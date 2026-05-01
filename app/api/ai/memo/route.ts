@@ -1,0 +1,3 @@
+import OpenAI from "openai";
+import { NextResponse } from "next/server";
+export async function POST(req:Request){const {context}=await req.json(); const client=new OpenAI({apiKey:process.env.OPENAI_API_KEY}); const sections=["Company Summary","Market Opportunity","Product Analysis","Traction Review","Financial Review","Founder Assessment","Key Risks","Suggested Questions","Investment Recommendation"].join(", "); const completion=await client.responses.create({model:"gpt-4.1",input:`Create investment memo with sections: ${sections}. Context: ${context}`}); return NextResponse.json({generated:true,disclaimer:"Assistant-generated; not financial advice.",memo:completion.output_text});}
