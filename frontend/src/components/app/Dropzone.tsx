@@ -1,6 +1,8 @@
 import { useState, useRef, type DragEvent } from "react";
-import { Upload, FileText, X, CheckCircle2 } from "lucide-react";
+import { Upload, FileText, X, CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth";
+import { uploadDocument, supabase } from "@/lib/supabase";
 
 export interface UploadedFile {
   id: string;
@@ -8,6 +10,7 @@ export interface UploadedFile {
   size: number;
   type: string;
   progress: number;
+  error?: boolean;
   rawFile?: File;
 }
 
@@ -15,14 +18,19 @@ export function Dropzone({
   onFiles,
   title = "Drag & drop or click to upload",
   hint = "Up to 50 MB · PDF, DOCX, XLSX, PNG",
+  dealRoomId,
+  onUploadComplete,
 }: {
   onFiles?: (files: UploadedFile[]) => void;
   title?: string;
   hint?: string;
+  dealRoomId?: string;
+  onUploadComplete?: () => void;
 }) {
   const [isOver, setIsOver] = useState(false);
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { user } = useAuth();
 
   const handleFiles = (list: FileList | null) => {
     if (!list || list.length === 0) return;
@@ -36,18 +44,38 @@ export function Dropzone({
     }));
     setFiles((xs) => [...next, ...xs]);
     onFiles?.(next);
-    // Mock progress animation
-    next.forEach((nf) => {
-      let p = 0;
-      const id = setInterval(() => {
-        p += Math.random() * 22 + 8;
-        if (p >= 100) {
-          p = 100;
-          clearInterval(id);
+
+    if (dealRoomId && user?.id) {
+      next.forEach(async (nf) => {
+        setFiles((xs) => xs.map((x) => x.id === nf.id ? { ...x, progress: 10 } : x));
+        const result = await uploadDocument(nf.rawFile!, dealRoomId, user.id);
+        if (result) {
+          await supabase.from("documents").insert({
+            deal_room_id: dealRoomId,
+            uploader_id: user.id,
+            storage_path: result.path,
+            category: "General",
+            status: "uploaded",
+          });
+          setFiles((xs) => xs.map((x) => x.id === nf.id ? { ...x, progress: 100 } : x));
+          onUploadComplete?.();
+        } else {
+          setFiles((xs) => xs.map((x) => x.id === nf.id ? { ...x, error: true } : x));
         }
-        setFiles((xs) => xs.map((x) => (x.id === nf.id ? { ...x, progress: Math.min(100, Math.round(p)) } : x)));
-      }, 220);
-    });
+      });
+    } else {
+      next.forEach((nf) => {
+        let p = 0;
+        const id = setInterval(() => {
+          p += Math.random() * 22 + 8;
+          if (p >= 100) {
+            p = 100;
+            clearInterval(id);
+          }
+          setFiles((xs) => xs.map((x) => (x.id === nf.id ? { ...x, progress: Math.min(100, Math.round(p)) } : x)));
+        }, 220);
+      });
+    }
   };
 
   const onDrop = (e: DragEvent) => {
@@ -94,11 +122,17 @@ export function Dropzone({
                   <div className="text-sm font-medium truncate">{f.name}</div>
                   <div className="text-[11px] text-muted-foreground tabular-nums shrink-0">{(f.size / 1024).toFixed(0)} KB</div>
                 </div>
-                <div className="mt-1.5 h-1 rounded-full bg-muted overflow-hidden">
-                  <div className="h-full bg-gradient-brand transition-all" style={{ width: `${f.progress}%` }} />
-                </div>
+                {f.error ? (
+                  <div className="mt-1.5 text-xs text-destructive">Upload failed — try again</div>
+                ) : (
+                  <div className="mt-1.5 h-1 rounded-full bg-muted overflow-hidden">
+                    <div className="h-full bg-gradient-brand transition-all" style={{ width: `${f.progress}%` }} />
+                  </div>
+                )}
               </div>
-              {f.progress === 100 ? (
+              {f.error ? (
+                <XCircle className="h-4 w-4 text-destructive shrink-0" />
+              ) : f.progress === 100 ? (
                 <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
               ) : (
                 <button

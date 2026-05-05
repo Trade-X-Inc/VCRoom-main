@@ -1,6 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { notifications, type Notification } from "@/lib/mock";
 import { useMemo, useState } from "react";
+
+interface Notification {
+  id: string;
+  kind: "deal" | "message" | "invite" | "system" | "ai";
+  title: string;
+  body: string;
+  time: string;
+  unread?: boolean;
+  actor?: string;
+}
+
+const notifications: Notification[] = [];
 import { Bell, MessageSquare, Briefcase, Sparkles, UserPlus, Settings, CheckCheck, Search } from "lucide-react";
 
 export const Route = createFileRoute("/app/notifications")({

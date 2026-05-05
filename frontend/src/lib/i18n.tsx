@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 export type Lang = "en" | "es" | "fr" | "de" | "ar";
 
@@ -166,9 +166,10 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     if (typeof window !== "undefined") localStorage.setItem(STORAGE_KEY, lang);
   }, [lang, dir]);
 
-  const t = (key: string) => dicts[lang][key] ?? dicts.en[key] ?? key;
+  const t = useMemo(() => (key: string) => dicts[lang][key] ?? dicts.en[key] ?? key, [lang]);
+  const ctx = useMemo(() => ({ lang, dir, setLang: setLangState, t }), [lang, dir, t]);
 
-  return <I18nContext.Provider value={{ lang, dir, setLang: setLangState, t }}>{children}</I18nContext.Provider>;
+  return <I18nContext.Provider value={ctx}>{children}</I18nContext.Provider>;
 }
 
 export function useI18n() {

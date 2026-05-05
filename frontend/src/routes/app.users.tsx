@@ -1,6 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { members, invites, type Role, type MemberStatus } from "@/lib/mock";
 import { useMemo, useState } from "react";
+
+type Role = "Owner" | "Admin" | "Member" | "Viewer";
+type MemberStatus = "Active" | "Pending" | "Suspended";
+interface Member {
+  id: string; name: string; email: string; initials: string;
+  role: Role; status: MemberStatus; lastActive: string;
+}
+interface Invite {
+  id: string; email: string; role: Role; scope: string;
+  sentBy: string; sentAt: string;
+  status: "Pending" | "Accepted" | "Expired" | "Revoked";
+}
+
+const members: Member[] = [];
+const invites: Invite[] = [];
 import { Users, UserPlus, Search, MoreHorizontal, Mail, Copy, Check, X } from "lucide-react";
 
 export const Route = createFileRoute("/app/users")({

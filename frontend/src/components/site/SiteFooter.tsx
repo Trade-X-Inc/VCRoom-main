@@ -36,8 +36,8 @@ export function SiteFooter() {
       links: [
         ["Changelog", "/"],
         ["Security", "/"],
-        ["Terms", "/"],
-        ["Privacy", "/"],
+        ["Terms", "/terms"],
+        ["Privacy", "/privacy"],
       ],
     },
   ];

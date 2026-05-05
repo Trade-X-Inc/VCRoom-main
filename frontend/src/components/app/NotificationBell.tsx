@@ -1,34 +1,70 @@
 import { Link } from "@tanstack/react-router";
-import { notifications, type Notification } from "@/lib/mock";
 import { Bell, MessageSquare, Briefcase, Sparkles, UserPlus, Settings, CheckCheck } from "lucide-react";
 import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
+import { formatDistanceToNow } from "date-fns";
 
-const iconFor = (k: Notification["kind"]) => {
-  switch (k) {
-    case "deal": return Briefcase;
-    case "message": return MessageSquare;
-    case "ai": return Sparkles;
-    case "invite": return UserPlus;
-    case "system": return Settings;
-  }
+type NotifType = "decision" | "message" | "invite" | "system" | string;
+
+interface NotifRow {
+  id: string;
+  title: string;
+  body: string;
+  type: NotifType;
+  read: boolean;
+  action_url: string | null;
+  created_at: string;
+}
+
+const iconFor = (type: NotifType) => {
+  if (type === "decision") return Briefcase;
+  if (type === "message") return MessageSquare;
+  if (type === "invite") return UserPlus;
+  if (type === "ai") return Sparkles;
+  return Settings;
 };
 
-const tintFor = (k: Notification["kind"]) => {
-  switch (k) {
-    case "deal": return "bg-success/10 text-success";
-    case "message": return "bg-brand/10 text-brand";
-    case "ai": return "bg-violet/10 text-violet";
-    case "invite": return "bg-warning/10 text-warning";
-    case "system": return "bg-muted text-muted-foreground";
-  }
+const tintFor = (type: NotifType) => {
+  if (type === "decision") return "bg-success/10 text-success";
+  if (type === "message") return "bg-brand/10 text-brand";
+  if (type === "invite") return "bg-warning/10 text-warning";
+  if (type === "ai") return "bg-violet/10 text-violet";
+  return "bg-muted text-muted-foreground";
 };
 
 export function NotificationBell() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [items, setItems] = useState(notifications);
-  const unread = items.filter((n) => n.unread).length;
 
-  const markAll = () => setItems((xs) => xs.map((n) => ({ ...n, unread: false })));
+  const { data: items = [] } = useQuery<NotifRow[]>({
+    queryKey: ["notifications", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("notifications")
+        .select("id, title, body, type, read, action_url, created_at")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      return (data ?? []) as NotifRow[];
+    },
+    refetchInterval: 30_000,
+  });
+
+  const unread = items.filter((n) => !n.read).length;
+
+  const markAll = async () => {
+    if (!user?.id || unread === 0) return;
+    await supabase
+      .from("notifications")
+      .update({ read: true })
+      .eq("user_id", user.id)
+      .eq("read", false);
+    queryClient.invalidateQueries({ queryKey: ["notifications", user.id] });
+  };
 
   return (
     <div className="relative">
@@ -56,22 +92,32 @@ export function NotificationBell() {
             </div>
 
             <div className="max-h-[420px] overflow-y-auto divide-y divide-border/60">
-              {items.slice(0, 6).map((n) => {
-                const Icon = iconFor(n.kind);
-                return (
-                  <div key={n.id} className={`flex gap-3 p-3.5 hover:bg-accent/50 transition-colors cursor-pointer ${n.unread ? "bg-brand/[0.02]" : ""}`}>
-                    <div className={`grid h-8 w-8 place-items-center rounded-md shrink-0 ${tintFor(n.kind)}`}>
+              {items.length === 0 && (
+                <div className="py-8 text-center text-xs text-muted-foreground">No notifications yet.</div>
+              )}
+              {items.slice(0, 10).map((n) => {
+                const Icon = iconFor(n.type);
+                const content = (
+                  <div className={`flex gap-3 p-3.5 hover:bg-accent/50 transition-colors cursor-pointer ${!n.read ? "bg-brand/[0.02]" : ""}`}>
+                    <div className={`grid h-8 w-8 place-items-center rounded-md shrink-0 ${tintFor(n.type)}`}>
                       <Icon className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <div className="text-sm font-medium leading-tight">{n.title}</div>
-                        {n.unread && <span className="h-1.5 w-1.5 rounded-full bg-brand mt-1.5 shrink-0" />}
+                        {!n.read && <span className="h-1.5 w-1.5 rounded-full bg-brand mt-1.5 shrink-0" />}
                       </div>
                       <div className="mt-0.5 text-xs text-muted-foreground line-clamp-2">{n.body}</div>
-                      <div className="mt-1 text-[10px] text-muted-foreground/70">{n.time}</div>
+                      <div className="mt-1 text-[10px] text-muted-foreground/70">
+                        {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
+                      </div>
                     </div>
                   </div>
+                );
+                return n.action_url ? (
+                  <Link key={n.id} to={n.action_url as any} onClick={() => setOpen(false)}>{content}</Link>
+                ) : (
+                  <div key={n.id}>{content}</div>
                 );
               })}
             </div>

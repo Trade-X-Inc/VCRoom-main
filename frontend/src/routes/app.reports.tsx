@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AppShell } from "@/components/app/AppShell";
 import { BarChart3, Download, FileText, FileSpreadsheet, TrendingUp, Briefcase, ClipboardCheck, ShieldCheck } from "lucide-react";
-import { deals, ddChecklist, auditLog } from "@/lib/mock";
 import { useI18n } from "@/lib/i18n";
 
+const deals: { firm: string; partner: string; check: string; stage: string; thesis: string }[] = [];
+const ddChecklist: { category: string; title: string; owner: string; due: string; status: string }[] = [];
+const auditLog: { actor: string; action: string; target: string; category: string; ip: string; time: string; severity: string }[] = [];
+
 export const Route = createFileRoute("/app/reports")({
-  component: () => <AppShell><Reports /></AppShell>,
+  component: Reports,
 });
 
 function downloadFile(filename: string, content: string, mime: string) {

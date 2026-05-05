@@ -3,9 +3,9 @@
 ## Runtime env variables
 
 Required in current code:
-- `NEXT_PUBLIC_SUPABASE_URL`
+- `VITE_SUPABASE_URL`
   - Used by: `lib/supabase.ts`, `lib/server-supabase.ts`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `VITE_SUPABASE_ANON_KEY`
   - Used by: `lib/supabase.ts`
 - `SUPABASE_SERVICE_ROLE_KEY`
   - Used by: `lib/server-supabase.ts` (admin client for server actions)
@@ -13,13 +13,13 @@ Required in current code:
   - Used by: `app/api/ai/summary/route.ts`, `app/api/ai/memo/route.ts`
 - `RESEND_API_KEY`
   - Present in env templates, but currently unused in code.
-- `NEXT_PUBLIC_APP_URL`
+- `VITE_APP_URL`
   - Present in env templates; no strong usage found in scanned backend code.
 
 Checklist:
 - [ ] Keep `.env.local` local-only.
 - [ ] Add production env vars in hosting platform secret manager.
-- [ ] Do not expose `SUPABASE_SERVICE_ROLE_KEY` to client-side code.
+- [ ] Do not prefix secret keys (OpenAI, Resend, Service Role) with `VITE_`.
 
 ## API/backend function inventory
 

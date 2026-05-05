@@ -6,6 +6,7 @@ import {
   PieChart, Brain, ClipboardCheck, ListChecks, ShieldCheck, UserCog, Kanban, BarChart3,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/app/NotificationBell";
 import { UserMenu } from "@/components/app/UserMenu";
@@ -13,12 +14,13 @@ import { ThemeToggle } from "@/components/app/ThemeToggle";
 import { LangSwitcher } from "@/components/app/LangSwitcher";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
+import { supabase } from "@/lib/supabase";
 
 interface NavItem { to: string; labelKey: string; icon: any; badge?: string; }
 
 const founderNav: NavItem[] = [
   { to: "/app", labelKey: "app.overview", icon: LayoutGrid },
-  { to: "/app/leads", labelKey: "app.leads", icon: Users, badge: "47" },
+  { to: "/app/leads", labelKey: "app.leads", icon: Users },
   { to: "/app/pipeline", labelKey: "app.pipeline", icon: Kanban },
   { to: "/app/email", labelKey: "app.email", icon: Mail },
   { to: "/app/profile", labelKey: "app.profile", icon: Building2 },
@@ -50,9 +52,21 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   const isInvestor = path.startsWith("/app/investor");
   const nav = isInvestor ? investorNav : founderNav;
   const [collapsed, setCollapsed] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
+
+  const { data: leadCount } = useQuery({
+    queryKey: ["lead-count", user?.id],
+    enabled: !!user?.id && !isInvestor,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("vc_leads")
+        .select("*", { count: "exact", head: true })
+        .eq("founder_id", user!.id);
+      return count ?? 0;
+    },
+  });
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -78,11 +92,13 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
 
         <div className="px-3 py-3">
           <div className={cn("flex items-center gap-2 rounded-lg border border-border/60 bg-background/60 px-2.5 py-2", collapsed && "justify-center")}>
-            <div className="grid h-6 w-6 place-items-center rounded-md bg-gradient-brand text-[10px] font-semibold text-brand-foreground">AR</div>
+            <div className="grid h-6 w-6 place-items-center rounded-md bg-gradient-brand text-[10px] font-semibold text-brand-foreground">
+              {user?.initials ?? "VR"}
+            </div>
             {!collapsed && (
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium truncate">{isInvestor ? "Northwind Capital" : "Atlas Robotics"}</div>
-                <div className="text-[10px] text-muted-foreground">{isInvestor ? "Fund · GP" : "Series A"}</div>
+                <div className="text-xs font-medium truncate">{user?.workspace ?? user?.name ?? "Workspace"}</div>
+                <div className="text-[10px] text-muted-foreground capitalize">{user?.appRole ?? "founder"}</div>
               </div>
             )}
           </div>
@@ -104,9 +120,14 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
               >
                 <n.icon className={cn("h-4 w-4", active && "text-brand")} />
                 {!collapsed && <span className="flex-1">{t(n.labelKey)}</span>}
-                {!collapsed && n.badge && (
-                  <span className="text-[10px] rounded-full bg-background border border-border/60 px-1.5 py-0.5 text-muted-foreground">{n.badge}</span>
-                )}
+                {!collapsed && (() => {
+                  const display = n.to === "/app/leads"
+                    ? (leadCount && leadCount > 0 ? String(leadCount) : undefined)
+                    : n.badge;
+                  return display
+                    ? <span className="text-[10px] rounded-full bg-background border border-border/60 px-1.5 py-0.5 text-muted-foreground">{display}</span>
+                    : null;
+                })()}
               </Link>
             );
           })}
@@ -128,22 +149,12 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                 );
               })}
 
-              <div className="pt-4">
-                <div className="px-2 pb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t("app.switchView")}</div>
-                <Link
-                  to={isInvestor ? "/app" : "/app/investor"}
-                  className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-muted-foreground hover:bg-accent/60 hover:text-foreground"
-                >
-                  <Briefcase className="h-4 w-4" />
-                  <span>{isInvestor ? t("app.founderView") : t("app.investorView")}</span>
-                </Link>
-              </div>
             </>
           )}
         </nav>
 
         <div className="p-3 border-t border-border/60">
-          <Link to={"/app/profile" as any} className={cn("flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-muted-foreground hover:bg-accent/60 hover:text-foreground", collapsed && "justify-center")}>
+          <Link to={"/app/settings" as any} className={cn("flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-muted-foreground hover:bg-accent/60 hover:text-foreground", collapsed && "justify-center")}>
             <Settings className="h-4 w-4" />
             {!collapsed && <span>Settings</span>}
           </Link>
@@ -167,13 +178,15 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
               <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground border border-border/60 rounded px-1.5 py-0.5">⌘K</kbd>
             </div>
           </div>
-          <button className="grid h-9 w-9 place-items-center rounded-md border border-border/60 hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
-            <Plus className="h-4 w-4" />
-          </button>
-          <LangSwitcher />
-          <ThemeToggle />
-          <NotificationBell />
-          <UserMenu />
+          <div className="ml-auto flex items-center gap-2">
+            <button className="grid h-9 w-9 place-items-center rounded-md border border-border/60 hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
+              <Plus className="h-4 w-4" />
+            </button>
+            <LangSwitcher />
+            <ThemeToggle />
+            <NotificationBell />
+            <UserMenu />
+          </div>
         </header>
         <main className="flex-1 min-w-0">{children ?? <Outlet />}</main>
       </div>

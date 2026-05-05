@@ -1,6 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { auditLog, type AuditEntry } from "@/lib/mock";
 import { useMemo, useState } from "react";
+
+type AuditSeverity = "info" | "warn" | "critical";
+interface AuditEntry {
+  id: string;
+  actor: string;
+  initials: string;
+  action: string;
+  target: string;
+  category: "Auth" | "Document" | "Deal Room" | "Invite" | "Settings" | "AI";
+  ip: string;
+  time: string;
+  severity: AuditSeverity;
+}
+
+const auditLog: AuditEntry[] = [];
 import { ShieldCheck, Search, Download, AlertTriangle, Activity } from "lucide-react";
 
 export const Route = createFileRoute("/app/audit")({

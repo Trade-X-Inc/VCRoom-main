@@ -9,13 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as InvestorsRouteImport } from './routes/investors'
 import { Route as FoundersRouteImport } from './routes/founders'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AppRouteImport } from './routes/app'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as SolutionsVcDealRoomRouteImport } from './routes/solutions.vc-deal-room'
@@ -25,6 +28,7 @@ import { Route as SolutionsFundraisingCrmRouteImport } from './routes/solutions.
 import { Route as SolutionsDueDiligenceRouteImport } from './routes/solutions.due-diligence'
 import { Route as JoinTokenRouteImport } from './routes/join.$token'
 import { Route as AppUsersRouteImport } from './routes/app.users'
+import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppReportsRouteImport } from './routes/app.reports'
 import { Route as AppProfileRouteImport } from './routes/app.profile'
 import { Route as AppPipelineRouteImport } from './routes/app.pipeline'
@@ -38,14 +42,23 @@ import { Route as AppDealRoomsRouteImport } from './routes/app.deal-rooms'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
 import { Route as AppAdvisorRouteImport } from './routes/app.advisor'
 import { Route as AppInvestorIndexRouteImport } from './routes/app.investor.index'
+import { Route as AppSettingsSecurityRouteImport } from './routes/app.settings.security'
 import { Route as AppSettingsNotificationsRouteImport } from './routes/app.settings.notifications'
+import { Route as AppSettingsDomainRouteImport } from './routes/app.settings.domain'
+import { Route as AppSettingsBillingRouteImport } from './routes/app.settings.billing'
 import { Route as AppInvestorStartupsRouteImport } from './routes/app.investor.startups'
 import { Route as AppInvestorDiligenceRouteImport } from './routes/app.investor.diligence'
 import { Route as AppInvestorDecisionsRouteImport } from './routes/app.investor.decisions'
 import { Route as AppInvestorDealRoomsRouteImport } from './routes/app.investor.deal-rooms'
 import { Route as AppInvestorAnalysisRouteImport } from './routes/app.investor.analysis'
 import { Route as AppDealRoomIdRouteImport } from './routes/app.deal-room.$id'
+import { Route as AppDealRoomIdNdaRouteImport } from './routes/app.deal-room.$id_.nda'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignUpRoute = SignUpRouteImport.update({
   id: '/sign-up',
   path: '/sign-up',
@@ -54,6 +67,11 @@ const SignUpRoute = SignUpRouteImport.update({
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
   path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -79,6 +97,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const AppRoute = AppRouteImport.update({
   id: '/app',
   path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -125,6 +148,11 @@ const JoinTokenRoute = JoinTokenRouteImport.update({
 const AppUsersRoute = AppUsersRouteImport.update({
   id: '/users',
   path: '/users',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AppRoute,
 } as any)
 const AppReportsRoute = AppReportsRouteImport.update({
@@ -192,12 +220,27 @@ const AppInvestorIndexRoute = AppInvestorIndexRouteImport.update({
   path: '/investor/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppSettingsSecurityRoute = AppSettingsSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
 const AppSettingsNotificationsRoute =
   AppSettingsNotificationsRouteImport.update({
-    id: '/settings/notifications',
-    path: '/settings/notifications',
-    getParentRoute: () => AppRoute,
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AppSettingsRoute,
   } as any)
+const AppSettingsDomainRoute = AppSettingsDomainRouteImport.update({
+  id: '/domain',
+  path: '/domain',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
+const AppSettingsBillingRoute = AppSettingsBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
 const AppInvestorStartupsRoute = AppInvestorStartupsRouteImport.update({
   id: '/investor/startups',
   path: '/investor/startups',
@@ -228,16 +271,24 @@ const AppDealRoomIdRoute = AppDealRoomIdRouteImport.update({
   path: '/deal-room/$id',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDealRoomIdNdaRoute = AppDealRoomIdNdaRouteImport.update({
+  id: '/deal-room/$id_/nda',
+  path: '/deal-room/$id/nda',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/app': typeof AppRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
   '/investors': typeof InvestorsRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/terms': typeof TermsRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
@@ -250,6 +301,7 @@ export interface FileRoutesByFullPath {
   '/app/pipeline': typeof AppPipelineRoute
   '/app/profile': typeof AppProfileRoute
   '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/users': typeof AppUsersRoute
   '/join/$token': typeof JoinTokenRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
@@ -264,17 +316,24 @@ export interface FileRoutesByFullPath {
   '/app/investor/decisions': typeof AppInvestorDecisionsRoute
   '/app/investor/diligence': typeof AppInvestorDiligenceRoute
   '/app/investor/startups': typeof AppInvestorStartupsRoute
+  '/app/settings/billing': typeof AppSettingsBillingRoute
+  '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
+  '/app/settings/security': typeof AppSettingsSecurityRoute
   '/app/investor/': typeof AppInvestorIndexRoute
+  '/app/deal-room/$id/nda': typeof AppDealRoomIdNdaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
   '/investors': typeof InvestorsRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/terms': typeof TermsRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
@@ -287,6 +346,7 @@ export interface FileRoutesByTo {
   '/app/pipeline': typeof AppPipelineRoute
   '/app/profile': typeof AppProfileRoute
   '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/users': typeof AppUsersRoute
   '/join/$token': typeof JoinTokenRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
@@ -301,19 +361,26 @@ export interface FileRoutesByTo {
   '/app/investor/decisions': typeof AppInvestorDecisionsRoute
   '/app/investor/diligence': typeof AppInvestorDiligenceRoute
   '/app/investor/startups': typeof AppInvestorStartupsRoute
+  '/app/settings/billing': typeof AppSettingsBillingRoute
+  '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
+  '/app/settings/security': typeof AppSettingsSecurityRoute
   '/app/investor': typeof AppInvestorIndexRoute
+  '/app/deal-room/$id/nda': typeof AppDealRoomIdNdaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/app': typeof AppRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
   '/investors': typeof InvestorsRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/terms': typeof TermsRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
@@ -326,6 +393,7 @@ export interface FileRoutesById {
   '/app/pipeline': typeof AppPipelineRoute
   '/app/profile': typeof AppProfileRoute
   '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/users': typeof AppUsersRoute
   '/join/$token': typeof JoinTokenRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
@@ -340,20 +408,27 @@ export interface FileRoutesById {
   '/app/investor/decisions': typeof AppInvestorDecisionsRoute
   '/app/investor/diligence': typeof AppInvestorDiligenceRoute
   '/app/investor/startups': typeof AppInvestorStartupsRoute
+  '/app/settings/billing': typeof AppSettingsBillingRoute
+  '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
+  '/app/settings/security': typeof AppSettingsSecurityRoute
   '/app/investor/': typeof AppInvestorIndexRoute
+  '/app/deal-room/$id_/nda': typeof AppDealRoomIdNdaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/app'
     | '/forgot-password'
     | '/founders'
     | '/investors'
     | '/pricing'
+    | '/privacy'
     | '/sign-in'
     | '/sign-up'
+    | '/terms'
     | '/app/advisor'
     | '/app/audit'
     | '/app/deal-rooms'
@@ -366,6 +441,7 @@ export interface FileRouteTypes {
     | '/app/pipeline'
     | '/app/profile'
     | '/app/reports'
+    | '/app/settings'
     | '/app/users'
     | '/join/$token'
     | '/solutions/due-diligence'
@@ -380,17 +456,24 @@ export interface FileRouteTypes {
     | '/app/investor/decisions'
     | '/app/investor/diligence'
     | '/app/investor/startups'
+    | '/app/settings/billing'
+    | '/app/settings/domain'
     | '/app/settings/notifications'
+    | '/app/settings/security'
     | '/app/investor/'
+    | '/app/deal-room/$id/nda'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/forgot-password'
     | '/founders'
     | '/investors'
     | '/pricing'
+    | '/privacy'
     | '/sign-in'
     | '/sign-up'
+    | '/terms'
     | '/app/advisor'
     | '/app/audit'
     | '/app/deal-rooms'
@@ -403,6 +486,7 @@ export interface FileRouteTypes {
     | '/app/pipeline'
     | '/app/profile'
     | '/app/reports'
+    | '/app/settings'
     | '/app/users'
     | '/join/$token'
     | '/solutions/due-diligence'
@@ -417,18 +501,25 @@ export interface FileRouteTypes {
     | '/app/investor/decisions'
     | '/app/investor/diligence'
     | '/app/investor/startups'
+    | '/app/settings/billing'
+    | '/app/settings/domain'
     | '/app/settings/notifications'
+    | '/app/settings/security'
     | '/app/investor'
+    | '/app/deal-room/$id/nda'
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/app'
     | '/forgot-password'
     | '/founders'
     | '/investors'
     | '/pricing'
+    | '/privacy'
     | '/sign-in'
     | '/sign-up'
+    | '/terms'
     | '/app/advisor'
     | '/app/audit'
     | '/app/deal-rooms'
@@ -441,6 +532,7 @@ export interface FileRouteTypes {
     | '/app/pipeline'
     | '/app/profile'
     | '/app/reports'
+    | '/app/settings'
     | '/app/users'
     | '/join/$token'
     | '/solutions/due-diligence'
@@ -455,19 +547,26 @@ export interface FileRouteTypes {
     | '/app/investor/decisions'
     | '/app/investor/diligence'
     | '/app/investor/startups'
+    | '/app/settings/billing'
+    | '/app/settings/domain'
     | '/app/settings/notifications'
+    | '/app/settings/security'
     | '/app/investor/'
+    | '/app/deal-room/$id_/nda'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AppRoute: typeof AppRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   FoundersRoute: typeof FoundersRoute
   InvestorsRoute: typeof InvestorsRoute
   PricingRoute: typeof PricingRoute
+  PrivacyRoute: typeof PrivacyRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
+  TermsRoute: typeof TermsRoute
   JoinTokenRoute: typeof JoinTokenRoute
   SolutionsDueDiligenceRoute: typeof SolutionsDueDiligenceRoute
   SolutionsFundraisingCrmRoute: typeof SolutionsFundraisingCrmRoute
@@ -478,6 +577,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sign-up': {
       id: '/sign-up'
       path: '/sign-up'
@@ -490,6 +596,13 @@ declare module '@tanstack/react-router' {
       path: '/sign-in'
       fullPath: '/sign-in'
       preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -525,6 +638,13 @@ declare module '@tanstack/react-router' {
       path: '/app'
       fullPath: '/app'
       preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -588,6 +708,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/app/users'
       preLoaderRoute: typeof AppUsersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/reports': {
@@ -681,12 +808,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/settings/security': {
+      id: '/app/settings/security'
+      path: '/security'
+      fullPath: '/app/settings/security'
+      preLoaderRoute: typeof AppSettingsSecurityRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
     '/app/settings/notifications': {
       id: '/app/settings/notifications'
-      path: '/settings/notifications'
+      path: '/notifications'
       fullPath: '/app/settings/notifications'
       preLoaderRoute: typeof AppSettingsNotificationsRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppSettingsRoute
+    }
+    '/app/settings/domain': {
+      id: '/app/settings/domain'
+      path: '/domain'
+      fullPath: '/app/settings/domain'
+      preLoaderRoute: typeof AppSettingsDomainRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
+    '/app/settings/billing': {
+      id: '/app/settings/billing'
+      path: '/billing'
+      fullPath: '/app/settings/billing'
+      preLoaderRoute: typeof AppSettingsBillingRouteImport
+      parentRoute: typeof AppSettingsRoute
     }
     '/app/investor/startups': {
       id: '/app/investor/startups'
@@ -730,8 +878,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDealRoomIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/deal-room/$id_/nda': {
+      id: '/app/deal-room/$id_/nda'
+      path: '/deal-room/$id/nda'
+      fullPath: '/app/deal-room/$id/nda'
+      preLoaderRoute: typeof AppDealRoomIdNdaRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
+
+interface AppSettingsRouteChildren {
+  AppSettingsBillingRoute: typeof AppSettingsBillingRoute
+  AppSettingsDomainRoute: typeof AppSettingsDomainRoute
+  AppSettingsNotificationsRoute: typeof AppSettingsNotificationsRoute
+  AppSettingsSecurityRoute: typeof AppSettingsSecurityRoute
+}
+
+const AppSettingsRouteChildren: AppSettingsRouteChildren = {
+  AppSettingsBillingRoute: AppSettingsBillingRoute,
+  AppSettingsDomainRoute: AppSettingsDomainRoute,
+  AppSettingsNotificationsRoute: AppSettingsNotificationsRoute,
+  AppSettingsSecurityRoute: AppSettingsSecurityRoute,
+}
+
+const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(
+  AppSettingsRouteChildren,
+)
 
 interface AppRouteChildren {
   AppAdvisorRoute: typeof AppAdvisorRoute
@@ -746,6 +919,7 @@ interface AppRouteChildren {
   AppPipelineRoute: typeof AppPipelineRoute
   AppProfileRoute: typeof AppProfileRoute
   AppReportsRoute: typeof AppReportsRoute
+  AppSettingsRoute: typeof AppSettingsRouteWithChildren
   AppUsersRoute: typeof AppUsersRoute
   AppIndexRoute: typeof AppIndexRoute
   AppDealRoomIdRoute: typeof AppDealRoomIdRoute
@@ -754,8 +928,8 @@ interface AppRouteChildren {
   AppInvestorDecisionsRoute: typeof AppInvestorDecisionsRoute
   AppInvestorDiligenceRoute: typeof AppInvestorDiligenceRoute
   AppInvestorStartupsRoute: typeof AppInvestorStartupsRoute
-  AppSettingsNotificationsRoute: typeof AppSettingsNotificationsRoute
   AppInvestorIndexRoute: typeof AppInvestorIndexRoute
+  AppDealRoomIdNdaRoute: typeof AppDealRoomIdNdaRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -771,6 +945,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppPipelineRoute: AppPipelineRoute,
   AppProfileRoute: AppProfileRoute,
   AppReportsRoute: AppReportsRoute,
+  AppSettingsRoute: AppSettingsRouteWithChildren,
   AppUsersRoute: AppUsersRoute,
   AppIndexRoute: AppIndexRoute,
   AppDealRoomIdRoute: AppDealRoomIdRoute,
@@ -779,21 +954,24 @@ const AppRouteChildren: AppRouteChildren = {
   AppInvestorDecisionsRoute: AppInvestorDecisionsRoute,
   AppInvestorDiligenceRoute: AppInvestorDiligenceRoute,
   AppInvestorStartupsRoute: AppInvestorStartupsRoute,
-  AppSettingsNotificationsRoute: AppSettingsNotificationsRoute,
   AppInvestorIndexRoute: AppInvestorIndexRoute,
+  AppDealRoomIdNdaRoute: AppDealRoomIdNdaRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AppRoute: AppRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   FoundersRoute: FoundersRoute,
   InvestorsRoute: InvestorsRoute,
   PricingRoute: PricingRoute,
+  PrivacyRoute: PrivacyRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
+  TermsRoute: TermsRoute,
   JoinTokenRoute: JoinTokenRoute,
   SolutionsDueDiligenceRoute: SolutionsDueDiligenceRoute,
   SolutionsFundraisingCrmRoute: SolutionsFundraisingCrmRoute,

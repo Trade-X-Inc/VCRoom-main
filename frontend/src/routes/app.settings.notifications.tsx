@@ -1,13 +1,35 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AppShell } from "@/components/app/AppShell";
 import { useState } from "react";
-import { notifRulesDefault, type NotifRule } from "@/lib/mock";
 import { Bell, Mail, Smartphone, Save, Briefcase, FileText, MessageSquare, UserPlus, Sparkles } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
+interface NotifRule {
+  id: string;
+  group: "Deal activity" | "Documents" | "Messages" | "Team & invites" | "AI insights";
+  label: string;
+  description: string;
+  email: boolean;
+  inApp: boolean;
+  push: boolean;
+}
+
+const notifRulesDefault: NotifRule[] = [
+  { id: "r1", group: "Deal activity", label: "Investor opened deal room", description: "Get notified when an investor first enters a room.", email: true, inApp: true, push: false },
+  { id: "r2", group: "Deal activity", label: "NDA signed", description: "Legal milestone — high-signal event.", email: true, inApp: true, push: true },
+  { id: "r3", group: "Deal activity", label: "Stage changed", description: "When a deal moves between pipeline stages.", email: false, inApp: true, push: false },
+  { id: "r4", group: "Documents", label: "Document downloaded", description: "Track who downloads sensitive files.", email: false, inApp: true, push: false },
+  { id: "r5", group: "Documents", label: "New document uploaded", description: "Workspace-wide upload notifications.", email: true, inApp: true, push: false },
+  { id: "r6", group: "Messages", label: "New question in Q&A", description: "When an investor asks a question.", email: true, inApp: true, push: true },
+  { id: "r7", group: "Messages", label: "Direct message", description: "1:1 messages from investors or team.", email: true, inApp: true, push: true },
+  { id: "r8", group: "Team & invites", label: "Invite accepted", description: "When someone joins via invite link.", email: true, inApp: true, push: false },
+  { id: "r9", group: "Team & invites", label: "New team member added", description: "Workspace membership changes.", email: true, inApp: true, push: false },
+  { id: "r10", group: "AI insights", label: "Weekly AI brief", description: "Mondays at 9 AM — round summary.", email: true, inApp: false, push: false },
+  { id: "r11", group: "AI insights", label: "Stalled investor flagged", description: "AI detects an at-risk relationship.", email: true, inApp: true, push: true },
+];
+
 export const Route = createFileRoute("/app/settings/notifications")({
-  component: () => <AppShell><NotifRulesPage /></AppShell>,
+  component: NotifRulesPage,
 });
 
 const groupIcon: Record<NotifRule["group"], any> = {

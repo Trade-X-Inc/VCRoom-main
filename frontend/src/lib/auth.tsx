@@ -1,20 +1,25 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 
+export type AppRole = "founder" | "investor";
+
 export interface AppUser {
   id: string;
   name: string;
   email: string;
   initials: string;
-  role: "founder" | "investor";
+  role: "Owner" | "Admin" | "Member" | "Viewer";
+  appRole: AppRole;
+  workspace: string;
 }
 
 interface AuthCtx {
   user: AppUser | null;
   isAuthenticated: boolean;
-  signIn: (email: string, _password: string) => Promise<void>;
-  signUp: (name: string, email: string, _password: string, inviteToken?: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (name: string, email: string, password: string, inviteToken?: string) => Promise<void>;
   signOut: () => Promise<void>;
+  setAppRole: (r: AppRole) => void;
 }
 
 const Ctx = createContext<AuthCtx | null>(null);
@@ -25,19 +30,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const buildUser = async (userId: string, email: string): Promise<AppUser> => {
     const { data } = await supabase.from("users").select("full_name, role").eq("id", userId).single();
-    const name = data?.full_name || email.split("@")[0] || "User";
-    const initials = name
-      .split(" ")
-      .map((s) => s[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
+    const name: string = (data?.full_name as string | null) || email.split("@")[0] || "User";
+    const initials = name.split(" ").map((s) => s[0]).slice(0, 2).join("").toUpperCase() || "VR";
+    const appRole: AppRole = data?.role === "investor" ? "investor" : "founder";
     return {
       id: userId,
       email,
       name,
-      initials: initials || "VR",
-      role: data?.role === "investor" ? "investor" : "founder",
+      initials,
+      role: "Owner",
+      appRole,
+      workspace: appRole === "investor" ? "Investor Workspace" : "Founder Workspace",
     };
   };
 
@@ -48,6 +51,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setHydrated(true);
     });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user?.id && session.user.email) {
+        setUser(await buildUser(session.user.id, session.user.email));
+      } else if (event === "SIGNED_OUT") {
+        setUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const signIn = async (email: string, password: string) => {
@@ -57,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(await buildUser(data.user.id, data.user.email));
   };
 
-  const signUp = async (name: string, email: string, password: string, _token?: string) => {
+  const signUp = async (name: string, email: string, password: string, _inviteToken?: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -65,12 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     if (error) throw error;
     if (!data.user?.id) throw new Error("Sign-up failed.");
-    await supabase.from("users").upsert({
-      id: data.user.id,
-      email,
-      role: "founder",
-      full_name: name,
-    });
+    await supabase.from("users").upsert({ id: data.user.id, email, role: "founder", full_name: name });
     setUser(await buildUser(data.user.id, email));
   };
 
@@ -79,8 +87,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const setAppRole = (r: AppRole) => {
+    if (!user) return;
+    setUser({ ...user, appRole: r, workspace: r === "investor" ? "Investor Workspace" : "Founder Workspace" });
+  };
+
   return (
-    <Ctx.Provider value={{ user: hydrated ? user : null, isAuthenticated: !!user, signIn, signUp, signOut }}>
+    <Ctx.Provider value={{ user: hydrated ? user : null, isAuthenticated: !!user, signIn, signUp, signOut, setAppRole }}>
       {children}
     </Ctx.Provider>
   );

@@ -9,6 +9,15 @@ export interface Lead {
   thesis: string;
   initials: string;
   hot?: boolean;
+  email?: string;
+  role?: string;
+  location?: string;
+  linkedin?: string;
+  twitter?: string;
+  bio?: string;
+  portfolio?: string[];
+  lastTouch?: string;
+  nextStep?: string;
 }
 
 export const stages: Stage[] = ["New", "Contacted", "Replied", "Meeting", "Interested", "Deal Room", "Rejected"];

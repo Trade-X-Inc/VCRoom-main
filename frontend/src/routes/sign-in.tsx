@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-r
 import { useState } from "react";
 import { AuthLayout, Divider, Field, GoogleButton } from "@/components/auth/AuthLayout";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 import { ArrowRight, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/sign-in")({
@@ -33,7 +34,10 @@ function SignInPage() {
   };
 
   const google = async () => {
-    setError("Google login is not configured yet.");
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin + "/app" },
+    });
   };
 
   return (
