@@ -1,25 +1,51 @@
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { resolve } from "path";
+import { existsSync, readFileSync, writeFileSync } from "fs";
+import { execSync } from "child_process";
 
-// Fix asset directory path in the auto-generated dist/server/wrangler.json.
-// The adapter writes "../client" (relative to dist/server/) but wrangler
-// resolves it from CWD when run from frontend/, causing assets to be missed.
-// Using an absolute path removes the ambiguity.
-const wranglerPath = "dist/server/wrangler.json";
+// 1. Remove "assets" key from dist/client/wrangler.json
+// Pages does not support the "assets" config key.
+const pagesWranglerPath = "dist/client/wrangler.json";
+if (existsSync(pagesWranglerPath)) {
+  const cfg = JSON.parse(readFileSync(pagesWranglerPath, "utf8"));
+  if (cfg.assets !== undefined) {
+    delete cfg.assets;
+    writeFileSync(pagesWranglerPath, JSON.stringify(cfg));
+    console.log("✓ Removed 'assets' key from dist/client/wrangler.json");
+  }
+}
 
-if (!existsSync(wranglerPath)) {
-  console.error("✘ dist/server/wrangler.json not found — did the build run?");
+// 2. Bundle dist/server/server.js → dist/client/_worker.js
+// Pages Advanced Mode: _worker.js handles SSR, Pages CDN serves static assets.
+if (!existsSync("dist/server/server.js")) {
+  console.error("✘ dist/server/server.js not found — did the build run?");
   process.exit(1);
 }
 
-const cfg = JSON.parse(readFileSync(wranglerPath, "utf8"));
+console.log("Bundling server.js → _worker.js ...");
+execSync(
+  [
+    "node_modules/.bin/esbuild",
+    "dist/server/server.js",
+    "--bundle",
+    "--format=esm",
+    "--platform=browser",
+    "--external:node:*",
+    "--conditions=worker,browser",
+    "--outfile=dist/client/_worker.js",
+    "--log-level=warning",
+  ].join(" "),
+  { stdio: "inherit" }
+);
 
-if (cfg.assets) {
-  cfg.assets.directory = resolve("dist/client");
-  // Remove binding — Cloudflare routes matching assets directly before
-  // invoking the Worker. Binding is only needed for programmatic access
-  // inside the Worker, which this app doesn't use.
-  delete cfg.assets.binding;
-  writeFileSync(wranglerPath, JSON.stringify(cfg));
-  console.log("✓ Patched dist/server/wrangler.json: absolute assets path, binding removed");
+// 3. Prepend MessageChannel polyfill
+// react-dom/server.browser uses MessageChannel which may not be available
+// in all Cloudflare Pages environments. This polyfill is a no-op when the
+// runtime already provides it.
+const polyfill = `\
+if(typeof MessageChannel==="undefined"){
+  class _MC{constructor(){this.port1={onmessage:null,postMessage:(d)=>{this.port2.onmessage&&this.port2.onmessage({data:d})}};this.port2={onmessage:null,postMessage:(d)=>{this.port1.onmessage&&this.port1.onmessage({data:d})}}}}
+  globalThis.MessageChannel=_MC;
 }
+`;
+const workerCode = readFileSync("dist/client/_worker.js", "utf8");
+writeFileSync("dist/client/_worker.js", polyfill + workerCode);
+console.log("✓ dist/client/_worker.js ready (with MessageChannel polyfill)");

@@ -5,12 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev --host",
-    "prebuild": "node -e \"const fs=require('fs');fs.mkdirSync('dist/server',{recursive:true});if(!fs.existsSync('dist/server/index.js'))fs.writeFileSync('dist/server/index.js','');\"",
     "build": "vite build",
     "postbuild": "node scripts/patch-wrangler.mjs",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
-    "deploy": "npm run build && wrangler deploy",
+    "deploy": "npm run build && wrangler pages deploy ./dist/client --project-name vcroom-main --commit-dirty=true",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
