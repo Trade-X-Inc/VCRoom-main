@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ddChecklist as seed, type DDItem, type DDStatus } from "@/lib/mock";
+import { type DDItem, type DDStatus } from "@/lib/mock";
 import { CheckCircle2, Circle, Clock, AlertTriangle, Plus, Filter } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -15,7 +15,7 @@ const cycle: Record<DDStatus, DDStatus> = { todo: "in_progress", in_progress: "d
 
 export function DDChecklist() {
   const { t } = useI18n();
-  const [items, setItems] = useState<DDItem[]>(seed);
+  const [items, setItems] = useState<DDItem[]>([]);
   const [filter, setFilter] = useState<"all" | DDStatus>("all");
 
   const filtered = useMemo(() => filter === "all" ? items : items.filter((i) => i.status === filter), [items, filter]);
@@ -27,7 +27,7 @@ export function DDChecklist() {
 
   const total = items.length;
   const done = items.filter((i) => i.status === "done").length;
-  const overall = Math.round((done / total) * 100);
+  const overall = total > 0 ? Math.round((done / total) * 100) : 0;
 
   const cycleStatus = (id: string) =>
     setItems((xs) => xs.map((x) => (x.id === id ? { ...x, status: cycle[x.status] } : x)));

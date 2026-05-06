@@ -14,20 +14,11 @@ const templates = [
   { k: "intro", label: "Warm intro reply" },
 ];
 
-const sample = `Hi Marcus,
-
-Quick note — Atlas Robotics is closing our Series A. We've grown ARR 4.2x in the last 12 months and just signed two F500 pilots in industrial automation.
-
-Given a16z's recent thesis around physical AI, I think there's a strong fit. Would you be open to a 20-minute call next week?
-
-Pitch deck attached. Happy to share the data room afterward.
-
-Best,
-Jordan`;
+const sample = "";
 
 function EmailComposer() {
   const [tab, setTab] = useState("cold");
-  const [to, setTo] = useState("marcus@a16z.com");
+  const [to, setTo] = useState("");
   const [body, setBody] = useState(sample);
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState("");
@@ -37,9 +28,9 @@ function EmailComposer() {
     try {
       await postJson("/api/invites", {
         to,
-        subject: "Atlas Robotics — Series A · physical AI",
+        subject: "Venture Room — Invitation",
         message: body,
-        inviteLink: "https://app.ventureroom.com/join/vr_invite_a8f3k2x",
+        inviteLink: window.location.origin + "/join",
       });
       setStatus("Invite email sent.");
     } catch (error) {
@@ -74,12 +65,8 @@ function EmailComposer() {
 
           <div className="rounded-xl border border-border/60 bg-card p-4 shadow-card">
             <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Recipient</div>
-            <div className="mt-3 flex items-center gap-2.5 rounded-md border border-border/60 bg-background/60 p-2.5">
-              <div className="grid h-8 w-8 place-items-center rounded-md bg-gradient-brand text-brand-foreground text-[11px] font-semibold">MV</div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium">Marcus Vale</div>
-                <div className="text-xs text-muted-foreground truncate">a16z · Dev tools</div>
-              </div>
+            <div className="mt-3">
+              <input value={to} onChange={(e) => setTo(e.target.value)} placeholder="investor@firm.com" className="w-full rounded-md border border-border/60 bg-background/60 px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
             </div>
             <div className="mt-3 text-xs text-muted-foreground">Tone</div>
             <div className="mt-1.5 flex gap-1.5">
@@ -101,13 +88,13 @@ function EmailComposer() {
           </div>
 
           <div className="p-5 space-y-3">
-            <div className="flex gap-2 text-sm">
+            <div className="flex gap-2 text-sm items-center">
               <span className="text-muted-foreground w-16">To</span>
-              <input value={to} onChange={(e) => setTo(e.target.value)} className="font-medium bg-transparent border-b border-border/40 focus:outline-none" />
+              <span className="font-medium text-sm">{to || <span className="text-muted-foreground italic">Enter recipient above</span>}</span>
             </div>
             <div className="flex gap-2 text-sm">
               <span className="text-muted-foreground w-16">Subject</span>
-              <span className="font-medium">Atlas Robotics — Series A · physical AI</span>
+              <span className="font-medium text-muted-foreground italic">AI-generated subject line</span>
             </div>
             <div className="border-t border-border/60 pt-4">
               <textarea

@@ -55,13 +55,11 @@ function Placeholder({ title, sub, messages, meId, draft, onDraft, onSend }: { t
       <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
       <div className="text-sm text-muted-foreground">{sub}</div>
       <div className="mt-6 grid grid-cols-[280px_1fr] gap-0 rounded-xl border border-border/60 bg-card shadow-card overflow-hidden min-h-[500px]">
-        <div className="border-r border-border/60">
-          {["Marcus Vale · a16z", "Sara Khan · NEA", "Hana Ito · Index", "Priya Shah · Lightspeed", "Tom Reid · Kleiner"].map((n, i) => (
-            <div key={n} className={`px-4 py-3 border-b border-border/60 cursor-pointer ${i === 0 ? "bg-accent" : "hover:bg-accent/40"}`}>
-              <div className="text-sm font-medium truncate">{n.split(" · ")[0]}</div>
-              <div className="text-xs text-muted-foreground truncate">{n.split(" · ")[1]} · 2h</div>
-            </div>
-          ))}
+        <div className="border-r border-border/60 flex flex-col">
+          <div className="px-4 py-3 border-b border-border/60 text-xs text-muted-foreground">Conversations</div>
+          <div className="flex-1 flex items-center justify-center p-4">
+            <div className="text-xs text-muted-foreground text-center">No conversations yet.<br />Messages from investors appear here.</div>
+          </div>
         </div>
         <div className="flex flex-col">
           <div className="flex-1 p-6 space-y-4">

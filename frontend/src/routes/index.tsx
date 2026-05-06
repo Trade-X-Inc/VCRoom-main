@@ -151,7 +151,7 @@ function Solution() {
                 <div className="absolute inset-0 noise opacity-60" />
                 <div className="relative grid grid-cols-2 gap-3 w-full max-w-sm">
                   {[
-                    { i: Users, l: "VC CRM", c: "47 leads" },
+                    { i: Users, l: "VC CRM", c: "CRM + pipeline" },
                     { i: Sparkles, l: "AI drafts", c: "12 ready" },
                     { i: Briefcase, l: "Deal rooms", c: "4 active" },
                     { i: ShieldCheck, l: "NDA", c: "Auto" },
@@ -277,7 +277,7 @@ function MiniDealRoom() {
     <div className="space-y-2">
       <div className="rounded-md border border-border/60 bg-card p-2.5 flex items-center gap-2">
         <Layers className="h-3.5 w-3.5 text-brand" />
-        <div className="text-xs font-medium flex-1">Atlas Robotics — Series A</div>
+        <div className="text-xs font-medium flex-1">Your Company — Series A</div>
         <span className="text-[10px] rounded-full bg-success/15 text-success px-1.5 py-0.5">Active</span>
       </div>
       {[["Pitch deck v3", CheckCircle2, "text-success"], ["Cap table", CheckCircle2, "text-success"], ["Financial model", AlertTriangle, "text-warning"], ["Q&A · 12 open", MessageSquare, "text-muted-foreground"]].map(([l, I, c]: any) => (

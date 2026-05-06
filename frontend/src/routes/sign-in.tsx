@@ -14,7 +14,7 @@ function SignInPage() {
   const { signIn } = useAuth();
   const nav = useNavigate();
   const search = useSearch({ from: "/sign-in" });
-  const [email, setEmail] = useState("jordan@atlas.ai");
+  const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -25,7 +25,8 @@ function SignInPage() {
     setLoading(true);
     try {
       const appUser = await signIn(email, pw);
-      nav({ to: appUser.appRole === "investor" ? "/app/investor" : "/app" });
+      const roleDefault = appUser.appRole === "investor" ? "/app/investor" : "/app";
+      nav({ to: (search.redirect && search.redirect !== "/app" ? search.redirect : roleDefault) as any });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to sign in.");
     } finally {

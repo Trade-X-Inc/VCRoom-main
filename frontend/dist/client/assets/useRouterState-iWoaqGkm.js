@@ -1,1 +1,0 @@
-import{h as s,r as c,i as a,k as i}from"./index-BRSBm38i.js";function f(r){const n=s({warn:r?.router===void 0}),t=r?.router||n,u=c.useRef(void 0);return a(t.stores.__store,e=>{if(r?.select){if(r.structuralSharing??t.options.defaultStructuralSharing){const o=i(u.current,r.select(e));return u.current=o,o}return r.select(e)}return e})}export{f as u};

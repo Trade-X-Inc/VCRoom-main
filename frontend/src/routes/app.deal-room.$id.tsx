@@ -48,8 +48,7 @@ function DealRoom() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const isInvestor = user?.appRole === "investor";
-  const userName = user?.name ?? (isInvestor ? "Investor" : "Founder");
+  const userName = user?.name ?? "User";
 
   // ── Supabase queries ──────────────────────────────────────────
   const { data: room } = useQuery({
@@ -160,10 +159,18 @@ function DealRoom() {
     }
   }, [memberList]);
 
+  const isInvestor = memberRow ? (memberRow.role === "investor" || memberRow.role === "viewer") : user?.appRole === "investor";
+  const isFounder = memberRow ? memberRow.role === "founder" : user?.appRole !== "investor";
+
   const dealRoomName = (room as any)?.startups?.company_name
     ? `${(room as any).startups.company_name} — Deal Room`
     : "Deal Room";
   const companyName = (room as any)?.startups?.company_name ?? "Unknown Company";
+
+  const visibleTabs = tabs.filter((t) => {
+    if (isInvestor) return ["overview", "documents", "qa", "notes", "decision"].includes(t.k);
+    return t.k !== "decision";
+  });
 
   // ── Q&A Supabase callbacks ────────────────────────────────────
   const handleAddQuestion = async (q: QAQuestion): Promise<string | undefined> => {
@@ -214,7 +221,7 @@ function DealRoom() {
           </div>
         </div>
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
-          {tabs.map((t) => (
+          {visibleTabs.map((t) => (
             <button
               key={t.k}
               onClick={() => setTab(t.k)}
@@ -248,7 +255,7 @@ function DealRoom() {
         {tab === "decision" && (
           <ReviewTab
             dealRoomId={dealRoomId}
-            currentUserRole={isInvestor ? "investor" : "founder"}
+            currentUserRole={isFounder ? "founder" : "investor"}
             startupId={(room as any)?.startup_id ?? ""}
           />
         )}

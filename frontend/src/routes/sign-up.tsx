@@ -179,7 +179,7 @@ function SignUpPage() {
           label="Full name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder={role === "investor" ? "Sara Khan" : "Jordan Reeves"}
+          placeholder={role === "investor" ? "Alex Johnson" : "Sam Rivera"}
           required
         />
         <Field

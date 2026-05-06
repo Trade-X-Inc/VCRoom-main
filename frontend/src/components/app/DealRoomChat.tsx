@@ -1,59 +1,36 @@
 import { useState, useEffect, useRef } from "react";
-import { dealRoomChat, dealRoomMembers, type ChatMessage } from "@/lib/mock";
+import { type ChatMessage } from "@/lib/mock";
 import { Send, Paperclip, Smile, Users } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export function DealRoomChat() {
   const { t } = useI18n();
-  const [messages, setMessages] = useState<ChatMessage[]>(dealRoomChat);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
-  const [typing, setTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, typing]);
+  }, [messages]);
 
   const send = () => {
     const text = draft.trim();
     if (!text) return;
     const now = new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-    setMessages((xs) => [...xs, { id: crypto.randomUUID(), author: "Jordan Reeves", initials: "JR", role: "Founder", text, time: now, me: true }]);
+    setMessages((xs) => [...xs, { id: crypto.randomUUID(), author: "You", initials: "ME", role: "Founder", text, time: now, me: true }]);
     setDraft("");
-    setTyping(true);
-    setTimeout(() => {
-      setTyping(false);
-      setMessages((xs) => [...xs, {
-        id: crypto.randomUUID(),
-        author: "Sara Khan",
-        initials: "SK",
-        role: "Investor",
-        text: "Got it — let me sync with the partnership and circle back today.",
-        time: new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }),
-      }]);
-    }, 1800);
   };
-
-  const onlineCount = dealRoomMembers.filter((m) => m.online).length;
 
   return (
     <div className="flex flex-col h-full">
       {/* header */}
       <div className="px-5 py-3 border-b border-border/60 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="flex -space-x-2">
-            {dealRoomMembers.slice(0, 4).map((m) => (
-              <div key={m.name} className="relative">
-                <div className="grid h-7 w-7 place-items-center rounded-full bg-gradient-brand text-brand-foreground text-[10px] font-semibold ring-2 ring-card">{m.initials}</div>
-                {m.online && <span className="absolute -bottom-0.5 -end-0.5 h-2 w-2 rounded-full bg-success ring-2 ring-card" />}
-              </div>
-            ))}
-          </div>
           <div>
-            <div className="text-sm font-semibold">Atlas × NEA — Deal Chat</div>
+            <div className="text-sm font-semibold">Team Chat</div>
             <div className="text-[11px] text-muted-foreground inline-flex items-center gap-1">
-              <Users className="h-3 w-3" /> {dealRoomMembers.length} members · {onlineCount} {t("chat.online")}
+              <Users className="h-3 w-3" /> Deal room team channel
             </div>
           </div>
         </div>
@@ -92,15 +69,8 @@ export function DealRoomChat() {
             </div>
           );
         })}
-        {typing && (
-          <div className="flex gap-3">
-            <div className="grid h-8 w-8 place-items-center rounded-full bg-accent text-[10px] font-semibold">SK</div>
-            <div className="rounded-2xl bg-accent px-4 py-3 inline-flex gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-pulse-glow" />
-              <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-pulse-glow" style={{ animationDelay: "0.15s" }} />
-              <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-pulse-glow" style={{ animationDelay: "0.3s" }} />
-            </div>
-          </div>
+        {messages.length === 0 && (
+          <div className="text-sm text-muted-foreground">No messages yet. Start the team conversation.</div>
         )}
       </div>
 
