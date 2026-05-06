@@ -1,0 +1,31 @@
+import { U as jsxRuntimeExports } from "./worker-entry-4qtpAlX3.js";
+import { S as SolutionPage } from "./SolutionPage-Bx4RIPdK.js";
+import { T as TrendingUp } from "./trending-up-9mYxMVFY.js";
+import "node:events";
+import "node:async_hooks";
+import "node:stream/web";
+import "node:stream";
+import "./router-DliDWiY8.js";
+import "./index-DYJmQpRE.js";
+import "./SiteFooter-DkNoLrOk.js";
+import "./Logo-D6dspbRM.js";
+import "./utils-Bz4m9VPB.js";
+import "./LangSwitcher-WD19H3AP.js";
+import "./createLucideIcon-amrEyyxI.js";
+import "./globe-BuWKFBTI.js";
+import "./arrow-right-BoBYgBgI.js";
+import "./AppPreview-UG0flS_B.js";
+import "./layout-grid-B1CM5Vx9.js";
+import "./users-B4gkQn5o.js";
+import "./file-text-AooM6BWu.js";
+import "./message-square-CFHAruJW.js";
+import "./sparkles-DVrSr6Sk.js";
+import "./search-CV2-VOeA.js";
+import "./bell-DuuhWqqD.js";
+import "./chevron-right-DAhPHPMx.js";
+import "./arrow-up-right-CQYgbfED.js";
+import "./check-xWl3XqmK.js";
+const SplitComponent = () => /* @__PURE__ */ jsxRuntimeExports.jsx(SolutionPage, { eyebrow: "Pipeline", title: "Every investor. Every stage. One view.", sub: "A purpose-built pipeline for the way fundraises actually work — with AI follow-ups, intro tracking, and stage analytics.", Icon: TrendingUp, features: [["Multi-stage kanban", "Drag, drop, decide. Stages tuned for fundraising."], ["Auto-nudge", "AI nags the right investor at the right time, in your voice."], ["Conversion analytics", "See where deals stall and where to double down."]] });
+export {
+  SplitComponent as component
+};
