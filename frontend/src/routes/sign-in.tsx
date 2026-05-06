@@ -24,8 +24,8 @@ function SignInPage() {
     setError("");
     setLoading(true);
     try {
-      await signIn(email, pw);
-      nav({ to: search.redirect as any });
+      const appUser = await signIn(email, pw);
+      nav({ to: appUser.appRole === "investor" ? "/app/investor" : "/app" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to sign in.");
     } finally {

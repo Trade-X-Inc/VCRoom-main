@@ -16,7 +16,7 @@ export interface AppUser {
 interface AuthCtx {
   user: AppUser | null;
   isAuthenticated: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<AppUser>;
   signUp: (name: string, email: string, password: string, inviteToken?: string) => Promise<void>;
   signOut: () => Promise<void>;
   setAppRole: (r: AppRole) => void;
@@ -63,11 +63,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string): Promise<AppUser> => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
     if (!data.user?.id || !data.user.email) throw new Error("Sign-in failed.");
-    setUser(await buildUser(data.user.id, data.user.email));
+    const appUser = await buildUser(data.user.id, data.user.email);
+    setUser(appUser);
+    return appUser;
   };
 
   const signUp = async (name: string, email: string, password: string, _inviteToken?: string) => {
