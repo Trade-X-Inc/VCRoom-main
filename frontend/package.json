@@ -9,7 +9,7 @@
     "postbuild": "node scripts/patch-wrangler.mjs",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
-    "deploy": "npm run build && wrangler deploy",
+    "deploy": "npm run build && wrangler pages deploy ./dist/client --project-name vcroom-main --commit-dirty=true",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
