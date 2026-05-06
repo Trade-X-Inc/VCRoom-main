@@ -6,9 +6,9 @@ export function SiteFooter() {
     {
       title: "Product",
       links: [
-        ["Founder app", "/app"],
-        ["Investor app", "/app/investor"],
-        ["Deal Room", "/app/deal-room/dr_001"],
+        ["For Founders", "/founders"],
+        ["For Investors", "/investors"],
+        ["Sign in", "/sign-in"],
         ["Pricing", "/pricing"],
       ],
     },
@@ -68,7 +68,7 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-border/60 pt-6 md:flex-row md:items-center">
-          <div className="text-xs text-muted-foreground">© 2025 VentureRoom. All rights reserved.</div>
+          <div className="text-xs text-muted-foreground">© {new Date().getFullYear()} Venture Room, Inc. All rights reserved.</div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-success animate-pulse-glow" />
             All systems operational

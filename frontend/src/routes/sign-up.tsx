@@ -2,50 +2,63 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AuthLayout, Divider, Field, GoogleButton } from "@/components/auth/AuthLayout";
 import { supabase } from "@/lib/supabase";
-import { ArrowRight, CheckCircle2, Loader2, KeyRound, MailCheck, Rocket, TrendingUp } from "lucide-react";
-
-type Role = "founder" | "investor";
+import { type AppRole } from "@/lib/auth";
+import { cn } from "@/lib/utils";
+import { ArrowRight, Loader2, KeyRound, MailCheck, Rocket, TrendingUp, Check } from "lucide-react";
 
 export const Route = createFileRoute("/sign-up")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    role: (s.role === "investor" ? "investor" : "founder") as AppRole,
+  }),
   component: SignUpPage,
 });
 
-function RoleCard({ role, selected, onSelect }: { role: Role; selected: boolean; onSelect: () => void }) {
-  const isFounder = role === "founder";
+function RoleCard({
+  active,
+  onClick,
+  icon: Icon,
+  label,
+  sub,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ElementType;
+  label: string;
+  sub: string;
+}) {
   return (
     <button
       type="button"
-      onClick={onSelect}
-      className={`relative flex flex-col items-center gap-2 rounded-xl border-2 p-4 text-center transition-all ${
-        selected
-          ? "border-brand bg-brand/5"
-          : "border-border/60 bg-accent/20 hover:border-border hover:bg-accent/40"
-      }`}
-    >
-      {selected && (
-        <CheckCircle2 className="absolute right-2.5 top-2.5 h-4 w-4 text-brand" />
+      onClick={onClick}
+      className={cn(
+        "relative rounded-xl border p-4 text-left transition-all",
+        active
+          ? "border-brand bg-brand/5 ring-2 ring-brand/20 shadow-glow"
+          : "border-border/60 hover:border-border bg-card",
       )}
-      <div className={`grid h-10 w-10 place-items-center rounded-full ${selected ? "bg-brand/10" : "bg-accent"}`}>
-        {isFounder ? (
-          <Rocket className={`h-5 w-5 ${selected ? "text-brand" : "text-muted-foreground"}`} />
-        ) : (
-          <TrendingUp className={`h-5 w-5 ${selected ? "text-brand" : "text-muted-foreground"}`} />
+    >
+      {active && (
+        <div className="absolute top-2 right-2 grid h-5 w-5 place-items-center rounded-full bg-gradient-brand text-brand-foreground">
+          <Check className="h-3 w-3" />
+        </div>
+      )}
+      <div
+        className={cn(
+          "grid h-9 w-9 place-items-center rounded-lg",
+          active ? "bg-gradient-brand text-brand-foreground" : "bg-accent text-foreground",
         )}
+      >
+        <Icon className="h-4 w-4" />
       </div>
-      <div>
-        <p className="text-sm font-semibold text-foreground">
-          {isFounder ? "I'm a Founder" : "I'm an Investor"}
-        </p>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          {isFounder ? "Raising capital for my startup" : "Reviewing and investing in deals"}
-        </p>
-      </div>
+      <div className="mt-3 text-sm font-semibold leading-tight">{label}</div>
+      <div className="text-[11px] text-muted-foreground mt-0.5">{sub}</div>
     </button>
   );
 }
 
 function SignUpPage() {
-  const [role, setRole] = useState<Role>("founder");
+  const search = Route.useSearch();
+  const [role, setRole] = useState<AppRole>(search.role);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
@@ -138,18 +151,35 @@ function SignUpPage() {
         </>
       }
     >
-      <div className="grid grid-cols-2 gap-3">
-        <RoleCard role="founder" selected={role === "founder"} onSelect={() => setRole("founder")} />
-        <RoleCard role="investor" selected={role === "investor"} onSelect={() => setRole("investor")} />
+      <div className="space-y-2 mb-2">
+        <div className="text-xs font-medium text-muted-foreground">I am a…</div>
+        <div className="grid grid-cols-2 gap-2.5">
+          <RoleCard
+            active={role === "founder"}
+            onClick={() => setRole("founder")}
+            icon={Rocket}
+            label="I'm a Founder"
+            sub="Raising capital for my startup"
+          />
+          <RoleCard
+            active={role === "investor"}
+            onClick={() => setRole("investor")}
+            icon={TrendingUp}
+            label="I'm an Investor"
+            sub="Reviewing investment opportunities"
+          />
+        </div>
       </div>
+
       <GoogleButton onClick={google} />
       <Divider />
+
       <form onSubmit={submit} className="space-y-3.5">
         <Field
           label="Full name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Jordan Reeves"
+          placeholder={role === "investor" ? "Sara Khan" : "Jordan Reeves"}
           required
         />
         <Field
@@ -185,17 +215,11 @@ function SignUpPage() {
         <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer">
           <input type="checkbox" required className="mt-0.5 h-3.5 w-3.5 accent-[var(--brand)]" />
           I agree to the{" "}
-          <Link
-            to={"/terms" as any}
-            className="text-foreground hover:text-brand underline underline-offset-2"
-          >
+          <Link to={"/terms" as any} className="text-foreground hover:text-brand underline underline-offset-2">
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link
-            to={"/privacy" as any}
-            className="text-foreground hover:text-brand underline underline-offset-2"
-          >
+          <Link to={"/privacy" as any} className="text-foreground hover:text-brand underline underline-offset-2">
             Privacy Policy
           </Link>
         </label>
@@ -203,13 +227,14 @@ function SignUpPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-gradient-brand text-brand-foreground py-2.5 text-sm font-medium shadow-glow disabled:opacity-60"
+          className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-brand text-brand-foreground py-2.5 text-sm font-medium shadow-glow disabled:opacity-60"
         >
           {loading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             <>
-              Create workspace <ArrowRight className="h-4 w-4" />
+              {role === "investor" ? "Create investor workspace" : "Create founder workspace"}{" "}
+              <ArrowRight className="h-4 w-4" />
             </>
           )}
         </button>

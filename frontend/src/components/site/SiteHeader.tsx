@@ -39,7 +39,7 @@ export function SiteHeader() {
           <Link to="/sign-in" search={{ redirect: "/app" }} className="hidden sm:inline-flex">
             <Button variant="ghost" size="sm">Sign in</Button>
           </Link>
-          <Link to="/sign-up">
+          <Link to="/sign-up" search={{ role: "founder" } as any}>
             <Button variant="brand" size="sm" className="gap-1.5">
               Get started <ArrowRight className="h-3.5 w-3.5" />
             </Button>

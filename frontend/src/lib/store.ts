@@ -58,8 +58,34 @@ export interface CompanyVideo {
   title: string;
   description: string;
   fileName: string;
-  status: "Uploaded" | "Processing" | "Ready";
+  status: "Uploading" | "Uploaded" | "Processing" | "Ready";
+  progress: number;
   uploadedAt: string;
+}
+
+export interface MeetingRecord {
+  id: string;
+  leadId?: string;
+  with: string;
+  contact: string;
+  purpose: string;
+  date: string;
+  time: string;
+  durationMin: number;
+  prepNotes: string;
+  dealSize: string;
+  participants: string[];
+  status: "Scheduled" | "Completed" | "Cancelled";
+  createdAt: string;
+}
+
+export interface ActivityRecord {
+  id: string;
+  leadId?: string;
+  leadName?: string;
+  type: "Email" | "Meeting" | "DealRoom" | "Note" | "Call";
+  summary: string;
+  createdAt: string;
 }
 
 export interface CrmLead {

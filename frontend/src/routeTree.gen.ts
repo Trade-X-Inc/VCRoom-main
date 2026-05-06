@@ -17,6 +17,7 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as InvestorsRouteImport } from './routes/investors'
 import { Route as FoundersRouteImport } from './routes/founders'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as DebugRouteImport } from './routes/debug'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -46,10 +47,14 @@ import { Route as AppSettingsSecurityRouteImport } from './routes/app.settings.s
 import { Route as AppSettingsNotificationsRouteImport } from './routes/app.settings.notifications'
 import { Route as AppSettingsDomainRouteImport } from './routes/app.settings.domain'
 import { Route as AppSettingsBillingRouteImport } from './routes/app.settings.billing'
+import { Route as AppInvestorTeamRouteImport } from './routes/app.investor.team'
 import { Route as AppInvestorStartupsRouteImport } from './routes/app.investor.startups'
+import { Route as AppInvestorPortfolioRouteImport } from './routes/app.investor.portfolio'
+import { Route as AppInvestorPipelineRouteImport } from './routes/app.investor.pipeline'
 import { Route as AppInvestorDiligenceRouteImport } from './routes/app.investor.diligence'
 import { Route as AppInvestorDecisionsRouteImport } from './routes/app.investor.decisions'
 import { Route as AppInvestorDealRoomsRouteImport } from './routes/app.investor.deal-rooms'
+import { Route as AppInvestorDealFlowRouteImport } from './routes/app.investor.deal-flow'
 import { Route as AppInvestorAnalysisRouteImport } from './routes/app.investor.analysis'
 import { Route as AppDealRoomIdRouteImport } from './routes/app.deal-room.$id'
 import { Route as AppDealRoomIdNdaRouteImport } from './routes/app.deal-room.$id_.nda'
@@ -92,6 +97,11 @@ const FoundersRoute = FoundersRouteImport.update({
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DebugRoute = DebugRouteImport.update({
+  id: '/debug',
+  path: '/debug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -241,9 +251,24 @@ const AppSettingsBillingRoute = AppSettingsBillingRouteImport.update({
   path: '/billing',
   getParentRoute: () => AppSettingsRoute,
 } as any)
+const AppInvestorTeamRoute = AppInvestorTeamRouteImport.update({
+  id: '/investor/team',
+  path: '/investor/team',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppInvestorStartupsRoute = AppInvestorStartupsRouteImport.update({
   id: '/investor/startups',
   path: '/investor/startups',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInvestorPortfolioRoute = AppInvestorPortfolioRouteImport.update({
+  id: '/investor/portfolio',
+  path: '/investor/portfolio',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInvestorPipelineRoute = AppInvestorPipelineRouteImport.update({
+  id: '/investor/pipeline',
+  path: '/investor/pipeline',
   getParentRoute: () => AppRoute,
 } as any)
 const AppInvestorDiligenceRoute = AppInvestorDiligenceRouteImport.update({
@@ -259,6 +284,11 @@ const AppInvestorDecisionsRoute = AppInvestorDecisionsRouteImport.update({
 const AppInvestorDealRoomsRoute = AppInvestorDealRoomsRouteImport.update({
   id: '/investor/deal-rooms',
   path: '/investor/deal-rooms',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInvestorDealFlowRoute = AppInvestorDealFlowRouteImport.update({
+  id: '/investor/deal-flow',
+  path: '/investor/deal-flow',
   getParentRoute: () => AppRoute,
 } as any)
 const AppInvestorAnalysisRoute = AppInvestorAnalysisRouteImport.update({
@@ -281,6 +311,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/app': typeof AppRouteWithChildren
+  '/debug': typeof DebugRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
   '/investors': typeof InvestorsRoute
@@ -312,10 +343,14 @@ export interface FileRoutesByFullPath {
   '/app/': typeof AppIndexRoute
   '/app/deal-room/$id': typeof AppDealRoomIdRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
+  '/app/investor/deal-flow': typeof AppInvestorDealFlowRoute
   '/app/investor/deal-rooms': typeof AppInvestorDealRoomsRoute
   '/app/investor/decisions': typeof AppInvestorDecisionsRoute
   '/app/investor/diligence': typeof AppInvestorDiligenceRoute
+  '/app/investor/pipeline': typeof AppInvestorPipelineRoute
+  '/app/investor/portfolio': typeof AppInvestorPortfolioRoute
   '/app/investor/startups': typeof AppInvestorStartupsRoute
+  '/app/investor/team': typeof AppInvestorTeamRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
@@ -326,6 +361,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/debug': typeof DebugRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
   '/investors': typeof InvestorsRoute
@@ -357,10 +393,14 @@ export interface FileRoutesByTo {
   '/app': typeof AppIndexRoute
   '/app/deal-room/$id': typeof AppDealRoomIdRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
+  '/app/investor/deal-flow': typeof AppInvestorDealFlowRoute
   '/app/investor/deal-rooms': typeof AppInvestorDealRoomsRoute
   '/app/investor/decisions': typeof AppInvestorDecisionsRoute
   '/app/investor/diligence': typeof AppInvestorDiligenceRoute
+  '/app/investor/pipeline': typeof AppInvestorPipelineRoute
+  '/app/investor/portfolio': typeof AppInvestorPortfolioRoute
   '/app/investor/startups': typeof AppInvestorStartupsRoute
+  '/app/investor/team': typeof AppInvestorTeamRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
@@ -373,6 +413,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/app': typeof AppRouteWithChildren
+  '/debug': typeof DebugRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
   '/investors': typeof InvestorsRoute
@@ -404,10 +445,14 @@ export interface FileRoutesById {
   '/app/': typeof AppIndexRoute
   '/app/deal-room/$id': typeof AppDealRoomIdRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
+  '/app/investor/deal-flow': typeof AppInvestorDealFlowRoute
   '/app/investor/deal-rooms': typeof AppInvestorDealRoomsRoute
   '/app/investor/decisions': typeof AppInvestorDecisionsRoute
   '/app/investor/diligence': typeof AppInvestorDiligenceRoute
+  '/app/investor/pipeline': typeof AppInvestorPipelineRoute
+  '/app/investor/portfolio': typeof AppInvestorPortfolioRoute
   '/app/investor/startups': typeof AppInvestorStartupsRoute
+  '/app/investor/team': typeof AppInvestorTeamRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
@@ -421,6 +466,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/app'
+    | '/debug'
     | '/forgot-password'
     | '/founders'
     | '/investors'
@@ -452,10 +498,14 @@ export interface FileRouteTypes {
     | '/app/'
     | '/app/deal-room/$id'
     | '/app/investor/analysis'
+    | '/app/investor/deal-flow'
     | '/app/investor/deal-rooms'
     | '/app/investor/decisions'
     | '/app/investor/diligence'
+    | '/app/investor/pipeline'
+    | '/app/investor/portfolio'
     | '/app/investor/startups'
+    | '/app/investor/team'
     | '/app/settings/billing'
     | '/app/settings/domain'
     | '/app/settings/notifications'
@@ -466,6 +516,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/debug'
     | '/forgot-password'
     | '/founders'
     | '/investors'
@@ -497,10 +548,14 @@ export interface FileRouteTypes {
     | '/app'
     | '/app/deal-room/$id'
     | '/app/investor/analysis'
+    | '/app/investor/deal-flow'
     | '/app/investor/deal-rooms'
     | '/app/investor/decisions'
     | '/app/investor/diligence'
+    | '/app/investor/pipeline'
+    | '/app/investor/portfolio'
     | '/app/investor/startups'
+    | '/app/investor/team'
     | '/app/settings/billing'
     | '/app/settings/domain'
     | '/app/settings/notifications'
@@ -512,6 +567,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/app'
+    | '/debug'
     | '/forgot-password'
     | '/founders'
     | '/investors'
@@ -543,10 +599,14 @@ export interface FileRouteTypes {
     | '/app/'
     | '/app/deal-room/$id'
     | '/app/investor/analysis'
+    | '/app/investor/deal-flow'
     | '/app/investor/deal-rooms'
     | '/app/investor/decisions'
     | '/app/investor/diligence'
+    | '/app/investor/pipeline'
+    | '/app/investor/portfolio'
     | '/app/investor/startups'
+    | '/app/investor/team'
     | '/app/settings/billing'
     | '/app/settings/domain'
     | '/app/settings/notifications'
@@ -559,6 +619,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AppRoute: typeof AppRouteWithChildren
+  DebugRoute: typeof DebugRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   FoundersRoute: typeof FoundersRoute
   InvestorsRoute: typeof InvestorsRoute
@@ -631,6 +692,13 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/debug': {
+      id: '/debug'
+      path: '/debug'
+      fullPath: '/debug'
+      preLoaderRoute: typeof DebugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -836,11 +904,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsBillingRouteImport
       parentRoute: typeof AppSettingsRoute
     }
+    '/app/investor/team': {
+      id: '/app/investor/team'
+      path: '/investor/team'
+      fullPath: '/app/investor/team'
+      preLoaderRoute: typeof AppInvestorTeamRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/investor/startups': {
       id: '/app/investor/startups'
       path: '/investor/startups'
       fullPath: '/app/investor/startups'
       preLoaderRoute: typeof AppInvestorStartupsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/investor/portfolio': {
+      id: '/app/investor/portfolio'
+      path: '/investor/portfolio'
+      fullPath: '/app/investor/portfolio'
+      preLoaderRoute: typeof AppInvestorPortfolioRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/investor/pipeline': {
+      id: '/app/investor/pipeline'
+      path: '/investor/pipeline'
+      fullPath: '/app/investor/pipeline'
+      preLoaderRoute: typeof AppInvestorPipelineRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/investor/diligence': {
@@ -862,6 +951,13 @@ declare module '@tanstack/react-router' {
       path: '/investor/deal-rooms'
       fullPath: '/app/investor/deal-rooms'
       preLoaderRoute: typeof AppInvestorDealRoomsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/investor/deal-flow': {
+      id: '/app/investor/deal-flow'
+      path: '/investor/deal-flow'
+      fullPath: '/app/investor/deal-flow'
+      preLoaderRoute: typeof AppInvestorDealFlowRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/investor/analysis': {
@@ -924,10 +1020,14 @@ interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
   AppDealRoomIdRoute: typeof AppDealRoomIdRoute
   AppInvestorAnalysisRoute: typeof AppInvestorAnalysisRoute
+  AppInvestorDealFlowRoute: typeof AppInvestorDealFlowRoute
   AppInvestorDealRoomsRoute: typeof AppInvestorDealRoomsRoute
   AppInvestorDecisionsRoute: typeof AppInvestorDecisionsRoute
   AppInvestorDiligenceRoute: typeof AppInvestorDiligenceRoute
+  AppInvestorPipelineRoute: typeof AppInvestorPipelineRoute
+  AppInvestorPortfolioRoute: typeof AppInvestorPortfolioRoute
   AppInvestorStartupsRoute: typeof AppInvestorStartupsRoute
+  AppInvestorTeamRoute: typeof AppInvestorTeamRoute
   AppInvestorIndexRoute: typeof AppInvestorIndexRoute
   AppDealRoomIdNdaRoute: typeof AppDealRoomIdNdaRoute
 }
@@ -950,10 +1050,14 @@ const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   AppDealRoomIdRoute: AppDealRoomIdRoute,
   AppInvestorAnalysisRoute: AppInvestorAnalysisRoute,
+  AppInvestorDealFlowRoute: AppInvestorDealFlowRoute,
   AppInvestorDealRoomsRoute: AppInvestorDealRoomsRoute,
   AppInvestorDecisionsRoute: AppInvestorDecisionsRoute,
   AppInvestorDiligenceRoute: AppInvestorDiligenceRoute,
+  AppInvestorPipelineRoute: AppInvestorPipelineRoute,
+  AppInvestorPortfolioRoute: AppInvestorPortfolioRoute,
   AppInvestorStartupsRoute: AppInvestorStartupsRoute,
+  AppInvestorTeamRoute: AppInvestorTeamRoute,
   AppInvestorIndexRoute: AppInvestorIndexRoute,
   AppDealRoomIdNdaRoute: AppDealRoomIdNdaRoute,
 }
@@ -964,6 +1068,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AppRoute: AppRouteWithChildren,
+  DebugRoute: DebugRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   FoundersRoute: FoundersRoute,
   InvestorsRoute: InvestorsRoute,

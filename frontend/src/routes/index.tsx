@@ -58,10 +58,10 @@ function Hero() {
           Manage your entire fundraise — from first investor email to final decision — in one structured platform built for founders and VCs.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link to="/app">
+          <Link to="/sign-up" search={{ role: "founder" } as any}>
             <Button variant="brand" size="lg" className="gap-2">Start as Founder <ArrowRight className="h-4 w-4" /></Button>
           </Link>
-          <Link to="/app/investor">
+          <Link to="/sign-up" search={{ role: "investor" } as any}>
             <Button variant="outline" size="lg">For Investors</Button>
           </Link>
         </div>
@@ -328,10 +328,10 @@ function FinalCTA() {
           <h2 className="text-4xl md:text-6xl font-semibold tracking-[-0.03em]">Run your fundraise<br />like a pro.</h2>
           <p className="mt-5 text-base md:text-lg opacity-70 max-w-lg mx-auto">Join the founders and investors making decisions faster, with more clarity.</p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link to="/app">
+            <Link to="/sign-up" search={{ role: "founder" } as any}>
               <Button variant="brand" size="lg" className="gap-2">Start free <ArrowRight className="h-4 w-4" /></Button>
             </Link>
-            <Link to="/app/investor">
+            <Link to="/sign-up" search={{ role: "investor" } as any}>
               <Button size="lg" className="bg-background/10 text-primary-foreground hover:bg-background/20 border border-primary-foreground/20">For Investors</Button>
             </Link>
           </div>

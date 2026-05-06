@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { CheckCircle2, Sparkles, Inbox } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -9,34 +9,33 @@ import { AIBriefPanel, type AIBriefData } from "@/components/app/AIBriefPanel";
 import { generateDealBrief } from "@/lib/deal-brief-fn";
 
 export const Route = createFileRoute("/app/investor/")({
-  component: InvestorPipeline,
+  component: InvestorDashboard,
 });
 
-const KANBAN_STAGES = ["Sourced", "Diligence", "Info Req.", "Partner", "Term Sheet", "Pass"];
+const STAGES = ["Sourced", "Reviewing", "Diligence", "Partner", "Term Sheet", "Closed"] as const;
 
 const DB_STATUS_TO_STAGE: Record<string, string> = {
-  under_review: "Diligence",
-  info_requested: "Info Req.",
+  under_review: "Reviewing",
+  info_requested: "Diligence",
   partner_review: "Partner",
   term_sheet: "Term Sheet",
-  rejected: "Pass",
-  exited: "Pass",
+  rejected: "Closed",
+  exited: "Closed",
 };
 
-interface KanbanCard {
-  id: string | null;
-  stage: string;
-  n: string;
-  s: string;
-  check: string;
-  score: number;
-}
-
-function InvestorPipeline() {
+function InvestorDashboard() {
   const { user } = useAuth();
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
 
-  // Fetch user's deal room IDs
+  const today = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const greet = (() => {
+    const h = new Date().getHours();
+    if (h < 12) return "Good morning";
+    if (h < 18) return "Good afternoon";
+    return "Good evening";
+  })();
+
+  // Fetch user's deal room memberships
   const { data: memberData } = useQuery({
     queryKey: ["my-room-ids", user?.id],
     enabled: !!user?.id,
@@ -57,13 +56,13 @@ function InvestorPipeline() {
     queryFn: async () => {
       const { data } = await supabase
         .from("deal_rooms")
-        .select("id, created_at, startup_id, startups(company_name, sector, stage, funding_target)")
+        .select("id, created_at, updated_at, startup_id, startups(company_name, sector, stage, funding_target)")
         .in("id", roomIds);
       return data ?? [];
     },
   });
 
-  // Fetch latest decision per room (ordered desc so first per room = latest)
+  // Fetch decisions for room count + attention strip
   const { data: decisionsData = [] } = useQuery({
     queryKey: ["investor-decisions", roomIds.join(",")],
     enabled: roomIds.length > 0,
@@ -77,32 +76,50 @@ function InvestorPipeline() {
     },
   });
 
-  // Build map roomId → latest status
-  const latestStatus: Record<string, string | null> = {};
-  for (const d of decisionsData) {
-    if (!(d.deal_room_id in latestStatus)) latestStatus[d.deal_room_id] = d.status;
-  }
-
-  // Attention strip: overdue deals + recent founder activity
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  // Fetch recent activity (from founders, not this investor)
   const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
-
   const { data: recentActivity = [] } = useQuery({
     queryKey: ["founder-activity", roomIds.join(","), user?.id],
     enabled: roomIds.length > 0 && !!user?.id,
     queryFn: async () => {
       const { data } = await supabase
         .from("activities")
-        .select("id, action, deal_room_id, created_at")
+        .select("id, action, deal_room_id, created_at, actor_id")
         .in("deal_room_id", roomIds)
         .neq("actor_id", user!.id)
         .gt("created_at", threeDaysAgo)
         .order("created_at", { ascending: false })
-        .limit(5);
+        .limit(10);
       return data ?? [];
     },
   });
 
+  // Build stage counts from real data
+  const latestStatus: Record<string, string | null> = {};
+  for (const d of decisionsData) {
+    if (!(d.deal_room_id in latestStatus)) latestStatus[d.deal_room_id] = d.status;
+  }
+  const stageCounts: Record<string, number> = Object.fromEntries(STAGES.map((s) => [s, 0]));
+  for (const room of roomsData) {
+    const status = latestStatus[room.id] ?? null;
+    const stage = DB_STATUS_TO_STAGE[status ?? ""] ?? "Sourced";
+    if (stage in stageCounts) stageCounts[stage]++;
+  }
+
+  // Stats
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const now = new Date();
+  const decisionsThisMonth = decisionsData.filter((d) => {
+    if (!d.created_at) return false;
+    const dt = new Date(d.created_at as string);
+    return dt.getMonth() === now.getMonth() && dt.getFullYear() === now.getFullYear();
+  }).length;
+  const inDiligence = roomsData.filter((r) => {
+    const s = latestStatus[r.id] ?? null;
+    return DB_STATUS_TO_STAGE[s ?? ""] === "Diligence";
+  }).length;
+
+  // Attention strip items
   const attentionItems: AttentionItem[] = [];
   for (const room of roomsData) {
     const status = latestStatus[room.id] ?? null;
@@ -126,34 +143,14 @@ function InvestorPipeline() {
     });
   }
 
-  // AI brief for selected room (30 min cache)
+  // AI brief for selected room
   const selectedRoom = roomsData.find((r) => r.id === selectedRoomId);
   const { data: briefResult, isLoading: briefLoading } = useQuery({
     queryKey: ["ai-brief", selectedRoomId, user?.id],
     enabled: !!selectedRoomId && !!user?.id,
     staleTime: 30 * 60 * 1000,
-    queryFn: async () => {
-      return generateDealBrief({ data: { dealRoomId: selectedRoomId!, userId: user!.id } });
-    },
+    queryFn: async () => generateDealBrief({ data: { dealRoomId: selectedRoomId!, userId: user!.id } }),
   });
-
-  // Build kanban cards from real data or fall back to mock
-  const realCards: KanbanCard[] = roomsData.map((room) => {
-    const startup = room.startups as any;
-    const status = latestStatus[room.id] ?? null;
-    return {
-      id: room.id,
-      stage: DB_STATUS_TO_STAGE[status ?? ""] ?? "Sourced",
-      n: startup?.company_name ?? "Unnamed deal",
-      s: [startup?.stage, startup?.sector].filter(Boolean).join(" · ") || "—",
-      check: startup?.funding_target ? `$${startup.funding_target}` : "—",
-      score: 0,
-    };
-  });
-
-  const useReal = realCards.length > 0;
-  const cards: KanbanCard[] = useReal ? realCards : MOCK_CARDS;
-
   const aiBriefData: AIBriefData | null =
     selectedRoomId && briefResult
       ? {
@@ -167,71 +164,112 @@ function InvestorPipeline() {
         }
       : null;
 
+  const [insights] = useState<string[]>([
+    "Connect your inbox to start sourcing deals automatically.",
+    "Invite your partner to collaborate on diligence.",
+    "Set your investment thesis to enable AI scoring.",
+  ]);
+
+  // Activity feed display items
+  const activityFeed = recentActivity.map((act) => {
+    const room = roomsData.find((r) => r.id === act.deal_room_id);
+    return {
+      id: act.id,
+      company: (room?.startups as any)?.company_name ?? "Deal",
+      action: act.action,
+      time: new Date(act.created_at as string).toLocaleDateString(),
+    };
+  });
+
   return (
-    <div className="p-6 lg:p-8">
-      <div className="flex items-end justify-between flex-wrap gap-4 mb-6">
+    <div className="p-6 lg:p-8 max-w-[1500px] mx-auto space-y-6">
+      <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Deal Pipeline</h1>
-          <div className="text-sm text-muted-foreground">
-            {useReal
-              ? `${roomIds.length} active deal room${roomIds.length !== 1 ? "s" : ""}`
-              : "128 sourced · 12 in active diligence · 4 decisions this week"}
-          </div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {greet}, {user?.name?.split(" ")[0] ?? "there"}
+          </h1>
+          <div className="text-sm text-muted-foreground">{today}</div>
         </div>
-        <button className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow">
-          <Plus className="h-4 w-4" /> Source deal
-        </button>
+        <button className="rounded-[10px] border border-border/60 px-3 py-2 text-sm hover:bg-accent">How it works</button>
       </div>
 
-      {/* Attention strip */}
-      <div className="mb-6">
+      <section>
+        <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">Today's attention</div>
         <AttentionStrip items={attentionItems} />
+      </section>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { l: "Active deals", v: `${roomIds.length}`, s: roomIds.length !== 1 ? "deal rooms" : "deal room" },
+          { l: "In diligence", v: `${inDiligence}`, s: "—" },
+          { l: "Decisions this month", v: `${decisionsThisMonth}`, s: "—" },
+          { l: "Avg deal score", v: "—", s: "—" },
+        ].map((k) => (
+          <div key={k.l} className="rounded-2xl border border-border/60 bg-card p-4">
+            <div className="text-xs text-muted-foreground">{k.l}</div>
+            <div className="mt-1 text-xl font-semibold tabular-nums">{k.v}</div>
+            <div className="text-[11px] text-muted-foreground">{k.s}</div>
+          </div>
+        ))}
       </div>
 
-      {/* Kanban board */}
-      <div className="-mx-6 lg:-mx-8 px-6 lg:px-8 overflow-x-auto pb-6">
-        <div className="flex gap-3 min-w-max">
-          {KANBAN_STAGES.map((stage) => {
-            const stageCards = cards.filter((c) => c.stage === stage);
-            return (
-              <div key={stage} className="w-[300px] flex-shrink-0">
-                <div className="px-1 mb-2.5 flex items-center justify-between">
-                  <div className="text-sm font-medium">
-                    {stage} <span className="text-xs text-muted-foreground">{stageCards.length}</span>
-                  </div>
-                </div>
-                <div className="space-y-2 rounded-xl bg-muted/30 p-2 min-h-[200px]">
-                  {stageCards.map((c) => (
-                    <button
-                      key={c.id ?? c.n}
-                      onClick={() => c.id ? setSelectedRoomId(c.id) : undefined}
-                      className="w-full text-left rounded-lg border border-border/60 bg-card p-3 shadow-xs hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <div className="text-sm font-semibold">{c.n}</div>
-                          <div className="text-xs text-muted-foreground">{c.s}</div>
-                        </div>
-                        {c.score > 0 && (
-                          <div className={`text-[11px] font-mono tabular-nums rounded-md px-1.5 py-0.5 ${c.score >= 85 ? "bg-success/15 text-success" : c.score >= 70 ? "bg-warning/15 text-warning" : "bg-destructive/15 text-destructive"}`}>
-                            {c.score}
-                          </div>
-                        )}
-                      </div>
-                      <div className="mt-3 flex items-center justify-between text-[11px]">
-                        <span className="text-muted-foreground">Ask</span>
-                        <span className="font-medium">{c.check}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+      <section className="rounded-2xl border border-border/60 bg-card overflow-hidden">
+        <div className="px-5 py-3 border-b border-border/60 text-sm font-semibold">Deal flow by stage</div>
+        <div className="grid grid-cols-3 md:grid-cols-6 divide-y md:divide-y-0 md:divide-x divide-border/60">
+          {STAGES.map((s) => (
+            <Link key={s} to="/app/investor/deal-flow" className="px-4 py-4 hover:bg-accent/40 transition-colors">
+              <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{s}</div>
+              <div className="mt-1 text-lg font-semibold tabular-nums">{stageCounts[s] ?? 0}</div>
+            </Link>
+          ))}
         </div>
+      </section>
+
+      <div className="grid lg:grid-cols-[1fr_400px] gap-5">
+        <section className="rounded-2xl border border-border/60 bg-card overflow-hidden">
+          <div className="px-5 py-3 border-b border-border/60 text-sm font-semibold">Recent activity</div>
+          {activityFeed.length === 0 ? (
+            <div className="p-10 text-center text-sm text-muted-foreground">
+              <Inbox className="mx-auto h-8 w-8 opacity-40" />
+              <div className="mt-2">No recent activity</div>
+            </div>
+          ) : (
+            <div className="divide-y divide-border/60">
+              {activityFeed.map((a) => (
+                <div key={a.id} className="px-5 py-3 flex items-center gap-3">
+                  <div className="flex-1">
+                    <div className="text-sm font-medium">{a.company}</div>
+                    <div className="text-xs text-muted-foreground">{a.action}</div>
+                  </div>
+                  <div className="text-xs text-muted-foreground">{a.time}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="rounded-2xl bg-gradient-to-br from-brand to-violet text-brand-foreground p-6 relative overflow-hidden">
+          <div className="absolute inset-0 noise opacity-20" />
+          <div className="relative">
+            <div className="inline-flex items-center gap-1.5 text-xs font-medium opacity-90">
+              <Sparkles className="h-3.5 w-3.5" /> AI Weekly Brief
+            </div>
+            <h3 className="mt-2 text-lg font-semibold">Your week in deals</h3>
+            <ul className="mt-4 space-y-2 text-sm opacity-95">
+              {insights.map((s, i) => (
+                <li key={i} className="flex gap-2">
+                  <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 opacity-80" />
+                  <span>{s}</span>
+                </li>
+              ))}
+            </ul>
+            <button className="mt-5 inline-flex items-center gap-1.5 rounded-[10px] bg-background/15 hover:bg-background/25 px-3 py-1.5 text-xs">
+              Regenerate
+            </button>
+          </div>
+        </section>
       </div>
 
-      {/* AI brief loading overlay */}
       {briefLoading && selectedRoomId && (
         <div className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm flex items-center justify-center">
           <div className="rounded-2xl bg-card p-8 shadow-elev text-sm text-muted-foreground animate-pulse">
@@ -240,7 +278,6 @@ function InvestorPipeline() {
         </div>
       )}
 
-      {/* AI brief panel */}
       <AIBriefPanel
         data={aiBriefData}
         onClose={() => setSelectedRoomId(null)}
@@ -251,14 +288,3 @@ function InvestorPipeline() {
     </div>
   );
 }
-
-const MOCK_CARDS: KanbanCard[] = [
-  { id: null, stage: "Sourced", n: "Atlas Robotics", s: "Series A · Robotics", check: "$5M", score: 87 },
-  { id: null, stage: "Sourced", n: "Lumen AI", s: "Seed · Dev tools", check: "$2M", score: 76 },
-  { id: null, stage: "Diligence", n: "Helix Bio", s: "Series A · Biotech", check: "$8M", score: 91 },
-  { id: null, stage: "Diligence", n: "Northwind", s: "Seed · Climate", check: "$1.5M", score: 68 },
-  { id: null, stage: "Partner", n: "Quanta Labs", s: "Series A · AI", check: "$10M", score: 94 },
-  { id: null, stage: "Info Req.", n: "Forge", s: "Seed · Fintech", check: "$3M", score: 72 },
-  { id: null, stage: "Term Sheet", n: "Vertex", s: "Series B · SaaS", check: "$15M", score: 89 },
-  { id: null, stage: "Pass", n: "Pulse", s: "Seed · Consumer", check: "—", score: 42 },
-];
