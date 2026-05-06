@@ -1,40 +1,25 @@
-import { existsSync, readFileSync, writeFileSync } from "fs";
-import { execSync } from "child_process";
+import { readFileSync, writeFileSync, existsSync } from "fs";
+import { resolve } from "path";
 
-// 1. Remove "assets" key from dist/client/wrangler.json
-// Pages does not support the "assets" config key — the adapter adds it but
-// wrangler pages deploy rejects it.
-const pagesWranglerPath = "dist/client/wrangler.json";
-if (existsSync(pagesWranglerPath)) {
-  const cfg = JSON.parse(readFileSync(pagesWranglerPath, "utf8"));
-  if (cfg.assets !== undefined) {
-    delete cfg.assets;
-    writeFileSync(pagesWranglerPath, JSON.stringify(cfg));
-    console.log("✓ Removed 'assets' key from dist/client/wrangler.json");
-  }
-}
+// Fix asset directory path in the auto-generated dist/server/wrangler.json.
+// The adapter writes "../client" (relative to dist/server/) but wrangler
+// resolves it from CWD when run from frontend/, causing assets to be missed.
+// Using an absolute path removes the ambiguity.
+const wranglerPath = "dist/server/wrangler.json";
 
-// 2. Bundle dist/server/server.js → dist/client/_worker.js
-// Cloudflare Pages Advanced Mode: _worker.js handles SSR for non-asset paths.
-// Pages CDN serves everything in dist/client/ (CSS, JS, images) directly.
-if (!existsSync("dist/server/server.js")) {
-  console.error("✘ dist/server/server.js not found — did the build run?");
+if (!existsSync(wranglerPath)) {
+  console.error("✘ dist/server/wrangler.json not found — did the build run?");
   process.exit(1);
 }
 
-console.log("Bundling server.js → _worker.js ...");
-execSync(
-  [
-    "node_modules/.bin/esbuild",
-    "dist/server/server.js",
-    "--bundle",
-    "--format=esm",
-    "--platform=browser",
-    "--external:node:*",
-    "--conditions=worker,browser",
-    "--outfile=dist/client/_worker.js",
-    "--log-level=warning",
-  ].join(" "),
-  { stdio: "inherit" }
-);
-console.log("✓ dist/client/_worker.js ready");
+const cfg = JSON.parse(readFileSync(wranglerPath, "utf8"));
+
+if (cfg.assets) {
+  cfg.assets.directory = resolve("dist/client");
+  // Remove binding — Cloudflare routes matching assets directly before
+  // invoking the Worker. Binding is only needed for programmatic access
+  // inside the Worker, which this app doesn't use.
+  delete cfg.assets.binding;
+  writeFileSync(wranglerPath, JSON.stringify(cfg));
+  console.log("✓ Patched dist/server/wrangler.json: absolute assets path, binding removed");
+}
