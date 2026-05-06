@@ -1,7 +1,7 @@
 {
   "name": "vcroom-main",
   "compatibility_date": "2024-09-23",
-  "compatibility_flags": ["nodejs_compat", "global_navigator"],
+  "compatibility_flags": ["nodejs_compat"],
   "main": "./dist/server/index.js",
   "assets": {
     "directory": "./dist/client",
