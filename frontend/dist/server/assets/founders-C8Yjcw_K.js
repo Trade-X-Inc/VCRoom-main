@@ -1,0 +1,31 @@
+import { U as jsxRuntimeExports } from "./worker-entry-Cmmw-2kk.js";
+import { S as SolutionPage } from "./SolutionPage-Hk7gSeOE.js";
+import { U as Users } from "./users-DG4-LCT1.js";
+import "node:events";
+import "node:async_hooks";
+import "node:stream/web";
+import "node:stream";
+import "./router-DUHyCcO4.js";
+import "./index-DYJmQpRE.js";
+import "./SiteFooter-ko0XRERz.js";
+import "./Logo-DAWquX1K.js";
+import "./utils-Bz4m9VPB.js";
+import "./LangSwitcher-CtmoKmV5.js";
+import "./createLucideIcon-ByQ9CEis.js";
+import "./globe-C2Bd-UgU.js";
+import "./arrow-right-UEn806qT.js";
+import "./AppPreview-d75kBYQh.js";
+import "./layout-grid-jsBmracF.js";
+import "./file-text-D5pqWYYG.js";
+import "./message-square-BXZGe1sQ.js";
+import "./sparkles-D86DPdwE.js";
+import "./search-BdeIBPuN.js";
+import "./bell-nx3hwQdI.js";
+import "./trending-up-DgeIFwuL.js";
+import "./chevron-right-DmvFmFFf.js";
+import "./arrow-up-right-Bu3C3T_X.js";
+import "./check-CokXn3MG.js";
+const SplitComponent = () => /* @__PURE__ */ jsxRuntimeExports.jsx(SolutionPage, { eyebrow: "For Founders", title: "Your fundraise. In one room.", sub: "Stop juggling spreadsheets, inboxes, and Drive folders. Venture Room gives you a single workspace to run the entire raise.", Icon: Users, features: [["Pipeline that thinks", "Drag-drop kanban with stage analytics, AI follow-ups, and intro suggestions."], ["AI email that sounds like you", "Cold outreach, replies, and weekly updates drafted in your voice."], ["Deal rooms that close", "NDA, documents, Q&A, checklist, and decision board — in one structured flow."]] });
+export {
+  SplitComponent as component
+};

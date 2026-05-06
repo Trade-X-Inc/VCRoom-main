@@ -94,6 +94,8 @@ function DealRooms() {
   );
 }
 
+const DEAL_TYPES = ["Equity", "SAFE", "Convertible Note", "Other"] as const;
+
 function CreateRoomForm({ onClose }: { onClose: () => void }) {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -102,6 +104,10 @@ function CreateRoomForm({ onClose }: { onClose: () => void }) {
   const [error, setError] = useState("");
   const [investorName, setInvestorName] = useState("");
   const [investorFirm, setInvestorFirm] = useState("");
+  const [dealType, setDealType] = useState<(typeof DEAL_TYPES)[number]>("Equity");
+  const [fundingTarget, setFundingTarget] = useState("");
+  const [description, setDescription] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
   const [startupId, setStartupId] = useState("");
 
   const { data: startups = [], isLoading: startupsLoading } = useQuery({
@@ -149,10 +155,21 @@ function CreateRoomForm({ onClose }: { onClose: () => void }) {
       await supabase.from("activities").insert({
         deal_room_id: newRoom.id,
         actor_id: user.id,
-        action: `Deal room created for ${investorName.trim()}${investorFirm.trim() ? ` (${investorFirm.trim()})` : ""}`,
+        action: `Deal room created for ${investorName.trim()}${investorFirm.trim() ? ` (${investorFirm.trim()})` : ""} · ${dealType}${fundingTarget ? ` · $${fundingTarget}` : ""}`,
       });
 
-      // 4. Invalidate + navigate
+      // 4. Send invite if email provided
+      if (inviteEmail.trim()) {
+        await supabase.from("invites").insert({
+          email: inviteEmail.trim(),
+          role: "investor",
+          invited_by: user.id,
+          deal_room_id: newRoom.id,
+          expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        });
+      }
+
+      // 5. Invalidate + navigate
       queryClient.invalidateQueries({ queryKey: ["deal-rooms"] });
       onClose();
       navigate({ to: "/app/deal-room/$id" as any, params: { id: newRoom.id } as any });
@@ -201,6 +218,52 @@ function CreateRoomForm({ onClose }: { onClose: () => void }) {
             placeholder="Sequoia Capital"
             className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
           />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground">Deal type</label>
+            <select
+              value={dealType}
+              onChange={(e) => setDealType(e.target.value as any)}
+              className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+            >
+              {DEAL_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground">Funding target ($)</label>
+            <input
+              type="number"
+              value={fundingTarget}
+              onChange={(e) => setFundingTarget(e.target.value)}
+              placeholder="500000"
+              className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs text-muted-foreground">Description (optional)</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={2}
+            placeholder="Brief notes on this investor relationship…"
+            className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
+          />
+        </div>
+
+        <div>
+          <label className="text-xs text-muted-foreground">Invite investor email (optional)</label>
+          <input
+            type="email"
+            value={inviteEmail}
+            onChange={(e) => setInviteEmail(e.target.value)}
+            placeholder="investor@sequoia.com"
+            className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+          />
+          <p className="mt-1 text-[11px] text-muted-foreground">We'll create an invite link you can share with them.</p>
         </div>
 
         <div>

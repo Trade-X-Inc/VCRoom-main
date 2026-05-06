@@ -1,0 +1,32 @@
+import { U as jsxRuntimeExports } from "./worker-entry-Cmmw-2kk.js";
+import { S as SolutionPage } from "./SolutionPage-Hk7gSeOE.js";
+import { L as Layers } from "./layers-ClMhj8zH.js";
+import "node:events";
+import "node:async_hooks";
+import "node:stream/web";
+import "node:stream";
+import "./router-DUHyCcO4.js";
+import "./index-DYJmQpRE.js";
+import "./SiteFooter-ko0XRERz.js";
+import "./Logo-DAWquX1K.js";
+import "./utils-Bz4m9VPB.js";
+import "./LangSwitcher-CtmoKmV5.js";
+import "./createLucideIcon-ByQ9CEis.js";
+import "./globe-C2Bd-UgU.js";
+import "./arrow-right-UEn806qT.js";
+import "./AppPreview-d75kBYQh.js";
+import "./layout-grid-jsBmracF.js";
+import "./users-DG4-LCT1.js";
+import "./file-text-D5pqWYYG.js";
+import "./message-square-BXZGe1sQ.js";
+import "./sparkles-D86DPdwE.js";
+import "./search-BdeIBPuN.js";
+import "./bell-nx3hwQdI.js";
+import "./trending-up-DgeIFwuL.js";
+import "./chevron-right-DmvFmFFf.js";
+import "./arrow-up-right-Bu3C3T_X.js";
+import "./check-CokXn3MG.js";
+const SplitComponent = () => /* @__PURE__ */ jsxRuntimeExports.jsx(SolutionPage, { eyebrow: "Fundraising CRM", title: "The CRM built for raising capital.", sub: "Salesforce wasn't built for raising a Series A. Venture Room is. Pipeline, outreach, and follow-ups designed for fundraising.", Icon: Layers, features: [["Investor-aware pipeline", "Stages that match how raises actually work — from intro to term sheet."], ["Inbox-native", "Two-way email sync. Replies update the stage automatically."], ["Founder analytics", "Reply rate, meeting conversion, time-in-stage — across the whole raise."]] });
+export {
+  SplitComponent as component
+};

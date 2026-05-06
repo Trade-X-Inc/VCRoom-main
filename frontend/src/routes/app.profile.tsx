@@ -220,8 +220,8 @@ function Profile() {
     <div className="p-6 lg:p-8 max-w-5xl mx-auto">
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Startup Profile</h1>
-          <div className="text-sm text-muted-foreground">This is what investors see when they enter your deal room.</div>
+          <h1 className="text-2xl font-semibold tracking-tight">{startup ? "Company Profile" : "Create your profile"}</h1>
+          <div className="text-sm text-muted-foreground">{startup ? "Edit your startup details, team, and pitch." : "Set up your startup profile so investors know who you are."}</div>
         </div>
         <button
           onClick={handleSave}

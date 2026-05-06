@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Papa from "papaparse";
 import { toast } from "sonner";
 import {
-  Plus, Upload, Flame, X, AlertCircle, Loader2,
+  Plus, Upload, Download, Flame, X, AlertCircle, Loader2,
   TrendingUp, Users, Zap, Briefcase,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
@@ -106,6 +106,21 @@ function Leads() {
   };
 
   const openAdd = () => { setEditLead(null); setDrawerOpen(true); };
+
+  const downloadSampleCsv = () => {
+    const csv = [
+      "investor_name,firm_name,email,linkedin_url,sector,stage,geography,ticket_size",
+      "Sarah Chen,Sequoia Capital,sarah@sequoia.com,https://linkedin.com/in/sarahchen,SaaS,Seed,US,$250K-$1M",
+      "Marcus Rivera,Accel Partners,marcus@accel.com,https://linkedin.com/in/marcusrivera,Fintech,Series A,Europe,$1M-$5M",
+    ].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sample_leads.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
   const openEdit = (lead: VCLead) => { setEditLead(lead); setDrawerOpen(true); };
 
   // KPI
@@ -129,6 +144,12 @@ function Leads() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={downloadSampleCsv}
+            className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent"
+          >
+            <Download className="h-4 w-4" /> Sample CSV
+          </button>
           <button
             onClick={() => setCsvOpen(true)}
             className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent"

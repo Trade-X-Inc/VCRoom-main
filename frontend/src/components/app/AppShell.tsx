@@ -1,7 +1,7 @@
 import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Logo } from "@/components/brand/Logo";
 import {
-  LayoutGrid, Users, Mail, Building2, FileText, Briefcase, MessageSquare,
+  LayoutGrid, Users, Building2, FileText, Briefcase, MessageSquare,
   Calendar, Sparkles, Search, Settings, ChevronsLeft, Plus,
   PieChart, Brain, ClipboardCheck, ListChecks, ShieldCheck, UserCog, Kanban, BarChart3,
 } from "lucide-react";
@@ -22,7 +22,6 @@ const founderNav: NavItem[] = [
   { to: "/app", labelKey: "app.overview", icon: LayoutGrid },
   { to: "/app/leads", labelKey: "app.leads", icon: Users },
   { to: "/app/pipeline", labelKey: "app.pipeline", icon: Kanban },
-  { to: "/app/email", labelKey: "app.email", icon: Mail },
   { to: "/app/profile", labelKey: "app.profile", icon: Building2 },
   { to: "/app/documents", labelKey: "app.documents", icon: FileText },
   { to: "/app/deal-rooms", labelKey: "app.dealRooms", icon: Briefcase, badge: "4" },

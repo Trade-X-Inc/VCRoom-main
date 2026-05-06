@@ -1,11 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 
-const adminClient = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
-
 type AdvisorInput = {
   userId: string;
   messages: Array<{ role: "user" | "assistant"; content: string }>;
@@ -19,6 +14,18 @@ type AdvisorResult = {
 export const sendAdvisorMessage = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): AdvisorInput => data as AdvisorInput)
   .handler(async ({ data }: { data: AdvisorInput }): Promise<AdvisorResult> => {
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceKey) {
+      return {
+        reply: "AI Advisor requires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in your server environment. Add them to your .env file in the project root.",
+        rateLimitRemaining: 20,
+      };
+    }
+
+    const adminClient = createClient(supabaseUrl, serviceKey);
+
     // Rate limit: 20 per day
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -84,7 +91,6 @@ Give specific, actionable fundraising advice based on this real context. Be dire
 
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
-      // Graceful fallback
       await adminClient.from("ai_usage").insert({ user_id: data.userId, action: "advisor_message" });
       return {
         reply: startup
@@ -108,7 +114,10 @@ Give specific, actionable fundraising advice based on this real context. Be dire
       }),
     });
 
-    if (!resp.ok) throw new Error("AI request failed");
+    if (!resp.ok) {
+      const errText = await resp.text().catch(() => "");
+      throw new Error(`OpenAI request failed (${resp.status}): ${errText}`);
+    }
     const json = (await resp.json()) as { choices: Array<{ message: { content: string } }> };
     const reply = json.choices[0]?.message?.content ?? "No response generated.";
 

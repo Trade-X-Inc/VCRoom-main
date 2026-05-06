@@ -1,0 +1,32 @@
+import { U as jsxRuntimeExports } from "./worker-entry-Cmmw-2kk.js";
+import { S as SolutionPage } from "./SolutionPage-Hk7gSeOE.js";
+import { B as Briefcase } from "./briefcase-Z_tlIkyK.js";
+import "node:events";
+import "node:async_hooks";
+import "node:stream/web";
+import "node:stream";
+import "./router-DUHyCcO4.js";
+import "./index-DYJmQpRE.js";
+import "./SiteFooter-ko0XRERz.js";
+import "./Logo-DAWquX1K.js";
+import "./utils-Bz4m9VPB.js";
+import "./LangSwitcher-CtmoKmV5.js";
+import "./createLucideIcon-ByQ9CEis.js";
+import "./globe-C2Bd-UgU.js";
+import "./arrow-right-UEn806qT.js";
+import "./AppPreview-d75kBYQh.js";
+import "./layout-grid-jsBmracF.js";
+import "./users-DG4-LCT1.js";
+import "./file-text-D5pqWYYG.js";
+import "./message-square-BXZGe1sQ.js";
+import "./sparkles-D86DPdwE.js";
+import "./search-BdeIBPuN.js";
+import "./bell-nx3hwQdI.js";
+import "./trending-up-DgeIFwuL.js";
+import "./chevron-right-DmvFmFFf.js";
+import "./arrow-up-right-Bu3C3T_X.js";
+import "./check-CokXn3MG.js";
+const SplitComponent = () => /* @__PURE__ */ jsxRuntimeExports.jsx(SolutionPage, { eyebrow: "For Investors", title: "Decide faster. With more clarity.", sub: "Bring every deal into one structured environment. AI summarizes risk. Your team sees status at a glance.", Icon: Briefcase, features: [["Deal pipeline", "All sourced deals, scored and stage-tagged. Filters for sector, stage, geography."], ["AI risk analysis", "Auto-summarized red flags, key metrics, and competitive context per deal."], ["Decision board", "Accept, reject, hold — with notes, risk level, and partner sign-off in one place."]] });
+export {
+  SplitComponent as component
+};
