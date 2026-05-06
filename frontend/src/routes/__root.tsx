@@ -72,6 +72,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  if (typeof window !== 'undefined') {
+    console.log('[env-check] VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL?.slice(0, 20) ?? 'MISSING')
+    console.log('[env-check] VITE_SUPABASE_ANON_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? 'present' : 'MISSING')
+    console.log('[env-check] VITE_GOOGLE_CLIENT_ID:', import.meta.env.VITE_GOOGLE_CLIENT_ID ? 'present' : 'MISSING')
+  }
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
