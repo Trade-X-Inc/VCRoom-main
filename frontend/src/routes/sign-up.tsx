@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { AuthLayout, Divider, Field, GoogleButton } from "@/components/auth/AuthLayout";
 import { supabase } from "@/lib/supabase";
@@ -58,6 +58,7 @@ function RoleCard({
 
 function SignUpPage() {
   const search = Route.useSearch();
+  const nav = useNavigate();
   const [role, setRole] = useState<AppRole>(search.role);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -87,11 +88,32 @@ function SignUpPage() {
         email,
         password: pw,
         options: {
-          emailRedirectTo: window.location.origin + "/sign-in",
           data: { full_name: name || role, role, invite_token: token || null },
         },
       });
       if (signUpError) throw signUpError;
+
+      // Belt-and-suspenders: persist role locally so sign-in can re-save if upsert failed
+      localStorage.setItem(`pending_role_${email}`, role);
+
+      // Check if we got an immediate session (email confirmation disabled)
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session && data.user?.id) {
+        const now = new Date().toISOString();
+        await supabase.from("users").upsert({
+          id: data.user.id,
+          email,
+          full_name: name || role,
+          role,
+          created_at: now,
+          updated_at: now,
+        });
+        localStorage.removeItem(`pending_role_${email}`);
+        nav({ to: role === "investor" ? "/app/investor" : "/app" });
+        return;
+      }
+
+      // Email confirmation required — save role and show confirmation screen
       if (data.user?.id) {
         const now = new Date().toISOString();
         const { error: upsertError } = await supabase.from("users").upsert({
@@ -104,8 +126,6 @@ function SignUpPage() {
         });
         if (upsertError) console.error("Failed to save user role:", upsertError);
       }
-      // Belt-and-suspenders: persist role locally so sign-in can re-save if upsert failed
-      localStorage.setItem(`pending_role_${email}`, role);
       setConfirmed(true);
       setCountdown(60);
     } catch (err) {
@@ -126,7 +146,7 @@ function SignUpPage() {
       const { error: resendError } = await supabase.auth.resend({
         type: "signup",
         email,
-        options: { emailRedirectTo: window.location.origin + "/sign-in" },
+        options: { emailRedirectTo: window.location.origin + "/auth/callback" },
       });
       if (resendError) throw resendError;
       setResendStatus("sent");
@@ -148,10 +168,15 @@ function SignUpPage() {
   })();
 
   const google = async () => {
-    await supabase.auth.signInWithOAuth({
+    localStorage.setItem("oauth_pending_role", role);
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin + "/app" },
+      options: {
+        redirectTo: window.location.origin + "/auth/callback",
+        queryParams: { access_type: "offline", prompt: "consent" },
+      },
     });
+    if (error) console.error(error);
   };
 
   if (confirmed) {
