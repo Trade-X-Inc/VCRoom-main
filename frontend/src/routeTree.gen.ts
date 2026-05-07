@@ -28,6 +28,7 @@ import { Route as SolutionsInvestorPipelineRouteImport } from './routes/solution
 import { Route as SolutionsFundraisingCrmRouteImport } from './routes/solutions.fundraising-crm'
 import { Route as SolutionsDueDiligenceRouteImport } from './routes/solutions.due-diligence'
 import { Route as JoinTokenRouteImport } from './routes/join.$token'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AppUsersRouteImport } from './routes/app.users'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppReportsRouteImport } from './routes/app.reports'
@@ -154,6 +155,11 @@ const SolutionsDueDiligenceRoute = SolutionsDueDiligenceRouteImport.update({
 const JoinTokenRoute = JoinTokenRouteImport.update({
   id: '/join/$token',
   path: '/join/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppUsersRoute = AppUsersRouteImport.update({
@@ -341,6 +347,7 @@ export interface FileRoutesByFullPath {
   '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/users': typeof AppUsersRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/join/$token': typeof JoinTokenRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
   '/solutions/fundraising-crm': typeof SolutionsFundraisingCrmRoute
@@ -391,6 +398,7 @@ export interface FileRoutesByTo {
   '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/users': typeof AppUsersRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/join/$token': typeof JoinTokenRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
   '/solutions/fundraising-crm': typeof SolutionsFundraisingCrmRoute
@@ -444,6 +452,7 @@ export interface FileRoutesById {
   '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/users': typeof AppUsersRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/join/$token': typeof JoinTokenRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
   '/solutions/fundraising-crm': typeof SolutionsFundraisingCrmRoute
@@ -498,6 +507,7 @@ export interface FileRouteTypes {
     | '/app/reports'
     | '/app/settings'
     | '/app/users'
+    | '/auth/callback'
     | '/join/$token'
     | '/solutions/due-diligence'
     | '/solutions/fundraising-crm'
@@ -548,6 +558,7 @@ export interface FileRouteTypes {
     | '/app/reports'
     | '/app/settings'
     | '/app/users'
+    | '/auth/callback'
     | '/join/$token'
     | '/solutions/due-diligence'
     | '/solutions/fundraising-crm'
@@ -600,6 +611,7 @@ export interface FileRouteTypes {
     | '/app/reports'
     | '/app/settings'
     | '/app/users'
+    | '/auth/callback'
     | '/join/$token'
     | '/solutions/due-diligence'
     | '/solutions/fundraising-crm'
@@ -638,6 +650,7 @@ export interface RootRouteChildren {
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   TermsRoute: typeof TermsRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   JoinTokenRoute: typeof JoinTokenRoute
   SolutionsDueDiligenceRoute: typeof SolutionsDueDiligenceRoute
   SolutionsFundraisingCrmRoute: typeof SolutionsFundraisingCrmRoute
@@ -779,6 +792,13 @@ declare module '@tanstack/react-router' {
       path: '/join/$token'
       fullPath: '/join/$token'
       preLoaderRoute: typeof JoinTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/users': {
@@ -1106,6 +1126,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   TermsRoute: TermsRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   JoinTokenRoute: JoinTokenRoute,
   SolutionsDueDiligenceRoute: SolutionsDueDiligenceRoute,
   SolutionsFundraisingCrmRoute: SolutionsFundraisingCrmRoute,

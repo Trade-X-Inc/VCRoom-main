@@ -14,26 +14,37 @@ function AuthCallback() {
       const { data: { session }, error } = await supabase.auth.getSession();
 
       if (error || !session) {
+        console.error("[Auth Callback] No session:", error);
         navigate({ to: "/sign-in" });
         return;
       }
 
       const metadata = session.user.user_metadata;
-      const pendingRole = localStorage.getItem("oauth_pending_role");
-      console.log("Pending role from storage:", pendingRole);
-      console.log("Metadata role:", metadata?.role);
+      const userEmail = session.user.email ?? "";
+
+      // Read both localStorage keys (OAuth sets oauth_pending_role, email signup sets pending_role_<email>)
+      const pendingRole = localStorage.getItem("oauth_pending_role") || localStorage.getItem(`pending_role_${userEmail}`);
+      console.log("[Auth Callback] User:", userEmail);
+      console.log("[Auth Callback] Pending role from localStorage:", pendingRole);
+      console.log("[Auth Callback] Metadata role:", metadata?.role);
 
       // Check if user already has a role in DB (returning users)
-      const { data: existingUser } = await supabase
+      const { data: existingUser, error: fetchErr } = await supabase
         .from("users")
         .select("role")
         .eq("id", session.user.id)
-        .single();
+        .maybeSingle();
+
+      if (fetchErr) console.error("[Auth Callback] DB fetch error:", fetchErr);
 
       // Priority: DB role > localStorage > metadata > default
       const role = existingUser?.role || pendingRole || metadata?.role || "founder";
-      console.log("Final role being saved:", role);
+      console.log("[Auth Callback] Existing DB role:", existingUser?.role);
+      console.log("[Auth Callback] Final role:", role);
+
+      // Clean up localStorage
       localStorage.removeItem("oauth_pending_role");
+      localStorage.removeItem(`pending_role_${userEmail}`);
 
       // Always upsert — existing users write back their DB role (no-op); new users write pending role
       const { error: upsertError } = await supabase.from("users").upsert(
@@ -46,14 +57,12 @@ function AuthCallback() {
         },
         { onConflict: "id" },
       );
-      if (upsertError) console.error("Upsert error:", upsertError);
+      if (upsertError) console.error("[Auth Callback] Upsert error:", upsertError);
+      else console.log("[Auth Callback] User upserted successfully");
 
-      console.log("Navigating to:", role === "investor" ? "/app/investor" : "/app");
-      if (role === "investor") {
-        navigate({ to: "/app/investor" });
-      } else {
-        navigate({ to: "/app" });
-      }
+      const target = role === "investor" ? "/app/investor" : "/app";
+      console.log("[Auth Callback] Navigating to:", target);
+      navigate({ to: target });
     };
 
     handleCallback();

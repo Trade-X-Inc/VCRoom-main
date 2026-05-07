@@ -154,11 +154,15 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
           .update(payload)
           .eq("id", lead.id)
           .eq("founder_id", user!.id);
+        console.log("[LeadDrawer] Update result:", { error });
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("vc_leads")
-          .insert({ ...payload, founder_id: user!.id });
+          .insert({ ...payload, founder_id: user!.id })
+          .select()
+          .single();
+        console.log("[LeadDrawer] Insert result:", { data, error });
         if (error) throw error;
       }
       toast.success("Lead saved");

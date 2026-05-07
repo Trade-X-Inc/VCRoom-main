@@ -2,5 +2,8 @@
   "name": "vcroom-main",
   "compatibility_date": "2024-09-23",
   "compatibility_flags": ["nodejs_compat"],
-  "pages_build_output_dir": "./dist/client"
+  "pages_build_output_dir": "./dist/client",
+  "vars": {
+    "NODE_ENV": "production"
+  }
 }

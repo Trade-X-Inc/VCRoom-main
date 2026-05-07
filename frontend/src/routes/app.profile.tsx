@@ -143,13 +143,12 @@ function Profile() {
         business_model: form.business_model || null,
         use_of_funds: form.use_of_funds || null,
       };
-      if (startup?.id) {
-        const { error } = await supabase.from("startups").update(payload).eq("id", startup.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from("startups").insert({ ...payload, founder_id: user.id });
-        if (error) throw error;
-      }
+      const { error } = await supabase.from("startups").upsert(
+        { ...payload, founder_id: user.id },
+        { onConflict: "founder_id" },
+      );
+      console.log("[Profile] Save result:", { error });
+      if (error) throw error;
       toast.success("Profile saved");
       queryClient.invalidateQueries({ queryKey: ["my-startup", user.id] });
       queryClient.invalidateQueries({ queryKey: ["my-startup-overview"] });

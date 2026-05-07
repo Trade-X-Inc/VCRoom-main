@@ -1,11 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 
-const adminClient = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
-
 type BriefInput = { dealRoomId: string; userId: string };
 
 export interface DealBriefResult {
@@ -20,6 +15,10 @@ export interface DealBriefResult {
 export const generateDealBrief = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): BriefInput => data as BriefInput)
   .handler(async ({ data }: { data: BriefInput }): Promise<DealBriefResult> => {
+    const supabaseUrl = process.env.SUPABASE_URL || (import.meta.env as any).VITE_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || (import.meta.env as any).VITE_SUPABASE_ANON_KEY;
+    const adminClient = createClient(supabaseUrl!, serviceKey!);
+
     // 1. Verify investor is a member of this deal room
     const { data: member } = await adminClient
       .from("deal_room_members")
