@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
 
   const buildUser = async (userId: string, email: string, userMetadata?: Record<string, any>): Promise<AppUser> => {
-    const { data } = await supabase.from("users").select("full_name, role").eq("id", userId).single();
+    const { data } = await supabase.from("users").select("full_name, role").eq("id", userId).maybeSingle();
     const dbRole = data?.role as string | null | undefined;
     const metaRole = userMetadata?.role as string | null | undefined;
     // Fall back to auth metadata role if DB has no role (e.g. upsert failed during signup)

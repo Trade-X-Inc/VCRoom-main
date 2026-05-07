@@ -5,7 +5,6 @@ import { supabase } from "@/lib/supabase";
 export const Route = createFileRoute("/app")({
   beforeLoad: async () => {
     try {
-      // Retry loop: give Supabase time to restore session from localStorage on page load
       let session = null;
       let attempts = 0;
       while (!session && attempts < 3) {
@@ -21,13 +20,13 @@ export const Route = createFileRoute("/app")({
         .from("users")
         .select("role")
         .eq("id", session.user.id)
-        .single();
+        .maybeSingle();
 
       const role = userRecord?.role || session.user.user_metadata?.role || "founder";
-      if (role === "investor") throw redirect({ to: "/app/investor" });
-    } catch (error) {
-      if (isRedirect(error)) throw error;
-      throw redirect({ to: "/sign-in" });
+      if (role === "investor") throw redirect({ to: "/app/investor/" });
+    } catch (err) {
+      if (isRedirect(err)) throw err;
+      // On DB error, allow founder dashboard access
     }
   },
   component: () => <AppShell><Outlet /></AppShell>,

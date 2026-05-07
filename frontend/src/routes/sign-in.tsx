@@ -119,6 +119,14 @@ function SignInPage() {
         </button>
         {error && <p className="text-xs text-destructive">{error}</p>}
       </form>
+
+      <div className="mt-4 p-3 bg-muted rounded-lg text-xs text-muted-foreground">
+        <p className="font-medium mb-2">Test navigation:</p>
+        <div className="flex gap-3">
+          <a href="/app" className="text-brand underline">Founder dashboard</a>
+          <a href="/app/investor/" className="text-brand underline">Investor dashboard</a>
+        </div>
+      </div>
     </AuthLayout>
   );
 }

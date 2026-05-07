@@ -38,9 +38,9 @@ function AuthCallback() {
       if (fetchErr) console.error("[Auth Callback] DB fetch error:", fetchErr);
 
       // Priority: DB role > localStorage > metadata > default
-      const role = existingUser?.role || pendingRole || metadata?.role || "founder";
+      const finalRole = existingUser?.role || pendingRole || metadata?.role || "founder";
       console.log("[Auth Callback] Existing DB role:", existingUser?.role);
-      console.log("[Auth Callback] Final role:", role);
+      console.log("[Auth Callback] Final role:", finalRole);
 
       // Clean up localStorage
       localStorage.removeItem("oauth_pending_role");
@@ -51,7 +51,7 @@ function AuthCallback() {
         {
           id: session.user.id,
           email: session.user.email,
-          role,
+          role: finalRole,
           full_name: metadata?.full_name || metadata?.name || session.user.email?.split("@")[0] || "",
           updated_at: new Date().toISOString(),
         },
@@ -60,9 +60,20 @@ function AuthCallback() {
       if (upsertError) console.error("[Auth Callback] Upsert error:", upsertError);
       else console.log("[Auth Callback] User upserted successfully");
 
-      const target = role === "investor" ? "/app/investor" : "/app";
+      const target = finalRole === "investor" ? "/app/investor/" : "/app";
       console.log("[Auth Callback] Navigating to:", target);
-      navigate({ to: target });
+
+      // Primary navigation via TanStack Router
+      navigate({ to: target as any });
+
+      // Fallback: force full page reload after 100ms in case navigate silently fails
+      setTimeout(() => {
+        if (finalRole === "investor") {
+          window.location.href = "/app/investor/";
+        } else {
+          window.location.href = "/app";
+        }
+      }, 100);
     };
 
     handleCallback();
