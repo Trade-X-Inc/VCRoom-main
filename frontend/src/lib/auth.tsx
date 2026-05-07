@@ -28,11 +28,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
-  const buildUser = async (userId: string, email: string): Promise<AppUser> => {
+  const buildUser = async (userId: string, email: string, userMetadata?: Record<string, any>): Promise<AppUser> => {
     const { data } = await supabase.from("users").select("full_name, role").eq("id", userId).single();
-    const name: string = (data?.full_name as string | null) || email.split("@")[0] || "User";
+    const dbRole = data?.role as string | null | undefined;
+    const metaRole = userMetadata?.role as string | null | undefined;
+    // Fall back to auth metadata role if DB has no role (e.g. upsert failed during signup)
+    const appRole: AppRole = (dbRole === "investor" || (!dbRole && metaRole === "investor")) ? "investor" : "founder";
+    const name: string = (data?.full_name as string | null) || (userMetadata?.full_name as string | null) || email.split("@")[0] || "User";
     const initials = name.split(" ").map((s) => s[0]).slice(0, 2).join("").toUpperCase() || "VR";
-    const appRole: AppRole = data?.role === "investor" ? "investor" : "founder";
     return {
       id: userId,
       email,
@@ -47,14 +50,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
       if (data.user?.id && data.user.email) {
-        setUser(await buildUser(data.user.id, data.user.email));
+        setUser(await buildUser(data.user.id, data.user.email, data.user.user_metadata));
       }
       setHydrated(true);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user?.id && session.user.email) {
-        setUser(await buildUser(session.user.id, session.user.email));
+        setUser(await buildUser(session.user.id, session.user.email, session.user.user_metadata));
       } else if (event === "SIGNED_OUT") {
         setUser(null);
       }
@@ -67,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
     if (!data.user?.id || !data.user.email) throw new Error("Sign-in failed.");
-    const appUser = await buildUser(data.user.id, data.user.email);
+    const appUser = await buildUser(data.user.id, data.user.email, data.user.user_metadata);
     setUser(appUser);
     return appUser;
   };

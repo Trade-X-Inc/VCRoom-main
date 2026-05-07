@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AuthLayout, Divider, Field, GoogleButton } from "@/components/auth/AuthLayout";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -19,6 +19,33 @@ function SignInPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // FIX 3: Save role when user arrives via email confirmation link
+  useEffect(() => {
+    const saveRoleAfterConfirmation = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const metadata = session.user.user_metadata;
+      if (!metadata?.role) return;
+      // Only upsert if role is missing in DB (avoid overwriting legitimate data)
+      const { data: existing } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", session.user.id)
+        .maybeSingle();
+      if (!existing?.role) {
+        const { error: upsertErr } = await supabase.from("users").upsert({
+          id: session.user.id,
+          role: metadata.role,
+          full_name: metadata.full_name || "",
+          updated_at: new Date().toISOString(),
+        });
+        if (upsertErr) console.error("[Auth] Role save on confirmation failed:", upsertErr);
+        else console.log("[Auth] Role saved after email confirmation:", metadata.role);
+      }
+    };
+    saveRoleAfterConfirmation();
+  }, []);
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -29,7 +56,26 @@ function SignInPage() {
         setError("Invalid email or password.");
         return;
       }
-      const roleDefault = appUser.appRole === "investor" ? "/app/investor" : "/app";
+
+      // FIX 1: If signup upsert failed earlier, re-save role from localStorage now that we have a valid session
+      const pendingRole = localStorage.getItem(`pending_role_${email}`);
+      if (pendingRole) {
+        await supabase.from("users").upsert({
+          id: appUser.id,
+          role: pendingRole,
+          updated_at: new Date().toISOString(),
+        });
+        localStorage.removeItem(`pending_role_${email}`);
+      }
+
+      // FIX 5: Debug — visible in browser console
+      console.log("[Auth Debug] User ID:", appUser.id);
+      console.log("[Auth Debug] appRole (from DB + metadata):", appUser.appRole);
+      console.log("[Auth Debug] Pending localStorage role:", pendingRole ?? "none");
+
+      // Navigate using effective role (localStorage takes precedence if DB was stale)
+      const effectiveRole = (pendingRole as "investor" | "founder" | null) ?? appUser.appRole;
+      const roleDefault = effectiveRole === "investor" ? "/app/investor" : "/app";
       const target = (search.redirect && search.redirect !== "/app") ? search.redirect : roleDefault;
       nav({ to: target as any });
     } catch (err: any) {

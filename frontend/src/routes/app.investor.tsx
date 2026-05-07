@@ -22,7 +22,8 @@ export const Route = createFileRoute("/app/investor")({
         .eq("id", session.user.id)
         .single();
 
-      if (userRecord?.role !== "investor") throw redirect({ to: "/app" });
+      const role = userRecord?.role || session.user.user_metadata?.role || "founder";
+      if (role !== "investor") throw redirect({ to: "/app" });
     } catch (error) {
       if (isRedirect(error)) throw error;
       throw redirect({ to: "/sign-in" });

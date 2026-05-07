@@ -93,6 +93,8 @@ function SignUpPage() {
         });
         if (upsertError) console.error("Failed to save user role:", upsertError);
       }
+      // Belt-and-suspenders: persist role locally so sign-in can re-save if upsert failed
+      localStorage.setItem(`pending_role_${email}`, role);
       setConfirmed(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create account.");
