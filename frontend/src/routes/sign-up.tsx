@@ -82,12 +82,16 @@ function SignUpPage() {
       });
       if (signUpError) throw signUpError;
       if (data.user?.id) {
-        await supabase.from("users").upsert({
+        const now = new Date().toISOString();
+        const { error: upsertError } = await supabase.from("users").upsert({
           id: data.user.id,
           email,
           full_name: name || role,
           role,
+          created_at: now,
+          updated_at: now,
         });
+        if (upsertError) console.error("Failed to save user role:", upsertError);
       }
       setConfirmed(true);
     } catch (err) {

@@ -25,10 +25,15 @@ function SignInPage() {
     setLoading(true);
     try {
       const appUser = await signIn(email, pw);
+      if (!appUser) {
+        setError("Invalid email or password.");
+        return;
+      }
       const roleDefault = appUser.appRole === "investor" ? "/app/investor" : "/app";
-      nav({ to: (search.redirect && search.redirect !== "/app" ? search.redirect : roleDefault) as any });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to sign in.");
+      const target = (search.redirect && search.redirect !== "/app") ? search.redirect : roleDefault;
+      nav({ to: target as any });
+    } catch (err: any) {
+      setError(err?.message || "Sign in failed.");
     } finally {
       setLoading(false);
     }
