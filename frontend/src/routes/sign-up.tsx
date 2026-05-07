@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AuthLayout, Divider, Field, GoogleButton } from "@/components/auth/AuthLayout";
 import { supabase } from "@/lib/supabase";
 import { type AppRole } from "@/lib/auth";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Loader2, KeyRound, MailCheck, Rocket, TrendingUp, Check } from "lucide-react";
+import { ArrowRight, Loader2, KeyRound, MailCheck, Rocket, TrendingUp, Check, RefreshCw, ExternalLink } from "lucide-react";
 
 export const Route = createFileRoute("/sign-up")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -67,6 +67,17 @@ function SignUpPage() {
   const [error, setError] = useState("");
   const [confirmed, setConfirmed] = useState(false);
 
+  // Resend state
+  const [countdown, setCountdown] = useState(0);
+  const [resendStatus, setResendStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  // Tick the countdown down by 1 every second
+  useEffect(() => {
+    if (countdown <= 0) return;
+    const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [countdown]);
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -96,12 +107,45 @@ function SignUpPage() {
       // Belt-and-suspenders: persist role locally so sign-in can re-save if upsert failed
       localStorage.setItem(`pending_role_${email}`, role);
       setConfirmed(true);
+      setCountdown(60);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create account.");
+      const msg = err instanceof Error ? err.message : "Failed to create account.";
+      if (msg.toLowerCase().includes("already registered") || msg.toLowerCase().includes("already been registered")) {
+        setError("An account with this email already exists. Sign in instead, or use a different email.");
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  const resend = async () => {
+    setResendStatus("sending");
+    try {
+      const { error: resendError } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: { emailRedirectTo: window.location.origin + "/sign-in" },
+      });
+      if (resendError) throw resendError;
+      setResendStatus("sent");
+      setCountdown(60);
+      setTimeout(() => setResendStatus("idle"), 3000);
+    } catch {
+      setResendStatus("error");
+      setTimeout(() => setResendStatus("idle"), 3000);
+    }
+  };
+
+  // Derive webmail link from email domain
+  const webmailLink = (() => {
+    const domain = email.split("@")[1]?.toLowerCase() ?? "";
+    if (domain === "gmail.com") return "https://mail.google.com";
+    if (domain === "outlook.com" || domain === "hotmail.com" || domain === "live.com") return "https://outlook.live.com";
+    if (domain === "yahoo.com") return "https://mail.yahoo.com";
+    return null;
+  })();
 
   const google = async () => {
     await supabase.auth.signInWithOAuth({
@@ -113,7 +157,7 @@ function SignUpPage() {
   if (confirmed) {
     return (
       <AuthLayout
-        title="Check your email"
+        title="Check your inbox"
         footer={
           <>
             Already confirmed?{" "}
@@ -127,14 +171,74 @@ function SignUpPage() {
           </>
         }
       >
-        <div className="flex flex-col items-center gap-4 py-6 text-center">
-          <div className="grid h-14 w-14 place-items-center rounded-full bg-success/10">
-            <MailCheck className="h-7 w-7 text-success" />
+        <div className="flex flex-col items-center gap-5 py-4 text-center">
+          <div className="grid h-16 w-16 place-items-center rounded-full bg-success/10 ring-4 ring-success/20">
+            <MailCheck className="h-8 w-8 text-success" />
           </div>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            Check your email — click the confirmation link to activate your account, then sign in to your{" "}
-            {role === "investor" ? "investor" : "founder"} dashboard.
+
+          <div>
+            <p className="text-sm font-medium">Confirmation email sent to</p>
+            <p className="mt-1 text-sm text-brand font-semibold">{email}</p>
+          </div>
+
+          <div className="w-full rounded-xl border border-border/60 bg-card p-4 text-left space-y-3">
+            {[
+              "Open the email from Venture Room",
+              "Click the confirmation link",
+              "You'll be redirected to sign in",
+            ].map((step, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <div className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-gradient-brand text-brand-foreground text-[10px] font-bold mt-0.5">
+                  {i + 1}
+                </div>
+                <span className="text-sm text-muted-foreground">{step}</span>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            Not seeing it? Check your <span className="font-medium text-foreground">spam or junk folder.</span>
           </p>
+
+          <div className="w-full flex flex-col gap-2">
+            {webmailLink && (
+              <a
+                href={webmailLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-border/60 bg-card px-4 py-2.5 text-sm font-medium hover:bg-accent transition-colors"
+              >
+                <ExternalLink className="h-4 w-4" /> Open email app
+              </a>
+            )}
+
+            <button
+              onClick={resend}
+              disabled={countdown > 0 || resendStatus === "sending"}
+              className={cn(
+                "inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors",
+                resendStatus === "sent"
+                  ? "bg-success/10 text-success border border-success/30"
+                  : resendStatus === "error"
+                  ? "bg-destructive/10 text-destructive border border-destructive/30"
+                  : countdown > 0
+                  ? "border border-border/60 text-muted-foreground cursor-not-allowed opacity-60"
+                  : "border border-brand/40 bg-brand/5 text-brand hover:bg-brand/10",
+              )}
+            >
+              {resendStatus === "sending" ? (
+                <><Loader2 className="h-4 w-4 animate-spin" /> Sending…</>
+              ) : resendStatus === "sent" ? (
+                <><Check className="h-4 w-4" /> Email sent!</>
+              ) : resendStatus === "error" ? (
+                "Failed — try again"
+              ) : countdown > 0 ? (
+                <><RefreshCw className="h-3.5 w-3.5" /> Resend in {countdown}s</>
+              ) : (
+                <><RefreshCw className="h-3.5 w-3.5" /> Resend confirmation email</>
+              )}
+            </button>
+          </div>
         </div>
       </AuthLayout>
     );
