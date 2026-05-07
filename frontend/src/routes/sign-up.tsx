@@ -19,22 +19,28 @@ function RoleCard({
   icon: Icon,
   label,
   sub,
+  locked,
 }: {
   active: boolean;
   onClick: () => void;
   icon: React.ElementType;
   label: string;
   sub: string;
+  locked: boolean;
 }) {
+  const isDisabled = locked && !active;
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={isDisabled || (locked && active) ? undefined : onClick}
+      disabled={isDisabled}
       className={cn(
         "relative rounded-xl border p-4 text-left transition-all",
-        active
+        isDisabled
+          ? "border-border/30 bg-muted/20 opacity-35 cursor-not-allowed"
+          : active
           ? "border-brand bg-brand/5 ring-2 ring-brand/20 shadow-glow"
-          : "border-border/60 hover:border-border bg-card",
+          : "border-border/60 hover:border-border bg-card cursor-pointer",
       )}
     >
       {active && (
@@ -57,9 +63,8 @@ function RoleCard({
 }
 
 function SignUpPage() {
-  const search = Route.useSearch();
   const nav = useNavigate();
-  const [role, setRole] = useState<AppRole>(search.role);
+  const [role, setRole] = useState<AppRole | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
@@ -81,6 +86,7 @@ function SignUpPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!role) return;
     setError("");
     setLoading(true);
     try {
@@ -88,44 +94,34 @@ function SignUpPage() {
         email,
         password: pw,
         options: {
+          emailRedirectTo: window.location.origin + "/auth/callback",
           data: { full_name: name || role, role, invite_token: token || null },
         },
       });
       if (signUpError) throw signUpError;
 
-      // Belt-and-suspenders: persist role locally so sign-in can re-save if upsert failed
+      // Persist role to users table immediately (may fail if unconfirmed — that's OK)
+      if (data.user?.id) {
+        const now = new Date().toISOString();
+        const { error: upsertError } = await supabase.from("users").upsert(
+          { id: data.user.id, email, full_name: name || role, role, created_at: now, updated_at: now },
+          { onConflict: "id" },
+        );
+        if (upsertError) console.error("Failed to save user role:", upsertError);
+      }
+
+      // Belt-and-suspenders: persist role locally so callback can re-save if upsert failed
       localStorage.setItem(`pending_role_${email}`, role);
 
-      // Check if we got an immediate session (email confirmation disabled)
+      // Check if we got an immediate session (email confirmation disabled in Supabase)
       const { data: { session } } = await supabase.auth.getSession();
       if (session && data.user?.id) {
-        const now = new Date().toISOString();
-        await supabase.from("users").upsert({
-          id: data.user.id,
-          email,
-          full_name: name || role,
-          role,
-          created_at: now,
-          updated_at: now,
-        });
         localStorage.removeItem(`pending_role_${email}`);
         nav({ to: role === "investor" ? "/app/investor" : "/app" });
         return;
       }
 
-      // Email confirmation required — save role and show confirmation screen
-      if (data.user?.id) {
-        const now = new Date().toISOString();
-        const { error: upsertError } = await supabase.from("users").upsert({
-          id: data.user.id,
-          email,
-          full_name: name || role,
-          role,
-          created_at: now,
-          updated_at: now,
-        });
-        if (upsertError) console.error("Failed to save user role:", upsertError);
-      }
+      // Email confirmation required — show confirmation screen
       setConfirmed(true);
       setCountdown(60);
     } catch (err) {
@@ -168,6 +164,7 @@ function SignUpPage() {
   })();
 
   const google = async () => {
+    if (!role) return;
     localStorage.setItem("oauth_pending_role", role);
     console.log("Saving role before OAuth:", role);
     const { error } = await supabase.auth.signInWithOAuth({
@@ -189,7 +186,7 @@ function SignUpPage() {
             Already confirmed?{" "}
             <Link
               to="/sign-in"
-              search={{ redirect: role === "investor" ? "/app/investor" : "/app" }}
+              search={{ redirect: (role ?? "founder") === "investor" ? "/app/investor" : "/app" }}
               className="text-foreground font-medium hover:text-brand"
             >
               Sign in
@@ -288,10 +285,13 @@ function SignUpPage() {
       }
     >
       <div className="space-y-2 mb-2">
-        <div className="text-xs font-medium text-muted-foreground">I am a…</div>
+        <div className="text-xs font-medium text-muted-foreground">
+          {role ? "Signing up as" : "I am a…"}
+        </div>
         <div className="grid grid-cols-2 gap-2.5">
           <RoleCard
             active={role === "founder"}
+            locked={role !== null}
             onClick={() => setRole("founder")}
             icon={Rocket}
             label="I'm a Founder"
@@ -299,6 +299,7 @@ function SignUpPage() {
           />
           <RoleCard
             active={role === "investor"}
+            locked={role !== null}
             onClick={() => setRole("investor")}
             icon={TrendingUp}
             label="I'm an Investor"
@@ -307,10 +308,20 @@ function SignUpPage() {
         </div>
       </div>
 
-      <GoogleButton onClick={google} />
-      <Divider />
+      {!role && (
+        <p className="text-xs text-muted-foreground text-center py-1">
+          Select your role above to continue
+        </p>
+      )}
 
-      <form onSubmit={submit} className="space-y-3.5">
+      {role && (
+        <>
+          <GoogleButton onClick={google} />
+          <Divider />
+        </>
+      )}
+
+      <form onSubmit={submit} className={cn("space-y-3.5", !role && "hidden")}>
         <Field
           label="Full name"
           value={name}
@@ -362,7 +373,8 @@ function SignUpPage() {
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !role}
+          title={!role ? "Please select your role to continue" : undefined}
           className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-brand text-brand-foreground py-2.5 text-sm font-medium shadow-glow disabled:opacity-60"
         >
           {loading ? (

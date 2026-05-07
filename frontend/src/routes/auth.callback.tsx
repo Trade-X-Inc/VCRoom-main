@@ -35,17 +35,18 @@ function AuthCallback() {
       console.log("Final role being saved:", role);
       localStorage.removeItem("oauth_pending_role");
 
-      // Only upsert if no existing record — don't overwrite returning users' roles
-      if (!existingUser) {
-        const { error: upsertError } = await supabase.from("users").upsert({
+      // Always upsert — existing users write back their DB role (no-op); new users write pending role
+      const { error: upsertError } = await supabase.from("users").upsert(
+        {
           id: session.user.id,
           email: session.user.email,
           role,
           full_name: metadata?.full_name || metadata?.name || session.user.email?.split("@")[0] || "",
           updated_at: new Date().toISOString(),
-        });
-        if (upsertError) console.error("Upsert error:", upsertError);
-      }
+        },
+        { onConflict: "id" },
+      );
+      if (upsertError) console.error("Upsert error:", upsertError);
 
       console.log("Navigating to:", role === "investor" ? "/app/investor" : "/app");
       if (role === "investor") {

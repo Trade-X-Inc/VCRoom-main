@@ -74,7 +74,7 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  if (!open) return null;
+  // All hooks before any conditional return (Rules of Hooks)
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [f, setF] = useState({
@@ -92,6 +92,7 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
   });
 
   useEffect(() => {
+    if (!open) return;
     if (lead) {
       setF({
         investor_name: lead.investor_name ?? "",
@@ -121,7 +122,9 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
         notes: "",
       });
     }
-  }, [lead]);
+  }, [open, lead]);
+
+  if (!open) return null;
 
   const set = <K extends keyof typeof f>(k: K, v: (typeof f)[K]) =>
     setF((s) => ({ ...s, [k]: v }));
@@ -237,9 +240,10 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
                   className={inputCls}
                 />
               </Field>
-              <Field label="Email">
+              <Field label="Email *">
                 <input
                   type="email"
+                  required
                   value={f.email}
                   onChange={(e) => set("email", e.target.value)}
                   placeholder="sarah@sequoia.com"
@@ -250,7 +254,7 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
 
             <Field label="LinkedIn URL">
               <input
-                type="url"
+                type="text"
                 value={f.linkedin_url}
                 onChange={(e) => set("linkedin_url", e.target.value)}
                 placeholder="https://linkedin.com/in/..."
@@ -364,7 +368,7 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
               </button>
               <button
                 type="submit"
-                disabled={saving || !f.investor_name.trim()}
+                disabled={saving || !f.investor_name.trim() || !f.email.trim()}
                 className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow disabled:opacity-50"
               >
                 {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}

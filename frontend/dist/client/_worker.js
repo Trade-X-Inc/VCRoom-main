@@ -26771,16 +26771,16 @@ var init_server3 = __esm({
   }
 });
 
-// dist/server/assets/_tanstack-start-manifest_v-lgSAjscA.js
-var tanstack_start_manifest_v_lgSAjscA_exports = {};
-__export(tanstack_start_manifest_v_lgSAjscA_exports, {
+// dist/server/assets/_tanstack-start-manifest_v-BI9mFuVT.js
+var tanstack_start_manifest_v_BI9mFuVT_exports = {};
+__export(tanstack_start_manifest_v_BI9mFuVT_exports, {
   tsrStartManifest: () => tsrStartManifest
 });
 var tsrStartManifest;
-var init_tanstack_start_manifest_v_lgSAjscA = __esm({
-  "dist/server/assets/_tanstack-start-manifest_v-lgSAjscA.js"() {
+var init_tanstack_start_manifest_v_BI9mFuVT = __esm({
+  "dist/server/assets/_tanstack-start-manifest_v-BI9mFuVT.js"() {
     "use strict";
-    tsrStartManifest = () => ({ routes: { __root__: { filePath: "/workspaces/VCRoom-main/frontend/src/routes/__root.tsx", children: ["/", "/about", "/app", "/debug", "/forgot-password", "/founders", "/investors", "/pricing", "/privacy", "/sign-in", "/sign-up", "/terms", "/auth/callback", "/join/$token", "/solutions/due-diligence", "/solutions/fundraising-crm", "/solutions/investor-pipeline", "/solutions/raise-1m", "/solutions/vc-deal-room"], assets: void 0, preloads: ["/assets/index-CEeDcL9t.js"] }, "/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/index.tsx", children: void 0, assets: void 0, preloads: ["/assets/index-DyyUEM_W.js", "/assets/SiteFooter-D8IJ3C-V.js", "/assets/AppPreview-D5ybmo0K.js", "/assets/arrow-right-ad17--vC.js", "/assets/triangle-alert-GsTTRSzX.js", "/assets/users-CqAOUWAx.js", "/assets/sparkles-BzTTKqX0.js", "/assets/briefcase-BFq6LOcs.js", "/assets/shield-check-zTDxOkZx.js", "/assets/file-text-CLsq6ae2.js", "/assets/list-checks-BK2dOChu.js", "/assets/layers-BqwzM-Hj.js", "/assets/circle-check-yXd6DjMs.js", "/assets/message-square-DRa-dNu0.js", "/assets/Logo-CxYvqI-m.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-D1Ub33ti.js", "/assets/createLucideIcon-B2Rdsjf7.js", "/assets/globe-DoUXBFaj.js", "/assets/layout-grid-xOOr6x77.js", "/assets/search-Dj6_Vt9C.js", "/assets/bell-BVloYnfY.js", "/assets/trending-up-BER7gz80.js", "/assets/chevron-right-DuD3_5us.js", "/assets/arrow-up-right-FcFuvov3.js"] }, "/about": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/about.tsx", children: void 0, assets: void 0, preloads: ["/assets/about-BEt6RpWS.js", "/assets/SiteFooter-D8IJ3C-V.js", "/assets/arrow-right-ad17--vC.js", "/assets/Logo-CxYvqI-m.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-D1Ub33ti.js", "/assets/createLucideIcon-B2Rdsjf7.js", "/assets/globe-DoUXBFaj.js"] }, "/app": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.tsx", children: ["/app/advisor", "/app/audit", "/app/deal-rooms", "/app/documents", "/app/email", "/app/investor", "/app/leads", "/app/meetings", "/app/messages", "/app/notifications", "/app/pipeline", "/app/profile", "/app/reports", "/app/settings", "/app/users", "/app/", "/app/deal-room/$id", "/app/deal-room/$id_/nda"], assets: void 0, preloads: ["/assets/app-_T3qQQ5I.js", "/assets/useRouterState-BU8vYWvZ.js", "/assets/Logo-CxYvqI-m.js", "/assets/useQuery-Cax2V_HJ.js", "/assets/utils-BQHNewu7.js", "/assets/bell-BVloYnfY.js", "/assets/check-check-qo5oijQ7.js", "/assets/formatDistanceToNow-Bf-pobNU.js", "/assets/briefcase-BFq6LOcs.js", "/assets/message-square-DRa-dNu0.js", "/assets/user-plus-C1fZwThy.js", "/assets/sparkles-BzTTKqX0.js", "/assets/settings-CXMOc3ff.js", "/assets/user-CvESc0k9.js", "/assets/users-CqAOUWAx.js", "/assets/shield-check-zTDxOkZx.js", "/assets/store-DU46N2Nh.js", "/assets/LangSwitcher-D1Ub33ti.js", "/assets/createLucideIcon-B2Rdsjf7.js", "/assets/layout-grid-xOOr6x77.js", "/assets/inbox-Bu3BH-eA.js", "/assets/kanban-CzMl1hTn.js", "/assets/building-2-3n3Nl9S9.js", "/assets/clipboard-check-DdLb00M1.js", "/assets/brain-DBju14pi.js", "/assets/chart-pie-BHyXChMz.js", "/assets/calendar-IQfbsAgq.js", "/assets/file-text-CLsq6ae2.js", "/assets/chart-column-BhhJnLDL.js", "/assets/search-Dj6_Vt9C.js", "/assets/plus-B0O_PYfM.js", "/assets/globe-DoUXBFaj.js"] }, "/debug": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/debug.tsx", children: void 0, assets: void 0, preloads: ["/assets/debug-Bg1oSu-j.js"] }, "/forgot-password": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/forgot-password.tsx", children: void 0, assets: void 0, preloads: ["/assets/forgot-password-3Eu5Xs-4.js", "/assets/AuthLayout-8UkphG3L.js", "/assets/check-CovdrdUL.js", "/assets/loader-circle-fjMfUJQg.js", "/assets/arrow-right-ad17--vC.js", "/assets/Logo-CxYvqI-m.js", "/assets/shield-check-zTDxOkZx.js", "/assets/createLucideIcon-B2Rdsjf7.js"] }, "/founders": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/founders.tsx", children: void 0, assets: void 0, preloads: ["/assets/founders-Dyh9QI-M.js", "/assets/SolutionPage-Xm3lik4C.js", "/assets/users-CqAOUWAx.js", "/assets/SiteFooter-D8IJ3C-V.js", "/assets/Logo-CxYvqI-m.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-D1Ub33ti.js", "/assets/createLucideIcon-B2Rdsjf7.js", "/assets/globe-DoUXBFaj.js", "/assets/arrow-right-ad17--vC.js", "/assets/AppPreview-D5ybmo0K.js", "/assets/layout-grid-xOOr6x77.js", "/assets/file-text-CLsq6ae2.js", "/assets/message-square-DRa-dNu0.js", "/assets/sparkles-BzTTKqX0.js", "/assets/search-Dj6_Vt9C.js", "/assets/bell-BVloYnfY.js", "/assets/trending-up-BER7gz80.js", "/assets/chevron-right-DuD3_5us.js", "/assets/arrow-up-right-FcFuvov3.js", "/assets/check-CovdrdUL.js"] }, "/investors": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/investors.tsx", children: void 0, assets: void 0, preloads: ["/assets/investors-Dil3pPeF.js", "/assets/SolutionPage-Xm3lik4C.js", "/assets/briefcase-BFq6LOcs.js", "/assets/SiteFooter-D8IJ3C-V.js", "/assets/Logo-CxYvqI-m.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-D1Ub33ti.js", "/assets/createLucideIcon-B2Rdsjf7.js", "/assets/globe-DoUXBFaj.js", "/assets/arrow-right-ad17--vC.js", "/assets/AppPreview-D5ybmo0K.js", "/assets/layout-grid-xOOr6x77.js", "/assets/users-CqAOUWAx.js", "/assets/file-text-CLsq6ae2.js", "/assets/message-square-DRa-dNu0.js", "/assets/sparkles-BzTTKqX0.js", "/assets/search-Dj6_Vt9C.js", "/assets/bell-BVloYnfY.js", "/assets/trending-up-BER7gz80.js", "/assets/chevron-right-DuD3_5us.js", "/assets/arrow-up-right-FcFuvov3.js", "/assets/check-CovdrdUL.js"] }, "/pricing": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/pricing.tsx", children: void 0, assets: void 0, preloads: ["/assets/pricing-CyfLRbMO.js", "/assets/SiteFooter-D8IJ3C-V.js", "/assets/arrow-right-ad17--vC.js", "/assets/check-CovdrdUL.js", "/assets/Logo-CxYvqI-m.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-D1Ub33ti.js", "/assets/createLucideIcon-B2Rdsjf7.js", "/assets/globe-DoUXBFaj.js"] }, "/privacy": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/privacy.tsx", children: void 0, assets: void 0, preloads: ["/assets/privacy-DF_nwIbG.js", "/assets/SiteFooter-D8IJ3C-V.js", "/assets/Logo-CxYvqI-m.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-D1Ub33ti.js", "/assets/createLucideIcon-B2Rdsjf7.js", "/assets/globe-DoUXBFaj.js", "/assets/arrow-right-ad17--vC.js"] }, "/sign-in": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/sign-in.tsx", children: void 0, assets: void 0, preloads: ["/assets/sign-in-BoUJThDy.js", "/assets/AuthLayout-8UkphG3L.js", "/assets/loader-circle-fjMfUJQg.js", "/assets/arrow-right-ad17--vC.js", "/assets/Logo-CxYvqI-m.js", "/assets/shield-check-zTDxOkZx.js", "/assets/createLucideIcon-B2Rdsjf7.js", "/assets/check-CovdrdUL.js"] }, "/sign-up": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/sign-up.tsx", children: void 0, assets: void 0, preloads: ["/assets/sign-up-BoM8pwy3.js", "/assets/AuthLayout-8UkphG3L.js", "/assets/utils-BQHNewu7.js", "/assets/createLucideIcon-B2Rdsjf7.js", "/assets/external-link-De6CmjLq.js", "/assets/loader-circle-fjMfUJQg.js", "/assets/check-CovdrdUL.js", "/assets/trending-up-BER7gz80.js", "/assets/arrow-right-ad17--vC.js", "/assets/Logo-CxYvqI-m.js", "/assets/shield-check-zTDxOkZx.js"] }, "/terms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/terms.tsx", children: void 0, assets: void 0, preloads: ["/assets/terms-DcrVZYYc.js", "/assets/SiteFooter-D8IJ3C-V.js", "/assets/Logo-CxYvqI-m.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-D1Ub33ti.js", "/assets/createLucideIcon-B2Rdsjf7.js", "/assets/globe-DoUXBFaj.js", "/assets/arrow-right-ad17--vC.js"] }, "/app/advisor": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.advisor.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.advisor-7nXRPtMg.js", "/assets/createServerFn-WTW-B8tK.js", "/assets/loader-circle-fjMfUJQg.js", "/assets/send-DbAzmw9M.js"] }, "/app/audit": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.audit.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.audit-D0UI7FQV.js", "/assets/download-BIVQRda1.js", "/assets/activity-BVx9g23z.js", "/assets/triangle-alert-GsTTRSzX.js"] }, "/app/deal-rooms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-rooms.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-rooms-BfMW8qYx.js", "/assets/arrow-up-right-FcFuvov3.js", "/assets/x-1uY69Pc7.js", "/assets/loader-circle-fjMfUJQg.js"] }, "/app/documents": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.documents.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.documents-D4erVeLA.js", "/assets/Dropzone-Ii4ctJH2.js", "/assets/upload-C7GImcLc.js", "/assets/circle-check-yXd6DjMs.js", "/assets/triangle-alert-GsTTRSzX.js", "/assets/download-BIVQRda1.js", "/assets/trash-2-DaC1ZKqF.js", "/assets/x-1uY69Pc7.js"] }, "/app/email": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.email.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.email-BoHWzbnf.js", "/assets/backend-B5nrjGvD.js", "/assets/copy-DPeqfgh5.js", "/assets/send-DbAzmw9M.js"] }, "/app/investor": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.tsx", children: ["/app/investor/analysis", "/app/investor/deal-flow", "/app/investor/deal-rooms", "/app/investor/decisions", "/app/investor/diligence", "/app/investor/pipeline", "/app/investor/portfolio", "/app/investor/startups", "/app/investor/team", "/app/investor/"], assets: void 0, preloads: ["/assets/app.investor-BLQX_Yqz.js"] }, "/app/leads": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.leads.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.leads-AkHRp9U6.js", "/assets/createServerFn-WTW-B8tK.js", "/assets/loader-circle-fjMfUJQg.js", "/assets/check-CovdrdUL.js", "/assets/copy-DPeqfgh5.js", "/assets/x-1uY69Pc7.js", "/assets/trash-2-DaC1ZKqF.js", "/assets/download-BIVQRda1.js", "/assets/upload-C7GImcLc.js", "/assets/trending-up-BER7gz80.js", "/assets/flame-Bnq967EH.js", "/assets/circle-alert-CKEADi88.js"] }, "/app/meetings": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.meetings.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.meetings-bKdNgtMS.js"] }, "/app/messages": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.messages.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.messages-CqjgmvD4.js"] }, "/app/notifications": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.notifications.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.notifications-Dl17sa0L.js"] }, "/app/pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.pipeline-BcXDVu8H.js", "/assets/loader-circle-fjMfUJQg.js", "/assets/funnel-lEpWmRyJ.js", "/assets/flame-Bnq967EH.js", "/assets/clock-CNUTIU0j.js", "/assets/arrow-up-right-FcFuvov3.js"] }, "/app/profile": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.profile.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.profile-CtfDdURF.js", "/assets/loader-circle-fjMfUJQg.js", "/assets/check-CovdrdUL.js", "/assets/upload-C7GImcLc.js", "/assets/x-1uY69Pc7.js", "/assets/trash-2-DaC1ZKqF.js"] }, "/app/reports": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.reports.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.reports-BBD5WynK.js", "/assets/trending-up-BER7gz80.js", "/assets/download-BIVQRda1.js"] }, "/app/settings": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.tsx", children: ["/app/settings/billing", "/app/settings/domain", "/app/settings/notifications", "/app/settings/security"], assets: void 0, preloads: ["/assets/app.settings-Ccu6JFDl.js", "/assets/credit-card-BWdxE9fR.js", "/assets/shield-Br52rkj8.js", "/assets/trash-2-DaC1ZKqF.js"] }, "/app/users": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.users.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.users-DRj5MQTD.js", "/assets/mail-bOT73s_t.js", "/assets/copy-DPeqfgh5.js", "/assets/x-1uY69Pc7.js", "/assets/check-CovdrdUL.js", "/assets/loader-circle-fjMfUJQg.js"] }, "/auth/callback": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/auth.callback.tsx", children: void 0, assets: void 0, preloads: ["/assets/auth.callback-BROizfk7.js"] }, "/join/$token": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/join.$token.tsx", children: void 0, assets: void 0, preloads: ["/assets/join._token-D5smAm6f.js", "/assets/Logo-CxYvqI-m.js", "/assets/triangle-alert-GsTTRSzX.js", "/assets/check-CovdrdUL.js", "/assets/arrow-right-ad17--vC.js", "/assets/shield-check-zTDxOkZx.js", "/assets/lock-BRGwUskr.js", "/assets/createLucideIcon-B2Rdsjf7.js"] }, "/solutions/due-diligence": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.due-diligence.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.due-diligence-CmvGVz-L.js", "/assets/SolutionPage-Xm3lik4C.js", "/assets/list-checks-BK2dOChu.js", "/assets/SiteFooter-D8IJ3C-V.js", "/assets/Logo-CxYvqI-m.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-D1Ub33ti.js", "/assets/createLucideIcon-B2Rdsjf7.js", "/assets/globe-DoUXBFaj.js", "/assets/arrow-right-ad17--vC.js", "/assets/AppPreview-D5ybmo0K.js", "/assets/layout-grid-xOOr6x77.js", "/assets/users-CqAOUWAx.js", "/assets/file-text-CLsq6ae2.js", "/assets/message-square-DRa-dNu0.js", "/assets/sparkles-BzTTKqX0.js", "/assets/search-Dj6_Vt9C.js", "/assets/bell-BVloYnfY.js", "/assets/trending-up-BER7gz80.js", "/assets/chevron-right-DuD3_5us.js", "/assets/arrow-up-right-FcFuvov3.js", "/assets/check-CovdrdUL.js"] }, "/solutions/fundraising-crm": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.fundraising-crm.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.fundraising-crm-B177sSAv.js", "/assets/SolutionPage-Xm3lik4C.js", "/assets/layers-BqwzM-Hj.js", "/assets/SiteFooter-D8IJ3C-V.js", "/assets/Logo-CxYvqI-m.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-D1Ub33ti.js", "/assets/createLucideIcon-B2Rdsjf7.js", "/assets/globe-DoUXBFaj.js", "/assets/arrow-right-ad17--vC.js", "/assets/AppPreview-D5ybmo0K.js", "/assets/layout-grid-xOOr6x77.js", "/assets/users-CqAOUWAx.js", "/assets/file-text-CLsq6ae2.js", "/assets/message-square-DRa-dNu0.js", "/assets/sparkles-BzTTKqX0.js", "/assets/search-Dj6_Vt9C.js", "/assets/bell-BVloYnfY.js", "/assets/trending-up-BER7gz80.js", "/assets/chevron-right-DuD3_5us.js", "/assets/arrow-up-right-FcFuvov3.js", "/assets/check-CovdrdUL.js"] }, "/solutions/investor-pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.investor-pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.investor-pipeline-DKoqyrGO.js", "/assets/SolutionPage-Xm3lik4C.js", "/assets/trending-up-BER7gz80.js", "/assets/SiteFooter-D8IJ3C-V.js", "/assets/Logo-CxYvqI-m.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-D1Ub33ti.js", "/assets/createLucideIcon-B2Rdsjf7.js", "/assets/globe-DoUXBFaj.js", "/assets/arrow-right-ad17--vC.js", "/assets/AppPreview-D5ybmo0K.js", "/assets/layout-grid-xOOr6x77.js", "/assets/users-CqAOUWAx.js", "/assets/file-text-CLsq6ae2.js", "/assets/message-square-DRa-dNu0.js", "/assets/sparkles-BzTTKqX0.js", "/assets/search-Dj6_Vt9C.js", "/assets/bell-BVloYnfY.js", "/assets/chevron-right-DuD3_5us.js", "/assets/arrow-up-right-FcFuvov3.js", "/assets/check-CovdrdUL.js"] }, "/solutions/raise-1m": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.raise-1m.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.raise-1m-BI4K5osL.js", "/assets/SolutionPage-Xm3lik4C.js", "/assets/sparkles-BzTTKqX0.js", "/assets/SiteFooter-D8IJ3C-V.js", "/assets/Logo-CxYvqI-m.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-D1Ub33ti.js", "/assets/createLucideIcon-B2Rdsjf7.js", "/assets/globe-DoUXBFaj.js", "/assets/arrow-right-ad17--vC.js", "/assets/AppPreview-D5ybmo0K.js", "/assets/layout-grid-xOOr6x77.js", "/assets/users-CqAOUWAx.js", "/assets/file-text-CLsq6ae2.js", "/assets/message-square-DRa-dNu0.js", "/assets/search-Dj6_Vt9C.js", "/assets/bell-BVloYnfY.js", "/assets/trending-up-BER7gz80.js", "/assets/chevron-right-DuD3_5us.js", "/assets/arrow-up-right-FcFuvov3.js", "/assets/check-CovdrdUL.js"] }, "/solutions/vc-deal-room": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.vc-deal-room.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.vc-deal-room-BXq1UdPm.js", "/assets/SolutionPage-Xm3lik4C.js", "/assets/briefcase-BFq6LOcs.js", "/assets/SiteFooter-D8IJ3C-V.js", "/assets/Logo-CxYvqI-m.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-D1Ub33ti.js", "/assets/createLucideIcon-B2Rdsjf7.js", "/assets/globe-DoUXBFaj.js", "/assets/arrow-right-ad17--vC.js", "/assets/AppPreview-D5ybmo0K.js", "/assets/layout-grid-xOOr6x77.js", "/assets/users-CqAOUWAx.js", "/assets/file-text-CLsq6ae2.js", "/assets/message-square-DRa-dNu0.js", "/assets/sparkles-BzTTKqX0.js", "/assets/search-Dj6_Vt9C.js", "/assets/bell-BVloYnfY.js", "/assets/trending-up-BER7gz80.js", "/assets/chevron-right-DuD3_5us.js", "/assets/arrow-up-right-FcFuvov3.js", "/assets/check-CovdrdUL.js"] }, "/app/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.index.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.index-D4rOzLMP.js", "/assets/loader-circle-fjMfUJQg.js", "/assets/circle-question-mark-Cj__Rt2G.js", "/assets/mail-bOT73s_t.js", "/assets/arrow-up-right-FcFuvov3.js", "/assets/clock-CNUTIU0j.js", "/assets/circle-check-yXd6DjMs.js", "/assets/x-1uY69Pc7.js", "/assets/trending-up-BER7gz80.js"] }, "/app/deal-room/$id": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-room.$id.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-room._id-C-NpXNTB.js", "/assets/backend-B5nrjGvD.js", "/assets/loader-circle-fjMfUJQg.js", "/assets/send-DbAzmw9M.js", "/assets/funnel-lEpWmRyJ.js", "/assets/triangle-alert-GsTTRSzX.js", "/assets/circle-pwYDwydw.js", "/assets/clock-CNUTIU0j.js", "/assets/circle-check-yXd6DjMs.js", "/assets/Dropzone-Ii4ctJH2.js", "/assets/chevron-right-DuD3_5us.js", "/assets/download-BIVQRda1.js", "/assets/arrow-right-ad17--vC.js", "/assets/list-checks-BK2dOChu.js", "/assets/activity-BVx9g23z.js", "/assets/lock-BRGwUskr.js", "/assets/x-1uY69Pc7.js", "/assets/circle-question-mark-Cj__Rt2G.js", "/assets/trending-up-BER7gz80.js", "/assets/shield-Br52rkj8.js", "/assets/circle-alert-CKEADi88.js", "/assets/external-link-De6CmjLq.js", "/assets/upload-C7GImcLc.js"] }, "/app/investor/analysis": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.analysis.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.analysis-aAQa8H1V.js", "/assets/download-BIVQRda1.js"] }, "/app/investor/deal-flow": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.deal-flow.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.deal-flow-CUBgH1ln.js", "/assets/AIBriefPanel-Bt6yLwgh.js", "/assets/funnel-lEpWmRyJ.js", "/assets/x-1uY69Pc7.js", "/assets/circle-check-yXd6DjMs.js", "/assets/triangle-alert-GsTTRSzX.js", "/assets/shield-Br52rkj8.js", "/assets/arrow-right-ad17--vC.js"] }, "/app/investor/deal-rooms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.deal-rooms.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.deal-rooms-5mH5Erte.js"] }, "/app/investor/decisions": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.decisions.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.decisions-B2dstrdu.js", "/assets/check-CovdrdUL.js", "/assets/x-1uY69Pc7.js"] }, "/app/investor/diligence": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.diligence.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.diligence-DPiSNiAc.js", "/assets/circle-check-yXd6DjMs.js", "/assets/circle-pwYDwydw.js"] }, "/app/investor/pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.pipeline-BPJQb-VJ.js"] }, "/app/investor/portfolio": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.portfolio.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.portfolio-KYiJ0ho_.js"] }, "/app/investor/startups": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.startups.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.startups-Cieafz5l.js", "/assets/external-link-De6CmjLq.js"] }, "/app/investor/team": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.team.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.team-BnNcBlQu.js"] }, "/app/settings/billing": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.billing.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.billing-bDA4dlVW.js", "/assets/check-CovdrdUL.js", "/assets/download-BIVQRda1.js"] }, "/app/settings/domain": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.domain.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.domain-C9kiqZmp.js", "/assets/circle-check-yXd6DjMs.js", "/assets/copy-DPeqfgh5.js", "/assets/mail-bOT73s_t.js"] }, "/app/settings/notifications": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.notifications.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.notifications-Cy144UgD.js", "/assets/mail-bOT73s_t.js", "/assets/smartphone-DOjHnxle.js"] }, "/app/settings/security": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.security.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.security-DP8BEuLQ.js", "/assets/smartphone-DOjHnxle.js", "/assets/triangle-alert-GsTTRSzX.js"] }, "/app/investor/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.index.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.index--0MmSpGK.js", "/assets/circle-check-yXd6DjMs.js", "/assets/clock-CNUTIU0j.js", "/assets/circle-alert-CKEADi88.js", "/assets/arrow-right-ad17--vC.js", "/assets/AIBriefPanel-Bt6yLwgh.js", "/assets/createServerFn-WTW-B8tK.js", "/assets/x-1uY69Pc7.js", "/assets/triangle-alert-GsTTRSzX.js", "/assets/shield-Br52rkj8.js"] }, "/app/deal-room/$id_/nda": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-room.$id_.nda.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-room._id_.nda-B54dN7hH.js", "/assets/shield-Br52rkj8.js", "/assets/loader-circle-fjMfUJQg.js", "/assets/lock-BRGwUskr.js"] } }, clientEntry: "/assets/index-CEeDcL9t.js" });
+    tsrStartManifest = () => ({ routes: { __root__: { filePath: "/workspaces/VCRoom-main/frontend/src/routes/__root.tsx", children: ["/", "/about", "/app", "/debug", "/forgot-password", "/founders", "/investors", "/pricing", "/privacy", "/sign-in", "/sign-up", "/terms", "/auth/callback", "/join/$token", "/solutions/due-diligence", "/solutions/fundraising-crm", "/solutions/investor-pipeline", "/solutions/raise-1m", "/solutions/vc-deal-room"], assets: void 0, preloads: ["/assets/index-2btCeu3x.js"] }, "/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/index.tsx", children: void 0, assets: void 0, preloads: ["/assets/index-DP-UolE7.js", "/assets/SiteFooter-PD74wLCl.js", "/assets/AppPreview-PQUW_yo-.js", "/assets/arrow-right-BXNH_v2z.js", "/assets/triangle-alert-v2GK_Yms.js", "/assets/users-BAB3T6DZ.js", "/assets/sparkles-Cb0HFkGE.js", "/assets/briefcase-BGygDDzX.js", "/assets/shield-check-LdR13ADV.js", "/assets/file-text-wbWITf07.js", "/assets/list-checks-DYUQH7H8.js", "/assets/layers-CWOLX7SW.js", "/assets/circle-check-rsTjyQNa.js", "/assets/message-square-DJLkzhfZ.js", "/assets/Logo-D4No5xAY.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-Vo3hyeDz.js", "/assets/createLucideIcon-BP4ck8eQ.js", "/assets/globe-ST5EJVjN.js", "/assets/layout-grid-BmahCvn3.js", "/assets/search-DKp-hLMg.js", "/assets/bell-ToAmFZff.js", "/assets/trending-up-DTMS_JfA.js", "/assets/chevron-right-8LUIsEI7.js", "/assets/arrow-up-right-DuKjxyOE.js"] }, "/about": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/about.tsx", children: void 0, assets: void 0, preloads: ["/assets/about-bMebdacL.js", "/assets/SiteFooter-PD74wLCl.js", "/assets/arrow-right-BXNH_v2z.js", "/assets/Logo-D4No5xAY.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-Vo3hyeDz.js", "/assets/createLucideIcon-BP4ck8eQ.js", "/assets/globe-ST5EJVjN.js"] }, "/app": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.tsx", children: ["/app/advisor", "/app/audit", "/app/deal-rooms", "/app/documents", "/app/email", "/app/investor", "/app/leads", "/app/meetings", "/app/messages", "/app/notifications", "/app/pipeline", "/app/profile", "/app/reports", "/app/settings", "/app/users", "/app/", "/app/deal-room/$id", "/app/deal-room/$id_/nda"], assets: void 0, preloads: ["/assets/app-CjJKvU0I.js", "/assets/useRouterState-CUbPFtco.js", "/assets/Logo-D4No5xAY.js", "/assets/useQuery-BbxL0TWw.js", "/assets/utils-BQHNewu7.js", "/assets/bell-ToAmFZff.js", "/assets/check-check-BJEIqIXR.js", "/assets/formatDistanceToNow-Bf-pobNU.js", "/assets/briefcase-BGygDDzX.js", "/assets/message-square-DJLkzhfZ.js", "/assets/user-plus-BdTMSDDG.js", "/assets/sparkles-Cb0HFkGE.js", "/assets/settings-BdgXs231.js", "/assets/user-BI1do-6i.js", "/assets/users-BAB3T6DZ.js", "/assets/shield-check-LdR13ADV.js", "/assets/store-ueA5s5rj.js", "/assets/LangSwitcher-Vo3hyeDz.js", "/assets/createLucideIcon-BP4ck8eQ.js", "/assets/layout-grid-BmahCvn3.js", "/assets/inbox-DnGPSqt3.js", "/assets/kanban-BYn1GShz.js", "/assets/building-2-d1WpEvpN.js", "/assets/clipboard-check-BBzb3YVb.js", "/assets/brain-De9kUShy.js", "/assets/chart-pie-Derwl9-V.js", "/assets/calendar-B0vU9-FG.js", "/assets/file-text-wbWITf07.js", "/assets/chart-column-BmRJDVz9.js", "/assets/search-DKp-hLMg.js", "/assets/plus-CAn6wuXw.js", "/assets/globe-ST5EJVjN.js"] }, "/debug": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/debug.tsx", children: void 0, assets: void 0, preloads: ["/assets/debug-XGOhA_F5.js"] }, "/forgot-password": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/forgot-password.tsx", children: void 0, assets: void 0, preloads: ["/assets/forgot-password-24tJnaBC.js", "/assets/AuthLayout-Bybzyvjn.js", "/assets/check-Cl89dZiA.js", "/assets/loader-circle-CdugNb8p.js", "/assets/arrow-right-BXNH_v2z.js", "/assets/Logo-D4No5xAY.js", "/assets/shield-check-LdR13ADV.js", "/assets/createLucideIcon-BP4ck8eQ.js"] }, "/founders": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/founders.tsx", children: void 0, assets: void 0, preloads: ["/assets/founders-0HTKNzlc.js", "/assets/SolutionPage-BOvwajbj.js", "/assets/users-BAB3T6DZ.js", "/assets/SiteFooter-PD74wLCl.js", "/assets/Logo-D4No5xAY.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-Vo3hyeDz.js", "/assets/createLucideIcon-BP4ck8eQ.js", "/assets/globe-ST5EJVjN.js", "/assets/arrow-right-BXNH_v2z.js", "/assets/AppPreview-PQUW_yo-.js", "/assets/layout-grid-BmahCvn3.js", "/assets/file-text-wbWITf07.js", "/assets/message-square-DJLkzhfZ.js", "/assets/sparkles-Cb0HFkGE.js", "/assets/search-DKp-hLMg.js", "/assets/bell-ToAmFZff.js", "/assets/trending-up-DTMS_JfA.js", "/assets/chevron-right-8LUIsEI7.js", "/assets/arrow-up-right-DuKjxyOE.js", "/assets/check-Cl89dZiA.js"] }, "/investors": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/investors.tsx", children: void 0, assets: void 0, preloads: ["/assets/investors-Cmq9oQfg.js", "/assets/SolutionPage-BOvwajbj.js", "/assets/briefcase-BGygDDzX.js", "/assets/SiteFooter-PD74wLCl.js", "/assets/Logo-D4No5xAY.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-Vo3hyeDz.js", "/assets/createLucideIcon-BP4ck8eQ.js", "/assets/globe-ST5EJVjN.js", "/assets/arrow-right-BXNH_v2z.js", "/assets/AppPreview-PQUW_yo-.js", "/assets/layout-grid-BmahCvn3.js", "/assets/users-BAB3T6DZ.js", "/assets/file-text-wbWITf07.js", "/assets/message-square-DJLkzhfZ.js", "/assets/sparkles-Cb0HFkGE.js", "/assets/search-DKp-hLMg.js", "/assets/bell-ToAmFZff.js", "/assets/trending-up-DTMS_JfA.js", "/assets/chevron-right-8LUIsEI7.js", "/assets/arrow-up-right-DuKjxyOE.js", "/assets/check-Cl89dZiA.js"] }, "/pricing": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/pricing.tsx", children: void 0, assets: void 0, preloads: ["/assets/pricing-CKNgv5kR.js", "/assets/SiteFooter-PD74wLCl.js", "/assets/arrow-right-BXNH_v2z.js", "/assets/check-Cl89dZiA.js", "/assets/Logo-D4No5xAY.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-Vo3hyeDz.js", "/assets/createLucideIcon-BP4ck8eQ.js", "/assets/globe-ST5EJVjN.js"] }, "/privacy": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/privacy.tsx", children: void 0, assets: void 0, preloads: ["/assets/privacy-CwoZ3IyN.js", "/assets/SiteFooter-PD74wLCl.js", "/assets/Logo-D4No5xAY.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-Vo3hyeDz.js", "/assets/createLucideIcon-BP4ck8eQ.js", "/assets/globe-ST5EJVjN.js", "/assets/arrow-right-BXNH_v2z.js"] }, "/sign-in": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/sign-in.tsx", children: void 0, assets: void 0, preloads: ["/assets/sign-in-CkoQTQN-.js", "/assets/AuthLayout-Bybzyvjn.js", "/assets/loader-circle-CdugNb8p.js", "/assets/arrow-right-BXNH_v2z.js", "/assets/Logo-D4No5xAY.js", "/assets/shield-check-LdR13ADV.js", "/assets/createLucideIcon-BP4ck8eQ.js", "/assets/check-Cl89dZiA.js"] }, "/sign-up": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/sign-up.tsx", children: void 0, assets: void 0, preloads: ["/assets/sign-up-Cy2GJMZV.js", "/assets/AuthLayout-Bybzyvjn.js", "/assets/utils-BQHNewu7.js", "/assets/createLucideIcon-BP4ck8eQ.js", "/assets/external-link-B1JYJO18.js", "/assets/loader-circle-CdugNb8p.js", "/assets/check-Cl89dZiA.js", "/assets/trending-up-DTMS_JfA.js", "/assets/arrow-right-BXNH_v2z.js", "/assets/Logo-D4No5xAY.js", "/assets/shield-check-LdR13ADV.js"] }, "/terms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/terms.tsx", children: void 0, assets: void 0, preloads: ["/assets/terms-BZdaV8TE.js", "/assets/SiteFooter-PD74wLCl.js", "/assets/Logo-D4No5xAY.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-Vo3hyeDz.js", "/assets/createLucideIcon-BP4ck8eQ.js", "/assets/globe-ST5EJVjN.js", "/assets/arrow-right-BXNH_v2z.js"] }, "/app/advisor": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.advisor.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.advisor-DCqAscTQ.js", "/assets/createServerFn-M_I0Yahw.js", "/assets/loader-circle-CdugNb8p.js", "/assets/send-C3yI_3lB.js"] }, "/app/audit": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.audit.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.audit-C9G-xMAA.js", "/assets/download-0ysVpwZI.js", "/assets/activity-C4rUqDQr.js", "/assets/triangle-alert-v2GK_Yms.js"] }, "/app/deal-rooms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-rooms.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-rooms-CG7wPj9-.js", "/assets/arrow-up-right-DuKjxyOE.js", "/assets/x-DyV3kO1L.js", "/assets/loader-circle-CdugNb8p.js"] }, "/app/documents": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.documents.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.documents-CI3yi5v7.js", "/assets/Dropzone-BqyN36l0.js", "/assets/upload-CxmGq_H9.js", "/assets/circle-check-rsTjyQNa.js", "/assets/triangle-alert-v2GK_Yms.js", "/assets/download-0ysVpwZI.js", "/assets/trash-2-pVWNasRe.js", "/assets/x-DyV3kO1L.js"] }, "/app/email": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.email.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.email-CW658G9j.js", "/assets/backend-B5nrjGvD.js", "/assets/copy-BbSrAflM.js", "/assets/send-C3yI_3lB.js"] }, "/app/investor": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.tsx", children: ["/app/investor/analysis", "/app/investor/deal-flow", "/app/investor/deal-rooms", "/app/investor/decisions", "/app/investor/diligence", "/app/investor/pipeline", "/app/investor/portfolio", "/app/investor/startups", "/app/investor/team", "/app/investor/"], assets: void 0, preloads: ["/assets/app.investor-RaraORa6.js"] }, "/app/leads": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.leads.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.leads-NH_lIabn.js", "/assets/createServerFn-M_I0Yahw.js", "/assets/loader-circle-CdugNb8p.js", "/assets/check-Cl89dZiA.js", "/assets/copy-BbSrAflM.js", "/assets/x-DyV3kO1L.js", "/assets/trash-2-pVWNasRe.js", "/assets/download-0ysVpwZI.js", "/assets/upload-CxmGq_H9.js", "/assets/trending-up-DTMS_JfA.js", "/assets/flame-C9fwtRkX.js", "/assets/circle-alert-DtsyWZvh.js"] }, "/app/meetings": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.meetings.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.meetings-BxoWy37n.js"] }, "/app/messages": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.messages.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.messages-94kF-KUb.js"] }, "/app/notifications": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.notifications.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.notifications-DbR1rYGU.js"] }, "/app/pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.pipeline-7-PuWBHN.js", "/assets/loader-circle-CdugNb8p.js", "/assets/funnel-0yTyEZ9P.js", "/assets/flame-C9fwtRkX.js", "/assets/clock-DohU1sUL.js", "/assets/arrow-up-right-DuKjxyOE.js"] }, "/app/profile": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.profile.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.profile-NI9tSrjj.js", "/assets/loader-circle-CdugNb8p.js", "/assets/check-Cl89dZiA.js", "/assets/upload-CxmGq_H9.js", "/assets/x-DyV3kO1L.js", "/assets/trash-2-pVWNasRe.js"] }, "/app/reports": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.reports.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.reports-Bhzz3x_k.js", "/assets/trending-up-DTMS_JfA.js", "/assets/download-0ysVpwZI.js"] }, "/app/settings": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.tsx", children: ["/app/settings/billing", "/app/settings/domain", "/app/settings/notifications", "/app/settings/security"], assets: void 0, preloads: ["/assets/app.settings-Bi7zGHrB.js", "/assets/credit-card-Bmw5rXjv.js", "/assets/shield-WVm_u6ID.js", "/assets/trash-2-pVWNasRe.js"] }, "/app/users": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.users.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.users-CxZg_lrl.js", "/assets/mail-Da3LhbK7.js", "/assets/copy-BbSrAflM.js", "/assets/x-DyV3kO1L.js", "/assets/check-Cl89dZiA.js", "/assets/loader-circle-CdugNb8p.js"] }, "/auth/callback": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/auth.callback.tsx", children: void 0, assets: void 0, preloads: ["/assets/auth.callback-8sp6lCjP.js"] }, "/join/$token": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/join.$token.tsx", children: void 0, assets: void 0, preloads: ["/assets/join._token-ClTaJpbV.js", "/assets/Logo-D4No5xAY.js", "/assets/triangle-alert-v2GK_Yms.js", "/assets/check-Cl89dZiA.js", "/assets/arrow-right-BXNH_v2z.js", "/assets/shield-check-LdR13ADV.js", "/assets/lock-Cl5-E2gJ.js", "/assets/createLucideIcon-BP4ck8eQ.js"] }, "/solutions/due-diligence": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.due-diligence.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.due-diligence-B6Q-QmuH.js", "/assets/SolutionPage-BOvwajbj.js", "/assets/list-checks-DYUQH7H8.js", "/assets/SiteFooter-PD74wLCl.js", "/assets/Logo-D4No5xAY.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-Vo3hyeDz.js", "/assets/createLucideIcon-BP4ck8eQ.js", "/assets/globe-ST5EJVjN.js", "/assets/arrow-right-BXNH_v2z.js", "/assets/AppPreview-PQUW_yo-.js", "/assets/layout-grid-BmahCvn3.js", "/assets/users-BAB3T6DZ.js", "/assets/file-text-wbWITf07.js", "/assets/message-square-DJLkzhfZ.js", "/assets/sparkles-Cb0HFkGE.js", "/assets/search-DKp-hLMg.js", "/assets/bell-ToAmFZff.js", "/assets/trending-up-DTMS_JfA.js", "/assets/chevron-right-8LUIsEI7.js", "/assets/arrow-up-right-DuKjxyOE.js", "/assets/check-Cl89dZiA.js"] }, "/solutions/fundraising-crm": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.fundraising-crm.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.fundraising-crm-D8ux5leS.js", "/assets/SolutionPage-BOvwajbj.js", "/assets/layers-CWOLX7SW.js", "/assets/SiteFooter-PD74wLCl.js", "/assets/Logo-D4No5xAY.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-Vo3hyeDz.js", "/assets/createLucideIcon-BP4ck8eQ.js", "/assets/globe-ST5EJVjN.js", "/assets/arrow-right-BXNH_v2z.js", "/assets/AppPreview-PQUW_yo-.js", "/assets/layout-grid-BmahCvn3.js", "/assets/users-BAB3T6DZ.js", "/assets/file-text-wbWITf07.js", "/assets/message-square-DJLkzhfZ.js", "/assets/sparkles-Cb0HFkGE.js", "/assets/search-DKp-hLMg.js", "/assets/bell-ToAmFZff.js", "/assets/trending-up-DTMS_JfA.js", "/assets/chevron-right-8LUIsEI7.js", "/assets/arrow-up-right-DuKjxyOE.js", "/assets/check-Cl89dZiA.js"] }, "/solutions/investor-pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.investor-pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.investor-pipeline-Dra_t3v9.js", "/assets/SolutionPage-BOvwajbj.js", "/assets/trending-up-DTMS_JfA.js", "/assets/SiteFooter-PD74wLCl.js", "/assets/Logo-D4No5xAY.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-Vo3hyeDz.js", "/assets/createLucideIcon-BP4ck8eQ.js", "/assets/globe-ST5EJVjN.js", "/assets/arrow-right-BXNH_v2z.js", "/assets/AppPreview-PQUW_yo-.js", "/assets/layout-grid-BmahCvn3.js", "/assets/users-BAB3T6DZ.js", "/assets/file-text-wbWITf07.js", "/assets/message-square-DJLkzhfZ.js", "/assets/sparkles-Cb0HFkGE.js", "/assets/search-DKp-hLMg.js", "/assets/bell-ToAmFZff.js", "/assets/chevron-right-8LUIsEI7.js", "/assets/arrow-up-right-DuKjxyOE.js", "/assets/check-Cl89dZiA.js"] }, "/solutions/raise-1m": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.raise-1m.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.raise-1m-FKVTXjkI.js", "/assets/SolutionPage-BOvwajbj.js", "/assets/sparkles-Cb0HFkGE.js", "/assets/SiteFooter-PD74wLCl.js", "/assets/Logo-D4No5xAY.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-Vo3hyeDz.js", "/assets/createLucideIcon-BP4ck8eQ.js", "/assets/globe-ST5EJVjN.js", "/assets/arrow-right-BXNH_v2z.js", "/assets/AppPreview-PQUW_yo-.js", "/assets/layout-grid-BmahCvn3.js", "/assets/users-BAB3T6DZ.js", "/assets/file-text-wbWITf07.js", "/assets/message-square-DJLkzhfZ.js", "/assets/search-DKp-hLMg.js", "/assets/bell-ToAmFZff.js", "/assets/trending-up-DTMS_JfA.js", "/assets/chevron-right-8LUIsEI7.js", "/assets/arrow-up-right-DuKjxyOE.js", "/assets/check-Cl89dZiA.js"] }, "/solutions/vc-deal-room": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.vc-deal-room.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.vc-deal-room-BU410mWD.js", "/assets/SolutionPage-BOvwajbj.js", "/assets/briefcase-BGygDDzX.js", "/assets/SiteFooter-PD74wLCl.js", "/assets/Logo-D4No5xAY.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-Vo3hyeDz.js", "/assets/createLucideIcon-BP4ck8eQ.js", "/assets/globe-ST5EJVjN.js", "/assets/arrow-right-BXNH_v2z.js", "/assets/AppPreview-PQUW_yo-.js", "/assets/layout-grid-BmahCvn3.js", "/assets/users-BAB3T6DZ.js", "/assets/file-text-wbWITf07.js", "/assets/message-square-DJLkzhfZ.js", "/assets/sparkles-Cb0HFkGE.js", "/assets/search-DKp-hLMg.js", "/assets/bell-ToAmFZff.js", "/assets/trending-up-DTMS_JfA.js", "/assets/chevron-right-8LUIsEI7.js", "/assets/arrow-up-right-DuKjxyOE.js", "/assets/check-Cl89dZiA.js"] }, "/app/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.index.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.index-CH_R9V6v.js", "/assets/loader-circle-CdugNb8p.js", "/assets/circle-question-mark-uRL3WVg9.js", "/assets/mail-Da3LhbK7.js", "/assets/arrow-up-right-DuKjxyOE.js", "/assets/clock-DohU1sUL.js", "/assets/circle-check-rsTjyQNa.js", "/assets/x-DyV3kO1L.js", "/assets/trending-up-DTMS_JfA.js"] }, "/app/deal-room/$id": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-room.$id.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-room._id-Du6sse6F.js", "/assets/backend-B5nrjGvD.js", "/assets/loader-circle-CdugNb8p.js", "/assets/send-C3yI_3lB.js", "/assets/funnel-0yTyEZ9P.js", "/assets/triangle-alert-v2GK_Yms.js", "/assets/circle-D5RA3dd7.js", "/assets/clock-DohU1sUL.js", "/assets/circle-check-rsTjyQNa.js", "/assets/Dropzone-BqyN36l0.js", "/assets/chevron-right-8LUIsEI7.js", "/assets/download-0ysVpwZI.js", "/assets/arrow-right-BXNH_v2z.js", "/assets/list-checks-DYUQH7H8.js", "/assets/activity-C4rUqDQr.js", "/assets/lock-Cl5-E2gJ.js", "/assets/x-DyV3kO1L.js", "/assets/circle-question-mark-uRL3WVg9.js", "/assets/trending-up-DTMS_JfA.js", "/assets/shield-WVm_u6ID.js", "/assets/circle-alert-DtsyWZvh.js", "/assets/external-link-B1JYJO18.js", "/assets/upload-CxmGq_H9.js"] }, "/app/investor/analysis": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.analysis.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.analysis-CAb2JMVl.js", "/assets/download-0ysVpwZI.js"] }, "/app/investor/deal-flow": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.deal-flow.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.deal-flow-B6YglRl4.js", "/assets/AIBriefPanel-CuDwur4i.js", "/assets/funnel-0yTyEZ9P.js", "/assets/x-DyV3kO1L.js", "/assets/circle-check-rsTjyQNa.js", "/assets/triangle-alert-v2GK_Yms.js", "/assets/shield-WVm_u6ID.js", "/assets/arrow-right-BXNH_v2z.js"] }, "/app/investor/deal-rooms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.deal-rooms.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.deal-rooms-DXjxXXYX.js"] }, "/app/investor/decisions": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.decisions.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.decisions-DKvxMkE1.js", "/assets/check-Cl89dZiA.js", "/assets/x-DyV3kO1L.js"] }, "/app/investor/diligence": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.diligence.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.diligence-D5XT6ctk.js", "/assets/circle-check-rsTjyQNa.js", "/assets/circle-D5RA3dd7.js"] }, "/app/investor/pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.pipeline-BmW265R9.js"] }, "/app/investor/portfolio": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.portfolio.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.portfolio-HRMF8ptl.js"] }, "/app/investor/startups": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.startups.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.startups-xDw6KBe9.js", "/assets/external-link-B1JYJO18.js"] }, "/app/investor/team": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.team.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.team-DPnUL0-9.js"] }, "/app/settings/billing": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.billing.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.billing-BfquQtKv.js", "/assets/check-Cl89dZiA.js", "/assets/download-0ysVpwZI.js"] }, "/app/settings/domain": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.domain.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.domain-CWGrjmrX.js", "/assets/circle-check-rsTjyQNa.js", "/assets/copy-BbSrAflM.js", "/assets/mail-Da3LhbK7.js"] }, "/app/settings/notifications": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.notifications.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.notifications-DSeCXabb.js", "/assets/mail-Da3LhbK7.js", "/assets/smartphone-sxwWiJQ6.js"] }, "/app/settings/security": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.security.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.security-JofpBQtg.js", "/assets/smartphone-sxwWiJQ6.js", "/assets/triangle-alert-v2GK_Yms.js"] }, "/app/investor/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.index.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.index-CVFS5Y9a.js", "/assets/circle-check-rsTjyQNa.js", "/assets/clock-DohU1sUL.js", "/assets/circle-alert-DtsyWZvh.js", "/assets/arrow-right-BXNH_v2z.js", "/assets/AIBriefPanel-CuDwur4i.js", "/assets/createServerFn-M_I0Yahw.js", "/assets/x-DyV3kO1L.js", "/assets/triangle-alert-v2GK_Yms.js", "/assets/shield-WVm_u6ID.js"] }, "/app/deal-room/$id_/nda": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-room.$id_.nda.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-room._id_.nda-DOWqx_l-.js", "/assets/shield-WVm_u6ID.js", "/assets/loader-circle-CdugNb8p.js", "/assets/lock-Cl5-E2gJ.js"] } }, clientEntry: "/assets/index-2btCeu3x.js" });
   }
 });
 
@@ -56944,7 +56944,7 @@ var init_lucide_react = __esm({
   }
 });
 
-// dist/server/assets/LangSwitcher-Z9WhK3Dz.js
+// dist/server/assets/LangSwitcher-6l4R3Fxu.js
 function ThemeToggle() {
   const { theme, setTheme, resolved } = useTheme();
   const [open, setOpen] = (0, import_react17.useState)(false);
@@ -57039,18 +57039,18 @@ function LangSwitcher() {
   ] });
 }
 var import_jsx_runtime23, import_react17;
-var init_LangSwitcher_Z9WhK3Dz = __esm({
-  "dist/server/assets/LangSwitcher-Z9WhK3Dz.js"() {
+var init_LangSwitcher_6l4R3Fxu = __esm({
+  "dist/server/assets/LangSwitcher-6l4R3Fxu.js"() {
     "use strict";
     import_jsx_runtime23 = __toESM(require_jsx_runtime(), 1);
     init_lucide_react();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     import_react17 = __toESM(require_react(), 1);
     init_utils_H80jjgLf();
   }
 });
 
-// dist/server/assets/SiteFooter-DnvFMO06.js
+// dist/server/assets/SiteFooter-_VnERCz7.js
 function SiteHeader() {
   return /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)("header", { className: "sticky top-0 z-40 w-full", children: [
     /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { className: "absolute inset-0 -z-10 backdrop-blur-xl bg-background/70 border-b border-border/60" }),
@@ -57145,8 +57145,8 @@ function SiteFooter() {
   ] }) });
 }
 var import_jsx_runtime24, React11, buttonVariants, Button, nav;
-var init_SiteFooter_DnvFMO06 = __esm({
-  "dist/server/assets/SiteFooter-DnvFMO06.js"() {
+var init_SiteFooter_VnERCz7 = __esm({
+  "dist/server/assets/SiteFooter-_VnERCz7.js"() {
     "use strict";
     import_jsx_runtime24 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -57156,7 +57156,7 @@ var init_SiteFooter_DnvFMO06 = __esm({
     init_dist10();
     init_utils_H80jjgLf();
     init_lucide_react();
-    init_LangSwitcher_Z9WhK3Dz();
+    init_LangSwitcher_6l4R3Fxu();
     buttonVariants = cva(
       "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
       {
@@ -57202,9 +57202,9 @@ var init_SiteFooter_DnvFMO06 = __esm({
   }
 });
 
-// dist/server/assets/terms-BkzsEX-S.js
-var terms_BkzsEX_S_exports = {};
-__export(terms_BkzsEX_S_exports, {
+// dist/server/assets/terms-VDfrQjiI.js
+var terms_VDfrQjiI_exports = {};
+__export(terms_VDfrQjiI_exports, {
   component: () => TermsPage
 });
 function TermsPage() {
@@ -57225,11 +57225,11 @@ function TermsPage() {
   ] });
 }
 var import_jsx_runtime25, import_react18, sections;
-var init_terms_BkzsEX_S = __esm({
-  "dist/server/assets/terms-BkzsEX-S.js"() {
+var init_terms_VDfrQjiI = __esm({
+  "dist/server/assets/terms-VDfrQjiI.js"() {
     "use strict";
     import_jsx_runtime25 = __toESM(require_jsx_runtime(), 1);
-    init_SiteFooter_DnvFMO06();
+    init_SiteFooter_VnERCz7();
     import_react18 = __toESM(require_react(), 1);
     init_dist10();
     init_clsx();
@@ -57334,9 +57334,9 @@ var init_AuthLayout_CGbmMhnh = __esm({
   }
 });
 
-// dist/server/assets/sign-up-GtS8qVVW.js
-var sign_up_GtS8qVVW_exports = {};
-__export(sign_up_GtS8qVVW_exports, {
+// dist/server/assets/sign-up-DytV9-f8.js
+var sign_up_DytV9_f8_exports = {};
+__export(sign_up_DytV9_f8_exports, {
   component: () => SignUpPage
 });
 function RoleCard({
@@ -57344,9 +57344,11 @@ function RoleCard({
   onClick,
   icon: Icon2,
   label,
-  sub
+  sub,
+  locked
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("button", { type: "button", onClick, className: cn3("relative rounded-xl border p-4 text-left transition-all", active ? "border-brand bg-brand/5 ring-2 ring-brand/20 shadow-glow" : "border-border/60 hover:border-border bg-card"), children: [
+  const isDisabled = locked && !active;
+  return /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("button", { type: "button", onClick: isDisabled || locked && active ? void 0 : onClick, disabled: isDisabled, className: cn3("relative rounded-xl border p-4 text-left transition-all", isDisabled ? "border-border/30 bg-muted/20 opacity-35 cursor-not-allowed" : active ? "border-brand bg-brand/5 ring-2 ring-brand/20 shadow-glow" : "border-border/60 hover:border-border bg-card cursor-pointer"), children: [
     active && /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "absolute top-2 right-2 grid h-5 w-5 place-items-center rounded-full bg-gradient-brand text-brand-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(Check, { className: "h-3 w-3" }) }),
     /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: cn3("grid h-9 w-9 place-items-center rounded-lg", active ? "bg-gradient-brand text-brand-foreground" : "bg-accent text-foreground"), children: /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(Icon2, { className: "h-4 w-4" }) }),
     /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "mt-3 text-sm font-semibold leading-tight", children: label }),
@@ -57354,9 +57356,8 @@ function RoleCard({
   ] });
 }
 function SignUpPage() {
-  const search = Route$N.useSearch();
   const nav2 = useNavigate();
-  const [role, setRole] = (0, import_react19.useState)(search.role);
+  const [role, setRole] = (0, import_react19.useState)(null);
   const [name, setName] = (0, import_react19.useState)("");
   const [email, setEmail] = (0, import_react19.useState)("");
   const [pw, setPw] = (0, import_react19.useState)("");
@@ -57373,6 +57374,7 @@ function SignUpPage() {
   }, [countdown]);
   const submit = async (e) => {
     e.preventDefault();
+    if (!role) return;
     setError("");
     setLoading(true);
     try {
@@ -57383,6 +57385,7 @@ function SignUpPage() {
         email,
         password: pw,
         options: {
+          emailRedirectTo: window.location.origin + "/auth/callback",
           data: {
             full_name: name || role,
             role,
@@ -57391,28 +57394,6 @@ function SignUpPage() {
         }
       });
       if (signUpError) throw signUpError;
-      localStorage.setItem(`pending_role_${email}`, role);
-      const {
-        data: {
-          session
-        }
-      } = await supabase.auth.getSession();
-      if (session && data.user?.id) {
-        const now = (/* @__PURE__ */ new Date()).toISOString();
-        await supabase.from("users").upsert({
-          id: data.user.id,
-          email,
-          full_name: name || role,
-          role,
-          created_at: now,
-          updated_at: now
-        });
-        localStorage.removeItem(`pending_role_${email}`);
-        nav2({
-          to: role === "investor" ? "/app/investor" : "/app"
-        });
-        return;
-      }
       if (data.user?.id) {
         const now = (/* @__PURE__ */ new Date()).toISOString();
         const {
@@ -57424,8 +57405,23 @@ function SignUpPage() {
           role,
           created_at: now,
           updated_at: now
+        }, {
+          onConflict: "id"
         });
         if (upsertError) console.error("Failed to save user role:", upsertError);
+      }
+      localStorage.setItem(`pending_role_${email}`, role);
+      const {
+        data: {
+          session
+        }
+      } = await supabase.auth.getSession();
+      if (session && data.user?.id) {
+        localStorage.removeItem(`pending_role_${email}`);
+        nav2({
+          to: role === "investor" ? "/app/investor" : "/app"
+        });
+        return;
       }
       setConfirmed(true);
       setCountdown(60);
@@ -57469,6 +57465,7 @@ function SignUpPage() {
     return null;
   })();
   const google = async () => {
+    if (!role) return;
     localStorage.setItem("oauth_pending_role", role);
     console.log("Saving role before OAuth:", role);
     const {
@@ -57490,7 +57487,7 @@ function SignUpPage() {
       "Already confirmed?",
       " ",
       /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(Link, { to: "/sign-in", search: {
-        redirect: role === "investor" ? "/app/investor" : "/app"
+        redirect: (role ?? "founder") === "investor" ? "/app/investor" : "/app"
       }, className: "text-foreground font-medium hover:text-brand", children: "Sign in" })
     ] }), children: /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("div", { className: "flex flex-col items-center gap-5 py-4 text-center", children: [
       /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "grid h-16 w-16 place-items-center rounded-full bg-success/10 ring-4 ring-success/20", children: /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(MailCheck, { className: "h-8 w-8 text-success" }) }),
@@ -57537,15 +57534,18 @@ function SignUpPage() {
     }, className: "text-foreground font-medium hover:text-brand", children: "Sign in" })
   ] }), children: [
     /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("div", { className: "space-y-2 mb-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "text-xs font-medium text-muted-foreground", children: "I am a\u2026" }),
+      /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "text-xs font-medium text-muted-foreground", children: role ? "Signing up as" : "I am a\u2026" }),
       /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("div", { className: "grid grid-cols-2 gap-2.5", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(RoleCard, { active: role === "founder", onClick: () => setRole("founder"), icon: Rocket, label: "I'm a Founder", sub: "Raising capital for my startup" }),
-        /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(RoleCard, { active: role === "investor", onClick: () => setRole("investor"), icon: TrendingUp, label: "I'm an Investor", sub: "Reviewing investment opportunities" })
+        /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(RoleCard, { active: role === "founder", locked: role !== null, onClick: () => setRole("founder"), icon: Rocket, label: "I'm a Founder", sub: "Raising capital for my startup" }),
+        /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(RoleCard, { active: role === "investor", locked: role !== null, onClick: () => setRole("investor"), icon: TrendingUp, label: "I'm an Investor", sub: "Reviewing investment opportunities" })
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(GoogleButton, { onClick: google }),
-    /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(Divider, {}),
-    /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("form", { onSubmit: submit, className: "space-y-3.5", children: [
+    !role && /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("p", { className: "text-xs text-muted-foreground text-center py-1", children: "Select your role above to continue" }),
+    role && /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)(import_jsx_runtime27.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(GoogleButton, { onClick: google }),
+      /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(Divider, {})
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("form", { onSubmit: submit, className: cn3("space-y-3.5", !role && "hidden"), children: [
       /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(Field, { label: "Full name", value: name, onChange: (e) => setName(e.target.value), placeholder: role === "investor" ? "Alex Johnson" : "Sam Rivera", required: true }),
       /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(Field, { label: "Work email", type: "email", value: email, onChange: (e) => setEmail(e.target.value), placeholder: "you@company.com", required: true }),
       /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(Field, { label: "Password", type: "password", value: pw, onChange: (e) => setPw(e.target.value), placeholder: "At least 8 characters", required: true }),
@@ -57568,7 +57568,7 @@ function SignUpPage() {
         " ",
         /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(Link, { to: "/privacy", className: "text-foreground hover:text-brand underline underline-offset-2", children: "Privacy Policy" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("button", { type: "submit", disabled: loading, className: "w-full inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-brand text-brand-foreground py-2.5 text-sm font-medium shadow-glow disabled:opacity-60", children: loading ? /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(LoaderCircle, { className: "h-4 w-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)(import_jsx_runtime27.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("button", { type: "submit", disabled: loading || !role, title: !role ? "Please select your role to continue" : void 0, className: "w-full inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-brand text-brand-foreground py-2.5 text-sm font-medium shadow-glow disabled:opacity-60", children: loading ? /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(LoaderCircle, { className: "h-4 w-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)(import_jsx_runtime27.Fragment, { children: [
         role === "investor" ? "Create investor workspace" : "Create founder workspace",
         " ",
         /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(ArrowRight, { className: "h-4 w-4" })
@@ -57578,14 +57578,14 @@ function SignUpPage() {
   ] });
 }
 var import_jsx_runtime27, import_react19;
-var init_sign_up_GtS8qVVW = __esm({
-  "dist/server/assets/sign-up-GtS8qVVW.js"() {
+var init_sign_up_DytV9_f8 = __esm({
+  "dist/server/assets/sign-up-DytV9-f8.js"() {
     "use strict";
     import_jsx_runtime27 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react19 = __toESM(require_react(), 1);
     init_AuthLayout_CGbmMhnh();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_utils_H80jjgLf();
     init_lucide_react();
     init_dist7();
@@ -57593,9 +57593,9 @@ var init_sign_up_GtS8qVVW = __esm({
   }
 });
 
-// dist/server/assets/sign-in-rD1aAnbc.js
-var sign_in_rD1aAnbc_exports = {};
-__export(sign_in_rD1aAnbc_exports, {
+// dist/server/assets/sign-in-CEWBme8D.js
+var sign_in_CEWBme8D_exports = {};
+__export(sign_in_CEWBme8D_exports, {
   component: () => SignInPage
 });
 function SignInPage() {
@@ -57704,23 +57704,23 @@ function SignInPage() {
   ] });
 }
 var import_jsx_runtime28, import_react20;
-var init_sign_in_rD1aAnbc = __esm({
-  "dist/server/assets/sign-in-rD1aAnbc.js"() {
+var init_sign_in_CEWBme8D = __esm({
+  "dist/server/assets/sign-in-CEWBme8D.js"() {
     "use strict";
     import_jsx_runtime28 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react20 = __toESM(require_react(), 1);
     init_AuthLayout_CGbmMhnh();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_lucide_react();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/privacy-BtdjrUAL.js
-var privacy_BtdjrUAL_exports = {};
-__export(privacy_BtdjrUAL_exports, {
+// dist/server/assets/privacy-Po5r0PvR.js
+var privacy_Po5r0PvR_exports = {};
+__export(privacy_Po5r0PvR_exports, {
   component: () => PrivacyPage
 });
 function PrivacyPage() {
@@ -57741,11 +57741,11 @@ function PrivacyPage() {
   ] });
 }
 var import_jsx_runtime29, import_react21, sections2;
-var init_privacy_BtdjrUAL = __esm({
-  "dist/server/assets/privacy-BtdjrUAL.js"() {
+var init_privacy_Po5r0PvR = __esm({
+  "dist/server/assets/privacy-Po5r0PvR.js"() {
     "use strict";
     import_jsx_runtime29 = __toESM(require_jsx_runtime(), 1);
-    init_SiteFooter_DnvFMO06();
+    init_SiteFooter_VnERCz7();
     import_react21 = __toESM(require_react(), 1);
     init_dist10();
     init_clsx();
@@ -57775,9 +57775,9 @@ var init_privacy_BtdjrUAL = __esm({
   }
 });
 
-// dist/server/assets/pricing-CEs5yxPO.js
-var pricing_CEs5yxPO_exports = {};
-__export(pricing_CEs5yxPO_exports, {
+// dist/server/assets/pricing-CEsa4geM.js
+var pricing_CEsa4geM_exports = {};
+__export(pricing_CEsa4geM_exports, {
   component: () => Pricing
 });
 function Pricing() {
@@ -57817,12 +57817,12 @@ function Pricing() {
   ] });
 }
 var import_jsx_runtime30, import_react22, tiers;
-var init_pricing_CEs5yxPO = __esm({
-  "dist/server/assets/pricing-CEs5yxPO.js"() {
+var init_pricing_CEsa4geM = __esm({
+  "dist/server/assets/pricing-CEsa4geM.js"() {
     "use strict";
     import_jsx_runtime30 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    init_SiteFooter_DnvFMO06();
+    init_SiteFooter_VnERCz7();
     init_lucide_react();
     import_react22 = __toESM(require_react(), 1);
     init_dist10();
@@ -57955,7 +57955,7 @@ var init_AppPreview_BtsG_qZV = __esm({
   }
 });
 
-// dist/server/assets/SolutionPage-C1qP4QJO.js
+// dist/server/assets/SolutionPage-C8I5PKrk.js
 function SolutionPage({ eyebrow, title, sub, Icon: Icon2, features }) {
   return /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)("div", { className: "min-h-screen bg-background", children: [
     /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(SiteHeader, {}),
@@ -57988,28 +57988,28 @@ function SolutionPage({ eyebrow, title, sub, Icon: Icon2, features }) {
   ] });
 }
 var import_jsx_runtime32;
-var init_SolutionPage_C1qP4QJO = __esm({
-  "dist/server/assets/SolutionPage-C1qP4QJO.js"() {
+var init_SolutionPage_C8I5PKrk = __esm({
+  "dist/server/assets/SolutionPage-C8I5PKrk.js"() {
     "use strict";
     import_jsx_runtime32 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    init_SiteFooter_DnvFMO06();
+    init_SiteFooter_VnERCz7();
     init_AppPreview_BtsG_qZV();
     init_lucide_react();
   }
 });
 
-// dist/server/assets/investors-BsXu0Tt3.js
-var investors_BsXu0Tt3_exports = {};
-__export(investors_BsXu0Tt3_exports, {
+// dist/server/assets/investors-BIbQlwtc.js
+var investors_BIbQlwtc_exports = {};
+__export(investors_BIbQlwtc_exports, {
   component: () => SplitComponent
 });
 var import_jsx_runtime33, import_react23, SplitComponent;
-var init_investors_BsXu0Tt3 = __esm({
-  "dist/server/assets/investors-BsXu0Tt3.js"() {
+var init_investors_BIbQlwtc = __esm({
+  "dist/server/assets/investors-BIbQlwtc.js"() {
     "use strict";
     import_jsx_runtime33 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_C1qP4QJO();
+    init_SolutionPage_C8I5PKrk();
     init_lucide_react();
     import_react23 = __toESM(require_react(), 1);
     init_dist10();
@@ -58019,17 +58019,17 @@ var init_investors_BsXu0Tt3 = __esm({
   }
 });
 
-// dist/server/assets/founders-Bvu121j0.js
-var founders_Bvu121j0_exports = {};
-__export(founders_Bvu121j0_exports, {
+// dist/server/assets/founders-BPWw3Kn5.js
+var founders_BPWw3Kn5_exports = {};
+__export(founders_BPWw3Kn5_exports, {
   component: () => SplitComponent2
 });
 var import_jsx_runtime34, import_react24, SplitComponent2;
-var init_founders_Bvu121j0 = __esm({
-  "dist/server/assets/founders-Bvu121j0.js"() {
+var init_founders_BPWw3Kn5 = __esm({
+  "dist/server/assets/founders-BPWw3Kn5.js"() {
     "use strict";
     import_jsx_runtime34 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_C1qP4QJO();
+    init_SolutionPage_C8I5PKrk();
     init_lucide_react();
     import_react24 = __toESM(require_react(), 1);
     init_dist10();
@@ -61734,9 +61734,9 @@ var init_store_C2XR0Skj = __esm({
   }
 });
 
-// dist/server/assets/app-GuUrC4kt.js
-var app_GuUrC4kt_exports = {};
-__export(app_GuUrC4kt_exports, {
+// dist/server/assets/app-6rnUn6lR.js
+var app_6rnUn6lR_exports = {};
+__export(app_6rnUn6lR_exports, {
   component: () => SplitComponent4
 });
 function NotificationBell() {
@@ -62023,8 +62023,8 @@ function AppShell({ children }) {
   ] });
 }
 var import_jsx_runtime37, import_react27, iconFor, tintFor, founderNav, investorNav, workspaceNavFounder, workspaceNavInvestor, SplitComponent4;
-var init_app_GuUrC4kt = __esm({
-  "dist/server/assets/app-GuUrC4kt.js"() {
+var init_app_6rnUn6lR = __esm({
+  "dist/server/assets/app-6rnUn6lR.js"() {
     "use strict";
     import_jsx_runtime37 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -62033,9 +62033,9 @@ var init_app_GuUrC4kt = __esm({
     import_react27 = __toESM(require_react(), 1);
     init_modern2();
     init_utils_H80jjgLf();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_date_fns();
-    init_LangSwitcher_Z9WhK3Dz();
+    init_LangSwitcher_6l4R3Fxu();
     init_store_C2XR0Skj();
     init_clsx();
     init_dist7();
@@ -62088,9 +62088,9 @@ var init_app_GuUrC4kt = __esm({
   }
 });
 
-// dist/server/assets/about-waUQymz-.js
-var about_waUQymz_exports = {};
-__export(about_waUQymz_exports, {
+// dist/server/assets/about-D4Ezd8__.js
+var about_D4Ezd8_exports = {};
+__export(about_D4Ezd8_exports, {
   component: () => About
 });
 function About() {
@@ -62110,11 +62110,11 @@ function About() {
   ] });
 }
 var import_jsx_runtime38, import_react28;
-var init_about_waUQymz = __esm({
-  "dist/server/assets/about-waUQymz-.js"() {
+var init_about_D4Ezd8 = __esm({
+  "dist/server/assets/about-D4Ezd8__.js"() {
     "use strict";
     import_jsx_runtime38 = __toESM(require_jsx_runtime(), 1);
-    init_SiteFooter_DnvFMO06();
+    init_SiteFooter_VnERCz7();
     init_lucide_react();
     init_esm5();
     import_react28 = __toESM(require_react(), 1);
@@ -62124,9 +62124,9 @@ var init_about_waUQymz = __esm({
   }
 });
 
-// dist/server/assets/index-30Qcy2tr.js
-var index_30Qcy2tr_exports = {};
-__export(index_30Qcy2tr_exports, {
+// dist/server/assets/index-ac9IJHOc.js
+var index_ac9IJHOc_exports = {};
+__export(index_ac9IJHOc_exports, {
   component: () => Landing
 });
 function Landing() {
@@ -62434,12 +62434,12 @@ function FinalCTA() {
   ] }) });
 }
 var import_jsx_runtime39, import_react29;
-var init_index_30Qcy2tr = __esm({
-  "dist/server/assets/index-30Qcy2tr.js"() {
+var init_index_ac9IJHOc = __esm({
+  "dist/server/assets/index-ac9IJHOc.js"() {
     "use strict";
     import_jsx_runtime39 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    init_SiteFooter_DnvFMO06();
+    init_SiteFooter_VnERCz7();
     init_AppPreview_BtsG_qZV();
     init_lucide_react();
     import_react29 = __toESM(require_react(), 1);
@@ -62449,9 +62449,9 @@ var init_index_30Qcy2tr = __esm({
   }
 });
 
-// dist/server/assets/app.index-DjzsNqHb.js
-var app_index_DjzsNqHb_exports = {};
-__export(app_index_DjzsNqHb_exports, {
+// dist/server/assets/app.index-DTUnRMT-.js
+var app_index_DTUnRMT_exports = {};
+__export(app_index_DTUnRMT_exports, {
   component: () => Overview
 });
 function timeAgo(iso) {
@@ -62947,15 +62947,15 @@ function Overview() {
   ] });
 }
 var import_jsx_runtime40, import_react30, DEAL_ROOM_PROGRESS;
-var init_app_index_DjzsNqHb = __esm({
-  "dist/server/assets/app.index-DjzsNqHb.js"() {
+var init_app_index_DTUnRMT = __esm({
+  "dist/server/assets/app.index-DTUnRMT-.js"() {
     "use strict";
     import_jsx_runtime40 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react30 = __toESM(require_react(), 1);
     init_modern2();
     init_lucide_react();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_utils_H80jjgLf();
     init_dist7();
     init_clsx();
@@ -62988,17 +62988,17 @@ var init_app_index_DjzsNqHb = __esm({
   }
 });
 
-// dist/server/assets/solutions.vc-deal-room-orGQUg2C.js
-var solutions_vc_deal_room_orGQUg2C_exports = {};
-__export(solutions_vc_deal_room_orGQUg2C_exports, {
+// dist/server/assets/solutions.vc-deal-room-udMSlW8f.js
+var solutions_vc_deal_room_udMSlW8f_exports = {};
+__export(solutions_vc_deal_room_udMSlW8f_exports, {
   component: () => SplitComponent5
 });
 var import_jsx_runtime41, import_react31, SplitComponent5;
-var init_solutions_vc_deal_room_orGQUg2C = __esm({
-  "dist/server/assets/solutions.vc-deal-room-orGQUg2C.js"() {
+var init_solutions_vc_deal_room_udMSlW8f = __esm({
+  "dist/server/assets/solutions.vc-deal-room-udMSlW8f.js"() {
     "use strict";
     import_jsx_runtime41 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_C1qP4QJO();
+    init_SolutionPage_C8I5PKrk();
     init_lucide_react();
     import_react31 = __toESM(require_react(), 1);
     init_dist10();
@@ -63008,17 +63008,17 @@ var init_solutions_vc_deal_room_orGQUg2C = __esm({
   }
 });
 
-// dist/server/assets/solutions.raise-1m-m3mEKJNs.js
-var solutions_raise_1m_m3mEKJNs_exports = {};
-__export(solutions_raise_1m_m3mEKJNs_exports, {
+// dist/server/assets/solutions.raise-1m-BG1gOOZV.js
+var solutions_raise_1m_BG1gOOZV_exports = {};
+__export(solutions_raise_1m_BG1gOOZV_exports, {
   component: () => SplitComponent6
 });
 var import_jsx_runtime42, import_react32, SplitComponent6;
-var init_solutions_raise_1m_m3mEKJNs = __esm({
-  "dist/server/assets/solutions.raise-1m-m3mEKJNs.js"() {
+var init_solutions_raise_1m_BG1gOOZV = __esm({
+  "dist/server/assets/solutions.raise-1m-BG1gOOZV.js"() {
     "use strict";
     import_jsx_runtime42 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_C1qP4QJO();
+    init_SolutionPage_C8I5PKrk();
     init_lucide_react();
     import_react32 = __toESM(require_react(), 1);
     init_dist10();
@@ -63028,17 +63028,17 @@ var init_solutions_raise_1m_m3mEKJNs = __esm({
   }
 });
 
-// dist/server/assets/solutions.investor-pipeline-B-rf5fTq.js
-var solutions_investor_pipeline_B_rf5fTq_exports = {};
-__export(solutions_investor_pipeline_B_rf5fTq_exports, {
+// dist/server/assets/solutions.investor-pipeline-CGgtdyku.js
+var solutions_investor_pipeline_CGgtdyku_exports = {};
+__export(solutions_investor_pipeline_CGgtdyku_exports, {
   component: () => SplitComponent7
 });
 var import_jsx_runtime43, import_react33, SplitComponent7;
-var init_solutions_investor_pipeline_B_rf5fTq = __esm({
-  "dist/server/assets/solutions.investor-pipeline-B-rf5fTq.js"() {
+var init_solutions_investor_pipeline_CGgtdyku = __esm({
+  "dist/server/assets/solutions.investor-pipeline-CGgtdyku.js"() {
     "use strict";
     import_jsx_runtime43 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_C1qP4QJO();
+    init_SolutionPage_C8I5PKrk();
     init_lucide_react();
     import_react33 = __toESM(require_react(), 1);
     init_dist10();
@@ -63048,17 +63048,17 @@ var init_solutions_investor_pipeline_B_rf5fTq = __esm({
   }
 });
 
-// dist/server/assets/solutions.fundraising-crm-DE2WfPPf.js
-var solutions_fundraising_crm_DE2WfPPf_exports = {};
-__export(solutions_fundraising_crm_DE2WfPPf_exports, {
+// dist/server/assets/solutions.fundraising-crm-BY5Swq_-.js
+var solutions_fundraising_crm_BY5Swq_exports = {};
+__export(solutions_fundraising_crm_BY5Swq_exports, {
   component: () => SplitComponent8
 });
 var import_jsx_runtime44, import_react34, SplitComponent8;
-var init_solutions_fundraising_crm_DE2WfPPf = __esm({
-  "dist/server/assets/solutions.fundraising-crm-DE2WfPPf.js"() {
+var init_solutions_fundraising_crm_BY5Swq = __esm({
+  "dist/server/assets/solutions.fundraising-crm-BY5Swq_-.js"() {
     "use strict";
     import_jsx_runtime44 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_C1qP4QJO();
+    init_SolutionPage_C8I5PKrk();
     init_lucide_react();
     import_react34 = __toESM(require_react(), 1);
     init_dist10();
@@ -63068,17 +63068,17 @@ var init_solutions_fundraising_crm_DE2WfPPf = __esm({
   }
 });
 
-// dist/server/assets/solutions.due-diligence-DoRege_n.js
-var solutions_due_diligence_DoRege_n_exports = {};
-__export(solutions_due_diligence_DoRege_n_exports, {
+// dist/server/assets/solutions.due-diligence-g-V6oZfY.js
+var solutions_due_diligence_g_V6oZfY_exports = {};
+__export(solutions_due_diligence_g_V6oZfY_exports, {
   component: () => SplitComponent9
 });
 var import_jsx_runtime45, import_react35, SplitComponent9;
-var init_solutions_due_diligence_DoRege_n = __esm({
-  "dist/server/assets/solutions.due-diligence-DoRege_n.js"() {
+var init_solutions_due_diligence_g_V6oZfY = __esm({
+  "dist/server/assets/solutions.due-diligence-g-V6oZfY.js"() {
     "use strict";
     import_jsx_runtime45 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_C1qP4QJO();
+    init_SolutionPage_C8I5PKrk();
     init_lucide_react();
     import_react35 = __toESM(require_react(), 1);
     init_dist10();
@@ -63088,9 +63088,9 @@ var init_solutions_due_diligence_DoRege_n = __esm({
   }
 });
 
-// dist/server/assets/join._token-CpFanWar.js
-var join_token_CpFanWar_exports = {};
-__export(join_token_CpFanWar_exports, {
+// dist/server/assets/join._token-D3up4Dt8.js
+var join_token_D3up4Dt8_exports = {};
+__export(join_token_D3up4Dt8_exports, {
   component: () => JoinFlow
 });
 function JoinFlow() {
@@ -63305,23 +63305,23 @@ function JoinFlow() {
   ] });
 }
 var import_jsx_runtime46, import_react36;
-var init_join_token_CpFanWar = __esm({
-  "dist/server/assets/join._token-CpFanWar.js"() {
+var init_join_token_D3up4Dt8 = __esm({
+  "dist/server/assets/join._token-D3up4Dt8.js"() {
     "use strict";
     import_jsx_runtime46 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react36 = __toESM(require_react(), 1);
     init_Logo_CIkq6vsm();
     init_lucide_react();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/auth.callback-BqaDKt5F.js
-var auth_callback_BqaDKt5F_exports = {};
-__export(auth_callback_BqaDKt5F_exports, {
+// dist/server/assets/auth.callback-DQsKNe_C.js
+var auth_callback_DQsKNe_C_exports = {};
+__export(auth_callback_DQsKNe_C_exports, {
   component: () => AuthCallback
 });
 function AuthCallback() {
@@ -63350,18 +63350,18 @@ function AuthCallback() {
       const role = existingUser?.role || pendingRole || metadata?.role || "founder";
       console.log("Final role being saved:", role);
       localStorage.removeItem("oauth_pending_role");
-      if (!existingUser) {
-        const {
-          error: upsertError
-        } = await supabase.from("users").upsert({
-          id: session.user.id,
-          email: session.user.email,
-          role,
-          full_name: metadata?.full_name || metadata?.name || session.user.email?.split("@")[0] || "",
-          updated_at: (/* @__PURE__ */ new Date()).toISOString()
-        });
-        if (upsertError) console.error("Upsert error:", upsertError);
-      }
+      const {
+        error: upsertError
+      } = await supabase.from("users").upsert({
+        id: session.user.id,
+        email: session.user.email,
+        role,
+        full_name: metadata?.full_name || metadata?.name || session.user.email?.split("@")[0] || "",
+        updated_at: (/* @__PURE__ */ new Date()).toISOString()
+      }, {
+        onConflict: "id"
+      });
+      if (upsertError) console.error("Upsert error:", upsertError);
       console.log("Navigating to:", role === "investor" ? "/app/investor" : "/app");
       if (role === "investor") {
         navigate({
@@ -63381,21 +63381,21 @@ function AuthCallback() {
   ] }) });
 }
 var import_jsx_runtime47, import_react37;
-var init_auth_callback_BqaDKt5F = __esm({
-  "dist/server/assets/auth.callback-BqaDKt5F.js"() {
+var init_auth_callback_DQsKNe_C = __esm({
+  "dist/server/assets/auth.callback-DQsKNe_C.js"() {
     "use strict";
     import_jsx_runtime47 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react37 = __toESM(require_react(), 1);
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.users-DSS0hibq.js
-var app_users_DSS0hibq_exports = {};
-__export(app_users_DSS0hibq_exports, {
+// dist/server/assets/app.users-DU2cZDbq.js
+var app_users_DU2cZDbq_exports = {};
+__export(app_users_DU2cZDbq_exports, {
   component: () => UsersPage
 });
 function UsersPage() {
@@ -63668,8 +63668,8 @@ function InviteModal({
   ] }) });
 }
 var import_jsx_runtime48, import_react38, roleColor;
-var init_app_users_DSS0hibq = __esm({
-  "dist/server/assets/app.users-DSS0hibq.js"() {
+var init_app_users_DU2cZDbq = __esm({
+  "dist/server/assets/app.users-DU2cZDbq.js"() {
     "use strict";
     import_jsx_runtime48 = __toESM(require_jsx_runtime(), 1);
     import_react38 = __toESM(require_react(), 1);
@@ -63677,7 +63677,7 @@ var init_app_users_DSS0hibq = __esm({
     init_lucide_react();
     init_dist7();
     init_date_fns();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_clsx();
     roleColor = {
       Owner: "bg-violet/10 text-violet border-violet/20",
@@ -63690,9 +63690,9 @@ var init_app_users_DSS0hibq = __esm({
   }
 });
 
-// dist/server/assets/app.settings-D7jAdFiL.js
-var app_settings_D7jAdFiL_exports = {};
-__export(app_settings_D7jAdFiL_exports, {
+// dist/server/assets/app.settings-O4NBC0X0.js
+var app_settings_O4NBC0X0_exports = {};
+__export(app_settings_O4NBC0X0_exports, {
   Card: () => Card,
   Field: () => Field2,
   SaveBar: () => SaveBar,
@@ -63814,15 +63814,15 @@ function SaveBar() {
   ] });
 }
 var import_jsx_runtime49, import_react39, tabs;
-var init_app_settings_D7jAdFiL = __esm({
-  "dist/server/assets/app.settings-D7jAdFiL.js"() {
+var init_app_settings_O4NBC0X0 = __esm({
+  "dist/server/assets/app.settings-O4NBC0X0.js"() {
     "use strict";
     import_jsx_runtime49 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_modern2();
     init_lucide_react();
     init_utils_H80jjgLf();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_clsx();
     import_react39 = __toESM(require_react(), 1);
     init_dist7();
@@ -63851,9 +63851,9 @@ var init_app_settings_D7jAdFiL = __esm({
   }
 });
 
-// dist/server/assets/app.reports-Cvu7-PWN.js
-var app_reports_Cvu7_PWN_exports = {};
-__export(app_reports_Cvu7_PWN_exports, {
+// dist/server/assets/app.reports-C5C_tLM8.js
+var app_reports_C5C_tLM8_exports = {};
+__export(app_reports_C5C_tLM8_exports, {
   component: () => Reports
 });
 function downloadFile(filename, content, mime) {
@@ -63990,12 +63990,12 @@ function Reports() {
   ] });
 }
 var import_jsx_runtime50, import_react40, deals, ddChecklist, auditLog;
-var init_app_reports_Cvu7_PWN = __esm({
-  "dist/server/assets/app.reports-Cvu7-PWN.js"() {
+var init_app_reports_C5C_tLM8 = __esm({
+  "dist/server/assets/app.reports-C5C_tLM8.js"() {
     "use strict";
     import_jsx_runtime50 = __toESM(require_jsx_runtime(), 1);
     init_lucide_react();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     import_react40 = __toESM(require_react(), 1);
     init_dist7();
     init_clsx();
@@ -64005,9 +64005,9 @@ var init_app_reports_Cvu7_PWN = __esm({
   }
 });
 
-// dist/server/assets/app.profile-DkJridoL.js
-var app_profile_DkJridoL_exports = {};
-__export(app_profile_DkJridoL_exports, {
+// dist/server/assets/app.profile-DWZA7yG1.js
+var app_profile_DWZA7yG1_exports = {};
+__export(app_profile_DWZA7yG1_exports, {
   component: () => Profile
 });
 function fromStartup(s) {
@@ -64551,15 +64551,15 @@ function TeamMembersSection({
   ] });
 }
 var import_jsx_runtime51, import_react41, STAGES, MEMBER_TAGS, emptyForm;
-var init_app_profile_DkJridoL = __esm({
-  "dist/server/assets/app.profile-DkJridoL.js"() {
+var init_app_profile_DWZA7yG1 = __esm({
+  "dist/server/assets/app.profile-DWZA7yG1.js"() {
     "use strict";
     import_jsx_runtime51 = __toESM(require_jsx_runtime(), 1);
     import_react41 = __toESM(require_react(), 1);
     init_modern2();
     init_lucide_react();
     init_dist7();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_utils_H80jjgLf();
     init_clsx();
     STAGES = ["Pre-seed", "Seed", "Series A", "Series B", "Series C+", "Growth"];
@@ -64584,9 +64584,9 @@ var init_app_profile_DkJridoL = __esm({
   }
 });
 
-// dist/server/assets/app.pipeline-1W8bG1oP.js
-var app_pipeline_1W8bG1oP_exports = {};
-__export(app_pipeline_1W8bG1oP_exports, {
+// dist/server/assets/app.pipeline--8UqJ3QE.js
+var app_pipeline_8UqJ3QE_exports = {};
+__export(app_pipeline_8UqJ3QE_exports, {
   component: () => Pipeline
 });
 function timeAgo2(iso) {
@@ -64780,14 +64780,14 @@ function DealCard({
   ] });
 }
 var import_jsx_runtime52, import_react42, pipelineStages, STATUS_TO_STAGE, STAGE_TO_STATUS, STAGE_PROBABILITY, stageTint;
-var init_app_pipeline_1W8bG1oP = __esm({
-  "dist/server/assets/app.pipeline-1W8bG1oP.js"() {
+var init_app_pipeline_8UqJ3QE = __esm({
+  "dist/server/assets/app.pipeline--8UqJ3QE.js"() {
     "use strict";
     import_jsx_runtime52 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react42 = __toESM(require_react(), 1);
     init_modern2();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_lucide_react();
     init_utils_H80jjgLf();
     init_dist7();
@@ -64938,9 +64938,9 @@ var init_app_notifications_CeL5tZom = __esm({
   }
 });
 
-// dist/server/assets/app.messages-DH5r5NJS.js
-var app_messages_DH5r5NJS_exports = {};
-__export(app_messages_DH5r5NJS_exports, {
+// dist/server/assets/app.messages-tOIAUAYl.js
+var app_messages_tOIAUAYl_exports = {};
+__export(app_messages_tOIAUAYl_exports, {
   component: () => MessagesPage
 });
 function MessagesPage() {
@@ -65026,12 +65026,12 @@ function Placeholder({
   ] });
 }
 var import_jsx_runtime54, import_react44;
-var init_app_messages_DH5r5NJS = __esm({
-  "dist/server/assets/app.messages-DH5r5NJS.js"() {
+var init_app_messages_tOIAUAYl = __esm({
+  "dist/server/assets/app.messages-tOIAUAYl.js"() {
     "use strict";
     import_jsx_runtime54 = __toESM(require_jsx_runtime(), 1);
     import_react44 = __toESM(require_react(), 1);
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_modern2();
     init_dist7();
     init_clsx();
@@ -65504,9 +65504,9 @@ var init_createSsrRpc_l1y8KE69 = __esm({
   }
 });
 
-// dist/server/assets/app.leads-DXHM6CIL.js
-var app_leads_DXHM6CIL_exports = {};
-__export(app_leads_DXHM6CIL_exports, {
+// dist/server/assets/app.leads-YTvlBEYK.js
+var app_leads_YTvlBEYK_exports = {};
+__export(app_leads_YTvlBEYK_exports, {
   component: () => Leads
 });
 import "node:async_hooks";
@@ -65657,7 +65657,6 @@ function LeadDrawer({ open, lead, onClose, onSaved }) {
   const isEdit = !!lead;
   const queryClient2 = useQueryClient();
   const { user } = useAuth();
-  if (!open) return null;
   const [saving, setSaving] = (0, import_react45.useState)(false);
   const [deleting, setDeleting] = (0, import_react45.useState)(false);
   const [f3, setF] = (0, import_react45.useState)({
@@ -65674,6 +65673,7 @@ function LeadDrawer({ open, lead, onClose, onSaved }) {
     notes: ""
   });
   (0, import_react45.useEffect)(() => {
+    if (!open) return;
     if (lead) {
       setF({
         investor_name: lead.investor_name ?? "",
@@ -65703,7 +65703,8 @@ function LeadDrawer({ open, lead, onClose, onSaved }) {
         notes: ""
       });
     }
-  }, [lead]);
+  }, [open, lead]);
+  if (!open) return null;
   const set = (k3, v3) => setF((s) => ({ ...s, [k3]: v3 }));
   const handleSave = async (e) => {
     e.preventDefault();
@@ -65801,10 +65802,11 @@ function LeadDrawer({ open, lead, onClose, onSaved }) {
                 className: inputCls
               }
             ) }),
-            /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(Field4, { label: "Email", children: /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(Field4, { label: "Email *", children: /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(
               "input",
               {
                 type: "email",
+                required: true,
                 value: f3.email,
                 onChange: (e) => set("email", e.target.value),
                 placeholder: "sarah@sequoia.com",
@@ -65815,7 +65817,7 @@ function LeadDrawer({ open, lead, onClose, onSaved }) {
           /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(Field4, { label: "LinkedIn URL", children: /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(
             "input",
             {
-              type: "url",
+              type: "text",
               value: f3.linkedin_url,
               onChange: (e) => set("linkedin_url", e.target.value),
               placeholder: "https://linkedin.com/in/...",
@@ -65921,7 +65923,7 @@ function LeadDrawer({ open, lead, onClose, onSaved }) {
               "button",
               {
                 type: "submit",
-                disabled: saving || !f3.investor_name.trim(),
+                disabled: saving || !f3.investor_name.trim() || !f3.email.trim(),
                 className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow disabled:opacity-50",
                 children: [
                   saving && /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
@@ -65943,12 +65945,14 @@ function mapCsvRow(raw) {
   Object.keys(raw).forEach((k3) => {
     n2[normKey(k3)] = raw[k3] ?? "";
   });
-  const investor_name = n2["investor_name"] || n2["investor"] || n2["name"] || n2["contact_name"] || "";
-  if (!investor_name.trim()) return null;
+  const email = (n2["email"] || n2["email_address"] || "").trim();
+  if (!email) return null;
+  const raw_name = n2["investor_name"] || n2["investor"] || n2["name"] || n2["contact_name"] || "";
+  const investor_name = raw_name.trim() || email.split("@")[0];
   return {
-    investor_name: investor_name.trim(),
+    investor_name,
     firm_name: n2["firm_name"] || n2["firm"] || n2["company"] || n2["fund"] || void 0,
-    email: n2["email"] || n2["email_address"] || void 0,
+    email,
     linkedin_url: n2["linkedin_url"] || n2["linkedin"] || void 0,
     sector: n2["sector"] || n2["focus"] || void 0,
     stage: n2["stage"] || n2["investment_stage"] || void 0,
@@ -66217,7 +66221,7 @@ function CsvImportModal({
             skipped > 0 && /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("span", { className: "ml-2 text-xs text-warning", children: [
               "(",
               skipped,
-              " rows skipped \u2014 investor_name is required)"
+              " skipped \u2014 no email)"
             ] })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("button", { onClick: () => {
@@ -66251,8 +66255,8 @@ function CsvImportModal({
   ] }) });
 }
 var import_jsx_runtime56, import_react45, import_papaparse, generateOutreachEmail2, ALL_STATUSES, STAGES2, inputCls, STATUS_DOT, PREVIEW_COLS;
-var init_app_leads_DXHM6CIL = __esm({
-  "dist/server/assets/app.leads-DXHM6CIL.js"() {
+var init_app_leads_YTvlBEYK = __esm({
+  "dist/server/assets/app.leads-YTvlBEYK.js"() {
     "use strict";
     import_jsx_runtime56 = __toESM(require_jsx_runtime(), 1);
     import_react45 = __toESM(require_react(), 1);
@@ -66260,7 +66264,7 @@ var init_app_leads_DXHM6CIL = __esm({
     import_papaparse = __toESM(require_papaparse_min(), 1);
     init_dist7();
     init_lucide_react();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_utils_H80jjgLf();
     init_createSsrRpc_l1y8KE69();
     init_server4();
@@ -66447,7 +66451,7 @@ var init_app_email_CbI5DM3y = __esm({
   }
 });
 
-// dist/server/assets/Dropzone-XnLt6uqF.js
+// dist/server/assets/Dropzone-ak873dKQ.js
 function Dropzone({
   onFiles,
   title = "Drag & drop or click to upload",
@@ -66567,20 +66571,20 @@ function Dropzone({
   ] });
 }
 var import_jsx_runtime59, import_react47;
-var init_Dropzone_XnLt6uqF = __esm({
-  "dist/server/assets/Dropzone-XnLt6uqF.js"() {
+var init_Dropzone_ak873dKQ = __esm({
+  "dist/server/assets/Dropzone-ak873dKQ.js"() {
     "use strict";
     import_jsx_runtime59 = __toESM(require_jsx_runtime(), 1);
     import_react47 = __toESM(require_react(), 1);
     init_lucide_react();
     init_utils_H80jjgLf();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
   }
 });
 
-// dist/server/assets/app.documents-ByrDHNqe.js
-var app_documents_ByrDHNqe_exports = {};
-__export(app_documents_ByrDHNqe_exports, {
+// dist/server/assets/app.documents-DRyPfG_N.js
+var app_documents_DRyPfG_N_exports = {};
+__export(app_documents_DRyPfG_N_exports, {
   component: () => Documents
 });
 function Documents() {
@@ -66767,13 +66771,13 @@ function Documents() {
   ] });
 }
 var import_jsx_runtime60, import_react48, CATEGORIES;
-var init_app_documents_ByrDHNqe = __esm({
-  "dist/server/assets/app.documents-ByrDHNqe.js"() {
+var init_app_documents_DRyPfG_N = __esm({
+  "dist/server/assets/app.documents-DRyPfG_N.js"() {
     "use strict";
     import_jsx_runtime60 = __toESM(require_jsx_runtime(), 1);
     init_lucide_react();
-    init_Dropzone_XnLt6uqF();
-    init_router_CMUL11Nw();
+    init_Dropzone_ak873dKQ();
+    init_router_DZsyhUH();
     import_react48 = __toESM(require_react(), 1);
     init_modern2();
     init_dist7();
@@ -66783,9 +66787,9 @@ var init_app_documents_ByrDHNqe = __esm({
   }
 });
 
-// dist/server/assets/app.deal-rooms-CcgzLbii.js
-var app_deal_rooms_CcgzLbii_exports = {};
-__export(app_deal_rooms_CcgzLbii_exports, {
+// dist/server/assets/app.deal-rooms-B0wk8YY1.js
+var app_deal_rooms_B0wk8YY1_exports = {};
+__export(app_deal_rooms_B0wk8YY1_exports, {
   component: () => DealRooms
 });
 function DealRooms() {
@@ -67011,15 +67015,15 @@ function CreateRoomForm({
   ] }) });
 }
 var import_jsx_runtime61, import_react49, DEAL_TYPES;
-var init_app_deal_rooms_CcgzLbii = __esm({
-  "dist/server/assets/app.deal-rooms-CcgzLbii.js"() {
+var init_app_deal_rooms_B0wk8YY1 = __esm({
+  "dist/server/assets/app.deal-rooms-B0wk8YY1.js"() {
     "use strict";
     import_jsx_runtime61 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_lucide_react();
     import_react49 = __toESM(require_react(), 1);
     init_modern2();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_dist7();
     init_clsx();
     DEAL_TYPES = ["Equity", "SAFE", "Convertible Note", "Other"];
@@ -67118,9 +67122,9 @@ var init_app_audit_Dz_yfFC8 = __esm({
   }
 });
 
-// dist/server/assets/app.advisor-ypdSk6h7.js
-var app_advisor_ypdSk6h7_exports = {};
-__export(app_advisor_ypdSk6h7_exports, {
+// dist/server/assets/app.advisor-LpcCgKgv.js
+var app_advisor_LpcCgKgv_exports = {};
+__export(app_advisor_LpcCgKgv_exports, {
   component: () => Advisor
 });
 import "node:async_hooks";
@@ -67244,14 +67248,14 @@ function Advisor() {
   ] });
 }
 var import_jsx_runtime63, import_react51, sendAdvisorMessage2, STARTERS;
-var init_app_advisor_ypdSk6h7 = __esm({
-  "dist/server/assets/app.advisor-ypdSk6h7.js"() {
+var init_app_advisor_LpcCgKgv = __esm({
+  "dist/server/assets/app.advisor-LpcCgKgv.js"() {
     "use strict";
     import_jsx_runtime63 = __toESM(require_jsx_runtime(), 1);
     import_react51 = __toESM(require_react(), 1);
     init_lucide_react();
     init_dist7();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_createSsrRpc_l1y8KE69();
     init_server4();
     init_clsx();
@@ -67329,9 +67333,9 @@ var init_AIBriefPanel_DAEtmxrb = __esm({
   }
 });
 
-// dist/server/assets/app.investor.index-4HF9qaMj.js
-var app_investor_index_4HF9qaMj_exports = {};
-__export(app_investor_index_4HF9qaMj_exports, {
+// dist/server/assets/app.investor.index-DJFg1UC3.js
+var app_investor_index_DJFg1UC3_exports = {};
+__export(app_investor_index_DJFg1UC3_exports, {
   component: () => InvestorDashboard
 });
 import "node:async_hooks";
@@ -67608,15 +67612,15 @@ function InvestorDashboard() {
   ] });
 }
 var import_jsx_runtime65, import_react52, tone, generateDealBrief2, STAGES3, DB_STATUS_TO_STAGE;
-var init_app_investor_index_4HF9qaMj = __esm({
-  "dist/server/assets/app.investor.index-4HF9qaMj.js"() {
+var init_app_investor_index_DJFg1UC3 = __esm({
+  "dist/server/assets/app.investor.index-DJFg1UC3.js"() {
     "use strict";
     import_jsx_runtime65 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react52 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_utils_H80jjgLf();
     init_AIBriefPanel_DAEtmxrb();
     init_createSsrRpc_l1y8KE69();
@@ -67644,9 +67648,9 @@ var init_app_investor_index_4HF9qaMj = __esm({
   }
 });
 
-// dist/server/assets/app.settings.security-XW3-N_13.js
-var app_settings_security_XW3_N_13_exports = {};
-__export(app_settings_security_XW3_N_13_exports, {
+// dist/server/assets/app.settings.security-CtLTNTvI.js
+var app_settings_security_CtLTNTvI_exports = {};
+__export(app_settings_security_CtLTNTvI_exports, {
   component: () => Security
 });
 function Security() {
@@ -67736,22 +67740,22 @@ function Toggle({
   return /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("button", { onClick: () => onChange(!checked), className: `relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${checked ? "bg-gradient-brand" : "bg-muted border border-border/60"}`, children: /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("span", { className: `inline-block h-3.5 w-3.5 rounded-full bg-background shadow-sm transition-transform ${checked ? "translate-x-[18px]" : "translate-x-0.5"}` }) });
 }
 var import_jsx_runtime66, import_react53;
-var init_app_settings_security_XW3_N_13 = __esm({
-  "dist/server/assets/app.settings.security-XW3-N_13.js"() {
+var init_app_settings_security_CtLTNTvI = __esm({
+  "dist/server/assets/app.settings.security-CtLTNTvI.js"() {
     "use strict";
     import_jsx_runtime66 = __toESM(require_jsx_runtime(), 1);
     import_react53 = __toESM(require_react(), 1);
     init_lucide_react();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_esm5();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.settings.notifications-C3C99BZD.js
-var app_settings_notifications_C3C99BZD_exports = {};
-__export(app_settings_notifications_C3C99BZD_exports, {
+// dist/server/assets/app.settings.notifications-X4FHNphQ.js
+var app_settings_notifications_X4FHNphQ_exports = {};
+__export(app_settings_notifications_X4FHNphQ_exports, {
   component: () => NotifRulesPage
 });
 function NotifRulesPage() {
@@ -67834,13 +67838,13 @@ function Toggle2({
   return /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("button", { onClick: () => onChange(!checked), className: cn3("relative inline-flex h-5 w-9 items-center rounded-full transition-colors", checked ? "bg-gradient-brand" : "bg-muted border border-border/60"), children: /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("span", { className: cn3("inline-block h-3.5 w-3.5 transform rounded-full bg-background shadow-sm transition-transform", checked ? "translate-x-[18px]" : "translate-x-0.5") }) });
 }
 var import_jsx_runtime67, import_react54, notifRulesDefault, groupIcon;
-var init_app_settings_notifications_C3C99BZD = __esm({
-  "dist/server/assets/app.settings.notifications-C3C99BZD.js"() {
+var init_app_settings_notifications_X4FHNphQ = __esm({
+  "dist/server/assets/app.settings.notifications-X4FHNphQ.js"() {
     "use strict";
     import_jsx_runtime67 = __toESM(require_jsx_runtime(), 1);
     import_react54 = __toESM(require_react(), 1);
     init_lucide_react();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_utils_H80jjgLf();
     init_dist7();
     init_clsx();
@@ -68134,9 +68138,9 @@ var init_app_investor_team_D8PNRFNG = __esm({
   }
 });
 
-// dist/server/assets/app.investor.startups-DYakKnpA.js
-var app_investor_startups_DYakKnpA_exports = {};
-__export(app_investor_startups_DYakKnpA_exports, {
+// dist/server/assets/app.investor.startups-Iu1geWyi.js
+var app_investor_startups_Iu1geWyi_exports = {};
+__export(app_investor_startups_Iu1geWyi_exports, {
   component: () => StartupsPage
 });
 function StartupsPage() {
@@ -68206,13 +68210,13 @@ function StartupsPage() {
   ] });
 }
 var import_jsx_runtime71, import_react56;
-var init_app_investor_startups_DYakKnpA = __esm({
-  "dist/server/assets/app.investor.startups-DYakKnpA.js"() {
+var init_app_investor_startups_Iu1geWyi = __esm({
+  "dist/server/assets/app.investor.startups-Iu1geWyi.js"() {
     "use strict";
     import_jsx_runtime71 = __toESM(require_jsx_runtime(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     import_react56 = __toESM(require_react(), 1);
     init_dist7();
     init_clsx();
@@ -68324,9 +68328,9 @@ var init_app_investor_pipeline_DYjYbcC = __esm({
   }
 });
 
-// dist/server/assets/app.investor.diligence-BSn3jN8U.js
-var app_investor_diligence_BSn3jN8U_exports = {};
-__export(app_investor_diligence_BSn3jN8U_exports, {
+// dist/server/assets/app.investor.diligence-DJfV7Hs0.js
+var app_investor_diligence_DJfV7Hs0_exports = {};
+__export(app_investor_diligence_DJfV7Hs0_exports, {
   component: () => DiligencePage
 });
 function DiligencePage() {
@@ -68453,22 +68457,22 @@ function DiligencePage() {
   ] });
 }
 var import_jsx_runtime74, import_react58;
-var init_app_investor_diligence_BSn3jN8U = __esm({
-  "dist/server/assets/app.investor.diligence-BSn3jN8U.js"() {
+var init_app_investor_diligence_DJfV7Hs0 = __esm({
+  "dist/server/assets/app.investor.diligence-DJfV7Hs0.js"() {
     "use strict";
     import_jsx_runtime74 = __toESM(require_jsx_runtime(), 1);
     import_react58 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.investor.decisions-CQEgb19L.js
-var app_investor_decisions_CQEgb19L_exports = {};
-__export(app_investor_decisions_CQEgb19L_exports, {
+// dist/server/assets/app.investor.decisions-M-ItS4sx.js
+var app_investor_decisions_M_ItS4sx_exports = {};
+__export(app_investor_decisions_M_ItS4sx_exports, {
   component: () => DecisionsPage
 });
 function DecisionsPage() {
@@ -68561,13 +68565,13 @@ function DecisionsPage() {
   ] });
 }
 var import_jsx_runtime75, import_react59;
-var init_app_investor_decisions_CQEgb19L = __esm({
-  "dist/server/assets/app.investor.decisions-CQEgb19L.js"() {
+var init_app_investor_decisions_M_ItS4sx = __esm({
+  "dist/server/assets/app.investor.decisions-M-ItS4sx.js"() {
     "use strict";
     import_jsx_runtime75 = __toESM(require_jsx_runtime(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     import_react59 = __toESM(require_react(), 1);
     init_dist7();
     init_clsx();
@@ -68791,9 +68795,9 @@ var init_app_investor_analysis_DiXGtmUh = __esm({
   }
 });
 
-// dist/server/assets/app.deal-room._id-8nfiEWLx.js
-var app_deal_room_id_8nfiEWLx_exports = {};
-__export(app_deal_room_id_8nfiEWLx_exports, {
+// dist/server/assets/app.deal-room._id-DvnRFYTN.js
+var app_deal_room_id_DvnRFYTN_exports = {};
+__export(app_deal_room_id_DvnRFYTN_exports, {
   component: () => DealRoom
 });
 function AIChat({ scope, starters, initialAssistant, className = "", compact = false }) {
@@ -70503,8 +70507,8 @@ function QA({
   ] });
 }
 var import_jsx_runtime79, import_react62, statusMeta, cycle2, DOCS, STAGES4, SECTION_META, DECISION_TO_DB, DB_TO_DECISION, tabs2, sampleDocs;
-var init_app_deal_room_id_8nfiEWLx = __esm({
-  "dist/server/assets/app.deal-room._id-8nfiEWLx.js"() {
+var init_app_deal_room_id_DvnRFYTN = __esm({
+  "dist/server/assets/app.deal-room._id-DvnRFYTN.js"() {
     "use strict";
     import_jsx_runtime79 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -70514,9 +70518,9 @@ var init_app_deal_room_id_8nfiEWLx = __esm({
     init_lucide_react();
     init_modern2();
     init_backend_CMfy16B4();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_utils_H80jjgLf();
-    init_Dropzone_XnLt6uqF();
+    init_Dropzone_ak873dKQ();
     init_store_C2XR0Skj();
     init_clsx();
     statusMeta = {
@@ -70612,9 +70616,9 @@ var init_app_deal_room_id_8nfiEWLx = __esm({
   }
 });
 
-// dist/server/assets/app.deal-room._id_.nda-D8Kmn0Sh.js
-var app_deal_room_id_nda_D8Kmn0Sh_exports = {};
-__export(app_deal_room_id_nda_D8Kmn0Sh_exports, {
+// dist/server/assets/app.deal-room._id_.nda-DDfNGUzR.js
+var app_deal_room_id_nda_DDfNGUzR_exports = {};
+__export(app_deal_room_id_nda_DDfNGUzR_exports, {
   component: () => NdaPage
 });
 function buildNdaText(startupName, founderName, investorName, date) {
@@ -70845,33 +70849,32 @@ function NdaPage() {
   ] }) });
 }
 var import_jsx_runtime80, import_react63;
-var init_app_deal_room_id_nda_D8Kmn0Sh = __esm({
-  "dist/server/assets/app.deal-room._id_.nda-D8Kmn0Sh.js"() {
+var init_app_deal_room_id_nda_DDfNGUzR = __esm({
+  "dist/server/assets/app.deal-room._id_.nda-DDfNGUzR.js"() {
     "use strict";
     import_jsx_runtime80 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react63 = __toESM(require_react(), 1);
     init_modern2();
     init_lucide_react();
-    init_router_CMUL11Nw();
+    init_router_DZsyhUH();
     init_Logo_CIkq6vsm();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/router-CMUL11Nw.js
-var router_CMUL11Nw_exports = {};
-__export(router_CMUL11Nw_exports, {
+// dist/server/assets/router-DZsyhUH_.js
+var router_DZsyhUH_exports = {};
+__export(router_DZsyhUH_exports, {
   L: () => LANGUAGES,
-  R: () => Route$N,
+  R: () => Route$w,
   a: () => useI18n,
   b: () => useTheme,
-  c: () => Route$w,
-  d: () => uploadDocument,
-  e: () => createNotification,
-  f: () => Route$1,
-  g: () => Route2,
+  c: () => uploadDocument,
+  d: () => createNotification,
+  e: () => Route$1,
+  f: () => Route2,
   l: () => logActivity,
   r: () => router,
   s: () => supabase,
@@ -71117,8 +71120,8 @@ function DefaultErrorComponent({ error, reset }) {
   ] }) });
 }
 var import_jsx_runtime81, import_react64, url, anonKey, supabase, Ctx, ThemeContext, STORAGE_KEY$1, LANGUAGES, en2, es, fr2, de3, ar2, dicts, STORAGE_KEY2, I18nContext, Toaster3, appCss, queryClient, Route$P, $$splitComponentImporter$O, Route$O, $$splitComponentImporter$N, Route$N, $$splitComponentImporter$M, Route$M, $$splitComponentImporter$L, Route$L, $$splitComponentImporter$K, Route$K, $$splitComponentImporter$J, Route$J, $$splitComponentImporter$I, Route$I, $$splitComponentImporter$H, Route$H, $$splitComponentImporter$G, Route$G, $$splitComponentImporter$F, Route$F, $$splitComponentImporter$E, Route$E, $$splitComponentImporter$D, Route$D, $$splitComponentImporter$C, Route$C, $$splitComponentImporter$B, Route$B, $$splitComponentImporter$A, Route$A, $$splitComponentImporter$z, Route$z, $$splitComponentImporter$y, Route$y, $$splitComponentImporter$x, Route$x, $$splitComponentImporter$w, Route$w, $$splitComponentImporter$v, Route$v, $$splitComponentImporter$u, Route$u, $$splitComponentImporter$t, Route$t, $$splitComponentImporter$s, Route$s, $$splitComponentImporter$r, Route$r, $$splitComponentImporter$q, Route$q, $$splitComponentImporter$p, Route$p, $$splitComponentImporter$o, Route$o, $$splitComponentImporter$n, Route$n, $$splitComponentImporter$m, Route$m, $$splitComponentImporter$l, Route$l, $$splitComponentImporter$k, Route$k, $$splitComponentImporter$j, Route$j, $$splitComponentImporter$i, Route$i, $$splitComponentImporter$h, Route$h, $$splitComponentImporter$g, Route$g, $$splitComponentImporter$f, Route$f, $$splitComponentImporter$e, Route$e, $$splitComponentImporter$d, Route$d, $$splitComponentImporter$c, Route$c, $$splitComponentImporter$b, Route$b, $$splitComponentImporter$a, Route$a, $$splitComponentImporter$9, Route$9, $$splitComponentImporter$8, Route$8, $$splitComponentImporter$7, Route$7, $$splitComponentImporter$6, Route$6, $$splitComponentImporter$5, Route$5, $$splitComponentImporter$4, Route$4, $$splitComponentImporter$3, Route$3, $$splitComponentImporter$2, Route$2, $$splitComponentImporter$1, Route$1, $$splitComponentImporter, Route2, TermsRoute, SignUpRoute, SignInRoute, PrivacyRoute, PricingRoute, InvestorsRoute, FoundersRoute, ForgotPasswordRoute, DebugRoute, AppRoute, AboutRoute, IndexRoute, AppIndexRoute, SolutionsVcDealRoomRoute, SolutionsRaise1mRoute, SolutionsInvestorPipelineRoute, SolutionsFundraisingCrmRoute, SolutionsDueDiligenceRoute, JoinTokenRoute, AuthCallbackRoute, AppUsersRoute, AppSettingsRoute, AppReportsRoute, AppProfileRoute, AppPipelineRoute, AppNotificationsRoute, AppMessagesRoute, AppMeetingsRoute, AppLeadsRoute, AppInvestorRoute, AppEmailRoute, AppDocumentsRoute, AppDealRoomsRoute, AppAuditRoute, AppAdvisorRoute, AppInvestorIndexRoute, AppSettingsSecurityRoute, AppSettingsNotificationsRoute, AppSettingsDomainRoute, AppSettingsBillingRoute, AppInvestorTeamRoute, AppInvestorStartupsRoute, AppInvestorPortfolioRoute, AppInvestorPipelineRoute, AppInvestorDiligenceRoute, AppInvestorDecisionsRoute, AppInvestorDealRoomsRoute, AppInvestorDealFlowRoute, AppInvestorAnalysisRoute, AppDealRoomIdRoute, AppDealRoomIdNdaRoute, AppInvestorRouteChildren, AppInvestorRouteWithChildren, AppSettingsRouteChildren, AppSettingsRouteWithChildren, AppRouteChildren, AppRouteWithChildren, rootRouteChildren, routeTree, getRouter, router;
-var init_router_CMUL11Nw = __esm({
-  "dist/server/assets/router-CMUL11Nw.js"() {
+var init_router_DZsyhUH = __esm({
+  "dist/server/assets/router-DZsyhUH_.js"() {
     "use strict";
     import_jsx_runtime81 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -71515,7 +71518,7 @@ var init_router_CMUL11Nw = __esm({
         }
       );
     };
-    appCss = "/assets/styles-B0zlywwF.css";
+    appCss = "/assets/styles-CCgSpFMU.css";
     queryClient = new QueryClient();
     Route$P = createRootRoute({
       head: () => ({
@@ -71542,7 +71545,7 @@ var init_router_CMUL11Nw = __esm({
       component: RootComponent,
       notFoundComponent: NotFoundComponent
     });
-    $$splitComponentImporter$O = () => Promise.resolve().then(() => (init_terms_BkzsEX_S(), terms_BkzsEX_S_exports));
+    $$splitComponentImporter$O = () => Promise.resolve().then(() => (init_terms_VDfrQjiI(), terms_VDfrQjiI_exports));
     Route$O = createFileRoute("/terms")({
       head: () => ({
         meta: [{
@@ -71554,21 +71557,21 @@ var init_router_CMUL11Nw = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$O, "component")
     });
-    $$splitComponentImporter$N = () => Promise.resolve().then(() => (init_sign_up_GtS8qVVW(), sign_up_GtS8qVVW_exports));
+    $$splitComponentImporter$N = () => Promise.resolve().then(() => (init_sign_up_DytV9_f8(), sign_up_DytV9_f8_exports));
     Route$N = createFileRoute("/sign-up")({
       validateSearch: (s) => ({
         role: s.role === "investor" ? "investor" : "founder"
       }),
       component: lazyRouteComponent($$splitComponentImporter$N, "component")
     });
-    $$splitComponentImporter$M = () => Promise.resolve().then(() => (init_sign_in_rD1aAnbc(), sign_in_rD1aAnbc_exports));
+    $$splitComponentImporter$M = () => Promise.resolve().then(() => (init_sign_in_CEWBme8D(), sign_in_CEWBme8D_exports));
     Route$M = createFileRoute("/sign-in")({
       validateSearch: (s) => ({
         redirect: s.redirect || "/app"
       }),
       component: lazyRouteComponent($$splitComponentImporter$M, "component")
     });
-    $$splitComponentImporter$L = () => Promise.resolve().then(() => (init_privacy_BtdjrUAL(), privacy_BtdjrUAL_exports));
+    $$splitComponentImporter$L = () => Promise.resolve().then(() => (init_privacy_Po5r0PvR(), privacy_Po5r0PvR_exports));
     Route$L = createFileRoute("/privacy")({
       head: () => ({
         meta: [{
@@ -71580,7 +71583,7 @@ var init_router_CMUL11Nw = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$L, "component")
     });
-    $$splitComponentImporter$K = () => Promise.resolve().then(() => (init_pricing_CEs5yxPO(), pricing_CEs5yxPO_exports));
+    $$splitComponentImporter$K = () => Promise.resolve().then(() => (init_pricing_CEsa4geM(), pricing_CEsa4geM_exports));
     Route$K = createFileRoute("/pricing")({
       head: () => ({
         meta: [{
@@ -71592,7 +71595,7 @@ var init_router_CMUL11Nw = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$K, "component")
     });
-    $$splitComponentImporter$J = () => Promise.resolve().then(() => (init_investors_BsXu0Tt3(), investors_BsXu0Tt3_exports));
+    $$splitComponentImporter$J = () => Promise.resolve().then(() => (init_investors_BIbQlwtc(), investors_BIbQlwtc_exports));
     Route$J = createFileRoute("/investors")({
       head: () => ({
         meta: [{
@@ -71604,7 +71607,7 @@ var init_router_CMUL11Nw = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$J, "component")
     });
-    $$splitComponentImporter$I = () => Promise.resolve().then(() => (init_founders_Bvu121j0(), founders_Bvu121j0_exports));
+    $$splitComponentImporter$I = () => Promise.resolve().then(() => (init_founders_BPWw3Kn5(), founders_BPWw3Kn5_exports));
     Route$I = createFileRoute("/founders")({
       head: () => ({
         meta: [{
@@ -71624,7 +71627,7 @@ var init_router_CMUL11Nw = __esm({
     Route$G = createFileRoute("/debug")({
       component: lazyRouteComponent($$splitComponentImporter$G, "component")
     });
-    $$splitComponentImporter$F = () => Promise.resolve().then(() => (init_app_GuUrC4kt(), app_GuUrC4kt_exports));
+    $$splitComponentImporter$F = () => Promise.resolve().then(() => (init_app_6rnUn6lR(), app_6rnUn6lR_exports));
     Route$F = createFileRoute("/app")({
       beforeLoad: async () => {
         try {
@@ -71657,7 +71660,7 @@ var init_router_CMUL11Nw = __esm({
       },
       component: lazyRouteComponent($$splitComponentImporter$F, "component")
     });
-    $$splitComponentImporter$E = () => Promise.resolve().then(() => (init_about_waUQymz(), about_waUQymz_exports));
+    $$splitComponentImporter$E = () => Promise.resolve().then(() => (init_about_D4Ezd8(), about_D4Ezd8_exports));
     Route$E = createFileRoute("/about")({
       head: () => ({
         meta: [{
@@ -71669,7 +71672,7 @@ var init_router_CMUL11Nw = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$E, "component")
     });
-    $$splitComponentImporter$D = () => Promise.resolve().then(() => (init_index_30Qcy2tr(), index_30Qcy2tr_exports));
+    $$splitComponentImporter$D = () => Promise.resolve().then(() => (init_index_ac9IJHOc(), index_ac9IJHOc_exports));
     Route$D = createFileRoute("/")({
       head: () => ({
         meta: [{
@@ -71687,11 +71690,11 @@ var init_router_CMUL11Nw = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$D, "component")
     });
-    $$splitComponentImporter$C = () => Promise.resolve().then(() => (init_app_index_DjzsNqHb(), app_index_DjzsNqHb_exports));
+    $$splitComponentImporter$C = () => Promise.resolve().then(() => (init_app_index_DTUnRMT(), app_index_DTUnRMT_exports));
     Route$C = createFileRoute("/app/")({
       component: lazyRouteComponent($$splitComponentImporter$C, "component")
     });
-    $$splitComponentImporter$B = () => Promise.resolve().then(() => (init_solutions_vc_deal_room_orGQUg2C(), solutions_vc_deal_room_orGQUg2C_exports));
+    $$splitComponentImporter$B = () => Promise.resolve().then(() => (init_solutions_vc_deal_room_udMSlW8f(), solutions_vc_deal_room_udMSlW8f_exports));
     Route$B = createFileRoute("/solutions/vc-deal-room")({
       head: () => ({
         meta: [{
@@ -71703,7 +71706,7 @@ var init_router_CMUL11Nw = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$B, "component")
     });
-    $$splitComponentImporter$A = () => Promise.resolve().then(() => (init_solutions_raise_1m_m3mEKJNs(), solutions_raise_1m_m3mEKJNs_exports));
+    $$splitComponentImporter$A = () => Promise.resolve().then(() => (init_solutions_raise_1m_BG1gOOZV(), solutions_raise_1m_BG1gOOZV_exports));
     Route$A = createFileRoute("/solutions/raise-1m")({
       head: () => ({
         meta: [{
@@ -71715,7 +71718,7 @@ var init_router_CMUL11Nw = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$A, "component")
     });
-    $$splitComponentImporter$z = () => Promise.resolve().then(() => (init_solutions_investor_pipeline_B_rf5fTq(), solutions_investor_pipeline_B_rf5fTq_exports));
+    $$splitComponentImporter$z = () => Promise.resolve().then(() => (init_solutions_investor_pipeline_CGgtdyku(), solutions_investor_pipeline_CGgtdyku_exports));
     Route$z = createFileRoute("/solutions/investor-pipeline")({
       head: () => ({
         meta: [{
@@ -71727,7 +71730,7 @@ var init_router_CMUL11Nw = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$z, "component")
     });
-    $$splitComponentImporter$y = () => Promise.resolve().then(() => (init_solutions_fundraising_crm_DE2WfPPf(), solutions_fundraising_crm_DE2WfPPf_exports));
+    $$splitComponentImporter$y = () => Promise.resolve().then(() => (init_solutions_fundraising_crm_BY5Swq(), solutions_fundraising_crm_BY5Swq_exports));
     Route$y = createFileRoute("/solutions/fundraising-crm")({
       head: () => ({
         meta: [{
@@ -71739,7 +71742,7 @@ var init_router_CMUL11Nw = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$y, "component")
     });
-    $$splitComponentImporter$x = () => Promise.resolve().then(() => (init_solutions_due_diligence_DoRege_n(), solutions_due_diligence_DoRege_n_exports));
+    $$splitComponentImporter$x = () => Promise.resolve().then(() => (init_solutions_due_diligence_g_V6oZfY(), solutions_due_diligence_g_V6oZfY_exports));
     Route$x = createFileRoute("/solutions/due-diligence")({
       head: () => ({
         meta: [{
@@ -71751,31 +71754,31 @@ var init_router_CMUL11Nw = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$x, "component")
     });
-    $$splitComponentImporter$w = () => Promise.resolve().then(() => (init_join_token_CpFanWar(), join_token_CpFanWar_exports));
+    $$splitComponentImporter$w = () => Promise.resolve().then(() => (init_join_token_D3up4Dt8(), join_token_D3up4Dt8_exports));
     Route$w = createFileRoute("/join/$token")({
       component: lazyRouteComponent($$splitComponentImporter$w, "component")
     });
-    $$splitComponentImporter$v = () => Promise.resolve().then(() => (init_auth_callback_BqaDKt5F(), auth_callback_BqaDKt5F_exports));
+    $$splitComponentImporter$v = () => Promise.resolve().then(() => (init_auth_callback_DQsKNe_C(), auth_callback_DQsKNe_C_exports));
     Route$v = createFileRoute("/auth/callback")({
       component: lazyRouteComponent($$splitComponentImporter$v, "component")
     });
-    $$splitComponentImporter$u = () => Promise.resolve().then(() => (init_app_users_DSS0hibq(), app_users_DSS0hibq_exports));
+    $$splitComponentImporter$u = () => Promise.resolve().then(() => (init_app_users_DU2cZDbq(), app_users_DU2cZDbq_exports));
     Route$u = createFileRoute("/app/users")({
       component: lazyRouteComponent($$splitComponentImporter$u, "component")
     });
-    $$splitComponentImporter$t = () => Promise.resolve().then(() => (init_app_settings_D7jAdFiL(), app_settings_D7jAdFiL_exports));
+    $$splitComponentImporter$t = () => Promise.resolve().then(() => (init_app_settings_O4NBC0X0(), app_settings_O4NBC0X0_exports));
     Route$t = createFileRoute("/app/settings")({
       component: lazyRouteComponent($$splitComponentImporter$t, "component")
     });
-    $$splitComponentImporter$s = () => Promise.resolve().then(() => (init_app_reports_Cvu7_PWN(), app_reports_Cvu7_PWN_exports));
+    $$splitComponentImporter$s = () => Promise.resolve().then(() => (init_app_reports_C5C_tLM8(), app_reports_C5C_tLM8_exports));
     Route$s = createFileRoute("/app/reports")({
       component: lazyRouteComponent($$splitComponentImporter$s, "component")
     });
-    $$splitComponentImporter$r = () => Promise.resolve().then(() => (init_app_profile_DkJridoL(), app_profile_DkJridoL_exports));
+    $$splitComponentImporter$r = () => Promise.resolve().then(() => (init_app_profile_DWZA7yG1(), app_profile_DWZA7yG1_exports));
     Route$r = createFileRoute("/app/profile")({
       component: lazyRouteComponent($$splitComponentImporter$r, "component")
     });
-    $$splitComponentImporter$q = () => Promise.resolve().then(() => (init_app_pipeline_1W8bG1oP(), app_pipeline_1W8bG1oP_exports));
+    $$splitComponentImporter$q = () => Promise.resolve().then(() => (init_app_pipeline_8UqJ3QE(), app_pipeline_8UqJ3QE_exports));
     Route$q = createFileRoute("/app/pipeline")({
       component: lazyRouteComponent($$splitComponentImporter$q, "component")
     });
@@ -71783,7 +71786,7 @@ var init_router_CMUL11Nw = __esm({
     Route$p = createFileRoute("/app/notifications")({
       component: lazyRouteComponent($$splitComponentImporter$p, "component")
     });
-    $$splitComponentImporter$o = () => Promise.resolve().then(() => (init_app_messages_DH5r5NJS(), app_messages_DH5r5NJS_exports));
+    $$splitComponentImporter$o = () => Promise.resolve().then(() => (init_app_messages_tOIAUAYl(), app_messages_tOIAUAYl_exports));
     Route$o = createFileRoute("/app/messages")({
       component: lazyRouteComponent($$splitComponentImporter$o, "component")
     });
@@ -71791,7 +71794,7 @@ var init_router_CMUL11Nw = __esm({
     Route$n = createFileRoute("/app/meetings")({
       component: lazyRouteComponent($$splitComponentImporter$n, "component")
     });
-    $$splitComponentImporter$m = () => Promise.resolve().then(() => (init_app_leads_DXHM6CIL(), app_leads_DXHM6CIL_exports));
+    $$splitComponentImporter$m = () => Promise.resolve().then(() => (init_app_leads_YTvlBEYK(), app_leads_YTvlBEYK_exports));
     Route$m = createFileRoute("/app/leads")({
       component: lazyRouteComponent($$splitComponentImporter$m, "component")
     });
@@ -71832,11 +71835,11 @@ var init_router_CMUL11Nw = __esm({
     Route$k = createFileRoute("/app/email")({
       component: lazyRouteComponent($$splitComponentImporter$k, "component")
     });
-    $$splitComponentImporter$j = () => Promise.resolve().then(() => (init_app_documents_ByrDHNqe(), app_documents_ByrDHNqe_exports));
+    $$splitComponentImporter$j = () => Promise.resolve().then(() => (init_app_documents_DRyPfG_N(), app_documents_DRyPfG_N_exports));
     Route$j = createFileRoute("/app/documents")({
       component: lazyRouteComponent($$splitComponentImporter$j, "component")
     });
-    $$splitComponentImporter$i = () => Promise.resolve().then(() => (init_app_deal_rooms_CcgzLbii(), app_deal_rooms_CcgzLbii_exports));
+    $$splitComponentImporter$i = () => Promise.resolve().then(() => (init_app_deal_rooms_B0wk8YY1(), app_deal_rooms_B0wk8YY1_exports));
     Route$i = createFileRoute("/app/deal-rooms")({
       component: lazyRouteComponent($$splitComponentImporter$i, "component")
     });
@@ -71844,19 +71847,19 @@ var init_router_CMUL11Nw = __esm({
     Route$h = createFileRoute("/app/audit")({
       component: lazyRouteComponent($$splitComponentImporter$h, "component")
     });
-    $$splitComponentImporter$g = () => Promise.resolve().then(() => (init_app_advisor_ypdSk6h7(), app_advisor_ypdSk6h7_exports));
+    $$splitComponentImporter$g = () => Promise.resolve().then(() => (init_app_advisor_LpcCgKgv(), app_advisor_LpcCgKgv_exports));
     Route$g = createFileRoute("/app/advisor")({
       component: lazyRouteComponent($$splitComponentImporter$g, "component")
     });
-    $$splitComponentImporter$f = () => Promise.resolve().then(() => (init_app_investor_index_4HF9qaMj(), app_investor_index_4HF9qaMj_exports));
+    $$splitComponentImporter$f = () => Promise.resolve().then(() => (init_app_investor_index_DJFg1UC3(), app_investor_index_DJFg1UC3_exports));
     Route$f = createFileRoute("/app/investor/")({
       component: lazyRouteComponent($$splitComponentImporter$f, "component")
     });
-    $$splitComponentImporter$e = () => Promise.resolve().then(() => (init_app_settings_security_XW3_N_13(), app_settings_security_XW3_N_13_exports));
+    $$splitComponentImporter$e = () => Promise.resolve().then(() => (init_app_settings_security_CtLTNTvI(), app_settings_security_CtLTNTvI_exports));
     Route$e = createFileRoute("/app/settings/security")({
       component: lazyRouteComponent($$splitComponentImporter$e, "component")
     });
-    $$splitComponentImporter$d = () => Promise.resolve().then(() => (init_app_settings_notifications_C3C99BZD(), app_settings_notifications_C3C99BZD_exports));
+    $$splitComponentImporter$d = () => Promise.resolve().then(() => (init_app_settings_notifications_X4FHNphQ(), app_settings_notifications_X4FHNphQ_exports));
     Route$d = createFileRoute("/app/settings/notifications")({
       component: lazyRouteComponent($$splitComponentImporter$d, "component")
     });
@@ -71872,7 +71875,7 @@ var init_router_CMUL11Nw = __esm({
     Route$a = createFileRoute("/app/investor/team")({
       component: lazyRouteComponent($$splitComponentImporter$a, "component")
     });
-    $$splitComponentImporter$9 = () => Promise.resolve().then(() => (init_app_investor_startups_DYakKnpA(), app_investor_startups_DYakKnpA_exports));
+    $$splitComponentImporter$9 = () => Promise.resolve().then(() => (init_app_investor_startups_Iu1geWyi(), app_investor_startups_Iu1geWyi_exports));
     Route$9 = createFileRoute("/app/investor/startups")({
       component: lazyRouteComponent($$splitComponentImporter$9, "component")
     });
@@ -71884,11 +71887,11 @@ var init_router_CMUL11Nw = __esm({
     Route$7 = createFileRoute("/app/investor/pipeline")({
       component: lazyRouteComponent($$splitComponentImporter$7, "component")
     });
-    $$splitComponentImporter$6 = () => Promise.resolve().then(() => (init_app_investor_diligence_BSn3jN8U(), app_investor_diligence_BSn3jN8U_exports));
+    $$splitComponentImporter$6 = () => Promise.resolve().then(() => (init_app_investor_diligence_DJfV7Hs0(), app_investor_diligence_DJfV7Hs0_exports));
     Route$6 = createFileRoute("/app/investor/diligence")({
       component: lazyRouteComponent($$splitComponentImporter$6, "component")
     });
-    $$splitComponentImporter$5 = () => Promise.resolve().then(() => (init_app_investor_decisions_CQEgb19L(), app_investor_decisions_CQEgb19L_exports));
+    $$splitComponentImporter$5 = () => Promise.resolve().then(() => (init_app_investor_decisions_M_ItS4sx(), app_investor_decisions_M_ItS4sx_exports));
     Route$5 = createFileRoute("/app/investor/decisions")({
       component: lazyRouteComponent($$splitComponentImporter$5, "component")
     });
@@ -71904,11 +71907,11 @@ var init_router_CMUL11Nw = __esm({
     Route$2 = createFileRoute("/app/investor/analysis")({
       component: lazyRouteComponent($$splitComponentImporter$2, "component")
     });
-    $$splitComponentImporter$1 = () => Promise.resolve().then(() => (init_app_deal_room_id_8nfiEWLx(), app_deal_room_id_8nfiEWLx_exports));
+    $$splitComponentImporter$1 = () => Promise.resolve().then(() => (init_app_deal_room_id_DvnRFYTN(), app_deal_room_id_DvnRFYTN_exports));
     Route$1 = createFileRoute("/app/deal-room/$id")({
       component: lazyRouteComponent($$splitComponentImporter$1, "component")
     });
-    $$splitComponentImporter = () => Promise.resolve().then(() => (init_app_deal_room_id_nda_D8Kmn0Sh(), app_deal_room_id_nda_D8Kmn0Sh_exports));
+    $$splitComponentImporter = () => Promise.resolve().then(() => (init_app_deal_room_id_nda_DDfNGUzR(), app_deal_room_id_nda_DDfNGUzR_exports));
     Route2 = createFileRoute("/app/deal-room/$id_/nda")({
       component: lazyRouteComponent($$splitComponentImporter, "component")
     });
@@ -72334,7 +72337,7 @@ function getResponse() {
   return getH3Event().res;
 }
 async function getStartManifest(matchedRoutes) {
-  const { tsrStartManifest: tsrStartManifest2 } = await Promise.resolve().then(() => (init_tanstack_start_manifest_v_lgSAjscA(), tanstack_start_manifest_v_lgSAjscA_exports));
+  const { tsrStartManifest: tsrStartManifest2 } = await Promise.resolve().then(() => (init_tanstack_start_manifest_v_BI9mFuVT(), tanstack_start_manifest_v_BI9mFuVT_exports));
   const startManifest = tsrStartManifest2();
   const rootRoute = startManifest.routes[rootRouteId] = startManifest.routes[rootRouteId] || {};
   rootRoute.assets = rootRoute.assets || [];
@@ -72792,7 +72795,7 @@ function getStartResponseHeaders(opts) {
 }
 async function loadEntries() {
   const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-    Promise.resolve().then(() => (init_router_CMUL11Nw(), router_CMUL11Nw_exports)).then((n2) => n2.r),
+    Promise.resolve().then(() => (init_router_DZsyhUH(), router_DZsyhUH_exports)).then((n2) => n2.r),
     Promise.resolve().then(() => (init_start_HYkvq4Ni(), start_HYkvq4Ni_exports)),
     Promise.resolve().then(() => (init_tanstack_start_plugin_adapters_Cwee5PKy(), tanstack_start_plugin_adapters_Cwee5PKy_exports))
   ]);

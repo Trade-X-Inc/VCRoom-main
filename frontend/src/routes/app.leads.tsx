@@ -48,13 +48,14 @@ function normKey(k: string): string {
 function mapCsvRow(raw: Record<string, string>): MappedRow | null {
   const n: Record<string, string> = {};
   Object.keys(raw).forEach((k) => { n[normKey(k)] = raw[k] ?? ""; });
-  const investor_name =
-    n["investor_name"] || n["investor"] || n["name"] || n["contact_name"] || "";
-  if (!investor_name.trim()) return null;
+  const email = (n["email"] || n["email_address"] || "").trim();
+  if (!email) return null; // Skip rows without email
+  const raw_name = n["investor_name"] || n["investor"] || n["name"] || n["contact_name"] || "";
+  const investor_name = raw_name.trim() || email.split("@")[0]; // Fallback to email prefix
   return {
-    investor_name: investor_name.trim(),
+    investor_name,
     firm_name: n["firm_name"] || n["firm"] || n["company"] || n["fund"] || undefined,
-    email: n["email"] || n["email_address"] || undefined,
+    email,
     linkedin_url: n["linkedin_url"] || n["linkedin"] || undefined,
     sector: n["sector"] || n["focus"] || undefined,
     stage: n["stage"] || n["investment_stage"] || undefined,
@@ -460,7 +461,7 @@ function CsvImportModal({
                   {mapped.length} leads found
                   {skipped > 0 && (
                     <span className="ml-2 text-xs text-warning">
-                      ({skipped} rows skipped — investor_name is required)
+                      ({skipped} skipped — no email)
                     </span>
                   )}
                 </p>
