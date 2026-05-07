@@ -20,17 +20,34 @@ function AuthCallback() {
 
       const metadata = session.user.user_metadata;
       const pendingRole = localStorage.getItem("oauth_pending_role");
-      const role = pendingRole || metadata?.role || "founder";
+      console.log("Pending role from storage:", pendingRole);
+      console.log("Metadata role:", metadata?.role);
+
+      // Check if user already has a role in DB (returning users)
+      const { data: existingUser } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", session.user.id)
+        .single();
+
+      // Priority: DB role > localStorage > metadata > default
+      const role = existingUser?.role || pendingRole || metadata?.role || "founder";
+      console.log("Final role being saved:", role);
       localStorage.removeItem("oauth_pending_role");
 
-      await supabase.from("users").upsert({
-        id: session.user.id,
-        email: session.user.email,
-        role,
-        full_name: metadata?.full_name || metadata?.name || "",
-        updated_at: new Date().toISOString(),
-      });
+      // Only upsert if no existing record — don't overwrite returning users' roles
+      if (!existingUser) {
+        const { error: upsertError } = await supabase.from("users").upsert({
+          id: session.user.id,
+          email: session.user.email,
+          role,
+          full_name: metadata?.full_name || metadata?.name || session.user.email?.split("@")[0] || "",
+          updated_at: new Date().toISOString(),
+        });
+        if (upsertError) console.error("Upsert error:", upsertError);
+      }
 
+      console.log("Navigating to:", role === "investor" ? "/app/investor" : "/app");
       if (role === "investor") {
         navigate({ to: "/app/investor" });
       } else {

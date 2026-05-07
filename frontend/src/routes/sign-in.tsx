@@ -86,14 +86,10 @@ function SignInPage() {
   };
 
   const google = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
+    await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: window.location.origin + "/auth/callback",
-        queryParams: { access_type: "offline", prompt: "consent" },
-      },
+      options: { redirectTo: window.location.origin + "/auth/callback" },
     });
-    if (error) console.error(error);
   };
 
   return (

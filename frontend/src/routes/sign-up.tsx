@@ -169,6 +169,7 @@ function SignUpPage() {
 
   const google = async () => {
     localStorage.setItem("oauth_pending_role", role);
+    console.log("Saving role before OAuth:", role);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
