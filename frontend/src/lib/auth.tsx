@@ -1,111 +1,93 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { supabase } from "@/lib/supabase";
+import { createContext, useContext, useEffect, useState } from 'react'
+import { supabase } from './supabase'
 
-export type AppRole = "founder" | "investor";
+type Role = 'founder' | 'investor'
 
-export interface AppUser {
-  id: string;
-  name: string;
-  email: string;
-  initials: string;
-  role: "Owner" | "Admin" | "Member" | "Viewer";
-  appRole: AppRole;
-  workspace: string;
+interface AppUser {
+  id: string
+  email: string
+  fullName: string
+  role: Role
 }
 
-interface AuthCtx {
-  user: AppUser | null;
-  isAuthenticated: boolean;
-  signIn: (email: string, password: string) => Promise<AppUser>;
-  signUp: (name: string, email: string, password: string, inviteToken?: string) => Promise<void>;
-  signOut: () => Promise<void>;
-  setAppRole: (r: AppRole) => void;
+interface AuthContextType {
+  user: AppUser | null
+  loading: boolean
+  signOut: () => Promise<void>
 }
 
-const Ctx = createContext<AuthCtx | null>(null);
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  loading: true,
+  signOut: async () => {}
+})
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AppUser | null>(null);
-  const [hydrated, setHydrated] = useState(false);
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<AppUser | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  const buildUser = async (userId: string, email: string, userMetadata?: Record<string, any>): Promise<AppUser> => {
-    const { data } = await supabase.from("users").select("full_name, role").eq("id", userId).maybeSingle();
-    const dbRole = data?.role as string | null | undefined;
-    const metaRole = userMetadata?.role as string | null | undefined;
-    // Fall back to auth metadata role if DB has no role (e.g. upsert failed during signup)
-    const appRole: AppRole = (dbRole === "investor" || (!dbRole && metaRole === "investor")) ? "investor" : "founder";
-    const name: string = (data?.full_name as string | null) || (userMetadata?.full_name as string | null) || email.split("@")[0] || "User";
-    const initials = name.split(" ").map((s) => s[0]).slice(0, 2).join("").toUpperCase() || "VR";
+  const buildUser = async (supabaseUser: any): Promise<AppUser> => {
+    const { data } = await supabase
+      .from('users')
+      .select('role, full_name')
+      .eq('id', supabaseUser.id)
+      .maybeSingle()
+
+    const role: Role = (
+      data?.role ||
+      supabaseUser.user_metadata?.role ||
+      'founder'
+    ) as Role
+
     return {
-      id: userId,
-      email,
-      name,
-      initials,
-      role: "Owner",
-      appRole,
-      workspace: appRole === "investor" ? "Investor Workspace" : "Founder Workspace",
-    };
-  };
+      id: supabaseUser.id,
+      email: supabaseUser.email || '',
+      fullName:
+        data?.full_name ||
+        supabaseUser.user_metadata?.full_name ||
+        supabaseUser.user_metadata?.name ||
+        supabaseUser.email?.split('@')[0] || '',
+      role
+    }
+  }
 
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (data.user?.id && data.user.email) {
-        setUser(await buildUser(data.user.id, data.user.email, data.user.user_metadata));
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        const appUser = await buildUser(session.user)
+        setUser(appUser)
       }
-      setHydrated(true);
-    });
+      setLoading(false)
+    })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user?.id && session.user.email) {
-        setUser(await buildUser(session.user.id, session.user.email, session.user.user_metadata));
-      } else if (event === "SIGNED_OUT") {
-        setUser(null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          const appUser = await buildUser(session.user)
+          setUser(appUser)
+        } else {
+          setUser(null)
+        }
+        setLoading(false)
       }
-    });
+    )
 
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const signIn = async (email: string, password: string): Promise<AppUser> => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    if (!data.user?.id || !data.user.email) throw new Error("Sign-in failed.");
-    const appUser = await buildUser(data.user.id, data.user.email, data.user.user_metadata);
-    setUser(appUser);
-    return appUser;
-  };
-
-  const signUp = async (name: string, email: string, password: string, _inviteToken?: string) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: name, role: "founder" } },
-    });
-    if (error) throw error;
-    if (!data.user?.id) throw new Error("Sign-up failed.");
-    await supabase.from("users").upsert({ id: data.user.id, email, role: "founder", full_name: name });
-    setUser(await buildUser(data.user.id, email));
-  };
+    return () => subscription.unsubscribe()
+  }, [])
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-  };
-
-  const setAppRole = (r: AppRole) => {
-    if (!user) return;
-    setUser({ ...user, appRole: r, workspace: r === "investor" ? "Investor Workspace" : "Founder Workspace" });
-  };
+    await supabase.auth.signOut()
+    setUser(null)
+    window.location.href = '/sign-in'
+  }
 
   return (
-    <Ctx.Provider value={{ user: hydrated ? user : null, isAuthenticated: !!user, signIn, signUp, signOut, setAppRole }}>
+    <AuthContext.Provider value={{ user, loading, signOut }}>
       {children}
-    </Ctx.Provider>
-  );
+    </AuthContext.Provider>
+  )
 }
 
 export function useAuth() {
-  const v = useContext(Ctx);
-  if (!v) throw new Error("useAuth must be used within AuthProvider");
-  return v;
+  return useContext(AuthContext)
 }

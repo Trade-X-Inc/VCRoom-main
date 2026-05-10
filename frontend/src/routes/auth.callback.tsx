@@ -1,101 +1,72 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 export const Route = createFileRoute('/auth/callback')({
-  component: AuthCallback,
+  component: AuthCallback
 })
 
 function AuthCallback() {
-  useEffect(() => {
-    const handleCallback = async () => {
-      console.log('[Auth Callback] Starting...')
+  const [msg, setMsg] = useState('Signing you in...')
 
-      // Wait up to 1s for session to be set after OAuth redirect
-      let session = null
-      for (let i = 0; i < 10; i++) {
-        const { data } = await supabase.auth.getSession()
-        session = data.session
-        if (session) break
-        await new Promise(r => setTimeout(r, 100))
-      }
+  useEffect(() => {
+    const run = async () => {
+      await new Promise(r => setTimeout(r, 1500))
+
+      const { data: { session } } = await supabase.auth.getSession()
 
       if (!session) {
-        console.error('[Auth Callback] No session after waiting')
-        window.location.href = '/sign-in'
+        setMsg('Could not sign in. Redirecting...')
+        setTimeout(() => { window.location.href = '/sign-in' }, 2000)
         return
       }
 
-      const userEmail = session.user.email ?? ''
-      const metadata = session.user.user_metadata
+      const userId = session.user.id
+      const userEmail = session.user.email || ''
 
-      console.log('[Auth Callback] User:', userEmail)
+      const pending = localStorage.getItem('pending_role') || ''
+      localStorage.removeItem('pending_role')
 
-      // Read both localStorage keys
-      const pendingRole =
-        localStorage.getItem('oauth_pending_role') ||
-        localStorage.getItem(`pending_role_${userEmail}`)
-
-      console.log('[Auth Callback] Pending role from localStorage:', pendingRole)
-      console.log('[Auth Callback] Metadata role:', metadata?.role)
-
-      // Check if user already has a role in DB
-      const { data: existingUser, error: fetchErr } = await supabase
+      const { data: existing } = await supabase
         .from('users')
         .select('role')
-        .eq('id', session.user.id)
+        .eq('id', userId)
         .maybeSingle()
 
-      if (fetchErr) console.error('[Auth Callback] DB fetch error:', fetchErr)
+      const role =
+        existing?.role ||
+        pending ||
+        session.user.user_metadata?.role ||
+        'founder'
 
-      const finalRole = existingUser?.role || pendingRole || metadata?.role || 'founder'
-      console.log('[Auth Callback] Final role:', finalRole)
+      setMsg(`Welcome! Setting up your ${role} account...`)
 
-      // Clean up localStorage
-      localStorage.removeItem('oauth_pending_role')
-      localStorage.removeItem(`pending_role_${userEmail}`)
-
-      // Upsert user to DB
-      const { error: upsertError } = await supabase.from('users').upsert(
+      await supabase.from('users').upsert(
         {
-          id: session.user.id,
-          email: userEmail,
-          role: finalRole,
-          full_name: metadata?.full_name || metadata?.name || userEmail.split('@')[0] || '',
-          updated_at: new Date().toISOString(),
+          id: userId,
+          role,
+          full_name:
+            session.user.user_metadata?.full_name ||
+            session.user.user_metadata?.name ||
+            userEmail.split('@')[0],
+          updated_at: new Date().toISOString()
         },
-        { onConflict: 'id' },
+        { onConflict: 'id' }
       )
 
-      if (upsertError) console.error('[Auth Callback] Upsert error:', upsertError)
-      else console.log('[Auth Callback] Upserted successfully')
-
-      const target = finalRole === 'investor' ? '/app/investor/' : '/app'
-      console.log('[Auth Callback] Navigating to:', target)
-
-      // Use window.location for a clean full-page navigation so beforeLoad runs fresh
+      setMsg('Redirecting to your dashboard...')
       setTimeout(() => {
-        window.location.href = target
+        window.location.href = role === 'investor' ? '/app/investor/' : '/app'
       }, 500)
     }
 
-    handleCallback()
+    run()
   }, [])
 
   return (
-    <div style={{
-      minHeight: '100vh', display: 'flex', alignItems: 'center',
-      justifyContent: 'center', background: '#0F0F13',
-    }}>
-      <div style={{ textAlign: 'center' }}>
-        <div style={{
-          width: '36px', height: '36px', border: '3px solid rgba(108,92,231,0.3)',
-          borderTop: '3px solid #6C5CE7', borderRadius: '50%',
-          animation: 'spin 0.8s linear infinite', margin: '0 auto 16px',
-        }} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
-        <p style={{ color: '#8B8FA8', fontSize: '15px' }}>Signing you in…</p>
-      </div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
+      <div className="w-10 h-10 rounded-full border-4 border-purple-600/30 border-t-purple-600 animate-spin" />
+      <p className="text-muted-foreground text-sm">{msg}</p>
     </div>
   )
 }

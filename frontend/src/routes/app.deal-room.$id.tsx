@@ -159,8 +159,8 @@ function DealRoom() {
     }
   }, [memberList]);
 
-  const isInvestor = memberRow ? (memberRow.role === "investor" || memberRow.role === "viewer") : user?.appRole === "investor";
-  const isFounder = memberRow ? memberRow.role === "founder" : user?.appRole !== "investor";
+  const isInvestor = memberRow ? (memberRow.role === "investor" || memberRow.role === "viewer") : user?.role === "investor";
+  const isFounder = memberRow ? memberRow.role === "founder" : user?.role !== "investor";
 
   const dealRoomName = (room as any)?.startups?.company_name
     ? `${(room as any).startups.company_name} — Deal Room`

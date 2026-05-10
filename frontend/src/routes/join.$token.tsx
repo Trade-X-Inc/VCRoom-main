@@ -58,8 +58,8 @@ function JoinFlow() {
         return;
       }
       setInvite(data as InviteInfo);
-      if (user?.name) {
-        setFormData((f) => ({ ...f, fullName: user.name }));
+      if (user?.fullName) {
+        setFormData((f) => ({ ...f, fullName: user.fullName }));
       }
     }
     loadInvite();

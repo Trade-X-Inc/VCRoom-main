@@ -156,7 +156,7 @@ function NdaPage() {
     setAccepting(true);
     setError("");
     try {
-      const role = user.appRole ?? "investor";
+      const role = user.role ?? "investor";
       const { error: insertErr } = await supabase.from("nda_acceptances").insert({
         deal_room_id: dealRoomId,
         user_id: user.id,

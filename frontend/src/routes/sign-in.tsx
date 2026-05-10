@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 
 export const Route = createFileRoute('/sign-in')({
-  component: SignIn,
+  component: SignIn
 })
 
 function SignIn() {
@@ -12,88 +12,80 @@ function SignIn() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const handleEmailSignIn = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-
-      if (error) {
-        setError(error.message)
-        setLoading(false)
-        return
-      }
-
-      if (!data.session) {
-        setError('Sign in failed. Please try again.')
-        setLoading(false)
-        return
-      }
-
-      // Get role from users table
-      const { data: userRecord } = await supabase
+  useEffect(() => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) return
+      const { data } = await supabase
         .from('users')
         .select('role')
-        .eq('id', data.session.user.id)
+        .eq('id', session.user.id)
         .maybeSingle()
+      const role = data?.role || session.user.user_metadata?.role || 'founder'
+      window.location.href = role === 'investor' ? '/app/investor/' : '/app'
+    })
+  }, [])
 
-      const role = userRecord?.role || data.session.user.user_metadata?.role || 'founder'
-
-      // Navigate based on role
-      if (role === 'investor') {
-        window.location.href = '/app/investor/'
-      } else {
-        window.location.href = '/app'
-      }
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong')
-      setLoading(false)
-    }
-  }
-
-  const handleGoogleSignIn = async () => {
+  const handleGoogle = async () => {
+    setError('')
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin + '/auth/callback' },
+      options: { redirectTo: window.location.origin + '/auth/callback' }
     })
     if (error) setError(error.message)
   }
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+
+    if (error) {
+      setError(error.message)
+      setLoading(false)
+      return
+    }
+
+    if (!data.session) {
+      setError('Sign in failed — please try again')
+      setLoading(false)
+      return
+    }
+
+    const { data: userRecord } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', data.session.user.id)
+      .maybeSingle()
+
+    const role = userRecord?.role || data.session.user.user_metadata?.role || 'founder'
+    window.location.href = role === 'investor' ? '/app/investor/' : '/app'
+  }
+
   return (
-    <div style={{
-      minHeight: '100vh', display: 'flex', alignItems: 'center',
-      justifyContent: 'center', background: '#0F0F13', padding: '20px',
-    }}>
-      <div style={{
-        background: '#1A1A24', border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: '16px', padding: '40px', width: '100%', maxWidth: '400px',
-      }}>
-        <h1 style={{ color: '#fff', fontSize: '24px', fontWeight: '600', marginBottom: '8px' }}>
-          Welcome back
-        </h1>
-        <p style={{ color: '#8B8FA8', marginBottom: '32px' }}>
-          Sign in to your VentureRoom workspace
-        </p>
+    <div className="min-h-screen flex items-center justify-center bg-background p-5">
+      <div className="w-full max-w-md bg-card border border-border rounded-2xl p-10">
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center">
+              <span className="text-white text-sm font-bold">VR</span>
+            </div>
+            <span className="font-semibold text-foreground">Venture Room</span>
+          </div>
+          <h1 className="text-2xl font-semibold text-foreground mb-1">Welcome back</h1>
+          <p className="text-muted-foreground text-sm">Sign in to your workspace</p>
+        </div>
 
         {error && (
-          <div style={{
-            background: 'rgba(225,112,85,0.1)', border: '1px solid #E17055',
-            borderRadius: '8px', padding: '12px', color: '#E17055',
-            marginBottom: '16px', fontSize: '14px',
-          }}>
+          <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm">
             {error}
           </div>
         )}
 
         <button
-          onClick={handleGoogleSignIn}
-          style={{
-            width: '100%', padding: '12px', background: '#fff',
-            border: '1px solid #e5e7eb', borderRadius: '10px', cursor: 'pointer',
-            fontSize: '15px', fontWeight: '500', marginBottom: '16px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-          }}
+          onClick={handleGoogle}
+          className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-border bg-background hover:bg-accent transition-colors mb-4 text-foreground text-sm font-medium"
         >
           <svg width="18" height="18" viewBox="0 0 18 18">
             <path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/>
@@ -104,67 +96,50 @@ function SignIn() {
           Continue with Google
         </button>
 
-        <div style={{ textAlign: 'center', color: '#8B8FA8', marginBottom: '16px', fontSize: '13px' }}>
-          or
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex-1 h-px bg-border" />
+          <span className="text-muted-foreground text-xs">or</span>
+          <div className="flex-1 h-px bg-border" />
         </div>
 
-        <form onSubmit={handleEmailSignIn}>
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', color: '#8B8FA8', fontSize: '13px', marginBottom: '6px' }}>
-              Email
-            </label>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm text-muted-foreground mb-1.5">Email</label>
             <input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
-              style={{
-                width: '100%', padding: '10px 12px', background: '#0F0F13',
-                border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px',
-                color: '#fff', fontSize: '15px', boxSizing: 'border-box',
-              }}
               placeholder="you@company.com"
+              className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
-          <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', color: '#8B8FA8', fontSize: '13px', marginBottom: '6px' }}>
-              Password
-            </label>
+          <div>
+            <label className="block text-sm text-muted-foreground mb-1.5">Password</label>
             <input
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
-              style={{
-                width: '100%', padding: '10px 12px', background: '#0F0F13',
-                border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px',
-                color: '#fff', fontSize: '15px', boxSizing: 'border-box',
-              }}
               placeholder="••••••••"
+              className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            style={{
-              width: '100%', padding: '12px',
-              background: 'linear-gradient(135deg, #6C5CE7, #4F46E5)',
-              border: 'none', borderRadius: '10px', color: '#fff',
-              fontSize: '15px', fontWeight: '600',
-              cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1,
-            }}
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {loading ? 'Signing in...' : 'Sign in →'}
           </button>
         </form>
 
-        <div style={{ textAlign: 'center', marginTop: '24px', color: '#8B8FA8', fontSize: '14px' }}>
-          Don't have an account?{' '}
-          <Link to="/sign-up" style={{ color: '#6C5CE7' }}>Create one</Link>
-        </div>
-        <div style={{ textAlign: 'center', marginTop: '12px' }}>
-          <Link to="/forgot-password" style={{ color: '#8B8FA8', fontSize: '13px' }}>
+        <div className="mt-6 flex items-center justify-between text-sm">
+          <Link to="/forgot-password" className="text-muted-foreground hover:text-foreground">
             Forgot password?
+          </Link>
+          <Link to="/sign-up" className="text-purple-500 hover:text-purple-400">
+            Create account →
           </Link>
         </div>
       </div>

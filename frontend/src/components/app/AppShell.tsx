@@ -57,19 +57,14 @@ const workspaceNavInvestor: NavItem[] = [
 export function AppShell({ children }: { children?: React.ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [collapsed, setCollapsed] = useState(false);
-  const { isAuthenticated, user } = useAuth();
+  const { user } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
   const profile = useProfile();
 
-  const isInvestor = user?.appRole === "investor" || (user as any)?.role === "investor";
+  const isInvestor = user?.role === "investor";
   const nav = isInvestor ? investorNav : founderNav;
   const workspaceNav = isInvestor ? workspaceNavInvestor : workspaceNavFounder;
-
-  console.log("[AppShell] user:", user);
-  console.log("[AppShell] role:", (user as any)?.role);
-  console.log("[AppShell] appRole:", user?.appRole);
-  console.log("[AppShell] isInvestor:", isInvestor);
 
   // Live lead count from Supabase (founder only)
   const { data: leadCount } = useQuery({
@@ -86,12 +81,6 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
 
   // Role-based navigation guard
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate({ to: "/sign-in", search: { redirect: path } });
-      return;
-    }
-    // Wait for user to be loaded before running role guards — prevents race condition
-    // where isInvestor=false while auth context is still hydrating
     if (!user) return;
 
     if (
@@ -108,14 +97,14 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
     if (!isInvestor && path.startsWith("/app/investor")) {
       navigate({ to: "/app" });
     }
-  }, [isAuthenticated, user, isInvestor, navigate, path]);
+  }, [user, isInvestor, navigate, path]);
 
-  if (!isAuthenticated) {
+  if (!user) {
     return <div className="min-h-screen bg-background grid place-items-center text-sm text-muted-foreground">Redirecting…</div>;
   }
 
   const workspaceName = isInvestor
-    ? (user?.workspace ?? "")
+    ? (user.fullName || "")
     : (profile?.name || "");
 
   return (
@@ -136,7 +125,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
               <img src={profile.logoDataUrl} alt={workspaceName} className="h-6 w-6 rounded-md object-cover" />
             ) : (
               <div className="grid h-6 w-6 place-items-center rounded-md bg-gradient-brand text-[10px] font-semibold text-brand-foreground">
-                {user?.initials ?? "VR"}
+                {user.fullName ? user.fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) : "VR"}
               </div>
             )}
             {!collapsed && (
