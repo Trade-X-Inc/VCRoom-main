@@ -4,6 +4,12 @@ import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/app")({
   beforeLoad: async () => {
+    // beforeLoad runs on the Cloudflare Worker (server) during SSR where
+    // localStorage doesn't exist — getSession() would always return null and
+    // redirect to /sign-in even for authenticated users. Skip on server;
+    // AppShell's useEffect handles client-side auth guards.
+    if (typeof window === 'undefined') return;
+
     try {
       let session = null;
       let attempts = 0;

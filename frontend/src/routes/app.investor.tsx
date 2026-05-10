@@ -4,6 +4,12 @@ import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/app/investor")({
   beforeLoad: async () => {
+    // beforeLoad runs on the Cloudflare Worker (server) during SSR where
+    // localStorage doesn't exist — getSession() would always return null and
+    // redirect to /sign-in even for authenticated users. Skip on server;
+    // AppShell's useEffect handles client-side auth guards.
+    if (typeof window === 'undefined') return;
+
     try {
       let session = null;
       let attempts = 0;
@@ -26,7 +32,6 @@ export const Route = createFileRoute("/app/investor")({
 
       // Only redirect confirmed founders — allow null/undefined (new users) through
       if (role === "founder") throw redirect({ to: "/app", search: {} });
-      // If role is null/undefined, allow access rather than locking out new users
     } catch (err) {
       if (isRedirect(err)) throw err;
       // On DB error, allow investor dashboard access rather than redirecting to sign-in
