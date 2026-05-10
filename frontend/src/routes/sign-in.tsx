@@ -1,132 +1,173 @@
-import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
-import { AuthLayout, Divider, Field, GoogleButton } from "@/components/auth/AuthLayout";
-import { useAuth } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { useState } from 'react'
+import { supabase } from '@/lib/supabase'
 
-export const Route = createFileRoute("/sign-in")({
-  validateSearch: (s: Record<string, unknown>) => ({ redirect: (s.redirect as string) || "/app" }),
-  component: SignInPage,
-});
+export const Route = createFileRoute('/sign-in')({
+  component: SignIn,
+})
 
-function SignInPage() {
-  const { signIn } = useAuth();
-  const nav = useNavigate();
-  const search = useSearch({ from: "/sign-in" });
-  const [email, setEmail] = useState("");
-  const [pw, setPw] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+function SignIn() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  // FIX 3: Save role when user arrives via email confirmation link
-  useEffect(() => {
-    const saveRoleAfterConfirmation = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return;
-      const metadata = session.user.user_metadata;
-      if (!metadata?.role) return;
-      // Only upsert if role is missing in DB (avoid overwriting legitimate data)
-      const { data: existing } = await supabase
-        .from("users")
-        .select("role")
-        .eq("id", session.user.id)
-        .maybeSingle();
-      if (!existing?.role) {
-        const { error: upsertErr } = await supabase.from("users").upsert({
-          id: session.user.id,
-          role: metadata.role,
-          full_name: metadata.full_name || "",
-          updated_at: new Date().toISOString(),
-        });
-        if (upsertErr) console.error("[Auth] Role save on confirmation failed:", upsertErr);
-        else console.log("[Auth] Role saved after email confirmation:", metadata.role);
-      }
-    };
-    saveRoleAfterConfirmation();
-  }, []);
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  const handleEmailSignIn = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
     try {
-      const appUser = await signIn(email, pw);
-      if (!appUser) {
-        setError("Invalid email or password.");
-        return;
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+
+      if (error) {
+        setError(error.message)
+        setLoading(false)
+        return
       }
 
-      // FIX 1: If signup upsert failed earlier, re-save role from localStorage now that we have a valid session
-      const pendingRole = localStorage.getItem(`pending_role_${email}`);
-      if (pendingRole) {
-        await supabase.from("users").upsert({
-          id: appUser.id,
-          role: pendingRole,
-          updated_at: new Date().toISOString(),
-        });
-        localStorage.removeItem(`pending_role_${email}`);
+      if (!data.session) {
+        setError('Sign in failed. Please try again.')
+        setLoading(false)
+        return
       }
 
-      // FIX 5: Debug — visible in browser console
-      console.log("[Auth Debug] User ID:", appUser.id);
-      console.log("[Auth Debug] appRole (from DB + metadata):", appUser.appRole);
-      console.log("[Auth Debug] Pending localStorage role:", pendingRole ?? "none");
+      // Get role from users table
+      const { data: userRecord } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', data.session.user.id)
+        .maybeSingle()
 
-      // Navigate using effective role (localStorage takes precedence if DB was stale)
-      const effectiveRole = (pendingRole as "investor" | "founder" | null) ?? appUser.appRole;
-      const roleDefault = effectiveRole === "investor" ? "/app/investor" : "/app";
-      const target = (search.redirect && search.redirect !== "/app") ? search.redirect : roleDefault;
-      nav({ to: target as any });
+      const role = userRecord?.role || data.session.user.user_metadata?.role || 'founder'
+
+      // Navigate based on role
+      if (role === 'investor') {
+        window.location.href = '/app/investor/'
+      } else {
+        window.location.href = '/app'
+      }
     } catch (err: any) {
-      setError(err?.message || "Sign in failed.");
-    } finally {
-      setLoading(false);
+      setError(err.message || 'Something went wrong')
+      setLoading(false)
     }
-  };
+  }
 
-  const google = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.origin + "/auth/callback" },
-    });
-  };
+  const handleGoogleSignIn = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin + '/auth/callback' },
+    })
+    if (error) setError(error.message)
+  }
 
   return (
-    <AuthLayout
-      title="Welcome back"
-      subtitle="Sign in to your Venture Room workspace."
-      footer={<>Don't have an account? <Link to="/sign-up" className="text-foreground font-medium hover:text-brand">Create one</Link></>}
-    >
-      <GoogleButton onClick={google} />
-      <Divider />
-      <form onSubmit={submit} className="space-y-3.5">
-        <Field label="Work email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" />
-        <div>
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-medium text-foreground/80">Password</label>
-            <Link to="/forgot-password" className="text-xs text-muted-foreground hover:text-foreground">Forgot?</Link>
-          </div>
-          <input
-            type="password"
-            value={pw}
-            onChange={(e) => setPw(e.target.value)}
-            className="mt-1.5 w-full rounded-md border border-border/60 bg-background px-3 py-2.5 text-sm focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/10"
-          />
-        </div>
-        <button type="submit" disabled={loading} className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-gradient-brand text-brand-foreground py-2.5 text-sm font-medium shadow-glow disabled:opacity-60">
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Sign in <ArrowRight className="h-4 w-4" /></>}
-        </button>
-        {error && <p className="text-xs text-destructive">{error}</p>}
-      </form>
+    <div style={{
+      minHeight: '100vh', display: 'flex', alignItems: 'center',
+      justifyContent: 'center', background: '#0F0F13', padding: '20px',
+    }}>
+      <div style={{
+        background: '#1A1A24', border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: '16px', padding: '40px', width: '100%', maxWidth: '400px',
+      }}>
+        <h1 style={{ color: '#fff', fontSize: '24px', fontWeight: '600', marginBottom: '8px' }}>
+          Welcome back
+        </h1>
+        <p style={{ color: '#8B8FA8', marginBottom: '32px' }}>
+          Sign in to your VentureRoom workspace
+        </p>
 
-      <div className="mt-4 p-3 bg-muted rounded-lg text-xs text-muted-foreground">
-        <p className="font-medium mb-2">Test navigation:</p>
-        <div className="flex gap-3">
-          <a href="/app" className="text-brand underline">Founder dashboard</a>
-          <a href="/app/investor/" className="text-brand underline">Investor dashboard</a>
+        {error && (
+          <div style={{
+            background: 'rgba(225,112,85,0.1)', border: '1px solid #E17055',
+            borderRadius: '8px', padding: '12px', color: '#E17055',
+            marginBottom: '16px', fontSize: '14px',
+          }}>
+            {error}
+          </div>
+        )}
+
+        <button
+          onClick={handleGoogleSignIn}
+          style={{
+            width: '100%', padding: '12px', background: '#fff',
+            border: '1px solid #e5e7eb', borderRadius: '10px', cursor: 'pointer',
+            fontSize: '15px', fontWeight: '500', marginBottom: '16px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+          }}
+        >
+          <svg width="18" height="18" viewBox="0 0 18 18">
+            <path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/>
+            <path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/>
+            <path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/>
+            <path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/>
+          </svg>
+          Continue with Google
+        </button>
+
+        <div style={{ textAlign: 'center', color: '#8B8FA8', marginBottom: '16px', fontSize: '13px' }}>
+          or
+        </div>
+
+        <form onSubmit={handleEmailSignIn}>
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', color: '#8B8FA8', fontSize: '13px', marginBottom: '6px' }}>
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              style={{
+                width: '100%', padding: '10px 12px', background: '#0F0F13',
+                border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px',
+                color: '#fff', fontSize: '15px', boxSizing: 'border-box',
+              }}
+              placeholder="you@company.com"
+            />
+          </div>
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{ display: 'block', color: '#8B8FA8', fontSize: '13px', marginBottom: '6px' }}>
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+              style={{
+                width: '100%', padding: '10px 12px', background: '#0F0F13',
+                border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px',
+                color: '#fff', fontSize: '15px', boxSizing: 'border-box',
+              }}
+              placeholder="••••••••"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: '100%', padding: '12px',
+              background: 'linear-gradient(135deg, #6C5CE7, #4F46E5)',
+              border: 'none', borderRadius: '10px', color: '#fff',
+              fontSize: '15px', fontWeight: '600',
+              cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1,
+            }}
+          >
+            {loading ? 'Signing in...' : 'Sign in →'}
+          </button>
+        </form>
+
+        <div style={{ textAlign: 'center', marginTop: '24px', color: '#8B8FA8', fontSize: '14px' }}>
+          Don't have an account?{' '}
+          <Link to="/sign-up" style={{ color: '#6C5CE7' }}>Create one</Link>
+        </div>
+        <div style={{ textAlign: 'center', marginTop: '12px' }}>
+          <Link to="/forgot-password" style={{ color: '#8B8FA8', fontSize: '13px' }}>
+            Forgot password?
+          </Link>
         </div>
       </div>
-    </AuthLayout>
-  );
+    </div>
+  )
 }
