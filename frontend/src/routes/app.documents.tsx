@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
-  FileText, FolderOpen, Upload, CheckCircle2, AlertTriangle,
-  Eye, Download, Trash2, Loader2,
+  FileText, Upload, CheckCircle2, AlertTriangle,
+  Download, Trash2, Loader2, LayoutGrid, List,
 } from "lucide-react";
 import { Dropzone, type UploadedFile } from "@/components/app/Dropzone";
 import { useI18n } from "@/lib/i18n";
@@ -11,21 +11,48 @@ import { useAuth } from "@/lib/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/documents")({
   component: Documents,
 });
 
-const CATEGORIES = ["Pitch", "Financial", "Legal", "Technical", "Market", "Other"] as const;
+const CATEGORIES = ["Pitch Deck", "Financials", "Legal", "Market Research", "Team", "Other"] as const;
 type DocCategory = (typeof CATEGORIES)[number];
+
+type ViewMode = "list" | "grid";
+
+function fileInfo(fileName: string): { label: string; bg: string; text: string } {
+  const ext = (fileName.split(".").pop() ?? "").toLowerCase();
+  if (ext === "pdf") return { label: "PDF", bg: "bg-red-500/10", text: "text-red-500" };
+  if (["pptx", "ppt", "key"].includes(ext)) return { label: "PPT", bg: "bg-orange-500/10", text: "text-orange-500" };
+  if (["xlsx", "xls", "csv"].includes(ext)) return { label: "XLS", bg: "bg-green-600/10", text: "text-green-600" };
+  if (["doc", "docx"].includes(ext)) return { label: "DOC", bg: "bg-blue-500/10", text: "text-blue-500" };
+  if (["png", "jpg", "jpeg", "gif", "svg", "webp"].includes(ext)) return { label: "IMG", bg: "bg-purple-500/10", text: "text-purple-500" };
+  if (["zip", "tar", "gz"].includes(ext)) return { label: "ZIP", bg: "bg-yellow-600/10", text: "text-yellow-600" };
+  return { label: (ext.toUpperCase() || "FILE"), bg: "bg-muted", text: "text-muted-foreground" };
+}
+
+function FileIcon({ fileName, size = "md" }: { fileName: string; size?: "sm" | "md" | "lg" }) {
+  const { label, bg, text } = fileInfo(fileName);
+  const cls = size === "sm" ? "h-8 w-8 text-[9px]" : size === "lg" ? "h-14 w-14 text-xs" : "h-9 w-9 text-[10px]";
+  return (
+    <div className={cn("grid place-items-center rounded-md font-bold shrink-0", cls, bg, text)}>
+      {label}
+    </div>
+  );
+}
+
+const TAB_LABELS = ["All", ...CATEGORIES] as const;
 
 function Documents() {
   const { t } = useI18n();
   const { user } = useAuth();
   const [showUpload, setShowUpload] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<DocCategory>("Pitch");
-  const [activeFolder, setActiveFolder] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState<DocCategory>("Pitch Deck");
+  const [activeTab, setActiveTab] = useState<string>("All");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
   const queryClient = useQueryClient();
 
   const { data: docs = [], isLoading } = useQuery({
@@ -43,18 +70,18 @@ function Documents() {
     },
   });
 
-  const folders = useMemo(() => {
-    const counts = docs.reduce<Record<string, number>>((acc, d) => {
+  const tabCounts = useMemo(() => {
+    const counts: Record<string, number> = { All: docs.length };
+    for (const d of docs) {
       const key = (d.category as string) || "Other";
-      acc[key] = (acc[key] ?? 0) + 1;
-      return acc;
-    }, {});
-    return [["All", docs.length], ...Object.entries(counts)] as [string, number][];
+      counts[key] = (counts[key] ?? 0) + 1;
+    }
+    return counts;
   }, [docs]);
 
-  const filtered = activeFolder === "All"
+  const filtered = activeTab === "All"
     ? docs
-    : docs.filter((d) => ((d.category as string) || "Other") === activeFolder);
+    : docs.filter((d) => ((d.category as string) || "Other") === activeTab);
 
   const onFiles = async (incoming: UploadedFile[]) => {
     if (!user) return;
@@ -103,32 +130,51 @@ function Documents() {
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto">
+      {/* Header */}
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{t("app.documents")}</h1>
-          <div className="text-sm text-muted-foreground">{docs.length} files · access controlled</div>
+          <div className="text-sm text-muted-foreground">{docs.length} file{docs.length !== 1 ? "s" : ""} · access controlled</div>
         </div>
-        <button
-          onClick={() => setShowUpload((v) => !v)}
-          className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"
-        >
-          <Upload className="h-4 w-4" /> {t("docs.upload")}
-        </button>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 rounded-md border border-border/60 p-0.5">
+            <button
+              onClick={() => setViewMode("list")}
+              className={cn("grid h-7 w-7 place-items-center rounded text-muted-foreground transition-colors", viewMode === "list" && "bg-accent text-foreground")}
+            >
+              <List className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => setViewMode("grid")}
+              className={cn("grid h-7 w-7 place-items-center rounded text-muted-foreground transition-colors", viewMode === "grid" && "bg-accent text-foreground")}
+            >
+              <LayoutGrid className="h-3.5 w-3.5" />
+            </button>
+          </div>
+          <button
+            onClick={() => setShowUpload((v) => !v)}
+            className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"
+          >
+            <Upload className="h-4 w-4" /> {t("docs.upload")}
+          </button>
+        </div>
       </div>
 
+      {/* Upload panel */}
       {showUpload && (
-        <div className="mt-5 space-y-3">
+        <div className="mt-5 rounded-xl border border-border/60 bg-card p-5 shadow-card space-y-3">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs text-muted-foreground">Category:</span>
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`rounded-full px-3 py-1 text-xs border transition-colors ${
+                className={cn(
+                  "rounded-full px-3 py-1 text-xs border transition-colors",
                   selectedCategory === cat
                     ? "bg-brand text-brand-foreground border-brand"
                     : "border-border/60 text-muted-foreground hover:bg-accent"
-                }`}
+                )}
               >
                 {cat}
               </button>
@@ -138,69 +184,130 @@ function Documents() {
         </div>
       )}
 
-      <div className="mt-6 grid lg:grid-cols-[220px_1fr] gap-5">
-        <aside className="space-y-1">
-          {folders.map(([n, c], i) => (
-            <button
-              key={n}
-              onClick={() => setActiveFolder(n)}
-              className={`w-full flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors ${
-                activeFolder === n
-                  ? "bg-accent text-foreground font-medium"
-                  : "text-muted-foreground hover:bg-accent/60"
-              }`}
-            >
-              <span className="flex items-center gap-2">
-                <FolderOpen className="h-4 w-4" /> {n}
+      {/* Category tabs */}
+      <div className="mt-6 flex items-center gap-1 overflow-x-auto pb-0.5 border-b border-border/60">
+        {TAB_LABELS.map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={cn(
+              "shrink-0 px-3 py-2 text-sm border-b-2 transition-colors whitespace-nowrap",
+              activeTab === tab
+                ? "border-brand text-foreground font-medium"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {tab}
+            {tabCounts[tab] !== undefined && (
+              <span className={cn("ml-1.5 text-xs", activeTab === tab ? "text-brand" : "text-muted-foreground/60")}>
+                {tabCounts[tab]}
               </span>
-              <span className="text-xs text-muted-foreground">{c}</span>
-            </button>
-          ))}
-        </aside>
+            )}
+          </button>
+        ))}
+      </div>
 
-        <div className="rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
-          <div className="grid grid-cols-12 px-5 py-3 border-b border-border/60 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
-            <div className="col-span-5">Name</div>
-            <div className="col-span-2">Category</div>
-            <div className="col-span-2">Uploaded</div>
-            <div className="col-span-2">Views</div>
-            <div className="col-span-1 text-right">Status</div>
-          </div>
-
-          {isLoading ? (
-            <div className="space-y-0">
-              {[1, 2, 3].map((n) => (
-                <div key={n} className="grid grid-cols-12 px-5 py-3 border-b border-border/60 items-center">
-                  <div className="col-span-5 flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-md bg-muted animate-pulse" />
-                    <div className="h-4 w-40 rounded bg-muted animate-pulse" />
-                  </div>
-                  <div className="col-span-7 h-4 w-24 rounded bg-muted/60 animate-pulse" />
+      {/* Content */}
+      <div className="mt-4">
+        {isLoading ? (
+          <div className="space-y-2">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="flex items-center gap-3 rounded-xl border border-border/60 bg-card p-4">
+                <div className="h-9 w-9 rounded-md bg-muted animate-pulse shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-4 w-48 rounded bg-muted animate-pulse" />
+                  <div className="h-3 w-24 rounded bg-muted/60 animate-pulse" />
                 </div>
-              ))}
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="py-16 text-center">
-              <FileText className="h-8 w-8 text-muted-foreground/30 mx-auto mb-3" />
-              <div className="text-sm text-muted-foreground">
-                {activeFolder === "All" ? "No documents yet — upload your first file." : `No files in ${activeFolder}.`}
               </div>
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border/60 bg-card py-16 text-center">
+            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-accent mx-auto mb-4">
+              <FileText className="h-7 w-7 text-muted-foreground/50" />
             </div>
-          ) : (
-            filtered.map((d) => (
+            <div className="text-sm font-medium">
+              {activeTab === "All" ? "No documents yet" : `No files in ${activeTab}`}
+            </div>
+            <div className="text-xs text-muted-foreground mt-1 mb-4">
+              {activeTab === "All"
+                ? "Upload pitch decks, financials, legal docs and more."
+                : `Upload your ${activeTab.toLowerCase()} documents here.`}
+            </div>
+            <button
+              onClick={() => { setSelectedCategory(activeTab === "All" ? "Pitch Deck" : activeTab as DocCategory); setShowUpload(true); }}
+              className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"
+            >
+              <Upload className="h-4 w-4" /> Upload now
+            </button>
+          </div>
+        ) : viewMode === "grid" ? (
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {filtered.map((d) => (
+              <div key={d.id} className="group rounded-xl border border-border/60 bg-card p-4 hover:shadow-card transition-shadow">
+                <div className="flex items-start justify-between mb-3">
+                  <FileIcon fileName={(d.file_name as string) || ""} size="lg" />
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleDownload(d.storage_path as string)}
+                      className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(d.id as string, d.storage_path as string)}
+                      title={deletingId === d.id ? "Click again to confirm" : "Delete"}
+                      className={cn(
+                        "grid h-7 w-7 place-items-center rounded-md transition-colors",
+                        deletingId === d.id
+                          ? "text-destructive bg-destructive/10"
+                          : "text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                      )}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+                <div className="text-sm font-medium truncate" title={(d.file_name as string) || "Untitled"}>
+                  {(d.file_name as string) || "Untitled"}
+                </div>
+                <div className="mt-1 flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">
+                    {Math.max(1, Math.round((Number(d.file_size) || 0) / 1024))} KB
+                  </span>
+                  {d.status === "uploaded"
+                    ? <CheckCircle2 className="h-3.5 w-3.5 text-success" />
+                    : <AlertTriangle className="h-3.5 w-3.5 text-warning" />}
+                </div>
+                <div className="mt-1 text-[10px] text-muted-foreground/60">
+                  {d.created_at ? formatDistanceToNow(new Date(d.created_at as string), { addSuffix: true }) : "—"}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
+            <div className="grid grid-cols-12 px-5 py-3 border-b border-border/60 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
+              <div className="col-span-5">Name</div>
+              <div className="col-span-2">Category</div>
+              <div className="col-span-2">Size</div>
+              <div className="col-span-2">Uploaded</div>
+              <div className="col-span-1 text-right">Actions</div>
+            </div>
+            {filtered.map((d) => (
               <div
                 key={d.id}
                 className="grid grid-cols-12 px-5 py-3 border-b border-border/60 last:border-0 hover:bg-accent/40 items-center text-sm group"
               >
                 <div className="col-span-5 flex items-center gap-3 min-w-0">
-                  <div className="grid h-8 w-8 place-items-center rounded-md bg-accent shrink-0">
-                    <FileText className="h-4 w-4 text-brand" />
-                  </div>
+                  <FileIcon fileName={(d.file_name as string) || ""} size="sm" />
                   <div className="min-w-0">
-                    <div className="font-medium truncate">{(d.file_name as string) || "Untitled"}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {Math.max(1, Math.round((Number(d.file_size) || 0) / 1024))} KB
+                    <div className="font-medium truncate" title={(d.file_name as string) || "Untitled"}>
+                      {(d.file_name as string) || "Untitled"}
                     </div>
+                    {d.status === "uploaded"
+                      ? <span className="text-[10px] text-success flex items-center gap-0.5"><CheckCircle2 className="h-3 w-3" />Uploaded</span>
+                      : <span className="text-[10px] text-warning flex items-center gap-0.5"><AlertTriangle className="h-3 w-3" />Review needed</span>}
                   </div>
                 </div>
                 <div className="col-span-2">
@@ -209,42 +316,38 @@ function Documents() {
                   </span>
                 </div>
                 <div className="col-span-2 text-xs text-muted-foreground">
+                  {Math.max(1, Math.round((Number(d.file_size) || 0) / 1024))} KB
+                </div>
+                <div className="col-span-2 text-xs text-muted-foreground">
                   {d.created_at
                     ? formatDistanceToNow(new Date(d.created_at as string), { addSuffix: true })
                     : "—"}
                 </div>
-                <div className="col-span-2 text-muted-foreground inline-flex items-center gap-1">
-                  <Eye className="h-3.5 w-3.5" /> —
-                </div>
-                <div className="col-span-1 flex items-center justify-end gap-1.5">
-                  {d.status === "uploaded" ? (
-                    <CheckCircle2 className="h-3.5 w-3.5 text-success" title="Uploaded" />
-                  ) : (
-                    <AlertTriangle className="h-3.5 w-3.5 text-warning" title="Review needed" />
-                  )}
+                <div className="col-span-1 flex items-center justify-end gap-1">
                   <button
                     onClick={() => handleDownload(d.storage_path as string)}
                     title="Download"
-                    className="text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <Download className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(d.id as string, d.storage_path as string)}
                     title={deletingId === d.id ? "Click again to confirm delete" : "Delete"}
-                    className={`opacity-0 group-hover:opacity-100 transition-opacity ${
+                    className={cn(
+                      "grid h-7 w-7 place-items-center rounded-md opacity-0 group-hover:opacity-100 transition-opacity",
                       deletingId === d.id
                         ? "text-destructive"
                         : "text-muted-foreground hover:text-destructive"
-                    }`}
+                    )}
                   >
-                    <Trash2 className="h-4 w-4" />
+                    {deletingId === d.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

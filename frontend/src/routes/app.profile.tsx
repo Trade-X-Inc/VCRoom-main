@@ -32,6 +32,21 @@ interface StartupRow {
   use_of_funds: string | null;
   logo_url: string | null;
   pitch_deck_url: string | null;
+  tagline: string | null;
+  founded_year: number | null;
+  previous_funding: string | null;
+  current_investors: string | null;
+  market_size: string | null;
+  competitive_advantage: string | null;
+  why_now: string | null;
+  founder_name: string | null;
+  founder_email: string | null;
+  founder_linkedin: string | null;
+  cofounder_name: string | null;
+  cofounder_linkedin: string | null;
+  key_metric: string | null;
+  growth_rate: string | null;
+  customer_count: string | null;
 }
 
 interface TeamMember {
@@ -54,6 +69,11 @@ type FormState = {
   funding_target: string; valuation: string; traction: string; revenue: string;
   team_size: string; description: string; website: string;
   problem: string; solution: string; business_model: string; use_of_funds: string;
+  tagline: string; founded_year: string; previous_funding: string;
+  current_investors: string; market_size: string; competitive_advantage: string;
+  why_now: string; founder_name: string; founder_email: string;
+  founder_linkedin: string; cofounder_name: string; cofounder_linkedin: string;
+  key_metric: string; growth_rate: string; customer_count: string;
 };
 
 const emptyForm: FormState = {
@@ -61,6 +81,11 @@ const emptyForm: FormState = {
   funding_target: "", valuation: "", traction: "", revenue: "",
   team_size: "", description: "", website: "",
   problem: "", solution: "", business_model: "", use_of_funds: "",
+  tagline: "", founded_year: "", previous_funding: "", current_investors: "",
+  market_size: "", competitive_advantage: "", why_now: "",
+  founder_name: "", founder_email: "", founder_linkedin: "",
+  cofounder_name: "", cofounder_linkedin: "",
+  key_metric: "", growth_rate: "", customer_count: "",
 };
 
 function fromStartup(s: StartupRow): FormState {
@@ -80,6 +105,21 @@ function fromStartup(s: StartupRow): FormState {
     solution: s.solution ?? "",
     business_model: s.business_model ?? "",
     use_of_funds: s.use_of_funds ?? "",
+    tagline: s.tagline ?? "",
+    founded_year: s.founded_year?.toString() ?? "",
+    previous_funding: s.previous_funding ?? "",
+    current_investors: s.current_investors ?? "",
+    market_size: s.market_size ?? "",
+    competitive_advantage: s.competitive_advantage ?? "",
+    why_now: s.why_now ?? "",
+    founder_name: s.founder_name ?? "",
+    founder_email: s.founder_email ?? "",
+    founder_linkedin: s.founder_linkedin ?? "",
+    cofounder_name: s.cofounder_name ?? "",
+    cofounder_linkedin: s.cofounder_linkedin ?? "",
+    key_metric: s.key_metric ?? "",
+    growth_rate: s.growth_rate ?? "",
+    customer_count: s.customer_count ?? "",
   };
 }
 
@@ -142,12 +182,26 @@ function Profile() {
         solution: form.solution || null,
         business_model: form.business_model || null,
         use_of_funds: form.use_of_funds || null,
+        tagline: form.tagline || null,
+        founded_year: form.founded_year ? parseInt(form.founded_year, 10) : null,
+        previous_funding: form.previous_funding || null,
+        current_investors: form.current_investors || null,
+        market_size: form.market_size || null,
+        competitive_advantage: form.competitive_advantage || null,
+        why_now: form.why_now || null,
+        founder_name: form.founder_name || null,
+        founder_email: form.founder_email || null,
+        founder_linkedin: form.founder_linkedin || null,
+        cofounder_name: form.cofounder_name || null,
+        cofounder_linkedin: form.cofounder_linkedin || null,
+        key_metric: form.key_metric || null,
+        growth_rate: form.growth_rate || null,
+        customer_count: form.customer_count || null,
       };
       const { error } = await supabase.from("startups").upsert(
         { ...payload, founder_id: user.id },
         { onConflict: "founder_id" },
       );
-      console.log("[Profile] Save result:", { error });
       if (error) throw error;
       toast.success("Profile saved");
       queryClient.invalidateQueries({ queryKey: ["my-startup", user.id] });
@@ -201,6 +255,20 @@ function Profile() {
     }
   };
 
+  const SaveBtn = ({ full = false }: { full?: boolean }) => (
+    <button
+      onClick={handleSave}
+      disabled={saving}
+      className={cn(
+        "inline-flex items-center gap-2 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-60",
+        full && "w-full justify-center",
+      )}
+    >
+      {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+      Save changes
+    </button>
+  );
+
   const initials = form.company_name
     ? form.company_name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()
     : "?";
@@ -222,14 +290,7 @@ function Profile() {
           <h1 className="text-2xl font-semibold tracking-tight">{startup ? "Company Profile" : "Create your profile"}</h1>
           <div className="text-sm text-muted-foreground">{startup ? "Edit your startup details, team, and pitch." : "Set up your startup profile so investors know who you are."}</div>
         </div>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="inline-flex items-center gap-2 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-60"
-        >
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-          Save changes
-        </button>
+        <SaveBtn />
       </div>
 
       {/* Hero card */}
@@ -254,15 +315,17 @@ function Profile() {
             </label>
             <div className="pb-1">
               <div className="text-xl font-semibold">{form.company_name || "Your Company"}</div>
-              <div className="text-sm text-muted-foreground">{form.description || "Add a tagline below"}</div>
+              <div className="text-sm text-muted-foreground">{form.tagline || form.description || "Add a tagline below"}</div>
             </div>
           </div>
         </div>
       </div>
 
       <div className="mt-5 grid lg:grid-cols-3 gap-4">
-        {/* Left: form */}
+        {/* Left: form sections */}
         <div className="lg:col-span-2 space-y-4">
+
+          {/* SECTION 1 — Company basics */}
           <FormSection title="Company basics">
             <div className="grid sm:grid-cols-2 gap-3">
               <Field label="Company name" value={form.company_name} onChange={field("company_name")} placeholder="Atlas Robotics" />
@@ -277,30 +340,57 @@ function Profile() {
               </div>
               <Field label="Country / HQ" value={form.country} onChange={field("country")} placeholder="San Francisco, USA" />
               <Field label="Team size" value={form.team_size} onChange={field("team_size")} placeholder="12" type="number" />
+              <Field label="Founded year" value={form.founded_year} onChange={field("founded_year")} placeholder="2022" type="number" />
             </div>
-            <TextArea label="Tagline / description" value={form.description} onChange={field("description")} placeholder="One-line description of your company" rows={2} />
+            <TextArea label="Tagline / one-liner" value={form.tagline} onChange={field("tagline")} placeholder="One sentence describing what you do and for whom" rows={2} />
           </FormSection>
 
+          {/* SECTION 2 — Fundraising */}
           <FormSection title="Fundraising">
             <div className="grid sm:grid-cols-2 gap-3">
               <Field label="Funding target" value={form.funding_target} onChange={field("funding_target")} placeholder="$5M" />
               <Field label="Pre-money valuation" value={form.valuation} onChange={field("valuation")} placeholder="$20M" />
+              <Field label="Previous funding raised" value={form.previous_funding} onChange={field("previous_funding")} placeholder="$500K pre-seed" />
+              <Field label="Current investors" value={form.current_investors} onChange={field("current_investors")} placeholder="Y Combinator, Sequoia" />
             </div>
             <TextArea label="Use of funds" value={form.use_of_funds} onChange={field("use_of_funds")} placeholder="40% engineering, 30% sales, 30% ops" rows={2} />
           </FormSection>
 
+          {/* SECTION 3 — Traction & metrics */}
           <FormSection title="Traction & metrics">
             <div className="grid sm:grid-cols-2 gap-3">
               <Field label="Revenue / ARR" value={form.revenue} onChange={field("revenue")} placeholder="$1.2M ARR" />
               <Field label="Traction highlight" value={form.traction} onChange={field("traction")} placeholder="500 customers, +15% MoM" />
+              <Field label="Key metric" value={form.key_metric} onChange={field("key_metric")} placeholder="NPS, CAC, LTV…" />
+              <Field label="Growth rate" value={form.growth_rate} onChange={field("growth_rate")} placeholder="15% MoM" />
+              <Field label="Customer count" value={form.customer_count} onChange={field("customer_count")} placeholder="500 paying customers" />
             </div>
           </FormSection>
 
+          {/* SECTION 4 — Pitch content */}
           <FormSection title="Pitch content">
             <TextArea label="Problem" value={form.problem} onChange={field("problem")} placeholder="What problem are you solving?" rows={3} />
             <TextArea label="Solution" value={form.solution} onChange={field("solution")} placeholder="How does your product solve it?" rows={3} />
             <TextArea label="Business model" value={form.business_model} onChange={field("business_model")} placeholder="How do you make money?" rows={2} />
+            <TextArea label="Market size" value={form.market_size} onChange={field("market_size")} placeholder="$50B TAM, $5B SAM…" rows={2} />
+            <TextArea label="Competitive advantage" value={form.competitive_advantage} onChange={field("competitive_advantage")} placeholder="What makes you hard to replicate?" rows={2} />
+            <TextArea label="Why now?" value={form.why_now} onChange={field("why_now")} placeholder="What tailwind or market shift makes this the right time?" rows={2} />
           </FormSection>
+
+          {/* SECTION 5 — Contact */}
+          <FormSection title="Contact">
+            <div className="grid sm:grid-cols-2 gap-3">
+              <Field label="Founder name" value={form.founder_name} onChange={field("founder_name")} placeholder="Jane Smith" />
+              <Field label="Founder email" value={form.founder_email} onChange={field("founder_email")} placeholder="jane@startup.com" type="email" />
+              <Field label="Founder LinkedIn" value={form.founder_linkedin} onChange={field("founder_linkedin")} placeholder="linkedin.com/in/janesmith" />
+              <Field label="Co-founder name" value={form.cofounder_name} onChange={field("cofounder_name")} placeholder="Alex Lee" />
+              <Field label="Co-founder LinkedIn" value={form.cofounder_linkedin} onChange={field("cofounder_linkedin")} placeholder="linkedin.com/in/alexlee" />
+            </div>
+          </FormSection>
+
+          <div className="pb-2">
+            <SaveBtn full />
+          </div>
         </div>
 
         {/* Right col */}
@@ -331,7 +421,7 @@ function Profile() {
 
           {/* Stats preview */}
           <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-            <div className="text-sm font-semibold mb-3">Overview preview</div>
+            <div className="text-sm font-semibold mb-3">Overview</div>
             <div className="space-y-2.5">
               {([
                 [Globe, "Stage", form.stage],
@@ -344,23 +434,24 @@ function Profile() {
                   <span className="ml-auto font-medium text-sm">{val || "—"}</span>
                 </div>
               ))}
+              {form.growth_rate && (
+                <div className="flex items-center gap-2.5 text-sm">
+                  <span className="text-muted-foreground text-xs">Growth</span>
+                  <span className="ml-auto font-medium text-sm text-success">{form.growth_rate}</span>
+                </div>
+              )}
+              {form.customer_count && (
+                <div className="flex items-center gap-2.5 text-sm">
+                  <span className="text-muted-foreground text-xs">Customers</span>
+                  <span className="ml-auto font-medium text-sm">{form.customer_count}</span>
+                </div>
+              )}
             </div>
-          </div>
-
-          <div className="flex justify-end">
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-60"
-            >
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-              Save changes
-            </button>
           </div>
         </div>
       </div>
 
-      {/* Team members - only after startup exists */}
+      {/* Team members */}
       {startup?.id && <TeamMembersSection startupId={startup.id} />}
 
       {!startup?.id && !isLoading && (
@@ -475,7 +566,7 @@ function TeamMembersSection({ startupId }: { startupId: string }) {
       if (error) throw error;
       const { data } = supabase.storage.from("avatars").getPublicUrl(path);
       setMf((f) => ({ ...f, photo_url: data.publicUrl }));
-    } catch (e: any) {
+    } catch {
       toast.error("Photo upload failed");
     } finally {
       setPhotoUploading(false);
@@ -553,7 +644,6 @@ function TeamMembersSection({ startupId }: { startupId: string }) {
         </button>
       </div>
 
-      {/* Inline form */}
       {showForm && (
         <div className="mb-5 rounded-xl border border-brand/30 bg-card p-5 shadow-card">
           <div className="flex items-center justify-between mb-4">
@@ -561,7 +651,6 @@ function TeamMembersSection({ startupId }: { startupId: string }) {
             <button onClick={closeForm} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
           </div>
           <div className="space-y-3">
-            {/* Photo */}
             <div className="flex items-center gap-3">
               <label className="relative cursor-pointer">
                 <div className="grid h-14 w-14 place-items-center rounded-full bg-accent border border-border/60 overflow-hidden text-sm font-semibold text-muted-foreground shrink-0">
@@ -628,7 +717,6 @@ function TeamMembersSection({ startupId }: { startupId: string }) {
         </div>
       )}
 
-      {/* Members grid */}
       {isLoading ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {[1, 2, 3].map((i) => (
@@ -644,14 +732,14 @@ function TeamMembersSection({ startupId }: { startupId: string }) {
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {members.map((m) => {
-            const initials = m.full_name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+            const inits = m.full_name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
             return (
               <div key={m.id} className="rounded-xl border border-border/60 bg-card p-4 shadow-card">
                 <div className="flex items-start gap-3">
                   <div className="grid h-10 w-10 place-items-center rounded-full bg-accent border border-border/60 overflow-hidden text-xs font-semibold shrink-0">
                     {m.photo_url
                       ? <img src={m.photo_url} alt={m.full_name} className="h-full w-full object-cover" />
-                      : initials}
+                      : inits}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-semibold truncate">{m.full_name}</div>
