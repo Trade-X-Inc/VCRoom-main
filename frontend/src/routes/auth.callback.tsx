@@ -11,38 +11,53 @@ function AuthCallback() {
 
   useEffect(() => {
     const run = async () => {
-      await new Promise(r => setTimeout(r, 1500))
+      try {
+        // Supabase puts tokens in the URL hash
+        // We need to let it process automatically
+        // onAuthStateChange will fire when ready
 
-      const { data: { session } } = await supabase.auth.getSession()
+        let session = null
+        let attempts = 0
 
-      if (!session) {
-        setMsg('Could not sign in. Redirecting...')
-        setTimeout(() => { window.location.href = '/sign-in' }, 2000)
-        return
-      }
+        // Poll for session up to 5 seconds
+        while (!session && attempts < 10) {
+          const { data } = await supabase.auth.getSession()
+          session = data.session
+          if (!session) {
+            await new Promise(r => setTimeout(r, 500))
+          }
+          attempts++
+        }
 
-      const userId = session.user.id
-      const userEmail = session.user.email || ''
+        if (!session) {
+          setMsg('Could not sign in. Redirecting...')
+          setTimeout(() => {
+            window.location.href = '/sign-in'
+          }, 2000)
+          return
+        }
 
-      const pending = localStorage.getItem('pending_role') || ''
-      localStorage.removeItem('pending_role')
+        const userId = session.user.id
+        const userEmail = session.user.email || ''
 
-      const { data: existing } = await supabase
-        .from('users')
-        .select('role')
-        .eq('id', userId)
-        .maybeSingle()
+        const pending = localStorage.getItem('pending_role') || ''
+        localStorage.removeItem('pending_role')
 
-      const role =
-        existing?.role ||
-        pending ||
-        session.user.user_metadata?.role ||
-        'founder'
+        const { data: existing } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', userId)
+          .maybeSingle()
 
-      setMsg(`Welcome! Setting up your ${role} account...`)
+        const role =
+          existing?.role ||
+          pending ||
+          session.user.user_metadata?.role ||
+          'founder'
 
-      await supabase.from('users').upsert(
-        {
+        setMsg(`Welcome! Loading your dashboard...`)
+
+        await supabase.from('users').upsert({
           id: userId,
           role,
           full_name:
@@ -50,14 +65,16 @@ function AuthCallback() {
             session.user.user_metadata?.name ||
             userEmail.split('@')[0],
           updated_at: new Date().toISOString()
-        },
-        { onConflict: 'id' }
-      )
+        }, { onConflict: 'id' })
 
-      setMsg('Redirecting to your dashboard...')
-      setTimeout(() => {
-        window.location.href = role === 'investor' ? '/app/investor/' : '/app'
-      }, 500)
+        window.location.href =
+          role === 'investor'
+            ? '/app/investor/'
+            : '/app'
+      } catch (err) {
+        console.error('Callback error:', err)
+        window.location.href = '/sign-in'
+      }
     }
 
     run()

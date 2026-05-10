@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 export const Route = createFileRoute('/sign-in')({
@@ -11,19 +11,6 @@ function SignIn() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-
-  useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) return
-      const { data } = await supabase
-        .from('users')
-        .select('role')
-        .eq('id', session.user.id)
-        .maybeSingle()
-      const role = data?.role || session.user.user_metadata?.role || 'founder'
-      window.location.href = role === 'investor' ? '/app/investor/' : '/app'
-    })
-  }, [])
 
   const handleGoogle = async () => {
     setError('')
