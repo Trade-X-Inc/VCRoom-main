@@ -14,7 +14,7 @@ export const Route = createFileRoute("/app")({
         attempts++;
       }
 
-      if (!session) throw redirect({ to: "/sign-in" });
+      if (!session) throw redirect({ to: "/sign-in", search: {} });
 
       const { data: userRecord } = await supabase
         .from("users")
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/app")({
         .maybeSingle();
 
       const role = userRecord?.role || session.user.user_metadata?.role || "founder";
-      if (role === "investor") throw redirect({ to: "/app/investor/" });
+      if (role === "investor") throw redirect({ to: "/app/investor/", search: {} });
     } catch (err) {
       if (isRedirect(err)) throw err;
       // On DB error, allow founder dashboard access

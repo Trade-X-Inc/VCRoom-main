@@ -62,9 +62,14 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   const navigate = useNavigate();
   const profile = useProfile();
 
-  const isInvestor = user?.appRole === "investor";
+  const isInvestor = user?.appRole === "investor" || (user as any)?.role === "investor";
   const nav = isInvestor ? investorNav : founderNav;
   const workspaceNav = isInvestor ? workspaceNavInvestor : workspaceNavFounder;
+
+  console.log("[AppShell] user:", user);
+  console.log("[AppShell] role:", (user as any)?.role);
+  console.log("[AppShell] appRole:", user?.appRole);
+  console.log("[AppShell] isInvestor:", isInvestor);
 
   // Live lead count from Supabase (founder only)
   const { data: leadCount } = useQuery({
@@ -85,6 +90,10 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       navigate({ to: "/sign-in", search: { redirect: path } });
       return;
     }
+    // Wait for user to be loaded before running role guards — prevents race condition
+    // where isInvestor=false while auth context is still hydrating
+    if (!user) return;
+
     if (
       isInvestor &&
       !path.startsWith("/app/investor") &&
@@ -94,12 +103,12 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       !path.startsWith("/app/settings") &&
       !path.startsWith("/app/meetings")
     ) {
-      navigate({ to: "/app/investor" });
+      navigate({ to: "/app/investor/" });
     }
     if (!isInvestor && path.startsWith("/app/investor")) {
       navigate({ to: "/app" });
     }
-  }, [isAuthenticated, isInvestor, navigate, path]);
+  }, [isAuthenticated, user, isInvestor, navigate, path]);
 
   if (!isAuthenticated) {
     return <div className="min-h-screen bg-background grid place-items-center text-sm text-muted-foreground">Redirecting…</div>;
@@ -156,7 +165,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
             </div>
           )}
           {nav.map((n) => {
-            const active = path === n.to || (n.to !== "/app" && n.to !== "/app/investor" && path.startsWith(n.to));
+            const active = path === n.to || path === n.to + "/" || (n.to !== "/app" && n.to !== "/app/investor" && path.startsWith(n.to));
             const badge = (() => {
               if (n.to === "/app/leads") return leadCount && leadCount > 0 ? String(leadCount) : undefined;
               return n.badge;
