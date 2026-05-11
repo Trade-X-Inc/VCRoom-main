@@ -23,7 +23,7 @@ const founderNav: NavItem[] = [
   { to: "/app", labelKey: "app.overview", icon: LayoutGrid },
   { to: "/app/leads", labelKey: "app.leads", icon: Users },
   { to: "/app/pipeline", labelKey: "app.pipeline", icon: Kanban },
-  { to: "/app/deal-rooms", labelKey: "app.dealRooms", icon: Briefcase, badge: "4" },
+  { to: "/app/deal-rooms", labelKey: "app.dealRooms", icon: Briefcase },
   { to: "/app/profile", labelKey: "app.profile", icon: Building2 },
   { to: "/app/documents", labelKey: "app.documents", icon: FileText },
   { to: "/app/meetings", labelKey: "app.meetings", icon: Calendar },
@@ -79,6 +79,34 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
     },
   });
 
+  // Company name from startups table (founder only)
+  const { data: startupData } = useQuery({
+    queryKey: ["shell-startup", user?.id],
+    enabled: !!user?.id && !isInvestor,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("startups")
+        .select("id, company_name, stage")
+        .eq("founder_id", user!.id)
+        .limit(1)
+        .maybeSingle();
+      return data as { id: string; company_name: string; stage: string | null } | null;
+    },
+  });
+
+  // Deal room count (founder only)
+  const { data: dealRoomCount } = useQuery({
+    queryKey: ["shell-deal-room-count", startupData?.id],
+    enabled: !!startupData?.id && !isInvestor,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("deal_rooms")
+        .select("*", { count: "exact", head: true })
+        .eq("startup_id", startupData!.id);
+      return count ?? 0;
+    },
+  });
+
   // Role-based navigation guard
   useEffect(() => {
     if (!user) return;
@@ -105,7 +133,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
 
   const workspaceName = isInvestor
     ? (user.fullName || "")
-    : (profile?.name || "");
+    : (startupData?.company_name || profile?.name || "");
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -134,7 +162,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                   <>
                     <div className="text-xs font-medium truncate">{workspaceName}</div>
                     <div className="text-[10px] text-muted-foreground truncate">
-                      {isInvestor ? "Fund · Partner" : (profile?.stage || "Company")}
+                      {isInvestor ? "Fund · Partner" : (startupData?.stage || profile?.stage || "Company")}
                     </div>
                   </>
                 ) : (
@@ -157,6 +185,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
             const active = path === n.to || path === n.to + "/" || (n.to !== "/app" && n.to !== "/app/investor" && path.startsWith(n.to));
             const badge = (() => {
               if (n.to === "/app/leads") return leadCount && leadCount > 0 ? String(leadCount) : undefined;
+              if (n.to === "/app/deal-rooms") return dealRoomCount && dealRoomCount > 0 ? String(dealRoomCount) : undefined;
               return n.badge;
             })();
             return (

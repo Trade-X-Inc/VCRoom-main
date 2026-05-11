@@ -1,17 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BarChart3, Download, FileText, FileSpreadsheet, TrendingUp, Briefcase, ClipboardCheck, ShieldCheck } from "lucide-react";
-import { useI18n } from "@/lib/i18n";
-
-const deals: { firm: string; partner: string; check: string; stage: string; thesis: string }[] = [];
-const ddChecklist: { category: string; title: string; owner: string; due: string; status: string }[] = [];
-const auditLog: { actor: string; action: string; target: string; category: string; ip: string; time: string; severity: string }[] = [];
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
+import {
+  BarChart3, Download, FileSpreadsheet, TrendingUp, Loader2,
+  Users, Briefcase, Calendar, MessageSquare,
+} from "lucide-react";
 
 export const Route = createFileRoute("/app/reports")({
   component: Reports,
 });
 
-function downloadFile(filename: string, content: string, mime: string) {
-  const blob = new Blob([content], { type: mime });
+// ── CSV helper ─────────────────────────────────────────────────────
+
+function downloadCsv(filename: string, rows: (string | number | null | undefined)[][]) {
+  const csv = rows
+    .map((r) =>
+      r.map((c) => {
+        const s = String(c ?? "");
+        return /[,"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+      }).join(",")
+    )
+    .join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -22,154 +33,315 @@ function downloadFile(filename: string, content: string, mime: string) {
   URL.revokeObjectURL(url);
 }
 
-function toCsv(rows: (string | number)[][]): string {
-  return rows
-    .map((r) =>
-      r
-        .map((c) => {
-          const s = String(c ?? "");
-          return /[,"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-        })
-        .join(",")
-    )
-    .join("\n");
-}
+// ── Funnel config ──────────────────────────────────────────────────
 
-function toPdfHtml(title: string, rows: (string | number)[][], cols: string[]) {
-  const date = new Date().toLocaleString();
-  const body = `<!doctype html><html><head><meta charset="utf-8"><title>${title}</title>
-<style>
-  body{font-family:-apple-system,BlinkMacSystemFont,Inter,sans-serif;color:#0a0a0f;padding:40px;max-width:980px;margin:auto}
-  header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #0a0a0f;padding-bottom:16px;margin-bottom:24px}
-  h1{margin:0;font-size:24px;letter-spacing:-0.02em}
-  .brand{font-weight:700;letter-spacing:0.08em;font-size:11px;color:#666;text-transform:uppercase}
-  .meta{font-size:11px;color:#666}
-  table{width:100%;border-collapse:collapse;font-size:12px}
-  th{text-align:left;text-transform:uppercase;font-size:10px;letter-spacing:0.06em;color:#666;border-bottom:1px solid #ddd;padding:8px 6px}
-  td{border-bottom:1px solid #eee;padding:8px 6px}
-  footer{margin-top:32px;font-size:10px;color:#999;text-align:center}
-</style></head><body>
-<header>
-  <div><div class="brand">Venture Room · Report</div><h1>${title}</h1></div>
-  <div class="meta">Generated ${date}</div>
-</header>
-<table><thead><tr>${cols.map((c) => `<th>${c}</th>`).join("")}</tr></thead>
-<tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${c ?? ""}</td>`).join("")}</tr>`).join("")}</tbody></table>
-<footer>Confidential — Venture Room</footer>
-<script>window.onload=()=>{setTimeout(()=>window.print(),250)}</script>
-</body></html>`;
-  return body;
-}
+const FUNNEL_STAGES = [
+  { label: "Total leads", statuses: null },
+  { label: "Contacted", statuses: ["Contacted", "Replied", "Follow Up", "Meeting Booked", "Interested", "Deal Room Created"] },
+  { label: "Replied", statuses: ["Replied", "Follow Up", "Meeting Booked", "Interested", "Deal Room Created"] },
+  { label: "Meeting", statuses: ["Meeting Booked", "Interested", "Deal Room Created"] },
+  { label: "Interested", statuses: ["Interested", "Deal Room Created"] },
+  { label: "Deal Room", statuses: ["Deal Room Created"] },
+] as const;
 
-function downloadPdf(title: string, cols: string[], rows: (string | number)[][]) {
-  const html = toPdfHtml(title, rows, cols);
-  const w = window.open("", "_blank");
-  if (!w) return;
-  w.document.write(html);
-  w.document.close();
-}
+// ── Component ──────────────────────────────────────────────────────
 
 function Reports() {
-  const { t } = useI18n();
+  const { user } = useAuth();
 
-  const reports = [
-    {
-      key: "pipeline",
-      title: "Pipeline snapshot",
-      desc: "All deals with stage, partner, check size, and probability.",
-      icon: Briefcase,
-      tint: "bg-brand/10 text-brand",
-      cols: ["Firm", "Partner", "Stage", "Check", "Probability", "Last touch"],
-      rows: () => deals.map((d) => [d.firm, d.partner, d.stage, d.check, `${d.probability}%`, d.lastTouch]),
+  const { data: leads = [], isLoading: leadsLoading } = useQuery({
+    queryKey: ["reports-leads", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("vc_leads")
+        .select("*")
+        .eq("founder_id", user!.id)
+        .order("updated_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as any[];
     },
-    {
-      key: "diligence",
-      title: "Due diligence status",
-      desc: "Checklist by category with owners and status.",
-      icon: ClipboardCheck,
-      tint: "bg-violet/10 text-violet",
-      cols: ["Category", "Item", "Owner", "Status", "Due"],
-      rows: () => ddChecklist.map((d) => [d.category, d.title, d.owner, d.status, d.due]),
+  });
+
+  const { data: startup } = useQuery({
+    queryKey: ["reports-startup", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("startups")
+        .select("id, company_name")
+        .eq("founder_id", user!.id)
+        .limit(1)
+        .maybeSingle();
+      return data as { id: string; company_name: string } | null;
     },
-    {
-      key: "activity",
-      title: "Activity & audit log",
-      desc: "Workspace activity across users, documents, and decisions.",
-      icon: ShieldCheck,
-      tint: "bg-success/10 text-success",
-      cols: ["Actor", "Action", "Target", "Category", "Severity", "When"],
-      rows: () => auditLog.map((a) => [a.actor, a.action, a.target, a.category, a.severity, a.time]),
+  });
+
+  const { data: rooms = [] } = useQuery({
+    queryKey: ["reports-deal-rooms", startup?.id],
+    enabled: !!startup?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("deal_rooms")
+        .select("id, status, created_at, deal_room_members(count), deal_room_documents(count)")
+        .eq("startup_id", startup!.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as any[];
     },
-    {
-      key: "performance",
-      title: "Round performance",
-      desc: "Funnel velocity, conversion rate, and avg. time per stage.",
-      icon: TrendingUp,
-      tint: "bg-warning/10 text-warning",
-      cols: ["Stage", "Deals", "Conversion", "Avg days"],
-      rows: () => [
-        ["Sourced", 2, "88%", 4],
-        ["Qualified", 2, "75%", 6],
-        ["Pitched", 2, "62%", 9],
-        ["Diligence", 2, "55%", 14],
-        ["Term Sheet", 1, "85%", 7],
-        ["Closed", 1, "—", 3],
-      ],
+  });
+
+  const { data: activities = [] } = useQuery({
+    queryKey: ["reports-activities", startup?.id],
+    enabled: !!startup?.id,
+    queryFn: async () => {
+      if (!startup?.id) return [];
+      const roomIds = rooms.map((r: any) => r.id);
+      if (roomIds.length === 0) return [];
+      const { data, error } = await supabase
+        .from("activities")
+        .select("id, action, created_at, actor_id, deal_room_id")
+        .in("deal_room_id", roomIds)
+        .order("created_at", { ascending: false })
+        .limit(200);
+      if (error) throw error;
+      return (data ?? []) as any[];
     },
+  });
+
+  const { data: meetings = [] } = useQuery({
+    queryKey: ["reports-meetings", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("meetings")
+        .select("id, title, meeting_date, meeting_type, status, vc_lead_id")
+        .eq("founder_id", user!.id)
+        .order("meeting_date", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as any[];
+    },
+  });
+
+  const isLoading = leadsLoading;
+
+  // ── Funnel calculations ──────────────────────────────────────────
+
+  const funnelCounts = FUNNEL_STAGES.map(({ statuses }) =>
+    statuses === null
+      ? leads.length
+      : leads.filter((l) => statuses.includes(l.status as any)).length
+  );
+
+  const maxCount = Math.max(...funnelCounts, 1);
+
+  // ── Key metrics ──────────────────────────────────────────────────
+
+  const total = leads.length;
+  const contactedCount = leads.filter((l) =>
+    ["Contacted", "Replied", "Follow Up", "Meeting Booked", "Interested", "Deal Room Created"].includes(l.status)
+  ).length;
+  const repliedCount = leads.filter((l) =>
+    ["Replied", "Follow Up", "Meeting Booked", "Interested", "Deal Room Created"].includes(l.status)
+  ).length;
+  const meetingCount = leads.filter((l) =>
+    ["Meeting Booked", "Interested", "Deal Room Created"].includes(l.status)
+  ).length;
+  const activeRooms = rooms.filter((r: any) => r.status !== "closed").length;
+
+  const pct = (n: number) => total > 0 ? `${Math.round((n / total) * 100)}%` : "—";
+
+  const metrics = [
+    { label: "Total leads", value: String(total), sub: "in your pipeline", icon: Users, tint: "bg-brand/10 text-brand" },
+    { label: "Reply rate", value: pct(repliedCount), sub: `${repliedCount} replied`, icon: MessageSquare, tint: "bg-violet/10 text-violet" },
+    { label: "Meeting rate", value: pct(meetingCount), sub: `${meetingCount} booked`, icon: Calendar, tint: "bg-success/10 text-success" },
+    { label: "Active deal rooms", value: String(activeRooms), sub: `${rooms.length} total`, icon: Briefcase, tint: "bg-warning/10 text-warning" },
   ];
 
+  // ── Download handlers ────────────────────────────────────────────
+
+  const downloadLeads = () => {
+    const header = ["Name", "Firm", "Status", "Ticket Size", "Sector", "Stage", "Email", "Updated At"];
+    const rows = leads.map((l) => [
+      l.investor_name, l.firm_name, l.status, l.ticket_size,
+      l.sector, l.investment_stage, l.email,
+      l.updated_at ? new Date(l.updated_at).toLocaleDateString() : "",
+    ]);
+    downloadCsv("vc-lead-list.csv", [header, ...rows]);
+  };
+
+  const downloadDealRooms = () => {
+    const header = ["Room ID", "Status", "Created At", "Documents", "Members"];
+    const rows = rooms.map((r: any) => [
+      r.id.slice(0, 8),
+      r.status,
+      r.created_at ? new Date(r.created_at).toLocaleDateString() : "",
+      r.deal_room_documents?.[0]?.count ?? 0,
+      r.deal_room_members?.[0]?.count ?? 0,
+    ]);
+    downloadCsv("deal-room-report.csv", [header, ...rows]);
+  };
+
+  const downloadActivities = () => {
+    const header = ["Actor ID", "Action", "Deal Room ID", "Date"];
+    const rows = activities.map((a: any) => [
+      a.actor_id?.slice(0, 8) ?? "",
+      a.action,
+      a.deal_room_id?.slice(0, 8) ?? "",
+      a.created_at ? new Date(a.created_at).toLocaleDateString() : "",
+    ]);
+    downloadCsv("activity-log.csv", [header, ...rows]);
+  };
+
+  const downloadMeetings = () => {
+    const header = ["Title", "Date", "Type", "Status", "Lead ID"];
+    const rows = meetings.map((m: any) => [
+      m.title,
+      m.meeting_date ? new Date(m.meeting_date).toLocaleDateString() : "",
+      m.meeting_type,
+      m.status,
+      m.vc_lead_id?.slice(0, 8) ?? "",
+    ]);
+    downloadCsv("meeting-log.csv", [header, ...rows]);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="p-8 flex items-center justify-center min-h-64">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6 lg:p-8 max-w-6xl mx-auto">
-      <div className="flex items-end justify-between flex-wrap gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-brand" />
-            <h1 className="text-2xl font-semibold tracking-tight">{t("reports.title")}</h1>
+    <div className="p-6 lg:p-8 max-w-5xl mx-auto space-y-8">
+      <div>
+        <div className="flex items-center gap-2">
+          <BarChart3 className="h-5 w-5 text-brand" />
+          <h1 className="text-2xl font-semibold tracking-tight">Reports</h1>
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">Pipeline analytics and downloadable reports.</p>
+      </div>
+
+      {/* Section 1 — Pipeline funnel */}
+      <div className="rounded-xl border border-border/60 bg-card p-6 shadow-card">
+        <div className="flex items-center gap-2 mb-5">
+          <TrendingUp className="h-4 w-4 text-brand" />
+          <div className="font-semibold">Pipeline funnel</div>
+        </div>
+        {total === 0 ? (
+          <div className="py-8 text-center text-sm text-muted-foreground">No leads yet. Add VC leads to see your funnel.</div>
+        ) : (
+          <div className="space-y-3">
+            {FUNNEL_STAGES.map(({ label }, i) => {
+              const count = funnelCounts[i];
+              const prev = i === 0 ? count : funnelCounts[i - 1];
+              const barPct = Math.round((count / maxCount) * 100);
+              const conv = prev > 0 && i > 0 ? `${Math.round((count / prev) * 100)}%` : null;
+              return (
+                <div key={label} className="flex items-center gap-3">
+                  <div className="w-28 text-xs text-muted-foreground shrink-0">{label}</div>
+                  <div className="flex-1 h-7 rounded-md bg-muted/40 overflow-hidden relative">
+                    <div
+                      className="h-full rounded-md bg-gradient-brand transition-all duration-500"
+                      style={{ width: `${barPct}%` }}
+                    />
+                    {count > 0 && (
+                      <div className="absolute inset-y-0 left-2 flex items-center text-[10px] font-medium text-brand-foreground mix-blend-overlay">
+                        {count} lead{count !== 1 ? "s" : ""}
+                      </div>
+                    )}
+                  </div>
+                  <div className="w-12 text-right shrink-0">
+                    <div className="text-xs font-semibold tabular-nums">{count}</div>
+                    {conv && <div className="text-[10px] text-muted-foreground">{conv}</div>}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">{t("reports.subtitle")}</p>
+        )}
+      </div>
+
+      {/* Section 2 — Download reports */}
+      <div className="rounded-xl border border-border/60 bg-card p-6 shadow-card">
+        <div className="flex items-center gap-2 mb-5">
+          <Download className="h-4 w-4 text-brand" />
+          <div className="font-semibold">Download reports</div>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-3">
+          {[
+            {
+              label: "VC Lead List",
+              desc: `${leads.length} leads with status, firm, ticket size`,
+              onClick: downloadLeads,
+              disabled: leads.length === 0,
+            },
+            {
+              label: "Deal Room Report",
+              desc: `${rooms.length} rooms with docs and member counts`,
+              onClick: downloadDealRooms,
+              disabled: rooms.length === 0,
+            },
+            {
+              label: "Activity Log",
+              desc: `${activities.length} recent deal room activities`,
+              onClick: downloadActivities,
+              disabled: activities.length === 0,
+            },
+            {
+              label: "Meeting Log",
+              desc: `${meetings.length} meetings with dates and status`,
+              onClick: downloadMeetings,
+              disabled: meetings.length === 0,
+            },
+          ].map((item) => (
+            <button
+              key={item.label}
+              onClick={item.onClick}
+              disabled={item.disabled}
+              className="flex items-start gap-3 rounded-lg border border-border/60 p-4 text-left hover:bg-accent hover:border-brand/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed group"
+            >
+              <div className="grid h-9 w-9 place-items-center rounded-lg bg-muted shrink-0 group-hover:bg-brand/10 transition-colors">
+                <FileSpreadsheet className="h-4 w-4 text-muted-foreground group-hover:text-brand" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium">{item.label}</div>
+                <div className="text-xs text-muted-foreground mt-0.5">{item.desc}</div>
+              </div>
+              <Download className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="mt-6 grid md:grid-cols-2 gap-4">
-        {reports.map((r) => (
-          <div key={r.key} className="rounded-xl border border-border/60 bg-card p-5 shadow-card flex flex-col">
-            <div className="flex items-start gap-3">
-              <div className={`grid h-10 w-10 place-items-center rounded-lg ${r.tint}`}>
-                <r.icon className="h-5 w-5" />
+      {/* Section 3 — Key metrics */}
+      <div>
+        <div className="font-semibold mb-4">Key metrics</div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {metrics.map((m) => (
+            <div key={m.label} className="rounded-xl border border-border/60 bg-card p-4 shadow-card">
+              <div className={`grid h-8 w-8 place-items-center rounded-lg mb-3 ${m.tint}`}>
+                <m.icon className="h-4 w-4" />
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-semibold">{r.title}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">{r.desc}</div>
-              </div>
+              <div className="text-xl font-semibold tabular-nums">{m.value}</div>
+              <div className="text-xs font-medium mt-0.5">{m.label}</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">{m.sub}</div>
             </div>
-            <div className="mt-4 flex items-center gap-2">
-              <button
-                onClick={() => {
-                  const rows = r.rows();
-                  downloadFile(`${r.key}.csv`, toCsv([r.cols, ...rows]), "text/csv");
-                }}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent"
-              >
-                <FileSpreadsheet className="h-3.5 w-3.5" /> {t("reports.csv")}
-              </button>
-              <button
-                onClick={() => downloadPdf(r.title, r.cols, r.rows())}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent"
-              >
-                <FileText className="h-3.5 w-3.5" /> {t("reports.pdf")}
-              </button>
-              <button
-                onClick={() => {
-                  const rows = r.rows();
-                  downloadFile(`${r.key}.json`, JSON.stringify({ generatedAt: new Date().toISOString(), columns: r.cols, rows }, null, 2), "application/json");
-                }}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent ms-auto"
-              >
-                <Download className="h-3.5 w-3.5" /> JSON
-              </button>
-            </div>
+          ))}
+        </div>
+        <div className="mt-3 grid sm:grid-cols-2 gap-3">
+          <div className="rounded-xl border border-border/60 bg-card p-4 shadow-card">
+            <div className="text-xs text-muted-foreground mb-1">Contacted rate</div>
+            <div className="text-xl font-semibold tabular-nums">{pct(contactedCount)}</div>
+            <div className="text-[11px] text-muted-foreground">{contactedCount} of {total} reached out</div>
           </div>
-        ))}
+          <div className="rounded-xl border border-border/60 bg-card p-4 shadow-card">
+            <div className="text-xs text-muted-foreground mb-1">Total meetings</div>
+            <div className="text-xl font-semibold tabular-nums">{meetings.length}</div>
+            <div className="text-[11px] text-muted-foreground">across all investors</div>
+          </div>
+        </div>
       </div>
     </div>
   );

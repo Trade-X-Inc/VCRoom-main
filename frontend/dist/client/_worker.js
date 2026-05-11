@@ -9511,7 +9511,7 @@ var require_use_sync_external_store_shim_development = __commonJS({
             "The result of getSnapshot should be cached to avoid an infinite loop"
           ), didWarnUncachedGetSnapshot = true);
         }
-        cachedValue = useState38({
+        cachedValue = useState39({
           inst: { value, getSnapshot }
         });
         var inst = cachedValue[0].inst, forceUpdate = cachedValue[1];
@@ -9549,7 +9549,7 @@ var require_use_sync_external_store_shim_development = __commonJS({
         return getSnapshot();
       }
       "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-      var React12 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState38 = React12.useState, useEffect19 = React12.useEffect, useLayoutEffect3 = React12.useLayoutEffect, useDebugValue = React12.useDebugValue, didWarnOld18Alpha = false, didWarnUncachedGetSnapshot = false, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+      var React12 = require_react(), objectIs = "function" === typeof Object.is ? Object.is : is, useState39 = React12.useState, useEffect19 = React12.useEffect, useLayoutEffect3 = React12.useLayoutEffect, useDebugValue = React12.useDebugValue, didWarnOld18Alpha = false, didWarnUncachedGetSnapshot = false, shim = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
       exports.useSyncExternalStore = void 0 !== React12.useSyncExternalStore ? React12.useSyncExternalStore : shim;
       "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
     })();
@@ -26770,16 +26770,16 @@ var init_server3 = __esm({
   }
 });
 
-// dist/server/assets/_tanstack-start-manifest_v-CzA3TX1f.js
-var tanstack_start_manifest_v_CzA3TX1f_exports = {};
-__export(tanstack_start_manifest_v_CzA3TX1f_exports, {
+// dist/server/assets/_tanstack-start-manifest_v-ox7iqhdR.js
+var tanstack_start_manifest_v_ox7iqhdR_exports = {};
+__export(tanstack_start_manifest_v_ox7iqhdR_exports, {
   tsrStartManifest: () => tsrStartManifest
 });
 var tsrStartManifest;
-var init_tanstack_start_manifest_v_CzA3TX1f = __esm({
-  "dist/server/assets/_tanstack-start-manifest_v-CzA3TX1f.js"() {
+var init_tanstack_start_manifest_v_ox7iqhdR = __esm({
+  "dist/server/assets/_tanstack-start-manifest_v-ox7iqhdR.js"() {
     "use strict";
-    tsrStartManifest = () => ({ routes: { __root__: { filePath: "/workspaces/VCRoom-main/frontend/src/routes/__root.tsx", children: ["/", "/about", "/app", "/debug", "/forgot-password", "/founders", "/investors", "/pricing", "/privacy", "/sign-in", "/sign-up", "/terms", "/auth/callback", "/join/$token", "/solutions/due-diligence", "/solutions/fundraising-crm", "/solutions/investor-pipeline", "/solutions/raise-1m", "/solutions/vc-deal-room"], assets: void 0, preloads: ["/assets/index-BxyC9b3D.js"] }, "/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/index.tsx", children: void 0, assets: void 0, preloads: ["/assets/index-ClOIXiEz.js", "/assets/SiteFooter-BUCFYBt_.js", "/assets/AppPreview-D61WD2z6.js", "/assets/arrow-right-Bi4fE4PK.js", "/assets/triangle-alert-CvjYeG98.js", "/assets/users-DC_eeIwc.js", "/assets/sparkles-AogeCxaI.js", "/assets/briefcase-CMKSwg4n.js", "/assets/shield-check-CMlAbBKx.js", "/assets/file-text-D5eyqd_S.js", "/assets/list-checks-B1zPr_2Y.js", "/assets/layers-6RCe1e9B.js", "/assets/circle-check-DqFUuJRo.js", "/assets/message-square-B4_eX7b1.js", "/assets/Logo-uuWlLO6x.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-r4QtsGCf.js", "/assets/createLucideIcon-cg0I5lIH.js", "/assets/globe-BEMox9-s.js", "/assets/layout-grid-Cl-UejEy.js", "/assets/search-C5T2SKkt.js", "/assets/bell-DVBE9wc4.js", "/assets/trending-up-rEY-8COn.js", "/assets/chevron-right-BoPx6sQy.js", "/assets/arrow-up-right-D4ay9Z0d.js"] }, "/about": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/about.tsx", children: void 0, assets: void 0, preloads: ["/assets/about-yQngZolu.js", "/assets/SiteFooter-BUCFYBt_.js", "/assets/arrow-right-Bi4fE4PK.js", "/assets/Logo-uuWlLO6x.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-r4QtsGCf.js", "/assets/createLucideIcon-cg0I5lIH.js", "/assets/globe-BEMox9-s.js"] }, "/app": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.tsx", children: ["/app/advisor", "/app/audit", "/app/deal-rooms", "/app/documents", "/app/email", "/app/investor", "/app/leads", "/app/meetings", "/app/messages", "/app/notifications", "/app/pipeline", "/app/profile", "/app/reports", "/app/settings", "/app/users", "/app/", "/app/deal-room/$id", "/app/deal-room/$id_/nda"], assets: void 0, preloads: ["/assets/app-H06-UFRh.js", "/assets/useRouterState-BsilejJT.js", "/assets/Logo-uuWlLO6x.js", "/assets/useQuery-BaKaEZMP.js", "/assets/utils-BQHNewu7.js", "/assets/bell-DVBE9wc4.js", "/assets/check-check-BTSAb_rN.js", "/assets/formatDistanceToNow-BCR7E-0-.js", "/assets/briefcase-CMKSwg4n.js", "/assets/message-square-B4_eX7b1.js", "/assets/user-plus-DUnC4No2.js", "/assets/sparkles-AogeCxaI.js", "/assets/settings-Cna874L1.js", "/assets/user-D-V-WVSW.js", "/assets/users-DC_eeIwc.js", "/assets/shield-check-CMlAbBKx.js", "/assets/store-DQRc3upq.js", "/assets/LangSwitcher-r4QtsGCf.js", "/assets/createLucideIcon-cg0I5lIH.js", "/assets/layout-grid-Cl-UejEy.js", "/assets/inbox-BXsRy4Ku.js", "/assets/kanban-BbibuSKH.js", "/assets/building-2-DEx1UaKW.js", "/assets/clipboard-check-2xO21ciP.js", "/assets/brain-C1HAInxN.js", "/assets/chart-pie-Kdvg1Mhg.js", "/assets/calendar-nym0ifUR.js", "/assets/file-text-D5eyqd_S.js", "/assets/chart-column-B-guhGGP.js", "/assets/search-C5T2SKkt.js", "/assets/plus-DsNN356z.js", "/assets/en-US-DJvzb04W.js", "/assets/globe-BEMox9-s.js"] }, "/debug": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/debug.tsx", children: void 0, assets: void 0, preloads: ["/assets/debug-BxwmRLpX.js"] }, "/forgot-password": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/forgot-password.tsx", children: void 0, assets: void 0, preloads: ["/assets/forgot-password-BQOzkW5Z.js"] }, "/founders": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/founders.tsx", children: void 0, assets: void 0, preloads: ["/assets/founders-Cm56M9Mb.js", "/assets/SolutionPage-DhfOS2a6.js", "/assets/users-DC_eeIwc.js", "/assets/SiteFooter-BUCFYBt_.js", "/assets/Logo-uuWlLO6x.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-r4QtsGCf.js", "/assets/createLucideIcon-cg0I5lIH.js", "/assets/globe-BEMox9-s.js", "/assets/arrow-right-Bi4fE4PK.js", "/assets/AppPreview-D61WD2z6.js", "/assets/layout-grid-Cl-UejEy.js", "/assets/file-text-D5eyqd_S.js", "/assets/message-square-B4_eX7b1.js", "/assets/sparkles-AogeCxaI.js", "/assets/search-C5T2SKkt.js", "/assets/bell-DVBE9wc4.js", "/assets/trending-up-rEY-8COn.js", "/assets/chevron-right-BoPx6sQy.js", "/assets/arrow-up-right-D4ay9Z0d.js", "/assets/check-Bc0VIgeM.js"] }, "/investors": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/investors.tsx", children: void 0, assets: void 0, preloads: ["/assets/investors-CFJYYzV1.js", "/assets/SolutionPage-DhfOS2a6.js", "/assets/briefcase-CMKSwg4n.js", "/assets/SiteFooter-BUCFYBt_.js", "/assets/Logo-uuWlLO6x.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-r4QtsGCf.js", "/assets/createLucideIcon-cg0I5lIH.js", "/assets/globe-BEMox9-s.js", "/assets/arrow-right-Bi4fE4PK.js", "/assets/AppPreview-D61WD2z6.js", "/assets/layout-grid-Cl-UejEy.js", "/assets/users-DC_eeIwc.js", "/assets/file-text-D5eyqd_S.js", "/assets/message-square-B4_eX7b1.js", "/assets/sparkles-AogeCxaI.js", "/assets/search-C5T2SKkt.js", "/assets/bell-DVBE9wc4.js", "/assets/trending-up-rEY-8COn.js", "/assets/chevron-right-BoPx6sQy.js", "/assets/arrow-up-right-D4ay9Z0d.js", "/assets/check-Bc0VIgeM.js"] }, "/pricing": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/pricing.tsx", children: void 0, assets: void 0, preloads: ["/assets/pricing-DIlaG2Q7.js", "/assets/SiteFooter-BUCFYBt_.js", "/assets/arrow-right-Bi4fE4PK.js", "/assets/check-Bc0VIgeM.js", "/assets/Logo-uuWlLO6x.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-r4QtsGCf.js", "/assets/createLucideIcon-cg0I5lIH.js", "/assets/globe-BEMox9-s.js"] }, "/privacy": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/privacy.tsx", children: void 0, assets: void 0, preloads: ["/assets/privacy-BskA4lNL.js", "/assets/SiteFooter-BUCFYBt_.js", "/assets/Logo-uuWlLO6x.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-r4QtsGCf.js", "/assets/createLucideIcon-cg0I5lIH.js", "/assets/globe-BEMox9-s.js", "/assets/arrow-right-Bi4fE4PK.js"] }, "/sign-in": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/sign-in.tsx", children: void 0, assets: void 0, preloads: ["/assets/sign-in-BBNve8RB.js"] }, "/sign-up": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/sign-up.tsx", children: void 0, assets: void 0, preloads: ["/assets/sign-up-DbWfF121.js"] }, "/terms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/terms.tsx", children: void 0, assets: void 0, preloads: ["/assets/terms-kYMJkbqJ.js", "/assets/SiteFooter-BUCFYBt_.js", "/assets/Logo-uuWlLO6x.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-r4QtsGCf.js", "/assets/createLucideIcon-cg0I5lIH.js", "/assets/globe-BEMox9-s.js", "/assets/arrow-right-Bi4fE4PK.js"] }, "/app/advisor": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.advisor.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.advisor-BtUpJ7Q1.js", "/assets/createServerFn-BdWO6N76.js", "/assets/loader-circle-Bubxi98A.js", "/assets/send-DWBldAqo.js"] }, "/app/audit": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.audit.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.audit-gxfBvyMl.js", "/assets/download-BiCw5Xgf.js", "/assets/activity-D4GZbilz.js", "/assets/triangle-alert-CvjYeG98.js"] }, "/app/deal-rooms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-rooms.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-rooms-CYdKmIvW.js", "/assets/arrow-up-right-D4ay9Z0d.js", "/assets/x-DKUDoIu4.js", "/assets/loader-circle-Bubxi98A.js"] }, "/app/documents": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.documents.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.documents-fwyU2Rdn.js", "/assets/list-BHzZfzqh.js", "/assets/upload-a-5kgGP7.js", "/assets/circle-check-DqFUuJRo.js", "/assets/triangle-alert-CvjYeG98.js", "/assets/download-BiCw5Xgf.js", "/assets/trash-2-lBpoUrCt.js", "/assets/loader-circle-Bubxi98A.js", "/assets/x-DKUDoIu4.js", "/assets/video-CFOVUUqS.js"] }, "/app/email": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.email.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.email-CpNJuQ4n.js", "/assets/backend-B5nrjGvD.js", "/assets/copy-C0aZ_6iL.js", "/assets/send-DWBldAqo.js"] }, "/app/investor": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.tsx", children: ["/app/investor/analysis", "/app/investor/deal-flow", "/app/investor/deal-rooms", "/app/investor/decisions", "/app/investor/diligence", "/app/investor/pipeline", "/app/investor/portfolio", "/app/investor/startups", "/app/investor/team", "/app/investor/"], assets: void 0, preloads: ["/assets/app.investor-BjIok_wO.js"] }, "/app/leads": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.leads.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.leads-DOpfkD0E.js", "/assets/createServerFn-BdWO6N76.js", "/assets/x-DKUDoIu4.js", "/assets/loader-circle-Bubxi98A.js", "/assets/copy-C0aZ_6iL.js", "/assets/check-Bc0VIgeM.js", "/assets/clock-2VDdmfSV.js", "/assets/trash-2-lBpoUrCt.js", "/assets/chevron-down-C8-ftosQ.js", "/assets/chevron-right-BoPx6sQy.js", "/assets/download-BiCw5Xgf.js", "/assets/upload-a-5kgGP7.js", "/assets/trending-up-rEY-8COn.js", "/assets/flame-IrH-IGJa.js", "/assets/circle-alert-BSRSj-rO.js"] }, "/app/meetings": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.meetings.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.meetings-CcXptGlj.js", "/assets/format-CjS2oCz0.js", "/assets/loader-circle-Bubxi98A.js", "/assets/chevron-down-C8-ftosQ.js", "/assets/chevron-right-BoPx6sQy.js", "/assets/clock-2VDdmfSV.js", "/assets/video-CFOVUUqS.js", "/assets/external-link-DSquLeyR.js"] }, "/app/messages": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.messages.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.messages-Dr2VtBCP.js"] }, "/app/notifications": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.notifications.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.notifications-DgE6MN10.js"] }, "/app/pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.pipeline-Dvzg-EHY.js", "/assets/loader-circle-Bubxi98A.js", "/assets/funnel-Lytmb17l.js", "/assets/flame-IrH-IGJa.js", "/assets/clock-2VDdmfSV.js", "/assets/arrow-up-right-D4ay9Z0d.js"] }, "/app/profile": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.profile.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.profile-CBssITfj.js", "/assets/loader-circle-Bubxi98A.js", "/assets/upload-a-5kgGP7.js", "/assets/check-Bc0VIgeM.js", "/assets/x-DKUDoIu4.js", "/assets/trash-2-lBpoUrCt.js"] }, "/app/reports": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.reports.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.reports-DYA9UeC3.js", "/assets/trending-up-rEY-8COn.js", "/assets/download-BiCw5Xgf.js"] }, "/app/settings": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.tsx", children: ["/app/settings/billing", "/app/settings/domain", "/app/settings/notifications", "/app/settings/security"], assets: void 0, preloads: ["/assets/app.settings-DwTlDzoT.js", "/assets/credit-card-B4au-ngZ.js", "/assets/shield-BxHAomqX.js", "/assets/trash-2-lBpoUrCt.js"] }, "/app/users": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.users.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.users-DrFlXW9f.js", "/assets/mail-msEnyJG6.js", "/assets/copy-C0aZ_6iL.js", "/assets/x-DKUDoIu4.js", "/assets/check-Bc0VIgeM.js", "/assets/loader-circle-Bubxi98A.js"] }, "/auth/callback": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/auth.callback.tsx", children: void 0, assets: void 0, preloads: ["/assets/auth.callback-Bf6vOZ09.js"] }, "/join/$token": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/join.$token.tsx", children: void 0, assets: void 0, preloads: ["/assets/join._token-BDfhzc98.js", "/assets/Logo-uuWlLO6x.js", "/assets/triangle-alert-CvjYeG98.js", "/assets/check-Bc0VIgeM.js", "/assets/arrow-right-Bi4fE4PK.js", "/assets/shield-check-CMlAbBKx.js", "/assets/lock-DMcGA7dA.js", "/assets/createLucideIcon-cg0I5lIH.js"] }, "/solutions/due-diligence": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.due-diligence.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.due-diligence-B-GfbUoH.js", "/assets/SolutionPage-DhfOS2a6.js", "/assets/list-checks-B1zPr_2Y.js", "/assets/SiteFooter-BUCFYBt_.js", "/assets/Logo-uuWlLO6x.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-r4QtsGCf.js", "/assets/createLucideIcon-cg0I5lIH.js", "/assets/globe-BEMox9-s.js", "/assets/arrow-right-Bi4fE4PK.js", "/assets/AppPreview-D61WD2z6.js", "/assets/layout-grid-Cl-UejEy.js", "/assets/users-DC_eeIwc.js", "/assets/file-text-D5eyqd_S.js", "/assets/message-square-B4_eX7b1.js", "/assets/sparkles-AogeCxaI.js", "/assets/search-C5T2SKkt.js", "/assets/bell-DVBE9wc4.js", "/assets/trending-up-rEY-8COn.js", "/assets/chevron-right-BoPx6sQy.js", "/assets/arrow-up-right-D4ay9Z0d.js", "/assets/check-Bc0VIgeM.js"] }, "/solutions/fundraising-crm": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.fundraising-crm.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.fundraising-crm-9Kqcop1s.js", "/assets/SolutionPage-DhfOS2a6.js", "/assets/layers-6RCe1e9B.js", "/assets/SiteFooter-BUCFYBt_.js", "/assets/Logo-uuWlLO6x.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-r4QtsGCf.js", "/assets/createLucideIcon-cg0I5lIH.js", "/assets/globe-BEMox9-s.js", "/assets/arrow-right-Bi4fE4PK.js", "/assets/AppPreview-D61WD2z6.js", "/assets/layout-grid-Cl-UejEy.js", "/assets/users-DC_eeIwc.js", "/assets/file-text-D5eyqd_S.js", "/assets/message-square-B4_eX7b1.js", "/assets/sparkles-AogeCxaI.js", "/assets/search-C5T2SKkt.js", "/assets/bell-DVBE9wc4.js", "/assets/trending-up-rEY-8COn.js", "/assets/chevron-right-BoPx6sQy.js", "/assets/arrow-up-right-D4ay9Z0d.js", "/assets/check-Bc0VIgeM.js"] }, "/solutions/investor-pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.investor-pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.investor-pipeline-Bfpky7oy.js", "/assets/SolutionPage-DhfOS2a6.js", "/assets/trending-up-rEY-8COn.js", "/assets/SiteFooter-BUCFYBt_.js", "/assets/Logo-uuWlLO6x.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-r4QtsGCf.js", "/assets/createLucideIcon-cg0I5lIH.js", "/assets/globe-BEMox9-s.js", "/assets/arrow-right-Bi4fE4PK.js", "/assets/AppPreview-D61WD2z6.js", "/assets/layout-grid-Cl-UejEy.js", "/assets/users-DC_eeIwc.js", "/assets/file-text-D5eyqd_S.js", "/assets/message-square-B4_eX7b1.js", "/assets/sparkles-AogeCxaI.js", "/assets/search-C5T2SKkt.js", "/assets/bell-DVBE9wc4.js", "/assets/chevron-right-BoPx6sQy.js", "/assets/arrow-up-right-D4ay9Z0d.js", "/assets/check-Bc0VIgeM.js"] }, "/solutions/raise-1m": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.raise-1m.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.raise-1m-Ct_QAZiS.js", "/assets/SolutionPage-DhfOS2a6.js", "/assets/sparkles-AogeCxaI.js", "/assets/SiteFooter-BUCFYBt_.js", "/assets/Logo-uuWlLO6x.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-r4QtsGCf.js", "/assets/createLucideIcon-cg0I5lIH.js", "/assets/globe-BEMox9-s.js", "/assets/arrow-right-Bi4fE4PK.js", "/assets/AppPreview-D61WD2z6.js", "/assets/layout-grid-Cl-UejEy.js", "/assets/users-DC_eeIwc.js", "/assets/file-text-D5eyqd_S.js", "/assets/message-square-B4_eX7b1.js", "/assets/search-C5T2SKkt.js", "/assets/bell-DVBE9wc4.js", "/assets/trending-up-rEY-8COn.js", "/assets/chevron-right-BoPx6sQy.js", "/assets/arrow-up-right-D4ay9Z0d.js", "/assets/check-Bc0VIgeM.js"] }, "/solutions/vc-deal-room": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.vc-deal-room.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.vc-deal-room-DAfo9U14.js", "/assets/SolutionPage-DhfOS2a6.js", "/assets/briefcase-CMKSwg4n.js", "/assets/SiteFooter-BUCFYBt_.js", "/assets/Logo-uuWlLO6x.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-r4QtsGCf.js", "/assets/createLucideIcon-cg0I5lIH.js", "/assets/globe-BEMox9-s.js", "/assets/arrow-right-Bi4fE4PK.js", "/assets/AppPreview-D61WD2z6.js", "/assets/layout-grid-Cl-UejEy.js", "/assets/users-DC_eeIwc.js", "/assets/file-text-D5eyqd_S.js", "/assets/message-square-B4_eX7b1.js", "/assets/sparkles-AogeCxaI.js", "/assets/search-C5T2SKkt.js", "/assets/bell-DVBE9wc4.js", "/assets/trending-up-rEY-8COn.js", "/assets/chevron-right-BoPx6sQy.js", "/assets/arrow-up-right-D4ay9Z0d.js", "/assets/check-Bc0VIgeM.js"] }, "/app/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.index.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.index-CdjPToWD.js", "/assets/loader-circle-Bubxi98A.js", "/assets/circle-question-mark-DHtWe_-w.js", "/assets/mail-msEnyJG6.js", "/assets/arrow-up-right-D4ay9Z0d.js", "/assets/format-CjS2oCz0.js", "/assets/circle-check-DqFUuJRo.js", "/assets/circle-alert-BSRSj-rO.js", "/assets/external-link-DSquLeyR.js", "/assets/clock-2VDdmfSV.js", "/assets/x-DKUDoIu4.js", "/assets/trending-up-rEY-8COn.js"] }, "/app/deal-room/$id": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-room.$id.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-room._id-BwpTHbIY.js", "/assets/backend-B5nrjGvD.js", "/assets/loader-circle-Bubxi98A.js", "/assets/send-DWBldAqo.js", "/assets/funnel-Lytmb17l.js", "/assets/triangle-alert-CvjYeG98.js", "/assets/circle-Ci1UPTVo.js", "/assets/clock-2VDdmfSV.js", "/assets/circle-check-DqFUuJRo.js", "/assets/upload-a-5kgGP7.js", "/assets/x-DKUDoIu4.js", "/assets/chevron-down-C8-ftosQ.js", "/assets/chevron-right-BoPx6sQy.js", "/assets/download-BiCw5Xgf.js", "/assets/arrow-right-Bi4fE4PK.js", "/assets/list-checks-B1zPr_2Y.js", "/assets/activity-D4GZbilz.js", "/assets/lock-DMcGA7dA.js", "/assets/circle-question-mark-DHtWe_-w.js", "/assets/external-link-DSquLeyR.js", "/assets/shield-BxHAomqX.js", "/assets/format-CjS2oCz0.js"] }, "/app/investor/analysis": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.analysis.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.analysis-D1rlVXwh.js", "/assets/deal-brief-fn-qisIqk1K.js", "/assets/loader-circle-Bubxi98A.js", "/assets/circle-check-DqFUuJRo.js", "/assets/triangle-alert-CvjYeG98.js", "/assets/download-BiCw5Xgf.js", "/assets/createServerFn-BdWO6N76.js"] }, "/app/investor/deal-flow": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.deal-flow.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.deal-flow-DCeBw1el.js", "/assets/clock-2VDdmfSV.js"] }, "/app/investor/deal-rooms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.deal-rooms.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.deal-rooms-CFPMgvM8.js", "/assets/shield-BxHAomqX.js", "/assets/clock-2VDdmfSV.js"] }, "/app/investor/decisions": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.decisions.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.decisions-qd_TQYZC.js", "/assets/check-Bc0VIgeM.js", "/assets/x-DKUDoIu4.js", "/assets/clock-2VDdmfSV.js"] }, "/app/investor/diligence": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.diligence.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.diligence-DIE7yAK0.js", "/assets/circle-check-DqFUuJRo.js", "/assets/circle-Ci1UPTVo.js"] }, "/app/investor/pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.pipeline-VdfJHlWN.js", "/assets/list-BHzZfzqh.js", "/assets/clock-2VDdmfSV.js"] }, "/app/investor/portfolio": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.portfolio.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.portfolio-CIZsse3Q.js", "/assets/trending-up-rEY-8COn.js", "/assets/clock-2VDdmfSV.js"] }, "/app/investor/startups": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.startups.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.startups-CNJLg1-C.js", "/assets/external-link-DSquLeyR.js", "/assets/clock-2VDdmfSV.js"] }, "/app/investor/team": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.team.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.team-C_MvIpog.js", "/assets/x-DKUDoIu4.js", "/assets/mail-msEnyJG6.js", "/assets/loader-circle-Bubxi98A.js", "/assets/clock-2VDdmfSV.js"] }, "/app/settings/billing": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.billing.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.billing-CLCFreLb.js", "/assets/check-Bc0VIgeM.js", "/assets/download-BiCw5Xgf.js"] }, "/app/settings/domain": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.domain.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.domain-g-sOxm8q.js", "/assets/circle-check-DqFUuJRo.js", "/assets/copy-C0aZ_6iL.js", "/assets/mail-msEnyJG6.js"] }, "/app/settings/notifications": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.notifications.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.notifications-BgbsTwPT.js", "/assets/mail-msEnyJG6.js", "/assets/smartphone-CmqESzsM.js"] }, "/app/settings/security": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.security.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.security-CQhbEO41.js", "/assets/smartphone-CmqESzsM.js", "/assets/triangle-alert-CvjYeG98.js"] }, "/app/investor/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.index.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.index-DYgprOzL.js", "/assets/circle-check-DqFUuJRo.js", "/assets/clock-2VDdmfSV.js", "/assets/circle-alert-BSRSj-rO.js", "/assets/arrow-right-Bi4fE4PK.js", "/assets/x-DKUDoIu4.js", "/assets/triangle-alert-CvjYeG98.js", "/assets/shield-BxHAomqX.js", "/assets/deal-brief-fn-qisIqk1K.js", "/assets/createServerFn-BdWO6N76.js"] }, "/app/deal-room/$id_/nda": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-room.$id_.nda.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-room._id_.nda-8TU_QFpq.js", "/assets/shield-BxHAomqX.js", "/assets/loader-circle-Bubxi98A.js", "/assets/lock-DMcGA7dA.js"] } }, clientEntry: "/assets/index-BxyC9b3D.js" });
+    tsrStartManifest = () => ({ routes: { __root__: { filePath: "/workspaces/VCRoom-main/frontend/src/routes/__root.tsx", children: ["/", "/about", "/app", "/debug", "/forgot-password", "/founders", "/investors", "/pricing", "/privacy", "/sign-in", "/sign-up", "/terms", "/auth/callback", "/join/$token", "/solutions/due-diligence", "/solutions/fundraising-crm", "/solutions/investor-pipeline", "/solutions/raise-1m", "/solutions/vc-deal-room"], assets: void 0, preloads: ["/assets/index-DyKq9ESA.js"] }, "/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/index.tsx", children: void 0, assets: void 0, preloads: ["/assets/index-CcIyrw3D.js", "/assets/SiteFooter-Bz4gXQ6o.js", "/assets/AppPreview-DpxO0AvD.js", "/assets/arrow-right-Dep1GZ8N.js", "/assets/triangle-alert-BT7a9JIS.js", "/assets/users-C-5Nr4uM.js", "/assets/sparkles-Cmk9oscE.js", "/assets/briefcase-CxQweGiL.js", "/assets/shield-check-Bh47Suw9.js", "/assets/file-text-Cx0Y3Di9.js", "/assets/list-checks-Dbcij4rC.js", "/assets/layers-OmDGIgUQ.js", "/assets/circle-check-cMrJVmBh.js", "/assets/message-square-CwVACVbN.js", "/assets/Logo-DeQp3mSG.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BAMs-I9q.js", "/assets/createLucideIcon-jZ-ZS1oW.js", "/assets/globe-DO0lw5lK.js", "/assets/layout-grid-CrR75X-x.js", "/assets/search-Be6SUHex.js", "/assets/bell-BziVP4QK.js", "/assets/trending-up-BQ4X13AZ.js", "/assets/chevron-right--JQmDpHl.js", "/assets/arrow-up-right-ORIztMqH.js"] }, "/about": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/about.tsx", children: void 0, assets: void 0, preloads: ["/assets/about-CYjbMEFc.js", "/assets/SiteFooter-Bz4gXQ6o.js", "/assets/arrow-right-Dep1GZ8N.js", "/assets/Logo-DeQp3mSG.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BAMs-I9q.js", "/assets/createLucideIcon-jZ-ZS1oW.js", "/assets/globe-DO0lw5lK.js"] }, "/app": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.tsx", children: ["/app/advisor", "/app/audit", "/app/deal-rooms", "/app/documents", "/app/email", "/app/investor", "/app/leads", "/app/meetings", "/app/messages", "/app/notifications", "/app/pipeline", "/app/profile", "/app/reports", "/app/settings", "/app/users", "/app/", "/app/deal-room/$id", "/app/deal-room/$id_/nda"], assets: void 0, preloads: ["/assets/app-Bc1PjWfb.js", "/assets/useRouterState-DxuFmz66.js", "/assets/Logo-DeQp3mSG.js", "/assets/useQuery-D2CWEXEe.js", "/assets/utils-BQHNewu7.js", "/assets/bell-BziVP4QK.js", "/assets/check-check-BrYpCdSi.js", "/assets/formatDistanceToNow-BCR7E-0-.js", "/assets/briefcase-CxQweGiL.js", "/assets/message-square-CwVACVbN.js", "/assets/user-plus-SfCSlazZ.js", "/assets/sparkles-Cmk9oscE.js", "/assets/settings-Bv1z4zGZ.js", "/assets/user-wVeejm41.js", "/assets/users-C-5Nr4uM.js", "/assets/shield-check-Bh47Suw9.js", "/assets/store-DOf_o8cf.js", "/assets/LangSwitcher-BAMs-I9q.js", "/assets/createLucideIcon-jZ-ZS1oW.js", "/assets/layout-grid-CrR75X-x.js", "/assets/inbox-Sjmp0ffh.js", "/assets/kanban-CAskm9EK.js", "/assets/building-2-uXvxKGkk.js", "/assets/clipboard-check-DXh-kGFT.js", "/assets/brain-D9oH6Z8q.js", "/assets/chart-pie-BmELoH2L.js", "/assets/calendar-Vc4CUYrq.js", "/assets/file-text-Cx0Y3Di9.js", "/assets/chart-column-CKtzR9mc.js", "/assets/search-Be6SUHex.js", "/assets/plus-Ch0uRTdQ.js", "/assets/en-US-DJvzb04W.js", "/assets/globe-DO0lw5lK.js"] }, "/debug": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/debug.tsx", children: void 0, assets: void 0, preloads: ["/assets/debug-Q8zyy9SZ.js"] }, "/forgot-password": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/forgot-password.tsx", children: void 0, assets: void 0, preloads: ["/assets/forgot-password-BAQIJxiU.js"] }, "/founders": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/founders.tsx", children: void 0, assets: void 0, preloads: ["/assets/founders-B8XBYPIX.js", "/assets/SolutionPage-BHx4XDPk.js", "/assets/users-C-5Nr4uM.js", "/assets/SiteFooter-Bz4gXQ6o.js", "/assets/Logo-DeQp3mSG.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BAMs-I9q.js", "/assets/createLucideIcon-jZ-ZS1oW.js", "/assets/globe-DO0lw5lK.js", "/assets/arrow-right-Dep1GZ8N.js", "/assets/AppPreview-DpxO0AvD.js", "/assets/layout-grid-CrR75X-x.js", "/assets/file-text-Cx0Y3Di9.js", "/assets/message-square-CwVACVbN.js", "/assets/sparkles-Cmk9oscE.js", "/assets/search-Be6SUHex.js", "/assets/bell-BziVP4QK.js", "/assets/trending-up-BQ4X13AZ.js", "/assets/chevron-right--JQmDpHl.js", "/assets/arrow-up-right-ORIztMqH.js", "/assets/check-TmW0Bdnt.js"] }, "/investors": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/investors.tsx", children: void 0, assets: void 0, preloads: ["/assets/investors-C5_j1EI6.js", "/assets/SolutionPage-BHx4XDPk.js", "/assets/briefcase-CxQweGiL.js", "/assets/SiteFooter-Bz4gXQ6o.js", "/assets/Logo-DeQp3mSG.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BAMs-I9q.js", "/assets/createLucideIcon-jZ-ZS1oW.js", "/assets/globe-DO0lw5lK.js", "/assets/arrow-right-Dep1GZ8N.js", "/assets/AppPreview-DpxO0AvD.js", "/assets/layout-grid-CrR75X-x.js", "/assets/users-C-5Nr4uM.js", "/assets/file-text-Cx0Y3Di9.js", "/assets/message-square-CwVACVbN.js", "/assets/sparkles-Cmk9oscE.js", "/assets/search-Be6SUHex.js", "/assets/bell-BziVP4QK.js", "/assets/trending-up-BQ4X13AZ.js", "/assets/chevron-right--JQmDpHl.js", "/assets/arrow-up-right-ORIztMqH.js", "/assets/check-TmW0Bdnt.js"] }, "/pricing": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/pricing.tsx", children: void 0, assets: void 0, preloads: ["/assets/pricing-DOTzqEVb.js", "/assets/SiteFooter-Bz4gXQ6o.js", "/assets/arrow-right-Dep1GZ8N.js", "/assets/check-TmW0Bdnt.js", "/assets/Logo-DeQp3mSG.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BAMs-I9q.js", "/assets/createLucideIcon-jZ-ZS1oW.js", "/assets/globe-DO0lw5lK.js"] }, "/privacy": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/privacy.tsx", children: void 0, assets: void 0, preloads: ["/assets/privacy-DQDmMoQj.js", "/assets/SiteFooter-Bz4gXQ6o.js", "/assets/Logo-DeQp3mSG.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BAMs-I9q.js", "/assets/createLucideIcon-jZ-ZS1oW.js", "/assets/globe-DO0lw5lK.js", "/assets/arrow-right-Dep1GZ8N.js"] }, "/sign-in": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/sign-in.tsx", children: void 0, assets: void 0, preloads: ["/assets/sign-in-DXgFv2yf.js"] }, "/sign-up": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/sign-up.tsx", children: void 0, assets: void 0, preloads: ["/assets/sign-up-DZDrIUr-.js"] }, "/terms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/terms.tsx", children: void 0, assets: void 0, preloads: ["/assets/terms-CTg2yTYg.js", "/assets/SiteFooter-Bz4gXQ6o.js", "/assets/Logo-DeQp3mSG.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BAMs-I9q.js", "/assets/createLucideIcon-jZ-ZS1oW.js", "/assets/globe-DO0lw5lK.js", "/assets/arrow-right-Dep1GZ8N.js"] }, "/app/advisor": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.advisor.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.advisor-CoABks1W.js", "/assets/createServerFn-DF8KXUyY.js", "/assets/loader-circle-D3ulDZnA.js", "/assets/send-S8S5dzYo.js"] }, "/app/audit": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.audit.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.audit-Bj_VpLWc.js", "/assets/download-CUA61y9j.js", "/assets/activity-DKjdxnWO.js", "/assets/triangle-alert-BT7a9JIS.js"] }, "/app/deal-rooms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-rooms.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-rooms-BEB7rqTV.js", "/assets/loader-circle-D3ulDZnA.js", "/assets/arrow-up-right-ORIztMqH.js", "/assets/x-Bp8i_Dhu.js"] }, "/app/documents": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.documents.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.documents-Syf5VrKw.js", "/assets/list-DxIGF7oD.js", "/assets/upload-CZsWxfXp.js", "/assets/circle-check-cMrJVmBh.js", "/assets/triangle-alert-BT7a9JIS.js", "/assets/download-CUA61y9j.js", "/assets/trash-2-dAzkgFfl.js", "/assets/loader-circle-D3ulDZnA.js", "/assets/x-Bp8i_Dhu.js", "/assets/video-AtjEVHqU.js"] }, "/app/email": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.email.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.email-Cqp13fym.js", "/assets/backend-B5nrjGvD.js", "/assets/copy-DvQecoGO.js", "/assets/send-S8S5dzYo.js"] }, "/app/investor": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.tsx", children: ["/app/investor/analysis", "/app/investor/deal-flow", "/app/investor/deal-rooms", "/app/investor/decisions", "/app/investor/diligence", "/app/investor/pipeline", "/app/investor/portfolio", "/app/investor/startups", "/app/investor/team", "/app/investor/"], assets: void 0, preloads: ["/assets/app.investor-C5Jb0rvY.js"] }, "/app/leads": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.leads.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.leads-BlXlunv1.js", "/assets/LeadDrawer-HXYeb6i-.js", "/assets/download-CUA61y9j.js", "/assets/upload-CZsWxfXp.js", "/assets/trending-up-BQ4X13AZ.js", "/assets/x-Bp8i_Dhu.js", "/assets/loader-circle-D3ulDZnA.js", "/assets/circle-alert-BfTlUEIg.js", "/assets/createServerFn-DF8KXUyY.js", "/assets/copy-DvQecoGO.js", "/assets/check-TmW0Bdnt.js", "/assets/clock-ClVoZQmf.js", "/assets/trash-2-dAzkgFfl.js", "/assets/chevron-down-DlCQPf1P.js", "/assets/chevron-right--JQmDpHl.js"] }, "/app/meetings": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.meetings.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.meetings-BSsX8hZl.js", "/assets/format-CjS2oCz0.js", "/assets/loader-circle-D3ulDZnA.js", "/assets/chevron-down-DlCQPf1P.js", "/assets/chevron-right--JQmDpHl.js", "/assets/clock-ClVoZQmf.js", "/assets/video-AtjEVHqU.js", "/assets/external-link-BOU2R0qE.js"] }, "/app/messages": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.messages.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.messages-B7TEyG4K.js"] }, "/app/notifications": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.notifications.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.notifications-Dk3r1UPV.js"] }, "/app/pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.pipeline-CD0aMzZG.js", "/assets/LeadDrawer-HXYeb6i-.js", "/assets/loader-circle-D3ulDZnA.js", "/assets/funnel-CgRnrMbA.js", "/assets/arrow-up-right-ORIztMqH.js", "/assets/createServerFn-DF8KXUyY.js", "/assets/x-Bp8i_Dhu.js", "/assets/copy-DvQecoGO.js", "/assets/check-TmW0Bdnt.js", "/assets/clock-ClVoZQmf.js", "/assets/trash-2-dAzkgFfl.js", "/assets/chevron-down-DlCQPf1P.js", "/assets/chevron-right--JQmDpHl.js"] }, "/app/profile": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.profile.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.profile-BkaoWcYI.js", "/assets/loader-circle-D3ulDZnA.js", "/assets/upload-CZsWxfXp.js", "/assets/check-TmW0Bdnt.js", "/assets/x-Bp8i_Dhu.js", "/assets/trash-2-dAzkgFfl.js"] }, "/app/reports": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.reports.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.reports-C3YgdUmj.js", "/assets/loader-circle-D3ulDZnA.js", "/assets/trending-up-BQ4X13AZ.js", "/assets/download-CUA61y9j.js"] }, "/app/settings": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.tsx", children: ["/app/settings/billing", "/app/settings/domain", "/app/settings/notifications", "/app/settings/security"], assets: void 0, preloads: ["/assets/app.settings-Rg49vDAo.js", "/assets/credit-card-DdJiwLtS.js", "/assets/shield-DUziEs7y.js", "/assets/trash-2-dAzkgFfl.js"] }, "/app/users": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.users.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.users-1cN72BLi.js", "/assets/mail-CUnAGN2x.js", "/assets/copy-DvQecoGO.js", "/assets/x-Bp8i_Dhu.js", "/assets/check-TmW0Bdnt.js", "/assets/loader-circle-D3ulDZnA.js"] }, "/auth/callback": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/auth.callback.tsx", children: void 0, assets: void 0, preloads: ["/assets/auth.callback-Be1iR6Yr.js"] }, "/join/$token": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/join.$token.tsx", children: void 0, assets: void 0, preloads: ["/assets/join._token-BoDGG2xe.js", "/assets/Logo-DeQp3mSG.js", "/assets/triangle-alert-BT7a9JIS.js", "/assets/check-TmW0Bdnt.js", "/assets/arrow-right-Dep1GZ8N.js", "/assets/shield-check-Bh47Suw9.js", "/assets/lock-Ba4Ck4W-.js", "/assets/createLucideIcon-jZ-ZS1oW.js"] }, "/solutions/due-diligence": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.due-diligence.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.due-diligence-2Xeznz_7.js", "/assets/SolutionPage-BHx4XDPk.js", "/assets/list-checks-Dbcij4rC.js", "/assets/SiteFooter-Bz4gXQ6o.js", "/assets/Logo-DeQp3mSG.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BAMs-I9q.js", "/assets/createLucideIcon-jZ-ZS1oW.js", "/assets/globe-DO0lw5lK.js", "/assets/arrow-right-Dep1GZ8N.js", "/assets/AppPreview-DpxO0AvD.js", "/assets/layout-grid-CrR75X-x.js", "/assets/users-C-5Nr4uM.js", "/assets/file-text-Cx0Y3Di9.js", "/assets/message-square-CwVACVbN.js", "/assets/sparkles-Cmk9oscE.js", "/assets/search-Be6SUHex.js", "/assets/bell-BziVP4QK.js", "/assets/trending-up-BQ4X13AZ.js", "/assets/chevron-right--JQmDpHl.js", "/assets/arrow-up-right-ORIztMqH.js", "/assets/check-TmW0Bdnt.js"] }, "/solutions/fundraising-crm": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.fundraising-crm.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.fundraising-crm-CIl09eoS.js", "/assets/SolutionPage-BHx4XDPk.js", "/assets/layers-OmDGIgUQ.js", "/assets/SiteFooter-Bz4gXQ6o.js", "/assets/Logo-DeQp3mSG.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BAMs-I9q.js", "/assets/createLucideIcon-jZ-ZS1oW.js", "/assets/globe-DO0lw5lK.js", "/assets/arrow-right-Dep1GZ8N.js", "/assets/AppPreview-DpxO0AvD.js", "/assets/layout-grid-CrR75X-x.js", "/assets/users-C-5Nr4uM.js", "/assets/file-text-Cx0Y3Di9.js", "/assets/message-square-CwVACVbN.js", "/assets/sparkles-Cmk9oscE.js", "/assets/search-Be6SUHex.js", "/assets/bell-BziVP4QK.js", "/assets/trending-up-BQ4X13AZ.js", "/assets/chevron-right--JQmDpHl.js", "/assets/arrow-up-right-ORIztMqH.js", "/assets/check-TmW0Bdnt.js"] }, "/solutions/investor-pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.investor-pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.investor-pipeline-QiPNx2gr.js", "/assets/SolutionPage-BHx4XDPk.js", "/assets/trending-up-BQ4X13AZ.js", "/assets/SiteFooter-Bz4gXQ6o.js", "/assets/Logo-DeQp3mSG.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BAMs-I9q.js", "/assets/createLucideIcon-jZ-ZS1oW.js", "/assets/globe-DO0lw5lK.js", "/assets/arrow-right-Dep1GZ8N.js", "/assets/AppPreview-DpxO0AvD.js", "/assets/layout-grid-CrR75X-x.js", "/assets/users-C-5Nr4uM.js", "/assets/file-text-Cx0Y3Di9.js", "/assets/message-square-CwVACVbN.js", "/assets/sparkles-Cmk9oscE.js", "/assets/search-Be6SUHex.js", "/assets/bell-BziVP4QK.js", "/assets/chevron-right--JQmDpHl.js", "/assets/arrow-up-right-ORIztMqH.js", "/assets/check-TmW0Bdnt.js"] }, "/solutions/raise-1m": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.raise-1m.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.raise-1m-CMixwllB.js", "/assets/SolutionPage-BHx4XDPk.js", "/assets/sparkles-Cmk9oscE.js", "/assets/SiteFooter-Bz4gXQ6o.js", "/assets/Logo-DeQp3mSG.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BAMs-I9q.js", "/assets/createLucideIcon-jZ-ZS1oW.js", "/assets/globe-DO0lw5lK.js", "/assets/arrow-right-Dep1GZ8N.js", "/assets/AppPreview-DpxO0AvD.js", "/assets/layout-grid-CrR75X-x.js", "/assets/users-C-5Nr4uM.js", "/assets/file-text-Cx0Y3Di9.js", "/assets/message-square-CwVACVbN.js", "/assets/search-Be6SUHex.js", "/assets/bell-BziVP4QK.js", "/assets/trending-up-BQ4X13AZ.js", "/assets/chevron-right--JQmDpHl.js", "/assets/arrow-up-right-ORIztMqH.js", "/assets/check-TmW0Bdnt.js"] }, "/solutions/vc-deal-room": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.vc-deal-room.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.vc-deal-room-DOS_qA3u.js", "/assets/SolutionPage-BHx4XDPk.js", "/assets/briefcase-CxQweGiL.js", "/assets/SiteFooter-Bz4gXQ6o.js", "/assets/Logo-DeQp3mSG.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BAMs-I9q.js", "/assets/createLucideIcon-jZ-ZS1oW.js", "/assets/globe-DO0lw5lK.js", "/assets/arrow-right-Dep1GZ8N.js", "/assets/AppPreview-DpxO0AvD.js", "/assets/layout-grid-CrR75X-x.js", "/assets/users-C-5Nr4uM.js", "/assets/file-text-Cx0Y3Di9.js", "/assets/message-square-CwVACVbN.js", "/assets/sparkles-Cmk9oscE.js", "/assets/search-Be6SUHex.js", "/assets/bell-BziVP4QK.js", "/assets/trending-up-BQ4X13AZ.js", "/assets/chevron-right--JQmDpHl.js", "/assets/arrow-up-right-ORIztMqH.js", "/assets/check-TmW0Bdnt.js"] }, "/app/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.index.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.index-DuQJpmxM.js", "/assets/loader-circle-D3ulDZnA.js", "/assets/circle-question-mark-BmAS8Sa-.js", "/assets/mail-CUnAGN2x.js", "/assets/arrow-up-right-ORIztMqH.js", "/assets/format-CjS2oCz0.js", "/assets/circle-check-cMrJVmBh.js", "/assets/circle-alert-BfTlUEIg.js", "/assets/external-link-BOU2R0qE.js", "/assets/clock-ClVoZQmf.js", "/assets/x-Bp8i_Dhu.js", "/assets/trending-up-BQ4X13AZ.js"] }, "/app/deal-room/$id": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-room.$id.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-room._id-C9XjJLMg.js", "/assets/backend-B5nrjGvD.js", "/assets/loader-circle-D3ulDZnA.js", "/assets/send-S8S5dzYo.js", "/assets/funnel-CgRnrMbA.js", "/assets/triangle-alert-BT7a9JIS.js", "/assets/circle-DQGLXRJp.js", "/assets/clock-ClVoZQmf.js", "/assets/circle-check-cMrJVmBh.js", "/assets/upload-CZsWxfXp.js", "/assets/x-Bp8i_Dhu.js", "/assets/chevron-down-DlCQPf1P.js", "/assets/chevron-right--JQmDpHl.js", "/assets/download-CUA61y9j.js", "/assets/arrow-right-Dep1GZ8N.js", "/assets/list-checks-Dbcij4rC.js", "/assets/activity-DKjdxnWO.js", "/assets/lock-Ba4Ck4W-.js", "/assets/circle-question-mark-BmAS8Sa-.js", "/assets/external-link-BOU2R0qE.js", "/assets/shield-DUziEs7y.js", "/assets/format-CjS2oCz0.js"] }, "/app/investor/analysis": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.analysis.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.analysis-C-YhZWox.js", "/assets/deal-brief-fn-Bexexg1j.js", "/assets/loader-circle-D3ulDZnA.js", "/assets/circle-check-cMrJVmBh.js", "/assets/triangle-alert-BT7a9JIS.js", "/assets/download-CUA61y9j.js", "/assets/createServerFn-DF8KXUyY.js"] }, "/app/investor/deal-flow": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.deal-flow.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.deal-flow-c5S_okm2.js", "/assets/clock-ClVoZQmf.js"] }, "/app/investor/deal-rooms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.deal-rooms.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.deal-rooms-D_AYE9Xq.js", "/assets/shield-DUziEs7y.js", "/assets/clock-ClVoZQmf.js"] }, "/app/investor/decisions": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.decisions.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.decisions-Bzo9srQK.js", "/assets/check-TmW0Bdnt.js", "/assets/x-Bp8i_Dhu.js", "/assets/clock-ClVoZQmf.js"] }, "/app/investor/diligence": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.diligence.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.diligence-4-C_yxKq.js", "/assets/circle-check-cMrJVmBh.js", "/assets/circle-DQGLXRJp.js"] }, "/app/investor/pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.pipeline-CKDoWx70.js", "/assets/list-DxIGF7oD.js", "/assets/clock-ClVoZQmf.js"] }, "/app/investor/portfolio": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.portfolio.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.portfolio-C_2fj5HP.js", "/assets/trending-up-BQ4X13AZ.js", "/assets/clock-ClVoZQmf.js"] }, "/app/investor/startups": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.startups.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.startups-DXtFNmG0.js", "/assets/external-link-BOU2R0qE.js", "/assets/clock-ClVoZQmf.js"] }, "/app/investor/team": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.team.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.team-BmLXOc-b.js", "/assets/x-Bp8i_Dhu.js", "/assets/mail-CUnAGN2x.js", "/assets/loader-circle-D3ulDZnA.js", "/assets/clock-ClVoZQmf.js"] }, "/app/settings/billing": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.billing.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.billing-Ctg9Bal2.js", "/assets/check-TmW0Bdnt.js", "/assets/download-CUA61y9j.js"] }, "/app/settings/domain": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.domain.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.domain-WZA2sqWN.js", "/assets/circle-check-cMrJVmBh.js", "/assets/copy-DvQecoGO.js", "/assets/mail-CUnAGN2x.js"] }, "/app/settings/notifications": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.notifications.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.notifications-xdAL4vK0.js", "/assets/mail-CUnAGN2x.js", "/assets/smartphone-Dt8QzobH.js"] }, "/app/settings/security": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.security.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.security-DPK3x1nK.js", "/assets/smartphone-Dt8QzobH.js", "/assets/triangle-alert-BT7a9JIS.js"] }, "/app/investor/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.index.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.index-C7xRZhAj.js", "/assets/circle-check-cMrJVmBh.js", "/assets/clock-ClVoZQmf.js", "/assets/circle-alert-BfTlUEIg.js", "/assets/arrow-right-Dep1GZ8N.js", "/assets/x-Bp8i_Dhu.js", "/assets/triangle-alert-BT7a9JIS.js", "/assets/shield-DUziEs7y.js", "/assets/deal-brief-fn-Bexexg1j.js", "/assets/createServerFn-DF8KXUyY.js"] }, "/app/deal-room/$id_/nda": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-room.$id_.nda.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-room._id_.nda-1MeSDV6N.js", "/assets/shield-DUziEs7y.js", "/assets/loader-circle-D3ulDZnA.js", "/assets/lock-Ba4Ck4W-.js"] } }, clientEntry: "/assets/index-DyKq9ESA.js" });
   }
 });
 
@@ -51218,10 +51218,10 @@ var init_dist7 = __esm({
             });
           }
         };
-        this.custom = (jsx77, data) => {
+        this.custom = (jsx78, data) => {
           const id = (data == null ? void 0 : data.id) || toastsCounter++;
           this.create({
-            jsx: jsx77(id),
+            jsx: jsx78(id),
             id,
             ...data
           });
@@ -57014,7 +57014,7 @@ var init_lucide_react = __esm({
   }
 });
 
-// dist/server/assets/LangSwitcher-CFWRhwh3.js
+// dist/server/assets/LangSwitcher-zAjoGqgJ.js
 function ThemeToggle() {
   const { theme, setTheme, resolved } = useTheme();
   const [open, setOpen] = (0, import_react19.useState)(false);
@@ -57109,18 +57109,18 @@ function LangSwitcher() {
   ] });
 }
 var import_jsx_runtime25, import_react19;
-var init_LangSwitcher_CFWRhwh3 = __esm({
-  "dist/server/assets/LangSwitcher-CFWRhwh3.js"() {
+var init_LangSwitcher_zAjoGqgJ = __esm({
+  "dist/server/assets/LangSwitcher-zAjoGqgJ.js"() {
     "use strict";
     import_jsx_runtime25 = __toESM(require_jsx_runtime(), 1);
     init_lucide_react();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     import_react19 = __toESM(require_react(), 1);
     init_utils_H80jjgLf();
   }
 });
 
-// dist/server/assets/SiteFooter-CAJx9iiJ.js
+// dist/server/assets/SiteFooter-Cuc-5WKp.js
 function SiteHeader() {
   return /* @__PURE__ */ (0, import_jsx_runtime26.jsxs)("header", { className: "sticky top-0 z-40 w-full", children: [
     /* @__PURE__ */ (0, import_jsx_runtime26.jsx)("div", { className: "absolute inset-0 -z-10 backdrop-blur-xl bg-background/70 border-b border-border/60" }),
@@ -57215,8 +57215,8 @@ function SiteFooter() {
   ] }) });
 }
 var import_jsx_runtime26, React11, buttonVariants, Button, nav;
-var init_SiteFooter_CAJx9iiJ = __esm({
-  "dist/server/assets/SiteFooter-CAJx9iiJ.js"() {
+var init_SiteFooter_Cuc_5WKp = __esm({
+  "dist/server/assets/SiteFooter-Cuc-5WKp.js"() {
     "use strict";
     import_jsx_runtime26 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -57226,7 +57226,7 @@ var init_SiteFooter_CAJx9iiJ = __esm({
     init_dist10();
     init_utils_H80jjgLf();
     init_lucide_react();
-    init_LangSwitcher_CFWRhwh3();
+    init_LangSwitcher_zAjoGqgJ();
     buttonVariants = cva(
       "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
       {
@@ -57272,9 +57272,9 @@ var init_SiteFooter_CAJx9iiJ = __esm({
   }
 });
 
-// dist/server/assets/terms-Wy5FibWA.js
-var terms_Wy5FibWA_exports = {};
-__export(terms_Wy5FibWA_exports, {
+// dist/server/assets/terms-Bk_4YK9E.js
+var terms_Bk_4YK9E_exports = {};
+__export(terms_Bk_4YK9E_exports, {
   component: () => TermsPage
 });
 function TermsPage() {
@@ -57295,11 +57295,11 @@ function TermsPage() {
   ] });
 }
 var import_jsx_runtime27, import_react20, sections;
-var init_terms_Wy5FibWA = __esm({
-  "dist/server/assets/terms-Wy5FibWA.js"() {
+var init_terms_Bk_4YK9E = __esm({
+  "dist/server/assets/terms-Bk_4YK9E.js"() {
     "use strict";
     import_jsx_runtime27 = __toESM(require_jsx_runtime(), 1);
-    init_SiteFooter_CAJx9iiJ();
+    init_SiteFooter_Cuc_5WKp();
     import_react20 = __toESM(require_react(), 1);
     init_dist10();
     init_clsx();
@@ -57332,9 +57332,9 @@ var init_terms_Wy5FibWA = __esm({
   }
 });
 
-// dist/server/assets/sign-up-BXj-wnhS.js
-var sign_up_BXj_wnhS_exports = {};
-__export(sign_up_BXj_wnhS_exports, {
+// dist/server/assets/sign-up-BNg05rfB.js
+var sign_up_BNg05rfB_exports = {};
+__export(sign_up_BNg05rfB_exports, {
   component: () => SignUp
 });
 function SignUp() {
@@ -57457,21 +57457,21 @@ function SignUp() {
   ] }) });
 }
 var import_jsx_runtime28, import_react21;
-var init_sign_up_BXj_wnhS = __esm({
-  "dist/server/assets/sign-up-BXj-wnhS.js"() {
+var init_sign_up_BNg05rfB = __esm({
+  "dist/server/assets/sign-up-BNg05rfB.js"() {
     "use strict";
     import_jsx_runtime28 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react21 = __toESM(require_react(), 1);
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/sign-in-53a5BpQu.js
-var sign_in_53a5BpQu_exports = {};
-__export(sign_in_53a5BpQu_exports, {
+// dist/server/assets/sign-in-s9FuAMRc.js
+var sign_in_s9FuAMRc_exports = {};
+__export(sign_in_s9FuAMRc_exports, {
   component: () => SignIn
 });
 function SignIn() {
@@ -57560,21 +57560,21 @@ function SignIn() {
   ] }) });
 }
 var import_jsx_runtime29, import_react22;
-var init_sign_in_53a5BpQu = __esm({
-  "dist/server/assets/sign-in-53a5BpQu.js"() {
+var init_sign_in_s9FuAMRc = __esm({
+  "dist/server/assets/sign-in-s9FuAMRc.js"() {
     "use strict";
     import_jsx_runtime29 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react22 = __toESM(require_react(), 1);
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/privacy-DtQjuu4P.js
-var privacy_DtQjuu4P_exports = {};
-__export(privacy_DtQjuu4P_exports, {
+// dist/server/assets/privacy-DDwupa3M.js
+var privacy_DDwupa3M_exports = {};
+__export(privacy_DDwupa3M_exports, {
   component: () => PrivacyPage
 });
 function PrivacyPage() {
@@ -57595,11 +57595,11 @@ function PrivacyPage() {
   ] });
 }
 var import_jsx_runtime30, import_react23, sections2;
-var init_privacy_DtQjuu4P = __esm({
-  "dist/server/assets/privacy-DtQjuu4P.js"() {
+var init_privacy_DDwupa3M = __esm({
+  "dist/server/assets/privacy-DDwupa3M.js"() {
     "use strict";
     import_jsx_runtime30 = __toESM(require_jsx_runtime(), 1);
-    init_SiteFooter_CAJx9iiJ();
+    init_SiteFooter_Cuc_5WKp();
     import_react23 = __toESM(require_react(), 1);
     init_dist10();
     init_clsx();
@@ -57629,9 +57629,9 @@ var init_privacy_DtQjuu4P = __esm({
   }
 });
 
-// dist/server/assets/pricing-DpEBtPMH.js
-var pricing_DpEBtPMH_exports = {};
-__export(pricing_DpEBtPMH_exports, {
+// dist/server/assets/pricing-CiA9y4jB.js
+var pricing_CiA9y4jB_exports = {};
+__export(pricing_CiA9y4jB_exports, {
   component: () => Pricing
 });
 function Pricing() {
@@ -57671,12 +57671,12 @@ function Pricing() {
   ] });
 }
 var import_jsx_runtime31, import_react24, tiers;
-var init_pricing_DpEBtPMH = __esm({
-  "dist/server/assets/pricing-DpEBtPMH.js"() {
+var init_pricing_CiA9y4jB = __esm({
+  "dist/server/assets/pricing-CiA9y4jB.js"() {
     "use strict";
     import_jsx_runtime31 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    init_SiteFooter_CAJx9iiJ();
+    init_SiteFooter_Cuc_5WKp();
     init_lucide_react();
     import_react24 = __toESM(require_react(), 1);
     init_dist10();
@@ -57809,7 +57809,7 @@ var init_AppPreview_BtsG_qZV = __esm({
   }
 });
 
-// dist/server/assets/SolutionPage-Dq3hm6Qv.js
+// dist/server/assets/SolutionPage-B-xJqXzJ.js
 function SolutionPage({ eyebrow, title, sub, Icon: Icon2, features }) {
   return /* @__PURE__ */ (0, import_jsx_runtime33.jsxs)("div", { className: "min-h-screen bg-background", children: [
     /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(SiteHeader, {}),
@@ -57842,28 +57842,28 @@ function SolutionPage({ eyebrow, title, sub, Icon: Icon2, features }) {
   ] });
 }
 var import_jsx_runtime33;
-var init_SolutionPage_Dq3hm6Qv = __esm({
-  "dist/server/assets/SolutionPage-Dq3hm6Qv.js"() {
+var init_SolutionPage_B_xJqXzJ = __esm({
+  "dist/server/assets/SolutionPage-B-xJqXzJ.js"() {
     "use strict";
     import_jsx_runtime33 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    init_SiteFooter_CAJx9iiJ();
+    init_SiteFooter_Cuc_5WKp();
     init_AppPreview_BtsG_qZV();
     init_lucide_react();
   }
 });
 
-// dist/server/assets/investors-CjijGePX.js
-var investors_CjijGePX_exports = {};
-__export(investors_CjijGePX_exports, {
+// dist/server/assets/investors-6EJWAmeW.js
+var investors_6EJWAmeW_exports = {};
+__export(investors_6EJWAmeW_exports, {
   component: () => SplitComponent
 });
 var import_jsx_runtime34, import_react25, SplitComponent;
-var init_investors_CjijGePX = __esm({
-  "dist/server/assets/investors-CjijGePX.js"() {
+var init_investors_6EJWAmeW = __esm({
+  "dist/server/assets/investors-6EJWAmeW.js"() {
     "use strict";
     import_jsx_runtime34 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_Dq3hm6Qv();
+    init_SolutionPage_B_xJqXzJ();
     init_lucide_react();
     import_react25 = __toESM(require_react(), 1);
     init_dist10();
@@ -57873,17 +57873,17 @@ var init_investors_CjijGePX = __esm({
   }
 });
 
-// dist/server/assets/founders-PW90z-eg.js
-var founders_PW90z_eg_exports = {};
-__export(founders_PW90z_eg_exports, {
+// dist/server/assets/founders-DigGCrJP.js
+var founders_DigGCrJP_exports = {};
+__export(founders_DigGCrJP_exports, {
   component: () => SplitComponent2
 });
 var import_jsx_runtime35, import_react26, SplitComponent2;
-var init_founders_PW90z_eg = __esm({
-  "dist/server/assets/founders-PW90z-eg.js"() {
+var init_founders_DigGCrJP = __esm({
+  "dist/server/assets/founders-DigGCrJP.js"() {
     "use strict";
     import_jsx_runtime35 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_Dq3hm6Qv();
+    init_SolutionPage_B_xJqXzJ();
     init_lucide_react();
     import_react26 = __toESM(require_react(), 1);
     init_dist10();
@@ -57893,9 +57893,9 @@ var init_founders_PW90z_eg = __esm({
   }
 });
 
-// dist/server/assets/forgot-password-BKZ1D9EZ.js
-var forgot_password_BKZ1D9EZ_exports = {};
-__export(forgot_password_BKZ1D9EZ_exports, {
+// dist/server/assets/forgot-password-Bytr6Oz5.js
+var forgot_password_Bytr6Oz5_exports = {};
+__export(forgot_password_Bytr6Oz5_exports, {
   component: () => ForgotPassword
 });
 function ForgotPassword() {
@@ -57940,13 +57940,13 @@ function ForgotPassword() {
   ] }) }) });
 }
 var import_jsx_runtime36, import_react27;
-var init_forgot_password_BKZ1D9EZ = __esm({
-  "dist/server/assets/forgot-password-BKZ1D9EZ.js"() {
+var init_forgot_password_Bytr6Oz5 = __esm({
+  "dist/server/assets/forgot-password-Bytr6Oz5.js"() {
     "use strict";
     import_jsx_runtime36 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react27 = __toESM(require_react(), 1);
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_dist7();
     init_clsx();
   }
@@ -61665,9 +61665,9 @@ var init_store_LLbTvev = __esm({
   }
 });
 
-// dist/server/assets/app-DYg0EBXN.js
-var app_DYg0EBXN_exports = {};
-__export(app_DYg0EBXN_exports, {
+// dist/server/assets/app-DNuWOEfq.js
+var app_DNuWOEfq_exports = {};
+__export(app_DNuWOEfq_exports, {
   component: () => SplitComponent4
 });
 function NotificationBell() {
@@ -61832,6 +61832,22 @@ function AppShell({ children }) {
       return count ?? 0;
     }
   });
+  const { data: startupData } = useQuery({
+    queryKey: ["shell-startup", user?.id],
+    enabled: !!user?.id && !isInvestor,
+    queryFn: async () => {
+      const { data } = await supabase.from("startups").select("id, company_name, stage").eq("founder_id", user.id).limit(1).maybeSingle();
+      return data;
+    }
+  });
+  const { data: dealRoomCount } = useQuery({
+    queryKey: ["shell-deal-room-count", startupData?.id],
+    enabled: !!startupData?.id && !isInvestor,
+    queryFn: async () => {
+      const { count } = await supabase.from("deal_rooms").select("*", { count: "exact", head: true }).eq("startup_id", startupData.id);
+      return count ?? 0;
+    }
+  });
   (0, import_react29.useEffect)(() => {
     if (!user) return;
     if (isInvestor && !path.startsWith("/app/investor") && !workspaceNavInvestor.some((n2) => path.startsWith(n2.to)) && path !== "/app/advisor" && !path.startsWith("/app/profile") && !path.startsWith("/app/settings") && !path.startsWith("/app/meetings")) {
@@ -61844,7 +61860,7 @@ function AppShell({ children }) {
   if (!user) {
     return /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("div", { className: "min-h-screen bg-background grid place-items-center text-sm text-muted-foreground", children: "Redirecting\u2026" });
   }
-  const workspaceName = isInvestor ? user.fullName || "" : profile?.name || "";
+  const workspaceName = isInvestor ? user.fullName || "" : startupData?.company_name || profile?.name || "";
   return /* @__PURE__ */ (0, import_jsx_runtime38.jsxs)("div", { className: "min-h-screen bg-background flex", children: [
     /* @__PURE__ */ (0, import_jsx_runtime38.jsxs)("aside", { className: cn3("border-r border-border/60 bg-sidebar flex flex-col transition-all", collapsed ? "w-[68px]" : "w-[248px]"), children: [
       /* @__PURE__ */ (0, import_jsx_runtime38.jsxs)("div", { className: "h-16 flex items-center px-4 border-b border-border/60", children: [
@@ -61855,7 +61871,7 @@ function AppShell({ children }) {
         profile?.logoDataUrl && !isInvestor ? /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("img", { src: profile.logoDataUrl, alt: workspaceName, className: "h-6 w-6 rounded-md object-cover" }) : /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("div", { className: "grid h-6 w-6 place-items-center rounded-md bg-gradient-brand text-[10px] font-semibold text-brand-foreground", children: user.fullName ? user.fullName.split(" ").map((n2) => n2[0]).join("").toUpperCase().slice(0, 2) : "VR" }),
         !collapsed && /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("div", { className: "flex-1 min-w-0", children: workspaceName ? /* @__PURE__ */ (0, import_jsx_runtime38.jsxs)(import_jsx_runtime38.Fragment, { children: [
           /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("div", { className: "text-xs font-medium truncate", children: workspaceName }),
-          /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("div", { className: "text-[10px] text-muted-foreground truncate", children: isInvestor ? "Fund \xB7 Partner" : profile?.stage || "Company" })
+          /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("div", { className: "text-[10px] text-muted-foreground truncate", children: isInvestor ? "Fund \xB7 Partner" : startupData?.stage || profile?.stage || "Company" })
         ] }) : /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(Link, { to: "/app/profile", className: "text-xs font-medium text-brand hover:underline", children: "Set up your profile \u2192" }) })
       ] }) }),
       /* @__PURE__ */ (0, import_jsx_runtime38.jsxs)("nav", { className: "flex-1 px-2 space-y-0.5 overflow-y-auto", children: [
@@ -61864,6 +61880,7 @@ function AppShell({ children }) {
           const active = path === n2.to || path === n2.to + "/" || n2.to !== "/app" && n2.to !== "/app/investor" && path.startsWith(n2.to);
           const badge = (() => {
             if (n2.to === "/app/leads") return leadCount && leadCount > 0 ? String(leadCount) : void 0;
+            if (n2.to === "/app/deal-rooms") return dealRoomCount && dealRoomCount > 0 ? String(dealRoomCount) : void 0;
             return n2.badge;
           })();
           return /* @__PURE__ */ (0, import_jsx_runtime38.jsxs)(
@@ -61947,8 +61964,8 @@ function AppShell({ children }) {
   ] });
 }
 var import_jsx_runtime38, import_react29, iconFor, tintFor, founderNav, investorNav, workspaceNavFounder, workspaceNavInvestor, SplitComponent4;
-var init_app_DYg0EBXN = __esm({
-  "dist/server/assets/app-DYg0EBXN.js"() {
+var init_app_DNuWOEfq = __esm({
+  "dist/server/assets/app-DNuWOEfq.js"() {
     "use strict";
     import_jsx_runtime38 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -61957,9 +61974,9 @@ var init_app_DYg0EBXN = __esm({
     import_react29 = __toESM(require_react(), 1);
     init_modern2();
     init_utils_H80jjgLf();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_date_fns();
-    init_LangSwitcher_CFWRhwh3();
+    init_LangSwitcher_zAjoGqgJ();
     init_store_LLbTvev();
     init_clsx();
     init_dist7();
@@ -61981,7 +61998,7 @@ var init_app_DYg0EBXN = __esm({
       { to: "/app", labelKey: "app.overview", icon: LayoutGrid },
       { to: "/app/leads", labelKey: "app.leads", icon: Users },
       { to: "/app/pipeline", labelKey: "app.pipeline", icon: Kanban },
-      { to: "/app/deal-rooms", labelKey: "app.dealRooms", icon: Briefcase, badge: "4" },
+      { to: "/app/deal-rooms", labelKey: "app.dealRooms", icon: Briefcase },
       { to: "/app/profile", labelKey: "app.profile", icon: Building2 },
       { to: "/app/documents", labelKey: "app.documents", icon: FileText },
       { to: "/app/meetings", labelKey: "app.meetings", icon: Calendar },
@@ -62012,9 +62029,9 @@ var init_app_DYg0EBXN = __esm({
   }
 });
 
-// dist/server/assets/about-DXN8ms4s.js
-var about_DXN8ms4s_exports = {};
-__export(about_DXN8ms4s_exports, {
+// dist/server/assets/about-Dlx6eCup.js
+var about_Dlx6eCup_exports = {};
+__export(about_Dlx6eCup_exports, {
   component: () => About
 });
 function About() {
@@ -62034,11 +62051,11 @@ function About() {
   ] });
 }
 var import_jsx_runtime39, import_react30;
-var init_about_DXN8ms4s = __esm({
-  "dist/server/assets/about-DXN8ms4s.js"() {
+var init_about_Dlx6eCup = __esm({
+  "dist/server/assets/about-Dlx6eCup.js"() {
     "use strict";
     import_jsx_runtime39 = __toESM(require_jsx_runtime(), 1);
-    init_SiteFooter_CAJx9iiJ();
+    init_SiteFooter_Cuc_5WKp();
     init_lucide_react();
     init_esm5();
     import_react30 = __toESM(require_react(), 1);
@@ -62048,9 +62065,9 @@ var init_about_DXN8ms4s = __esm({
   }
 });
 
-// dist/server/assets/index-B0MS24Ah.js
-var index_B0MS24Ah_exports = {};
-__export(index_B0MS24Ah_exports, {
+// dist/server/assets/index-BAVbkYGN.js
+var index_BAVbkYGN_exports = {};
+__export(index_BAVbkYGN_exports, {
   component: () => Landing
 });
 function Landing() {
@@ -62358,12 +62375,12 @@ function FinalCTA() {
   ] }) });
 }
 var import_jsx_runtime40, import_react31;
-var init_index_B0MS24Ah = __esm({
-  "dist/server/assets/index-B0MS24Ah.js"() {
+var init_index_BAVbkYGN = __esm({
+  "dist/server/assets/index-BAVbkYGN.js"() {
     "use strict";
     import_jsx_runtime40 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    init_SiteFooter_CAJx9iiJ();
+    init_SiteFooter_Cuc_5WKp();
     init_AppPreview_BtsG_qZV();
     init_lucide_react();
     import_react31 = __toESM(require_react(), 1);
@@ -62373,9 +62390,9 @@ var init_index_B0MS24Ah = __esm({
   }
 });
 
-// dist/server/assets/app.index-CMz44UaC.js
-var app_index_CMz44UaC_exports = {};
-__export(app_index_CMz44UaC_exports, {
+// dist/server/assets/app.index-D4fReIdX.js
+var app_index_D4fReIdX_exports = {};
+__export(app_index_D4fReIdX_exports, {
   component: () => Overview
 });
 function timeAgo(iso) {
@@ -62963,8 +62980,8 @@ function Overview() {
   ] });
 }
 var import_jsx_runtime41, import_react32, DEAL_ROOM_PROGRESS;
-var init_app_index_CMz44UaC = __esm({
-  "dist/server/assets/app.index-CMz44UaC.js"() {
+var init_app_index_D4fReIdX = __esm({
+  "dist/server/assets/app.index-D4fReIdX.js"() {
     "use strict";
     import_jsx_runtime41 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -62972,7 +62989,7 @@ var init_app_index_CMz44UaC = __esm({
     init_modern2();
     init_date_fns();
     init_lucide_react();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_utils_H80jjgLf();
     init_dist7();
     init_clsx();
@@ -63005,17 +63022,17 @@ var init_app_index_CMz44UaC = __esm({
   }
 });
 
-// dist/server/assets/solutions.vc-deal-room-BRdZmX8Y.js
-var solutions_vc_deal_room_BRdZmX8Y_exports = {};
-__export(solutions_vc_deal_room_BRdZmX8Y_exports, {
+// dist/server/assets/solutions.vc-deal-room-DYPWwYxT.js
+var solutions_vc_deal_room_DYPWwYxT_exports = {};
+__export(solutions_vc_deal_room_DYPWwYxT_exports, {
   component: () => SplitComponent5
 });
 var import_jsx_runtime42, import_react33, SplitComponent5;
-var init_solutions_vc_deal_room_BRdZmX8Y = __esm({
-  "dist/server/assets/solutions.vc-deal-room-BRdZmX8Y.js"() {
+var init_solutions_vc_deal_room_DYPWwYxT = __esm({
+  "dist/server/assets/solutions.vc-deal-room-DYPWwYxT.js"() {
     "use strict";
     import_jsx_runtime42 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_Dq3hm6Qv();
+    init_SolutionPage_B_xJqXzJ();
     init_lucide_react();
     import_react33 = __toESM(require_react(), 1);
     init_dist10();
@@ -63025,17 +63042,17 @@ var init_solutions_vc_deal_room_BRdZmX8Y = __esm({
   }
 });
 
-// dist/server/assets/solutions.raise-1m-DE1T2D2J.js
-var solutions_raise_1m_DE1T2D2J_exports = {};
-__export(solutions_raise_1m_DE1T2D2J_exports, {
+// dist/server/assets/solutions.raise-1m-BA2b5LCn.js
+var solutions_raise_1m_BA2b5LCn_exports = {};
+__export(solutions_raise_1m_BA2b5LCn_exports, {
   component: () => SplitComponent6
 });
 var import_jsx_runtime43, import_react34, SplitComponent6;
-var init_solutions_raise_1m_DE1T2D2J = __esm({
-  "dist/server/assets/solutions.raise-1m-DE1T2D2J.js"() {
+var init_solutions_raise_1m_BA2b5LCn = __esm({
+  "dist/server/assets/solutions.raise-1m-BA2b5LCn.js"() {
     "use strict";
     import_jsx_runtime43 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_Dq3hm6Qv();
+    init_SolutionPage_B_xJqXzJ();
     init_lucide_react();
     import_react34 = __toESM(require_react(), 1);
     init_dist10();
@@ -63045,17 +63062,17 @@ var init_solutions_raise_1m_DE1T2D2J = __esm({
   }
 });
 
-// dist/server/assets/solutions.investor-pipeline-AVN1mMWU.js
-var solutions_investor_pipeline_AVN1mMWU_exports = {};
-__export(solutions_investor_pipeline_AVN1mMWU_exports, {
+// dist/server/assets/solutions.investor-pipeline-C46ewaxt.js
+var solutions_investor_pipeline_C46ewaxt_exports = {};
+__export(solutions_investor_pipeline_C46ewaxt_exports, {
   component: () => SplitComponent7
 });
 var import_jsx_runtime44, import_react35, SplitComponent7;
-var init_solutions_investor_pipeline_AVN1mMWU = __esm({
-  "dist/server/assets/solutions.investor-pipeline-AVN1mMWU.js"() {
+var init_solutions_investor_pipeline_C46ewaxt = __esm({
+  "dist/server/assets/solutions.investor-pipeline-C46ewaxt.js"() {
     "use strict";
     import_jsx_runtime44 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_Dq3hm6Qv();
+    init_SolutionPage_B_xJqXzJ();
     init_lucide_react();
     import_react35 = __toESM(require_react(), 1);
     init_dist10();
@@ -63065,17 +63082,17 @@ var init_solutions_investor_pipeline_AVN1mMWU = __esm({
   }
 });
 
-// dist/server/assets/solutions.fundraising-crm-BBkbwwXR.js
-var solutions_fundraising_crm_BBkbwwXR_exports = {};
-__export(solutions_fundraising_crm_BBkbwwXR_exports, {
+// dist/server/assets/solutions.fundraising-crm-D-Z-u9Hb.js
+var solutions_fundraising_crm_D_Z_u9Hb_exports = {};
+__export(solutions_fundraising_crm_D_Z_u9Hb_exports, {
   component: () => SplitComponent8
 });
 var import_jsx_runtime45, import_react36, SplitComponent8;
-var init_solutions_fundraising_crm_BBkbwwXR = __esm({
-  "dist/server/assets/solutions.fundraising-crm-BBkbwwXR.js"() {
+var init_solutions_fundraising_crm_D_Z_u9Hb = __esm({
+  "dist/server/assets/solutions.fundraising-crm-D-Z-u9Hb.js"() {
     "use strict";
     import_jsx_runtime45 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_Dq3hm6Qv();
+    init_SolutionPage_B_xJqXzJ();
     init_lucide_react();
     import_react36 = __toESM(require_react(), 1);
     init_dist10();
@@ -63085,17 +63102,17 @@ var init_solutions_fundraising_crm_BBkbwwXR = __esm({
   }
 });
 
-// dist/server/assets/solutions.due-diligence-Dc4hz6i6.js
-var solutions_due_diligence_Dc4hz6i6_exports = {};
-__export(solutions_due_diligence_Dc4hz6i6_exports, {
+// dist/server/assets/solutions.due-diligence-DU12YoKn.js
+var solutions_due_diligence_DU12YoKn_exports = {};
+__export(solutions_due_diligence_DU12YoKn_exports, {
   component: () => SplitComponent9
 });
 var import_jsx_runtime46, import_react37, SplitComponent9;
-var init_solutions_due_diligence_Dc4hz6i6 = __esm({
-  "dist/server/assets/solutions.due-diligence-Dc4hz6i6.js"() {
+var init_solutions_due_diligence_DU12YoKn = __esm({
+  "dist/server/assets/solutions.due-diligence-DU12YoKn.js"() {
     "use strict";
     import_jsx_runtime46 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_Dq3hm6Qv();
+    init_SolutionPage_B_xJqXzJ();
     init_lucide_react();
     import_react37 = __toESM(require_react(), 1);
     init_dist10();
@@ -63105,9 +63122,9 @@ var init_solutions_due_diligence_Dc4hz6i6 = __esm({
   }
 });
 
-// dist/server/assets/join._token-DqiNuBK5.js
-var join_token_DqiNuBK5_exports = {};
-__export(join_token_DqiNuBK5_exports, {
+// dist/server/assets/join._token-B3wMrYbM.js
+var join_token_B3wMrYbM_exports = {};
+__export(join_token_B3wMrYbM_exports, {
   component: () => JoinFlow
 });
 function JoinFlow() {
@@ -63322,23 +63339,23 @@ function JoinFlow() {
   ] });
 }
 var import_jsx_runtime47, import_react38;
-var init_join_token_DqiNuBK5 = __esm({
-  "dist/server/assets/join._token-DqiNuBK5.js"() {
+var init_join_token_B3wMrYbM = __esm({
+  "dist/server/assets/join._token-B3wMrYbM.js"() {
     "use strict";
     import_jsx_runtime47 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react38 = __toESM(require_react(), 1);
     init_Logo_CIkq6vsm();
     init_lucide_react();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/auth.callback-CR79cSOM.js
-var auth_callback_CR79cSOM_exports = {};
-__export(auth_callback_CR79cSOM_exports, {
+// dist/server/assets/auth.callback-DRo17tzO.js
+var auth_callback_DRo17tzO_exports = {};
+__export(auth_callback_DRo17tzO_exports, {
   component: () => AuthCallback
 });
 function AuthCallback() {
@@ -63396,20 +63413,20 @@ function AuthCallback() {
   ] });
 }
 var import_jsx_runtime48, import_react39;
-var init_auth_callback_CR79cSOM = __esm({
-  "dist/server/assets/auth.callback-CR79cSOM.js"() {
+var init_auth_callback_DRo17tzO = __esm({
+  "dist/server/assets/auth.callback-DRo17tzO.js"() {
     "use strict";
     import_jsx_runtime48 = __toESM(require_jsx_runtime(), 1);
     import_react39 = __toESM(require_react(), 1);
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.users-D7k1tVdY.js
-var app_users_D7k1tVdY_exports = {};
-__export(app_users_D7k1tVdY_exports, {
+// dist/server/assets/app.users-z9ftYOzp.js
+var app_users_z9ftYOzp_exports = {};
+__export(app_users_z9ftYOzp_exports, {
   component: () => UsersPage
 });
 function UsersPage() {
@@ -63682,8 +63699,8 @@ function InviteModal({
   ] }) });
 }
 var import_jsx_runtime49, import_react40, roleColor;
-var init_app_users_D7k1tVdY = __esm({
-  "dist/server/assets/app.users-D7k1tVdY.js"() {
+var init_app_users_z9ftYOzp = __esm({
+  "dist/server/assets/app.users-z9ftYOzp.js"() {
     "use strict";
     import_jsx_runtime49 = __toESM(require_jsx_runtime(), 1);
     import_react40 = __toESM(require_react(), 1);
@@ -63691,7 +63708,7 @@ var init_app_users_D7k1tVdY = __esm({
     init_lucide_react();
     init_dist7();
     init_date_fns();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_clsx();
     roleColor = {
       Owner: "bg-violet/10 text-violet border-violet/20",
@@ -63704,9 +63721,9 @@ var init_app_users_D7k1tVdY = __esm({
   }
 });
 
-// dist/server/assets/app.settings-Gp1lEP1B.js
-var app_settings_Gp1lEP1B_exports = {};
-__export(app_settings_Gp1lEP1B_exports, {
+// dist/server/assets/app.settings-C6Ea2cuu.js
+var app_settings_C6Ea2cuu_exports = {};
+__export(app_settings_C6Ea2cuu_exports, {
   Card: () => Card,
   Field: () => Field,
   SaveBar: () => SaveBar,
@@ -63828,15 +63845,15 @@ function SaveBar() {
   ] });
 }
 var import_jsx_runtime50, import_react41, tabs;
-var init_app_settings_Gp1lEP1B = __esm({
-  "dist/server/assets/app.settings-Gp1lEP1B.js"() {
+var init_app_settings_C6Ea2cuu = __esm({
+  "dist/server/assets/app.settings-C6Ea2cuu.js"() {
     "use strict";
     import_jsx_runtime50 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_modern2();
     init_lucide_react();
     init_utils_H80jjgLf();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_clsx();
     import_react41 = __toESM(require_react(), 1);
     init_dist7();
@@ -63865,14 +63882,18 @@ var init_app_settings_Gp1lEP1B = __esm({
   }
 });
 
-// dist/server/assets/app.reports-tyOILLnd.js
-var app_reports_tyOILLnd_exports = {};
-__export(app_reports_tyOILLnd_exports, {
+// dist/server/assets/app.reports-DRJ5Lsli.js
+var app_reports_DRJ5Lsli_exports = {};
+__export(app_reports_DRJ5Lsli_exports, {
   component: () => Reports
 });
-function downloadFile(filename, content, mime) {
-  const blob = new Blob([content], {
-    type: mime
+function downloadCsv(filename, rows) {
+  const csv = rows.map((r2) => r2.map((c3) => {
+    const s = String(c3 ?? "");
+    return /[,"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  }).join(",")).join("\n");
+  const blob = new Blob([csv], {
+    type: "text/csv"
   });
   const url2 = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -63883,145 +63904,286 @@ function downloadFile(filename, content, mime) {
   document.body.removeChild(a);
   URL.revokeObjectURL(url2);
 }
-function toCsv(rows) {
-  return rows.map((r2) => r2.map((c3) => {
-    const s = String(c3 ?? "");
-    return /[,"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-  }).join(",")).join("\n");
-}
-function toPdfHtml(title, rows, cols) {
-  const date = (/* @__PURE__ */ new Date()).toLocaleString();
-  const body = `<!doctype html><html><head><meta charset="utf-8"><title>${title}</title>
-<style>
-  body{font-family:-apple-system,BlinkMacSystemFont,Inter,sans-serif;color:#0a0a0f;padding:40px;max-width:980px;margin:auto}
-  header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #0a0a0f;padding-bottom:16px;margin-bottom:24px}
-  h1{margin:0;font-size:24px;letter-spacing:-0.02em}
-  .brand{font-weight:700;letter-spacing:0.08em;font-size:11px;color:#666;text-transform:uppercase}
-  .meta{font-size:11px;color:#666}
-  table{width:100%;border-collapse:collapse;font-size:12px}
-  th{text-align:left;text-transform:uppercase;font-size:10px;letter-spacing:0.06em;color:#666;border-bottom:1px solid #ddd;padding:8px 6px}
-  td{border-bottom:1px solid #eee;padding:8px 6px}
-  footer{margin-top:32px;font-size:10px;color:#999;text-align:center}
-</style></head><body>
-<header>
-  <div><div class="brand">Venture Room \xB7 Report</div><h1>${title}</h1></div>
-  <div class="meta">Generated ${date}</div>
-</header>
-<table><thead><tr>${cols.map((c3) => `<th>${c3}</th>`).join("")}</tr></thead>
-<tbody>${rows.map((r2) => `<tr>${r2.map((c3) => `<td>${c3 ?? ""}</td>`).join("")}</tr>`).join("")}</tbody></table>
-<footer>Confidential \u2014 Venture Room</footer>
-<script>window.onload=()=>{setTimeout(()=>window.print(),250)}<\/script>
-</body></html>`;
-  return body;
-}
-function downloadPdf(title, cols, rows) {
-  const html2 = toPdfHtml(title, rows, cols);
-  const w3 = window.open("", "_blank");
-  if (!w3) return;
-  w3.document.write(html2);
-  w3.document.close();
-}
 function Reports() {
   const {
-    t
-  } = useI18n();
-  const reports = [{
-    key: "pipeline",
-    title: "Pipeline snapshot",
-    desc: "All deals with stage, partner, check size, and probability.",
+    user
+  } = useAuth();
+  const {
+    data: leads = [],
+    isLoading: leadsLoading
+  } = useQuery({
+    queryKey: ["reports-leads", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const {
+        data,
+        error
+      } = await supabase.from("vc_leads").select("*").eq("founder_id", user.id).order("updated_at", {
+        ascending: false
+      });
+      if (error) throw error;
+      return data ?? [];
+    }
+  });
+  const {
+    data: startup
+  } = useQuery({
+    queryKey: ["reports-startup", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const {
+        data
+      } = await supabase.from("startups").select("id, company_name").eq("founder_id", user.id).limit(1).maybeSingle();
+      return data;
+    }
+  });
+  const {
+    data: rooms = []
+  } = useQuery({
+    queryKey: ["reports-deal-rooms", startup?.id],
+    enabled: !!startup?.id,
+    queryFn: async () => {
+      const {
+        data,
+        error
+      } = await supabase.from("deal_rooms").select("id, status, created_at, deal_room_members(count), deal_room_documents(count)").eq("startup_id", startup.id).order("created_at", {
+        ascending: false
+      });
+      if (error) throw error;
+      return data ?? [];
+    }
+  });
+  const {
+    data: activities = []
+  } = useQuery({
+    queryKey: ["reports-activities", startup?.id],
+    enabled: !!startup?.id,
+    queryFn: async () => {
+      if (!startup?.id) return [];
+      const roomIds = rooms.map((r2) => r2.id);
+      if (roomIds.length === 0) return [];
+      const {
+        data,
+        error
+      } = await supabase.from("activities").select("id, action, created_at, actor_id, deal_room_id").in("deal_room_id", roomIds).order("created_at", {
+        ascending: false
+      }).limit(200);
+      if (error) throw error;
+      return data ?? [];
+    }
+  });
+  const {
+    data: meetings = []
+  } = useQuery({
+    queryKey: ["reports-meetings", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const {
+        data,
+        error
+      } = await supabase.from("meetings").select("id, title, meeting_date, meeting_type, status, vc_lead_id").eq("founder_id", user.id).order("meeting_date", {
+        ascending: false
+      });
+      if (error) throw error;
+      return data ?? [];
+    }
+  });
+  const isLoading = leadsLoading;
+  const funnelCounts = FUNNEL_STAGES.map(({
+    statuses
+  }) => statuses === null ? leads.length : leads.filter((l2) => statuses.includes(l2.status)).length);
+  const maxCount = Math.max(...funnelCounts, 1);
+  const total = leads.length;
+  const contactedCount = leads.filter((l2) => ["Contacted", "Replied", "Follow Up", "Meeting Booked", "Interested", "Deal Room Created"].includes(l2.status)).length;
+  const repliedCount = leads.filter((l2) => ["Replied", "Follow Up", "Meeting Booked", "Interested", "Deal Room Created"].includes(l2.status)).length;
+  const meetingCount = leads.filter((l2) => ["Meeting Booked", "Interested", "Deal Room Created"].includes(l2.status)).length;
+  const activeRooms = rooms.filter((r2) => r2.status !== "closed").length;
+  const pct = (n2) => total > 0 ? `${Math.round(n2 / total * 100)}%` : "\u2014";
+  const metrics = [{
+    label: "Total leads",
+    value: String(total),
+    sub: "in your pipeline",
+    icon: Users,
+    tint: "bg-brand/10 text-brand"
+  }, {
+    label: "Reply rate",
+    value: pct(repliedCount),
+    sub: `${repliedCount} replied`,
+    icon: MessageSquare,
+    tint: "bg-violet/10 text-violet"
+  }, {
+    label: "Meeting rate",
+    value: pct(meetingCount),
+    sub: `${meetingCount} booked`,
+    icon: Calendar,
+    tint: "bg-success/10 text-success"
+  }, {
+    label: "Active deal rooms",
+    value: String(activeRooms),
+    sub: `${rooms.length} total`,
     icon: Briefcase,
-    tint: "bg-brand/10 text-brand",
-    cols: ["Firm", "Partner", "Stage", "Check", "Probability", "Last touch"],
-    rows: () => deals.map((d2) => [d2.firm, d2.partner, d2.stage, d2.check, `${d2.probability}%`, d2.lastTouch])
-  }, {
-    key: "diligence",
-    title: "Due diligence status",
-    desc: "Checklist by category with owners and status.",
-    icon: ClipboardCheck,
-    tint: "bg-violet/10 text-violet",
-    cols: ["Category", "Item", "Owner", "Status", "Due"],
-    rows: () => ddChecklist.map((d2) => [d2.category, d2.title, d2.owner, d2.status, d2.due])
-  }, {
-    key: "activity",
-    title: "Activity & audit log",
-    desc: "Workspace activity across users, documents, and decisions.",
-    icon: ShieldCheck,
-    tint: "bg-success/10 text-success",
-    cols: ["Actor", "Action", "Target", "Category", "Severity", "When"],
-    rows: () => auditLog.map((a) => [a.actor, a.action, a.target, a.category, a.severity, a.time])
-  }, {
-    key: "performance",
-    title: "Round performance",
-    desc: "Funnel velocity, conversion rate, and avg. time per stage.",
-    icon: TrendingUp,
-    tint: "bg-warning/10 text-warning",
-    cols: ["Stage", "Deals", "Conversion", "Avg days"],
-    rows: () => [["Sourced", 2, "88%", 4], ["Qualified", 2, "75%", 6], ["Pitched", 2, "62%", 9], ["Diligence", 2, "55%", 14], ["Term Sheet", 1, "85%", 7], ["Closed", 1, "\u2014", 3]]
+    tint: "bg-warning/10 text-warning"
   }];
-  return /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "p-6 lg:p-8 max-w-6xl mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "flex items-end justify-between flex-wrap gap-4", children: /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { children: [
+  const downloadLeads = () => {
+    const header = ["Name", "Firm", "Status", "Ticket Size", "Sector", "Stage", "Email", "Updated At"];
+    const rows = leads.map((l2) => [l2.investor_name, l2.firm_name, l2.status, l2.ticket_size, l2.sector, l2.investment_stage, l2.email, l2.updated_at ? new Date(l2.updated_at).toLocaleDateString() : ""]);
+    downloadCsv("vc-lead-list.csv", [header, ...rows]);
+  };
+  const downloadDealRooms = () => {
+    const header = ["Room ID", "Status", "Created At", "Documents", "Members"];
+    const rows = rooms.map((r2) => [r2.id.slice(0, 8), r2.status, r2.created_at ? new Date(r2.created_at).toLocaleDateString() : "", r2.deal_room_documents?.[0]?.count ?? 0, r2.deal_room_members?.[0]?.count ?? 0]);
+    downloadCsv("deal-room-report.csv", [header, ...rows]);
+  };
+  const downloadActivities = () => {
+    const header = ["Actor ID", "Action", "Deal Room ID", "Date"];
+    const rows = activities.map((a) => [a.actor_id?.slice(0, 8) ?? "", a.action, a.deal_room_id?.slice(0, 8) ?? "", a.created_at ? new Date(a.created_at).toLocaleDateString() : ""]);
+    downloadCsv("activity-log.csv", [header, ...rows]);
+  };
+  const downloadMeetings = () => {
+    const header = ["Title", "Date", "Type", "Status", "Lead ID"];
+    const rows = meetings.map((m3) => [m3.title, m3.meeting_date ? new Date(m3.meeting_date).toLocaleDateString() : "", m3.meeting_type, m3.status, m3.vc_lead_id?.slice(0, 8) ?? ""]);
+    downloadCsv("meeting-log.csv", [header, ...rows]);
+  };
+  if (isLoading) {
+    return /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "p-8 flex items-center justify-center min-h-64", children: /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(LoaderCircle, { className: "h-6 w-6 animate-spin text-muted-foreground" }) });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "p-6 lg:p-8 max-w-5xl mx-auto space-y-8", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { children: [
       /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "flex items-center gap-2", children: [
         /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(ChartColumn, { className: "h-5 w-5 text-brand" }),
-        /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: t("reports.title") })
+        /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Reports" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: t("reports.subtitle") })
-    ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "mt-6 grid md:grid-cols-2 gap-4", children: reports.map((r2) => /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card flex flex-col", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "flex items-start gap-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: `grid h-10 w-10 place-items-center rounded-lg ${r2.tint}`, children: /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(r2.icon, { className: "h-5 w-5" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: "Pipeline analytics and downloadable reports." })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-6 shadow-card", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "flex items-center gap-2 mb-5", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(TrendingUp, { className: "h-4 w-4 text-brand" }),
+        /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "font-semibold", children: "Pipeline funnel" })
+      ] }),
+      total === 0 ? /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "py-8 text-center text-sm text-muted-foreground", children: "No leads yet. Add VC leads to see your funnel." }) : /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "space-y-3", children: FUNNEL_STAGES.map(({
+        label
+      }, i2) => {
+        const count = funnelCounts[i2];
+        const prev = i2 === 0 ? count : funnelCounts[i2 - 1];
+        const barPct = Math.round(count / maxCount * 100);
+        const conv = prev > 0 && i2 > 0 ? `${Math.round(count / prev * 100)}%` : null;
+        return /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "flex items-center gap-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "w-28 text-xs text-muted-foreground shrink-0", children: label }),
+          /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "flex-1 h-7 rounded-md bg-muted/40 overflow-hidden relative", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "h-full rounded-md bg-gradient-brand transition-all duration-500", style: {
+              width: `${barPct}%`
+            } }),
+            count > 0 && /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "absolute inset-y-0 left-2 flex items-center text-[10px] font-medium text-brand-foreground mix-blend-overlay", children: [
+              count,
+              " lead",
+              count !== 1 ? "s" : ""
+            ] })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "w-12 text-right shrink-0", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "text-xs font-semibold tabular-nums", children: count }),
+            conv && /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "text-[10px] text-muted-foreground", children: conv })
+          ] })
+        ] }, label);
+      }) })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-6 shadow-card", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "flex items-center gap-2 mb-5", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(Download, { className: "h-4 w-4 text-brand" }),
+        /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "font-semibold", children: "Download reports" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "grid sm:grid-cols-2 gap-3", children: [{
+        label: "VC Lead List",
+        desc: `${leads.length} leads with status, firm, ticket size`,
+        onClick: downloadLeads,
+        disabled: leads.length === 0
+      }, {
+        label: "Deal Room Report",
+        desc: `${rooms.length} rooms with docs and member counts`,
+        onClick: downloadDealRooms,
+        disabled: rooms.length === 0
+      }, {
+        label: "Activity Log",
+        desc: `${activities.length} recent deal room activities`,
+        onClick: downloadActivities,
+        disabled: activities.length === 0
+      }, {
+        label: "Meeting Log",
+        desc: `${meetings.length} meetings with dates and status`,
+        onClick: downloadMeetings,
+        disabled: meetings.length === 0
+      }].map((item) => /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("button", { onClick: item.onClick, disabled: item.disabled, className: "flex items-start gap-3 rounded-lg border border-border/60 p-4 text-left hover:bg-accent hover:border-brand/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed group", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "grid h-9 w-9 place-items-center rounded-lg bg-muted shrink-0 group-hover:bg-brand/10 transition-colors", children: /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(FileSpreadsheet, { className: "h-4 w-4 text-muted-foreground group-hover:text-brand" }) }),
         /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "flex-1 min-w-0", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "font-semibold", children: r2.title }),
-          /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "text-xs text-muted-foreground mt-0.5", children: r2.desc })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "mt-4 flex items-center gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("button", { onClick: () => {
-          const rows = r2.rows();
-          downloadFile(`${r2.key}.csv`, toCsv([r2.cols, ...rows]), "text/csv");
-        }, className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(FileSpreadsheet, { className: "h-3.5 w-3.5" }),
-          " ",
-          t("reports.csv")
+          /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "text-sm font-medium", children: item.label }),
+          /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "text-xs text-muted-foreground mt-0.5", children: item.desc })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("button", { onClick: () => downloadPdf(r2.title, r2.cols, r2.rows()), className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(FileText, { className: "h-3.5 w-3.5" }),
-          " ",
-          t("reports.pdf")
+        /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(Download, { className: "h-4 w-4 text-muted-foreground shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity" })
+      ] }, item.label)) })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "font-semibold mb-4", children: "Key metrics" }),
+      /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "grid sm:grid-cols-2 lg:grid-cols-4 gap-3", children: metrics.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-4 shadow-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: `grid h-8 w-8 place-items-center rounded-lg mb-3 ${m3.tint}`, children: /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(m3.icon, { className: "h-4 w-4" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "text-xl font-semibold tabular-nums", children: m3.value }),
+        /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "text-xs font-medium mt-0.5", children: m3.label }),
+        /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "text-[11px] text-muted-foreground mt-0.5", children: m3.sub })
+      ] }, m3.label)) }),
+      /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "mt-3 grid sm:grid-cols-2 gap-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-4 shadow-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "text-xs text-muted-foreground mb-1", children: "Contacted rate" }),
+          /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "text-xl font-semibold tabular-nums", children: pct(contactedCount) }),
+          /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "text-[11px] text-muted-foreground", children: [
+            contactedCount,
+            " of ",
+            total,
+            " reached out"
+          ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("button", { onClick: () => {
-          const rows = r2.rows();
-          downloadFile(`${r2.key}.json`, JSON.stringify({
-            generatedAt: (/* @__PURE__ */ new Date()).toISOString(),
-            columns: r2.cols,
-            rows
-          }, null, 2), "application/json");
-        }, className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent ms-auto", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(Download, { className: "h-3.5 w-3.5" }),
-          " JSON"
+        /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-4 shadow-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "text-xs text-muted-foreground mb-1", children: "Total meetings" }),
+          /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "text-xl font-semibold tabular-nums", children: meetings.length }),
+          /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "text-[11px] text-muted-foreground", children: "across all investors" })
         ] })
       ] })
-    ] }, r2.key)) })
+    ] })
   ] });
 }
-var import_jsx_runtime51, import_react42, deals, ddChecklist, auditLog;
-var init_app_reports_tyOILLnd = __esm({
-  "dist/server/assets/app.reports-tyOILLnd.js"() {
+var import_jsx_runtime51, import_react42, FUNNEL_STAGES;
+var init_app_reports_DRJ5Lsli = __esm({
+  "dist/server/assets/app.reports-DRJ5Lsli.js"() {
     "use strict";
     import_jsx_runtime51 = __toESM(require_jsx_runtime(), 1);
+    init_modern2();
+    init_router_DOcN9fVX();
     init_lucide_react();
-    init_router_B5AOfxDk();
     import_react42 = __toESM(require_react(), 1);
     init_dist7();
     init_clsx();
-    deals = [];
-    ddChecklist = [];
-    auditLog = [];
+    FUNNEL_STAGES = [{
+      label: "Total leads",
+      statuses: null
+    }, {
+      label: "Contacted",
+      statuses: ["Contacted", "Replied", "Follow Up", "Meeting Booked", "Interested", "Deal Room Created"]
+    }, {
+      label: "Replied",
+      statuses: ["Replied", "Follow Up", "Meeting Booked", "Interested", "Deal Room Created"]
+    }, {
+      label: "Meeting",
+      statuses: ["Meeting Booked", "Interested", "Deal Room Created"]
+    }, {
+      label: "Interested",
+      statuses: ["Interested", "Deal Room Created"]
+    }, {
+      label: "Deal Room",
+      statuses: ["Deal Room Created"]
+    }];
   }
 });
 
-// dist/server/assets/app.profile-BxYVXCn7.js
-var app_profile_BxYVXCn7_exports = {};
-__export(app_profile_BxYVXCn7_exports, {
+// dist/server/assets/app.profile-C-4g9Re9.js
+var app_profile_C_4g9Re9_exports = {};
+__export(app_profile_C_4g9Re9_exports, {
   component: () => Profile
 });
 function fromStartup(s) {
@@ -64618,15 +64780,15 @@ function TeamMembersSection({
   ] });
 }
 var import_jsx_runtime52, import_react43, STAGES, MEMBER_TAGS, emptyForm;
-var init_app_profile_BxYVXCn7 = __esm({
-  "dist/server/assets/app.profile-BxYVXCn7.js"() {
+var init_app_profile_C_4g9Re9 = __esm({
+  "dist/server/assets/app.profile-C-4g9Re9.js"() {
     "use strict";
     import_jsx_runtime52 = __toESM(require_jsx_runtime(), 1);
     import_react43 = __toESM(require_react(), 1);
     init_modern2();
     init_lucide_react();
     init_dist7();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_utils_H80jjgLf();
     init_clsx();
     STAGES = ["Pre-idea", "Pre-seed", "Seed", "Series A", "Series B", "Growth", "Profitable"];
@@ -64666,11 +64828,878 @@ var init_app_profile_BxYVXCn7 = __esm({
   }
 });
 
-// dist/server/assets/app.pipeline-W2jx-L9u.js
-var app_pipeline_W2jx_L9u_exports = {};
-__export(app_pipeline_W2jx_L9u_exports, {
+// dist/server/assets/createSsrRpc-l1y8KE69.js
+var createSsrRpc;
+var init_createSsrRpc_l1y8KE69 = __esm({
+  "dist/server/assets/createSsrRpc-l1y8KE69.js"() {
+    "use strict";
+    init_server4();
+    createSsrRpc = (functionId) => {
+      const url2 = "/_serverFn/" + functionId;
+      const serverFnMeta = { id: functionId };
+      const fn2 = async (...args) => {
+        return (await getServerFnById(functionId))(...args);
+      };
+      return Object.assign(fn2, {
+        url: url2,
+        serverFnMeta,
+        [TSS_SERVER_FUNCTION]: true
+      });
+    };
+  }
+});
+
+// dist/server/assets/LeadDrawer-mv-iA4VM.js
+function Field3({ label, children }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("label", { className: "block text-xs text-muted-foreground mb-1", children: label }),
+    children
+  ] });
+}
+function CollapsibleSection({
+  title,
+  defaultOpen = false,
+  children
+}) {
+  const [open, setOpen] = (0, import_react44.useState)(defaultOpen);
+  return /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "rounded-lg border border-border/60 bg-card overflow-hidden", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(
+      "button",
+      {
+        type: "button",
+        onClick: () => setOpen((v3) => !v3),
+        className: "w-full flex items-center justify-between px-4 py-3 text-sm font-semibold hover:bg-accent/30 transition-colors",
+        children: [
+          title,
+          open ? /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(ChevronDown, { className: "h-4 w-4 text-muted-foreground" }) : /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(ChevronRight, { className: "h-4 w-4 text-muted-foreground" })
+        ]
+      }
+    ),
+    open && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "px-4 pb-4 pt-1 space-y-3", children })
+  ] });
+}
+function MeetingCard({ meeting, past = false }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: cn3("rounded-lg border border-border/60 bg-card p-3", past && "opacity-60"), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex items-start justify-between gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "text-sm font-medium", children: meeting.title }),
+        /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "text-xs text-muted-foreground mt-0.5", children: meeting.scheduled_at ? new Date(meeting.scheduled_at).toLocaleString() : "\u2014" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex gap-1.5 shrink-0", children: [
+        meeting.meeting_type && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("span", { className: "rounded-full bg-accent px-2 py-0.5 text-[10px] text-muted-foreground", children: meeting.meeting_type }),
+        meeting.platform && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("span", { className: "rounded-full bg-accent px-2 py-0.5 text-[10px] text-muted-foreground", children: meeting.platform })
+      ] })
+    ] }),
+    meeting.meeting_link && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+      "a",
+      {
+        href: meeting.meeting_link,
+        target: "_blank",
+        rel: "noopener noreferrer",
+        className: "mt-2 block text-xs text-brand hover:underline truncate",
+        children: meeting.meeting_link
+      }
+    ),
+    meeting.notes && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "mt-2 text-xs text-muted-foreground", children: meeting.notes })
+  ] });
+}
+function LeadDrawer({ open, lead, onClose, onSaved }) {
+  const isEdit = !!lead;
+  const queryClient2 = useQueryClient();
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = (0, import_react44.useState)("profile");
+  const [saving, setSaving] = (0, import_react44.useState)(false);
+  const [deleting, setDeleting] = (0, import_react44.useState)(false);
+  const [f3, setF] = (0, import_react44.useState)(emptyForm2);
+  const [emailType, setEmailType] = (0, import_react44.useState)("cold");
+  const [generatingEmail, setGeneratingEmail] = (0, import_react44.useState)(false);
+  const [generatedEmail, setGeneratedEmail] = (0, import_react44.useState)("");
+  const [generatingLinkedIn, setGeneratingLinkedIn] = (0, import_react44.useState)(false);
+  const [generatedLinkedIn, setGeneratedLinkedIn] = (0, import_react44.useState)("");
+  const [investorReply, setInvestorReply] = (0, import_react44.useState)("");
+  const [generatingReply, setGeneratingReply] = (0, import_react44.useState)(false);
+  const [generatedReply, setGeneratedReply] = (0, import_react44.useState)("");
+  const [showMeetingForm, setShowMeetingForm] = (0, import_react44.useState)(false);
+  const [schedulingMeeting, setSchedulingMeeting] = (0, import_react44.useState)(false);
+  const [mf, setMf] = (0, import_react44.useState)({
+    title: "",
+    scheduled_at: "",
+    meeting_type: "Intro",
+    platform: "Zoom",
+    meeting_link: "",
+    notes: ""
+  });
+  const [newNote, setNewNote] = (0, import_react44.useState)("");
+  const [addingNote, setAddingNote] = (0, import_react44.useState)(false);
+  const [updatingStatus, setUpdatingStatus] = (0, import_react44.useState)(false);
+  (0, import_react44.useEffect)(() => {
+    if (!open) return;
+    setActiveTab("profile");
+    setGeneratedEmail("");
+    setGeneratedLinkedIn("");
+    setGeneratedReply("");
+    setInvestorReply("");
+    setShowMeetingForm(false);
+    setNewNote("");
+    if (lead) {
+      setF({
+        investor_name: lead.investor_name ?? "",
+        firm_name: lead.firm_name ?? "",
+        email: lead.email ?? "",
+        phone: lead.phone ?? "",
+        linkedin_url: lead.linkedin_url ?? "",
+        twitter_url: lead.twitter_url ?? "",
+        website: lead.website ?? "",
+        sector: lead.sector ?? "",
+        stage: lead.stage ?? "",
+        geography: lead.geography ?? "",
+        ticket_size: lead.ticket_size ?? "",
+        status: lead.status,
+        follow_up_date: lead.follow_up_date ?? "",
+        notes: lead.notes ?? "",
+        source: lead.source ?? "",
+        relationship_strength: lead.relationship_strength ?? "",
+        last_contacted: lead.last_contacted ?? "",
+        next_action: lead.next_action ?? ""
+      });
+    } else {
+      setF(emptyForm2);
+    }
+  }, [open, lead]);
+  const { data: meetings = [], refetch: refetchMeetings } = useQuery({
+    queryKey: ["lead-meetings", lead?.id],
+    enabled: !!lead?.id && open,
+    queryFn: async () => {
+      const { data } = await supabase.from("meetings").select("*").eq("vc_lead_id", lead.id).order("scheduled_at", { ascending: true });
+      return data ?? [];
+    }
+  });
+  if (!open) return null;
+  const set = (k3, v3) => setF((s) => ({ ...s, [k3]: v3 }));
+  const handleSave = async (e) => {
+    e.preventDefault();
+    if (!f3.investor_name.trim()) return;
+    setSaving(true);
+    try {
+      const payload = {
+        investor_name: f3.investor_name.trim(),
+        firm_name: f3.firm_name || null,
+        email: f3.email || null,
+        phone: f3.phone || null,
+        linkedin_url: f3.linkedin_url || null,
+        twitter_url: f3.twitter_url || null,
+        website: f3.website || null,
+        sector: f3.sector || null,
+        stage: f3.stage || null,
+        geography: f3.geography || null,
+        ticket_size: f3.ticket_size || null,
+        status: f3.status,
+        follow_up_date: f3.follow_up_date || null,
+        notes: f3.notes || null,
+        source: f3.source || null,
+        relationship_strength: f3.relationship_strength || null,
+        last_contacted: f3.last_contacted || null,
+        next_action: f3.next_action || null,
+        updated_at: (/* @__PURE__ */ new Date()).toISOString()
+      };
+      if (isEdit) {
+        const { error } = await supabase.from("vc_leads").update(payload).eq("id", lead.id).eq("founder_id", user.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("vc_leads").insert({ ...payload, founder_id: user.id });
+        if (error) throw error;
+      }
+      toast.success("Lead saved");
+      onSaved();
+    } catch {
+      toast.error("Failed to save");
+    } finally {
+      setSaving(false);
+    }
+  };
+  const handleDelete = async () => {
+    if (!lead) return;
+    setDeleting(true);
+    try {
+      const { error } = await supabase.from("vc_leads").delete().eq("id", lead.id).eq("founder_id", user.id);
+      if (error) throw error;
+      toast.success("Lead deleted");
+      onSaved();
+    } catch {
+      toast.error("Failed to delete");
+    } finally {
+      setDeleting(false);
+    }
+  };
+  const handleGenerateEmail = async (type) => {
+    if (!user?.id || !lead) return;
+    setEmailType(type);
+    setGeneratingEmail(true);
+    setGeneratedEmail("");
+    try {
+      const result = await generateOutreachEmail2({ data: { userId: user.id, leadId: lead.id, type } });
+      setGeneratedEmail(`Subject: ${result.subject}
+
+${result.body}`);
+    } catch (err) {
+      toast.error(err.message || "Failed to generate email");
+    } finally {
+      setGeneratingEmail(false);
+    }
+  };
+  const handleGenerateLinkedIn = async () => {
+    if (!user?.id || !lead) return;
+    setGeneratingLinkedIn(true);
+    setGeneratedLinkedIn("");
+    try {
+      const result = await generateLinkedInMessage2({ data: { userId: user.id, leadId: lead.id } });
+      setGeneratedLinkedIn(result.message);
+    } catch (err) {
+      toast.error(err.message || "Failed to generate LinkedIn message");
+    } finally {
+      setGeneratingLinkedIn(false);
+    }
+  };
+  const handleGenerateReply = async () => {
+    if (!user?.id || !lead || !investorReply.trim()) return;
+    setGeneratingReply(true);
+    setGeneratedReply("");
+    try {
+      const result = await generateReply2({ data: { userId: user.id, leadId: lead.id, investorReply: investorReply.trim() } });
+      setGeneratedReply(result.reply);
+    } catch (err) {
+      toast.error(err.message || "Failed to generate reply");
+    } finally {
+      setGeneratingReply(false);
+    }
+  };
+  const handleSaveEmailToNotes = async () => {
+    if (!lead || !generatedEmail) return;
+    const tag = emailType === "cold" ? "Cold Email" : "Follow-up Email";
+    const entry = `**${tag} (${(/* @__PURE__ */ new Date()).toLocaleDateString()}):**
+${generatedEmail}`;
+    const appended = [f3.notes, entry].filter(Boolean).join("\n\n---\n\n");
+    await supabase.from("vc_leads").update({ notes: appended, updated_at: (/* @__PURE__ */ new Date()).toISOString() }).eq("id", lead.id);
+    setF((s) => ({ ...s, notes: appended }));
+    queryClient2.invalidateQueries({ queryKey: ["leads", user?.id] });
+    toast.success("Saved to notes");
+  };
+  const handleScheduleMeeting = async (e) => {
+    e.preventDefault();
+    if (!lead?.id) return;
+    setSchedulingMeeting(true);
+    try {
+      const { error } = await supabase.from("meetings").insert({
+        vc_lead_id: lead.id,
+        title: mf.title,
+        scheduled_at: mf.scheduled_at,
+        meeting_type: mf.meeting_type,
+        platform: mf.platform,
+        meeting_link: mf.meeting_link || null,
+        notes: mf.notes || null
+      });
+      if (error) throw error;
+      toast.success("Meeting scheduled");
+      setShowMeetingForm(false);
+      setMf({ title: "", scheduled_at: "", meeting_type: "Intro", platform: "Zoom", meeting_link: "", notes: "" });
+      refetchMeetings();
+      queryClient2.invalidateQueries({ queryKey: ["meetings"] });
+    } catch (err) {
+      toast.error(err.message || "Failed to schedule");
+    } finally {
+      setSchedulingMeeting(false);
+    }
+  };
+  const handleUpdateStatus = async (newStatus) => {
+    if (!lead?.id || !user?.id) return;
+    setUpdatingStatus(true);
+    try {
+      const { error } = await supabase.from("vc_leads").update({ status: newStatus, updated_at: (/* @__PURE__ */ new Date()).toISOString() }).eq("id", lead.id).eq("founder_id", user.id);
+      if (error) throw error;
+      setF((s) => ({ ...s, status: newStatus }));
+      queryClient2.invalidateQueries({ queryKey: ["leads", user.id] });
+      toast.success(`Status \u2192 ${newStatus}`);
+    } catch {
+      toast.error("Failed to update status");
+    } finally {
+      setUpdatingStatus(false);
+    }
+  };
+  const handleAddNote = async () => {
+    if (!lead || !newNote.trim()) return;
+    setAddingNote(true);
+    const entry = `${newNote.trim()}
+_${(/* @__PURE__ */ new Date()).toLocaleString()}_`;
+    const appended = [f3.notes, entry].filter(Boolean).join("\n\n---\n\n");
+    try {
+      const { error } = await supabase.from("vc_leads").update({ notes: appended, updated_at: (/* @__PURE__ */ new Date()).toISOString() }).eq("id", lead.id);
+      if (error) throw error;
+      setF((s) => ({ ...s, notes: appended }));
+      setNewNote("");
+      queryClient2.invalidateQueries({ queryKey: ["leads", user?.id] });
+      toast.success("Note added");
+    } catch {
+      toast.error("Failed to add note");
+    } finally {
+      setAddingNote(false);
+    }
+  };
+  const notesList = f3.notes ? f3.notes.split("\n\n---\n\n").filter(Boolean).reverse() : [];
+  const now = /* @__PURE__ */ new Date();
+  const upcomingMeetings = meetings.filter((m3) => new Date(m3.scheduled_at) >= now);
+  const pastMeetings = meetings.filter((m3) => new Date(m3.scheduled_at) < now);
+  const TABS = [
+    { id: "profile", label: "Profile", icon: User },
+    { id: "outreach", label: "Outreach", icon: MessageSquare },
+    { id: "meetings", label: "Meetings", icon: Calendar },
+    { id: "pipeline", label: "Pipeline", icon: GitBranch }
+  ];
+  return /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_jsx_runtime53.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "fixed inset-0 z-30 bg-foreground/20 backdrop-blur-sm", onClick: onClose }),
+    /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("aside", { className: "fixed top-16 bottom-0 right-0 z-40 w-full sm:w-[600px] lg:w-[660px] border-l border-border/60 bg-background shadow-elev flex flex-col overflow-hidden", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "h-14 border-b border-border/60 flex items-center justify-between px-5 shrink-0", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex items-center gap-3 min-w-0", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "grid h-8 w-8 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold text-sm shrink-0", children: (f3.investor_name || "?")[0].toUpperCase() }),
+          /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "min-w-0", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "text-sm font-semibold truncate", children: isEdit ? f3.investor_name || "Edit lead" : "New lead" }),
+            f3.firm_name && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "text-xs text-muted-foreground truncate", children: f3.firm_name })
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+          "button",
+          {
+            onClick: onClose,
+            className: "grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground shrink-0",
+            children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(X2, { className: "h-4 w-4" })
+          }
+        )
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "border-b border-border/60 flex shrink-0", children: TABS.map((tab) => /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(
+        "button",
+        {
+          onClick: () => setActiveTab(tab.id),
+          className: cn3(
+            "flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium border-b-2 transition-colors",
+            activeTab === tab.id ? "border-brand text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+          ),
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(tab.icon, { className: "h-3.5 w-3.5" }),
+            tab.label
+          ]
+        },
+        tab.id
+      )) }),
+      /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("form", { onSubmit: handleSave, className: "flex flex-col flex-1 min-h-0", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex-1 overflow-y-auto px-5 py-4", children: [
+          activeTab === "profile" && /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "space-y-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Investor name *", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+              "input",
+              {
+                required: true,
+                value: f3.investor_name,
+                onChange: (e) => set("investor_name", e.target.value),
+                placeholder: "Sarah Johnson",
+                className: inputCls
+              }
+            ) }),
+            /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "grid grid-cols-2 gap-3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Firm name", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("input", { value: f3.firm_name, onChange: (e) => set("firm_name", e.target.value), placeholder: "Sequoia Capital", className: inputCls }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Email", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("input", { type: "email", value: f3.email, onChange: (e) => set("email", e.target.value), placeholder: "sarah@sequoia.com", className: inputCls }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Phone", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("input", { value: f3.phone, onChange: (e) => set("phone", e.target.value), placeholder: "+1 555 0100", className: inputCls }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "LinkedIn URL", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("input", { value: f3.linkedin_url, onChange: (e) => set("linkedin_url", e.target.value), placeholder: "linkedin.com/in/...", className: inputCls }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Twitter / X", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("input", { value: f3.twitter_url, onChange: (e) => set("twitter_url", e.target.value), placeholder: "@username", className: inputCls }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Website", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("input", { value: f3.website, onChange: (e) => set("website", e.target.value), placeholder: "sequoiacap.com", className: inputCls }) })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "grid grid-cols-2 gap-3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Sector", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("input", { value: f3.sector, onChange: (e) => set("sector", e.target.value), placeholder: "SaaS, FinTech\u2026", className: inputCls }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Stage", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("select", { value: f3.stage, onChange: (e) => set("stage", e.target.value), className: inputCls, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("option", { value: "", children: "Select\u2026" }),
+                STAGES2.map((s) => /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("option", { children: s }, s))
+              ] }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Geography", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("input", { value: f3.geography, onChange: (e) => set("geography", e.target.value), placeholder: "US, Europe\u2026", className: inputCls }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Ticket size", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("input", { value: f3.ticket_size, onChange: (e) => set("ticket_size", e.target.value), placeholder: "$500K\u2013$2M", className: inputCls }) })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "grid grid-cols-2 gap-3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Relationship", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("select", { value: f3.relationship_strength, onChange: (e) => set("relationship_strength", e.target.value), className: inputCls, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("option", { value: "", children: "Select\u2026" }),
+                REL_STRENGTHS.map((r2) => /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("option", { children: r2 }, r2))
+              ] }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Follow-up date", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("input", { type: "date", value: f3.follow_up_date, onChange: (e) => set("follow_up_date", e.target.value), className: inputCls }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Last contacted", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("input", { type: "date", value: f3.last_contacted, onChange: (e) => set("last_contacted", e.target.value), className: inputCls }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Source", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("input", { value: f3.source, onChange: (e) => set("source", e.target.value), placeholder: "LinkedIn, intro\u2026", className: inputCls }) })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Next action", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("input", { value: f3.next_action, onChange: (e) => set("next_action", e.target.value), placeholder: "Send deck, follow up\u2026", className: inputCls }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Notes", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+              "textarea",
+              {
+                value: f3.notes,
+                onChange: (e) => set("notes", e.target.value),
+                rows: 4,
+                placeholder: "Context, thesis fit, intro source\u2026",
+                className: cn3(inputCls, "resize-none")
+              }
+            ) }),
+            /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("label", { className: "block text-xs text-muted-foreground mb-2", children: "Status" }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "flex flex-wrap gap-1.5", children: ALL_STATUSES.map((s) => /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+                "button",
+                {
+                  type: "button",
+                  onClick: () => set("status", s),
+                  className: cn3(
+                    "rounded-full px-2.5 py-1 text-xs font-medium transition-all border",
+                    f3.status === s ? `${STATUS_COLOR[s]} border-current` : "bg-muted/40 text-muted-foreground border-transparent hover:border-border/60"
+                  ),
+                  children: s
+                },
+                s
+              )) })
+            ] })
+          ] }),
+          activeTab === "outreach" && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "space-y-3", children: !isEdit ? /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "rounded-lg border border-border/60 bg-accent/30 p-4 text-sm text-muted-foreground text-center", children: "Save this lead first to generate outreach content." }) : /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_jsx_runtime53.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(CollapsibleSection, { title: "AI Email Generator", defaultOpen: true, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("p", { className: "text-xs text-muted-foreground", children: [
+                "Personalised email for ",
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("strong", { children: f3.investor_name }),
+                f3.firm_name ? ` at ${f3.firm_name}` : "",
+                "."
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => handleGenerateEmail("cold"),
+                    disabled: generatingEmail,
+                    className: "flex-1 rounded-md border border-border/60 px-3 py-2 text-xs hover:bg-accent disabled:opacity-50 flex items-center justify-center gap-1.5",
+                    children: [
+                      generatingEmail && emailType === "cold" && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
+                      "Cold email"
+                    ]
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => handleGenerateEmail("followup"),
+                    disabled: generatingEmail,
+                    className: "flex-1 rounded-md border border-border/60 px-3 py-2 text-xs hover:bg-accent disabled:opacity-50 flex items-center justify-center gap-1.5",
+                    children: [
+                      generatingEmail && emailType === "followup" && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
+                      "Follow-up"
+                    ]
+                  }
+                )
+              ] }),
+              generatingEmail && !generatedEmail && /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "rounded-lg border border-border/60 bg-background p-4 flex items-center justify-center gap-2 text-sm text-muted-foreground", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(LoaderCircle, { className: "h-4 w-4 animate-spin" }),
+                " Generating\u2026"
+              ] }),
+              generatedEmail && /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "rounded-lg border border-brand/30 bg-background p-3 space-y-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex items-center justify-between", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("span", { className: "text-xs font-semibold text-brand uppercase tracking-wide", children: emailType === "cold" ? "Cold Email" : "Follow-up" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex gap-1.5", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(
+                      "button",
+                      {
+                        type: "button",
+                        onClick: () => {
+                          navigator.clipboard.writeText(generatedEmail);
+                          toast.success("Copied!");
+                        },
+                        className: "flex items-center gap-1 rounded border border-border/60 px-2 py-0.5 text-xs hover:bg-accent",
+                        children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Copy, { className: "h-3 w-3" }),
+                          " Copy"
+                        ]
+                      }
+                    ),
+                    /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+                      "button",
+                      {
+                        type: "button",
+                        onClick: handleSaveEmailToNotes,
+                        className: "flex items-center gap-1 rounded border border-border/60 px-2 py-0.5 text-xs hover:bg-accent",
+                        children: "Save"
+                      }
+                    )
+                  ] })
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+                  "textarea",
+                  {
+                    value: generatedEmail,
+                    onChange: (e) => setGeneratedEmail(e.target.value),
+                    rows: 10,
+                    className: cn3(inputCls, "resize-none text-xs font-mono")
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(CollapsibleSection, { title: "LinkedIn Message", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("p", { className: "text-xs text-muted-foreground", children: "Generate a short connection request (<300 chars)." }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(
+                "button",
+                {
+                  type: "button",
+                  onClick: handleGenerateLinkedIn,
+                  disabled: generatingLinkedIn,
+                  className: "w-full rounded-md border border-border/60 px-3 py-2 text-xs hover:bg-accent disabled:opacity-50 flex items-center justify-center gap-1.5",
+                  children: [
+                    generatingLinkedIn && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
+                    "Generate LinkedIn message"
+                  ]
+                }
+              ),
+              generatedLinkedIn && /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "rounded-lg border border-border/60 bg-background p-3 space-y-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex items-center justify-between", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("span", { className: "text-xs text-muted-foreground", children: [
+                    generatedLinkedIn.length,
+                    "/300 chars"
+                  ] }),
+                  /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex gap-1.5", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(
+                      "button",
+                      {
+                        type: "button",
+                        onClick: () => {
+                          navigator.clipboard.writeText(generatedLinkedIn);
+                          toast.success("Copied!");
+                        },
+                        className: "flex items-center gap-1 rounded border border-border/60 px-2 py-0.5 text-xs hover:bg-accent",
+                        children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Copy, { className: "h-3 w-3" }),
+                          " Copy"
+                        ]
+                      }
+                    ),
+                    f3.linkedin_url && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+                      "a",
+                      {
+                        href: f3.linkedin_url.startsWith("http") ? f3.linkedin_url : `https://${f3.linkedin_url}`,
+                        target: "_blank",
+                        rel: "noopener noreferrer",
+                        className: "flex items-center gap-1 rounded border border-border/60 px-2 py-0.5 text-xs hover:bg-accent text-brand",
+                        children: "Open \u2197"
+                      }
+                    )
+                  ] })
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+                  "textarea",
+                  {
+                    value: generatedLinkedIn,
+                    onChange: (e) => setGeneratedLinkedIn(e.target.value),
+                    rows: 4,
+                    className: cn3(inputCls, "resize-none text-xs")
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(CollapsibleSection, { title: "Reply Handler", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("p", { className: "text-xs text-muted-foreground", children: "Paste the investor's reply and generate your follow-up." }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Investor's reply", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+                "textarea",
+                {
+                  value: investorReply,
+                  onChange: (e) => setInvestorReply(e.target.value),
+                  rows: 3,
+                  placeholder: "Paste the investor's email or message here\u2026",
+                  className: cn3(inputCls, "resize-none text-xs")
+                }
+              ) }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(
+                "button",
+                {
+                  type: "button",
+                  onClick: handleGenerateReply,
+                  disabled: generatingReply || !investorReply.trim(),
+                  className: "w-full rounded-md border border-border/60 px-3 py-2 text-xs hover:bg-accent disabled:opacity-50 flex items-center justify-center gap-1.5",
+                  children: [
+                    generatingReply && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
+                    "Generate reply"
+                  ]
+                }
+              ),
+              generatedReply && /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "rounded-lg border border-border/60 bg-background p-3 space-y-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex items-center justify-between", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("span", { className: "text-xs font-semibold text-muted-foreground uppercase tracking-wide", children: "Your reply" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(
+                    "button",
+                    {
+                      type: "button",
+                      onClick: () => {
+                        navigator.clipboard.writeText(generatedReply);
+                        toast.success("Copied!");
+                      },
+                      className: "flex items-center gap-1 rounded border border-border/60 px-2 py-0.5 text-xs hover:bg-accent",
+                      children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Copy, { className: "h-3 w-3" }),
+                        " Copy"
+                      ]
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+                  "textarea",
+                  {
+                    value: generatedReply,
+                    onChange: (e) => setGeneratedReply(e.target.value),
+                    rows: 6,
+                    className: cn3(inputCls, "resize-none text-xs")
+                  }
+                )
+              ] })
+            ] })
+          ] }) }),
+          activeTab === "meetings" && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "space-y-4", children: !isEdit ? /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "rounded-lg border border-border/60 bg-accent/30 p-4 text-sm text-muted-foreground text-center", children: "Save this lead first to schedule meetings." }) : /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_jsx_runtime53.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(
+              "button",
+              {
+                type: "button",
+                onClick: () => setShowMeetingForm((v3) => !v3),
+                className: "w-full flex items-center justify-center gap-1.5 rounded-md border border-dashed border-border/60 py-2.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors",
+                children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Plus, { className: "h-4 w-4" }),
+                  " Schedule meeting"
+                ]
+              }
+            ),
+            showMeetingForm && /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("form", { onSubmit: handleScheduleMeeting, className: "rounded-lg border border-border/60 bg-card p-4 space-y-3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "text-sm font-semibold", children: "New meeting" }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Title", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("input", { required: true, value: mf.title, onChange: (e) => setMf((s) => ({ ...s, title: e.target.value })), placeholder: "Intro call with Sarah", className: inputCls }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Date & Time", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("input", { required: true, type: "datetime-local", value: mf.scheduled_at, onChange: (e) => setMf((s) => ({ ...s, scheduled_at: e.target.value })), className: inputCls }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "grid grid-cols-2 gap-3", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Type", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("select", { value: mf.meeting_type, onChange: (e) => setMf((s) => ({ ...s, meeting_type: e.target.value })), className: inputCls, children: MEETING_TYPES.map((t) => /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("option", { children: t }, t)) }) }),
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Platform", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("select", { value: mf.platform, onChange: (e) => setMf((s) => ({ ...s, platform: e.target.value })), className: inputCls, children: PLATFORMS.map((p3) => /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("option", { children: p3 }, p3)) }) })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Meeting link", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("input", { value: mf.meeting_link, onChange: (e) => setMf((s) => ({ ...s, meeting_link: e.target.value })), placeholder: "https://zoom.us/j/...", className: inputCls }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Field3, { label: "Prep notes", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("textarea", { value: mf.notes, onChange: (e) => setMf((s) => ({ ...s, notes: e.target.value })), rows: 2, placeholder: "Questions to ask, talking points\u2026", className: cn3(inputCls, "resize-none") }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex gap-2 pt-1", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("button", { type: "button", onClick: () => setShowMeetingForm(false), className: "flex-1 rounded-md border border-border/60 py-2 text-xs hover:bg-accent", children: "Cancel" }),
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("button", { type: "submit", disabled: schedulingMeeting, className: "flex-1 rounded-md bg-gradient-brand text-brand-foreground py-2 text-xs disabled:opacity-50 flex items-center justify-center gap-1.5", children: [
+                  schedulingMeeting && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
+                  "Schedule"
+                ] })
+              ] })
+            ] }),
+            upcomingMeetings.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2", children: "Upcoming" }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "space-y-2", children: upcomingMeetings.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(MeetingCard, { meeting: m3 }, m3.id)) })
+            ] }),
+            pastMeetings.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2", children: "Past" }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "space-y-2", children: pastMeetings.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(MeetingCard, { meeting: m3, past: true }, m3.id)) })
+            ] }),
+            meetings.length === 0 && !showMeetingForm && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "rounded-lg border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground", children: "No meetings yet" })
+          ] }) }),
+          activeTab === "pipeline" && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "space-y-5", children: !isEdit ? /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "rounded-lg border border-border/60 bg-accent/30 p-4 text-sm text-muted-foreground text-center", children: "Save this lead first to track pipeline progress." }) : /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_jsx_runtime53.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "rounded-lg border border-border/60 bg-card p-4", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3", children: "Pipeline stage" }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "flex flex-wrap gap-1.5 mb-2", children: PIPELINE_MAIN.map((s, i2) => {
+                const isActive = f3.status === s;
+                const mainIdx = PIPELINE_MAIN.findIndex((x3) => x3 === f3.status);
+                const isPast2 = mainIdx > i2;
+                return /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => handleUpdateStatus(s),
+                    disabled: updatingStatus,
+                    className: cn3(
+                      "flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-all border disabled:opacity-60",
+                      isActive ? "bg-brand text-brand-foreground border-brand shadow-glow" : isPast2 ? "bg-brand/10 text-brand border-brand/30" : "bg-muted/40 text-muted-foreground border-transparent hover:border-border/60"
+                    ),
+                    children: [
+                      isActive && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Check, { className: "h-3 w-3 shrink-0" }),
+                      s
+                    ]
+                  },
+                  s
+                );
+              }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "flex gap-1.5 pt-1 border-t border-border/40", children: ["Follow Up", "Rejected"].map((s) => /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(
+                "button",
+                {
+                  type: "button",
+                  onClick: () => handleUpdateStatus(s),
+                  disabled: updatingStatus,
+                  className: cn3(
+                    "flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-all border disabled:opacity-60",
+                    f3.status === s ? `${STATUS_COLOR[s]} border-current` : "bg-muted/40 text-muted-foreground border-transparent hover:border-border/60"
+                  ),
+                  children: [
+                    f3.status === s && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Check, { className: "h-3 w-3 shrink-0" }),
+                    s
+                  ]
+                },
+                s
+              )) })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2", children: "Activity log" }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+                  "textarea",
+                  {
+                    value: newNote,
+                    onChange: (e) => setNewNote(e.target.value),
+                    rows: 2,
+                    placeholder: "Add update, meeting note, or status change reason\u2026",
+                    className: cn3(inputCls, "resize-none text-xs")
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: handleAddNote,
+                    disabled: addingNote || !newNote.trim(),
+                    className: "w-full rounded-md bg-gradient-brand text-brand-foreground py-2 text-xs disabled:opacity-50 flex items-center justify-center gap-1.5",
+                    children: [
+                      addingNote && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
+                      "Add to log"
+                    ]
+                  }
+                )
+              ] })
+            ] }),
+            notesList.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "rounded-lg border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground", children: "No activity logged yet" }) : /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "space-y-2", children: notesList.map((note, i2) => /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "rounded-lg border border-border/60 bg-card p-3", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex items-start gap-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Clock, { className: "h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0" }),
+              /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("pre", { className: "text-xs whitespace-pre-wrap font-sans text-muted-foreground", children: note })
+            ] }) }, i2)) })
+          ] }) })
+        ] }),
+        activeTab === "profile" && /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "shrink-0 border-t border-border/60 px-5 py-3 flex items-center justify-between gap-2", children: [
+          isEdit ? /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(
+            "button",
+            {
+              type: "button",
+              onClick: handleDelete,
+              disabled: deleting,
+              className: "inline-flex items-center gap-1.5 rounded-md border border-destructive/40 text-destructive px-3 py-1.5 text-sm hover:bg-destructive/10 disabled:opacity-50",
+              children: [
+                deleting ? /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Trash2, { className: "h-3.5 w-3.5" }),
+                "Delete"
+              ]
+            }
+          ) : /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", {}),
+          /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+              "button",
+              {
+                type: "button",
+                onClick: onClose,
+                className: "rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent",
+                children: "Cancel"
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(
+              "button",
+              {
+                type: "submit",
+                disabled: saving || !f3.investor_name.trim(),
+                className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow disabled:opacity-50",
+                children: [
+                  saving && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
+                  isEdit ? "Save changes" : "Add lead"
+                ]
+              }
+            )
+          ] })
+        ] })
+      ] })
+    ] })
+  ] });
+}
+var import_jsx_runtime53, import_react44, generateOutreachEmail2, generateLinkedInMessage2, generateReply2, ALL_STATUSES, PIPELINE_MAIN, STATUS_COLOR, STAGES2, REL_STRENGTHS, MEETING_TYPES, PLATFORMS, inputCls, emptyForm2;
+var init_LeadDrawer_mv_iA4VM = __esm({
+  "dist/server/assets/LeadDrawer-mv-iA4VM.js"() {
+    "use strict";
+    import_jsx_runtime53 = __toESM(require_jsx_runtime(), 1);
+    import_react44 = __toESM(require_react(), 1);
+    init_lucide_react();
+    init_dist7();
+    init_router_DOcN9fVX();
+    init_modern2();
+    init_utils_H80jjgLf();
+    init_createSsrRpc_l1y8KE69();
+    init_server4();
+    generateOutreachEmail2 = createServerFn({
+      method: "POST"
+    }).inputValidator((data) => data).handler(createSsrRpc("1d719b02e5cbb8bfb1f5fdbf08bea97cdac2cfff952491ca07a2d91de6f74c81"));
+    generateLinkedInMessage2 = createServerFn({
+      method: "POST"
+    }).inputValidator((data) => data).handler(createSsrRpc("272077c9c144c7cbae7da95efd3b0536517866897833aab391e7e9e60debb102"));
+    generateReply2 = createServerFn({
+      method: "POST"
+    }).inputValidator((data) => data).handler(createSsrRpc("08b07e340aa3dd2c22b3ea45b5ff6e1a1e3844f3dadeb4cfd75858793e9c8fb3"));
+    ALL_STATUSES = [
+      "New",
+      "Shortlisted",
+      "Contacted",
+      "Replied",
+      "Meeting Booked",
+      "Interested",
+      "Deal Room Created",
+      "Follow Up",
+      "Rejected"
+    ];
+    PIPELINE_MAIN = [
+      "New",
+      "Shortlisted",
+      "Contacted",
+      "Replied",
+      "Meeting Booked",
+      "Interested",
+      "Deal Room Created"
+    ];
+    STATUS_COLOR = {
+      "New": "bg-muted-foreground/20 text-muted-foreground",
+      "Shortlisted": "bg-foreground/10 text-foreground",
+      "Contacted": "bg-brand/15 text-brand",
+      "Replied": "bg-violet/15 text-violet",
+      "Meeting Booked": "bg-warning/15 text-warning",
+      "Interested": "bg-warning/20 text-warning",
+      "Deal Room Created": "bg-success/15 text-success",
+      "Follow Up": "bg-brand/10 text-brand",
+      "Rejected": "bg-destructive/15 text-destructive"
+    };
+    STAGES2 = ["Pre-seed", "Seed", "Series A", "Series B", "Growth"];
+    REL_STRENGTHS = ["Cold", "Warm", "Hot", "Intro"];
+    MEETING_TYPES = ["Intro", "Deep Dive", "Partner", "Follow-up"];
+    PLATFORMS = ["Zoom", "Google Meet", "Phone", "In Person"];
+    inputCls = "w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/10";
+    emptyForm2 = {
+      investor_name: "",
+      firm_name: "",
+      email: "",
+      phone: "",
+      linkedin_url: "",
+      twitter_url: "",
+      website: "",
+      sector: "",
+      stage: "",
+      geography: "",
+      ticket_size: "",
+      status: "New",
+      follow_up_date: "",
+      notes: "",
+      source: "",
+      relationship_strength: "",
+      last_contacted: "",
+      next_action: ""
+    };
+  }
+});
+
+// dist/server/assets/app.pipeline-CrgeFDq2.js
+var app_pipeline_CrgeFDq2_exports = {};
+__export(app_pipeline_CrgeFDq2_exports, {
   component: () => Pipeline
 });
+import "node:async_hooks";
 function timeAgo2(iso) {
   const diff = Date.now() - new Date(iso).getTime();
   const mins = Math.floor(diff / 6e4);
@@ -64685,11 +65714,6 @@ function leadToDeal(lead) {
   const name = lead.investor_name ?? "";
   const parts = name.trim().split(" ");
   const initials = parts.length >= 2 ? ((parts[0][0] ?? "") + (parts[parts.length - 1][0] ?? "")).toUpperCase() : name.slice(0, 2).toUpperCase();
-  let signal;
-  if (lead.follow_up_date) {
-    const fup = /* @__PURE__ */ new Date(lead.follow_up_date + "T12:00:00");
-    if (fup <= /* @__PURE__ */ new Date()) signal = "hot";
-  }
   return {
     id: lead.id,
     firm: lead.firm_name ?? "\u2014",
@@ -64699,20 +65723,18 @@ function leadToDeal(lead) {
     stage,
     probability: STAGE_PROBABILITY[stage],
     lastTouch: timeAgo2(lead.updated_at),
-    signal,
+    isHot: lead.status === "Interested",
     thesis: lead.sector ?? "\u2014"
   };
 }
 function Pipeline() {
   const {
-    t
-  } = useI18n();
-  const {
     user
   } = useAuth();
   const queryClient2 = useQueryClient();
-  const [dragId, setDragId] = (0, import_react44.useState)(null);
-  const [overStage, setOverStage] = (0, import_react44.useState)(null);
+  const [dragId, setDragId] = (0, import_react45.useState)(null);
+  const [overStage, setOverStage] = (0, import_react45.useState)(null);
+  const [selectedLead, setSelectedLead] = (0, import_react45.useState)(null);
   const {
     data: rawLeads = [],
     isLoading
@@ -64723,36 +65745,31 @@ function Pipeline() {
       const {
         data,
         error
-      } = await supabase.from("vc_leads").select("id, investor_name, firm_name, ticket_size, status, sector, updated_at, follow_up_date").eq("founder_id", user.id).order("updated_at", {
+      } = await supabase.from("vc_leads").select("*").eq("founder_id", user.id).order("updated_at", {
         ascending: false
       });
       if (error) throw error;
       return data ?? [];
     }
   });
-  const deals2 = (0, import_react44.useMemo)(() => rawLeads.map(leadToDeal), [rawLeads]);
-  const byStage = (0, import_react44.useMemo)(() => {
+  const deals = (0, import_react45.useMemo)(() => rawLeads.map(leadToDeal), [rawLeads]);
+  const byStage = (0, import_react45.useMemo)(() => {
     const m3 = {
       Sourced: [],
-      Qualified: [],
-      Pitched: [],
-      Diligence: [],
-      "Term Sheet": [],
-      Closed: []
+      Contacted: [],
+      Meeting: [],
+      Interested: [],
+      "Deal Room": [],
+      Passed: []
     };
-    deals2.forEach((d2) => m3[d2.stage].push(d2));
+    deals.forEach((d2) => m3[d2.stage].push(d2));
     return m3;
-  }, [deals2]);
-  const totalValue = (xs) => xs.reduce((sum, d2) => {
-    const n2 = parseFloat(d2.check.replace(/[^0-9.]/g, "")) || 0;
-    return sum + n2;
-  }, 0);
+  }, [deals]);
   const onDrop = async (stage) => {
     if (!dragId || !user?.id) return;
     const newStatus = STAGE_TO_STATUS[stage];
     setDragId(null);
     setOverStage(null);
-    if (!newStatus) return;
     queryClient2.setQueryData(["pipeline-leads", user.id], (old) => (old ?? []).map((l2) => l2.id === dragId ? {
       ...l2,
       status: newStatus
@@ -64763,152 +65780,188 @@ function Pipeline() {
     }).eq("id", dragId).eq("founder_id", user.id);
   };
   if (isLoading) {
-    return /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "p-8 flex items-center justify-center min-h-64", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(LoaderCircle, { className: "h-6 w-6 animate-spin text-muted-foreground" }) });
+    return /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "p-8 flex items-center justify-center min-h-64", children: /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(LoaderCircle, { className: "h-6 w-6 animate-spin text-muted-foreground" }) });
   }
-  if (deals2.length === 0) {
-    return /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1600px] mx-auto", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "flex items-end justify-between flex-wrap gap-4", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: t("pipeline.title") }),
-        /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: t("pipeline.subtitle") })
+  if (deals.length === 0) {
+    return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1600px] mx-auto", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "flex items-end justify-between flex-wrap gap-4", children: /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Pipeline" }),
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: "Manage your investor relationships as a visual pipeline." })
       ] }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "mt-16 flex flex-col items-center gap-4 text-center", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Users, { className: "h-12 w-12 text-muted-foreground/30" }),
-        /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("p", { className: "text-base font-medium", children: "Your pipeline is empty." }),
-        /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("p", { className: "text-sm text-muted-foreground max-w-sm", children: "Add VC leads to see them appear here. Leads are mapped to pipeline stages based on their status." }),
-        /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(Link, { to: "/app/leads", className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Plus, { className: "h-4 w-4" }),
+      /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "mt-16 flex flex-col items-center gap-4 text-center", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(Users, { className: "h-12 w-12 text-muted-foreground/30" }),
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("p", { className: "text-base font-medium", children: "Your pipeline is empty." }),
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("p", { className: "text-sm text-muted-foreground max-w-sm", children: "Add VC leads to see them appear here. Leads are mapped to pipeline stages based on their status." }),
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(Link, { to: "/app/leads", className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(Plus, { className: "h-4 w-4" }),
           " Add VC leads"
         ] })
       ] })
     ] });
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1600px] mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex items-end justify-between flex-wrap gap-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: t("pipeline.title") }),
-        /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: t("pipeline.subtitle") })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "flex items-center gap-2", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("button", { className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Funnel, { className: "h-4 w-4" }),
-        " Filters"
-      ] }) })
-    ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "mt-5 grid grid-cols-2 md:grid-cols-4 gap-3", children: [["Total deals", String(deals2.length), "across pipeline"], ["Pipeline value", `$${totalValue(deals2).toFixed(0)}M`, "uncommitted"], ["Hot deals", String(deals2.filter((d2) => d2.signal === "hot").length), "need follow-up"], ["Closed", `$${totalValue(byStage.Closed).toFixed(0)}M`, "this quarter"]].map(([l2, v3, s]) => /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-4 shadow-card", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "text-xs text-muted-foreground", children: l2 }),
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "mt-1 text-xl font-semibold tabular-nums", children: v3 }),
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "text-[11px] text-muted-foreground", children: s })
-    ] }, l2)) }),
-    /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "mt-6 grid grid-flow-col auto-cols-[minmax(280px,1fr)] gap-3 overflow-x-auto pb-4", children: pipelineStages.map((stage) => {
-      const items = byStage[stage];
-      const isOver = overStage === stage;
-      return /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { onDragOver: (e) => {
-        e.preventDefault();
-        setOverStage(stage);
-      }, onDragLeave: () => setOverStage((s) => s === stage ? null : s), onDrop: () => onDrop(stage), className: cn3("flex flex-col rounded-xl border bg-muted/30 transition-colors min-h-[400px]", isOver ? "border-brand bg-brand/5" : "border-border/60"), children: [
-        /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "px-3 py-2.5 border-b border-border/60 flex items-center justify-between", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("span", { className: cn3("h-2 w-2 rounded-full", stageTint[stage]) }),
-            /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("span", { className: "text-xs font-semibold uppercase tracking-wider", children: stage }),
-            /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("span", { className: "text-[10px] text-muted-foreground", children: items.length })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("span", { className: "text-[10px] text-muted-foreground tabular-nums", children: [
-            "$",
-            totalValue(items).toFixed(0),
-            "M"
-          ] })
+  const maxCount = Math.max(...pipelineStages.map((s) => byStage[s].length), 1);
+  return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_jsx_runtime54.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1600px] mx-auto", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "flex items-end justify-between flex-wrap gap-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Pipeline" }),
+          /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: "Manage your investor relationships as a visual pipeline." })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex-1 p-2 space-y-2", children: [
-          items.map((d2) => /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(DealCard, { deal: d2, onDragStart: () => setDragId(d2.id) }, d2.id)),
-          items.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "py-8 text-center text-[11px] text-muted-foreground", children: "Drop deals here" })
-        ] })
-      ] }, stage);
-    }) })
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "flex items-center gap-2", children: /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("button", { className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(Funnel, { className: "h-4 w-4" }),
+          " Filters"
+        ] }) })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "mt-5 grid grid-cols-2 md:grid-cols-4 gap-3", children: [["Total leads", String(deals.length), "across all stages"], ["Hot deals", String(deals.filter((d2) => d2.isHot).length), "Interested investors"], ["Deal rooms", String(byStage["Deal Room"].length), "active diligence"], ["Passed", String(byStage["Passed"].length), "this round"]].map(([l2, v3, s]) => /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-4 shadow-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "text-xs text-muted-foreground", children: l2 }),
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "mt-1 text-xl font-semibold tabular-nums", children: v3 }),
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "text-[11px] text-muted-foreground", children: s })
+      ] }, l2)) }),
+      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "mt-6 grid grid-flow-col auto-cols-[minmax(260px,1fr)] gap-3 overflow-x-auto pb-4", children: pipelineStages.map((stage) => {
+        const items = byStage[stage];
+        const isOver = overStage === stage;
+        return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { onDragOver: (e) => {
+          e.preventDefault();
+          setOverStage(stage);
+        }, onDragLeave: () => setOverStage((s) => s === stage ? null : s), onDrop: () => onDrop(stage), className: cn3("flex flex-col rounded-xl border bg-muted/30 transition-colors min-h-[400px]", isOver ? "border-brand bg-brand/5" : "border-border/60"), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "px-3 py-2.5 border-b border-border/60 flex items-center justify-between", children: /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("span", { className: cn3("h-2 w-2 rounded-full", stageTint[stage]) }),
+            /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("span", { className: "text-xs font-semibold uppercase tracking-wider", children: stage }),
+            /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("span", { className: "text-[10px] text-muted-foreground", children: items.length })
+          ] }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "flex-1 p-2 space-y-2", children: [
+            items.map((d2) => /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(DealCard, { deal: d2, onDragStart: () => setDragId(d2.id), onClick: () => {
+              const raw = rawLeads.find((l2) => l2.id === d2.id);
+              if (raw) setSelectedLead(raw);
+            } }, d2.id)),
+            items.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "py-8 text-center text-[11px] text-muted-foreground", children: "Drop leads here" })
+          ] })
+        ] }, stage);
+      }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "mt-6 rounded-xl border border-border/60 bg-card p-5 shadow-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "text-sm font-semibold mb-4", children: "Pipeline distribution" }),
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "space-y-3", children: pipelineStages.map((stage) => {
+          const count = byStage[stage].length;
+          const barPct = Math.round(count / maxCount * 100);
+          return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "flex items-center gap-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "w-24 text-xs text-muted-foreground shrink-0", children: stage }),
+            /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "flex-1 h-6 rounded-md bg-muted/40 overflow-hidden relative", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: cn3("h-full rounded-md transition-all duration-500", stageBarColor[stage]), style: {
+                width: `${barPct}%`
+              } }),
+              count > 0 && /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "absolute inset-y-0 left-2 flex items-center text-[10px] font-medium text-foreground/70", children: [
+                count,
+                " lead",
+                count !== 1 ? "s" : ""
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "w-5 text-xs text-right tabular-nums text-muted-foreground shrink-0", children: count })
+          ] }, stage);
+        }) })
+      ] })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(LeadDrawer, { open: !!selectedLead, lead: selectedLead, onClose: () => setSelectedLead(null), onSaved: () => {
+      setSelectedLead(null);
+      queryClient2.invalidateQueries({
+        queryKey: ["pipeline-leads", user?.id]
+      });
+    } })
   ] });
 }
 function DealCard({
   deal,
-  onDragStart
+  onDragStart,
+  onClick
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { draggable: true, onDragStart, className: "group rounded-lg border border-border/60 bg-card p-3 shadow-xs hover:shadow-card hover:border-brand/40 transition-all cursor-grab active:cursor-grabbing", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex items-start justify-between gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "flex items-center gap-2 min-w-0", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "grid h-7 w-7 place-items-center rounded-md bg-gradient-brand text-brand-foreground text-[10px] font-semibold shrink-0", children: deal.initials }),
-        /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "min-w-0", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "text-sm font-semibold truncate", children: deal.firm }),
-          /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "text-[11px] text-muted-foreground truncate", children: deal.partner })
+  return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { draggable: true, onDragStart, onClick, className: "group rounded-lg border border-border/60 bg-card p-3 shadow-xs hover:shadow-card hover:border-brand/40 transition-all cursor-grab active:cursor-grabbing", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "flex items-start justify-between gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "flex items-center gap-2 min-w-0", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "grid h-7 w-7 place-items-center rounded-md bg-gradient-brand text-brand-foreground text-[10px] font-semibold shrink-0", children: deal.initials }),
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "min-w-0", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "text-sm font-semibold truncate", children: deal.firm }),
+          /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "text-[11px] text-muted-foreground truncate", children: deal.partner })
         ] })
       ] }),
-      deal.signal === "hot" && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Flame, { className: "h-3.5 w-3.5 text-warning shrink-0" }),
-      deal.signal === "stale" && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(Clock, { className: "h-3.5 w-3.5 text-muted-foreground shrink-0" })
+      deal.isHot && /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(Flame, { className: "h-3.5 w-3.5 text-warning shrink-0" })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "mt-2 text-[11px] text-muted-foreground", children: deal.thesis }),
-    /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "mt-2.5 flex items-center justify-between", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("span", { className: "text-xs font-medium tabular-nums", children: deal.check }),
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("span", { className: "text-[10px] text-muted-foreground", children: deal.lastTouch })
+    /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "mt-2 text-[11px] text-muted-foreground", children: deal.thesis }),
+    /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "mt-2.5 flex items-center justify-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("span", { className: "text-xs font-medium tabular-nums", children: deal.check }),
+      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("span", { className: "text-[10px] text-muted-foreground", children: deal.lastTouch })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { className: "mt-2 flex items-center gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "flex-1 h-1 rounded-full bg-muted overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { className: "h-full bg-gradient-brand", style: {
+    /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "mt-2 flex items-center gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "flex-1 h-1 rounded-full bg-muted overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "h-full bg-gradient-brand", style: {
         width: `${deal.probability}%`
       } }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("span", { className: "text-[10px] tabular-nums text-muted-foreground", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("span", { className: "text-[10px] tabular-nums text-muted-foreground", children: [
         deal.probability,
         "%"
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("button", { className: "mt-2 w-full inline-flex items-center justify-center gap-1 text-[10px] text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "mt-2 w-full inline-flex items-center justify-center gap-1 text-[10px] text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity", children: [
       "Open ",
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(ArrowUpRight, { className: "h-3 w-3" })
+      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(ArrowUpRight, { className: "h-3 w-3" })
     ] })
   ] });
 }
-var import_jsx_runtime53, import_react44, pipelineStages, STATUS_TO_STAGE, STAGE_TO_STATUS, STAGE_PROBABILITY, stageTint;
-var init_app_pipeline_W2jx_L9u = __esm({
-  "dist/server/assets/app.pipeline-W2jx-L9u.js"() {
+var import_jsx_runtime54, import_react45, pipelineStages, STATUS_TO_STAGE, STAGE_TO_STATUS, STAGE_PROBABILITY, stageTint, stageBarColor;
+var init_app_pipeline_CrgeFDq2 = __esm({
+  "dist/server/assets/app.pipeline-CrgeFDq2.js"() {
     "use strict";
-    import_jsx_runtime53 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime54 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    import_react44 = __toESM(require_react(), 1);
+    import_react45 = __toESM(require_react(), 1);
     init_modern2();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_lucide_react();
     init_utils_H80jjgLf();
+    init_LeadDrawer_mv_iA4VM();
     init_dist7();
     init_clsx();
-    pipelineStages = ["Sourced", "Qualified", "Pitched", "Diligence", "Term Sheet", "Closed"];
+    init_production();
+    pipelineStages = ["Sourced", "Contacted", "Meeting", "Interested", "Deal Room", "Passed"];
     STATUS_TO_STAGE = {
       "New": "Sourced",
       "Shortlisted": "Sourced",
-      "Contacted": "Qualified",
-      "Replied": "Qualified",
-      "Follow Up": "Qualified",
-      "Meeting Booked": "Pitched",
-      "Interested": "Diligence",
-      "Deal Room Created": "Term Sheet",
-      "Rejected": "Closed"
+      "Contacted": "Contacted",
+      "Replied": "Contacted",
+      "Follow Up": "Contacted",
+      "Meeting Booked": "Meeting",
+      "Interested": "Interested",
+      "Deal Room Created": "Deal Room",
+      "Rejected": "Passed"
     };
     STAGE_TO_STATUS = {
       "Sourced": "New",
-      "Qualified": "Contacted",
-      "Pitched": "Meeting Booked",
-      "Diligence": "Interested",
-      "Term Sheet": "Deal Room Created",
-      "Closed": null
+      "Contacted": "Contacted",
+      "Meeting": "Meeting Booked",
+      "Interested": "Interested",
+      "Deal Room": "Deal Room Created",
+      "Passed": "Rejected"
     };
     STAGE_PROBABILITY = {
       "Sourced": 10,
-      "Qualified": 25,
-      "Pitched": 40,
-      "Diligence": 60,
-      "Term Sheet": 80,
-      "Closed": 100
+      "Contacted": 25,
+      "Meeting": 45,
+      "Interested": 65,
+      "Deal Room": 80,
+      "Passed": 0
     };
     stageTint = {
       "Sourced": "bg-muted-foreground/40",
-      "Qualified": "bg-foreground/40",
-      "Pitched": "bg-brand",
-      "Diligence": "bg-violet",
-      "Term Sheet": "bg-warning",
-      "Closed": "bg-success"
+      "Contacted": "bg-foreground/40",
+      "Meeting": "bg-brand",
+      "Interested": "bg-violet",
+      "Deal Room": "bg-warning",
+      "Passed": "bg-destructive/60"
+    };
+    stageBarColor = {
+      "Sourced": "bg-muted-foreground/50",
+      "Contacted": "bg-foreground/50",
+      "Meeting": "bg-brand",
+      "Interested": "bg-violet",
+      "Deal Room": "bg-warning",
+      "Passed": "bg-destructive/60"
     };
   }
 });
@@ -64919,10 +65972,10 @@ __export(app_notifications_CeL5tZom_exports, {
   component: () => NotificationsPage
 });
 function NotificationsPage() {
-  const [items, setItems] = (0, import_react45.useState)(notifications);
-  const [filter, setFilter] = (0, import_react45.useState)("all");
-  const [q2, setQ] = (0, import_react45.useState)("");
-  const list = (0, import_react45.useMemo)(() => {
+  const [items, setItems] = (0, import_react46.useState)(notifications);
+  const [filter, setFilter] = (0, import_react46.useState)("all");
+  const [q2, setQ] = (0, import_react46.useState)("");
+  const list = (0, import_react46.useMemo)(() => {
     let xs = items;
     if (filter === "unread") xs = xs.filter((n2) => n2.unread);
     else if (filter !== "all") xs = xs.filter((n2) => n2.kind === filter);
@@ -64930,58 +65983,58 @@ function NotificationsPage() {
     return xs;
   }, [items, filter, q2]);
   const unread = items.filter((n2) => n2.unread).length;
-  return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "p-6 lg:p-8 max-w-4xl mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "flex items-end justify-between gap-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "flex items-center gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(Bell, { className: "h-5 w-5 text-brand" }),
-          /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Notifications" }),
-          unread > 0 && /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("span", { className: "text-[10px] rounded-full bg-brand/10 text-brand px-1.5 py-0.5 font-medium", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { className: "p-6 lg:p-8 max-w-4xl mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { className: "flex items-end justify-between gap-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(Bell, { className: "h-5 w-5 text-brand" }),
+          /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Notifications" }),
+          unread > 0 && /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("span", { className: "text-[10px] rounded-full bg-brand/10 text-brand px-1.5 py-0.5 font-medium", children: [
             unread,
             " unread"
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: "Everything happening across your raise \u2014 investor activity, documents, and AI insights." })
+        /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: "Everything happening across your raise \u2014 investor activity, documents, and AI insights." })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("button", { onClick: () => setItems((xs) => xs.map((n2) => ({
+      /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("button", { onClick: () => setItems((xs) => xs.map((n2) => ({
         ...n2,
         unread: false
       }))), className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(CheckCheck, { className: "h-4 w-4" }),
+        /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(CheckCheck, { className: "h-4 w-4" }),
         " Mark all read"
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "mt-6 flex flex-wrap items-center gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "relative flex-1 min-w-[200px] max-w-sm", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(Search, { className: "absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" }),
-        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("input", { value: q2, onChange: (e) => setQ(e.target.value), placeholder: "Search notifications\u2026", className: "w-full rounded-md border border-border/60 bg-background pl-8 pr-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
+    /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { className: "mt-6 flex flex-wrap items-center gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { className: "relative flex-1 min-w-[200px] max-w-sm", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(Search, { className: "absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" }),
+        /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("input", { value: q2, onChange: (e) => setQ(e.target.value), placeholder: "Search notifications\u2026", className: "w-full rounded-md border border-border/60 bg-background pl-8 pr-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "flex flex-wrap gap-1", children: filters.map((f3) => /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("button", { onClick: () => setFilter(f3.k), className: `rounded-full px-3 py-1.5 text-xs transition-colors ${filter === f3.k ? "bg-foreground text-background" : "border border-border/60 hover:bg-accent"}`, children: f3.l }, f3.k)) })
+      /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("div", { className: "flex flex-wrap gap-1", children: filters.map((f3) => /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("button", { onClick: () => setFilter(f3.k), className: `rounded-full px-3 py-1.5 text-xs transition-colors ${filter === f3.k ? "bg-foreground text-background" : "border border-border/60 hover:bg-accent"}`, children: f3.l }, f3.k)) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "mt-5 rounded-xl border border-border/60 bg-card shadow-card divide-y divide-border/60 overflow-hidden", children: list.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "p-12 text-center text-sm text-muted-foreground", children: "No notifications match." }) : list.map((n2) => {
+    /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("div", { className: "mt-5 rounded-xl border border-border/60 bg-card shadow-card divide-y divide-border/60 overflow-hidden", children: list.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("div", { className: "p-12 text-center text-sm text-muted-foreground", children: "No notifications match." }) : list.map((n2) => {
       const Icon2 = iconFor2(n2.kind);
-      return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: `flex gap-4 px-5 py-4 hover:bg-accent/40 transition-colors ${n2.unread ? "bg-brand/[0.02]" : ""}`, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: `grid h-10 w-10 place-items-center rounded-lg shrink-0 ${tintFor2(n2.kind)}`, children: /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(Icon2, { className: "h-5 w-5" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "min-w-0 flex-1", children: /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "flex items-start justify-between gap-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "text-sm font-medium", children: n2.title }),
-            /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "mt-0.5 text-sm text-muted-foreground", children: n2.body })
+      return /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { className: `flex gap-4 px-5 py-4 hover:bg-accent/40 transition-colors ${n2.unread ? "bg-brand/[0.02]" : ""}`, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("div", { className: `grid h-10 w-10 place-items-center rounded-lg shrink-0 ${tintFor2(n2.kind)}`, children: /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(Icon2, { className: "h-5 w-5" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("div", { className: "min-w-0 flex-1", children: /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { className: "flex items-start justify-between gap-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("div", { className: "text-sm font-medium", children: n2.title }),
+            /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("div", { className: "mt-0.5 text-sm text-muted-foreground", children: n2.body })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "flex items-center gap-2 shrink-0", children: [
-            n2.unread && /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("span", { className: "h-2 w-2 rounded-full bg-brand" }),
-            /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("span", { className: "text-xs text-muted-foreground tabular-nums", children: n2.time })
+          /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { className: "flex items-center gap-2 shrink-0", children: [
+            n2.unread && /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("span", { className: "h-2 w-2 rounded-full bg-brand" }),
+            /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("span", { className: "text-xs text-muted-foreground tabular-nums", children: n2.time })
           ] })
         ] }) })
       ] }, n2.id);
     }) })
   ] });
 }
-var import_jsx_runtime54, import_react45, notifications, iconFor2, tintFor2, filters;
+var import_jsx_runtime55, import_react46, notifications, iconFor2, tintFor2, filters;
 var init_app_notifications_CeL5tZom = __esm({
   "dist/server/assets/app.notifications-CeL5tZom.js"() {
     "use strict";
-    import_jsx_runtime54 = __toESM(require_jsx_runtime(), 1);
-    import_react45 = __toESM(require_react(), 1);
+    import_jsx_runtime55 = __toESM(require_jsx_runtime(), 1);
+    import_react46 = __toESM(require_react(), 1);
     init_lucide_react();
     notifications = [];
     iconFor2 = (k3) => ({
@@ -65020,16 +66073,16 @@ var init_app_notifications_CeL5tZom = __esm({
   }
 });
 
-// dist/server/assets/app.messages-3qB8DO4l.js
-var app_messages_3qB8DO4l_exports = {};
-__export(app_messages_3qB8DO4l_exports, {
+// dist/server/assets/app.messages-JUY5grGr.js
+var app_messages_JUY5grGr_exports = {};
+__export(app_messages_JUY5grGr_exports, {
   component: () => MessagesPage
 });
 function MessagesPage() {
   const {
     user
   } = useAuth();
-  const [draft, setDraft] = (0, import_react46.useState)("");
+  const [draft, setDraft] = (0, import_react47.useState)("");
   const queryClient2 = useQueryClient();
   const {
     data: room
@@ -65074,7 +66127,7 @@ function MessagesPage() {
       });
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(Placeholder, { title: "Messages", sub: "Threaded conversations with every investor in one inbox.", messages, meId: user?.id, draft, onDraft: setDraft, onSend: send });
+  return /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(Placeholder, { title: "Messages", sub: "Threaded conversations with every investor in one inbox.", messages, meId: user?.id, draft, onDraft: setDraft, onSend: send });
 }
 function Placeholder({
   title,
@@ -65085,44 +66138,44 @@ function Placeholder({
   onDraft,
   onSend
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { className: "p-6 lg:p-8 max-w-5xl mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: title }),
-    /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("div", { className: "text-sm text-muted-foreground", children: sub }),
-    /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { className: "mt-6 grid grid-cols-[280px_1fr] gap-0 rounded-xl border border-border/60 bg-card shadow-card overflow-hidden min-h-[500px]", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { className: "border-r border-border/60 flex flex-col", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("div", { className: "px-4 py-3 border-b border-border/60 text-xs text-muted-foreground", children: "Conversations" }),
-        /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("div", { className: "flex-1 flex items-center justify-center p-4", children: /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { className: "text-xs text-muted-foreground text-center", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "p-6 lg:p-8 max-w-5xl mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: title }),
+    /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "text-sm text-muted-foreground", children: sub }),
+    /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "mt-6 grid grid-cols-[280px_1fr] gap-0 rounded-xl border border-border/60 bg-card shadow-card overflow-hidden min-h-[500px]", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "border-r border-border/60 flex flex-col", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "px-4 py-3 border-b border-border/60 text-xs text-muted-foreground", children: "Conversations" }),
+        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "flex-1 flex items-center justify-center p-4", children: /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "text-xs text-muted-foreground text-center", children: [
           "No conversations yet.",
-          /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("br", {}),
+          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("br", {}),
           "Messages from investors appear here."
         ] }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { className: "flex flex-col", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("div", { className: "flex-1 p-6 space-y-4", children: messages.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("div", { className: `flex ${m3.sender_id === meId ? "justify-end" : ""}`, children: /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("div", { className: `max-w-[70%] rounded-2xl px-4 py-2.5 text-sm ${m3.sender_id === meId ? "bg-gradient-brand text-brand-foreground" : "bg-accent"}`, children: m3.body }) }, m3.id)) }),
-        /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { className: "border-t border-border/60 p-3 flex gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("input", { value: draft, onChange: (e) => onDraft(e.target.value), placeholder: "Message\u2026", className: "flex-1 rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" }),
-          /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("button", { onClick: onSend, className: "rounded-md bg-gradient-brand text-brand-foreground px-4 text-sm", children: "Send" })
+      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "flex flex-col", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "flex-1 p-6 space-y-4", children: messages.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: `flex ${m3.sender_id === meId ? "justify-end" : ""}`, children: /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: `max-w-[70%] rounded-2xl px-4 py-2.5 text-sm ${m3.sender_id === meId ? "bg-gradient-brand text-brand-foreground" : "bg-accent"}`, children: m3.body }) }, m3.id)) }),
+        /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "border-t border-border/60 p-3 flex gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("input", { value: draft, onChange: (e) => onDraft(e.target.value), placeholder: "Message\u2026", className: "flex-1 rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" }),
+          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("button", { onClick: onSend, className: "rounded-md bg-gradient-brand text-brand-foreground px-4 text-sm", children: "Send" })
         ] })
       ] })
     ] })
   ] });
 }
-var import_jsx_runtime55, import_react46;
-var init_app_messages_3qB8DO4l = __esm({
-  "dist/server/assets/app.messages-3qB8DO4l.js"() {
+var import_jsx_runtime56, import_react47;
+var init_app_messages_JUY5grGr = __esm({
+  "dist/server/assets/app.messages-JUY5grGr.js"() {
     "use strict";
-    import_jsx_runtime55 = __toESM(require_jsx_runtime(), 1);
-    import_react46 = __toESM(require_react(), 1);
-    init_router_B5AOfxDk();
+    import_jsx_runtime56 = __toESM(require_jsx_runtime(), 1);
+    import_react47 = __toESM(require_react(), 1);
+    init_router_DOcN9fVX();
     init_modern2();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.meetings-pCeKiBwE.js
-var app_meetings_pCeKiBwE_exports = {};
-__export(app_meetings_pCeKiBwE_exports, {
+// dist/server/assets/app.meetings-DO_jSYvx.js
+var app_meetings_DO_jSYvx_exports = {};
+__export(app_meetings_DO_jSYvx_exports, {
   component: () => Meetings
 });
 function isNextWeek(date) {
@@ -65137,11 +66190,11 @@ function Meetings() {
     user
   } = useAuth();
   const queryClient2 = useQueryClient();
-  const [showForm, setShowForm] = (0, import_react47.useState)(false);
-  const [pastOpen, setPastOpen] = (0, import_react47.useState)(false);
-  const [expandedPrep, setExpandedPrep] = (0, import_react47.useState)(/* @__PURE__ */ new Set());
-  const [saving, setSaving] = (0, import_react47.useState)(false);
-  const [f3, setF] = (0, import_react47.useState)({
+  const [showForm, setShowForm] = (0, import_react48.useState)(false);
+  const [pastOpen, setPastOpen] = (0, import_react48.useState)(false);
+  const [expandedPrep, setExpandedPrep] = (0, import_react48.useState)(/* @__PURE__ */ new Set());
+  const [saving, setSaving] = (0, import_react48.useState)(false);
+  const [f3, setF] = (0, import_react48.useState)({
     title: "",
     scheduledAt: "",
     meetingLink: "",
@@ -65236,116 +66289,116 @@ function Meetings() {
     }
   };
   if (isLoading) {
-    return /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "p-6 lg:p-8 max-w-4xl mx-auto", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "h-8 w-48 rounded-lg bg-muted animate-pulse mb-2" }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "h-4 w-72 rounded bg-muted/60 animate-pulse mb-6" }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "space-y-3", children: [1, 2, 3].map((i2) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "h-24 rounded-xl bg-muted/40 animate-pulse" }, i2)) })
+    return /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "p-6 lg:p-8 max-w-4xl mx-auto", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "h-8 w-48 rounded-lg bg-muted animate-pulse mb-2" }),
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "h-4 w-72 rounded bg-muted/60 animate-pulse mb-6" }),
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "space-y-3", children: [1, 2, 3].map((i2) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "h-24 rounded-xl bg-muted/40 animate-pulse" }, i2)) })
     ] });
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "p-6 lg:p-8 max-w-4xl mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "flex items-end justify-between flex-wrap gap-4 mb-6", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Meetings" }),
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "text-sm text-muted-foreground mt-0.5", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "p-6 lg:p-8 max-w-4xl mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex items-end justify-between flex-wrap gap-4 mb-6", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Meetings" }),
+        /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "text-sm text-muted-foreground mt-0.5", children: [
           meetings.length,
           " meeting",
           meetings.length !== 1 ? "s" : "",
           " scheduled"
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("button", { onClick: () => setShowForm((v3) => !v3), className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(Plus, { className: "h-4 w-4" }),
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("button", { onClick: () => setShowForm((v3) => !v3), className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Plus, { className: "h-4 w-4" }),
         " Schedule meeting"
       ] })
     ] }),
-    showForm && /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("form", { onSubmit: submit, className: "mb-6 rounded-xl border border-border/60 bg-card p-5 shadow-card space-y-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "text-sm font-semibold mb-1", children: "New meeting" }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "grid sm:grid-cols-2 gap-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("label", { className: "text-xs text-muted-foreground", children: "Title *" }),
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("input", { required: true, value: f3.title, onChange: (e) => set("title", e.target.value), placeholder: "Intro call / Partner meeting\u2026", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
+    showForm && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("form", { onSubmit: submit, className: "mb-6 rounded-xl border border-border/60 bg-card p-5 shadow-card space-y-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-sm font-semibold mb-1", children: "New meeting" }),
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "grid sm:grid-cols-2 gap-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("label", { className: "text-xs text-muted-foreground", children: "Title *" }),
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { required: true, value: f3.title, onChange: (e) => set("title", e.target.value), placeholder: "Intro call / Partner meeting\u2026", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("label", { className: "text-xs text-muted-foreground", children: "Date & Time *" }),
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("input", { type: "datetime-local", required: true, value: f3.scheduledAt, onChange: (e) => set("scheduledAt", e.target.value), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
+        /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("label", { className: "text-xs text-muted-foreground", children: "Date & Time *" }),
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { type: "datetime-local", required: true, value: f3.scheduledAt, onChange: (e) => set("scheduledAt", e.target.value), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("label", { className: "text-xs text-muted-foreground", children: "VC lead" }),
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("select", { value: f3.vcLeadId, onChange: (e) => set("vcLeadId", e.target.value), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: "", children: "\u2014 None \u2014" }),
-            vcLeads.map((l2) => /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("option", { value: l2.id, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("label", { className: "text-xs text-muted-foreground", children: "VC lead" }),
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("select", { value: f3.vcLeadId, onChange: (e) => set("vcLeadId", e.target.value), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("option", { value: "", children: "\u2014 None \u2014" }),
+            vcLeads.map((l2) => /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("option", { value: l2.id, children: [
               l2.investor_name,
               l2.firm_name ? ` \xB7 ${l2.firm_name}` : ""
             ] }, l2.id))
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("label", { className: "text-xs text-muted-foreground", children: "Platform" }),
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("select", { value: f3.platform, onChange: (e) => set("platform", e.target.value), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: "", children: "\u2014 Select \u2014" }),
-            ["Zoom", "Google Meet", "Microsoft Teams", "Phone", "In-person", "Other"].map((p3) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("option", { value: p3, children: p3 }, p3))
+        /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("label", { className: "text-xs text-muted-foreground", children: "Platform" }),
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("select", { value: f3.platform, onChange: (e) => set("platform", e.target.value), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("option", { value: "", children: "\u2014 Select \u2014" }),
+            ["Zoom", "Google Meet", "Microsoft Teams", "Phone", "In-person", "Other"].map((p3) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("option", { value: p3, children: p3 }, p3))
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "sm:col-span-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("label", { className: "text-xs text-muted-foreground", children: "Meeting link" }),
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("input", { type: "url", value: f3.meetingLink, onChange: (e) => set("meetingLink", e.target.value), placeholder: "https://zoom.us/j/\u2026", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
+        /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "sm:col-span-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("label", { className: "text-xs text-muted-foreground", children: "Meeting link" }),
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { type: "url", value: f3.meetingLink, onChange: (e) => set("meetingLink", e.target.value), placeholder: "https://zoom.us/j/\u2026", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "sm:col-span-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("label", { className: "text-xs text-muted-foreground", children: "Prep notes" }),
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("textarea", { value: f3.prepNotes, onChange: (e) => set("prepNotes", e.target.value), rows: 2, placeholder: "Key points to cover, questions to ask\u2026", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none" })
+        /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "sm:col-span-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("label", { className: "text-xs text-muted-foreground", children: "Prep notes" }),
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("textarea", { value: f3.prepNotes, onChange: (e) => set("prepNotes", e.target.value), rows: 2, placeholder: "Key points to cover, questions to ask\u2026", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none" })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "flex justify-end gap-2 pt-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("button", { type: "button", onClick: () => setShowForm(false), className: "rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent", children: "Cancel" }),
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("button", { type: "submit", disabled: !f3.title || !f3.scheduledAt || saving, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-1.5 text-sm shadow-glow disabled:opacity-50", children: [
-          saving && /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex justify-end gap-2 pt-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("button", { type: "button", onClick: () => setShowForm(false), className: "rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent", children: "Cancel" }),
+        /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("button", { type: "submit", disabled: !f3.title || !f3.scheduledAt || saving, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-1.5 text-sm shadow-glow disabled:opacity-50", children: [
+          saving && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
           "Save meeting"
         ] })
       ] })
     ] }),
-    meetings.length === 0 && !showForm && /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card shadow-card p-12 flex flex-col items-center gap-3 text-center", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "grid h-12 w-12 place-items-center rounded-full bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(Calendar, { className: "h-5 w-5 text-muted-foreground" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "text-sm font-medium", children: "No meetings scheduled yet" }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "text-xs text-muted-foreground max-w-xs", children: "Schedule meetings directly here or set a lead's status to trigger a meeting." }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(Link, { to: "/app/leads", className: "mt-2 inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: "Go to VC Leads" })
+    meetings.length === 0 && !showForm && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card shadow-card p-12 flex flex-col items-center gap-3 text-center", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "grid h-12 w-12 place-items-center rounded-full bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Calendar, { className: "h-5 w-5 text-muted-foreground" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-sm font-medium", children: "No meetings scheduled yet" }),
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-xs text-muted-foreground max-w-xs", children: "Schedule meetings directly here or set a lead's status to trigger a meeting." }),
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Link, { to: "/app/leads", className: "mt-2 inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: "Go to VC Leads" })
     ] }),
-    todayMeetings.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("section", { className: "mb-6", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3", children: [
+    todayMeetings.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("section", { className: "mb-6", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3", children: [
         "Today (",
         todayMeetings.length,
         ")"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "space-y-3", children: todayMeetings.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(MeetingRow, { m: m3, variant: "today", prepOpen: expandedPrep.has(m3.id), onTogglePrep: () => togglePrep(m3.id) }, m3.id)) })
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "space-y-3", children: todayMeetings.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(MeetingRow, { m: m3, variant: "today", prepOpen: expandedPrep.has(m3.id), onTogglePrep: () => togglePrep(m3.id) }, m3.id)) })
     ] }),
-    upcomingMeetings.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("section", { className: "mb-6", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3", children: [
+    upcomingMeetings.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("section", { className: "mb-6", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3", children: [
         "Upcoming (",
         upcomingMeetings.length,
         ")"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "space-y-5", children: [
-        thisWeek.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "text-[11px] text-muted-foreground mb-2 pl-1", children: "This week" }),
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "space-y-2", children: thisWeek.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(MeetingRow, { m: m3, variant: "upcoming", prepOpen: expandedPrep.has(m3.id), onTogglePrep: () => togglePrep(m3.id) }, m3.id)) })
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "space-y-5", children: [
+        thisWeek.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-[11px] text-muted-foreground mb-2 pl-1", children: "This week" }),
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "space-y-2", children: thisWeek.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(MeetingRow, { m: m3, variant: "upcoming", prepOpen: expandedPrep.has(m3.id), onTogglePrep: () => togglePrep(m3.id) }, m3.id)) })
         ] }),
-        nextWeek.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "text-[11px] text-muted-foreground mb-2 pl-1", children: "Next week" }),
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "space-y-2", children: nextWeek.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(MeetingRow, { m: m3, variant: "upcoming", prepOpen: expandedPrep.has(m3.id), onTogglePrep: () => togglePrep(m3.id) }, m3.id)) })
+        nextWeek.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-[11px] text-muted-foreground mb-2 pl-1", children: "Next week" }),
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "space-y-2", children: nextWeek.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(MeetingRow, { m: m3, variant: "upcoming", prepOpen: expandedPrep.has(m3.id), onTogglePrep: () => togglePrep(m3.id) }, m3.id)) })
         ] }),
-        later.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "text-[11px] text-muted-foreground mb-2 pl-1", children: "Later" }),
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "space-y-2", children: later.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(MeetingRow, { m: m3, variant: "upcoming", prepOpen: expandedPrep.has(m3.id), onTogglePrep: () => togglePrep(m3.id) }, m3.id)) })
+        later.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-[11px] text-muted-foreground mb-2 pl-1", children: "Later" }),
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "space-y-2", children: later.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(MeetingRow, { m: m3, variant: "upcoming", prepOpen: expandedPrep.has(m3.id), onTogglePrep: () => togglePrep(m3.id) }, m3.id)) })
         ] })
       ] })
     ] }),
-    pastMeetings.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("section", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("button", { onClick: () => setPastOpen((v3) => !v3), className: "flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3", children: [
-        pastOpen ? /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(ChevronDown, { className: "h-3.5 w-3.5" }) : /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(ChevronRight, { className: "h-3.5 w-3.5" }),
+    pastMeetings.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("section", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("button", { onClick: () => setPastOpen((v3) => !v3), className: "flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3", children: [
+        pastOpen ? /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(ChevronDown, { className: "h-3.5 w-3.5" }) : /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(ChevronRight, { className: "h-3.5 w-3.5" }),
         "Past (",
         pastMeetings.length,
         ")"
       ] }),
-      pastOpen && /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "space-y-2 opacity-60", children: pastMeetings.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(MeetingRow, { m: m3, variant: "past", prepOpen: false, onTogglePrep: () => {
+      pastOpen && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "space-y-2 opacity-60", children: pastMeetings.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(MeetingRow, { m: m3, variant: "past", prepOpen: false, onTogglePrep: () => {
       } }, m3.id)) })
     ] })
   ] });
@@ -65359,58 +66412,58 @@ function MeetingRow({
   const d2 = new Date(m3.scheduled_at);
   const investorName = m3.vc_leads?.investor_name;
   const firmName = m3.vc_leads?.firm_name;
-  return /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: cn3("rounded-xl border border-border/60 bg-card shadow-card p-4", variant === "today" && "border-l-4 border-l-warning"), children: /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "flex items-start gap-4", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: cn3("shrink-0 grid place-items-center rounded-lg w-12 h-12 text-center", variant === "today" ? "bg-gradient-brand text-brand-foreground" : variant === "past" ? "bg-muted/60 text-muted-foreground" : "bg-brand/10 text-brand"), children: [
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "text-[10px] font-semibold uppercase", children: format(d2, "MMM") }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "text-lg font-bold leading-none", children: format(d2, "d") })
+  return /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: cn3("rounded-xl border border-border/60 bg-card shadow-card p-4", variant === "today" && "border-l-4 border-l-warning"), children: /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex items-start gap-4", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: cn3("shrink-0 grid place-items-center rounded-lg w-12 h-12 text-center", variant === "today" ? "bg-gradient-brand text-brand-foreground" : variant === "past" ? "bg-muted/60 text-muted-foreground" : "bg-brand/10 text-brand"), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-[10px] font-semibold uppercase", children: format(d2, "MMM") }),
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-lg font-bold leading-none", children: format(d2, "d") })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "flex-1 min-w-0", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "flex items-center gap-2 flex-wrap", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("span", { className: "text-sm font-semibold", children: m3.title }),
-        variant === "today" && /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("span", { className: "text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-warning/10 text-warning", children: "Today" })
+    /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex-1 min-w-0", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex items-center gap-2 flex-wrap", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("span", { className: "text-sm font-semibold", children: m3.title }),
+        variant === "today" && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("span", { className: "text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-warning/10 text-warning", children: "Today" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("div", { className: "flex items-center gap-3 mt-1 flex-wrap", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("span", { className: "flex items-center gap-1 text-xs text-muted-foreground", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(Clock, { className: "h-3 w-3" }),
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex items-center gap-3 mt-1 flex-wrap", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("span", { className: "flex items-center gap-1 text-xs text-muted-foreground", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Clock, { className: "h-3 w-3" }),
           " ",
           format(d2, "h:mm a")
         ] }),
-        m3.platform && /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("span", { className: "flex items-center gap-1 text-xs text-muted-foreground", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(Video, { className: "h-3 w-3" }),
+        m3.platform && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("span", { className: "flex items-center gap-1 text-xs text-muted-foreground", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Video, { className: "h-3 w-3" }),
           " ",
           m3.platform
         ] }),
-        investorName && /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("span", { className: "flex items-center gap-1 text-xs text-muted-foreground", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(Building2, { className: "h-3 w-3" }),
+        investorName && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("span", { className: "flex items-center gap-1 text-xs text-muted-foreground", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Building2, { className: "h-3 w-3" }),
           investorName,
           firmName ? ` \xB7 ${firmName}` : ""
         ] })
       ] }),
-      (m3.prep_notes || m3.notes) && /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("button", { onClick: onTogglePrep, className: "mt-1.5 text-xs text-brand hover:underline inline-flex items-center gap-1", children: [
-        prepOpen ? /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(ChevronDown, { className: "h-3 w-3" }) : /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(ChevronRight, { className: "h-3 w-3" }),
+      (m3.prep_notes || m3.notes) && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("button", { onClick: onTogglePrep, className: "mt-1.5 text-xs text-brand hover:underline inline-flex items-center gap-1", children: [
+        prepOpen ? /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(ChevronDown, { className: "h-3 w-3" }) : /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(ChevronRight, { className: "h-3 w-3" }),
         prepOpen ? "Hide" : "Show",
         " prep notes"
       ] }),
-      prepOpen && (m3.prep_notes || m3.notes) && /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { className: "mt-2 rounded-md bg-accent/50 p-3 text-xs text-muted-foreground", children: m3.prep_notes || m3.notes })
+      prepOpen && (m3.prep_notes || m3.notes) && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "mt-2 rounded-md bg-accent/50 p-3 text-xs text-muted-foreground", children: m3.prep_notes || m3.notes })
     ] }),
-    m3.meeting_link && variant !== "past" && /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)("a", { href: m3.meeting_link, target: "_blank", rel: "noopener noreferrer", className: "shrink-0 inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-xs hover:bg-brand/10", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(ExternalLink, { className: "h-3 w-3" }),
+    m3.meeting_link && variant !== "past" && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("a", { href: m3.meeting_link, target: "_blank", rel: "noopener noreferrer", className: "shrink-0 inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-xs hover:bg-brand/10", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(ExternalLink, { className: "h-3 w-3" }),
       " Join"
     ] })
   ] }) });
 }
-var import_jsx_runtime56, import_react47;
-var init_app_meetings_pCeKiBwE = __esm({
-  "dist/server/assets/app.meetings-pCeKiBwE.js"() {
+var import_jsx_runtime57, import_react48;
+var init_app_meetings_DO_jSYvx = __esm({
+  "dist/server/assets/app.meetings-DO_jSYvx.js"() {
     "use strict";
-    import_jsx_runtime56 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime57 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    import_react47 = __toESM(require_react(), 1);
+    import_react48 = __toESM(require_react(), 1);
     init_modern2();
     init_date_fns();
     init_dist7();
     init_lucide_react();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_utils_H80jjgLf();
     init_clsx();
   }
@@ -65832,796 +66885,12 @@ var require_papaparse_min = __commonJS({
   }
 });
 
-// dist/server/assets/createSsrRpc-l1y8KE69.js
-var createSsrRpc;
-var init_createSsrRpc_l1y8KE69 = __esm({
-  "dist/server/assets/createSsrRpc-l1y8KE69.js"() {
-    "use strict";
-    init_server4();
-    createSsrRpc = (functionId) => {
-      const url2 = "/_serverFn/" + functionId;
-      const serverFnMeta = { id: functionId };
-      const fn2 = async (...args) => {
-        return (await getServerFnById(functionId))(...args);
-      };
-      return Object.assign(fn2, {
-        url: url2,
-        serverFnMeta,
-        [TSS_SERVER_FUNCTION]: true
-      });
-    };
-  }
-});
-
-// dist/server/assets/app.leads-DyUnMpHL.js
-var app_leads_DyUnMpHL_exports = {};
-__export(app_leads_DyUnMpHL_exports, {
+// dist/server/assets/app.leads-Brtk0fpt.js
+var app_leads_Brtk0fpt_exports = {};
+__export(app_leads_Brtk0fpt_exports, {
   component: () => Leads
 });
 import "node:async_hooks";
-function Field3({ label, children }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("label", { className: "block text-xs text-muted-foreground mb-1", children: label }),
-    children
-  ] });
-}
-function CollapsibleSection({
-  title,
-  defaultOpen = false,
-  children
-}) {
-  const [open, setOpen] = (0, import_react48.useState)(defaultOpen);
-  return /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "rounded-lg border border-border/60 bg-card overflow-hidden", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(
-      "button",
-      {
-        type: "button",
-        onClick: () => setOpen((v3) => !v3),
-        className: "w-full flex items-center justify-between px-4 py-3 text-sm font-semibold hover:bg-accent/30 transition-colors",
-        children: [
-          title,
-          open ? /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(ChevronDown, { className: "h-4 w-4 text-muted-foreground" }) : /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(ChevronRight, { className: "h-4 w-4 text-muted-foreground" })
-        ]
-      }
-    ),
-    open && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "px-4 pb-4 pt-1 space-y-3", children })
-  ] });
-}
-function MeetingCard({ meeting, past = false }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: cn3("rounded-lg border border-border/60 bg-card p-3", past && "opacity-60"), children: [
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex items-start justify-between gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-sm font-medium", children: meeting.title }),
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-xs text-muted-foreground mt-0.5", children: meeting.scheduled_at ? new Date(meeting.scheduled_at).toLocaleString() : "\u2014" })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex gap-1.5 shrink-0", children: [
-        meeting.meeting_type && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("span", { className: "rounded-full bg-accent px-2 py-0.5 text-[10px] text-muted-foreground", children: meeting.meeting_type }),
-        meeting.platform && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("span", { className: "rounded-full bg-accent px-2 py-0.5 text-[10px] text-muted-foreground", children: meeting.platform })
-      ] })
-    ] }),
-    meeting.meeting_link && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-      "a",
-      {
-        href: meeting.meeting_link,
-        target: "_blank",
-        rel: "noopener noreferrer",
-        className: "mt-2 block text-xs text-brand hover:underline truncate",
-        children: meeting.meeting_link
-      }
-    ),
-    meeting.notes && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "mt-2 text-xs text-muted-foreground", children: meeting.notes })
-  ] });
-}
-function LeadDrawer({ open, lead, onClose, onSaved }) {
-  const isEdit = !!lead;
-  const queryClient2 = useQueryClient();
-  const { user } = useAuth();
-  const [activeTab, setActiveTab] = (0, import_react48.useState)("profile");
-  const [saving, setSaving] = (0, import_react48.useState)(false);
-  const [deleting, setDeleting] = (0, import_react48.useState)(false);
-  const [f3, setF] = (0, import_react48.useState)(emptyForm2);
-  const [emailType, setEmailType] = (0, import_react48.useState)("cold");
-  const [generatingEmail, setGeneratingEmail] = (0, import_react48.useState)(false);
-  const [generatedEmail, setGeneratedEmail] = (0, import_react48.useState)("");
-  const [generatingLinkedIn, setGeneratingLinkedIn] = (0, import_react48.useState)(false);
-  const [generatedLinkedIn, setGeneratedLinkedIn] = (0, import_react48.useState)("");
-  const [investorReply, setInvestorReply] = (0, import_react48.useState)("");
-  const [generatingReply, setGeneratingReply] = (0, import_react48.useState)(false);
-  const [generatedReply, setGeneratedReply] = (0, import_react48.useState)("");
-  const [showMeetingForm, setShowMeetingForm] = (0, import_react48.useState)(false);
-  const [schedulingMeeting, setSchedulingMeeting] = (0, import_react48.useState)(false);
-  const [mf, setMf] = (0, import_react48.useState)({
-    title: "",
-    scheduled_at: "",
-    meeting_type: "Intro",
-    platform: "Zoom",
-    meeting_link: "",
-    notes: ""
-  });
-  const [newNote, setNewNote] = (0, import_react48.useState)("");
-  const [addingNote, setAddingNote] = (0, import_react48.useState)(false);
-  const [updatingStatus, setUpdatingStatus] = (0, import_react48.useState)(false);
-  (0, import_react48.useEffect)(() => {
-    if (!open) return;
-    setActiveTab("profile");
-    setGeneratedEmail("");
-    setGeneratedLinkedIn("");
-    setGeneratedReply("");
-    setInvestorReply("");
-    setShowMeetingForm(false);
-    setNewNote("");
-    if (lead) {
-      setF({
-        investor_name: lead.investor_name ?? "",
-        firm_name: lead.firm_name ?? "",
-        email: lead.email ?? "",
-        phone: lead.phone ?? "",
-        linkedin_url: lead.linkedin_url ?? "",
-        twitter_url: lead.twitter_url ?? "",
-        website: lead.website ?? "",
-        sector: lead.sector ?? "",
-        stage: lead.stage ?? "",
-        geography: lead.geography ?? "",
-        ticket_size: lead.ticket_size ?? "",
-        status: lead.status,
-        follow_up_date: lead.follow_up_date ?? "",
-        notes: lead.notes ?? "",
-        source: lead.source ?? "",
-        relationship_strength: lead.relationship_strength ?? "",
-        last_contacted: lead.last_contacted ?? "",
-        next_action: lead.next_action ?? ""
-      });
-    } else {
-      setF(emptyForm2);
-    }
-  }, [open, lead]);
-  const { data: meetings = [], refetch: refetchMeetings } = useQuery({
-    queryKey: ["lead-meetings", lead?.id],
-    enabled: !!lead?.id && open,
-    queryFn: async () => {
-      const { data } = await supabase.from("meetings").select("*").eq("vc_lead_id", lead.id).order("scheduled_at", { ascending: true });
-      return data ?? [];
-    }
-  });
-  if (!open) return null;
-  const set = (k3, v3) => setF((s) => ({ ...s, [k3]: v3 }));
-  const handleSave = async (e) => {
-    e.preventDefault();
-    if (!f3.investor_name.trim()) return;
-    setSaving(true);
-    try {
-      const payload = {
-        investor_name: f3.investor_name.trim(),
-        firm_name: f3.firm_name || null,
-        email: f3.email || null,
-        phone: f3.phone || null,
-        linkedin_url: f3.linkedin_url || null,
-        twitter_url: f3.twitter_url || null,
-        website: f3.website || null,
-        sector: f3.sector || null,
-        stage: f3.stage || null,
-        geography: f3.geography || null,
-        ticket_size: f3.ticket_size || null,
-        status: f3.status,
-        follow_up_date: f3.follow_up_date || null,
-        notes: f3.notes || null,
-        source: f3.source || null,
-        relationship_strength: f3.relationship_strength || null,
-        last_contacted: f3.last_contacted || null,
-        next_action: f3.next_action || null,
-        updated_at: (/* @__PURE__ */ new Date()).toISOString()
-      };
-      if (isEdit) {
-        const { error } = await supabase.from("vc_leads").update(payload).eq("id", lead.id).eq("founder_id", user.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from("vc_leads").insert({ ...payload, founder_id: user.id });
-        if (error) throw error;
-      }
-      toast.success("Lead saved");
-      onSaved();
-    } catch {
-      toast.error("Failed to save");
-    } finally {
-      setSaving(false);
-    }
-  };
-  const handleDelete = async () => {
-    if (!lead) return;
-    setDeleting(true);
-    try {
-      const { error } = await supabase.from("vc_leads").delete().eq("id", lead.id).eq("founder_id", user.id);
-      if (error) throw error;
-      toast.success("Lead deleted");
-      onSaved();
-    } catch {
-      toast.error("Failed to delete");
-    } finally {
-      setDeleting(false);
-    }
-  };
-  const handleGenerateEmail = async (type) => {
-    if (!user?.id || !lead) return;
-    setEmailType(type);
-    setGeneratingEmail(true);
-    setGeneratedEmail("");
-    try {
-      const result = await generateOutreachEmail2({ data: { userId: user.id, leadId: lead.id, type } });
-      setGeneratedEmail(`Subject: ${result.subject}
-
-${result.body}`);
-    } catch (err) {
-      toast.error(err.message || "Failed to generate email");
-    } finally {
-      setGeneratingEmail(false);
-    }
-  };
-  const handleGenerateLinkedIn = async () => {
-    if (!user?.id || !lead) return;
-    setGeneratingLinkedIn(true);
-    setGeneratedLinkedIn("");
-    try {
-      const result = await generateLinkedInMessage2({ data: { userId: user.id, leadId: lead.id } });
-      setGeneratedLinkedIn(result.message);
-    } catch (err) {
-      toast.error(err.message || "Failed to generate LinkedIn message");
-    } finally {
-      setGeneratingLinkedIn(false);
-    }
-  };
-  const handleGenerateReply = async () => {
-    if (!user?.id || !lead || !investorReply.trim()) return;
-    setGeneratingReply(true);
-    setGeneratedReply("");
-    try {
-      const result = await generateReply2({ data: { userId: user.id, leadId: lead.id, investorReply: investorReply.trim() } });
-      setGeneratedReply(result.reply);
-    } catch (err) {
-      toast.error(err.message || "Failed to generate reply");
-    } finally {
-      setGeneratingReply(false);
-    }
-  };
-  const handleSaveEmailToNotes = async () => {
-    if (!lead || !generatedEmail) return;
-    const tag = emailType === "cold" ? "Cold Email" : "Follow-up Email";
-    const entry = `**${tag} (${(/* @__PURE__ */ new Date()).toLocaleDateString()}):**
-${generatedEmail}`;
-    const appended = [f3.notes, entry].filter(Boolean).join("\n\n---\n\n");
-    await supabase.from("vc_leads").update({ notes: appended, updated_at: (/* @__PURE__ */ new Date()).toISOString() }).eq("id", lead.id);
-    setF((s) => ({ ...s, notes: appended }));
-    queryClient2.invalidateQueries({ queryKey: ["leads", user?.id] });
-    toast.success("Saved to notes");
-  };
-  const handleScheduleMeeting = async (e) => {
-    e.preventDefault();
-    if (!lead?.id) return;
-    setSchedulingMeeting(true);
-    try {
-      const { error } = await supabase.from("meetings").insert({
-        vc_lead_id: lead.id,
-        title: mf.title,
-        scheduled_at: mf.scheduled_at,
-        meeting_type: mf.meeting_type,
-        platform: mf.platform,
-        meeting_link: mf.meeting_link || null,
-        notes: mf.notes || null
-      });
-      if (error) throw error;
-      toast.success("Meeting scheduled");
-      setShowMeetingForm(false);
-      setMf({ title: "", scheduled_at: "", meeting_type: "Intro", platform: "Zoom", meeting_link: "", notes: "" });
-      refetchMeetings();
-      queryClient2.invalidateQueries({ queryKey: ["meetings"] });
-    } catch (err) {
-      toast.error(err.message || "Failed to schedule");
-    } finally {
-      setSchedulingMeeting(false);
-    }
-  };
-  const handleUpdateStatus = async (newStatus) => {
-    if (!lead?.id || !user?.id) return;
-    setUpdatingStatus(true);
-    try {
-      const { error } = await supabase.from("vc_leads").update({ status: newStatus, updated_at: (/* @__PURE__ */ new Date()).toISOString() }).eq("id", lead.id).eq("founder_id", user.id);
-      if (error) throw error;
-      setF((s) => ({ ...s, status: newStatus }));
-      queryClient2.invalidateQueries({ queryKey: ["leads", user.id] });
-      toast.success(`Status \u2192 ${newStatus}`);
-    } catch {
-      toast.error("Failed to update status");
-    } finally {
-      setUpdatingStatus(false);
-    }
-  };
-  const handleAddNote = async () => {
-    if (!lead || !newNote.trim()) return;
-    setAddingNote(true);
-    const entry = `${newNote.trim()}
-_${(/* @__PURE__ */ new Date()).toLocaleString()}_`;
-    const appended = [f3.notes, entry].filter(Boolean).join("\n\n---\n\n");
-    try {
-      const { error } = await supabase.from("vc_leads").update({ notes: appended, updated_at: (/* @__PURE__ */ new Date()).toISOString() }).eq("id", lead.id);
-      if (error) throw error;
-      setF((s) => ({ ...s, notes: appended }));
-      setNewNote("");
-      queryClient2.invalidateQueries({ queryKey: ["leads", user?.id] });
-      toast.success("Note added");
-    } catch {
-      toast.error("Failed to add note");
-    } finally {
-      setAddingNote(false);
-    }
-  };
-  const notesList = f3.notes ? f3.notes.split("\n\n---\n\n").filter(Boolean).reverse() : [];
-  const now = /* @__PURE__ */ new Date();
-  const upcomingMeetings = meetings.filter((m3) => new Date(m3.scheduled_at) >= now);
-  const pastMeetings = meetings.filter((m3) => new Date(m3.scheduled_at) < now);
-  const TABS = [
-    { id: "profile", label: "Profile", icon: User },
-    { id: "outreach", label: "Outreach", icon: MessageSquare },
-    { id: "meetings", label: "Meetings", icon: Calendar },
-    { id: "pipeline", label: "Pipeline", icon: GitBranch }
-  ];
-  return /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(import_jsx_runtime57.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "fixed inset-0 z-30 bg-foreground/20 backdrop-blur-sm", onClick: onClose }),
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("aside", { className: "fixed top-16 bottom-0 right-0 z-40 w-full sm:w-[600px] lg:w-[660px] border-l border-border/60 bg-background shadow-elev flex flex-col overflow-hidden", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "h-14 border-b border-border/60 flex items-center justify-between px-5 shrink-0", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex items-center gap-3 min-w-0", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "grid h-8 w-8 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold text-sm shrink-0", children: (f3.investor_name || "?")[0].toUpperCase() }),
-          /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "min-w-0", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-sm font-semibold truncate", children: isEdit ? f3.investor_name || "Edit lead" : "New lead" }),
-            f3.firm_name && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-xs text-muted-foreground truncate", children: f3.firm_name })
-          ] })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-          "button",
-          {
-            onClick: onClose,
-            className: "grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground shrink-0",
-            children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(X2, { className: "h-4 w-4" })
-          }
-        )
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "border-b border-border/60 flex shrink-0", children: TABS.map((tab) => /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(
-        "button",
-        {
-          onClick: () => setActiveTab(tab.id),
-          className: cn3(
-            "flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium border-b-2 transition-colors",
-            activeTab === tab.id ? "border-brand text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
-          ),
-          children: [
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(tab.icon, { className: "h-3.5 w-3.5" }),
-            tab.label
-          ]
-        },
-        tab.id
-      )) }),
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("form", { onSubmit: handleSave, className: "flex flex-col flex-1 min-h-0", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex-1 overflow-y-auto px-5 py-4", children: [
-          activeTab === "profile" && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "space-y-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Investor name *", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-              "input",
-              {
-                required: true,
-                value: f3.investor_name,
-                onChange: (e) => set("investor_name", e.target.value),
-                placeholder: "Sarah Johnson",
-                className: inputCls
-              }
-            ) }),
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "grid grid-cols-2 gap-3", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Firm name", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { value: f3.firm_name, onChange: (e) => set("firm_name", e.target.value), placeholder: "Sequoia Capital", className: inputCls }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Email", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { type: "email", value: f3.email, onChange: (e) => set("email", e.target.value), placeholder: "sarah@sequoia.com", className: inputCls }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Phone", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { value: f3.phone, onChange: (e) => set("phone", e.target.value), placeholder: "+1 555 0100", className: inputCls }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "LinkedIn URL", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { value: f3.linkedin_url, onChange: (e) => set("linkedin_url", e.target.value), placeholder: "linkedin.com/in/...", className: inputCls }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Twitter / X", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { value: f3.twitter_url, onChange: (e) => set("twitter_url", e.target.value), placeholder: "@username", className: inputCls }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Website", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { value: f3.website, onChange: (e) => set("website", e.target.value), placeholder: "sequoiacap.com", className: inputCls }) })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "grid grid-cols-2 gap-3", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Sector", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { value: f3.sector, onChange: (e) => set("sector", e.target.value), placeholder: "SaaS, FinTech\u2026", className: inputCls }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Stage", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("select", { value: f3.stage, onChange: (e) => set("stage", e.target.value), className: inputCls, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("option", { value: "", children: "Select\u2026" }),
-                STAGES2.map((s) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("option", { children: s }, s))
-              ] }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Geography", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { value: f3.geography, onChange: (e) => set("geography", e.target.value), placeholder: "US, Europe\u2026", className: inputCls }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Ticket size", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { value: f3.ticket_size, onChange: (e) => set("ticket_size", e.target.value), placeholder: "$500K\u2013$2M", className: inputCls }) })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "grid grid-cols-2 gap-3", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Relationship", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("select", { value: f3.relationship_strength, onChange: (e) => set("relationship_strength", e.target.value), className: inputCls, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("option", { value: "", children: "Select\u2026" }),
-                REL_STRENGTHS.map((r2) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("option", { children: r2 }, r2))
-              ] }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Follow-up date", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { type: "date", value: f3.follow_up_date, onChange: (e) => set("follow_up_date", e.target.value), className: inputCls }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Last contacted", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { type: "date", value: f3.last_contacted, onChange: (e) => set("last_contacted", e.target.value), className: inputCls }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Source", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { value: f3.source, onChange: (e) => set("source", e.target.value), placeholder: "LinkedIn, intro\u2026", className: inputCls }) })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Next action", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { value: f3.next_action, onChange: (e) => set("next_action", e.target.value), placeholder: "Send deck, follow up\u2026", className: inputCls }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Notes", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-              "textarea",
-              {
-                value: f3.notes,
-                onChange: (e) => set("notes", e.target.value),
-                rows: 4,
-                placeholder: "Context, thesis fit, intro source\u2026",
-                className: cn3(inputCls, "resize-none")
-              }
-            ) }),
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("label", { className: "block text-xs text-muted-foreground mb-2", children: "Status" }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "flex flex-wrap gap-1.5", children: ALL_STATUSES.map((s) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-                "button",
-                {
-                  type: "button",
-                  onClick: () => set("status", s),
-                  className: cn3(
-                    "rounded-full px-2.5 py-1 text-xs font-medium transition-all border",
-                    f3.status === s ? `${STATUS_COLOR[s]} border-current` : "bg-muted/40 text-muted-foreground border-transparent hover:border-border/60"
-                  ),
-                  children: s
-                },
-                s
-              )) })
-            ] })
-          ] }),
-          activeTab === "outreach" && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "space-y-3", children: !isEdit ? /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "rounded-lg border border-border/60 bg-accent/30 p-4 text-sm text-muted-foreground text-center", children: "Save this lead first to generate outreach content." }) : /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(import_jsx_runtime57.Fragment, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(CollapsibleSection, { title: "AI Email Generator", defaultOpen: true, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("p", { className: "text-xs text-muted-foreground", children: [
-                "Personalised email for ",
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("strong", { children: f3.investor_name }),
-                f3.firm_name ? ` at ${f3.firm_name}` : "",
-                "."
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex gap-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(
-                  "button",
-                  {
-                    type: "button",
-                    onClick: () => handleGenerateEmail("cold"),
-                    disabled: generatingEmail,
-                    className: "flex-1 rounded-md border border-border/60 px-3 py-2 text-xs hover:bg-accent disabled:opacity-50 flex items-center justify-center gap-1.5",
-                    children: [
-                      generatingEmail && emailType === "cold" && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
-                      "Cold email"
-                    ]
-                  }
-                ),
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(
-                  "button",
-                  {
-                    type: "button",
-                    onClick: () => handleGenerateEmail("followup"),
-                    disabled: generatingEmail,
-                    className: "flex-1 rounded-md border border-border/60 px-3 py-2 text-xs hover:bg-accent disabled:opacity-50 flex items-center justify-center gap-1.5",
-                    children: [
-                      generatingEmail && emailType === "followup" && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
-                      "Follow-up"
-                    ]
-                  }
-                )
-              ] }),
-              generatingEmail && !generatedEmail && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "rounded-lg border border-border/60 bg-background p-4 flex items-center justify-center gap-2 text-sm text-muted-foreground", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(LoaderCircle, { className: "h-4 w-4 animate-spin" }),
-                " Generating\u2026"
-              ] }),
-              generatedEmail && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "rounded-lg border border-brand/30 bg-background p-3 space-y-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex items-center justify-between", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("span", { className: "text-xs font-semibold text-brand uppercase tracking-wide", children: emailType === "cold" ? "Cold Email" : "Follow-up" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex gap-1.5", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(
-                      "button",
-                      {
-                        type: "button",
-                        onClick: () => {
-                          navigator.clipboard.writeText(generatedEmail);
-                          toast.success("Copied!");
-                        },
-                        className: "flex items-center gap-1 rounded border border-border/60 px-2 py-0.5 text-xs hover:bg-accent",
-                        children: [
-                          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Copy, { className: "h-3 w-3" }),
-                          " Copy"
-                        ]
-                      }
-                    ),
-                    /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-                      "button",
-                      {
-                        type: "button",
-                        onClick: handleSaveEmailToNotes,
-                        className: "flex items-center gap-1 rounded border border-border/60 px-2 py-0.5 text-xs hover:bg-accent",
-                        children: "Save"
-                      }
-                    )
-                  ] })
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-                  "textarea",
-                  {
-                    value: generatedEmail,
-                    onChange: (e) => setGeneratedEmail(e.target.value),
-                    rows: 10,
-                    className: cn3(inputCls, "resize-none text-xs font-mono")
-                  }
-                )
-              ] })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(CollapsibleSection, { title: "LinkedIn Message", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("p", { className: "text-xs text-muted-foreground", children: "Generate a short connection request (<300 chars)." }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(
-                "button",
-                {
-                  type: "button",
-                  onClick: handleGenerateLinkedIn,
-                  disabled: generatingLinkedIn,
-                  className: "w-full rounded-md border border-border/60 px-3 py-2 text-xs hover:bg-accent disabled:opacity-50 flex items-center justify-center gap-1.5",
-                  children: [
-                    generatingLinkedIn && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
-                    "Generate LinkedIn message"
-                  ]
-                }
-              ),
-              generatedLinkedIn && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "rounded-lg border border-border/60 bg-background p-3 space-y-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex items-center justify-between", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("span", { className: "text-xs text-muted-foreground", children: [
-                    generatedLinkedIn.length,
-                    "/300 chars"
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex gap-1.5", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(
-                      "button",
-                      {
-                        type: "button",
-                        onClick: () => {
-                          navigator.clipboard.writeText(generatedLinkedIn);
-                          toast.success("Copied!");
-                        },
-                        className: "flex items-center gap-1 rounded border border-border/60 px-2 py-0.5 text-xs hover:bg-accent",
-                        children: [
-                          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Copy, { className: "h-3 w-3" }),
-                          " Copy"
-                        ]
-                      }
-                    ),
-                    f3.linkedin_url && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-                      "a",
-                      {
-                        href: f3.linkedin_url.startsWith("http") ? f3.linkedin_url : `https://${f3.linkedin_url}`,
-                        target: "_blank",
-                        rel: "noopener noreferrer",
-                        className: "flex items-center gap-1 rounded border border-border/60 px-2 py-0.5 text-xs hover:bg-accent text-brand",
-                        children: "Open \u2197"
-                      }
-                    )
-                  ] })
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-                  "textarea",
-                  {
-                    value: generatedLinkedIn,
-                    onChange: (e) => setGeneratedLinkedIn(e.target.value),
-                    rows: 4,
-                    className: cn3(inputCls, "resize-none text-xs")
-                  }
-                )
-              ] })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(CollapsibleSection, { title: "Reply Handler", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("p", { className: "text-xs text-muted-foreground", children: "Paste the investor's reply and generate your follow-up." }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Investor's reply", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-                "textarea",
-                {
-                  value: investorReply,
-                  onChange: (e) => setInvestorReply(e.target.value),
-                  rows: 3,
-                  placeholder: "Paste the investor's email or message here\u2026",
-                  className: cn3(inputCls, "resize-none text-xs")
-                }
-              ) }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(
-                "button",
-                {
-                  type: "button",
-                  onClick: handleGenerateReply,
-                  disabled: generatingReply || !investorReply.trim(),
-                  className: "w-full rounded-md border border-border/60 px-3 py-2 text-xs hover:bg-accent disabled:opacity-50 flex items-center justify-center gap-1.5",
-                  children: [
-                    generatingReply && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
-                    "Generate reply"
-                  ]
-                }
-              ),
-              generatedReply && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "rounded-lg border border-border/60 bg-background p-3 space-y-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex items-center justify-between", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("span", { className: "text-xs font-semibold text-muted-foreground uppercase tracking-wide", children: "Your reply" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(
-                    "button",
-                    {
-                      type: "button",
-                      onClick: () => {
-                        navigator.clipboard.writeText(generatedReply);
-                        toast.success("Copied!");
-                      },
-                      className: "flex items-center gap-1 rounded border border-border/60 px-2 py-0.5 text-xs hover:bg-accent",
-                      children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Copy, { className: "h-3 w-3" }),
-                        " Copy"
-                      ]
-                    }
-                  )
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-                  "textarea",
-                  {
-                    value: generatedReply,
-                    onChange: (e) => setGeneratedReply(e.target.value),
-                    rows: 6,
-                    className: cn3(inputCls, "resize-none text-xs")
-                  }
-                )
-              ] })
-            ] })
-          ] }) }),
-          activeTab === "meetings" && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "space-y-4", children: !isEdit ? /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "rounded-lg border border-border/60 bg-accent/30 p-4 text-sm text-muted-foreground text-center", children: "Save this lead first to schedule meetings." }) : /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(import_jsx_runtime57.Fragment, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(
-              "button",
-              {
-                type: "button",
-                onClick: () => setShowMeetingForm((v3) => !v3),
-                className: "w-full flex items-center justify-center gap-1.5 rounded-md border border-dashed border-border/60 py-2.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors",
-                children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Plus, { className: "h-4 w-4" }),
-                  " Schedule meeting"
-                ]
-              }
-            ),
-            showMeetingForm && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("form", { onSubmit: handleScheduleMeeting, className: "rounded-lg border border-border/60 bg-card p-4 space-y-3", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-sm font-semibold", children: "New meeting" }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Title", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { required: true, value: mf.title, onChange: (e) => setMf((s) => ({ ...s, title: e.target.value })), placeholder: "Intro call with Sarah", className: inputCls }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Date & Time", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { required: true, type: "datetime-local", value: mf.scheduled_at, onChange: (e) => setMf((s) => ({ ...s, scheduled_at: e.target.value })), className: inputCls }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "grid grid-cols-2 gap-3", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Type", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("select", { value: mf.meeting_type, onChange: (e) => setMf((s) => ({ ...s, meeting_type: e.target.value })), className: inputCls, children: MEETING_TYPES.map((t) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("option", { children: t }, t)) }) }),
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Platform", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("select", { value: mf.platform, onChange: (e) => setMf((s) => ({ ...s, platform: e.target.value })), className: inputCls, children: PLATFORMS.map((p3) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("option", { children: p3 }, p3)) }) })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Meeting link", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { value: mf.meeting_link, onChange: (e) => setMf((s) => ({ ...s, meeting_link: e.target.value })), placeholder: "https://zoom.us/j/...", className: inputCls }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Field3, { label: "Prep notes", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("textarea", { value: mf.notes, onChange: (e) => setMf((s) => ({ ...s, notes: e.target.value })), rows: 2, placeholder: "Questions to ask, talking points\u2026", className: cn3(inputCls, "resize-none") }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex gap-2 pt-1", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("button", { type: "button", onClick: () => setShowMeetingForm(false), className: "flex-1 rounded-md border border-border/60 py-2 text-xs hover:bg-accent", children: "Cancel" }),
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("button", { type: "submit", disabled: schedulingMeeting, className: "flex-1 rounded-md bg-gradient-brand text-brand-foreground py-2 text-xs disabled:opacity-50 flex items-center justify-center gap-1.5", children: [
-                  schedulingMeeting && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
-                  "Schedule"
-                ] })
-              ] })
-            ] }),
-            upcomingMeetings.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2", children: "Upcoming" }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "space-y-2", children: upcomingMeetings.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(MeetingCard, { meeting: m3 }, m3.id)) })
-            ] }),
-            pastMeetings.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2", children: "Past" }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "space-y-2", children: pastMeetings.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(MeetingCard, { meeting: m3, past: true }, m3.id)) })
-            ] }),
-            meetings.length === 0 && !showMeetingForm && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "rounded-lg border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground", children: "No meetings yet" })
-          ] }) }),
-          activeTab === "pipeline" && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "space-y-5", children: !isEdit ? /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "rounded-lg border border-border/60 bg-accent/30 p-4 text-sm text-muted-foreground text-center", children: "Save this lead first to track pipeline progress." }) : /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(import_jsx_runtime57.Fragment, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "rounded-lg border border-border/60 bg-card p-4", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3", children: "Pipeline stage" }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "flex flex-wrap gap-1.5 mb-2", children: PIPELINE_MAIN.map((s, i2) => {
-                const isActive = f3.status === s;
-                const mainIdx = PIPELINE_MAIN.findIndex((x3) => x3 === f3.status);
-                const isPast2 = mainIdx > i2;
-                return /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(
-                  "button",
-                  {
-                    type: "button",
-                    onClick: () => handleUpdateStatus(s),
-                    disabled: updatingStatus,
-                    className: cn3(
-                      "flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-all border disabled:opacity-60",
-                      isActive ? "bg-brand text-brand-foreground border-brand shadow-glow" : isPast2 ? "bg-brand/10 text-brand border-brand/30" : "bg-muted/40 text-muted-foreground border-transparent hover:border-border/60"
-                    ),
-                    children: [
-                      isActive && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Check, { className: "h-3 w-3 shrink-0" }),
-                      s
-                    ]
-                  },
-                  s
-                );
-              }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "flex gap-1.5 pt-1 border-t border-border/40", children: ["Follow Up", "Rejected"].map((s) => /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(
-                "button",
-                {
-                  type: "button",
-                  onClick: () => handleUpdateStatus(s),
-                  disabled: updatingStatus,
-                  className: cn3(
-                    "flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-all border disabled:opacity-60",
-                    f3.status === s ? `${STATUS_COLOR[s]} border-current` : "bg-muted/40 text-muted-foreground border-transparent hover:border-border/60"
-                  ),
-                  children: [
-                    f3.status === s && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Check, { className: "h-3 w-3 shrink-0" }),
-                    s
-                  ]
-                },
-                s
-              )) })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2", children: "Activity log" }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "space-y-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-                  "textarea",
-                  {
-                    value: newNote,
-                    onChange: (e) => setNewNote(e.target.value),
-                    rows: 2,
-                    placeholder: "Add update, meeting note, or status change reason\u2026",
-                    className: cn3(inputCls, "resize-none text-xs")
-                  }
-                ),
-                /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(
-                  "button",
-                  {
-                    type: "button",
-                    onClick: handleAddNote,
-                    disabled: addingNote || !newNote.trim(),
-                    className: "w-full rounded-md bg-gradient-brand text-brand-foreground py-2 text-xs disabled:opacity-50 flex items-center justify-center gap-1.5",
-                    children: [
-                      addingNote && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
-                      "Add to log"
-                    ]
-                  }
-                )
-              ] })
-            ] }),
-            notesList.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "rounded-lg border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground", children: "No activity logged yet" }) : /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "space-y-2", children: notesList.map((note, i2) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "rounded-lg border border-border/60 bg-card p-3", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex items-start gap-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Clock, { className: "h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0" }),
-              /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("pre", { className: "text-xs whitespace-pre-wrap font-sans text-muted-foreground", children: note })
-            ] }) }, i2)) })
-          ] }) })
-        ] }),
-        activeTab === "profile" && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "shrink-0 border-t border-border/60 px-5 py-3 flex items-center justify-between gap-2", children: [
-          isEdit ? /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(
-            "button",
-            {
-              type: "button",
-              onClick: handleDelete,
-              disabled: deleting,
-              className: "inline-flex items-center gap-1.5 rounded-md border border-destructive/40 text-destructive px-3 py-1.5 text-sm hover:bg-destructive/10 disabled:opacity-50",
-              children: [
-                deleting ? /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Trash2, { className: "h-3.5 w-3.5" }),
-                "Delete"
-              ]
-            }
-          ) : /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", {}),
-          /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-              "button",
-              {
-                type: "button",
-                onClick: onClose,
-                className: "rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent",
-                children: "Cancel"
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(
-              "button",
-              {
-                type: "submit",
-                disabled: saving || !f3.investor_name.trim(),
-                className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow disabled:opacity-50",
-                children: [
-                  saving && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
-                  isEdit ? "Save changes" : "Add lead"
-                ]
-              }
-            )
-          ] })
-        ] })
-      ] })
-    ] })
-  ] });
-}
 function normKey(k3) {
   return k3.toLowerCase().replace(/[\s\-]+/g, "_");
 }
@@ -66650,9 +66919,9 @@ function Leads() {
     user
   } = useAuth();
   const queryClient2 = useQueryClient();
-  const [drawerOpen, setDrawerOpen] = (0, import_react48.useState)(false);
-  const [editLead, setEditLead] = (0, import_react48.useState)(null);
-  const [csvOpen, setCsvOpen] = (0, import_react48.useState)(false);
+  const [drawerOpen, setDrawerOpen] = (0, import_react49.useState)(false);
+  const [editLead, setEditLead] = (0, import_react49.useState)(null);
+  const [csvOpen, setCsvOpen] = (0, import_react49.useState)(false);
   const {
     data: leads = [],
     isLoading
@@ -66671,7 +66940,7 @@ function Leads() {
       return data ?? [];
     }
   });
-  const grouped = (0, import_react48.useMemo)(() => {
+  const grouped = (0, import_react49.useMemo)(() => {
     const map = {};
     ALL_STATUSES.forEach((s) => {
       map[s] = [];
@@ -66715,40 +66984,40 @@ function Leads() {
   const contacted = leads.filter((l2) => ["Contacted", "Replied", "Meeting Booked"].includes(l2.status)).length;
   const hot = leads.filter((l2) => ["Interested", "Meeting Booked"].includes(l2.status)).length;
   const dealRooms = leads.filter((l2) => l2.status === "Deal Room Created").length;
-  return /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex flex-col", style: {
+  return /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "flex flex-col", style: {
     height: "calc(100vh - 4rem)"
   }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "px-8 py-5 border-b border-border/60 flex items-center justify-between gap-4 shrink-0", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "VC Leads" }),
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("p", { className: "text-sm text-muted-foreground mt-0.5", children: isLoading ? "Loading\u2026" : `${total} investors in pipeline` })
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "px-8 py-5 border-b border-border/60 flex items-center justify-between gap-4 shrink-0", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "VC Leads" }),
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("p", { className: "text-sm text-muted-foreground mt-0.5", children: isLoading ? "Loading\u2026" : `${total} investors in pipeline` })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex items-center gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("button", { onClick: downloadSampleCsv, className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Download, { className: "h-4 w-4" }),
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("button", { onClick: downloadSampleCsv, className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(Download, { className: "h-4 w-4" }),
           " Sample CSV"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("button", { onClick: () => setCsvOpen(true), className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Upload, { className: "h-4 w-4" }),
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("button", { onClick: () => setCsvOpen(true), className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(Upload, { className: "h-4 w-4" }),
           " Import CSV"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("button", { onClick: openAdd, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Plus, { className: "h-4 w-4" }),
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("button", { onClick: openAdd, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(Plus, { className: "h-4 w-4" }),
           " Add Lead"
         ] })
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "px-8 py-4 grid grid-cols-2 md:grid-cols-4 gap-3 shrink-0", children: [["Total leads", total, TrendingUp, "brand"], ["Contacted", contacted, Users, "violet"], ["Hot leads", hot, Zap, "warning"], ["Deal rooms", dealRooms, Briefcase, "success"]].map(([label, value, Icon2, color]) => /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-4 shadow-card", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex items-center justify-between text-xs text-muted-foreground", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("span", { children: label }),
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Icon2, { className: `h-3.5 w-3.5 text-${color}` })
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("div", { className: "px-8 py-4 grid grid-cols-2 md:grid-cols-4 gap-3 shrink-0", children: [["Total leads", total, TrendingUp, "brand"], ["Contacted", contacted, Users, "violet"], ["Hot leads", hot, Zap, "warning"], ["Deal rooms", dealRooms, Briefcase, "success"]].map(([label, value, Icon2, color]) => /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-4 shadow-card", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "flex items-center justify-between text-xs text-muted-foreground", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("span", { children: label }),
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(Icon2, { className: `h-3.5 w-3.5 text-${color}` })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: `mt-2 text-2xl font-semibold text-${color}`, children: value })
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("div", { className: `mt-2 text-2xl font-semibold text-${color}`, children: value })
     ] }, label)) }),
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "flex-1 overflow-x-auto px-8 pb-6 min-h-0", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "flex gap-3 h-full", style: {
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("div", { className: "flex-1 overflow-x-auto px-8 pb-6 min-h-0", children: /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("div", { className: "flex gap-3 h-full", style: {
       minWidth: "max-content"
-    }, children: ALL_STATUSES.map((status) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(KanbanColumn, { status, leads: grouped[status] ?? [], isLoading, onDrop: handleDrop, onCardClick: openEdit }, status)) }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(LeadDrawer, { open: drawerOpen, lead: editLead, onClose: () => {
+    }, children: ALL_STATUSES.map((status) => /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(KanbanColumn, { status, leads: grouped[status] ?? [], isLoading, onDrop: handleDrop, onCardClick: openEdit }, status)) }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(LeadDrawer, { open: drawerOpen, lead: editLead, onClose: () => {
       setDrawerOpen(false);
       setEditLead(null);
     }, onSaved: () => {
@@ -66758,7 +67027,7 @@ function Leads() {
       setDrawerOpen(false);
       setEditLead(null);
     } }),
-    csvOpen && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(CsvImportModal, { userId: user?.id ?? "", onClose: () => setCsvOpen(false), onImported: () => {
+    csvOpen && /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(CsvImportModal, { userId: user?.id ?? "", onClose: () => setCsvOpen(false), onImported: () => {
       queryClient2.invalidateQueries({
         queryKey: ["leads", user?.id]
       });
@@ -66773,15 +67042,15 @@ function KanbanColumn({
   onDrop,
   onCardClick
 }) {
-  const [dragOver, setDragOver] = (0, import_react48.useState)(false);
+  const [dragOver, setDragOver] = (0, import_react49.useState)(false);
   const isFirst = status === ALL_STATUSES[0];
-  return /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "w-[240px] flex-shrink-0 flex flex-col", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex items-center gap-2 px-1 mb-2.5 shrink-0", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("span", { className: cn3("h-2 w-2 rounded-full shrink-0", STATUS_DOT[status]) }),
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("span", { className: "text-sm font-medium", children: status }),
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("span", { className: "text-xs text-muted-foreground", children: isLoading ? "\u2026" : leads.length })
+  return /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "w-[240px] flex-shrink-0 flex flex-col", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "flex items-center gap-2 px-1 mb-2.5 shrink-0", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("span", { className: cn3("h-2 w-2 rounded-full shrink-0", STATUS_DOT[status]) }),
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("span", { className: "text-sm font-medium", children: status }),
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("span", { className: "text-xs text-muted-foreground", children: isLoading ? "\u2026" : leads.length })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { onDragOver: (e) => {
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("div", { onDragOver: (e) => {
       e.preventDefault();
       setDragOver(true);
     }, onDragLeave: (e) => {
@@ -66791,17 +67060,17 @@ function KanbanColumn({
       setDragOver(false);
       const leadId = e.dataTransfer.getData("leadId");
       if (leadId) onDrop(leadId, status);
-    }, className: cn3("flex-1 rounded-xl border border-border/60 p-2 space-y-2 transition-colors overflow-y-auto min-h-[400px]", "max-h-[calc(100vh-280px)]", dragOver ? "bg-brand/5 border-brand/40" : "bg-muted/30"), children: isLoading ? /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(import_jsx_runtime57.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "h-20 rounded-lg bg-muted/60 animate-pulse" }),
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "h-20 rounded-lg bg-muted/60 animate-pulse" })
-    ] }) : leads.length === 0 && isFirst ? /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex flex-col items-center justify-center h-32 gap-2 text-center", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Users, { className: "h-7 w-7 text-muted-foreground/30" }),
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("p", { className: "text-xs text-muted-foreground/60", children: [
+    }, className: cn3("flex-1 rounded-xl border border-border/60 p-2 space-y-2 transition-colors overflow-y-auto min-h-[400px]", "max-h-[calc(100vh-280px)]", dragOver ? "bg-brand/5 border-brand/40" : "bg-muted/30"), children: isLoading ? /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(import_jsx_runtime58.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("div", { className: "h-20 rounded-lg bg-muted/60 animate-pulse" }),
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("div", { className: "h-20 rounded-lg bg-muted/60 animate-pulse" })
+    ] }) : leads.length === 0 && isFirst ? /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "flex flex-col items-center justify-center h-32 gap-2 text-center", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(Users, { className: "h-7 w-7 text-muted-foreground/30" }),
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("p", { className: "text-xs text-muted-foreground/60", children: [
         "No leads yet.",
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("br", {}),
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("br", {}),
         "Add one or import a CSV."
       ] })
-    ] }) : leads.map((l2) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(LeadCard, { lead: l2, onClick: () => onCardClick(l2) }, l2.id)) })
+    ] }) : leads.map((l2) => /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(LeadCard, { lead: l2, onClick: () => onCardClick(l2) }, l2.id)) })
   ] });
 }
 function LeadCard({
@@ -66813,22 +67082,22 @@ function LeadCard({
   const followUp = lead.follow_up_date ? /* @__PURE__ */ new Date(lead.follow_up_date + "T12:00:00") : null;
   const isOverdue = followUp !== null && followUp <= today;
   const isHot = lead.status === "Interested";
-  return /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { draggable: true, onDragStart: (e) => {
+  return /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { draggable: true, onDragStart: (e) => {
     e.dataTransfer.setData("leadId", lead.id);
     e.dataTransfer.effectAllowed = "move";
   }, onClick, className: "rounded-lg border border-border/60 bg-card p-3 shadow-xs hover:shadow-card cursor-grab active:cursor-grabbing transition-all select-none", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex items-start justify-between gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex-1 min-w-0", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex items-center gap-1.5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("span", { className: "text-sm font-semibold truncate leading-snug", children: lead.investor_name }),
-          isHot && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Flame, { className: "h-3 w-3 text-warning shrink-0" })
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "flex items-start justify-between gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "flex-1 min-w-0", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "flex items-center gap-1.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("span", { className: "text-sm font-semibold truncate leading-snug", children: lead.investor_name }),
+          isHot && /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(Flame, { className: "h-3 w-3 text-warning shrink-0" })
         ] }),
-        lead.firm_name && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "text-xs text-muted-foreground truncate mt-0.5", children: lead.firm_name })
+        lead.firm_name && /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("div", { className: "text-xs text-muted-foreground truncate mt-0.5", children: lead.firm_name })
       ] }),
-      lead.ticket_size && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("span", { className: "text-[11px] text-muted-foreground shrink-0 tabular-nums", children: lead.ticket_size })
+      lead.ticket_size && /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("span", { className: "text-[11px] text-muted-foreground shrink-0 tabular-nums", children: lead.ticket_size })
     ] }),
-    followUp && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: cn3("mt-2 text-[11px] inline-flex items-center gap-1", isOverdue ? "text-warning" : "text-muted-foreground"), children: [
-      isOverdue && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(CircleAlert, { className: "h-3 w-3" }),
+    followUp && /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: cn3("mt-2 text-[11px] inline-flex items-center gap-1", isOverdue ? "text-warning" : "text-muted-foreground"), children: [
+      isOverdue && /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(CircleAlert, { className: "h-3 w-3" }),
       followUp.toLocaleDateString("en-US", {
         month: "short",
         day: "numeric"
@@ -66841,10 +67110,10 @@ function CsvImportModal({
   onClose,
   onImported
 }) {
-  const fileRef = (0, import_react48.useRef)(null);
-  const [mapped, setMapped] = (0, import_react48.useState)(null);
-  const [skipped, setSkipped] = (0, import_react48.useState)(0);
-  const [importing, setImporting] = (0, import_react48.useState)(false);
+  const fileRef = (0, import_react49.useRef)(null);
+  const [mapped, setMapped] = (0, import_react49.useState)(null);
+  const [skipped, setSkipped] = (0, import_react49.useState)(0);
+  const [importing, setImporting] = (0, import_react49.useState)(false);
   const handleFile = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -66886,40 +67155,40 @@ function CsvImportModal({
       setImporting(false);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "fixed inset-0 z-50 grid place-items-center bg-foreground/30 backdrop-blur-sm p-4", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { onClick: (e) => e.stopPropagation(), className: "w-full max-w-2xl rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "px-6 py-4 border-b border-border/60 flex items-center justify-between", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("h3", { className: "text-base font-semibold", children: "Import CSV" }),
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("button", { onClick: onClose, className: "text-muted-foreground hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(X2, { className: "h-4 w-4" }) })
+  return /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("div", { className: "fixed inset-0 z-50 grid place-items-center bg-foreground/30 backdrop-blur-sm p-4", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { onClick: (e) => e.stopPropagation(), className: "w-full max-w-2xl rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "px-6 py-4 border-b border-border/60 flex items-center justify-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("h3", { className: "text-base font-semibold", children: "Import CSV" }),
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("button", { onClick: onClose, className: "text-muted-foreground hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(X2, { className: "h-4 w-4" }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "px-6 py-5 space-y-5", children: [
-      !mapped && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { onClick: () => fileRef.current?.click(), className: "rounded-xl border-2 border-dashed border-border/60 bg-muted/30 hover:bg-accent/40 hover:border-brand/50 p-8 text-center cursor-pointer transition-all", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(Upload, { className: "h-8 w-8 mx-auto text-muted-foreground mb-3" }),
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("p", { className: "text-sm font-medium", children: "Click to select a CSV file" }),
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("p", { className: "text-xs text-muted-foreground mt-1", children: "Expected columns: investor_name, firm_name, email, sector, stage\u2026" }),
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("input", { ref: fileRef, type: "file", accept: ".csv", className: "hidden", onChange: handleFile })
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "px-6 py-5 space-y-5", children: [
+      !mapped && /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { onClick: () => fileRef.current?.click(), className: "rounded-xl border-2 border-dashed border-border/60 bg-muted/30 hover:bg-accent/40 hover:border-brand/50 p-8 text-center cursor-pointer transition-all", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(Upload, { className: "h-8 w-8 mx-auto text-muted-foreground mb-3" }),
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("p", { className: "text-sm font-medium", children: "Click to select a CSV file" }),
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("p", { className: "text-xs text-muted-foreground mt-1", children: "Expected columns: investor_name, firm_name, email, sector, stage\u2026" }),
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("input", { ref: fileRef, type: "file", accept: ".csv", className: "hidden", onChange: handleFile })
       ] }),
-      mapped && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(import_jsx_runtime57.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "flex items-center justify-between", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("p", { className: "text-sm font-medium", children: [
+      mapped && /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(import_jsx_runtime58.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "flex items-center justify-between", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("p", { className: "text-sm font-medium", children: [
             mapped.length,
             " leads found",
-            skipped > 0 && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("span", { className: "ml-2 text-xs text-warning", children: [
+            skipped > 0 && /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("span", { className: "ml-2 text-xs text-warning", children: [
               "(",
               skipped,
               " skipped \u2014 no email)"
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("button", { onClick: () => {
+          /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("button", { onClick: () => {
             setMapped(null);
             setSkipped(0);
           }, className: "text-xs text-muted-foreground hover:text-foreground underline", children: "Choose different file" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "rounded-xl border border-border/60 overflow-hidden", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("div", { className: "overflow-x-auto", children: /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("table", { className: "w-full text-xs", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("tr", { className: "bg-muted/30 border-b border-border/60", children: PREVIEW_COLS.map((col) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("th", { className: "px-3 py-2 text-left font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap", children: col.replace(/_/g, " ") }, col)) }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("tbody", { className: "divide-y divide-border/60", children: mapped.slice(0, 5).map((row, i2) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("tr", { className: "hover:bg-accent/30", children: PREVIEW_COLS.map((col) => /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("td", { className: "px-3 py-2 truncate max-w-[160px]", children: row[col] || /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("span", { className: "text-muted-foreground/50", children: "\u2014" }) }, col)) }, i2)) })
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "rounded-xl border border-border/60 overflow-hidden", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("div", { className: "overflow-x-auto", children: /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("table", { className: "w-full text-xs", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("tr", { className: "bg-muted/30 border-b border-border/60", children: PREVIEW_COLS.map((col) => /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("th", { className: "px-3 py-2 text-left font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap", children: col.replace(/_/g, " ") }, col)) }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("tbody", { className: "divide-y divide-border/60", children: mapped.slice(0, 5).map((row, i2) => /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("tr", { className: "hover:bg-accent/30", children: PREVIEW_COLS.map((col) => /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("td", { className: "px-3 py-2 truncate max-w-[160px]", children: row[col] || /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("span", { className: "text-muted-foreground/50", children: "\u2014" }) }, col)) }, i2)) })
           ] }) }),
-          mapped.length > 5 && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "px-3 py-2 bg-muted/20 border-t border-border/60 text-xs text-muted-foreground", children: [
+          mapped.length > 5 && /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "px-3 py-2 bg-muted/20 border-t border-border/60 text-xs text-muted-foreground", children: [
             "+ ",
             mapped.length - 5,
             " more rows"
@@ -66927,99 +67196,33 @@ function CsvImportModal({
         ] })
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)("div", { className: "px-6 py-4 border-t border-border/60 flex items-center justify-end gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("button", { onClick: onClose, className: "rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent", children: "Cancel" }),
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("button", { onClick: doImport, disabled: !mapped || mapped.length === 0 || importing, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-1.5 text-sm shadow-glow disabled:opacity-50", children: importing ? /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(import_jsx_runtime57.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)("div", { className: "px-6 py-4 border-t border-border/60 flex items-center justify-end gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("button", { onClick: onClose, className: "rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent", children: "Cancel" }),
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("button", { onClick: doImport, disabled: !mapped || mapped.length === 0 || importing, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-1.5 text-sm shadow-glow disabled:opacity-50", children: importing ? /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(import_jsx_runtime58.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
         " Importing\u2026"
-      ] }) : /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(import_jsx_runtime57.Fragment, { children: [
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(import_jsx_runtime58.Fragment, { children: [
         "Import ",
         mapped ? `${mapped.length} leads` : "all"
       ] }) })
     ] })
   ] }) });
 }
-var import_jsx_runtime57, import_react48, import_papaparse, generateOutreachEmail2, generateLinkedInMessage2, generateReply2, ALL_STATUSES, PIPELINE_MAIN, STATUS_COLOR, STAGES2, REL_STRENGTHS, MEETING_TYPES, PLATFORMS, inputCls, emptyForm2, STATUS_DOT, PREVIEW_COLS;
-var init_app_leads_DyUnMpHL = __esm({
-  "dist/server/assets/app.leads-DyUnMpHL.js"() {
+var import_jsx_runtime58, import_react49, import_papaparse, STATUS_DOT, PREVIEW_COLS;
+var init_app_leads_Brtk0fpt = __esm({
+  "dist/server/assets/app.leads-Brtk0fpt.js"() {
     "use strict";
-    import_jsx_runtime57 = __toESM(require_jsx_runtime(), 1);
-    import_react48 = __toESM(require_react(), 1);
+    import_jsx_runtime58 = __toESM(require_jsx_runtime(), 1);
+    import_react49 = __toESM(require_react(), 1);
     init_modern2();
     import_papaparse = __toESM(require_papaparse_min(), 1);
     init_dist7();
     init_lucide_react();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
+    init_LeadDrawer_mv_iA4VM();
     init_utils_H80jjgLf();
-    init_createSsrRpc_l1y8KE69();
-    init_server4();
     init_clsx();
     init_production();
-    generateOutreachEmail2 = createServerFn({
-      method: "POST"
-    }).inputValidator((data) => data).handler(createSsrRpc("1d719b02e5cbb8bfb1f5fdbf08bea97cdac2cfff952491ca07a2d91de6f74c81"));
-    generateLinkedInMessage2 = createServerFn({
-      method: "POST"
-    }).inputValidator((data) => data).handler(createSsrRpc("272077c9c144c7cbae7da95efd3b0536517866897833aab391e7e9e60debb102"));
-    generateReply2 = createServerFn({
-      method: "POST"
-    }).inputValidator((data) => data).handler(createSsrRpc("08b07e340aa3dd2c22b3ea45b5ff6e1a1e3844f3dadeb4cfd75858793e9c8fb3"));
-    ALL_STATUSES = [
-      "New",
-      "Shortlisted",
-      "Contacted",
-      "Replied",
-      "Meeting Booked",
-      "Interested",
-      "Deal Room Created",
-      "Follow Up",
-      "Rejected"
-    ];
-    PIPELINE_MAIN = [
-      "New",
-      "Shortlisted",
-      "Contacted",
-      "Replied",
-      "Meeting Booked",
-      "Interested",
-      "Deal Room Created"
-    ];
-    STATUS_COLOR = {
-      "New": "bg-muted-foreground/20 text-muted-foreground",
-      "Shortlisted": "bg-foreground/10 text-foreground",
-      "Contacted": "bg-brand/15 text-brand",
-      "Replied": "bg-violet/15 text-violet",
-      "Meeting Booked": "bg-warning/15 text-warning",
-      "Interested": "bg-warning/20 text-warning",
-      "Deal Room Created": "bg-success/15 text-success",
-      "Follow Up": "bg-brand/10 text-brand",
-      "Rejected": "bg-destructive/15 text-destructive"
-    };
-    STAGES2 = ["Pre-seed", "Seed", "Series A", "Series B", "Growth"];
-    REL_STRENGTHS = ["Cold", "Warm", "Hot", "Intro"];
-    MEETING_TYPES = ["Intro", "Deep Dive", "Partner", "Follow-up"];
-    PLATFORMS = ["Zoom", "Google Meet", "Phone", "In Person"];
-    inputCls = "w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/10";
-    emptyForm2 = {
-      investor_name: "",
-      firm_name: "",
-      email: "",
-      phone: "",
-      linkedin_url: "",
-      twitter_url: "",
-      website: "",
-      sector: "",
-      stage: "",
-      geography: "",
-      ticket_size: "",
-      status: "New",
-      follow_up_date: "",
-      notes: "",
-      source: "",
-      relationship_strength: "",
-      last_contacted: "",
-      next_action: ""
-    };
     STATUS_DOT = {
       "New": "bg-muted-foreground/50",
       "Shortlisted": "bg-foreground",
@@ -67040,13 +67243,13 @@ var app_investor_BFsOu0JM_exports = {};
 __export(app_investor_BFsOu0JM_exports, {
   component: () => SplitComponent10
 });
-var import_jsx_runtime58, SplitComponent10;
+var import_jsx_runtime59, SplitComponent10;
 var init_app_investor_BFsOu0JM = __esm({
   "dist/server/assets/app.investor-BFsOu0JM.js"() {
     "use strict";
-    import_jsx_runtime58 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime59 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    SplitComponent10 = () => /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(Outlet, {});
+    SplitComponent10 = () => /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(Outlet, {});
   }
 });
 
@@ -67078,11 +67281,11 @@ __export(app_email_CbI5DM3y_exports, {
   component: () => EmailComposer
 });
 function EmailComposer() {
-  const [tab, setTab] = (0, import_react49.useState)("cold");
-  const [to2, setTo] = (0, import_react49.useState)("");
-  const [body, setBody] = (0, import_react49.useState)(sample);
-  const [sending, setSending] = (0, import_react49.useState)(false);
-  const [status, setStatus] = (0, import_react49.useState)("");
+  const [tab, setTab] = (0, import_react50.useState)("cold");
+  const [to2, setTo] = (0, import_react50.useState)("");
+  const [body, setBody] = (0, import_react50.useState)(sample);
+  const [sending, setSending] = (0, import_react50.useState)(false);
+  const [status, setStatus] = (0, import_react50.useState)("");
   const sendInvite = async () => {
     setSending(true);
     setStatus("");
@@ -67100,73 +67303,73 @@ function EmailComposer() {
       setSending(false);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("div", { className: "p-6 lg:p-8 max-w-6xl mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "AI Email Assistant" }),
-      /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("div", { className: "text-sm text-muted-foreground", children: "Drafts that sound like you. Approved by you." })
+  return /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "p-6 lg:p-8 max-w-6xl mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "AI Email Assistant" }),
+      /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "text-sm text-muted-foreground", children: "Drafts that sound like you. Approved by you." })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("div", { className: "mt-6 grid lg:grid-cols-[280px_1fr] gap-5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("div", { className: "space-y-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-4 shadow-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("div", { className: "text-xs font-semibold uppercase tracking-wider text-muted-foreground", children: "Templates" }),
-          /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("div", { className: "mt-2 space-y-1", children: templates.map((t) => /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("button", { onClick: () => setTab(t.k), className: `w-full text-left rounded-md px-2.5 py-2 text-sm transition-colors ${tab === t.k ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60"}`, children: t.label }, t.k)) })
+    /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "mt-6 grid lg:grid-cols-[280px_1fr] gap-5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "space-y-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-4 shadow-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "text-xs font-semibold uppercase tracking-wider text-muted-foreground", children: "Templates" }),
+          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "mt-2 space-y-1", children: templates.map((t) => /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("button", { onClick: () => setTab(t.k), className: `w-full text-left rounded-md px-2.5 py-2 text-sm transition-colors ${tab === t.k ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60"}`, children: t.label }, t.k)) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-4 shadow-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("div", { className: "text-xs font-semibold uppercase tracking-wider text-muted-foreground", children: "Recipient" }),
-          /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("div", { className: "mt-3", children: /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("input", { value: to2, onChange: (e) => setTo(e.target.value), placeholder: "investor@firm.com", className: "w-full rounded-md border border-border/60 bg-background/60 px-3 py-2 text-sm focus:outline-none focus:border-brand/50" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("div", { className: "mt-3 text-xs text-muted-foreground", children: "Tone" }),
-          /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("div", { className: "mt-1.5 flex gap-1.5", children: ["Direct", "Warm", "Formal"].map((t, i2) => /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("button", { className: `flex-1 rounded-md border border-border/60 px-2 py-1.5 text-xs ${i2 === 0 ? "bg-accent" : "hover:bg-accent/60"}`, children: t }, t)) })
+        /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-4 shadow-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "text-xs font-semibold uppercase tracking-wider text-muted-foreground", children: "Recipient" }),
+          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "mt-3", children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("input", { value: to2, onChange: (e) => setTo(e.target.value), placeholder: "investor@firm.com", className: "w-full rounded-md border border-border/60 bg-background/60 px-3 py-2 text-sm focus:outline-none focus:border-brand/50" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "mt-3 text-xs text-muted-foreground", children: "Tone" }),
+          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "mt-1.5 flex gap-1.5", children: ["Direct", "Warm", "Formal"].map((t, i2) => /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("button", { className: `flex-1 rounded-md border border-border/60 px-2 py-1.5 text-xs ${i2 === 0 ? "bg-accent" : "hover:bg-accent/60"}`, children: t }, t)) })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card shadow-card overflow-hidden", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("div", { className: "flex items-center gap-2 border-b border-border/60 px-5 py-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("div", { className: "grid h-7 w-7 place-items-center rounded-md bg-gradient-brand text-brand-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(Sparkles, { className: "h-3.5 w-3.5" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("div", { className: "flex-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("div", { className: "text-sm font-medium", children: "AI draft \xB7 Cold outreach" }),
-            /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("div", { className: "text-xs text-muted-foreground", children: "Written in your voice based on your profile" })
+      /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card shadow-card overflow-hidden", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "flex items-center gap-2 border-b border-border/60 px-5 py-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "grid h-7 w-7 place-items-center rounded-md bg-gradient-brand text-brand-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(Sparkles, { className: "h-3.5 w-3.5" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "flex-1", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "text-sm font-medium", children: "AI draft \xB7 Cold outreach" }),
+            /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "text-xs text-muted-foreground", children: "Written in your voice based on your profile" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("button", { className: "text-xs inline-flex items-center gap-1 rounded-md border border-border/60 px-2.5 py-1.5 hover:bg-accent", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(RotateCw, { className: "h-3 w-3" }),
+          /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("button", { className: "text-xs inline-flex items-center gap-1 rounded-md border border-border/60 px-2.5 py-1.5 hover:bg-accent", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(RotateCw, { className: "h-3 w-3" }),
             " Regenerate"
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("div", { className: "p-5 space-y-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("div", { className: "flex gap-2 text-sm items-center", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("span", { className: "text-muted-foreground w-16", children: "To" }),
-            /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("span", { className: "font-medium text-sm", children: to2 || /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("span", { className: "text-muted-foreground italic", children: "Enter recipient above" }) })
+        /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "p-5 space-y-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "flex gap-2 text-sm items-center", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("span", { className: "text-muted-foreground w-16", children: "To" }),
+            /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("span", { className: "font-medium text-sm", children: to2 || /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("span", { className: "text-muted-foreground italic", children: "Enter recipient above" }) })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("div", { className: "flex gap-2 text-sm", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("span", { className: "text-muted-foreground w-16", children: "Subject" }),
-            /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("span", { className: "font-medium text-muted-foreground italic", children: "AI-generated subject line" })
+          /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "flex gap-2 text-sm", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("span", { className: "text-muted-foreground w-16", children: "Subject" }),
+            /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("span", { className: "font-medium text-muted-foreground italic", children: "AI-generated subject line" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("div", { className: "border-t border-border/60 pt-4", children: /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("textarea", { value: body, onChange: (e) => setBody(e.target.value), className: "w-full min-h-[300px] resize-none bg-transparent text-sm leading-relaxed focus:outline-none" }) })
+          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "border-t border-border/60 pt-4", children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("textarea", { value: body, onChange: (e) => setBody(e.target.value), className: "w-full min-h-[300px] resize-none bg-transparent text-sm leading-relaxed focus:outline-none" }) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("div", { className: "border-t border-border/60 px-5 py-3 flex items-center justify-between bg-gradient-soft", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("div", { className: "text-xs text-muted-foreground", children: "Reading time: 28s \xB7 Tone: direct \xB7 Sentiment: confident" }),
-          /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("div", { className: "flex gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("button", { className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 bg-background px-3 py-2 text-sm hover:bg-accent", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(Copy, { className: "h-3.5 w-3.5" }),
+        /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "border-t border-border/60 px-5 py-3 flex items-center justify-between bg-gradient-soft", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "text-xs text-muted-foreground", children: "Reading time: 28s \xB7 Tone: direct \xB7 Sentiment: confident" }),
+          /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "flex gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("button", { className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 bg-background px-3 py-2 text-sm hover:bg-accent", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(Copy, { className: "h-3.5 w-3.5" }),
               " Copy"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)("button", { onClick: sendInvite, disabled: sending, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow disabled:opacity-60", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(Send, { className: "h-3.5 w-3.5" }),
+            /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("button", { onClick: sendInvite, disabled: sending, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow disabled:opacity-60", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(Send, { className: "h-3.5 w-3.5" }),
               " ",
               sending ? "Sending..." : "Send"
             ] })
           ] })
         ] }),
-        status && /* @__PURE__ */ (0, import_jsx_runtime59.jsx)("div", { className: "px-5 pb-4 text-xs text-muted-foreground", children: status })
+        status && /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "px-5 pb-4 text-xs text-muted-foreground", children: status })
       ] })
     ] })
   ] });
 }
-var import_jsx_runtime59, import_react49, templates, sample;
+var import_jsx_runtime60, import_react50, templates, sample;
 var init_app_email_CbI5DM3y = __esm({
   "dist/server/assets/app.email-CbI5DM3y.js"() {
     "use strict";
-    import_jsx_runtime59 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime60 = __toESM(require_jsx_runtime(), 1);
     init_lucide_react();
-    import_react49 = __toESM(require_react(), 1);
+    import_react50 = __toESM(require_react(), 1);
     init_backend_CMfy16B4();
     templates = [{
       k: "cold",
@@ -67185,9 +67388,9 @@ var init_app_email_CbI5DM3y = __esm({
   }
 });
 
-// dist/server/assets/app.documents-DyIlv7nK.js
-var app_documents_DyIlv7nK_exports = {};
-__export(app_documents_DyIlv7nK_exports, {
+// dist/server/assets/app.documents-DtIhfslp.js
+var app_documents_DtIhfslp_exports = {};
+__export(app_documents_DtIhfslp_exports, {
   component: () => Documents
 });
 function getFileIconProps(fileName) {
@@ -67230,19 +67433,19 @@ function DocIcon({
     colorCls
   } = getFileIconProps(fileName);
   const cls = size === "sm" ? "h-5 w-5" : size === "lg" ? "h-10 w-10" : "h-7 w-7";
-  return /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(Icon2, { className: cn3(cls, colorCls, "shrink-0") });
+  return /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Icon2, { className: cn3(cls, colorCls, "shrink-0") });
 }
 function Documents() {
   const {
     user
   } = useAuth();
-  const [showUpload, setShowUpload] = (0, import_react50.useState)(false);
-  const [activeTab, setActiveTab] = (0, import_react50.useState)("All");
-  const [viewMode, setViewMode] = (0, import_react50.useState)("list");
-  const [deletingId, setDeletingId] = (0, import_react50.useState)(null);
-  const [addRoomDocId, setAddRoomDocId] = (0, import_react50.useState)(null);
-  const [addRoomId, setAddRoomId] = (0, import_react50.useState)("");
-  const [addingRoom, setAddingRoom] = (0, import_react50.useState)(false);
+  const [showUpload, setShowUpload] = (0, import_react51.useState)(false);
+  const [activeTab, setActiveTab] = (0, import_react51.useState)("All");
+  const [viewMode, setViewMode] = (0, import_react51.useState)("list");
+  const [deletingId, setDeletingId] = (0, import_react51.useState)(null);
+  const [addRoomDocId, setAddRoomDocId] = (0, import_react51.useState)(null);
+  const [addRoomId, setAddRoomId] = (0, import_react51.useState)("");
+  const [addingRoom, setAddingRoom] = (0, import_react51.useState)(false);
   const queryClient2 = useQueryClient();
   const {
     data: docs = [],
@@ -67276,7 +67479,7 @@ function Documents() {
       }));
     }
   });
-  const tabCounts = (0, import_react50.useMemo)(() => {
+  const tabCounts = (0, import_react51.useMemo)(() => {
     const counts = {
       All: docs.length
     };
@@ -67337,137 +67540,137 @@ function Documents() {
     setAddingRoom(false);
   };
   const preSelectCategory = activeTab === "All" ? "Pitch Deck" : activeTab;
-  return /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "p-6 lg:p-8 max-w-7xl mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "flex items-end justify-between flex-wrap gap-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Documents" }),
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "text-sm text-muted-foreground", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "p-6 lg:p-8 max-w-7xl mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "flex items-end justify-between flex-wrap gap-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Documents" }),
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "text-sm text-muted-foreground", children: [
           docs.length,
           " file",
           docs.length !== 1 ? "s" : "",
           " \xB7 access controlled"
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "flex items-center gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "flex items-center gap-1 rounded-md border border-border/60 p-0.5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("button", { onClick: () => setViewMode("list"), className: cn3("grid h-7 w-7 place-items-center rounded text-muted-foreground transition-colors", viewMode === "list" && "bg-accent text-foreground"), children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(List, { className: "h-3.5 w-3.5" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("button", { onClick: () => setViewMode("grid"), className: cn3("grid h-7 w-7 place-items-center rounded text-muted-foreground transition-colors", viewMode === "grid" && "bg-accent text-foreground"), children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(LayoutGrid, { className: "h-3.5 w-3.5" }) })
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "flex items-center gap-1 rounded-md border border-border/60 p-0.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("button", { onClick: () => setViewMode("list"), className: cn3("grid h-7 w-7 place-items-center rounded text-muted-foreground transition-colors", viewMode === "list" && "bg-accent text-foreground"), children: /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(List, { className: "h-3.5 w-3.5" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("button", { onClick: () => setViewMode("grid"), className: cn3("grid h-7 w-7 place-items-center rounded text-muted-foreground transition-colors", viewMode === "grid" && "bg-accent text-foreground"), children: /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(LayoutGrid, { className: "h-3.5 w-3.5" }) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("button", { onClick: () => setShowUpload(true), className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(Upload, { className: "h-4 w-4" }),
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("button", { onClick: () => setShowUpload(true), className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Upload, { className: "h-4 w-4" }),
           " Upload document"
         ] })
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "mt-6 flex items-center gap-1 overflow-x-auto pb-0.5 border-b border-border/60", children: TAB_LABELS.map((tab) => /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("button", { onClick: () => setActiveTab(tab), className: cn3("shrink-0 px-3 py-2 text-sm border-b-2 transition-colors whitespace-nowrap", activeTab === tab ? "border-brand text-foreground font-medium" : "border-transparent text-muted-foreground hover:text-foreground"), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "mt-6 flex items-center gap-1 overflow-x-auto pb-0.5 border-b border-border/60", children: TAB_LABELS.map((tab) => /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("button", { onClick: () => setActiveTab(tab), className: cn3("shrink-0 px-3 py-2 text-sm border-b-2 transition-colors whitespace-nowrap", activeTab === tab ? "border-brand text-foreground font-medium" : "border-transparent text-muted-foreground hover:text-foreground"), children: [
       tab,
-      tabCounts[tab] !== void 0 && /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("span", { className: cn3("ml-1.5 text-xs", activeTab === tab ? "text-brand" : "text-muted-foreground/60"), children: tabCounts[tab] })
+      tabCounts[tab] !== void 0 && /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("span", { className: cn3("ml-1.5 text-xs", activeTab === tab ? "text-brand" : "text-muted-foreground/60"), children: tabCounts[tab] })
     ] }, tab)) }),
-    /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "mt-4", children: isLoading ? /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "space-y-2", children: [1, 2, 3].map((n2) => /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "flex items-center gap-3 rounded-xl border border-border/60 bg-card p-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "h-9 w-9 rounded-md bg-muted animate-pulse shrink-0" }),
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "flex-1 space-y-1.5", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "h-4 w-48 rounded bg-muted animate-pulse" }),
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "h-3 w-24 rounded bg-muted/60 animate-pulse" })
+    /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "mt-4", children: isLoading ? /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "space-y-2", children: [1, 2, 3].map((n2) => /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "flex items-center gap-3 rounded-xl border border-border/60 bg-card p-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "h-9 w-9 rounded-md bg-muted animate-pulse shrink-0" }),
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "flex-1 space-y-1.5", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "h-4 w-48 rounded bg-muted animate-pulse" }),
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "h-3 w-24 rounded bg-muted/60 animate-pulse" })
       ] })
-    ] }, n2)) }) : filtered.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "rounded-xl border border-dashed border-border/60 bg-card py-16 text-center", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "grid h-14 w-14 place-items-center rounded-2xl bg-accent mx-auto mb-4", children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(FileText, { className: "h-7 w-7 text-muted-foreground/50" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "text-sm font-medium", children: activeTab === "All" ? "No documents yet" : `No files in ${activeTab}` }),
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "text-xs text-muted-foreground mt-1 mb-4 max-w-sm mx-auto", children: activeTab === "All" ? "Upload your pitch deck and data room documents to share with investors" : `Upload your ${activeTab.toLowerCase()} documents here.` }),
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("button", { onClick: () => setShowUpload(true), className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(Upload, { className: "h-4 w-4" }),
+    ] }, n2)) }) : filtered.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "rounded-xl border border-dashed border-border/60 bg-card py-16 text-center", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "grid h-14 w-14 place-items-center rounded-2xl bg-accent mx-auto mb-4", children: /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(FileText, { className: "h-7 w-7 text-muted-foreground/50" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "text-sm font-medium", children: activeTab === "All" ? "No documents yet" : `No files in ${activeTab}` }),
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "text-xs text-muted-foreground mt-1 mb-4 max-w-sm mx-auto", children: activeTab === "All" ? "Upload your pitch deck and data room documents to share with investors" : `Upload your ${activeTab.toLowerCase()} documents here.` }),
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("button", { onClick: () => setShowUpload(true), className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Upload, { className: "h-4 w-4" }),
         " Upload now"
       ] })
-    ] }) : viewMode === "grid" ? /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3", children: filtered.map((d2) => {
+    ] }) : viewMode === "grid" ? /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3", children: filtered.map((d2) => {
       const fname = d2.file_name || "";
-      return /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "group rounded-xl border border-border/60 bg-card p-4 hover:shadow-card transition-shadow flex flex-col gap-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "flex items-center justify-center h-16", children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(DocIcon, { fileName: fname, size: "lg" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "text-sm font-medium truncate", title: fname, children: fname.length > 24 ? fname.slice(0, 24) + "\u2026" : fname || "Untitled" }),
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "mt-1.5 flex items-center justify-between gap-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("span", { className: cn3("text-[10px] font-medium px-1.5 py-0.5 rounded-full", CAT_COLOR[d2.category || "Other"]), children: d2.category || "Other" }),
-            d2.status === "uploaded" ? /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(CircleCheck, { className: "h-3.5 w-3.5 text-success shrink-0" }) : /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(TriangleAlert, { className: "h-3.5 w-3.5 text-warning shrink-0" })
+      return /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "group rounded-xl border border-border/60 bg-card p-4 hover:shadow-card transition-shadow flex flex-col gap-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "flex items-center justify-center h-16", children: /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(DocIcon, { fileName: fname, size: "lg" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "text-sm font-medium truncate", title: fname, children: fname.length > 24 ? fname.slice(0, 24) + "\u2026" : fname || "Untitled" }),
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "mt-1.5 flex items-center justify-between gap-1", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("span", { className: cn3("text-[10px] font-medium px-1.5 py-0.5 rounded-full", CAT_COLOR[d2.category || "Other"]), children: d2.category || "Other" }),
+            d2.status === "uploaded" ? /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(CircleCheck, { className: "h-3.5 w-3.5 text-success shrink-0" }) : /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(TriangleAlert, { className: "h-3.5 w-3.5 text-warning shrink-0" })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "text-[10px] text-muted-foreground/60 flex items-center justify-between", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("span", { children: d2.created_at ? formatDistanceToNow(new Date(d2.created_at), {
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "text-[10px] text-muted-foreground/60 flex items-center justify-between", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("span", { children: d2.created_at ? formatDistanceToNow(new Date(d2.created_at), {
             addSuffix: true
           }) : "\u2014" }),
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("span", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("span", { children: [
             Math.max(1, Math.round((Number(d2.file_size) || 0) / 1024)),
             " KB"
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "flex gap-1 pt-1 border-t border-border/40", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("button", { onClick: () => handleDownload(d2.storage_path), title: "Download", className: "flex-1 grid place-items-center h-7 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors", children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(Download, { className: "h-3.5 w-3.5" }) }),
-          dealRooms.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("button", { onClick: () => {
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "flex gap-1 pt-1 border-t border-border/40", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("button", { onClick: () => handleDownload(d2.storage_path), title: "Download", className: "flex-1 grid place-items-center h-7 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors", children: /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Download, { className: "h-3.5 w-3.5" }) }),
+          dealRooms.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("button", { onClick: () => {
             setAddRoomDocId(d2.id);
             setAddRoomId("");
-          }, title: "Add to deal room", className: "flex-1 grid place-items-center h-7 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors", children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(Plus, { className: "h-3.5 w-3.5" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("button", { onClick: () => handleDelete(d2.id, d2.storage_path), title: deletingId === d2.id ? "Click again to confirm" : "Delete", className: cn3("flex-1 grid place-items-center h-7 rounded-md transition-colors", deletingId === d2.id ? "text-destructive bg-destructive/10" : "text-muted-foreground hover:bg-destructive/10 hover:text-destructive"), children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(Trash2, { className: "h-3.5 w-3.5" }) })
+          }, title: "Add to deal room", className: "flex-1 grid place-items-center h-7 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors", children: /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Plus, { className: "h-3.5 w-3.5" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("button", { onClick: () => handleDelete(d2.id, d2.storage_path), title: deletingId === d2.id ? "Click again to confirm" : "Delete", className: cn3("flex-1 grid place-items-center h-7 rounded-md transition-colors", deletingId === d2.id ? "text-destructive bg-destructive/10" : "text-muted-foreground hover:bg-destructive/10 hover:text-destructive"), children: /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Trash2, { className: "h-3.5 w-3.5" }) })
         ] })
       ] }, d2.id);
-    }) }) : /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card overflow-hidden", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "grid grid-cols-12 px-5 py-3 border-b border-border/60 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "col-span-5", children: "Name" }),
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "col-span-2", children: "Category" }),
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "col-span-2", children: "Size" }),
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "col-span-2", children: "Uploaded" }),
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "col-span-1 text-right", children: "Actions" })
+    }) }) : /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card overflow-hidden", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "grid grid-cols-12 px-5 py-3 border-b border-border/60 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "col-span-5", children: "Name" }),
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "col-span-2", children: "Category" }),
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "col-span-2", children: "Size" }),
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "col-span-2", children: "Uploaded" }),
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "col-span-1 text-right", children: "Actions" })
       ] }),
       filtered.map((d2) => {
         const fname = d2.file_name || "";
-        return /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "grid grid-cols-12 px-5 py-3 border-b border-border/60 last:border-0 hover:bg-accent/40 items-center text-sm group", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "col-span-5 flex items-center gap-3 min-w-0", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(DocIcon, { fileName: fname, size: "sm" }),
-            /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "min-w-0", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "font-medium truncate", title: fname, children: fname || "Untitled" }),
-              d2.status === "uploaded" ? /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("span", { className: "text-[10px] text-success flex items-center gap-0.5", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(CircleCheck, { className: "h-3 w-3" }),
+        return /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "grid grid-cols-12 px-5 py-3 border-b border-border/60 last:border-0 hover:bg-accent/40 items-center text-sm group", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "col-span-5 flex items-center gap-3 min-w-0", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(DocIcon, { fileName: fname, size: "sm" }),
+            /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "min-w-0", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "font-medium truncate", title: fname, children: fname || "Untitled" }),
+              d2.status === "uploaded" ? /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("span", { className: "text-[10px] text-success flex items-center gap-0.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(CircleCheck, { className: "h-3 w-3" }),
                 "Uploaded"
-              ] }) : /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("span", { className: "text-[10px] text-warning flex items-center gap-0.5", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(TriangleAlert, { className: "h-3 w-3" }),
+              ] }) : /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("span", { className: "text-[10px] text-warning flex items-center gap-0.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(TriangleAlert, { className: "h-3 w-3" }),
                 "Review needed"
               ] })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "col-span-2", children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("span", { className: cn3("text-[10px] font-medium px-1.5 py-0.5 rounded-full", CAT_COLOR[d2.category || "Other"]), children: d2.category || "Other" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "col-span-2 text-xs text-muted-foreground", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "col-span-2", children: /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("span", { className: cn3("text-[10px] font-medium px-1.5 py-0.5 rounded-full", CAT_COLOR[d2.category || "Other"]), children: d2.category || "Other" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "col-span-2 text-xs text-muted-foreground", children: [
             Math.max(1, Math.round((Number(d2.file_size) || 0) / 1024)),
             " KB"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "col-span-2 text-xs text-muted-foreground", children: d2.created_at ? formatDistanceToNow(new Date(d2.created_at), {
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "col-span-2 text-xs text-muted-foreground", children: d2.created_at ? formatDistanceToNow(new Date(d2.created_at), {
             addSuffix: true
           }) : "\u2014" }),
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "col-span-1 flex items-center justify-end gap-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("button", { onClick: () => handleDownload(d2.storage_path), title: "Download", className: "grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity", children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(Download, { className: "h-4 w-4" }) }),
-            dealRooms.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("button", { onClick: () => {
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "col-span-1 flex items-center justify-end gap-1", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("button", { onClick: () => handleDownload(d2.storage_path), title: "Download", className: "grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity", children: /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Download, { className: "h-4 w-4" }) }),
+            dealRooms.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("button", { onClick: () => {
               setAddRoomDocId(d2.id);
               setAddRoomId("");
-            }, title: "Add to deal room", className: "grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity", children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(Plus, { className: "h-4 w-4" }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("button", { onClick: () => handleDelete(d2.id, d2.storage_path), title: deletingId === d2.id ? "Click again to confirm delete" : "Delete", className: cn3("grid h-7 w-7 place-items-center rounded-md opacity-0 group-hover:opacity-100 transition-opacity", deletingId === d2.id ? "text-destructive" : "text-muted-foreground hover:text-destructive"), children: deletingId === d2.id ? /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(LoaderCircle, { className: "h-4 w-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(Trash2, { className: "h-4 w-4" }) })
+            }, title: "Add to deal room", className: "grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity", children: /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Plus, { className: "h-4 w-4" }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("button", { onClick: () => handleDelete(d2.id, d2.storage_path), title: deletingId === d2.id ? "Click again to confirm delete" : "Delete", className: cn3("grid h-7 w-7 place-items-center rounded-md opacity-0 group-hover:opacity-100 transition-opacity", deletingId === d2.id ? "text-destructive" : "text-muted-foreground hover:text-destructive"), children: deletingId === d2.id ? /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(LoaderCircle, { className: "h-4 w-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Trash2, { className: "h-4 w-4" }) })
           ] })
         ] }, d2.id);
       })
     ] }) }),
-    showUpload && /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(UploadModal, { userId: user.id, initialCategory: preSelectCategory, onClose: () => setShowUpload(false), onUploaded: () => {
+    showUpload && /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(UploadModal, { userId: user.id, initialCategory: preSelectCategory, onClose: () => setShowUpload(false), onUploaded: () => {
       queryClient2.invalidateQueries({
         queryKey: ["documents", user?.id]
       });
       setShowUpload(false);
     } }),
-    addRoomDocId && /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "fixed inset-0 z-50 grid place-items-center bg-foreground/30 backdrop-blur-sm p-4", onClick: () => setAddRoomDocId(null), children: /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { onClick: (e) => e.stopPropagation(), className: "w-full max-w-sm rounded-2xl border border-border/60 bg-card shadow-elev p-6", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "flex items-center justify-between mb-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("h3", { className: "text-sm font-semibold", children: "Add to deal room" }),
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("button", { onClick: () => setAddRoomDocId(null), className: "text-muted-foreground hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(X2, { className: "h-4 w-4" }) })
+    addRoomDocId && /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "fixed inset-0 z-50 grid place-items-center bg-foreground/30 backdrop-blur-sm p-4", onClick: () => setAddRoomDocId(null), children: /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { onClick: (e) => e.stopPropagation(), className: "w-full max-w-sm rounded-2xl border border-border/60 bg-card shadow-elev p-6", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "flex items-center justify-between mb-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("h3", { className: "text-sm font-semibold", children: "Add to deal room" }),
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("button", { onClick: () => setAddRoomDocId(null), className: "text-muted-foreground hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(X2, { className: "h-4 w-4" }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("select", { value: addRoomId, onChange: (e) => setAddRoomId(e.target.value), className: "w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 mb-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("option", { value: "", children: "Select deal room\u2026" }),
-        dealRooms.map((r2) => /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("option", { value: r2.id, children: r2.name }, r2.id))
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("select", { value: addRoomId, onChange: (e) => setAddRoomId(e.target.value), className: "w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 mb-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("option", { value: "", children: "Select deal room\u2026" }),
+        dealRooms.map((r2) => /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("option", { value: r2.id, children: r2.name }, r2.id))
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "flex gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("button", { onClick: () => setAddRoomDocId(null), className: "flex-1 rounded-md border border-border/60 py-2 text-sm hover:bg-accent", children: "Cancel" }),
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("button", { onClick: handleAddToRoom, disabled: !addRoomId || addingRoom, className: "flex-1 inline-flex items-center justify-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground py-2 text-sm shadow-glow disabled:opacity-50", children: [
-          addingRoom && /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "flex gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("button", { onClick: () => setAddRoomDocId(null), className: "flex-1 rounded-md border border-border/60 py-2 text-sm hover:bg-accent", children: "Cancel" }),
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("button", { onClick: handleAddToRoom, disabled: !addRoomId || addingRoom, className: "flex-1 inline-flex items-center justify-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground py-2 text-sm shadow-glow disabled:opacity-50", children: [
+          addingRoom && /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
           "Add to room"
         ] })
       ] })
@@ -67480,12 +67683,12 @@ function UploadModal({
   onClose,
   onUploaded
 }) {
-  const fileRef = (0, import_react50.useRef)(null);
-  const [category, setCategory] = (0, import_react50.useState)(initialCategory);
-  const [file, setFile] = (0, import_react50.useState)(null);
-  const [docName, setDocName] = (0, import_react50.useState)("");
-  const [description, setDescription] = (0, import_react50.useState)("");
-  const [uploading, setUploading] = (0, import_react50.useState)(false);
+  const fileRef = (0, import_react51.useRef)(null);
+  const [category, setCategory] = (0, import_react51.useState)(initialCategory);
+  const [file, setFile] = (0, import_react51.useState)(null);
+  const [docName, setDocName] = (0, import_react51.useState)("");
+  const [description, setDescription] = (0, import_react51.useState)("");
+  const [uploading, setUploading] = (0, import_react51.useState)(false);
   const handleFileChange = (e) => {
     const f3 = e.target.files?.[0];
     if (!f3) return;
@@ -67529,66 +67732,66 @@ function UploadModal({
       setUploading(false);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "fixed inset-0 z-50 grid place-items-center bg-foreground/30 backdrop-blur-sm p-4", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { onClick: (e) => e.stopPropagation(), className: "w-full max-w-md rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "px-6 py-4 border-b border-border/60 flex items-center justify-between", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("h3", { className: "text-base font-semibold", children: "Upload document" }),
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("button", { onClick: onClose, className: "text-muted-foreground hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(X2, { className: "h-4 w-4" }) })
+  return /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "fixed inset-0 z-50 grid place-items-center bg-foreground/30 backdrop-blur-sm p-4", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { onClick: (e) => e.stopPropagation(), className: "w-full max-w-md rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "px-6 py-4 border-b border-border/60 flex items-center justify-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("h3", { className: "text-base font-semibold", children: "Upload document" }),
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("button", { onClick: onClose, className: "text-muted-foreground hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(X2, { className: "h-4 w-4" }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "px-6 py-5 space-y-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("label", { className: "block text-xs text-muted-foreground mb-1.5", children: "Category *" }),
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("select", { value: category, onChange: (e) => setCategory(e.target.value), className: "w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50", children: CATEGORIES.map((c3) => /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("option", { children: c3 }, c3)) })
+    /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "px-6 py-5 space-y-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("label", { className: "block text-xs text-muted-foreground mb-1.5", children: "Category *" }),
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("select", { value: category, onChange: (e) => setCategory(e.target.value), className: "w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50", children: CATEGORIES.map((c3) => /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("option", { children: c3 }, c3)) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("label", { className: "block text-xs text-muted-foreground mb-1.5", children: "File *" }),
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { onClick: () => fileRef.current?.click(), className: cn3("rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-colors", file ? "border-brand/50 bg-brand/5" : "border-border/60 bg-muted/20 hover:border-brand/40 hover:bg-accent/20"), children: file ? /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(CircleCheck, { className: "h-6 w-6 text-success mx-auto mb-2" }),
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "text-sm font-medium truncate", children: file.name }),
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "text-xs text-muted-foreground mt-0.5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("label", { className: "block text-xs text-muted-foreground mb-1.5", children: "File *" }),
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { onClick: () => fileRef.current?.click(), className: cn3("rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-colors", file ? "border-brand/50 bg-brand/5" : "border-border/60 bg-muted/20 hover:border-brand/40 hover:bg-accent/20"), children: file ? /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(CircleCheck, { className: "h-6 w-6 text-success mx-auto mb-2" }),
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "text-sm font-medium truncate", children: file.name }),
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "text-xs text-muted-foreground mt-0.5", children: [
             Math.round(file.size / 1024),
             " KB"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("button", { type: "button", onClick: (e) => {
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("button", { type: "button", onClick: (e) => {
             e.stopPropagation();
             setFile(null);
             setDocName("");
           }, className: "mt-2 text-xs text-muted-foreground hover:text-destructive underline", children: "Remove" })
-        ] }) : /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(Upload, { className: "h-6 w-6 text-muted-foreground mx-auto mb-2" }),
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "text-sm font-medium", children: "Click to select file" }),
-          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("div", { className: "text-xs text-muted-foreground mt-0.5", children: "All file types \xB7 max 50MB" })
+        ] }) : /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Upload, { className: "h-6 w-6 text-muted-foreground mx-auto mb-2" }),
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "text-sm font-medium", children: "Click to select file" }),
+          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "text-xs text-muted-foreground mt-0.5", children: "All file types \xB7 max 50MB" })
         ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("input", { ref: fileRef, type: "file", className: "hidden", onChange: handleFileChange })
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("input", { ref: fileRef, type: "file", className: "hidden", onChange: handleFileChange })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("label", { className: "block text-xs text-muted-foreground mb-1.5", children: "Document name" }),
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("input", { type: "text", value: docName, onChange: (e) => setDocName(e.target.value), placeholder: "Auto-filled from filename", className: "w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("label", { className: "block text-xs text-muted-foreground mb-1.5", children: "Document name" }),
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("input", { type: "text", value: docName, onChange: (e) => setDocName(e.target.value), placeholder: "Auto-filled from filename", className: "w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("label", { className: "block text-xs text-muted-foreground mb-1.5", children: "Description (optional)" }),
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("input", { type: "text", value: description, onChange: (e) => setDescription(e.target.value), placeholder: "Brief description of this document", className: "w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("label", { className: "block text-xs text-muted-foreground mb-1.5", children: "Description (optional)" }),
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("input", { type: "text", value: description, onChange: (e) => setDescription(e.target.value), placeholder: "Brief description of this document", className: "w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)("div", { className: "px-6 py-4 border-t border-border/60 flex items-center justify-end gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("button", { onClick: onClose, className: "rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent", children: "Cancel" }),
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsx)("button", { onClick: handleUpload, disabled: !file || uploading, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-1.5 text-sm shadow-glow disabled:opacity-50", children: uploading ? /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)(import_jsx_runtime60.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
+    /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "px-6 py-4 border-t border-border/60 flex items-center justify-end gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("button", { onClick: onClose, className: "rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent", children: "Cancel" }),
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("button", { onClick: handleUpload, disabled: !file || uploading, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-1.5 text-sm shadow-glow disabled:opacity-50", children: uploading ? /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)(import_jsx_runtime61.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
         " Uploading\u2026"
-      ] }) : /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)(import_jsx_runtime60.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(Upload, { className: "h-3.5 w-3.5" }),
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)(import_jsx_runtime61.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Upload, { className: "h-3.5 w-3.5" }),
         " Upload"
       ] }) })
     ] })
   ] }) });
 }
-var import_jsx_runtime60, import_react50, CATEGORIES, TAB_LABELS, CAT_COLOR;
-var init_app_documents_DyIlv7nK = __esm({
-  "dist/server/assets/app.documents-DyIlv7nK.js"() {
+var import_jsx_runtime61, import_react51, CATEGORIES, TAB_LABELS, CAT_COLOR;
+var init_app_documents_DtIhfslp = __esm({
+  "dist/server/assets/app.documents-DtIhfslp.js"() {
     "use strict";
-    import_jsx_runtime60 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime61 = __toESM(require_jsx_runtime(), 1);
     init_lucide_react();
-    import_react50 = __toESM(require_react(), 1);
-    init_router_B5AOfxDk();
+    import_react51 = __toESM(require_react(), 1);
+    init_router_DOcN9fVX();
     init_modern2();
     init_dist7();
     init_date_fns();
@@ -67608,126 +67811,171 @@ var init_app_documents_DyIlv7nK = __esm({
   }
 });
 
-// dist/server/assets/app.deal-rooms-CH_KsBKT.js
-var app_deal_rooms_CH_KsBKT_exports = {};
-__export(app_deal_rooms_CH_KsBKT_exports, {
+// dist/server/assets/app.deal-rooms-CpVf6FIj.js
+var app_deal_rooms_CpVf6FIj_exports = {};
+__export(app_deal_rooms_CpVf6FIj_exports, {
   component: () => DealRooms
 });
+function statusLabel(s) {
+  if (!s) return "New";
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
 function DealRooms() {
-  const [open, setOpen] = (0, import_react51.useState)(false);
+  const [open, setOpen] = (0, import_react52.useState)(false);
   const {
-    data: rooms = []
+    user
+  } = useAuth();
+  const {
+    data: startup
   } = useQuery({
-    queryKey: ["deal-rooms"],
+    queryKey: ["dr-startup", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const {
+        data
+      } = await supabase.from("startups").select("id, company_name").eq("founder_id", user.id).limit(1).maybeSingle();
+      return data;
+    }
+  });
+  const {
+    data: rooms = [],
+    isLoading
+  } = useQuery({
+    queryKey: ["deal-rooms", user?.id],
+    enabled: !!startup?.id,
     queryFn: async () => {
       const {
         data,
         error
-      } = await supabase.from("deal_rooms").select("id, status, created_at, startups(company_name), organizations(name)").order("created_at", {
+      } = await supabase.from("deal_rooms").select(`
+          id, status, created_at, updated_at,
+          deal_room_members(user_id, role, users(full_name, email)),
+          deal_room_documents(id)
+        `).eq("startup_id", startup.id).order("updated_at", {
         ascending: false
       });
       if (error) throw error;
       return data ?? [];
     }
   });
-  return /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "p-6 lg:p-8 max-w-7xl mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "flex items-end justify-between flex-wrap gap-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Deal Rooms" }),
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "text-sm text-muted-foreground", children: [
+  if (isLoading) {
+    return /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "p-8 flex items-center justify-center min-h-64", children: /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(LoaderCircle, { className: "h-6 w-6 animate-spin text-muted-foreground" }) });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "p-6 lg:p-8 max-w-7xl mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "flex items-end justify-between flex-wrap gap-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Deal Rooms" }),
+        /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "text-sm text-muted-foreground", children: [
           rooms.length,
-          " active rooms"
+          " room",
+          rooms.length !== 1 ? "s" : ""
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("button", { onClick: () => setOpen(true), className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Plus, { className: "h-4 w-4" }),
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("button", { onClick: () => setOpen(true), className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(Plus, { className: "h-4 w-4" }),
         " Create new deal room"
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "mt-6 grid md:grid-cols-2 gap-4", children: [
-      rooms.map((r2) => /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)(Link, { to: "/app/deal-room/$id", params: {
-        id: r2.id
-      }, className: "rounded-xl border border-border/60 bg-card p-5 shadow-card hover:shadow-elev transition-shadow group", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "flex items-start justify-between", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "flex items-center gap-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "grid h-10 w-10 place-items-center rounded-lg bg-gradient-soft border border-border/60 text-xs font-semibold", children: (r2.organizations?.name || r2.startups?.company_name || "DR").split(" ").map((s) => s[0]).join("").slice(0, 2) }),
-            /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "font-semibold", children: r2.organizations?.name ?? r2.startups?.company_name ?? "Deal Room" }),
-              /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "text-xs text-muted-foreground", children: r2.startups?.company_name ? `Startup: ${r2.startups.company_name}` : "No startup linked" })
+    /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "mt-6 grid md:grid-cols-2 gap-4", children: [
+      rooms.map((r2) => {
+        const members = r2.deal_room_members ?? [];
+        const investorMember = members.find((m3) => m3.role !== "founder");
+        const investorName = investorMember?.users?.full_name ?? investorMember?.users?.email ?? "Investor pending";
+        const docsCount = (r2.deal_room_documents ?? []).length;
+        const daysOpen = Math.floor((Date.now() - new Date(r2.created_at).getTime()) / 864e5);
+        const lastActivity = r2.updated_at ? formatDistanceToNow(new Date(r2.updated_at), {
+          addSuffix: true
+        }) : "\u2014";
+        const status = r2.status ?? "new";
+        const initials = investorName.split(" ").map((s) => s[0]).join("").slice(0, 2).toUpperCase();
+        return /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card hover:shadow-elev transition-shadow flex flex-col gap-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "flex items-start justify-between", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "flex items-center gap-3 min-w-0", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground text-xs font-semibold shrink-0", children: initials || "DR" }),
+              /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "min-w-0", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "font-semibold truncate", children: investorName }),
+                /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "text-xs text-muted-foreground truncate", children: startup?.company_name ?? "Deal Room" })
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("span", { className: cn3("rounded-full px-2 py-0.5 text-[11px] font-medium shrink-0", STATUS_COLOR2[status] ?? "bg-muted/60 text-muted-foreground"), children: statusLabel(status) })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "grid grid-cols-3 gap-2 text-center", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "rounded-lg bg-muted/30 p-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "text-base font-semibold tabular-nums", children: docsCount }),
+              /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "text-[10px] text-muted-foreground", children: "docs" })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "rounded-lg bg-muted/30 p-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "text-base font-semibold tabular-nums", children: daysOpen }),
+              /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "text-[10px] text-muted-foreground", children: "days open" })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "rounded-lg bg-muted/30 p-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "text-base font-semibold tabular-nums", children: members.length }),
+              /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "text-[10px] text-muted-foreground", children: "members" })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(ArrowUpRight, { className: "h-4 w-4 text-muted-foreground group-hover:text-foreground" })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "mt-4 flex items-center gap-2 text-xs", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("span", { className: `rounded-full px-2 py-0.5 ${r2.status === "closed" ? "bg-warning/15 text-warning" : "bg-success/15 text-success"}`, children: r2.status ?? "new" }),
-          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("span", { className: "text-muted-foreground", children: "Deal room" }),
-          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("span", { className: "text-muted-foreground", children: "\xB7" }),
-          /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("span", { className: "text-muted-foreground", children: [
-            "ID: ",
-            r2.id.slice(0, 8)
+          /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "flex items-center justify-between", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "text-[11px] text-muted-foreground", children: [
+              "Last activity ",
+              lastActivity
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)(Link, { to: "/app/deal-room/$id", params: {
+              id: r2.id
+            }, className: "inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-2.5 py-1.5 text-xs shadow-glow hover:opacity-90 transition-opacity", children: [
+              "Open ",
+              /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(ArrowUpRight, { className: "h-3 w-3" })
+            ] })
           ] })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "mt-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "flex justify-between text-[11px] text-muted-foreground mb-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("span", { children: "Progress" }),
-            /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("span", { children: r2.status === "new" ? "15%" : "65%" })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "h-1.5 rounded-full bg-muted overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "h-full bg-gradient-brand", style: {
-            width: r2.status === "new" ? "15%" : "65%"
-          } }) })
-        ] })
-      ] }, r2.id)),
-      rooms.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "col-span-2 rounded-xl border border-dashed border-border/60 p-12 text-center", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Briefcase, { className: "h-8 w-8 text-muted-foreground mx-auto mb-3" }),
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "text-sm font-medium", children: "No deal rooms yet" }),
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "text-xs text-muted-foreground mt-1", children: "Create your first deal room to start a structured investor review." }),
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("button", { onClick: () => setOpen(true), className: "mt-4 inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Plus, { className: "h-4 w-4" }),
+        ] }, r2.id);
+      }),
+      rooms.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "col-span-2 rounded-xl border border-dashed border-border/60 p-12 text-center", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(Briefcase, { className: "h-8 w-8 text-muted-foreground mx-auto mb-3" }),
+        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "text-sm font-medium", children: "No deal rooms yet" }),
+        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "text-xs text-muted-foreground mt-1", children: "Create your first deal room to start a structured investor review." }),
+        /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("button", { onClick: () => setOpen(true), className: "mt-4 inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(Plus, { className: "h-4 w-4" }),
           " Create deal room"
         ] })
       ] })
     ] }),
-    open && /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(CreateRoomForm, { onClose: () => setOpen(false) })
+    open && /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(CreateRoomForm, { userId: user?.id ?? "", onClose: () => setOpen(false) })
   ] });
 }
 function CreateRoomForm({
+  userId,
   onClose
 }) {
-  const {
-    user
-  } = useAuth();
   const navigate = useNavigate();
   const queryClient2 = useQueryClient();
-  const [saving, setSaving] = (0, import_react51.useState)(false);
-  const [error, setError] = (0, import_react51.useState)("");
-  const [investorName, setInvestorName] = (0, import_react51.useState)("");
-  const [investorFirm, setInvestorFirm] = (0, import_react51.useState)("");
-  const [dealType, setDealType] = (0, import_react51.useState)("Equity");
-  const [fundingTarget, setFundingTarget] = (0, import_react51.useState)("");
-  const [description, setDescription] = (0, import_react51.useState)("");
-  const [inviteEmail, setInviteEmail] = (0, import_react51.useState)("");
-  const [startupId, setStartupId] = (0, import_react51.useState)("");
+  const [saving, setSaving] = (0, import_react52.useState)(false);
+  const [error, setError] = (0, import_react52.useState)("");
+  const [investorName, setInvestorName] = (0, import_react52.useState)("");
+  const [investorFirm, setInvestorFirm] = (0, import_react52.useState)("");
+  const [dealType, setDealType] = (0, import_react52.useState)("Equity");
+  const [fundingTarget, setFundingTarget] = (0, import_react52.useState)("");
+  const [description, setDescription] = (0, import_react52.useState)("");
+  const [inviteEmail, setInviteEmail] = (0, import_react52.useState)("");
+  const [startupId, setStartupId] = (0, import_react52.useState)("");
   const {
     data: startups = [],
     isLoading: startupsLoading
   } = useQuery({
-    queryKey: ["my-startups", user?.id],
-    enabled: !!user?.id,
+    queryKey: ["my-startups", userId],
+    enabled: !!userId,
     queryFn: async () => {
       const {
         data
-      } = await supabase.from("startups").select("id, company_name").eq("founder_id", user.id);
+      } = await supabase.from("startups").select("id, company_name").eq("founder_id", userId);
       return data ?? [];
     }
   });
-  (0, import_react51.useEffect)(() => {
+  (0, import_react52.useEffect)(() => {
     if (startups.length === 1 && !startupId) {
       setStartupId(startups[0].id);
     }
   }, [startups, startupId]);
   const submit = async (e) => {
     e.preventDefault();
-    if (!investorName.trim() || !startupId || !user?.id) return;
+    if (!investorName.trim() || !startupId || !userId) return;
     setSaving(true);
     setError("");
     try {
@@ -67742,26 +67990,26 @@ function CreateRoomForm({
       if (!newRoom?.id) throw new Error("No room ID returned");
       await supabase.from("deal_room_members").insert({
         deal_room_id: newRoom.id,
-        user_id: user.id,
+        user_id: userId,
         role: "founder",
         accepted_at: (/* @__PURE__ */ new Date()).toISOString()
       });
       await supabase.from("activities").insert({
         deal_room_id: newRoom.id,
-        actor_id: user.id,
+        actor_id: userId,
         action: `Deal room created for ${investorName.trim()}${investorFirm.trim() ? ` (${investorFirm.trim()})` : ""} \xB7 ${dealType}${fundingTarget ? ` \xB7 $${fundingTarget}` : ""}`
       });
       if (inviteEmail.trim()) {
         await supabase.from("invites").insert({
           email: inviteEmail.trim(),
           role: "investor",
-          invited_by: user.id,
+          invited_by: userId,
           deal_room_id: newRoom.id,
           expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1e3).toISOString()
         });
       }
       queryClient2.invalidateQueries({
-        queryKey: ["deal-rooms"]
+        queryKey: ["deal-rooms", userId]
       });
       onClose();
       navigate({
@@ -67776,77 +68024,85 @@ function CreateRoomForm({
       setSaving(false);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("div", { className: "fixed inset-0 z-50 grid place-items-center bg-foreground/30 backdrop-blur-sm p-4", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("form", { onClick: (e) => e.stopPropagation(), onSubmit: submit, className: "w-full max-w-lg rounded-2xl border border-border/60 bg-card shadow-elev p-6 space-y-4", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "flex items-center justify-between", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("h3", { className: "text-lg font-semibold inline-flex items-center gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Briefcase, { className: "h-5 w-5 text-brand" }),
+  return /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "fixed inset-0 z-50 grid place-items-center bg-foreground/30 backdrop-blur-sm p-4", onClick: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("form", { onClick: (e) => e.stopPropagation(), onSubmit: submit, className: "w-full max-w-lg rounded-2xl border border-border/60 bg-card shadow-elev p-6 space-y-4", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "flex items-center justify-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("h3", { className: "text-lg font-semibold inline-flex items-center gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(Briefcase, { className: "h-5 w-5 text-brand" }),
         " Create new deal room"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("button", { type: "button", onClick: onClose, className: "text-muted-foreground hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(X2, { className: "h-4 w-4" }) })
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("button", { type: "button", onClick: onClose, className: "text-muted-foreground hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(X2, { className: "h-4 w-4" }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("label", { className: "text-xs text-muted-foreground", children: "Investor name *" }),
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("input", { required: true, value: investorName, onChange: (e) => setInvestorName(e.target.value), placeholder: "Sarah Johnson", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
+    /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("label", { className: "text-xs text-muted-foreground", children: "Investor name *" }),
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("input", { required: true, value: investorName, onChange: (e) => setInvestorName(e.target.value), placeholder: "Sarah Johnson", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("label", { className: "text-xs text-muted-foreground", children: "Investor firm" }),
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("input", { value: investorFirm, onChange: (e) => setInvestorFirm(e.target.value), placeholder: "Sequoia Capital", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
+    /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("label", { className: "text-xs text-muted-foreground", children: "Investor firm" }),
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("input", { value: investorFirm, onChange: (e) => setInvestorFirm(e.target.value), placeholder: "Sequoia Capital", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "grid grid-cols-2 gap-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("label", { className: "text-xs text-muted-foreground", children: "Deal type" }),
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("select", { value: dealType, onChange: (e) => setDealType(e.target.value), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50", children: DEAL_TYPES.map((t) => /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("option", { value: t, children: t }, t)) })
+    /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "grid grid-cols-2 gap-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("label", { className: "text-xs text-muted-foreground", children: "Deal type" }),
+        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("select", { value: dealType, onChange: (e) => setDealType(e.target.value), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50", children: DEAL_TYPES.map((t) => /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("option", { value: t, children: t }, t)) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("label", { className: "text-xs text-muted-foreground", children: "Funding target ($)" }),
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("input", { type: "number", value: fundingTarget, onChange: (e) => setFundingTarget(e.target.value), placeholder: "500000", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("label", { className: "text-xs text-muted-foreground", children: "Funding target ($)" }),
+        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("input", { type: "number", value: fundingTarget, onChange: (e) => setFundingTarget(e.target.value), placeholder: "500000", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("label", { className: "text-xs text-muted-foreground", children: "Description (optional)" }),
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("textarea", { value: description, onChange: (e) => setDescription(e.target.value), rows: 2, placeholder: "Brief notes on this investor relationship\u2026", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none" })
+    /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("label", { className: "text-xs text-muted-foreground", children: "Description (optional)" }),
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("textarea", { value: description, onChange: (e) => setDescription(e.target.value), rows: 2, placeholder: "Brief notes on this investor relationship\u2026", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none" })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("label", { className: "text-xs text-muted-foreground", children: "Invite investor email (optional)" }),
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("input", { type: "email", value: inviteEmail, onChange: (e) => setInviteEmail(e.target.value), placeholder: "investor@sequoia.com", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" }),
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("p", { className: "mt-1 text-[11px] text-muted-foreground", children: "We'll create an invite link you can share with them." })
+    /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("label", { className: "text-xs text-muted-foreground", children: "Invite investor email (optional)" }),
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("input", { type: "email", value: inviteEmail, onChange: (e) => setInviteEmail(e.target.value), placeholder: "investor@sequoia.com", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" }),
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("p", { className: "mt-1 text-[11px] text-muted-foreground", children: "We'll create an invite link you can share with them." })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("label", { className: "text-xs text-muted-foreground", children: "Select startup *" }),
-      startupsLoading ? /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "mt-1.5 flex items-center gap-2 text-sm text-muted-foreground", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
+    /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("label", { className: "text-xs text-muted-foreground", children: "Select startup *" }),
+      startupsLoading ? /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "mt-1.5 flex items-center gap-2 text-sm text-muted-foreground", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
         " Loading\u2026"
-      ] }) : startups.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "mt-1.5 rounded-lg border border-border/60 bg-muted/30 p-3 text-sm text-muted-foreground", children: [
+      ] }) : startups.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "mt-1.5 rounded-lg border border-border/60 bg-muted/30 p-3 text-sm text-muted-foreground", children: [
         "Set up your company profile first.",
         " ",
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Link, { to: "/app/profile", className: "text-brand hover:underline", onClick: onClose, children: "Go to profile \u2192" })
-      ] }) : /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("select", { required: true, value: startupId, onChange: (e) => setStartupId(e.target.value), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("option", { value: "", children: "Select a startup\u2026" }),
-        startups.map((s) => /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("option", { value: s.id, children: s.company_name }, s.id))
+        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(Link, { to: "/app/profile", className: "text-brand hover:underline", onClick: onClose, children: "Go to profile \u2192" })
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("select", { required: true, value: startupId, onChange: (e) => setStartupId(e.target.value), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("option", { value: "", children: "Select a startup\u2026" }),
+        startups.map((s) => /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("option", { value: s.id, children: s.company_name }, s.id))
       ] })
     ] }),
-    error && /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("p", { className: "text-xs text-destructive", children: error }),
-    /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)("div", { className: "flex justify-end gap-2 pt-2 border-t border-border/60", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("button", { type: "button", onClick: onClose, className: "rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: "Cancel" }),
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)("button", { type: "submit", disabled: saving || !investorName.trim() || !startupId || startups.length === 0, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm disabled:opacity-60", children: saving ? /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)(import_jsx_runtime61.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
+    error && /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("p", { className: "text-xs text-destructive", children: error }),
+    /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "flex justify-end gap-2 pt-2 border-t border-border/60", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("button", { type: "button", onClick: onClose, className: "rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: "Cancel" }),
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("button", { type: "submit", disabled: saving || !investorName.trim() || !startupId || startups.length === 0, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm disabled:opacity-60", children: saving ? /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)(import_jsx_runtime62.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
         " Creating\u2026"
       ] }) : "Create deal room" })
     ] })
   ] }) });
 }
-var import_jsx_runtime61, import_react51, DEAL_TYPES;
-var init_app_deal_rooms_CH_KsBKT = __esm({
-  "dist/server/assets/app.deal-rooms-CH_KsBKT.js"() {
+var import_jsx_runtime62, import_react52, STATUS_COLOR2, DEAL_TYPES;
+var init_app_deal_rooms_CpVf6FIj = __esm({
+  "dist/server/assets/app.deal-rooms-CpVf6FIj.js"() {
     "use strict";
-    import_jsx_runtime61 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime62 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_lucide_react();
-    import_react51 = __toESM(require_react(), 1);
+    import_react52 = __toESM(require_react(), 1);
     init_modern2();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
+    init_date_fns();
+    init_utils_H80jjgLf();
     init_dist7();
     init_clsx();
+    STATUS_COLOR2 = {
+      new: "bg-brand/15 text-brand",
+      active: "bg-success/15 text-success",
+      closed: "bg-muted/60 text-muted-foreground",
+      rejected: "bg-destructive/15 text-destructive"
+    };
     DEAL_TYPES = ["Equity", "SAFE", "Convertible Note", "Other"];
   }
 });
@@ -67857,79 +68113,79 @@ __export(app_audit_Dz_yfFC8_exports, {
   component: () => AuditPage
 });
 function AuditPage() {
-  const [q2, setQ] = (0, import_react52.useState)("");
-  const [cat, setCat] = (0, import_react52.useState)("All");
-  const list = (0, import_react52.useMemo)(() => {
-    let xs = auditLog2;
+  const [q2, setQ] = (0, import_react53.useState)("");
+  const [cat, setCat] = (0, import_react53.useState)("All");
+  const list = (0, import_react53.useMemo)(() => {
+    let xs = auditLog;
     if (cat !== "All") xs = xs.filter((e) => e.category === cat);
     if (q2) xs = xs.filter((e) => (e.actor + e.action + e.target + e.ip).toLowerCase().includes(q2.toLowerCase()));
     return xs;
   }, [q2, cat]);
-  const critical = auditLog2.filter((e) => e.severity === "critical").length;
-  return /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "p-6 lg:p-8 max-w-6xl mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "flex items-end justify-between gap-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "flex items-center gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(ShieldCheck, { className: "h-5 w-5 text-brand" }),
-          /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Activity audit log" })
+  const critical = auditLog.filter((e) => e.severity === "critical").length;
+  return /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "p-6 lg:p-8 max-w-6xl mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "flex items-end justify-between gap-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(ShieldCheck, { className: "h-5 w-5 text-brand" }),
+          /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Activity audit log" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: "Immutable record of every action taken across your workspace and deal rooms." })
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: "Immutable record of every action taken across your workspace and deal rooms." })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("button", { className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(Download, { className: "h-4 w-4" }),
+      /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("button", { className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(Download, { className: "h-4 w-4" }),
         " Export CSV"
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "mt-6 grid grid-cols-2 md:grid-cols-4 gap-3", children: [["Total events", auditLog2.length.toString(), Activity, "text-foreground"], ["Last 24h", "9", Activity, "text-foreground"], ["Sign-ins", auditLog2.filter((e) => e.category === "Auth").length.toString(), ShieldCheck, "text-brand"], ["Critical", critical.toString(), TriangleAlert, critical ? "text-destructive" : "text-muted-foreground"]].map(([l2, v3, I3, c3]) => /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-4 shadow-card", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "text-xs text-muted-foreground", children: l2 }),
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(I3, { className: `h-3.5 w-3.5 ${c3}` })
+    /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "mt-6 grid grid-cols-2 md:grid-cols-4 gap-3", children: [["Total events", auditLog.length.toString(), Activity, "text-foreground"], ["Last 24h", "9", Activity, "text-foreground"], ["Sign-ins", auditLog.filter((e) => e.category === "Auth").length.toString(), ShieldCheck, "text-brand"], ["Critical", critical.toString(), TriangleAlert, critical ? "text-destructive" : "text-muted-foreground"]].map(([l2, v3, I3, c3]) => /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-4 shadow-card", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "flex items-center justify-between", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "text-xs text-muted-foreground", children: l2 }),
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(I3, { className: `h-3.5 w-3.5 ${c3}` })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: `mt-1 text-xl font-semibold tabular-nums ${c3}`, children: v3 })
+      /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: `mt-1 text-xl font-semibold tabular-nums ${c3}`, children: v3 })
     ] }, l2)) }),
-    /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "mt-6 flex flex-wrap items-center gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "relative flex-1 min-w-[200px] max-w-sm", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(Search, { className: "absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" }),
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("input", { value: q2, onChange: (e) => setQ(e.target.value), placeholder: "Filter by user, action, IP\u2026", className: "w-full rounded-md border border-border/60 bg-background pl-8 pr-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
+    /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "mt-6 flex flex-wrap items-center gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "relative flex-1 min-w-[200px] max-w-sm", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(Search, { className: "absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" }),
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("input", { value: q2, onChange: (e) => setQ(e.target.value), placeholder: "Filter by user, action, IP\u2026", className: "w-full rounded-md border border-border/60 bg-background pl-8 pr-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "flex flex-wrap gap-1", children: cats.map((c3) => /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("button", { onClick: () => setCat(c3), className: `rounded-full px-3 py-1.5 text-xs transition-colors ${cat === c3 ? "bg-foreground text-background" : "border border-border/60 hover:bg-accent"}`, children: c3 }, c3)) })
+      /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "flex flex-wrap gap-1", children: cats.map((c3) => /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("button", { onClick: () => setCat(c3), className: `rounded-full px-3 py-1.5 text-xs transition-colors ${cat === c3 ? "bg-foreground text-background" : "border border-border/60 hover:bg-accent"}`, children: c3 }, c3)) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "mt-5 rounded-xl border border-border/60 bg-card shadow-card overflow-hidden", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "grid grid-cols-[1fr_1.6fr_1fr_140px_120px] gap-4 px-5 py-2.5 border-b border-border/60 bg-accent/30 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { children: "Actor" }),
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { children: "Action" }),
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { children: "Category" }),
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { children: "IP address" }),
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "text-right", children: "When" })
+    /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "mt-5 rounded-xl border border-border/60 bg-card shadow-card overflow-hidden", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "grid grid-cols-[1fr_1.6fr_1fr_140px_120px] gap-4 px-5 py-2.5 border-b border-border/60 bg-accent/30 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { children: "Actor" }),
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { children: "Action" }),
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { children: "Category" }),
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { children: "IP address" }),
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "text-right", children: "When" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "divide-y divide-border/60", children: list.map((e) => /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "grid grid-cols-[1fr_1.6fr_1fr_140px_120px] gap-4 px-5 py-3.5 items-center text-sm hover:bg-accent/40", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "flex items-center gap-2.5 min-w-0", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "grid h-7 w-7 place-items-center rounded-full bg-accent text-[10px] font-semibold shrink-0", children: e.initials }),
-          /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "truncate font-medium", children: e.actor })
+      /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "divide-y divide-border/60", children: list.map((e) => /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "grid grid-cols-[1fr_1.6fr_1fr_140px_120px] gap-4 px-5 py-3.5 items-center text-sm hover:bg-accent/40", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "flex items-center gap-2.5 min-w-0", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "grid h-7 w-7 place-items-center rounded-full bg-accent text-[10px] font-semibold shrink-0", children: e.initials }),
+          /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "truncate font-medium", children: e.actor })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "min-w-0", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "font-medium", children: e.action }),
-          /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "text-xs text-muted-foreground truncate", children: e.target })
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "min-w-0", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "font-medium", children: e.action }),
+          /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "text-xs text-muted-foreground truncate", children: e.target })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)("div", { className: "flex items-center gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("span", { className: `h-1.5 w-1.5 rounded-full ${catDot(e.category)}` }),
-          /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("span", { className: "text-xs", children: e.category }),
-          e.severity !== "info" && /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("span", { className: `text-[10px] rounded-full px-1.5 py-0.5 font-medium border ${sevTint(e.severity)}`, children: e.severity === "critical" ? "Critical" : "Warn" })
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("span", { className: `h-1.5 w-1.5 rounded-full ${catDot(e.category)}` }),
+          /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("span", { className: "text-xs", children: e.category }),
+          e.severity !== "info" && /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("span", { className: `text-[10px] rounded-full px-1.5 py-0.5 font-medium border ${sevTint(e.severity)}`, children: e.severity === "critical" ? "Critical" : "Warn" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "text-xs text-muted-foreground tabular-nums truncate", children: e.ip }),
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)("div", { className: "text-xs text-muted-foreground text-right tabular-nums", children: e.time })
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "text-xs text-muted-foreground tabular-nums truncate", children: e.ip }),
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "text-xs text-muted-foreground text-right tabular-nums", children: e.time })
       ] }, e.id)) })
     ] })
   ] });
 }
-var import_jsx_runtime62, import_react52, auditLog2, cats, sevTint, catDot;
+var import_jsx_runtime63, import_react53, auditLog, cats, sevTint, catDot;
 var init_app_audit_Dz_yfFC8 = __esm({
   "dist/server/assets/app.audit-Dz_yfFC8.js"() {
     "use strict";
-    import_jsx_runtime62 = __toESM(require_jsx_runtime(), 1);
-    import_react52 = __toESM(require_react(), 1);
+    import_jsx_runtime63 = __toESM(require_jsx_runtime(), 1);
+    import_react53 = __toESM(require_react(), 1);
     init_lucide_react();
-    auditLog2 = [];
+    auditLog = [];
     cats = ["All", "Auth", "Document", "Deal Room", "Invite", "Settings", "AI"];
     sevTint = (s) => s === "critical" ? "bg-destructive/10 text-destructive border-destructive/20" : s === "warn" ? "bg-warning/10 text-warning border-warning/20" : "bg-muted text-muted-foreground border-border/60";
     catDot = (c3) => ({
@@ -67943,9 +68199,9 @@ var init_app_audit_Dz_yfFC8 = __esm({
   }
 });
 
-// dist/server/assets/app.advisor-B0wpDJNv.js
-var app_advisor_B0wpDJNv_exports = {};
-__export(app_advisor_B0wpDJNv_exports, {
+// dist/server/assets/app.advisor-qouHNJxT.js
+var app_advisor_qouHNJxT_exports = {};
+__export(app_advisor_qouHNJxT_exports, {
   component: () => Advisor
 });
 import "node:async_hooks";
@@ -67953,17 +68209,17 @@ function Advisor() {
   const {
     user
   } = useAuth();
-  const endRef = (0, import_react53.useRef)(null);
-  const [msgs, setMsgs] = (0, import_react53.useState)([{
+  const endRef = (0, import_react54.useRef)(null);
+  const [msgs, setMsgs] = (0, import_react54.useState)([{
     id: "m0",
     role: "assistant",
     content: "I'm your AI fundraising advisor. I have live context on your pipeline, leads, and deal rooms. Ask me anything about your raise."
   }]);
-  const [input, setInput] = (0, import_react53.useState)("");
-  const [thinking, setThinking] = (0, import_react53.useState)(false);
-  const [remaining, setRemaining] = (0, import_react53.useState)(20);
-  const [limitHit, setLimitHit] = (0, import_react53.useState)(false);
-  (0, import_react53.useEffect)(() => {
+  const [input, setInput] = (0, import_react54.useState)("");
+  const [thinking, setThinking] = (0, import_react54.useState)(false);
+  const [remaining, setRemaining] = (0, import_react54.useState)(20);
+  const [limitHit, setLimitHit] = (0, import_react54.useState)(false);
+  (0, import_react54.useEffect)(() => {
     endRef.current?.scrollIntoView({
       behavior: "smooth"
     });
@@ -68019,64 +68275,64 @@ function Advisor() {
     }
   };
   const showStarters = msgs.length <= 1;
-  return /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "flex flex-col h-[calc(100vh-4rem)]", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "border-b border-border/60 bg-background/80 backdrop-blur-xl px-6 lg:px-8 py-4 shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "max-w-3xl mx-auto flex items-center justify-between gap-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "grid h-9 w-9 place-items-center rounded-xl bg-gradient-brand text-brand-foreground shadow-glow shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(Sparkles, { className: "h-4 w-4" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("h1", { className: "text-lg font-semibold tracking-tight", children: "AI Advisor" }),
-          /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "text-xs text-muted-foreground", children: "Personalized fundraising advice based on your live pipeline." })
+  return /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "flex flex-col h-[calc(100vh-4rem)]", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "border-b border-border/60 bg-background/80 backdrop-blur-xl px-6 lg:px-8 py-4 shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "max-w-3xl mx-auto flex items-center justify-between gap-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "flex items-center gap-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "grid h-9 w-9 place-items-center rounded-xl bg-gradient-brand text-brand-foreground shadow-glow shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Sparkles, { className: "h-4 w-4" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("h1", { className: "text-lg font-semibold tracking-tight", children: "AI Advisor" }),
+          /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "text-xs text-muted-foreground", children: "Personalized fundraising advice based on your live pipeline." })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: `text-[11px] tabular-nums shrink-0 ${remaining <= 5 ? "text-warning" : "text-muted-foreground"}`, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: `text-[11px] tabular-nums shrink-0 ${remaining <= 5 ? "text-warning" : "text-muted-foreground"}`, children: [
         remaining,
         " / 20 left today"
       ] })
     ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "flex-1 overflow-y-auto", children: /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "max-w-3xl mx-auto px-6 py-6 space-y-5", children: [
-      msgs.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: `flex gap-3 ${m3.role === "user" ? "flex-row-reverse" : ""}`, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: `grid h-8 w-8 place-items-center rounded-full shrink-0 ${m3.role === "user" ? "bg-gradient-brand text-brand-foreground" : "bg-accent text-foreground border border-border/60"}`, children: m3.role === "user" ? /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(User, { className: "h-4 w-4" }) : /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(Sparkles, { className: "h-4 w-4 text-brand" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: `max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m3.role === "user" ? "bg-gradient-brand text-brand-foreground" : "bg-card border border-border/60 shadow-card"}`, children: m3.content })
+    /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "flex-1 overflow-y-auto", children: /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "max-w-3xl mx-auto px-6 py-6 space-y-5", children: [
+      msgs.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: `flex gap-3 ${m3.role === "user" ? "flex-row-reverse" : ""}`, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: `grid h-8 w-8 place-items-center rounded-full shrink-0 ${m3.role === "user" ? "bg-gradient-brand text-brand-foreground" : "bg-accent text-foreground border border-border/60"}`, children: m3.role === "user" ? /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(User, { className: "h-4 w-4" }) : /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Sparkles, { className: "h-4 w-4 text-brand" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: `max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m3.role === "user" ? "bg-gradient-brand text-brand-foreground" : "bg-card border border-border/60 shadow-card"}`, children: m3.content })
       ] }, m3.id)),
-      thinking && /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "flex gap-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "grid h-8 w-8 place-items-center rounded-full bg-accent border border-border/60 shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(Sparkles, { className: "h-4 w-4 text-brand animate-pulse" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "rounded-2xl px-4 py-3 bg-card border border-border/60 shadow-card inline-flex items-center gap-2 text-xs text-muted-foreground", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
+      thinking && /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "flex gap-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "grid h-8 w-8 place-items-center rounded-full bg-accent border border-border/60 shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Sparkles, { className: "h-4 w-4 text-brand animate-pulse" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "rounded-2xl px-4 py-3 bg-card border border-border/60 shadow-card inline-flex items-center gap-2 text-xs text-muted-foreground", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
           " Thinking\u2026"
         ] })
       ] }),
-      showStarters && /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "grid sm:grid-cols-2 gap-2 pt-2", children: STARTERS.map((s) => /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("button", { onClick: () => send(s), className: "text-left rounded-xl border border-border/60 bg-card p-3 text-sm hover:border-brand/40 hover:bg-accent transition-colors shadow-card", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(Sparkles, { className: "h-3.5 w-3.5 text-brand mb-1.5" }),
-        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { children: s })
+      showStarters && /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "grid sm:grid-cols-2 gap-2 pt-2", children: STARTERS.map((s) => /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("button", { onClick: () => send(s), className: "text-left rounded-xl border border-border/60 bg-card p-3 text-sm hover:border-brand/40 hover:bg-accent transition-colors shadow-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Sparkles, { className: "h-3.5 w-3.5 text-brand mb-1.5" }),
+        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { children: s })
       ] }, s)) }),
-      /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { ref: endRef })
+      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { ref: endRef })
     ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "border-t border-border/60 bg-background/80 backdrop-blur-xl shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("div", { className: "max-w-3xl mx-auto px-6 py-3.5", children: [
-      limitHit ? /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-center text-destructive", children: "Daily limit reached (20 messages). Resets at midnight." }) : /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)("form", { onSubmit: (e) => {
+    /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "border-t border-border/60 bg-background/80 backdrop-blur-xl shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "max-w-3xl mx-auto px-6 py-3.5", children: [
+      limitHit ? /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-center text-destructive", children: "Daily limit reached (20 messages). Resets at midnight." }) : /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("form", { onSubmit: (e) => {
         e.preventDefault();
         send(input);
       }, className: "flex items-end gap-2 rounded-xl border border-border/60 bg-card p-2 shadow-card focus-within:border-brand/40 focus-within:ring-2 focus-within:ring-brand/10", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("textarea", { value: input, onChange: (e) => setInput(e.target.value), onKeyDown: (e) => {
+        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("textarea", { value: input, onChange: (e) => setInput(e.target.value), onKeyDown: (e) => {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             send(input);
           }
         }, rows: 1, placeholder: "Ask about your raise\u2026", className: "flex-1 resize-none bg-transparent px-2 py-1.5 text-sm placeholder:text-muted-foreground/60 focus:outline-none max-h-32" }),
-        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("button", { type: "submit", disabled: !input.trim() || thinking, className: "grid h-8 w-8 place-items-center rounded-md bg-gradient-brand text-brand-foreground shadow-glow disabled:opacity-40", children: /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(Send, { className: "h-3.5 w-3.5" }) })
+        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("button", { type: "submit", disabled: !input.trim() || thinking, className: "grid h-8 w-8 place-items-center rounded-md bg-gradient-brand text-brand-foreground shadow-glow disabled:opacity-40", children: /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Send, { className: "h-3.5 w-3.5" }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime63.jsx)("div", { className: "mt-1.5 text-[10px] text-muted-foreground text-center", children: "AI may be inaccurate \u2014 verify with your legal & finance team." })
+      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "mt-1.5 text-[10px] text-muted-foreground text-center", children: "AI may be inaccurate \u2014 verify with your legal & finance team." })
     ] }) })
   ] });
 }
-var import_jsx_runtime63, import_react53, sendAdvisorMessage2, STARTERS;
-var init_app_advisor_B0wpDJNv = __esm({
-  "dist/server/assets/app.advisor-B0wpDJNv.js"() {
+var import_jsx_runtime64, import_react54, sendAdvisorMessage2, STARTERS;
+var init_app_advisor_qouHNJxT = __esm({
+  "dist/server/assets/app.advisor-qouHNJxT.js"() {
     "use strict";
-    import_jsx_runtime63 = __toESM(require_jsx_runtime(), 1);
-    import_react53 = __toESM(require_react(), 1);
+    import_jsx_runtime64 = __toESM(require_jsx_runtime(), 1);
+    import_react54 = __toESM(require_react(), 1);
     init_lucide_react();
     init_dist7();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_createSsrRpc_l1y8KE69();
     init_server4();
     init_clsx();
@@ -68101,25 +68357,25 @@ var init_deal_brief_fn_D15ylBUr = __esm({
   }
 });
 
-// dist/server/assets/app.investor.index-BzmycpI7.js
-var app_investor_index_BzmycpI7_exports = {};
-__export(app_investor_index_BzmycpI7_exports, {
+// dist/server/assets/app.investor.index-DF-tDBra.js
+var app_investor_index_DF_tDBra_exports = {};
+__export(app_investor_index_DF_tDBra_exports, {
   component: () => InvestorDashboard
 });
 import "node:async_hooks";
 function AttentionStrip({ items, onAct }) {
-  const [dismissed, setDismissed] = (0, import_react54.useState)([]);
+  const [dismissed, setDismissed] = (0, import_react55.useState)([]);
   const visible = items.filter((i2) => !dismissed.includes(i2.id));
   if (visible.length === 0) {
-    return /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "rounded-2xl border border-success/30 bg-success/5 px-5 py-4 flex items-center gap-3 text-sm", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(CircleCheck, { className: "h-5 w-5 text-success" }),
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("span", { className: "font-medium text-success", children: "You're all caught up \u2713" })
+    return /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "rounded-2xl border border-success/30 bg-success/5 px-5 py-4 flex items-center gap-3 text-sm", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(CircleCheck, { className: "h-5 w-5 text-success" }),
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("span", { className: "font-medium text-success", children: "You're all caught up \u2713" })
     ] });
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 snap-x", children: visible.map((item) => {
+  return /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 snap-x", children: visible.map((item) => {
     const t = tone[item.level];
     const Icon2 = item.icon ?? t.icon;
-    return /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(
+    return /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(
       "div",
       {
         className: cn3(
@@ -68127,11 +68383,11 @@ function AttentionStrip({ items, onAct }) {
           t.border
         ),
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "flex items-start gap-2.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Icon2, { className: cn3("h-4 w-4 mt-0.5 shrink-0", t.color) }),
-            /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "text-sm leading-snug", children: item.title })
+          /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "flex items-start gap-2.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Icon2, { className: cn3("h-4 w-4 mt-0.5 shrink-0", t.color) }),
+            /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "text-sm leading-snug", children: item.title })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "mt-auto flex justify-end", children: /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(
+          /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "mt-auto flex justify-end", children: /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(
             "button",
             {
               onClick: () => {
@@ -68141,7 +68397,7 @@ function AttentionStrip({ items, onAct }) {
               className: "inline-flex items-center gap-1 text-xs font-medium text-brand hover:underline",
               children: [
                 "Act now ",
-                /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(ArrowRight, { className: "h-3 w-3" })
+                /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(ArrowRight, { className: "h-3 w-3" })
               ]
             }
           ) })
@@ -68156,53 +68412,53 @@ function AIBriefPanel({ data, onClose, onOpenDealRoom }) {
   const score = data.thesisMatch;
   const scoreColor = score >= 80 ? "text-success" : score >= 60 ? "text-warning" : "text-destructive";
   const scoreBg = score >= 80 ? "bg-success/10" : score >= 60 ? "bg-warning/10" : "bg-destructive/10";
-  return /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(import_jsx_runtime64.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm", onClick: onClose }),
-    /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("aside", { className: "fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[400px] bg-background border-l border-border/60 shadow-elev flex flex-col", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "p-5 border-b border-border/60 flex items-start gap-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "grid h-9 w-9 place-items-center rounded-lg bg-gradient-brand text-brand-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Brain, { className: "h-4 w-4" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "flex-1 min-w-0", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("h2", { className: "text-sm font-semibold", children: "AI Brief" }),
-          /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "text-xs text-muted-foreground truncate", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(import_jsx_runtime65.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm", onClick: onClose }),
+    /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("aside", { className: "fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[400px] bg-background border-l border-border/60 shadow-elev flex flex-col", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "p-5 border-b border-border/60 flex items-start gap-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "grid h-9 w-9 place-items-center rounded-lg bg-gradient-brand text-brand-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Brain, { className: "h-4 w-4" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "flex-1 min-w-0", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("h2", { className: "text-sm font-semibold", children: "AI Brief" }),
+          /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "text-xs text-muted-foreground truncate", children: [
             data.company,
             data.tagline ? ` \xB7 ${data.tagline}` : ""
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("button", { onClick: onClose, className: "grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(X2, { className: "h-4 w-4" }) })
+        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("button", { onClick: onClose, className: "grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(X2, { className: "h-4 w-4" }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "flex-1 overflow-y-auto p-5 space-y-5", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: cn3("rounded-2xl p-4 flex items-center gap-4", scoreBg), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: cn3("text-3xl font-semibold tabular-nums", scoreColor), children: score }),
-          /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "text-xs uppercase tracking-wider text-muted-foreground font-semibold", children: "Thesis match score" }),
-            /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "text-xs mt-0.5", children: score >= 80 ? "Strong fit with your thesis." : score >= 60 ? "Partial fit \u2014 worth a closer look." : "Limited fit with your current thesis." })
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "flex-1 overflow-y-auto p-5 space-y-5", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: cn3("rounded-2xl p-4 flex items-center gap-4", scoreBg), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: cn3("text-3xl font-semibold tabular-nums", scoreColor), children: score }),
+          /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "text-xs uppercase tracking-wider text-muted-foreground font-semibold", children: "Thesis match score" }),
+            /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "text-xs mt-0.5", children: score >= 80 ? "Strong fit with your thesis." : score >= 60 ? "Partial fit \u2014 worth a closer look." : "Limited fit with your current thesis." })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Section, { icon: CircleCheck, title: "Strengths", tone: "text-success", items: data.strengths }),
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Section, { icon: TriangleAlert, title: "Risks", tone: "text-destructive", items: data.risks }),
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Section, { icon: Shield, title: "Mitigants", tone: "text-brand", items: data.mitigants }),
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-accent/30 p-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "text-[11px] uppercase tracking-wider text-muted-foreground font-semibold", children: "Suggested next action" }),
-          /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "mt-1 text-sm", children: data.nextAction })
+        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Section, { icon: CircleCheck, title: "Strengths", tone: "text-success", items: data.strengths }),
+        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Section, { icon: TriangleAlert, title: "Risks", tone: "text-destructive", items: data.risks }),
+        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Section, { icon: Shield, title: "Mitigants", tone: "text-brand", items: data.mitigants }),
+        /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-accent/30 p-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "text-[11px] uppercase tracking-wider text-muted-foreground font-semibold", children: "Suggested next action" }),
+          /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "mt-1 text-sm", children: data.nextAction })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "border-t border-border/60 p-4", children: /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("button", { onClick: onOpenDealRoom, className: "w-full inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-brand text-brand-foreground px-4 py-2.5 text-sm shadow-glow", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "border-t border-border/60 p-4", children: /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("button", { onClick: onOpenDealRoom, className: "w-full inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-brand text-brand-foreground px-4 py-2.5 text-sm shadow-glow", children: [
         "Open full deal room ",
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(ArrowRight, { className: "h-4 w-4" })
+        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(ArrowRight, { className: "h-4 w-4" })
       ] }) })
     ] })
   ] });
 }
 function Section({ icon: Icon2, title, tone: tone2, items }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: cn3("flex items-center gap-1.5 text-[11px] uppercase tracking-wider font-semibold mb-2", tone2), children: [
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Icon2, { className: "h-3.5 w-3.5" }),
+  return /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: cn3("flex items-center gap-1.5 text-[11px] uppercase tracking-wider font-semibold mb-2", tone2), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Icon2, { className: "h-3.5 w-3.5" }),
       " ",
       title
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("ul", { className: "space-y-1.5", children: items.map((s, i2) => /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("li", { className: "text-sm flex gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("span", { className: cn3("mt-2 h-1 w-1 rounded-full shrink-0", tone2.replace("text-", "bg-")) }),
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("span", { children: s })
+    /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("ul", { className: "space-y-1.5", children: items.map((s, i2) => /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("li", { className: "text-sm flex gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("span", { className: cn3("mt-2 h-1 w-1 rounded-full shrink-0", tone2.replace("text-", "bg-")) }),
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("span", { children: s })
     ] }, i2)) })
   ] });
 }
@@ -68210,7 +68466,7 @@ function InvestorDashboard() {
   const {
     user
   } = useAuth();
-  const [selectedRoomId, setSelectedRoomId] = (0, import_react54.useState)(null);
+  const [selectedRoomId, setSelectedRoomId] = (0, import_react55.useState)(null);
   const today = (/* @__PURE__ */ new Date()).toLocaleDateString(void 0, {
     weekday: "long",
     day: "numeric",
@@ -68344,7 +68600,7 @@ function InvestorDashboard() {
     nextAction: briefResult.nextAction,
     dealRoomId: selectedRoomId
   } : null;
-  const [insights] = (0, import_react54.useState)(["Connect your inbox to start sourcing deals automatically.", "Invite your partner to collaborate on diligence.", "Set your investment thesis to enable AI scoring."]);
+  const [insights] = (0, import_react55.useState)(["Connect your inbox to start sourcing deals automatically.", "Invite your partner to collaborate on diligence.", "Set your investment thesis to enable AI scoring."]);
   const activityFeed = recentActivity.map((act) => {
     const room = roomsData.find((r2) => r2.id === act.deal_room_id);
     return {
@@ -68354,23 +68610,23 @@ function InvestorDashboard() {
       time: new Date(act.created_at).toLocaleDateString()
     };
   });
-  return /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1500px] mx-auto space-y-6", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "flex items-end justify-between flex-wrap gap-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("h1", { className: "text-2xl font-semibold tracking-tight", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1500px] mx-auto space-y-6", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "flex items-end justify-between flex-wrap gap-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("h1", { className: "text-2xl font-semibold tracking-tight", children: [
           greet,
           ", ",
           user?.fullName?.split(" ")[0] ?? "there"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "text-sm text-muted-foreground", children: today })
+        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "text-sm text-muted-foreground", children: today })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("button", { className: "rounded-[10px] border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: "How it works" })
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("button", { className: "rounded-[10px] border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: "How it works" })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("section", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2", children: "Today's attention" }),
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(AttentionStrip, { items: attentionItems })
+    /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("section", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2", children: "Today's attention" }),
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(AttentionStrip, { items: attentionItems })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "grid grid-cols-2 md:grid-cols-4 gap-3", children: [{
+    /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "grid grid-cols-2 md:grid-cols-4 gap-3", children: [{
       l: "Active deals",
       v: `${roomIds.length}`,
       s: roomIds.length !== 1 ? "deal rooms" : "deal room"
@@ -68386,64 +68642,64 @@ function InvestorDashboard() {
       l: "Avg deal score",
       v: "\u2014",
       s: "\u2014"
-    }].map((k3) => /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "text-xs text-muted-foreground", children: k3.l }),
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "mt-1 text-xl font-semibold tabular-nums", children: k3.v }),
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "text-[11px] text-muted-foreground", children: k3.s })
+    }].map((k3) => /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "text-xs text-muted-foreground", children: k3.l }),
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "mt-1 text-xl font-semibold tabular-nums", children: k3.v }),
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "text-[11px] text-muted-foreground", children: k3.s })
     ] }, k3.l)) }),
-    /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("section", { className: "rounded-2xl border border-border/60 bg-card overflow-hidden", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "px-5 py-3 border-b border-border/60 text-sm font-semibold", children: "Deal flow by stage" }),
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "grid grid-cols-3 md:grid-cols-6 divide-y md:divide-y-0 md:divide-x divide-border/60", children: STAGES3.map((s) => /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(Link, { to: "/app/investor/deal-flow", className: "px-4 py-4 hover:bg-accent/40 transition-colors", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "text-[11px] uppercase tracking-wider text-muted-foreground", children: s }),
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "mt-1 text-lg font-semibold tabular-nums", children: stageCounts[s] ?? 0 })
+    /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("section", { className: "rounded-2xl border border-border/60 bg-card overflow-hidden", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "px-5 py-3 border-b border-border/60 text-sm font-semibold", children: "Deal flow by stage" }),
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "grid grid-cols-3 md:grid-cols-6 divide-y md:divide-y-0 md:divide-x divide-border/60", children: STAGES3.map((s) => /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(Link, { to: "/app/investor/deal-flow", className: "px-4 py-4 hover:bg-accent/40 transition-colors", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "text-[11px] uppercase tracking-wider text-muted-foreground", children: s }),
+        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "mt-1 text-lg font-semibold tabular-nums", children: stageCounts[s] ?? 0 })
       ] }, s)) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "grid lg:grid-cols-[1fr_400px] gap-5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("section", { className: "rounded-2xl border border-border/60 bg-card overflow-hidden", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "px-5 py-3 border-b border-border/60 text-sm font-semibold", children: "Recent activity" }),
-        activityFeed.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "p-10 text-center text-sm text-muted-foreground", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Inbox, { className: "mx-auto h-8 w-8 opacity-40" }),
-          /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "mt-2", children: "No recent activity" })
-        ] }) : /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "divide-y divide-border/60", children: activityFeed.map((a) => /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "px-5 py-3 flex items-center gap-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "flex-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "text-sm font-medium", children: a.company }),
-            /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "text-xs text-muted-foreground", children: a.action })
+    /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "grid lg:grid-cols-[1fr_400px] gap-5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("section", { className: "rounded-2xl border border-border/60 bg-card overflow-hidden", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "px-5 py-3 border-b border-border/60 text-sm font-semibold", children: "Recent activity" }),
+        activityFeed.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "p-10 text-center text-sm text-muted-foreground", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Inbox, { className: "mx-auto h-8 w-8 opacity-40" }),
+          /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "mt-2", children: "No recent activity" })
+        ] }) : /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "divide-y divide-border/60", children: activityFeed.map((a) => /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "px-5 py-3 flex items-center gap-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "flex-1", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "text-sm font-medium", children: a.company }),
+            /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "text-xs text-muted-foreground", children: a.action })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "text-xs text-muted-foreground", children: a.time })
+          /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "text-xs text-muted-foreground", children: a.time })
         ] }, a.id)) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("section", { className: "rounded-2xl bg-gradient-to-br from-brand to-violet text-brand-foreground p-6 relative overflow-hidden", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "absolute inset-0 noise opacity-20" }),
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "relative", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("div", { className: "inline-flex items-center gap-1.5 text-xs font-medium opacity-90", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Sparkles, { className: "h-3.5 w-3.5" }),
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("section", { className: "rounded-2xl bg-gradient-to-br from-brand to-violet text-brand-foreground p-6 relative overflow-hidden", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "absolute inset-0 noise opacity-20" }),
+        /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "relative", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "inline-flex items-center gap-1.5 text-xs font-medium opacity-90", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Sparkles, { className: "h-3.5 w-3.5" }),
             " AI Weekly Brief"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("h3", { className: "mt-2 text-lg font-semibold", children: "Your week in deals" }),
-          /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("ul", { className: "mt-4 space-y-2 text-sm opacity-95", children: insights.map((s, i2) => /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)("li", { className: "flex gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(CircleCheck, { className: "h-4 w-4 mt-0.5 shrink-0 opacity-80" }),
-            /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("span", { children: s })
+          /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("h3", { className: "mt-2 text-lg font-semibold", children: "Your week in deals" }),
+          /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("ul", { className: "mt-4 space-y-2 text-sm opacity-95", children: insights.map((s, i2) => /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("li", { className: "flex gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(CircleCheck, { className: "h-4 w-4 mt-0.5 shrink-0 opacity-80" }),
+            /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("span", { children: s })
           ] }, i2)) }),
-          /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("button", { className: "mt-5 inline-flex items-center gap-1.5 rounded-[10px] bg-background/15 hover:bg-background/25 px-3 py-1.5 text-xs", children: "Regenerate" })
+          /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("button", { className: "mt-5 inline-flex items-center gap-1.5 rounded-[10px] bg-background/15 hover:bg-background/25 px-3 py-1.5 text-xs", children: "Regenerate" })
         ] })
       ] })
     ] }),
-    briefLoading && selectedRoomId && /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm flex items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime64.jsx)("div", { className: "rounded-2xl bg-card p-8 shadow-elev text-sm text-muted-foreground animate-pulse", children: "Generating AI brief\u2026" }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(AIBriefPanel, { data: aiBriefData, onClose: () => setSelectedRoomId(null), onOpenDealRoom: () => {
+    briefLoading && selectedRoomId && /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm flex items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "rounded-2xl bg-card p-8 shadow-elev text-sm text-muted-foreground animate-pulse", children: "Generating AI brief\u2026" }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(AIBriefPanel, { data: aiBriefData, onClose: () => setSelectedRoomId(null), onOpenDealRoom: () => {
       if (selectedRoomId) window.location.href = `/app/deal-room/${selectedRoomId}`;
     } })
   ] });
 }
-var import_jsx_runtime64, import_react54, tone, STAGES3, DB_STATUS_TO_STAGE;
-var init_app_investor_index_BzmycpI7 = __esm({
-  "dist/server/assets/app.investor.index-BzmycpI7.js"() {
+var import_jsx_runtime65, import_react55, tone, STAGES3, DB_STATUS_TO_STAGE;
+var init_app_investor_index_DF_tDBra = __esm({
+  "dist/server/assets/app.investor.index-DF-tDBra.js"() {
     "use strict";
-    import_jsx_runtime64 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime65 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    import_react54 = __toESM(require_react(), 1);
+    import_react55 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_utils_H80jjgLf();
     init_deal_brief_fn_D15ylBUr();
     init_dist7();
@@ -68466,9 +68722,9 @@ var init_app_investor_index_BzmycpI7 = __esm({
   }
 });
 
-// dist/server/assets/app.settings.security-CYiZeMX9.js
-var app_settings_security_CYiZeMX9_exports = {};
-__export(app_settings_security_CYiZeMX9_exports, {
+// dist/server/assets/app.settings.security-D3HaJrh-.js
+var app_settings_security_D3HaJrh_exports = {};
+__export(app_settings_security_D3HaJrh_exports, {
   component: () => Security
 });
 function Security() {
@@ -68476,49 +68732,49 @@ function Security() {
     signOut
   } = useAuth();
   const nav2 = useNavigate();
-  const [twoFA, setTwoFA] = (0, import_react55.useState)(true);
-  const [sessionTimeout, setSessionTimeout] = (0, import_react55.useState)(true);
-  return /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "space-y-5", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("section", { className: "rounded-xl border border-border/60 bg-card shadow-card p-5 space-y-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("h2", { className: "text-sm font-semibold inline-flex items-center gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Shield, { className: "h-4 w-4 text-brand" }),
+  const [twoFA, setTwoFA] = (0, import_react56.useState)(true);
+  const [sessionTimeout, setSessionTimeout] = (0, import_react56.useState)(true);
+  return /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "space-y-5", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("section", { className: "rounded-xl border border-border/60 bg-card shadow-card p-5 space-y-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("h2", { className: "text-sm font-semibold inline-flex items-center gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Shield, { className: "h-4 w-4 text-brand" }),
         " Authentication"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Row, { icon: Smartphone, title: "Two-factor authentication", sub: "Required for all admin actions.", children: /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Toggle, { checked: twoFA, onChange: setTwoFA }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Row, { icon: Key, title: "Auto-logout after 30 min inactivity", sub: "Recommended for shared devices.", children: /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Toggle, { checked: sessionTimeout, onChange: setSessionTimeout }) })
+      /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Row, { icon: Smartphone, title: "Two-factor authentication", sub: "Required for all admin actions.", children: /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Toggle, { checked: twoFA, onChange: setTwoFA }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Row, { icon: Key, title: "Auto-logout after 30 min inactivity", sub: "Recommended for shared devices.", children: /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Toggle, { checked: sessionTimeout, onChange: setSessionTimeout }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("section", { className: "rounded-xl border border-border/60 bg-card shadow-card p-5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("h2", { className: "text-sm font-semibold", children: "Active sessions" }),
-      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "mt-3 divide-y divide-border/60", children: [{
+    /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("section", { className: "rounded-xl border border-border/60 bg-card shadow-card p-5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("h2", { className: "text-sm font-semibold", children: "Active sessions" }),
+      /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("div", { className: "mt-3 divide-y divide-border/60", children: [{
         dev: "MacBook Pro \xB7 Chrome",
         loc: "San Francisco, US",
         current: true
       }, {
         dev: "iPhone 15 \xB7 Safari",
         loc: "San Francisco, US"
-      }].map((s) => /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "flex items-center justify-between py-3 text-sm", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "font-medium", children: [
+      }].map((s) => /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "flex items-center justify-between py-3 text-sm", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "font-medium", children: [
             s.dev,
             " ",
-            s.current && /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("span", { className: "text-[10px] rounded bg-brand/10 text-brand px-1.5 py-0.5 ml-1", children: "This device" })
+            s.current && /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("span", { className: "text-[10px] rounded bg-brand/10 text-brand px-1.5 py-0.5 ml-1", children: "This device" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "text-xs text-muted-foreground", children: s.loc })
+          /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("div", { className: "text-xs text-muted-foreground", children: s.loc })
         ] }),
-        !s.current && /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("button", { className: "text-xs text-muted-foreground hover:text-destructive", children: "Revoke" })
+        !s.current && /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("button", { className: "text-xs text-muted-foreground hover:text-destructive", children: "Revoke" })
       ] }, s.dev)) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("section", { className: "rounded-xl border border-destructive/30 bg-destructive/5 p-5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("h2", { className: "text-sm font-semibold inline-flex items-center gap-2 text-destructive", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(TriangleAlert, { className: "h-4 w-4" }),
+    /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("section", { className: "rounded-xl border border-destructive/30 bg-destructive/5 p-5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("h2", { className: "text-sm font-semibold inline-flex items-center gap-2 text-destructive", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(TriangleAlert, { className: "h-4 w-4" }),
         " Danger zone"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "mt-3 flex items-center justify-between", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "text-sm font-medium", children: "Sign out of all devices" }),
-          /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "text-xs text-muted-foreground", children: "Ends every active session." })
+      /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "mt-3 flex items-center justify-between", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("div", { className: "text-sm font-medium", children: "Sign out of all devices" }),
+          /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("div", { className: "text-xs text-muted-foreground", children: "Ends every active session." })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("button", { onClick: () => {
+        /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("button", { onClick: () => {
           signOut();
           nav2({
             to: "/sign-in",
@@ -68527,7 +68783,7 @@ function Security() {
             }
           });
         }, className: "rounded-md border border-destructive/40 text-destructive px-3 py-2 text-sm hover:bg-destructive/10 inline-flex items-center gap-1.5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Trash2, { className: "h-3.5 w-3.5" }),
+          /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Trash2, { className: "h-3.5 w-3.5" }),
           " Sign out everywhere"
         ] })
       ] })
@@ -68540,12 +68796,12 @@ function Row({
   sub,
   children
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "flex items-center justify-between gap-3", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "flex items-center gap-3 min-w-0", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "grid h-9 w-9 place-items-center rounded-md bg-accent text-foreground/70 shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Icon2, { className: "h-4 w-4" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)("div", { className: "min-w-0", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "text-sm font-medium", children: title }),
-        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("div", { className: "text-xs text-muted-foreground", children: sub })
+  return /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "flex items-center justify-between gap-3", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "flex items-center gap-3 min-w-0", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("div", { className: "grid h-9 w-9 place-items-center rounded-md bg-accent text-foreground/70 shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Icon2, { className: "h-4 w-4" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "min-w-0", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("div", { className: "text-sm font-medium", children: title }),
+        /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("div", { className: "text-xs text-muted-foreground", children: sub })
       ] })
     ] }),
     children
@@ -68555,33 +68811,33 @@ function Toggle({
   checked,
   onChange
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("button", { onClick: () => onChange(!checked), className: `relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${checked ? "bg-gradient-brand" : "bg-muted border border-border/60"}`, children: /* @__PURE__ */ (0, import_jsx_runtime65.jsx)("span", { className: `inline-block h-3.5 w-3.5 rounded-full bg-background shadow-sm transition-transform ${checked ? "translate-x-[18px]" : "translate-x-0.5"}` }) });
+  return /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("button", { onClick: () => onChange(!checked), className: `relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${checked ? "bg-gradient-brand" : "bg-muted border border-border/60"}`, children: /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("span", { className: `inline-block h-3.5 w-3.5 rounded-full bg-background shadow-sm transition-transform ${checked ? "translate-x-[18px]" : "translate-x-0.5"}` }) });
 }
-var import_jsx_runtime65, import_react55;
-var init_app_settings_security_CYiZeMX9 = __esm({
-  "dist/server/assets/app.settings.security-CYiZeMX9.js"() {
+var import_jsx_runtime66, import_react56;
+var init_app_settings_security_D3HaJrh = __esm({
+  "dist/server/assets/app.settings.security-D3HaJrh-.js"() {
     "use strict";
-    import_jsx_runtime65 = __toESM(require_jsx_runtime(), 1);
-    import_react55 = __toESM(require_react(), 1);
+    import_jsx_runtime66 = __toESM(require_jsx_runtime(), 1);
+    import_react56 = __toESM(require_react(), 1);
     init_lucide_react();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_esm5();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.settings.notifications-CvRfZWF0.js
-var app_settings_notifications_CvRfZWF0_exports = {};
-__export(app_settings_notifications_CvRfZWF0_exports, {
+// dist/server/assets/app.settings.notifications-Co9_0BdV.js
+var app_settings_notifications_Co9_0BdV_exports = {};
+__export(app_settings_notifications_Co9_0BdV_exports, {
   component: () => NotifRulesPage
 });
 function NotifRulesPage() {
   const {
     t
   } = useI18n();
-  const [rules, setRules] = (0, import_react56.useState)(notifRulesDefault);
-  const [savedAt, setSavedAt] = (0, import_react56.useState)(null);
+  const [rules, setRules] = (0, import_react57.useState)(notifRulesDefault);
+  const [savedAt, setSavedAt] = (0, import_react57.useState)(null);
   const update = (id, key, value) => {
     setRules((rs) => rs.map((r2) => r2.id === id ? {
       ...r2,
@@ -68592,57 +68848,57 @@ function NotifRulesPage() {
   const save = () => {
     setSavedAt((/* @__PURE__ */ new Date()).toLocaleTimeString());
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "p-6 lg:p-8 max-w-5xl mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "flex items-end justify-between flex-wrap gap-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "flex items-center gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Bell, { className: "h-5 w-5 text-brand" }),
-          /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: t("rules.title") })
+  return /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { className: "p-6 lg:p-8 max-w-5xl mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { className: "flex items-end justify-between flex-wrap gap-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(Bell, { className: "h-5 w-5 text-brand" }),
+          /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: t("rules.title") })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: t("rules.subtitle") })
+        /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: t("rules.subtitle") })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "flex items-center gap-3", children: [
-        savedAt && /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("span", { className: "text-xs text-success", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { className: "flex items-center gap-3", children: [
+        savedAt && /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("span", { className: "text-xs text-success", children: [
           "Saved at ",
           savedAt
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("button", { onClick: save, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Save, { className: "h-4 w-4" }),
+        /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("button", { onClick: save, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(Save, { className: "h-4 w-4" }),
           " ",
           t("common.save")
         ] })
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "mt-6 rounded-xl border border-border/60 bg-card shadow-card overflow-hidden", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "grid grid-cols-12 px-5 py-3 border-b border-border/60 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("div", { className: "col-span-6", children: t("rules.events") }),
-        /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "col-span-2 text-center inline-flex items-center justify-center gap-1", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Mail, { className: "h-3.5 w-3.5" }),
+    /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { className: "mt-6 rounded-xl border border-border/60 bg-card shadow-card overflow-hidden", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { className: "grid grid-cols-12 px-5 py-3 border-b border-border/60 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("div", { className: "col-span-6", children: t("rules.events") }),
+        /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { className: "col-span-2 text-center inline-flex items-center justify-center gap-1", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(Mail, { className: "h-3.5 w-3.5" }),
           t("rules.email")
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "col-span-2 text-center inline-flex items-center justify-center gap-1", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Bell, { className: "h-3.5 w-3.5" }),
+        /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { className: "col-span-2 text-center inline-flex items-center justify-center gap-1", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(Bell, { className: "h-3.5 w-3.5" }),
           t("rules.inApp")
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "col-span-2 text-center inline-flex items-center justify-center gap-1", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Smartphone, { className: "h-3.5 w-3.5" }),
+        /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { className: "col-span-2 text-center inline-flex items-center justify-center gap-1", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(Smartphone, { className: "h-3.5 w-3.5" }),
           t("rules.push")
         ] })
       ] }),
       groups.map((g2) => {
         const Icon2 = groupIcon[g2];
-        return /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "px-5 py-2.5 bg-muted/40 border-b border-border/60 flex items-center gap-2 text-xs uppercase tracking-wider font-semibold text-muted-foreground", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Icon2, { className: "h-3.5 w-3.5" }),
+        return /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { className: "px-5 py-2.5 bg-muted/40 border-b border-border/60 flex items-center gap-2 text-xs uppercase tracking-wider font-semibold text-muted-foreground", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(Icon2, { className: "h-3.5 w-3.5" }),
             " ",
             g2
           ] }),
-          rules.filter((r2) => r2.group === g2).map((r2) => /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "grid grid-cols-12 items-center px-5 py-3.5 border-b border-border/60 last:border-0 hover:bg-accent/30 transition-colors", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)("div", { className: "col-span-6", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("div", { className: "text-sm font-medium", children: r2.label }),
-              /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("div", { className: "text-xs text-muted-foreground mt-0.5", children: r2.description })
+          rules.filter((r2) => r2.group === g2).map((r2) => /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { className: "grid grid-cols-12 items-center px-5 py-3.5 border-b border-border/60 last:border-0 hover:bg-accent/30 transition-colors", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { className: "col-span-6", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("div", { className: "text-sm font-medium", children: r2.label }),
+              /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("div", { className: "text-xs text-muted-foreground mt-0.5", children: r2.description })
             ] }),
-            ["email", "inApp", "push"].map((k3) => /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("div", { className: "col-span-2 flex justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Toggle2, { checked: r2[k3], onChange: (v3) => update(r2.id, k3, v3) }) }, k3))
+            ["email", "inApp", "push"].map((k3) => /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("div", { className: "col-span-2 flex justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(Toggle2, { checked: r2[k3], onChange: (v3) => update(r2.id, k3, v3) }) }, k3))
           ] }, r2.id))
         ] }, g2);
       })
@@ -68653,16 +68909,16 @@ function Toggle2({
   checked,
   onChange
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("button", { onClick: () => onChange(!checked), className: cn3("relative inline-flex h-5 w-9 items-center rounded-full transition-colors", checked ? "bg-gradient-brand" : "bg-muted border border-border/60"), children: /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("span", { className: cn3("inline-block h-3.5 w-3.5 transform rounded-full bg-background shadow-sm transition-transform", checked ? "translate-x-[18px]" : "translate-x-0.5") }) });
+  return /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("button", { onClick: () => onChange(!checked), className: cn3("relative inline-flex h-5 w-9 items-center rounded-full transition-colors", checked ? "bg-gradient-brand" : "bg-muted border border-border/60"), children: /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("span", { className: cn3("inline-block h-3.5 w-3.5 transform rounded-full bg-background shadow-sm transition-transform", checked ? "translate-x-[18px]" : "translate-x-0.5") }) });
 }
-var import_jsx_runtime66, import_react56, notifRulesDefault, groupIcon;
-var init_app_settings_notifications_CvRfZWF0 = __esm({
-  "dist/server/assets/app.settings.notifications-CvRfZWF0.js"() {
+var import_jsx_runtime67, import_react57, notifRulesDefault, groupIcon;
+var init_app_settings_notifications_Co9_0BdV = __esm({
+  "dist/server/assets/app.settings.notifications-Co9_0BdV.js"() {
     "use strict";
-    import_jsx_runtime66 = __toESM(require_jsx_runtime(), 1);
-    import_react56 = __toESM(require_react(), 1);
+    import_jsx_runtime67 = __toESM(require_jsx_runtime(), 1);
+    import_react57 = __toESM(require_react(), 1);
     init_lucide_react();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_utils_H80jjgLf();
     init_dist7();
     init_clsx();
@@ -68771,10 +69027,10 @@ __export(app_settings_domain_Baf0I4yA_exports, {
   component: () => DomainEmail
 });
 function DomainEmail() {
-  const [domains, setDomains] = (0, import_react57.useState)(initial);
-  const [input, setInput] = (0, import_react57.useState)("");
-  const [emailFrom, setEmailFrom] = (0, import_react57.useState)("notifications@atlas.ai");
-  const [signed, setSigned] = (0, import_react57.useState)(true);
+  const [domains, setDomains] = (0, import_react58.useState)(initial);
+  const [input, setInput] = (0, import_react58.useState)("");
+  const [emailFrom, setEmailFrom] = (0, import_react58.useState)("notifications@atlas.ai");
+  const [signed, setSigned] = (0, import_react58.useState)(true);
   const addDomain = (e) => {
     e.preventDefault();
     if (!input.match(/^[a-z0-9.-]+\.[a-z]{2,}$/i)) return;
@@ -68785,64 +69041,64 @@ function DomainEmail() {
     }]);
     setInput("");
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { className: "space-y-5", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("section", { className: "rounded-xl border border-border/60 bg-card shadow-card p-5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("h2", { className: "text-sm font-semibold inline-flex items-center gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(Globe, { className: "h-4 w-4 text-brand" }),
+  return /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("div", { className: "space-y-5", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("section", { className: "rounded-xl border border-border/60 bg-card shadow-card p-5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("h2", { className: "text-sm font-semibold inline-flex items-center gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(Globe, { className: "h-4 w-4 text-brand" }),
         " Custom domains"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("p", { className: "text-xs text-muted-foreground mt-1", children: "Connect your own domain to host deal rooms and outbound emails." }),
-      /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("form", { onSubmit: addDomain, className: "mt-4 flex gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("input", { value: input, onChange: (e) => setInput(e.target.value), placeholder: "yourdomain.com", className: "flex-1 rounded-md border border-border/60 bg-background px-3 py-2 text-sm" }),
-        /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("button", { className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(Plus, { className: "h-4 w-4" }),
+      /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("p", { className: "text-xs text-muted-foreground mt-1", children: "Connect your own domain to host deal rooms and outbound emails." }),
+      /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("form", { onSubmit: addDomain, className: "mt-4 flex gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("input", { value: input, onChange: (e) => setInput(e.target.value), placeholder: "yourdomain.com", className: "flex-1 rounded-md border border-border/60 bg-background px-3 py-2 text-sm" }),
+        /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("button", { className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(Plus, { className: "h-4 w-4" }),
           " Add domain"
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("div", { className: "mt-4 space-y-2", children: domains.map((d2) => /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { className: "flex items-center justify-between rounded-md border border-border/60 bg-background/40 p-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { className: "flex items-center gap-2 text-sm", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(Globe, { className: "h-4 w-4 text-muted-foreground" }),
-          /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("span", { className: "font-medium", children: d2.name }),
-          d2.primary && /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("span", { className: "text-[10px] rounded bg-brand/10 text-brand px-1.5 py-0.5", children: "Primary" }),
-          /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("span", { className: cn3("inline-flex items-center gap-1 text-[11px]", d2.verified ? "text-success" : "text-warning"), children: d2.verified ? /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)(import_jsx_runtime67.Fragment, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(CircleCheck, { className: "h-3 w-3" }),
+      /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("div", { className: "mt-4 space-y-2", children: domains.map((d2) => /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("div", { className: "flex items-center justify-between rounded-md border border-border/60 bg-background/40 p-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("div", { className: "flex items-center gap-2 text-sm", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(Globe, { className: "h-4 w-4 text-muted-foreground" }),
+          /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("span", { className: "font-medium", children: d2.name }),
+          d2.primary && /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("span", { className: "text-[10px] rounded bg-brand/10 text-brand px-1.5 py-0.5", children: "Primary" }),
+          /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("span", { className: cn3("inline-flex items-center gap-1 text-[11px]", d2.verified ? "text-success" : "text-warning"), children: d2.verified ? /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)(import_jsx_runtime68.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(CircleCheck, { className: "h-3 w-3" }),
             " Verified"
           ] }) : "Pending DNS" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("button", { onClick: () => setDomains((xs) => xs.filter((x3) => x3.name !== d2.name)), className: "p-1.5 text-muted-foreground hover:text-destructive", children: /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(Trash2, { className: "h-3.5 w-3.5" }) })
+        /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("button", { onClick: () => setDomains((xs) => xs.filter((x3) => x3.name !== d2.name)), className: "p-1.5 text-muted-foreground hover:text-destructive", children: /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(Trash2, { className: "h-3.5 w-3.5" }) })
       ] }, d2.name)) }),
-      /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { className: "mt-5 rounded-lg bg-muted/40 border border-border/60 p-4 space-y-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("div", { className: "text-xs font-semibold uppercase tracking-wider text-muted-foreground", children: "Required DNS records" }),
-        [["TXT", "@", "v=spf1 include:ventureroom.app ~all"], ["CNAME", "vr._domainkey", "vr-dkim.ventureroom.app"], ["MX", "@", "10 mx.ventureroom.app"]].map(([t, host, val]) => /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { className: "grid grid-cols-[60px_120px_1fr_auto] items-center gap-2 text-xs font-mono", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("span", { className: "font-semibold", children: t }),
-          /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("span", { className: "text-muted-foreground truncate", children: host }),
-          /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("span", { className: "truncate", children: val }),
-          /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("button", { onClick: () => navigator.clipboard.writeText(val), className: "p-1 text-muted-foreground hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(Copy, { className: "h-3 w-3" }) })
+      /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("div", { className: "mt-5 rounded-lg bg-muted/40 border border-border/60 p-4 space-y-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("div", { className: "text-xs font-semibold uppercase tracking-wider text-muted-foreground", children: "Required DNS records" }),
+        [["TXT", "@", "v=spf1 include:ventureroom.app ~all"], ["CNAME", "vr._domainkey", "vr-dkim.ventureroom.app"], ["MX", "@", "10 mx.ventureroom.app"]].map(([t, host, val]) => /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("div", { className: "grid grid-cols-[60px_120px_1fr_auto] items-center gap-2 text-xs font-mono", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("span", { className: "font-semibold", children: t }),
+          /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("span", { className: "text-muted-foreground truncate", children: host }),
+          /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("span", { className: "truncate", children: val }),
+          /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("button", { onClick: () => navigator.clipboard.writeText(val), className: "p-1 text-muted-foreground hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(Copy, { className: "h-3 w-3" }) })
         ] }, t + host))
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("section", { className: "rounded-xl border border-border/60 bg-card shadow-card p-5 space-y-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("h2", { className: "text-sm font-semibold inline-flex items-center gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(Mail, { className: "h-4 w-4 text-brand" }),
+    /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("section", { className: "rounded-xl border border-border/60 bg-card shadow-card p-5 space-y-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("h2", { className: "text-sm font-semibold inline-flex items-center gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(Mail, { className: "h-4 w-4 text-brand" }),
         " Email configuration"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("label", { className: "text-xs text-muted-foreground", children: 'Default "From" address' }),
-        /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("input", { value: emailFrom, onChange: (e) => setEmailFrom(e.target.value), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm" })
+      /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("label", { className: "text-xs text-muted-foreground", children: 'Default "From" address' }),
+        /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("input", { value: emailFrom, onChange: (e) => setEmailFrom(e.target.value), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)("label", { className: "flex items-center gap-2 text-sm", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("input", { type: "checkbox", checked: signed, onChange: (e) => setSigned(e.target.checked), className: "h-4 w-4 accent-[var(--brand)]" }),
+      /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("label", { className: "flex items-center gap-2 text-sm", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("input", { type: "checkbox", checked: signed, onChange: (e) => setSigned(e.target.checked), className: "h-4 w-4 accent-[var(--brand)]" }),
         "DKIM-sign all outbound messages"
       ] })
     ] })
   ] });
 }
-var import_jsx_runtime67, import_react57, initial;
+var import_jsx_runtime68, import_react58, initial;
 var init_app_settings_domain_Baf0I4yA = __esm({
   "dist/server/assets/app.settings.domain-Baf0I4yA.js"() {
     "use strict";
-    import_jsx_runtime67 = __toESM(require_jsx_runtime(), 1);
-    import_react57 = __toESM(require_react(), 1);
+    import_jsx_runtime68 = __toESM(require_jsx_runtime(), 1);
+    import_react58 = __toESM(require_react(), 1);
     init_lucide_react();
     init_utils_H80jjgLf();
     init_clsx();
@@ -68860,13 +69116,13 @@ __export(app_settings_billing_wl3kYi6Q_exports, {
   component: () => Billing
 });
 function Billing() {
-  return /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("div", { className: "space-y-5", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("section", { className: "rounded-xl border border-border/60 bg-card shadow-card p-5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("h2", { className: "text-sm font-semibold inline-flex items-center gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(CreditCard, { className: "h-4 w-4 text-brand" }),
+  return /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "space-y-5", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("section", { className: "rounded-xl border border-border/60 bg-card shadow-card p-5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("h2", { className: "text-sm font-semibold inline-flex items-center gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(CreditCard, { className: "h-4 w-4 text-brand" }),
         " Plan"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("div", { className: "mt-4 grid sm:grid-cols-3 gap-3", children: [{
+      /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "mt-4 grid sm:grid-cols-3 gap-3", children: [{
         name: "Starter",
         price: "Free",
         features: ["1 deal room", "5 documents", "Basic Q&A"]
@@ -68879,47 +69135,47 @@ function Billing() {
         name: "Fund",
         price: "$199/mo",
         features: ["Unlimited rooms", "Custom domain", "API access"]
-      }].map((p3) => /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("div", { className: `rounded-xl border p-4 ${p3.current ? "border-brand bg-brand/5" : "border-border/60"}`, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("div", { className: "flex items-center justify-between", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("div", { className: "font-semibold", children: p3.name }),
-          p3.current && /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("span", { className: "text-[10px] rounded bg-brand/10 text-brand px-1.5 py-0.5", children: "Current" })
+      }].map((p3) => /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: `rounded-xl border p-4 ${p3.current ? "border-brand bg-brand/5" : "border-border/60"}`, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "flex items-center justify-between", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "font-semibold", children: p3.name }),
+          p3.current && /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("span", { className: "text-[10px] rounded bg-brand/10 text-brand px-1.5 py-0.5", children: "Current" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("div", { className: "text-xl font-semibold mt-1", children: p3.price }),
-        /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("ul", { className: "mt-3 space-y-1.5 text-xs text-muted-foreground", children: p3.features.map((f3) => /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("li", { className: "inline-flex items-center gap-1.5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(Check, { className: "h-3 w-3 text-success" }),
+        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "text-xl font-semibold mt-1", children: p3.price }),
+        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("ul", { className: "mt-3 space-y-1.5 text-xs text-muted-foreground", children: p3.features.map((f3) => /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("li", { className: "inline-flex items-center gap-1.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(Check, { className: "h-3 w-3 text-success" }),
           " ",
           f3
         ] }, f3)) }),
-        /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("button", { className: `mt-4 w-full rounded-md py-2 text-sm ${p3.current ? "border border-border/60" : "bg-gradient-brand text-brand-foreground shadow-glow"}`, children: p3.current ? "Manage" : "Upgrade" })
+        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("button", { className: `mt-4 w-full rounded-md py-2 text-sm ${p3.current ? "border border-border/60" : "bg-gradient-brand text-brand-foreground shadow-glow"}`, children: p3.current ? "Manage" : "Upgrade" })
       ] }, p3.name)) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("section", { className: "rounded-xl border border-border/60 bg-card shadow-card p-5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("h2", { className: "text-sm font-semibold", children: "Invoices" }),
-      /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("div", { className: "mt-3 divide-y divide-border/60", children: ["May 2026", "Apr 2026", "Mar 2026"].map((m3) => /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("div", { className: "flex items-center justify-between py-3 text-sm", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("div", { className: "font-medium", children: m3 }),
-          /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("div", { className: "text-xs text-muted-foreground", children: "$49.00 \xB7 Paid" })
+    /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("section", { className: "rounded-xl border border-border/60 bg-card shadow-card p-5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("h2", { className: "text-sm font-semibold", children: "Invoices" }),
+      /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "mt-3 divide-y divide-border/60", children: ["May 2026", "Apr 2026", "Mar 2026"].map((m3) => /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "flex items-center justify-between py-3 text-sm", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "font-medium", children: m3 }),
+          /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "text-xs text-muted-foreground", children: "$49.00 \xB7 Paid" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)("button", { className: "inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(Download, { className: "h-3.5 w-3.5" }),
+        /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("button", { className: "inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(Download, { className: "h-3.5 w-3.5" }),
           " PDF"
         ] })
       ] }, m3)) })
     ] })
   ] });
 }
-var import_jsx_runtime68;
+var import_jsx_runtime69;
 var init_app_settings_billing_wl3kYi6Q = __esm({
   "dist/server/assets/app.settings.billing-wl3kYi6Q.js"() {
     "use strict";
-    import_jsx_runtime68 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime69 = __toESM(require_jsx_runtime(), 1);
     init_lucide_react();
   }
 });
 
-// dist/server/assets/app.investor.team-ZPyO-_Nz.js
-var app_investor_team_ZPyO_Nz_exports = {};
-__export(app_investor_team_ZPyO_Nz_exports, {
+// dist/server/assets/app.investor.team-UUnF8Gub.js
+var app_investor_team_UUnF8Gub_exports = {};
+__export(app_investor_team_UUnF8Gub_exports, {
   component: () => TeamPage
 });
 function TeamPage() {
@@ -68927,9 +69183,9 @@ function TeamPage() {
     user
   } = useAuth();
   const queryClient2 = useQueryClient();
-  const [showInvite, setShowInvite] = (0, import_react58.useState)(false);
-  const [inviteEmail, setInviteEmail] = (0, import_react58.useState)("");
-  const [sending, setSending] = (0, import_react58.useState)(false);
+  const [showInvite, setShowInvite] = (0, import_react59.useState)(false);
+  const [inviteEmail, setInviteEmail] = (0, import_react59.useState)("");
+  const [sending, setSending] = (0, import_react59.useState)(false);
   const {
     data: invites = [],
     isLoading: invitesLoading
@@ -68989,101 +69245,101 @@ function TeamPage() {
       queryKey: ["investor-invites", user?.id]
     });
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "p-6 lg:p-8 max-w-5xl mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "flex items-end justify-between", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Team" }),
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "text-sm text-muted-foreground", children: "Invite analysts and partners to collaborate on deals" })
+  return /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "p-6 lg:p-8 max-w-5xl mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "flex items-end justify-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Team" }),
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "text-sm text-muted-foreground", children: "Invite analysts and partners to collaborate on deals" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("button", { onClick: () => setShowInvite((v3) => !v3), className: "inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(UserPlus, { className: "h-4 w-4" }),
+      /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("button", { onClick: () => setShowInvite((v3) => !v3), className: "inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(UserPlus, { className: "h-4 w-4" }),
         " Invite analyst"
       ] })
     ] }),
-    showInvite && /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "mt-5 rounded-2xl border border-brand/30 bg-card p-5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "flex items-center justify-between mb-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "text-sm font-semibold", children: "Send an invite" }),
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("button", { onClick: () => setShowInvite(false), className: "text-muted-foreground hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(X2, { className: "h-4 w-4" }) })
+    showInvite && /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "mt-5 rounded-2xl border border-brand/30 bg-card p-5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "flex items-center justify-between mb-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "text-sm font-semibold", children: "Send an invite" }),
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("button", { onClick: () => setShowInvite(false), className: "text-muted-foreground hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(X2, { className: "h-4 w-4" }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "flex gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "relative flex-1", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(Mail, { className: "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" }),
-          /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("input", { type: "email", value: inviteEmail, onChange: (e) => setInviteEmail(e.target.value), onKeyDown: (e) => e.key === "Enter" && handleInvite(), placeholder: "colleague@fund.com", className: "w-full rounded-[10px] border border-border/60 bg-background pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
+      /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "flex gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "relative flex-1", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(Mail, { className: "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" }),
+          /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("input", { type: "email", value: inviteEmail, onChange: (e) => setInviteEmail(e.target.value), onKeyDown: (e) => e.key === "Enter" && handleInvite(), placeholder: "colleague@fund.com", className: "w-full rounded-[10px] border border-border/60 bg-background pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("button", { onClick: handleInvite, disabled: sending || !inviteEmail.trim(), className: "inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-60", children: [
-          sending && /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("button", { onClick: handleInvite, disabled: sending || !inviteEmail.trim(), className: "inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-60", children: [
+          sending && /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
           "Send"
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("p", { className: "mt-2 text-xs text-muted-foreground", children: "They'll receive a link to join as an investor collaborator." })
+      /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("p", { className: "mt-2 text-xs text-muted-foreground", children: "They'll receive a link to join as an investor collaborator." })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "mt-6", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "text-sm font-semibold mb-3", children: "Members" }),
-      /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "rounded-2xl border border-border/60 bg-card p-4", children: /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "grid h-10 w-10 place-items-center rounded-full bg-gradient-brand text-brand-foreground font-semibold text-sm", children: user?.fullName?.split(" ").map((w3) => w3[0]).slice(0, 2).join("").toUpperCase() || "?" }),
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "flex-1", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "text-sm font-medium", children: user?.fullName || "You" }),
-          /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "text-xs text-muted-foreground", children: user?.email })
+    /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "mt-6", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "text-sm font-semibold mb-3", children: "Members" }),
+      /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "rounded-2xl border border-border/60 bg-card p-4", children: /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "flex items-center gap-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "grid h-10 w-10 place-items-center rounded-full bg-gradient-brand text-brand-foreground font-semibold text-sm", children: user?.fullName?.split(" ").map((w3) => w3[0]).slice(0, 2).join("").toUpperCase() || "?" }),
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "flex-1", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "text-sm font-medium", children: user?.fullName || "You" }),
+          /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "text-xs text-muted-foreground", children: user?.email })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("span", { className: "text-[10px] font-medium rounded-full bg-brand/10 text-brand px-2 py-0.5", children: "Owner" })
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("span", { className: "text-[10px] font-medium rounded-full bg-brand/10 text-brand px-2 py-0.5", children: "Owner" })
       ] }) }),
-      accepted.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "mt-2 space-y-2", children: accepted.map((inv) => /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-4 flex items-center gap-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "grid h-10 w-10 place-items-center rounded-full bg-accent text-sm font-semibold text-muted-foreground", children: inv.email[0].toUpperCase() }),
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "flex-1", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "text-sm font-medium", children: inv.email }),
-          /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "text-xs text-muted-foreground", children: [
+      accepted.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "mt-2 space-y-2", children: accepted.map((inv) => /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-4 flex items-center gap-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "grid h-10 w-10 place-items-center rounded-full bg-accent text-sm font-semibold text-muted-foreground", children: inv.email[0].toUpperCase() }),
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "flex-1", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "text-sm font-medium", children: inv.email }),
+          /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "text-xs text-muted-foreground", children: [
             "Joined ",
             formatDistanceToNow(new Date(inv.accepted_at), {
               addSuffix: true
             })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("span", { className: "text-[10px] font-medium rounded-full bg-success/10 text-success px-2 py-0.5", children: "Analyst" })
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("span", { className: "text-[10px] font-medium rounded-full bg-success/10 text-success px-2 py-0.5", children: "Analyst" })
       ] }, inv.id)) }),
-      accepted.length === 0 && !showInvite && /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "mt-4 rounded-2xl border border-dashed border-border/60 bg-card p-8 text-center", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-muted text-muted-foreground mb-3", children: /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(Users, { className: "h-5 w-5" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "text-sm font-medium", children: "Just you so far" }),
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("p", { className: "mt-1 text-xs text-muted-foreground", children: "Invite analysts and partners to collaborate on deals together." })
+      accepted.length === 0 && !showInvite && /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "mt-4 rounded-2xl border border-dashed border-border/60 bg-card p-8 text-center", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-muted text-muted-foreground mb-3", children: /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(Users, { className: "h-5 w-5" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "text-sm font-medium", children: "Just you so far" }),
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("p", { className: "mt-1 text-xs text-muted-foreground", children: "Invite analysts and partners to collaborate on deals together." })
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "mt-8", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "text-sm font-semibold mb-3", children: "Pending invites" }),
-      invitesLoading ? /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "h-20 rounded-2xl border border-border/60 bg-card animate-pulse" }) : pending.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "rounded-2xl border border-border/60 bg-card p-6 text-sm text-muted-foreground text-center", children: "No pending invites." }) : /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "space-y-2", children: pending.map((inv) => /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-4 flex items-center gap-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(Mail, { className: "h-4 w-4 text-muted-foreground shrink-0" }),
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "flex-1 min-w-0", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("div", { className: "text-sm font-medium truncate", children: inv.email }),
-          /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)("div", { className: "flex items-center gap-1 text-xs text-muted-foreground", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(Clock, { className: "h-3 w-3" }),
+    /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "mt-8", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "text-sm font-semibold mb-3", children: "Pending invites" }),
+      invitesLoading ? /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "h-20 rounded-2xl border border-border/60 bg-card animate-pulse" }) : pending.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "rounded-2xl border border-border/60 bg-card p-6 text-sm text-muted-foreground text-center", children: "No pending invites." }) : /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "space-y-2", children: pending.map((inv) => /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-4 flex items-center gap-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(Mail, { className: "h-4 w-4 text-muted-foreground shrink-0" }),
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "flex-1 min-w-0", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "text-sm font-medium truncate", children: inv.email }),
+          /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "flex items-center gap-1 text-xs text-muted-foreground", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(Clock, { className: "h-3 w-3" }),
             "Sent ",
             formatDistanceToNow(new Date(inv.created_at), {
               addSuffix: true
             })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("span", { className: "text-[10px] rounded-full bg-warning/10 text-warning px-2 py-0.5", children: "Pending" }),
-        /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("button", { onClick: () => handleCancelInvite(inv.id), className: "text-muted-foreground hover:text-destructive transition-colors", title: "Cancel invite", children: /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(X2, { className: "h-4 w-4" }) })
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("span", { className: "text-[10px] rounded-full bg-warning/10 text-warning px-2 py-0.5", children: "Pending" }),
+        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("button", { onClick: () => handleCancelInvite(inv.id), className: "text-muted-foreground hover:text-destructive transition-colors", title: "Cancel invite", children: /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(X2, { className: "h-4 w-4" }) })
       ] }, inv.id)) })
     ] })
   ] });
 }
-var import_jsx_runtime69, import_react58;
-var init_app_investor_team_ZPyO_Nz = __esm({
-  "dist/server/assets/app.investor.team-ZPyO-_Nz.js"() {
+var import_jsx_runtime70, import_react59;
+var init_app_investor_team_UUnF8Gub = __esm({
+  "dist/server/assets/app.investor.team-UUnF8Gub.js"() {
     "use strict";
-    import_jsx_runtime69 = __toESM(require_jsx_runtime(), 1);
-    import_react58 = __toESM(require_react(), 1);
+    import_jsx_runtime70 = __toESM(require_jsx_runtime(), 1);
+    import_react59 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_dist7();
     init_date_fns();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.investor.startups-D-VJ10wj.js
-var app_investor_startups_D_VJ10wj_exports = {};
-__export(app_investor_startups_D_VJ10wj_exports, {
+// dist/server/assets/app.investor.startups-BFOskxTF.js
+var app_investor_startups_BFOskxTF_exports = {};
+__export(app_investor_startups_BFOskxTF_exports, {
   component: () => StartupsPage
 });
 function StartupsPage() {
@@ -69118,58 +69374,58 @@ function StartupsPage() {
     }
   });
   if (isLoading) {
-    return /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1400px] mx-auto", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "h-8 w-48 rounded-lg bg-muted animate-pulse mb-2" }),
-      /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "h-4 w-64 rounded bg-muted/60 animate-pulse" }),
-      /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "mt-6 grid md:grid-cols-2 gap-4", children: [1, 2, 3, 4].map((i2) => /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "rounded-2xl border border-border/60 bg-card h-44 animate-pulse" }, i2)) })
+    return /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1400px] mx-auto", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "h-8 w-48 rounded-lg bg-muted animate-pulse mb-2" }),
+      /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "h-4 w-64 rounded bg-muted/60 animate-pulse" }),
+      /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "mt-6 grid md:grid-cols-2 gap-4", children: [1, 2, 3, 4].map((i2) => /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "rounded-2xl border border-border/60 bg-card h-44 animate-pulse" }, i2)) })
     ] });
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1400px] mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Startups" }),
-      /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "text-sm text-muted-foreground", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1400px] mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Startups" }),
+      /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { className: "text-sm text-muted-foreground", children: [
         startups.length,
         " compan",
         startups.length !== 1 ? "ies" : "y",
         " in your deal flow"
       ] })
     ] }),
-    isError2 ? /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "mt-8 rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground", children: "Could not load data. Please refresh." }) : startups.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "mt-8 rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(Building2, { className: "h-6 w-6" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("h3", { className: "mt-4 text-lg font-semibold", children: "No startups yet" }),
-      /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("p", { className: "mt-1 text-sm text-muted-foreground max-w-sm mx-auto", children: "You'll see companies here when founders invite you to their deal room." })
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "mt-6 grid md:grid-cols-2 gap-4", children: startups.map((c3) => /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)(Link, { to: "/app/deal-room/$id", params: {
+    isError2 ? /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "mt-8 rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground", children: "Could not load data. Please refresh." }) : startups.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { className: "mt-8 rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(Building2, { className: "h-6 w-6" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("h3", { className: "mt-4 text-lg font-semibold", children: "No startups yet" }),
+      /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("p", { className: "mt-1 text-sm text-muted-foreground max-w-sm mx-auto", children: "You'll see companies here when founders invite you to their deal room." })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "mt-6 grid md:grid-cols-2 gap-4", children: startups.map((c3) => /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)(Link, { to: "/app/deal-room/$id", params: {
       id: c3.dealRoomId
     }, className: "block rounded-2xl border border-border/60 bg-card p-5 hover:shadow-card transition-shadow group", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold shrink-0", children: (c3.company_name || "S")[0] }),
-        /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "flex-1 min-w-0", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "font-semibold truncate group-hover:text-brand transition-colors", children: c3.company_name }),
-          /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "text-xs text-muted-foreground", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { className: "flex items-center gap-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold shrink-0", children: (c3.company_name || "S")[0] }),
+        /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { className: "flex-1 min-w-0", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "font-semibold truncate group-hover:text-brand transition-colors", children: c3.company_name }),
+          /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { className: "text-xs text-muted-foreground", children: [
             c3.sector || "General",
             " \xB7 ",
             c3.stage || "Stage unknown"
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(ExternalLink, { className: "h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" })
+        /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(ExternalLink, { className: "h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" })
       ] }),
-      c3.tagline && /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("p", { className: "mt-3 text-sm text-muted-foreground line-clamp-1", children: c3.tagline }),
-      /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "mt-4 grid grid-cols-3 gap-2 pt-4 border-t border-border/60", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "text-xs text-muted-foreground", children: "Revenue" }),
-          /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "text-sm font-medium", children: c3.revenue || "\u2014" })
+      c3.tagline && /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("p", { className: "mt-3 text-sm text-muted-foreground line-clamp-1", children: c3.tagline }),
+      /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { className: "mt-4 grid grid-cols-3 gap-2 pt-4 border-t border-border/60", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "text-xs text-muted-foreground", children: "Revenue" }),
+          /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "text-sm font-medium", children: c3.revenue || "\u2014" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "text-xs text-muted-foreground", children: "Ask" }),
-          /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "text-sm font-medium", children: c3.funding_target || "\u2014" })
+        /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "text-xs text-muted-foreground", children: "Ask" }),
+          /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "text-sm font-medium", children: c3.funding_target || "\u2014" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "text-xs text-muted-foreground", children: "Team" }),
-          /* @__PURE__ */ (0, import_jsx_runtime70.jsx)("div", { className: "text-sm font-medium", children: c3.team_size || "\u2014" })
+        /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "text-xs text-muted-foreground", children: "Team" }),
+          /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "text-sm font-medium", children: c3.team_size || "\u2014" })
         ] })
       ] }),
-      c3.updatedAt && /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)("div", { className: "mt-3 flex items-center gap-1 text-xs text-muted-foreground", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(Clock, { className: "h-3 w-3" }),
+      c3.updatedAt && /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { className: "mt-3 flex items-center gap-1 text-xs text-muted-foreground", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(Clock, { className: "h-3 w-3" }),
         formatDistanceToNow(new Date(c3.updatedAt), {
           addSuffix: true
         })
@@ -69177,25 +69433,25 @@ function StartupsPage() {
     ] }, c3.id)) })
   ] });
 }
-var import_jsx_runtime70, import_react59;
-var init_app_investor_startups_D_VJ10wj = __esm({
-  "dist/server/assets/app.investor.startups-D-VJ10wj.js"() {
+var import_jsx_runtime71, import_react60;
+var init_app_investor_startups_BFOskxTF = __esm({
+  "dist/server/assets/app.investor.startups-BFOskxTF.js"() {
     "use strict";
-    import_jsx_runtime70 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime71 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_lucide_react();
     init_modern2();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_date_fns();
-    import_react59 = __toESM(require_react(), 1);
+    import_react60 = __toESM(require_react(), 1);
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.investor.portfolio-C_-J10S8.js
-var app_investor_portfolio_C_J10S8_exports = {};
-__export(app_investor_portfolio_C_J10S8_exports, {
+// dist/server/assets/app.investor.portfolio-CNrAph1Y.js
+var app_investor_portfolio_CNrAph1Y_exports = {};
+__export(app_investor_portfolio_CNrAph1Y_exports, {
   component: () => PortfolioPage
 });
 function PortfolioPage() {
@@ -69257,47 +69513,47 @@ function PortfolioPage() {
       }));
     }
   });
-  const statusLabel = {
+  const statusLabel2 = {
     accept: "Invested",
     invest: "Invested",
     term_sheet: "Term Sheet"
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1400px] mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Portfolio" }),
-      /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "text-sm text-muted-foreground", children: "Companies you've committed to invest in" })
+  return /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1400px] mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Portfolio" }),
+      /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "text-sm text-muted-foreground", children: "Companies you've committed to invest in" })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "mt-6 rounded-2xl border border-border/60 bg-card p-6 grid grid-cols-2 md:grid-cols-4 gap-6", children: [["Portfolio companies", `${invested.length}`], ["Term sheets signed", `${invested.filter((i2) => i2.status === "term_sheet").length}`], ["Investments closed", `${invested.filter((i2) => ["accept", "invest"].includes(i2.status)).length}`], ["Avg ticket", "\u2014"]].map(([l2, v3]) => /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "text-xs text-muted-foreground", children: l2 }),
-      /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "mt-1 text-xl font-semibold tabular-nums", children: v3 })
+    /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "mt-6 rounded-2xl border border-border/60 bg-card p-6 grid grid-cols-2 md:grid-cols-4 gap-6", children: [["Portfolio companies", `${invested.length}`], ["Term sheets signed", `${invested.filter((i2) => i2.status === "term_sheet").length}`], ["Investments closed", `${invested.filter((i2) => ["accept", "invest"].includes(i2.status)).length}`], ["Avg ticket", "\u2014"]].map(([l2, v3]) => /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "text-xs text-muted-foreground", children: l2 }),
+      /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "mt-1 text-xl font-semibold tabular-nums", children: v3 })
     ] }, l2)) }),
-    /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "mt-6", children: isLoading ? /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "grid md:grid-cols-2 lg:grid-cols-3 gap-4", children: [1, 2, 3].map((i2) => /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "rounded-2xl border border-border/60 bg-card h-48 animate-pulse" }, i2)) }) : isError2 ? /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground", children: "Could not load data. Please refresh." }) : invested.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { className: "rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(ChartPie, { className: "h-6 w-6" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("h3", { className: "mt-4 text-lg font-semibold", children: "No portfolio companies yet" }),
-      /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("p", { className: "mt-1 text-sm text-muted-foreground max-w-sm mx-auto", children: "Companies appear here after you mark a deal as Invested in the Decision Board." })
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "grid md:grid-cols-2 lg:grid-cols-3 gap-4", children: invested.map((c3) => /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)(Link, { to: "/app/deal-room/$id", params: {
+    /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "mt-6", children: isLoading ? /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "grid md:grid-cols-2 lg:grid-cols-3 gap-4", children: [1, 2, 3].map((i2) => /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "rounded-2xl border border-border/60 bg-card h-48 animate-pulse" }, i2)) }) : isError2 ? /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground", children: "Could not load data. Please refresh." }) : invested.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime72.jsx)(ChartPie, { className: "h-6 w-6" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("h3", { className: "mt-4 text-lg font-semibold", children: "No portfolio companies yet" }),
+      /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("p", { className: "mt-1 text-sm text-muted-foreground max-w-sm mx-auto", children: "Companies appear here after you mark a deal as Invested in the Decision Board." })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "grid md:grid-cols-2 lg:grid-cols-3 gap-4", children: invested.map((c3) => /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)(Link, { to: "/app/deal-room/$id", params: {
       id: c3.id
     }, className: "block rounded-2xl border border-border/60 bg-card p-5 hover:shadow-card transition-shadow group", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold shrink-0", children: c3.company[0] }),
-        /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { className: "flex-1 min-w-0", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "font-semibold truncate group-hover:text-brand transition-colors", children: c3.company }),
-          /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { className: "text-xs text-muted-foreground", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "flex items-center gap-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold shrink-0", children: c3.company[0] }),
+        /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "flex-1 min-w-0", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "font-semibold truncate group-hover:text-brand transition-colors", children: c3.company }),
+          /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "text-xs text-muted-foreground", children: [
             c3.sector || "\u2014",
             " \xB7 ",
             c3.stage || "\u2014"
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("span", { className: "text-[10px] font-medium rounded-full bg-success/10 text-success px-2 py-0.5 shrink-0", children: statusLabel[c3.status] ?? c3.status })
+        /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("span", { className: "text-[10px] font-medium rounded-full bg-success/10 text-success px-2 py-0.5 shrink-0", children: statusLabel2[c3.status] ?? c3.status })
       ] }),
-      (c3.revenue || c3.traction) && /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { className: "mt-3 flex items-center gap-1.5 text-xs text-muted-foreground", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(TrendingUp, { className: "h-3.5 w-3.5 text-success" }),
+      (c3.revenue || c3.traction) && /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "mt-3 flex items-center gap-1.5 text-xs text-muted-foreground", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime72.jsx)(TrendingUp, { className: "h-3.5 w-3.5 text-success" }),
         c3.revenue || c3.traction
       ] }),
-      c3.fundingTarget && /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("div", { className: "mt-1 text-xs text-brand font-medium", children: c3.fundingTarget }),
-      c3.notes && /* @__PURE__ */ (0, import_jsx_runtime71.jsx)("p", { className: "mt-2 text-xs text-muted-foreground line-clamp-2", children: c3.notes }),
-      c3.decisionAt && /* @__PURE__ */ (0, import_jsx_runtime71.jsxs)("div", { className: "mt-3 flex items-center gap-1 text-[10px] text-muted-foreground border-t border-border/60 pt-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime71.jsx)(Clock, { className: "h-2.5 w-2.5" }),
+      c3.fundingTarget && /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "mt-1 text-xs text-brand font-medium", children: c3.fundingTarget }),
+      c3.notes && /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("p", { className: "mt-2 text-xs text-muted-foreground line-clamp-2", children: c3.notes }),
+      c3.decisionAt && /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "mt-3 flex items-center gap-1 text-[10px] text-muted-foreground border-t border-border/60 pt-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime72.jsx)(Clock, { className: "h-2.5 w-2.5" }),
         "Decision ",
         formatDistanceToNow(new Date(c3.decisionAt), {
           addSuffix: true
@@ -69306,32 +69562,32 @@ function PortfolioPage() {
     ] }, c3.id)) }) })
   ] });
 }
-var import_jsx_runtime71, import_react60;
-var init_app_investor_portfolio_C_J10S8 = __esm({
-  "dist/server/assets/app.investor.portfolio-C_-J10S8.js"() {
+var import_jsx_runtime72, import_react61;
+var init_app_investor_portfolio_CNrAph1Y = __esm({
+  "dist/server/assets/app.investor.portfolio-CNrAph1Y.js"() {
     "use strict";
-    import_jsx_runtime71 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime72 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_lucide_react();
     init_modern2();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_date_fns();
-    import_react60 = __toESM(require_react(), 1);
+    import_react61 = __toESM(require_react(), 1);
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.investor.pipeline-DFJkzPWx.js
-var app_investor_pipeline_DFJkzPWx_exports = {};
-__export(app_investor_pipeline_DFJkzPWx_exports, {
+// dist/server/assets/app.investor.pipeline-Ce0UIV6h.js
+var app_investor_pipeline_Ce0UIV6h_exports = {};
+__export(app_investor_pipeline_Ce0UIV6h_exports, {
   component: () => PipelinePage
 });
 function PipelinePage() {
   const {
     user
   } = useAuth();
-  const [view, setView] = (0, import_react61.useState)("kanban");
+  const [view, setView] = (0, import_react62.useState)("kanban");
   const {
     data: rooms = [],
     isLoading,
@@ -69365,20 +69621,20 @@ function PipelinePage() {
   });
   const byStage = Object.fromEntries(STAGES4.map((s) => [s.k, rooms.filter((r2) => r2.pipelineStage === s.k)]));
   if (isLoading) {
-    return /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "p-6 lg:p-8", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "h-8 w-48 rounded-lg bg-muted animate-pulse mb-2" }),
-      /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "h-4 w-64 rounded bg-muted/60 animate-pulse" }),
-      /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "mt-6 flex gap-3", children: [1, 2, 3, 4].map((i2) => /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "w-[280px] h-64 rounded-2xl border border-border/60 bg-card animate-pulse shrink-0" }, i2)) })
+    return /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "p-6 lg:p-8", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "h-8 w-48 rounded-lg bg-muted animate-pulse mb-2" }),
+      /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "h-4 w-64 rounded bg-muted/60 animate-pulse" }),
+      /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "mt-6 flex gap-3", children: [1, 2, 3, 4].map((i2) => /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "w-[280px] h-64 rounded-2xl border border-border/60 bg-card animate-pulse shrink-0" }, i2)) })
     ] });
   }
   if (isError2) {
-    return /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "p-6 lg:p-8", children: /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground", children: "Could not load data. Please refresh." }) });
+    return /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "p-6 lg:p-8", children: /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground", children: "Could not load data. Please refresh." }) });
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1600px] mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "flex items-end justify-between flex-wrap gap-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "My Pipeline" }),
-        /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "text-sm text-muted-foreground", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1600px] mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "flex items-end justify-between flex-wrap gap-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "My Pipeline" }),
+        /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "text-sm text-muted-foreground", children: [
           rooms.length,
           " deal",
           rooms.length !== 1 ? "s" : "",
@@ -69387,71 +69643,71 @@ function PipelinePage() {
           " stages"
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "inline-flex rounded-[10px] border border-border/60 p-0.5 bg-card", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("button", { onClick: () => setView("kanban"), className: cn3("inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md", view === "kanban" ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:text-foreground"), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime72.jsx)(Kanban, { className: "h-3.5 w-3.5" }),
+      /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "inline-flex rounded-[10px] border border-border/60 p-0.5 bg-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("button", { onClick: () => setView("kanban"), className: cn3("inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md", view === "kanban" ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:text-foreground"), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime73.jsx)(Kanban, { className: "h-3.5 w-3.5" }),
           " Kanban"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("button", { onClick: () => setView("list"), className: cn3("inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md", view === "list" ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:text-foreground"), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime72.jsx)(List, { className: "h-3.5 w-3.5" }),
+        /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("button", { onClick: () => setView("list"), className: cn3("inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md", view === "list" ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:text-foreground"), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime73.jsx)(List, { className: "h-3.5 w-3.5" }),
           " List"
         ] })
       ] })
     ] }),
-    view === "kanban" ? /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "mt-6 -mx-6 lg:-mx-8 px-6 lg:px-8 overflow-x-auto pb-4", children: /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "flex gap-3 min-w-max", children: STAGES4.map((s) => {
+    view === "kanban" ? /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "mt-6 -mx-6 lg:-mx-8 px-6 lg:px-8 overflow-x-auto pb-4", children: /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "flex gap-3 min-w-max", children: STAGES4.map((s) => {
       const cards = byStage[s.k] ?? [];
-      return /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "w-[280px] shrink-0", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "px-1 mb-3 flex items-center gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("span", { className: cn3("h-2 w-2 rounded-full", s.dot) }),
-          /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "text-xs font-semibold", children: s.k }),
-          /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("span", { className: "text-xs text-muted-foreground ml-auto", children: cards.length })
+      return /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "w-[280px] shrink-0", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "px-1 mb-3 flex items-center gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("span", { className: cn3("h-2 w-2 rounded-full", s.dot) }),
+          /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "text-xs font-semibold", children: s.k }),
+          /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("span", { className: "text-xs text-muted-foreground ml-auto", children: cards.length })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: cn3("rounded-2xl border border-border/60 min-h-[200px] p-2 space-y-2", s.color), children: cards.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "grid place-items-center h-[160px] text-xs text-muted-foreground/60", children: "No deals here" }) : cards.map((room) => /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)(Link, { to: "/app/deal-room/$id", params: {
+        /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: cn3("rounded-2xl border border-border/60 min-h-[200px] p-2 space-y-2", s.color), children: cards.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "grid place-items-center h-[160px] text-xs text-muted-foreground/60", children: "No deals here" }) : cards.map((room) => /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)(Link, { to: "/app/deal-room/$id", params: {
           id: room.id
         }, className: "block rounded-xl border border-border/60 bg-card p-3 hover:shadow-card transition-shadow", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "grid h-7 w-7 place-items-center rounded-md bg-gradient-brand text-brand-foreground text-[11px] font-semibold shrink-0", children: room.company[0] }),
-            /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "min-w-0", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "text-sm font-medium truncate", children: room.company }),
-              /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "text-[10px] text-muted-foreground", children: room.sector || "\u2014" })
+          /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "grid h-7 w-7 place-items-center rounded-md bg-gradient-brand text-brand-foreground text-[11px] font-semibold shrink-0", children: room.company[0] }),
+            /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "min-w-0", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "text-sm font-medium truncate", children: room.company }),
+              /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "text-[10px] text-muted-foreground", children: room.sector || "\u2014" })
             ] })
           ] }),
-          room.fundingTarget && /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "mt-2 text-[11px] text-brand font-medium", children: room.fundingTarget }),
-          room.updatedAt && /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "mt-1 flex items-center gap-1 text-[10px] text-muted-foreground", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime72.jsx)(Clock, { className: "h-2.5 w-2.5" }),
+          room.fundingTarget && /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "mt-2 text-[11px] text-brand font-medium", children: room.fundingTarget }),
+          room.updatedAt && /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "mt-1 flex items-center gap-1 text-[10px] text-muted-foreground", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime73.jsx)(Clock, { className: "h-2.5 w-2.5" }),
             formatDistanceToNow(new Date(room.updatedAt), {
               addSuffix: true
             })
           ] })
         ] }, room.id)) })
       ] }, s.k);
-    }) }) }) : /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "mt-6 rounded-2xl border border-border/60 bg-card overflow-hidden", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "grid grid-cols-12 px-5 py-3 text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border/60", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "col-span-4", children: "Company" }),
-        /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "col-span-2", children: "Stage" }),
-        /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "col-span-2", children: "Pipeline" }),
-        /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "col-span-2", children: "Ask" }),
-        /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "col-span-2", children: "Last activity" })
+    }) }) }) : /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "mt-6 rounded-2xl border border-border/60 bg-card overflow-hidden", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "grid grid-cols-12 px-5 py-3 text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border/60", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "col-span-4", children: "Company" }),
+        /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "col-span-2", children: "Stage" }),
+        /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "col-span-2", children: "Pipeline" }),
+        /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "col-span-2", children: "Ask" }),
+        /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "col-span-2", children: "Last activity" })
       ] }),
-      rooms.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "px-5 py-12 text-sm text-muted-foreground text-center", children: "No deals in your pipeline yet." }) : rooms.map((room) => {
+      rooms.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "px-5 py-12 text-sm text-muted-foreground text-center", children: "No deals in your pipeline yet." }) : rooms.map((room) => {
         const stageInfo = STAGES4.find((s) => s.k === room.pipelineStage);
-        return /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)(Link, { to: "/app/deal-room/$id", params: {
+        return /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)(Link, { to: "/app/deal-room/$id", params: {
           id: room.id
         }, className: "grid grid-cols-12 px-5 py-3 border-b border-border/60 last:border-0 hover:bg-accent/40 items-center text-sm", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { className: "col-span-4 flex items-center gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "grid h-7 w-7 place-items-center rounded-md bg-gradient-brand text-brand-foreground text-[11px] font-semibold shrink-0", children: room.company[0] }),
-            /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("div", { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "font-medium", children: room.company }),
-              /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "text-xs text-muted-foreground", children: room.sector || "\u2014" })
+          /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "col-span-4 flex items-center gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "grid h-7 w-7 place-items-center rounded-md bg-gradient-brand text-brand-foreground text-[11px] font-semibold shrink-0", children: room.company[0] }),
+            /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "font-medium", children: room.company }),
+              /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "text-xs text-muted-foreground", children: room.sector || "\u2014" })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "col-span-2 text-xs text-muted-foreground", children: room.startupStage || "\u2014" }),
-          /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "col-span-2", children: /* @__PURE__ */ (0, import_jsx_runtime72.jsxs)("span", { className: cn3("inline-flex items-center gap-1 text-[11px] font-medium rounded-full px-2 py-0.5"), children: [
-            /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("span", { className: cn3("h-1.5 w-1.5 rounded-full", stageInfo?.dot) }),
+          /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "col-span-2 text-xs text-muted-foreground", children: room.startupStage || "\u2014" }),
+          /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "col-span-2", children: /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("span", { className: cn3("inline-flex items-center gap-1 text-[11px] font-medium rounded-full px-2 py-0.5"), children: [
+            /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("span", { className: cn3("h-1.5 w-1.5 rounded-full", stageInfo?.dot) }),
             room.pipelineStage
           ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "col-span-2 text-xs text-muted-foreground", children: room.fundingTarget || "\u2014" }),
-          /* @__PURE__ */ (0, import_jsx_runtime72.jsx)("div", { className: "col-span-2 text-xs text-muted-foreground", children: room.updatedAt ? formatDistanceToNow(new Date(room.updatedAt), {
+          /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "col-span-2 text-xs text-muted-foreground", children: room.fundingTarget || "\u2014" }),
+          /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "col-span-2 text-xs text-muted-foreground", children: room.updatedAt ? formatDistanceToNow(new Date(room.updatedAt), {
             addSuffix: true
           }) : "\u2014" })
         ] }, room.id);
@@ -69459,16 +69715,16 @@ function PipelinePage() {
     ] })
   ] });
 }
-var import_jsx_runtime72, import_react61, DB_STATUS_TO_STAGE2, STAGES4;
-var init_app_investor_pipeline_DFJkzPWx = __esm({
-  "dist/server/assets/app.investor.pipeline-DFJkzPWx.js"() {
+var import_jsx_runtime73, import_react62, DB_STATUS_TO_STAGE2, STAGES4;
+var init_app_investor_pipeline_Ce0UIV6h = __esm({
+  "dist/server/assets/app.investor.pipeline-Ce0UIV6h.js"() {
     "use strict";
-    import_jsx_runtime72 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime73 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    import_react61 = __toESM(require_react(), 1);
+    import_react62 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_date_fns();
     init_utils_H80jjgLf();
     init_dist7();
@@ -69513,16 +69769,16 @@ var init_app_investor_pipeline_DFJkzPWx = __esm({
   }
 });
 
-// dist/server/assets/app.investor.diligence-BdUMIo_w.js
-var app_investor_diligence_BdUMIo_w_exports = {};
-__export(app_investor_diligence_BdUMIo_w_exports, {
+// dist/server/assets/app.investor.diligence-YObBiQ-H.js
+var app_investor_diligence_YObBiQ_H_exports = {};
+__export(app_investor_diligence_YObBiQ_H_exports, {
   component: () => DiligencePage
 });
 function DiligencePage() {
   const {
     user
   } = useAuth();
-  const [selectedRoomId, setSelectedRoomId] = (0, import_react62.useState)("");
+  const [selectedRoomId, setSelectedRoomId] = (0, import_react63.useState)("");
   const {
     data: rooms = []
   } = useQuery({
@@ -69571,37 +69827,37 @@ function DiligencePage() {
   const doneCount = items.filter((i2) => String(i2.status).toLowerCase().includes("done")).length;
   const progress = total ? Math.round(doneCount / total * 100) : 0;
   const sectionKeys = ["Legal", "Financial", "Technical", "Commercial", "Team"];
-  return /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1400px] mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Due Diligence" }),
-      /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "text-sm text-muted-foreground", children: "Track diligence progress across your active deals" })
+  return /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1400px] mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Due Diligence" }),
+      /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "text-sm text-muted-foreground", children: "Track diligence progress across your active deals" })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "mt-5", children: /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("select", { value: selectedRoomId, onChange: (e) => setSelectedRoomId(e.target.value), className: "rounded-[10px] border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("option", { value: "", children: "Select a company\u2026" }),
-      rooms.map((r2) => /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("option", { value: r2.id, children: r2.name }, r2.id))
+    /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "mt-5", children: /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("select", { value: selectedRoomId, onChange: (e) => setSelectedRoomId(e.target.value), className: "rounded-[10px] border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("option", { value: "", children: "Select a company\u2026" }),
+      rooms.map((r2) => /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("option", { value: r2.id, children: r2.name }, r2.id))
     ] }) }),
-    !selectedRoomId ? /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "mt-8 rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime73.jsx)(ClipboardCheck, { className: "h-6 w-6" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("h3", { className: "mt-4 text-lg font-semibold", children: "Select a company to view due diligence" }),
-      /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: "Companies in your active deal flow appear in the dropdown above." })
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "mt-6 grid lg:grid-cols-[1fr_360px] gap-5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "space-y-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "flex items-center justify-between", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "text-sm font-semibold", children: "Overall progress" }),
-            /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "text-sm tabular-nums", children: [
+    !selectedRoomId ? /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "mt-8 rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(ClipboardCheck, { className: "h-6 w-6" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("h3", { className: "mt-4 text-lg font-semibold", children: "Select a company to view due diligence" }),
+      /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: "Companies in your active deal flow appear in the dropdown above." })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "mt-6 grid lg:grid-cols-[1fr_360px] gap-5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "flex items-center justify-between", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "text-sm font-semibold", children: "Overall progress" }),
+            /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "text-sm tabular-nums", children: [
               progress,
               "%"
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "mt-3 h-2 rounded-full bg-muted overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "h-full bg-gradient-brand transition-all", style: {
+          /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "mt-3 h-2 rounded-full bg-muted overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "h-full bg-gradient-brand transition-all", style: {
             width: `${progress}%`
           } }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "mt-3 grid grid-cols-5 gap-2 text-[11px] text-muted-foreground", children: sectionKeys.map((sk) => {
+          /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "mt-3 grid grid-cols-5 gap-2 text-[11px] text-muted-foreground", children: sectionKeys.map((sk) => {
             const sec = sections3.find((s) => s.t.toLowerCase() === sk.toLowerCase());
             const done = sec?.items.filter((i2) => i2.done).length ?? 0;
             const tot = sec?.items.length ?? 0;
-            return /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "rounded-md border border-border/60 px-2 py-1.5 text-center", children: [
+            return /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "rounded-md border border-border/60 px-2 py-1.5 text-center", children: [
               sk,
               " ",
               done,
@@ -69610,54 +69866,54 @@ function DiligencePage() {
             ] }, sk);
           }) })
         ] }),
-        sections3.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "rounded-2xl border border-dashed border-border/60 bg-card p-8 text-center text-sm text-muted-foreground", children: "No checklist items yet." }) : sections3.map((s) => {
+        sections3.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "rounded-2xl border border-dashed border-border/60 bg-card p-8 text-center text-sm text-muted-foreground", children: "No checklist items yet." }) : sections3.map((s) => {
           const done = s.items.filter((i2) => i2.done).length;
-          return /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card overflow-hidden", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "flex items-center justify-between px-5 py-3 border-b border-border/60", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "text-sm font-semibold", children: s.t }),
-              /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "text-xs text-muted-foreground", children: [
+          return /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card overflow-hidden", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "flex items-center justify-between px-5 py-3 border-b border-border/60", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "text-sm font-semibold", children: s.t }),
+              /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "text-xs text-muted-foreground", children: [
                 done,
                 "/",
                 s.items.length
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "divide-y divide-border/60", children: s.items.map((item) => /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "flex items-center gap-3 px-5 py-3", children: [
-              item.done ? /* @__PURE__ */ (0, import_jsx_runtime73.jsx)(CircleCheck, { className: "h-4 w-4 text-success shrink-0" }) : /* @__PURE__ */ (0, import_jsx_runtime73.jsx)(Circle, { className: "h-4 w-4 text-muted-foreground shrink-0" }),
-              /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("span", { className: `text-sm ${item.done ? "text-muted-foreground line-through" : ""}`, children: item.label })
+            /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "divide-y divide-border/60", children: s.items.map((item) => /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "flex items-center gap-3 px-5 py-3", children: [
+              item.done ? /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(CircleCheck, { className: "h-4 w-4 text-success shrink-0" }) : /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(Circle, { className: "h-4 w-4 text-muted-foreground shrink-0" }),
+              /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("span", { className: `text-sm ${item.done ? "text-muted-foreground line-through" : ""}`, children: item.label })
             ] }, item.id)) })
           ] }, s.t);
         })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-5", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("div", { className: "flex items-center justify-between", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "text-sm font-semibold", children: "Document requests" }),
-          /* @__PURE__ */ (0, import_jsx_runtime73.jsxs)("button", { className: "inline-flex items-center gap-1 text-xs rounded-[10px] border border-border/60 px-2 py-1 hover:bg-accent", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime73.jsx)(FileUp, { className: "h-3.5 w-3.5" }),
+      /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-5", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "flex items-center justify-between", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "text-sm font-semibold", children: "Document requests" }),
+          /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("button", { className: "inline-flex items-center gap-1 text-xs rounded-[10px] border border-border/60 px-2 py-1 hover:bg-accent", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(FileUp, { className: "h-3.5 w-3.5" }),
             " Request"
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime73.jsx)("div", { className: "mt-4 text-sm text-muted-foreground text-center py-6", children: "No requests yet." })
+        /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "mt-4 text-sm text-muted-foreground text-center py-6", children: "No requests yet." })
       ] }) })
     ] })
   ] });
 }
-var import_jsx_runtime73, import_react62;
-var init_app_investor_diligence_BdUMIo_w = __esm({
-  "dist/server/assets/app.investor.diligence-BdUMIo_w.js"() {
+var import_jsx_runtime74, import_react63;
+var init_app_investor_diligence_YObBiQ_H = __esm({
+  "dist/server/assets/app.investor.diligence-YObBiQ-H.js"() {
     "use strict";
-    import_jsx_runtime73 = __toESM(require_jsx_runtime(), 1);
-    import_react62 = __toESM(require_react(), 1);
+    import_jsx_runtime74 = __toESM(require_jsx_runtime(), 1);
+    import_react63 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.investor.decisions-kaKj7qWa.js
-var app_investor_decisions_kaKj7qWa_exports = {};
-__export(app_investor_decisions_kaKj7qWa_exports, {
+// dist/server/assets/app.investor.decisions-CBMamwfA.js
+var app_investor_decisions_CBMamwfA_exports = {};
+__export(app_investor_decisions_CBMamwfA_exports, {
   component: () => DecisionsPage
 });
 function DecisionsPage() {
@@ -69707,16 +69963,16 @@ function DecisionsPage() {
     hold: decisions.filter((d2) => String(d2.status).toLowerCase() === "hold"),
     pass: decisions.filter((d2) => ["pass", "rejected"].includes(String(d2.status).toLowerCase()))
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1500px] mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Decision Board" }),
-      /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "text-sm text-muted-foreground", children: "Investment decisions across your active deals" })
+  return /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1500px] mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Decision Board" }),
+      /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "text-sm text-muted-foreground", children: "Investment decisions across your active deals" })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "mt-6 rounded-2xl border border-border/60 bg-card p-6 grid grid-cols-2 md:grid-cols-4 gap-6", children: [["Total decisions", `${decisions.length}`], ["Invest", `${cols.invest.length}`], ["Hold", `${cols.hold.length}`], ["Pass rate", decisions.length > 0 ? `${Math.round(cols.pass.length / decisions.length * 100)}%` : "\u2014"]].map(([l2, v3]) => /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "text-xs text-muted-foreground", children: l2 }),
-      /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "mt-1 text-xl font-semibold tabular-nums", children: v3 })
+    /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "mt-6 rounded-2xl border border-border/60 bg-card p-6 grid grid-cols-2 md:grid-cols-4 gap-6", children: [["Total decisions", `${decisions.length}`], ["Invest", `${cols.invest.length}`], ["Hold", `${cols.hold.length}`], ["Pass rate", decisions.length > 0 ? `${Math.round(cols.pass.length / decisions.length * 100)}%` : "\u2014"]].map(([l2, v3]) => /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "text-xs text-muted-foreground", children: l2 }),
+      /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "mt-1 text-xl font-semibold tabular-nums", children: v3 })
     ] }, l2)) }),
-    isLoading ? /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "mt-6 grid md:grid-cols-3 gap-4", children: [1, 2, 3].map((i2) => /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "rounded-2xl border border-border/60 bg-card h-64 animate-pulse" }, i2)) }) : isError2 ? /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "mt-6 rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground", children: "Could not load data. Please refresh." }) : /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "mt-6 grid md:grid-cols-3 gap-4", children: [{
+    isLoading ? /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "mt-6 grid md:grid-cols-3 gap-4", children: [1, 2, 3].map((i2) => /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "rounded-2xl border border-border/60 bg-card h-64 animate-pulse" }, i2)) }) : isError2 ? /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "mt-6 rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground", children: "Could not load data. Please refresh." }) : /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "mt-6 grid md:grid-cols-3 gap-4", children: [{
       t: "Invest",
       c: "success",
       Icon: Check,
@@ -69731,55 +69987,55 @@ function DecisionsPage() {
       c: "destructive",
       Icon: X2,
       items: cols.pass
-    }].map((col) => /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card overflow-hidden", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: `px-5 py-3 border-b border-border/60 flex items-center gap-2`, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(col.Icon, { className: `h-4 w-4 text-${col.c}` }),
-        /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("span", { className: "text-sm font-semibold", children: col.t }),
-        /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("span", { className: "text-xs text-muted-foreground ml-auto", children: col.items.length })
+    }].map((col) => /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card overflow-hidden", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { className: `px-5 py-3 border-b border-border/60 flex items-center gap-2`, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime75.jsx)(col.Icon, { className: `h-4 w-4 text-${col.c}` }),
+        /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("span", { className: "text-sm font-semibold", children: col.t }),
+        /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("span", { className: "text-xs text-muted-foreground ml-auto", children: col.items.length })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "p-3 space-y-2", children: col.items.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "py-8 text-sm text-muted-foreground text-center", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "p-3 space-y-2", children: col.items.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { className: "py-8 text-sm text-muted-foreground text-center", children: [
         "No ",
         col.t.toLowerCase(),
         " decisions yet"
-      ] }) : col.items.map((item) => /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)(Link, { to: "/app/deal-room/$id", params: {
+      ] }) : col.items.map((item) => /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)(Link, { to: "/app/deal-room/$id", params: {
         id: item.deal_room_id
       }, className: "block rounded-xl border border-border/60 bg-background/40 p-3 hover:shadow-card transition-shadow", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "text-sm font-medium", children: item.company }),
-        item.sector && /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "text-xs text-muted-foreground", children: item.sector }),
-        item.notes && /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("div", { className: "mt-1 text-xs text-muted-foreground line-clamp-2", children: item.notes }),
-        item.created_at && /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "mt-1.5 flex items-center gap-1 text-[10px] text-muted-foreground/70", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime74.jsx)(Clock, { className: "h-2.5 w-2.5" }),
+        /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "text-sm font-medium", children: item.company }),
+        item.sector && /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "text-xs text-muted-foreground", children: item.sector }),
+        item.notes && /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "mt-1 text-xs text-muted-foreground line-clamp-2", children: item.notes }),
+        item.created_at && /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { className: "mt-1.5 flex items-center gap-1 text-[10px] text-muted-foreground/70", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime75.jsx)(Clock, { className: "h-2.5 w-2.5" }),
           formatDistanceToNow(new Date(item.created_at), {
             addSuffix: true
           })
         ] })
       ] }, item.id)) })
     ] }, col.t)) }),
-    !isLoading && memberData?.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime74.jsxs)("div", { className: "mt-6 rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("h3", { className: "text-lg font-semibold", children: "No decisions yet" }),
-      /* @__PURE__ */ (0, import_jsx_runtime74.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: "Decisions appear here once you've been invited to deal rooms." })
+    !isLoading && memberData?.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { className: "mt-6 rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("h3", { className: "text-lg font-semibold", children: "No decisions yet" }),
+      /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: "Decisions appear here once you've been invited to deal rooms." })
     ] })
   ] });
 }
-var import_jsx_runtime74, import_react63;
-var init_app_investor_decisions_kaKj7qWa = __esm({
-  "dist/server/assets/app.investor.decisions-kaKj7qWa.js"() {
+var import_jsx_runtime75, import_react64;
+var init_app_investor_decisions_CBMamwfA = __esm({
+  "dist/server/assets/app.investor.decisions-CBMamwfA.js"() {
     "use strict";
-    import_jsx_runtime74 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime75 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_lucide_react();
     init_modern2();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_date_fns();
-    import_react63 = __toESM(require_react(), 1);
+    import_react64 = __toESM(require_react(), 1);
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.investor.deal-rooms-DUNuFc0T.js
-var app_investor_deal_rooms_DUNuFc0T_exports = {};
-__export(app_investor_deal_rooms_DUNuFc0T_exports, {
+// dist/server/assets/app.investor.deal-rooms-U0E6Qe2Z.js
+var app_investor_deal_rooms_U0E6Qe2Z_exports = {};
+__export(app_investor_deal_rooms_U0E6Qe2Z_exports, {
   component: () => DealRoomsPage
 });
 function DealRoomsPage() {
@@ -69818,52 +70074,52 @@ function DealRoomsPage() {
       })).filter((r2) => !!r2.id).sort((a, b2) => new Date(b2.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
     }
   });
-  return /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1400px] mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Deal Rooms" }),
-      /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { className: "text-sm text-muted-foreground", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1400px] mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Deal Rooms" }),
+      /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "text-sm text-muted-foreground", children: [
         rooms.length,
         " active data room",
         rooms.length !== 1 ? "s" : "",
         " you've been invited to"
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "mt-6", children: isLoading ? /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "grid md:grid-cols-2 lg:grid-cols-3 gap-4", children: [1, 2, 3].map((i2) => /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "rounded-2xl border border-border/60 bg-card h-48 animate-pulse" }, i2)) }) : isError2 ? /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground", children: "Could not load data. Please refresh." }) : rooms.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { className: "rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime75.jsx)(Briefcase, { className: "h-6 w-6" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("h3", { className: "mt-4 text-lg font-semibold", children: "No active deal rooms" }),
-      /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("p", { className: "mt-1 text-sm text-muted-foreground max-w-sm mx-auto", children: "Founders' deal room invitations appear here once you've been accepted." })
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "grid md:grid-cols-2 lg:grid-cols-3 gap-4", children: rooms.map((room) => {
+    /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "mt-6", children: isLoading ? /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "grid md:grid-cols-2 lg:grid-cols-3 gap-4", children: [1, 2, 3].map((i2) => /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "rounded-2xl border border-border/60 bg-card h-48 animate-pulse" }, i2)) }) : isError2 ? /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground", children: "Could not load data. Please refresh." }) : rooms.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime76.jsx)(Briefcase, { className: "h-6 w-6" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("h3", { className: "mt-4 text-lg font-semibold", children: "No active deal rooms" }),
+      /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("p", { className: "mt-1 text-sm text-muted-foreground max-w-sm mx-auto", children: "Founders' deal room invitations appear here once you've been accepted." })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "grid md:grid-cols-2 lg:grid-cols-3 gap-4", children: rooms.map((room) => {
       const statusInfo = STATUS_TO_LABEL[room.status ?? ""] ?? {
         label: "New",
         cls: "bg-muted text-muted-foreground"
       };
       const daysSinceActivity = room.updatedAt ? Math.floor((Date.now() - new Date(room.updatedAt).getTime()) / (1e3 * 60 * 60 * 24)) : null;
       const isStale2 = daysSinceActivity !== null && daysSinceActivity > 7;
-      return /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)(Link, { to: "/app/deal-room/$id", params: {
+      return /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)(Link, { to: "/app/deal-room/$id", params: {
         id: room.id
       }, className: "block rounded-2xl border border-border/60 bg-card p-5 hover:shadow-card transition-shadow group", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { className: "flex items-start justify-between gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { className: "flex items-center gap-3 min-w-0", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold text-sm shrink-0", children: room.company[0] }),
-            /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { className: "min-w-0", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("div", { className: "font-semibold truncate group-hover:text-brand transition-colors", children: room.company }),
-              /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { className: "text-xs text-muted-foreground", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "flex items-start justify-between gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "flex items-center gap-3 min-w-0", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold text-sm shrink-0", children: room.company[0] }),
+            /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "min-w-0", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "font-semibold truncate group-hover:text-brand transition-colors", children: room.company }),
+              /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "text-xs text-muted-foreground", children: [
                 room.sector || "\u2014",
                 " \xB7 ",
                 room.stage || "Stage TBD"
               ] })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("span", { className: cn3("shrink-0 text-[10px] font-medium rounded-full px-2 py-0.5", statusInfo.cls), children: statusInfo.label })
+          /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("span", { className: cn3("shrink-0 text-[10px] font-medium rounded-full px-2 py-0.5", statusInfo.cls), children: statusInfo.label })
         ] }),
-        room.tagline && /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("p", { className: "mt-3 text-sm text-muted-foreground line-clamp-2", children: room.tagline }),
-        /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { className: "mt-4 pt-4 border-t border-border/60 flex items-center justify-between gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { className: "flex items-center gap-1.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime75.jsx)(Shield, { className: "h-3 w-3 text-muted-foreground" }),
-            /* @__PURE__ */ (0, import_jsx_runtime75.jsx)("span", { className: "text-xs text-muted-foreground", children: room.fundingTarget || "Target TBD" })
+        room.tagline && /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("p", { className: "mt-3 text-sm text-muted-foreground line-clamp-2", children: room.tagline }),
+        /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "mt-4 pt-4 border-t border-border/60 flex items-center justify-between gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "flex items-center gap-1.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime76.jsx)(Shield, { className: "h-3 w-3 text-muted-foreground" }),
+            /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("span", { className: "text-xs text-muted-foreground", children: room.fundingTarget || "Target TBD" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime75.jsxs)("div", { className: cn3("flex items-center gap-1 text-xs", isStale2 ? "text-warning" : "text-muted-foreground"), children: [
-            /* @__PURE__ */ (0, import_jsx_runtime75.jsx)(Clock, { className: "h-3 w-3" }),
+          /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: cn3("flex items-center gap-1 text-xs", isStale2 ? "text-warning" : "text-muted-foreground"), children: [
+            /* @__PURE__ */ (0, import_jsx_runtime76.jsx)(Clock, { className: "h-3 w-3" }),
             room.updatedAt ? formatDistanceToNow(new Date(room.updatedAt), {
               addSuffix: true
             }) : "\u2014"
@@ -69873,18 +70129,18 @@ function DealRoomsPage() {
     }) }) })
   ] });
 }
-var import_jsx_runtime75, import_react64, STATUS_TO_LABEL;
-var init_app_investor_deal_rooms_DUNuFc0T = __esm({
-  "dist/server/assets/app.investor.deal-rooms-DUNuFc0T.js"() {
+var import_jsx_runtime76, import_react65, STATUS_TO_LABEL;
+var init_app_investor_deal_rooms_U0E6Qe2Z = __esm({
+  "dist/server/assets/app.investor.deal-rooms-U0E6Qe2Z.js"() {
     "use strict";
-    import_jsx_runtime75 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime76 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_lucide_react();
     init_modern2();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_date_fns();
     init_utils_H80jjgLf();
-    import_react64 = __toESM(require_react(), 1);
+    import_react65 = __toESM(require_react(), 1);
     init_dist7();
     init_clsx();
     STATUS_TO_LABEL = {
@@ -69916,16 +70172,16 @@ var init_app_investor_deal_rooms_DUNuFc0T = __esm({
   }
 });
 
-// dist/server/assets/app.investor.deal-flow-DuVKEwUd.js
-var app_investor_deal_flow_DuVKEwUd_exports = {};
-__export(app_investor_deal_flow_DuVKEwUd_exports, {
+// dist/server/assets/app.investor.deal-flow-DR25rM4j.js
+var app_investor_deal_flow_DR25rM4j_exports = {};
+__export(app_investor_deal_flow_DR25rM4j_exports, {
   component: () => DealFlowPage
 });
 function DealFlowPage() {
   const {
     user
   } = useAuth();
-  const [q2, setQ] = (0, import_react65.useState)("");
+  const [q2, setQ] = (0, import_react66.useState)("");
   const {
     data: rooms = [],
     isLoading,
@@ -69958,43 +70214,43 @@ function DealFlowPage() {
     }
   });
   const filtered = q2 ? rooms.filter((r2) => r2.company.toLowerCase().includes(q2.toLowerCase()) || (r2.sector ?? "").toLowerCase().includes(q2.toLowerCase())) : rooms;
-  return /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1600px] mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "flex items-end justify-between flex-wrap gap-3", children: /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Deal Flow" }),
-      /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "text-sm text-muted-foreground", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1600px] mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "flex items-end justify-between flex-wrap gap-3", children: /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Deal Flow" }),
+      /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "text-sm text-muted-foreground", children: [
         rooms.length,
         " deal",
         rooms.length !== 1 ? "s" : "",
         " in your pipeline"
       ] })
     ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "mt-5 flex items-center gap-2", children: /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "relative flex-1 max-w-md", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime76.jsx)(Search, { className: "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" }),
-      /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("input", { value: q2, onChange: (e) => setQ(e.target.value), placeholder: "Search by company or sector\u2026", className: "w-full rounded-[10px] border border-border/60 bg-background pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
+    /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "mt-5 flex items-center gap-2", children: /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "relative flex-1 max-w-md", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(Search, { className: "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" }),
+      /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("input", { value: q2, onChange: (e) => setQ(e.target.value), placeholder: "Search by company or sector\u2026", className: "w-full rounded-[10px] border border-border/60 bg-background pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
     ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "mt-5", children: isLoading ? /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "grid md:grid-cols-2 lg:grid-cols-3 gap-4", children: [1, 2, 3].map((i2) => /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "rounded-2xl border border-border/60 bg-card h-44 animate-pulse" }, i2)) }) : isError2 ? /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground", children: "Could not load data. Please refresh." }) : filtered.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime76.jsx)(Inbox, { className: "h-6 w-6" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("h3", { className: "mt-4 text-lg font-semibold", children: "No deals yet" }),
-      /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("p", { className: "mt-1 text-sm text-muted-foreground max-w-sm mx-auto", children: q2 ? "No deals match your search." : "Deal rooms will appear here when founders invite you to their data room." })
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "grid md:grid-cols-2 lg:grid-cols-3 gap-4", children: filtered.map((room) => /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)(Link, { to: "/app/deal-room/$id", params: {
+    /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "mt-5", children: isLoading ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "grid md:grid-cols-2 lg:grid-cols-3 gap-4", children: [1, 2, 3].map((i2) => /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "rounded-2xl border border-border/60 bg-card h-44 animate-pulse" }, i2)) }) : isError2 ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground", children: "Could not load data. Please refresh." }) : filtered.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(Inbox, { className: "h-6 w-6" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("h3", { className: "mt-4 text-lg font-semibold", children: "No deals yet" }),
+      /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("p", { className: "mt-1 text-sm text-muted-foreground max-w-sm mx-auto", children: q2 ? "No deals match your search." : "Deal rooms will appear here when founders invite you to their data room." })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "grid md:grid-cols-2 lg:grid-cols-3 gap-4", children: filtered.map((room) => /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)(Link, { to: "/app/deal-room/$id", params: {
       id: room.id
     }, className: "block rounded-2xl border border-border/60 bg-card p-5 hover:shadow-card transition-shadow group", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground text-sm font-semibold shrink-0", children: room.company[0] }),
-        /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "flex-1 min-w-0", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("div", { className: "font-semibold truncate group-hover:text-brand transition-colors", children: room.company }),
-          /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "text-xs text-muted-foreground", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "flex items-center gap-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground text-sm font-semibold shrink-0", children: room.company[0] }),
+        /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "flex-1 min-w-0", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "font-semibold truncate group-hover:text-brand transition-colors", children: room.company }),
+          /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "text-xs text-muted-foreground", children: [
             room.sector || "General",
             " \xB7 ",
             room.stage || "Stage TBD"
           ] })
         ] })
       ] }),
-      room.blurb && /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("p", { className: "mt-3 text-sm text-muted-foreground line-clamp-2", children: room.blurb }),
-      /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("div", { className: "mt-4 flex items-center justify-between pt-4 border-t border-border/60", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime76.jsx)("span", { className: "text-xs font-medium text-brand", children: room.fundingTarget || "Target TBD" }),
-        /* @__PURE__ */ (0, import_jsx_runtime76.jsxs)("span", { className: "flex items-center gap-1 text-xs text-muted-foreground", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime76.jsx)(Clock, { className: "h-3 w-3" }),
+      room.blurb && /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("p", { className: "mt-3 text-sm text-muted-foreground line-clamp-2", children: room.blurb }),
+      /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "mt-4 flex items-center justify-between pt-4 border-t border-border/60", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { className: "text-xs font-medium text-brand", children: room.fundingTarget || "Target TBD" }),
+        /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("span", { className: "flex items-center gap-1 text-xs text-muted-foreground", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(Clock, { className: "h-3 w-3" }),
           room.updatedAt ? formatDistanceToNow(new Date(room.updatedAt), {
             addSuffix: true
           }) : "\u2014"
@@ -70003,25 +70259,25 @@ function DealFlowPage() {
     ] }, room.id)) }) })
   ] });
 }
-var import_jsx_runtime76, import_react65;
-var init_app_investor_deal_flow_DuVKEwUd = __esm({
-  "dist/server/assets/app.investor.deal-flow-DuVKEwUd.js"() {
+var import_jsx_runtime77, import_react66;
+var init_app_investor_deal_flow_DR25rM4j = __esm({
+  "dist/server/assets/app.investor.deal-flow-DR25rM4j.js"() {
     "use strict";
-    import_jsx_runtime76 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime77 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    import_react65 = __toESM(require_react(), 1);
+    import_react66 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_date_fns();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.investor.analysis-BB5yqveW.js
-var app_investor_analysis_BB5yqveW_exports = {};
-__export(app_investor_analysis_BB5yqveW_exports, {
+// dist/server/assets/app.investor.analysis-DY5s-TdV.js
+var app_investor_analysis_DY5s_TdV_exports = {};
+__export(app_investor_analysis_DY5s_TdV_exports, {
   component: () => AnalysisPage
 });
 import "node:async_hooks";
@@ -70029,7 +70285,7 @@ function AnalysisPage() {
   const {
     user
   } = useAuth();
-  const [selectedRoomId, setSelectedRoomId] = (0, import_react66.useState)("");
+  const [selectedRoomId, setSelectedRoomId] = (0, import_react67.useState)("");
   const {
     data: rooms = [],
     isLoading: roomsLoading
@@ -70077,92 +70333,92 @@ function AnalysisPage() {
     a.click();
     URL.revokeObjectURL(url2);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1400px] mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "AI Analysis" }),
-      /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "text-sm text-muted-foreground", children: "Thesis fit, risks, and investment memo \u2014 generated from deal room data" })
+  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "p-6 lg:p-8 max-w-[1400px] mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "AI Analysis" }),
+      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm text-muted-foreground", children: "Thesis fit, risks, and investment memo \u2014 generated from deal room data" })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "mt-5", children: roomsLoading ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "h-9 w-48 rounded-[10px] bg-muted animate-pulse" }) : /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("select", { value: selectedRoomId, onChange: (e) => setSelectedRoomId(e.target.value), className: "rounded-[10px] border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("option", { value: "", children: "Select a company to analyse\u2026" }),
-      rooms.map((r2) => /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("option", { value: r2.id, children: r2.name }, r2.id))
+    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-5", children: roomsLoading ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "h-9 w-48 rounded-[10px] bg-muted animate-pulse" }) : /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("select", { value: selectedRoomId, onChange: (e) => setSelectedRoomId(e.target.value), className: "rounded-[10px] border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("option", { value: "", children: "Select a company to analyse\u2026" }),
+      rooms.map((r2) => /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("option", { value: r2.id, children: r2.name }, r2.id))
     ] }) }),
-    !selectedRoomId ? /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "mt-8 rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(Brain, { className: "h-6 w-6" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("h3", { className: "mt-4 text-lg font-semibold", children: "Select a company to generate AI analysis" }),
-      /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("p", { className: "mt-1 text-sm text-muted-foreground max-w-sm mx-auto", children: "Analysis is generated from data inside the deal room \u2014 pitch deck, documents, and company profile." })
-    ] }) : briefLoading ? /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "mt-8 rounded-2xl border border-border/60 bg-card p-12 flex flex-col items-center gap-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(LoaderCircle, { className: "h-8 w-8 animate-spin text-brand" }),
-      /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "text-sm text-muted-foreground", children: [
+    !selectedRoomId ? /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "mt-8 rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Brain, { className: "h-6 w-6" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("h3", { className: "mt-4 text-lg font-semibold", children: "Select a company to generate AI analysis" }),
+      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("p", { className: "mt-1 text-sm text-muted-foreground max-w-sm mx-auto", children: "Analysis is generated from data inside the deal room \u2014 pitch deck, documents, and company profile." })
+    ] }) : briefLoading ? /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "mt-8 rounded-2xl border border-border/60 bg-card p-12 flex flex-col items-center gap-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(LoaderCircle, { className: "h-8 w-8 animate-spin text-brand" }),
+      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "text-sm text-muted-foreground", children: [
         "Generating AI analysis for ",
         selectedName,
         "\u2026"
       ] })
-    ] }) : briefError ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "mt-8 rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground", children: "Could not generate analysis. Please try again." }) : brief ? /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "mt-6 space-y-5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-6 relative overflow-hidden", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "absolute inset-0 bg-gradient-mesh opacity-[0.06]" }),
-        /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "relative", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "text-xs uppercase tracking-wider text-brand font-medium", children: "Investment thesis match" }),
-          /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "mt-3 flex items-baseline gap-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { className: "text-5xl font-semibold tabular-nums", children: brief.matchScore ?? "\u2014" }),
-            /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { className: "text-sm text-muted-foreground", children: "/ 100" })
+    ] }) : briefError ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-8 rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground", children: "Could not generate analysis. Please try again." }) : brief ? /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "mt-6 space-y-5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-6 relative overflow-hidden", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "absolute inset-0 bg-gradient-mesh opacity-[0.06]" }),
+        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "relative", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-xs uppercase tracking-wider text-brand font-medium", children: "Investment thesis match" }),
+          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "mt-3 flex items-baseline gap-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-5xl font-semibold tabular-nums", children: brief.matchScore ?? "\u2014" }),
+            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-sm text-muted-foreground", children: "/ 100" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "mt-3 h-2 rounded-full bg-muted overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "h-full bg-gradient-brand transition-all", style: {
+          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-3 h-2 rounded-full bg-muted overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "h-full bg-gradient-brand transition-all", style: {
             width: `${Math.min(100, brief.matchScore ?? 0)}%`
           } }) })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "grid md:grid-cols-3 gap-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "flex items-center gap-2 text-success text-sm font-semibold mb-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(CircleCheck, { className: "h-4 w-4" }),
+      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "grid md:grid-cols-3 gap-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-2 text-success text-sm font-semibold mb-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(CircleCheck, { className: "h-4 w-4" }),
             " Strengths"
           ] }),
-          (brief.strengths ?? []).length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "text-sm text-muted-foreground", children: "No data." }) : /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("ul", { className: "space-y-2", children: brief.strengths.map((s, i2) => /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("li", { className: "text-sm text-muted-foreground flex gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { className: "text-success shrink-0", children: "\xB7" }),
+          (brief.strengths ?? []).length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm text-muted-foreground", children: "No data." }) : /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("ul", { className: "space-y-2", children: brief.strengths.map((s, i2) => /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("li", { className: "text-sm text-muted-foreground flex gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-success shrink-0", children: "\xB7" }),
             s
           ] }, i2)) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "flex items-center gap-2 text-destructive text-sm font-semibold mb-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(TriangleAlert, { className: "h-4 w-4" }),
+        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-2 text-destructive text-sm font-semibold mb-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(TriangleAlert, { className: "h-4 w-4" }),
             " Risks"
           ] }),
-          (brief.risks ?? []).length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "text-sm text-muted-foreground", children: "No data." }) : /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("ul", { className: "space-y-2", children: brief.risks.map((r2, i2) => /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("li", { className: "text-sm text-muted-foreground flex gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { className: "text-destructive shrink-0", children: "\xB7" }),
+          (brief.risks ?? []).length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm text-muted-foreground", children: "No data." }) : /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("ul", { className: "space-y-2", children: brief.risks.map((r2, i2) => /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("li", { className: "text-sm text-muted-foreground flex gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-destructive shrink-0", children: "\xB7" }),
             r2
           ] }, i2)) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "flex items-center gap-2 text-brand text-sm font-semibold mb-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(Lightbulb, { className: "h-4 w-4" }),
+        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-2 text-brand text-sm font-semibold mb-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Lightbulb, { className: "h-4 w-4" }),
             " Mitigants"
           ] }),
-          (brief.mitigants ?? []).length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "text-sm text-muted-foreground", children: "No data." }) : /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("ul", { className: "space-y-2", children: brief.mitigants.map((m3, i2) => /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("li", { className: "text-sm text-muted-foreground flex gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("span", { className: "text-brand shrink-0", children: "\xB7" }),
+          (brief.mitigants ?? []).length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm text-muted-foreground", children: "No data." }) : /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("ul", { className: "space-y-2", children: brief.mitigants.map((m3, i2) => /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("li", { className: "text-sm text-muted-foreground flex gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-brand shrink-0", children: "\xB7" }),
             m3
           ] }, i2)) })
         ] })
       ] }),
-      brief.nextAction && /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-5", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "text-sm font-semibold mb-2", children: "Recommended next action" }),
-        /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("p", { className: "text-sm text-muted-foreground", children: brief.nextAction })
+      brief.nextAction && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-5", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold mb-2", children: "Recommended next action" }),
+        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("p", { className: "text-sm text-muted-foreground", children: brief.nextAction })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime77.jsx)("div", { className: "flex justify-end", children: /* @__PURE__ */ (0, import_jsx_runtime77.jsxs)("button", { onClick: downloadMemo, className: "inline-flex items-center gap-1.5 rounded-[10px] border border-border/60 px-3 py-1.5 text-sm hover:bg-accent", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime77.jsx)(Download, { className: "h-3.5 w-3.5" }),
+      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "flex justify-end", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: downloadMemo, className: "inline-flex items-center gap-1.5 rounded-[10px] border border-border/60 px-3 py-1.5 text-sm hover:bg-accent", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Download, { className: "h-3.5 w-3.5" }),
         " Download memo"
       ] }) })
     ] }) : null
   ] });
 }
-var import_jsx_runtime77, import_react66;
-var init_app_investor_analysis_BB5yqveW = __esm({
-  "dist/server/assets/app.investor.analysis-BB5yqveW.js"() {
+var import_jsx_runtime78, import_react67;
+var init_app_investor_analysis_DY5s_TdV = __esm({
+  "dist/server/assets/app.investor.analysis-DY5s-TdV.js"() {
     "use strict";
-    import_jsx_runtime77 = __toESM(require_jsx_runtime(), 1);
-    import_react66 = __toESM(require_react(), 1);
+    import_jsx_runtime78 = __toESM(require_jsx_runtime(), 1);
+    import_react67 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_deal_brief_fn_D15ylBUr();
     init_dist7();
     init_clsx();
@@ -70170,13 +70426,13 @@ var init_app_investor_analysis_BB5yqveW = __esm({
   }
 });
 
-// dist/server/assets/app.deal-room._id-CJCHVxIK.js
-var app_deal_room_id_CJCHVxIK_exports = {};
-__export(app_deal_room_id_CJCHVxIK_exports, {
+// dist/server/assets/app.deal-room._id-DTpIlyeK.js
+var app_deal_room_id_DTpIlyeK_exports = {};
+__export(app_deal_room_id_DTpIlyeK_exports, {
   component: () => DealRoom
 });
 function AIChat({ scope, starters, initialAssistant, className = "", compact = false }) {
-  const [msgs, setMsgs] = (0, import_react67.useState)(() => [
+  const [msgs, setMsgs] = (0, import_react68.useState)(() => [
     {
       id: "m0",
       role: "assistant",
@@ -70184,10 +70440,10 @@ function AIChat({ scope, starters, initialAssistant, className = "", compact = f
       ts: Date.now()
     }
   ]);
-  const [input, setInput] = (0, import_react67.useState)("");
-  const [thinking, setThinking] = (0, import_react67.useState)(false);
-  const endRef = (0, import_react67.useRef)(null);
-  (0, import_react67.useEffect)(() => {
+  const [input, setInput] = (0, import_react68.useState)("");
+  const [thinking, setThinking] = (0, import_react68.useState)(false);
+  const endRef = (0, import_react68.useRef)(null);
+  (0, import_react68.useEffect)(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [msgs, thinking]);
   const send = async (text) => {
@@ -70209,27 +70465,27 @@ User prompt: ${t}` });
     setThinking(false);
   };
   const showStarters = msgs.length <= 1 && starters && starters.length > 0;
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: `flex flex-col h-full bg-background ${className}`, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "flex-1 overflow-y-auto", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: `mx-auto ${compact ? "max-w-full px-4" : "max-w-3xl px-6"} py-6 space-y-5`, children: [
-      msgs.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: `flex gap-3 ${m3.role === "user" ? "flex-row-reverse" : ""}`, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: `grid h-8 w-8 place-items-center rounded-full shrink-0 ${m3.role === "user" ? "bg-gradient-brand text-brand-foreground" : "bg-accent text-foreground border border-border/60"}`, children: m3.role === "user" ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(User, { className: "h-4 w-4" }) : /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Sparkles, { className: "h-4 w-4 text-brand" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: `max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m3.role === "user" ? "bg-gradient-brand text-brand-foreground" : "bg-card border border-border/60 shadow-card"}`, children: m3.content })
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: `flex flex-col h-full bg-background ${className}`, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "flex-1 overflow-y-auto", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: `mx-auto ${compact ? "max-w-full px-4" : "max-w-3xl px-6"} py-6 space-y-5`, children: [
+      msgs.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: `flex gap-3 ${m3.role === "user" ? "flex-row-reverse" : ""}`, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: `grid h-8 w-8 place-items-center rounded-full shrink-0 ${m3.role === "user" ? "bg-gradient-brand text-brand-foreground" : "bg-accent text-foreground border border-border/60"}`, children: m3.role === "user" ? /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(User, { className: "h-4 w-4" }) : /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Sparkles, { className: "h-4 w-4 text-brand" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: `max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m3.role === "user" ? "bg-gradient-brand text-brand-foreground" : "bg-card border border-border/60 shadow-card"}`, children: m3.content })
       ] }, m3.id)),
-      thinking && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex gap-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "grid h-8 w-8 place-items-center rounded-full bg-accent border border-border/60", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Sparkles, { className: "h-4 w-4 text-brand animate-pulse" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-2xl px-4 py-3 bg-card border border-border/60 shadow-card inline-flex items-center gap-2 text-xs text-muted-foreground", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
+      thinking && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex gap-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "grid h-8 w-8 place-items-center rounded-full bg-accent border border-border/60", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Sparkles, { className: "h-4 w-4 text-brand animate-pulse" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-2xl px-4 py-3 bg-card border border-border/60 shadow-card inline-flex items-center gap-2 text-xs text-muted-foreground", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }),
           " Thinking\u2026"
         ] })
       ] }),
-      showStarters && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "grid sm:grid-cols-2 gap-2 pt-2", children: starters.map((s) => /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => send(s), className: "text-left rounded-xl border border-border/60 bg-card p-3 text-sm hover:border-brand/40 hover:bg-accent transition-colors shadow-card", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Sparkles, { className: "h-3.5 w-3.5 text-brand mb-1.5" }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { children: s })
+      showStarters && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "grid sm:grid-cols-2 gap-2 pt-2", children: starters.map((s) => /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => send(s), className: "text-left rounded-xl border border-border/60 bg-card p-3 text-sm hover:border-brand/40 hover:bg-accent transition-colors shadow-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Sparkles, { className: "h-3.5 w-3.5 text-brand mb-1.5" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { children: s })
       ] }, s)) }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { ref: endRef })
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { ref: endRef })
     ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "border-t border-border/60 bg-background/80 backdrop-blur-xl", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: `mx-auto ${compact ? "max-w-full px-4" : "max-w-3xl px-6"} py-3.5`, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "border-t border-border/60 bg-background/80 backdrop-blur-xl", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: `mx-auto ${compact ? "max-w-full px-4" : "max-w-3xl px-6"} py-3.5`, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)(
         "form",
         {
           onSubmit: (e) => {
@@ -70238,7 +70494,7 @@ User prompt: ${t}` });
           },
           className: "flex items-end gap-2 rounded-xl border border-border/60 bg-card p-2 shadow-card focus-within:border-brand/40 focus-within:ring-2 focus-within:ring-brand/10",
           children: [
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(
               "textarea",
               {
                 value: input,
@@ -70254,20 +70510,20 @@ User prompt: ${t}` });
                 className: "flex-1 resize-none bg-transparent px-2 py-1.5 text-sm placeholder:text-muted-foreground/60 focus:outline-none max-h-32"
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { type: "submit", disabled: !input.trim() || thinking, className: "grid h-8 w-8 place-items-center rounded-md bg-gradient-brand text-brand-foreground shadow-glow disabled:opacity-40", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Send, { className: "h-3.5 w-3.5" }) })
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { type: "submit", disabled: !input.trim() || thinking, className: "grid h-8 w-8 place-items-center rounded-md bg-gradient-brand text-brand-foreground shadow-glow disabled:opacity-40", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Send, { className: "h-3.5 w-3.5" }) })
           ]
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-1.5 text-[10px] text-muted-foreground text-center", children: "AI may be inaccurate \u2014 verify with your legal & finance team." })
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-1.5 text-[10px] text-muted-foreground text-center", children: "AI may be inaccurate \u2014 verify with your legal & finance team." })
     ] }) })
   ] });
 }
 function DealRoomChat() {
   const { t } = useI18n();
-  const [messages, setMessages] = (0, import_react67.useState)([]);
-  const [draft, setDraft] = (0, import_react67.useState)("");
-  const scrollRef = (0, import_react67.useRef)(null);
-  (0, import_react67.useEffect)(() => {
+  const [messages, setMessages] = (0, import_react68.useState)([]);
+  const [draft, setDraft] = (0, import_react68.useState)("");
+  const scrollRef = (0, import_react68.useRef)(null);
+  (0, import_react68.useEffect)(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
   const send = () => {
@@ -70277,41 +70533,41 @@ function DealRoomChat() {
     setMessages((xs) => [...xs, { id: crypto.randomUUID(), author: "You", initials: "ME", role: "Founder", text, time: now, me: true }]);
     setDraft("");
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex flex-col h-full", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "px-5 py-3 border-b border-border/60 flex items-center justify-between", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "flex items-center gap-2", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold", children: "Team Chat" }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "text-[11px] text-muted-foreground inline-flex items-center gap-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Users, { className: "h-3 w-3" }),
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex flex-col h-full", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "px-5 py-3 border-b border-border/60 flex items-center justify-between", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "flex items-center gap-2", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold", children: "Team Chat" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "text-[11px] text-muted-foreground inline-flex items-center gap-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Users, { className: "h-3 w-3" }),
         " Deal room team channel"
       ] })
     ] }) }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { ref: scrollRef, className: "flex-1 overflow-y-auto px-5 py-4 space-y-3", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { ref: scrollRef, className: "flex-1 overflow-y-auto px-5 py-4 space-y-3", children: [
       messages.map((m3, i2) => {
         const prev = messages[i2 - 1];
         const grouped = prev && prev.author === m3.author;
-        return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: cn3("flex gap-3", m3.me ? "flex-row-reverse" : ""), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: cn3("h-8 w-8 shrink-0", grouped && "invisible"), children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: cn3("grid h-8 w-8 place-items-center rounded-full text-[10px] font-semibold", m3.me ? "bg-gradient-brand text-brand-foreground" : "bg-accent"), children: m3.initials }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: cn3("max-w-[72%]", m3.me && "items-end flex flex-col"), children: [
-            !grouped && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: cn3("flex items-center gap-2 mb-1 text-[11px]", m3.me && "flex-row-reverse"), children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "font-medium", children: m3.author }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: cn3(
+        return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: cn3("flex gap-3", m3.me ? "flex-row-reverse" : ""), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: cn3("h-8 w-8 shrink-0", grouped && "invisible"), children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: cn3("grid h-8 w-8 place-items-center rounded-full text-[10px] font-semibold", m3.me ? "bg-gradient-brand text-brand-foreground" : "bg-accent"), children: m3.initials }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: cn3("max-w-[72%]", m3.me && "items-end flex flex-col"), children: [
+            !grouped && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: cn3("flex items-center gap-2 mb-1 text-[11px]", m3.me && "flex-row-reverse"), children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "font-medium", children: m3.author }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: cn3(
                 "text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded",
                 m3.role === "Investor" ? "bg-brand/10 text-brand" : m3.role === "Founder" ? "bg-success/10 text-success" : "bg-violet/10 text-violet"
               ), children: m3.role }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-muted-foreground", children: m3.time })
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "text-muted-foreground", children: m3.time })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: cn3(
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: cn3(
               "rounded-2xl px-3.5 py-2 text-sm",
               m3.me ? "bg-gradient-brand text-brand-foreground rounded-tr-sm" : "bg-accent rounded-tl-sm"
             ), children: m3.text })
           ] })
         ] }, m3.id);
       }),
-      messages.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm text-muted-foreground", children: "No messages yet. Start the team conversation." })
+      messages.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm text-muted-foreground", children: "No messages yet. Start the team conversation." })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "px-4 py-3 border-t border-border/60 bg-background", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-end gap-2 rounded-xl border border-border/60 bg-card px-3 py-2 focus-within:border-brand/50 focus-within:ring-2 focus-within:ring-brand/10 transition", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { className: "text-muted-foreground hover:text-foreground p-1", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Paperclip, { className: "h-4 w-4" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "px-4 py-3 border-t border-border/60 bg-background", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-end gap-2 rounded-xl border border-border/60 bg-card px-3 py-2 focus-within:border-brand/50 focus-within:ring-2 focus-within:ring-brand/10 transition", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { className: "text-muted-foreground hover:text-foreground p-1", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Paperclip, { className: "h-4 w-4" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(
         "textarea",
         {
           rows: 1,
@@ -70327,9 +70583,9 @@ function DealRoomChat() {
           className: "flex-1 bg-transparent text-sm resize-none outline-none max-h-32 py-1"
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { className: "text-muted-foreground hover:text-foreground p-1", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Smile, { className: "h-4 w-4" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: send, disabled: !draft.trim(), className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs disabled:opacity-50", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Send, { className: "h-3.5 w-3.5" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { className: "text-muted-foreground hover:text-foreground p-1", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Smile, { className: "h-4 w-4" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: send, disabled: !draft.trim(), className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs disabled:opacity-50", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Send, { className: "h-3.5 w-3.5" }),
         " ",
         t("chat.send")
       ] })
@@ -70338,10 +70594,10 @@ function DealRoomChat() {
 }
 function DDChecklist() {
   const { t } = useI18n();
-  const [items, setItems] = (0, import_react67.useState)([]);
-  const [filter, setFilter] = (0, import_react67.useState)("all");
-  const filtered = (0, import_react67.useMemo)(() => filter === "all" ? items : items.filter((i2) => i2.status === filter), [items, filter]);
-  const byCategory = (0, import_react67.useMemo)(() => {
+  const [items, setItems] = (0, import_react68.useState)([]);
+  const [filter, setFilter] = (0, import_react68.useState)("all");
+  const filtered = (0, import_react68.useMemo)(() => filter === "all" ? items : items.filter((i2) => i2.status === filter), [items, filter]);
+  const byCategory = (0, import_react68.useMemo)(() => {
     const m3 = /* @__PURE__ */ new Map();
     filtered.forEach((i2) => {
       if (!m3.has(i2.category)) m3.set(i2.category, []);
@@ -70353,11 +70609,11 @@ function DDChecklist() {
   const done = items.filter((i2) => i2.status === "done").length;
   const overall = total > 0 ? Math.round(done / total * 100) : 0;
   const cycleStatus = (id) => setItems((xs) => xs.map((x3) => x3.id === id ? { ...x3, status: cycle2[x3.status] } : x3));
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "p-8 max-w-5xl mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-end justify-between gap-4 flex-wrap", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("h2", { className: "text-xl font-semibold tracking-tight", children: t("checklist.title") }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("p", { className: "text-sm text-muted-foreground mt-1", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "p-8 max-w-5xl mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-end justify-between gap-4 flex-wrap", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("h2", { className: "text-xl font-semibold tracking-tight", children: t("checklist.title") }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("p", { className: "text-sm text-muted-foreground mt-1", children: [
           done,
           " of ",
           total,
@@ -70368,16 +70624,16 @@ function DDChecklist() {
           "%"
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Plus, { className: "h-4 w-4" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Plus, { className: "h-4 w-4" }),
         " ",
         t("checklist.add")
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-3 h-1.5 rounded-full bg-muted overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "h-full bg-gradient-brand transition-all", style: { width: `${overall}%` } }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "mt-5 flex flex-wrap items-center gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Funnel, { className: "h-3.5 w-3.5 text-muted-foreground" }),
-      ["all", "todo", "in_progress", "done", "blocked"].map((f3) => /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-3 h-1.5 rounded-full bg-muted overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "h-full bg-gradient-brand transition-all", style: { width: `${overall}%` } }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "mt-5 flex flex-wrap items-center gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Funnel, { className: "h-3.5 w-3.5 text-muted-foreground" }),
+      ["all", "todo", "in_progress", "done", "blocked"].map((f3) => /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(
         "button",
         {
           onClick: () => setFilter(f3),
@@ -70390,30 +70646,30 @@ function DDChecklist() {
         f3
       ))
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-5 space-y-4", children: byCategory.map(([cat, list]) => {
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-5 space-y-4", children: byCategory.map(([cat, list]) => {
       const catDone = list.filter((i2) => i2.status === "done").length;
-      return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card shadow-card overflow-hidden", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "px-5 py-3 border-b border-border/60 flex items-center justify-between", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold", children: cat }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("span", { className: "text-xs text-muted-foreground tabular-nums", children: [
+      return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card shadow-card overflow-hidden", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "px-5 py-3 border-b border-border/60 flex items-center justify-between", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold", children: cat }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("span", { className: "text-xs text-muted-foreground tabular-nums", children: [
             catDone,
             "/",
             list.length
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "divide-y divide-border/60", children: list.map((i2) => {
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "divide-y divide-border/60", children: list.map((i2) => {
           const M2 = statusMeta[i2.status];
-          return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "grid grid-cols-12 items-center px-5 py-3 hover:bg-accent/30 gap-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { onClick: () => cycleStatus(i2.id), className: cn3("col-span-1", M2.tint), title: M2.label, children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(M2.icon, { className: "h-5 w-5" }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "col-span-6 min-w-0", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: cn3("text-sm font-medium truncate", i2.status === "done" && "text-muted-foreground line-through"), children: i2.title }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: cn3("text-[11px] mt-0.5", M2.tint), children: M2.label })
+          return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "grid grid-cols-12 items-center px-5 py-3 hover:bg-accent/30 gap-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { onClick: () => cycleStatus(i2.id), className: cn3("col-span-1", M2.tint), title: M2.label, children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(M2.icon, { className: "h-5 w-5" }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "col-span-6 min-w-0", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: cn3("text-sm font-medium truncate", i2.status === "done" && "text-muted-foreground line-through"), children: i2.title }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: cn3("text-[11px] mt-0.5", M2.tint), children: M2.label })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "col-span-3 flex items-center gap-2 min-w-0", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "grid h-6 w-6 place-items-center rounded-full bg-accent text-[10px] font-semibold shrink-0", children: i2.ownerInitials }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-xs text-muted-foreground truncate", children: i2.owner })
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "col-span-3 flex items-center gap-2 min-w-0", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "grid h-6 w-6 place-items-center rounded-full bg-accent text-[10px] font-semibold shrink-0", children: i2.ownerInitials }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-xs text-muted-foreground truncate", children: i2.owner })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "col-span-2 text-end text-xs text-muted-foreground tabular-nums", children: i2.due })
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "col-span-2 text-end text-xs text-muted-foreground tabular-nums", children: i2.due })
           ] }, i2.id);
         }) })
       ] }, cat);
@@ -70427,9 +70683,9 @@ function Dropzone({
   dealRoomId,
   onUploadComplete
 }) {
-  const [isOver, setIsOver] = (0, import_react67.useState)(false);
-  const [files, setFiles] = (0, import_react67.useState)([]);
-  const inputRef = (0, import_react67.useRef)(null);
+  const [isOver, setIsOver] = (0, import_react68.useState)(false);
+  const [files, setFiles] = (0, import_react68.useState)([]);
+  const inputRef = (0, import_react68.useRef)(null);
   const { user } = useAuth();
   const handleFiles = (list) => {
     if (!list || list.length === 0) return;
@@ -70480,8 +70736,8 @@ function Dropzone({
     setIsOver(false);
     handleFiles(e.dataTransfer.files);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "space-y-3", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "space-y-3", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)(
       "div",
       {
         onDragOver: (e) => {
@@ -70496,10 +70752,10 @@ function Dropzone({
           isOver ? "border-brand bg-brand/5" : "border-border bg-muted/30 hover:border-brand/50 hover:bg-accent/40"
         ),
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "grid h-12 w-12 place-items-center rounded-full bg-gradient-brand text-brand-foreground mx-auto shadow-glow", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Upload, { className: "h-5 w-5" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-3 text-sm font-medium", children: title }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-xs text-muted-foreground mt-1", children: hint }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "grid h-12 w-12 place-items-center rounded-full bg-gradient-brand text-brand-foreground mx-auto shadow-glow", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Upload, { className: "h-5 w-5" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-3 text-sm font-medium", children: title }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-xs text-muted-foreground mt-1", children: hint }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(
             "input",
             {
               ref: inputRef,
@@ -70512,19 +70768,19 @@ function Dropzone({
         ]
       }
     ),
-    files.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "rounded-xl border border-border/60 bg-card shadow-card divide-y divide-border/60 overflow-hidden", children: files.map((f3) => /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-3 px-4 py-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "grid h-8 w-8 place-items-center rounded-md bg-accent shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(FileText, { className: "h-4 w-4 text-brand" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "min-w-0 flex-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center justify-between gap-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-medium truncate", children: f3.name }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "text-[11px] text-muted-foreground tabular-nums shrink-0", children: [
+    files.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "rounded-xl border border-border/60 bg-card shadow-card divide-y divide-border/60 overflow-hidden", children: files.map((f3) => /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center gap-3 px-4 py-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "grid h-8 w-8 place-items-center rounded-md bg-accent shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(FileText, { className: "h-4 w-4 text-brand" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "min-w-0 flex-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center justify-between gap-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-medium truncate", children: f3.name }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "text-[11px] text-muted-foreground tabular-nums shrink-0", children: [
             (f3.size / 1024).toFixed(0),
             " KB"
           ] })
         ] }),
-        f3.error ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-1.5 text-xs text-destructive", children: "Upload failed \u2014 try again" }) : /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-1.5 h-1 rounded-full bg-muted overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "h-full bg-gradient-brand transition-all", style: { width: `${f3.progress}%` } }) })
+        f3.error ? /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-1.5 text-xs text-destructive", children: "Upload failed \u2014 try again" }) : /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-1.5 h-1 rounded-full bg-muted overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "h-full bg-gradient-brand transition-all", style: { width: `${f3.progress}%` } }) })
       ] }),
-      f3.error ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(CircleX, { className: "h-4 w-4 text-destructive shrink-0" }) : f3.progress === 100 ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(CircleCheck, { className: "h-4 w-4 text-success shrink-0" }) : /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+      f3.error ? /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(CircleX, { className: "h-4 w-4 text-destructive shrink-0" }) : f3.progress === 100 ? /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(CircleCheck, { className: "h-4 w-4 text-success shrink-0" }) : /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(
         "button",
         {
           onClick: (e) => {
@@ -70532,7 +70788,7 @@ function Dropzone({
             setFiles((xs) => xs.filter((x3) => x3.id !== f3.id));
           },
           className: "text-muted-foreground hover:text-foreground shrink-0",
-          children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(X2, { className: "h-4 w-4" })
+          children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(X2, { className: "h-4 w-4" })
         }
       )
     ] }, f3.id)) })
@@ -70581,18 +70837,18 @@ function ReviewTab({
   currentUserRole,
   startupId
 }) {
-  return currentUserRole === "investor" ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(InvestorReview, { dealRoomId, startupId }) : /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(FounderReview, { dealRoomId });
+  return currentUserRole === "investor" ? /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(InvestorReview, { dealRoomId, startupId }) : /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(FounderReview, { dealRoomId });
 }
 function InvestorReview({ dealRoomId, startupId }) {
   const { user } = useAuth();
   const queryClient2 = useQueryClient();
   const { data: decision } = useLatestDecision(dealRoomId);
-  const [sections3, setSections] = (0, import_react67.useState)(initSections(null));
-  const [activeDoc, setActiveDoc] = (0, import_react67.useState)(DOCS[0]);
-  const [docNotes, setDocNotes] = (0, import_react67.useState)({});
-  const [reviewedDocs, setReviewedDocs] = (0, import_react67.useState)({});
-  const prevIdRef = (0, import_react67.useRef)(void 0);
-  (0, import_react67.useEffect)(() => {
+  const [sections3, setSections] = (0, import_react68.useState)(initSections(null));
+  const [activeDoc, setActiveDoc] = (0, import_react68.useState)(DOCS[0]);
+  const [docNotes, setDocNotes] = (0, import_react68.useState)({});
+  const [reviewedDocs, setReviewedDocs] = (0, import_react68.useState)({});
+  const prevIdRef = (0, import_react68.useRef)(void 0);
+  (0, import_react68.useEffect)(() => {
     if (decision === void 0) return;
     const newId = decision?.id ?? null;
     if (newId !== prevIdRef.current) {
@@ -70657,26 +70913,26 @@ function InvestorReview({ dealRoomId, startupId }) {
     queryClient2.invalidateQueries({ queryKey: ["decision", dealRoomId] });
   };
   const currentDecisionStatus = decision?.status ? DB_TO_DECISION[decision.status] : void 0;
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6 p-6 lg:p-8", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "space-y-5 min-w-0", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("h2", { className: "text-2xl font-semibold tracking-tight", children: "Investment Review" }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("p", { className: "text-sm text-muted-foreground mt-1", children: "Complete each section before making a final decision." }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "mt-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center justify-between text-xs text-muted-foreground mb-1.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("span", { children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6 p-6 lg:p-8", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "space-y-5 min-w-0", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("h2", { className: "text-2xl font-semibold tracking-tight", children: "Investment Review" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("p", { className: "text-sm text-muted-foreground mt-1", children: "Complete each section before making a final decision." }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "mt-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center justify-between text-xs text-muted-foreground mb-1.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("span", { children: [
               completed,
               " of 6 sections reviewed"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("span", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("span", { children: [
               Math.round(completed / 6 * 100),
               "%"
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "h-2 rounded-full bg-muted overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "h-full bg-gradient-brand transition-all", style: { width: `${completed / 6 * 100}%` } }) })
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "h-2 rounded-full bg-muted overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "h-full bg-gradient-brand transition-all", style: { width: `${completed / 6 * 100}%` } }) })
         ] })
       ] }),
-      SECTION_META.map((meta) => /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+      SECTION_META.map((meta) => /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(
         ReviewSection,
         {
           meta,
@@ -70686,9 +70942,9 @@ function InvestorReview({ dealRoomId, startupId }) {
         },
         meta.key
       )),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(DecisionZone, { avg, currentStatus: currentDecisionStatus, onDecision: handleDecision })
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(DecisionZone, { avg, currentStatus: currentDecisionStatus, onDecision: handleDecision })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "lg:sticky lg:top-4 self-start", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "lg:sticky lg:top-4 self-start", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(
       DocumentPreview,
       {
         activeDoc,
@@ -70707,7 +70963,7 @@ function ReviewSection({
   onChange,
   onSave
 }) {
-  const [open, setOpen] = (0, import_react67.useState)(false);
+  const [open, setOpen] = (0, import_react68.useState)(false);
   const wordCount = state.notes.trim().split(/\s+/).filter(Boolean).length;
   const overLimit = wordCount > 500;
   const done = state.status === "Done";
@@ -70716,12 +70972,12 @@ function ReviewSection({
     if (updated.status === "Not reviewed") updated.status = "In review";
     onChange(updated);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: cn3("rounded-2xl border bg-card shadow-card overflow-hidden transition-colors", done ? "border-success/40" : "border-border/60"), children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => setOpen((o3) => !o3), className: cn3("w-full flex items-center gap-3 px-5 py-4 text-left", done && "bg-success/5"), children: [
-      open ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(ChevronDown, { className: "h-4 w-4 text-muted-foreground" }) : /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(ChevronRight, { className: "h-4 w-4 text-muted-foreground" }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold", children: meta.label }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "text-xs text-muted-foreground mt-0.5", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: cn3("rounded-2xl border bg-card shadow-card overflow-hidden transition-colors", done ? "border-success/40" : "border-border/60"), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => setOpen((o3) => !o3), className: cn3("w-full flex items-center gap-3 px-5 py-4 text-left", done && "bg-success/5"), children: [
+      open ? /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(ChevronDown, { className: "h-4 w-4 text-muted-foreground" }) : /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(ChevronRight, { className: "h-4 w-4 text-muted-foreground" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold", children: meta.label }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "text-xs text-muted-foreground mt-0.5", children: [
           state.rating > 0 ? `${state.rating}/5 stars` : "Not rated",
           " \xB7 ",
           Object.values(state.checks).filter(Boolean).length,
@@ -70730,12 +70986,12 @@ function ReviewSection({
           " checks"
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(StatusPill, { status: state.status })
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(StatusPill, { status: state.status })
     ] }),
-    open && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "px-5 pb-5 space-y-4 border-t border-border/60 pt-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(StarRating, { value: state.rating, onChange: (v3) => bump({ rating: v3 }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+    open && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "px-5 pb-5 space-y-4 border-t border-border/60 pt-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(StarRating, { value: state.rating, onChange: (v3) => bump({ rating: v3 }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(
           "textarea",
           {
             value: state.notes,
@@ -70747,13 +71003,13 @@ function ReviewSection({
             )
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: cn3("text-[11px] mt-1 flex justify-end", overLimit ? "text-destructive" : "text-muted-foreground"), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: cn3("text-[11px] mt-1 flex justify-end", overLimit ? "text-destructive" : "text-muted-foreground"), children: [
           wordCount,
           " / 500 words"
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "grid sm:grid-cols-2 gap-2", children: meta.checks.map((c3) => /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("label", { className: "flex items-center gap-2 text-sm rounded-md border border-border/60 px-3 py-2 hover:bg-accent/40 cursor-pointer", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "grid sm:grid-cols-2 gap-2", children: meta.checks.map((c3) => /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("label", { className: "flex items-center gap-2 text-sm rounded-md border border-border/60 px-3 py-2 hover:bg-accent/40 cursor-pointer", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(
           "input",
           {
             type: "checkbox",
@@ -70762,20 +71018,20 @@ function ReviewSection({
             className: "h-4 w-4 rounded border-border accent-[hsl(var(--brand))]"
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { children: c3 })
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { children: c3 })
       ] }, c3)) }),
-      meta.key === "qa" && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { className: "text-xs inline-flex items-center gap-1 text-brand hover:underline", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Download, { className: "h-3 w-3" }),
+      meta.key === "qa" && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { className: "text-xs inline-flex items-center gap-1 text-brand hover:underline", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Download, { className: "h-3 w-3" }),
         " Download Q&A Report"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "flex justify-end pt-2 border-t border-border/40", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "flex justify-end pt-2 border-t border-border/40", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)(
         "button",
         {
           onClick: () => onSave({ ...state, status: "Done" }),
           disabled: overLimit,
           className: "inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-50",
           children: [
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(CircleCheck, { className: "h-4 w-4" }),
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(CircleCheck, { className: "h-4 w-4" }),
             " Mark as reviewed"
           ]
         }
@@ -70785,12 +71041,12 @@ function ReviewSection({
 }
 function StatusPill({ status }) {
   const tone2 = status === "Done" ? "bg-success/15 text-success" : status === "In review" ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground";
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: cn3("text-[10px] px-2 py-0.5 rounded-full font-medium", tone2), children: status });
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: cn3("text-[10px] px-2 py-0.5 rounded-full font-medium", tone2), children: status });
 }
 function StarRating({ value, onChange }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-1", children: [
-    [1, 2, 3, 4, 5].map((n2) => /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { onClick: () => onChange(n2), className: "p-0.5", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Star, { className: cn3("h-5 w-5 transition-colors", n2 <= value ? "fill-warning text-warning" : "text-muted-foreground/40") }) }, n2)),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "ml-2 text-xs text-muted-foreground", children: value > 0 ? `${value}/5` : "Tap to rate" })
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center gap-1", children: [
+    [1, 2, 3, 4, 5].map((n2) => /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { onClick: () => onChange(n2), className: "p-0.5", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Star, { className: cn3("h-5 w-5 transition-colors", n2 <= value ? "fill-warning text-warning" : "text-muted-foreground/40") }) }, n2)),
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "ml-2 text-xs text-muted-foreground", children: value > 0 ? `${value}/5` : "Tap to rate" })
   ] });
 }
 function DecisionZone({
@@ -70798,32 +71054,32 @@ function DecisionZone({
   currentStatus,
   onDecision
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-2xl border-2 border-dashed border-destructive/40 bg-destructive/5 p-6 space-y-5", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(TriangleAlert, { className: "h-5 w-5 text-destructive" }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold", children: "Decision Zone" }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-xs text-muted-foreground", children: "Your decision will be visible to the founder immediately." })
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-2xl border-2 border-dashed border-destructive/40 bg-destructive/5 p-6 space-y-5", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(TriangleAlert, { className: "h-5 w-5 text-destructive" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold", children: "Decision Zone" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-xs text-muted-foreground", children: "Your decision will be visible to the founder immediately." })
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-[10px] bg-card border border-border/60 p-4 flex items-center justify-between", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-xs uppercase tracking-wider text-muted-foreground font-semibold", children: "Overall deal score" }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "text-3xl font-semibold mt-1", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-[10px] bg-card border border-border/60 p-4 flex items-center justify-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-xs uppercase tracking-wider text-muted-foreground font-semibold", children: "Overall deal score" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "text-3xl font-semibold mt-1", children: [
           avg.toFixed(1),
           " ",
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-base text-muted-foreground font-normal", children: "/ 5.0" })
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "text-base text-muted-foreground font-normal", children: "/ 5.0" })
         ] })
       ] }),
-      currentStatus && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: `text-xs px-3 py-1.5 rounded-full bg-${decisionTone(currentStatus)}/15 text-${decisionTone(currentStatus)} font-medium`, children: currentStatus })
+      currentStatus && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: `text-xs px-3 py-1.5 rounded-full bg-${decisionTone(currentStatus)}/15 text-${decisionTone(currentStatus)} font-medium`, children: currentStatus })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "grid gap-2.5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(DecisionButton, { type: "Under Review", icon: Clock, tone: "brand", label: "Under Review", sub: "Still evaluating", onDecision }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(DecisionButton, { type: "Request More Info", icon: FileQuestionMark, tone: "warning", label: "Request More Info", sub: "Ask the founder for specifics", onDecision }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(DecisionButton, { type: "Move to Partner Review", icon: Users, tone: "violet", label: "Move to Partner Review", sub: "Escalate to your partnership", onDecision }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(DecisionButton, { type: "Term Sheet Ready", icon: FileCheck, tone: "success", label: "Term Sheet Ready", sub: "Notify founder you're ready to proceed", onDecision }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(DecisionButton, { type: "Not Proceeding", icon: CircleX, tone: "destructive", label: "Not Proceeding", sub: "Decline with reason", onDecision }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(DecisionButton, { type: "Exit", icon: LogOut, tone: "muted-foreground", label: "Exit Deal Room", sub: "Remove your access", onDecision })
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "grid gap-2.5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(DecisionButton, { type: "Under Review", icon: Clock, tone: "brand", label: "Under Review", sub: "Still evaluating", onDecision }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(DecisionButton, { type: "Request More Info", icon: FileQuestionMark, tone: "warning", label: "Request More Info", sub: "Ask the founder for specifics", onDecision }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(DecisionButton, { type: "Move to Partner Review", icon: Users, tone: "violet", label: "Move to Partner Review", sub: "Escalate to your partnership", onDecision }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(DecisionButton, { type: "Term Sheet Ready", icon: FileCheck, tone: "success", label: "Term Sheet Ready", sub: "Notify founder you're ready to proceed", onDecision }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(DecisionButton, { type: "Not Proceeding", icon: CircleX, tone: "destructive", label: "Not Proceeding", sub: "Decline with reason", onDecision }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(DecisionButton, { type: "Exit", icon: LogOut, tone: "muted-foreground", label: "Exit Deal Room", sub: "Remove your access", onDecision })
     ] })
   ] });
 }
@@ -70835,12 +71091,12 @@ function DecisionButton({
   sub,
   onDecision
 }) {
-  const [openForm, setOpenForm] = (0, import_react67.useState)(false);
-  const [loading, setLoading] = (0, import_react67.useState)(false);
-  const [reason, setReason] = (0, import_react67.useState)("Stage too early");
-  const [message2, setMessage] = (0, import_react67.useState)("");
-  const [what, setWhat] = (0, import_react67.useState)("");
-  const [deadline, setDeadline] = (0, import_react67.useState)("");
+  const [openForm, setOpenForm] = (0, import_react68.useState)(false);
+  const [loading, setLoading] = (0, import_react68.useState)(false);
+  const [reason, setReason] = (0, import_react68.useState)("Stage too early");
+  const [message2, setMessage] = (0, import_react68.useState)("");
+  const [what, setWhat] = (0, import_react68.useState)("");
+  const [deadline, setDeadline] = (0, import_react68.useState)("");
   const requiresForm = type === "Request More Info" || type === "Not Proceeding" || type === "Exit";
   const requiresConfirm = type === "Term Sheet Ready";
   const submit = async () => {
@@ -70871,8 +71127,8 @@ function DecisionButton({
       }
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)(
       "button",
       {
         onClick: handleClick,
@@ -70882,40 +71138,40 @@ function DecisionButton({
           `border-${tone2}/40 bg-${tone2}/10 hover:bg-${tone2}/15 text-${tone2}`
         ),
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Icon2, { className: "h-5 w-5 shrink-0" }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold leading-tight", children: label }),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-[11px] opacity-80", children: sub })
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Icon2, { className: "h-5 w-5 shrink-0" }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex-1", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold leading-tight", children: label }),
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-[11px] opacity-80", children: sub })
           ] })
         ]
       }
     ),
-    openForm && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "mt-2 rounded-[10px] border border-border/60 bg-card p-4 space-y-3", children: [
-      type === "Request More Info" && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(import_jsx_runtime78.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("label", { className: "text-xs font-medium", children: "What information is needed?" }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("textarea", { value: what, onChange: (e) => setWhat(e.target.value), className: "mt-1 w-full min-h-[80px] rounded-[10px] border border-border/60 bg-background p-2 text-sm" })
+    openForm && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "mt-2 rounded-[10px] border border-border/60 bg-card p-4 space-y-3", children: [
+      type === "Request More Info" && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)(import_jsx_runtime79.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("label", { className: "text-xs font-medium", children: "What information is needed?" }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("textarea", { value: what, onChange: (e) => setWhat(e.target.value), className: "mt-1 w-full min-h-[80px] rounded-[10px] border border-border/60 bg-background p-2 text-sm" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("label", { className: "text-xs font-medium", children: "Deadline" }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("input", { type: "date", value: deadline, onChange: (e) => setDeadline(e.target.value), className: "mt-1 w-full rounded-[10px] border border-border/60 bg-background p-2 text-sm" })
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("label", { className: "text-xs font-medium", children: "Deadline" }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("input", { type: "date", value: deadline, onChange: (e) => setDeadline(e.target.value), className: "mt-1 w-full rounded-[10px] border border-border/60 bg-background p-2 text-sm" })
         ] })
       ] }),
-      (type === "Not Proceeding" || type === "Exit") && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(import_jsx_runtime78.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("label", { className: "text-xs font-medium", children: "Reason" }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("select", { value: reason, onChange: (e) => setReason(e.target.value), className: "mt-1 w-full rounded-[10px] border border-border/60 bg-background p-2 text-sm", children: ["Stage too early", "Outside thesis", "Team concerns", "Market concerns", "Financial concerns", "Other"].map((r2) => /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("option", { children: r2 }, r2)) })
+      (type === "Not Proceeding" || type === "Exit") && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)(import_jsx_runtime79.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("label", { className: "text-xs font-medium", children: "Reason" }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("select", { value: reason, onChange: (e) => setReason(e.target.value), className: "mt-1 w-full rounded-[10px] border border-border/60 bg-background p-2 text-sm", children: ["Stage too early", "Outside thesis", "Team concerns", "Market concerns", "Financial concerns", "Other"].map((r2) => /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("option", { children: r2 }, r2)) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("label", { className: "text-xs font-medium", children: "Message to founder (optional)" }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("textarea", { value: message2, onChange: (e) => setMessage(e.target.value), className: "mt-1 w-full min-h-[60px] rounded-[10px] border border-border/60 bg-background p-2 text-sm" })
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("label", { className: "text-xs font-medium", children: "Message to founder (optional)" }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("textarea", { value: message2, onChange: (e) => setMessage(e.target.value), className: "mt-1 w-full min-h-[60px] rounded-[10px] border border-border/60 bg-background p-2 text-sm" })
         ] })
       ] }),
-      requiresConfirm && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm", children: "This will notify the founder you are ready to proceed to term sheet. Continue?" }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex justify-end gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { onClick: () => setOpenForm(false), className: "rounded-[10px] border border-border/60 px-3 py-1.5 text-sm hover:bg-accent", children: "Cancel" }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: submit, disabled: loading, className: "inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow disabled:opacity-60", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Send, { className: "h-3.5 w-3.5" }),
+      requiresConfirm && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm", children: "This will notify the founder you are ready to proceed to term sheet. Continue?" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex justify-end gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { onClick: () => setOpenForm(false), className: "rounded-[10px] border border-border/60 px-3 py-1.5 text-sm hover:bg-accent", children: "Cancel" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: submit, disabled: loading, className: "inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow disabled:opacity-60", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Send, { className: "h-3.5 w-3.5" }),
           " ",
           requiresConfirm ? "Confirm" : "Send"
         ] })
@@ -70933,54 +71189,54 @@ function DocumentPreview({
 }) {
   const note = docNotes[activeDoc] ?? "";
   const reviewed = !!reviewedDocs[activeDoc];
-  const [page, setPage] = (0, import_react67.useState)(1);
-  const [zoom, setZoom] = (0, import_react67.useState)(100);
-  const [savedAt, setSavedAt] = (0, import_react67.useState)(null);
-  (0, import_react67.useEffect)(() => {
+  const [page, setPage] = (0, import_react68.useState)(1);
+  const [zoom, setZoom] = (0, import_react68.useState)(100);
+  const [savedAt, setSavedAt] = (0, import_react68.useState)(null);
+  (0, import_react68.useEffect)(() => {
     if (!note) return;
     const t = setTimeout(() => setSavedAt((/* @__PURE__ */ new Date()).toLocaleTimeString()), 800);
     return () => clearTimeout(t);
   }, [note]);
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card shadow-card overflow-hidden", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "p-4 border-b border-border/60 space-y-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Search, { className: "h-4 w-4 text-muted-foreground" }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("select", { value: activeDoc, onChange: (e) => {
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card shadow-card overflow-hidden", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "p-4 border-b border-border/60 space-y-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Search, { className: "h-4 w-4 text-muted-foreground" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("select", { value: activeDoc, onChange: (e) => {
           setActiveDoc(e.target.value);
           setPage(1);
-        }, className: "flex-1 rounded-[10px] border border-border/60 bg-background p-2 text-sm", children: DOCS.map((d2) => /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("option", { children: d2 }, d2)) })
+        }, className: "flex-1 rounded-[10px] border border-border/60 bg-background p-2 text-sm", children: DOCS.map((d2) => /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("option", { children: d2 }, d2)) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center justify-between gap-2 text-xs", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-1", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { onClick: () => setPage((p3) => Math.max(1, p3 - 1)), className: "grid h-7 w-7 place-items-center rounded-md border border-border/60 hover:bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(ArrowLeft, { className: "h-3.5 w-3.5" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("span", { className: "text-muted-foreground px-1", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center justify-between gap-2 text-xs", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center gap-1", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { onClick: () => setPage((p3) => Math.max(1, p3 - 1)), className: "grid h-7 w-7 place-items-center rounded-md border border-border/60 hover:bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(ArrowLeft, { className: "h-3.5 w-3.5" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("span", { className: "text-muted-foreground px-1", children: [
             "Page ",
             page,
             " of 12"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { onClick: () => setPage((p3) => Math.min(12, p3 + 1)), className: "grid h-7 w-7 place-items-center rounded-md border border-border/60 hover:bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(ArrowRight, { className: "h-3.5 w-3.5" }) })
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { onClick: () => setPage((p3) => Math.min(12, p3 + 1)), className: "grid h-7 w-7 place-items-center rounded-md border border-border/60 hover:bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(ArrowRight, { className: "h-3.5 w-3.5" }) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-1", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { onClick: () => setZoom((z2) => Math.max(50, z2 - 10)), className: "grid h-7 w-7 place-items-center rounded-md border border-border/60 hover:bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(ZoomOut, { className: "h-3.5 w-3.5" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("span", { className: "text-muted-foreground px-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center gap-1", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { onClick: () => setZoom((z2) => Math.max(50, z2 - 10)), className: "grid h-7 w-7 place-items-center rounded-md border border-border/60 hover:bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(ZoomOut, { className: "h-3.5 w-3.5" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("span", { className: "text-muted-foreground px-1", children: [
             zoom,
             "%"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { onClick: () => setZoom((z2) => Math.min(200, z2 + 10)), className: "grid h-7 w-7 place-items-center rounded-md border border-border/60 hover:bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(ZoomIn, { className: "h-3.5 w-3.5" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { onClick: () => window.print(), className: "grid h-7 w-7 place-items-center rounded-md border border-border/60 hover:bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Printer, { className: "h-3.5 w-3.5" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { className: "grid h-7 w-7 place-items-center rounded-md border border-border/60 hover:bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Download, { className: "h-3.5 w-3.5" }) })
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { onClick: () => setZoom((z2) => Math.min(200, z2 + 10)), className: "grid h-7 w-7 place-items-center rounded-md border border-border/60 hover:bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(ZoomIn, { className: "h-3.5 w-3.5" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { onClick: () => window.print(), className: "grid h-7 w-7 place-items-center rounded-md border border-border/60 hover:bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Printer, { className: "h-3.5 w-3.5" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { className: "grid h-7 w-7 place-items-center rounded-md border border-border/60 hover:bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Download, { className: "h-3.5 w-3.5" }) })
         ] })
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "bg-muted/40 p-6 grid place-items-center min-h-[420px]", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "bg-muted/40 p-6 grid place-items-center min-h-[420px]", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(
       "div",
       {
         className: "bg-background rounded-md shadow-elev w-full max-w-md aspect-[3/4] grid place-items-center text-center p-6",
         style: { transform: `scale(${zoom / 100})`, transformOrigin: "center" },
-        children: /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(FileText, { className: "h-10 w-10 text-muted-foreground/50 mx-auto" }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-medium mt-3", children: activeDoc }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "text-xs text-muted-foreground mt-1", children: [
+        children: /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(FileText, { className: "h-10 w-10 text-muted-foreground/50 mx-auto" }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-medium mt-3", children: activeDoc }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "text-xs text-muted-foreground mt-1", children: [
             "Page ",
             page,
             " preview"
@@ -70988,12 +71244,12 @@ function DocumentPreview({
         ] })
       }
     ) }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "p-4 space-y-2 border-t border-border/60", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center justify-between text-xs", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "font-medium", children: "Your notes on this document" }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-muted-foreground", children: savedAt ? `Saved ${savedAt}` : "Auto-saves" })
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "p-4 space-y-2 border-t border-border/60", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center justify-between text-xs", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "font-medium", children: "Your notes on this document" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "text-muted-foreground", children: savedAt ? `Saved ${savedAt}` : "Auto-saves" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(
         "textarea",
         {
           value: note,
@@ -71002,13 +71258,13 @@ function DocumentPreview({
           className: "w-full min-h-[90px] rounded-[10px] border border-border/60 bg-background p-2 text-sm focus:outline-none focus:border-brand/50"
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center justify-between text-xs", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("span", { className: "text-muted-foreground", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center justify-between text-xs", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("span", { className: "text-muted-foreground", children: [
           note.length,
           " chars"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("label", { className: "inline-flex items-center gap-2 cursor-pointer", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("label", { className: "inline-flex items-center gap-2 cursor-pointer", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(
             "input",
             {
               type: "checkbox",
@@ -71017,7 +71273,7 @@ function DocumentPreview({
               className: "h-4 w-4 accent-[hsl(var(--brand))]"
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { children: "Mark this document as reviewed" })
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { children: "Mark this document as reviewed" })
         ] })
       ] })
     ] })
@@ -71028,7 +71284,7 @@ function FounderReview({ dealRoomId }) {
   const { data: decision, isLoading } = useLatestDecision(dealRoomId);
   const dbStatus = decision?.status ?? null;
   const displayStatus = dbStatus ? DB_TO_DECISION[dbStatus] : null;
-  const currentStageIndex = (0, import_react67.useMemo)(() => {
+  const currentStageIndex = (0, import_react68.useMemo)(() => {
     if (!dbStatus) return 1;
     if (dbStatus === "term_sheet") return 4;
     if (dbStatus === "partner_review") return 3;
@@ -71054,73 +71310,73 @@ function FounderReview({ dealRoomId }) {
     message: decision.notes
   } : null;
   if (isLoading) {
-    return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "p-6 lg:p-8 max-w-5xl mx-auto space-y-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "h-8 w-48 rounded-lg bg-muted animate-pulse" }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "h-4 w-64 rounded bg-muted/60 animate-pulse" })
+    return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "p-6 lg:p-8 max-w-5xl mx-auto space-y-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "h-8 w-48 rounded-lg bg-muted animate-pulse" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "h-4 w-64 rounded bg-muted/60 animate-pulse" })
     ] });
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "p-6 lg:p-8 max-w-5xl mx-auto space-y-6", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("h2", { className: "text-2xl font-semibold tracking-tight", children: "Deal Progress" }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("p", { className: "text-sm text-muted-foreground mt-1", children: "Track where investors are in their review process." })
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "p-6 lg:p-8 max-w-5xl mx-auto space-y-6", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("h2", { className: "text-2xl font-semibold tracking-tight", children: "Deal Progress" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("p", { className: "text-sm text-muted-foreground mt-1", children: "Track where investors are in their review process." })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "rounded-2xl border border-border/60 bg-card p-6 shadow-card", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "flex items-center gap-2 overflow-x-auto pb-2", children: STAGES5.map((stage, i2) => {
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "rounded-2xl border border-border/60 bg-card p-6 shadow-card", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "flex items-center gap-2 overflow-x-auto pb-2", children: STAGES5.map((stage, i2) => {
       const done = currentStageIndex >= 0 && i2 < currentStageIndex;
       const current = currentStageIndex >= 0 && i2 === currentStageIndex;
-      return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-2 shrink-0", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex flex-col items-center gap-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: cn3(
+      return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center gap-2 shrink-0", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex flex-col items-center gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: cn3(
             "h-9 w-9 rounded-full grid place-items-center text-xs font-semibold",
             done ? "bg-success/15 text-success" : current ? "bg-violet/15 text-violet ring-2 ring-violet" : "bg-muted text-muted-foreground"
-          ), children: done ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(CircleCheck, { className: "h-4 w-4" }) : i2 + 1 }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: cn3("text-[11px] text-center w-20", current ? "text-violet font-semibold" : "text-muted-foreground"), children: stage })
+          ), children: done ? /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(CircleCheck, { className: "h-4 w-4" }) : i2 + 1 }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: cn3("text-[11px] text-center w-20", current ? "text-violet font-semibold" : "text-muted-foreground"), children: stage })
         ] }),
-        i2 < STAGES5.length - 1 && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: cn3("h-0.5 w-8", done ? "bg-success" : "bg-border") })
+        i2 < STAGES5.length - 1 && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: cn3("h-0.5 w-8", done ? "bg-success" : "bg-border") })
       ] }, stage);
     }) }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(DecisionStatusCard, { decision: decisionForCard }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-6 shadow-card", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold mb-4", children: "Review Progress" }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "space-y-3", children: SECTION_META.map((meta) => {
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(DecisionStatusCard, { decision: decisionForCard }),
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-6 shadow-card", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold mb-4", children: "Review Progress" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "space-y-3", children: SECTION_META.map((meta) => {
         const s = sections3[meta.key];
         const checks = Object.values(s.checks).filter(Boolean).length;
         const total = meta.checks.length;
         const pct = s.status === "Done" ? 100 : Math.round(checks / total * 100);
-        return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center justify-between text-xs mb-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "font-medium", children: meta.label }),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-muted-foreground", children: s.status === "Done" ? "Complete \u2713" : pct === 0 ? "Not started" : `${pct}% reviewed` })
+        return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center justify-between text-xs mb-1", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "font-medium", children: meta.label }),
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "text-muted-foreground", children: s.status === "Done" ? "Complete \u2713" : pct === 0 ? "Not started" : `${pct}% reviewed` })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "h-1.5 rounded-full bg-muted overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: cn3("h-full transition-all", s.status === "Done" ? "bg-success" : "bg-gradient-brand"), style: { width: `${pct}%` } }) })
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "h-1.5 rounded-full bg-muted overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: cn3("h-full transition-all", s.status === "Done" ? "bg-success" : "bg-gradient-brand"), style: { width: `${pct}%` } }) })
         ] }, meta.key);
       }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-6 shadow-card", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold mb-3", children: "Activity" }),
-      activities.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "text-xs text-muted-foreground py-6 text-center", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Sparkles, { className: "h-5 w-5 text-muted-foreground/40 mx-auto mb-2" }),
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-6 shadow-card", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold mb-3", children: "Activity" }),
+      activities.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "text-xs text-muted-foreground py-6 text-center", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Sparkles, { className: "h-5 w-5 text-muted-foreground/40 mx-auto mb-2" }),
         "Investor activity will appear here as they review your deal."
-      ] }) : /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "space-y-2.5", children: activities.map((a) => /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-2 text-sm", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "h-1.5 w-1.5 rounded-full bg-brand" }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "flex-1", children: a.action }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-xs text-muted-foreground", children: relTime(a.created_at) })
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "space-y-2.5", children: activities.map((a) => /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center gap-2 text-sm", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "h-1.5 w-1.5 rounded-full bg-brand" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "flex-1", children: a.action }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "text-xs text-muted-foreground", children: relTime(a.created_at) })
       ] }, a.id)) })
     ] })
   ] });
 }
 function DecisionStatusCard({ decision }) {
   if (!decision) {
-    return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-6 shadow-card border-l-4 border-l-brand", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Clock, { className: "h-5 w-5 text-brand" }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold", children: "Awaiting investor review" })
+    return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card p-6 shadow-card border-l-4 border-l-brand", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Clock, { className: "h-5 w-5 text-brand" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold", children: "Awaiting investor review" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-xs text-muted-foreground mt-1.5", children: "No decisions yet." })
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-xs text-muted-foreground mt-1.5", children: "No decisions yet." })
     ] });
   }
   const { status, updatedAt, requestInfo, reason, message: message2 } = decision;
   const config = {
-    "Under Review": { tone: "brand", emoji: "\u{1F50D}", title: "Under Review", body: /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(import_jsx_runtime78.Fragment, { children: [
+    "Under Review": { tone: "brand", emoji: "\u{1F50D}", title: "Under Review", body: /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)(import_jsx_runtime79.Fragment, { children: [
       "Last activity: ",
       relTime(updatedAt)
     ] }) },
@@ -71128,57 +71384,57 @@ function DecisionStatusCard({ decision }) {
       tone: "warning",
       emoji: "\u26A0\uFE0F",
       title: "Information Requested",
-      body: /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "space-y-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "font-medium", children: "Requested:" }),
+      body: /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "space-y-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "font-medium", children: "Requested:" }),
           " ",
           requestInfo?.what || "\u2014"
         ] }),
-        requestInfo?.deadline && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "font-medium", children: "Deadline:" }),
+        requestInfo?.deadline && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "font-medium", children: "Deadline:" }),
           " ",
           requestInfo.deadline
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { className: "mt-2 inline-flex items-center gap-1 text-warning text-xs font-medium hover:underline", children: "Upload requested documents \u2192" })
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { className: "mt-2 inline-flex items-center gap-1 text-warning text-xs font-medium hover:underline", children: "Upload requested documents \u2192" })
       ] })
     },
-    "Move to Partner Review": { tone: "violet", emoji: "\u2B50", title: "Advanced to Partner Review", body: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(import_jsx_runtime78.Fragment, { children: "Your deal has been escalated. This is a strong positive signal." }) },
-    "Term Sheet Ready": { tone: "success", emoji: "\u{1F389}", title: "Term Sheet Ready!", body: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(import_jsx_runtime78.Fragment, { children: "Congratulations \u2014 the investor is ready to proceed. Check your email." }) },
+    "Move to Partner Review": { tone: "violet", emoji: "\u2B50", title: "Advanced to Partner Review", body: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(import_jsx_runtime79.Fragment, { children: "Your deal has been escalated. This is a strong positive signal." }) },
+    "Term Sheet Ready": { tone: "success", emoji: "\u{1F389}", title: "Term Sheet Ready!", body: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(import_jsx_runtime79.Fragment, { children: "Congratulations \u2014 the investor is ready to proceed. Check your email." }) },
     "Not Proceeding": {
       tone: "muted-foreground",
       emoji: "\u2715",
       title: "Not Proceeding",
-      body: /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "space-y-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "font-medium", children: "Reason:" }),
+      body: /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "space-y-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "font-medium", children: "Reason:" }),
           " ",
           reason || "\u2014"
         ] }),
-        message2 && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "text-sm", children: [
+        message2 && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "text-sm", children: [
           '"',
           message2,
           '"'
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-xs italic mt-2", children: "This is not the end. Keep going." })
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-xs italic mt-2", children: "This is not the end. Keep going." })
       ] })
     },
-    "Exit": { tone: "muted-foreground", emoji: "\u2190", title: "Investor Exited", body: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(import_jsx_runtime78.Fragment, { children: reason || "Investor has left the deal room." }) }
+    "Exit": { tone: "muted-foreground", emoji: "\u2190", title: "Investor Exited", body: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(import_jsx_runtime79.Fragment, { children: reason || "Investor has left the deal room." }) }
   };
   const c3 = config[status];
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: `rounded-2xl border bg-card p-6 shadow-card border-l-4 border-l-${c3.tone} bg-${c3.tone}/5`, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-xl", children: c3.emoji }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold", children: c3.title })
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: `rounded-2xl border bg-card p-6 shadow-card border-l-4 border-l-${c3.tone} bg-${c3.tone}/5`, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "text-xl", children: c3.emoji }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold", children: c3.title })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm text-muted-foreground mt-2", children: c3.body })
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm text-muted-foreground mt-2", children: c3.body })
   ] });
 }
 function DealRoom() {
   const {
     id: dealRoomId
   } = Route$1.useParams();
-  const [tab, setTab] = (0, import_react67.useState)("overview");
-  const [aiOpen, setAiOpen] = (0, import_react67.useState)(false);
+  const [tab, setTab] = (0, import_react68.useState)("overview");
+  const [aiOpen, setAiOpen] = (0, import_react68.useState)(false);
   const {
     user
   } = useAuth();
@@ -71247,7 +71503,7 @@ function DealRoom() {
       return data ?? null;
     }
   });
-  (0, import_react67.useEffect)(() => {
+  (0, import_react68.useEffect)(() => {
     if (!ndaLoading && user?.id && !ndaAcceptance) {
       navigate({
         to: "/app/deal-room/$id/nda",
@@ -71257,7 +71513,7 @@ function DealRoom() {
       });
     }
   }, [ndaLoading, ndaAcceptance, user?.id, navigate, dealRoomId]);
-  (0, import_react67.useEffect)(() => {
+  (0, import_react68.useEffect)(() => {
     if (qaMessages.length > 0) {
       const mapped = qaMessages.map((m3) => ({
         id: m3.id,
@@ -71274,7 +71530,7 @@ function DealRoom() {
       qaStore.set(() => mapped);
     }
   }, [qaMessages]);
-  (0, import_react67.useEffect)(() => {
+  (0, import_react68.useEffect)(() => {
     if (memberList.length > 0) {
       const mapped = memberList.map((m3) => ({
         id: m3.id,
@@ -71298,65 +71554,65 @@ function DealRoom() {
     return t.k !== "decision";
   });
   if (!user?.id || ndaLoading || !ndaAcceptance) {
-    return /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "flex h-[calc(100vh-4rem)] items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm text-muted-foreground animate-pulse", children: "Verifying access\u2026" }) });
+    return /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "flex h-[calc(100vh-4rem)] items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm text-muted-foreground animate-pulse", children: "Verifying access\u2026" }) });
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex h-[calc(100vh-4rem)] relative", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("aside", { className: "w-[260px] border-r border-border/60 bg-sidebar flex flex-col", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "p-5 border-b border-border/60", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(Link, { to: "/app/deal-rooms", className: "text-xs text-muted-foreground inline-flex items-center gap-1 hover:text-foreground", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(ArrowLeft, { className: "h-3 w-3" }),
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex h-[calc(100vh-4rem)] relative", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("aside", { className: "w-[260px] border-r border-border/60 bg-sidebar flex flex-col", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "p-5 border-b border-border/60", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)(Link, { to: "/app/deal-rooms", className: "text-xs text-muted-foreground inline-flex items-center gap-1 hover:text-foreground", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(ArrowLeft, { className: "h-3 w-3" }),
           " All deal rooms"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "mt-3 flex items-center gap-2.5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "grid h-9 w-9 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold", children: companyName[0] ?? "D" }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "min-w-0", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold truncate", children: companyName }),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-[11px] text-muted-foreground", children: isInvestor ? "Founder \xB7 Deal Room" : "Investor \xB7 Deal Room" })
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "mt-3 flex items-center gap-2.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "grid h-9 w-9 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold", children: companyName[0] ?? "D" }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "min-w-0", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold truncate", children: companyName }),
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-[11px] text-muted-foreground", children: isInvestor ? "Founder \xB7 Deal Room" : "Investor \xB7 Deal Room" })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "mt-3 inline-flex items-center gap-1.5 text-[11px] text-success", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "h-1.5 w-1.5 rounded-full bg-success animate-pulse-glow" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "mt-3 inline-flex items-center gap-1.5 text-[11px] text-success", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "h-1.5 w-1.5 rounded-full bg-success animate-pulse-glow" }),
           " Active \xB7 NDA signed"
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("nav", { className: "flex-1 p-2 space-y-0.5 overflow-y-auto", children: visibleTabs.map((t) => /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => setTab(t.k), className: `w-full flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors ${tab === t.k ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60"}`, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(t.i, { className: `h-4 w-4 ${tab === t.k ? "text-brand" : ""}` }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("nav", { className: "flex-1 p-2 space-y-0.5 overflow-y-auto", children: visibleTabs.map((t) => /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => setTab(t.k), className: `w-full flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors ${tab === t.k ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60"}`, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(t.i, { className: `h-4 w-4 ${tab === t.k ? "text-brand" : ""}` }),
         t.l
       ] }, t.k)) }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "p-4 border-t border-border/60 text-[11px] text-muted-foreground", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Lock, { className: "h-3 w-3 inline mr-1" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "p-4 border-t border-border/60 text-[11px] text-muted-foreground", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Lock, { className: "h-3 w-3 inline mr-1" }),
         " Encrypted \xB7 watermarked"
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("main", { className: "flex-1 overflow-y-auto", children: [
-      tab === "overview" && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(DealRoomOverview, { dealRoomId, room, memberList, isInvestor, isFounder, onTabChange: setTab }),
-      tab === "documents" && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Documents2, { dealRoomId, isFounder, userId: user?.id }),
-      tab === "chat" && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "h-full", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(DealRoomChat, {}) }),
-      tab === "qa" && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(QA, { dealRoomId, userId: user?.id, userName }),
-      tab === "checklist" && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(DDChecklist, {}),
-      tab === "notes" && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Notes, { dealRoomId, userId: user?.id }),
-      tab === "timeline" && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Timeline, { dealRoomId }),
-      tab === "meetings" && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(MeetingsTab, { dealRoomId, userId: user?.id }),
-      tab === "decision" && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(ReviewTab, { dealRoomId, currentUserRole: isFounder ? "founder" : "investor", startupId: room?.startup_id ?? "" })
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("main", { className: "flex-1 overflow-y-auto", children: [
+      tab === "overview" && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(DealRoomOverview, { dealRoomId, room, memberList, isInvestor, isFounder, onTabChange: setTab }),
+      tab === "documents" && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Documents2, { dealRoomId, isFounder, userId: user?.id }),
+      tab === "chat" && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "h-full", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(DealRoomChat, {}) }),
+      tab === "qa" && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(QA, { dealRoomId, userId: user?.id, userName }),
+      tab === "checklist" && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(DDChecklist, {}),
+      tab === "notes" && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Notes, { dealRoomId, userId: user?.id }),
+      tab === "timeline" && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Timeline, { dealRoomId }),
+      tab === "meetings" && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(MeetingsTab, { dealRoomId, userId: user?.id }),
+      tab === "decision" && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(ReviewTab, { dealRoomId, currentUserRole: isFounder ? "founder" : "investor", startupId: room?.startup_id ?? "" })
     ] }),
-    !aiOpen && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => setAiOpen(true), className: "absolute bottom-6 right-6 inline-flex items-center gap-2 rounded-full bg-gradient-brand text-brand-foreground px-4 py-2.5 text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Sparkles, { className: "h-4 w-4" }),
+    !aiOpen && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => setAiOpen(true), className: "absolute bottom-6 right-6 inline-flex items-center gap-2 rounded-full bg-gradient-brand text-brand-foreground px-4 py-2.5 text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Sparkles, { className: "h-4 w-4" }),
       " Ask AI"
     ] }),
-    aiOpen && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(import_jsx_runtime78.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "fixed inset-0 z-30 bg-foreground/20 backdrop-blur-sm", onClick: () => setAiOpen(false) }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("aside", { className: "fixed top-16 bottom-0 right-0 z-40 w-full sm:w-[440px] border-l border-border/60 bg-background shadow-elev flex flex-col", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "h-14 border-b border-border/60 flex items-center justify-between px-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "grid h-7 w-7 place-items-center rounded-lg bg-gradient-brand text-brand-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Sparkles, { className: "h-3.5 w-3.5" }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold leading-tight", children: "Deal Room AI" }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-[10px] text-muted-foreground", children: companyName })
+    aiOpen && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)(import_jsx_runtime79.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "fixed inset-0 z-30 bg-foreground/20 backdrop-blur-sm", onClick: () => setAiOpen(false) }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("aside", { className: "fixed top-16 bottom-0 right-0 z-40 w-full sm:w-[440px] border-l border-border/60 bg-background shadow-elev flex flex-col", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "h-14 border-b border-border/60 flex items-center justify-between px-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "grid h-7 w-7 place-items-center rounded-lg bg-gradient-brand text-brand-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Sparkles, { className: "h-3.5 w-3.5" }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold leading-tight", children: "Deal Room AI" }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-[10px] text-muted-foreground", children: companyName })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { onClick: () => setAiOpen(false), className: "grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(X2, { className: "h-4 w-4" }) })
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { onClick: () => setAiOpen(false), className: "grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(X2, { className: "h-4 w-4" }) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "flex-1 min-h-0", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(AIChat, { compact: true, scope: `the ${companyName} deal room`, initialAssistant: "I have context on this deal room \u2014 documents, Q&A, diligence checklist, and team. Ask me anything.", starters: isInvestor ? ["Summarize this deal in 3 bullets.", "What are the top 3 risks?", "How does ARR growth compare to peers?", "Draft my partner meeting memo."] : ["Summarize this deal in 3 bullets.", "What diligence items are still open?", "Draft a follow-up to the investor.", "Flag the top 3 risks."] }) })
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "flex-1 min-h-0", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(AIChat, { compact: true, scope: `the ${companyName} deal room`, initialAssistant: "I have context on this deal room \u2014 documents, Q&A, diligence checklist, and team. Ask me anything.", starters: isInvestor ? ["Summarize this deal in 3 bullets.", "What are the top 3 risks?", "How does ARR growth compare to peers?", "Draft my partner meeting memo."] : ["Summarize this deal in 3 bullets.", "What diligence items are still open?", "Draft a follow-up to the investor.", "Flag the top 3 risks."] }) })
       ] })
     ] })
   ] });
@@ -71370,7 +71626,7 @@ function DealRoomOverview({
   onTabChange
 }) {
   const startup = room?.startups;
-  const [showProblem, setShowProblem] = (0, import_react67.useState)(false);
+  const [showProblem, setShowProblem] = (0, import_react68.useState)(false);
   const {
     data: recentActivity = []
   } = useQuery({
@@ -71387,166 +71643,166 @@ function DealRoomOverview({
   const daysOpen = room?.created_at ? Math.floor((Date.now() - new Date(room.created_at).getTime()) / 864e5) : 0;
   const lastActivity = recentActivity[0]?.created_at;
   const memberStatusColor = (accepted) => accepted ? "bg-success/10 text-success" : "bg-warning/10 text-warning";
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "p-8 max-w-5xl mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-start justify-between gap-6 mb-6", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-[11px] uppercase tracking-wider text-muted-foreground font-semibold", children: isInvestor ? "Reviewing" : "Deal Room" }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("h2", { className: "mt-1 text-2xl font-semibold tracking-tight", children: startup?.company_name ?? "Deal Room" }),
-        startup?.tagline && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: startup.tagline })
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "p-8 max-w-5xl mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-start justify-between gap-6 mb-6", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-[11px] uppercase tracking-wider text-muted-foreground font-semibold", children: isInvestor ? "Reviewing" : "Deal Room" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("h2", { className: "mt-1 text-2xl font-semibold tracking-tight", children: startup?.company_name ?? "Deal Room" }),
+        startup?.tagline && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: startup.tagline })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "flex gap-2 shrink-0", children: isFounder ? /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(import_jsx_runtime78.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => onTabChange("documents"), className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(UserPlus, { className: "h-4 w-4" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "flex gap-2 shrink-0", children: isFounder ? /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)(import_jsx_runtime79.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => onTabChange("documents"), className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(UserPlus, { className: "h-4 w-4" }),
           " Invite"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => onTabChange("chat"), className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Send, { className: "h-4 w-4" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => onTabChange("chat"), className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Send, { className: "h-4 w-4" }),
           " Send update"
         ] })
-      ] }) : /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(import_jsx_runtime78.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => onTabChange("qa"), className: "inline-flex items-center gap-1.5 rounded-md border border-warning/40 bg-warning/10 text-warning px-3 py-2 text-sm hover:bg-warning/15", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(CircleQuestionMark, { className: "h-4 w-4" }),
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)(import_jsx_runtime79.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => onTabChange("qa"), className: "inline-flex items-center gap-1.5 rounded-md border border-warning/40 bg-warning/10 text-warning px-3 py-2 text-sm hover:bg-warning/15", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(CircleQuestionMark, { className: "h-4 w-4" }),
           " Request info"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => onTabChange("decision"), className: "inline-flex items-center gap-1.5 rounded-md border border-success/40 bg-success/10 text-success px-3 py-2 text-sm hover:bg-success/15", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(ThumbsUp, { className: "h-4 w-4" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => onTabChange("decision"), className: "inline-flex items-center gap-1.5 rounded-md border border-success/40 bg-success/10 text-success px-3 py-2 text-sm hover:bg-success/15", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(ThumbsUp, { className: "h-4 w-4" }),
           " Submit review"
         ] })
       ] }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "grid md:grid-cols-5 gap-5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "md:col-span-3 space-y-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-start gap-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-bold text-sm", children: startup?.company_name?.[0] ?? "D" }),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex-1 min-w-0", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold", children: startup?.company_name ?? "Company" }),
-              startup?.tagline && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-xs text-muted-foreground mt-0.5", children: startup.tagline }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex flex-wrap gap-1.5 mt-2", children: [
-                startup?.stage && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-[11px] px-2 py-0.5 rounded-full bg-brand/10 text-brand", children: startup.stage }),
-                startup?.sector && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-[11px] px-2 py-0.5 rounded-full bg-accent text-muted-foreground", children: startup.sector })
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "grid md:grid-cols-5 gap-5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "md:col-span-3 space-y-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-start gap-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-bold text-sm", children: startup?.company_name?.[0] ?? "D" }),
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex-1 min-w-0", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold", children: startup?.company_name ?? "Company" }),
+              startup?.tagline && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-xs text-muted-foreground mt-0.5", children: startup.tagline }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex flex-wrap gap-1.5 mt-2", children: [
+                startup?.stage && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "text-[11px] px-2 py-0.5 rounded-full bg-brand/10 text-brand", children: startup.stage }),
+                startup?.sector && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "text-[11px] px-2 py-0.5 rounded-full bg-accent text-muted-foreground", children: startup.sector })
               ] })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "mt-4 grid grid-cols-2 gap-3", children: [
-            startup?.funding_target && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-lg bg-accent/50 p-3", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-[10px] text-muted-foreground uppercase tracking-wider", children: "Raising" }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold mt-0.5", children: startup.funding_target })
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "mt-4 grid grid-cols-2 gap-3", children: [
+            startup?.funding_target && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-lg bg-accent/50 p-3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-[10px] text-muted-foreground uppercase tracking-wider", children: "Raising" }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold mt-0.5", children: startup.funding_target })
             ] }),
-            startup?.revenue && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-lg bg-accent/50 p-3", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-[10px] text-muted-foreground uppercase tracking-wider", children: "ARR" }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold mt-0.5", children: startup.revenue })
+            startup?.revenue && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-lg bg-accent/50 p-3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-[10px] text-muted-foreground uppercase tracking-wider", children: "ARR" }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold mt-0.5", children: startup.revenue })
             ] }),
-            startup?.team_size && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-lg bg-accent/50 p-3", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-[10px] text-muted-foreground uppercase tracking-wider", children: "Team size" }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold mt-0.5", children: startup.team_size })
+            startup?.team_size && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-lg bg-accent/50 p-3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-[10px] text-muted-foreground uppercase tracking-wider", children: "Team size" }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold mt-0.5", children: startup.team_size })
             ] }),
-            startup?.website && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-lg bg-accent/50 p-3", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-[10px] text-muted-foreground uppercase tracking-wider", children: "Website" }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("a", { href: startup.website, target: "_blank", rel: "noopener noreferrer", className: "text-sm font-semibold text-brand mt-0.5 flex items-center gap-1 hover:underline", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(ExternalLink, { className: "h-3 w-3" }),
+            startup?.website && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-lg bg-accent/50 p-3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-[10px] text-muted-foreground uppercase tracking-wider", children: "Website" }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("a", { href: startup.website, target: "_blank", rel: "noopener noreferrer", className: "text-sm font-semibold text-brand mt-0.5 flex items-center gap-1 hover:underline", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(ExternalLink, { className: "h-3 w-3" }),
                 " Visit"
               ] })
             ] })
           ] }),
-          (startup?.problem || startup?.solution) && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "mt-3 border-t border-border/60 pt-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => setShowProblem((v3) => !v3), className: "text-xs text-brand hover:underline", children: [
+          (startup?.problem || startup?.solution) && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "mt-3 border-t border-border/60 pt-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => setShowProblem((v3) => !v3), className: "text-xs text-brand hover:underline", children: [
               showProblem ? "Hide" : "Show",
               " problem / solution"
             ] }),
-            showProblem && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "mt-2 space-y-3", children: [
-              startup.problem && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-[10px] uppercase tracking-wider text-muted-foreground font-semibold", children: "Problem" }),
-                /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm mt-1", children: startup.problem })
+            showProblem && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "mt-2 space-y-3", children: [
+              startup.problem && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-[10px] uppercase tracking-wider text-muted-foreground font-semibold", children: "Problem" }),
+                /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm mt-1", children: startup.problem })
               ] }),
-              startup.solution && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-[10px] uppercase tracking-wider text-muted-foreground font-semibold", children: "Solution" }),
-                /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm mt-1", children: startup.solution })
+              startup.solution && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-[10px] uppercase tracking-wider text-muted-foreground font-semibold", children: "Solution" }),
+                /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm mt-1", children: startup.solution })
               ] })
             ] })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center justify-between mb-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "text-sm font-semibold inline-flex items-center gap-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Users, { className: "h-4 w-4 text-brand" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center justify-between mb-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "text-sm font-semibold inline-flex items-center gap-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Users, { className: "h-4 w-4 text-brand" }),
               " Participants"
             ] }),
-            isFounder && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { className: "text-xs inline-flex items-center gap-1 text-muted-foreground hover:text-foreground", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(UserPlus, { className: "h-3.5 w-3.5" }),
+            isFounder && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { className: "text-xs inline-flex items-center gap-1 text-muted-foreground hover:text-foreground", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(UserPlus, { className: "h-3.5 w-3.5" }),
               " Invite"
             ] })
           ] }),
-          memberList.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-xs text-muted-foreground", children: "No participants yet." }) : /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "divide-y divide-border/60", children: memberList.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-3 py-2.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "grid h-8 w-8 place-items-center rounded-full bg-accent text-[11px] font-semibold shrink-0", children: (m3.users?.full_name ?? "?").split(" ").map((s) => s[0]).slice(0, 2).join("") }),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex-1 min-w-0", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-medium truncate", children: m3.users?.full_name ?? "Unknown" }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-xs text-muted-foreground truncate", children: m3.users?.email ?? "" })
+          memberList.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-xs text-muted-foreground", children: "No participants yet." }) : /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "divide-y divide-border/60", children: memberList.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center gap-3 py-2.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "grid h-8 w-8 place-items-center rounded-full bg-accent text-[11px] font-semibold shrink-0", children: (m3.users?.full_name ?? "?").split(" ").map((s) => s[0]).slice(0, 2).join("") }),
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex-1 min-w-0", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-medium truncate", children: m3.users?.full_name ?? "Unknown" }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-xs text-muted-foreground truncate", children: m3.users?.email ?? "" })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex flex-col items-end gap-1 shrink-0", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-[10px] capitalize text-muted-foreground", children: m3.role }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: cn3("text-[10px] px-2 py-0.5 rounded", memberStatusColor(!!m3.accepted_at)), children: m3.accepted_at ? "NDA Accepted" : "Invited" })
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex flex-col items-end gap-1 shrink-0", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "text-[10px] capitalize text-muted-foreground", children: m3.role }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: cn3("text-[10px] px-2 py-0.5 rounded", memberStatusColor(!!m3.accepted_at)), children: m3.accepted_at ? "NDA Accepted" : "Invited" })
             ] })
           ] }, m3.id)) })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "md:col-span-2 space-y-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold mb-3", children: "Deal status" }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "space-y-2.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex justify-between text-sm", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-muted-foreground", children: "Stage" }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "font-medium capitalize", children: room?.status ?? "Active" })
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "md:col-span-2 space-y-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold mb-3", children: "Deal status" }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "space-y-2.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex justify-between text-sm", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "text-muted-foreground", children: "Stage" }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "font-medium capitalize", children: room?.status ?? "Active" })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex justify-between text-sm", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-muted-foreground", children: "Days open" }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "font-medium", children: daysOpen })
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex justify-between text-sm", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "text-muted-foreground", children: "Days open" }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "font-medium", children: daysOpen })
             ] }),
-            lastActivity && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex justify-between text-sm", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-muted-foreground", children: "Last activity" }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "font-medium", children: formatDistanceToNow(new Date(lastActivity), {
+            lastActivity && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex justify-between text-sm", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "text-muted-foreground", children: "Last activity" }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "font-medium", children: formatDistanceToNow(new Date(lastActivity), {
                 addSuffix: true
               }) })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "mt-4 border-t border-border/60 pt-4", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-2", children: "Quick actions" }),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "space-y-1.5", children: isFounder ? /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(import_jsx_runtime78.Fragment, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => onTabChange("documents"), className: "w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(FileText, { className: "h-3.5 w-3.5 text-brand" }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "mt-4 border-t border-border/60 pt-4", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-2", children: "Quick actions" }),
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "space-y-1.5", children: isFounder ? /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)(import_jsx_runtime79.Fragment, { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => onTabChange("documents"), className: "w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(FileText, { className: "h-3.5 w-3.5 text-brand" }),
                 " Upload document"
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => onTabChange("meetings"), className: "w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Calendar, { className: "h-3.5 w-3.5 text-brand" }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => onTabChange("meetings"), className: "w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Calendar, { className: "h-3.5 w-3.5 text-brand" }),
                 " Schedule meeting"
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => onTabChange("chat"), className: "w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Send, { className: "h-3.5 w-3.5 text-brand" }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => onTabChange("chat"), className: "w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Send, { className: "h-3.5 w-3.5 text-brand" }),
                 " Send investor update"
               ] })
-            ] }) : /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(import_jsx_runtime78.Fragment, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => onTabChange("documents"), className: "w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(FileText, { className: "h-3.5 w-3.5 text-brand" }),
+            ] }) : /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)(import_jsx_runtime79.Fragment, { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => onTabChange("documents"), className: "w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(FileText, { className: "h-3.5 w-3.5 text-brand" }),
                 " Request document"
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => onTabChange("qa"), className: "w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(MessageSquare, { className: "h-3.5 w-3.5 text-brand" }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => onTabChange("qa"), className: "w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(MessageSquare, { className: "h-3.5 w-3.5 text-brand" }),
                 " Ask a question"
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => onTabChange("decision"), className: "w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(ThumbsUp, { className: "h-3.5 w-3.5 text-success" }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => onTabChange("decision"), className: "w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(ThumbsUp, { className: "h-3.5 w-3.5 text-success" }),
                 " Submit review"
               ] })
             ] }) })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold mb-3", children: "Recent activity" }),
-          recentActivity.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-xs text-muted-foreground", children: "No activity yet." }) : /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "space-y-2.5", children: recentActivity.map((e) => /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-start gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "h-1.5 w-1.5 rounded-full bg-brand mt-1.5 shrink-0" }),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex-1 min-w-0", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm truncate", children: e.action }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-xs text-muted-foreground", children: formatDistanceToNow(new Date(e.created_at), {
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold mb-3", children: "Recent activity" }),
+          recentActivity.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-xs text-muted-foreground", children: "No activity yet." }) : /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "space-y-2.5", children: recentActivity.map((e) => /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-start gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "h-1.5 w-1.5 rounded-full bg-brand mt-1.5 shrink-0" }),
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex-1 min-w-0", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm truncate", children: e.action }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-xs text-muted-foreground", children: formatDistanceToNow(new Date(e.created_at), {
                 addSuffix: true
               }) })
             ] })
@@ -71562,8 +71818,8 @@ function Documents2({
   userId
 }) {
   const queryClient2 = useQueryClient();
-  const [showLibrary, setShowLibrary] = (0, import_react67.useState)(false);
-  const [addingFromLib, setAddingFromLib] = (0, import_react67.useState)(null);
+  const [showLibrary, setShowLibrary] = (0, import_react68.useState)(false);
+  const [addingFromLib, setAddingFromLib] = (0, import_react68.useState)(null);
   const {
     data: docs = []
   } = useQuery({
@@ -71623,89 +71879,89 @@ function Documents2({
     });
     toast.success("Removed from deal room");
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "p-8 max-w-5xl mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center justify-between", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("h2", { className: "text-xl font-semibold tracking-tight", children: "Documents" }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex gap-2", children: [
-        isFounder && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => setShowLibrary(true), className: "inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-sm hover:bg-brand/10", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Plus, { className: "h-4 w-4" }),
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "p-8 max-w-5xl mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center justify-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("h2", { className: "text-xl font-semibold tracking-tight", children: "Documents" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex gap-2", children: [
+        isFounder && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => setShowLibrary(true), className: "inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-sm hover:bg-brand/10", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Plus, { className: "h-4 w-4" }),
           " Add from library"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent", children: "Request document" })
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent", children: "Request document" })
       ] })
     ] }),
-    isFounder && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-5", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Dropzone, { dealRoomId, onUploadComplete: () => queryClient2.invalidateQueries({
+    isFounder && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-5", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Dropzone, { dealRoomId, onUploadComplete: () => queryClient2.invalidateQueries({
       queryKey: ["documents", dealRoomId]
     }) }) }),
-    showLibrary && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm grid place-items-center p-4", onClick: () => setShowLibrary(false), children: /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "w-full max-w-lg rounded-2xl border border-border/60 bg-card shadow-elev", onClick: (e) => e.stopPropagation(), children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center justify-between p-5 border-b border-border/60", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold", children: "Add from document library" }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { onClick: () => setShowLibrary(false), className: "grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(X2, { className: "h-4 w-4" }) })
+    showLibrary && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm grid place-items-center p-4", onClick: () => setShowLibrary(false), children: /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "w-full max-w-lg rounded-2xl border border-border/60 bg-card shadow-elev", onClick: (e) => e.stopPropagation(), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center justify-between p-5 border-b border-border/60", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold", children: "Add from document library" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { onClick: () => setShowLibrary(false), className: "grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(X2, { className: "h-4 w-4" }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "p-3 max-h-80 overflow-y-auto", children: [
-        libLoading && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm text-muted-foreground p-3 animate-pulse", children: "Loading\u2026" }),
-        !libLoading && libraryDocs.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm text-muted-foreground p-3", children: "No personal documents without a deal room. Upload documents in the Documents page first." }),
-        libraryDocs.map((doc) => /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-3 p-3 rounded-lg hover:bg-accent/50", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "grid h-8 w-8 place-items-center rounded-md bg-accent shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(FileText, { className: "h-4 w-4 text-brand" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex-1 min-w-0", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-medium truncate", children: doc.name || doc.storage_path?.split("/").pop() || "Document" }),
-            doc.category && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-xs text-muted-foreground", children: doc.category })
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "p-3 max-h-80 overflow-y-auto", children: [
+        libLoading && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm text-muted-foreground p-3 animate-pulse", children: "Loading\u2026" }),
+        !libLoading && libraryDocs.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm text-muted-foreground p-3", children: "No personal documents without a deal room. Upload documents in the Documents page first." }),
+        libraryDocs.map((doc) => /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center gap-3 p-3 rounded-lg hover:bg-accent/50", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "grid h-8 w-8 place-items-center rounded-md bg-accent shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(FileText, { className: "h-4 w-4 text-brand" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex-1 min-w-0", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-medium truncate", children: doc.name || doc.storage_path?.split("/").pop() || "Document" }),
+            doc.category && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-xs text-muted-foreground", children: doc.category })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => addFromLibrary(doc.id), disabled: addingFromLib === doc.id, className: "shrink-0 inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs disabled:opacity-50", children: [
-            addingFromLib === doc.id ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(LoaderCircle, { className: "h-3 w-3 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Plus, { className: "h-3 w-3" }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => addFromLibrary(doc.id), disabled: addingFromLib === doc.id, className: "shrink-0 inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs disabled:opacity-50", children: [
+            addingFromLib === doc.id ? /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(LoaderCircle, { className: "h-3 w-3 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Plus, { className: "h-3 w-3" }),
             "Add"
           ] })
         ] }, doc.id))
       ] })
     ] }) }),
-    ndaDocs.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "mt-5", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2", children: "System generated" }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "rounded-xl border border-border/60 bg-card shadow-card divide-y divide-border/60", children: ndaDocs.map((d2) => /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-3 px-5 py-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "grid h-8 w-8 place-items-center rounded-md bg-success/10", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Shield, { className: "h-4 w-4 text-success" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex-1 min-w-0", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-medium truncate", children: d2.name }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "text-xs text-muted-foreground", children: [
+    ndaDocs.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "mt-5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2", children: "System generated" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "rounded-xl border border-border/60 bg-card shadow-card divide-y divide-border/60", children: ndaDocs.map((d2) => /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center gap-3 px-5 py-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "grid h-8 w-8 place-items-center rounded-md bg-success/10", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Shield, { className: "h-4 w-4 text-success" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex-1 min-w-0", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-medium truncate", children: d2.name }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "text-xs text-muted-foreground", children: [
             "Auto-generated NDA \xB7 ",
             new Date(d2.createdAt).toLocaleDateString()
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("span", { className: "inline-flex items-center gap-1 text-success text-xs", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(CircleCheck, { className: "h-3.5 w-3.5" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("span", { className: "inline-flex items-center gap-1 text-success text-xs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(CircleCheck, { className: "h-3.5 w-3.5" }),
           " Signed by all"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { className: "text-muted-foreground hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Download, { className: "h-4 w-4" }) })
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { className: "text-muted-foreground hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Download, { className: "h-4 w-4" }) })
       ] }, d2.name)) })
     ] }),
-    docs.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-5 rounded-xl border border-border/60 bg-card shadow-card divide-y divide-border/60", children: docs.map((doc) => {
+    docs.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-5 rounded-xl border border-border/60 bg-card shadow-card divide-y divide-border/60", children: docs.map((doc) => {
       const catColor = CATEGORY_COLORS[doc.category] ?? "bg-accent text-muted-foreground";
-      return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-3 px-5 py-3 hover:bg-accent/40 group", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "grid h-8 w-8 place-items-center rounded-md bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(FileText, { className: "h-4 w-4 text-brand" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex-1 min-w-0", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-medium truncate", children: doc.name || (doc.storage_path?.split("/").pop() ?? "Document") }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-2 mt-0.5 flex-wrap", children: [
-            doc.category && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: cn3("text-[10px] px-1.5 py-0.5 rounded-full", catColor), children: doc.category }),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("span", { className: "text-xs text-muted-foreground", children: [
+      return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center gap-3 px-5 py-3 hover:bg-accent/40 group", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "grid h-8 w-8 place-items-center rounded-md bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(FileText, { className: "h-4 w-4 text-brand" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex-1 min-w-0", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-medium truncate", children: doc.name || (doc.storage_path?.split("/").pop() ?? "Document") }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center gap-2 mt-0.5 flex-wrap", children: [
+            doc.category && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: cn3("text-[10px] px-1.5 py-0.5 rounded-full", catColor), children: doc.category }),
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("span", { className: "text-xs text-muted-foreground", children: [
               doc.users?.full_name ?? "Unknown",
               " \xB7 ",
               new Date(doc.created_at).toLocaleDateString()
             ] })
           ] })
         ] }),
-        doc.status === "ready" ? /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("span", { className: "inline-flex items-center gap-1 text-success text-xs", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(CircleCheck, { className: "h-3.5 w-3.5" }),
+        doc.status === "ready" ? /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("span", { className: "inline-flex items-center gap-1 text-success text-xs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(CircleCheck, { className: "h-3.5 w-3.5" }),
           " Ready"
-        ] }) : /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("span", { className: "inline-flex items-center gap-1 text-warning text-xs", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(TriangleAlert, { className: "h-3.5 w-3.5" }),
+        ] }) : /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("span", { className: "inline-flex items-center gap-1 text-warning text-xs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(TriangleAlert, { className: "h-3.5 w-3.5" }),
           " Review"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { onClick: () => handleDownload(doc.storage_path), className: "text-muted-foreground hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Download, { className: "h-4 w-4" }) }),
-        isFounder && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { onClick: () => removeFromRoom(doc.id), title: "Remove from deal room", className: "text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(X2, { className: "h-4 w-4" }) })
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { onClick: () => handleDownload(doc.storage_path), className: "text-muted-foreground hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Download, { className: "h-4 w-4" }) }),
+        isFounder && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { onClick: () => removeFromRoom(doc.id), title: "Remove from deal room", className: "text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(X2, { className: "h-4 w-4" }) })
       ] }, doc.id);
     }) }),
-    docs.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "mt-8 rounded-xl border border-border/60 bg-card shadow-card p-10 flex flex-col items-center gap-3 text-center", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "grid h-12 w-12 place-items-center rounded-full bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(FileText, { className: "h-5 w-5 text-muted-foreground" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-medium", children: "No documents yet" }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-xs text-muted-foreground max-w-xs", children: isFounder ? "Upload files above or add from your document library." : "The founder hasn't shared any documents yet." })
+    docs.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "mt-8 rounded-xl border border-border/60 bg-card shadow-card p-10 flex flex-col items-center gap-3 text-center", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "grid h-12 w-12 place-items-center rounded-full bg-accent", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(FileText, { className: "h-5 w-5 text-muted-foreground" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-medium", children: "No documents yet" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-xs text-muted-foreground max-w-xs", children: isFounder ? "Upload files above or add from your document library." : "The founder hasn't shared any documents yet." })
     ] })
   ] });
 }
@@ -71714,9 +71970,9 @@ function Notes({
   userId
 }) {
   const queryClient2 = useQueryClient();
-  const [body, setBody] = (0, import_react67.useState)("");
-  const [isPrivate, setIsPrivate] = (0, import_react67.useState)(false);
-  const [saving, setSaving] = (0, import_react67.useState)(false);
+  const [body, setBody] = (0, import_react68.useState)("");
+  const [isPrivate, setIsPrivate] = (0, import_react68.useState)(false);
+  const [saving, setSaving] = (0, import_react68.useState)(false);
   const {
     data: notes = [],
     isLoading,
@@ -71756,32 +72012,32 @@ function Notes({
       setSaving(false);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "p-8 max-w-3xl mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("h2", { className: "text-xl font-semibold tracking-tight", children: "Notes" }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("form", { onSubmit: submit, className: "mt-5 rounded-xl border border-border/60 bg-card p-4 shadow-card space-y-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("textarea", { value: body, onChange: (e) => setBody(e.target.value), placeholder: "Write a note\u2026", rows: 3, className: "w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none" }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("label", { className: "flex items-center gap-2 cursor-pointer", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("input", { type: "checkbox", checked: isPrivate, onChange: (e) => setIsPrivate(e.target.checked), className: "h-4 w-4 accent-[var(--brand)]" }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-xs text-muted-foreground", children: "Private (only visible to me)" })
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "p-8 max-w-3xl mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("h2", { className: "text-xl font-semibold tracking-tight", children: "Notes" }),
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("form", { onSubmit: submit, className: "mt-5 rounded-xl border border-border/60 bg-card p-4 shadow-card space-y-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("textarea", { value: body, onChange: (e) => setBody(e.target.value), placeholder: "Write a note\u2026", rows: 3, className: "w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center justify-between", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("label", { className: "flex items-center gap-2 cursor-pointer", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("input", { type: "checkbox", checked: isPrivate, onChange: (e) => setIsPrivate(e.target.checked), className: "h-4 w-4 accent-[var(--brand)]" }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "text-xs text-muted-foreground", children: "Private (only visible to me)" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { type: "submit", disabled: !body.trim() || saving, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow disabled:opacity-50", children: [
-          saving && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(LoaderCircle, { className: "h-3 w-3 animate-spin" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { type: "submit", disabled: !body.trim() || saving, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow disabled:opacity-50", children: [
+          saving && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(LoaderCircle, { className: "h-3 w-3 animate-spin" }),
           "Save note"
         ] })
       ] })
     ] }),
-    isError2 && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("p", { className: "mt-4 text-sm text-destructive", children: "Could not load data. Please refresh." }),
-    isLoading && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-4 text-sm text-muted-foreground animate-pulse", children: "Loading\u2026" }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-5 grid gap-3", children: notes.map((n2) => /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: `rounded-xl border border-border/60 p-4 shadow-card ${n2.private ? "bg-warning/5 border-warning/30" : "bg-card"}`, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center gap-2 text-xs", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "font-medium", children: n2.author_id === userId ? "You" : n2.users?.full_name ?? "Unknown" }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-muted-foreground", children: formatDistanceToNow(new Date(n2.created_at), {
+    isError2 && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("p", { className: "mt-4 text-sm text-destructive", children: "Could not load data. Please refresh." }),
+    isLoading && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-4 text-sm text-muted-foreground animate-pulse", children: "Loading\u2026" }),
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-5 grid gap-3", children: notes.map((n2) => /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: `rounded-xl border border-border/60 p-4 shadow-card ${n2.private ? "bg-warning/5 border-warning/30" : "bg-card"}`, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center gap-2 text-xs", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "font-medium", children: n2.author_id === userId ? "You" : n2.users?.full_name ?? "Unknown" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "text-muted-foreground", children: formatDistanceToNow(new Date(n2.created_at), {
           addSuffix: true
         }) }),
-        n2.private && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "ml-auto text-[10px] uppercase tracking-wider text-warning", children: "Private" })
+        n2.private && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "ml-auto text-[10px] uppercase tracking-wider text-warning", children: "Private" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-2 text-sm", children: n2.body })
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-2 text-sm", children: n2.body })
     ] }, n2.id)) })
   ] });
 }
@@ -71813,18 +72069,18 @@ function Timeline({
     if (a.includes("invited") || a.includes("member")) return "warning";
     return "muted-foreground";
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "p-8 max-w-3xl mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("h2", { className: "text-xl font-semibold tracking-tight", children: "Activity" }),
-    isError2 && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("p", { className: "mt-4 text-sm text-destructive", children: "Could not load data. Please refresh." }),
-    isLoading && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-4 text-sm text-muted-foreground animate-pulse", children: "Loading\u2026" }),
-    !isLoading && !isError2 && events.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("p", { className: "mt-6 text-sm text-muted-foreground", children: "No activity yet. Activity is recorded automatically as the deal room is used." }),
-    events.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "mt-6 relative pl-6", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "absolute left-2 top-2 bottom-2 w-px bg-border" }),
-      events.map((e) => /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "relative pb-6 last:pb-0", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: `absolute -left-[18px] top-1.5 h-3 w-3 rounded-full bg-${dotColor(e.action)} ring-4 ring-background` }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-medium", children: e.action }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "text-xs text-muted-foreground inline-flex items-center gap-1 mt-0.5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Clock, { className: "h-3 w-3" }),
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "p-8 max-w-3xl mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("h2", { className: "text-xl font-semibold tracking-tight", children: "Activity" }),
+    isError2 && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("p", { className: "mt-4 text-sm text-destructive", children: "Could not load data. Please refresh." }),
+    isLoading && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-4 text-sm text-muted-foreground animate-pulse", children: "Loading\u2026" }),
+    !isLoading && !isError2 && events.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("p", { className: "mt-6 text-sm text-muted-foreground", children: "No activity yet. Activity is recorded automatically as the deal room is used." }),
+    events.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "mt-6 relative pl-6", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "absolute left-2 top-2 bottom-2 w-px bg-border" }),
+      events.map((e) => /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "relative pb-6 last:pb-0", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: `absolute -left-[18px] top-1.5 h-3 w-3 rounded-full bg-${dotColor(e.action)} ring-4 ring-background` }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-medium", children: e.action }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "text-xs text-muted-foreground inline-flex items-center gap-1 mt-0.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Clock, { className: "h-3 w-3" }),
           e.users?.full_name ? `${e.users.full_name} \xB7 ` : "",
           formatDistanceToNow(new Date(e.created_at), {
             addSuffix: true
@@ -71839,9 +72095,9 @@ function MeetingsTab({
   userId
 }) {
   const queryClient2 = useQueryClient();
-  const [showForm, setShowForm] = (0, import_react67.useState)(false);
-  const [saving, setSaving] = (0, import_react67.useState)(false);
-  const [f3, setF] = (0, import_react67.useState)({
+  const [showForm, setShowForm] = (0, import_react68.useState)(false);
+  const [saving, setSaving] = (0, import_react68.useState)(false);
+  const [f3, setF] = (0, import_react68.useState)({
     title: "",
     scheduledAt: "",
     meetingLink: "",
@@ -71899,63 +72155,63 @@ function MeetingsTab({
   const now = /* @__PURE__ */ new Date();
   const upcoming = meetings.filter((m3) => new Date(m3.scheduled_at) >= now);
   const past = meetings.filter((m3) => new Date(m3.scheduled_at) < now);
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "p-8 max-w-3xl mx-auto", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center justify-between", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("h2", { className: "text-xl font-semibold tracking-tight", children: "Meetings" }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: () => setShowForm((v3) => !v3), className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Plus, { className: "h-4 w-4" }),
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "p-8 max-w-3xl mx-auto", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center justify-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("h2", { className: "text-xl font-semibold tracking-tight", children: "Meetings" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: () => setShowForm((v3) => !v3), className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Plus, { className: "h-4 w-4" }),
         " Schedule meeting"
       ] })
     ] }),
-    showForm && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("form", { onSubmit: submit, className: "mt-5 rounded-xl border border-border/60 bg-card p-5 shadow-card space-y-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("label", { className: "text-xs text-muted-foreground", children: "Title *" }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("input", { required: true, value: f3.title, onChange: (e) => set("title", e.target.value), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm" })
+    showForm && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("form", { onSubmit: submit, className: "mt-5 rounded-xl border border-border/60 bg-card p-5 shadow-card space-y-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("label", { className: "text-xs text-muted-foreground", children: "Title *" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("input", { required: true, value: f3.title, onChange: (e) => set("title", e.target.value), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("label", { className: "text-xs text-muted-foreground", children: "Date & Time *" }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("input", { type: "datetime-local", required: true, value: f3.scheduledAt, onChange: (e) => set("scheduledAt", e.target.value), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm" })
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("label", { className: "text-xs text-muted-foreground", children: "Date & Time *" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("input", { type: "datetime-local", required: true, value: f3.scheduledAt, onChange: (e) => set("scheduledAt", e.target.value), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("label", { className: "text-xs text-muted-foreground", children: "Meeting link" }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("input", { type: "url", value: f3.meetingLink, onChange: (e) => set("meetingLink", e.target.value), placeholder: "Zoom / Google Meet / Teams link", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm" })
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("label", { className: "text-xs text-muted-foreground", children: "Meeting link" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("input", { type: "url", value: f3.meetingLink, onChange: (e) => set("meetingLink", e.target.value), placeholder: "Zoom / Google Meet / Teams link", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("label", { className: "text-xs text-muted-foreground", children: "Notes" }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("textarea", { value: f3.notes, onChange: (e) => set("notes", e.target.value), rows: 2, className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm" })
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("label", { className: "text-xs text-muted-foreground", children: "Notes" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("textarea", { value: f3.notes, onChange: (e) => set("notes", e.target.value), rows: 2, className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex justify-end gap-2 pt-1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("button", { type: "button", onClick: () => setShowForm(false), className: "rounded-md border border-border/60 px-3 py-1.5 text-sm", children: "Cancel" }),
-        /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { type: "submit", disabled: !f3.title || !f3.scheduledAt || saving, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm disabled:opacity-50", children: [
-          saving && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(LoaderCircle, { className: "h-3 w-3 animate-spin" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex justify-end gap-2 pt-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { type: "button", onClick: () => setShowForm(false), className: "rounded-md border border-border/60 px-3 py-1.5 text-sm", children: "Cancel" }),
+        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { type: "submit", disabled: !f3.title || !f3.scheduledAt || saving, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm disabled:opacity-50", children: [
+          saving && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(LoaderCircle, { className: "h-3 w-3 animate-spin" }),
           "Add meeting"
         ] })
       ] })
     ] }),
-    isError2 && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("p", { className: "mt-4 text-sm text-destructive", children: "Could not load data. Please refresh." }),
-    isLoading && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-4 text-sm text-muted-foreground animate-pulse", children: "Loading\u2026" }),
-    upcoming.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(import_jsx_runtime78.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-6 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold", children: "Upcoming" }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-2 space-y-3", children: upcoming.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(MeetingCard2, { m: m3 }, m3.id)) })
+    isError2 && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("p", { className: "mt-4 text-sm text-destructive", children: "Could not load data. Please refresh." }),
+    isLoading && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-4 text-sm text-muted-foreground animate-pulse", children: "Loading\u2026" }),
+    upcoming.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)(import_jsx_runtime79.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-6 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold", children: "Upcoming" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-2 space-y-3", children: upcoming.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(MeetingCard2, { m: m3 }, m3.id)) })
     ] }),
-    past.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)(import_jsx_runtime78.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-6 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold", children: "Past" }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-2 space-y-3 opacity-60", children: past.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(MeetingCard2, { m: m3 }, m3.id)) })
+    past.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)(import_jsx_runtime79.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-6 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold", children: "Past" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-2 space-y-3 opacity-60", children: past.map((m3) => /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(MeetingCard2, { m: m3 }, m3.id)) })
     ] }),
-    !isLoading && meetings.length === 0 && !showForm && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("p", { className: "mt-6 text-sm text-muted-foreground", children: "No meetings scheduled yet." })
+    !isLoading && meetings.length === 0 && !showForm && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("p", { className: "mt-6 text-sm text-muted-foreground", children: "No meetings scheduled yet." })
   ] });
 }
 function MeetingCard2({
   m: m3
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-center justify-between gap-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm font-semibold", children: m3.title }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-xs text-muted-foreground shrink-0", children: format(new Date(m3.scheduled_at), "EEE, d MMM \xB7 h:mm a") })
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-center justify-between gap-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm font-semibold", children: m3.title }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "text-xs text-muted-foreground shrink-0", children: format(new Date(m3.scheduled_at), "EEE, d MMM \xB7 h:mm a") })
     ] }),
-    m3.notes && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "mt-1 text-sm text-muted-foreground", children: m3.notes }),
-    m3.meeting_link && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("a", { href: m3.meeting_link, target: "_blank", rel: "noopener noreferrer", className: "mt-3 inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-xs hover:bg-brand/10", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(ExternalLink, { className: "h-3 w-3" }),
+    m3.notes && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "mt-1 text-sm text-muted-foreground", children: m3.notes }),
+    m3.meeting_link && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("a", { href: m3.meeting_link, target: "_blank", rel: "noopener noreferrer", className: "mt-3 inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-xs hover:bg-brand/10", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(ExternalLink, { className: "h-3 w-3" }),
       " Join meeting"
     ] })
   ] });
@@ -71965,13 +72221,13 @@ function QA({
   userId,
   userName
 }) {
-  const [msgs, setMsgs] = (0, import_react67.useState)([]);
-  const [input, setInput] = (0, import_react67.useState)("");
-  const [loading, setLoading] = (0, import_react67.useState)(true);
-  const [loadError, setLoadError] = (0, import_react67.useState)(false);
-  const [sending, setSending] = (0, import_react67.useState)(false);
-  const scrollRef = (0, import_react67.useRef)(null);
-  (0, import_react67.useEffect)(() => {
+  const [msgs, setMsgs] = (0, import_react68.useState)([]);
+  const [input, setInput] = (0, import_react68.useState)("");
+  const [loading, setLoading] = (0, import_react68.useState)(true);
+  const [loadError, setLoadError] = (0, import_react68.useState)(false);
+  const [sending, setSending] = (0, import_react68.useState)(false);
+  const scrollRef = (0, import_react68.useRef)(null);
+  (0, import_react68.useEffect)(() => {
     (async () => {
       const {
         data,
@@ -71984,7 +72240,7 @@ function QA({
       setLoading(false);
     })();
   }, [dealRoomId]);
-  (0, import_react67.useEffect)(() => {
+  (0, import_react68.useEffect)(() => {
     const channel = supabase.channel("qa-" + dealRoomId).on("postgres_changes", {
       event: "INSERT",
       schema: "public",
@@ -72011,7 +72267,7 @@ function QA({
       supabase.removeChannel(channel);
     };
   }, [dealRoomId, userId, userName]);
-  (0, import_react67.useEffect)(() => {
+  (0, import_react68.useEffect)(() => {
     scrollRef.current?.scrollTo({
       top: scrollRef.current.scrollHeight,
       behavior: "smooth"
@@ -72057,60 +72313,60 @@ function QA({
     }
     setSending(false);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex flex-col h-full", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "px-8 pt-6 pb-4 border-b border-border/60 shrink-0", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("h2", { className: "text-xl font-semibold tracking-tight", children: "Q&A Discussion" }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: "Public deal room discussion thread." })
+  return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex flex-col h-full", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "px-8 pt-6 pb-4 border-b border-border/60 shrink-0", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("h2", { className: "text-xl font-semibold tracking-tight", children: "Q&A Discussion" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("p", { className: "mt-1 text-sm text-muted-foreground", children: "Public deal room discussion thread." })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { ref: scrollRef, className: "flex-1 overflow-y-auto px-8 py-4 space-y-3", children: [
-      loading && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm text-muted-foreground animate-pulse", children: "Loading\u2026" }),
-      loadError && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("p", { className: "text-sm text-destructive", children: "Could not load data. Please refresh." }),
-      !loading && !loadError && msgs.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "text-sm text-muted-foreground", children: "No messages yet. Start the conversation." }),
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { ref: scrollRef, className: "flex-1 overflow-y-auto px-8 py-4 space-y-3", children: [
+      loading && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm text-muted-foreground animate-pulse", children: "Loading\u2026" }),
+      loadError && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("p", { className: "text-sm text-destructive", children: "Could not load data. Please refresh." }),
+      !loading && !loadError && msgs.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm text-muted-foreground", children: "No messages yet. Start the conversation." }),
       msgs.map((m3, i2) => {
         const isMe = m3.sender_id === userId;
         const name = isMe ? userName : m3.users?.full_name ?? "Unknown";
         const prev = msgs[i2 - 1];
         const grouped = prev && prev.sender_id === m3.sender_id;
         const initials = name.split(" ").map((s) => s[0]).slice(0, 2).join("");
-        return /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: cn3("flex gap-3", isMe ? "flex-row-reverse" : ""), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: cn3("h-8 w-8 shrink-0", grouped && "invisible"), children: /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: cn3("grid h-8 w-8 place-items-center rounded-full text-[10px] font-semibold", isMe ? "bg-gradient-brand text-brand-foreground" : "bg-accent"), children: initials }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: cn3("max-w-[72%]", isMe && "items-end flex flex-col"), children: [
-            !grouped && /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: cn3("flex items-center gap-2 mb-1 text-[11px]", isMe && "flex-row-reverse"), children: [
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "font-medium", children: name }),
-              /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("span", { className: "text-muted-foreground", children: format(new Date(m3.created_at), "h:mm a") })
+        return /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: cn3("flex gap-3", isMe ? "flex-row-reverse" : ""), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: cn3("h-8 w-8 shrink-0", grouped && "invisible"), children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: cn3("grid h-8 w-8 place-items-center rounded-full text-[10px] font-semibold", isMe ? "bg-gradient-brand text-brand-foreground" : "bg-accent"), children: initials }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: cn3("max-w-[72%]", isMe && "items-end flex flex-col"), children: [
+            !grouped && /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: cn3("flex items-center gap-2 mb-1 text-[11px]", isMe && "flex-row-reverse"), children: [
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "font-medium", children: name }),
+              /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "text-muted-foreground", children: format(new Date(m3.created_at), "h:mm a") })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: cn3("rounded-2xl px-3.5 py-2 text-sm", isMe ? "bg-gradient-brand text-brand-foreground rounded-tr-sm" : "bg-accent rounded-tl-sm"), children: m3.body })
+            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: cn3("rounded-2xl px-3.5 py-2 text-sm", isMe ? "bg-gradient-brand text-brand-foreground rounded-tr-sm" : "bg-accent rounded-tl-sm"), children: m3.body })
           ] })
         ] }, m3.id);
       })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("div", { className: "px-8 py-4 border-t border-border/60 bg-background shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("div", { className: "flex items-end gap-2 rounded-xl border border-border/60 bg-card px-3 py-2 focus-within:border-brand/50 focus-within:ring-2 focus-within:ring-brand/10 transition", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsx)("textarea", { rows: 1, value: input, onChange: (e) => setInput(e.target.value), onKeyDown: (e) => {
+    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "px-8 py-4 border-t border-border/60 bg-background shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "flex items-end gap-2 rounded-xl border border-border/60 bg-card px-3 py-2 focus-within:border-brand/50 focus-within:ring-2 focus-within:ring-brand/10 transition", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("textarea", { rows: 1, value: input, onChange: (e) => setInput(e.target.value), onKeyDown: (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
           e.preventDefault();
           send();
         }
       }, placeholder: "Ask a question or leave a comment\u2026", className: "flex-1 bg-transparent text-sm resize-none outline-none max-h-32 py-1" }),
-      /* @__PURE__ */ (0, import_jsx_runtime78.jsxs)("button", { onClick: send, disabled: !input.trim() || !userId || sending, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs disabled:opacity-50", children: [
-        sending ? /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime78.jsx)(Send, { className: "h-3.5 w-3.5" }),
+      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("button", { onClick: send, disabled: !input.trim() || !userId || sending, className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs disabled:opacity-50", children: [
+        sending ? /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Send, { className: "h-3.5 w-3.5" }),
         "Send"
       ] })
     ] }) })
   ] });
 }
-var import_jsx_runtime78, import_react67, statusMeta, cycle2, DOCS, STAGES5, SECTION_META, DECISION_TO_DB, DB_TO_DECISION, tabs2, CATEGORY_COLORS;
-var init_app_deal_room_id_CJCHVxIK = __esm({
-  "dist/server/assets/app.deal-room._id-CJCHVxIK.js"() {
+var import_jsx_runtime79, import_react68, statusMeta, cycle2, DOCS, STAGES5, SECTION_META, DECISION_TO_DB, DB_TO_DECISION, tabs2, CATEGORY_COLORS;
+var init_app_deal_room_id_DTpIlyeK = __esm({
+  "dist/server/assets/app.deal-room._id-DTpIlyeK.js"() {
     "use strict";
-    import_jsx_runtime78 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime79 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    import_react67 = __toESM(require_react(), 1);
+    import_react68 = __toESM(require_react(), 1);
     init_date_fns();
     init_dist7();
     init_lucide_react();
     init_modern2();
     init_backend_CMfy16B4();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_utils_H80jjgLf();
     init_store_LLbTvev();
     init_clsx();
@@ -72203,9 +72459,9 @@ var init_app_deal_room_id_CJCHVxIK = __esm({
   }
 });
 
-// dist/server/assets/app.deal-room._id_.nda-Ci2upYUl.js
-var app_deal_room_id_nda_Ci2upYUl_exports = {};
-__export(app_deal_room_id_nda_Ci2upYUl_exports, {
+// dist/server/assets/app.deal-room._id_.nda-gaWbjQx5.js
+var app_deal_room_id_nda_gaWbjQx5_exports = {};
+__export(app_deal_room_id_nda_gaWbjQx5_exports, {
   component: () => NdaPage
 });
 function buildNdaText(startupName, founderName, investorName, date) {
@@ -72283,9 +72539,9 @@ function NdaPage() {
   const {
     user
   } = useAuth();
-  const [agreed, setAgreed] = (0, import_react68.useState)(false);
-  const [accepting, setAccepting] = (0, import_react68.useState)(false);
-  const [error, setError] = (0, import_react68.useState)("");
+  const [agreed, setAgreed] = (0, import_react69.useState)(false);
+  const [accepting, setAccepting] = (0, import_react69.useState)(false);
+  const [error, setError] = (0, import_react69.useState)("");
   const {
     data: existingAcceptance,
     isLoading: checkingNda
@@ -72299,7 +72555,7 @@ function NdaPage() {
       return data ?? null;
     }
   });
-  (0, import_react68.useEffect)(() => {
+  (0, import_react69.useEffect)(() => {
     if (!checkingNda && existingAcceptance) {
       navigate({
         to: "/app/deal-room/$id",
@@ -72384,76 +72640,76 @@ function NdaPage() {
     }
   };
   if (checkingNda || roomLoading) {
-    return /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "min-h-[calc(100vh-4rem)] grid place-items-center", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-sm text-muted-foreground animate-pulse", children: "Loading\u2026" }) });
+    return /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "min-h-[calc(100vh-4rem)] grid place-items-center", children: /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "text-sm text-muted-foreground animate-pulse", children: "Loading\u2026" }) });
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "min-h-[calc(100vh-4rem)] bg-muted/30 py-10 px-4", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "mx-auto max-w-2xl", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "flex justify-center mb-8", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Logo, { withWordmark: true }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "px-8 py-6 border-b border-border/60 flex items-center gap-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-brand/10 border border-brand/20", children: /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Shield, { className: "h-6 w-6 text-brand" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("h1", { className: "text-xl font-semibold tracking-tight", children: "Non-Disclosure Agreement" }),
-          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("p", { className: "text-sm text-muted-foreground mt-0.5", children: "Review and sign to access this deal room." })
+  return /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "min-h-[calc(100vh-4rem)] bg-muted/30 py-10 px-4", children: /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("div", { className: "mx-auto max-w-2xl", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "flex justify-center mb-8", children: /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(Logo, { withWordmark: true }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("div", { className: "px-8 py-6 border-b border-border/60 flex items-center gap-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-brand/10 border border-brand/20", children: /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(Shield, { className: "h-6 w-6 text-brand" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("h1", { className: "text-xl font-semibold tracking-tight", children: "Non-Disclosure Agreement" }),
+          /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("p", { className: "text-sm text-muted-foreground mt-0.5", children: "Review and sign to access this deal room." })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "px-8 py-6 space-y-6", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "grid grid-cols-3 gap-3 text-xs", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-lg border border-border/60 bg-background p-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-muted-foreground mb-0.5", children: "Company" }),
-            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "font-medium truncate", children: startupName })
+      /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("div", { className: "px-8 py-6 space-y-6", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("div", { className: "grid grid-cols-3 gap-3 text-xs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("div", { className: "rounded-lg border border-border/60 bg-background p-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "text-muted-foreground mb-0.5", children: "Company" }),
+            /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "font-medium truncate", children: startupName })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-lg border border-border/60 bg-background p-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-muted-foreground mb-0.5", children: "Signing as" }),
-            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "font-medium truncate", children: investorName })
+          /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("div", { className: "rounded-lg border border-border/60 bg-background p-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "text-muted-foreground mb-0.5", children: "Signing as" }),
+            /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "font-medium truncate", children: investorName })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "rounded-lg border border-border/60 bg-background p-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-muted-foreground mb-0.5", children: "Version" }),
-            /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { className: "font-medium", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("div", { className: "rounded-lg border border-border/60 bg-background p-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "text-muted-foreground mb-0.5", children: "Version" }),
+            /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("div", { className: "font-medium", children: [
               "v1.0 \xB7 ",
               today
             ] })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2", children: "Agreement text" }),
-          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("div", { className: "h-64 overflow-y-auto rounded-xl border border-border/60 bg-background p-5 text-xs leading-relaxed text-muted-foreground whitespace-pre-wrap", children: ndaText })
+        /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2", children: "Agreement text" }),
+          /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "h-64 overflow-y-auto rounded-xl border border-border/60 bg-background p-5 text-xs leading-relaxed text-muted-foreground whitespace-pre-wrap", children: ndaText })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)("label", { className: "flex items-start gap-3 cursor-pointer", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("input", { type: "checkbox", checked: agreed, onChange: (e) => setAgreed(e.target.checked), className: "mt-0.5 h-4 w-4 shrink-0 accent-[var(--brand)] cursor-pointer" }),
-          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("span", { className: "text-sm leading-snug", children: "I have read and agree to the terms of this Non-Disclosure Agreement. I understand this is a legally binding agreement executed electronically." })
+        /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("label", { className: "flex items-start gap-3 cursor-pointer", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("input", { type: "checkbox", checked: agreed, onChange: (e) => setAgreed(e.target.checked), className: "mt-0.5 h-4 w-4 shrink-0 accent-[var(--brand)] cursor-pointer" }),
+          /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("span", { className: "text-sm leading-snug", children: "I have read and agree to the terms of this Non-Disclosure Agreement. I understand this is a legally binding agreement executed electronically." })
         ] }),
-        error && /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("p", { className: "text-sm text-destructive", children: error }),
-        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("button", { onClick: handleAccept, disabled: !agreed || accepting || !user?.id, className: "w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-brand text-brand-foreground py-3 text-sm font-medium shadow-glow disabled:opacity-50 disabled:shadow-none transition-all hover:scale-[1.01]", children: accepting ? /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)(import_jsx_runtime79.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(LoaderCircle, { className: "h-4 w-4 animate-spin" }),
+        error && /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("p", { className: "text-sm text-destructive", children: error }),
+        /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("button", { onClick: handleAccept, disabled: !agreed || accepting || !user?.id, className: "w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-brand text-brand-foreground py-3 text-sm font-medium shadow-glow disabled:opacity-50 disabled:shadow-none transition-all hover:scale-[1.01]", children: accepting ? /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)(import_jsx_runtime80.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(LoaderCircle, { className: "h-4 w-4 animate-spin" }),
           " Saving\u2026"
-        ] }) : /* @__PURE__ */ (0, import_jsx_runtime79.jsxs)(import_jsx_runtime79.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime79.jsx)(Lock, { className: "h-4 w-4" }),
+        ] }) : /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)(import_jsx_runtime80.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(Lock, { className: "h-4 w-4" }),
           " Accept & Enter Deal Room"
         ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime79.jsx)("p", { className: "text-center text-xs text-muted-foreground pb-2", children: "Your acceptance is timestamped and logged with your browser's user-agent string." })
+        /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("p", { className: "text-center text-xs text-muted-foreground pb-2", children: "Your acceptance is timestamped and logged with your browser's user-agent string." })
       ] })
     ] })
   ] }) });
 }
-var import_jsx_runtime79, import_react68;
-var init_app_deal_room_id_nda_Ci2upYUl = __esm({
-  "dist/server/assets/app.deal-room._id_.nda-Ci2upYUl.js"() {
+var import_jsx_runtime80, import_react69;
+var init_app_deal_room_id_nda_gaWbjQx5 = __esm({
+  "dist/server/assets/app.deal-room._id_.nda-gaWbjQx5.js"() {
     "use strict";
-    import_jsx_runtime79 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime80 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    import_react68 = __toESM(require_react(), 1);
+    import_react69 = __toESM(require_react(), 1);
     init_modern2();
     init_lucide_react();
-    init_router_B5AOfxDk();
+    init_router_DOcN9fVX();
     init_Logo_CIkq6vsm();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/router-B5AOfxDk.js
-var router_B5AOfxDk_exports = {};
-__export(router_B5AOfxDk_exports, {
+// dist/server/assets/router-DOcN9fVX.js
+var router_DOcN9fVX_exports = {};
+__export(router_DOcN9fVX_exports, {
   L: () => LANGUAGES,
   R: () => Route$w,
   a: () => useI18n,
@@ -72491,8 +72747,8 @@ async function uploadDocument(file, dealRoomId, userId) {
   return data ? { path, signedUrl: data.signedUrl } : null;
 }
 function AuthProvider({ children }) {
-  const [user, setUser] = (0, import_react69.useState)(null);
-  const [loading, setLoading] = (0, import_react69.useState)(true);
+  const [user, setUser] = (0, import_react70.useState)(null);
+  const [loading, setLoading] = (0, import_react70.useState)(true);
   const buildUser = async (supabaseUser) => {
     const { data } = await supabase.from("users").select("role, full_name").eq("id", supabaseUser.id).maybeSingle();
     const role = data?.role || supabaseUser.user_metadata?.role || "founder";
@@ -72503,7 +72759,7 @@ function AuthProvider({ children }) {
       role
     };
   };
-  (0, import_react69.useEffect)(() => {
+  (0, import_react70.useEffect)(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
         const appUser = await buildUser(session.user);
@@ -72529,10 +72785,10 @@ function AuthProvider({ children }) {
     setUser(null);
     window.location.href = "/sign-in";
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(AuthContext.Provider, { value: { user, loading, signOut }, children });
+  return /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(AuthContext.Provider, { value: { user, loading, signOut }, children });
 }
 function useAuth() {
-  return (0, import_react69.useContext)(AuthContext);
+  return (0, import_react70.useContext)(AuthContext);
 }
 function systemPref() {
   if (typeof window === "undefined") return "light";
@@ -72545,19 +72801,19 @@ function apply(resolved) {
   root.style.colorScheme = resolved;
 }
 function ThemeProvider({ children }) {
-  const [theme, setThemeState] = (0, import_react69.useState)("system");
-  const [resolved, setResolved] = (0, import_react69.useState)("light");
-  (0, import_react69.useEffect)(() => {
+  const [theme, setThemeState] = (0, import_react70.useState)("system");
+  const [resolved, setResolved] = (0, import_react70.useState)("light");
+  (0, import_react70.useEffect)(() => {
     const stored = typeof window !== "undefined" && localStorage.getItem(STORAGE_KEY$1) || "system";
     setThemeState(stored);
   }, []);
-  (0, import_react69.useEffect)(() => {
+  (0, import_react70.useEffect)(() => {
     const next = theme === "system" ? systemPref() : theme;
     setResolved(next);
     apply(next);
     if (typeof window !== "undefined") localStorage.setItem(STORAGE_KEY$1, theme);
   }, [theme]);
-  (0, import_react69.useEffect)(() => {
+  (0, import_react70.useEffect)(() => {
     if (theme !== "system" || typeof window === "undefined") return;
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const onChange = () => {
@@ -72568,41 +72824,41 @@ function ThemeProvider({ children }) {
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
   }, [theme]);
-  return /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(ThemeContext.Provider, { value: { theme, resolved, setTheme: setThemeState }, children });
+  return /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(ThemeContext.Provider, { value: { theme, resolved, setTheme: setThemeState }, children });
 }
 function useTheme() {
-  const ctx = (0, import_react69.useContext)(ThemeContext);
+  const ctx = (0, import_react70.useContext)(ThemeContext);
   if (!ctx) throw new Error("useTheme must be used within ThemeProvider");
   return ctx;
 }
 function I18nProvider({ children }) {
-  const [lang, setLangState] = (0, import_react69.useState)("en");
-  (0, import_react69.useEffect)(() => {
+  const [lang, setLangState] = (0, import_react70.useState)("en");
+  (0, import_react70.useEffect)(() => {
     const stored = typeof window !== "undefined" && localStorage.getItem(STORAGE_KEY2) || "en";
     setLangState(stored);
   }, []);
   const dir = LANGUAGES.find((l2) => l2.code === lang)?.dir ?? "ltr";
-  (0, import_react69.useEffect)(() => {
+  (0, import_react70.useEffect)(() => {
     if (typeof document === "undefined") return;
     document.documentElement.lang = lang;
     document.documentElement.dir = dir;
     if (typeof window !== "undefined") localStorage.setItem(STORAGE_KEY2, lang);
   }, [lang, dir]);
-  const t = (0, import_react69.useMemo)(() => (key) => dicts[lang][key] ?? dicts.en[key] ?? key, [lang]);
-  const ctx = (0, import_react69.useMemo)(() => ({ lang, dir, setLang: setLangState, t }), [lang, dir, t]);
-  return /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(I18nContext.Provider, { value: ctx, children });
+  const t = (0, import_react70.useMemo)(() => (key) => dicts[lang][key] ?? dicts.en[key] ?? key, [lang]);
+  const ctx = (0, import_react70.useMemo)(() => ({ lang, dir, setLang: setLangState, t }), [lang, dir, t]);
+  return /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(I18nContext.Provider, { value: ctx, children });
 }
 function useI18n() {
-  const ctx = (0, import_react69.useContext)(I18nContext);
+  const ctx = (0, import_react70.useContext)(I18nContext);
   if (!ctx) throw new Error("useI18n must be used within I18nProvider");
   return ctx;
 }
 function NotFoundComponent() {
-  return /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "flex min-h-screen items-center justify-center bg-background px-4", children: /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("div", { className: "max-w-md text-center", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("h1", { className: "text-7xl font-bold text-foreground", children: "404" }),
-    /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("h2", { className: "mt-4 text-xl font-semibold text-foreground", children: "Page not found" }),
-    /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("p", { className: "mt-2 text-sm text-muted-foreground", children: "The page you're looking for doesn't exist or has been moved." }),
-    /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "mt-6", children: /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime81.jsx)("div", { className: "flex min-h-screen items-center justify-center bg-background px-4", children: /* @__PURE__ */ (0, import_jsx_runtime81.jsxs)("div", { className: "max-w-md text-center", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime81.jsx)("h1", { className: "text-7xl font-bold text-foreground", children: "404" }),
+    /* @__PURE__ */ (0, import_jsx_runtime81.jsx)("h2", { className: "mt-4 text-xl font-semibold text-foreground", children: "Page not found" }),
+    /* @__PURE__ */ (0, import_jsx_runtime81.jsx)("p", { className: "mt-2 text-sm text-muted-foreground", children: "The page you're looking for doesn't exist or has been moved." }),
+    /* @__PURE__ */ (0, import_jsx_runtime81.jsx)("div", { className: "mt-6", children: /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(
       Link,
       {
         to: "/",
@@ -72613,11 +72869,11 @@ function NotFoundComponent() {
   ] }) });
 }
 function RootShell({ children }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("html", { lang: "en", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("head", { children: /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(HeadContent, {}) }),
-    /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("body", { children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime81.jsxs)("html", { lang: "en", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime81.jsx)("head", { children: /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(HeadContent, {}) }),
+    /* @__PURE__ */ (0, import_jsx_runtime81.jsxs)("body", { children: [
       children,
-      /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(Scripts, {})
+      /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(Scripts, {})
     ] })
   ] });
 }
@@ -72627,15 +72883,15 @@ function RootComponent() {
     console.log("[env-check] VITE_SUPABASE_ANON_KEY:", "present");
     console.log("[env-check] VITE_GOOGLE_CLIENT_ID:", "present");
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(ThemeProvider, { children: /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(I18nProvider, { children: /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)(AuthProvider, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(Outlet, {}),
-    /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(Toaster3, {})
+  return /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(ThemeProvider, { children: /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(I18nProvider, { children: /* @__PURE__ */ (0, import_jsx_runtime81.jsxs)(AuthProvider, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(Outlet, {}),
+    /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(Toaster3, {})
   ] }) }) }) });
 }
 function DefaultErrorComponent({ error, reset }) {
   const router2 = useRouter();
-  return /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "flex min-h-screen items-center justify-center bg-background px-4", children: /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("div", { className: "max-w-md text-center", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("div", { className: "mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10", children: /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime81.jsx)("div", { className: "flex min-h-screen items-center justify-center bg-background px-4", children: /* @__PURE__ */ (0, import_jsx_runtime81.jsxs)("div", { className: "max-w-md text-center", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime81.jsx)("div", { className: "mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10", children: /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(
       "svg",
       {
         xmlns: "http://www.w3.org/2000/svg",
@@ -72644,7 +72900,7 @@ function DefaultErrorComponent({ error, reset }) {
         viewBox: "0 0 24 24",
         stroke: "currentColor",
         strokeWidth: 2,
-        children: /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(
+        children: /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(
           "path",
           {
             strokeLinecap: "round",
@@ -72654,11 +72910,11 @@ function DefaultErrorComponent({ error, reset }) {
         )
       }
     ) }),
-    /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("h1", { className: "text-2xl font-bold tracking-tight text-foreground", children: "Something went wrong" }),
-    /* @__PURE__ */ (0, import_jsx_runtime80.jsx)("p", { className: "mt-2 text-sm text-muted-foreground", children: "An unexpected error occurred. Please try again." }),
+    /* @__PURE__ */ (0, import_jsx_runtime81.jsx)("h1", { className: "text-2xl font-bold tracking-tight text-foreground", children: "Something went wrong" }),
+    /* @__PURE__ */ (0, import_jsx_runtime81.jsx)("p", { className: "mt-2 text-sm text-muted-foreground", children: "An unexpected error occurred. Please try again." }),
     false,
-    /* @__PURE__ */ (0, import_jsx_runtime80.jsxs)("div", { className: "mt-6 flex items-center justify-center gap-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime81.jsxs)("div", { className: "mt-6 flex items-center justify-center gap-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(
         "button",
         {
           onClick: () => {
@@ -72669,7 +72925,7 @@ function DefaultErrorComponent({ error, reset }) {
           children: "Try again"
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(
         "a",
         {
           href: "/",
@@ -72680,27 +72936,27 @@ function DefaultErrorComponent({ error, reset }) {
     ] })
   ] }) });
 }
-var import_jsx_runtime80, import_react69, url, anonKey, supabase, AuthContext, ThemeContext, STORAGE_KEY$1, LANGUAGES, en2, es, fr2, de3, ar2, dicts, STORAGE_KEY2, I18nContext, Toaster3, appCss, queryClient, Route$P, $$splitComponentImporter$O, Route$O, $$splitComponentImporter$N, Route$N, $$splitComponentImporter$M, Route$M, $$splitComponentImporter$L, Route$L, $$splitComponentImporter$K, Route$K, $$splitComponentImporter$J, Route$J, $$splitComponentImporter$I, Route$I, $$splitComponentImporter$H, Route$H, $$splitComponentImporter$G, Route$G, $$splitComponentImporter$F, Route$F, $$splitComponentImporter$E, Route$E, $$splitComponentImporter$D, Route$D, $$splitComponentImporter$C, Route$C, $$splitComponentImporter$B, Route$B, $$splitComponentImporter$A, Route$A, $$splitComponentImporter$z, Route$z, $$splitComponentImporter$y, Route$y, $$splitComponentImporter$x, Route$x, $$splitComponentImporter$w, Route$w, $$splitComponentImporter$v, Route$v, $$splitComponentImporter$u, Route$u, $$splitComponentImporter$t, Route$t, $$splitComponentImporter$s, Route$s, $$splitComponentImporter$r, Route$r, $$splitComponentImporter$q, Route$q, $$splitComponentImporter$p, Route$p, $$splitComponentImporter$o, Route$o, $$splitComponentImporter$n, Route$n, $$splitComponentImporter$m, Route$m, $$splitComponentImporter$l, Route$l, $$splitComponentImporter$k, Route$k, $$splitComponentImporter$j, Route$j, $$splitComponentImporter$i, Route$i, $$splitComponentImporter$h, Route$h, $$splitComponentImporter$g, Route$g, $$splitComponentImporter$f, Route$f, $$splitComponentImporter$e, Route$e, $$splitComponentImporter$d, Route$d, $$splitComponentImporter$c, Route$c, $$splitComponentImporter$b, Route$b, $$splitComponentImporter$a, Route$a, $$splitComponentImporter$9, Route$9, $$splitComponentImporter$8, Route$8, $$splitComponentImporter$7, Route$7, $$splitComponentImporter$6, Route$6, $$splitComponentImporter$5, Route$5, $$splitComponentImporter$4, Route$4, $$splitComponentImporter$3, Route$3, $$splitComponentImporter$2, Route$2, $$splitComponentImporter$1, Route$1, $$splitComponentImporter, Route2, TermsRoute, SignUpRoute, SignInRoute, PrivacyRoute, PricingRoute, InvestorsRoute, FoundersRoute, ForgotPasswordRoute, DebugRoute, AppRoute, AboutRoute, IndexRoute, AppIndexRoute, SolutionsVcDealRoomRoute, SolutionsRaise1mRoute, SolutionsInvestorPipelineRoute, SolutionsFundraisingCrmRoute, SolutionsDueDiligenceRoute, JoinTokenRoute, AuthCallbackRoute, AppUsersRoute, AppSettingsRoute, AppReportsRoute, AppProfileRoute, AppPipelineRoute, AppNotificationsRoute, AppMessagesRoute, AppMeetingsRoute, AppLeadsRoute, AppInvestorRoute, AppEmailRoute, AppDocumentsRoute, AppDealRoomsRoute, AppAuditRoute, AppAdvisorRoute, AppInvestorIndexRoute, AppSettingsSecurityRoute, AppSettingsNotificationsRoute, AppSettingsDomainRoute, AppSettingsBillingRoute, AppInvestorTeamRoute, AppInvestorStartupsRoute, AppInvestorPortfolioRoute, AppInvestorPipelineRoute, AppInvestorDiligenceRoute, AppInvestorDecisionsRoute, AppInvestorDealRoomsRoute, AppInvestorDealFlowRoute, AppInvestorAnalysisRoute, AppDealRoomIdRoute, AppDealRoomIdNdaRoute, AppInvestorRouteChildren, AppInvestorRouteWithChildren, AppSettingsRouteChildren, AppSettingsRouteWithChildren, AppRouteChildren, AppRouteWithChildren, rootRouteChildren, routeTree, getRouter, router;
-var init_router_B5AOfxDk = __esm({
-  "dist/server/assets/router-B5AOfxDk.js"() {
+var import_jsx_runtime81, import_react70, url, anonKey, supabase, AuthContext, ThemeContext, STORAGE_KEY$1, LANGUAGES, en2, es, fr2, de3, ar2, dicts, STORAGE_KEY2, I18nContext, Toaster3, appCss, queryClient, Route$P, $$splitComponentImporter$O, Route$O, $$splitComponentImporter$N, Route$N, $$splitComponentImporter$M, Route$M, $$splitComponentImporter$L, Route$L, $$splitComponentImporter$K, Route$K, $$splitComponentImporter$J, Route$J, $$splitComponentImporter$I, Route$I, $$splitComponentImporter$H, Route$H, $$splitComponentImporter$G, Route$G, $$splitComponentImporter$F, Route$F, $$splitComponentImporter$E, Route$E, $$splitComponentImporter$D, Route$D, $$splitComponentImporter$C, Route$C, $$splitComponentImporter$B, Route$B, $$splitComponentImporter$A, Route$A, $$splitComponentImporter$z, Route$z, $$splitComponentImporter$y, Route$y, $$splitComponentImporter$x, Route$x, $$splitComponentImporter$w, Route$w, $$splitComponentImporter$v, Route$v, $$splitComponentImporter$u, Route$u, $$splitComponentImporter$t, Route$t, $$splitComponentImporter$s, Route$s, $$splitComponentImporter$r, Route$r, $$splitComponentImporter$q, Route$q, $$splitComponentImporter$p, Route$p, $$splitComponentImporter$o, Route$o, $$splitComponentImporter$n, Route$n, $$splitComponentImporter$m, Route$m, $$splitComponentImporter$l, Route$l, $$splitComponentImporter$k, Route$k, $$splitComponentImporter$j, Route$j, $$splitComponentImporter$i, Route$i, $$splitComponentImporter$h, Route$h, $$splitComponentImporter$g, Route$g, $$splitComponentImporter$f, Route$f, $$splitComponentImporter$e, Route$e, $$splitComponentImporter$d, Route$d, $$splitComponentImporter$c, Route$c, $$splitComponentImporter$b, Route$b, $$splitComponentImporter$a, Route$a, $$splitComponentImporter$9, Route$9, $$splitComponentImporter$8, Route$8, $$splitComponentImporter$7, Route$7, $$splitComponentImporter$6, Route$6, $$splitComponentImporter$5, Route$5, $$splitComponentImporter$4, Route$4, $$splitComponentImporter$3, Route$3, $$splitComponentImporter$2, Route$2, $$splitComponentImporter$1, Route$1, $$splitComponentImporter, Route2, TermsRoute, SignUpRoute, SignInRoute, PrivacyRoute, PricingRoute, InvestorsRoute, FoundersRoute, ForgotPasswordRoute, DebugRoute, AppRoute, AboutRoute, IndexRoute, AppIndexRoute, SolutionsVcDealRoomRoute, SolutionsRaise1mRoute, SolutionsInvestorPipelineRoute, SolutionsFundraisingCrmRoute, SolutionsDueDiligenceRoute, JoinTokenRoute, AuthCallbackRoute, AppUsersRoute, AppSettingsRoute, AppReportsRoute, AppProfileRoute, AppPipelineRoute, AppNotificationsRoute, AppMessagesRoute, AppMeetingsRoute, AppLeadsRoute, AppInvestorRoute, AppEmailRoute, AppDocumentsRoute, AppDealRoomsRoute, AppAuditRoute, AppAdvisorRoute, AppInvestorIndexRoute, AppSettingsSecurityRoute, AppSettingsNotificationsRoute, AppSettingsDomainRoute, AppSettingsBillingRoute, AppInvestorTeamRoute, AppInvestorStartupsRoute, AppInvestorPortfolioRoute, AppInvestorPipelineRoute, AppInvestorDiligenceRoute, AppInvestorDecisionsRoute, AppInvestorDealRoomsRoute, AppInvestorDealFlowRoute, AppInvestorAnalysisRoute, AppDealRoomIdRoute, AppDealRoomIdNdaRoute, AppInvestorRouteChildren, AppInvestorRouteWithChildren, AppSettingsRouteChildren, AppSettingsRouteWithChildren, AppRouteChildren, AppRouteWithChildren, rootRouteChildren, routeTree, getRouter, router;
+var init_router_DOcN9fVX = __esm({
+  "dist/server/assets/router-DOcN9fVX.js"() {
     "use strict";
-    import_jsx_runtime80 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime81 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_modern2();
-    import_react69 = __toESM(require_react(), 1);
+    import_react70 = __toESM(require_react(), 1);
     init_dist6();
     init_dist7();
     init_clsx();
     url = "https://ldimninnjlvxozubheib.supabase.co";
     anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
     supabase = createClient(url, anonKey);
-    AuthContext = (0, import_react69.createContext)({
+    AuthContext = (0, import_react70.createContext)({
       user: null,
       loading: true,
       signOut: async () => {
       }
     });
-    ThemeContext = (0, import_react69.createContext)(null);
+    ThemeContext = (0, import_react70.createContext)(null);
     STORAGE_KEY$1 = "vr.theme";
     LANGUAGES = [
       { code: "en", label: "English", flag: "\u{1F1EC}\u{1F1E7}", dir: "ltr" },
@@ -73066,9 +73322,9 @@ var init_router_B5AOfxDk = __esm({
     };
     dicts = { en: en2, es, fr: fr2, de: de3, ar: ar2 };
     STORAGE_KEY2 = "vr.lang";
-    I18nContext = (0, import_react69.createContext)(null);
+    I18nContext = (0, import_react70.createContext)(null);
     Toaster3 = ({ ...props }) => {
-      return /* @__PURE__ */ (0, import_jsx_runtime80.jsx)(
+      return /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(
         Toaster,
         {
           className: "toaster group",
@@ -73084,7 +73340,7 @@ var init_router_B5AOfxDk = __esm({
         }
       );
     };
-    appCss = "/assets/styles-DMrkfjnv.css";
+    appCss = "/assets/styles-BHJyw8Lt.css";
     queryClient = new QueryClient();
     Route$P = createRootRoute({
       head: () => ({
@@ -73111,7 +73367,7 @@ var init_router_B5AOfxDk = __esm({
       component: RootComponent,
       notFoundComponent: NotFoundComponent
     });
-    $$splitComponentImporter$O = () => Promise.resolve().then(() => (init_terms_Wy5FibWA(), terms_Wy5FibWA_exports));
+    $$splitComponentImporter$O = () => Promise.resolve().then(() => (init_terms_Bk_4YK9E(), terms_Bk_4YK9E_exports));
     Route$O = createFileRoute("/terms")({
       head: () => ({
         meta: [{
@@ -73123,15 +73379,15 @@ var init_router_B5AOfxDk = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$O, "component")
     });
-    $$splitComponentImporter$N = () => Promise.resolve().then(() => (init_sign_up_BXj_wnhS(), sign_up_BXj_wnhS_exports));
+    $$splitComponentImporter$N = () => Promise.resolve().then(() => (init_sign_up_BNg05rfB(), sign_up_BNg05rfB_exports));
     Route$N = createFileRoute("/sign-up")({
       component: lazyRouteComponent($$splitComponentImporter$N, "component")
     });
-    $$splitComponentImporter$M = () => Promise.resolve().then(() => (init_sign_in_53a5BpQu(), sign_in_53a5BpQu_exports));
+    $$splitComponentImporter$M = () => Promise.resolve().then(() => (init_sign_in_s9FuAMRc(), sign_in_s9FuAMRc_exports));
     Route$M = createFileRoute("/sign-in")({
       component: lazyRouteComponent($$splitComponentImporter$M, "component")
     });
-    $$splitComponentImporter$L = () => Promise.resolve().then(() => (init_privacy_DtQjuu4P(), privacy_DtQjuu4P_exports));
+    $$splitComponentImporter$L = () => Promise.resolve().then(() => (init_privacy_DDwupa3M(), privacy_DDwupa3M_exports));
     Route$L = createFileRoute("/privacy")({
       head: () => ({
         meta: [{
@@ -73143,7 +73399,7 @@ var init_router_B5AOfxDk = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$L, "component")
     });
-    $$splitComponentImporter$K = () => Promise.resolve().then(() => (init_pricing_DpEBtPMH(), pricing_DpEBtPMH_exports));
+    $$splitComponentImporter$K = () => Promise.resolve().then(() => (init_pricing_CiA9y4jB(), pricing_CiA9y4jB_exports));
     Route$K = createFileRoute("/pricing")({
       head: () => ({
         meta: [{
@@ -73155,7 +73411,7 @@ var init_router_B5AOfxDk = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$K, "component")
     });
-    $$splitComponentImporter$J = () => Promise.resolve().then(() => (init_investors_CjijGePX(), investors_CjijGePX_exports));
+    $$splitComponentImporter$J = () => Promise.resolve().then(() => (init_investors_6EJWAmeW(), investors_6EJWAmeW_exports));
     Route$J = createFileRoute("/investors")({
       head: () => ({
         meta: [{
@@ -73167,7 +73423,7 @@ var init_router_B5AOfxDk = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$J, "component")
     });
-    $$splitComponentImporter$I = () => Promise.resolve().then(() => (init_founders_PW90z_eg(), founders_PW90z_eg_exports));
+    $$splitComponentImporter$I = () => Promise.resolve().then(() => (init_founders_DigGCrJP(), founders_DigGCrJP_exports));
     Route$I = createFileRoute("/founders")({
       head: () => ({
         meta: [{
@@ -73179,7 +73435,7 @@ var init_router_B5AOfxDk = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$I, "component")
     });
-    $$splitComponentImporter$H = () => Promise.resolve().then(() => (init_forgot_password_BKZ1D9EZ(), forgot_password_BKZ1D9EZ_exports));
+    $$splitComponentImporter$H = () => Promise.resolve().then(() => (init_forgot_password_Bytr6Oz5(), forgot_password_Bytr6Oz5_exports));
     Route$H = createFileRoute("/forgot-password")({
       component: lazyRouteComponent($$splitComponentImporter$H, "component")
     });
@@ -73187,7 +73443,7 @@ var init_router_B5AOfxDk = __esm({
     Route$G = createFileRoute("/debug")({
       component: lazyRouteComponent($$splitComponentImporter$G, "component")
     });
-    $$splitComponentImporter$F = () => Promise.resolve().then(() => (init_app_DYg0EBXN(), app_DYg0EBXN_exports));
+    $$splitComponentImporter$F = () => Promise.resolve().then(() => (init_app_DNuWOEfq(), app_DNuWOEfq_exports));
     Route$F = createFileRoute("/app")({
       beforeLoad: async () => {
         if (typeof window === "undefined") return;
@@ -73220,7 +73476,7 @@ var init_router_B5AOfxDk = __esm({
       },
       component: lazyRouteComponent($$splitComponentImporter$F, "component")
     });
-    $$splitComponentImporter$E = () => Promise.resolve().then(() => (init_about_DXN8ms4s(), about_DXN8ms4s_exports));
+    $$splitComponentImporter$E = () => Promise.resolve().then(() => (init_about_Dlx6eCup(), about_Dlx6eCup_exports));
     Route$E = createFileRoute("/about")({
       head: () => ({
         meta: [{
@@ -73232,7 +73488,7 @@ var init_router_B5AOfxDk = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$E, "component")
     });
-    $$splitComponentImporter$D = () => Promise.resolve().then(() => (init_index_B0MS24Ah(), index_B0MS24Ah_exports));
+    $$splitComponentImporter$D = () => Promise.resolve().then(() => (init_index_BAVbkYGN(), index_BAVbkYGN_exports));
     Route$D = createFileRoute("/")({
       head: () => ({
         meta: [{
@@ -73250,11 +73506,11 @@ var init_router_B5AOfxDk = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$D, "component")
     });
-    $$splitComponentImporter$C = () => Promise.resolve().then(() => (init_app_index_CMz44UaC(), app_index_CMz44UaC_exports));
+    $$splitComponentImporter$C = () => Promise.resolve().then(() => (init_app_index_D4fReIdX(), app_index_D4fReIdX_exports));
     Route$C = createFileRoute("/app/")({
       component: lazyRouteComponent($$splitComponentImporter$C, "component")
     });
-    $$splitComponentImporter$B = () => Promise.resolve().then(() => (init_solutions_vc_deal_room_BRdZmX8Y(), solutions_vc_deal_room_BRdZmX8Y_exports));
+    $$splitComponentImporter$B = () => Promise.resolve().then(() => (init_solutions_vc_deal_room_DYPWwYxT(), solutions_vc_deal_room_DYPWwYxT_exports));
     Route$B = createFileRoute("/solutions/vc-deal-room")({
       head: () => ({
         meta: [{
@@ -73266,7 +73522,7 @@ var init_router_B5AOfxDk = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$B, "component")
     });
-    $$splitComponentImporter$A = () => Promise.resolve().then(() => (init_solutions_raise_1m_DE1T2D2J(), solutions_raise_1m_DE1T2D2J_exports));
+    $$splitComponentImporter$A = () => Promise.resolve().then(() => (init_solutions_raise_1m_BA2b5LCn(), solutions_raise_1m_BA2b5LCn_exports));
     Route$A = createFileRoute("/solutions/raise-1m")({
       head: () => ({
         meta: [{
@@ -73278,7 +73534,7 @@ var init_router_B5AOfxDk = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$A, "component")
     });
-    $$splitComponentImporter$z = () => Promise.resolve().then(() => (init_solutions_investor_pipeline_AVN1mMWU(), solutions_investor_pipeline_AVN1mMWU_exports));
+    $$splitComponentImporter$z = () => Promise.resolve().then(() => (init_solutions_investor_pipeline_C46ewaxt(), solutions_investor_pipeline_C46ewaxt_exports));
     Route$z = createFileRoute("/solutions/investor-pipeline")({
       head: () => ({
         meta: [{
@@ -73290,7 +73546,7 @@ var init_router_B5AOfxDk = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$z, "component")
     });
-    $$splitComponentImporter$y = () => Promise.resolve().then(() => (init_solutions_fundraising_crm_BBkbwwXR(), solutions_fundraising_crm_BBkbwwXR_exports));
+    $$splitComponentImporter$y = () => Promise.resolve().then(() => (init_solutions_fundraising_crm_D_Z_u9Hb(), solutions_fundraising_crm_D_Z_u9Hb_exports));
     Route$y = createFileRoute("/solutions/fundraising-crm")({
       head: () => ({
         meta: [{
@@ -73302,7 +73558,7 @@ var init_router_B5AOfxDk = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$y, "component")
     });
-    $$splitComponentImporter$x = () => Promise.resolve().then(() => (init_solutions_due_diligence_Dc4hz6i6(), solutions_due_diligence_Dc4hz6i6_exports));
+    $$splitComponentImporter$x = () => Promise.resolve().then(() => (init_solutions_due_diligence_DU12YoKn(), solutions_due_diligence_DU12YoKn_exports));
     Route$x = createFileRoute("/solutions/due-diligence")({
       head: () => ({
         meta: [{
@@ -73314,31 +73570,31 @@ var init_router_B5AOfxDk = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$x, "component")
     });
-    $$splitComponentImporter$w = () => Promise.resolve().then(() => (init_join_token_DqiNuBK5(), join_token_DqiNuBK5_exports));
+    $$splitComponentImporter$w = () => Promise.resolve().then(() => (init_join_token_B3wMrYbM(), join_token_B3wMrYbM_exports));
     Route$w = createFileRoute("/join/$token")({
       component: lazyRouteComponent($$splitComponentImporter$w, "component")
     });
-    $$splitComponentImporter$v = () => Promise.resolve().then(() => (init_auth_callback_CR79cSOM(), auth_callback_CR79cSOM_exports));
+    $$splitComponentImporter$v = () => Promise.resolve().then(() => (init_auth_callback_DRo17tzO(), auth_callback_DRo17tzO_exports));
     Route$v = createFileRoute("/auth/callback")({
       component: lazyRouteComponent($$splitComponentImporter$v, "component")
     });
-    $$splitComponentImporter$u = () => Promise.resolve().then(() => (init_app_users_D7k1tVdY(), app_users_D7k1tVdY_exports));
+    $$splitComponentImporter$u = () => Promise.resolve().then(() => (init_app_users_z9ftYOzp(), app_users_z9ftYOzp_exports));
     Route$u = createFileRoute("/app/users")({
       component: lazyRouteComponent($$splitComponentImporter$u, "component")
     });
-    $$splitComponentImporter$t = () => Promise.resolve().then(() => (init_app_settings_Gp1lEP1B(), app_settings_Gp1lEP1B_exports));
+    $$splitComponentImporter$t = () => Promise.resolve().then(() => (init_app_settings_C6Ea2cuu(), app_settings_C6Ea2cuu_exports));
     Route$t = createFileRoute("/app/settings")({
       component: lazyRouteComponent($$splitComponentImporter$t, "component")
     });
-    $$splitComponentImporter$s = () => Promise.resolve().then(() => (init_app_reports_tyOILLnd(), app_reports_tyOILLnd_exports));
+    $$splitComponentImporter$s = () => Promise.resolve().then(() => (init_app_reports_DRJ5Lsli(), app_reports_DRJ5Lsli_exports));
     Route$s = createFileRoute("/app/reports")({
       component: lazyRouteComponent($$splitComponentImporter$s, "component")
     });
-    $$splitComponentImporter$r = () => Promise.resolve().then(() => (init_app_profile_BxYVXCn7(), app_profile_BxYVXCn7_exports));
+    $$splitComponentImporter$r = () => Promise.resolve().then(() => (init_app_profile_C_4g9Re9(), app_profile_C_4g9Re9_exports));
     Route$r = createFileRoute("/app/profile")({
       component: lazyRouteComponent($$splitComponentImporter$r, "component")
     });
-    $$splitComponentImporter$q = () => Promise.resolve().then(() => (init_app_pipeline_W2jx_L9u(), app_pipeline_W2jx_L9u_exports));
+    $$splitComponentImporter$q = () => Promise.resolve().then(() => (init_app_pipeline_CrgeFDq2(), app_pipeline_CrgeFDq2_exports));
     Route$q = createFileRoute("/app/pipeline")({
       component: lazyRouteComponent($$splitComponentImporter$q, "component")
     });
@@ -73346,15 +73602,15 @@ var init_router_B5AOfxDk = __esm({
     Route$p = createFileRoute("/app/notifications")({
       component: lazyRouteComponent($$splitComponentImporter$p, "component")
     });
-    $$splitComponentImporter$o = () => Promise.resolve().then(() => (init_app_messages_3qB8DO4l(), app_messages_3qB8DO4l_exports));
+    $$splitComponentImporter$o = () => Promise.resolve().then(() => (init_app_messages_JUY5grGr(), app_messages_JUY5grGr_exports));
     Route$o = createFileRoute("/app/messages")({
       component: lazyRouteComponent($$splitComponentImporter$o, "component")
     });
-    $$splitComponentImporter$n = () => Promise.resolve().then(() => (init_app_meetings_pCeKiBwE(), app_meetings_pCeKiBwE_exports));
+    $$splitComponentImporter$n = () => Promise.resolve().then(() => (init_app_meetings_DO_jSYvx(), app_meetings_DO_jSYvx_exports));
     Route$n = createFileRoute("/app/meetings")({
       component: lazyRouteComponent($$splitComponentImporter$n, "component")
     });
-    $$splitComponentImporter$m = () => Promise.resolve().then(() => (init_app_leads_DyUnMpHL(), app_leads_DyUnMpHL_exports));
+    $$splitComponentImporter$m = () => Promise.resolve().then(() => (init_app_leads_Brtk0fpt(), app_leads_Brtk0fpt_exports));
     Route$m = createFileRoute("/app/leads")({
       component: lazyRouteComponent($$splitComponentImporter$m, "component")
     });
@@ -73395,11 +73651,11 @@ var init_router_B5AOfxDk = __esm({
     Route$k = createFileRoute("/app/email")({
       component: lazyRouteComponent($$splitComponentImporter$k, "component")
     });
-    $$splitComponentImporter$j = () => Promise.resolve().then(() => (init_app_documents_DyIlv7nK(), app_documents_DyIlv7nK_exports));
+    $$splitComponentImporter$j = () => Promise.resolve().then(() => (init_app_documents_DtIhfslp(), app_documents_DtIhfslp_exports));
     Route$j = createFileRoute("/app/documents")({
       component: lazyRouteComponent($$splitComponentImporter$j, "component")
     });
-    $$splitComponentImporter$i = () => Promise.resolve().then(() => (init_app_deal_rooms_CH_KsBKT(), app_deal_rooms_CH_KsBKT_exports));
+    $$splitComponentImporter$i = () => Promise.resolve().then(() => (init_app_deal_rooms_CpVf6FIj(), app_deal_rooms_CpVf6FIj_exports));
     Route$i = createFileRoute("/app/deal-rooms")({
       component: lazyRouteComponent($$splitComponentImporter$i, "component")
     });
@@ -73407,19 +73663,19 @@ var init_router_B5AOfxDk = __esm({
     Route$h = createFileRoute("/app/audit")({
       component: lazyRouteComponent($$splitComponentImporter$h, "component")
     });
-    $$splitComponentImporter$g = () => Promise.resolve().then(() => (init_app_advisor_B0wpDJNv(), app_advisor_B0wpDJNv_exports));
+    $$splitComponentImporter$g = () => Promise.resolve().then(() => (init_app_advisor_qouHNJxT(), app_advisor_qouHNJxT_exports));
     Route$g = createFileRoute("/app/advisor")({
       component: lazyRouteComponent($$splitComponentImporter$g, "component")
     });
-    $$splitComponentImporter$f = () => Promise.resolve().then(() => (init_app_investor_index_BzmycpI7(), app_investor_index_BzmycpI7_exports));
+    $$splitComponentImporter$f = () => Promise.resolve().then(() => (init_app_investor_index_DF_tDBra(), app_investor_index_DF_tDBra_exports));
     Route$f = createFileRoute("/app/investor/")({
       component: lazyRouteComponent($$splitComponentImporter$f, "component")
     });
-    $$splitComponentImporter$e = () => Promise.resolve().then(() => (init_app_settings_security_CYiZeMX9(), app_settings_security_CYiZeMX9_exports));
+    $$splitComponentImporter$e = () => Promise.resolve().then(() => (init_app_settings_security_D3HaJrh(), app_settings_security_D3HaJrh_exports));
     Route$e = createFileRoute("/app/settings/security")({
       component: lazyRouteComponent($$splitComponentImporter$e, "component")
     });
-    $$splitComponentImporter$d = () => Promise.resolve().then(() => (init_app_settings_notifications_CvRfZWF0(), app_settings_notifications_CvRfZWF0_exports));
+    $$splitComponentImporter$d = () => Promise.resolve().then(() => (init_app_settings_notifications_Co9_0BdV(), app_settings_notifications_Co9_0BdV_exports));
     Route$d = createFileRoute("/app/settings/notifications")({
       component: lazyRouteComponent($$splitComponentImporter$d, "component")
     });
@@ -73431,47 +73687,47 @@ var init_router_B5AOfxDk = __esm({
     Route$b = createFileRoute("/app/settings/billing")({
       component: lazyRouteComponent($$splitComponentImporter$b, "component")
     });
-    $$splitComponentImporter$a = () => Promise.resolve().then(() => (init_app_investor_team_ZPyO_Nz(), app_investor_team_ZPyO_Nz_exports));
+    $$splitComponentImporter$a = () => Promise.resolve().then(() => (init_app_investor_team_UUnF8Gub(), app_investor_team_UUnF8Gub_exports));
     Route$a = createFileRoute("/app/investor/team")({
       component: lazyRouteComponent($$splitComponentImporter$a, "component")
     });
-    $$splitComponentImporter$9 = () => Promise.resolve().then(() => (init_app_investor_startups_D_VJ10wj(), app_investor_startups_D_VJ10wj_exports));
+    $$splitComponentImporter$9 = () => Promise.resolve().then(() => (init_app_investor_startups_BFOskxTF(), app_investor_startups_BFOskxTF_exports));
     Route$9 = createFileRoute("/app/investor/startups")({
       component: lazyRouteComponent($$splitComponentImporter$9, "component")
     });
-    $$splitComponentImporter$8 = () => Promise.resolve().then(() => (init_app_investor_portfolio_C_J10S8(), app_investor_portfolio_C_J10S8_exports));
+    $$splitComponentImporter$8 = () => Promise.resolve().then(() => (init_app_investor_portfolio_CNrAph1Y(), app_investor_portfolio_CNrAph1Y_exports));
     Route$8 = createFileRoute("/app/investor/portfolio")({
       component: lazyRouteComponent($$splitComponentImporter$8, "component")
     });
-    $$splitComponentImporter$7 = () => Promise.resolve().then(() => (init_app_investor_pipeline_DFJkzPWx(), app_investor_pipeline_DFJkzPWx_exports));
+    $$splitComponentImporter$7 = () => Promise.resolve().then(() => (init_app_investor_pipeline_Ce0UIV6h(), app_investor_pipeline_Ce0UIV6h_exports));
     Route$7 = createFileRoute("/app/investor/pipeline")({
       component: lazyRouteComponent($$splitComponentImporter$7, "component")
     });
-    $$splitComponentImporter$6 = () => Promise.resolve().then(() => (init_app_investor_diligence_BdUMIo_w(), app_investor_diligence_BdUMIo_w_exports));
+    $$splitComponentImporter$6 = () => Promise.resolve().then(() => (init_app_investor_diligence_YObBiQ_H(), app_investor_diligence_YObBiQ_H_exports));
     Route$6 = createFileRoute("/app/investor/diligence")({
       component: lazyRouteComponent($$splitComponentImporter$6, "component")
     });
-    $$splitComponentImporter$5 = () => Promise.resolve().then(() => (init_app_investor_decisions_kaKj7qWa(), app_investor_decisions_kaKj7qWa_exports));
+    $$splitComponentImporter$5 = () => Promise.resolve().then(() => (init_app_investor_decisions_CBMamwfA(), app_investor_decisions_CBMamwfA_exports));
     Route$5 = createFileRoute("/app/investor/decisions")({
       component: lazyRouteComponent($$splitComponentImporter$5, "component")
     });
-    $$splitComponentImporter$4 = () => Promise.resolve().then(() => (init_app_investor_deal_rooms_DUNuFc0T(), app_investor_deal_rooms_DUNuFc0T_exports));
+    $$splitComponentImporter$4 = () => Promise.resolve().then(() => (init_app_investor_deal_rooms_U0E6Qe2Z(), app_investor_deal_rooms_U0E6Qe2Z_exports));
     Route$4 = createFileRoute("/app/investor/deal-rooms")({
       component: lazyRouteComponent($$splitComponentImporter$4, "component")
     });
-    $$splitComponentImporter$3 = () => Promise.resolve().then(() => (init_app_investor_deal_flow_DuVKEwUd(), app_investor_deal_flow_DuVKEwUd_exports));
+    $$splitComponentImporter$3 = () => Promise.resolve().then(() => (init_app_investor_deal_flow_DR25rM4j(), app_investor_deal_flow_DR25rM4j_exports));
     Route$3 = createFileRoute("/app/investor/deal-flow")({
       component: lazyRouteComponent($$splitComponentImporter$3, "component")
     });
-    $$splitComponentImporter$2 = () => Promise.resolve().then(() => (init_app_investor_analysis_BB5yqveW(), app_investor_analysis_BB5yqveW_exports));
+    $$splitComponentImporter$2 = () => Promise.resolve().then(() => (init_app_investor_analysis_DY5s_TdV(), app_investor_analysis_DY5s_TdV_exports));
     Route$2 = createFileRoute("/app/investor/analysis")({
       component: lazyRouteComponent($$splitComponentImporter$2, "component")
     });
-    $$splitComponentImporter$1 = () => Promise.resolve().then(() => (init_app_deal_room_id_CJCHVxIK(), app_deal_room_id_CJCHVxIK_exports));
+    $$splitComponentImporter$1 = () => Promise.resolve().then(() => (init_app_deal_room_id_DTpIlyeK(), app_deal_room_id_DTpIlyeK_exports));
     Route$1 = createFileRoute("/app/deal-room/$id")({
       component: lazyRouteComponent($$splitComponentImporter$1, "component")
     });
-    $$splitComponentImporter = () => Promise.resolve().then(() => (init_app_deal_room_id_nda_Ci2upYUl(), app_deal_room_id_nda_Ci2upYUl_exports));
+    $$splitComponentImporter = () => Promise.resolve().then(() => (init_app_deal_room_id_nda_gaWbjQx5(), app_deal_room_id_nda_gaWbjQx5_exports));
     Route2 = createFileRoute("/app/deal-room/$id_/nda")({
       component: lazyRouteComponent($$splitComponentImporter, "component")
     });
@@ -73845,7 +74101,7 @@ var init_tanstack_start_plugin_adapters_Cwee5PKy = __esm({
 // dist/server/server.js
 import { AsyncLocalStorage } from "node:async_hooks";
 function StartServer(props) {
-  return /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(RouterProvider, { router: props.router });
+  return /* @__PURE__ */ (0, import_jsx_runtime82.jsx)(RouterProvider, { router: props.router });
 }
 function isPromiseLike2(value) {
   return typeof value.then === "function";
@@ -73897,7 +74153,7 @@ function getResponse() {
   return getH3Event().res;
 }
 async function getStartManifest(matchedRoutes) {
-  const { tsrStartManifest: tsrStartManifest2 } = await Promise.resolve().then(() => (init_tanstack_start_manifest_v_CzA3TX1f(), tanstack_start_manifest_v_CzA3TX1f_exports));
+  const { tsrStartManifest: tsrStartManifest2 } = await Promise.resolve().then(() => (init_tanstack_start_manifest_v_ox7iqhdR(), tanstack_start_manifest_v_ox7iqhdR_exports));
   const startManifest = tsrStartManifest2();
   const rootRoute = startManifest.routes[rootRouteId] = startManifest.routes[rootRouteId] || {};
   rootRoute.assets = rootRoute.assets || [];
@@ -74355,7 +74611,7 @@ function getStartResponseHeaders(opts) {
 }
 async function loadEntries() {
   const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-    Promise.resolve().then(() => (init_router_B5AOfxDk(), router_B5AOfxDk_exports)).then((n2) => n2.r),
+    Promise.resolve().then(() => (init_router_DOcN9fVX(), router_DOcN9fVX_exports)).then((n2) => n2.r),
     Promise.resolve().then(() => (init_start_HYkvq4Ni(), start_HYkvq4Ni_exports)),
     Promise.resolve().then(() => (init_tanstack_start_plugin_adapters_Cwee5PKy(), tanstack_start_plugin_adapters_Cwee5PKy_exports))
   ]);
@@ -74668,7 +74924,7 @@ function createServerEntry(entry) {
     }
   };
 }
-var import_react70, import_jsx_runtime81, defaultStreamHandler, GLOBAL_EVENT_STORAGE_KEY, globalObj$1, eventStorage, HEADERS, manifest, TSS_FORMDATA_CONTEXT, TSS_SERVER_FUNCTION, TSS_SERVER_FUNCTION_FACTORY, X_TSS_SERIALIZED, X_TSS_RAW_RESPONSE, TSS_CONTENT_TYPE_FRAMED, FrameType, FRAME_HEADER_SIZE, TSS_CONTENT_TYPE_FRAMED_VERSIONED, GLOBAL_STORAGE_KEY, globalObj, startStorage, getStartOptions, getStartContextServerOnly, createServerFn, textEncoder2, EMPTY_PAYLOAD, serovalPlugins, FORM_DATA_CONTENT_TYPES, MAX_PAYLOAD_SIZE, handleServerAction, ServerFunctionSerializationAdapter, entriesPromise, baseManifestPromise, cachedFinalManifestPromise, ROUTER_BASEPATH, SERVER_FN_BASE, IS_PRERENDERING, IS_SHELL_ENV, ERR_NO_RESPONSE, ERR_NO_DEFER, fetch2, server;
+var import_react71, import_jsx_runtime82, defaultStreamHandler, GLOBAL_EVENT_STORAGE_KEY, globalObj$1, eventStorage, HEADERS, manifest, TSS_FORMDATA_CONTEXT, TSS_SERVER_FUNCTION, TSS_SERVER_FUNCTION_FACTORY, X_TSS_SERIALIZED, X_TSS_RAW_RESPONSE, TSS_CONTENT_TYPE_FRAMED, FrameType, FRAME_HEADER_SIZE, TSS_CONTENT_TYPE_FRAMED_VERSIONED, GLOBAL_STORAGE_KEY, globalObj, startStorage, getStartOptions, getStartContextServerOnly, createServerFn, textEncoder2, EMPTY_PAYLOAD, serovalPlugins, FORM_DATA_CONTENT_TYPES, MAX_PAYLOAD_SIZE, handleServerAction, ServerFunctionSerializationAdapter, entriesPromise, baseManifestPromise, cachedFinalManifestPromise, ROUTER_BASEPATH, SERVER_FN_BASE, IS_PRERENDERING, IS_SHELL_ENV, ERR_NO_RESPONSE, ERR_NO_DEFER, fetch2, server;
 var init_server4 = __esm({
   "dist/server/server.js"() {
     init_service_worker2();
@@ -74677,15 +74933,15 @@ var init_server4 = __esm({
     init_esm();
     init_client();
     init_server2();
-    import_react70 = __toESM(require_react(), 1);
+    import_react71 = __toESM(require_react(), 1);
     init_esm5();
-    import_jsx_runtime81 = __toESM(require_jsx_runtime(), 1);
+    import_jsx_runtime82 = __toESM(require_jsx_runtime(), 1);
     init_server3();
     defaultStreamHandler = defineHandlerCallback(({ request, router: router2, responseHeaders }) => renderRouterToStream({
       request,
       router: router2,
       responseHeaders,
-      children: /* @__PURE__ */ (0, import_jsx_runtime81.jsx)(StartServer, { router: router2 })
+      children: /* @__PURE__ */ (0, import_jsx_runtime82.jsx)(StartServer, { router: router2 })
     }));
     GLOBAL_EVENT_STORAGE_KEY = /* @__PURE__ */ Symbol.for("tanstack-start:event-storage");
     globalObj$1 = globalThis;

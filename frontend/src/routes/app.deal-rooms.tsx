@@ -4,100 +4,172 @@ import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
+import { formatDistanceToNow } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/deal-rooms")({
   component: DealRooms,
 });
 
+// ── Helpers ────────────────────────────────────────────────────────
+
+const STATUS_COLOR: Record<string, string> = {
+  new: "bg-brand/15 text-brand",
+  active: "bg-success/15 text-success",
+  closed: "bg-muted/60 text-muted-foreground",
+  rejected: "bg-destructive/15 text-destructive",
+};
+
+function statusLabel(s: string | null) {
+  if (!s) return "New";
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+// ── Component ──────────────────────────────────────────────────────
+
 function DealRooms() {
   const [open, setOpen] = useState(false);
-  const { data: rooms = [] } = useQuery({
-    queryKey: ["deal-rooms"],
+  const { user } = useAuth();
+
+  const { data: startup } = useQuery({
+    queryKey: ["dr-startup", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("startups")
+        .select("id, company_name")
+        .eq("founder_id", user!.id)
+        .limit(1)
+        .maybeSingle();
+      return data as { id: string; company_name: string } | null;
+    },
+  });
+
+  const { data: rooms = [], isLoading } = useQuery({
+    queryKey: ["deal-rooms", user?.id],
+    enabled: !!startup?.id,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("deal_rooms")
-        .select("id, status, created_at, startups(company_name), organizations(name)")
-        .order("created_at", { ascending: false });
+        .select(`
+          id, status, created_at, updated_at,
+          deal_room_members(user_id, role, users(full_name, email)),
+          deal_room_documents(id)
+        `)
+        .eq("startup_id", startup!.id)
+        .order("updated_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as any[];
     },
   });
+
+  if (isLoading) {
+    return (
+      <div className="p-8 flex items-center justify-center min-h-64">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto">
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Deal Rooms</h1>
-          <div className="text-sm text-muted-foreground">{rooms.length} active rooms</div>
+          <div className="text-sm text-muted-foreground">{rooms.length} room{rooms.length !== 1 ? "s" : ""}</div>
         </div>
-        <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow">
+        <button
+          onClick={() => setOpen(true)}
+          className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"
+        >
           <Plus className="h-4 w-4" /> Create new deal room
         </button>
       </div>
 
       <div className="mt-6 grid md:grid-cols-2 gap-4">
-        {(rooms as any[]).map((r) => (
-          <Link
-            to={"/app/deal-room/$id" as any}
-            params={{ id: r.id } as any}
-            key={r.id}
-            className="rounded-xl border border-border/60 bg-card p-5 shadow-card hover:shadow-elev transition-shadow group"
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-soft border border-border/60 text-xs font-semibold">
-                  {(r.organizations?.name || r.startups?.company_name || "DR").split(" ").map((s: string) => s[0]).join("").slice(0, 2)}
-                </div>
-                <div>
-                  <div className="font-semibold">{r.organizations?.name ?? r.startups?.company_name ?? "Deal Room"}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {r.startups?.company_name ? `Startup: ${r.startups.company_name}` : "No startup linked"}
+        {rooms.map((r: any) => {
+          const members: any[] = r.deal_room_members ?? [];
+          const investorMember = members.find((m: any) => m.role !== "founder");
+          const investorName = investorMember?.users?.full_name ?? investorMember?.users?.email ?? "Investor pending";
+          const docsCount: number = (r.deal_room_documents ?? []).length;
+          const daysOpen = Math.floor((Date.now() - new Date(r.created_at).getTime()) / 86400000);
+          const lastActivity = r.updated_at
+            ? formatDistanceToNow(new Date(r.updated_at), { addSuffix: true })
+            : "—";
+          const status = r.status ?? "new";
+          const initials = investorName.split(" ").map((s: string) => s[0]).join("").slice(0, 2).toUpperCase();
+
+          return (
+            <div key={r.id} className="rounded-xl border border-border/60 bg-card p-5 shadow-card hover:shadow-elev transition-shadow flex flex-col gap-4">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground text-xs font-semibold shrink-0">
+                    {initials || "DR"}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-semibold truncate">{investorName}</div>
+                    <div className="text-xs text-muted-foreground truncate">{startup?.company_name ?? "Deal Room"}</div>
                   </div>
                 </div>
+                <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium shrink-0", STATUS_COLOR[status] ?? "bg-muted/60 text-muted-foreground")}>
+                  {statusLabel(status)}
+                </span>
               </div>
-              <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />
-            </div>
-            <div className="mt-4 flex items-center gap-2 text-xs">
-              <span className={`rounded-full px-2 py-0.5 ${r.status === "closed" ? "bg-warning/15 text-warning" : "bg-success/15 text-success"}`}>
-                {r.status ?? "new"}
-              </span>
-              <span className="text-muted-foreground">Deal room</span>
-              <span className="text-muted-foreground">·</span>
-              <span className="text-muted-foreground">ID: {r.id.slice(0, 8)}</span>
-            </div>
-            <div className="mt-4">
-              <div className="flex justify-between text-[11px] text-muted-foreground mb-1">
-                <span>Progress</span>
-                <span>{r.status === "new" ? "15%" : "65%"}</span>
+
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="rounded-lg bg-muted/30 p-2">
+                  <div className="text-base font-semibold tabular-nums">{docsCount}</div>
+                  <div className="text-[10px] text-muted-foreground">docs</div>
+                </div>
+                <div className="rounded-lg bg-muted/30 p-2">
+                  <div className="text-base font-semibold tabular-nums">{daysOpen}</div>
+                  <div className="text-[10px] text-muted-foreground">days open</div>
+                </div>
+                <div className="rounded-lg bg-muted/30 p-2">
+                  <div className="text-base font-semibold tabular-nums">{members.length}</div>
+                  <div className="text-[10px] text-muted-foreground">members</div>
+                </div>
               </div>
-              <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                <div className="h-full bg-gradient-brand" style={{ width: r.status === "new" ? "15%" : "65%" }} />
+
+              <div className="flex items-center justify-between">
+                <div className="text-[11px] text-muted-foreground">Last activity {lastActivity}</div>
+                <Link
+                  to={"/app/deal-room/$id" as any}
+                  params={{ id: r.id } as any}
+                  className="inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-2.5 py-1.5 text-xs shadow-glow hover:opacity-90 transition-opacity"
+                >
+                  Open <ArrowUpRight className="h-3 w-3" />
+                </Link>
               </div>
             </div>
-          </Link>
-        ))}
+          );
+        })}
 
         {rooms.length === 0 && (
           <div className="col-span-2 rounded-xl border border-dashed border-border/60 p-12 text-center">
             <Briefcase className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
             <div className="text-sm font-medium">No deal rooms yet</div>
             <div className="text-xs text-muted-foreground mt-1">Create your first deal room to start a structured investor review.</div>
-            <button onClick={() => setOpen(true)} className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow">
+            <button
+              onClick={() => setOpen(true)}
+              className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"
+            >
               <Plus className="h-4 w-4" /> Create deal room
             </button>
           </div>
         )}
       </div>
 
-      {open && <CreateRoomForm onClose={() => setOpen(false)} />}
+      {open && <CreateRoomForm userId={user?.id ?? ""} onClose={() => setOpen(false)} />}
     </div>
   );
 }
 
+// ── Create Room Form ───────────────────────────────────────────────
+
 const DEAL_TYPES = ["Equity", "SAFE", "Convertible Note", "Other"] as const;
 
-function CreateRoomForm({ onClose }: { onClose: () => void }) {
-  const { user } = useAuth();
+function CreateRoomForm({ userId, onClose }: { userId: string; onClose: () => void }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
@@ -111,13 +183,13 @@ function CreateRoomForm({ onClose }: { onClose: () => void }) {
   const [startupId, setStartupId] = useState("");
 
   const { data: startups = [], isLoading: startupsLoading } = useQuery({
-    queryKey: ["my-startups", user?.id],
-    enabled: !!user?.id,
+    queryKey: ["my-startups", userId],
+    enabled: !!userId,
     queryFn: async () => {
       const { data } = await supabase
         .from("startups")
         .select("id, company_name")
-        .eq("founder_id", user!.id);
+        .eq("founder_id", userId);
       return (data ?? []) as { id: string; company_name: string }[];
     },
   });
@@ -130,11 +202,10 @@ function CreateRoomForm({ onClose }: { onClose: () => void }) {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!investorName.trim() || !startupId || !user?.id) return;
+    if (!investorName.trim() || !startupId || !userId) return;
     setSaving(true);
     setError("");
     try {
-      // 1. INSERT deal room
       const { data: newRoom, error: roomErr } = await supabase
         .from("deal_rooms")
         .insert({ startup_id: startupId, status: "new" })
@@ -143,34 +214,30 @@ function CreateRoomForm({ onClose }: { onClose: () => void }) {
       if (roomErr) throw roomErr;
       if (!newRoom?.id) throw new Error("No room ID returned");
 
-      // 2. INSERT deal_room_members
       await supabase.from("deal_room_members").insert({
         deal_room_id: newRoom.id,
-        user_id: user.id,
+        user_id: userId,
         role: "founder",
         accepted_at: new Date().toISOString(),
       });
 
-      // 3. INSERT activity
       await supabase.from("activities").insert({
         deal_room_id: newRoom.id,
-        actor_id: user.id,
+        actor_id: userId,
         action: `Deal room created for ${investorName.trim()}${investorFirm.trim() ? ` (${investorFirm.trim()})` : ""} · ${dealType}${fundingTarget ? ` · $${fundingTarget}` : ""}`,
       });
 
-      // 4. Send invite if email provided
       if (inviteEmail.trim()) {
         await supabase.from("invites").insert({
           email: inviteEmail.trim(),
           role: "investor",
-          invited_by: user.id,
+          invited_by: userId,
           deal_room_id: newRoom.id,
           expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         });
       }
 
-      // 5. Invalidate + navigate
-      queryClient.invalidateQueries({ queryKey: ["deal-rooms"] });
+      queryClient.invalidateQueries({ queryKey: ["deal-rooms", userId] });
       onClose();
       navigate({ to: "/app/deal-room/$id" as any, params: { id: newRoom.id } as any });
     } catch (err) {

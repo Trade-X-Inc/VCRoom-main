@@ -3,9 +3,10 @@ import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { Plus, Flame, Clock, ArrowUpRight, Filter, Users, Loader2 } from "lucide-react";
-import { useI18n } from "@/lib/i18n";
+import { Plus, Flame, ArrowUpRight, Filter, Users, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LeadDrawer } from "@/components/app/LeadDrawer";
+import type { VCLead } from "@/components/app/LeadDrawer";
 
 export const Route = createFileRoute("/app/pipeline")({
   component: Pipeline,
@@ -13,9 +14,9 @@ export const Route = createFileRoute("/app/pipeline")({
 
 // ── Types ──────────────────────────────────────────────────────────
 
-type PipelineStage = "Sourced" | "Qualified" | "Pitched" | "Diligence" | "Term Sheet" | "Closed";
+type PipelineStage = "Sourced" | "Contacted" | "Meeting" | "Interested" | "Deal Room" | "Passed";
 
-const pipelineStages: PipelineStage[] = ["Sourced", "Qualified", "Pitched", "Diligence", "Term Sheet", "Closed"];
+const pipelineStages: PipelineStage[] = ["Sourced", "Contacted", "Meeting", "Interested", "Deal Room", "Passed"];
 
 interface PipelineDeal {
   id: string;
@@ -26,60 +27,58 @@ interface PipelineDeal {
   stage: PipelineStage;
   probability: number;
   lastTouch: string;
-  signal?: "hot" | "stale";
+  isHot: boolean;
   thesis: string;
 }
-
-type RawLead = {
-  id: string;
-  investor_name: string;
-  firm_name: string | null;
-  ticket_size: string | null;
-  status: string;
-  sector: string | null;
-  updated_at: string;
-  follow_up_date: string | null;
-};
 
 // ── Mappings ───────────────────────────────────────────────────────
 
 const STATUS_TO_STAGE: Record<string, PipelineStage> = {
   "New": "Sourced",
   "Shortlisted": "Sourced",
-  "Contacted": "Qualified",
-  "Replied": "Qualified",
-  "Follow Up": "Qualified",
-  "Meeting Booked": "Pitched",
-  "Interested": "Diligence",
-  "Deal Room Created": "Term Sheet",
-  "Rejected": "Closed",
+  "Contacted": "Contacted",
+  "Replied": "Contacted",
+  "Follow Up": "Contacted",
+  "Meeting Booked": "Meeting",
+  "Interested": "Interested",
+  "Deal Room Created": "Deal Room",
+  "Rejected": "Passed",
 };
 
-const STAGE_TO_STATUS: Record<PipelineStage, string | null> = {
+const STAGE_TO_STATUS: Record<PipelineStage, string> = {
   "Sourced": "New",
-  "Qualified": "Contacted",
-  "Pitched": "Meeting Booked",
-  "Diligence": "Interested",
-  "Term Sheet": "Deal Room Created",
-  "Closed": null,
+  "Contacted": "Contacted",
+  "Meeting": "Meeting Booked",
+  "Interested": "Interested",
+  "Deal Room": "Deal Room Created",
+  "Passed": "Rejected",
 };
 
 const STAGE_PROBABILITY: Record<PipelineStage, number> = {
   "Sourced": 10,
-  "Qualified": 25,
-  "Pitched": 40,
-  "Diligence": 60,
-  "Term Sheet": 80,
-  "Closed": 100,
+  "Contacted": 25,
+  "Meeting": 45,
+  "Interested": 65,
+  "Deal Room": 80,
+  "Passed": 0,
 };
 
 const stageTint: Record<PipelineStage, string> = {
   "Sourced": "bg-muted-foreground/40",
-  "Qualified": "bg-foreground/40",
-  "Pitched": "bg-brand",
-  "Diligence": "bg-violet",
-  "Term Sheet": "bg-warning",
-  "Closed": "bg-success",
+  "Contacted": "bg-foreground/40",
+  "Meeting": "bg-brand",
+  "Interested": "bg-violet",
+  "Deal Room": "bg-warning",
+  "Passed": "bg-destructive/60",
+};
+
+const stageBarColor: Record<PipelineStage, string> = {
+  "Sourced": "bg-muted-foreground/50",
+  "Contacted": "bg-foreground/50",
+  "Meeting": "bg-brand",
+  "Interested": "bg-violet",
+  "Deal Room": "bg-warning",
+  "Passed": "bg-destructive/60",
 };
 
 // ── Helpers ────────────────────────────────────────────────────────
@@ -94,19 +93,13 @@ function timeAgo(iso: string): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
-function leadToDeal(lead: RawLead): PipelineDeal {
+function leadToDeal(lead: VCLead): PipelineDeal {
   const stage = STATUS_TO_STAGE[lead.status] ?? "Sourced";
   const name = lead.investor_name ?? "";
   const parts = name.trim().split(" ");
   const initials = parts.length >= 2
     ? ((parts[0][0] ?? "") + (parts[parts.length - 1][0] ?? "")).toUpperCase()
     : name.slice(0, 2).toUpperCase();
-
-  let signal: "hot" | "stale" | undefined;
-  if (lead.follow_up_date) {
-    const fup = new Date(lead.follow_up_date + "T12:00:00");
-    if (fup <= new Date()) signal = "hot";
-  }
 
   return {
     id: lead.id,
@@ -117,7 +110,7 @@ function leadToDeal(lead: RawLead): PipelineDeal {
     stage,
     probability: STAGE_PROBABILITY[stage],
     lastTouch: timeAgo(lead.updated_at),
-    signal,
+    isHot: lead.status === "Interested",
     thesis: lead.sector ?? "—",
   };
 }
@@ -125,23 +118,23 @@ function leadToDeal(lead: RawLead): PipelineDeal {
 // ── Component ──────────────────────────────────────────────────────
 
 function Pipeline() {
-  const { t } = useI18n();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [dragId, setDragId] = useState<string | null>(null);
   const [overStage, setOverStage] = useState<PipelineStage | null>(null);
+  const [selectedLead, setSelectedLead] = useState<VCLead | null>(null);
 
-  const { data: rawLeads = [], isLoading } = useQuery<RawLead[]>({
+  const { data: rawLeads = [], isLoading } = useQuery<VCLead[]>({
     queryKey: ["pipeline-leads", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("vc_leads")
-        .select("id, investor_name, firm_name, ticket_size, status, sector, updated_at, follow_up_date")
+        .select("*")
         .eq("founder_id", user!.id)
         .order("updated_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as RawLead[];
+      return (data ?? []) as VCLead[];
     },
   });
 
@@ -149,26 +142,19 @@ function Pipeline() {
 
   const byStage = useMemo(() => {
     const m: Record<PipelineStage, PipelineDeal[]> = {
-      Sourced: [], Qualified: [], Pitched: [], Diligence: [], "Term Sheet": [], Closed: [],
+      Sourced: [], Contacted: [], Meeting: [], Interested: [], "Deal Room": [], Passed: [],
     };
     deals.forEach((d) => m[d.stage].push(d));
     return m;
   }, [deals]);
-
-  const totalValue = (xs: PipelineDeal[]) =>
-    xs.reduce((sum, d) => {
-      const n = parseFloat(d.check.replace(/[^0-9.]/g, "")) || 0;
-      return sum + n;
-    }, 0);
 
   const onDrop = async (stage: PipelineStage) => {
     if (!dragId || !user?.id) return;
     const newStatus = STAGE_TO_STATUS[stage];
     setDragId(null);
     setOverStage(null);
-    if (!newStatus) return;
 
-    queryClient.setQueryData<RawLead[]>(
+    queryClient.setQueryData<VCLead[]>(
       ["pipeline-leads", user.id],
       (old) => (old ?? []).map((l) => l.id === dragId ? { ...l, status: newStatus } : l),
     );
@@ -193,8 +179,8 @@ function Pipeline() {
       <div className="p-6 lg:p-8 max-w-[1600px] mx-auto">
         <div className="flex items-end justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">{t("pipeline.title")}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{t("pipeline.subtitle")}</p>
+            <h1 className="text-2xl font-semibold tracking-tight">Pipeline</h1>
+            <p className="mt-1 text-sm text-muted-foreground">Manage your investor relationships as a visual pipeline.</p>
           </div>
         </div>
         <div className="mt-16 flex flex-col items-center gap-4 text-center">
@@ -214,83 +200,139 @@ function Pipeline() {
     );
   }
 
+  const maxCount = Math.max(...pipelineStages.map((s) => byStage[s].length), 1);
+
   return (
-    <div className="p-6 lg:p-8 max-w-[1600px] mx-auto">
-      <div className="flex items-end justify-between flex-wrap gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{t("pipeline.title")}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t("pipeline.subtitle")}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent">
-            <Filter className="h-4 w-4" /> Filters
-          </button>
-        </div>
-      </div>
-
-      {/* KPI strip */}
-      <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          ["Total deals", String(deals.length), "across pipeline"],
-          ["Pipeline value", `$${totalValue(deals).toFixed(0)}M`, "uncommitted"],
-          ["Hot deals", String(deals.filter((d) => d.signal === "hot").length), "need follow-up"],
-          ["Closed", `$${totalValue(byStage.Closed).toFixed(0)}M`, "this quarter"],
-        ].map(([l, v, s]) => (
-          <div key={l} className="rounded-xl border border-border/60 bg-card p-4 shadow-card">
-            <div className="text-xs text-muted-foreground">{l}</div>
-            <div className="mt-1 text-xl font-semibold tabular-nums">{v}</div>
-            <div className="text-[11px] text-muted-foreground">{s}</div>
+    <>
+      <div className="p-6 lg:p-8 max-w-[1600px] mx-auto">
+        <div className="flex items-end justify-between flex-wrap gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">Pipeline</h1>
+            <p className="mt-1 text-sm text-muted-foreground">Manage your investor relationships as a visual pipeline.</p>
           </div>
-        ))}
+          <div className="flex items-center gap-2">
+            <button className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent">
+              <Filter className="h-4 w-4" /> Filters
+            </button>
+          </div>
+        </div>
+
+        {/* KPI strip */}
+        <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            ["Total leads", String(deals.length), "across all stages"],
+            ["Hot deals", String(deals.filter((d) => d.isHot).length), "Interested investors"],
+            ["Deal rooms", String(byStage["Deal Room"].length), "active diligence"],
+            ["Passed", String(byStage["Passed"].length), "this round"],
+          ].map(([l, v, s]) => (
+            <div key={l} className="rounded-xl border border-border/60 bg-card p-4 shadow-card">
+              <div className="text-xs text-muted-foreground">{l}</div>
+              <div className="mt-1 text-xl font-semibold tabular-nums">{v}</div>
+              <div className="text-[11px] text-muted-foreground">{s}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Kanban */}
+        <div className="mt-6 grid grid-flow-col auto-cols-[minmax(260px,1fr)] gap-3 overflow-x-auto pb-4">
+          {pipelineStages.map((stage) => {
+            const items = byStage[stage];
+            const isOver = overStage === stage;
+            return (
+              <div
+                key={stage}
+                onDragOver={(e) => { e.preventDefault(); setOverStage(stage); }}
+                onDragLeave={() => setOverStage((s) => (s === stage ? null : s))}
+                onDrop={() => onDrop(stage)}
+                className={cn(
+                  "flex flex-col rounded-xl border bg-muted/30 transition-colors min-h-[400px]",
+                  isOver ? "border-brand bg-brand/5" : "border-border/60",
+                )}
+              >
+                <div className="px-3 py-2.5 border-b border-border/60 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className={cn("h-2 w-2 rounded-full", stageTint[stage])} />
+                    <span className="text-xs font-semibold uppercase tracking-wider">{stage}</span>
+                    <span className="text-[10px] text-muted-foreground">{items.length}</span>
+                  </div>
+                </div>
+                <div className="flex-1 p-2 space-y-2">
+                  {items.map((d) => (
+                    <DealCard
+                      key={d.id}
+                      deal={d}
+                      onDragStart={() => setDragId(d.id)}
+                      onClick={() => {
+                        const raw = rawLeads.find((l) => l.id === d.id);
+                        if (raw) setSelectedLead(raw);
+                      }}
+                    />
+                  ))}
+                  {items.length === 0 && (
+                    <div className="py-8 text-center text-[11px] text-muted-foreground">Drop leads here</div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Horizontal bar chart */}
+        <div className="mt-6 rounded-xl border border-border/60 bg-card p-5 shadow-card">
+          <div className="text-sm font-semibold mb-4">Pipeline distribution</div>
+          <div className="space-y-3">
+            {pipelineStages.map((stage) => {
+              const count = byStage[stage].length;
+              const barPct = Math.round((count / maxCount) * 100);
+              return (
+                <div key={stage} className="flex items-center gap-3">
+                  <div className="w-24 text-xs text-muted-foreground shrink-0">{stage}</div>
+                  <div className="flex-1 h-6 rounded-md bg-muted/40 overflow-hidden relative">
+                    <div
+                      className={cn("h-full rounded-md transition-all duration-500", stageBarColor[stage])}
+                      style={{ width: `${barPct}%` }}
+                    />
+                    {count > 0 && (
+                      <div className="absolute inset-y-0 left-2 flex items-center text-[10px] font-medium text-foreground/70">
+                        {count} lead{count !== 1 ? "s" : ""}
+                      </div>
+                    )}
+                  </div>
+                  <div className="w-5 text-xs text-right tabular-nums text-muted-foreground shrink-0">{count}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
-      {/* Kanban */}
-      <div className="mt-6 grid grid-flow-col auto-cols-[minmax(280px,1fr)] gap-3 overflow-x-auto pb-4">
-        {pipelineStages.map((stage) => {
-          const items = byStage[stage];
-          const isOver = overStage === stage;
-          return (
-            <div
-              key={stage}
-              onDragOver={(e) => { e.preventDefault(); setOverStage(stage); }}
-              onDragLeave={() => setOverStage((s) => (s === stage ? null : s))}
-              onDrop={() => onDrop(stage)}
-              className={cn(
-                "flex flex-col rounded-xl border bg-muted/30 transition-colors min-h-[400px]",
-                isOver ? "border-brand bg-brand/5" : "border-border/60",
-              )}
-            >
-              <div className="px-3 py-2.5 border-b border-border/60 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className={cn("h-2 w-2 rounded-full", stageTint[stage])} />
-                  <span className="text-xs font-semibold uppercase tracking-wider">{stage}</span>
-                  <span className="text-[10px] text-muted-foreground">{items.length}</span>
-                </div>
-                <span className="text-[10px] text-muted-foreground tabular-nums">
-                  ${totalValue(items).toFixed(0)}M
-                </span>
-              </div>
-              <div className="flex-1 p-2 space-y-2">
-                {items.map((d) => (
-                  <DealCard key={d.id} deal={d} onDragStart={() => setDragId(d.id)} />
-                ))}
-                {items.length === 0 && (
-                  <div className="py-8 text-center text-[11px] text-muted-foreground">Drop deals here</div>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
+      <LeadDrawer
+        open={!!selectedLead}
+        lead={selectedLead}
+        onClose={() => setSelectedLead(null)}
+        onSaved={() => {
+          setSelectedLead(null);
+          queryClient.invalidateQueries({ queryKey: ["pipeline-leads", user?.id] });
+        }}
+      />
+    </>
   );
 }
 
-function DealCard({ deal, onDragStart }: { deal: PipelineDeal; onDragStart: () => void }) {
+function DealCard({
+  deal,
+  onDragStart,
+  onClick,
+}: {
+  deal: PipelineDeal;
+  onDragStart: () => void;
+  onClick: () => void;
+}) {
   return (
     <div
       draggable
       onDragStart={onDragStart}
+      onClick={onClick}
       className="group rounded-lg border border-border/60 bg-card p-3 shadow-xs hover:shadow-card hover:border-brand/40 transition-all cursor-grab active:cursor-grabbing"
     >
       <div className="flex items-start justify-between gap-2">
@@ -303,8 +345,7 @@ function DealCard({ deal, onDragStart }: { deal: PipelineDeal; onDragStart: () =
             <div className="text-[11px] text-muted-foreground truncate">{deal.partner}</div>
           </div>
         </div>
-        {deal.signal === "hot" && <Flame className="h-3.5 w-3.5 text-warning shrink-0" />}
-        {deal.signal === "stale" && <Clock className="h-3.5 w-3.5 text-muted-foreground shrink-0" />}
+        {deal.isHot && <Flame className="h-3.5 w-3.5 text-warning shrink-0" />}
       </div>
       <div className="mt-2 text-[11px] text-muted-foreground">{deal.thesis}</div>
       <div className="mt-2.5 flex items-center justify-between">
@@ -317,9 +358,9 @@ function DealCard({ deal, onDragStart }: { deal: PipelineDeal; onDragStart: () =
         </div>
         <span className="text-[10px] tabular-nums text-muted-foreground">{deal.probability}%</span>
       </div>
-      <button className="mt-2 w-full inline-flex items-center justify-center gap-1 text-[10px] text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="mt-2 w-full inline-flex items-center justify-center gap-1 text-[10px] text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity">
         Open <ArrowUpRight className="h-3 w-3" />
-      </button>
+      </div>
     </div>
   );
 }
