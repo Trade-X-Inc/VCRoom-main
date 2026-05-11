@@ -38,88 +38,87 @@ export const sendAdvisorMessage = createServerFn({ method: "POST" })
     const used = usedToday ?? 0;
     if (used >= 20) throw new Error("RATE_LIMIT: Daily limit of 20 messages reached. Resets tomorrow.");
 
-    // Fetch founder context in parallel
-    const upcomingCutoff = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
-    const [startupRes, leadsRes, meetingsRes, roomCountRes, activityRes] = await Promise.all([
-      adminClient
-        .from("startups")
-        .select("company_name, sector, stage, funding_target, traction, revenue, team_size, key_metric, growth_rate, customer_count, tagline")
+    // Fetch full context
+    const [startup, leads, meetings, dealRooms] = await Promise.all([
+      adminClient.from("startups")
+        .select("*")
         .eq("founder_id", data.userId)
-        .limit(1)
-        .maybeSingle(),
-      adminClient
-        .from("vc_leads")
-        .select("status")
-        .eq("founder_id", data.userId),
-      adminClient
-        .from("meetings")
-        .select("title, scheduled_at, meeting_type, platform")
+        .maybeSingle()
+        .then((r) => r.data),
+      adminClient.from("vc_leads")
+        .select("investor_name, firm_name, status, follow_up_date, email, next_action")
+        .eq("founder_id", data.userId)
+        .then((r) => r.data || []),
+      adminClient.from("meetings")
+        .select("title, scheduled_at, platform, prep_notes")
+        .eq("created_by", data.userId)
         .gte("scheduled_at", new Date().toISOString())
-        .lte("scheduled_at", upcomingCutoff)
         .order("scheduled_at", { ascending: true })
-        .limit(5),
-      adminClient
-        .from("deal_rooms")
-        .select("id", { count: "exact", head: true })
-        .eq("founder_id", data.userId),
-      adminClient
-        .from("activities")
-        .select("action")
-        .eq("actor_id", data.userId)
-        .order("created_at", { ascending: false })
-        .limit(10),
+        .limit(5)
+        .then((r) => r.data || []),
+      adminClient.from("deal_rooms")
+        .select("id, status, updated_at")
+        .limit(20)
+        .then((r) => r.data || []),
     ]);
 
-    const startup = startupRes.data;
-    const leads = leadsRes.data ?? [];
-    const leadCount = leads.length;
-    const dealRoomCount = roomCountRes.count ?? 0;
-    const recentActivity = activityRes.data?.map((a) => a.action).join(", ") ?? "none";
+    const statusCounts = [
+      "New", "Shortlisted", "Contacted", "Replied",
+      "Meeting Booked", "Interested",
+      "Deal Room Created", "Rejected", "Follow Up",
+    ].map((s) => ({
+      status: s,
+      count: (leads as any[]).filter((l) => l.status === s).length,
+    })).filter((s) => s.count > 0);
 
-    // Build per-status lead breakdown
-    const statusCounts: Record<string, number> = {};
-    for (const l of leads) {
-      const s = l.status ?? "Unknown";
-      statusCounts[s] = (statusCounts[s] ?? 0) + 1;
-    }
-    const leadBreakdown = Object.entries(statusCounts)
-      .map(([s, n]) => `${n} ${s}`)
-      .join(", ") || "none";
+    const overdueFollowUps = (leads as any[]).filter((l) =>
+      l.follow_up_date && new Date(l.follow_up_date) < new Date()
+    );
 
-    // Format upcoming meetings
-    const upcomingMeetings = (meetingsRes.data ?? [])
-      .map((m) => `${m.title} on ${new Date(m.scheduled_at).toLocaleDateString()} via ${m.platform ?? "TBD"}`)
-      .join("; ") || "none scheduled";
+    const systemPrompt = `You are an expert fundraising advisor for ${(startup as any)?.company_name || "this startup"}.
 
-    const systemPrompt = startup
-      ? `You are a senior fundraising advisor for ${startup.company_name}, a ${startup.stage ?? "early-stage"} ${startup.sector ?? "tech"} startup raising ${startup.funding_target ?? "a funding round"}.
-${startup.tagline ? `\nTagline: ${startup.tagline}` : ""}
+COMPANY: ${(startup as any)?.company_name || "Not set"}
+STAGE: ${(startup as any)?.stage || "Not set"}
+SECTOR: ${(startup as any)?.sector || "Not set"}
+RAISING: ${(startup as any)?.funding_target || "Not set"}
+ARR: ${(startup as any)?.revenue || "Not set"}
+TRACTION: ${(startup as any)?.traction || "Not set"}
 
-Current pipeline:
-- Total VC leads tracked: ${leadCount}
-- Lead breakdown by status: ${leadBreakdown}
-- Active deal rooms (investor data rooms): ${dealRoomCount}
-- Upcoming meetings (next 14 days): ${upcomingMeetings}
+PIPELINE SUMMARY (${(leads as any[]).length} total leads):
+${statusCounts.map((s) => `  ${s.status}: ${s.count}`).join("\n") || "  No leads yet"}
 
-Company metrics:
-- Revenue / ARR: ${startup.revenue ?? "not shared"}
-- Traction: ${startup.traction ?? "not shared"}
-- Key metric: ${(startup as any).key_metric ?? "not shared"}
-- Growth rate: ${(startup as any).growth_rate ?? "not shared"}
-- Customers: ${(startup as any).customer_count ?? "not shared"}
-- Team size: ${startup.team_size ?? "not shared"}
+${overdueFollowUps.length > 0
+  ? `OVERDUE FOLLOW-UPS (${overdueFollowUps.length}):
+${overdueFollowUps.slice(0, 5).map((l) => `  - ${(l as any).investor_name} at ${(l as any).firm_name || "unknown firm"} (due ${(l as any).follow_up_date})`).join("\n")}`
+  : "No overdue follow-ups"}
 
-Recent founder activity: ${recentActivity}
+${(meetings as any[]).length > 0
+  ? `UPCOMING MEETINGS:\n${(meetings as any[]).map((m) => `  - ${m.title} on ${new Date(m.scheduled_at).toLocaleDateString()}`).join("\n")}`
+  : "No upcoming meetings scheduled"}
 
-Give specific, actionable fundraising advice based on this real context. Reference exact numbers when relevant. Be direct and concise. Max 150 words per response. No generic platitudes.`
-      : `You are a senior fundraising advisor. The founder hasn't completed their startup profile yet — encourage them to set up their profile at /app/profile for personalized advice. Be helpful and welcoming.`;
+DEAL ROOMS: ${(dealRooms as any[]).length} active
+
+YOUR ROLE:
+You are a senior fundraising advisor. Help the founder with:
+- Pipeline analysis and prioritization
+- Follow-up strategies for specific investors
+- Meeting preparation
+- Email and outreach advice
+- Deal room strategy
+- Investor objection handling
+- Round strategy and timing
+
+Always reference specific investors/meetings from the data above when relevant.
+Be direct and actionable.
+Max 150 words per response unless asked for more.
+End every response with one clear next action.`;
 
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
       await adminClient.from("ai_usage").insert({ user_id: data.userId, action: "advisor_message" });
       return {
-        reply: startup
-          ? `Based on your pipeline (${leadCount} leads across statuses: ${leadBreakdown}; ${dealRoomCount} deal rooms): Focus on converting meeting-stage leads first. Follow up within 48h of each meeting with a 3-bullet summary and clear next step. Aim for 1 new warm intro per day from existing connections.`
+        reply: (startup as any)?.company_name
+          ? `Based on your pipeline (${(leads as any[]).length} leads, ${(dealRooms as any[]).length} deal rooms): Focus on converting meeting-stage leads first. Follow up within 48h of each meeting with a 3-bullet summary and a clear next step.`
           : "Complete your startup profile first — I'll give you much more specific advice once I can see your stage, sector, metrics, and fundraising target.",
         rateLimitRemaining: 20 - used - 1,
       };

@@ -61,7 +61,7 @@ interface TeamMember {
   display_order: number;
 }
 
-const STAGES = ["Pre-seed", "Seed", "Series A", "Series B", "Series C+", "Growth"];
+const STAGES = ["Pre-idea", "Pre-seed", "Seed", "Series A", "Series B", "Growth", "Profitable"];
 const MEMBER_TAGS = ["Founder", "Co-Founder", "Advisor", "Employee", "Board Member"] as const;
 
 type FormState = {
@@ -327,10 +327,14 @@ function Profile() {
 
           {/* SECTION 1 — Company basics */}
           <FormSection title="Company basics">
+            <Field label="Company name *" value={form.company_name} onChange={field("company_name")} placeholder="Atlas Robotics" />
+            <Field label="Tagline" value={form.tagline} onChange={field("tagline")} placeholder="One line that explains your company" />
             <div className="grid sm:grid-cols-2 gap-3">
-              <Field label="Company name" value={form.company_name} onChange={field("company_name")} placeholder="Atlas Robotics" />
               <Field label="Website" value={form.website} onChange={field("website")} placeholder="https://example.com" />
-              <Field label="Sector" value={form.sector} onChange={field("sector")} placeholder="B2B SaaS, Fintech…" />
+              <Field label="Founded year" value={form.founded_year} onChange={field("founded_year")} placeholder="2022" type="number" />
+              <Field label="Country / HQ" value={form.country} onChange={field("country")} placeholder="San Francisco, USA" />
+              <Field label="Team size" value={form.team_size} onChange={field("team_size")} placeholder="12" type="number" />
+              <Field label="Sector" value={form.sector} onChange={field("sector")} placeholder="B2B SaaS, Fintech, AI..." />
               <div>
                 <label className="text-xs text-muted-foreground">Stage</label>
                 <select value={form.stage} onChange={field("stage")} className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50">
@@ -338,11 +342,7 @@ function Profile() {
                   {STAGES.map((s) => <option key={s}>{s}</option>)}
                 </select>
               </div>
-              <Field label="Country / HQ" value={form.country} onChange={field("country")} placeholder="San Francisco, USA" />
-              <Field label="Team size" value={form.team_size} onChange={field("team_size")} placeholder="12" type="number" />
-              <Field label="Founded year" value={form.founded_year} onChange={field("founded_year")} placeholder="2022" type="number" />
             </div>
-            <TextArea label="Tagline / one-liner" value={form.tagline} onChange={field("tagline")} placeholder="One sentence describing what you do and for whom" rows={2} />
           </FormSection>
 
           {/* SECTION 2 — Fundraising */}
@@ -360,20 +360,20 @@ function Profile() {
           <FormSection title="Traction & metrics">
             <div className="grid sm:grid-cols-2 gap-3">
               <Field label="Revenue / ARR" value={form.revenue} onChange={field("revenue")} placeholder="$1.2M ARR" />
-              <Field label="Traction highlight" value={form.traction} onChange={field("traction")} placeholder="500 customers, +15% MoM" />
-              <Field label="Key metric" value={form.key_metric} onChange={field("key_metric")} placeholder="NPS, CAC, LTV…" />
-              <Field label="Growth rate" value={form.growth_rate} onChange={field("growth_rate")} placeholder="15% MoM" />
+              <Field label="Growth rate" value={form.growth_rate} onChange={field("growth_rate")} placeholder="+15% MoM" />
               <Field label="Customer count" value={form.customer_count} onChange={field("customer_count")} placeholder="500 paying customers" />
+              <Field label="Key metric" value={form.key_metric} onChange={field("key_metric")} placeholder="Your most important metric" />
             </div>
+            <TextArea label="Traction highlights" value={form.traction} onChange={field("traction")} placeholder="Key traction highlights..." rows={3} />
           </FormSection>
 
           {/* SECTION 4 — Pitch content */}
           <FormSection title="Pitch content">
-            <TextArea label="Problem" value={form.problem} onChange={field("problem")} placeholder="What problem are you solving?" rows={3} />
-            <TextArea label="Solution" value={form.solution} onChange={field("solution")} placeholder="How does your product solve it?" rows={3} />
-            <TextArea label="Business model" value={form.business_model} onChange={field("business_model")} placeholder="How do you make money?" rows={2} />
-            <TextArea label="Market size" value={form.market_size} onChange={field("market_size")} placeholder="$50B TAM, $5B SAM…" rows={2} />
-            <TextArea label="Competitive advantage" value={form.competitive_advantage} onChange={field("competitive_advantage")} placeholder="What makes you hard to replicate?" rows={2} />
+            <TextArea label="Problem" value={form.problem} onChange={field("problem")} placeholder="What problem are you solving?" rows={4} />
+            <TextArea label="Solution" value={form.solution} onChange={field("solution")} placeholder="How does your product solve it?" rows={4} />
+            <TextArea label="Business model" value={form.business_model} onChange={field("business_model")} placeholder="How do you make money?" rows={3} />
+            <Field label="Market size" value={form.market_size} onChange={field("market_size") as any} placeholder="$50B TAM, $5B SAM…" />
+            <TextArea label="Competitive advantage" value={form.competitive_advantage} onChange={field("competitive_advantage")} placeholder="What makes you hard to replicate?" rows={3} />
             <TextArea label="Why now?" value={form.why_now} onChange={field("why_now")} placeholder="What tailwind or market shift makes this the right time?" rows={2} />
           </FormSection>
 
