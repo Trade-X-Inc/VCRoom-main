@@ -47447,112 +47447,13 @@ var init_dist6 = __esm({
   }
 });
 
-// dist/server/assets/deal-brief-fn-Dje44HTV.js
-var deal_brief_fn_Dje44HTV_exports = {};
-__export(deal_brief_fn_Dje44HTV_exports, {
-  generateDealBrief_createServerFn_handler: () => generateDealBrief_createServerFn_handler
-});
-import "node:async_hooks";
-var import_react11, import_jsx_runtime16, generateDealBrief_createServerFn_handler, generateDealBrief;
-var init_deal_brief_fn_Dje44HTV = __esm({
-  "dist/server/assets/deal-brief-fn-Dje44HTV.js"() {
-    "use strict";
-    init_createServerRpc_D_6bKnO();
-    init_dist6();
-    init_server4();
-    init_production();
-    import_react11 = __toESM(require_react(), 1);
-    import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
-    generateDealBrief_createServerFn_handler = createServerRpc({
-      id: "56f68b50d6d653ae4f4287eb005bbb35fecea7fa7ce69a4b2a6cc974383a502e",
-      name: "generateDealBrief",
-      filename: "src/lib/deal-brief-fn.ts"
-    }, (opts) => generateDealBrief.__executeServer(opts));
-    generateDealBrief = createServerFn({
-      method: "POST"
-    }).inputValidator((data) => data).handler(generateDealBrief_createServerFn_handler, async ({
-      data
-    }) => {
-      const supabaseUrl = process.env.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
-      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
-      const adminClient = createClient(supabaseUrl, serviceKey);
-      const {
-        data: member
-      } = await adminClient.from("deal_room_members").select("user_id").eq("deal_room_id", data.dealRoomId).eq("user_id", data.userId).maybeSingle();
-      if (!member) throw new Error("Unauthorized");
-      const {
-        data: room
-      } = await adminClient.from("deal_rooms").select("startup_id").eq("id", data.dealRoomId).single();
-      const {
-        data: startup
-      } = room?.startup_id ? await adminClient.from("startups").select("company_name, sector, stage, funding_target, traction, description").eq("id", room.startup_id).maybeSingle() : {
-        data: null
-      };
-      const {
-        data: activities
-      } = await adminClient.from("activities").select("action, created_at").eq("deal_room_id", data.dealRoomId).order("created_at", {
-        ascending: false
-      }).limit(10);
-      const activitySummary = (activities ?? []).map((a) => a.action).join(", ");
-      const companyName = startup?.company_name ?? "Unknown startup";
-      const userPrompt = `Analyze this startup for investment:
-Company: ${companyName}
-Sector: ${startup?.sector ?? "Unknown"}
-Stage: ${startup?.stage ?? "Unknown"}
-Funding target: ${startup?.funding_target ?? "Unknown"}
-Traction: ${startup?.traction ?? "Unknown"}
-Description: ${startup?.description ?? "None provided"}
-Recent activity: ${activitySummary || "None"}`;
-      const apiKey = process.env.OPENAI_API_KEY;
-      if (!apiKey) {
-        return {
-          matchScore: 72,
-          matchLabel: "Moderate fit",
-          strengths: ["Early-stage traction", "Clear market opportunity", "Experienced team"],
-          risks: ["Market competition", "Execution risk", "Capital requirements"],
-          mitigants: ["Strong domain expertise", "Clear differentiation", "Advisory support"],
-          nextAction: "Schedule a discovery call to understand the team and traction better."
-        };
-      }
-      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          max_tokens: 600,
-          temperature: 0.4,
-          messages: [{
-            role: "system",
-            content: `You are an investment analyst. Return ONLY valid JSON:
-{"matchScore":0-100,"matchLabel":"Strong fit|Moderate fit|Weak fit","strengths":["...","...","..."],"risks":["...","...","..."],"mitigants":["...","...","..."],"nextAction":"..."}`
-          }, {
-            role: "user",
-            content: userPrompt
-          }]
-        })
-      });
-      if (!resp.ok) throw new Error("OpenAI request failed");
-      const json = await resp.json();
-      const raw = json.choices[0]?.message?.content ?? "";
-      const parsed = JSON.parse(raw);
-      if (typeof parsed.matchScore !== "number" || !Array.isArray(parsed.strengths)) {
-        throw new Error("Invalid AI response shape");
-      }
-      return parsed;
-    });
-  }
-});
-
 // dist/server/assets/advisor-fn-DEJqMeOO.js
 var advisor_fn_DEJqMeOO_exports = {};
 __export(advisor_fn_DEJqMeOO_exports, {
   sendAdvisorMessage_createServerFn_handler: () => sendAdvisorMessage_createServerFn_handler
 });
 import "node:async_hooks";
-var import_react12, import_jsx_runtime17, sendAdvisorMessage_createServerFn_handler, sendAdvisorMessage;
+var import_react11, import_jsx_runtime16, sendAdvisorMessage_createServerFn_handler, sendAdvisorMessage;
 var init_advisor_fn_DEJqMeOO = __esm({
   "dist/server/assets/advisor-fn-DEJqMeOO.js"() {
     "use strict";
@@ -47560,8 +47461,8 @@ var init_advisor_fn_DEJqMeOO = __esm({
     init_dist6();
     init_server4();
     init_production();
-    import_react12 = __toESM(require_react(), 1);
-    import_jsx_runtime17 = __toESM(require_jsx_runtime(), 1);
+    import_react11 = __toESM(require_react(), 1);
+    import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
     sendAdvisorMessage_createServerFn_handler = createServerRpc({
       id: "b0451d818a4af8f61f8d6702b0a87626ab580dea9833910b8d678173c48d62e2",
       name: "sendAdvisorMessage",
@@ -47668,6 +47569,105 @@ End every response with one clear next action.`;
         reply,
         rateLimitRemaining: 20 - used - 1
       };
+    });
+  }
+});
+
+// dist/server/assets/deal-brief-fn-Dje44HTV.js
+var deal_brief_fn_Dje44HTV_exports = {};
+__export(deal_brief_fn_Dje44HTV_exports, {
+  generateDealBrief_createServerFn_handler: () => generateDealBrief_createServerFn_handler
+});
+import "node:async_hooks";
+var import_react12, import_jsx_runtime17, generateDealBrief_createServerFn_handler, generateDealBrief;
+var init_deal_brief_fn_Dje44HTV = __esm({
+  "dist/server/assets/deal-brief-fn-Dje44HTV.js"() {
+    "use strict";
+    init_createServerRpc_D_6bKnO();
+    init_dist6();
+    init_server4();
+    init_production();
+    import_react12 = __toESM(require_react(), 1);
+    import_jsx_runtime17 = __toESM(require_jsx_runtime(), 1);
+    generateDealBrief_createServerFn_handler = createServerRpc({
+      id: "56f68b50d6d653ae4f4287eb005bbb35fecea7fa7ce69a4b2a6cc974383a502e",
+      name: "generateDealBrief",
+      filename: "src/lib/deal-brief-fn.ts"
+    }, (opts) => generateDealBrief.__executeServer(opts));
+    generateDealBrief = createServerFn({
+      method: "POST"
+    }).inputValidator((data) => data).handler(generateDealBrief_createServerFn_handler, async ({
+      data
+    }) => {
+      const supabaseUrl = process.env.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
+      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
+      const adminClient = createClient(supabaseUrl, serviceKey);
+      const {
+        data: member
+      } = await adminClient.from("deal_room_members").select("user_id").eq("deal_room_id", data.dealRoomId).eq("user_id", data.userId).maybeSingle();
+      if (!member) throw new Error("Unauthorized");
+      const {
+        data: room
+      } = await adminClient.from("deal_rooms").select("startup_id").eq("id", data.dealRoomId).single();
+      const {
+        data: startup
+      } = room?.startup_id ? await adminClient.from("startups").select("company_name, sector, stage, funding_target, traction, description").eq("id", room.startup_id).maybeSingle() : {
+        data: null
+      };
+      const {
+        data: activities
+      } = await adminClient.from("activities").select("action, created_at").eq("deal_room_id", data.dealRoomId).order("created_at", {
+        ascending: false
+      }).limit(10);
+      const activitySummary = (activities ?? []).map((a) => a.action).join(", ");
+      const companyName = startup?.company_name ?? "Unknown startup";
+      const userPrompt = `Analyze this startup for investment:
+Company: ${companyName}
+Sector: ${startup?.sector ?? "Unknown"}
+Stage: ${startup?.stage ?? "Unknown"}
+Funding target: ${startup?.funding_target ?? "Unknown"}
+Traction: ${startup?.traction ?? "Unknown"}
+Description: ${startup?.description ?? "None provided"}
+Recent activity: ${activitySummary || "None"}`;
+      const apiKey = process.env.OPENAI_API_KEY;
+      if (!apiKey) {
+        return {
+          matchScore: 72,
+          matchLabel: "Moderate fit",
+          strengths: ["Early-stage traction", "Clear market opportunity", "Experienced team"],
+          risks: ["Market competition", "Execution risk", "Capital requirements"],
+          mitigants: ["Strong domain expertise", "Clear differentiation", "Advisory support"],
+          nextAction: "Schedule a discovery call to understand the team and traction better."
+        };
+      }
+      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          max_tokens: 600,
+          temperature: 0.4,
+          messages: [{
+            role: "system",
+            content: `You are an investment analyst. Return ONLY valid JSON:
+{"matchScore":0-100,"matchLabel":"Strong fit|Moderate fit|Weak fit","strengths":["...","...","..."],"risks":["...","...","..."],"mitigants":["...","...","..."],"nextAction":"..."}`
+          }, {
+            role: "user",
+            content: userPrompt
+          }]
+        })
+      });
+      if (!resp.ok) throw new Error("OpenAI request failed");
+      const json = await resp.json();
+      const raw = json.choices[0]?.message?.content ?? "";
+      const parsed = JSON.parse(raw);
+      if (typeof parsed.matchScore !== "number" || !Array.isArray(parsed.strengths)) {
+        throw new Error("Invalid AI response shape");
+      }
+      return parsed;
     });
   }
 });
@@ -74949,13 +74949,13 @@ var init_server4 = __esm({
     eventStorage = globalObj$1[GLOBAL_EVENT_STORAGE_KEY];
     HEADERS = { TSS_SHELL: "X-TSS_SHELL" };
     manifest = {
-      "56f68b50d6d653ae4f4287eb005bbb35fecea7fa7ce69a4b2a6cc974383a502e": {
-        functionName: "generateDealBrief_createServerFn_handler",
-        importer: () => Promise.resolve().then(() => (init_deal_brief_fn_Dje44HTV(), deal_brief_fn_Dje44HTV_exports))
-      },
       "b0451d818a4af8f61f8d6702b0a87626ab580dea9833910b8d678173c48d62e2": {
         functionName: "sendAdvisorMessage_createServerFn_handler",
         importer: () => Promise.resolve().then(() => (init_advisor_fn_DEJqMeOO(), advisor_fn_DEJqMeOO_exports))
+      },
+      "56f68b50d6d653ae4f4287eb005bbb35fecea7fa7ce69a4b2a6cc974383a502e": {
+        functionName: "generateDealBrief_createServerFn_handler",
+        importer: () => Promise.resolve().then(() => (init_deal_brief_fn_Dje44HTV(), deal_brief_fn_Dje44HTV_exports))
       },
       "1d719b02e5cbb8bfb1f5fdbf08bea97cdac2cfff952491ca07a2d91de6f74c81": {
         functionName: "generateOutreachEmail_createServerFn_handler",
