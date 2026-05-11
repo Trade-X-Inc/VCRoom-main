@@ -186,7 +186,7 @@ function InvestorDashboard() {
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">
-            {greet}, {user?.name?.split(" ")[0] ?? "there"}
+            {greet}, {user?.fullName?.split(" ")[0] ?? "there"}
           </h1>
           <div className="text-sm text-muted-foreground">{today}</div>
         </div>

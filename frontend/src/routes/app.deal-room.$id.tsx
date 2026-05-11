@@ -56,7 +56,7 @@ function DealRoom() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("deal_rooms")
-        .select("*, startups(company_name)")
+        .select("*, startups(*)")
         .eq("id", dealRoomId)
         .single();
       if (error) throw error;
@@ -240,12 +240,16 @@ function DealRoom() {
       {/* Main content */}
       <main className="flex-1 overflow-y-auto">
         {tab === "overview" && (
-          <>
-            {isInvestor ? <InvestorOverview companyName={companyName} /> : <FounderOverview />}
-            <ParticipantsSection dealRoomId={dealRoomId} />
-          </>
+          <DealRoomOverview
+            dealRoomId={dealRoomId}
+            room={room}
+            memberList={memberList}
+            isInvestor={isInvestor}
+            isFounder={isFounder}
+            onTabChange={setTab}
+          />
         )}
-        {tab === "documents" && <Documents dealRoomId={dealRoomId} />}
+        {tab === "documents" && <Documents dealRoomId={dealRoomId} isFounder={isFounder} userId={user?.id} />}
         {tab === "chat" && <div className="h-full"><DealRoomChat /></div>}
         {tab === "qa" && <QA dealRoomId={dealRoomId} userId={user?.id} userName={userName} />}
         {tab === "checklist" && <DDChecklist />}
@@ -311,127 +315,315 @@ function DealRoom() {
   );
 }
 
-// ── Founder overview ──────────────────────────────────────────────
-function FounderOverview() {
+// ── Deal Room Overview (unified for founder + investor) ───────────
+function DealRoomOverview({
+  dealRoomId,
+  room,
+  memberList,
+  isInvestor,
+  isFounder,
+  onTabChange,
+}: {
+  dealRoomId: string;
+  room: any;
+  memberList: any[];
+  isInvestor: boolean;
+  isFounder: boolean;
+  onTabChange: (tab: string) => void;
+}) {
+  const startup = room?.startups;
+  const [showProblem, setShowProblem] = useState(false);
+
+  const { data: recentActivity = [] } = useQuery({
+    queryKey: ["activities-overview", dealRoomId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("activities")
+        .select("*")
+        .eq("deal_room_id", dealRoomId)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      return data ?? [];
+    },
+  });
+
+  const daysOpen = room?.created_at
+    ? Math.floor((Date.now() - new Date(room.created_at).getTime()) / 86400000)
+    : 0;
+  const lastActivity = (recentActivity as any[])[0]?.created_at;
+
+  const memberStatusColor = (accepted: boolean) =>
+    accepted ? "bg-success/10 text-success" : "bg-warning/10 text-warning";
+
   return (
     <div className="p-8 max-w-5xl mx-auto">
-      <div className="flex items-start justify-between gap-6">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-6 mb-6">
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Deal room</div>
-          <h2 className="mt-1 text-2xl font-semibold tracking-tight">Active Investor Review</h2>
-          <p className="mt-1.5 text-sm text-muted-foreground max-w-2xl">Active diligence in progress.</p>
+          <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
+            {isInvestor ? "Reviewing" : "Deal Room"}
+          </div>
+          <h2 className="mt-1 text-2xl font-semibold tracking-tight">
+            {startup?.company_name ?? "Deal Room"}
+          </h2>
+          {startup?.tagline && (
+            <p className="mt-1 text-sm text-muted-foreground">{startup.tagline}</p>
+          )}
         </div>
-        <div className="flex gap-2">
-          <button className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent"><Plus className="h-4 w-4" /> Invite</button>
-          <button className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"><Send className="h-4 w-4" /> Send update</button>
+        <div className="flex gap-2 shrink-0">
+          {isFounder ? (
+            <>
+              <button
+                onClick={() => onTabChange("documents")}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent"
+              >
+                <UserPlus className="h-4 w-4" /> Invite
+              </button>
+              <button
+                onClick={() => onTabChange("chat")}
+                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"
+              >
+                <Send className="h-4 w-4" /> Send update
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => onTabChange("qa")}
+                className="inline-flex items-center gap-1.5 rounded-md border border-warning/40 bg-warning/10 text-warning px-3 py-2 text-sm hover:bg-warning/15"
+              >
+                <HelpCircle className="h-4 w-4" /> Request info
+              </button>
+              <button
+                onClick={() => onTabChange("decision")}
+                className="inline-flex items-center gap-1.5 rounded-md border border-success/40 bg-success/10 text-success px-3 py-2 text-sm hover:bg-success/15"
+              >
+                <ThumbsUp className="h-4 w-4" /> Submit review
+              </button>
+            </>
+          )}
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          ["Stage", "Diligence", TrendingUp, "brand"],
-          ["Probability", "65%", Target, "success"],
-          ["Days open", "12", Clock, "violet"],
-          ["Open items", "4", AlertCircle, "warning"],
-        ].map(([l, v, I, c]: any) => (
-          <div key={l} className="rounded-xl border border-border/60 bg-card p-4 shadow-card">
-            <div className="flex items-center justify-between text-xs text-muted-foreground"><span>{l}</span><I className={`h-3.5 w-3.5 text-${c}`} /></div>
-            <div className="mt-2 text-xl font-semibold">{v}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-6 grid md:grid-cols-3 gap-4">
-        <div className="md:col-span-2 rounded-xl border border-border/60 bg-card p-5 shadow-card">
-          <div className="flex items-center justify-between">
-            <div className="text-sm font-semibold">Investor activity</div>
-            <Eye className="h-4 w-4 text-muted-foreground" />
-          </div>
-          <div className="mt-4 space-y-3">
-            {[
-              ["Investor opened Cohort analysis v2.pdf", "12m ago", "brand"],
-              ["Investor viewed pitch deck (4th time)", "1h ago", "violet"],
-              ["Investor asked a question in Q&A", "2h ago", "warning"],
-              ["NDA signed", "yesterday", "success"],
-            ].map(([t, d, c]: any, i) => (
-              <div key={i} className="flex items-center gap-3 text-sm">
-                <span className={`h-1.5 w-1.5 rounded-full bg-${c}`} />
-                <span className="flex-1">{t}</span>
-                <span className="text-xs text-muted-foreground">{d}</span>
+      {/* Two-column layout: 60% left / 40% right */}
+      <div className="grid md:grid-cols-5 gap-5">
+        {/* LEFT — company summary + participants */}
+        <div className="md:col-span-3 space-y-4">
+          <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+            <div className="flex items-start gap-3">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-bold text-sm">
+                {startup?.company_name?.[0] ?? "D"}
               </div>
-            ))}
-          </div>
-        </div>
-        <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-          <div className="text-sm font-semibold">Next steps</div>
-          <div className="mt-3 space-y-2.5 text-sm">
-            <div className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-success mt-0.5" /><span>Customer ref calls scheduled</span></div>
-            <div className="flex items-start gap-2"><Clock className="h-4 w-4 text-warning mt-0.5" /><span>Cap table review by Fri</span></div>
-            <div className="flex items-start gap-2"><Clock className="h-4 w-4 text-warning mt-0.5" /><span>Forecast model 2026</span></div>
-            <div className="flex items-start gap-2"><AlertCircle className="h-4 w-4 text-destructive mt-0.5" /><span>SOC2 evidence (blocked)</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-semibold">{startup?.company_name ?? "Company"}</div>
+                {startup?.tagline && (
+                  <div className="text-xs text-muted-foreground mt-0.5">{startup.tagline}</div>
+                )}
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {startup?.stage && (
+                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-brand/10 text-brand">
+                      {startup.stage}
+                    </span>
+                  )}
+                  {startup?.sector && (
+                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-accent text-muted-foreground">
+                      {startup.sector}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
 
-// ── Investor overview ─────────────────────────────────────────────
-function InvestorOverview({ companyName }: { companyName: string }) {
-  return (
-    <div className="p-8 max-w-5xl mx-auto">
-      <div className="flex items-start justify-between gap-6">
-        <div>
-          <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Reviewing</div>
-          <h2 className="mt-1 text-2xl font-semibold tracking-tight">{companyName}</h2>
-          <p className="mt-1.5 text-sm text-muted-foreground max-w-2xl">Active deal room — review documents, Q&A, and checklist.</p>
-        </div>
-        <div className="flex gap-2">
-          <button className="inline-flex items-center gap-1.5 rounded-md border border-success/40 bg-success/10 text-success px-3 py-2 text-sm hover:bg-success/15">
-            <ThumbsUp className="h-4 w-4" /> Accept
-          </button>
-          <button className="inline-flex items-center gap-1.5 rounded-md border border-warning/40 bg-warning/10 text-warning px-3 py-2 text-sm hover:bg-warning/15">
-            <HelpCircle className="h-4 w-4" /> Request info
-          </button>
-          <button className="inline-flex items-center gap-1.5 rounded-md border border-destructive/40 bg-destructive/10 text-destructive px-3 py-2 text-sm hover:bg-destructive/15">
-            <ThumbsDown className="h-4 w-4" /> Pass
-          </button>
-        </div>
-      </div>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              {startup?.funding_target && (
+                <div className="rounded-lg bg-accent/50 p-3">
+                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Raising</div>
+                  <div className="text-sm font-semibold mt-0.5">{startup.funding_target}</div>
+                </div>
+              )}
+              {startup?.revenue && (
+                <div className="rounded-lg bg-accent/50 p-3">
+                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider">ARR</div>
+                  <div className="text-sm font-semibold mt-0.5">{startup.revenue}</div>
+                </div>
+              )}
+              {startup?.team_size && (
+                <div className="rounded-lg bg-accent/50 p-3">
+                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Team size</div>
+                  <div className="text-sm font-semibold mt-0.5">{startup.team_size}</div>
+                </div>
+              )}
+              {startup?.website && (
+                <div className="rounded-lg bg-accent/50 p-3">
+                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Website</div>
+                  <a
+                    href={startup.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-semibold text-brand mt-0.5 flex items-center gap-1 hover:underline"
+                  >
+                    <ExternalLink className="h-3 w-3" /> Visit
+                  </a>
+                </div>
+              )}
+            </div>
 
-      <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          ["ARR", "$4.2M", "+318% YoY", DollarSign, "success"],
-          ["Customers", "12", "F500: 4", Users, "brand"],
-          ["Net retention", "134%", "Best-in-class", TrendingUp, "violet"],
-          ["Runway", "18mo", "post-raise", Shield, "warning"],
-        ].map(([l, v, d, I, c]: any) => (
-          <div key={l} className="rounded-xl border border-border/60 bg-card p-4 shadow-card">
-            <div className="flex items-center justify-between text-xs text-muted-foreground"><span>{l}</span><I className={`h-3.5 w-3.5 text-${c}`} /></div>
-            <div className="mt-2 text-xl font-semibold">{v}</div>
-            <div className="text-[11px] text-muted-foreground">{d}</div>
+            {(startup?.problem || startup?.solution) && (
+              <div className="mt-3 border-t border-border/60 pt-3">
+                <button
+                  onClick={() => setShowProblem((v) => !v)}
+                  className="text-xs text-brand hover:underline"
+                >
+                  {showProblem ? "Hide" : "Show"} problem / solution
+                </button>
+                {showProblem && (
+                  <div className="mt-2 space-y-3">
+                    {startup.problem && (
+                      <div>
+                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Problem</div>
+                        <div className="text-sm mt-1">{startup.problem}</div>
+                      </div>
+                    )}
+                    {startup.solution && (
+                      <div>
+                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Solution</div>
+                        <div className="text-sm mt-1">{startup.solution}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        ))}
-      </div>
 
-      <div className="mt-6 grid md:grid-cols-2 gap-4">
-        <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-          <div className="text-sm font-semibold inline-flex items-center gap-2"><Building2 className="h-4 w-4 text-brand" /> Round details</div>
-          <div className="mt-3 space-y-2.5 text-sm">
-            {[["Round", "Series A"], ["Target", "$8M"], ["Soft circled", "$3.2M"], ["Lead", "Open"], ["Valuation", "$48M post"], ["Close", "~6 weeks"]].map(([l, v]) => (
-              <div key={l} className="flex justify-between"><span className="text-muted-foreground">{l}</span><span className="font-medium">{v}</span></div>
-            ))}
+          {/* Participants */}
+          <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-sm font-semibold inline-flex items-center gap-2">
+                <Users className="h-4 w-4 text-brand" /> Participants
+              </div>
+              {isFounder && (
+                <button className="text-xs inline-flex items-center gap-1 text-muted-foreground hover:text-foreground">
+                  <UserPlus className="h-3.5 w-3.5" /> Invite
+                </button>
+              )}
+            </div>
+            {memberList.length === 0 ? (
+              <div className="text-xs text-muted-foreground">No participants yet.</div>
+            ) : (
+              <div className="divide-y divide-border/60">
+                {(memberList as any[]).map((m) => (
+                  <div key={m.id} className="flex items-center gap-3 py-2.5">
+                    <div className="grid h-8 w-8 place-items-center rounded-full bg-accent text-[11px] font-semibold shrink-0">
+                      {(m.users?.full_name ?? "?").split(" ").map((s: string) => s[0]).slice(0, 2).join("")}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium truncate">{m.users?.full_name ?? "Unknown"}</div>
+                      <div className="text-xs text-muted-foreground truncate">{m.users?.email ?? ""}</div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <span className="text-[10px] capitalize text-muted-foreground">{m.role}</span>
+                      <span className={cn("text-[10px] px-2 py-0.5 rounded", memberStatusColor(!!m.accepted_at))}>
+                        {m.accepted_at ? "NDA Accepted" : "Invited"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-        <div className="rounded-xl border border-brand/30 bg-gradient-to-br from-brand/5 to-violet/5 p-5 shadow-card">
-          <div className="text-sm font-semibold inline-flex items-center gap-2"><Sparkles className="h-4 w-4 text-brand" /> AI decision summary</div>
-          <div className="mt-3 space-y-2 text-sm">
-            <div className="flex items-start gap-2"><span className="text-success mt-0.5">+</span><span>Strong NRR (134%) and F500 traction (4/12 customers).</span></div>
-            <div className="flex items-start gap-2"><span className="text-success mt-0.5">+</span><span>Founders with deep domain expertise — proven shippers.</span></div>
-            <div className="flex items-start gap-2"><span className="text-warning mt-0.5">!</span><span>Hardware GM concentration: top 3 customers = 41% ARR.</span></div>
-            <div className="flex items-start gap-2"><span className="text-destructive mt-0.5">−</span><span>Capex-heavy. Watch BOM trajectory before Y2.</span></div>
+
+        {/* RIGHT — deal status + recent activity */}
+        <div className="md:col-span-2 space-y-4">
+          <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+            <div className="text-sm font-semibold mb-3">Deal status</div>
+            <div className="space-y-2.5">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Stage</span>
+                <span className="font-medium capitalize">{room?.status ?? "Active"}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Days open</span>
+                <span className="font-medium">{daysOpen}</span>
+              </div>
+              {lastActivity && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Last activity</span>
+                  <span className="font-medium">{formatDistanceToNow(new Date(lastActivity), { addSuffix: true })}</span>
+                </div>
+              )}
+            </div>
+            <div className="mt-4 border-t border-border/60 pt-4">
+              <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-2">Quick actions</div>
+              <div className="space-y-1.5">
+                {isFounder ? (
+                  <>
+                    <button
+                      onClick={() => onTabChange("documents")}
+                      className="w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2"
+                    >
+                      <FileText className="h-3.5 w-3.5 text-brand" /> Upload document
+                    </button>
+                    <button
+                      onClick={() => onTabChange("meetings")}
+                      className="w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2"
+                    >
+                      <Calendar className="h-3.5 w-3.5 text-brand" /> Schedule meeting
+                    </button>
+                    <button
+                      onClick={() => onTabChange("chat")}
+                      className="w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2"
+                    >
+                      <Send className="h-3.5 w-3.5 text-brand" /> Send investor update
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => onTabChange("documents")}
+                      className="w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2"
+                    >
+                      <FileText className="h-3.5 w-3.5 text-brand" /> Request document
+                    </button>
+                    <button
+                      onClick={() => onTabChange("qa")}
+                      className="w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2"
+                    >
+                      <MessageSquare className="h-3.5 w-3.5 text-brand" /> Ask a question
+                    </button>
+                    <button
+                      onClick={() => onTabChange("decision")}
+                      className="w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2"
+                    >
+                      <ThumbsUp className="h-3.5 w-3.5 text-success" /> Submit review
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
-          <button className="mt-4 text-xs text-brand hover:underline">Generate full investment memo →</button>
+
+          <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+            <div className="text-sm font-semibold mb-3">Recent activity</div>
+            {(recentActivity as any[]).length === 0 ? (
+              <div className="text-xs text-muted-foreground">No activity yet.</div>
+            ) : (
+              <div className="space-y-2.5">
+                {(recentActivity as any[]).map((e) => (
+                  <div key={e.id} className="flex items-start gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-brand mt-1.5 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm truncate">{e.action}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {formatDistanceToNow(new Date(e.created_at), { addSuffix: true })}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -439,22 +631,47 @@ function InvestorOverview({ companyName }: { companyName: string }) {
 }
 
 // ── Documents ─────────────────────────────────────────────────────
-const sampleDocs = [
-  { name: "Pitch deck v3.pdf", category: "Strategy" },
-  { name: "Financial model Q4.xlsx", category: "Finance" },
-  { name: "Cap table current.xlsx", category: "Legal" },
-  { name: "Product roadmap 2025.pdf", category: "Product" },
-];
+const CATEGORY_COLORS: Record<string, string> = {
+  "Pitch Deck": "bg-brand/10 text-brand",
+  "Financials": "bg-success/10 text-success",
+  "Legal": "bg-violet/10 text-violet",
+  "Market Research": "bg-warning/10 text-warning",
+  "Team": "bg-brand/10 text-brand",
+  "Product": "bg-violet/10 text-violet",
+  "Other": "bg-accent text-muted-foreground",
+};
 
-function Documents({ dealRoomId }: { dealRoomId: string }) {
+function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFounder: boolean; userId?: string }) {
   const queryClient = useQueryClient();
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [addingFromLib, setAddingFromLib] = useState<string | null>(null);
+
   const { data: docs = [] } = useQuery({
     queryKey: ["documents", dealRoomId],
     queryFn: async () => {
-      const { data } = await supabase.from("documents").select("*").eq("deal_room_id", dealRoomId).order("created_at", { ascending: false });
+      const { data } = await supabase
+        .from("documents")
+        .select("*, users(full_name)")
+        .eq("deal_room_id", dealRoomId)
+        .order("created_at", { ascending: false });
       return data ?? [];
     },
   });
+
+  const { data: libraryDocs = [], isLoading: libLoading } = useQuery({
+    queryKey: ["library-docs", userId],
+    enabled: showLibrary && !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("documents")
+        .select("*")
+        .eq("uploader_id", userId!)
+        .is("deal_room_id", null)
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+  });
+
   const ndaDocs = useGeneratedNdaDocs().filter((d) => d.dealRoomId === dealRoomId);
 
   const handleDownload = async (storagePath: string) => {
@@ -462,18 +679,101 @@ function Documents({ dealRoomId }: { dealRoomId: string }) {
     if (data?.signedUrl) window.open(data.signedUrl, "_blank");
   };
 
+  const addFromLibrary = async (docId: string) => {
+    setAddingFromLib(docId);
+    await supabase.from("documents").update({ deal_room_id: dealRoomId }).eq("id", docId);
+    await queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+    await queryClient.invalidateQueries({ queryKey: ["library-docs", userId] });
+    setAddingFromLib(null);
+    toast.success("Document added to deal room");
+    setShowLibrary(false);
+  };
+
+  const removeFromRoom = async (docId: string) => {
+    await supabase.from("documents").update({ deal_room_id: null }).eq("id", docId);
+    queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+    toast.success("Removed from deal room");
+  };
+
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold tracking-tight">Documents</h2>
-        <button className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent">Request document</button>
+        <div className="flex gap-2">
+          {isFounder && (
+            <button
+              onClick={() => setShowLibrary(true)}
+              className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-sm hover:bg-brand/10"
+            >
+              <Plus className="h-4 w-4" /> Add from library
+            </button>
+          )}
+          <button className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent">
+            Request document
+          </button>
+        </div>
       </div>
-      <div className="mt-5">
-        <Dropzone
-          dealRoomId={dealRoomId}
-          onUploadComplete={() => queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] })}
-        />
-      </div>
+
+      {isFounder && (
+        <div className="mt-5">
+          <Dropzone
+            dealRoomId={dealRoomId}
+            onUploadComplete={() => queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] })}
+          />
+        </div>
+      )}
+
+      {/* Library modal */}
+      {showLibrary && (
+        <div
+          className="fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm grid place-items-center p-4"
+          onClick={() => setShowLibrary(false)}
+        >
+          <div
+            className="w-full max-w-lg rounded-2xl border border-border/60 bg-card shadow-elev"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-5 border-b border-border/60">
+              <div className="text-sm font-semibold">Add from document library</div>
+              <button
+                onClick={() => setShowLibrary(false)}
+                className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="p-3 max-h-80 overflow-y-auto">
+              {libLoading && <div className="text-sm text-muted-foreground p-3 animate-pulse">Loading…</div>}
+              {!libLoading && (libraryDocs as any[]).length === 0 && (
+                <div className="text-sm text-muted-foreground p-3">
+                  No personal documents without a deal room. Upload documents in the Documents page first.
+                </div>
+              )}
+              {(libraryDocs as any[]).map((doc) => (
+                <div key={doc.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent/50">
+                  <div className="grid h-8 w-8 place-items-center rounded-md bg-accent shrink-0">
+                    <FileText className="h-4 w-4 text-brand" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium truncate">
+                      {doc.name || doc.storage_path?.split("/").pop() || "Document"}
+                    </div>
+                    {doc.category && <div className="text-xs text-muted-foreground">{doc.category}</div>}
+                  </div>
+                  <button
+                    onClick={() => addFromLibrary(doc.id)}
+                    disabled={addingFromLib === doc.id}
+                    className="shrink-0 inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs disabled:opacity-50"
+                  >
+                    {addingFromLib === doc.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
+                    Add
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {ndaDocs.length > 0 && (
         <div className="mt-5">
@@ -494,41 +794,64 @@ function Documents({ dealRoomId }: { dealRoomId: string }) {
         </div>
       )}
 
-      {docs.length > 0 && (
+      {(docs as any[]).length > 0 && (
         <div className="mt-5 rounded-xl border border-border/60 bg-card shadow-card divide-y divide-border/60">
-          {(docs as any[]).map((doc) => (
-            <div key={doc.id} className="flex items-center gap-3 px-5 py-3 hover:bg-accent/40 group">
-              <div className="grid h-8 w-8 place-items-center rounded-md bg-accent"><FileText className="h-4 w-4 text-brand" /></div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium truncate">{doc.storage_path?.split("/").pop() ?? "Document"}</div>
-                <div className="text-xs text-muted-foreground">{doc.category ?? "General"}</div>
+          {(docs as any[]).map((doc) => {
+            const catColor = CATEGORY_COLORS[doc.category] ?? "bg-accent text-muted-foreground";
+            return (
+              <div key={doc.id} className="flex items-center gap-3 px-5 py-3 hover:bg-accent/40 group">
+                <div className="grid h-8 w-8 place-items-center rounded-md bg-accent">
+                  <FileText className="h-4 w-4 text-brand" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium truncate">
+                    {doc.name || (doc.storage_path?.split("/").pop() ?? "Document")}
+                  </div>
+                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                    {doc.category && (
+                      <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full", catColor)}>{doc.category}</span>
+                    )}
+                    <span className="text-xs text-muted-foreground">
+                      {doc.users?.full_name ?? "Unknown"} · {new Date(doc.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+                {doc.status === "ready" ? (
+                  <span className="inline-flex items-center gap-1 text-success text-xs"><CheckCircle2 className="h-3.5 w-3.5" /> Ready</span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-warning text-xs"><AlertTriangle className="h-3.5 w-3.5" /> Review</span>
+                )}
+                <button
+                  onClick={() => handleDownload(doc.storage_path)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <Download className="h-4 w-4" />
+                </button>
+                {isFounder && (
+                  <button
+                    onClick={() => removeFromRoom(doc.id)}
+                    title="Remove from deal room"
+                    className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
-              {doc.status === "ready" ? (
-                <span className="inline-flex items-center gap-1 text-success text-xs"><CheckCircle2 className="h-3.5 w-3.5" /> Ready</span>
-              ) : (
-                <span className="inline-flex items-center gap-1 text-warning text-xs"><AlertTriangle className="h-3.5 w-3.5" /> Review</span>
-              )}
-              <button onClick={() => handleDownload(doc.storage_path)} className="text-muted-foreground hover:text-foreground"><Download className="h-4 w-4" /></button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
-      {docs.length === 0 && (
-        <div className="mt-5">
-          <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Sample documents</div>
-          <div className="rounded-xl border border-border/60 bg-card shadow-card divide-y divide-border/60">
-            {sampleDocs.map((doc) => (
-              <div key={doc.name} className="flex items-center gap-3 px-5 py-3 opacity-50">
-                <div className="grid h-8 w-8 place-items-center rounded-md bg-accent"><FileText className="h-4 w-4 text-brand" /></div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium truncate">{doc.name}</div>
-                  <div className="text-xs text-muted-foreground">{doc.category}</div>
-                </div>
-                <span className="inline-flex items-center gap-1 text-warning text-xs"><AlertTriangle className="h-3.5 w-3.5" /> Review</span>
-                <button disabled className="text-muted-foreground/40"><Download className="h-4 w-4" /></button>
-              </div>
-            ))}
+      {(docs as any[]).length === 0 && (
+        <div className="mt-8 rounded-xl border border-border/60 bg-card shadow-card p-10 flex flex-col items-center gap-3 text-center">
+          <div className="grid h-12 w-12 place-items-center rounded-full bg-accent">
+            <FileText className="h-5 w-5 text-muted-foreground" />
+          </div>
+          <div className="text-sm font-medium">No documents yet</div>
+          <div className="text-xs text-muted-foreground max-w-xs">
+            {isFounder
+              ? "Upload files above or add from your document library."
+              : "The founder hasn't shared any documents yet."}
           </div>
         </div>
       )}

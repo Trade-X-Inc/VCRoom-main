@@ -1,5 +1,4 @@
 import { createFileRoute, Outlet, redirect, isRedirect } from "@tanstack/react-router";
-import { AppShell } from "@/components/app/AppShell";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/app/investor")({
@@ -37,5 +36,5 @@ export const Route = createFileRoute("/app/investor")({
       // On DB error, allow investor dashboard access rather than redirecting to sign-in
     }
   },
-  component: () => <AppShell><Outlet /></AppShell>,
+  component: () => <Outlet />,
 });

@@ -1,10 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { format, formatDistanceToNow } from "date-fns";
 import {
   ArrowUpRight, TrendingUp, Users, Briefcase, Mail, Sparkles,
   Calendar, FileText, CheckCircle2, Clock, Building2, X, Loader2,
-  HelpCircle,
+  HelpCircle, ExternalLink, AlertCircle,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -330,6 +331,44 @@ function Overview() {
     },
   });
 
+  const { data: overdueLeads = [] } = useQuery<
+    { id: string; investor_name: string; firm_name: string | null; follow_up_date: string }[]
+  >({
+    queryKey: ["overdue-leads", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const today = new Date();
+      today.setHours(23, 59, 59, 999);
+      const { data } = await supabase
+        .from("vc_leads")
+        .select("id, investor_name, firm_name, follow_up_date")
+        .eq("founder_id", user!.id)
+        .lte("follow_up_date", today.toISOString())
+        .order("follow_up_date", { ascending: true })
+        .limit(5);
+      return (data ?? []) as any[];
+    },
+  });
+
+  const { data: todayMeetings = [] } = useQuery<any[]>({
+    queryKey: ["today-meetings", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const start = new Date();
+      start.setHours(0, 0, 0, 0);
+      const end = new Date();
+      end.setHours(23, 59, 59, 999);
+      const { data } = await supabase
+        .from("meetings")
+        .select("id, title, scheduled_at, meeting_link, vc_leads(investor_name)")
+        .eq("created_by", user!.id)
+        .gte("scheduled_at", start.toISOString())
+        .lte("scheduled_at", end.toISOString())
+        .order("scheduled_at", { ascending: true });
+      return (data ?? []) as any[];
+    },
+  });
+
   const isQueriesLoading = !user?.id || startupLoading || leadLoading;
   const isNewUser = !isQueriesLoading && !startup && leadCount === 0;
 
@@ -468,6 +507,108 @@ function Overview() {
           </Link>
         </div>
       </div>
+
+      {/* Today's actions */}
+      {(() => {
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const staleDealRooms = dealRooms.filter((r) => new Date(r.updated_at) < sevenDaysAgo);
+        const noProfile = !startup?.name;
+
+        type Action = {
+          key: string;
+          label: string;
+          sub: string;
+          border: string;
+          link?: string | null;
+          to?: string;
+        };
+
+        const actions: Action[] = [
+          ...overdueLeads.map((l) => ({
+            key: l.id,
+            label: `Follow up with ${l.investor_name}${l.firm_name ? ` at ${l.firm_name}` : ""}`,
+            sub: `Due ${new Date(l.follow_up_date).toLocaleDateString()}`,
+            border: "border-l-destructive",
+            to: "/app/leads",
+          })),
+          ...todayMeetings.map((m) => ({
+            key: m.id,
+            label: m.title,
+            sub: `Today at ${format(new Date(m.scheduled_at), "h:mm a")}`,
+            border: "border-l-warning",
+            link: m.meeting_link,
+            to: "/app/meetings",
+          })),
+          ...staleDealRooms.map((r) => ({
+            key: r.id,
+            label: `Deal room with ${r.name ?? "investor"} is stale`,
+            sub: `No activity for ${formatDistanceToNow(new Date(r.updated_at))}`,
+            border: "border-l-warning",
+          })),
+          ...(noProfile
+            ? [{
+                key: "profile",
+                label: "Complete your company profile",
+                sub: "Add your startup details to attract investors",
+                border: "border-l-brand",
+                to: "/app/profile",
+              }]
+            : []),
+        ];
+
+        if (actions.length === 0) {
+          return (
+            <div className="mt-6 rounded-xl border border-success/30 bg-success/5 px-5 py-3.5 flex items-center gap-3">
+              <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
+              <span className="text-sm font-medium text-success">You're all caught up</span>
+            </div>
+          );
+        }
+
+        return (
+          <div className="mt-6">
+            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+              <AlertCircle className="h-3.5 w-3.5 text-warning" /> Today's actions
+            </div>
+            <div className="space-y-2">
+              {actions.map((a) => (
+                <div
+                  key={a.key}
+                  className={cn(
+                    "rounded-xl border border-border/60 bg-card px-4 py-3 border-l-4 shadow-card flex items-center justify-between gap-4",
+                    a.border,
+                  )}
+                >
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium truncate">{a.label}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">{a.sub}</div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {a.link && (
+                      <a
+                        href={a.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-xs hover:bg-brand/10"
+                      >
+                        <ExternalLink className="h-3 w-3" /> Join
+                      </a>
+                    )}
+                    {a.to && (
+                      <Link
+                        to={a.to as any}
+                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                      >
+                        View <ArrowUpRight className="h-3 w-3" />
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Raise progress */}
       <div className="mt-6 rounded-2xl border border-border/60 bg-card p-6 shadow-card relative overflow-hidden">

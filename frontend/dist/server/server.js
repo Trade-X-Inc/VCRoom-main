@@ -73,7 +73,7 @@ function getResponse() {
 }
 var HEADERS = { TSS_SHELL: "X-TSS_SHELL" };
 async function getStartManifest(matchedRoutes) {
-  const { tsrStartManifest } = await import("./assets/_tanstack-start-manifest_v-DOGnIsK6.js");
+  const { tsrStartManifest } = await import("./assets/_tanstack-start-manifest_v-CzA3TX1f.js");
   const startManifest = tsrStartManifest();
   const rootRoute = startManifest.routes[rootRouteId] = startManifest.routes[rootRouteId] || {};
   rootRoute.assets = rootRoute.assets || [];
@@ -104,11 +104,19 @@ const manifest = {
   },
   "b0451d818a4af8f61f8d6702b0a87626ab580dea9833910b8d678173c48d62e2": {
     functionName: "sendAdvisorMessage_createServerFn_handler",
-    importer: () => import("./assets/advisor-fn-CbPDP938.js")
+    importer: () => import("./assets/advisor-fn-DEJqMeOO.js")
   },
   "1d719b02e5cbb8bfb1f5fdbf08bea97cdac2cfff952491ca07a2d91de6f74c81": {
     functionName: "generateOutreachEmail_createServerFn_handler",
     importer: () => import("./assets/ai-fn-BnVcGPuW.js")
+  },
+  "272077c9c144c7cbae7da95efd3b0536517866897833aab391e7e9e60debb102": {
+    functionName: "generateLinkedInMessage_createServerFn_handler",
+    importer: () => import("./assets/linkedin-fn-l_s-0HWp.js")
+  },
+  "08b07e340aa3dd2c22b3ea45b5ff6e1a1e3844f3dadeb4cfd75858793e9c8fb3": {
+    functionName: "generateReply_createServerFn_handler",
+    importer: () => import("./assets/reply-fn-BVzd5hsu.js")
   }
 };
 async function getServerFnById(id, access) {
@@ -863,7 +871,7 @@ var baseManifestPromise;
 var cachedFinalManifestPromise;
 async function loadEntries() {
   const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-    import("./assets/router-AGHVmeo2.js").then((n) => n.r),
+    import("./assets/router-B5AOfxDk.js").then((n) => n.r),
     import("./assets/start-HYkvq4Ni.js"),
     import("./assets/__23tanstack-start-plugin-adapters-Cwee5PKy.js")
   ]);
