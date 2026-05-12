@@ -1,13 +1,12 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
-export type Lang = "en" | "es" | "fr" | "de" | "ar";
+export type Lang = "en" | "es" | "fr" | "de";
 
 export const LANGUAGES: { code: Lang; label: string; flag: string; dir: "ltr" | "rtl" }[] = [
   { code: "en", label: "English", flag: "🇬🇧", dir: "ltr" },
   { code: "es", label: "Español", flag: "🇪🇸", dir: "ltr" },
   { code: "fr", label: "Français", flag: "🇫🇷", dir: "ltr" },
   { code: "de", label: "Deutsch", flag: "🇩🇪", dir: "ltr" },
-  { code: "ar", label: "العربية", flag: "🇸🇦", dir: "rtl" },
 ];
 
 type Dict = Record<string, string>;
@@ -116,33 +115,7 @@ const de: Dict = {
   "common.save": "Speichern", "common.cancel": "Abbrechen", "common.add": "Hinzufügen", "common.delete": "Löschen",
 };
 
-const ar: Dict = {
-  "nav.product": "المنتج", "nav.founders": "المؤسسون", "nav.investors": "المستثمرون", "nav.pricing": "الأسعار",
-  "nav.solutions": "الحلول", "nav.signin": "تسجيل الدخول", "nav.getStarted": "ابدأ",
-  "app.search": "ابحث عن مستثمرين، مستندات، صفقات…",
-  "app.overview": "نظرة عامة", "app.leads": "عملاء محتملون", "app.email": "بريد بالذكاء", "app.profile": "الملف",
-  "app.documents": "المستندات", "app.dealRooms": "غرف الصفقات", "app.messages": "الرسائل", "app.meetings": "الاجتماعات",
-  "app.advisor": "مستشار AI", "app.pipeline": "خط الأنابيب", "app.startups": "الشركات", "app.diligence": "العناية الواجبة",
-  "app.analysis": "تحليل AI", "app.decisions": "القرارات", "app.users": "الفريق", "app.audit": "السجل",
-  "app.notifications": "الإشعارات", "app.settings": "الإعدادات", "app.workspace": "مساحة العمل", "app.investorView": "عرض المستثمر",
-  "app.founderView": "عرض المؤسس", "app.switchView": "تبديل العرض", "app.admin": "إدارة",
-  "settings.theme": "السمة", "settings.language": "اللغة", "settings.notifications": "قواعد الإشعارات",
-  "settings.light": "فاتح", "settings.dark": "داكن", "settings.system": "النظام",
-  "pipeline.title": "خط أنابيب الصفقات", "pipeline.subtitle": "اسحب الصفقات بين المراحل.",
-  "pipeline.newDeal": "صفقة جديدة", "pipeline.deals": "صفقات",
-  "chat.placeholder": "رسالة إلى غرفة الصفقة…", "chat.send": "إرسال", "chat.online": "متصل",
-  "checklist.title": "قائمة العناية الواجبة", "checklist.complete": "مكتمل", "checklist.add": "إضافة",
-  "checklist.owner": "المسؤول", "checklist.due": "تاريخ",
-  "docs.upload": "رفع", "docs.dropHere": "أفلت الملفات هنا", "docs.dragOr": "اسحب وأفلت أو انقر",
-  "docs.maxSize": "حتى 50 ميغا · PDF, DOCX, XLSX, PNG",
-  "reports.download": "تحميل التقرير", "reports.csv": "CSV", "reports.pdf": "PDF",
-  "reports.title": "التقارير", "reports.subtitle": "صدّر خط الأنابيب والعناية والنشاط.",
-  "rules.title": "قواعد الإشعارات", "rules.subtitle": "اختر ما تتلقاه وأين.",
-  "rules.channels": "القنوات", "rules.events": "الأحداث", "rules.email": "بريد", "rules.inApp": "داخل التطبيق", "rules.push": "Push",
-  "common.save": "حفظ", "common.cancel": "إلغاء", "common.add": "إضافة", "common.delete": "حذف",
-};
-
-const dicts: Record<Lang, Dict> = { en, es, fr, de, ar };
+const dicts: Record<Lang, Dict> = { en, es, fr, de };
 
 const STORAGE_KEY = "vr.lang";
 

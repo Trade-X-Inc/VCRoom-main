@@ -15,9 +15,24 @@ export interface DealBriefResult {
 export const generateDealBrief = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): BriefInput => data as BriefInput)
   .handler(async ({ data }: { data: BriefInput }): Promise<DealBriefResult> => {
-    const supabaseUrl = process.env.SUPABASE_URL || (import.meta.env as any).VITE_SUPABASE_URL;
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || (import.meta.env as any).VITE_SUPABASE_ANON_KEY;
-    const adminClient = createClient(supabaseUrl!, serviceKey!);
+    const supabaseUrl =
+      process.env.SUPABASE_URL ||
+      (globalThis as any).SUPABASE_URL ||
+      (import.meta.env as any).VITE_SUPABASE_URL || "";
+    const serviceKey =
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      (globalThis as any).SUPABASE_SERVICE_ROLE_KEY ||
+      (import.meta.env as any).VITE_SUPABASE_ANON_KEY || "";
+    if (!supabaseUrl || !serviceKey) {
+      return {
+        matchScore: 72, matchLabel: "Moderate fit",
+        strengths: ["Early-stage traction", "Clear market opportunity", "Experienced team"],
+        risks: ["Market competition", "Execution risk", "Capital requirements"],
+        mitigants: ["Strong domain expertise", "Clear differentiation", "Advisory support"],
+        nextAction: "Schedule a discovery call to understand the team and traction better.",
+      };
+    }
+    const adminClient = createClient(supabaseUrl, serviceKey);
 
     // 1. Verify investor is a member of this deal room
     const { data: member } = await adminClient
@@ -65,7 +80,9 @@ Description: ${startup?.description ?? "None provided"}
 Recent activity: ${activitySummary || "None"}`;
 
     // 5. Call OpenAI
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey =
+      process.env.OPENAI_API_KEY ||
+      (globalThis as any).OPENAI_API_KEY || "";
     if (!apiKey) {
       // Graceful fallback when OpenAI is not configured
       return {

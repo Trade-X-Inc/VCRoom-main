@@ -7,7 +7,7 @@ export const Route = createFileRoute("/app")({
     // beforeLoad runs on the Cloudflare Worker (server) during SSR where
     // localStorage doesn't exist — getSession() would always return null and
     // redirect to /sign-in even for authenticated users. Skip on server;
-    // AppShell's useEffect handles client-side auth guards.
+    // AppShell's useEffect handles client-side role-based navigation.
     if (typeof window === 'undefined') return;
 
     try {
@@ -22,14 +22,10 @@ export const Route = createFileRoute("/app")({
 
       if (!session) throw redirect({ to: "/sign-in", search: {} });
 
-      const { data: userRecord } = await supabase
-        .from("users")
-        .select("role")
-        .eq("id", session.user.id)
-        .maybeSingle();
-
-      const role = userRecord?.role || session.user.user_metadata?.role || "founder";
-      if (role === "investor") throw redirect({ to: "/app/investor/", search: {} });
+      // Role-based navigation (investor ↔ founder) is handled client-side by
+      // AppShell's useEffect. Doing it here caused an infinite redirect loop:
+      // /app/investor/* is nested under /app, so beforeLoad fires again after
+      // the redirect to /app/investor/, and the loop never terminates.
     } catch (err) {
       if (isRedirect(err)) throw err;
       // On DB error, allow founder dashboard access

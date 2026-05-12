@@ -11,9 +11,24 @@ type EmailInput = { leadId: string; type: "cold" | "followup"; userId: string };
 export const generateOutreachEmail = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): EmailInput => data as EmailInput)
   .handler(async ({ data }: { data: EmailInput }) => {
-    const supabaseUrl = process.env.SUPABASE_URL || (import.meta.env as any).VITE_SUPABASE_URL;
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || (import.meta.env as any).VITE_SUPABASE_ANON_KEY;
-    const adminClient = createClient(supabaseUrl!, serviceKey!);
+    const supabaseUrl =
+      process.env.SUPABASE_URL ||
+      (globalThis as any).SUPABASE_URL ||
+      (import.meta.env as any).VITE_SUPABASE_URL || "";
+    const serviceKey =
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      (globalThis as any).SUPABASE_SERVICE_ROLE_KEY ||
+      (import.meta.env as any).VITE_SUPABASE_ANON_KEY || "";
+    const openAIKey =
+      process.env.OPENAI_API_KEY ||
+      (globalThis as any).OPENAI_API_KEY || "";
+    if (!supabaseUrl || !serviceKey) {
+      return {
+        subject: "Unable to generate",
+        body: "AI service temporarily unavailable. Please try again later.",
+      };
+    }
+    const adminClient = createClient(supabaseUrl, serviceKey);
 
     // 1. Rate limit: max 10 per hour
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
@@ -57,11 +72,17 @@ Keep it under 80 words. Reference prior contact.
 Be warm but direct.`;
 
     // 5. Call OpenAI
+    if (!openAIKey) {
+      return {
+        subject: "Unable to generate",
+        body: "AI service temporarily unavailable. Please configure OPENAI_API_KEY.",
+      };
+    }
     const resp = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${openAIKey}`,
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",

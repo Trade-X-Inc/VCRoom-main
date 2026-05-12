@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Briefcase, ArrowUpRight, Plus, X, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Briefcase, ArrowUpRight, Plus, X, Loader2, Search } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
@@ -182,6 +182,40 @@ function CreateRoomForm({ userId, onClose }: { userId: string; onClose: () => vo
   const [inviteEmail, setInviteEmail] = useState("");
   const [startupId, setStartupId] = useState("");
 
+  // Autocomplete state
+  const [search, setSearch] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<any>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const { data: vcLeads = [] } = useQuery({
+    queryKey: ["leads-search", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("vc_leads")
+        .select("id, investor_name, firm_name, email")
+        .eq("founder_id", userId)
+        .order("investor_name");
+      return (data ?? []) as { id: string; investor_name: string; firm_name: string | null; email: string | null }[];
+    },
+  });
+
+  const filtered = vcLeads.filter((l) =>
+    l.investor_name?.toLowerCase().includes(search.toLowerCase()) ||
+    (l.firm_name?.toLowerCase() ?? "").includes(search.toLowerCase())
+  ).slice(0, 8);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const { data: startups = [], isLoading: startupsLoading } = useQuery({
     queryKey: ["my-startups", userId],
     enabled: !!userId,
@@ -266,15 +300,73 @@ function CreateRoomForm({ userId, onClose }: { userId: string; onClose: () => vo
           </button>
         </div>
 
-        <div>
+        <div ref={dropdownRef}>
           <label className="text-xs text-muted-foreground">Investor name *</label>
-          <input
-            required
-            value={investorName}
-            onChange={(e) => setInvestorName(e.target.value)}
-            placeholder="Sarah Johnson"
-            className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
-          />
+          <div className="relative mt-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+            <input
+              required
+              value={investorName}
+              onChange={(e) => {
+                const val = e.target.value;
+                setInvestorName(val);
+                setSearch(val);
+                setSelectedLead(null);
+                setShowDropdown(val.length > 0);
+              }}
+              onFocus={() => { if (investorName.length > 0 && !selectedLead) setShowDropdown(true); }}
+              placeholder="Search VC leads or type a name…"
+              className="w-full rounded-md border border-border/60 bg-background pl-9 pr-8 py-2 text-sm focus:outline-none focus:border-brand/50"
+            />
+            {selectedLead && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedLead(null);
+                  setSearch("");
+                  setInvestorName("");
+                  setInviteEmail("");
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+            {showDropdown && (
+              <div className="absolute z-20 w-full mt-1 rounded-lg border border-border/60 bg-card shadow-elev overflow-hidden">
+                {filtered.length > 0 ? (
+                  filtered.map((l) => (
+                    <button
+                      key={l.id}
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        setSelectedLead(l);
+                        setInvestorName(l.investor_name);
+                        setSearch(l.investor_name);
+                        setInvestorFirm(l.firm_name ?? "");
+                        setInviteEmail(l.email ?? "");
+                        setShowDropdown(false);
+                      }}
+                      className="flex items-center gap-3 w-full px-3 py-2 text-left text-sm hover:bg-accent"
+                    >
+                      <div className="grid h-6 w-6 place-items-center rounded-md bg-gradient-brand text-brand-foreground text-[10px] font-semibold shrink-0">
+                        {l.investor_name.split(" ").map((s) => s[0]).join("").slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-medium truncate">{l.investor_name}</div>
+                        {l.firm_name && <div className="text-xs text-muted-foreground truncate">{l.firm_name}</div>}
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <div className="px-3 py-2.5 text-xs text-muted-foreground">
+                    No matching leads — type an email below to invite manually.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         <div>

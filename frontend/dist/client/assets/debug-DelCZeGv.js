@@ -1,0 +1,1 @@
+import{j as o}from"./index-BJ4Z17aI.js";const e=()=>o.jsx("pre",{style:{padding:20,fontFamily:"monospace",whiteSpace:"pre-wrap"},children:JSON.stringify({VITE_SUPABASE_URL:"SET ✓",VITE_SUPABASE_ANON_KEY:"SET ✓",VITE_GOOGLE_CLIENT_ID:"SET ✓",VITE_APP_URL:"https://vcroom-main.ilovetech56.workers.dev",MODE:"production",PROD:!0},null,2)});export{e as component};

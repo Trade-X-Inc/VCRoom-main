@@ -14,8 +14,14 @@ type AdvisorResult = {
 export const sendAdvisorMessage = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): AdvisorInput => data as AdvisorInput)
   .handler(async ({ data }: { data: AdvisorInput }): Promise<AdvisorResult> => {
-    const supabaseUrl = process.env.SUPABASE_URL || (import.meta.env as any).VITE_SUPABASE_URL;
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || (import.meta.env as any).VITE_SUPABASE_ANON_KEY;
+    const supabaseUrl =
+      process.env.SUPABASE_URL ||
+      (globalThis as any).SUPABASE_URL ||
+      (import.meta.env as any).VITE_SUPABASE_URL || "";
+    const serviceKey =
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      (globalThis as any).SUPABASE_SERVICE_ROLE_KEY ||
+      (import.meta.env as any).VITE_SUPABASE_ANON_KEY || "";
 
     if (!supabaseUrl || !serviceKey) {
       return {
@@ -113,7 +119,9 @@ Be direct and actionable.
 Max 150 words per response unless asked for more.
 End every response with one clear next action.`;
 
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey =
+      process.env.OPENAI_API_KEY ||
+      (globalThis as any).OPENAI_API_KEY || "";
     if (!apiKey) {
       await adminClient.from("ai_usage").insert({ user_id: data.userId, action: "advisor_message" });
       return {

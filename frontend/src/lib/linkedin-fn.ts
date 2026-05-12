@@ -6,9 +6,19 @@ type LinkedInInput = { userId: string; leadId: string };
 export const generateLinkedInMessage = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): LinkedInInput => data as LinkedInInput)
   .handler(async ({ data }: { data: LinkedInInput }) => {
-    const supabaseUrl = process.env.SUPABASE_URL || (import.meta.env as any).VITE_SUPABASE_URL;
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || (import.meta.env as any).VITE_SUPABASE_ANON_KEY;
-    const adminClient = createClient(supabaseUrl!, serviceKey!);
+    const supabaseUrl =
+      process.env.SUPABASE_URL ||
+      (globalThis as any).SUPABASE_URL ||
+      (import.meta.env as any).VITE_SUPABASE_URL || "";
+    const serviceKey =
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      (globalThis as any).SUPABASE_SERVICE_ROLE_KEY ||
+      (import.meta.env as any).VITE_SUPABASE_ANON_KEY || "";
+    const openAIKey =
+      process.env.OPENAI_API_KEY ||
+      (globalThis as any).OPENAI_API_KEY || "";
+    if (!supabaseUrl || !serviceKey) throw new Error("Supabase not configured");
+    const adminClient = createClient(supabaseUrl, serviceKey);
 
     const { data: lead, error: leadErr } = await adminClient
       .from("vc_leads")
@@ -29,11 +39,12 @@ export const generateLinkedInMessage = createServerFn({ method: "POST" })
 Startup: ${startup?.sector ?? lead.sector ?? "tech"} sector, ${startup?.stage ?? lead.stage ?? "early"} stage, raising ${startup?.funding_target ?? "seed round"}.
 Keep the message under 300 characters. Be genuine and specific, not salesy. Just ask to connect.`;
 
+    if (!openAIKey) throw new Error("OpenAI not configured");
     const resp = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${openAIKey}`,
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",

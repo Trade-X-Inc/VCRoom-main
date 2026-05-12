@@ -6,9 +6,19 @@ type ReplyInput = { userId: string; leadId: string; investorReply: string };
 export const generateReply = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): ReplyInput => data as ReplyInput)
   .handler(async ({ data }: { data: ReplyInput }) => {
-    const supabaseUrl = process.env.SUPABASE_URL || (import.meta.env as any).VITE_SUPABASE_URL;
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || (import.meta.env as any).VITE_SUPABASE_ANON_KEY;
-    const adminClient = createClient(supabaseUrl!, serviceKey!);
+    const supabaseUrl =
+      process.env.SUPABASE_URL ||
+      (globalThis as any).SUPABASE_URL ||
+      (import.meta.env as any).VITE_SUPABASE_URL || "";
+    const serviceKey =
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      (globalThis as any).SUPABASE_SERVICE_ROLE_KEY ||
+      (import.meta.env as any).VITE_SUPABASE_ANON_KEY || "";
+    const openAIKey =
+      process.env.OPENAI_API_KEY ||
+      (globalThis as any).OPENAI_API_KEY || "";
+    if (!supabaseUrl || !serviceKey) throw new Error("Supabase not configured");
+    const adminClient = createClient(supabaseUrl, serviceKey);
 
     const { data: lead, error: leadErr } = await adminClient
       .from("vc_leads")
@@ -33,11 +43,12 @@ Write a professional follow-up reply from ${startup?.founder_name ?? "the founde
 Current lead status: ${lead.status}.
 Keep it under 150 words. Be warm, professional, and move the conversation forward.`;
 
+    if (!openAIKey) throw new Error("OpenAI not configured");
     const resp = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${openAIKey}`,
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
