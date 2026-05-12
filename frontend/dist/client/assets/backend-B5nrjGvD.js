@@ -1,1 +1,0 @@
-async function a(e,s){const t=await fetch(`${e}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(s),credentials:"include"});if(!t.ok){const n=await t.text();throw new Error(n||`Request failed: ${t.status}`)}return t.json()}export{a as p};
