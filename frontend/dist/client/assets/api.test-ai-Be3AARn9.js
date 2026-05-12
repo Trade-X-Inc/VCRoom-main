@@ -1,1 +1,0 @@
-import{g as e,j as n}from"./index-Cg-gjIuQ.js";const s=function(){const t={serverSide:e.useLoaderData(),clientSide:{VITE_OPENAI_API_KEY:"missing",hasKey:!1}};return n.jsx("pre",{style:{padding:24,fontFamily:"monospace",fontSize:14,background:"#f8f8f8",minHeight:"100vh",margin:0,whiteSpace:"pre-wrap"},children:JSON.stringify(t,null,2)})};export{s as component};

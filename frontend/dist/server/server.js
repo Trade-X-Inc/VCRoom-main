@@ -73,7 +73,7 @@ function getResponse() {
 }
 var HEADERS = { TSS_SHELL: "X-TSS_SHELL" };
 async function getStartManifest(matchedRoutes) {
-  const { tsrStartManifest } = await import("./assets/_tanstack-start-manifest_v-COjLHjh8.js");
+  const { tsrStartManifest } = await import("./assets/_tanstack-start-manifest_v-CJms-sbe.js");
   const startManifest = tsrStartManifest();
   const rootRoute = startManifest.routes[rootRouteId] = startManifest.routes[rootRouteId] || {};
   rootRoute.assets = rootRoute.assets || [];
@@ -100,27 +100,27 @@ async function getStartManifest(matchedRoutes) {
 const manifest = {
   "157f76e85df17cf0242a7d5c8036d366db569f6a04eeaffd5e9d8f9789563b44": {
     functionName: "checkAIKeys_createServerFn_handler",
-    importer: () => import("./assets/api.test-ai-BFhXvJHs.js")
+    importer: () => import("./assets/api.test-ai-iCNcQsY4.js")
   },
   "56f68b50d6d653ae4f4287eb005bbb35fecea7fa7ce69a4b2a6cc974383a502e": {
     functionName: "generateDealBrief_createServerFn_handler",
-    importer: () => import("./assets/deal-brief-fn-DafvcXP-.js")
+    importer: () => import("./assets/deal-brief-fn-Cex4lGMe.js")
   },
   "397b3f65700da6e488c63bfeb016aac33e5f67ff2f57bcca85b9c84f5eace701": {
     functionName: "getAIAdvice_createServerFn_handler",
     importer: () => import("./assets/advisor-fn-BaFZ-RXF.js")
   },
-  "08b07e340aa3dd2c22b3ea45b5ff6e1a1e3844f3dadeb4cfd75858793e9c8fb3": {
-    functionName: "generateReply_createServerFn_handler",
-    importer: () => import("./assets/reply-fn-B_ummABI.js")
+  "1d719b02e5cbb8bfb1f5fdbf08bea97cdac2cfff952491ca07a2d91de6f74c81": {
+    functionName: "generateOutreachEmail_createServerFn_handler",
+    importer: () => import("./assets/ai-fn-D7HqjDvn.js")
   },
   "272077c9c144c7cbae7da95efd3b0536517866897833aab391e7e9e60debb102": {
     functionName: "generateLinkedInMessage_createServerFn_handler",
-    importer: () => import("./assets/linkedin-fn-B9qUM3Ah.js")
+    importer: () => import("./assets/linkedin-fn-BFzdjH53.js")
   },
-  "1d719b02e5cbb8bfb1f5fdbf08bea97cdac2cfff952491ca07a2d91de6f74c81": {
-    functionName: "generateOutreachEmail_createServerFn_handler",
-    importer: () => import("./assets/ai-fn-DrVjgWEV.js")
+  "08b07e340aa3dd2c22b3ea45b5ff6e1a1e3844f3dadeb4cfd75858793e9c8fb3": {
+    functionName: "generateReply_createServerFn_handler",
+    importer: () => import("./assets/reply-fn-DhU3mlaK.js")
   }
 };
 async function getServerFnById(id, access) {
@@ -875,7 +875,7 @@ var baseManifestPromise;
 var cachedFinalManifestPromise;
 async function loadEntries() {
   const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-    import("./assets/router-BRauOI85.js").then((n) => n.r),
+    import("./assets/router-Rpa7zDhF.js").then((n) => n.r),
     import("./assets/start-HYkvq4Ni.js"),
     import("./assets/__23tanstack-start-plugin-adapters-Cwee5PKy.js")
   ]);
