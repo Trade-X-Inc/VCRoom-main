@@ -26800,21 +26800,22 @@ var init_createServerRpc_D_6bKnO = __esm({
   }
 });
 
-// dist/server/assets/api.test-ai-BD0iVlJk.js
-var api_test_ai_BD0iVlJk_exports = {};
-__export(api_test_ai_BD0iVlJk_exports, {
+// dist/server/assets/api.test-ai-BFhXvJHs.js
+var api_test_ai_BFhXvJHs_exports = {};
+__export(api_test_ai_BFhXvJHs_exports, {
   checkAIKeys_createServerFn_handler: () => checkAIKeys_createServerFn_handler
 });
 import "node:async_hooks";
-var import_react11, import_jsx_runtime16, checkAIKeys_createServerFn_handler, checkAIKeys;
-var init_api_test_ai_BD0iVlJk = __esm({
-  "dist/server/assets/api.test-ai-BD0iVlJk.js"() {
+var import_react11, import_jsx_runtime16, __vite_import_meta_env__, checkAIKeys_createServerFn_handler, checkAIKeys;
+var init_api_test_ai_BFhXvJHs = __esm({
+  "dist/server/assets/api.test-ai-BFhXvJHs.js"() {
     "use strict";
     init_createServerRpc_D_6bKnO();
     init_server4();
     init_production();
     import_react11 = __toESM(require_react(), 1);
     import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
+    __vite_import_meta_env__ = {};
     checkAIKeys_createServerFn_handler = createServerRpc({
       id: "157f76e85df17cf0242a7d5c8036d366db569f6a04eeaffd5e9d8f9789563b44",
       name: "checkAIKeys",
@@ -26823,17 +26824,50 @@ var init_api_test_ai_BD0iVlJk = __esm({
     checkAIKeys = createServerFn({
       method: "GET"
     }).handler(checkAIKeys_createServerFn_handler, async () => {
-      const fromProcessEnv = process.env.OPENAI_API_KEY || "";
-      const fromGlobalThis = globalThis.OPENAI_API_KEY || "";
-      const key = fromProcessEnv || fromGlobalThis;
-      const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "";
-      const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "";
+      const sources = {
+        processEnv: process.env.OPENAI_API_KEY || "",
+        globalThis: globalThis.OPENAI_API_KEY || "",
+        importMeta: __vite_import_meta_env__?.OPENAI_API_KEY || "",
+        viteEnv: ""
+      };
+      const key = sources.processEnv || sources.globalThis || sources.importMeta || sources.viteEnv || "";
+      const supabaseSources = {
+        processEnv: process.env.SUPABASE_URL || "",
+        globalThis: globalThis.SUPABASE_URL || ""
+      };
+      const supabaseKeySources = {
+        processEnv: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+        globalThis: globalThis.SUPABASE_SERVICE_ROLE_KEY || ""
+      };
       return {
-        hasKey: !!key,
-        keyPrefix: key ? key.slice(0, 8) : "missing",
-        source: fromProcessEnv ? "process.env" : fromGlobalThis ? "globalThis" : "not found",
-        supabaseUrl: !!supabaseUrl,
-        supabaseKey: !!supabaseKey,
+        openai: {
+          hasKey: !!key,
+          keyPrefix: key ? key.slice(0, 8) : "missing",
+          sources: {
+            processEnv: !!sources.processEnv,
+            globalThis: !!sources.globalThis,
+            importMeta: !!sources.importMeta,
+            viteEnv: false
+          }
+        },
+        supabase: {
+          url: {
+            found: true,
+            sources: {
+              processEnv: !!supabaseKeySources.processEnv,
+              globalThis: !!supabaseSources.globalThis,
+              viteEnv: true
+            }
+          },
+          key: {
+            found: true,
+            sources: {
+              processEnv: !!supabaseKeySources.processEnv,
+              globalThis: !!supabaseKeySources.globalThis,
+              viteEnv: true
+            }
+          }
+        },
         nodeEnv: "production"
       };
     });
@@ -47487,15 +47521,15 @@ var init_dist6 = __esm({
   }
 });
 
-// dist/server/assets/advisor-fn-3EN-lqRx.js
-var advisor_fn_3EN_lqRx_exports = {};
-__export(advisor_fn_3EN_lqRx_exports, {
+// dist/server/assets/advisor-fn-DV-FYqJi.js
+var advisor_fn_DV_FYqJi_exports = {};
+__export(advisor_fn_DV_FYqJi_exports, {
   getAIAdvice_createServerFn_handler: () => getAIAdvice_createServerFn_handler
 });
 import "node:async_hooks";
 var import_react12, import_jsx_runtime17, getAIAdvice_createServerFn_handler, getAIAdvice;
-var init_advisor_fn_3EN_lqRx = __esm({
-  "dist/server/assets/advisor-fn-3EN-lqRx.js"() {
+var init_advisor_fn_DV_FYqJi = __esm({
+  "dist/server/assets/advisor-fn-DV-FYqJi.js"() {
     "use strict";
     init_createServerRpc_D_6bKnO();
     init_dist6();
@@ -47513,9 +47547,9 @@ var init_advisor_fn_3EN_lqRx = __esm({
     }).inputValidator((data) => data).handler(getAIAdvice_createServerFn_handler, async ({
       data
     }) => {
-      const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || "";
-      const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
-      const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || "";
+      const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || void 0 || "";
+      const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
+      const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
       if (!openAIKey) {
         return {
           reply: "AI Advisor is not configured yet. Please add your OpenAI API key to get started.",
@@ -47523,7 +47557,7 @@ var init_advisor_fn_3EN_lqRx = __esm({
         };
       }
       let context = "";
-      if (supabaseUrl && supabaseKey) {
+      {
         try {
           const admin = createClient(supabaseUrl, supabaseKey);
           const [{
@@ -47586,15 +47620,15 @@ ${context}` : "", "\nHelp with: pipeline strategy, investor outreach, meeting pr
   }
 });
 
-// dist/server/assets/deal-brief-fn-B8dVSAf7.js
-var deal_brief_fn_B8dVSAf7_exports = {};
-__export(deal_brief_fn_B8dVSAf7_exports, {
+// dist/server/assets/deal-brief-fn-DafvcXP-.js
+var deal_brief_fn_DafvcXP_exports = {};
+__export(deal_brief_fn_DafvcXP_exports, {
   generateDealBrief_createServerFn_handler: () => generateDealBrief_createServerFn_handler
 });
 import "node:async_hooks";
 var import_react13, import_jsx_runtime18, generateDealBrief_createServerFn_handler, generateDealBrief;
-var init_deal_brief_fn_B8dVSAf7 = __esm({
-  "dist/server/assets/deal-brief-fn-B8dVSAf7.js"() {
+var init_deal_brief_fn_DafvcXP = __esm({
+  "dist/server/assets/deal-brief-fn-DafvcXP-.js"() {
     "use strict";
     init_createServerRpc_D_6bKnO();
     init_dist6();
@@ -47642,7 +47676,7 @@ Funding target: ${startup?.funding_target ?? "Unknown"}
 Traction: ${startup?.traction ?? "Unknown"}
 Description: ${startup?.description ?? "None provided"}
 Recent activity: ${activitySummary || "None"}`;
-      const apiKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || "";
+      const apiKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || void 0 || "";
       if (!apiKey) {
         return {
           matchScore: 72,
@@ -47685,15 +47719,15 @@ Recent activity: ${activitySummary || "None"}`;
   }
 });
 
-// dist/server/assets/ai-fn-C4515MCI.js
-var ai_fn_C4515MCI_exports = {};
-__export(ai_fn_C4515MCI_exports, {
+// dist/server/assets/ai-fn-DAj5FUH2.js
+var ai_fn_DAj5FUH2_exports = {};
+__export(ai_fn_DAj5FUH2_exports, {
   generateOutreachEmail_createServerFn_handler: () => generateOutreachEmail_createServerFn_handler
 });
 import "node:async_hooks";
 var import_react14, import_jsx_runtime19, systemPrompt, generateOutreachEmail_createServerFn_handler, generateOutreachEmail;
-var init_ai_fn_C4515MCI = __esm({
-  "dist/server/assets/ai-fn-C4515MCI.js"() {
+var init_ai_fn_DAj5FUH2 = __esm({
+  "dist/server/assets/ai-fn-DAj5FUH2.js"() {
     "use strict";
     init_createServerRpc_D_6bKnO();
     init_dist6();
@@ -47717,7 +47751,7 @@ No markdown, no explanation, just the JSON object.`;
     }) => {
       const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
       const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
-      const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || "";
+      const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || void 0 || "";
       const adminClient = createClient(supabaseUrl, serviceKey);
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1e3).toISOString();
       const {
@@ -47787,15 +47821,15 @@ Be warm but direct.`;
   }
 });
 
-// dist/server/assets/linkedin-fn-DKhD-_nX.js
-var linkedin_fn_DKhD_nX_exports = {};
-__export(linkedin_fn_DKhD_nX_exports, {
+// dist/server/assets/linkedin-fn-Dy3zCFEf.js
+var linkedin_fn_Dy3zCFEf_exports = {};
+__export(linkedin_fn_Dy3zCFEf_exports, {
   generateLinkedInMessage_createServerFn_handler: () => generateLinkedInMessage_createServerFn_handler
 });
 import "node:async_hooks";
 var import_react15, import_jsx_runtime20, generateLinkedInMessage_createServerFn_handler, generateLinkedInMessage;
-var init_linkedin_fn_DKhD_nX = __esm({
-  "dist/server/assets/linkedin-fn-DKhD-_nX.js"() {
+var init_linkedin_fn_Dy3zCFEf = __esm({
+  "dist/server/assets/linkedin-fn-Dy3zCFEf.js"() {
     "use strict";
     init_createServerRpc_D_6bKnO();
     init_dist6();
@@ -47815,7 +47849,7 @@ var init_linkedin_fn_DKhD_nX = __esm({
     }) => {
       const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
       const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
-      const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || "";
+      const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || void 0 || "";
       const adminClient = createClient(supabaseUrl, serviceKey);
       const {
         data: lead,
@@ -47864,15 +47898,15 @@ Keep the message under 300 characters. Be genuine and specific, not salesy. Just
   }
 });
 
-// dist/server/assets/reply-fn-CHtXOihs.js
-var reply_fn_CHtXOihs_exports = {};
-__export(reply_fn_CHtXOihs_exports, {
+// dist/server/assets/reply-fn-DePVAZDa.js
+var reply_fn_DePVAZDa_exports = {};
+__export(reply_fn_DePVAZDa_exports, {
   generateReply_createServerFn_handler: () => generateReply_createServerFn_handler
 });
 import "node:async_hooks";
 var import_react16, import_jsx_runtime21, generateReply_createServerFn_handler, generateReply;
-var init_reply_fn_CHtXOihs = __esm({
-  "dist/server/assets/reply-fn-CHtXOihs.js"() {
+var init_reply_fn_DePVAZDa = __esm({
+  "dist/server/assets/reply-fn-DePVAZDa.js"() {
     "use strict";
     init_createServerRpc_D_6bKnO();
     init_dist6();
@@ -47892,7 +47926,7 @@ var init_reply_fn_CHtXOihs = __esm({
     }) => {
       const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
       const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
-      const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || "";
+      const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || void 0 || "";
       const adminClient = createClient(supabaseUrl, serviceKey);
       const {
         data: lead,
@@ -75245,27 +75279,27 @@ var init_server4 = __esm({
     manifest = {
       "157f76e85df17cf0242a7d5c8036d366db569f6a04eeaffd5e9d8f9789563b44": {
         functionName: "checkAIKeys_createServerFn_handler",
-        importer: () => Promise.resolve().then(() => (init_api_test_ai_BD0iVlJk(), api_test_ai_BD0iVlJk_exports))
+        importer: () => Promise.resolve().then(() => (init_api_test_ai_BFhXvJHs(), api_test_ai_BFhXvJHs_exports))
       },
       "397b3f65700da6e488c63bfeb016aac33e5f67ff2f57bcca85b9c84f5eace701": {
         functionName: "getAIAdvice_createServerFn_handler",
-        importer: () => Promise.resolve().then(() => (init_advisor_fn_3EN_lqRx(), advisor_fn_3EN_lqRx_exports))
+        importer: () => Promise.resolve().then(() => (init_advisor_fn_DV_FYqJi(), advisor_fn_DV_FYqJi_exports))
       },
       "56f68b50d6d653ae4f4287eb005bbb35fecea7fa7ce69a4b2a6cc974383a502e": {
         functionName: "generateDealBrief_createServerFn_handler",
-        importer: () => Promise.resolve().then(() => (init_deal_brief_fn_B8dVSAf7(), deal_brief_fn_B8dVSAf7_exports))
+        importer: () => Promise.resolve().then(() => (init_deal_brief_fn_DafvcXP(), deal_brief_fn_DafvcXP_exports))
       },
       "1d719b02e5cbb8bfb1f5fdbf08bea97cdac2cfff952491ca07a2d91de6f74c81": {
         functionName: "generateOutreachEmail_createServerFn_handler",
-        importer: () => Promise.resolve().then(() => (init_ai_fn_C4515MCI(), ai_fn_C4515MCI_exports))
+        importer: () => Promise.resolve().then(() => (init_ai_fn_DAj5FUH2(), ai_fn_DAj5FUH2_exports))
       },
       "272077c9c144c7cbae7da95efd3b0536517866897833aab391e7e9e60debb102": {
         functionName: "generateLinkedInMessage_createServerFn_handler",
-        importer: () => Promise.resolve().then(() => (init_linkedin_fn_DKhD_nX(), linkedin_fn_DKhD_nX_exports))
+        importer: () => Promise.resolve().then(() => (init_linkedin_fn_Dy3zCFEf(), linkedin_fn_Dy3zCFEf_exports))
       },
       "08b07e340aa3dd2c22b3ea45b5ff6e1a1e3844f3dadeb4cfd75858793e9c8fb3": {
         functionName: "generateReply_createServerFn_handler",
-        importer: () => Promise.resolve().then(() => (init_reply_fn_CHtXOihs(), reply_fn_CHtXOihs_exports))
+        importer: () => Promise.resolve().then(() => (init_reply_fn_DePVAZDa(), reply_fn_DePVAZDa_exports))
       }
     };
     TSS_FORMDATA_CONTEXT = "__TSS_CONTEXT";

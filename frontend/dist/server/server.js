@@ -100,27 +100,27 @@ async function getStartManifest(matchedRoutes) {
 const manifest = {
   "157f76e85df17cf0242a7d5c8036d366db569f6a04eeaffd5e9d8f9789563b44": {
     functionName: "checkAIKeys_createServerFn_handler",
-    importer: () => import("./assets/api.test-ai-BD0iVlJk.js")
+    importer: () => import("./assets/api.test-ai-BFhXvJHs.js")
   },
   "397b3f65700da6e488c63bfeb016aac33e5f67ff2f57bcca85b9c84f5eace701": {
     functionName: "getAIAdvice_createServerFn_handler",
-    importer: () => import("./assets/advisor-fn-3EN-lqRx.js")
+    importer: () => import("./assets/advisor-fn-DV-FYqJi.js")
   },
   "56f68b50d6d653ae4f4287eb005bbb35fecea7fa7ce69a4b2a6cc974383a502e": {
     functionName: "generateDealBrief_createServerFn_handler",
-    importer: () => import("./assets/deal-brief-fn-B8dVSAf7.js")
+    importer: () => import("./assets/deal-brief-fn-DafvcXP-.js")
   },
   "1d719b02e5cbb8bfb1f5fdbf08bea97cdac2cfff952491ca07a2d91de6f74c81": {
     functionName: "generateOutreachEmail_createServerFn_handler",
-    importer: () => import("./assets/ai-fn-C4515MCI.js")
+    importer: () => import("./assets/ai-fn-DAj5FUH2.js")
   },
   "272077c9c144c7cbae7da95efd3b0536517866897833aab391e7e9e60debb102": {
     functionName: "generateLinkedInMessage_createServerFn_handler",
-    importer: () => import("./assets/linkedin-fn-DKhD-_nX.js")
+    importer: () => import("./assets/linkedin-fn-Dy3zCFEf.js")
   },
   "08b07e340aa3dd2c22b3ea45b5ff6e1a1e3844f3dadeb4cfd75858793e9c8fb3": {
     functionName: "generateReply_createServerFn_handler",
-    importer: () => import("./assets/reply-fn-CHtXOihs.js")
+    importer: () => import("./assets/reply-fn-DePVAZDa.js")
   }
 };
 async function getServerFnById(id, access) {

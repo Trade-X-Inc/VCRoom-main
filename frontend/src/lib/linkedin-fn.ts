@@ -16,7 +16,8 @@ export const generateLinkedInMessage = createServerFn({ method: "POST" })
       (import.meta.env as any).VITE_SUPABASE_ANON_KEY || "";
     const openAIKey =
       process.env.OPENAI_API_KEY ||
-      (globalThis as any).OPENAI_API_KEY || "";
+      (globalThis as any).OPENAI_API_KEY ||
+      import.meta.env.VITE_OPENAI_API_KEY || "";
     if (!supabaseUrl || !serviceKey) throw new Error("Supabase not configured");
     const adminClient = createClient(supabaseUrl, serviceKey);
 

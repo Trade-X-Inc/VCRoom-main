@@ -21,7 +21,8 @@ export const generateOutreachEmail = createServerFn({ method: "POST" })
       (import.meta.env as any).VITE_SUPABASE_ANON_KEY || "";
     const openAIKey =
       process.env.OPENAI_API_KEY ||
-      (globalThis as any).OPENAI_API_KEY || "";
+      (globalThis as any).OPENAI_API_KEY ||
+      import.meta.env.VITE_OPENAI_API_KEY || "";
     if (!supabaseUrl || !serviceKey) {
       return {
         subject: "Unable to generate",

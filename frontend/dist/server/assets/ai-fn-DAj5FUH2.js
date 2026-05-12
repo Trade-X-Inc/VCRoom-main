@@ -28,7 +28,7 @@ const generateOutreachEmail = createServerFn({
 }) => {
   const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
-  const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || "";
+  const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || void 0 || "";
   const adminClient = createClient(supabaseUrl, serviceKey);
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1e3).toISOString();
   const {

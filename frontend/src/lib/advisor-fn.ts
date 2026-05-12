@@ -17,17 +17,18 @@ export const getAIAdvice = createServerFn({ method: "POST" })
   .handler(async ({ data }: { data: AdvisorInput }): Promise<AdvisorResult> => {
     const openAIKey =
       process.env.OPENAI_API_KEY ||
-      (globalThis as any).OPENAI_API_KEY || "";
+      (globalThis as any).OPENAI_API_KEY ||
+      import.meta.env.VITE_OPENAI_API_KEY || "";
 
     const supabaseUrl =
       process.env.SUPABASE_URL ||
       (globalThis as any).SUPABASE_URL ||
-      process.env.VITE_SUPABASE_URL || "";
+      import.meta.env.VITE_SUPABASE_URL || "";
 
     const supabaseKey =
       process.env.SUPABASE_SERVICE_ROLE_KEY ||
       (globalThis as any).SUPABASE_SERVICE_ROLE_KEY ||
-      process.env.VITE_SUPABASE_ANON_KEY || "";
+      import.meta.env.VITE_SUPABASE_ANON_KEY || "";
 
     if (!openAIKey) {
       return {

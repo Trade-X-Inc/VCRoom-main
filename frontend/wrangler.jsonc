@@ -4,6 +4,11 @@
   "compatibility_flags": ["nodejs_compat"],
   "pages_build_output_dir": "./dist/client",
   "vars": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "OPENAI_API_KEY": "PLACEHOLDER",
+    "SUPABASE_URL": "PLACEHOLDER",
+    "SUPABASE_SERVICE_ROLE_KEY": "PLACEHOLDER",
+    "VITE_SUPABASE_URL": "PLACEHOLDER",
+    "VITE_SUPABASE_ANON_KEY": "PLACEHOLDER"
   }
 }

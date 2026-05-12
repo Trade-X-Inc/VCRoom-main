@@ -22,9 +22,9 @@ const getAIAdvice = createServerFn({
 }).inputValidator((data) => data).handler(getAIAdvice_createServerFn_handler, async ({
   data
 }) => {
-  const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || "";
-  const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || "";
+  const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || void 0 || "";
+  const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
   if (!openAIKey) {
     return {
       reply: "AI Advisor is not configured yet. Please add your OpenAI API key to get started.",
@@ -32,7 +32,7 @@ const getAIAdvice = createServerFn({
     };
   }
   let context = "";
-  if (supabaseUrl && supabaseKey) {
+  {
     try {
       const admin = createClient(supabaseUrl, supabaseKey);
       const [{

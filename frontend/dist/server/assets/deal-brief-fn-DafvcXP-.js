@@ -52,7 +52,7 @@ Funding target: ${startup?.funding_target ?? "Unknown"}
 Traction: ${startup?.traction ?? "Unknown"}
 Description: ${startup?.description ?? "None provided"}
 Recent activity: ${activitySummary || "None"}`;
-  const apiKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || "";
+  const apiKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || void 0 || "";
   if (!apiKey) {
     return {
       matchScore: 72,
