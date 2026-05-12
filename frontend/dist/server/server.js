@@ -73,7 +73,7 @@ function getResponse() {
 }
 var HEADERS = { TSS_SHELL: "X-TSS_SHELL" };
 async function getStartManifest(matchedRoutes) {
-  const { tsrStartManifest } = await import("./assets/_tanstack-start-manifest_v-DNpmMjf-.js");
+  const { tsrStartManifest } = await import("./assets/_tanstack-start-manifest_v-DzdqksVy.js");
   const startManifest = tsrStartManifest();
   const rootRoute = startManifest.routes[rootRouteId] = startManifest.routes[rootRouteId] || {};
   rootRoute.assets = rootRoute.assets || [];
@@ -98,9 +98,9 @@ async function getStartManifest(matchedRoutes) {
   };
 }
 const manifest = {
-  "b0451d818a4af8f61f8d6702b0a87626ab580dea9833910b8d678173c48d62e2": {
-    functionName: "sendAdvisorMessage_createServerFn_handler",
-    importer: () => import("./assets/advisor-fn-CDvwbxoI.js")
+  "397b3f65700da6e488c63bfeb016aac33e5f67ff2f57bcca85b9c84f5eace701": {
+    functionName: "getAIAdvice_createServerFn_handler",
+    importer: () => import("./assets/advisor-fn-3EN-lqRx.js")
   },
   "56f68b50d6d653ae4f4287eb005bbb35fecea7fa7ce69a4b2a6cc974383a502e": {
     functionName: "generateDealBrief_createServerFn_handler",
@@ -871,7 +871,7 @@ var baseManifestPromise;
 var cachedFinalManifestPromise;
 async function loadEntries() {
   const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-    import("./assets/router-3WmBSyta.js").then((n) => n.r),
+    import("./assets/router-C9QH749P.js").then((n) => n.r),
     import("./assets/start-HYkvq4Ni.js"),
     import("./assets/__23tanstack-start-plugin-adapters-Cwee5PKy.js")
   ]);

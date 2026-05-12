@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { Sparkles, Send, Loader2, User } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
-import { sendAdvisorMessage } from "@/lib/advisor-fn";
+import { getAIAdvice } from "@/lib/advisor-fn";
 
 export const Route = createFileRoute("/app/advisor")({
   component: Advisor,
@@ -36,8 +36,7 @@ function Advisor() {
   ]);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
-  const [remaining, setRemaining] = useState(20);
-  const [limitHit, setLimitHit] = useState(false);
+  const [errorBanner, setErrorBanner] = useState<string | null>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -45,33 +44,25 @@ function Advisor() {
 
   const send = async (text: string) => {
     const t = text.trim();
-    if (!t || thinking || !user?.id || limitHit) return;
+    if (!t || thinking || !user?.id) return;
 
     setInput("");
+    setErrorBanner(null);
     const userMsg: ChatMsg = { id: `u${Date.now()}`, role: "user", content: t };
     setMsgs((xs) => [...xs, userMsg]);
     setThinking(true);
 
     try {
-      // Build history (skip initial greeting, include all prior msgs + new user msg)
-      const history = [...msgs.slice(1), userMsg].map((m) => ({
-        role: m.role as "user" | "assistant",
-        content: m.content,
-      }));
+      const history = msgs.slice(1).map((m) => ({ role: m.role as string, content: m.content }));
+      const result = await getAIAdvice({ data: { userId: user.id, message: t, history } });
 
-      const result = await sendAdvisorMessage({ data: { userId: user.id, messages: history } });
       setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: result.reply }]);
-      setRemaining(result.rateLimitRemaining);
-      if (result.rateLimitRemaining <= 0) setLimitHit(true);
-    } catch (e: any) {
-      if (e.message?.includes("RATE_LIMIT")) {
-        setLimitHit(true);
-        setRemaining(0);
-        setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: "You've reached today's message limit. Resets at midnight." }]);
-      } else {
-        toast.error("Request failed. Please try again.");
-        setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: "Sorry, I couldn't process that. Please try again." }]);
+      if (result.error === "missing_key") {
+        setErrorBanner("OpenAI API key not configured. Contact your admin.");
       }
+    } catch (e: any) {
+      toast.error("Request failed. Please try again.");
+      setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: "Sorry, I couldn't process that. Please try again." }]);
     } finally {
       setThinking(false);
     }
@@ -93,9 +84,11 @@ function Advisor() {
               <div className="text-xs text-muted-foreground">Personalized fundraising advice based on your live pipeline.</div>
             </div>
           </div>
-          <div className={`text-[11px] tabular-nums shrink-0 ${remaining <= 5 ? "text-warning" : "text-muted-foreground"}`}>
-            {remaining} / 20 left today
-          </div>
+          {errorBanner && (
+            <div className="text-[11px] text-destructive shrink-0 rounded-md border border-destructive/30 bg-destructive/5 px-2 py-1">
+              {errorBanner}
+            </div>
+          )}
         </div>
       </div>
 
@@ -146,32 +139,26 @@ function Advisor() {
       {/* Input */}
       <div className="border-t border-border/60 bg-background/80 backdrop-blur-xl shrink-0">
         <div className="max-w-3xl mx-auto px-6 py-3.5">
-          {limitHit ? (
-            <div className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-center text-destructive">
-              Daily limit reached (20 messages). Resets at midnight.
-            </div>
-          ) : (
-            <form
-              onSubmit={(e) => { e.preventDefault(); send(input); }}
-              className="flex items-end gap-2 rounded-xl border border-border/60 bg-card p-2 shadow-card focus-within:border-brand/40 focus-within:ring-2 focus-within:ring-brand/10"
+          <form
+            onSubmit={(e) => { e.preventDefault(); send(input); }}
+            className="flex items-end gap-2 rounded-xl border border-border/60 bg-card p-2 shadow-card focus-within:border-brand/40 focus-within:ring-2 focus-within:ring-brand/10"
+          >
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }}
+              rows={1}
+              placeholder="Ask about your raise…"
+              className="flex-1 resize-none bg-transparent px-2 py-1.5 text-sm placeholder:text-muted-foreground/60 focus:outline-none max-h-32"
+            />
+            <button
+              type="submit"
+              disabled={!input.trim() || thinking}
+              className="grid h-8 w-8 place-items-center rounded-md bg-gradient-brand text-brand-foreground shadow-glow disabled:opacity-40"
             >
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }}
-                rows={1}
-                placeholder="Ask about your raise…"
-                className="flex-1 resize-none bg-transparent px-2 py-1.5 text-sm placeholder:text-muted-foreground/60 focus:outline-none max-h-32"
-              />
-              <button
-                type="submit"
-                disabled={!input.trim() || thinking}
-                className="grid h-8 w-8 place-items-center rounded-md bg-gradient-brand text-brand-foreground shadow-glow disabled:opacity-40"
-              >
-                <Send className="h-3.5 w-3.5" />
-              </button>
-            </form>
-          )}
+              <Send className="h-3.5 w-3.5" />
+            </button>
+          </form>
           <div className="mt-1.5 text-[10px] text-muted-foreground text-center">
             AI may be inaccurate — verify with your legal & finance team.
           </div>
