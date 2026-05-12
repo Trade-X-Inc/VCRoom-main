@@ -6,7 +6,7 @@ Return ONLY valid JSON in this exact format:
 {"subject":"...","body":"..."}
 No markdown, no explanation, just the JSON object.`;
 
-type EmailInput = { leadId: string; type: "cold" | "followup"; userId: string };
+type EmailInput = { leadId: string; type: "cold" | "followup"; userId: string; openAIKey?: string };
 
 export const generateOutreachEmail = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): EmailInput => data as EmailInput)
@@ -20,6 +20,7 @@ export const generateOutreachEmail = createServerFn({ method: "POST" })
       (globalThis as any).SUPABASE_SERVICE_ROLE_KEY ||
       (import.meta.env as any).VITE_SUPABASE_ANON_KEY || "";
     const openAIKey =
+      data.openAIKey ||
       process.env.OPENAI_API_KEY ||
       (globalThis as any).OPENAI_API_KEY ||
       import.meta.env.VITE_OPENAI_API_KEY || "";

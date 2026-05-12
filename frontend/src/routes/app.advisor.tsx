@@ -53,8 +53,9 @@ function Advisor() {
     setThinking(true);
 
     try {
+      const openAIKey = import.meta.env.VITE_OPENAI_API_KEY || "";
       const history = msgs.slice(1).map((m) => ({ role: m.role as string, content: m.content }));
-      const result = await getAIAdvice({ data: { userId: user.id, message: t, history } });
+      const result = await getAIAdvice({ data: { userId: user.id, message: t, history, openAIKey } });
 
       setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: result.reply }]);
       if (result.error === "missing_key") {

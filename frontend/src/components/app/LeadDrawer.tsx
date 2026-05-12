@@ -318,7 +318,8 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
     setGeneratingEmail(true);
     setGeneratedEmail("");
     try {
-      const result = await generateOutreachEmail({ data: { userId: user.id, leadId: lead.id, type } });
+      const openAIKey = import.meta.env.VITE_OPENAI_API_KEY || "";
+      const result = await generateOutreachEmail({ data: { userId: user.id, leadId: lead.id, type, openAIKey } });
       setGeneratedEmail(`Subject: ${result.subject}\n\n${result.body}`);
     } catch (err: any) {
       toast.error(err.message || "Failed to generate email");
@@ -332,7 +333,8 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
     setGeneratingLinkedIn(true);
     setGeneratedLinkedIn("");
     try {
-      const result = await generateLinkedInMessage({ data: { userId: user.id, leadId: lead.id } });
+      const openAIKey = import.meta.env.VITE_OPENAI_API_KEY || "";
+      const result = await generateLinkedInMessage({ data: { userId: user.id, leadId: lead.id, openAIKey } });
       setGeneratedLinkedIn(result.message);
     } catch (err: any) {
       toast.error(err.message || "Failed to generate LinkedIn message");
@@ -346,7 +348,8 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
     setGeneratingReply(true);
     setGeneratedReply("");
     try {
-      const result = await generateReply({ data: { userId: user.id, leadId: lead.id, investorReply: investorReply.trim() } });
+      const openAIKey = import.meta.env.VITE_OPENAI_API_KEY || "";
+      const result = await generateReply({ data: { userId: user.id, leadId: lead.id, investorReply: investorReply.trim(), openAIKey } });
       setGeneratedReply(result.reply);
     } catch (err: any) {
       toast.error(err.message || "Failed to generate reply");

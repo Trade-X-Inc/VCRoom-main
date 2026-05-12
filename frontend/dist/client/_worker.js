@@ -26770,16 +26770,16 @@ var init_server3 = __esm({
   }
 });
 
-// dist/server/assets/_tanstack-start-manifest_v-CZWWiQue.js
-var tanstack_start_manifest_v_CZWWiQue_exports = {};
-__export(tanstack_start_manifest_v_CZWWiQue_exports, {
+// dist/server/assets/_tanstack-start-manifest_v-COjLHjh8.js
+var tanstack_start_manifest_v_COjLHjh8_exports = {};
+__export(tanstack_start_manifest_v_COjLHjh8_exports, {
   tsrStartManifest: () => tsrStartManifest
 });
 var tsrStartManifest;
-var init_tanstack_start_manifest_v_CZWWiQue = __esm({
-  "dist/server/assets/_tanstack-start-manifest_v-CZWWiQue.js"() {
+var init_tanstack_start_manifest_v_COjLHjh8 = __esm({
+  "dist/server/assets/_tanstack-start-manifest_v-COjLHjh8.js"() {
     "use strict";
-    tsrStartManifest = () => ({ routes: { __root__: { filePath: "/workspaces/VCRoom-main/frontend/src/routes/__root.tsx", children: ["/", "/about", "/app", "/debug", "/forgot-password", "/founders", "/investors", "/pricing", "/privacy", "/sign-in", "/sign-up", "/terms", "/api/test-ai", "/auth/callback", "/join/$token", "/solutions/due-diligence", "/solutions/fundraising-crm", "/solutions/investor-pipeline", "/solutions/raise-1m", "/solutions/vc-deal-room"], assets: void 0, preloads: ["/assets/index-CyfykXr5.js"] }, "/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/index.tsx", children: void 0, assets: void 0, preloads: ["/assets/index-DCDQViyD.js", "/assets/SiteFooter-tlu9m0Hi.js", "/assets/AppPreview-waKhmBna.js", "/assets/arrow-right-CayhVvGW.js", "/assets/triangle-alert-UzsXw-lW.js", "/assets/users-CCZbLzio.js", "/assets/sparkles-BO0_GS8y.js", "/assets/briefcase-B3ggb30w.js", "/assets/shield-check-CH1muVkv.js", "/assets/file-text-DFq6hwKx.js", "/assets/list-checks-uN3y1f6S.js", "/assets/layers-D7QCLJuj.js", "/assets/circle-check-BU7AlprF.js", "/assets/message-square-eFJLH5nV.js", "/assets/Logo-ByUMUDPu.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-CwpJGe60.js", "/assets/createLucideIcon-lioqlphf.js", "/assets/globe-ybO33oti.js", "/assets/layout-grid-BCFV8_uG.js", "/assets/search-z6mxam2G.js", "/assets/bell-DhEiL-Zc.js", "/assets/trending-up-PFGO2e8J.js", "/assets/chevron-right-CmXaayKl.js", "/assets/arrow-up-right-G9_kT0j1.js"] }, "/about": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/about.tsx", children: void 0, assets: void 0, preloads: ["/assets/about-CfJlocXp.js", "/assets/SiteFooter-tlu9m0Hi.js", "/assets/arrow-right-CayhVvGW.js", "/assets/Logo-ByUMUDPu.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-CwpJGe60.js", "/assets/createLucideIcon-lioqlphf.js", "/assets/globe-ybO33oti.js"] }, "/app": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.tsx", children: ["/app/advisor", "/app/audit", "/app/deal-rooms", "/app/documents", "/app/email", "/app/investor", "/app/leads", "/app/meetings", "/app/messages", "/app/notifications", "/app/pipeline", "/app/profile", "/app/reports", "/app/settings", "/app/users", "/app/", "/app/deal-room/$id", "/app/deal-room/$id_/nda"], assets: void 0, preloads: ["/assets/app-BStYGuTG.js", "/assets/useRouterState-CXfQle49.js", "/assets/Logo-ByUMUDPu.js", "/assets/useQuery-D-jgCqcC.js", "/assets/utils-BQHNewu7.js", "/assets/bell-DhEiL-Zc.js", "/assets/check-check-BVCxWyrE.js", "/assets/formatDistanceToNow-BCR7E-0-.js", "/assets/briefcase-B3ggb30w.js", "/assets/message-square-eFJLH5nV.js", "/assets/user-plus-j1X4M8Ih.js", "/assets/sparkles-BO0_GS8y.js", "/assets/settings-rD-Bvgfj.js", "/assets/user-CFf_RAjw.js", "/assets/users-CCZbLzio.js", "/assets/shield-check-CH1muVkv.js", "/assets/store-CBp9T8Js.js", "/assets/LangSwitcher-CwpJGe60.js", "/assets/createLucideIcon-lioqlphf.js", "/assets/layout-grid-BCFV8_uG.js", "/assets/inbox-l9K0gaM6.js", "/assets/kanban-Dh3MRWt2.js", "/assets/building-2-Dmmal9B-.js", "/assets/clipboard-check-C7xyTH0U.js", "/assets/brain-DG81b6H_.js", "/assets/chart-pie-0bK7vajP.js", "/assets/calendar-CO6KnJhn.js", "/assets/file-text-DFq6hwKx.js", "/assets/chart-column-xYZlkud4.js", "/assets/search-z6mxam2G.js", "/assets/plus-B7W25EWr.js", "/assets/en-US-DJvzb04W.js", "/assets/globe-ybO33oti.js"] }, "/debug": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/debug.tsx", children: void 0, assets: void 0, preloads: ["/assets/debug-dA3wFU7_.js"] }, "/forgot-password": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/forgot-password.tsx", children: void 0, assets: void 0, preloads: ["/assets/forgot-password-B5g6dO-2.js"] }, "/founders": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/founders.tsx", children: void 0, assets: void 0, preloads: ["/assets/founders-CQoihTjT.js", "/assets/SolutionPage-Ch-Yv-Kk.js", "/assets/users-CCZbLzio.js", "/assets/SiteFooter-tlu9m0Hi.js", "/assets/Logo-ByUMUDPu.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-CwpJGe60.js", "/assets/createLucideIcon-lioqlphf.js", "/assets/globe-ybO33oti.js", "/assets/arrow-right-CayhVvGW.js", "/assets/AppPreview-waKhmBna.js", "/assets/layout-grid-BCFV8_uG.js", "/assets/file-text-DFq6hwKx.js", "/assets/message-square-eFJLH5nV.js", "/assets/sparkles-BO0_GS8y.js", "/assets/search-z6mxam2G.js", "/assets/bell-DhEiL-Zc.js", "/assets/trending-up-PFGO2e8J.js", "/assets/chevron-right-CmXaayKl.js", "/assets/arrow-up-right-G9_kT0j1.js", "/assets/check-CmfhIrFe.js"] }, "/investors": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/investors.tsx", children: void 0, assets: void 0, preloads: ["/assets/investors-DDtyKF1y.js", "/assets/SolutionPage-Ch-Yv-Kk.js", "/assets/briefcase-B3ggb30w.js", "/assets/SiteFooter-tlu9m0Hi.js", "/assets/Logo-ByUMUDPu.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-CwpJGe60.js", "/assets/createLucideIcon-lioqlphf.js", "/assets/globe-ybO33oti.js", "/assets/arrow-right-CayhVvGW.js", "/assets/AppPreview-waKhmBna.js", "/assets/layout-grid-BCFV8_uG.js", "/assets/users-CCZbLzio.js", "/assets/file-text-DFq6hwKx.js", "/assets/message-square-eFJLH5nV.js", "/assets/sparkles-BO0_GS8y.js", "/assets/search-z6mxam2G.js", "/assets/bell-DhEiL-Zc.js", "/assets/trending-up-PFGO2e8J.js", "/assets/chevron-right-CmXaayKl.js", "/assets/arrow-up-right-G9_kT0j1.js", "/assets/check-CmfhIrFe.js"] }, "/pricing": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/pricing.tsx", children: void 0, assets: void 0, preloads: ["/assets/pricing-DP7G5QKd.js", "/assets/SiteFooter-tlu9m0Hi.js", "/assets/arrow-right-CayhVvGW.js", "/assets/check-CmfhIrFe.js", "/assets/Logo-ByUMUDPu.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-CwpJGe60.js", "/assets/createLucideIcon-lioqlphf.js", "/assets/globe-ybO33oti.js"] }, "/privacy": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/privacy.tsx", children: void 0, assets: void 0, preloads: ["/assets/privacy-CUYu4r4p.js", "/assets/SiteFooter-tlu9m0Hi.js", "/assets/Logo-ByUMUDPu.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-CwpJGe60.js", "/assets/createLucideIcon-lioqlphf.js", "/assets/globe-ybO33oti.js", "/assets/arrow-right-CayhVvGW.js"] }, "/sign-in": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/sign-in.tsx", children: void 0, assets: void 0, preloads: ["/assets/sign-in-CywehXBl.js"] }, "/sign-up": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/sign-up.tsx", children: void 0, assets: void 0, preloads: ["/assets/sign-up-BYPTmVLV.js"] }, "/terms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/terms.tsx", children: void 0, assets: void 0, preloads: ["/assets/terms-8jvB98PE.js", "/assets/SiteFooter-tlu9m0Hi.js", "/assets/Logo-ByUMUDPu.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-CwpJGe60.js", "/assets/createLucideIcon-lioqlphf.js", "/assets/globe-ybO33oti.js", "/assets/arrow-right-CayhVvGW.js"] }, "/api/test-ai": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/api.test-ai.tsx", children: void 0, assets: void 0, preloads: ["/assets/api.test-ai-D25Gk3TQ.js"] }, "/app/advisor": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.advisor.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.advisor-DOdeoWRE.js", "/assets/loader-circle-CjFNFJ2Z.js", "/assets/send-B2dIOQQp.js"] }, "/app/audit": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.audit.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.audit-DmwFVxm6.js", "/assets/download-BrEweHKS.js", "/assets/activity-DQPW2Uzx.js", "/assets/triangle-alert-UzsXw-lW.js"] }, "/app/deal-rooms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-rooms.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-rooms-N1NzYXiq.js", "/assets/loader-circle-CjFNFJ2Z.js", "/assets/arrow-up-right-G9_kT0j1.js", "/assets/x-BnZzlBua.js"] }, "/app/documents": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.documents.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.documents-D7mEwNXl.js", "/assets/list-DXa1OZ08.js", "/assets/upload-BYYIb3Ke.js", "/assets/circle-check-BU7AlprF.js", "/assets/triangle-alert-UzsXw-lW.js", "/assets/download-BrEweHKS.js", "/assets/trash-2-Ch_Az06S.js", "/assets/loader-circle-CjFNFJ2Z.js", "/assets/x-BnZzlBua.js", "/assets/video-Nk5qJe9q.js"] }, "/app/email": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.email.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.email-D41tzx6b.js", "/assets/backend-B5nrjGvD.js", "/assets/copy-e4yjjT2e.js", "/assets/send-B2dIOQQp.js"] }, "/app/investor": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.tsx", children: ["/app/investor/analysis", "/app/investor/deal-flow", "/app/investor/deal-rooms", "/app/investor/decisions", "/app/investor/diligence", "/app/investor/pipeline", "/app/investor/portfolio", "/app/investor/startups", "/app/investor/team", "/app/investor/"], assets: void 0, preloads: ["/assets/app.investor-B0GPXiI8.js"] }, "/app/leads": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.leads.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.leads-CLMetjPz.js", "/assets/LeadDrawer-BSo3kWkf.js", "/assets/download-BrEweHKS.js", "/assets/upload-BYYIb3Ke.js", "/assets/trending-up-PFGO2e8J.js", "/assets/zap-2xVvGlaO.js", "/assets/x-BnZzlBua.js", "/assets/loader-circle-CjFNFJ2Z.js", "/assets/circle-alert-B5W9ZGHm.js", "/assets/copy-e4yjjT2e.js", "/assets/check-CmfhIrFe.js", "/assets/clock-CH32yAEM.js", "/assets/trash-2-Ch_Az06S.js", "/assets/chevron-down-CuglkYq9.js", "/assets/chevron-right-CmXaayKl.js"] }, "/app/meetings": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.meetings.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.meetings-qfMH59Uz.js", "/assets/format-CjS2oCz0.js", "/assets/loader-circle-CjFNFJ2Z.js", "/assets/chevron-down-CuglkYq9.js", "/assets/chevron-right-CmXaayKl.js", "/assets/clock-CH32yAEM.js", "/assets/video-Nk5qJe9q.js", "/assets/external-link-P66eqA4U.js"] }, "/app/messages": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.messages.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.messages-C8cg7tCH.js"] }, "/app/notifications": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.notifications.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.notifications-Dl6ZoYDD.js"] }, "/app/pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.pipeline-DavFxEAB.js", "/assets/LeadDrawer-BSo3kWkf.js", "/assets/loader-circle-CjFNFJ2Z.js", "/assets/funnel-BudIQUb1.js", "/assets/arrow-up-right-G9_kT0j1.js", "/assets/x-BnZzlBua.js", "/assets/copy-e4yjjT2e.js", "/assets/check-CmfhIrFe.js", "/assets/clock-CH32yAEM.js", "/assets/trash-2-Ch_Az06S.js", "/assets/chevron-down-CuglkYq9.js", "/assets/chevron-right-CmXaayKl.js"] }, "/app/profile": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.profile.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.profile-DL0tl3Fl.js", "/assets/download-BrEweHKS.js", "/assets/loader-circle-CjFNFJ2Z.js", "/assets/upload-BYYIb3Ke.js", "/assets/zap-2xVvGlaO.js", "/assets/x-BnZzlBua.js", "/assets/check-CmfhIrFe.js", "/assets/trash-2-Ch_Az06S.js"] }, "/app/reports": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.reports.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.reports-B_qjbyYO.js", "/assets/loader-circle-CjFNFJ2Z.js", "/assets/trending-up-PFGO2e8J.js", "/assets/download-BrEweHKS.js"] }, "/app/settings": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.tsx", children: ["/app/settings/billing", "/app/settings/domain", "/app/settings/notifications", "/app/settings/security"], assets: void 0, preloads: ["/assets/app.settings-Cc7LglNT.js", "/assets/credit-card-pa8ISU6K.js", "/assets/shield-BExVQaaU.js", "/assets/trash-2-Ch_Az06S.js"] }, "/app/users": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.users.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.users-DwV1Jn0N.js", "/assets/mail-DOAaaZPX.js", "/assets/copy-e4yjjT2e.js", "/assets/x-BnZzlBua.js", "/assets/check-CmfhIrFe.js", "/assets/loader-circle-CjFNFJ2Z.js"] }, "/auth/callback": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/auth.callback.tsx", children: void 0, assets: void 0, preloads: ["/assets/auth.callback-BOCY4Q9s.js"] }, "/join/$token": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/join.$token.tsx", children: void 0, assets: void 0, preloads: ["/assets/join._token-CXj-EPos.js", "/assets/Logo-ByUMUDPu.js", "/assets/triangle-alert-UzsXw-lW.js", "/assets/check-CmfhIrFe.js", "/assets/arrow-right-CayhVvGW.js", "/assets/shield-check-CH1muVkv.js", "/assets/lock-BBVIJgt4.js", "/assets/createLucideIcon-lioqlphf.js"] }, "/solutions/due-diligence": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.due-diligence.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.due-diligence-Cmw6cw2v.js", "/assets/SolutionPage-Ch-Yv-Kk.js", "/assets/list-checks-uN3y1f6S.js", "/assets/SiteFooter-tlu9m0Hi.js", "/assets/Logo-ByUMUDPu.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-CwpJGe60.js", "/assets/createLucideIcon-lioqlphf.js", "/assets/globe-ybO33oti.js", "/assets/arrow-right-CayhVvGW.js", "/assets/AppPreview-waKhmBna.js", "/assets/layout-grid-BCFV8_uG.js", "/assets/users-CCZbLzio.js", "/assets/file-text-DFq6hwKx.js", "/assets/message-square-eFJLH5nV.js", "/assets/sparkles-BO0_GS8y.js", "/assets/search-z6mxam2G.js", "/assets/bell-DhEiL-Zc.js", "/assets/trending-up-PFGO2e8J.js", "/assets/chevron-right-CmXaayKl.js", "/assets/arrow-up-right-G9_kT0j1.js", "/assets/check-CmfhIrFe.js"] }, "/solutions/fundraising-crm": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.fundraising-crm.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.fundraising-crm-QplRE-Fi.js", "/assets/SolutionPage-Ch-Yv-Kk.js", "/assets/layers-D7QCLJuj.js", "/assets/SiteFooter-tlu9m0Hi.js", "/assets/Logo-ByUMUDPu.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-CwpJGe60.js", "/assets/createLucideIcon-lioqlphf.js", "/assets/globe-ybO33oti.js", "/assets/arrow-right-CayhVvGW.js", "/assets/AppPreview-waKhmBna.js", "/assets/layout-grid-BCFV8_uG.js", "/assets/users-CCZbLzio.js", "/assets/file-text-DFq6hwKx.js", "/assets/message-square-eFJLH5nV.js", "/assets/sparkles-BO0_GS8y.js", "/assets/search-z6mxam2G.js", "/assets/bell-DhEiL-Zc.js", "/assets/trending-up-PFGO2e8J.js", "/assets/chevron-right-CmXaayKl.js", "/assets/arrow-up-right-G9_kT0j1.js", "/assets/check-CmfhIrFe.js"] }, "/solutions/investor-pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.investor-pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.investor-pipeline-3ii6shA2.js", "/assets/SolutionPage-Ch-Yv-Kk.js", "/assets/trending-up-PFGO2e8J.js", "/assets/SiteFooter-tlu9m0Hi.js", "/assets/Logo-ByUMUDPu.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-CwpJGe60.js", "/assets/createLucideIcon-lioqlphf.js", "/assets/globe-ybO33oti.js", "/assets/arrow-right-CayhVvGW.js", "/assets/AppPreview-waKhmBna.js", "/assets/layout-grid-BCFV8_uG.js", "/assets/users-CCZbLzio.js", "/assets/file-text-DFq6hwKx.js", "/assets/message-square-eFJLH5nV.js", "/assets/sparkles-BO0_GS8y.js", "/assets/search-z6mxam2G.js", "/assets/bell-DhEiL-Zc.js", "/assets/chevron-right-CmXaayKl.js", "/assets/arrow-up-right-G9_kT0j1.js", "/assets/check-CmfhIrFe.js"] }, "/solutions/raise-1m": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.raise-1m.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.raise-1m-BxhQ92yj.js", "/assets/SolutionPage-Ch-Yv-Kk.js", "/assets/sparkles-BO0_GS8y.js", "/assets/SiteFooter-tlu9m0Hi.js", "/assets/Logo-ByUMUDPu.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-CwpJGe60.js", "/assets/createLucideIcon-lioqlphf.js", "/assets/globe-ybO33oti.js", "/assets/arrow-right-CayhVvGW.js", "/assets/AppPreview-waKhmBna.js", "/assets/layout-grid-BCFV8_uG.js", "/assets/users-CCZbLzio.js", "/assets/file-text-DFq6hwKx.js", "/assets/message-square-eFJLH5nV.js", "/assets/search-z6mxam2G.js", "/assets/bell-DhEiL-Zc.js", "/assets/trending-up-PFGO2e8J.js", "/assets/chevron-right-CmXaayKl.js", "/assets/arrow-up-right-G9_kT0j1.js", "/assets/check-CmfhIrFe.js"] }, "/solutions/vc-deal-room": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.vc-deal-room.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.vc-deal-room-B8Uuv9Yz.js", "/assets/SolutionPage-Ch-Yv-Kk.js", "/assets/briefcase-B3ggb30w.js", "/assets/SiteFooter-tlu9m0Hi.js", "/assets/Logo-ByUMUDPu.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-CwpJGe60.js", "/assets/createLucideIcon-lioqlphf.js", "/assets/globe-ybO33oti.js", "/assets/arrow-right-CayhVvGW.js", "/assets/AppPreview-waKhmBna.js", "/assets/layout-grid-BCFV8_uG.js", "/assets/users-CCZbLzio.js", "/assets/file-text-DFq6hwKx.js", "/assets/message-square-eFJLH5nV.js", "/assets/sparkles-BO0_GS8y.js", "/assets/search-z6mxam2G.js", "/assets/bell-DhEiL-Zc.js", "/assets/trending-up-PFGO2e8J.js", "/assets/chevron-right-CmXaayKl.js", "/assets/arrow-up-right-G9_kT0j1.js", "/assets/check-CmfhIrFe.js"] }, "/app/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.index.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.index-CrbZXaPY.js", "/assets/loader-circle-CjFNFJ2Z.js", "/assets/circle-question-mark-C5a143Gf.js", "/assets/mail-DOAaaZPX.js", "/assets/arrow-up-right-G9_kT0j1.js", "/assets/format-CjS2oCz0.js", "/assets/circle-check-BU7AlprF.js", "/assets/circle-alert-B5W9ZGHm.js", "/assets/external-link-P66eqA4U.js", "/assets/clock-CH32yAEM.js", "/assets/x-BnZzlBua.js", "/assets/trending-up-PFGO2e8J.js"] }, "/app/deal-room/$id": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-room.$id.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-room._id-lPo16pFS.js", "/assets/backend-B5nrjGvD.js", "/assets/loader-circle-CjFNFJ2Z.js", "/assets/send-B2dIOQQp.js", "/assets/funnel-BudIQUb1.js", "/assets/triangle-alert-UzsXw-lW.js", "/assets/circle-BdZ3LOoy.js", "/assets/clock-CH32yAEM.js", "/assets/circle-check-BU7AlprF.js", "/assets/upload-BYYIb3Ke.js", "/assets/x-BnZzlBua.js", "/assets/chevron-down-CuglkYq9.js", "/assets/chevron-right-CmXaayKl.js", "/assets/download-BrEweHKS.js", "/assets/arrow-right-CayhVvGW.js", "/assets/list-checks-uN3y1f6S.js", "/assets/activity-DQPW2Uzx.js", "/assets/lock-BBVIJgt4.js", "/assets/circle-question-mark-C5a143Gf.js", "/assets/external-link-P66eqA4U.js", "/assets/shield-BExVQaaU.js", "/assets/format-CjS2oCz0.js"] }, "/app/investor/analysis": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.analysis.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.analysis-DbulVw0o.js", "/assets/deal-brief-fn-C9nwz89C.js", "/assets/loader-circle-CjFNFJ2Z.js", "/assets/circle-check-BU7AlprF.js", "/assets/triangle-alert-UzsXw-lW.js", "/assets/download-BrEweHKS.js"] }, "/app/investor/deal-flow": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.deal-flow.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.deal-flow-B_AkjTXq.js", "/assets/clock-CH32yAEM.js"] }, "/app/investor/deal-rooms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.deal-rooms.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.deal-rooms-DeHdoT41.js", "/assets/shield-BExVQaaU.js", "/assets/clock-CH32yAEM.js"] }, "/app/investor/decisions": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.decisions.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.decisions-Bak6EJnQ.js", "/assets/check-CmfhIrFe.js", "/assets/x-BnZzlBua.js", "/assets/clock-CH32yAEM.js"] }, "/app/investor/diligence": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.diligence.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.diligence-BDtUO7Cz.js", "/assets/circle-check-BU7AlprF.js", "/assets/circle-BdZ3LOoy.js"] }, "/app/investor/pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.pipeline-DeG9wfeI.js", "/assets/list-DXa1OZ08.js", "/assets/clock-CH32yAEM.js"] }, "/app/investor/portfolio": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.portfolio.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.portfolio-Dy-uCJ41.js", "/assets/trending-up-PFGO2e8J.js", "/assets/clock-CH32yAEM.js"] }, "/app/investor/startups": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.startups.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.startups-ABV3W-aJ.js", "/assets/external-link-P66eqA4U.js", "/assets/clock-CH32yAEM.js"] }, "/app/investor/team": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.team.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.team-BHS14CRT.js", "/assets/x-BnZzlBua.js", "/assets/mail-DOAaaZPX.js", "/assets/loader-circle-CjFNFJ2Z.js", "/assets/clock-CH32yAEM.js"] }, "/app/settings/billing": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.billing.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.billing-BR4RmrOW.js", "/assets/check-CmfhIrFe.js", "/assets/download-BrEweHKS.js"] }, "/app/settings/domain": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.domain.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.domain-q9IAczhj.js", "/assets/circle-check-BU7AlprF.js", "/assets/copy-e4yjjT2e.js", "/assets/mail-DOAaaZPX.js"] }, "/app/settings/notifications": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.notifications.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.notifications-DVYODQAo.js", "/assets/mail-DOAaaZPX.js", "/assets/smartphone-PlDT25lm.js"] }, "/app/settings/security": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.security.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.security-B3D5N9Pc.js", "/assets/smartphone-PlDT25lm.js", "/assets/triangle-alert-UzsXw-lW.js"] }, "/app/investor/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.index.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.index-FijKek_w.js", "/assets/circle-check-BU7AlprF.js", "/assets/clock-CH32yAEM.js", "/assets/circle-alert-B5W9ZGHm.js", "/assets/arrow-right-CayhVvGW.js", "/assets/x-BnZzlBua.js", "/assets/triangle-alert-UzsXw-lW.js", "/assets/shield-BExVQaaU.js", "/assets/deal-brief-fn-C9nwz89C.js"] }, "/app/deal-room/$id_/nda": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-room.$id_.nda.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-room._id_.nda-CI45JLhZ.js", "/assets/shield-BExVQaaU.js", "/assets/loader-circle-CjFNFJ2Z.js", "/assets/lock-BBVIJgt4.js"] } }, clientEntry: "/assets/index-CyfykXr5.js" });
+    tsrStartManifest = () => ({ routes: { __root__: { filePath: "/workspaces/VCRoom-main/frontend/src/routes/__root.tsx", children: ["/", "/about", "/app", "/debug", "/forgot-password", "/founders", "/investors", "/pricing", "/privacy", "/sign-in", "/sign-up", "/terms", "/api/test-ai", "/auth/callback", "/join/$token", "/solutions/due-diligence", "/solutions/fundraising-crm", "/solutions/investor-pipeline", "/solutions/raise-1m", "/solutions/vc-deal-room"], assets: void 0, preloads: ["/assets/index-Cg-gjIuQ.js"] }, "/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/index.tsx", children: void 0, assets: void 0, preloads: ["/assets/index-DBhpF2-S.js", "/assets/SiteFooter-NQwEuZ1Q.js", "/assets/AppPreview-BQIbx08t.js", "/assets/arrow-right-B3TKFX8S.js", "/assets/triangle-alert-8XvsMsH5.js", "/assets/users-DMWCwNsD.js", "/assets/sparkles-V16TByBk.js", "/assets/briefcase-Dwk_NTMb.js", "/assets/shield-check-lo6N1BXQ.js", "/assets/file-text-BfkpzkHW.js", "/assets/list-checks-CX41f78f.js", "/assets/layers-eE7x8NZg.js", "/assets/circle-check-qwKYgVRR.js", "/assets/message-square-T3SwQCaq.js", "/assets/Logo-CU2qDVda.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BB8gQSTv.js", "/assets/createLucideIcon-Dl7r67Lh.js", "/assets/globe-BmDgRoiM.js", "/assets/layout-grid-Cn-y7IZv.js", "/assets/search-0kOZYTSu.js", "/assets/bell-DTna1AL8.js", "/assets/trending-up-D1HHLZNL.js", "/assets/chevron-right-CpAhmULm.js", "/assets/arrow-up-right-_YClZU3P.js"] }, "/about": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/about.tsx", children: void 0, assets: void 0, preloads: ["/assets/about-Cs3RzCxb.js", "/assets/SiteFooter-NQwEuZ1Q.js", "/assets/arrow-right-B3TKFX8S.js", "/assets/Logo-CU2qDVda.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BB8gQSTv.js", "/assets/createLucideIcon-Dl7r67Lh.js", "/assets/globe-BmDgRoiM.js"] }, "/app": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.tsx", children: ["/app/advisor", "/app/audit", "/app/deal-rooms", "/app/documents", "/app/email", "/app/investor", "/app/leads", "/app/meetings", "/app/messages", "/app/notifications", "/app/pipeline", "/app/profile", "/app/reports", "/app/settings", "/app/users", "/app/", "/app/deal-room/$id", "/app/deal-room/$id_/nda"], assets: void 0, preloads: ["/assets/app-DYlxzVoq.js", "/assets/useRouterState-CE9wIVUR.js", "/assets/Logo-CU2qDVda.js", "/assets/useQuery-RkEEo8_Q.js", "/assets/utils-BQHNewu7.js", "/assets/bell-DTna1AL8.js", "/assets/check-check-Cine_0m0.js", "/assets/formatDistanceToNow-BCR7E-0-.js", "/assets/briefcase-Dwk_NTMb.js", "/assets/message-square-T3SwQCaq.js", "/assets/user-plus-DrOz4Do4.js", "/assets/sparkles-V16TByBk.js", "/assets/settings-f63SdyOn.js", "/assets/user-BWs8zEoe.js", "/assets/users-DMWCwNsD.js", "/assets/shield-check-lo6N1BXQ.js", "/assets/store-D3lJ7cOh.js", "/assets/LangSwitcher-BB8gQSTv.js", "/assets/createLucideIcon-Dl7r67Lh.js", "/assets/layout-grid-Cn-y7IZv.js", "/assets/inbox-B9s3qj-U.js", "/assets/kanban-BdK6Cj-J.js", "/assets/building-2-C0_FReJs.js", "/assets/clipboard-check-GFckQinM.js", "/assets/brain-ebiqEbnn.js", "/assets/chart-pie-urECB6e6.js", "/assets/calendar-D7oKaO4n.js", "/assets/file-text-BfkpzkHW.js", "/assets/chart-column-PNohOnC4.js", "/assets/search-0kOZYTSu.js", "/assets/plus-DmrIC_XD.js", "/assets/en-US-DJvzb04W.js", "/assets/globe-BmDgRoiM.js"] }, "/debug": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/debug.tsx", children: void 0, assets: void 0, preloads: ["/assets/debug-CDCFdAA9.js"] }, "/forgot-password": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/forgot-password.tsx", children: void 0, assets: void 0, preloads: ["/assets/forgot-password-BhLzFUXL.js"] }, "/founders": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/founders.tsx", children: void 0, assets: void 0, preloads: ["/assets/founders-DV8NyF9r.js", "/assets/SolutionPage-psUe_p61.js", "/assets/users-DMWCwNsD.js", "/assets/SiteFooter-NQwEuZ1Q.js", "/assets/Logo-CU2qDVda.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BB8gQSTv.js", "/assets/createLucideIcon-Dl7r67Lh.js", "/assets/globe-BmDgRoiM.js", "/assets/arrow-right-B3TKFX8S.js", "/assets/AppPreview-BQIbx08t.js", "/assets/layout-grid-Cn-y7IZv.js", "/assets/file-text-BfkpzkHW.js", "/assets/message-square-T3SwQCaq.js", "/assets/sparkles-V16TByBk.js", "/assets/search-0kOZYTSu.js", "/assets/bell-DTna1AL8.js", "/assets/trending-up-D1HHLZNL.js", "/assets/chevron-right-CpAhmULm.js", "/assets/arrow-up-right-_YClZU3P.js", "/assets/check-BHep8LNT.js"] }, "/investors": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/investors.tsx", children: void 0, assets: void 0, preloads: ["/assets/investors-BLOO_5u7.js", "/assets/SolutionPage-psUe_p61.js", "/assets/briefcase-Dwk_NTMb.js", "/assets/SiteFooter-NQwEuZ1Q.js", "/assets/Logo-CU2qDVda.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BB8gQSTv.js", "/assets/createLucideIcon-Dl7r67Lh.js", "/assets/globe-BmDgRoiM.js", "/assets/arrow-right-B3TKFX8S.js", "/assets/AppPreview-BQIbx08t.js", "/assets/layout-grid-Cn-y7IZv.js", "/assets/users-DMWCwNsD.js", "/assets/file-text-BfkpzkHW.js", "/assets/message-square-T3SwQCaq.js", "/assets/sparkles-V16TByBk.js", "/assets/search-0kOZYTSu.js", "/assets/bell-DTna1AL8.js", "/assets/trending-up-D1HHLZNL.js", "/assets/chevron-right-CpAhmULm.js", "/assets/arrow-up-right-_YClZU3P.js", "/assets/check-BHep8LNT.js"] }, "/pricing": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/pricing.tsx", children: void 0, assets: void 0, preloads: ["/assets/pricing-DKw3t0zy.js", "/assets/SiteFooter-NQwEuZ1Q.js", "/assets/arrow-right-B3TKFX8S.js", "/assets/check-BHep8LNT.js", "/assets/Logo-CU2qDVda.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BB8gQSTv.js", "/assets/createLucideIcon-Dl7r67Lh.js", "/assets/globe-BmDgRoiM.js"] }, "/privacy": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/privacy.tsx", children: void 0, assets: void 0, preloads: ["/assets/privacy-SB7XE2-P.js", "/assets/SiteFooter-NQwEuZ1Q.js", "/assets/Logo-CU2qDVda.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BB8gQSTv.js", "/assets/createLucideIcon-Dl7r67Lh.js", "/assets/globe-BmDgRoiM.js", "/assets/arrow-right-B3TKFX8S.js"] }, "/sign-in": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/sign-in.tsx", children: void 0, assets: void 0, preloads: ["/assets/sign-in-N11pUr9j.js"] }, "/sign-up": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/sign-up.tsx", children: void 0, assets: void 0, preloads: ["/assets/sign-up-D0IDjfwC.js"] }, "/terms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/terms.tsx", children: void 0, assets: void 0, preloads: ["/assets/terms-CFzOzhgD.js", "/assets/SiteFooter-NQwEuZ1Q.js", "/assets/Logo-CU2qDVda.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BB8gQSTv.js", "/assets/createLucideIcon-Dl7r67Lh.js", "/assets/globe-BmDgRoiM.js", "/assets/arrow-right-B3TKFX8S.js"] }, "/api/test-ai": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/api.test-ai.tsx", children: void 0, assets: void 0, preloads: ["/assets/api.test-ai-Be3AARn9.js"] }, "/app/advisor": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.advisor.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.advisor-lv-uDY77.js", "/assets/loader-circle-Br4FFRN-.js", "/assets/send-DaZC4JtL.js"] }, "/app/audit": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.audit.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.audit-DDLymb8u.js", "/assets/download-FPx02rqy.js", "/assets/activity-Dblrzx9P.js", "/assets/triangle-alert-8XvsMsH5.js"] }, "/app/deal-rooms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-rooms.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-rooms-ws1iM-rl.js", "/assets/loader-circle-Br4FFRN-.js", "/assets/arrow-up-right-_YClZU3P.js", "/assets/x-kW-VEnhi.js"] }, "/app/documents": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.documents.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.documents-zv253pWA.js", "/assets/list-DLHGhhRh.js", "/assets/upload-CaRFMJzR.js", "/assets/circle-check-qwKYgVRR.js", "/assets/triangle-alert-8XvsMsH5.js", "/assets/download-FPx02rqy.js", "/assets/trash-2-BNoU21-Y.js", "/assets/loader-circle-Br4FFRN-.js", "/assets/x-kW-VEnhi.js", "/assets/video-Cd2D_SRs.js"] }, "/app/email": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.email.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.email-rp8X-iIj.js", "/assets/backend-B5nrjGvD.js", "/assets/copy-d5CZopPc.js", "/assets/send-DaZC4JtL.js"] }, "/app/investor": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.tsx", children: ["/app/investor/analysis", "/app/investor/deal-flow", "/app/investor/deal-rooms", "/app/investor/decisions", "/app/investor/diligence", "/app/investor/pipeline", "/app/investor/portfolio", "/app/investor/startups", "/app/investor/team", "/app/investor/"], assets: void 0, preloads: ["/assets/app.investor-CeqUpUoI.js"] }, "/app/leads": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.leads.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.leads-BsvqJ6E7.js", "/assets/LeadDrawer-xnufrLBx.js", "/assets/download-FPx02rqy.js", "/assets/upload-CaRFMJzR.js", "/assets/trending-up-D1HHLZNL.js", "/assets/zap-BRSuaZmz.js", "/assets/x-kW-VEnhi.js", "/assets/loader-circle-Br4FFRN-.js", "/assets/circle-alert-CFRpU1QT.js", "/assets/copy-d5CZopPc.js", "/assets/check-BHep8LNT.js", "/assets/clock-RLg_bvWn.js", "/assets/trash-2-BNoU21-Y.js", "/assets/chevron-down-D41pDEuf.js", "/assets/chevron-right-CpAhmULm.js"] }, "/app/meetings": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.meetings.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.meetings-DBJ52hgo.js", "/assets/format-CjS2oCz0.js", "/assets/loader-circle-Br4FFRN-.js", "/assets/chevron-down-D41pDEuf.js", "/assets/chevron-right-CpAhmULm.js", "/assets/clock-RLg_bvWn.js", "/assets/video-Cd2D_SRs.js", "/assets/external-link-BY0H28te.js"] }, "/app/messages": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.messages.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.messages-DEymeAYj.js"] }, "/app/notifications": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.notifications.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.notifications-CopqmaFw.js"] }, "/app/pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.pipeline-CRplECnv.js", "/assets/LeadDrawer-xnufrLBx.js", "/assets/loader-circle-Br4FFRN-.js", "/assets/funnel-CGluylx-.js", "/assets/arrow-up-right-_YClZU3P.js", "/assets/x-kW-VEnhi.js", "/assets/copy-d5CZopPc.js", "/assets/check-BHep8LNT.js", "/assets/clock-RLg_bvWn.js", "/assets/trash-2-BNoU21-Y.js", "/assets/chevron-down-D41pDEuf.js", "/assets/chevron-right-CpAhmULm.js"] }, "/app/profile": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.profile.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.profile-ERCW6eLn.js", "/assets/download-FPx02rqy.js", "/assets/loader-circle-Br4FFRN-.js", "/assets/upload-CaRFMJzR.js", "/assets/zap-BRSuaZmz.js", "/assets/x-kW-VEnhi.js", "/assets/check-BHep8LNT.js", "/assets/trash-2-BNoU21-Y.js"] }, "/app/reports": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.reports.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.reports-C53syfz2.js", "/assets/loader-circle-Br4FFRN-.js", "/assets/trending-up-D1HHLZNL.js", "/assets/download-FPx02rqy.js"] }, "/app/settings": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.tsx", children: ["/app/settings/billing", "/app/settings/domain", "/app/settings/notifications", "/app/settings/security"], assets: void 0, preloads: ["/assets/app.settings-Fusmad_b.js", "/assets/credit-card-DUSQgWx-.js", "/assets/shield-T_RLSPbg.js", "/assets/trash-2-BNoU21-Y.js"] }, "/app/users": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.users.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.users-B0rZfwpE.js", "/assets/mail-KW8QgRk1.js", "/assets/copy-d5CZopPc.js", "/assets/x-kW-VEnhi.js", "/assets/check-BHep8LNT.js", "/assets/loader-circle-Br4FFRN-.js"] }, "/auth/callback": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/auth.callback.tsx", children: void 0, assets: void 0, preloads: ["/assets/auth.callback-BgB3G1qt.js"] }, "/join/$token": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/join.$token.tsx", children: void 0, assets: void 0, preloads: ["/assets/join._token-DQF-dk36.js", "/assets/Logo-CU2qDVda.js", "/assets/triangle-alert-8XvsMsH5.js", "/assets/check-BHep8LNT.js", "/assets/arrow-right-B3TKFX8S.js", "/assets/shield-check-lo6N1BXQ.js", "/assets/lock-oVMNkgV8.js", "/assets/createLucideIcon-Dl7r67Lh.js"] }, "/solutions/due-diligence": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.due-diligence.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.due-diligence-DF-Jc1mN.js", "/assets/SolutionPage-psUe_p61.js", "/assets/list-checks-CX41f78f.js", "/assets/SiteFooter-NQwEuZ1Q.js", "/assets/Logo-CU2qDVda.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BB8gQSTv.js", "/assets/createLucideIcon-Dl7r67Lh.js", "/assets/globe-BmDgRoiM.js", "/assets/arrow-right-B3TKFX8S.js", "/assets/AppPreview-BQIbx08t.js", "/assets/layout-grid-Cn-y7IZv.js", "/assets/users-DMWCwNsD.js", "/assets/file-text-BfkpzkHW.js", "/assets/message-square-T3SwQCaq.js", "/assets/sparkles-V16TByBk.js", "/assets/search-0kOZYTSu.js", "/assets/bell-DTna1AL8.js", "/assets/trending-up-D1HHLZNL.js", "/assets/chevron-right-CpAhmULm.js", "/assets/arrow-up-right-_YClZU3P.js", "/assets/check-BHep8LNT.js"] }, "/solutions/fundraising-crm": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.fundraising-crm.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.fundraising-crm-COemMMAl.js", "/assets/SolutionPage-psUe_p61.js", "/assets/layers-eE7x8NZg.js", "/assets/SiteFooter-NQwEuZ1Q.js", "/assets/Logo-CU2qDVda.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BB8gQSTv.js", "/assets/createLucideIcon-Dl7r67Lh.js", "/assets/globe-BmDgRoiM.js", "/assets/arrow-right-B3TKFX8S.js", "/assets/AppPreview-BQIbx08t.js", "/assets/layout-grid-Cn-y7IZv.js", "/assets/users-DMWCwNsD.js", "/assets/file-text-BfkpzkHW.js", "/assets/message-square-T3SwQCaq.js", "/assets/sparkles-V16TByBk.js", "/assets/search-0kOZYTSu.js", "/assets/bell-DTna1AL8.js", "/assets/trending-up-D1HHLZNL.js", "/assets/chevron-right-CpAhmULm.js", "/assets/arrow-up-right-_YClZU3P.js", "/assets/check-BHep8LNT.js"] }, "/solutions/investor-pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.investor-pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.investor-pipeline-BgSB0WJ-.js", "/assets/SolutionPage-psUe_p61.js", "/assets/trending-up-D1HHLZNL.js", "/assets/SiteFooter-NQwEuZ1Q.js", "/assets/Logo-CU2qDVda.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BB8gQSTv.js", "/assets/createLucideIcon-Dl7r67Lh.js", "/assets/globe-BmDgRoiM.js", "/assets/arrow-right-B3TKFX8S.js", "/assets/AppPreview-BQIbx08t.js", "/assets/layout-grid-Cn-y7IZv.js", "/assets/users-DMWCwNsD.js", "/assets/file-text-BfkpzkHW.js", "/assets/message-square-T3SwQCaq.js", "/assets/sparkles-V16TByBk.js", "/assets/search-0kOZYTSu.js", "/assets/bell-DTna1AL8.js", "/assets/chevron-right-CpAhmULm.js", "/assets/arrow-up-right-_YClZU3P.js", "/assets/check-BHep8LNT.js"] }, "/solutions/raise-1m": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.raise-1m.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.raise-1m-B82LIZXV.js", "/assets/SolutionPage-psUe_p61.js", "/assets/sparkles-V16TByBk.js", "/assets/SiteFooter-NQwEuZ1Q.js", "/assets/Logo-CU2qDVda.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BB8gQSTv.js", "/assets/createLucideIcon-Dl7r67Lh.js", "/assets/globe-BmDgRoiM.js", "/assets/arrow-right-B3TKFX8S.js", "/assets/AppPreview-BQIbx08t.js", "/assets/layout-grid-Cn-y7IZv.js", "/assets/users-DMWCwNsD.js", "/assets/file-text-BfkpzkHW.js", "/assets/message-square-T3SwQCaq.js", "/assets/search-0kOZYTSu.js", "/assets/bell-DTna1AL8.js", "/assets/trending-up-D1HHLZNL.js", "/assets/chevron-right-CpAhmULm.js", "/assets/arrow-up-right-_YClZU3P.js", "/assets/check-BHep8LNT.js"] }, "/solutions/vc-deal-room": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.vc-deal-room.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.vc-deal-room-GNDQ_Epc.js", "/assets/SolutionPage-psUe_p61.js", "/assets/briefcase-Dwk_NTMb.js", "/assets/SiteFooter-NQwEuZ1Q.js", "/assets/Logo-CU2qDVda.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-BB8gQSTv.js", "/assets/createLucideIcon-Dl7r67Lh.js", "/assets/globe-BmDgRoiM.js", "/assets/arrow-right-B3TKFX8S.js", "/assets/AppPreview-BQIbx08t.js", "/assets/layout-grid-Cn-y7IZv.js", "/assets/users-DMWCwNsD.js", "/assets/file-text-BfkpzkHW.js", "/assets/message-square-T3SwQCaq.js", "/assets/sparkles-V16TByBk.js", "/assets/search-0kOZYTSu.js", "/assets/bell-DTna1AL8.js", "/assets/trending-up-D1HHLZNL.js", "/assets/chevron-right-CpAhmULm.js", "/assets/arrow-up-right-_YClZU3P.js", "/assets/check-BHep8LNT.js"] }, "/app/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.index.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.index-D2k_wan4.js", "/assets/loader-circle-Br4FFRN-.js", "/assets/circle-question-mark-DOBjh897.js", "/assets/mail-KW8QgRk1.js", "/assets/arrow-up-right-_YClZU3P.js", "/assets/format-CjS2oCz0.js", "/assets/circle-check-qwKYgVRR.js", "/assets/circle-alert-CFRpU1QT.js", "/assets/external-link-BY0H28te.js", "/assets/clock-RLg_bvWn.js", "/assets/x-kW-VEnhi.js", "/assets/trending-up-D1HHLZNL.js"] }, "/app/deal-room/$id": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-room.$id.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-room._id-DYniHPsW.js", "/assets/backend-B5nrjGvD.js", "/assets/loader-circle-Br4FFRN-.js", "/assets/send-DaZC4JtL.js", "/assets/funnel-CGluylx-.js", "/assets/triangle-alert-8XvsMsH5.js", "/assets/circle-BjkMuAu-.js", "/assets/clock-RLg_bvWn.js", "/assets/circle-check-qwKYgVRR.js", "/assets/upload-CaRFMJzR.js", "/assets/x-kW-VEnhi.js", "/assets/chevron-down-D41pDEuf.js", "/assets/chevron-right-CpAhmULm.js", "/assets/download-FPx02rqy.js", "/assets/arrow-right-B3TKFX8S.js", "/assets/list-checks-CX41f78f.js", "/assets/activity-Dblrzx9P.js", "/assets/lock-oVMNkgV8.js", "/assets/circle-question-mark-DOBjh897.js", "/assets/external-link-BY0H28te.js", "/assets/shield-T_RLSPbg.js", "/assets/format-CjS2oCz0.js"] }, "/app/investor/analysis": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.analysis.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.analysis-BpL3hz1L.js", "/assets/deal-brief-fn-Drv39SVr.js", "/assets/loader-circle-Br4FFRN-.js", "/assets/circle-check-qwKYgVRR.js", "/assets/triangle-alert-8XvsMsH5.js", "/assets/download-FPx02rqy.js"] }, "/app/investor/deal-flow": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.deal-flow.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.deal-flow-CVqHJlBz.js", "/assets/clock-RLg_bvWn.js"] }, "/app/investor/deal-rooms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.deal-rooms.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.deal-rooms-BtvFeYKp.js", "/assets/shield-T_RLSPbg.js", "/assets/clock-RLg_bvWn.js"] }, "/app/investor/decisions": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.decisions.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.decisions-BbehLvUt.js", "/assets/check-BHep8LNT.js", "/assets/x-kW-VEnhi.js", "/assets/clock-RLg_bvWn.js"] }, "/app/investor/diligence": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.diligence.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.diligence-N0GlolRv.js", "/assets/circle-check-qwKYgVRR.js", "/assets/circle-BjkMuAu-.js"] }, "/app/investor/pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.pipeline-CXymcV8Q.js", "/assets/list-DLHGhhRh.js", "/assets/clock-RLg_bvWn.js"] }, "/app/investor/portfolio": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.portfolio.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.portfolio-DS7PucbL.js", "/assets/trending-up-D1HHLZNL.js", "/assets/clock-RLg_bvWn.js"] }, "/app/investor/startups": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.startups.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.startups-B_glN4K9.js", "/assets/external-link-BY0H28te.js", "/assets/clock-RLg_bvWn.js"] }, "/app/investor/team": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.team.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.team-Ddza2EhN.js", "/assets/x-kW-VEnhi.js", "/assets/mail-KW8QgRk1.js", "/assets/loader-circle-Br4FFRN-.js", "/assets/clock-RLg_bvWn.js"] }, "/app/settings/billing": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.billing.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.billing-C5Z_OhqU.js", "/assets/check-BHep8LNT.js", "/assets/download-FPx02rqy.js"] }, "/app/settings/domain": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.domain.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.domain-IJ_mfKb6.js", "/assets/circle-check-qwKYgVRR.js", "/assets/copy-d5CZopPc.js", "/assets/mail-KW8QgRk1.js"] }, "/app/settings/notifications": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.notifications.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.notifications-BnAOgeZu.js", "/assets/mail-KW8QgRk1.js", "/assets/smartphone-0c2y9_AY.js"] }, "/app/settings/security": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.security.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.security-DkeEDlqy.js", "/assets/smartphone-0c2y9_AY.js", "/assets/triangle-alert-8XvsMsH5.js"] }, "/app/investor/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.index.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.index-Fx3t9wiw.js", "/assets/circle-check-qwKYgVRR.js", "/assets/clock-RLg_bvWn.js", "/assets/circle-alert-CFRpU1QT.js", "/assets/arrow-right-B3TKFX8S.js", "/assets/x-kW-VEnhi.js", "/assets/triangle-alert-8XvsMsH5.js", "/assets/shield-T_RLSPbg.js", "/assets/deal-brief-fn-Drv39SVr.js"] }, "/app/deal-room/$id_/nda": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-room.$id_.nda.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-room._id_.nda-DCUs9mrT.js", "/assets/shield-T_RLSPbg.js", "/assets/loader-circle-Br4FFRN-.js", "/assets/lock-oVMNkgV8.js"] } }, clientEntry: "/assets/index-Cg-gjIuQ.js" });
   }
 });
 
@@ -47521,112 +47521,13 @@ var init_dist6 = __esm({
   }
 });
 
-// dist/server/assets/advisor-fn-DV-FYqJi.js
-var advisor_fn_DV_FYqJi_exports = {};
-__export(advisor_fn_DV_FYqJi_exports, {
-  getAIAdvice_createServerFn_handler: () => getAIAdvice_createServerFn_handler
-});
-import "node:async_hooks";
-var import_react12, import_jsx_runtime17, getAIAdvice_createServerFn_handler, getAIAdvice;
-var init_advisor_fn_DV_FYqJi = __esm({
-  "dist/server/assets/advisor-fn-DV-FYqJi.js"() {
-    "use strict";
-    init_createServerRpc_D_6bKnO();
-    init_dist6();
-    init_server4();
-    init_production();
-    import_react12 = __toESM(require_react(), 1);
-    import_jsx_runtime17 = __toESM(require_jsx_runtime(), 1);
-    getAIAdvice_createServerFn_handler = createServerRpc({
-      id: "397b3f65700da6e488c63bfeb016aac33e5f67ff2f57bcca85b9c84f5eace701",
-      name: "getAIAdvice",
-      filename: "src/lib/advisor-fn.ts"
-    }, (opts) => getAIAdvice.__executeServer(opts));
-    getAIAdvice = createServerFn({
-      method: "POST"
-    }).inputValidator((data) => data).handler(getAIAdvice_createServerFn_handler, async ({
-      data
-    }) => {
-      const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || void 0 || "";
-      const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
-      const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
-      if (!openAIKey) {
-        return {
-          reply: "AI Advisor is not configured yet. Please add your OpenAI API key to get started.",
-          error: "missing_key"
-        };
-      }
-      let context = "";
-      {
-        try {
-          const admin = createClient(supabaseUrl, supabaseKey);
-          const [{
-            data: startup
-          }, {
-            data: leads
-          }, {
-            data: meetings
-          }] = await Promise.all([admin.from("startups").select("company_name, stage, sector, funding_target, revenue, traction").eq("founder_id", data.userId).maybeSingle(), admin.from("vc_leads").select("investor_name, firm_name, status, follow_up_date").eq("founder_id", data.userId), admin.from("meetings").select("title, scheduled_at").eq("created_by", data.userId).gte("scheduled_at", (/* @__PURE__ */ new Date()).toISOString()).limit(3)]);
-          if (startup) {
-            context = [`Company: ${startup.company_name || "Not set"}`, `Stage: ${startup.stage || "Not set"}`, `Sector: ${startup.sector || "Not set"}`, `Raising: ${startup.funding_target || "Not set"}`, `ARR: ${startup.revenue || "Not set"}`, `Total leads: ${leads?.length || 0}`, `Upcoming meetings: ${meetings?.length || 0}`].join("\n");
-          }
-        } catch (e) {
-          console.error("Context fetch failed:", e);
-        }
-      }
-      const systemPrompt2 = ["You are an expert fundraising advisor for startup founders.", context ? `
-Current context:
-${context}` : "", "\nHelp with: pipeline strategy, investor outreach, meeting prep, deal room advice.", "Be specific, direct, and actionable. Max 150 words. End with one clear next action."].join("");
-      try {
-        const response = await fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${openAIKey}`
-          },
-          body: JSON.stringify({
-            model: "gpt-4o-mini",
-            max_tokens: 400,
-            messages: [{
-              role: "system",
-              content: systemPrompt2
-            }, ...data.history.slice(-6), {
-              role: "user",
-              content: data.message
-            }]
-          })
-        });
-        if (!response.ok) {
-          const err = await response.json().catch(() => ({}));
-          console.error("OpenAI error:", err);
-          return {
-            reply: `AI error: ${err?.error?.message || "Unknown error"}`,
-            error: "api_error"
-          };
-        }
-        const result = await response.json();
-        return {
-          reply: result.choices[0].message.content,
-          error: null
-        };
-      } catch (err) {
-        console.error("Fetch error:", err);
-        return {
-          reply: "Connection error. Please try again.",
-          error: "fetch_error"
-        };
-      }
-    });
-  }
-});
-
 // dist/server/assets/deal-brief-fn-DafvcXP-.js
 var deal_brief_fn_DafvcXP_exports = {};
 __export(deal_brief_fn_DafvcXP_exports, {
   generateDealBrief_createServerFn_handler: () => generateDealBrief_createServerFn_handler
 });
 import "node:async_hooks";
-var import_react13, import_jsx_runtime18, generateDealBrief_createServerFn_handler, generateDealBrief;
+var import_react12, import_jsx_runtime17, generateDealBrief_createServerFn_handler, generateDealBrief;
 var init_deal_brief_fn_DafvcXP = __esm({
   "dist/server/assets/deal-brief-fn-DafvcXP-.js"() {
     "use strict";
@@ -47634,8 +47535,8 @@ var init_deal_brief_fn_DafvcXP = __esm({
     init_dist6();
     init_server4();
     init_production();
-    import_react13 = __toESM(require_react(), 1);
-    import_jsx_runtime18 = __toESM(require_jsx_runtime(), 1);
+    import_react12 = __toESM(require_react(), 1);
+    import_jsx_runtime17 = __toESM(require_jsx_runtime(), 1);
     generateDealBrief_createServerFn_handler = createServerRpc({
       id: "56f68b50d6d653ae4f4287eb005bbb35fecea7fa7ce69a4b2a6cc974383a502e",
       name: "generateDealBrief",
@@ -47719,15 +47620,114 @@ Recent activity: ${activitySummary || "None"}`;
   }
 });
 
-// dist/server/assets/ai-fn-DAj5FUH2.js
-var ai_fn_DAj5FUH2_exports = {};
-__export(ai_fn_DAj5FUH2_exports, {
-  generateOutreachEmail_createServerFn_handler: () => generateOutreachEmail_createServerFn_handler
+// dist/server/assets/advisor-fn-BaFZ-RXF.js
+var advisor_fn_BaFZ_RXF_exports = {};
+__export(advisor_fn_BaFZ_RXF_exports, {
+  getAIAdvice_createServerFn_handler: () => getAIAdvice_createServerFn_handler
 });
 import "node:async_hooks";
-var import_react14, import_jsx_runtime19, systemPrompt, generateOutreachEmail_createServerFn_handler, generateOutreachEmail;
-var init_ai_fn_DAj5FUH2 = __esm({
-  "dist/server/assets/ai-fn-DAj5FUH2.js"() {
+var import_react13, import_jsx_runtime18, getAIAdvice_createServerFn_handler, getAIAdvice;
+var init_advisor_fn_BaFZ_RXF = __esm({
+  "dist/server/assets/advisor-fn-BaFZ-RXF.js"() {
+    "use strict";
+    init_createServerRpc_D_6bKnO();
+    init_dist6();
+    init_server4();
+    init_production();
+    import_react13 = __toESM(require_react(), 1);
+    import_jsx_runtime18 = __toESM(require_jsx_runtime(), 1);
+    getAIAdvice_createServerFn_handler = createServerRpc({
+      id: "397b3f65700da6e488c63bfeb016aac33e5f67ff2f57bcca85b9c84f5eace701",
+      name: "getAIAdvice",
+      filename: "src/lib/advisor-fn.ts"
+    }, (opts) => getAIAdvice.__executeServer(opts));
+    getAIAdvice = createServerFn({
+      method: "POST"
+    }).inputValidator((data) => data).handler(getAIAdvice_createServerFn_handler, async ({
+      data
+    }) => {
+      const openAIKey = data.openAIKey || process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || "";
+      const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
+      const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
+      if (!openAIKey) {
+        return {
+          reply: "AI Advisor is not configured yet. Please add your OpenAI API key to get started.",
+          error: "missing_key"
+        };
+      }
+      let context = "";
+      {
+        try {
+          const admin = createClient(supabaseUrl, supabaseKey);
+          const [{
+            data: startup
+          }, {
+            data: leads
+          }, {
+            data: meetings
+          }] = await Promise.all([admin.from("startups").select("company_name, stage, sector, funding_target, revenue, traction").eq("founder_id", data.userId).maybeSingle(), admin.from("vc_leads").select("investor_name, firm_name, status, follow_up_date").eq("founder_id", data.userId), admin.from("meetings").select("title, scheduled_at").eq("created_by", data.userId).gte("scheduled_at", (/* @__PURE__ */ new Date()).toISOString()).limit(3)]);
+          if (startup) {
+            context = [`Company: ${startup.company_name || "Not set"}`, `Stage: ${startup.stage || "Not set"}`, `Sector: ${startup.sector || "Not set"}`, `Raising: ${startup.funding_target || "Not set"}`, `ARR: ${startup.revenue || "Not set"}`, `Total leads: ${leads?.length || 0}`, `Upcoming meetings: ${meetings?.length || 0}`].join("\n");
+          }
+        } catch (e) {
+          console.error("Context fetch failed:", e);
+        }
+      }
+      const systemPrompt2 = ["You are an expert fundraising advisor for startup founders.", context ? `
+Current context:
+${context}` : "", "\nHelp with: pipeline strategy, investor outreach, meeting prep, deal room advice.", "Be specific, direct, and actionable. Max 150 words. End with one clear next action."].join("");
+      try {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${openAIKey}`
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            max_tokens: 400,
+            messages: [{
+              role: "system",
+              content: systemPrompt2
+            }, ...data.history.slice(-6), {
+              role: "user",
+              content: data.message
+            }]
+          })
+        });
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          console.error("OpenAI error:", err);
+          return {
+            reply: `AI error: ${err?.error?.message || "Unknown error"}`,
+            error: "api_error"
+          };
+        }
+        const result = await response.json();
+        return {
+          reply: result.choices[0].message.content,
+          error: null
+        };
+      } catch (err) {
+        console.error("Fetch error:", err);
+        return {
+          reply: "Connection error. Please try again.",
+          error: "fetch_error"
+        };
+      }
+    });
+  }
+});
+
+// dist/server/assets/reply-fn-B_ummABI.js
+var reply_fn_B_ummABI_exports = {};
+__export(reply_fn_B_ummABI_exports, {
+  generateReply_createServerFn_handler: () => generateReply_createServerFn_handler
+});
+import "node:async_hooks";
+var import_react14, import_jsx_runtime19, generateReply_createServerFn_handler, generateReply;
+var init_reply_fn_B_ummABI = __esm({
+  "dist/server/assets/reply-fn-B_ummABI.js"() {
     "use strict";
     init_createServerRpc_D_6bKnO();
     init_dist6();
@@ -47735,6 +47735,164 @@ var init_ai_fn_DAj5FUH2 = __esm({
     init_production();
     import_react14 = __toESM(require_react(), 1);
     import_jsx_runtime19 = __toESM(require_jsx_runtime(), 1);
+    generateReply_createServerFn_handler = createServerRpc({
+      id: "08b07e340aa3dd2c22b3ea45b5ff6e1a1e3844f3dadeb4cfd75858793e9c8fb3",
+      name: "generateReply",
+      filename: "src/lib/reply-fn.ts"
+    }, (opts) => generateReply.__executeServer(opts));
+    generateReply = createServerFn({
+      method: "POST"
+    }).inputValidator((data) => data).handler(generateReply_createServerFn_handler, async ({
+      data
+    }) => {
+      const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
+      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
+      const openAIKey = data.openAIKey || process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || void 0 || "";
+      const adminClient = createClient(supabaseUrl, serviceKey);
+      const {
+        data: lead,
+        error: leadErr
+      } = await adminClient.from("vc_leads").select("*").eq("id", data.leadId).single();
+      if (leadErr || !lead) throw new Error("Lead not found");
+      if (lead.founder_id !== data.userId) throw new Error("Unauthorized");
+      const {
+        data: startup
+      } = await adminClient.from("startups").select("company_name, sector, stage, funding_target, founder_name").eq("founder_id", data.userId).limit(1).maybeSingle();
+      const userPrompt = `The investor ${lead.investor_name}${lead.firm_name ? ` from ${lead.firm_name}` : ""} replied to the founder:
+
+"${data.investorReply}"
+
+Write a professional follow-up reply from ${startup?.founder_name ?? "the founder"} of ${startup?.company_name ?? "the startup"}.
+Current lead status: ${lead.status}.
+Keep it under 150 words. Be warm, professional, and move the conversation forward.`;
+      if (!openAIKey) throw new Error("OpenAI not configured");
+      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${openAIKey}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          max_tokens: 300,
+          temperature: 0.7,
+          messages: [{
+            role: "system",
+            content: "You write professional email replies for startup founders responding to investors. Return only the reply text, no subject line, no explanation."
+          }, {
+            role: "user",
+            content: userPrompt
+          }]
+        })
+      });
+      if (!resp.ok) throw new Error("OpenAI request failed");
+      const json = await resp.json();
+      const reply = (json.choices[0]?.message?.content ?? "").trim();
+      if (!reply) throw new Error("Invalid AI response");
+      await adminClient.from("ai_usage").insert({
+        user_id: data.userId,
+        action: "reply_gen"
+      });
+      return {
+        reply
+      };
+    });
+  }
+});
+
+// dist/server/assets/linkedin-fn-B9qUM3Ah.js
+var linkedin_fn_B9qUM3Ah_exports = {};
+__export(linkedin_fn_B9qUM3Ah_exports, {
+  generateLinkedInMessage_createServerFn_handler: () => generateLinkedInMessage_createServerFn_handler
+});
+import "node:async_hooks";
+var import_react15, import_jsx_runtime20, generateLinkedInMessage_createServerFn_handler, generateLinkedInMessage;
+var init_linkedin_fn_B9qUM3Ah = __esm({
+  "dist/server/assets/linkedin-fn-B9qUM3Ah.js"() {
+    "use strict";
+    init_createServerRpc_D_6bKnO();
+    init_dist6();
+    init_server4();
+    init_production();
+    import_react15 = __toESM(require_react(), 1);
+    import_jsx_runtime20 = __toESM(require_jsx_runtime(), 1);
+    generateLinkedInMessage_createServerFn_handler = createServerRpc({
+      id: "272077c9c144c7cbae7da95efd3b0536517866897833aab391e7e9e60debb102",
+      name: "generateLinkedInMessage",
+      filename: "src/lib/linkedin-fn.ts"
+    }, (opts) => generateLinkedInMessage.__executeServer(opts));
+    generateLinkedInMessage = createServerFn({
+      method: "POST"
+    }).inputValidator((data) => data).handler(generateLinkedInMessage_createServerFn_handler, async ({
+      data
+    }) => {
+      const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
+      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
+      const openAIKey = data.openAIKey || process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || void 0 || "";
+      const adminClient = createClient(supabaseUrl, serviceKey);
+      const {
+        data: lead,
+        error: leadErr
+      } = await adminClient.from("vc_leads").select("*").eq("id", data.leadId).single();
+      if (leadErr || !lead) throw new Error("Lead not found");
+      if (lead.founder_id !== data.userId) throw new Error("Unauthorized");
+      const {
+        data: startup
+      } = await adminClient.from("startups").select("company_name, sector, stage, funding_target, founder_name").eq("founder_id", data.userId).limit(1).maybeSingle();
+      const userPrompt = `Write a LinkedIn connection request from ${startup?.founder_name ?? "a founder"} of ${startup?.company_name ?? "a startup"} to ${lead.investor_name}${lead.firm_name ? ` at ${lead.firm_name}` : ""}.
+Startup: ${startup?.sector ?? lead.sector ?? "tech"} sector, ${startup?.stage ?? lead.stage ?? "early"} stage, raising ${startup?.funding_target ?? "seed round"}.
+Keep the message under 300 characters. Be genuine and specific, not salesy. Just ask to connect.`;
+      if (!openAIKey) throw new Error("OpenAI not configured");
+      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${openAIKey}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          max_tokens: 150,
+          temperature: 0.7,
+          messages: [{
+            role: "system",
+            content: "You write short LinkedIn connection request messages. Return only the message text, no quotes, no explanation."
+          }, {
+            role: "user",
+            content: userPrompt
+          }]
+        })
+      });
+      if (!resp.ok) throw new Error("OpenAI request failed");
+      const json = await resp.json();
+      const message2 = (json.choices[0]?.message?.content ?? "").trim();
+      if (!message2) throw new Error("Invalid AI response");
+      await adminClient.from("ai_usage").insert({
+        user_id: data.userId,
+        action: "linkedin_gen"
+      });
+      return {
+        message: message2
+      };
+    });
+  }
+});
+
+// dist/server/assets/ai-fn-DrVjgWEV.js
+var ai_fn_DrVjgWEV_exports = {};
+__export(ai_fn_DrVjgWEV_exports, {
+  generateOutreachEmail_createServerFn_handler: () => generateOutreachEmail_createServerFn_handler
+});
+import "node:async_hooks";
+var import_react16, import_jsx_runtime21, systemPrompt, generateOutreachEmail_createServerFn_handler, generateOutreachEmail;
+var init_ai_fn_DrVjgWEV = __esm({
+  "dist/server/assets/ai-fn-DrVjgWEV.js"() {
+    "use strict";
+    init_createServerRpc_D_6bKnO();
+    init_dist6();
+    init_server4();
+    init_production();
+    import_react16 = __toESM(require_react(), 1);
+    import_jsx_runtime21 = __toESM(require_jsx_runtime(), 1);
     systemPrompt = `You are an expert fundraising advisor helping startup founders write concise, personalized investor outreach emails.
 Return ONLY valid JSON in this exact format:
 {"subject":"...","body":"..."}
@@ -47751,7 +47909,7 @@ No markdown, no explanation, just the JSON object.`;
     }) => {
       const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
       const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
-      const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || void 0 || "";
+      const openAIKey = data.openAIKey || process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || void 0 || "";
       const adminClient = createClient(supabaseUrl, serviceKey);
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1e3).toISOString();
       const {
@@ -47816,164 +47974,6 @@ Be warm but direct.`;
       return {
         subject: parsed.subject,
         body: parsed.body
-      };
-    });
-  }
-});
-
-// dist/server/assets/linkedin-fn-Dy3zCFEf.js
-var linkedin_fn_Dy3zCFEf_exports = {};
-__export(linkedin_fn_Dy3zCFEf_exports, {
-  generateLinkedInMessage_createServerFn_handler: () => generateLinkedInMessage_createServerFn_handler
-});
-import "node:async_hooks";
-var import_react15, import_jsx_runtime20, generateLinkedInMessage_createServerFn_handler, generateLinkedInMessage;
-var init_linkedin_fn_Dy3zCFEf = __esm({
-  "dist/server/assets/linkedin-fn-Dy3zCFEf.js"() {
-    "use strict";
-    init_createServerRpc_D_6bKnO();
-    init_dist6();
-    init_server4();
-    init_production();
-    import_react15 = __toESM(require_react(), 1);
-    import_jsx_runtime20 = __toESM(require_jsx_runtime(), 1);
-    generateLinkedInMessage_createServerFn_handler = createServerRpc({
-      id: "272077c9c144c7cbae7da95efd3b0536517866897833aab391e7e9e60debb102",
-      name: "generateLinkedInMessage",
-      filename: "src/lib/linkedin-fn.ts"
-    }, (opts) => generateLinkedInMessage.__executeServer(opts));
-    generateLinkedInMessage = createServerFn({
-      method: "POST"
-    }).inputValidator((data) => data).handler(generateLinkedInMessage_createServerFn_handler, async ({
-      data
-    }) => {
-      const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
-      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
-      const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || void 0 || "";
-      const adminClient = createClient(supabaseUrl, serviceKey);
-      const {
-        data: lead,
-        error: leadErr
-      } = await adminClient.from("vc_leads").select("*").eq("id", data.leadId).single();
-      if (leadErr || !lead) throw new Error("Lead not found");
-      if (lead.founder_id !== data.userId) throw new Error("Unauthorized");
-      const {
-        data: startup
-      } = await adminClient.from("startups").select("company_name, sector, stage, funding_target, founder_name").eq("founder_id", data.userId).limit(1).maybeSingle();
-      const userPrompt = `Write a LinkedIn connection request from ${startup?.founder_name ?? "a founder"} of ${startup?.company_name ?? "a startup"} to ${lead.investor_name}${lead.firm_name ? ` at ${lead.firm_name}` : ""}.
-Startup: ${startup?.sector ?? lead.sector ?? "tech"} sector, ${startup?.stage ?? lead.stage ?? "early"} stage, raising ${startup?.funding_target ?? "seed round"}.
-Keep the message under 300 characters. Be genuine and specific, not salesy. Just ask to connect.`;
-      if (!openAIKey) throw new Error("OpenAI not configured");
-      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${openAIKey}`
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          max_tokens: 150,
-          temperature: 0.7,
-          messages: [{
-            role: "system",
-            content: "You write short LinkedIn connection request messages. Return only the message text, no quotes, no explanation."
-          }, {
-            role: "user",
-            content: userPrompt
-          }]
-        })
-      });
-      if (!resp.ok) throw new Error("OpenAI request failed");
-      const json = await resp.json();
-      const message2 = (json.choices[0]?.message?.content ?? "").trim();
-      if (!message2) throw new Error("Invalid AI response");
-      await adminClient.from("ai_usage").insert({
-        user_id: data.userId,
-        action: "linkedin_gen"
-      });
-      return {
-        message: message2
-      };
-    });
-  }
-});
-
-// dist/server/assets/reply-fn-DePVAZDa.js
-var reply_fn_DePVAZDa_exports = {};
-__export(reply_fn_DePVAZDa_exports, {
-  generateReply_createServerFn_handler: () => generateReply_createServerFn_handler
-});
-import "node:async_hooks";
-var import_react16, import_jsx_runtime21, generateReply_createServerFn_handler, generateReply;
-var init_reply_fn_DePVAZDa = __esm({
-  "dist/server/assets/reply-fn-DePVAZDa.js"() {
-    "use strict";
-    init_createServerRpc_D_6bKnO();
-    init_dist6();
-    init_server4();
-    init_production();
-    import_react16 = __toESM(require_react(), 1);
-    import_jsx_runtime21 = __toESM(require_jsx_runtime(), 1);
-    generateReply_createServerFn_handler = createServerRpc({
-      id: "08b07e340aa3dd2c22b3ea45b5ff6e1a1e3844f3dadeb4cfd75858793e9c8fb3",
-      name: "generateReply",
-      filename: "src/lib/reply-fn.ts"
-    }, (opts) => generateReply.__executeServer(opts));
-    generateReply = createServerFn({
-      method: "POST"
-    }).inputValidator((data) => data).handler(generateReply_createServerFn_handler, async ({
-      data
-    }) => {
-      const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
-      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
-      const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || void 0 || "";
-      const adminClient = createClient(supabaseUrl, serviceKey);
-      const {
-        data: lead,
-        error: leadErr
-      } = await adminClient.from("vc_leads").select("*").eq("id", data.leadId).single();
-      if (leadErr || !lead) throw new Error("Lead not found");
-      if (lead.founder_id !== data.userId) throw new Error("Unauthorized");
-      const {
-        data: startup
-      } = await adminClient.from("startups").select("company_name, sector, stage, funding_target, founder_name").eq("founder_id", data.userId).limit(1).maybeSingle();
-      const userPrompt = `The investor ${lead.investor_name}${lead.firm_name ? ` from ${lead.firm_name}` : ""} replied to the founder:
-
-"${data.investorReply}"
-
-Write a professional follow-up reply from ${startup?.founder_name ?? "the founder"} of ${startup?.company_name ?? "the startup"}.
-Current lead status: ${lead.status}.
-Keep it under 150 words. Be warm, professional, and move the conversation forward.`;
-      if (!openAIKey) throw new Error("OpenAI not configured");
-      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${openAIKey}`
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          max_tokens: 300,
-          temperature: 0.7,
-          messages: [{
-            role: "system",
-            content: "You write professional email replies for startup founders responding to investors. Return only the reply text, no subject line, no explanation."
-          }, {
-            role: "user",
-            content: userPrompt
-          }]
-        })
-      });
-      if (!resp.ok) throw new Error("OpenAI request failed");
-      const json = await resp.json();
-      const reply = (json.choices[0]?.message?.content ?? "").trim();
-      if (!reply) throw new Error("Invalid AI response");
-      await adminClient.from("ai_usage").insert({
-        user_id: data.userId,
-        action: "reply_gen"
-      });
-      return {
-        reply
       };
     });
   }
@@ -57127,7 +57127,7 @@ var init_lucide_react = __esm({
   }
 });
 
-// dist/server/assets/LangSwitcher-miQCJoFN.js
+// dist/server/assets/LangSwitcher-DYo0Rvmy.js
 function ThemeToggle() {
   const { theme, setTheme, resolved } = useTheme();
   const [open, setOpen] = (0, import_react20.useState)(false);
@@ -57222,18 +57222,18 @@ function LangSwitcher() {
   ] });
 }
 var import_jsx_runtime26, import_react20;
-var init_LangSwitcher_miQCJoFN = __esm({
-  "dist/server/assets/LangSwitcher-miQCJoFN.js"() {
+var init_LangSwitcher_DYo0Rvmy = __esm({
+  "dist/server/assets/LangSwitcher-DYo0Rvmy.js"() {
     "use strict";
     import_jsx_runtime26 = __toESM(require_jsx_runtime(), 1);
     init_lucide_react();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     import_react20 = __toESM(require_react(), 1);
     init_utils_H80jjgLf();
   }
 });
 
-// dist/server/assets/SiteFooter-BYuuT7oO.js
+// dist/server/assets/SiteFooter-CE8Cdq7u.js
 function SiteHeader() {
   return /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("header", { className: "sticky top-0 z-40 w-full", children: [
     /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "absolute inset-0 -z-10 backdrop-blur-xl bg-background/70 border-b border-border/60" }),
@@ -57328,8 +57328,8 @@ function SiteFooter() {
   ] }) });
 }
 var import_jsx_runtime27, React11, buttonVariants, Button, nav;
-var init_SiteFooter_BYuuT7oO = __esm({
-  "dist/server/assets/SiteFooter-BYuuT7oO.js"() {
+var init_SiteFooter_CE8Cdq7u = __esm({
+  "dist/server/assets/SiteFooter-CE8Cdq7u.js"() {
     "use strict";
     import_jsx_runtime27 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -57339,7 +57339,7 @@ var init_SiteFooter_BYuuT7oO = __esm({
     init_dist10();
     init_utils_H80jjgLf();
     init_lucide_react();
-    init_LangSwitcher_miQCJoFN();
+    init_LangSwitcher_DYo0Rvmy();
     buttonVariants = cva(
       "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
       {
@@ -57385,9 +57385,9 @@ var init_SiteFooter_BYuuT7oO = __esm({
   }
 });
 
-// dist/server/assets/terms-DE_mKsEU.js
-var terms_DE_mKsEU_exports = {};
-__export(terms_DE_mKsEU_exports, {
+// dist/server/assets/terms-Cbz3Tj9R.js
+var terms_Cbz3Tj9R_exports = {};
+__export(terms_Cbz3Tj9R_exports, {
   component: () => TermsPage
 });
 import "node:async_hooks";
@@ -57409,11 +57409,11 @@ function TermsPage() {
   ] });
 }
 var import_jsx_runtime28, import_react21, sections;
-var init_terms_DE_mKsEU = __esm({
-  "dist/server/assets/terms-DE_mKsEU.js"() {
+var init_terms_Cbz3Tj9R = __esm({
+  "dist/server/assets/terms-Cbz3Tj9R.js"() {
     "use strict";
     import_jsx_runtime28 = __toESM(require_jsx_runtime(), 1);
-    init_SiteFooter_BYuuT7oO();
+    init_SiteFooter_CE8Cdq7u();
     import_react21 = __toESM(require_react(), 1);
     init_dist10();
     init_clsx();
@@ -57447,9 +57447,9 @@ var init_terms_DE_mKsEU = __esm({
   }
 });
 
-// dist/server/assets/sign-up-D3aICks3.js
-var sign_up_D3aICks3_exports = {};
-__export(sign_up_D3aICks3_exports, {
+// dist/server/assets/sign-up-DZLhpchY.js
+var sign_up_DZLhpchY_exports = {};
+__export(sign_up_DZLhpchY_exports, {
   component: () => SignUp
 });
 import "node:async_hooks";
@@ -57573,22 +57573,22 @@ function SignUp() {
   ] }) });
 }
 var import_jsx_runtime29, import_react22;
-var init_sign_up_D3aICks3 = __esm({
-  "dist/server/assets/sign-up-D3aICks3.js"() {
+var init_sign_up_DZLhpchY = __esm({
+  "dist/server/assets/sign-up-DZLhpchY.js"() {
     "use strict";
     import_jsx_runtime29 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react22 = __toESM(require_react(), 1);
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_dist7();
     init_production();
     init_clsx();
   }
 });
 
-// dist/server/assets/sign-in-C9gtbcKh.js
-var sign_in_C9gtbcKh_exports = {};
-__export(sign_in_C9gtbcKh_exports, {
+// dist/server/assets/sign-in-Ctjfar7F.js
+var sign_in_Ctjfar7F_exports = {};
+__export(sign_in_Ctjfar7F_exports, {
   component: () => SignIn
 });
 import "node:async_hooks";
@@ -57678,22 +57678,22 @@ function SignIn() {
   ] }) });
 }
 var import_jsx_runtime30, import_react23;
-var init_sign_in_C9gtbcKh = __esm({
-  "dist/server/assets/sign-in-C9gtbcKh.js"() {
+var init_sign_in_Ctjfar7F = __esm({
+  "dist/server/assets/sign-in-Ctjfar7F.js"() {
     "use strict";
     import_jsx_runtime30 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react23 = __toESM(require_react(), 1);
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_dist7();
     init_production();
     init_clsx();
   }
 });
 
-// dist/server/assets/privacy-BlMHlTxc.js
-var privacy_BlMHlTxc_exports = {};
-__export(privacy_BlMHlTxc_exports, {
+// dist/server/assets/privacy-RfxBcgHR.js
+var privacy_RfxBcgHR_exports = {};
+__export(privacy_RfxBcgHR_exports, {
   component: () => PrivacyPage
 });
 import "node:async_hooks";
@@ -57715,11 +57715,11 @@ function PrivacyPage() {
   ] });
 }
 var import_jsx_runtime31, import_react24, sections2;
-var init_privacy_BlMHlTxc = __esm({
-  "dist/server/assets/privacy-BlMHlTxc.js"() {
+var init_privacy_RfxBcgHR = __esm({
+  "dist/server/assets/privacy-RfxBcgHR.js"() {
     "use strict";
     import_jsx_runtime31 = __toESM(require_jsx_runtime(), 1);
-    init_SiteFooter_BYuuT7oO();
+    init_SiteFooter_CE8Cdq7u();
     import_react24 = __toESM(require_react(), 1);
     init_dist10();
     init_clsx();
@@ -57750,9 +57750,9 @@ var init_privacy_BlMHlTxc = __esm({
   }
 });
 
-// dist/server/assets/pricing-DB-z3M7K.js
-var pricing_DB_z3M7K_exports = {};
-__export(pricing_DB_z3M7K_exports, {
+// dist/server/assets/pricing-Dvg8v-6T.js
+var pricing_Dvg8v_6T_exports = {};
+__export(pricing_Dvg8v_6T_exports, {
   component: () => Pricing
 });
 import "node:async_hooks";
@@ -57793,12 +57793,12 @@ function Pricing() {
   ] });
 }
 var import_jsx_runtime32, import_react25, tiers;
-var init_pricing_DB_z3M7K = __esm({
-  "dist/server/assets/pricing-DB-z3M7K.js"() {
+var init_pricing_Dvg8v_6T = __esm({
+  "dist/server/assets/pricing-Dvg8v-6T.js"() {
     "use strict";
     import_jsx_runtime32 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    init_SiteFooter_BYuuT7oO();
+    init_SiteFooter_CE8Cdq7u();
     init_lucide_react();
     import_react25 = __toESM(require_react(), 1);
     init_dist10();
@@ -57932,7 +57932,7 @@ var init_AppPreview_BtsG_qZV = __esm({
   }
 });
 
-// dist/server/assets/SolutionPage-hqWiaAgM.js
+// dist/server/assets/SolutionPage-CQdQpO9i.js
 function SolutionPage({ eyebrow, title, sub, Icon: Icon2, features }) {
   return /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)("div", { className: "min-h-screen bg-background", children: [
     /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(SiteHeader, {}),
@@ -57965,29 +57965,29 @@ function SolutionPage({ eyebrow, title, sub, Icon: Icon2, features }) {
   ] });
 }
 var import_jsx_runtime34;
-var init_SolutionPage_hqWiaAgM = __esm({
-  "dist/server/assets/SolutionPage-hqWiaAgM.js"() {
+var init_SolutionPage_CQdQpO9i = __esm({
+  "dist/server/assets/SolutionPage-CQdQpO9i.js"() {
     "use strict";
     import_jsx_runtime34 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    init_SiteFooter_BYuuT7oO();
+    init_SiteFooter_CE8Cdq7u();
     init_AppPreview_BtsG_qZV();
     init_lucide_react();
   }
 });
 
-// dist/server/assets/investors-DIvq9bBK.js
-var investors_DIvq9bBK_exports = {};
-__export(investors_DIvq9bBK_exports, {
+// dist/server/assets/investors-CSh5h1s2.js
+var investors_CSh5h1s2_exports = {};
+__export(investors_CSh5h1s2_exports, {
   component: () => SplitComponent
 });
 import "node:async_hooks";
 var import_jsx_runtime35, import_react26, SplitComponent;
-var init_investors_DIvq9bBK = __esm({
-  "dist/server/assets/investors-DIvq9bBK.js"() {
+var init_investors_CSh5h1s2 = __esm({
+  "dist/server/assets/investors-CSh5h1s2.js"() {
     "use strict";
     import_jsx_runtime35 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_hqWiaAgM();
+    init_SolutionPage_CQdQpO9i();
     init_lucide_react();
     import_react26 = __toESM(require_react(), 1);
     init_dist10();
@@ -57998,18 +57998,18 @@ var init_investors_DIvq9bBK = __esm({
   }
 });
 
-// dist/server/assets/founders-aQ6-2EyW.js
-var founders_aQ6_2EyW_exports = {};
-__export(founders_aQ6_2EyW_exports, {
+// dist/server/assets/founders-IJ2YAJez.js
+var founders_IJ2YAJez_exports = {};
+__export(founders_IJ2YAJez_exports, {
   component: () => SplitComponent2
 });
 import "node:async_hooks";
 var import_jsx_runtime36, import_react27, SplitComponent2;
-var init_founders_aQ6_2EyW = __esm({
-  "dist/server/assets/founders-aQ6-2EyW.js"() {
+var init_founders_IJ2YAJez = __esm({
+  "dist/server/assets/founders-IJ2YAJez.js"() {
     "use strict";
     import_jsx_runtime36 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_hqWiaAgM();
+    init_SolutionPage_CQdQpO9i();
     init_lucide_react();
     import_react27 = __toESM(require_react(), 1);
     init_dist10();
@@ -58020,9 +58020,9 @@ var init_founders_aQ6_2EyW = __esm({
   }
 });
 
-// dist/server/assets/forgot-password-BxZMhSvA.js
-var forgot_password_BxZMhSvA_exports = {};
-__export(forgot_password_BxZMhSvA_exports, {
+// dist/server/assets/forgot-password-EoMP8m7p.js
+var forgot_password_EoMP8m7p_exports = {};
+__export(forgot_password_EoMP8m7p_exports, {
   component: () => ForgotPassword
 });
 import "node:async_hooks";
@@ -58068,13 +58068,13 @@ function ForgotPassword() {
   ] }) }) });
 }
 var import_jsx_runtime37, import_react28;
-var init_forgot_password_BxZMhSvA = __esm({
-  "dist/server/assets/forgot-password-BxZMhSvA.js"() {
+var init_forgot_password_EoMP8m7p = __esm({
+  "dist/server/assets/forgot-password-EoMP8m7p.js"() {
     "use strict";
     import_jsx_runtime37 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react28 = __toESM(require_react(), 1);
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_dist7();
     init_production();
     init_clsx();
@@ -61794,9 +61794,9 @@ var init_store_LLbTvev = __esm({
   }
 });
 
-// dist/server/assets/app-B7DjYVHW.js
-var app_B7DjYVHW_exports = {};
-__export(app_B7DjYVHW_exports, {
+// dist/server/assets/app-Cq3KkfMu.js
+var app_Cq3KkfMu_exports = {};
+__export(app_Cq3KkfMu_exports, {
   component: () => SplitComponent4
 });
 import "node:async_hooks";
@@ -62091,8 +62091,8 @@ function AppShell({ children }) {
   ] });
 }
 var import_jsx_runtime39, import_react30, iconFor, tintFor, founderNav, investorNav, workspaceNavFounder, workspaceNavInvestor, SplitComponent4;
-var init_app_B7DjYVHW = __esm({
-  "dist/server/assets/app-B7DjYVHW.js"() {
+var init_app_Cq3KkfMu = __esm({
+  "dist/server/assets/app-Cq3KkfMu.js"() {
     "use strict";
     import_jsx_runtime39 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -62101,9 +62101,9 @@ var init_app_B7DjYVHW = __esm({
     import_react30 = __toESM(require_react(), 1);
     init_modern2();
     init_utils_H80jjgLf();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_date_fns();
-    init_LangSwitcher_miQCJoFN();
+    init_LangSwitcher_DYo0Rvmy();
     init_store_LLbTvev();
     init_clsx();
     init_dist7();
@@ -62157,9 +62157,9 @@ var init_app_B7DjYVHW = __esm({
   }
 });
 
-// dist/server/assets/about-BfEhtZsC.js
-var about_BfEhtZsC_exports = {};
-__export(about_BfEhtZsC_exports, {
+// dist/server/assets/about-DjYzlz5P.js
+var about_DjYzlz5P_exports = {};
+__export(about_DjYzlz5P_exports, {
   component: () => About
 });
 import "node:async_hooks";
@@ -62180,11 +62180,11 @@ function About() {
   ] });
 }
 var import_jsx_runtime40, import_react31;
-var init_about_BfEhtZsC = __esm({
-  "dist/server/assets/about-BfEhtZsC.js"() {
+var init_about_DjYzlz5P = __esm({
+  "dist/server/assets/about-DjYzlz5P.js"() {
     "use strict";
     import_jsx_runtime40 = __toESM(require_jsx_runtime(), 1);
-    init_SiteFooter_BYuuT7oO();
+    init_SiteFooter_CE8Cdq7u();
     init_lucide_react();
     init_esm5();
     import_react31 = __toESM(require_react(), 1);
@@ -62195,9 +62195,9 @@ var init_about_BfEhtZsC = __esm({
   }
 });
 
-// dist/server/assets/index-DnZIqdE7.js
-var index_DnZIqdE7_exports = {};
-__export(index_DnZIqdE7_exports, {
+// dist/server/assets/index-C1rcQwV4.js
+var index_C1rcQwV4_exports = {};
+__export(index_C1rcQwV4_exports, {
   component: () => Landing
 });
 import "node:async_hooks";
@@ -62506,12 +62506,12 @@ function FinalCTA() {
   ] }) });
 }
 var import_jsx_runtime41, import_react32;
-var init_index_DnZIqdE7 = __esm({
-  "dist/server/assets/index-DnZIqdE7.js"() {
+var init_index_C1rcQwV4 = __esm({
+  "dist/server/assets/index-C1rcQwV4.js"() {
     "use strict";
     import_jsx_runtime41 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    init_SiteFooter_BYuuT7oO();
+    init_SiteFooter_CE8Cdq7u();
     init_AppPreview_BtsG_qZV();
     init_lucide_react();
     import_react32 = __toESM(require_react(), 1);
@@ -62522,9 +62522,9 @@ var init_index_DnZIqdE7 = __esm({
   }
 });
 
-// dist/server/assets/app.index-CyUCKFC8.js
-var app_index_CyUCKFC8_exports = {};
-__export(app_index_CyUCKFC8_exports, {
+// dist/server/assets/app.index-gth79moq.js
+var app_index_gth79moq_exports = {};
+__export(app_index_gth79moq_exports, {
   component: () => Overview
 });
 import "node:async_hooks";
@@ -63113,8 +63113,8 @@ function Overview() {
   ] });
 }
 var import_jsx_runtime42, import_react33, DEAL_ROOM_PROGRESS;
-var init_app_index_CyUCKFC8 = __esm({
-  "dist/server/assets/app.index-CyUCKFC8.js"() {
+var init_app_index_gth79moq = __esm({
+  "dist/server/assets/app.index-gth79moq.js"() {
     "use strict";
     import_jsx_runtime42 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -63122,7 +63122,7 @@ var init_app_index_CyUCKFC8 = __esm({
     init_modern2();
     init_date_fns();
     init_lucide_react();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_utils_H80jjgLf();
     init_dist7();
     init_production();
@@ -63156,18 +63156,18 @@ var init_app_index_CyUCKFC8 = __esm({
   }
 });
 
-// dist/server/assets/solutions.vc-deal-room-BHghcqtU.js
-var solutions_vc_deal_room_BHghcqtU_exports = {};
-__export(solutions_vc_deal_room_BHghcqtU_exports, {
+// dist/server/assets/solutions.vc-deal-room-BPidwXDV.js
+var solutions_vc_deal_room_BPidwXDV_exports = {};
+__export(solutions_vc_deal_room_BPidwXDV_exports, {
   component: () => SplitComponent5
 });
 import "node:async_hooks";
 var import_jsx_runtime43, import_react34, SplitComponent5;
-var init_solutions_vc_deal_room_BHghcqtU = __esm({
-  "dist/server/assets/solutions.vc-deal-room-BHghcqtU.js"() {
+var init_solutions_vc_deal_room_BPidwXDV = __esm({
+  "dist/server/assets/solutions.vc-deal-room-BPidwXDV.js"() {
     "use strict";
     import_jsx_runtime43 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_hqWiaAgM();
+    init_SolutionPage_CQdQpO9i();
     init_lucide_react();
     import_react34 = __toESM(require_react(), 1);
     init_dist10();
@@ -63178,18 +63178,18 @@ var init_solutions_vc_deal_room_BHghcqtU = __esm({
   }
 });
 
-// dist/server/assets/solutions.raise-1m-D-UUo6GS.js
-var solutions_raise_1m_D_UUo6GS_exports = {};
-__export(solutions_raise_1m_D_UUo6GS_exports, {
+// dist/server/assets/solutions.raise-1m-D-yEWW8Y.js
+var solutions_raise_1m_D_yEWW8Y_exports = {};
+__export(solutions_raise_1m_D_yEWW8Y_exports, {
   component: () => SplitComponent6
 });
 import "node:async_hooks";
 var import_jsx_runtime44, import_react35, SplitComponent6;
-var init_solutions_raise_1m_D_UUo6GS = __esm({
-  "dist/server/assets/solutions.raise-1m-D-UUo6GS.js"() {
+var init_solutions_raise_1m_D_yEWW8Y = __esm({
+  "dist/server/assets/solutions.raise-1m-D-yEWW8Y.js"() {
     "use strict";
     import_jsx_runtime44 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_hqWiaAgM();
+    init_SolutionPage_CQdQpO9i();
     init_lucide_react();
     import_react35 = __toESM(require_react(), 1);
     init_dist10();
@@ -63200,18 +63200,18 @@ var init_solutions_raise_1m_D_UUo6GS = __esm({
   }
 });
 
-// dist/server/assets/solutions.investor-pipeline-CXqqi161.js
-var solutions_investor_pipeline_CXqqi161_exports = {};
-__export(solutions_investor_pipeline_CXqqi161_exports, {
+// dist/server/assets/solutions.investor-pipeline-DbhPMpY0.js
+var solutions_investor_pipeline_DbhPMpY0_exports = {};
+__export(solutions_investor_pipeline_DbhPMpY0_exports, {
   component: () => SplitComponent7
 });
 import "node:async_hooks";
 var import_jsx_runtime45, import_react36, SplitComponent7;
-var init_solutions_investor_pipeline_CXqqi161 = __esm({
-  "dist/server/assets/solutions.investor-pipeline-CXqqi161.js"() {
+var init_solutions_investor_pipeline_DbhPMpY0 = __esm({
+  "dist/server/assets/solutions.investor-pipeline-DbhPMpY0.js"() {
     "use strict";
     import_jsx_runtime45 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_hqWiaAgM();
+    init_SolutionPage_CQdQpO9i();
     init_lucide_react();
     import_react36 = __toESM(require_react(), 1);
     init_dist10();
@@ -63222,18 +63222,18 @@ var init_solutions_investor_pipeline_CXqqi161 = __esm({
   }
 });
 
-// dist/server/assets/solutions.fundraising-crm-Bb-vd3i8.js
-var solutions_fundraising_crm_Bb_vd3i8_exports = {};
-__export(solutions_fundraising_crm_Bb_vd3i8_exports, {
+// dist/server/assets/solutions.fundraising-crm-CMw81zT6.js
+var solutions_fundraising_crm_CMw81zT6_exports = {};
+__export(solutions_fundraising_crm_CMw81zT6_exports, {
   component: () => SplitComponent8
 });
 import "node:async_hooks";
 var import_jsx_runtime46, import_react37, SplitComponent8;
-var init_solutions_fundraising_crm_Bb_vd3i8 = __esm({
-  "dist/server/assets/solutions.fundraising-crm-Bb-vd3i8.js"() {
+var init_solutions_fundraising_crm_CMw81zT6 = __esm({
+  "dist/server/assets/solutions.fundraising-crm-CMw81zT6.js"() {
     "use strict";
     import_jsx_runtime46 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_hqWiaAgM();
+    init_SolutionPage_CQdQpO9i();
     init_lucide_react();
     import_react37 = __toESM(require_react(), 1);
     init_dist10();
@@ -63244,18 +63244,18 @@ var init_solutions_fundraising_crm_Bb_vd3i8 = __esm({
   }
 });
 
-// dist/server/assets/solutions.due-diligence-CbMcGO8a.js
-var solutions_due_diligence_CbMcGO8a_exports = {};
-__export(solutions_due_diligence_CbMcGO8a_exports, {
+// dist/server/assets/solutions.due-diligence-ShFU7AwW.js
+var solutions_due_diligence_ShFU7AwW_exports = {};
+__export(solutions_due_diligence_ShFU7AwW_exports, {
   component: () => SplitComponent9
 });
 import "node:async_hooks";
 var import_jsx_runtime47, import_react38, SplitComponent9;
-var init_solutions_due_diligence_CbMcGO8a = __esm({
-  "dist/server/assets/solutions.due-diligence-CbMcGO8a.js"() {
+var init_solutions_due_diligence_ShFU7AwW = __esm({
+  "dist/server/assets/solutions.due-diligence-ShFU7AwW.js"() {
     "use strict";
     import_jsx_runtime47 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_hqWiaAgM();
+    init_SolutionPage_CQdQpO9i();
     init_lucide_react();
     import_react38 = __toESM(require_react(), 1);
     init_dist10();
@@ -63266,9 +63266,9 @@ var init_solutions_due_diligence_CbMcGO8a = __esm({
   }
 });
 
-// dist/server/assets/join._token-Dcz2g1ly.js
-var join_token_Dcz2g1ly_exports = {};
-__export(join_token_Dcz2g1ly_exports, {
+// dist/server/assets/join._token-BST4WH6h.js
+var join_token_BST4WH6h_exports = {};
+__export(join_token_BST4WH6h_exports, {
   component: () => JoinFlow
 });
 import "node:async_hooks";
@@ -63484,24 +63484,24 @@ function JoinFlow() {
   ] });
 }
 var import_jsx_runtime48, import_react39;
-var init_join_token_Dcz2g1ly = __esm({
-  "dist/server/assets/join._token-Dcz2g1ly.js"() {
+var init_join_token_BST4WH6h = __esm({
+  "dist/server/assets/join._token-BST4WH6h.js"() {
     "use strict";
     import_jsx_runtime48 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react39 = __toESM(require_react(), 1);
     init_Logo_CIkq6vsm();
     init_lucide_react();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_dist7();
     init_production();
     init_clsx();
   }
 });
 
-// dist/server/assets/auth.callback-B4MwFdOY.js
-var auth_callback_B4MwFdOY_exports = {};
-__export(auth_callback_B4MwFdOY_exports, {
+// dist/server/assets/auth.callback-CoLhWSAL.js
+var auth_callback_CoLhWSAL_exports = {};
+__export(auth_callback_CoLhWSAL_exports, {
   component: () => AuthCallback
 });
 import "node:async_hooks";
@@ -63560,21 +63560,21 @@ function AuthCallback() {
   ] });
 }
 var import_jsx_runtime49, import_react40;
-var init_auth_callback_B4MwFdOY = __esm({
-  "dist/server/assets/auth.callback-B4MwFdOY.js"() {
+var init_auth_callback_CoLhWSAL = __esm({
+  "dist/server/assets/auth.callback-CoLhWSAL.js"() {
     "use strict";
     import_jsx_runtime49 = __toESM(require_jsx_runtime(), 1);
     import_react40 = __toESM(require_react(), 1);
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_dist7();
     init_production();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.users-B9Cj2R90.js
-var app_users_B9Cj2R90_exports = {};
-__export(app_users_B9Cj2R90_exports, {
+// dist/server/assets/app.users-DsamaZ4_.js
+var app_users_DsamaZ4_exports = {};
+__export(app_users_DsamaZ4_exports, {
   component: () => UsersPage
 });
 import "node:async_hooks";
@@ -63848,8 +63848,8 @@ function InviteModal({
   ] }) });
 }
 var import_jsx_runtime50, import_react41, roleColor;
-var init_app_users_B9Cj2R90 = __esm({
-  "dist/server/assets/app.users-B9Cj2R90.js"() {
+var init_app_users_DsamaZ4 = __esm({
+  "dist/server/assets/app.users-DsamaZ4_.js"() {
     "use strict";
     import_jsx_runtime50 = __toESM(require_jsx_runtime(), 1);
     import_react41 = __toESM(require_react(), 1);
@@ -63857,7 +63857,7 @@ var init_app_users_B9Cj2R90 = __esm({
     init_lucide_react();
     init_dist7();
     init_date_fns();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_production();
     init_clsx();
     roleColor = {
@@ -63871,9 +63871,9 @@ var init_app_users_B9Cj2R90 = __esm({
   }
 });
 
-// dist/server/assets/app.settings-DGifbmK5.js
-var app_settings_DGifbmK5_exports = {};
-__export(app_settings_DGifbmK5_exports, {
+// dist/server/assets/app.settings-Bw0rvynr.js
+var app_settings_Bw0rvynr_exports = {};
+__export(app_settings_Bw0rvynr_exports, {
   Card: () => Card,
   Field: () => Field,
   SaveBar: () => SaveBar,
@@ -63996,15 +63996,15 @@ function SaveBar() {
   ] });
 }
 var import_jsx_runtime51, import_react42, tabs;
-var init_app_settings_DGifbmK5 = __esm({
-  "dist/server/assets/app.settings-DGifbmK5.js"() {
+var init_app_settings_Bw0rvynr = __esm({
+  "dist/server/assets/app.settings-Bw0rvynr.js"() {
     "use strict";
     import_jsx_runtime51 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_modern2();
     init_lucide_react();
     init_utils_H80jjgLf();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_clsx();
     import_react42 = __toESM(require_react(), 1);
     init_dist7();
@@ -64034,9 +64034,9 @@ var init_app_settings_DGifbmK5 = __esm({
   }
 });
 
-// dist/server/assets/app.reports-BUN1O2LW.js
-var app_reports_BUN1O2LW_exports = {};
-__export(app_reports_BUN1O2LW_exports, {
+// dist/server/assets/app.reports-Cr24rL5e.js
+var app_reports_Cr24rL5e_exports = {};
+__export(app_reports_Cr24rL5e_exports, {
   component: () => Reports
 });
 import "node:async_hooks";
@@ -64302,12 +64302,12 @@ function Reports() {
   ] });
 }
 var import_jsx_runtime52, import_react43, FUNNEL_STAGES;
-var init_app_reports_BUN1O2LW = __esm({
-  "dist/server/assets/app.reports-BUN1O2LW.js"() {
+var init_app_reports_Cr24rL5e = __esm({
+  "dist/server/assets/app.reports-Cr24rL5e.js"() {
     "use strict";
     import_jsx_runtime52 = __toESM(require_jsx_runtime(), 1);
     init_modern2();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_lucide_react();
     import_react43 = __toESM(require_react(), 1);
     init_dist7();
@@ -64335,9 +64335,9 @@ var init_app_reports_BUN1O2LW = __esm({
   }
 });
 
-// dist/server/assets/app.profile-BCMOBbnz.js
-var app_profile_BCMOBbnz_exports = {};
-__export(app_profile_BCMOBbnz_exports, {
+// dist/server/assets/app.profile-CRVIQQvX.js
+var app_profile_CRVIQQvX_exports = {};
+__export(app_profile_CRVIQQvX_exports, {
   component: () => Profile
 });
 import "node:async_hooks";
@@ -65071,15 +65071,15 @@ function TeamMembersSection({
   ] });
 }
 var import_jsx_runtime53, import_react44, STAGES, MEMBER_TAGS, emptyForm;
-var init_app_profile_BCMOBbnz = __esm({
-  "dist/server/assets/app.profile-BCMOBbnz.js"() {
+var init_app_profile_CRVIQQvX = __esm({
+  "dist/server/assets/app.profile-CRVIQQvX.js"() {
     "use strict";
     import_jsx_runtime53 = __toESM(require_jsx_runtime(), 1);
     import_react44 = __toESM(require_react(), 1);
     init_modern2();
     init_lucide_react();
     init_dist7();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_utils_H80jjgLf();
     init_production();
     init_clsx();
@@ -65120,7 +65120,7 @@ var init_app_profile_BCMOBbnz = __esm({
   }
 });
 
-// dist/server/assets/LeadDrawer-C5KxHy8Z.js
+// dist/server/assets/LeadDrawer-BzqnqpQ7.js
 function Field3({ label, children }) {
   return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { children: [
     /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("label", { className: "block text-xs text-muted-foreground mb-1", children: label }),
@@ -65308,7 +65308,8 @@ function LeadDrawer({ open, lead, onClose, onSaved }) {
     setGeneratingEmail(true);
     setGeneratedEmail("");
     try {
-      const result = await generateOutreachEmail2({ data: { userId: user.id, leadId: lead.id, type } });
+      const openAIKey = "";
+      const result = await generateOutreachEmail2({ data: { userId: user.id, leadId: lead.id, type, openAIKey } });
       setGeneratedEmail(`Subject: ${result.subject}
 
 ${result.body}`);
@@ -65323,7 +65324,8 @@ ${result.body}`);
     setGeneratingLinkedIn(true);
     setGeneratedLinkedIn("");
     try {
-      const result = await generateLinkedInMessage2({ data: { userId: user.id, leadId: lead.id } });
+      const openAIKey = "";
+      const result = await generateLinkedInMessage2({ data: { userId: user.id, leadId: lead.id, openAIKey } });
       setGeneratedLinkedIn(result.message);
     } catch (err) {
       toast.error(err.message || "Failed to generate LinkedIn message");
@@ -65336,7 +65338,8 @@ ${result.body}`);
     setGeneratingReply(true);
     setGeneratedReply("");
     try {
-      const result = await generateReply2({ data: { userId: user.id, leadId: lead.id, investorReply: investorReply.trim() } });
+      const openAIKey = "";
+      const result = await generateReply2({ data: { userId: user.id, leadId: lead.id, investorReply: investorReply.trim(), openAIKey } });
       setGeneratedReply(result.reply);
     } catch (err) {
       toast.error(err.message || "Failed to generate reply");
@@ -65885,14 +65888,14 @@ _${(/* @__PURE__ */ new Date()).toLocaleString()}_`;
   ] });
 }
 var import_jsx_runtime54, import_react45, generateOutreachEmail2, generateLinkedInMessage2, generateReply2, ALL_STATUSES, PIPELINE_MAIN, STATUS_COLOR, STAGES2, REL_STRENGTHS, MEETING_TYPES, PLATFORMS, inputCls, emptyForm2;
-var init_LeadDrawer_C5KxHy8Z = __esm({
-  "dist/server/assets/LeadDrawer-C5KxHy8Z.js"() {
+var init_LeadDrawer_BzqnqpQ7 = __esm({
+  "dist/server/assets/LeadDrawer-BzqnqpQ7.js"() {
     "use strict";
     import_jsx_runtime54 = __toESM(require_jsx_runtime(), 1);
     import_react45 = __toESM(require_react(), 1);
     init_lucide_react();
     init_dist7();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_modern2();
     init_utils_H80jjgLf();
     init_server4();
@@ -65964,9 +65967,9 @@ var init_LeadDrawer_C5KxHy8Z = __esm({
   }
 });
 
-// dist/server/assets/app.pipeline-BQ2nT-WF.js
-var app_pipeline_BQ2nT_WF_exports = {};
-__export(app_pipeline_BQ2nT_WF_exports, {
+// dist/server/assets/app.pipeline-DVnzKtpg.js
+var app_pipeline_DVnzKtpg_exports = {};
+__export(app_pipeline_DVnzKtpg_exports, {
   component: () => Pipeline
 });
 import "node:async_hooks";
@@ -66175,17 +66178,17 @@ function DealCard({
   ] });
 }
 var import_jsx_runtime55, import_react46, pipelineStages, STATUS_TO_STAGE, STAGE_TO_STATUS, STAGE_PROBABILITY, stageTint, stageBarColor;
-var init_app_pipeline_BQ2nT_WF = __esm({
-  "dist/server/assets/app.pipeline-BQ2nT-WF.js"() {
+var init_app_pipeline_DVnzKtpg = __esm({
+  "dist/server/assets/app.pipeline-DVnzKtpg.js"() {
     "use strict";
     import_jsx_runtime55 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react46 = __toESM(require_react(), 1);
     init_modern2();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_lucide_react();
     init_utils_H80jjgLf();
-    init_LeadDrawer_C5KxHy8Z();
+    init_LeadDrawer_BzqnqpQ7();
     init_dist7();
     init_production();
     init_clsx();
@@ -66343,9 +66346,9 @@ var init_app_notifications_CeL5tZom = __esm({
   }
 });
 
-// dist/server/assets/app.messages-RkyCIaU7.js
-var app_messages_RkyCIaU7_exports = {};
-__export(app_messages_RkyCIaU7_exports, {
+// dist/server/assets/app.messages-ZOEv1Pop.js
+var app_messages_ZOEv1Pop_exports = {};
+__export(app_messages_ZOEv1Pop_exports, {
   component: () => MessagesPage
 });
 import "node:async_hooks";
@@ -66432,12 +66435,12 @@ function Placeholder({
   ] });
 }
 var import_jsx_runtime57, import_react48;
-var init_app_messages_RkyCIaU7 = __esm({
-  "dist/server/assets/app.messages-RkyCIaU7.js"() {
+var init_app_messages_ZOEv1Pop = __esm({
+  "dist/server/assets/app.messages-ZOEv1Pop.js"() {
     "use strict";
     import_jsx_runtime57 = __toESM(require_jsx_runtime(), 1);
     import_react48 = __toESM(require_react(), 1);
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_modern2();
     init_dist7();
     init_production();
@@ -66445,9 +66448,9 @@ var init_app_messages_RkyCIaU7 = __esm({
   }
 });
 
-// dist/server/assets/app.meetings-BZAwk3rV.js
-var app_meetings_BZAwk3rV_exports = {};
-__export(app_meetings_BZAwk3rV_exports, {
+// dist/server/assets/app.meetings-BE-qsNXO.js
+var app_meetings_BE_qsNXO_exports = {};
+__export(app_meetings_BE_qsNXO_exports, {
   component: () => Meetings
 });
 import "node:async_hooks";
@@ -66726,8 +66729,8 @@ function MeetingRow({
   ] }) });
 }
 var import_jsx_runtime58, import_react49;
-var init_app_meetings_BZAwk3rV = __esm({
-  "dist/server/assets/app.meetings-BZAwk3rV.js"() {
+var init_app_meetings_BE_qsNXO = __esm({
+  "dist/server/assets/app.meetings-BE-qsNXO.js"() {
     "use strict";
     import_jsx_runtime58 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -66736,7 +66739,7 @@ var init_app_meetings_BZAwk3rV = __esm({
     init_date_fns();
     init_dist7();
     init_lucide_react();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_utils_H80jjgLf();
     init_production();
     init_clsx();
@@ -67159,9 +67162,9 @@ var require_papaparse_min = __commonJS({
   }
 });
 
-// dist/server/assets/app.leads-C0D847za.js
-var app_leads_C0D847za_exports = {};
-__export(app_leads_C0D847za_exports, {
+// dist/server/assets/app.leads-B0RWa4G6.js
+var app_leads_B0RWa4G6_exports = {};
+__export(app_leads_B0RWa4G6_exports, {
   component: () => Leads
 });
 import "node:async_hooks";
@@ -67483,8 +67486,8 @@ function CsvImportModal({
   ] }) });
 }
 var import_jsx_runtime59, import_react50, import_papaparse, STATUS_DOT, PREVIEW_COLS;
-var init_app_leads_C0D847za = __esm({
-  "dist/server/assets/app.leads-C0D847za.js"() {
+var init_app_leads_B0RWa4G6 = __esm({
+  "dist/server/assets/app.leads-B0RWa4G6.js"() {
     "use strict";
     import_jsx_runtime59 = __toESM(require_jsx_runtime(), 1);
     import_react50 = __toESM(require_react(), 1);
@@ -67492,8 +67495,8 @@ var init_app_leads_C0D847za = __esm({
     import_papaparse = __toESM(require_papaparse_min(), 1);
     init_dist7();
     init_lucide_react();
-    init_router_ZDeKAwyq();
-    init_LeadDrawer_C5KxHy8Z();
+    init_router_BRauOI85();
+    init_LeadDrawer_BzqnqpQ7();
     init_utils_H80jjgLf();
     init_production();
     init_clsx();
@@ -67662,9 +67665,9 @@ var init_app_email_CbI5DM3y = __esm({
   }
 });
 
-// dist/server/assets/app.documents-Bfh6cBsO.js
-var app_documents_Bfh6cBsO_exports = {};
-__export(app_documents_Bfh6cBsO_exports, {
+// dist/server/assets/app.documents-BAWfL-SO.js
+var app_documents_BAWfL_SO_exports = {};
+__export(app_documents_BAWfL_SO_exports, {
   component: () => Documents
 });
 import "node:async_hooks";
@@ -68060,13 +68063,13 @@ function UploadModal({
   ] }) });
 }
 var import_jsx_runtime62, import_react52, CATEGORIES, TAB_LABELS, CAT_COLOR;
-var init_app_documents_Bfh6cBsO = __esm({
-  "dist/server/assets/app.documents-Bfh6cBsO.js"() {
+var init_app_documents_BAWfL_SO = __esm({
+  "dist/server/assets/app.documents-BAWfL-SO.js"() {
     "use strict";
     import_jsx_runtime62 = __toESM(require_jsx_runtime(), 1);
     init_lucide_react();
     import_react52 = __toESM(require_react(), 1);
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_modern2();
     init_dist7();
     init_date_fns();
@@ -68087,9 +68090,9 @@ var init_app_documents_Bfh6cBsO = __esm({
   }
 });
 
-// dist/server/assets/app.deal-rooms-BPkIb2kC.js
-var app_deal_rooms_BPkIb2kC_exports = {};
-__export(app_deal_rooms_BPkIb2kC_exports, {
+// dist/server/assets/app.deal-rooms-oZhZwwt0.js
+var app_deal_rooms_oZhZwwt0_exports = {};
+__export(app_deal_rooms_oZhZwwt0_exports, {
   component: () => DealRooms
 });
 import "node:async_hooks";
@@ -68419,15 +68422,15 @@ function CreateRoomForm({
   ] }) });
 }
 var import_jsx_runtime63, import_react53, STATUS_COLOR2, DEAL_TYPES;
-var init_app_deal_rooms_BPkIb2kC = __esm({
-  "dist/server/assets/app.deal-rooms-BPkIb2kC.js"() {
+var init_app_deal_rooms_oZhZwwt0 = __esm({
+  "dist/server/assets/app.deal-rooms-oZhZwwt0.js"() {
     "use strict";
     import_jsx_runtime63 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_lucide_react();
     import_react53 = __toESM(require_react(), 1);
     init_modern2();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_date_fns();
     init_utils_H80jjgLf();
     init_dist7();
@@ -68535,9 +68538,9 @@ var init_app_audit_Dz_yfFC8 = __esm({
   }
 });
 
-// dist/server/assets/app.advisor-ZjdId7l5.js
-var app_advisor_ZjdId7l5_exports = {};
-__export(app_advisor_ZjdId7l5_exports, {
+// dist/server/assets/app.advisor-BVKHGHNx.js
+var app_advisor_BVKHGHNx_exports = {};
+__export(app_advisor_BVKHGHNx_exports, {
   component: () => Advisor
 });
 import "node:async_hooks";
@@ -68572,6 +68575,7 @@ function Advisor() {
     setMsgs((xs) => [...xs, userMsg]);
     setThinking(true);
     try {
+      const openAIKey = "";
       const history = msgs.slice(1).map((m3) => ({
         role: m3.role,
         content: m3.content
@@ -68580,7 +68584,8 @@ function Advisor() {
         data: {
           userId: user.id,
           message: t,
-          history
+          history,
+          openAIKey
         }
       });
       setMsgs((xs) => [...xs, {
@@ -68650,14 +68655,14 @@ function Advisor() {
   ] });
 }
 var import_jsx_runtime65, import_react55, getAIAdvice2, STARTERS;
-var init_app_advisor_ZjdId7l5 = __esm({
-  "dist/server/assets/app.advisor-ZjdId7l5.js"() {
+var init_app_advisor_BVKHGHNx = __esm({
+  "dist/server/assets/app.advisor-BVKHGHNx.js"() {
     "use strict";
     import_jsx_runtime65 = __toESM(require_jsx_runtime(), 1);
     import_react55 = __toESM(require_react(), 1);
     init_lucide_react();
     init_dist7();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_server4();
     init_clsx();
     init_production();
@@ -68668,24 +68673,31 @@ var init_app_advisor_ZjdId7l5 = __esm({
   }
 });
 
-// dist/server/assets/api.test-ai-C1EgTMiG.js
-var api_test_ai_C1EgTMiG_exports = {};
-__export(api_test_ai_C1EgTMiG_exports, {
+// dist/server/assets/api.test-ai-BlgUtB4Z.js
+var api_test_ai_BlgUtB4Z_exports = {};
+__export(api_test_ai_BlgUtB4Z_exports, {
   component: () => SplitComponent11
 });
 import "node:async_hooks";
 var import_jsx_runtime66, import_react56, SplitComponent11;
-var init_api_test_ai_C1EgTMiG = __esm({
-  "dist/server/assets/api.test-ai-C1EgTMiG.js"() {
+var init_api_test_ai_BlgUtB4Z = __esm({
+  "dist/server/assets/api.test-ai-BlgUtB4Z.js"() {
     "use strict";
     import_jsx_runtime66 = __toESM(require_jsx_runtime(), 1);
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     import_react56 = __toESM(require_react(), 1);
     init_dist7();
     init_production();
     init_clsx();
     SplitComponent11 = function TestAI() {
       const data = Route$g.useLoaderData();
+      const output = {
+        serverSide: data,
+        clientSide: {
+          VITE_OPENAI_API_KEY: "missing",
+          hasKey: false
+        }
+      };
       return /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("pre", { style: {
         padding: 24,
         fontFamily: "monospace",
@@ -68694,17 +68706,17 @@ var init_api_test_ai_C1EgTMiG = __esm({
         minHeight: "100vh",
         margin: 0,
         whiteSpace: "pre-wrap"
-      }, children: JSON.stringify(data, null, 2) });
+      }, children: JSON.stringify(output, null, 2) });
     };
   }
 });
 
-// dist/server/assets/deal-brief-fn-BA1cnQHn.js
+// dist/server/assets/deal-brief-fn-CDNrHnKG.js
 var generateDealBrief2;
-var init_deal_brief_fn_BA1cnQHn = __esm({
-  "dist/server/assets/deal-brief-fn-BA1cnQHn.js"() {
+var init_deal_brief_fn_CDNrHnKG = __esm({
+  "dist/server/assets/deal-brief-fn-CDNrHnKG.js"() {
     "use strict";
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_server4();
     generateDealBrief2 = createServerFn({
       method: "POST"
@@ -68712,9 +68724,9 @@ var init_deal_brief_fn_BA1cnQHn = __esm({
   }
 });
 
-// dist/server/assets/app.investor.index-DL6LU91d.js
-var app_investor_index_DL6LU91d_exports = {};
-__export(app_investor_index_DL6LU91d_exports, {
+// dist/server/assets/app.investor.index-BU2HcxAX.js
+var app_investor_index_BU2HcxAX_exports = {};
+__export(app_investor_index_BU2HcxAX_exports, {
   component: () => InvestorDashboard
 });
 import "node:async_hooks";
@@ -69046,17 +69058,17 @@ function InvestorDashboard() {
   ] });
 }
 var import_jsx_runtime67, import_react57, tone, STAGES3, DB_STATUS_TO_STAGE;
-var init_app_investor_index_DL6LU91d = __esm({
-  "dist/server/assets/app.investor.index-DL6LU91d.js"() {
+var init_app_investor_index_BU2HcxAX = __esm({
+  "dist/server/assets/app.investor.index-BU2HcxAX.js"() {
     "use strict";
     import_jsx_runtime67 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react57 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_utils_H80jjgLf();
-    init_deal_brief_fn_BA1cnQHn();
+    init_deal_brief_fn_CDNrHnKG();
     init_dist7();
     init_production();
     init_clsx();
@@ -69077,9 +69089,9 @@ var init_app_investor_index_DL6LU91d = __esm({
   }
 });
 
-// dist/server/assets/app.settings.security-Beq2Mhmc.js
-var app_settings_security_Beq2Mhmc_exports = {};
-__export(app_settings_security_Beq2Mhmc_exports, {
+// dist/server/assets/app.settings.security-qh4_RpWG.js
+var app_settings_security_qh4_RpWG_exports = {};
+__export(app_settings_security_qh4_RpWG_exports, {
   component: () => Security
 });
 import "node:async_hooks";
@@ -69170,13 +69182,13 @@ function Toggle({
   return /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("button", { onClick: () => onChange(!checked), className: `relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${checked ? "bg-gradient-brand" : "bg-muted border border-border/60"}`, children: /* @__PURE__ */ (0, import_jsx_runtime68.jsx)("span", { className: `inline-block h-3.5 w-3.5 rounded-full bg-background shadow-sm transition-transform ${checked ? "translate-x-[18px]" : "translate-x-0.5"}` }) });
 }
 var import_jsx_runtime68, import_react58;
-var init_app_settings_security_Beq2Mhmc = __esm({
-  "dist/server/assets/app.settings.security-Beq2Mhmc.js"() {
+var init_app_settings_security_qh4_RpWG = __esm({
+  "dist/server/assets/app.settings.security-qh4_RpWG.js"() {
     "use strict";
     import_jsx_runtime68 = __toESM(require_jsx_runtime(), 1);
     import_react58 = __toESM(require_react(), 1);
     init_lucide_react();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_esm5();
     init_dist7();
     init_production();
@@ -69184,9 +69196,9 @@ var init_app_settings_security_Beq2Mhmc = __esm({
   }
 });
 
-// dist/server/assets/app.settings.notifications-DBv8_g7N.js
-var app_settings_notifications_DBv8_g7N_exports = {};
-__export(app_settings_notifications_DBv8_g7N_exports, {
+// dist/server/assets/app.settings.notifications-C6cZW6yT.js
+var app_settings_notifications_C6cZW6yT_exports = {};
+__export(app_settings_notifications_C6cZW6yT_exports, {
   component: () => NotifRulesPage
 });
 import "node:async_hooks";
@@ -69270,13 +69282,13 @@ function Toggle2({
   return /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("button", { onClick: () => onChange(!checked), className: cn3("relative inline-flex h-5 w-9 items-center rounded-full transition-colors", checked ? "bg-gradient-brand" : "bg-muted border border-border/60"), children: /* @__PURE__ */ (0, import_jsx_runtime69.jsx)("span", { className: cn3("inline-block h-3.5 w-3.5 transform rounded-full bg-background shadow-sm transition-transform", checked ? "translate-x-[18px]" : "translate-x-0.5") }) });
 }
 var import_jsx_runtime69, import_react59, notifRulesDefault, groupIcon;
-var init_app_settings_notifications_DBv8_g7N = __esm({
-  "dist/server/assets/app.settings.notifications-DBv8_g7N.js"() {
+var init_app_settings_notifications_C6cZW6yT = __esm({
+  "dist/server/assets/app.settings.notifications-C6cZW6yT.js"() {
     "use strict";
     import_jsx_runtime69 = __toESM(require_jsx_runtime(), 1);
     import_react59 = __toESM(require_react(), 1);
     init_lucide_react();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_utils_H80jjgLf();
     init_dist7();
     init_production();
@@ -69532,9 +69544,9 @@ var init_app_settings_billing_wl3kYi6Q = __esm({
   }
 });
 
-// dist/server/assets/app.investor.team-DigzXb3T.js
-var app_investor_team_DigzXb3T_exports = {};
-__export(app_investor_team_DigzXb3T_exports, {
+// dist/server/assets/app.investor.team-Bd_bKdPo.js
+var app_investor_team_Bd_bKdPo_exports = {};
+__export(app_investor_team_Bd_bKdPo_exports, {
   component: () => TeamPage
 });
 import "node:async_hooks";
@@ -69683,14 +69695,14 @@ function TeamPage() {
   ] });
 }
 var import_jsx_runtime72, import_react61;
-var init_app_investor_team_DigzXb3T = __esm({
-  "dist/server/assets/app.investor.team-DigzXb3T.js"() {
+var init_app_investor_team_Bd_bKdPo = __esm({
+  "dist/server/assets/app.investor.team-Bd_bKdPo.js"() {
     "use strict";
     import_jsx_runtime72 = __toESM(require_jsx_runtime(), 1);
     import_react61 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_dist7();
     init_date_fns();
     init_production();
@@ -69698,9 +69710,9 @@ var init_app_investor_team_DigzXb3T = __esm({
   }
 });
 
-// dist/server/assets/app.investor.startups-COWKqFKx.js
-var app_investor_startups_COWKqFKx_exports = {};
-__export(app_investor_startups_COWKqFKx_exports, {
+// dist/server/assets/app.investor.startups-BX6bI7qA.js
+var app_investor_startups_BX6bI7qA_exports = {};
+__export(app_investor_startups_BX6bI7qA_exports, {
   component: () => StartupsPage
 });
 import "node:async_hooks";
@@ -69796,14 +69808,14 @@ function StartupsPage() {
   ] });
 }
 var import_jsx_runtime73, import_react62;
-var init_app_investor_startups_COWKqFKx = __esm({
-  "dist/server/assets/app.investor.startups-COWKqFKx.js"() {
+var init_app_investor_startups_BX6bI7qA = __esm({
+  "dist/server/assets/app.investor.startups-BX6bI7qA.js"() {
     "use strict";
     import_jsx_runtime73 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_lucide_react();
     init_modern2();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_date_fns();
     import_react62 = __toESM(require_react(), 1);
     init_dist7();
@@ -69812,9 +69824,9 @@ var init_app_investor_startups_COWKqFKx = __esm({
   }
 });
 
-// dist/server/assets/app.investor.portfolio-Bl-gL_A8.js
-var app_investor_portfolio_Bl_gL_A8_exports = {};
-__export(app_investor_portfolio_Bl_gL_A8_exports, {
+// dist/server/assets/app.investor.portfolio-_xxEwoWE.js
+var app_investor_portfolio_xxEwoWE_exports = {};
+__export(app_investor_portfolio_xxEwoWE_exports, {
   component: () => PortfolioPage
 });
 import "node:async_hooks";
@@ -69927,14 +69939,14 @@ function PortfolioPage() {
   ] });
 }
 var import_jsx_runtime74, import_react63;
-var init_app_investor_portfolio_Bl_gL_A8 = __esm({
-  "dist/server/assets/app.investor.portfolio-Bl-gL_A8.js"() {
+var init_app_investor_portfolio_xxEwoWE = __esm({
+  "dist/server/assets/app.investor.portfolio-_xxEwoWE.js"() {
     "use strict";
     import_jsx_runtime74 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_lucide_react();
     init_modern2();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_date_fns();
     import_react63 = __toESM(require_react(), 1);
     init_dist7();
@@ -69943,9 +69955,9 @@ var init_app_investor_portfolio_Bl_gL_A8 = __esm({
   }
 });
 
-// dist/server/assets/app.investor.pipeline-gBPQiTLY.js
-var app_investor_pipeline_gBPQiTLY_exports = {};
-__export(app_investor_pipeline_gBPQiTLY_exports, {
+// dist/server/assets/app.investor.pipeline-bYyouJX7.js
+var app_investor_pipeline_bYyouJX7_exports = {};
+__export(app_investor_pipeline_bYyouJX7_exports, {
   component: () => PipelinePage
 });
 import "node:async_hooks";
@@ -70082,15 +70094,15 @@ function PipelinePage() {
   ] });
 }
 var import_jsx_runtime75, import_react64, DB_STATUS_TO_STAGE2, STAGES4;
-var init_app_investor_pipeline_gBPQiTLY = __esm({
-  "dist/server/assets/app.investor.pipeline-gBPQiTLY.js"() {
+var init_app_investor_pipeline_bYyouJX7 = __esm({
+  "dist/server/assets/app.investor.pipeline-bYyouJX7.js"() {
     "use strict";
     import_jsx_runtime75 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react64 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_date_fns();
     init_utils_H80jjgLf();
     init_dist7();
@@ -70136,9 +70148,9 @@ var init_app_investor_pipeline_gBPQiTLY = __esm({
   }
 });
 
-// dist/server/assets/app.investor.diligence-B0DShNDl.js
-var app_investor_diligence_B0DShNDl_exports = {};
-__export(app_investor_diligence_B0DShNDl_exports, {
+// dist/server/assets/app.investor.diligence-CLg1uA8M.js
+var app_investor_diligence_CLg1uA8M_exports = {};
+__export(app_investor_diligence_CLg1uA8M_exports, {
   component: () => DiligencePage
 });
 import "node:async_hooks";
@@ -70266,23 +70278,23 @@ function DiligencePage() {
   ] });
 }
 var import_jsx_runtime76, import_react65;
-var init_app_investor_diligence_B0DShNDl = __esm({
-  "dist/server/assets/app.investor.diligence-B0DShNDl.js"() {
+var init_app_investor_diligence_CLg1uA8M = __esm({
+  "dist/server/assets/app.investor.diligence-CLg1uA8M.js"() {
     "use strict";
     import_jsx_runtime76 = __toESM(require_jsx_runtime(), 1);
     import_react65 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_dist7();
     init_production();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.investor.decisions-XimQM_Fl.js
-var app_investor_decisions_XimQM_Fl_exports = {};
-__export(app_investor_decisions_XimQM_Fl_exports, {
+// dist/server/assets/app.investor.decisions-Bx1Nmslj.js
+var app_investor_decisions_Bx1Nmslj_exports = {};
+__export(app_investor_decisions_Bx1Nmslj_exports, {
   component: () => DecisionsPage
 });
 import "node:async_hooks";
@@ -70388,14 +70400,14 @@ function DecisionsPage() {
   ] });
 }
 var import_jsx_runtime77, import_react66;
-var init_app_investor_decisions_XimQM_Fl = __esm({
-  "dist/server/assets/app.investor.decisions-XimQM_Fl.js"() {
+var init_app_investor_decisions_Bx1Nmslj = __esm({
+  "dist/server/assets/app.investor.decisions-Bx1Nmslj.js"() {
     "use strict";
     import_jsx_runtime77 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_lucide_react();
     init_modern2();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_date_fns();
     import_react66 = __toESM(require_react(), 1);
     init_dist7();
@@ -70404,9 +70416,9 @@ var init_app_investor_decisions_XimQM_Fl = __esm({
   }
 });
 
-// dist/server/assets/app.investor.deal-rooms-BywBCUTg.js
-var app_investor_deal_rooms_BywBCUTg_exports = {};
-__export(app_investor_deal_rooms_BywBCUTg_exports, {
+// dist/server/assets/app.investor.deal-rooms-Bq4IJp9K.js
+var app_investor_deal_rooms_Bq4IJp9K_exports = {};
+__export(app_investor_deal_rooms_Bq4IJp9K_exports, {
   component: () => DealRoomsPage
 });
 import "node:async_hooks";
@@ -70502,14 +70514,14 @@ function DealRoomsPage() {
   ] });
 }
 var import_jsx_runtime78, import_react67, STATUS_TO_LABEL;
-var init_app_investor_deal_rooms_BywBCUTg = __esm({
-  "dist/server/assets/app.investor.deal-rooms-BywBCUTg.js"() {
+var init_app_investor_deal_rooms_Bq4IJp9K = __esm({
+  "dist/server/assets/app.investor.deal-rooms-Bq4IJp9K.js"() {
     "use strict";
     import_jsx_runtime78 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_lucide_react();
     init_modern2();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_date_fns();
     init_utils_H80jjgLf();
     import_react67 = __toESM(require_react(), 1);
@@ -70545,9 +70557,9 @@ var init_app_investor_deal_rooms_BywBCUTg = __esm({
   }
 });
 
-// dist/server/assets/app.investor.deal-flow-DwjxXUp1.js
-var app_investor_deal_flow_DwjxXUp1_exports = {};
-__export(app_investor_deal_flow_DwjxXUp1_exports, {
+// dist/server/assets/app.investor.deal-flow-EZLYWi-h.js
+var app_investor_deal_flow_EZLYWi_h_exports = {};
+__export(app_investor_deal_flow_EZLYWi_h_exports, {
   component: () => DealFlowPage
 });
 import "node:async_hooks";
@@ -70634,15 +70646,15 @@ function DealFlowPage() {
   ] });
 }
 var import_jsx_runtime79, import_react68;
-var init_app_investor_deal_flow_DwjxXUp1 = __esm({
-  "dist/server/assets/app.investor.deal-flow-DwjxXUp1.js"() {
+var init_app_investor_deal_flow_EZLYWi_h = __esm({
+  "dist/server/assets/app.investor.deal-flow-EZLYWi-h.js"() {
     "use strict";
     import_jsx_runtime79 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react68 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_date_fns();
     init_dist7();
     init_production();
@@ -70650,9 +70662,9 @@ var init_app_investor_deal_flow_DwjxXUp1 = __esm({
   }
 });
 
-// dist/server/assets/app.investor.analysis-KeQq5WrP.js
-var app_investor_analysis_KeQq5WrP_exports = {};
-__export(app_investor_analysis_KeQq5WrP_exports, {
+// dist/server/assets/app.investor.analysis-DMf2gbz6.js
+var app_investor_analysis_DMf2gbz6_exports = {};
+__export(app_investor_analysis_DMf2gbz6_exports, {
   component: () => AnalysisPage
 });
 import "node:async_hooks";
@@ -70786,24 +70798,24 @@ function AnalysisPage() {
   ] });
 }
 var import_jsx_runtime80, import_react69;
-var init_app_investor_analysis_KeQq5WrP = __esm({
-  "dist/server/assets/app.investor.analysis-KeQq5WrP.js"() {
+var init_app_investor_analysis_DMf2gbz6 = __esm({
+  "dist/server/assets/app.investor.analysis-DMf2gbz6.js"() {
     "use strict";
     import_jsx_runtime80 = __toESM(require_jsx_runtime(), 1);
     import_react69 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_ZDeKAwyq();
-    init_deal_brief_fn_BA1cnQHn();
+    init_router_BRauOI85();
+    init_deal_brief_fn_CDNrHnKG();
     init_dist7();
     init_production();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.deal-room._id-BVFPh71i.js
-var app_deal_room_id_BVFPh71i_exports = {};
-__export(app_deal_room_id_BVFPh71i_exports, {
+// dist/server/assets/app.deal-room._id-olRUbhrW.js
+var app_deal_room_id_olRUbhrW_exports = {};
+__export(app_deal_room_id_olRUbhrW_exports, {
   component: () => DealRoom
 });
 import "node:async_hooks";
@@ -72731,8 +72743,8 @@ function QA({
   ] });
 }
 var import_jsx_runtime81, import_react70, statusMeta, cycle2, DOCS, STAGES5, SECTION_META, DECISION_TO_DB, DB_TO_DECISION, tabs2, CATEGORY_COLORS;
-var init_app_deal_room_id_BVFPh71i = __esm({
-  "dist/server/assets/app.deal-room._id-BVFPh71i.js"() {
+var init_app_deal_room_id_olRUbhrW = __esm({
+  "dist/server/assets/app.deal-room._id-olRUbhrW.js"() {
     "use strict";
     import_jsx_runtime81 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -72742,7 +72754,7 @@ var init_app_deal_room_id_BVFPh71i = __esm({
     init_lucide_react();
     init_modern2();
     init_backend_CMfy16B4();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_utils_H80jjgLf();
     init_store_LLbTvev();
     init_production();
@@ -72836,9 +72848,9 @@ var init_app_deal_room_id_BVFPh71i = __esm({
   }
 });
 
-// dist/server/assets/app.deal-room._id_.nda-C2MhmSaJ.js
-var app_deal_room_id_nda_C2MhmSaJ_exports = {};
-__export(app_deal_room_id_nda_C2MhmSaJ_exports, {
+// dist/server/assets/app.deal-room._id_.nda-Dzoe2vTQ.js
+var app_deal_room_id_nda_Dzoe2vTQ_exports = {};
+__export(app_deal_room_id_nda_Dzoe2vTQ_exports, {
   component: () => NdaPage
 });
 import "node:async_hooks";
@@ -73070,15 +73082,15 @@ function NdaPage() {
   ] }) });
 }
 var import_jsx_runtime82, import_react71;
-var init_app_deal_room_id_nda_C2MhmSaJ = __esm({
-  "dist/server/assets/app.deal-room._id_.nda-C2MhmSaJ.js"() {
+var init_app_deal_room_id_nda_Dzoe2vTQ = __esm({
+  "dist/server/assets/app.deal-room._id_.nda-Dzoe2vTQ.js"() {
     "use strict";
     import_jsx_runtime82 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react71 = __toESM(require_react(), 1);
     init_modern2();
     init_lucide_react();
-    init_router_ZDeKAwyq();
+    init_router_BRauOI85();
     init_Logo_CIkq6vsm();
     init_dist7();
     init_production();
@@ -73086,9 +73098,9 @@ var init_app_deal_room_id_nda_C2MhmSaJ = __esm({
   }
 });
 
-// dist/server/assets/router-ZDeKAwyq.js
-var router_ZDeKAwyq_exports = {};
-__export(router_ZDeKAwyq_exports, {
+// dist/server/assets/router-BRauOI85.js
+var router_BRauOI85_exports = {};
+__export(router_BRauOI85_exports, {
   L: () => LANGUAGES,
   R: () => Route$x,
   a: () => useI18n,
@@ -73318,8 +73330,8 @@ function DefaultErrorComponent({ error, reset }) {
   ] }) });
 }
 var import_jsx_runtime83, import_react72, url, anonKey, supabase, AuthContext, ThemeContext, STORAGE_KEY$1, LANGUAGES, en2, es, fr2, de3, dicts, STORAGE_KEY2, I18nContext, Toaster3, appCss, queryClient, Route$Q, $$splitComponentImporter$P, Route$P, $$splitComponentImporter$O, Route$O, $$splitComponentImporter$N, Route$N, $$splitComponentImporter$M, Route$M, $$splitComponentImporter$L, Route$L, $$splitComponentImporter$K, Route$K, $$splitComponentImporter$J, Route$J, $$splitComponentImporter$I, Route$I, $$splitComponentImporter$H, Route$H, $$splitComponentImporter$G, Route$G, $$splitComponentImporter$F, Route$F, $$splitComponentImporter$E, Route$E, $$splitComponentImporter$D, Route$D, $$splitComponentImporter$C, Route$C, $$splitComponentImporter$B, Route$B, $$splitComponentImporter$A, Route$A, $$splitComponentImporter$z, Route$z, $$splitComponentImporter$y, Route$y, $$splitComponentImporter$x, Route$x, $$splitComponentImporter$w, Route$w, $$splitComponentImporter$v, Route$v, $$splitComponentImporter$u, Route$u, $$splitComponentImporter$t, Route$t, $$splitComponentImporter$s, Route$s, $$splitComponentImporter$r, Route$r, $$splitComponentImporter$q, Route$q, $$splitComponentImporter$p, Route$p, $$splitComponentImporter$o, Route$o, $$splitComponentImporter$n, Route$n, $$splitComponentImporter$m, Route$m, $$splitComponentImporter$l, Route$l, $$splitComponentImporter$k, Route$k, $$splitComponentImporter$j, Route$j, $$splitComponentImporter$i, Route$i, $$splitComponentImporter$h, Route$h, createSsrRpc, $$splitComponentImporter$g, checkAIKeys2, Route$g, $$splitComponentImporter$f, Route$f, $$splitComponentImporter$e, Route$e, $$splitComponentImporter$d, Route$d, $$splitComponentImporter$c, Route$c, $$splitComponentImporter$b, Route$b, $$splitComponentImporter$a, Route$a, $$splitComponentImporter$9, Route$9, $$splitComponentImporter$8, Route$8, $$splitComponentImporter$7, Route$7, $$splitComponentImporter$6, Route$6, $$splitComponentImporter$5, Route$5, $$splitComponentImporter$4, Route$4, $$splitComponentImporter$3, Route$3, $$splitComponentImporter$2, Route$2, $$splitComponentImporter$1, Route$1, $$splitComponentImporter, Route2, TermsRoute, SignUpRoute, SignInRoute, PrivacyRoute, PricingRoute, InvestorsRoute, FoundersRoute, ForgotPasswordRoute, DebugRoute, AppRoute, AboutRoute, IndexRoute, AppIndexRoute, SolutionsVcDealRoomRoute, SolutionsRaise1mRoute, SolutionsInvestorPipelineRoute, SolutionsFundraisingCrmRoute, SolutionsDueDiligenceRoute, JoinTokenRoute, AuthCallbackRoute, AppUsersRoute, AppSettingsRoute, AppReportsRoute, AppProfileRoute, AppPipelineRoute, AppNotificationsRoute, AppMessagesRoute, AppMeetingsRoute, AppLeadsRoute, AppInvestorRoute, AppEmailRoute, AppDocumentsRoute, AppDealRoomsRoute, AppAuditRoute, AppAdvisorRoute, ApiTestAiRoute, AppInvestorIndexRoute, AppSettingsSecurityRoute, AppSettingsNotificationsRoute, AppSettingsDomainRoute, AppSettingsBillingRoute, AppInvestorTeamRoute, AppInvestorStartupsRoute, AppInvestorPortfolioRoute, AppInvestorPipelineRoute, AppInvestorDiligenceRoute, AppInvestorDecisionsRoute, AppInvestorDealRoomsRoute, AppInvestorDealFlowRoute, AppInvestorAnalysisRoute, AppDealRoomIdRoute, AppDealRoomIdNdaRoute, AppInvestorRouteChildren, AppInvestorRouteWithChildren, AppSettingsRouteChildren, AppSettingsRouteWithChildren, AppRouteChildren, AppRouteWithChildren, rootRouteChildren, routeTree, getRouter, router;
-var init_router_ZDeKAwyq = __esm({
-  "dist/server/assets/router-ZDeKAwyq.js"() {
+var init_router_BRauOI85 = __esm({
+  "dist/server/assets/router-BRauOI85.js"() {
     "use strict";
     import_jsx_runtime83 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -73677,7 +73689,7 @@ var init_router_ZDeKAwyq = __esm({
       component: RootComponent,
       notFoundComponent: NotFoundComponent
     });
-    $$splitComponentImporter$P = () => Promise.resolve().then(() => (init_terms_DE_mKsEU(), terms_DE_mKsEU_exports));
+    $$splitComponentImporter$P = () => Promise.resolve().then(() => (init_terms_Cbz3Tj9R(), terms_Cbz3Tj9R_exports));
     Route$P = createFileRoute("/terms")({
       head: () => ({
         meta: [{
@@ -73689,15 +73701,15 @@ var init_router_ZDeKAwyq = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$P, "component")
     });
-    $$splitComponentImporter$O = () => Promise.resolve().then(() => (init_sign_up_D3aICks3(), sign_up_D3aICks3_exports));
+    $$splitComponentImporter$O = () => Promise.resolve().then(() => (init_sign_up_DZLhpchY(), sign_up_DZLhpchY_exports));
     Route$O = createFileRoute("/sign-up")({
       component: lazyRouteComponent($$splitComponentImporter$O, "component")
     });
-    $$splitComponentImporter$N = () => Promise.resolve().then(() => (init_sign_in_C9gtbcKh(), sign_in_C9gtbcKh_exports));
+    $$splitComponentImporter$N = () => Promise.resolve().then(() => (init_sign_in_Ctjfar7F(), sign_in_Ctjfar7F_exports));
     Route$N = createFileRoute("/sign-in")({
       component: lazyRouteComponent($$splitComponentImporter$N, "component")
     });
-    $$splitComponentImporter$M = () => Promise.resolve().then(() => (init_privacy_BlMHlTxc(), privacy_BlMHlTxc_exports));
+    $$splitComponentImporter$M = () => Promise.resolve().then(() => (init_privacy_RfxBcgHR(), privacy_RfxBcgHR_exports));
     Route$M = createFileRoute("/privacy")({
       head: () => ({
         meta: [{
@@ -73709,7 +73721,7 @@ var init_router_ZDeKAwyq = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$M, "component")
     });
-    $$splitComponentImporter$L = () => Promise.resolve().then(() => (init_pricing_DB_z3M7K(), pricing_DB_z3M7K_exports));
+    $$splitComponentImporter$L = () => Promise.resolve().then(() => (init_pricing_Dvg8v_6T(), pricing_Dvg8v_6T_exports));
     Route$L = createFileRoute("/pricing")({
       head: () => ({
         meta: [{
@@ -73721,7 +73733,7 @@ var init_router_ZDeKAwyq = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$L, "component")
     });
-    $$splitComponentImporter$K = () => Promise.resolve().then(() => (init_investors_DIvq9bBK(), investors_DIvq9bBK_exports));
+    $$splitComponentImporter$K = () => Promise.resolve().then(() => (init_investors_CSh5h1s2(), investors_CSh5h1s2_exports));
     Route$K = createFileRoute("/investors")({
       head: () => ({
         meta: [{
@@ -73733,7 +73745,7 @@ var init_router_ZDeKAwyq = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$K, "component")
     });
-    $$splitComponentImporter$J = () => Promise.resolve().then(() => (init_founders_aQ6_2EyW(), founders_aQ6_2EyW_exports));
+    $$splitComponentImporter$J = () => Promise.resolve().then(() => (init_founders_IJ2YAJez(), founders_IJ2YAJez_exports));
     Route$J = createFileRoute("/founders")({
       head: () => ({
         meta: [{
@@ -73745,7 +73757,7 @@ var init_router_ZDeKAwyq = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$J, "component")
     });
-    $$splitComponentImporter$I = () => Promise.resolve().then(() => (init_forgot_password_BxZMhSvA(), forgot_password_BxZMhSvA_exports));
+    $$splitComponentImporter$I = () => Promise.resolve().then(() => (init_forgot_password_EoMP8m7p(), forgot_password_EoMP8m7p_exports));
     Route$I = createFileRoute("/forgot-password")({
       component: lazyRouteComponent($$splitComponentImporter$I, "component")
     });
@@ -73753,7 +73765,7 @@ var init_router_ZDeKAwyq = __esm({
     Route$H = createFileRoute("/debug")({
       component: lazyRouteComponent($$splitComponentImporter$H, "component")
     });
-    $$splitComponentImporter$G = () => Promise.resolve().then(() => (init_app_B7DjYVHW(), app_B7DjYVHW_exports));
+    $$splitComponentImporter$G = () => Promise.resolve().then(() => (init_app_Cq3KkfMu(), app_Cq3KkfMu_exports));
     Route$G = createFileRoute("/app")({
       beforeLoad: async () => {
         if (typeof window === "undefined") return;
@@ -73778,7 +73790,7 @@ var init_router_ZDeKAwyq = __esm({
       },
       component: lazyRouteComponent($$splitComponentImporter$G, "component")
     });
-    $$splitComponentImporter$F = () => Promise.resolve().then(() => (init_about_BfEhtZsC(), about_BfEhtZsC_exports));
+    $$splitComponentImporter$F = () => Promise.resolve().then(() => (init_about_DjYzlz5P(), about_DjYzlz5P_exports));
     Route$F = createFileRoute("/about")({
       head: () => ({
         meta: [{
@@ -73790,7 +73802,7 @@ var init_router_ZDeKAwyq = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$F, "component")
     });
-    $$splitComponentImporter$E = () => Promise.resolve().then(() => (init_index_DnZIqdE7(), index_DnZIqdE7_exports));
+    $$splitComponentImporter$E = () => Promise.resolve().then(() => (init_index_C1rcQwV4(), index_C1rcQwV4_exports));
     Route$E = createFileRoute("/")({
       head: () => ({
         meta: [{
@@ -73808,11 +73820,11 @@ var init_router_ZDeKAwyq = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$E, "component")
     });
-    $$splitComponentImporter$D = () => Promise.resolve().then(() => (init_app_index_CyUCKFC8(), app_index_CyUCKFC8_exports));
+    $$splitComponentImporter$D = () => Promise.resolve().then(() => (init_app_index_gth79moq(), app_index_gth79moq_exports));
     Route$D = createFileRoute("/app/")({
       component: lazyRouteComponent($$splitComponentImporter$D, "component")
     });
-    $$splitComponentImporter$C = () => Promise.resolve().then(() => (init_solutions_vc_deal_room_BHghcqtU(), solutions_vc_deal_room_BHghcqtU_exports));
+    $$splitComponentImporter$C = () => Promise.resolve().then(() => (init_solutions_vc_deal_room_BPidwXDV(), solutions_vc_deal_room_BPidwXDV_exports));
     Route$C = createFileRoute("/solutions/vc-deal-room")({
       head: () => ({
         meta: [{
@@ -73824,7 +73836,7 @@ var init_router_ZDeKAwyq = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$C, "component")
     });
-    $$splitComponentImporter$B = () => Promise.resolve().then(() => (init_solutions_raise_1m_D_UUo6GS(), solutions_raise_1m_D_UUo6GS_exports));
+    $$splitComponentImporter$B = () => Promise.resolve().then(() => (init_solutions_raise_1m_D_yEWW8Y(), solutions_raise_1m_D_yEWW8Y_exports));
     Route$B = createFileRoute("/solutions/raise-1m")({
       head: () => ({
         meta: [{
@@ -73836,7 +73848,7 @@ var init_router_ZDeKAwyq = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$B, "component")
     });
-    $$splitComponentImporter$A = () => Promise.resolve().then(() => (init_solutions_investor_pipeline_CXqqi161(), solutions_investor_pipeline_CXqqi161_exports));
+    $$splitComponentImporter$A = () => Promise.resolve().then(() => (init_solutions_investor_pipeline_DbhPMpY0(), solutions_investor_pipeline_DbhPMpY0_exports));
     Route$A = createFileRoute("/solutions/investor-pipeline")({
       head: () => ({
         meta: [{
@@ -73848,7 +73860,7 @@ var init_router_ZDeKAwyq = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$A, "component")
     });
-    $$splitComponentImporter$z = () => Promise.resolve().then(() => (init_solutions_fundraising_crm_Bb_vd3i8(), solutions_fundraising_crm_Bb_vd3i8_exports));
+    $$splitComponentImporter$z = () => Promise.resolve().then(() => (init_solutions_fundraising_crm_CMw81zT6(), solutions_fundraising_crm_CMw81zT6_exports));
     Route$z = createFileRoute("/solutions/fundraising-crm")({
       head: () => ({
         meta: [{
@@ -73860,7 +73872,7 @@ var init_router_ZDeKAwyq = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$z, "component")
     });
-    $$splitComponentImporter$y = () => Promise.resolve().then(() => (init_solutions_due_diligence_CbMcGO8a(), solutions_due_diligence_CbMcGO8a_exports));
+    $$splitComponentImporter$y = () => Promise.resolve().then(() => (init_solutions_due_diligence_ShFU7AwW(), solutions_due_diligence_ShFU7AwW_exports));
     Route$y = createFileRoute("/solutions/due-diligence")({
       head: () => ({
         meta: [{
@@ -73872,31 +73884,31 @@ var init_router_ZDeKAwyq = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$y, "component")
     });
-    $$splitComponentImporter$x = () => Promise.resolve().then(() => (init_join_token_Dcz2g1ly(), join_token_Dcz2g1ly_exports));
+    $$splitComponentImporter$x = () => Promise.resolve().then(() => (init_join_token_BST4WH6h(), join_token_BST4WH6h_exports));
     Route$x = createFileRoute("/join/$token")({
       component: lazyRouteComponent($$splitComponentImporter$x, "component")
     });
-    $$splitComponentImporter$w = () => Promise.resolve().then(() => (init_auth_callback_B4MwFdOY(), auth_callback_B4MwFdOY_exports));
+    $$splitComponentImporter$w = () => Promise.resolve().then(() => (init_auth_callback_CoLhWSAL(), auth_callback_CoLhWSAL_exports));
     Route$w = createFileRoute("/auth/callback")({
       component: lazyRouteComponent($$splitComponentImporter$w, "component")
     });
-    $$splitComponentImporter$v = () => Promise.resolve().then(() => (init_app_users_B9Cj2R90(), app_users_B9Cj2R90_exports));
+    $$splitComponentImporter$v = () => Promise.resolve().then(() => (init_app_users_DsamaZ4(), app_users_DsamaZ4_exports));
     Route$v = createFileRoute("/app/users")({
       component: lazyRouteComponent($$splitComponentImporter$v, "component")
     });
-    $$splitComponentImporter$u = () => Promise.resolve().then(() => (init_app_settings_DGifbmK5(), app_settings_DGifbmK5_exports));
+    $$splitComponentImporter$u = () => Promise.resolve().then(() => (init_app_settings_Bw0rvynr(), app_settings_Bw0rvynr_exports));
     Route$u = createFileRoute("/app/settings")({
       component: lazyRouteComponent($$splitComponentImporter$u, "component")
     });
-    $$splitComponentImporter$t = () => Promise.resolve().then(() => (init_app_reports_BUN1O2LW(), app_reports_BUN1O2LW_exports));
+    $$splitComponentImporter$t = () => Promise.resolve().then(() => (init_app_reports_Cr24rL5e(), app_reports_Cr24rL5e_exports));
     Route$t = createFileRoute("/app/reports")({
       component: lazyRouteComponent($$splitComponentImporter$t, "component")
     });
-    $$splitComponentImporter$s = () => Promise.resolve().then(() => (init_app_profile_BCMOBbnz(), app_profile_BCMOBbnz_exports));
+    $$splitComponentImporter$s = () => Promise.resolve().then(() => (init_app_profile_CRVIQQvX(), app_profile_CRVIQQvX_exports));
     Route$s = createFileRoute("/app/profile")({
       component: lazyRouteComponent($$splitComponentImporter$s, "component")
     });
-    $$splitComponentImporter$r = () => Promise.resolve().then(() => (init_app_pipeline_BQ2nT_WF(), app_pipeline_BQ2nT_WF_exports));
+    $$splitComponentImporter$r = () => Promise.resolve().then(() => (init_app_pipeline_DVnzKtpg(), app_pipeline_DVnzKtpg_exports));
     Route$r = createFileRoute("/app/pipeline")({
       component: lazyRouteComponent($$splitComponentImporter$r, "component")
     });
@@ -73904,15 +73916,15 @@ var init_router_ZDeKAwyq = __esm({
     Route$q = createFileRoute("/app/notifications")({
       component: lazyRouteComponent($$splitComponentImporter$q, "component")
     });
-    $$splitComponentImporter$p = () => Promise.resolve().then(() => (init_app_messages_RkyCIaU7(), app_messages_RkyCIaU7_exports));
+    $$splitComponentImporter$p = () => Promise.resolve().then(() => (init_app_messages_ZOEv1Pop(), app_messages_ZOEv1Pop_exports));
     Route$p = createFileRoute("/app/messages")({
       component: lazyRouteComponent($$splitComponentImporter$p, "component")
     });
-    $$splitComponentImporter$o = () => Promise.resolve().then(() => (init_app_meetings_BZAwk3rV(), app_meetings_BZAwk3rV_exports));
+    $$splitComponentImporter$o = () => Promise.resolve().then(() => (init_app_meetings_BE_qsNXO(), app_meetings_BE_qsNXO_exports));
     Route$o = createFileRoute("/app/meetings")({
       component: lazyRouteComponent($$splitComponentImporter$o, "component")
     });
-    $$splitComponentImporter$n = () => Promise.resolve().then(() => (init_app_leads_C0D847za(), app_leads_C0D847za_exports));
+    $$splitComponentImporter$n = () => Promise.resolve().then(() => (init_app_leads_B0RWa4G6(), app_leads_B0RWa4G6_exports));
     Route$n = createFileRoute("/app/leads")({
       component: lazyRouteComponent($$splitComponentImporter$n, "component")
     });
@@ -73953,11 +73965,11 @@ var init_router_ZDeKAwyq = __esm({
     Route$l = createFileRoute("/app/email")({
       component: lazyRouteComponent($$splitComponentImporter$l, "component")
     });
-    $$splitComponentImporter$k = () => Promise.resolve().then(() => (init_app_documents_Bfh6cBsO(), app_documents_Bfh6cBsO_exports));
+    $$splitComponentImporter$k = () => Promise.resolve().then(() => (init_app_documents_BAWfL_SO(), app_documents_BAWfL_SO_exports));
     Route$k = createFileRoute("/app/documents")({
       component: lazyRouteComponent($$splitComponentImporter$k, "component")
     });
-    $$splitComponentImporter$j = () => Promise.resolve().then(() => (init_app_deal_rooms_BPkIb2kC(), app_deal_rooms_BPkIb2kC_exports));
+    $$splitComponentImporter$j = () => Promise.resolve().then(() => (init_app_deal_rooms_oZhZwwt0(), app_deal_rooms_oZhZwwt0_exports));
     Route$j = createFileRoute("/app/deal-rooms")({
       component: lazyRouteComponent($$splitComponentImporter$j, "component")
     });
@@ -73965,7 +73977,7 @@ var init_router_ZDeKAwyq = __esm({
     Route$i = createFileRoute("/app/audit")({
       component: lazyRouteComponent($$splitComponentImporter$i, "component")
     });
-    $$splitComponentImporter$h = () => Promise.resolve().then(() => (init_app_advisor_ZjdId7l5(), app_advisor_ZjdId7l5_exports));
+    $$splitComponentImporter$h = () => Promise.resolve().then(() => (init_app_advisor_BVKHGHNx(), app_advisor_BVKHGHNx_exports));
     Route$h = createFileRoute("/app/advisor")({
       component: lazyRouteComponent($$splitComponentImporter$h, "component")
     });
@@ -73981,7 +73993,7 @@ var init_router_ZDeKAwyq = __esm({
         [TSS_SERVER_FUNCTION]: true
       });
     };
-    $$splitComponentImporter$g = () => Promise.resolve().then(() => (init_api_test_ai_C1EgTMiG(), api_test_ai_C1EgTMiG_exports));
+    $$splitComponentImporter$g = () => Promise.resolve().then(() => (init_api_test_ai_BlgUtB4Z(), api_test_ai_BlgUtB4Z_exports));
     checkAIKeys2 = createServerFn({
       method: "GET"
     }).handler(createSsrRpc("157f76e85df17cf0242a7d5c8036d366db569f6a04eeaffd5e9d8f9789563b44"));
@@ -73989,15 +74001,15 @@ var init_router_ZDeKAwyq = __esm({
       loader: () => checkAIKeys2(),
       component: lazyRouteComponent($$splitComponentImporter$g, "component")
     });
-    $$splitComponentImporter$f = () => Promise.resolve().then(() => (init_app_investor_index_DL6LU91d(), app_investor_index_DL6LU91d_exports));
+    $$splitComponentImporter$f = () => Promise.resolve().then(() => (init_app_investor_index_BU2HcxAX(), app_investor_index_BU2HcxAX_exports));
     Route$f = createFileRoute("/app/investor/")({
       component: lazyRouteComponent($$splitComponentImporter$f, "component")
     });
-    $$splitComponentImporter$e = () => Promise.resolve().then(() => (init_app_settings_security_Beq2Mhmc(), app_settings_security_Beq2Mhmc_exports));
+    $$splitComponentImporter$e = () => Promise.resolve().then(() => (init_app_settings_security_qh4_RpWG(), app_settings_security_qh4_RpWG_exports));
     Route$e = createFileRoute("/app/settings/security")({
       component: lazyRouteComponent($$splitComponentImporter$e, "component")
     });
-    $$splitComponentImporter$d = () => Promise.resolve().then(() => (init_app_settings_notifications_DBv8_g7N(), app_settings_notifications_DBv8_g7N_exports));
+    $$splitComponentImporter$d = () => Promise.resolve().then(() => (init_app_settings_notifications_C6cZW6yT(), app_settings_notifications_C6cZW6yT_exports));
     Route$d = createFileRoute("/app/settings/notifications")({
       component: lazyRouteComponent($$splitComponentImporter$d, "component")
     });
@@ -74009,47 +74021,47 @@ var init_router_ZDeKAwyq = __esm({
     Route$b = createFileRoute("/app/settings/billing")({
       component: lazyRouteComponent($$splitComponentImporter$b, "component")
     });
-    $$splitComponentImporter$a = () => Promise.resolve().then(() => (init_app_investor_team_DigzXb3T(), app_investor_team_DigzXb3T_exports));
+    $$splitComponentImporter$a = () => Promise.resolve().then(() => (init_app_investor_team_Bd_bKdPo(), app_investor_team_Bd_bKdPo_exports));
     Route$a = createFileRoute("/app/investor/team")({
       component: lazyRouteComponent($$splitComponentImporter$a, "component")
     });
-    $$splitComponentImporter$9 = () => Promise.resolve().then(() => (init_app_investor_startups_COWKqFKx(), app_investor_startups_COWKqFKx_exports));
+    $$splitComponentImporter$9 = () => Promise.resolve().then(() => (init_app_investor_startups_BX6bI7qA(), app_investor_startups_BX6bI7qA_exports));
     Route$9 = createFileRoute("/app/investor/startups")({
       component: lazyRouteComponent($$splitComponentImporter$9, "component")
     });
-    $$splitComponentImporter$8 = () => Promise.resolve().then(() => (init_app_investor_portfolio_Bl_gL_A8(), app_investor_portfolio_Bl_gL_A8_exports));
+    $$splitComponentImporter$8 = () => Promise.resolve().then(() => (init_app_investor_portfolio_xxEwoWE(), app_investor_portfolio_xxEwoWE_exports));
     Route$8 = createFileRoute("/app/investor/portfolio")({
       component: lazyRouteComponent($$splitComponentImporter$8, "component")
     });
-    $$splitComponentImporter$7 = () => Promise.resolve().then(() => (init_app_investor_pipeline_gBPQiTLY(), app_investor_pipeline_gBPQiTLY_exports));
+    $$splitComponentImporter$7 = () => Promise.resolve().then(() => (init_app_investor_pipeline_bYyouJX7(), app_investor_pipeline_bYyouJX7_exports));
     Route$7 = createFileRoute("/app/investor/pipeline")({
       component: lazyRouteComponent($$splitComponentImporter$7, "component")
     });
-    $$splitComponentImporter$6 = () => Promise.resolve().then(() => (init_app_investor_diligence_B0DShNDl(), app_investor_diligence_B0DShNDl_exports));
+    $$splitComponentImporter$6 = () => Promise.resolve().then(() => (init_app_investor_diligence_CLg1uA8M(), app_investor_diligence_CLg1uA8M_exports));
     Route$6 = createFileRoute("/app/investor/diligence")({
       component: lazyRouteComponent($$splitComponentImporter$6, "component")
     });
-    $$splitComponentImporter$5 = () => Promise.resolve().then(() => (init_app_investor_decisions_XimQM_Fl(), app_investor_decisions_XimQM_Fl_exports));
+    $$splitComponentImporter$5 = () => Promise.resolve().then(() => (init_app_investor_decisions_Bx1Nmslj(), app_investor_decisions_Bx1Nmslj_exports));
     Route$5 = createFileRoute("/app/investor/decisions")({
       component: lazyRouteComponent($$splitComponentImporter$5, "component")
     });
-    $$splitComponentImporter$4 = () => Promise.resolve().then(() => (init_app_investor_deal_rooms_BywBCUTg(), app_investor_deal_rooms_BywBCUTg_exports));
+    $$splitComponentImporter$4 = () => Promise.resolve().then(() => (init_app_investor_deal_rooms_Bq4IJp9K(), app_investor_deal_rooms_Bq4IJp9K_exports));
     Route$4 = createFileRoute("/app/investor/deal-rooms")({
       component: lazyRouteComponent($$splitComponentImporter$4, "component")
     });
-    $$splitComponentImporter$3 = () => Promise.resolve().then(() => (init_app_investor_deal_flow_DwjxXUp1(), app_investor_deal_flow_DwjxXUp1_exports));
+    $$splitComponentImporter$3 = () => Promise.resolve().then(() => (init_app_investor_deal_flow_EZLYWi_h(), app_investor_deal_flow_EZLYWi_h_exports));
     Route$3 = createFileRoute("/app/investor/deal-flow")({
       component: lazyRouteComponent($$splitComponentImporter$3, "component")
     });
-    $$splitComponentImporter$2 = () => Promise.resolve().then(() => (init_app_investor_analysis_KeQq5WrP(), app_investor_analysis_KeQq5WrP_exports));
+    $$splitComponentImporter$2 = () => Promise.resolve().then(() => (init_app_investor_analysis_DMf2gbz6(), app_investor_analysis_DMf2gbz6_exports));
     Route$2 = createFileRoute("/app/investor/analysis")({
       component: lazyRouteComponent($$splitComponentImporter$2, "component")
     });
-    $$splitComponentImporter$1 = () => Promise.resolve().then(() => (init_app_deal_room_id_BVFPh71i(), app_deal_room_id_BVFPh71i_exports));
+    $$splitComponentImporter$1 = () => Promise.resolve().then(() => (init_app_deal_room_id_olRUbhrW(), app_deal_room_id_olRUbhrW_exports));
     Route$1 = createFileRoute("/app/deal-room/$id")({
       component: lazyRouteComponent($$splitComponentImporter$1, "component")
     });
-    $$splitComponentImporter = () => Promise.resolve().then(() => (init_app_deal_room_id_nda_C2MhmSaJ(), app_deal_room_id_nda_C2MhmSaJ_exports));
+    $$splitComponentImporter = () => Promise.resolve().then(() => (init_app_deal_room_id_nda_Dzoe2vTQ(), app_deal_room_id_nda_Dzoe2vTQ_exports));
     Route2 = createFileRoute("/app/deal-room/$id_/nda")({
       component: lazyRouteComponent($$splitComponentImporter, "component")
     });
@@ -74481,7 +74493,7 @@ function getResponse() {
   return getH3Event().res;
 }
 async function getStartManifest(matchedRoutes) {
-  const { tsrStartManifest: tsrStartManifest2 } = await Promise.resolve().then(() => (init_tanstack_start_manifest_v_CZWWiQue(), tanstack_start_manifest_v_CZWWiQue_exports));
+  const { tsrStartManifest: tsrStartManifest2 } = await Promise.resolve().then(() => (init_tanstack_start_manifest_v_COjLHjh8(), tanstack_start_manifest_v_COjLHjh8_exports));
   const startManifest = tsrStartManifest2();
   const rootRoute = startManifest.routes[rootRouteId] = startManifest.routes[rootRouteId] || {};
   rootRoute.assets = rootRoute.assets || [];
@@ -74939,7 +74951,7 @@ function getStartResponseHeaders(opts) {
 }
 async function loadEntries() {
   const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-    Promise.resolve().then(() => (init_router_ZDeKAwyq(), router_ZDeKAwyq_exports)).then((n2) => n2.r),
+    Promise.resolve().then(() => (init_router_BRauOI85(), router_BRauOI85_exports)).then((n2) => n2.r),
     Promise.resolve().then(() => (init_start_HYkvq4Ni(), start_HYkvq4Ni_exports)),
     Promise.resolve().then(() => (init_tanstack_start_plugin_adapters_Cwee5PKy(), tanstack_start_plugin_adapters_Cwee5PKy_exports))
   ]);
@@ -75281,25 +75293,25 @@ var init_server4 = __esm({
         functionName: "checkAIKeys_createServerFn_handler",
         importer: () => Promise.resolve().then(() => (init_api_test_ai_BFhXvJHs(), api_test_ai_BFhXvJHs_exports))
       },
-      "397b3f65700da6e488c63bfeb016aac33e5f67ff2f57bcca85b9c84f5eace701": {
-        functionName: "getAIAdvice_createServerFn_handler",
-        importer: () => Promise.resolve().then(() => (init_advisor_fn_DV_FYqJi(), advisor_fn_DV_FYqJi_exports))
-      },
       "56f68b50d6d653ae4f4287eb005bbb35fecea7fa7ce69a4b2a6cc974383a502e": {
         functionName: "generateDealBrief_createServerFn_handler",
         importer: () => Promise.resolve().then(() => (init_deal_brief_fn_DafvcXP(), deal_brief_fn_DafvcXP_exports))
       },
-      "1d719b02e5cbb8bfb1f5fdbf08bea97cdac2cfff952491ca07a2d91de6f74c81": {
-        functionName: "generateOutreachEmail_createServerFn_handler",
-        importer: () => Promise.resolve().then(() => (init_ai_fn_DAj5FUH2(), ai_fn_DAj5FUH2_exports))
-      },
-      "272077c9c144c7cbae7da95efd3b0536517866897833aab391e7e9e60debb102": {
-        functionName: "generateLinkedInMessage_createServerFn_handler",
-        importer: () => Promise.resolve().then(() => (init_linkedin_fn_Dy3zCFEf(), linkedin_fn_Dy3zCFEf_exports))
+      "397b3f65700da6e488c63bfeb016aac33e5f67ff2f57bcca85b9c84f5eace701": {
+        functionName: "getAIAdvice_createServerFn_handler",
+        importer: () => Promise.resolve().then(() => (init_advisor_fn_BaFZ_RXF(), advisor_fn_BaFZ_RXF_exports))
       },
       "08b07e340aa3dd2c22b3ea45b5ff6e1a1e3844f3dadeb4cfd75858793e9c8fb3": {
         functionName: "generateReply_createServerFn_handler",
-        importer: () => Promise.resolve().then(() => (init_reply_fn_DePVAZDa(), reply_fn_DePVAZDa_exports))
+        importer: () => Promise.resolve().then(() => (init_reply_fn_B_ummABI(), reply_fn_B_ummABI_exports))
+      },
+      "272077c9c144c7cbae7da95efd3b0536517866897833aab391e7e9e60debb102": {
+        functionName: "generateLinkedInMessage_createServerFn_handler",
+        importer: () => Promise.resolve().then(() => (init_linkedin_fn_B9qUM3Ah(), linkedin_fn_B9qUM3Ah_exports))
+      },
+      "1d719b02e5cbb8bfb1f5fdbf08bea97cdac2cfff952491ca07a2d91de6f74c81": {
+        functionName: "generateOutreachEmail_createServerFn_handler",
+        importer: () => Promise.resolve().then(() => (init_ai_fn_DrVjgWEV(), ai_fn_DrVjgWEV_exports))
       }
     };
     TSS_FORMDATA_CONTEXT = "__TSS_CONTEXT";

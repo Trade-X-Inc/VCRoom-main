@@ -65,6 +65,14 @@ export const Route = createFileRoute("/api/test-ai")({
   loader: () => checkAIKeys(),
   component: function TestAI() {
     const data = Route.useLoaderData();
+    const clientKey = import.meta.env.VITE_OPENAI_API_KEY || "";
+    const output = {
+      serverSide: data,
+      clientSide: {
+        VITE_OPENAI_API_KEY: clientKey ? clientKey.slice(0, 8) + "..." : "missing",
+        hasKey: !!clientKey,
+      },
+    };
     return (
       <pre
         style={{
@@ -77,7 +85,7 @@ export const Route = createFileRoute("/api/test-ai")({
           whiteSpace: "pre-wrap",
         }}
       >
-        {JSON.stringify(data, null, 2)}
+        {JSON.stringify(output, null, 2)}
       </pre>
     );
   },

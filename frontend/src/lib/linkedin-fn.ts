@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 
-type LinkedInInput = { userId: string; leadId: string };
+type LinkedInInput = { userId: string; leadId: string; openAIKey?: string };
 
 export const generateLinkedInMessage = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): LinkedInInput => data as LinkedInInput)
@@ -15,6 +15,7 @@ export const generateLinkedInMessage = createServerFn({ method: "POST" })
       (globalThis as any).SUPABASE_SERVICE_ROLE_KEY ||
       (import.meta.env as any).VITE_SUPABASE_ANON_KEY || "";
     const openAIKey =
+      data.openAIKey ||
       process.env.OPENAI_API_KEY ||
       (globalThis as any).OPENAI_API_KEY ||
       import.meta.env.VITE_OPENAI_API_KEY || "";

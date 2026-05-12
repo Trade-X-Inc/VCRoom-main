@@ -5,6 +5,7 @@ type AdvisorInput = {
   userId: string;
   message: string;
   history: Array<{ role: string; content: string }>;
+  openAIKey?: string;
 };
 
 type AdvisorResult = {
@@ -16,9 +17,9 @@ export const getAIAdvice = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): AdvisorInput => data as AdvisorInput)
   .handler(async ({ data }: { data: AdvisorInput }): Promise<AdvisorResult> => {
     const openAIKey =
+      data.openAIKey ||
       process.env.OPENAI_API_KEY ||
-      (globalThis as any).OPENAI_API_KEY ||
-      import.meta.env.VITE_OPENAI_API_KEY || "";
+      (globalThis as any).OPENAI_API_KEY || "";
 
     const supabaseUrl =
       process.env.SUPABASE_URL ||
