@@ -73,7 +73,7 @@ function getResponse() {
 }
 var HEADERS = { TSS_SHELL: "X-TSS_SHELL" };
 async function getStartManifest(matchedRoutes) {
-  const { tsrStartManifest } = await import("./assets/_tanstack-start-manifest_v-DzdqksVy.js");
+  const { tsrStartManifest } = await import("./assets/_tanstack-start-manifest_v-CZWWiQue.js");
   const startManifest = tsrStartManifest();
   const rootRoute = startManifest.routes[rootRouteId] = startManifest.routes[rootRouteId] || {};
   rootRoute.assets = rootRoute.assets || [];
@@ -98,6 +98,10 @@ async function getStartManifest(matchedRoutes) {
   };
 }
 const manifest = {
+  "157f76e85df17cf0242a7d5c8036d366db569f6a04eeaffd5e9d8f9789563b44": {
+    functionName: "checkAIKeys_createServerFn_handler",
+    importer: () => import("./assets/api.test-ai-BD0iVlJk.js")
+  },
   "397b3f65700da6e488c63bfeb016aac33e5f67ff2f57bcca85b9c84f5eace701": {
     functionName: "getAIAdvice_createServerFn_handler",
     importer: () => import("./assets/advisor-fn-3EN-lqRx.js")
@@ -871,7 +875,7 @@ var baseManifestPromise;
 var cachedFinalManifestPromise;
 async function loadEntries() {
   const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-    import("./assets/router-C9QH749P.js").then((n) => n.r),
+    import("./assets/router-ZDeKAwyq.js").then((n) => n.r),
     import("./assets/start-HYkvq4Ni.js"),
     import("./assets/__23tanstack-start-plugin-adapters-Cwee5PKy.js")
   ]);

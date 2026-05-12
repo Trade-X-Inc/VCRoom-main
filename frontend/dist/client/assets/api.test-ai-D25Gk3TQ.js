@@ -1,0 +1,1 @@
+import{g as n,j as e}from"./index-CyfykXr5.js";const i=function(){const t=n.useLoaderData();return e.jsx("pre",{style:{padding:24,fontFamily:"monospace",fontSize:14,background:"#f8f8f8",minHeight:"100vh",margin:0,whiteSpace:"pre-wrap"},children:JSON.stringify(t,null,2)})};export{i as component};

@@ -44,6 +44,7 @@ import { Route as AppDocumentsRouteImport } from './routes/app.documents'
 import { Route as AppDealRoomsRouteImport } from './routes/app.deal-rooms'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
 import { Route as AppAdvisorRouteImport } from './routes/app.advisor'
+import { Route as ApiTestAiRouteImport } from './routes/api.test-ai'
 import { Route as AppInvestorIndexRouteImport } from './routes/app.investor.index'
 import { Route as AppSettingsSecurityRouteImport } from './routes/app.settings.security'
 import { Route as AppSettingsNotificationsRouteImport } from './routes/app.settings.notifications'
@@ -237,6 +238,11 @@ const AppAdvisorRoute = AppAdvisorRouteImport.update({
   path: '/advisor',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiTestAiRoute = ApiTestAiRouteImport.update({
+  id: '/api/test-ai',
+  path: '/api/test-ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppInvestorIndexRoute = AppInvestorIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -332,6 +338,7 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
+  '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
@@ -384,6 +391,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
+  '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
@@ -437,6 +445,7 @@ export interface FileRoutesById {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
+  '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
@@ -492,6 +501,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/terms'
+    | '/api/test-ai'
     | '/app/advisor'
     | '/app/audit'
     | '/app/deal-rooms'
@@ -544,6 +554,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/terms'
+    | '/api/test-ai'
     | '/app/advisor'
     | '/app/audit'
     | '/app/deal-rooms'
@@ -596,6 +607,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/terms'
+    | '/api/test-ai'
     | '/app/advisor'
     | '/app/audit'
     | '/app/deal-rooms'
@@ -650,6 +662,7 @@ export interface RootRouteChildren {
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   TermsRoute: typeof TermsRoute
+  ApiTestAiRoute: typeof ApiTestAiRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   JoinTokenRoute: typeof JoinTokenRoute
   SolutionsDueDiligenceRoute: typeof SolutionsDueDiligenceRoute
@@ -906,6 +919,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdvisorRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api/test-ai': {
+      id: '/api/test-ai'
+      path: '/api/test-ai'
+      fullPath: '/api/test-ai'
+      preLoaderRoute: typeof ApiTestAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/investor/': {
       id: '/app/investor/'
       path: '/'
@@ -1126,6 +1146,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   TermsRoute: TermsRoute,
+  ApiTestAiRoute: ApiTestAiRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   JoinTokenRoute: JoinTokenRoute,
   SolutionsDueDiligenceRoute: SolutionsDueDiligenceRoute,
