@@ -1,1 +1,0 @@
-import{c as e}from"./createServerFn-BpjGy8ov.js";import{l as a}from"./index-BJ4Z17aI.js";const t=e({method:"POST"}).handler(a("56f68b50d6d653ae4f4287eb005bbb35fecea7fa7ce69a4b2a6cc974383a502e"));export{t as g};

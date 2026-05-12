@@ -26770,16 +26770,16 @@ var init_server3 = __esm({
   }
 });
 
-// dist/server/assets/_tanstack-start-manifest_v-5AxDneNO.js
-var tanstack_start_manifest_v_5AxDneNO_exports = {};
-__export(tanstack_start_manifest_v_5AxDneNO_exports, {
+// dist/server/assets/_tanstack-start-manifest_v-DNpmMjf-.js
+var tanstack_start_manifest_v_DNpmMjf_exports = {};
+__export(tanstack_start_manifest_v_DNpmMjf_exports, {
   tsrStartManifest: () => tsrStartManifest
 });
 var tsrStartManifest;
-var init_tanstack_start_manifest_v_5AxDneNO = __esm({
-  "dist/server/assets/_tanstack-start-manifest_v-5AxDneNO.js"() {
+var init_tanstack_start_manifest_v_DNpmMjf = __esm({
+  "dist/server/assets/_tanstack-start-manifest_v-DNpmMjf-.js"() {
     "use strict";
-    tsrStartManifest = () => ({ routes: { __root__: { filePath: "/workspaces/VCRoom-main/frontend/src/routes/__root.tsx", children: ["/", "/about", "/app", "/debug", "/forgot-password", "/founders", "/investors", "/pricing", "/privacy", "/sign-in", "/sign-up", "/terms", "/auth/callback", "/join/$token", "/solutions/due-diligence", "/solutions/fundraising-crm", "/solutions/investor-pipeline", "/solutions/raise-1m", "/solutions/vc-deal-room"], assets: void 0, preloads: ["/assets/index-BJ4Z17aI.js"] }, "/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/index.tsx", children: void 0, assets: void 0, preloads: ["/assets/index-CPyCXkEy.js", "/assets/SiteFooter-437Q58b6.js", "/assets/AppPreview-Dbsdv3EB.js", "/assets/arrow-right-BUubeVlU.js", "/assets/triangle-alert-BaJqDpLI.js", "/assets/users-BpbO82Py.js", "/assets/sparkles-Cr9uMbrj.js", "/assets/briefcase-C4mca5Dr.js", "/assets/shield-check-zH8jRLEQ.js", "/assets/file-text-BINTbYCK.js", "/assets/list-checks-BaHbkgDV.js", "/assets/layers-CVKerucb.js", "/assets/circle-check-qPE_mL4_.js", "/assets/message-square-B8HSSWoK.js", "/assets/Logo-3SgZiqoE.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-1VS3fm5K.js", "/assets/createLucideIcon-DAZlsZcX.js", "/assets/globe-CU1gJZxM.js", "/assets/layout-grid-g-SQqvxt.js", "/assets/search--6i6g3dV.js", "/assets/bell-BZEGswdP.js", "/assets/trending-up-C3ELO0NQ.js", "/assets/chevron-right-eyT_9XTZ.js", "/assets/arrow-up-right-VA4OQB1l.js"] }, "/about": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/about.tsx", children: void 0, assets: void 0, preloads: ["/assets/about-CaBQUXPG.js", "/assets/SiteFooter-437Q58b6.js", "/assets/arrow-right-BUubeVlU.js", "/assets/Logo-3SgZiqoE.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-1VS3fm5K.js", "/assets/createLucideIcon-DAZlsZcX.js", "/assets/globe-CU1gJZxM.js"] }, "/app": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.tsx", children: ["/app/advisor", "/app/audit", "/app/deal-rooms", "/app/documents", "/app/email", "/app/investor", "/app/leads", "/app/meetings", "/app/messages", "/app/notifications", "/app/pipeline", "/app/profile", "/app/reports", "/app/settings", "/app/users", "/app/", "/app/deal-room/$id", "/app/deal-room/$id_/nda"], assets: void 0, preloads: ["/assets/app-inL5b7C_.js", "/assets/useRouterState-BAUyQYMh.js", "/assets/Logo-3SgZiqoE.js", "/assets/useQuery-C4pkq0MO.js", "/assets/utils-BQHNewu7.js", "/assets/bell-BZEGswdP.js", "/assets/check-check-BCaXSjQt.js", "/assets/formatDistanceToNow-BCR7E-0-.js", "/assets/briefcase-C4mca5Dr.js", "/assets/message-square-B8HSSWoK.js", "/assets/user-plus-CjePDGD4.js", "/assets/sparkles-Cr9uMbrj.js", "/assets/settings-PCsbGo37.js", "/assets/user-Dhrsq74M.js", "/assets/users-BpbO82Py.js", "/assets/shield-check-zH8jRLEQ.js", "/assets/store-DZtlEBW4.js", "/assets/LangSwitcher-1VS3fm5K.js", "/assets/createLucideIcon-DAZlsZcX.js", "/assets/layout-grid-g-SQqvxt.js", "/assets/inbox-BV2inHc2.js", "/assets/kanban-CQOPqpHp.js", "/assets/building-2-DJiLvTVr.js", "/assets/clipboard-check-DFyg7O1p.js", "/assets/brain-DGy_QRJ1.js", "/assets/chart-pie-C72L21aF.js", "/assets/calendar-BK1WjN-a.js", "/assets/file-text-BINTbYCK.js", "/assets/chart-column-C3QGizjX.js", "/assets/search--6i6g3dV.js", "/assets/plus-CBWe_o_a.js", "/assets/en-US-DJvzb04W.js", "/assets/globe-CU1gJZxM.js"] }, "/debug": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/debug.tsx", children: void 0, assets: void 0, preloads: ["/assets/debug-DelCZeGv.js"] }, "/forgot-password": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/forgot-password.tsx", children: void 0, assets: void 0, preloads: ["/assets/forgot-password-D3WKpI-A.js"] }, "/founders": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/founders.tsx", children: void 0, assets: void 0, preloads: ["/assets/founders-D0GIF9ZQ.js", "/assets/SolutionPage-n1Sv-51F.js", "/assets/users-BpbO82Py.js", "/assets/SiteFooter-437Q58b6.js", "/assets/Logo-3SgZiqoE.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-1VS3fm5K.js", "/assets/createLucideIcon-DAZlsZcX.js", "/assets/globe-CU1gJZxM.js", "/assets/arrow-right-BUubeVlU.js", "/assets/AppPreview-Dbsdv3EB.js", "/assets/layout-grid-g-SQqvxt.js", "/assets/file-text-BINTbYCK.js", "/assets/message-square-B8HSSWoK.js", "/assets/sparkles-Cr9uMbrj.js", "/assets/search--6i6g3dV.js", "/assets/bell-BZEGswdP.js", "/assets/trending-up-C3ELO0NQ.js", "/assets/chevron-right-eyT_9XTZ.js", "/assets/arrow-up-right-VA4OQB1l.js", "/assets/check-VWz44494.js"] }, "/investors": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/investors.tsx", children: void 0, assets: void 0, preloads: ["/assets/investors-vvENfb69.js", "/assets/SolutionPage-n1Sv-51F.js", "/assets/briefcase-C4mca5Dr.js", "/assets/SiteFooter-437Q58b6.js", "/assets/Logo-3SgZiqoE.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-1VS3fm5K.js", "/assets/createLucideIcon-DAZlsZcX.js", "/assets/globe-CU1gJZxM.js", "/assets/arrow-right-BUubeVlU.js", "/assets/AppPreview-Dbsdv3EB.js", "/assets/layout-grid-g-SQqvxt.js", "/assets/users-BpbO82Py.js", "/assets/file-text-BINTbYCK.js", "/assets/message-square-B8HSSWoK.js", "/assets/sparkles-Cr9uMbrj.js", "/assets/search--6i6g3dV.js", "/assets/bell-BZEGswdP.js", "/assets/trending-up-C3ELO0NQ.js", "/assets/chevron-right-eyT_9XTZ.js", "/assets/arrow-up-right-VA4OQB1l.js", "/assets/check-VWz44494.js"] }, "/pricing": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/pricing.tsx", children: void 0, assets: void 0, preloads: ["/assets/pricing-Bh_S4y9t.js", "/assets/SiteFooter-437Q58b6.js", "/assets/arrow-right-BUubeVlU.js", "/assets/check-VWz44494.js", "/assets/Logo-3SgZiqoE.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-1VS3fm5K.js", "/assets/createLucideIcon-DAZlsZcX.js", "/assets/globe-CU1gJZxM.js"] }, "/privacy": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/privacy.tsx", children: void 0, assets: void 0, preloads: ["/assets/privacy-C9578Y8s.js", "/assets/SiteFooter-437Q58b6.js", "/assets/Logo-3SgZiqoE.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-1VS3fm5K.js", "/assets/createLucideIcon-DAZlsZcX.js", "/assets/globe-CU1gJZxM.js", "/assets/arrow-right-BUubeVlU.js"] }, "/sign-in": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/sign-in.tsx", children: void 0, assets: void 0, preloads: ["/assets/sign-in-BwE19atI.js"] }, "/sign-up": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/sign-up.tsx", children: void 0, assets: void 0, preloads: ["/assets/sign-up-BlpX-d6n.js"] }, "/terms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/terms.tsx", children: void 0, assets: void 0, preloads: ["/assets/terms-BxWD_0zd.js", "/assets/SiteFooter-437Q58b6.js", "/assets/Logo-3SgZiqoE.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-1VS3fm5K.js", "/assets/createLucideIcon-DAZlsZcX.js", "/assets/globe-CU1gJZxM.js", "/assets/arrow-right-BUubeVlU.js"] }, "/app/advisor": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.advisor.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.advisor-DytRkjRJ.js", "/assets/createServerFn-BpjGy8ov.js", "/assets/loader-circle-dBc8rUQ3.js", "/assets/send-_1YTZkeH.js"] }, "/app/audit": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.audit.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.audit-Bj4njtBE.js", "/assets/download-CGyoOJfq.js", "/assets/activity-BV3YSYzu.js", "/assets/triangle-alert-BaJqDpLI.js"] }, "/app/deal-rooms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-rooms.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-rooms-Dhod5J8p.js", "/assets/loader-circle-dBc8rUQ3.js", "/assets/arrow-up-right-VA4OQB1l.js", "/assets/x-Q28OVRgH.js"] }, "/app/documents": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.documents.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.documents-CeAgtIVG.js", "/assets/list-DvU4UWsM.js", "/assets/upload-DtiW-V19.js", "/assets/circle-check-qPE_mL4_.js", "/assets/triangle-alert-BaJqDpLI.js", "/assets/download-CGyoOJfq.js", "/assets/trash-2-Dyiy6EnQ.js", "/assets/loader-circle-dBc8rUQ3.js", "/assets/x-Q28OVRgH.js", "/assets/video-B7oM1JHi.js"] }, "/app/email": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.email.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.email-C1eA8O0S.js", "/assets/backend-B5nrjGvD.js", "/assets/copy-BTqGIrqn.js", "/assets/send-_1YTZkeH.js"] }, "/app/investor": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.tsx", children: ["/app/investor/analysis", "/app/investor/deal-flow", "/app/investor/deal-rooms", "/app/investor/decisions", "/app/investor/diligence", "/app/investor/pipeline", "/app/investor/portfolio", "/app/investor/startups", "/app/investor/team", "/app/investor/"], assets: void 0, preloads: ["/assets/app.investor-QvtDYhLE.js"] }, "/app/leads": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.leads.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.leads-BCv4r2SC.js", "/assets/LeadDrawer-B5B4peZV.js", "/assets/download-CGyoOJfq.js", "/assets/upload-DtiW-V19.js", "/assets/trending-up-C3ELO0NQ.js", "/assets/x-Q28OVRgH.js", "/assets/loader-circle-dBc8rUQ3.js", "/assets/circle-alert-vo1-svh8.js", "/assets/createServerFn-BpjGy8ov.js", "/assets/copy-BTqGIrqn.js", "/assets/check-VWz44494.js", "/assets/clock-DmoVse93.js", "/assets/trash-2-Dyiy6EnQ.js", "/assets/chevron-down-Bwe8nz6E.js", "/assets/chevron-right-eyT_9XTZ.js"] }, "/app/meetings": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.meetings.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.meetings-wZetj2Mw.js", "/assets/format-CjS2oCz0.js", "/assets/loader-circle-dBc8rUQ3.js", "/assets/chevron-down-Bwe8nz6E.js", "/assets/chevron-right-eyT_9XTZ.js", "/assets/clock-DmoVse93.js", "/assets/video-B7oM1JHi.js", "/assets/external-link-BCPcWW0d.js"] }, "/app/messages": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.messages.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.messages-BD6U7pUe.js"] }, "/app/notifications": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.notifications.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.notifications-WWI7qlAk.js"] }, "/app/pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.pipeline-CDMETKW8.js", "/assets/LeadDrawer-B5B4peZV.js", "/assets/loader-circle-dBc8rUQ3.js", "/assets/funnel-DE9C3YD1.js", "/assets/arrow-up-right-VA4OQB1l.js", "/assets/createServerFn-BpjGy8ov.js", "/assets/x-Q28OVRgH.js", "/assets/copy-BTqGIrqn.js", "/assets/check-VWz44494.js", "/assets/clock-DmoVse93.js", "/assets/trash-2-Dyiy6EnQ.js", "/assets/chevron-down-Bwe8nz6E.js", "/assets/chevron-right-eyT_9XTZ.js"] }, "/app/profile": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.profile.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.profile-D5wZouK6.js", "/assets/loader-circle-dBc8rUQ3.js", "/assets/upload-DtiW-V19.js", "/assets/check-VWz44494.js", "/assets/x-Q28OVRgH.js", "/assets/trash-2-Dyiy6EnQ.js"] }, "/app/reports": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.reports.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.reports-Cx_20quM.js", "/assets/loader-circle-dBc8rUQ3.js", "/assets/trending-up-C3ELO0NQ.js", "/assets/download-CGyoOJfq.js"] }, "/app/settings": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.tsx", children: ["/app/settings/billing", "/app/settings/domain", "/app/settings/notifications", "/app/settings/security"], assets: void 0, preloads: ["/assets/app.settings-D7LKx4uO.js", "/assets/credit-card-CI8WSJ1L.js", "/assets/shield-BUIKeUQq.js", "/assets/trash-2-Dyiy6EnQ.js"] }, "/app/users": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.users.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.users-CM7PS0ZL.js", "/assets/mail-CsJSPUlv.js", "/assets/copy-BTqGIrqn.js", "/assets/x-Q28OVRgH.js", "/assets/check-VWz44494.js", "/assets/loader-circle-dBc8rUQ3.js"] }, "/auth/callback": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/auth.callback.tsx", children: void 0, assets: void 0, preloads: ["/assets/auth.callback-Bid-8oF5.js"] }, "/join/$token": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/join.$token.tsx", children: void 0, assets: void 0, preloads: ["/assets/join._token-C8jiwe4l.js", "/assets/Logo-3SgZiqoE.js", "/assets/triangle-alert-BaJqDpLI.js", "/assets/check-VWz44494.js", "/assets/arrow-right-BUubeVlU.js", "/assets/shield-check-zH8jRLEQ.js", "/assets/lock-Dqzt6EEr.js", "/assets/createLucideIcon-DAZlsZcX.js"] }, "/solutions/due-diligence": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.due-diligence.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.due-diligence-fiLrTKJX.js", "/assets/SolutionPage-n1Sv-51F.js", "/assets/list-checks-BaHbkgDV.js", "/assets/SiteFooter-437Q58b6.js", "/assets/Logo-3SgZiqoE.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-1VS3fm5K.js", "/assets/createLucideIcon-DAZlsZcX.js", "/assets/globe-CU1gJZxM.js", "/assets/arrow-right-BUubeVlU.js", "/assets/AppPreview-Dbsdv3EB.js", "/assets/layout-grid-g-SQqvxt.js", "/assets/users-BpbO82Py.js", "/assets/file-text-BINTbYCK.js", "/assets/message-square-B8HSSWoK.js", "/assets/sparkles-Cr9uMbrj.js", "/assets/search--6i6g3dV.js", "/assets/bell-BZEGswdP.js", "/assets/trending-up-C3ELO0NQ.js", "/assets/chevron-right-eyT_9XTZ.js", "/assets/arrow-up-right-VA4OQB1l.js", "/assets/check-VWz44494.js"] }, "/solutions/fundraising-crm": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.fundraising-crm.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.fundraising-crm-BogWmDlI.js", "/assets/SolutionPage-n1Sv-51F.js", "/assets/layers-CVKerucb.js", "/assets/SiteFooter-437Q58b6.js", "/assets/Logo-3SgZiqoE.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-1VS3fm5K.js", "/assets/createLucideIcon-DAZlsZcX.js", "/assets/globe-CU1gJZxM.js", "/assets/arrow-right-BUubeVlU.js", "/assets/AppPreview-Dbsdv3EB.js", "/assets/layout-grid-g-SQqvxt.js", "/assets/users-BpbO82Py.js", "/assets/file-text-BINTbYCK.js", "/assets/message-square-B8HSSWoK.js", "/assets/sparkles-Cr9uMbrj.js", "/assets/search--6i6g3dV.js", "/assets/bell-BZEGswdP.js", "/assets/trending-up-C3ELO0NQ.js", "/assets/chevron-right-eyT_9XTZ.js", "/assets/arrow-up-right-VA4OQB1l.js", "/assets/check-VWz44494.js"] }, "/solutions/investor-pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.investor-pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.investor-pipeline-BJDS9Zl4.js", "/assets/SolutionPage-n1Sv-51F.js", "/assets/trending-up-C3ELO0NQ.js", "/assets/SiteFooter-437Q58b6.js", "/assets/Logo-3SgZiqoE.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-1VS3fm5K.js", "/assets/createLucideIcon-DAZlsZcX.js", "/assets/globe-CU1gJZxM.js", "/assets/arrow-right-BUubeVlU.js", "/assets/AppPreview-Dbsdv3EB.js", "/assets/layout-grid-g-SQqvxt.js", "/assets/users-BpbO82Py.js", "/assets/file-text-BINTbYCK.js", "/assets/message-square-B8HSSWoK.js", "/assets/sparkles-Cr9uMbrj.js", "/assets/search--6i6g3dV.js", "/assets/bell-BZEGswdP.js", "/assets/chevron-right-eyT_9XTZ.js", "/assets/arrow-up-right-VA4OQB1l.js", "/assets/check-VWz44494.js"] }, "/solutions/raise-1m": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.raise-1m.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.raise-1m-DMjXCoZ2.js", "/assets/SolutionPage-n1Sv-51F.js", "/assets/sparkles-Cr9uMbrj.js", "/assets/SiteFooter-437Q58b6.js", "/assets/Logo-3SgZiqoE.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-1VS3fm5K.js", "/assets/createLucideIcon-DAZlsZcX.js", "/assets/globe-CU1gJZxM.js", "/assets/arrow-right-BUubeVlU.js", "/assets/AppPreview-Dbsdv3EB.js", "/assets/layout-grid-g-SQqvxt.js", "/assets/users-BpbO82Py.js", "/assets/file-text-BINTbYCK.js", "/assets/message-square-B8HSSWoK.js", "/assets/search--6i6g3dV.js", "/assets/bell-BZEGswdP.js", "/assets/trending-up-C3ELO0NQ.js", "/assets/chevron-right-eyT_9XTZ.js", "/assets/arrow-up-right-VA4OQB1l.js", "/assets/check-VWz44494.js"] }, "/solutions/vc-deal-room": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.vc-deal-room.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.vc-deal-room-CBRjPf1T.js", "/assets/SolutionPage-n1Sv-51F.js", "/assets/briefcase-C4mca5Dr.js", "/assets/SiteFooter-437Q58b6.js", "/assets/Logo-3SgZiqoE.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-1VS3fm5K.js", "/assets/createLucideIcon-DAZlsZcX.js", "/assets/globe-CU1gJZxM.js", "/assets/arrow-right-BUubeVlU.js", "/assets/AppPreview-Dbsdv3EB.js", "/assets/layout-grid-g-SQqvxt.js", "/assets/users-BpbO82Py.js", "/assets/file-text-BINTbYCK.js", "/assets/message-square-B8HSSWoK.js", "/assets/sparkles-Cr9uMbrj.js", "/assets/search--6i6g3dV.js", "/assets/bell-BZEGswdP.js", "/assets/trending-up-C3ELO0NQ.js", "/assets/chevron-right-eyT_9XTZ.js", "/assets/arrow-up-right-VA4OQB1l.js", "/assets/check-VWz44494.js"] }, "/app/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.index.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.index-DnnRD_No.js", "/assets/loader-circle-dBc8rUQ3.js", "/assets/circle-question-mark-CaAxQlu0.js", "/assets/mail-CsJSPUlv.js", "/assets/arrow-up-right-VA4OQB1l.js", "/assets/format-CjS2oCz0.js", "/assets/circle-check-qPE_mL4_.js", "/assets/circle-alert-vo1-svh8.js", "/assets/external-link-BCPcWW0d.js", "/assets/clock-DmoVse93.js", "/assets/x-Q28OVRgH.js", "/assets/trending-up-C3ELO0NQ.js"] }, "/app/deal-room/$id": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-room.$id.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-room._id-dsnIfzZS.js", "/assets/backend-B5nrjGvD.js", "/assets/loader-circle-dBc8rUQ3.js", "/assets/send-_1YTZkeH.js", "/assets/funnel-DE9C3YD1.js", "/assets/triangle-alert-BaJqDpLI.js", "/assets/circle-C8b_a-EN.js", "/assets/clock-DmoVse93.js", "/assets/circle-check-qPE_mL4_.js", "/assets/upload-DtiW-V19.js", "/assets/x-Q28OVRgH.js", "/assets/chevron-down-Bwe8nz6E.js", "/assets/chevron-right-eyT_9XTZ.js", "/assets/download-CGyoOJfq.js", "/assets/arrow-right-BUubeVlU.js", "/assets/list-checks-BaHbkgDV.js", "/assets/activity-BV3YSYzu.js", "/assets/lock-Dqzt6EEr.js", "/assets/circle-question-mark-CaAxQlu0.js", "/assets/external-link-BCPcWW0d.js", "/assets/shield-BUIKeUQq.js", "/assets/format-CjS2oCz0.js"] }, "/app/investor/analysis": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.analysis.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.analysis-CFFk1qt6.js", "/assets/deal-brief-fn-Bxj7AsOd.js", "/assets/loader-circle-dBc8rUQ3.js", "/assets/circle-check-qPE_mL4_.js", "/assets/triangle-alert-BaJqDpLI.js", "/assets/download-CGyoOJfq.js", "/assets/createServerFn-BpjGy8ov.js"] }, "/app/investor/deal-flow": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.deal-flow.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.deal-flow-n2qSKZSR.js", "/assets/clock-DmoVse93.js"] }, "/app/investor/deal-rooms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.deal-rooms.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.deal-rooms-CqphJbm2.js", "/assets/shield-BUIKeUQq.js", "/assets/clock-DmoVse93.js"] }, "/app/investor/decisions": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.decisions.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.decisions-DS9wrqT5.js", "/assets/check-VWz44494.js", "/assets/x-Q28OVRgH.js", "/assets/clock-DmoVse93.js"] }, "/app/investor/diligence": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.diligence.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.diligence-BEChoSZH.js", "/assets/circle-check-qPE_mL4_.js", "/assets/circle-C8b_a-EN.js"] }, "/app/investor/pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.pipeline-BXQxLQ-f.js", "/assets/list-DvU4UWsM.js", "/assets/clock-DmoVse93.js"] }, "/app/investor/portfolio": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.portfolio.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.portfolio-DLlKv9QL.js", "/assets/trending-up-C3ELO0NQ.js", "/assets/clock-DmoVse93.js"] }, "/app/investor/startups": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.startups.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.startups-CzQ9CLxj.js", "/assets/external-link-BCPcWW0d.js", "/assets/clock-DmoVse93.js"] }, "/app/investor/team": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.team.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.team-DI6MVR6Y.js", "/assets/x-Q28OVRgH.js", "/assets/mail-CsJSPUlv.js", "/assets/loader-circle-dBc8rUQ3.js", "/assets/clock-DmoVse93.js"] }, "/app/settings/billing": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.billing.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.billing-v6lWz1Xw.js", "/assets/check-VWz44494.js", "/assets/download-CGyoOJfq.js"] }, "/app/settings/domain": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.domain.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.domain-BZjbPDoK.js", "/assets/circle-check-qPE_mL4_.js", "/assets/copy-BTqGIrqn.js", "/assets/mail-CsJSPUlv.js"] }, "/app/settings/notifications": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.notifications.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.notifications-CHqndUNy.js", "/assets/mail-CsJSPUlv.js", "/assets/smartphone-BTO3lgkw.js"] }, "/app/settings/security": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.security.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.security-BPdMYLk4.js", "/assets/smartphone-BTO3lgkw.js", "/assets/triangle-alert-BaJqDpLI.js"] }, "/app/investor/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.index.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.index-CT9qm59K.js", "/assets/circle-check-qPE_mL4_.js", "/assets/clock-DmoVse93.js", "/assets/circle-alert-vo1-svh8.js", "/assets/arrow-right-BUubeVlU.js", "/assets/x-Q28OVRgH.js", "/assets/triangle-alert-BaJqDpLI.js", "/assets/shield-BUIKeUQq.js", "/assets/deal-brief-fn-Bxj7AsOd.js", "/assets/createServerFn-BpjGy8ov.js"] }, "/app/deal-room/$id_/nda": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-room.$id_.nda.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-room._id_.nda-c9E8QMzw.js", "/assets/shield-BUIKeUQq.js", "/assets/loader-circle-dBc8rUQ3.js", "/assets/lock-Dqzt6EEr.js"] } }, clientEntry: "/assets/index-BJ4Z17aI.js" });
+    tsrStartManifest = () => ({ routes: { __root__: { filePath: "/workspaces/VCRoom-main/frontend/src/routes/__root.tsx", children: ["/", "/about", "/app", "/debug", "/forgot-password", "/founders", "/investors", "/pricing", "/privacy", "/sign-in", "/sign-up", "/terms", "/auth/callback", "/join/$token", "/solutions/due-diligence", "/solutions/fundraising-crm", "/solutions/investor-pipeline", "/solutions/raise-1m", "/solutions/vc-deal-room"], assets: void 0, preloads: ["/assets/index-VdKZFXIr.js"] }, "/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/index.tsx", children: void 0, assets: void 0, preloads: ["/assets/index-CF6kTTIJ.js", "/assets/SiteFooter-CZwLD33L.js", "/assets/AppPreview-D9IDiu1l.js", "/assets/arrow-right-DmQpKCw3.js", "/assets/triangle-alert-Z7G_lVwb.js", "/assets/users-CogCfbEh.js", "/assets/sparkles-prFcQJAR.js", "/assets/briefcase-_BEglD-6.js", "/assets/shield-check-CZDp0G6f.js", "/assets/file-text-CDp3Nq3p.js", "/assets/list-checks-w2iX7f8v.js", "/assets/layers-DrfmdB31.js", "/assets/circle-check-Cpt2N42C.js", "/assets/message-square-_J5gyJMh.js", "/assets/Logo-DL_-w1or.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-DsoOZTGI.js", "/assets/createLucideIcon-mnU49eGF.js", "/assets/globe-CbLh4328.js", "/assets/layout-grid-DSdARXYX.js", "/assets/search-DB1nMbhQ.js", "/assets/bell-BRlTNLVW.js", "/assets/trending-up-BsIZ00h9.js", "/assets/chevron-right-CdU7Wo3O.js", "/assets/arrow-up-right-DM_DCzie.js"] }, "/about": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/about.tsx", children: void 0, assets: void 0, preloads: ["/assets/about-DKqyno0o.js", "/assets/SiteFooter-CZwLD33L.js", "/assets/arrow-right-DmQpKCw3.js", "/assets/Logo-DL_-w1or.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-DsoOZTGI.js", "/assets/createLucideIcon-mnU49eGF.js", "/assets/globe-CbLh4328.js"] }, "/app": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.tsx", children: ["/app/advisor", "/app/audit", "/app/deal-rooms", "/app/documents", "/app/email", "/app/investor", "/app/leads", "/app/meetings", "/app/messages", "/app/notifications", "/app/pipeline", "/app/profile", "/app/reports", "/app/settings", "/app/users", "/app/", "/app/deal-room/$id", "/app/deal-room/$id_/nda"], assets: void 0, preloads: ["/assets/app-BpQ1IAWo.js", "/assets/useRouterState-zcIKdvo8.js", "/assets/Logo-DL_-w1or.js", "/assets/useQuery-B_SuRnLO.js", "/assets/utils-BQHNewu7.js", "/assets/bell-BRlTNLVW.js", "/assets/check-check-B1unfPHC.js", "/assets/formatDistanceToNow-BCR7E-0-.js", "/assets/briefcase-_BEglD-6.js", "/assets/message-square-_J5gyJMh.js", "/assets/user-plus-BQIcdOnI.js", "/assets/sparkles-prFcQJAR.js", "/assets/settings-CUxLP70j.js", "/assets/user-C1CgAHS_.js", "/assets/users-CogCfbEh.js", "/assets/shield-check-CZDp0G6f.js", "/assets/store-Ci3-IsOz.js", "/assets/LangSwitcher-DsoOZTGI.js", "/assets/createLucideIcon-mnU49eGF.js", "/assets/layout-grid-DSdARXYX.js", "/assets/inbox-BNMG5uK0.js", "/assets/kanban-BijbW479.js", "/assets/building-2-mUMXHSLP.js", "/assets/clipboard-check-zoWpF2Gy.js", "/assets/brain-B0RizMKR.js", "/assets/chart-pie-ef3QM1Y0.js", "/assets/calendar--NKHacQX.js", "/assets/file-text-CDp3Nq3p.js", "/assets/chart-column-COVhVtaQ.js", "/assets/search-DB1nMbhQ.js", "/assets/plus-Ba6QKkXX.js", "/assets/en-US-DJvzb04W.js", "/assets/globe-CbLh4328.js"] }, "/debug": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/debug.tsx", children: void 0, assets: void 0, preloads: ["/assets/debug-uhgSTWMu.js"] }, "/forgot-password": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/forgot-password.tsx", children: void 0, assets: void 0, preloads: ["/assets/forgot-password-BlZbP-WU.js"] }, "/founders": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/founders.tsx", children: void 0, assets: void 0, preloads: ["/assets/founders-DLR_AapH.js", "/assets/SolutionPage-CEELtbHR.js", "/assets/users-CogCfbEh.js", "/assets/SiteFooter-CZwLD33L.js", "/assets/Logo-DL_-w1or.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-DsoOZTGI.js", "/assets/createLucideIcon-mnU49eGF.js", "/assets/globe-CbLh4328.js", "/assets/arrow-right-DmQpKCw3.js", "/assets/AppPreview-D9IDiu1l.js", "/assets/layout-grid-DSdARXYX.js", "/assets/file-text-CDp3Nq3p.js", "/assets/message-square-_J5gyJMh.js", "/assets/sparkles-prFcQJAR.js", "/assets/search-DB1nMbhQ.js", "/assets/bell-BRlTNLVW.js", "/assets/trending-up-BsIZ00h9.js", "/assets/chevron-right-CdU7Wo3O.js", "/assets/arrow-up-right-DM_DCzie.js", "/assets/check-CN6kMUEJ.js"] }, "/investors": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/investors.tsx", children: void 0, assets: void 0, preloads: ["/assets/investors-xKtKVQ4X.js", "/assets/SolutionPage-CEELtbHR.js", "/assets/briefcase-_BEglD-6.js", "/assets/SiteFooter-CZwLD33L.js", "/assets/Logo-DL_-w1or.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-DsoOZTGI.js", "/assets/createLucideIcon-mnU49eGF.js", "/assets/globe-CbLh4328.js", "/assets/arrow-right-DmQpKCw3.js", "/assets/AppPreview-D9IDiu1l.js", "/assets/layout-grid-DSdARXYX.js", "/assets/users-CogCfbEh.js", "/assets/file-text-CDp3Nq3p.js", "/assets/message-square-_J5gyJMh.js", "/assets/sparkles-prFcQJAR.js", "/assets/search-DB1nMbhQ.js", "/assets/bell-BRlTNLVW.js", "/assets/trending-up-BsIZ00h9.js", "/assets/chevron-right-CdU7Wo3O.js", "/assets/arrow-up-right-DM_DCzie.js", "/assets/check-CN6kMUEJ.js"] }, "/pricing": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/pricing.tsx", children: void 0, assets: void 0, preloads: ["/assets/pricing-D0oMUyRu.js", "/assets/SiteFooter-CZwLD33L.js", "/assets/arrow-right-DmQpKCw3.js", "/assets/check-CN6kMUEJ.js", "/assets/Logo-DL_-w1or.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-DsoOZTGI.js", "/assets/createLucideIcon-mnU49eGF.js", "/assets/globe-CbLh4328.js"] }, "/privacy": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/privacy.tsx", children: void 0, assets: void 0, preloads: ["/assets/privacy-CUQC1L1x.js", "/assets/SiteFooter-CZwLD33L.js", "/assets/Logo-DL_-w1or.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-DsoOZTGI.js", "/assets/createLucideIcon-mnU49eGF.js", "/assets/globe-CbLh4328.js", "/assets/arrow-right-DmQpKCw3.js"] }, "/sign-in": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/sign-in.tsx", children: void 0, assets: void 0, preloads: ["/assets/sign-in-BX_e5yhd.js"] }, "/sign-up": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/sign-up.tsx", children: void 0, assets: void 0, preloads: ["/assets/sign-up-Dj4sMS8b.js"] }, "/terms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/terms.tsx", children: void 0, assets: void 0, preloads: ["/assets/terms-D9Wogrw3.js", "/assets/SiteFooter-CZwLD33L.js", "/assets/Logo-DL_-w1or.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-DsoOZTGI.js", "/assets/createLucideIcon-mnU49eGF.js", "/assets/globe-CbLh4328.js", "/assets/arrow-right-DmQpKCw3.js"] }, "/app/advisor": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.advisor.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.advisor-gKkrfMbP.js", "/assets/createServerFn-Che7uXTt.js", "/assets/loader-circle-b7sG63SA.js", "/assets/send-BAIIHKiE.js"] }, "/app/audit": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.audit.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.audit-BuUQ6Vw5.js", "/assets/download-th0v0wSr.js", "/assets/activity-D4AY-Q3U.js", "/assets/triangle-alert-Z7G_lVwb.js"] }, "/app/deal-rooms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-rooms.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-rooms-D9nSZmx-.js", "/assets/loader-circle-b7sG63SA.js", "/assets/arrow-up-right-DM_DCzie.js", "/assets/x-Bblti7mg.js"] }, "/app/documents": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.documents.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.documents-DisaBNuB.js", "/assets/list-D3V-zJAe.js", "/assets/upload-XdAVBaDN.js", "/assets/circle-check-Cpt2N42C.js", "/assets/triangle-alert-Z7G_lVwb.js", "/assets/download-th0v0wSr.js", "/assets/trash-2-DcsMoCF8.js", "/assets/loader-circle-b7sG63SA.js", "/assets/x-Bblti7mg.js", "/assets/video-DtCKMnYz.js"] }, "/app/email": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.email.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.email-CGs4QQFA.js", "/assets/backend-B5nrjGvD.js", "/assets/copy-BAAy4o-_.js", "/assets/send-BAIIHKiE.js"] }, "/app/investor": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.tsx", children: ["/app/investor/analysis", "/app/investor/deal-flow", "/app/investor/deal-rooms", "/app/investor/decisions", "/app/investor/diligence", "/app/investor/pipeline", "/app/investor/portfolio", "/app/investor/startups", "/app/investor/team", "/app/investor/"], assets: void 0, preloads: ["/assets/app.investor-CMOTCOUI.js"] }, "/app/leads": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.leads.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.leads-GKnrX82T.js", "/assets/LeadDrawer-C7nuuemH.js", "/assets/download-th0v0wSr.js", "/assets/upload-XdAVBaDN.js", "/assets/trending-up-BsIZ00h9.js", "/assets/zap-D3nejXZv.js", "/assets/x-Bblti7mg.js", "/assets/loader-circle-b7sG63SA.js", "/assets/circle-alert-NG70raHV.js", "/assets/createServerFn-Che7uXTt.js", "/assets/copy-BAAy4o-_.js", "/assets/check-CN6kMUEJ.js", "/assets/clock-p3ZVntcs.js", "/assets/trash-2-DcsMoCF8.js", "/assets/chevron-down-CYIF6Wpo.js", "/assets/chevron-right-CdU7Wo3O.js"] }, "/app/meetings": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.meetings.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.meetings-CFGThT_E.js", "/assets/format-CjS2oCz0.js", "/assets/loader-circle-b7sG63SA.js", "/assets/chevron-down-CYIF6Wpo.js", "/assets/chevron-right-CdU7Wo3O.js", "/assets/clock-p3ZVntcs.js", "/assets/video-DtCKMnYz.js", "/assets/external-link-CaT9eIFl.js"] }, "/app/messages": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.messages.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.messages-rIl-u_Hs.js"] }, "/app/notifications": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.notifications.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.notifications-Dn8Y7w7O.js"] }, "/app/pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.pipeline-YJUHd0Sh.js", "/assets/LeadDrawer-C7nuuemH.js", "/assets/loader-circle-b7sG63SA.js", "/assets/funnel-Ds_X2y4w.js", "/assets/arrow-up-right-DM_DCzie.js", "/assets/createServerFn-Che7uXTt.js", "/assets/x-Bblti7mg.js", "/assets/copy-BAAy4o-_.js", "/assets/check-CN6kMUEJ.js", "/assets/clock-p3ZVntcs.js", "/assets/trash-2-DcsMoCF8.js", "/assets/chevron-down-CYIF6Wpo.js", "/assets/chevron-right-CdU7Wo3O.js"] }, "/app/profile": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.profile.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.profile-DSPOz2v5.js", "/assets/download-th0v0wSr.js", "/assets/loader-circle-b7sG63SA.js", "/assets/upload-XdAVBaDN.js", "/assets/zap-D3nejXZv.js", "/assets/x-Bblti7mg.js", "/assets/check-CN6kMUEJ.js", "/assets/trash-2-DcsMoCF8.js"] }, "/app/reports": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.reports.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.reports-DvUmMkC0.js", "/assets/loader-circle-b7sG63SA.js", "/assets/trending-up-BsIZ00h9.js", "/assets/download-th0v0wSr.js"] }, "/app/settings": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.tsx", children: ["/app/settings/billing", "/app/settings/domain", "/app/settings/notifications", "/app/settings/security"], assets: void 0, preloads: ["/assets/app.settings-eXhLW_YH.js", "/assets/credit-card-Dhl2ZLDL.js", "/assets/shield-BZGOQqN7.js", "/assets/trash-2-DcsMoCF8.js"] }, "/app/users": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.users.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.users-2RyGQKPn.js", "/assets/mail-BBkeKUKC.js", "/assets/copy-BAAy4o-_.js", "/assets/x-Bblti7mg.js", "/assets/check-CN6kMUEJ.js", "/assets/loader-circle-b7sG63SA.js"] }, "/auth/callback": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/auth.callback.tsx", children: void 0, assets: void 0, preloads: ["/assets/auth.callback-D7XE6lCj.js"] }, "/join/$token": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/join.$token.tsx", children: void 0, assets: void 0, preloads: ["/assets/join._token-CB02OAea.js", "/assets/Logo-DL_-w1or.js", "/assets/triangle-alert-Z7G_lVwb.js", "/assets/check-CN6kMUEJ.js", "/assets/arrow-right-DmQpKCw3.js", "/assets/shield-check-CZDp0G6f.js", "/assets/lock-CiEYrDds.js", "/assets/createLucideIcon-mnU49eGF.js"] }, "/solutions/due-diligence": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.due-diligence.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.due-diligence-Buy0HSap.js", "/assets/SolutionPage-CEELtbHR.js", "/assets/list-checks-w2iX7f8v.js", "/assets/SiteFooter-CZwLD33L.js", "/assets/Logo-DL_-w1or.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-DsoOZTGI.js", "/assets/createLucideIcon-mnU49eGF.js", "/assets/globe-CbLh4328.js", "/assets/arrow-right-DmQpKCw3.js", "/assets/AppPreview-D9IDiu1l.js", "/assets/layout-grid-DSdARXYX.js", "/assets/users-CogCfbEh.js", "/assets/file-text-CDp3Nq3p.js", "/assets/message-square-_J5gyJMh.js", "/assets/sparkles-prFcQJAR.js", "/assets/search-DB1nMbhQ.js", "/assets/bell-BRlTNLVW.js", "/assets/trending-up-BsIZ00h9.js", "/assets/chevron-right-CdU7Wo3O.js", "/assets/arrow-up-right-DM_DCzie.js", "/assets/check-CN6kMUEJ.js"] }, "/solutions/fundraising-crm": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.fundraising-crm.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.fundraising-crm-Cr-Bn8Ep.js", "/assets/SolutionPage-CEELtbHR.js", "/assets/layers-DrfmdB31.js", "/assets/SiteFooter-CZwLD33L.js", "/assets/Logo-DL_-w1or.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-DsoOZTGI.js", "/assets/createLucideIcon-mnU49eGF.js", "/assets/globe-CbLh4328.js", "/assets/arrow-right-DmQpKCw3.js", "/assets/AppPreview-D9IDiu1l.js", "/assets/layout-grid-DSdARXYX.js", "/assets/users-CogCfbEh.js", "/assets/file-text-CDp3Nq3p.js", "/assets/message-square-_J5gyJMh.js", "/assets/sparkles-prFcQJAR.js", "/assets/search-DB1nMbhQ.js", "/assets/bell-BRlTNLVW.js", "/assets/trending-up-BsIZ00h9.js", "/assets/chevron-right-CdU7Wo3O.js", "/assets/arrow-up-right-DM_DCzie.js", "/assets/check-CN6kMUEJ.js"] }, "/solutions/investor-pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.investor-pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.investor-pipeline-C2qZ2Hqu.js", "/assets/SolutionPage-CEELtbHR.js", "/assets/trending-up-BsIZ00h9.js", "/assets/SiteFooter-CZwLD33L.js", "/assets/Logo-DL_-w1or.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-DsoOZTGI.js", "/assets/createLucideIcon-mnU49eGF.js", "/assets/globe-CbLh4328.js", "/assets/arrow-right-DmQpKCw3.js", "/assets/AppPreview-D9IDiu1l.js", "/assets/layout-grid-DSdARXYX.js", "/assets/users-CogCfbEh.js", "/assets/file-text-CDp3Nq3p.js", "/assets/message-square-_J5gyJMh.js", "/assets/sparkles-prFcQJAR.js", "/assets/search-DB1nMbhQ.js", "/assets/bell-BRlTNLVW.js", "/assets/chevron-right-CdU7Wo3O.js", "/assets/arrow-up-right-DM_DCzie.js", "/assets/check-CN6kMUEJ.js"] }, "/solutions/raise-1m": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.raise-1m.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.raise-1m-DR9DwBB4.js", "/assets/SolutionPage-CEELtbHR.js", "/assets/sparkles-prFcQJAR.js", "/assets/SiteFooter-CZwLD33L.js", "/assets/Logo-DL_-w1or.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-DsoOZTGI.js", "/assets/createLucideIcon-mnU49eGF.js", "/assets/globe-CbLh4328.js", "/assets/arrow-right-DmQpKCw3.js", "/assets/AppPreview-D9IDiu1l.js", "/assets/layout-grid-DSdARXYX.js", "/assets/users-CogCfbEh.js", "/assets/file-text-CDp3Nq3p.js", "/assets/message-square-_J5gyJMh.js", "/assets/search-DB1nMbhQ.js", "/assets/bell-BRlTNLVW.js", "/assets/trending-up-BsIZ00h9.js", "/assets/chevron-right-CdU7Wo3O.js", "/assets/arrow-up-right-DM_DCzie.js", "/assets/check-CN6kMUEJ.js"] }, "/solutions/vc-deal-room": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/solutions.vc-deal-room.tsx", children: void 0, assets: void 0, preloads: ["/assets/solutions.vc-deal-room-zAWeLsLZ.js", "/assets/SolutionPage-CEELtbHR.js", "/assets/briefcase-_BEglD-6.js", "/assets/SiteFooter-CZwLD33L.js", "/assets/Logo-DL_-w1or.js", "/assets/utils-BQHNewu7.js", "/assets/LangSwitcher-DsoOZTGI.js", "/assets/createLucideIcon-mnU49eGF.js", "/assets/globe-CbLh4328.js", "/assets/arrow-right-DmQpKCw3.js", "/assets/AppPreview-D9IDiu1l.js", "/assets/layout-grid-DSdARXYX.js", "/assets/users-CogCfbEh.js", "/assets/file-text-CDp3Nq3p.js", "/assets/message-square-_J5gyJMh.js", "/assets/sparkles-prFcQJAR.js", "/assets/search-DB1nMbhQ.js", "/assets/bell-BRlTNLVW.js", "/assets/trending-up-BsIZ00h9.js", "/assets/chevron-right-CdU7Wo3O.js", "/assets/arrow-up-right-DM_DCzie.js", "/assets/check-CN6kMUEJ.js"] }, "/app/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.index.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.index-Du5wVh1Q.js", "/assets/loader-circle-b7sG63SA.js", "/assets/circle-question-mark-CPD512uZ.js", "/assets/mail-BBkeKUKC.js", "/assets/arrow-up-right-DM_DCzie.js", "/assets/format-CjS2oCz0.js", "/assets/circle-check-Cpt2N42C.js", "/assets/circle-alert-NG70raHV.js", "/assets/external-link-CaT9eIFl.js", "/assets/clock-p3ZVntcs.js", "/assets/x-Bblti7mg.js", "/assets/trending-up-BsIZ00h9.js"] }, "/app/deal-room/$id": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-room.$id.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-room._id-BJWt-sf3.js", "/assets/backend-B5nrjGvD.js", "/assets/loader-circle-b7sG63SA.js", "/assets/send-BAIIHKiE.js", "/assets/funnel-Ds_X2y4w.js", "/assets/triangle-alert-Z7G_lVwb.js", "/assets/circle-DBc3wUMU.js", "/assets/clock-p3ZVntcs.js", "/assets/circle-check-Cpt2N42C.js", "/assets/upload-XdAVBaDN.js", "/assets/x-Bblti7mg.js", "/assets/chevron-down-CYIF6Wpo.js", "/assets/chevron-right-CdU7Wo3O.js", "/assets/download-th0v0wSr.js", "/assets/arrow-right-DmQpKCw3.js", "/assets/list-checks-w2iX7f8v.js", "/assets/activity-D4AY-Q3U.js", "/assets/lock-CiEYrDds.js", "/assets/circle-question-mark-CPD512uZ.js", "/assets/external-link-CaT9eIFl.js", "/assets/shield-BZGOQqN7.js", "/assets/format-CjS2oCz0.js"] }, "/app/investor/analysis": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.analysis.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.analysis-Buff2g_v.js", "/assets/deal-brief-fn-Dq10uB_g.js", "/assets/loader-circle-b7sG63SA.js", "/assets/circle-check-Cpt2N42C.js", "/assets/triangle-alert-Z7G_lVwb.js", "/assets/download-th0v0wSr.js", "/assets/createServerFn-Che7uXTt.js"] }, "/app/investor/deal-flow": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.deal-flow.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.deal-flow-CovknqXz.js", "/assets/clock-p3ZVntcs.js"] }, "/app/investor/deal-rooms": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.deal-rooms.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.deal-rooms-7QX2p6h2.js", "/assets/shield-BZGOQqN7.js", "/assets/clock-p3ZVntcs.js"] }, "/app/investor/decisions": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.decisions.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.decisions-DtOw4nHl.js", "/assets/check-CN6kMUEJ.js", "/assets/x-Bblti7mg.js", "/assets/clock-p3ZVntcs.js"] }, "/app/investor/diligence": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.diligence.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.diligence-DKHZg-EK.js", "/assets/circle-check-Cpt2N42C.js", "/assets/circle-DBc3wUMU.js"] }, "/app/investor/pipeline": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.pipeline.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.pipeline-CeYXqJTw.js", "/assets/list-D3V-zJAe.js", "/assets/clock-p3ZVntcs.js"] }, "/app/investor/portfolio": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.portfolio.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.portfolio-B6BbCavK.js", "/assets/trending-up-BsIZ00h9.js", "/assets/clock-p3ZVntcs.js"] }, "/app/investor/startups": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.startups.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.startups-B9LG0n_z.js", "/assets/external-link-CaT9eIFl.js", "/assets/clock-p3ZVntcs.js"] }, "/app/investor/team": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.team.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.team-DfHB8P3n.js", "/assets/x-Bblti7mg.js", "/assets/mail-BBkeKUKC.js", "/assets/loader-circle-b7sG63SA.js", "/assets/clock-p3ZVntcs.js"] }, "/app/settings/billing": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.billing.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.billing-BbWkzmXT.js", "/assets/check-CN6kMUEJ.js", "/assets/download-th0v0wSr.js"] }, "/app/settings/domain": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.domain.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.domain-CbFY7jGl.js", "/assets/circle-check-Cpt2N42C.js", "/assets/copy-BAAy4o-_.js", "/assets/mail-BBkeKUKC.js"] }, "/app/settings/notifications": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.notifications.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.notifications-B9U0dpNC.js", "/assets/mail-BBkeKUKC.js", "/assets/smartphone-D57pJHF3.js"] }, "/app/settings/security": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.settings.security.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.settings.security-DqGGS2Lg.js", "/assets/smartphone-D57pJHF3.js", "/assets/triangle-alert-Z7G_lVwb.js"] }, "/app/investor/": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.investor.index.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.investor.index-D1x3Ppda.js", "/assets/circle-check-Cpt2N42C.js", "/assets/clock-p3ZVntcs.js", "/assets/circle-alert-NG70raHV.js", "/assets/arrow-right-DmQpKCw3.js", "/assets/x-Bblti7mg.js", "/assets/triangle-alert-Z7G_lVwb.js", "/assets/shield-BZGOQqN7.js", "/assets/deal-brief-fn-Dq10uB_g.js", "/assets/createServerFn-Che7uXTt.js"] }, "/app/deal-room/$id_/nda": { filePath: "/workspaces/VCRoom-main/frontend/src/routes/app.deal-room.$id_.nda.tsx", children: void 0, assets: void 0, preloads: ["/assets/app.deal-room._id_.nda-q2W_tTqc.js", "/assets/shield-BZGOQqN7.js", "/assets/loader-circle-b7sG63SA.js", "/assets/lock-CiEYrDds.js"] } }, clientEntry: "/assets/index-VdKZFXIr.js" });
   }
 });
 
@@ -47447,112 +47447,13 @@ var init_dist6 = __esm({
   }
 });
 
-// dist/server/assets/deal-brief-fn-B8dVSAf7.js
-var deal_brief_fn_B8dVSAf7_exports = {};
-__export(deal_brief_fn_B8dVSAf7_exports, {
-  generateDealBrief_createServerFn_handler: () => generateDealBrief_createServerFn_handler
-});
-import "node:async_hooks";
-var import_react11, import_jsx_runtime16, generateDealBrief_createServerFn_handler, generateDealBrief;
-var init_deal_brief_fn_B8dVSAf7 = __esm({
-  "dist/server/assets/deal-brief-fn-B8dVSAf7.js"() {
-    "use strict";
-    init_createServerRpc_D_6bKnO();
-    init_dist6();
-    init_server4();
-    init_production();
-    import_react11 = __toESM(require_react(), 1);
-    import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
-    generateDealBrief_createServerFn_handler = createServerRpc({
-      id: "56f68b50d6d653ae4f4287eb005bbb35fecea7fa7ce69a4b2a6cc974383a502e",
-      name: "generateDealBrief",
-      filename: "src/lib/deal-brief-fn.ts"
-    }, (opts) => generateDealBrief.__executeServer(opts));
-    generateDealBrief = createServerFn({
-      method: "POST"
-    }).inputValidator((data) => data).handler(generateDealBrief_createServerFn_handler, async ({
-      data
-    }) => {
-      const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
-      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
-      const adminClient = createClient(supabaseUrl, serviceKey);
-      const {
-        data: member
-      } = await adminClient.from("deal_room_members").select("user_id").eq("deal_room_id", data.dealRoomId).eq("user_id", data.userId).maybeSingle();
-      if (!member) throw new Error("Unauthorized");
-      const {
-        data: room
-      } = await adminClient.from("deal_rooms").select("startup_id").eq("id", data.dealRoomId).single();
-      const {
-        data: startup
-      } = room?.startup_id ? await adminClient.from("startups").select("company_name, sector, stage, funding_target, traction, description").eq("id", room.startup_id).maybeSingle() : {
-        data: null
-      };
-      const {
-        data: activities
-      } = await adminClient.from("activities").select("action, created_at").eq("deal_room_id", data.dealRoomId).order("created_at", {
-        ascending: false
-      }).limit(10);
-      const activitySummary = (activities ?? []).map((a) => a.action).join(", ");
-      const companyName = startup?.company_name ?? "Unknown startup";
-      const userPrompt = `Analyze this startup for investment:
-Company: ${companyName}
-Sector: ${startup?.sector ?? "Unknown"}
-Stage: ${startup?.stage ?? "Unknown"}
-Funding target: ${startup?.funding_target ?? "Unknown"}
-Traction: ${startup?.traction ?? "Unknown"}
-Description: ${startup?.description ?? "None provided"}
-Recent activity: ${activitySummary || "None"}`;
-      const apiKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || "";
-      if (!apiKey) {
-        return {
-          matchScore: 72,
-          matchLabel: "Moderate fit",
-          strengths: ["Early-stage traction", "Clear market opportunity", "Experienced team"],
-          risks: ["Market competition", "Execution risk", "Capital requirements"],
-          mitigants: ["Strong domain expertise", "Clear differentiation", "Advisory support"],
-          nextAction: "Schedule a discovery call to understand the team and traction better."
-        };
-      }
-      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          max_tokens: 600,
-          temperature: 0.4,
-          messages: [{
-            role: "system",
-            content: `You are an investment analyst. Return ONLY valid JSON:
-{"matchScore":0-100,"matchLabel":"Strong fit|Moderate fit|Weak fit","strengths":["...","...","..."],"risks":["...","...","..."],"mitigants":["...","...","..."],"nextAction":"..."}`
-          }, {
-            role: "user",
-            content: userPrompt
-          }]
-        })
-      });
-      if (!resp.ok) throw new Error("OpenAI request failed");
-      const json = await resp.json();
-      const raw = json.choices[0]?.message?.content ?? "";
-      const parsed = JSON.parse(raw);
-      if (typeof parsed.matchScore !== "number" || !Array.isArray(parsed.strengths)) {
-        throw new Error("Invalid AI response shape");
-      }
-      return parsed;
-    });
-  }
-});
-
 // dist/server/assets/advisor-fn-CDvwbxoI.js
 var advisor_fn_CDvwbxoI_exports = {};
 __export(advisor_fn_CDvwbxoI_exports, {
   sendAdvisorMessage_createServerFn_handler: () => sendAdvisorMessage_createServerFn_handler
 });
 import "node:async_hooks";
-var import_react12, import_jsx_runtime17, sendAdvisorMessage_createServerFn_handler, sendAdvisorMessage;
+var import_react11, import_jsx_runtime16, sendAdvisorMessage_createServerFn_handler, sendAdvisorMessage;
 var init_advisor_fn_CDvwbxoI = __esm({
   "dist/server/assets/advisor-fn-CDvwbxoI.js"() {
     "use strict";
@@ -47560,8 +47461,8 @@ var init_advisor_fn_CDvwbxoI = __esm({
     init_dist6();
     init_server4();
     init_production();
-    import_react12 = __toESM(require_react(), 1);
-    import_jsx_runtime17 = __toESM(require_jsx_runtime(), 1);
+    import_react11 = __toESM(require_react(), 1);
+    import_jsx_runtime16 = __toESM(require_jsx_runtime(), 1);
     sendAdvisorMessage_createServerFn_handler = createServerRpc({
       id: "b0451d818a4af8f61f8d6702b0a87626ab580dea9833910b8d678173c48d62e2",
       name: "sendAdvisorMessage",
@@ -47672,66 +47573,87 @@ End every response with one clear next action.`;
   }
 });
 
-// dist/server/assets/reply-fn-CHtXOihs.js
-var reply_fn_CHtXOihs_exports = {};
-__export(reply_fn_CHtXOihs_exports, {
-  generateReply_createServerFn_handler: () => generateReply_createServerFn_handler
+// dist/server/assets/deal-brief-fn-B8dVSAf7.js
+var deal_brief_fn_B8dVSAf7_exports = {};
+__export(deal_brief_fn_B8dVSAf7_exports, {
+  generateDealBrief_createServerFn_handler: () => generateDealBrief_createServerFn_handler
 });
 import "node:async_hooks";
-var import_react13, import_jsx_runtime18, generateReply_createServerFn_handler, generateReply;
-var init_reply_fn_CHtXOihs = __esm({
-  "dist/server/assets/reply-fn-CHtXOihs.js"() {
+var import_react12, import_jsx_runtime17, generateDealBrief_createServerFn_handler, generateDealBrief;
+var init_deal_brief_fn_B8dVSAf7 = __esm({
+  "dist/server/assets/deal-brief-fn-B8dVSAf7.js"() {
     "use strict";
     init_createServerRpc_D_6bKnO();
     init_dist6();
     init_server4();
     init_production();
-    import_react13 = __toESM(require_react(), 1);
-    import_jsx_runtime18 = __toESM(require_jsx_runtime(), 1);
-    generateReply_createServerFn_handler = createServerRpc({
-      id: "08b07e340aa3dd2c22b3ea45b5ff6e1a1e3844f3dadeb4cfd75858793e9c8fb3",
-      name: "generateReply",
-      filename: "src/lib/reply-fn.ts"
-    }, (opts) => generateReply.__executeServer(opts));
-    generateReply = createServerFn({
+    import_react12 = __toESM(require_react(), 1);
+    import_jsx_runtime17 = __toESM(require_jsx_runtime(), 1);
+    generateDealBrief_createServerFn_handler = createServerRpc({
+      id: "56f68b50d6d653ae4f4287eb005bbb35fecea7fa7ce69a4b2a6cc974383a502e",
+      name: "generateDealBrief",
+      filename: "src/lib/deal-brief-fn.ts"
+    }, (opts) => generateDealBrief.__executeServer(opts));
+    generateDealBrief = createServerFn({
       method: "POST"
-    }).inputValidator((data) => data).handler(generateReply_createServerFn_handler, async ({
+    }).inputValidator((data) => data).handler(generateDealBrief_createServerFn_handler, async ({
       data
     }) => {
       const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
       const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
-      const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || "";
       const adminClient = createClient(supabaseUrl, serviceKey);
       const {
-        data: lead,
-        error: leadErr
-      } = await adminClient.from("vc_leads").select("*").eq("id", data.leadId).single();
-      if (leadErr || !lead) throw new Error("Lead not found");
-      if (lead.founder_id !== data.userId) throw new Error("Unauthorized");
+        data: member
+      } = await adminClient.from("deal_room_members").select("user_id").eq("deal_room_id", data.dealRoomId).eq("user_id", data.userId).maybeSingle();
+      if (!member) throw new Error("Unauthorized");
+      const {
+        data: room
+      } = await adminClient.from("deal_rooms").select("startup_id").eq("id", data.dealRoomId).single();
       const {
         data: startup
-      } = await adminClient.from("startups").select("company_name, sector, stage, funding_target, founder_name").eq("founder_id", data.userId).limit(1).maybeSingle();
-      const userPrompt = `The investor ${lead.investor_name}${lead.firm_name ? ` from ${lead.firm_name}` : ""} replied to the founder:
-
-"${data.investorReply}"
-
-Write a professional follow-up reply from ${startup?.founder_name ?? "the founder"} of ${startup?.company_name ?? "the startup"}.
-Current lead status: ${lead.status}.
-Keep it under 150 words. Be warm, professional, and move the conversation forward.`;
-      if (!openAIKey) throw new Error("OpenAI not configured");
+      } = room?.startup_id ? await adminClient.from("startups").select("company_name, sector, stage, funding_target, traction, description").eq("id", room.startup_id).maybeSingle() : {
+        data: null
+      };
+      const {
+        data: activities
+      } = await adminClient.from("activities").select("action, created_at").eq("deal_room_id", data.dealRoomId).order("created_at", {
+        ascending: false
+      }).limit(10);
+      const activitySummary = (activities ?? []).map((a) => a.action).join(", ");
+      const companyName = startup?.company_name ?? "Unknown startup";
+      const userPrompt = `Analyze this startup for investment:
+Company: ${companyName}
+Sector: ${startup?.sector ?? "Unknown"}
+Stage: ${startup?.stage ?? "Unknown"}
+Funding target: ${startup?.funding_target ?? "Unknown"}
+Traction: ${startup?.traction ?? "Unknown"}
+Description: ${startup?.description ?? "None provided"}
+Recent activity: ${activitySummary || "None"}`;
+      const apiKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || "";
+      if (!apiKey) {
+        return {
+          matchScore: 72,
+          matchLabel: "Moderate fit",
+          strengths: ["Early-stage traction", "Clear market opportunity", "Experienced team"],
+          risks: ["Market competition", "Execution risk", "Capital requirements"],
+          mitigants: ["Strong domain expertise", "Clear differentiation", "Advisory support"],
+          nextAction: "Schedule a discovery call to understand the team and traction better."
+        };
+      }
       const resp = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${openAIKey}`
+          Authorization: `Bearer ${apiKey}`
         },
         body: JSON.stringify({
           model: "gpt-4o-mini",
-          max_tokens: 300,
-          temperature: 0.7,
+          max_tokens: 600,
+          temperature: 0.4,
           messages: [{
             role: "system",
-            content: "You write professional email replies for startup founders responding to investors. Return only the reply text, no subject line, no explanation."
+            content: `You are an investment analyst. Return ONLY valid JSON:
+{"matchScore":0-100,"matchLabel":"Strong fit|Moderate fit|Weak fit","strengths":["...","...","..."],"risks":["...","...","..."],"mitigants":["...","...","..."],"nextAction":"..."}`
           }, {
             role: "user",
             content: userPrompt
@@ -47740,14 +47662,113 @@ Keep it under 150 words. Be warm, professional, and move the conversation forwar
       });
       if (!resp.ok) throw new Error("OpenAI request failed");
       const json = await resp.json();
-      const reply = (json.choices[0]?.message?.content ?? "").trim();
-      if (!reply) throw new Error("Invalid AI response");
+      const raw = json.choices[0]?.message?.content ?? "";
+      const parsed = JSON.parse(raw);
+      if (typeof parsed.matchScore !== "number" || !Array.isArray(parsed.strengths)) {
+        throw new Error("Invalid AI response shape");
+      }
+      return parsed;
+    });
+  }
+});
+
+// dist/server/assets/ai-fn-C4515MCI.js
+var ai_fn_C4515MCI_exports = {};
+__export(ai_fn_C4515MCI_exports, {
+  generateOutreachEmail_createServerFn_handler: () => generateOutreachEmail_createServerFn_handler
+});
+import "node:async_hooks";
+var import_react13, import_jsx_runtime18, systemPrompt, generateOutreachEmail_createServerFn_handler, generateOutreachEmail;
+var init_ai_fn_C4515MCI = __esm({
+  "dist/server/assets/ai-fn-C4515MCI.js"() {
+    "use strict";
+    init_createServerRpc_D_6bKnO();
+    init_dist6();
+    init_server4();
+    init_production();
+    import_react13 = __toESM(require_react(), 1);
+    import_jsx_runtime18 = __toESM(require_jsx_runtime(), 1);
+    systemPrompt = `You are an expert fundraising advisor helping startup founders write concise, personalized investor outreach emails.
+Return ONLY valid JSON in this exact format:
+{"subject":"...","body":"..."}
+No markdown, no explanation, just the JSON object.`;
+    generateOutreachEmail_createServerFn_handler = createServerRpc({
+      id: "1d719b02e5cbb8bfb1f5fdbf08bea97cdac2cfff952491ca07a2d91de6f74c81",
+      name: "generateOutreachEmail",
+      filename: "src/lib/ai-fn.ts"
+    }, (opts) => generateOutreachEmail.__executeServer(opts));
+    generateOutreachEmail = createServerFn({
+      method: "POST"
+    }).inputValidator((data) => data).handler(generateOutreachEmail_createServerFn_handler, async ({
+      data
+    }) => {
+      const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
+      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
+      const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || "";
+      const adminClient = createClient(supabaseUrl, serviceKey);
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1e3).toISOString();
+      const {
+        count
+      } = await adminClient.from("ai_usage").select("id", {
+        count: "exact",
+        head: true
+      }).eq("user_id", data.userId).eq("action", "email_gen").gte("created_at", oneHourAgo);
+      if ((count ?? 0) >= 10) throw new Error("Rate limit exceeded");
+      const {
+        data: lead,
+        error: leadErr
+      } = await adminClient.from("vc_leads").select("*").eq("id", data.leadId).single();
+      if (leadErr || !lead) throw new Error("Lead not found");
+      if (lead.founder_id !== data.userId) throw new Error("Unauthorized");
+      const {
+        data: startup
+      } = await adminClient.from("startups").select("*").eq("founder_id", data.userId).limit(1).maybeSingle();
+      const userPrompt = data.type === "cold" ? `Write a cold outreach email from ${startup?.company_name ?? "our startup"} founder to ${lead.investor_name} at ${lead.firm_name ?? "their firm"}.
+Startup: ${startup?.sector ?? lead.sector ?? "tech"} sector, ${startup?.stage ?? lead.stage ?? "early"} stage, raising ${startup?.funding_target ?? "seed round"}.
+Investor focus: ${lead.sector ?? "various"}, ${lead.stage ?? "early-stage"}.
+Keep it under 120 words. Be specific, not generic.
+Subject line should be intriguing, under 8 words.` : `Write a follow-up email. The founder previously contacted ${lead.investor_name} at ${lead.firm_name ?? "their firm"}.
+Current status: ${lead.status}.
+Notes context: ${lead.notes ?? "none"}.
+Keep it under 80 words. Reference prior contact.
+Be warm but direct.`;
+      if (!openAIKey) {
+        return {
+          subject: "Unable to generate",
+          body: "AI service temporarily unavailable. Please configure OPENAI_API_KEY."
+        };
+      }
+      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${openAIKey}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          max_tokens: 400,
+          temperature: 0.7,
+          messages: [{
+            role: "system",
+            content: systemPrompt
+          }, {
+            role: "user",
+            content: userPrompt
+          }]
+        })
+      });
+      if (!resp.ok) throw new Error("OpenAI request failed");
+      const json = await resp.json();
+      const raw = json.choices[0]?.message?.content ?? "";
+      const parsed = JSON.parse(raw);
+      if (!parsed.subject || !parsed.body) throw new Error("Invalid AI response");
       await adminClient.from("ai_usage").insert({
         user_id: data.userId,
-        action: "reply_gen"
+        action: "email_gen"
       });
       return {
-        reply
+        subject: parsed.subject,
+        body: parsed.body
       };
     });
   }
@@ -47830,15 +47851,15 @@ Keep the message under 300 characters. Be genuine and specific, not salesy. Just
   }
 });
 
-// dist/server/assets/ai-fn-C4515MCI.js
-var ai_fn_C4515MCI_exports = {};
-__export(ai_fn_C4515MCI_exports, {
-  generateOutreachEmail_createServerFn_handler: () => generateOutreachEmail_createServerFn_handler
+// dist/server/assets/reply-fn-CHtXOihs.js
+var reply_fn_CHtXOihs_exports = {};
+__export(reply_fn_CHtXOihs_exports, {
+  generateReply_createServerFn_handler: () => generateReply_createServerFn_handler
 });
 import "node:async_hooks";
-var import_react15, import_jsx_runtime20, systemPrompt, generateOutreachEmail_createServerFn_handler, generateOutreachEmail;
-var init_ai_fn_C4515MCI = __esm({
-  "dist/server/assets/ai-fn-C4515MCI.js"() {
+var import_react15, import_jsx_runtime20, generateReply_createServerFn_handler, generateReply;
+var init_reply_fn_CHtXOihs = __esm({
+  "dist/server/assets/reply-fn-CHtXOihs.js"() {
     "use strict";
     init_createServerRpc_D_6bKnO();
     init_dist6();
@@ -47846,32 +47867,20 @@ var init_ai_fn_C4515MCI = __esm({
     init_production();
     import_react15 = __toESM(require_react(), 1);
     import_jsx_runtime20 = __toESM(require_jsx_runtime(), 1);
-    systemPrompt = `You are an expert fundraising advisor helping startup founders write concise, personalized investor outreach emails.
-Return ONLY valid JSON in this exact format:
-{"subject":"...","body":"..."}
-No markdown, no explanation, just the JSON object.`;
-    generateOutreachEmail_createServerFn_handler = createServerRpc({
-      id: "1d719b02e5cbb8bfb1f5fdbf08bea97cdac2cfff952491ca07a2d91de6f74c81",
-      name: "generateOutreachEmail",
-      filename: "src/lib/ai-fn.ts"
-    }, (opts) => generateOutreachEmail.__executeServer(opts));
-    generateOutreachEmail = createServerFn({
+    generateReply_createServerFn_handler = createServerRpc({
+      id: "08b07e340aa3dd2c22b3ea45b5ff6e1a1e3844f3dadeb4cfd75858793e9c8fb3",
+      name: "generateReply",
+      filename: "src/lib/reply-fn.ts"
+    }, (opts) => generateReply.__executeServer(opts));
+    generateReply = createServerFn({
       method: "POST"
-    }).inputValidator((data) => data).handler(generateOutreachEmail_createServerFn_handler, async ({
+    }).inputValidator((data) => data).handler(generateReply_createServerFn_handler, async ({
       data
     }) => {
       const supabaseUrl = process.env.SUPABASE_URL || globalThis.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
       const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || globalThis.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI";
       const openAIKey = process.env.OPENAI_API_KEY || globalThis.OPENAI_API_KEY || "";
       const adminClient = createClient(supabaseUrl, serviceKey);
-      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1e3).toISOString();
-      const {
-        count
-      } = await adminClient.from("ai_usage").select("id", {
-        count: "exact",
-        head: true
-      }).eq("user_id", data.userId).eq("action", "email_gen").gte("created_at", oneHourAgo);
-      if ((count ?? 0) >= 10) throw new Error("Rate limit exceeded");
       const {
         data: lead,
         error: leadErr
@@ -47880,22 +47889,15 @@ No markdown, no explanation, just the JSON object.`;
       if (lead.founder_id !== data.userId) throw new Error("Unauthorized");
       const {
         data: startup
-      } = await adminClient.from("startups").select("*").eq("founder_id", data.userId).limit(1).maybeSingle();
-      const userPrompt = data.type === "cold" ? `Write a cold outreach email from ${startup?.company_name ?? "our startup"} founder to ${lead.investor_name} at ${lead.firm_name ?? "their firm"}.
-Startup: ${startup?.sector ?? lead.sector ?? "tech"} sector, ${startup?.stage ?? lead.stage ?? "early"} stage, raising ${startup?.funding_target ?? "seed round"}.
-Investor focus: ${lead.sector ?? "various"}, ${lead.stage ?? "early-stage"}.
-Keep it under 120 words. Be specific, not generic.
-Subject line should be intriguing, under 8 words.` : `Write a follow-up email. The founder previously contacted ${lead.investor_name} at ${lead.firm_name ?? "their firm"}.
-Current status: ${lead.status}.
-Notes context: ${lead.notes ?? "none"}.
-Keep it under 80 words. Reference prior contact.
-Be warm but direct.`;
-      if (!openAIKey) {
-        return {
-          subject: "Unable to generate",
-          body: "AI service temporarily unavailable. Please configure OPENAI_API_KEY."
-        };
-      }
+      } = await adminClient.from("startups").select("company_name, sector, stage, funding_target, founder_name").eq("founder_id", data.userId).limit(1).maybeSingle();
+      const userPrompt = `The investor ${lead.investor_name}${lead.firm_name ? ` from ${lead.firm_name}` : ""} replied to the founder:
+
+"${data.investorReply}"
+
+Write a professional follow-up reply from ${startup?.founder_name ?? "the founder"} of ${startup?.company_name ?? "the startup"}.
+Current lead status: ${lead.status}.
+Keep it under 150 words. Be warm, professional, and move the conversation forward.`;
+      if (!openAIKey) throw new Error("OpenAI not configured");
       const resp = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -47904,11 +47906,11 @@ Be warm but direct.`;
         },
         body: JSON.stringify({
           model: "gpt-4o-mini",
-          max_tokens: 400,
+          max_tokens: 300,
           temperature: 0.7,
           messages: [{
             role: "system",
-            content: systemPrompt
+            content: "You write professional email replies for startup founders responding to investors. Return only the reply text, no subject line, no explanation."
           }, {
             role: "user",
             content: userPrompt
@@ -47917,16 +47919,14 @@ Be warm but direct.`;
       });
       if (!resp.ok) throw new Error("OpenAI request failed");
       const json = await resp.json();
-      const raw = json.choices[0]?.message?.content ?? "";
-      const parsed = JSON.parse(raw);
-      if (!parsed.subject || !parsed.body) throw new Error("Invalid AI response");
+      const reply = (json.choices[0]?.message?.content ?? "").trim();
+      if (!reply) throw new Error("Invalid AI response");
       await adminClient.from("ai_usage").insert({
         user_id: data.userId,
-        action: "email_gen"
+        action: "reply_gen"
       });
       return {
-        subject: parsed.subject,
-        body: parsed.body
+        reply
       };
     });
   }
@@ -55871,12 +55871,31 @@ var init_external_link = __esm({
   }
 });
 
+// node_modules/lucide-react/dist/esm/icons/eye.js
+var __iconNode28, Eye;
+var init_eye = __esm({
+  "node_modules/lucide-react/dist/esm/icons/eye.js"() {
+    init_createLucideIcon();
+    __iconNode28 = [
+      [
+        "path",
+        {
+          d: "M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0",
+          key: "1nclc0"
+        }
+      ],
+      ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
+    ];
+    Eye = createLucideIcon("eye", __iconNode28);
+  }
+});
+
 // node_modules/lucide-react/dist/esm/icons/file-check.js
-var __iconNode28, FileCheck;
+var __iconNode29, FileCheck;
 var init_file_check = __esm({
   "node_modules/lucide-react/dist/esm/icons/file-check.js"() {
     init_createLucideIcon();
-    __iconNode28 = [
+    __iconNode29 = [
       [
         "path",
         {
@@ -55887,16 +55906,16 @@ var init_file_check = __esm({
       ["path", { d: "M14 2v5a1 1 0 0 0 1 1h5", key: "wfsgrz" }],
       ["path", { d: "m9 15 2 2 4-4", key: "1grp1n" }]
     ];
-    FileCheck = createLucideIcon("file-check", __iconNode28);
+    FileCheck = createLucideIcon("file-check", __iconNode29);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/file-question-mark.js
-var __iconNode29, FileQuestionMark;
+var __iconNode30, FileQuestionMark;
 var init_file_question_mark = __esm({
   "node_modules/lucide-react/dist/esm/icons/file-question-mark.js"() {
     init_createLucideIcon();
-    __iconNode29 = [
+    __iconNode30 = [
       [
         "path",
         {
@@ -55907,16 +55926,16 @@ var init_file_question_mark = __esm({
       ["path", { d: "M12 17h.01", key: "p32p05" }],
       ["path", { d: "M9.1 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3", key: "mhlwft" }]
     ];
-    FileQuestionMark = createLucideIcon("file-question-mark", __iconNode29);
+    FileQuestionMark = createLucideIcon("file-question-mark", __iconNode30);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/file-spreadsheet.js
-var __iconNode30, FileSpreadsheet;
+var __iconNode31, FileSpreadsheet;
 var init_file_spreadsheet = __esm({
   "node_modules/lucide-react/dist/esm/icons/file-spreadsheet.js"() {
     init_createLucideIcon();
-    __iconNode30 = [
+    __iconNode31 = [
       [
         "path",
         {
@@ -55930,16 +55949,16 @@ var init_file_spreadsheet = __esm({
       ["path", { d: "M8 17h2", key: "2yhykz" }],
       ["path", { d: "M14 17h2", key: "10kma7" }]
     ];
-    FileSpreadsheet = createLucideIcon("file-spreadsheet", __iconNode30);
+    FileSpreadsheet = createLucideIcon("file-spreadsheet", __iconNode31);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/file-text.js
-var __iconNode31, FileText;
+var __iconNode32, FileText;
 var init_file_text = __esm({
   "node_modules/lucide-react/dist/esm/icons/file-text.js"() {
     init_createLucideIcon();
-    __iconNode31 = [
+    __iconNode32 = [
       [
         "path",
         {
@@ -55952,16 +55971,16 @@ var init_file_text = __esm({
       ["path", { d: "M16 13H8", key: "t4e002" }],
       ["path", { d: "M16 17H8", key: "z1uh3a" }]
     ];
-    FileText = createLucideIcon("file-text", __iconNode31);
+    FileText = createLucideIcon("file-text", __iconNode32);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/file-up.js
-var __iconNode32, FileUp;
+var __iconNode33, FileUp;
 var init_file_up = __esm({
   "node_modules/lucide-react/dist/esm/icons/file-up.js"() {
     init_createLucideIcon();
-    __iconNode32 = [
+    __iconNode33 = [
       [
         "path",
         {
@@ -55973,16 +55992,16 @@ var init_file_up = __esm({
       ["path", { d: "M12 12v6", key: "3ahymv" }],
       ["path", { d: "m15 15-3-3-3 3", key: "15xj92" }]
     ];
-    FileUp = createLucideIcon("file-up", __iconNode32);
+    FileUp = createLucideIcon("file-up", __iconNode33);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/file.js
-var __iconNode33, File2;
+var __iconNode34, File2;
 var init_file = __esm({
   "node_modules/lucide-react/dist/esm/icons/file.js"() {
     init_createLucideIcon();
-    __iconNode33 = [
+    __iconNode34 = [
       [
         "path",
         {
@@ -55992,16 +56011,16 @@ var init_file = __esm({
       ],
       ["path", { d: "M14 2v5a1 1 0 0 0 1 1h5", key: "wfsgrz" }]
     ];
-    File2 = createLucideIcon("file", __iconNode33);
+    File2 = createLucideIcon("file", __iconNode34);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/flame.js
-var __iconNode34, Flame;
+var __iconNode35, Flame;
 var init_flame = __esm({
   "node_modules/lucide-react/dist/esm/icons/flame.js"() {
     init_createLucideIcon();
-    __iconNode34 = [
+    __iconNode35 = [
       [
         "path",
         {
@@ -56010,16 +56029,16 @@ var init_flame = __esm({
         }
       ]
     ];
-    Flame = createLucideIcon("flame", __iconNode34);
+    Flame = createLucideIcon("flame", __iconNode35);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/funnel.js
-var __iconNode35, Funnel;
+var __iconNode36, Funnel;
 var init_funnel = __esm({
   "node_modules/lucide-react/dist/esm/icons/funnel.js"() {
     init_createLucideIcon();
-    __iconNode35 = [
+    __iconNode36 = [
       [
         "path",
         {
@@ -56028,74 +56047,74 @@ var init_funnel = __esm({
         }
       ]
     ];
-    Funnel = createLucideIcon("funnel", __iconNode35);
+    Funnel = createLucideIcon("funnel", __iconNode36);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/gavel.js
-var __iconNode36, Gavel;
+var __iconNode37, Gavel;
 var init_gavel = __esm({
   "node_modules/lucide-react/dist/esm/icons/gavel.js"() {
     init_createLucideIcon();
-    __iconNode36 = [
+    __iconNode37 = [
       ["path", { d: "m14 13-8.381 8.38a1 1 0 0 1-3.001-3l8.384-8.381", key: "pgg06f" }],
       ["path", { d: "m16 16 6-6", key: "vzrcl6" }],
       ["path", { d: "m21.5 10.5-8-8", key: "a17d9x" }],
       ["path", { d: "m8 8 6-6", key: "18bi4p" }],
       ["path", { d: "m8.5 7.5 8 8", key: "1oyaui" }]
     ];
-    Gavel = createLucideIcon("gavel", __iconNode36);
+    Gavel = createLucideIcon("gavel", __iconNode37);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/git-branch.js
-var __iconNode37, GitBranch;
+var __iconNode38, GitBranch;
 var init_git_branch = __esm({
   "node_modules/lucide-react/dist/esm/icons/git-branch.js"() {
     init_createLucideIcon();
-    __iconNode37 = [
+    __iconNode38 = [
       ["path", { d: "M15 6a9 9 0 0 0-9 9V3", key: "1cii5b" }],
       ["circle", { cx: "18", cy: "6", r: "3", key: "1h7g24" }],
       ["circle", { cx: "6", cy: "18", r: "3", key: "fqmcym" }]
     ];
-    GitBranch = createLucideIcon("git-branch", __iconNode37);
+    GitBranch = createLucideIcon("git-branch", __iconNode38);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/globe.js
-var __iconNode38, Globe;
+var __iconNode39, Globe;
 var init_globe = __esm({
   "node_modules/lucide-react/dist/esm/icons/globe.js"() {
     init_createLucideIcon();
-    __iconNode38 = [
+    __iconNode39 = [
       ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
       ["path", { d: "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20", key: "13o1zl" }],
       ["path", { d: "M2 12h20", key: "9i4pu4" }]
     ];
-    Globe = createLucideIcon("globe", __iconNode38);
+    Globe = createLucideIcon("globe", __iconNode39);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/image.js
-var __iconNode39, Image;
+var __iconNode40, Image;
 var init_image = __esm({
   "node_modules/lucide-react/dist/esm/icons/image.js"() {
     init_createLucideIcon();
-    __iconNode39 = [
+    __iconNode40 = [
       ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", ry: "2", key: "1m3agn" }],
       ["circle", { cx: "9", cy: "9", r: "2", key: "af1f0g" }],
       ["path", { d: "m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21", key: "1xmnt7" }]
     ];
-    Image = createLucideIcon("image", __iconNode39);
+    Image = createLucideIcon("image", __iconNode40);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/inbox.js
-var __iconNode40, Inbox;
+var __iconNode41, Inbox;
 var init_inbox = __esm({
   "node_modules/lucide-react/dist/esm/icons/inbox.js"() {
     init_createLucideIcon();
-    __iconNode40 = [
+    __iconNode41 = [
       ["polyline", { points: "22 12 16 12 14 15 10 15 8 12 2 12", key: "o97t9d" }],
       [
         "path",
@@ -56105,58 +56124,58 @@ var init_inbox = __esm({
         }
       ]
     ];
-    Inbox = createLucideIcon("inbox", __iconNode40);
+    Inbox = createLucideIcon("inbox", __iconNode41);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/info.js
-var __iconNode41, Info;
+var __iconNode42, Info;
 var init_info = __esm({
   "node_modules/lucide-react/dist/esm/icons/info.js"() {
     init_createLucideIcon();
-    __iconNode41 = [
+    __iconNode42 = [
       ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
       ["path", { d: "M12 16v-4", key: "1dtifu" }],
       ["path", { d: "M12 8h.01", key: "e9boi3" }]
     ];
-    Info = createLucideIcon("info", __iconNode41);
+    Info = createLucideIcon("info", __iconNode42);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/kanban.js
-var __iconNode42, Kanban;
+var __iconNode43, Kanban;
 var init_kanban = __esm({
   "node_modules/lucide-react/dist/esm/icons/kanban.js"() {
     init_createLucideIcon();
-    __iconNode42 = [
+    __iconNode43 = [
       ["path", { d: "M5 3v14", key: "9nsxs2" }],
       ["path", { d: "M12 3v8", key: "1h2ygw" }],
       ["path", { d: "M19 3v18", key: "1sk56x" }]
     ];
-    Kanban = createLucideIcon("kanban", __iconNode42);
+    Kanban = createLucideIcon("kanban", __iconNode43);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/key.js
-var __iconNode43, Key;
+var __iconNode44, Key;
 var init_key = __esm({
   "node_modules/lucide-react/dist/esm/icons/key.js"() {
     init_createLucideIcon();
-    __iconNode43 = [
+    __iconNode44 = [
       ["path", { d: "m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4", key: "g0fldk" }],
       ["path", { d: "m21 2-9.6 9.6", key: "1j0ho8" }],
       ["circle", { cx: "7.5", cy: "15.5", r: "5.5", key: "yqb3hr" }]
     ];
-    Key = createLucideIcon("key", __iconNode43);
+    Key = createLucideIcon("key", __iconNode44);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/layers.js
-var __iconNode44, Layers;
+var __iconNode45, Layers;
 var init_layers = __esm({
   "node_modules/lucide-react/dist/esm/icons/layers.js"() {
     init_createLucideIcon();
-    __iconNode44 = [
+    __iconNode45 = [
       [
         "path",
         {
@@ -56179,31 +56198,31 @@ var init_layers = __esm({
         }
       ]
     ];
-    Layers = createLucideIcon("layers", __iconNode44);
+    Layers = createLucideIcon("layers", __iconNode45);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/layout-grid.js
-var __iconNode45, LayoutGrid;
+var __iconNode46, LayoutGrid;
 var init_layout_grid = __esm({
   "node_modules/lucide-react/dist/esm/icons/layout-grid.js"() {
     init_createLucideIcon();
-    __iconNode45 = [
+    __iconNode46 = [
       ["rect", { width: "7", height: "7", x: "3", y: "3", rx: "1", key: "1g98yp" }],
       ["rect", { width: "7", height: "7", x: "14", y: "3", rx: "1", key: "6d4xhi" }],
       ["rect", { width: "7", height: "7", x: "14", y: "14", rx: "1", key: "nxv5o0" }],
       ["rect", { width: "7", height: "7", x: "3", y: "14", rx: "1", key: "1bb6yr" }]
     ];
-    LayoutGrid = createLucideIcon("layout-grid", __iconNode45);
+    LayoutGrid = createLucideIcon("layout-grid", __iconNode46);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/lightbulb.js
-var __iconNode46, Lightbulb;
+var __iconNode47, Lightbulb;
 var init_lightbulb = __esm({
   "node_modules/lucide-react/dist/esm/icons/lightbulb.js"() {
     init_createLucideIcon();
-    __iconNode46 = [
+    __iconNode47 = [
       [
         "path",
         {
@@ -56214,32 +56233,32 @@ var init_lightbulb = __esm({
       ["path", { d: "M9 18h6", key: "x1upvd" }],
       ["path", { d: "M10 22h4", key: "ceow96" }]
     ];
-    Lightbulb = createLucideIcon("lightbulb", __iconNode46);
+    Lightbulb = createLucideIcon("lightbulb", __iconNode47);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/list-checks.js
-var __iconNode47, ListChecks;
+var __iconNode48, ListChecks;
 var init_list_checks = __esm({
   "node_modules/lucide-react/dist/esm/icons/list-checks.js"() {
     init_createLucideIcon();
-    __iconNode47 = [
+    __iconNode48 = [
       ["path", { d: "M13 5h8", key: "a7qcls" }],
       ["path", { d: "M13 12h8", key: "h98zly" }],
       ["path", { d: "M13 19h8", key: "c3s6r1" }],
       ["path", { d: "m3 17 2 2 4-4", key: "1jhpwq" }],
       ["path", { d: "m3 7 2 2 4-4", key: "1obspn" }]
     ];
-    ListChecks = createLucideIcon("list-checks", __iconNode47);
+    ListChecks = createLucideIcon("list-checks", __iconNode48);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/list.js
-var __iconNode48, List;
+var __iconNode49, List;
 var init_list = __esm({
   "node_modules/lucide-react/dist/esm/icons/list.js"() {
     init_createLucideIcon();
-    __iconNode48 = [
+    __iconNode49 = [
       ["path", { d: "M3 5h.01", key: "18ugdj" }],
       ["path", { d: "M3 12h.01", key: "nlz23k" }],
       ["path", { d: "M3 19h.01", key: "noohij" }],
@@ -56247,66 +56266,66 @@ var init_list = __esm({
       ["path", { d: "M8 12h13", key: "1za7za" }],
       ["path", { d: "M8 19h13", key: "m83p4d" }]
     ];
-    List = createLucideIcon("list", __iconNode48);
+    List = createLucideIcon("list", __iconNode49);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/loader-circle.js
-var __iconNode49, LoaderCircle;
+var __iconNode50, LoaderCircle;
 var init_loader_circle = __esm({
   "node_modules/lucide-react/dist/esm/icons/loader-circle.js"() {
     init_createLucideIcon();
-    __iconNode49 = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
-    LoaderCircle = createLucideIcon("loader-circle", __iconNode49);
+    __iconNode50 = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
+    LoaderCircle = createLucideIcon("loader-circle", __iconNode50);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/lock.js
-var __iconNode50, Lock;
+var __iconNode51, Lock;
 var init_lock = __esm({
   "node_modules/lucide-react/dist/esm/icons/lock.js"() {
     init_createLucideIcon();
-    __iconNode50 = [
+    __iconNode51 = [
       ["rect", { width: "18", height: "11", x: "3", y: "11", rx: "2", ry: "2", key: "1w4ew1" }],
       ["path", { d: "M7 11V7a5 5 0 0 1 10 0v4", key: "fwvmzm" }]
     ];
-    Lock = createLucideIcon("lock", __iconNode50);
+    Lock = createLucideIcon("lock", __iconNode51);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/log-out.js
-var __iconNode51, LogOut;
+var __iconNode52, LogOut;
 var init_log_out = __esm({
   "node_modules/lucide-react/dist/esm/icons/log-out.js"() {
     init_createLucideIcon();
-    __iconNode51 = [
+    __iconNode52 = [
       ["path", { d: "m16 17 5-5-5-5", key: "1bji2h" }],
       ["path", { d: "M21 12H9", key: "dn1m92" }],
       ["path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", key: "1uf3rs" }]
     ];
-    LogOut = createLucideIcon("log-out", __iconNode51);
+    LogOut = createLucideIcon("log-out", __iconNode52);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/mail.js
-var __iconNode52, Mail;
+var __iconNode53, Mail;
 var init_mail = __esm({
   "node_modules/lucide-react/dist/esm/icons/mail.js"() {
     init_createLucideIcon();
-    __iconNode52 = [
+    __iconNode53 = [
       ["path", { d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7", key: "132q7q" }],
       ["rect", { x: "2", y: "4", width: "20", height: "16", rx: "2", key: "izxlao" }]
     ];
-    Mail = createLucideIcon("mail", __iconNode52);
+    Mail = createLucideIcon("mail", __iconNode53);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/messages-square.js
-var __iconNode53, MessagesSquare;
+var __iconNode54, MessagesSquare;
 var init_messages_square = __esm({
   "node_modules/lucide-react/dist/esm/icons/messages-square.js"() {
     init_createLucideIcon();
-    __iconNode53 = [
+    __iconNode54 = [
       [
         "path",
         {
@@ -56322,16 +56341,16 @@ var init_messages_square = __esm({
         }
       ]
     ];
-    MessagesSquare = createLucideIcon("messages-square", __iconNode53);
+    MessagesSquare = createLucideIcon("messages-square", __iconNode54);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/message-square.js
-var __iconNode54, MessageSquare;
+var __iconNode55, MessageSquare;
 var init_message_square = __esm({
   "node_modules/lucide-react/dist/esm/icons/message-square.js"() {
     init_createLucideIcon();
-    __iconNode54 = [
+    __iconNode55 = [
       [
         "path",
         {
@@ -56340,30 +56359,30 @@ var init_message_square = __esm({
         }
       ]
     ];
-    MessageSquare = createLucideIcon("message-square", __iconNode54);
+    MessageSquare = createLucideIcon("message-square", __iconNode55);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/monitor.js
-var __iconNode55, Monitor;
+var __iconNode56, Monitor;
 var init_monitor = __esm({
   "node_modules/lucide-react/dist/esm/icons/monitor.js"() {
     init_createLucideIcon();
-    __iconNode55 = [
+    __iconNode56 = [
       ["rect", { width: "20", height: "14", x: "2", y: "3", rx: "2", key: "48i651" }],
       ["line", { x1: "8", x2: "16", y1: "21", y2: "21", key: "1svkeh" }],
       ["line", { x1: "12", x2: "12", y1: "17", y2: "21", key: "vw1qmm" }]
     ];
-    Monitor = createLucideIcon("monitor", __iconNode55);
+    Monitor = createLucideIcon("monitor", __iconNode56);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/moon.js
-var __iconNode56, Moon;
+var __iconNode57, Moon;
 var init_moon = __esm({
   "node_modules/lucide-react/dist/esm/icons/moon.js"() {
     init_createLucideIcon();
-    __iconNode56 = [
+    __iconNode57 = [
       [
         "path",
         {
@@ -56372,16 +56391,16 @@ var init_moon = __esm({
         }
       ]
     ];
-    Moon = createLucideIcon("moon", __iconNode56);
+    Moon = createLucideIcon("moon", __iconNode57);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/paperclip.js
-var __iconNode57, Paperclip;
+var __iconNode58, Paperclip;
 var init_paperclip = __esm({
   "node_modules/lucide-react/dist/esm/icons/paperclip.js"() {
     init_createLucideIcon();
-    __iconNode57 = [
+    __iconNode58 = [
       [
         "path",
         {
@@ -56390,29 +56409,48 @@ var init_paperclip = __esm({
         }
       ]
     ];
-    Paperclip = createLucideIcon("paperclip", __iconNode57);
+    Paperclip = createLucideIcon("paperclip", __iconNode58);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/pause.js
-var __iconNode58, Pause;
+var __iconNode59, Pause;
 var init_pause = __esm({
   "node_modules/lucide-react/dist/esm/icons/pause.js"() {
     init_createLucideIcon();
-    __iconNode58 = [
+    __iconNode59 = [
       ["rect", { x: "14", y: "3", width: "5", height: "18", rx: "1", key: "kaeet6" }],
       ["rect", { x: "5", y: "3", width: "5", height: "18", rx: "1", key: "1wsw3u" }]
     ];
-    Pause = createLucideIcon("pause", __iconNode58);
+    Pause = createLucideIcon("pause", __iconNode59);
+  }
+});
+
+// node_modules/lucide-react/dist/esm/icons/pen-line.js
+var __iconNode60, PenLine;
+var init_pen_line = __esm({
+  "node_modules/lucide-react/dist/esm/icons/pen-line.js"() {
+    init_createLucideIcon();
+    __iconNode60 = [
+      ["path", { d: "M13 21h8", key: "1jsn5i" }],
+      [
+        "path",
+        {
+          d: "M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z",
+          key: "1a8usu"
+        }
+      ]
+    ];
+    PenLine = createLucideIcon("pen-line", __iconNode60);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/pencil.js
-var __iconNode59, Pencil;
+var __iconNode61, Pencil;
 var init_pencil = __esm({
   "node_modules/lucide-react/dist/esm/icons/pencil.js"() {
     init_createLucideIcon();
-    __iconNode59 = [
+    __iconNode61 = [
       [
         "path",
         {
@@ -56422,29 +56460,29 @@ var init_pencil = __esm({
       ],
       ["path", { d: "m15 5 4 4", key: "1mk7zo" }]
     ];
-    Pencil = createLucideIcon("pencil", __iconNode59);
+    Pencil = createLucideIcon("pencil", __iconNode61);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/plus.js
-var __iconNode60, Plus;
+var __iconNode62, Plus;
 var init_plus = __esm({
   "node_modules/lucide-react/dist/esm/icons/plus.js"() {
     init_createLucideIcon();
-    __iconNode60 = [
+    __iconNode62 = [
       ["path", { d: "M5 12h14", key: "1ays0h" }],
       ["path", { d: "M12 5v14", key: "s699le" }]
     ];
-    Plus = createLucideIcon("plus", __iconNode60);
+    Plus = createLucideIcon("plus", __iconNode62);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/printer.js
-var __iconNode61, Printer;
+var __iconNode63, Printer;
 var init_printer = __esm({
   "node_modules/lucide-react/dist/esm/icons/printer.js"() {
     init_createLucideIcon();
-    __iconNode61 = [
+    __iconNode63 = [
       [
         "path",
         {
@@ -56455,29 +56493,29 @@ var init_printer = __esm({
       ["path", { d: "M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6", key: "1itne7" }],
       ["rect", { x: "6", y: "14", width: "12", height: "8", rx: "1", key: "1ue0tg" }]
     ];
-    Printer = createLucideIcon("printer", __iconNode61);
+    Printer = createLucideIcon("printer", __iconNode63);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/rotate-cw.js
-var __iconNode62, RotateCw;
+var __iconNode64, RotateCw;
 var init_rotate_cw = __esm({
   "node_modules/lucide-react/dist/esm/icons/rotate-cw.js"() {
     init_createLucideIcon();
-    __iconNode62 = [
+    __iconNode64 = [
       ["path", { d: "M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8", key: "1p45f6" }],
       ["path", { d: "M21 3v5h-5", key: "1q7to0" }]
     ];
-    RotateCw = createLucideIcon("rotate-cw", __iconNode62);
+    RotateCw = createLucideIcon("rotate-cw", __iconNode64);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/save.js
-var __iconNode63, Save;
+var __iconNode65, Save;
 var init_save = __esm({
   "node_modules/lucide-react/dist/esm/icons/save.js"() {
     init_createLucideIcon();
-    __iconNode63 = [
+    __iconNode65 = [
       [
         "path",
         {
@@ -56488,29 +56526,29 @@ var init_save = __esm({
       ["path", { d: "M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7", key: "1ydtos" }],
       ["path", { d: "M7 3v4a1 1 0 0 0 1 1h7", key: "t51u73" }]
     ];
-    Save = createLucideIcon("save", __iconNode63);
+    Save = createLucideIcon("save", __iconNode65);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/search.js
-var __iconNode64, Search;
+var __iconNode66, Search;
 var init_search = __esm({
   "node_modules/lucide-react/dist/esm/icons/search.js"() {
     init_createLucideIcon();
-    __iconNode64 = [
+    __iconNode66 = [
       ["path", { d: "m21 21-4.34-4.34", key: "14j7rj" }],
       ["circle", { cx: "11", cy: "11", r: "8", key: "4ej97u" }]
     ];
-    Search = createLucideIcon("search", __iconNode64);
+    Search = createLucideIcon("search", __iconNode66);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/send.js
-var __iconNode65, Send;
+var __iconNode67, Send;
 var init_send = __esm({
   "node_modules/lucide-react/dist/esm/icons/send.js"() {
     init_createLucideIcon();
-    __iconNode65 = [
+    __iconNode67 = [
       [
         "path",
         {
@@ -56520,16 +56558,16 @@ var init_send = __esm({
       ],
       ["path", { d: "m21.854 2.147-10.94 10.939", key: "12cjpa" }]
     ];
-    Send = createLucideIcon("send", __iconNode65);
+    Send = createLucideIcon("send", __iconNode67);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/settings.js
-var __iconNode66, Settings;
+var __iconNode68, Settings;
 var init_settings = __esm({
   "node_modules/lucide-react/dist/esm/icons/settings.js"() {
     init_createLucideIcon();
-    __iconNode66 = [
+    __iconNode68 = [
       [
         "path",
         {
@@ -56539,16 +56577,16 @@ var init_settings = __esm({
       ],
       ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
     ];
-    Settings = createLucideIcon("settings", __iconNode66);
+    Settings = createLucideIcon("settings", __iconNode68);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/shield-check.js
-var __iconNode67, ShieldCheck;
+var __iconNode69, ShieldCheck;
 var init_shield_check = __esm({
   "node_modules/lucide-react/dist/esm/icons/shield-check.js"() {
     init_createLucideIcon();
-    __iconNode67 = [
+    __iconNode69 = [
       [
         "path",
         {
@@ -56558,16 +56596,16 @@ var init_shield_check = __esm({
       ],
       ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
     ];
-    ShieldCheck = createLucideIcon("shield-check", __iconNode67);
+    ShieldCheck = createLucideIcon("shield-check", __iconNode69);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/shield.js
-var __iconNode68, Shield;
+var __iconNode70, Shield;
 var init_shield = __esm({
   "node_modules/lucide-react/dist/esm/icons/shield.js"() {
     init_createLucideIcon();
-    __iconNode68 = [
+    __iconNode70 = [
       [
         "path",
         {
@@ -56576,44 +56614,44 @@ var init_shield = __esm({
         }
       ]
     ];
-    Shield = createLucideIcon("shield", __iconNode68);
+    Shield = createLucideIcon("shield", __iconNode70);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/smartphone.js
-var __iconNode69, Smartphone;
+var __iconNode71, Smartphone;
 var init_smartphone = __esm({
   "node_modules/lucide-react/dist/esm/icons/smartphone.js"() {
     init_createLucideIcon();
-    __iconNode69 = [
+    __iconNode71 = [
       ["rect", { width: "14", height: "20", x: "5", y: "2", rx: "2", ry: "2", key: "1yt0o3" }],
       ["path", { d: "M12 18h.01", key: "mhygvu" }]
     ];
-    Smartphone = createLucideIcon("smartphone", __iconNode69);
+    Smartphone = createLucideIcon("smartphone", __iconNode71);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/smile.js
-var __iconNode70, Smile;
+var __iconNode72, Smile;
 var init_smile = __esm({
   "node_modules/lucide-react/dist/esm/icons/smile.js"() {
     init_createLucideIcon();
-    __iconNode70 = [
+    __iconNode72 = [
       ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
       ["path", { d: "M8 14s1.5 2 4 2 4-2 4-2", key: "1y1vjs" }],
       ["line", { x1: "9", x2: "9.01", y1: "9", y2: "9", key: "yxxnd0" }],
       ["line", { x1: "15", x2: "15.01", y1: "9", y2: "9", key: "1p4y9e" }]
     ];
-    Smile = createLucideIcon("smile", __iconNode70);
+    Smile = createLucideIcon("smile", __iconNode72);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/sparkles.js
-var __iconNode71, Sparkles;
+var __iconNode73, Sparkles;
 var init_sparkles = __esm({
   "node_modules/lucide-react/dist/esm/icons/sparkles.js"() {
     init_createLucideIcon();
-    __iconNode71 = [
+    __iconNode73 = [
       [
         "path",
         {
@@ -56625,16 +56663,16 @@ var init_sparkles = __esm({
       ["path", { d: "M22 4h-4", key: "gwowj6" }],
       ["circle", { cx: "4", cy: "20", r: "2", key: "6kqj1y" }]
     ];
-    Sparkles = createLucideIcon("sparkles", __iconNode71);
+    Sparkles = createLucideIcon("sparkles", __iconNode73);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/star.js
-var __iconNode72, Star;
+var __iconNode74, Star;
 var init_star = __esm({
   "node_modules/lucide-react/dist/esm/icons/star.js"() {
     init_createLucideIcon();
-    __iconNode72 = [
+    __iconNode74 = [
       [
         "path",
         {
@@ -56643,16 +56681,16 @@ var init_star = __esm({
         }
       ]
     ];
-    Star = createLucideIcon("star", __iconNode72);
+    Star = createLucideIcon("star", __iconNode74);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/sticky-note.js
-var __iconNode73, StickyNote;
+var __iconNode75, StickyNote;
 var init_sticky_note = __esm({
   "node_modules/lucide-react/dist/esm/icons/sticky-note.js"() {
     init_createLucideIcon();
-    __iconNode73 = [
+    __iconNode75 = [
       [
         "path",
         {
@@ -56662,16 +56700,16 @@ var init_sticky_note = __esm({
       ],
       ["path", { d: "M15 3v5a1 1 0 0 0 1 1h5", key: "6s6qgf" }]
     ];
-    StickyNote = createLucideIcon("sticky-note", __iconNode73);
+    StickyNote = createLucideIcon("sticky-note", __iconNode75);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/sun.js
-var __iconNode74, Sun;
+var __iconNode76, Sun;
 var init_sun = __esm({
   "node_modules/lucide-react/dist/esm/icons/sun.js"() {
     init_createLucideIcon();
-    __iconNode74 = [
+    __iconNode76 = [
       ["circle", { cx: "12", cy: "12", r: "4", key: "4exip2" }],
       ["path", { d: "M12 2v2", key: "tus03m" }],
       ["path", { d: "M12 20v2", key: "1lh1kg" }],
@@ -56682,16 +56720,16 @@ var init_sun = __esm({
       ["path", { d: "m6.34 17.66-1.41 1.41", key: "1m8zz5" }],
       ["path", { d: "m19.07 4.93-1.41 1.41", key: "1shlcs" }]
     ];
-    Sun = createLucideIcon("sun", __iconNode74);
+    Sun = createLucideIcon("sun", __iconNode76);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/table-2.js
-var __iconNode75, Table2;
+var __iconNode77, Table2;
 var init_table_2 = __esm({
   "node_modules/lucide-react/dist/esm/icons/table-2.js"() {
     init_createLucideIcon();
-    __iconNode75 = [
+    __iconNode77 = [
       [
         "path",
         {
@@ -56700,16 +56738,30 @@ var init_table_2 = __esm({
         }
       ]
     ];
-    Table2 = createLucideIcon("table-2", __iconNode75);
+    Table2 = createLucideIcon("table-2", __iconNode77);
+  }
+});
+
+// node_modules/lucide-react/dist/esm/icons/text-align-start.js
+var __iconNode78, TextAlignStart;
+var init_text_align_start = __esm({
+  "node_modules/lucide-react/dist/esm/icons/text-align-start.js"() {
+    init_createLucideIcon();
+    __iconNode78 = [
+      ["path", { d: "M21 5H3", key: "1fi0y6" }],
+      ["path", { d: "M15 12H3", key: "6jk70r" }],
+      ["path", { d: "M17 19H3", key: "z6ezky" }]
+    ];
+    TextAlignStart = createLucideIcon("text-align-start", __iconNode78);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/thumbs-up.js
-var __iconNode76, ThumbsUp;
+var __iconNode79, ThumbsUp;
 var init_thumbs_up = __esm({
   "node_modules/lucide-react/dist/esm/icons/thumbs-up.js"() {
     init_createLucideIcon();
-    __iconNode76 = [
+    __iconNode79 = [
       [
         "path",
         {
@@ -56719,45 +56771,45 @@ var init_thumbs_up = __esm({
       ],
       ["path", { d: "M7 10v12", key: "1qc93n" }]
     ];
-    ThumbsUp = createLucideIcon("thumbs-up", __iconNode76);
+    ThumbsUp = createLucideIcon("thumbs-up", __iconNode79);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/trash-2.js
-var __iconNode77, Trash2;
+var __iconNode80, Trash2;
 var init_trash_2 = __esm({
   "node_modules/lucide-react/dist/esm/icons/trash-2.js"() {
     init_createLucideIcon();
-    __iconNode77 = [
+    __iconNode80 = [
       ["path", { d: "M10 11v6", key: "nco0om" }],
       ["path", { d: "M14 11v6", key: "outv1u" }],
       ["path", { d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6", key: "miytrc" }],
       ["path", { d: "M3 6h18", key: "d0wm0j" }],
       ["path", { d: "M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2", key: "e791ji" }]
     ];
-    Trash2 = createLucideIcon("trash-2", __iconNode77);
+    Trash2 = createLucideIcon("trash-2", __iconNode80);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/trending-up.js
-var __iconNode78, TrendingUp;
+var __iconNode81, TrendingUp;
 var init_trending_up = __esm({
   "node_modules/lucide-react/dist/esm/icons/trending-up.js"() {
     init_createLucideIcon();
-    __iconNode78 = [
+    __iconNode81 = [
       ["path", { d: "M16 7h6v6", key: "box55l" }],
       ["path", { d: "m22 7-8.5 8.5-5-5L2 17", key: "1t1m79" }]
     ];
-    TrendingUp = createLucideIcon("trending-up", __iconNode78);
+    TrendingUp = createLucideIcon("trending-up", __iconNode81);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/triangle-alert.js
-var __iconNode79, TriangleAlert;
+var __iconNode82, TriangleAlert;
 var init_triangle_alert = __esm({
   "node_modules/lucide-react/dist/esm/icons/triangle-alert.js"() {
     init_createLucideIcon();
-    __iconNode79 = [
+    __iconNode82 = [
       [
         "path",
         {
@@ -56768,30 +56820,30 @@ var init_triangle_alert = __esm({
       ["path", { d: "M12 9v4", key: "juzpu7" }],
       ["path", { d: "M12 17h.01", key: "p32p05" }]
     ];
-    TriangleAlert = createLucideIcon("triangle-alert", __iconNode79);
+    TriangleAlert = createLucideIcon("triangle-alert", __iconNode82);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/upload.js
-var __iconNode80, Upload;
+var __iconNode83, Upload;
 var init_upload = __esm({
   "node_modules/lucide-react/dist/esm/icons/upload.js"() {
     init_createLucideIcon();
-    __iconNode80 = [
+    __iconNode83 = [
       ["path", { d: "M12 3v12", key: "1x0j5s" }],
       ["path", { d: "m17 8-5-5-5 5", key: "7q97r8" }],
       ["path", { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4", key: "ih7n3h" }]
     ];
-    Upload = createLucideIcon("upload", __iconNode80);
+    Upload = createLucideIcon("upload", __iconNode83);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/user-cog.js
-var __iconNode81, UserCog;
+var __iconNode84, UserCog;
 var init_user_cog = __esm({
   "node_modules/lucide-react/dist/esm/icons/user-cog.js"() {
     init_createLucideIcon();
-    __iconNode81 = [
+    __iconNode84 = [
       ["path", { d: "M10 15H6a4 4 0 0 0-4 4v2", key: "1nfge6" }],
       ["path", { d: "m14.305 16.53.923-.382", key: "1itpsq" }],
       ["path", { d: "m15.228 13.852-.923-.383", key: "eplpkm" }],
@@ -56804,59 +56856,59 @@ var init_user_cog = __esm({
       ["circle", { cx: "18", cy: "15", r: "3", key: "gjjjvw" }],
       ["circle", { cx: "9", cy: "7", r: "4", key: "nufk8" }]
     ];
-    UserCog = createLucideIcon("user-cog", __iconNode81);
+    UserCog = createLucideIcon("user-cog", __iconNode84);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/user-plus.js
-var __iconNode82, UserPlus;
+var __iconNode85, UserPlus;
 var init_user_plus = __esm({
   "node_modules/lucide-react/dist/esm/icons/user-plus.js"() {
     init_createLucideIcon();
-    __iconNode82 = [
+    __iconNode85 = [
       ["path", { d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2", key: "1yyitq" }],
       ["circle", { cx: "9", cy: "7", r: "4", key: "nufk8" }],
       ["line", { x1: "19", x2: "19", y1: "8", y2: "14", key: "1bvyxn" }],
       ["line", { x1: "22", x2: "16", y1: "11", y2: "11", key: "1shjgl" }]
     ];
-    UserPlus = createLucideIcon("user-plus", __iconNode82);
+    UserPlus = createLucideIcon("user-plus", __iconNode85);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/user.js
-var __iconNode83, User;
+var __iconNode86, User;
 var init_user = __esm({
   "node_modules/lucide-react/dist/esm/icons/user.js"() {
     init_createLucideIcon();
-    __iconNode83 = [
+    __iconNode86 = [
       ["path", { d: "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2", key: "975kel" }],
       ["circle", { cx: "12", cy: "7", r: "4", key: "17ys0d" }]
     ];
-    User = createLucideIcon("user", __iconNode83);
+    User = createLucideIcon("user", __iconNode86);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/users.js
-var __iconNode84, Users;
+var __iconNode87, Users;
 var init_users = __esm({
   "node_modules/lucide-react/dist/esm/icons/users.js"() {
     init_createLucideIcon();
-    __iconNode84 = [
+    __iconNode87 = [
       ["path", { d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2", key: "1yyitq" }],
       ["path", { d: "M16 3.128a4 4 0 0 1 0 7.744", key: "16gr8j" }],
       ["path", { d: "M22 21v-2a4 4 0 0 0-3-3.87", key: "kshegd" }],
       ["circle", { cx: "9", cy: "7", r: "4", key: "nufk8" }]
     ];
-    Users = createLucideIcon("users", __iconNode84);
+    Users = createLucideIcon("users", __iconNode87);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/video.js
-var __iconNode85, Video;
+var __iconNode88, Video;
 var init_video = __esm({
   "node_modules/lucide-react/dist/esm/icons/video.js"() {
     init_createLucideIcon();
-    __iconNode85 = [
+    __iconNode88 = [
       [
         "path",
         {
@@ -56866,29 +56918,29 @@ var init_video = __esm({
       ],
       ["rect", { x: "2", y: "6", width: "14", height: "12", rx: "2", key: "158x01" }]
     ];
-    Video = createLucideIcon("video", __iconNode85);
+    Video = createLucideIcon("video", __iconNode88);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/x.js
-var __iconNode86, X2;
+var __iconNode89, X2;
 var init_x = __esm({
   "node_modules/lucide-react/dist/esm/icons/x.js"() {
     init_createLucideIcon();
-    __iconNode86 = [
+    __iconNode89 = [
       ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
       ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
     ];
-    X2 = createLucideIcon("x", __iconNode86);
+    X2 = createLucideIcon("x", __iconNode89);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/zap.js
-var __iconNode87, Zap;
+var __iconNode90, Zap;
 var init_zap = __esm({
   "node_modules/lucide-react/dist/esm/icons/zap.js"() {
     init_createLucideIcon();
-    __iconNode87 = [
+    __iconNode90 = [
       [
         "path",
         {
@@ -56897,36 +56949,36 @@ var init_zap = __esm({
         }
       ]
     ];
-    Zap = createLucideIcon("zap", __iconNode87);
+    Zap = createLucideIcon("zap", __iconNode90);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/zoom-in.js
-var __iconNode88, ZoomIn;
+var __iconNode91, ZoomIn;
 var init_zoom_in = __esm({
   "node_modules/lucide-react/dist/esm/icons/zoom-in.js"() {
     init_createLucideIcon();
-    __iconNode88 = [
+    __iconNode91 = [
       ["circle", { cx: "11", cy: "11", r: "8", key: "4ej97u" }],
       ["line", { x1: "21", x2: "16.65", y1: "21", y2: "16.65", key: "13gj7c" }],
       ["line", { x1: "11", x2: "11", y1: "8", y2: "14", key: "1vmskp" }],
       ["line", { x1: "8", x2: "14", y1: "11", y2: "11", key: "durymu" }]
     ];
-    ZoomIn = createLucideIcon("zoom-in", __iconNode88);
+    ZoomIn = createLucideIcon("zoom-in", __iconNode91);
   }
 });
 
 // node_modules/lucide-react/dist/esm/icons/zoom-out.js
-var __iconNode89, ZoomOut;
+var __iconNode92, ZoomOut;
 var init_zoom_out = __esm({
   "node_modules/lucide-react/dist/esm/icons/zoom-out.js"() {
     init_createLucideIcon();
-    __iconNode89 = [
+    __iconNode92 = [
       ["circle", { cx: "11", cy: "11", r: "8", key: "4ej97u" }],
       ["line", { x1: "21", x2: "16.65", y1: "21", y2: "16.65", key: "13gj7c" }],
       ["line", { x1: "8", x2: "14", y1: "11", y2: "11", key: "durymu" }]
     ];
-    ZoomOut = createLucideIcon("zoom-out", __iconNode89);
+    ZoomOut = createLucideIcon("zoom-out", __iconNode92);
   }
 });
 
@@ -56943,7 +56995,9 @@ var init_lucide_react = __esm({
     init_funnel();
     init_layers();
     init_loader_circle();
+    init_pen_line();
     init_sparkles();
+    init_text_align_start();
     init_triangle_alert();
     init_activity();
     init_arrow_left();
@@ -56966,6 +57020,7 @@ var init_lucide_react = __esm({
     init_credit_card();
     init_download();
     init_external_link();
+    init_eye();
     init_file_check();
     init_file_spreadsheet();
     init_file_text();
@@ -57025,7 +57080,7 @@ var init_lucide_react = __esm({
   }
 });
 
-// dist/server/assets/LangSwitcher-V9VJ-Wls.js
+// dist/server/assets/LangSwitcher-F8OxBFA2.js
 function ThemeToggle() {
   const { theme, setTheme, resolved } = useTheme();
   const [open, setOpen] = (0, import_react19.useState)(false);
@@ -57120,18 +57175,18 @@ function LangSwitcher() {
   ] });
 }
 var import_jsx_runtime25, import_react19;
-var init_LangSwitcher_V9VJ_Wls = __esm({
-  "dist/server/assets/LangSwitcher-V9VJ-Wls.js"() {
+var init_LangSwitcher_F8OxBFA2 = __esm({
+  "dist/server/assets/LangSwitcher-F8OxBFA2.js"() {
     "use strict";
     import_jsx_runtime25 = __toESM(require_jsx_runtime(), 1);
     init_lucide_react();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     import_react19 = __toESM(require_react(), 1);
     init_utils_H80jjgLf();
   }
 });
 
-// dist/server/assets/SiteFooter-DD3E3K-L.js
+// dist/server/assets/SiteFooter-uXYMh1zr.js
 function SiteHeader() {
   return /* @__PURE__ */ (0, import_jsx_runtime26.jsxs)("header", { className: "sticky top-0 z-40 w-full", children: [
     /* @__PURE__ */ (0, import_jsx_runtime26.jsx)("div", { className: "absolute inset-0 -z-10 backdrop-blur-xl bg-background/70 border-b border-border/60" }),
@@ -57226,8 +57281,8 @@ function SiteFooter() {
   ] }) });
 }
 var import_jsx_runtime26, React11, buttonVariants, Button, nav;
-var init_SiteFooter_DD3E3K_L = __esm({
-  "dist/server/assets/SiteFooter-DD3E3K-L.js"() {
+var init_SiteFooter_uXYMh1zr = __esm({
+  "dist/server/assets/SiteFooter-uXYMh1zr.js"() {
     "use strict";
     import_jsx_runtime26 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -57237,7 +57292,7 @@ var init_SiteFooter_DD3E3K_L = __esm({
     init_dist10();
     init_utils_H80jjgLf();
     init_lucide_react();
-    init_LangSwitcher_V9VJ_Wls();
+    init_LangSwitcher_F8OxBFA2();
     buttonVariants = cva(
       "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
       {
@@ -57283,9 +57338,9 @@ var init_SiteFooter_DD3E3K_L = __esm({
   }
 });
 
-// dist/server/assets/terms-CGOhguBt.js
-var terms_CGOhguBt_exports = {};
-__export(terms_CGOhguBt_exports, {
+// dist/server/assets/terms-DLxpKBr3.js
+var terms_DLxpKBr3_exports = {};
+__export(terms_DLxpKBr3_exports, {
   component: () => TermsPage
 });
 function TermsPage() {
@@ -57306,11 +57361,11 @@ function TermsPage() {
   ] });
 }
 var import_jsx_runtime27, import_react20, sections;
-var init_terms_CGOhguBt = __esm({
-  "dist/server/assets/terms-CGOhguBt.js"() {
+var init_terms_DLxpKBr3 = __esm({
+  "dist/server/assets/terms-DLxpKBr3.js"() {
     "use strict";
     import_jsx_runtime27 = __toESM(require_jsx_runtime(), 1);
-    init_SiteFooter_DD3E3K_L();
+    init_SiteFooter_uXYMh1zr();
     import_react20 = __toESM(require_react(), 1);
     init_dist10();
     init_clsx();
@@ -57343,9 +57398,9 @@ var init_terms_CGOhguBt = __esm({
   }
 });
 
-// dist/server/assets/sign-up-DIsOg3SU.js
-var sign_up_DIsOg3SU_exports = {};
-__export(sign_up_DIsOg3SU_exports, {
+// dist/server/assets/sign-up-CI0HOuEm.js
+var sign_up_CI0HOuEm_exports = {};
+__export(sign_up_CI0HOuEm_exports, {
   component: () => SignUp
 });
 function SignUp() {
@@ -57468,21 +57523,21 @@ function SignUp() {
   ] }) });
 }
 var import_jsx_runtime28, import_react21;
-var init_sign_up_DIsOg3SU = __esm({
-  "dist/server/assets/sign-up-DIsOg3SU.js"() {
+var init_sign_up_CI0HOuEm = __esm({
+  "dist/server/assets/sign-up-CI0HOuEm.js"() {
     "use strict";
     import_jsx_runtime28 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react21 = __toESM(require_react(), 1);
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/sign-in-CS27ggak.js
-var sign_in_CS27ggak_exports = {};
-__export(sign_in_CS27ggak_exports, {
+// dist/server/assets/sign-in-CJa9HVxz.js
+var sign_in_CJa9HVxz_exports = {};
+__export(sign_in_CJa9HVxz_exports, {
   component: () => SignIn
 });
 function SignIn() {
@@ -57571,21 +57626,21 @@ function SignIn() {
   ] }) });
 }
 var import_jsx_runtime29, import_react22;
-var init_sign_in_CS27ggak = __esm({
-  "dist/server/assets/sign-in-CS27ggak.js"() {
+var init_sign_in_CJa9HVxz = __esm({
+  "dist/server/assets/sign-in-CJa9HVxz.js"() {
     "use strict";
     import_jsx_runtime29 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react22 = __toESM(require_react(), 1);
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/privacy-Bo4BP-49.js
-var privacy_Bo4BP_49_exports = {};
-__export(privacy_Bo4BP_49_exports, {
+// dist/server/assets/privacy-DJqaic4z.js
+var privacy_DJqaic4z_exports = {};
+__export(privacy_DJqaic4z_exports, {
   component: () => PrivacyPage
 });
 function PrivacyPage() {
@@ -57606,11 +57661,11 @@ function PrivacyPage() {
   ] });
 }
 var import_jsx_runtime30, import_react23, sections2;
-var init_privacy_Bo4BP_49 = __esm({
-  "dist/server/assets/privacy-Bo4BP-49.js"() {
+var init_privacy_DJqaic4z = __esm({
+  "dist/server/assets/privacy-DJqaic4z.js"() {
     "use strict";
     import_jsx_runtime30 = __toESM(require_jsx_runtime(), 1);
-    init_SiteFooter_DD3E3K_L();
+    init_SiteFooter_uXYMh1zr();
     import_react23 = __toESM(require_react(), 1);
     init_dist10();
     init_clsx();
@@ -57640,9 +57695,9 @@ var init_privacy_Bo4BP_49 = __esm({
   }
 });
 
-// dist/server/assets/pricing-C29OZ4Bu.js
-var pricing_C29OZ4Bu_exports = {};
-__export(pricing_C29OZ4Bu_exports, {
+// dist/server/assets/pricing-Cuxs2FXG.js
+var pricing_Cuxs2FXG_exports = {};
+__export(pricing_Cuxs2FXG_exports, {
   component: () => Pricing
 });
 function Pricing() {
@@ -57682,12 +57737,12 @@ function Pricing() {
   ] });
 }
 var import_jsx_runtime31, import_react24, tiers;
-var init_pricing_C29OZ4Bu = __esm({
-  "dist/server/assets/pricing-C29OZ4Bu.js"() {
+var init_pricing_Cuxs2FXG = __esm({
+  "dist/server/assets/pricing-Cuxs2FXG.js"() {
     "use strict";
     import_jsx_runtime31 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    init_SiteFooter_DD3E3K_L();
+    init_SiteFooter_uXYMh1zr();
     init_lucide_react();
     import_react24 = __toESM(require_react(), 1);
     init_dist10();
@@ -57820,7 +57875,7 @@ var init_AppPreview_BtsG_qZV = __esm({
   }
 });
 
-// dist/server/assets/SolutionPage-CjiWDGap.js
+// dist/server/assets/SolutionPage-BvSJ72FD.js
 function SolutionPage({ eyebrow, title, sub, Icon: Icon2, features }) {
   return /* @__PURE__ */ (0, import_jsx_runtime33.jsxs)("div", { className: "min-h-screen bg-background", children: [
     /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(SiteHeader, {}),
@@ -57853,28 +57908,28 @@ function SolutionPage({ eyebrow, title, sub, Icon: Icon2, features }) {
   ] });
 }
 var import_jsx_runtime33;
-var init_SolutionPage_CjiWDGap = __esm({
-  "dist/server/assets/SolutionPage-CjiWDGap.js"() {
+var init_SolutionPage_BvSJ72FD = __esm({
+  "dist/server/assets/SolutionPage-BvSJ72FD.js"() {
     "use strict";
     import_jsx_runtime33 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    init_SiteFooter_DD3E3K_L();
+    init_SiteFooter_uXYMh1zr();
     init_AppPreview_BtsG_qZV();
     init_lucide_react();
   }
 });
 
-// dist/server/assets/investors-BXVI1BaT.js
-var investors_BXVI1BaT_exports = {};
-__export(investors_BXVI1BaT_exports, {
+// dist/server/assets/investors-CXKCVG4l.js
+var investors_CXKCVG4l_exports = {};
+__export(investors_CXKCVG4l_exports, {
   component: () => SplitComponent
 });
 var import_jsx_runtime34, import_react25, SplitComponent;
-var init_investors_BXVI1BaT = __esm({
-  "dist/server/assets/investors-BXVI1BaT.js"() {
+var init_investors_CXKCVG4l = __esm({
+  "dist/server/assets/investors-CXKCVG4l.js"() {
     "use strict";
     import_jsx_runtime34 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_CjiWDGap();
+    init_SolutionPage_BvSJ72FD();
     init_lucide_react();
     import_react25 = __toESM(require_react(), 1);
     init_dist10();
@@ -57884,17 +57939,17 @@ var init_investors_BXVI1BaT = __esm({
   }
 });
 
-// dist/server/assets/founders-CTj0emoq.js
-var founders_CTj0emoq_exports = {};
-__export(founders_CTj0emoq_exports, {
+// dist/server/assets/founders-BnB4fwmd.js
+var founders_BnB4fwmd_exports = {};
+__export(founders_BnB4fwmd_exports, {
   component: () => SplitComponent2
 });
 var import_jsx_runtime35, import_react26, SplitComponent2;
-var init_founders_CTj0emoq = __esm({
-  "dist/server/assets/founders-CTj0emoq.js"() {
+var init_founders_BnB4fwmd = __esm({
+  "dist/server/assets/founders-BnB4fwmd.js"() {
     "use strict";
     import_jsx_runtime35 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_CjiWDGap();
+    init_SolutionPage_BvSJ72FD();
     init_lucide_react();
     import_react26 = __toESM(require_react(), 1);
     init_dist10();
@@ -57904,9 +57959,9 @@ var init_founders_CTj0emoq = __esm({
   }
 });
 
-// dist/server/assets/forgot-password-l9VNuX2o.js
-var forgot_password_l9VNuX2o_exports = {};
-__export(forgot_password_l9VNuX2o_exports, {
+// dist/server/assets/forgot-password-DeiTzYlS.js
+var forgot_password_DeiTzYlS_exports = {};
+__export(forgot_password_DeiTzYlS_exports, {
   component: () => ForgotPassword
 });
 function ForgotPassword() {
@@ -57951,13 +58006,13 @@ function ForgotPassword() {
   ] }) }) });
 }
 var import_jsx_runtime36, import_react27;
-var init_forgot_password_l9VNuX2o = __esm({
-  "dist/server/assets/forgot-password-l9VNuX2o.js"() {
+var init_forgot_password_DeiTzYlS = __esm({
+  "dist/server/assets/forgot-password-DeiTzYlS.js"() {
     "use strict";
     import_jsx_runtime36 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react27 = __toESM(require_react(), 1);
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_dist7();
     init_clsx();
   }
@@ -61676,9 +61731,9 @@ var init_store_LLbTvev = __esm({
   }
 });
 
-// dist/server/assets/app-DFx2ogJX.js
-var app_DFx2ogJX_exports = {};
-__export(app_DFx2ogJX_exports, {
+// dist/server/assets/app-eleWCjsI.js
+var app_eleWCjsI_exports = {};
+__export(app_eleWCjsI_exports, {
   component: () => SplitComponent4
 });
 function NotificationBell() {
@@ -61972,8 +62027,8 @@ function AppShell({ children }) {
   ] });
 }
 var import_jsx_runtime38, import_react29, iconFor, tintFor, founderNav, investorNav, workspaceNavFounder, workspaceNavInvestor, SplitComponent4;
-var init_app_DFx2ogJX = __esm({
-  "dist/server/assets/app-DFx2ogJX.js"() {
+var init_app_eleWCjsI = __esm({
+  "dist/server/assets/app-eleWCjsI.js"() {
     "use strict";
     import_jsx_runtime38 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -61982,9 +62037,9 @@ var init_app_DFx2ogJX = __esm({
     import_react29 = __toESM(require_react(), 1);
     init_modern2();
     init_utils_H80jjgLf();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_date_fns();
-    init_LangSwitcher_V9VJ_Wls();
+    init_LangSwitcher_F8OxBFA2();
     init_store_LLbTvev();
     init_clsx();
     init_dist7();
@@ -62037,9 +62092,9 @@ var init_app_DFx2ogJX = __esm({
   }
 });
 
-// dist/server/assets/about-PFps4NVP.js
-var about_PFps4NVP_exports = {};
-__export(about_PFps4NVP_exports, {
+// dist/server/assets/about-W5ckLSw0.js
+var about_W5ckLSw0_exports = {};
+__export(about_W5ckLSw0_exports, {
   component: () => About
 });
 function About() {
@@ -62059,11 +62114,11 @@ function About() {
   ] });
 }
 var import_jsx_runtime39, import_react30;
-var init_about_PFps4NVP = __esm({
-  "dist/server/assets/about-PFps4NVP.js"() {
+var init_about_W5ckLSw0 = __esm({
+  "dist/server/assets/about-W5ckLSw0.js"() {
     "use strict";
     import_jsx_runtime39 = __toESM(require_jsx_runtime(), 1);
-    init_SiteFooter_DD3E3K_L();
+    init_SiteFooter_uXYMh1zr();
     init_lucide_react();
     init_esm5();
     import_react30 = __toESM(require_react(), 1);
@@ -62073,9 +62128,9 @@ var init_about_PFps4NVP = __esm({
   }
 });
 
-// dist/server/assets/index-D0-umLqO.js
-var index_D0_umLqO_exports = {};
-__export(index_D0_umLqO_exports, {
+// dist/server/assets/index-BUzdUS1j.js
+var index_BUzdUS1j_exports = {};
+__export(index_BUzdUS1j_exports, {
   component: () => Landing
 });
 function Landing() {
@@ -62383,12 +62438,12 @@ function FinalCTA() {
   ] }) });
 }
 var import_jsx_runtime40, import_react31;
-var init_index_D0_umLqO = __esm({
-  "dist/server/assets/index-D0-umLqO.js"() {
+var init_index_BUzdUS1j = __esm({
+  "dist/server/assets/index-BUzdUS1j.js"() {
     "use strict";
     import_jsx_runtime40 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
-    init_SiteFooter_DD3E3K_L();
+    init_SiteFooter_uXYMh1zr();
     init_AppPreview_BtsG_qZV();
     init_lucide_react();
     import_react31 = __toESM(require_react(), 1);
@@ -62398,9 +62453,9 @@ var init_index_D0_umLqO = __esm({
   }
 });
 
-// dist/server/assets/app.index-B05kkWeL.js
-var app_index_B05kkWeL_exports = {};
-__export(app_index_B05kkWeL_exports, {
+// dist/server/assets/app.index-BfTpDU6I.js
+var app_index_BfTpDU6I_exports = {};
+__export(app_index_BfTpDU6I_exports, {
   component: () => Overview
 });
 function timeAgo(iso) {
@@ -62988,8 +63043,8 @@ function Overview() {
   ] });
 }
 var import_jsx_runtime41, import_react32, DEAL_ROOM_PROGRESS;
-var init_app_index_B05kkWeL = __esm({
-  "dist/server/assets/app.index-B05kkWeL.js"() {
+var init_app_index_BfTpDU6I = __esm({
+  "dist/server/assets/app.index-BfTpDU6I.js"() {
     "use strict";
     import_jsx_runtime41 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -62997,7 +63052,7 @@ var init_app_index_B05kkWeL = __esm({
     init_modern2();
     init_date_fns();
     init_lucide_react();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_utils_H80jjgLf();
     init_dist7();
     init_clsx();
@@ -63030,17 +63085,17 @@ var init_app_index_B05kkWeL = __esm({
   }
 });
 
-// dist/server/assets/solutions.vc-deal-room-BxyhShsL.js
-var solutions_vc_deal_room_BxyhShsL_exports = {};
-__export(solutions_vc_deal_room_BxyhShsL_exports, {
+// dist/server/assets/solutions.vc-deal-room-C8wozciX.js
+var solutions_vc_deal_room_C8wozciX_exports = {};
+__export(solutions_vc_deal_room_C8wozciX_exports, {
   component: () => SplitComponent5
 });
 var import_jsx_runtime42, import_react33, SplitComponent5;
-var init_solutions_vc_deal_room_BxyhShsL = __esm({
-  "dist/server/assets/solutions.vc-deal-room-BxyhShsL.js"() {
+var init_solutions_vc_deal_room_C8wozciX = __esm({
+  "dist/server/assets/solutions.vc-deal-room-C8wozciX.js"() {
     "use strict";
     import_jsx_runtime42 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_CjiWDGap();
+    init_SolutionPage_BvSJ72FD();
     init_lucide_react();
     import_react33 = __toESM(require_react(), 1);
     init_dist10();
@@ -63050,17 +63105,17 @@ var init_solutions_vc_deal_room_BxyhShsL = __esm({
   }
 });
 
-// dist/server/assets/solutions.raise-1m-BCxQn053.js
-var solutions_raise_1m_BCxQn053_exports = {};
-__export(solutions_raise_1m_BCxQn053_exports, {
+// dist/server/assets/solutions.raise-1m-B9l2SqhA.js
+var solutions_raise_1m_B9l2SqhA_exports = {};
+__export(solutions_raise_1m_B9l2SqhA_exports, {
   component: () => SplitComponent6
 });
 var import_jsx_runtime43, import_react34, SplitComponent6;
-var init_solutions_raise_1m_BCxQn053 = __esm({
-  "dist/server/assets/solutions.raise-1m-BCxQn053.js"() {
+var init_solutions_raise_1m_B9l2SqhA = __esm({
+  "dist/server/assets/solutions.raise-1m-B9l2SqhA.js"() {
     "use strict";
     import_jsx_runtime43 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_CjiWDGap();
+    init_SolutionPage_BvSJ72FD();
     init_lucide_react();
     import_react34 = __toESM(require_react(), 1);
     init_dist10();
@@ -63070,17 +63125,17 @@ var init_solutions_raise_1m_BCxQn053 = __esm({
   }
 });
 
-// dist/server/assets/solutions.investor-pipeline-Dl645HLJ.js
-var solutions_investor_pipeline_Dl645HLJ_exports = {};
-__export(solutions_investor_pipeline_Dl645HLJ_exports, {
+// dist/server/assets/solutions.investor-pipeline-TeIhdO2E.js
+var solutions_investor_pipeline_TeIhdO2E_exports = {};
+__export(solutions_investor_pipeline_TeIhdO2E_exports, {
   component: () => SplitComponent7
 });
 var import_jsx_runtime44, import_react35, SplitComponent7;
-var init_solutions_investor_pipeline_Dl645HLJ = __esm({
-  "dist/server/assets/solutions.investor-pipeline-Dl645HLJ.js"() {
+var init_solutions_investor_pipeline_TeIhdO2E = __esm({
+  "dist/server/assets/solutions.investor-pipeline-TeIhdO2E.js"() {
     "use strict";
     import_jsx_runtime44 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_CjiWDGap();
+    init_SolutionPage_BvSJ72FD();
     init_lucide_react();
     import_react35 = __toESM(require_react(), 1);
     init_dist10();
@@ -63090,17 +63145,17 @@ var init_solutions_investor_pipeline_Dl645HLJ = __esm({
   }
 });
 
-// dist/server/assets/solutions.fundraising-crm-DInBRKWM.js
-var solutions_fundraising_crm_DInBRKWM_exports = {};
-__export(solutions_fundraising_crm_DInBRKWM_exports, {
+// dist/server/assets/solutions.fundraising-crm-Dd1jnQIP.js
+var solutions_fundraising_crm_Dd1jnQIP_exports = {};
+__export(solutions_fundraising_crm_Dd1jnQIP_exports, {
   component: () => SplitComponent8
 });
 var import_jsx_runtime45, import_react36, SplitComponent8;
-var init_solutions_fundraising_crm_DInBRKWM = __esm({
-  "dist/server/assets/solutions.fundraising-crm-DInBRKWM.js"() {
+var init_solutions_fundraising_crm_Dd1jnQIP = __esm({
+  "dist/server/assets/solutions.fundraising-crm-Dd1jnQIP.js"() {
     "use strict";
     import_jsx_runtime45 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_CjiWDGap();
+    init_SolutionPage_BvSJ72FD();
     init_lucide_react();
     import_react36 = __toESM(require_react(), 1);
     init_dist10();
@@ -63110,17 +63165,17 @@ var init_solutions_fundraising_crm_DInBRKWM = __esm({
   }
 });
 
-// dist/server/assets/solutions.due-diligence-BnLkGrz-.js
-var solutions_due_diligence_BnLkGrz_exports = {};
-__export(solutions_due_diligence_BnLkGrz_exports, {
+// dist/server/assets/solutions.due-diligence-RhXl7QTB.js
+var solutions_due_diligence_RhXl7QTB_exports = {};
+__export(solutions_due_diligence_RhXl7QTB_exports, {
   component: () => SplitComponent9
 });
 var import_jsx_runtime46, import_react37, SplitComponent9;
-var init_solutions_due_diligence_BnLkGrz = __esm({
-  "dist/server/assets/solutions.due-diligence-BnLkGrz-.js"() {
+var init_solutions_due_diligence_RhXl7QTB = __esm({
+  "dist/server/assets/solutions.due-diligence-RhXl7QTB.js"() {
     "use strict";
     import_jsx_runtime46 = __toESM(require_jsx_runtime(), 1);
-    init_SolutionPage_CjiWDGap();
+    init_SolutionPage_BvSJ72FD();
     init_lucide_react();
     import_react37 = __toESM(require_react(), 1);
     init_dist10();
@@ -63130,9 +63185,9 @@ var init_solutions_due_diligence_BnLkGrz = __esm({
   }
 });
 
-// dist/server/assets/join._token-DgU6TIUM.js
-var join_token_DgU6TIUM_exports = {};
-__export(join_token_DgU6TIUM_exports, {
+// dist/server/assets/join._token-DzY3fXeU.js
+var join_token_DzY3fXeU_exports = {};
+__export(join_token_DzY3fXeU_exports, {
   component: () => JoinFlow
 });
 function JoinFlow() {
@@ -63347,23 +63402,23 @@ function JoinFlow() {
   ] });
 }
 var import_jsx_runtime47, import_react38;
-var init_join_token_DgU6TIUM = __esm({
-  "dist/server/assets/join._token-DgU6TIUM.js"() {
+var init_join_token_DzY3fXeU = __esm({
+  "dist/server/assets/join._token-DzY3fXeU.js"() {
     "use strict";
     import_jsx_runtime47 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react38 = __toESM(require_react(), 1);
     init_Logo_CIkq6vsm();
     init_lucide_react();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/auth.callback-BUqeg_Il.js
-var auth_callback_BUqeg_Il_exports = {};
-__export(auth_callback_BUqeg_Il_exports, {
+// dist/server/assets/auth.callback-DC3KIXww.js
+var auth_callback_DC3KIXww_exports = {};
+__export(auth_callback_DC3KIXww_exports, {
   component: () => AuthCallback
 });
 function AuthCallback() {
@@ -63421,20 +63476,20 @@ function AuthCallback() {
   ] });
 }
 var import_jsx_runtime48, import_react39;
-var init_auth_callback_BUqeg_Il = __esm({
-  "dist/server/assets/auth.callback-BUqeg_Il.js"() {
+var init_auth_callback_DC3KIXww = __esm({
+  "dist/server/assets/auth.callback-DC3KIXww.js"() {
     "use strict";
     import_jsx_runtime48 = __toESM(require_jsx_runtime(), 1);
     import_react39 = __toESM(require_react(), 1);
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.users-B1nxjekQ.js
-var app_users_B1nxjekQ_exports = {};
-__export(app_users_B1nxjekQ_exports, {
+// dist/server/assets/app.users-WC5z1T4d.js
+var app_users_WC5z1T4d_exports = {};
+__export(app_users_WC5z1T4d_exports, {
   component: () => UsersPage
 });
 function UsersPage() {
@@ -63707,8 +63762,8 @@ function InviteModal({
   ] }) });
 }
 var import_jsx_runtime49, import_react40, roleColor;
-var init_app_users_B1nxjekQ = __esm({
-  "dist/server/assets/app.users-B1nxjekQ.js"() {
+var init_app_users_WC5z1T4d = __esm({
+  "dist/server/assets/app.users-WC5z1T4d.js"() {
     "use strict";
     import_jsx_runtime49 = __toESM(require_jsx_runtime(), 1);
     import_react40 = __toESM(require_react(), 1);
@@ -63716,7 +63771,7 @@ var init_app_users_B1nxjekQ = __esm({
     init_lucide_react();
     init_dist7();
     init_date_fns();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_clsx();
     roleColor = {
       Owner: "bg-violet/10 text-violet border-violet/20",
@@ -63729,9 +63784,9 @@ var init_app_users_B1nxjekQ = __esm({
   }
 });
 
-// dist/server/assets/app.settings-CT9jEZPA.js
-var app_settings_CT9jEZPA_exports = {};
-__export(app_settings_CT9jEZPA_exports, {
+// dist/server/assets/app.settings-Ci3cam-c.js
+var app_settings_Ci3cam_c_exports = {};
+__export(app_settings_Ci3cam_c_exports, {
   Card: () => Card,
   Field: () => Field,
   SaveBar: () => SaveBar,
@@ -63853,15 +63908,15 @@ function SaveBar() {
   ] });
 }
 var import_jsx_runtime50, import_react41, tabs;
-var init_app_settings_CT9jEZPA = __esm({
-  "dist/server/assets/app.settings-CT9jEZPA.js"() {
+var init_app_settings_Ci3cam_c = __esm({
+  "dist/server/assets/app.settings-Ci3cam-c.js"() {
     "use strict";
     import_jsx_runtime50 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_modern2();
     init_lucide_react();
     init_utils_H80jjgLf();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_clsx();
     import_react41 = __toESM(require_react(), 1);
     init_dist7();
@@ -63890,9 +63945,9 @@ var init_app_settings_CT9jEZPA = __esm({
   }
 });
 
-// dist/server/assets/app.reports-DRhNjuwv.js
-var app_reports_DRhNjuwv_exports = {};
-__export(app_reports_DRhNjuwv_exports, {
+// dist/server/assets/app.reports-Cl_3iIAk.js
+var app_reports_Cl_3iIAk_exports = {};
+__export(app_reports_Cl_3iIAk_exports, {
   component: () => Reports
 });
 function downloadCsv(filename, rows) {
@@ -64157,12 +64212,12 @@ function Reports() {
   ] });
 }
 var import_jsx_runtime51, import_react42, FUNNEL_STAGES;
-var init_app_reports_DRhNjuwv = __esm({
-  "dist/server/assets/app.reports-DRhNjuwv.js"() {
+var init_app_reports_Cl_3iIAk = __esm({
+  "dist/server/assets/app.reports-Cl_3iIAk.js"() {
     "use strict";
     import_jsx_runtime51 = __toESM(require_jsx_runtime(), 1);
     init_modern2();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_lucide_react();
     import_react42 = __toESM(require_react(), 1);
     init_dist7();
@@ -64189,9 +64244,9 @@ var init_app_reports_DRhNjuwv = __esm({
   }
 });
 
-// dist/server/assets/app.profile-Df8qWlz1.js
-var app_profile_Df8qWlz1_exports = {};
-__export(app_profile_Df8qWlz1_exports, {
+// dist/server/assets/app.profile-CS2pXV3j.js
+var app_profile_CS2pXV3j_exports = {};
+__export(app_profile_CS2pXV3j_exports, {
   component: () => Profile
 });
 function fromStartup(s) {
@@ -64233,6 +64288,14 @@ function Profile() {
     user
   } = useAuth();
   const queryClient2 = useQueryClient();
+  const [mode, setMode] = (0, import_react43.useState)("edit");
+  const [tab, setTab] = (0, import_react43.useState)("quick");
+  const [form, setForm] = (0, import_react43.useState)(emptyForm);
+  const [logoUrl, setLogoUrl] = (0, import_react43.useState)(null);
+  const [deckName, setDeckName] = (0, import_react43.useState)(null);
+  const [saving, setSaving] = (0, import_react43.useState)(false);
+  const [logoUploading, setLogoUploading] = (0, import_react43.useState)(false);
+  const [deckUploading, setDeckUploading] = (0, import_react43.useState)(false);
   const {
     data: startup,
     isLoading
@@ -64246,12 +64309,6 @@ function Profile() {
       return data;
     }
   });
-  const [form, setForm] = (0, import_react43.useState)(emptyForm);
-  const [logoUrl, setLogoUrl] = (0, import_react43.useState)(null);
-  const [deckName, setDeckName] = (0, import_react43.useState)(null);
-  const [saving, setSaving] = (0, import_react43.useState)(false);
-  const [logoUploading, setLogoUploading] = (0, import_react43.useState)(false);
-  const [deckUploading, setDeckUploading] = (0, import_react43.useState)(false);
   (0, import_react43.useEffect)(() => {
     if (startup) {
       setForm(fromStartup(startup));
@@ -64300,26 +64357,43 @@ function Profile() {
         cofounder_linkedin: form.cofounder_linkedin || null,
         key_metric: form.key_metric || null,
         growth_rate: form.growth_rate || null,
-        customer_count: form.customer_count || null
+        customer_count: form.customer_count || null,
+        updated_at: (/* @__PURE__ */ new Date()).toISOString()
       };
       const {
-        error
-      } = await supabase.from("startups").upsert({
-        ...payload,
-        founder_id: user.id
-      }, {
-        onConflict: "founder_id"
-      });
-      if (error) throw error;
-      toast.success("Profile saved");
-      queryClient2.invalidateQueries({
-        queryKey: ["my-startup", user.id]
-      });
-      queryClient2.invalidateQueries({
-        queryKey: ["my-startup-overview"]
-      });
-    } catch (e) {
-      toast.error(e.message ?? "Save failed");
+        data: existing
+      } = await supabase.from("startups").select("id").eq("founder_id", user.id).maybeSingle();
+      let error;
+      if (existing?.id) {
+        const {
+          error: updateError
+        } = await supabase.from("startups").update(payload).eq("id", existing.id);
+        error = updateError;
+      } else {
+        const {
+          error: insertError
+        } = await supabase.from("startups").insert({
+          ...payload,
+          founder_id: user.id,
+          created_at: (/* @__PURE__ */ new Date()).toISOString()
+        });
+        error = insertError;
+      }
+      if (error) {
+        toast.error("Failed to save: " + error.message);
+      } else {
+        toast.success("Profile saved");
+        queryClient2.invalidateQueries({
+          queryKey: ["my-startup", user.id]
+        });
+        queryClient2.invalidateQueries({
+          queryKey: ["my-startup-overview"]
+        });
+        queryClient2.invalidateQueries({
+          queryKey: ["shell-startup", user.id]
+        });
+        setMode("view");
+      }
     } finally {
       setSaving(false);
     }
@@ -64382,12 +64456,7 @@ function Profile() {
       setDeckUploading(false);
     }
   };
-  const SaveBtn = ({
-    full = false
-  }) => /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("button", { onClick: handleSave, disabled: saving, className: cn3("inline-flex items-center gap-2 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-60", full && "w-full justify-center"), children: [
-    saving ? /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(LoaderCircle, { className: "h-4 w-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Check, { className: "h-4 w-4" }),
-    "Save changes"
-  ] });
+  const handleDownloadPDF = () => window.print();
   const initials = form.company_name ? form.company_name.split(" ").map((w3) => w3[0]).slice(0, 2).join("").toUpperCase() : "?";
   if (isLoading) {
     return /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "p-6 lg:p-8 max-w-5xl mx-auto space-y-4", children: [
@@ -64396,13 +64465,103 @@ function Profile() {
       /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "h-64 rounded-2xl bg-muted/40 animate-pulse" })
     ] });
   }
+  if (mode === "view") {
+    const filled = (v3) => v3 && v3.trim().length > 0;
+    const pairs = [["Stage", form.stage], ["Sector", form.sector], ["Country", form.country], ["Website", form.website], ["Founded", form.founded_year], ["Team size", form.team_size], ["Revenue / ARR", form.revenue], ["Growth rate", form.growth_rate], ["Customers", form.customer_count], ["Key metric", form.key_metric], ["Funding target", form.funding_target], ["Valuation", form.valuation], ["Previous funding", form.previous_funding], ["Current investors", form.current_investors], ["Market size", form.market_size]].filter(([, v3]) => filled(v3));
+    return /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(import_jsx_runtime52.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("style", { children: `
+          @media print {
+            aside, header, .no-print { display: none !important; }
+            body { background: white !important; }
+            .print-card { box-shadow: none !important; border: 1px solid #e5e7eb !important; }
+          }
+        ` }),
+      /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "p-6 lg:p-8 max-w-5xl mx-auto", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "flex items-center justify-between flex-wrap gap-3 mb-6 no-print", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: "Company Profile" }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("p", { className: "text-sm text-muted-foreground mt-0.5", children: "How investors see your startup." })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("button", { onClick: handleDownloadPDF, className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Download, { className: "h-4 w-4" }),
+              " Download PDF"
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("button", { onClick: () => setMode("edit"), className: "inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(PenLine, { className: "h-4 w-4" }),
+              " Edit profile"
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "rounded-2xl border border-border/60 bg-card shadow-card overflow-hidden print-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "h-28 bg-gradient-mesh relative", children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "absolute inset-0 noise opacity-40" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "px-6 pb-6 -mt-10", children: /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "flex items-end gap-4", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "grid h-20 w-20 place-items-center rounded-2xl bg-gradient-brand text-brand-foreground text-2xl font-semibold border-4 border-background shadow-elev overflow-hidden shrink-0", children: logoUrl ? /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("img", { src: logoUrl, alt: "logo", className: "h-full w-full object-cover" }) : /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { children: initials }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "pb-1", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("h2", { className: "text-2xl font-bold", children: form.company_name || "Unnamed Company" }),
+              filled(form.tagline) && /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("p", { className: "text-sm text-muted-foreground mt-0.5", children: form.tagline }),
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "flex items-center gap-2 mt-2 flex-wrap", children: [
+                filled(form.stage) && /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: "rounded-full bg-brand/10 text-brand text-xs px-2.5 py-0.5 font-medium", children: form.stage }),
+                filled(form.sector) && /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: "rounded-full bg-violet/10 text-violet text-xs px-2.5 py-0.5 font-medium", children: form.sector })
+              ] })
+            ] })
+          ] }) })
+        ] }),
+        filled(form.description) && /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "mt-4 rounded-xl border border-border/60 bg-card p-5 shadow-card print-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-sm font-semibold mb-2", children: "About" }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("p", { className: "text-sm text-muted-foreground leading-relaxed", children: form.description })
+        ] }),
+        pairs.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "mt-4 rounded-xl border border-border/60 bg-card p-5 shadow-card print-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-sm font-semibold mb-3", children: "Key details" }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "grid sm:grid-cols-2 gap-x-8 gap-y-2.5", children: pairs.map(([label, val]) => /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "flex items-center justify-between border-b border-border/40 pb-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: "text-xs text-muted-foreground", children: label }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: "text-sm font-medium", children: val })
+          ] }, label)) })
+        ] }),
+        (filled(form.problem) || filled(form.solution)) && /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "mt-4 grid sm:grid-cols-2 gap-4", children: [
+          filled(form.problem) && /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card print-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-sm font-semibold mb-2", children: "Problem" }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("p", { className: "text-sm text-muted-foreground leading-relaxed", children: form.problem })
+          ] }),
+          filled(form.solution) && /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card print-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-sm font-semibold mb-2", children: "Solution" }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("p", { className: "text-sm text-muted-foreground leading-relaxed", children: form.solution })
+          ] })
+        ] }),
+        (filled(form.traction) || filled(form.business_model) || filled(form.use_of_funds) || filled(form.why_now) || filled(form.competitive_advantage)) && /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "mt-4 space-y-4", children: [["Traction highlights", form.traction], ["Business model", form.business_model], ["Use of funds", form.use_of_funds], ["Why now?", form.why_now], ["Competitive advantage", form.competitive_advantage]].filter(([, v3]) => filled(v3)).map(([label, val]) => /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card print-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-sm font-semibold mb-2", children: label }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("p", { className: "text-sm text-muted-foreground leading-relaxed", children: val })
+        ] }, label)) }),
+        (filled(form.founder_name) || filled(form.founder_email)) && /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "mt-4 rounded-xl border border-border/60 bg-card p-5 shadow-card print-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-sm font-semibold mb-3", children: "Contact" }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "grid sm:grid-cols-2 gap-3", children: [["Founder", form.founder_name], ["Email", form.founder_email], ["LinkedIn", form.founder_linkedin], ["Co-founder", form.cofounder_name], ["Co-founder LinkedIn", form.cofounder_linkedin]].filter(([, v3]) => filled(v3)).map(([label, val]) => /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-xs text-muted-foreground", children: label }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-sm font-medium mt-0.5", children: val })
+          ] }, label)) })
+        ] }),
+        startup?.id && /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "mt-4 no-print", children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TeamMembersSection, { startupId: startup.id, readOnly: true }) })
+      ] })
+    ] });
+  }
+  const SaveBtn = ({
+    full = false
+  }) => /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("button", { onClick: handleSave, disabled: saving, className: cn3("inline-flex items-center gap-2 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-60", full && "w-full justify-center"), children: [
+    saving ? /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(LoaderCircle, { className: "h-4 w-4 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Check, { className: "h-4 w-4" }),
+    "Save changes"
+  ] });
   return /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "p-6 lg:p-8 max-w-5xl mx-auto", children: [
     /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "flex items-end justify-between flex-wrap gap-4", children: [
       /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: startup ? "Company Profile" : "Create your profile" }),
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("h1", { className: "text-2xl font-semibold tracking-tight", children: startup ? "Edit profile" : "Create your profile" }),
         /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-sm text-muted-foreground", children: startup ? "Edit your startup details, team, and pitch." : "Set up your startup profile so investors know who you are." })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(SaveBtn, {})
+      /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "flex items-center gap-2", children: [
+        startup && /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("button", { onClick: () => setMode("view"), className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Eye, { className: "h-4 w-4" }),
+          " View profile"
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(SaveBtn, {})
+      ] })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "mt-6 rounded-2xl border border-border/60 bg-card shadow-card overflow-hidden", children: [
       /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "h-32 bg-gradient-mesh relative", children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "absolute inset-0 noise opacity-40" }) }),
@@ -64418,100 +64577,135 @@ function Profile() {
         ] })
       ] }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "mt-5 grid lg:grid-cols-3 gap-4", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "lg:col-span-2 space-y-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(FormSection, { title: "Company basics", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Company name *", value: form.company_name, onChange: field("company_name"), placeholder: "Atlas Robotics" }),
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Tagline", value: form.tagline, onChange: field("tagline"), placeholder: "One line that explains your company" }),
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "grid sm:grid-cols-2 gap-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Website", value: form.website, onChange: field("website"), placeholder: "https://example.com" }),
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Founded year", value: form.founded_year, onChange: field("founded_year"), placeholder: "2022", type: "number" }),
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Country / HQ", value: form.country, onChange: field("country"), placeholder: "San Francisco, USA" }),
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Team size", value: form.team_size, onChange: field("team_size"), placeholder: "12", type: "number" }),
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Sector", value: form.sector, onChange: field("sector"), placeholder: "B2B SaaS, Fintech, AI..." }),
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("label", { className: "text-xs text-muted-foreground", children: "Stage" }),
-              /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("select", { value: form.stage, onChange: field("stage"), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("option", { value: "", children: "Select stage" }),
-                STAGES.map((s) => /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("option", { children: s }, s))
-              ] })
-            ] })
-          ] })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(FormSection, { title: "Fundraising", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "grid sm:grid-cols-2 gap-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Funding target", value: form.funding_target, onChange: field("funding_target"), placeholder: "$5M" }),
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Pre-money valuation", value: form.valuation, onChange: field("valuation"), placeholder: "$20M" }),
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Previous funding raised", value: form.previous_funding, onChange: field("previous_funding"), placeholder: "$500K pre-seed" }),
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Current investors", value: form.current_investors, onChange: field("current_investors"), placeholder: "Y Combinator, Sequoia" })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TextArea, { label: "Use of funds", value: form.use_of_funds, onChange: field("use_of_funds"), placeholder: "40% engineering, 30% sales, 30% ops", rows: 2 })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(FormSection, { title: "Traction & metrics", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "grid sm:grid-cols-2 gap-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Revenue / ARR", value: form.revenue, onChange: field("revenue"), placeholder: "$1.2M ARR" }),
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Growth rate", value: form.growth_rate, onChange: field("growth_rate"), placeholder: "+15% MoM" }),
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Customer count", value: form.customer_count, onChange: field("customer_count"), placeholder: "500 paying customers" }),
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Key metric", value: form.key_metric, onChange: field("key_metric"), placeholder: "Your most important metric" })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TextArea, { label: "Traction highlights", value: form.traction, onChange: field("traction"), placeholder: "Key traction highlights...", rows: 3 })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(FormSection, { title: "Pitch content", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TextArea, { label: "Problem", value: form.problem, onChange: field("problem"), placeholder: "What problem are you solving?", rows: 4 }),
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TextArea, { label: "Solution", value: form.solution, onChange: field("solution"), placeholder: "How does your product solve it?", rows: 4 }),
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TextArea, { label: "Business model", value: form.business_model, onChange: field("business_model"), placeholder: "How do you make money?", rows: 3 }),
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Market size", value: form.market_size, onChange: field("market_size"), placeholder: "$50B TAM, $5B SAM\u2026" }),
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TextArea, { label: "Competitive advantage", value: form.competitive_advantage, onChange: field("competitive_advantage"), placeholder: "What makes you hard to replicate?", rows: 3 }),
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TextArea, { label: "Why now?", value: form.why_now, onChange: field("why_now"), placeholder: "What tailwind or market shift makes this the right time?", rows: 2 })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(FormSection, { title: "Contact", children: /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "grid sm:grid-cols-2 gap-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Founder name", value: form.founder_name, onChange: field("founder_name"), placeholder: "Jane Smith" }),
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Founder email", value: form.founder_email, onChange: field("founder_email"), placeholder: "jane@startup.com", type: "email" }),
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Founder LinkedIn", value: form.founder_linkedin, onChange: field("founder_linkedin"), placeholder: "linkedin.com/in/janesmith" }),
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Co-founder name", value: form.cofounder_name, onChange: field("cofounder_name"), placeholder: "Alex Lee" }),
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Co-founder LinkedIn", value: form.cofounder_linkedin, onChange: field("cofounder_linkedin"), placeholder: "linkedin.com/in/alexlee" })
-        ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "pb-2", children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(SaveBtn, { full: true }) })
+    /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "mt-5 flex items-center gap-1 rounded-lg border border-border/60 bg-muted/30 p-1 w-fit", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("button", { onClick: () => setTab("quick"), className: cn3("inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors", tab === "quick" ? "bg-background text-foreground font-medium shadow-xs" : "text-muted-foreground hover:text-foreground"), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Zap, { className: "h-3.5 w-3.5" }),
+        " Quick setup"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "space-y-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-sm font-semibold mb-3", children: "Pitch deck" }),
-          deckName ? /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "rounded-lg border border-border/60 bg-accent/30 p-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-sm font-medium truncate", children: deckName }),
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-xs text-muted-foreground mt-0.5 mb-2", children: "Uploaded" }),
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("label", { className: "text-xs text-brand hover:underline cursor-pointer", children: [
-              "Replace",
-              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("input", { type: "file", accept: ".pdf,.pptx,.key", className: "sr-only", onChange: (e) => e.target.files?.[0] && handleDeckUpload(e.target.files[0]) })
-            ] })
-          ] }) : /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("label", { className: "rounded-xl border-2 border-dashed border-border/80 bg-card p-5 text-center cursor-pointer hover:border-brand/50 hover:bg-accent/20 transition-colors block", children: [
-            deckUploading ? /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(LoaderCircle, { className: "h-5 w-5 text-muted-foreground mx-auto animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Upload, { className: "h-5 w-5 text-muted-foreground mx-auto" }),
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-sm font-medium mt-2", children: deckUploading ? "Uploading\u2026" : "Upload pitch deck" }),
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-xs text-muted-foreground mt-0.5", children: "PDF, PPTX or Keynote" }),
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("input", { type: "file", accept: ".pdf,.pptx,.key", className: "sr-only", onChange: (e) => e.target.files?.[0] && handleDeckUpload(e.target.files[0]) })
-          ] })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-sm font-semibold mb-3", children: "Overview" }),
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "space-y-2.5", children: [
-            [[Globe, "Stage", form.stage], [Users, "Team", form.team_size], [Building2, "Sector", form.sector]].map(([Icon2, label, val]) => /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "flex items-center gap-2.5 text-sm", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Icon2, { className: "h-4 w-4 text-muted-foreground shrink-0" }),
-              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: "text-muted-foreground text-xs", children: label }),
-              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: "ml-auto font-medium text-sm", children: val || "\u2014" })
-            ] }, label)),
-            form.growth_rate && /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "flex items-center gap-2.5 text-sm", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: "text-muted-foreground text-xs", children: "Growth" }),
-              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: "ml-auto font-medium text-sm text-success", children: form.growth_rate })
-            ] }),
-            form.customer_count && /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "flex items-center gap-2.5 text-sm", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: "text-muted-foreground text-xs", children: "Customers" }),
-              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: "ml-auto font-medium text-sm", children: form.customer_count })
-            ] })
-          ] })
-        ] })
+      /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("button", { onClick: () => setTab("full"), className: cn3("inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors", tab === "full" ? "bg-background text-foreground font-medium shadow-xs" : "text-muted-foreground hover:text-foreground"), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TextAlignStart, { className: "h-3.5 w-3.5" }),
+        " Full details"
       ] })
     ] }),
-    startup?.id && /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TeamMembersSection, { startupId: startup.id }),
+    tab === "quick" ? (
+      // QUICK SETUP: 5 fields
+      /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "mt-4 grid lg:grid-cols-3 gap-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "lg:col-span-2", children: /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(FormSection, { title: "Quick setup", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Company name", value: form.company_name, onChange: field("company_name"), placeholder: "Atlas Robotics" }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Tagline", value: form.tagline, onChange: field("tagline"), placeholder: "One line that explains your company" }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Website", value: form.website, onChange: field("website"), placeholder: "https://example.com" }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Country / HQ", value: form.country, onChange: field("country"), placeholder: "San Francisco, USA" }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Sector", value: form.sector, onChange: field("sector"), placeholder: "B2B SaaS, Fintech, AI..." }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "pt-2", children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(SaveBtn, { full: true }) })
+        ] }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(RightCol, { form, deckName, deckUploading, onDeckUpload: handleDeckUpload }) })
+      ] })
+    ) : (
+      // FULL DETAILS: all sections
+      /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "mt-4 grid lg:grid-cols-3 gap-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "lg:col-span-2 space-y-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(FormSection, { title: "Company basics", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Company name", value: form.company_name, onChange: field("company_name"), placeholder: "Atlas Robotics" }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Tagline", value: form.tagline, onChange: field("tagline"), placeholder: "One line that explains your company" }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "grid sm:grid-cols-2 gap-3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Website", value: form.website, onChange: field("website"), placeholder: "https://example.com" }),
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Founded year", value: form.founded_year, onChange: field("founded_year"), placeholder: "2022" }),
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Country / HQ", value: form.country, onChange: field("country"), placeholder: "San Francisco, USA" }),
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Team size", value: form.team_size, onChange: field("team_size"), placeholder: "12" }),
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Sector", value: form.sector, onChange: field("sector"), placeholder: "B2B SaaS, Fintech, AI..." }),
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("label", { className: "text-xs text-muted-foreground", children: "Stage" }),
+                /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("select", { value: form.stage, onChange: field("stage"), className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("option", { value: "", children: "Select stage" }),
+                  STAGES.map((s) => /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("option", { children: s }, s))
+                ] })
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TextArea, { label: "Description", value: form.description, onChange: field("description"), placeholder: "What does your company do?", rows: 3 })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(FormSection, { title: "Fundraising", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "grid sm:grid-cols-2 gap-3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Funding target", value: form.funding_target, onChange: field("funding_target"), placeholder: "$5M" }),
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Pre-money valuation", value: form.valuation, onChange: field("valuation"), placeholder: "$20M" }),
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Previous funding raised", value: form.previous_funding, onChange: field("previous_funding"), placeholder: "$500K pre-seed" }),
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Current investors", value: form.current_investors, onChange: field("current_investors"), placeholder: "Y Combinator, Sequoia" })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TextArea, { label: "Use of funds", value: form.use_of_funds, onChange: field("use_of_funds"), placeholder: "40% engineering, 30% sales, 30% ops", rows: 2 })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(FormSection, { title: "Traction & metrics", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "grid sm:grid-cols-2 gap-3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Revenue / ARR", value: form.revenue, onChange: field("revenue"), placeholder: "$1.2M ARR" }),
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Growth rate", value: form.growth_rate, onChange: field("growth_rate"), placeholder: "+15% MoM" }),
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Customer count", value: form.customer_count, onChange: field("customer_count"), placeholder: "500 paying customers" }),
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Key metric", value: form.key_metric, onChange: field("key_metric"), placeholder: "Your most important metric" })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TextArea, { label: "Traction highlights", value: form.traction, onChange: field("traction"), placeholder: "Key traction highlights...", rows: 3 })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(FormSection, { title: "Pitch content", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TextArea, { label: "Problem", value: form.problem, onChange: field("problem"), placeholder: "What problem are you solving?", rows: 4 }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TextArea, { label: "Solution", value: form.solution, onChange: field("solution"), placeholder: "How does your product solve it?", rows: 4 }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TextArea, { label: "Business model", value: form.business_model, onChange: field("business_model"), placeholder: "How do you make money?", rows: 3 }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Market size", value: form.market_size, onChange: field("market_size"), placeholder: "$50B TAM, $5B SAM\u2026" }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TextArea, { label: "Competitive advantage", value: form.competitive_advantage, onChange: field("competitive_advantage"), placeholder: "What makes you hard to replicate?", rows: 3 }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TextArea, { label: "Why now?", value: form.why_now, onChange: field("why_now"), placeholder: "What tailwind or market shift makes this the right time?", rows: 2 })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(FormSection, { title: "Contact", children: /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "grid sm:grid-cols-2 gap-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Founder name", value: form.founder_name, onChange: field("founder_name"), placeholder: "Jane Smith" }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Founder email", value: form.founder_email, onChange: field("founder_email"), placeholder: "jane@startup.com" }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Founder LinkedIn", value: form.founder_linkedin, onChange: field("founder_linkedin"), placeholder: "linkedin.com/in/janesmith" }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Co-founder name", value: form.cofounder_name, onChange: field("cofounder_name"), placeholder: "Alex Lee" }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Field2, { label: "Co-founder LinkedIn", value: form.cofounder_linkedin, onChange: field("cofounder_linkedin"), placeholder: "linkedin.com/in/alexlee" })
+          ] }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "pb-2", children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(SaveBtn, { full: true }) })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "space-y-4", children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(RightCol, { form, deckName, deckUploading, onDeckUpload: handleDeckUpload }) })
+      ] })
+    ),
+    startup?.id && /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "mt-8", children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(TeamMembersSection, { startupId: startup.id }) }),
     !startup?.id && !isLoading && /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "mt-6 rounded-xl border border-dashed border-border/60 bg-card p-6 text-center text-sm text-muted-foreground", children: "Save your profile first to add team members." })
+  ] });
+}
+function RightCol({
+  form,
+  deckName,
+  deckUploading,
+  onDeckUpload
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(import_jsx_runtime52.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-sm font-semibold mb-3", children: "Pitch deck" }),
+      deckName ? /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "rounded-lg border border-border/60 bg-accent/30 p-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-sm font-medium truncate", children: deckName }),
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-xs text-muted-foreground mt-0.5 mb-2", children: "Uploaded" }),
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("label", { className: "text-xs text-brand hover:underline cursor-pointer", children: [
+          "Replace",
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("input", { type: "file", accept: ".pdf,.pptx,.key", className: "sr-only", onChange: (e) => e.target.files?.[0] && onDeckUpload(e.target.files[0]) })
+        ] })
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("label", { className: "rounded-xl border-2 border-dashed border-border/80 bg-card p-5 text-center cursor-pointer hover:border-brand/50 hover:bg-accent/20 transition-colors block", children: [
+        deckUploading ? /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(LoaderCircle, { className: "h-5 w-5 text-muted-foreground mx-auto animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Upload, { className: "h-5 w-5 text-muted-foreground mx-auto" }),
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-sm font-medium mt-2", children: deckUploading ? "Uploading\u2026" : "Upload pitch deck" }),
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-xs text-muted-foreground mt-0.5", children: "PDF, PPTX or Keynote" }),
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("input", { type: "file", accept: ".pdf,.pptx,.key", className: "sr-only", onChange: (e) => e.target.files?.[0] && onDeckUpload(e.target.files[0]) })
+      ] })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "rounded-xl border border-border/60 bg-card p-5 shadow-card", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-sm font-semibold mb-3", children: "Overview" }),
+      /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "space-y-2.5", children: [
+        [[Globe, "Stage", form.stage], [Users, "Team", form.team_size], [Building2, "Sector", form.sector]].map(([Icon2, label, val]) => /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "flex items-center gap-2.5 text-sm", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Icon2, { className: "h-4 w-4 text-muted-foreground shrink-0" }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: "text-muted-foreground text-xs", children: label }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: "ml-auto font-medium text-sm", children: val || "\u2014" })
+        ] }, label)),
+        form.growth_rate && /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "flex items-center gap-2.5 text-sm", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: "text-muted-foreground text-xs", children: "Growth" }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: "ml-auto font-medium text-sm text-success", children: form.growth_rate })
+        ] }),
+        form.customer_count && /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "flex items-center gap-2.5 text-sm", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: "text-muted-foreground text-xs", children: "Customers" }),
+          /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: "ml-auto font-medium text-sm", children: form.customer_count })
+        ] })
+      ] })
+    ] })
   ] });
 }
 function FormSection({
@@ -64548,7 +64742,8 @@ function TextArea({
   ] });
 }
 function TeamMembersSection({
-  startupId
+  startupId,
+  readOnly = false
 }) {
   const queryClient2 = useQueryClient();
   const [showForm, setShowForm] = (0, import_react43.useState)(false);
@@ -64629,10 +64824,6 @@ function TeamMembersSection({
     }
   };
   const handleSubmit = async () => {
-    if (!mf.full_name.trim() || !mf.role.trim()) {
-      toast.error("Name and role are required");
-      return;
-    }
     setSubmitting(true);
     try {
       const payload = {
@@ -64696,10 +64887,10 @@ function TeamMembersSection({
     Employee: "bg-brand/10 text-brand",
     "Board Member": "bg-success/10 text-success"
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "mt-8", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { children: [
     /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "flex items-center justify-between mb-4", children: [
       /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("h2", { className: "text-lg font-semibold tracking-tight", children: "Team members" }),
-      /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("button", { onClick: () => {
+      !readOnly && /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("button", { onClick: () => {
         closeForm();
         setShowForm((v3) => !v3);
       }, className: "inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent", children: [
@@ -64707,7 +64898,7 @@ function TeamMembersSection({
         " Add member"
       ] })
     ] }),
-    showForm && /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "mb-5 rounded-xl border border-brand/30 bg-card p-5 shadow-card", children: [
+    !readOnly && showForm && /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "mb-5 rounded-xl border border-brand/30 bg-card p-5 shadow-card", children: [
       /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "flex items-center justify-between mb-4", children: [
         /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-sm font-semibold", children: editingId ? "Edit team member" : "New team member" }),
         /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("button", { onClick: closeForm, className: "text-muted-foreground hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(X2, { className: "h-4 w-4" }) })
@@ -64722,11 +64913,11 @@ function TeamMembersSection({
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "grid sm:grid-cols-2 gap-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("label", { className: "text-xs text-muted-foreground", children: "Full name *" }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("label", { className: "text-xs text-muted-foreground", children: "Full name" }),
             /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("input", { value: mf.full_name, onChange: setField("full_name"), placeholder: "Jane Smith", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("label", { className: "text-xs text-muted-foreground", children: "Role / title *" }),
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("label", { className: "text-xs text-muted-foreground", children: "Role / title" }),
             /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("input", { value: mf.role, onChange: setField("role"), placeholder: "CTO", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { children: [
@@ -64735,7 +64926,7 @@ function TeamMembersSection({
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { children: [
             /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("label", { className: "text-xs text-muted-foreground", children: "Email" }),
-            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("input", { value: mf.email, onChange: setField("email"), type: "email", placeholder: "jane@company.com", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
+            /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("input", { value: mf.email, onChange: setField("email"), placeholder: "jane@company.com", className: "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "sm:col-span-2", children: [
             /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("label", { className: "text-xs text-muted-foreground", children: "LinkedIn URL" }),
@@ -64777,7 +64968,7 @@ function TeamMembersSection({
             /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { className: "text-xs text-muted-foreground truncate", children: m3.role }),
             m3.tag && /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("span", { className: cn3("text-[10px] px-1.5 py-0.5 rounded-full font-medium mt-1 inline-block", tagColor[m3.tag] ?? "bg-muted text-muted-foreground"), children: m3.tag })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "flex gap-1 shrink-0", children: [
+          !readOnly && /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { className: "flex gap-1 shrink-0", children: [
             /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("button", { onClick: () => openEdit(m3), className: "grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground", children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Pencil, { className: "h-3.5 w-3.5" }) }),
             /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("button", { onClick: () => handleDelete(m3.id), disabled: deletingId === m3.id, className: "grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive disabled:opacity-40", children: deletingId === m3.id ? /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(LoaderCircle, { className: "h-3.5 w-3.5 animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(Trash2, { className: "h-3.5 w-3.5" }) })
           ] })
@@ -64788,15 +64979,15 @@ function TeamMembersSection({
   ] });
 }
 var import_jsx_runtime52, import_react43, STAGES, MEMBER_TAGS, emptyForm;
-var init_app_profile_Df8qWlz1 = __esm({
-  "dist/server/assets/app.profile-Df8qWlz1.js"() {
+var init_app_profile_CS2pXV3j = __esm({
+  "dist/server/assets/app.profile-CS2pXV3j.js"() {
     "use strict";
     import_jsx_runtime52 = __toESM(require_jsx_runtime(), 1);
     import_react43 = __toESM(require_react(), 1);
     init_modern2();
     init_lucide_react();
     init_dist7();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_utils_H80jjgLf();
     init_clsx();
     STAGES = ["Pre-idea", "Pre-seed", "Seed", "Series A", "Series B", "Growth", "Profitable"];
@@ -64857,7 +65048,7 @@ var init_createSsrRpc_l1y8KE69 = __esm({
   }
 });
 
-// dist/server/assets/LeadDrawer-tXaM8rKh.js
+// dist/server/assets/LeadDrawer-D4nnqM1O.js
 function Field3({ label, children }) {
   return /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)("div", { children: [
     /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("label", { className: "block text-xs text-muted-foreground mb-1", children: label }),
@@ -65622,14 +65813,14 @@ _${(/* @__PURE__ */ new Date()).toLocaleString()}_`;
   ] });
 }
 var import_jsx_runtime53, import_react44, generateOutreachEmail2, generateLinkedInMessage2, generateReply2, ALL_STATUSES, PIPELINE_MAIN, STATUS_COLOR, STAGES2, REL_STRENGTHS, MEETING_TYPES, PLATFORMS, inputCls, emptyForm2;
-var init_LeadDrawer_tXaM8rKh = __esm({
-  "dist/server/assets/LeadDrawer-tXaM8rKh.js"() {
+var init_LeadDrawer_D4nnqM1O = __esm({
+  "dist/server/assets/LeadDrawer-D4nnqM1O.js"() {
     "use strict";
     import_jsx_runtime53 = __toESM(require_jsx_runtime(), 1);
     import_react44 = __toESM(require_react(), 1);
     init_lucide_react();
     init_dist7();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_modern2();
     init_utils_H80jjgLf();
     init_createSsrRpc_l1y8KE69();
@@ -65702,9 +65893,9 @@ var init_LeadDrawer_tXaM8rKh = __esm({
   }
 });
 
-// dist/server/assets/app.pipeline-BuuPy3oF.js
-var app_pipeline_BuuPy3oF_exports = {};
-__export(app_pipeline_BuuPy3oF_exports, {
+// dist/server/assets/app.pipeline-DPWS7aB1.js
+var app_pipeline_DPWS7aB1_exports = {};
+__export(app_pipeline_DPWS7aB1_exports, {
   component: () => Pipeline
 });
 import "node:async_hooks";
@@ -65913,17 +66104,17 @@ function DealCard({
   ] });
 }
 var import_jsx_runtime54, import_react45, pipelineStages, STATUS_TO_STAGE, STAGE_TO_STATUS, STAGE_PROBABILITY, stageTint, stageBarColor;
-var init_app_pipeline_BuuPy3oF = __esm({
-  "dist/server/assets/app.pipeline-BuuPy3oF.js"() {
+var init_app_pipeline_DPWS7aB1 = __esm({
+  "dist/server/assets/app.pipeline-DPWS7aB1.js"() {
     "use strict";
     import_jsx_runtime54 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react45 = __toESM(require_react(), 1);
     init_modern2();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_lucide_react();
     init_utils_H80jjgLf();
-    init_LeadDrawer_tXaM8rKh();
+    init_LeadDrawer_D4nnqM1O();
     init_dist7();
     init_clsx();
     init_production();
@@ -66081,9 +66272,9 @@ var init_app_notifications_CeL5tZom = __esm({
   }
 });
 
-// dist/server/assets/app.messages-DicGSXFC.js
-var app_messages_DicGSXFC_exports = {};
-__export(app_messages_DicGSXFC_exports, {
+// dist/server/assets/app.messages-hc_LZaDH.js
+var app_messages_hc_LZaDH_exports = {};
+__export(app_messages_hc_LZaDH_exports, {
   component: () => MessagesPage
 });
 function MessagesPage() {
@@ -66169,21 +66360,21 @@ function Placeholder({
   ] });
 }
 var import_jsx_runtime56, import_react47;
-var init_app_messages_DicGSXFC = __esm({
-  "dist/server/assets/app.messages-DicGSXFC.js"() {
+var init_app_messages_hc_LZaDH = __esm({
+  "dist/server/assets/app.messages-hc_LZaDH.js"() {
     "use strict";
     import_jsx_runtime56 = __toESM(require_jsx_runtime(), 1);
     import_react47 = __toESM(require_react(), 1);
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_modern2();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.meetings-DECizoTT.js
-var app_meetings_DECizoTT_exports = {};
-__export(app_meetings_DECizoTT_exports, {
+// dist/server/assets/app.meetings-Qtejk3m2.js
+var app_meetings_Qtejk3m2_exports = {};
+__export(app_meetings_Qtejk3m2_exports, {
   component: () => Meetings
 });
 function isNextWeek(date) {
@@ -66461,8 +66652,8 @@ function MeetingRow({
   ] }) });
 }
 var import_jsx_runtime57, import_react48;
-var init_app_meetings_DECizoTT = __esm({
-  "dist/server/assets/app.meetings-DECizoTT.js"() {
+var init_app_meetings_Qtejk3m2 = __esm({
+  "dist/server/assets/app.meetings-Qtejk3m2.js"() {
     "use strict";
     import_jsx_runtime57 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -66471,7 +66662,7 @@ var init_app_meetings_DECizoTT = __esm({
     init_date_fns();
     init_dist7();
     init_lucide_react();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_utils_H80jjgLf();
     init_clsx();
   }
@@ -66893,9 +67084,9 @@ var require_papaparse_min = __commonJS({
   }
 });
 
-// dist/server/assets/app.leads-DwwijI6p.js
-var app_leads_DwwijI6p_exports = {};
-__export(app_leads_DwwijI6p_exports, {
+// dist/server/assets/app.leads-GkB1J6I_.js
+var app_leads_GkB1J6I_exports = {};
+__export(app_leads_GkB1J6I_exports, {
   component: () => Leads
 });
 import "node:async_hooks";
@@ -67217,8 +67408,8 @@ function CsvImportModal({
   ] }) });
 }
 var import_jsx_runtime58, import_react49, import_papaparse, STATUS_DOT, PREVIEW_COLS;
-var init_app_leads_DwwijI6p = __esm({
-  "dist/server/assets/app.leads-DwwijI6p.js"() {
+var init_app_leads_GkB1J6I = __esm({
+  "dist/server/assets/app.leads-GkB1J6I_.js"() {
     "use strict";
     import_jsx_runtime58 = __toESM(require_jsx_runtime(), 1);
     import_react49 = __toESM(require_react(), 1);
@@ -67226,8 +67417,8 @@ var init_app_leads_DwwijI6p = __esm({
     import_papaparse = __toESM(require_papaparse_min(), 1);
     init_dist7();
     init_lucide_react();
-    init_router_D87oKCVm();
-    init_LeadDrawer_tXaM8rKh();
+    init_router_3WmBSyta();
+    init_LeadDrawer_D4nnqM1O();
     init_utils_H80jjgLf();
     init_clsx();
     init_production();
@@ -67396,9 +67587,9 @@ var init_app_email_CbI5DM3y = __esm({
   }
 });
 
-// dist/server/assets/app.documents-Q7Iqbc5K.js
-var app_documents_Q7Iqbc5K_exports = {};
-__export(app_documents_Q7Iqbc5K_exports, {
+// dist/server/assets/app.documents-CrDCKLJ4.js
+var app_documents_CrDCKLJ4_exports = {};
+__export(app_documents_CrDCKLJ4_exports, {
   component: () => Documents
 });
 function getFileIconProps(fileName) {
@@ -67793,13 +67984,13 @@ function UploadModal({
   ] }) });
 }
 var import_jsx_runtime61, import_react51, CATEGORIES, TAB_LABELS, CAT_COLOR;
-var init_app_documents_Q7Iqbc5K = __esm({
-  "dist/server/assets/app.documents-Q7Iqbc5K.js"() {
+var init_app_documents_CrDCKLJ4 = __esm({
+  "dist/server/assets/app.documents-CrDCKLJ4.js"() {
     "use strict";
     import_jsx_runtime61 = __toESM(require_jsx_runtime(), 1);
     init_lucide_react();
     import_react51 = __toESM(require_react(), 1);
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_modern2();
     init_dist7();
     init_date_fns();
@@ -67819,9 +68010,9 @@ var init_app_documents_Q7Iqbc5K = __esm({
   }
 });
 
-// dist/server/assets/app.deal-rooms-Bqx2lRnb.js
-var app_deal_rooms_Bqx2lRnb_exports = {};
-__export(app_deal_rooms_Bqx2lRnb_exports, {
+// dist/server/assets/app.deal-rooms-DKLM9syq.js
+var app_deal_rooms_DKLM9syq_exports = {};
+__export(app_deal_rooms_DKLM9syq_exports, {
   component: () => DealRooms
 });
 function statusLabel(s) {
@@ -68150,15 +68341,15 @@ function CreateRoomForm({
   ] }) });
 }
 var import_jsx_runtime62, import_react52, STATUS_COLOR2, DEAL_TYPES;
-var init_app_deal_rooms_Bqx2lRnb = __esm({
-  "dist/server/assets/app.deal-rooms-Bqx2lRnb.js"() {
+var init_app_deal_rooms_DKLM9syq = __esm({
+  "dist/server/assets/app.deal-rooms-DKLM9syq.js"() {
     "use strict";
     import_jsx_runtime62 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_lucide_react();
     import_react52 = __toESM(require_react(), 1);
     init_modern2();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_date_fns();
     init_utils_H80jjgLf();
     init_dist7();
@@ -68265,9 +68456,9 @@ var init_app_audit_Dz_yfFC8 = __esm({
   }
 });
 
-// dist/server/assets/app.advisor-B8DcT1lZ.js
-var app_advisor_B8DcT1lZ_exports = {};
-__export(app_advisor_B8DcT1lZ_exports, {
+// dist/server/assets/app.advisor-BjVQm5bj.js
+var app_advisor_BjVQm5bj_exports = {};
+__export(app_advisor_BjVQm5bj_exports, {
   component: () => Advisor
 });
 import "node:async_hooks";
@@ -68391,14 +68582,14 @@ function Advisor() {
   ] });
 }
 var import_jsx_runtime64, import_react54, sendAdvisorMessage2, STARTERS;
-var init_app_advisor_B8DcT1lZ = __esm({
-  "dist/server/assets/app.advisor-B8DcT1lZ.js"() {
+var init_app_advisor_BjVQm5bj = __esm({
+  "dist/server/assets/app.advisor-BjVQm5bj.js"() {
     "use strict";
     import_jsx_runtime64 = __toESM(require_jsx_runtime(), 1);
     import_react54 = __toESM(require_react(), 1);
     init_lucide_react();
     init_dist7();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_createSsrRpc_l1y8KE69();
     init_server4();
     init_clsx();
@@ -68423,9 +68614,9 @@ var init_deal_brief_fn_D15ylBUr = __esm({
   }
 });
 
-// dist/server/assets/app.investor.index-BeH9bP0I.js
-var app_investor_index_BeH9bP0I_exports = {};
-__export(app_investor_index_BeH9bP0I_exports, {
+// dist/server/assets/app.investor.index-W3vemrDz.js
+var app_investor_index_W3vemrDz_exports = {};
+__export(app_investor_index_W3vemrDz_exports, {
   component: () => InvestorDashboard
 });
 import "node:async_hooks";
@@ -68757,15 +68948,15 @@ function InvestorDashboard() {
   ] });
 }
 var import_jsx_runtime65, import_react55, tone, STAGES3, DB_STATUS_TO_STAGE;
-var init_app_investor_index_BeH9bP0I = __esm({
-  "dist/server/assets/app.investor.index-BeH9bP0I.js"() {
+var init_app_investor_index_W3vemrDz = __esm({
+  "dist/server/assets/app.investor.index-W3vemrDz.js"() {
     "use strict";
     import_jsx_runtime65 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react55 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_utils_H80jjgLf();
     init_deal_brief_fn_D15ylBUr();
     init_dist7();
@@ -68788,9 +68979,9 @@ var init_app_investor_index_BeH9bP0I = __esm({
   }
 });
 
-// dist/server/assets/app.settings.security-8FbTvjHA.js
-var app_settings_security_8FbTvjHA_exports = {};
-__export(app_settings_security_8FbTvjHA_exports, {
+// dist/server/assets/app.settings.security-BkofCVaf.js
+var app_settings_security_BkofCVaf_exports = {};
+__export(app_settings_security_BkofCVaf_exports, {
   component: () => Security
 });
 function Security() {
@@ -68880,22 +69071,22 @@ function Toggle({
   return /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("button", { onClick: () => onChange(!checked), className: `relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${checked ? "bg-gradient-brand" : "bg-muted border border-border/60"}`, children: /* @__PURE__ */ (0, import_jsx_runtime66.jsx)("span", { className: `inline-block h-3.5 w-3.5 rounded-full bg-background shadow-sm transition-transform ${checked ? "translate-x-[18px]" : "translate-x-0.5"}` }) });
 }
 var import_jsx_runtime66, import_react56;
-var init_app_settings_security_8FbTvjHA = __esm({
-  "dist/server/assets/app.settings.security-8FbTvjHA.js"() {
+var init_app_settings_security_BkofCVaf = __esm({
+  "dist/server/assets/app.settings.security-BkofCVaf.js"() {
     "use strict";
     import_jsx_runtime66 = __toESM(require_jsx_runtime(), 1);
     import_react56 = __toESM(require_react(), 1);
     init_lucide_react();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_esm5();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.settings.notifications-MHIIgkbG.js
-var app_settings_notifications_MHIIgkbG_exports = {};
-__export(app_settings_notifications_MHIIgkbG_exports, {
+// dist/server/assets/app.settings.notifications-CdTGOAKs.js
+var app_settings_notifications_CdTGOAKs_exports = {};
+__export(app_settings_notifications_CdTGOAKs_exports, {
   component: () => NotifRulesPage
 });
 function NotifRulesPage() {
@@ -68978,13 +69169,13 @@ function Toggle2({
   return /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("button", { onClick: () => onChange(!checked), className: cn3("relative inline-flex h-5 w-9 items-center rounded-full transition-colors", checked ? "bg-gradient-brand" : "bg-muted border border-border/60"), children: /* @__PURE__ */ (0, import_jsx_runtime67.jsx)("span", { className: cn3("inline-block h-3.5 w-3.5 transform rounded-full bg-background shadow-sm transition-transform", checked ? "translate-x-[18px]" : "translate-x-0.5") }) });
 }
 var import_jsx_runtime67, import_react57, notifRulesDefault, groupIcon;
-var init_app_settings_notifications_MHIIgkbG = __esm({
-  "dist/server/assets/app.settings.notifications-MHIIgkbG.js"() {
+var init_app_settings_notifications_CdTGOAKs = __esm({
+  "dist/server/assets/app.settings.notifications-CdTGOAKs.js"() {
     "use strict";
     import_jsx_runtime67 = __toESM(require_jsx_runtime(), 1);
     import_react57 = __toESM(require_react(), 1);
     init_lucide_react();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_utils_H80jjgLf();
     init_dist7();
     init_clsx();
@@ -69239,9 +69430,9 @@ var init_app_settings_billing_wl3kYi6Q = __esm({
   }
 });
 
-// dist/server/assets/app.investor.team-VPgxIgWQ.js
-var app_investor_team_VPgxIgWQ_exports = {};
-__export(app_investor_team_VPgxIgWQ_exports, {
+// dist/server/assets/app.investor.team-DPrbMsTE.js
+var app_investor_team_DPrbMsTE_exports = {};
+__export(app_investor_team_DPrbMsTE_exports, {
   component: () => TeamPage
 });
 function TeamPage() {
@@ -69389,23 +69580,23 @@ function TeamPage() {
   ] });
 }
 var import_jsx_runtime70, import_react59;
-var init_app_investor_team_VPgxIgWQ = __esm({
-  "dist/server/assets/app.investor.team-VPgxIgWQ.js"() {
+var init_app_investor_team_DPrbMsTE = __esm({
+  "dist/server/assets/app.investor.team-DPrbMsTE.js"() {
     "use strict";
     import_jsx_runtime70 = __toESM(require_jsx_runtime(), 1);
     import_react59 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_dist7();
     init_date_fns();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.investor.startups-BUMJTeOn.js
-var app_investor_startups_BUMJTeOn_exports = {};
-__export(app_investor_startups_BUMJTeOn_exports, {
+// dist/server/assets/app.investor.startups-DiOFyqTc.js
+var app_investor_startups_DiOFyqTc_exports = {};
+__export(app_investor_startups_DiOFyqTc_exports, {
   component: () => StartupsPage
 });
 function StartupsPage() {
@@ -69500,14 +69691,14 @@ function StartupsPage() {
   ] });
 }
 var import_jsx_runtime71, import_react60;
-var init_app_investor_startups_BUMJTeOn = __esm({
-  "dist/server/assets/app.investor.startups-BUMJTeOn.js"() {
+var init_app_investor_startups_DiOFyqTc = __esm({
+  "dist/server/assets/app.investor.startups-DiOFyqTc.js"() {
     "use strict";
     import_jsx_runtime71 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_lucide_react();
     init_modern2();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_date_fns();
     import_react60 = __toESM(require_react(), 1);
     init_dist7();
@@ -69515,9 +69706,9 @@ var init_app_investor_startups_BUMJTeOn = __esm({
   }
 });
 
-// dist/server/assets/app.investor.portfolio-CFPCLrzr.js
-var app_investor_portfolio_CFPCLrzr_exports = {};
-__export(app_investor_portfolio_CFPCLrzr_exports, {
+// dist/server/assets/app.investor.portfolio-DO02sZEP.js
+var app_investor_portfolio_DO02sZEP_exports = {};
+__export(app_investor_portfolio_DO02sZEP_exports, {
   component: () => PortfolioPage
 });
 function PortfolioPage() {
@@ -69629,14 +69820,14 @@ function PortfolioPage() {
   ] });
 }
 var import_jsx_runtime72, import_react61;
-var init_app_investor_portfolio_CFPCLrzr = __esm({
-  "dist/server/assets/app.investor.portfolio-CFPCLrzr.js"() {
+var init_app_investor_portfolio_DO02sZEP = __esm({
+  "dist/server/assets/app.investor.portfolio-DO02sZEP.js"() {
     "use strict";
     import_jsx_runtime72 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_lucide_react();
     init_modern2();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_date_fns();
     import_react61 = __toESM(require_react(), 1);
     init_dist7();
@@ -69644,9 +69835,9 @@ var init_app_investor_portfolio_CFPCLrzr = __esm({
   }
 });
 
-// dist/server/assets/app.investor.pipeline-A1jWEfuL.js
-var app_investor_pipeline_A1jWEfuL_exports = {};
-__export(app_investor_pipeline_A1jWEfuL_exports, {
+// dist/server/assets/app.investor.pipeline-D9_cB4CL.js
+var app_investor_pipeline_D9_cB4CL_exports = {};
+__export(app_investor_pipeline_D9_cB4CL_exports, {
   component: () => PipelinePage
 });
 function PipelinePage() {
@@ -69782,15 +69973,15 @@ function PipelinePage() {
   ] });
 }
 var import_jsx_runtime73, import_react62, DB_STATUS_TO_STAGE2, STAGES4;
-var init_app_investor_pipeline_A1jWEfuL = __esm({
-  "dist/server/assets/app.investor.pipeline-A1jWEfuL.js"() {
+var init_app_investor_pipeline_D9_cB4CL = __esm({
+  "dist/server/assets/app.investor.pipeline-D9_cB4CL.js"() {
     "use strict";
     import_jsx_runtime73 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react62 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_date_fns();
     init_utils_H80jjgLf();
     init_dist7();
@@ -69835,9 +70026,9 @@ var init_app_investor_pipeline_A1jWEfuL = __esm({
   }
 });
 
-// dist/server/assets/app.investor.diligence-ctT9GQwY.js
-var app_investor_diligence_ctT9GQwY_exports = {};
-__export(app_investor_diligence_ctT9GQwY_exports, {
+// dist/server/assets/app.investor.diligence--T3Yd3Zl.js
+var app_investor_diligence_T3Yd3Zl_exports = {};
+__export(app_investor_diligence_T3Yd3Zl_exports, {
   component: () => DiligencePage
 });
 function DiligencePage() {
@@ -69964,22 +70155,22 @@ function DiligencePage() {
   ] });
 }
 var import_jsx_runtime74, import_react63;
-var init_app_investor_diligence_ctT9GQwY = __esm({
-  "dist/server/assets/app.investor.diligence-ctT9GQwY.js"() {
+var init_app_investor_diligence_T3Yd3Zl = __esm({
+  "dist/server/assets/app.investor.diligence--T3Yd3Zl.js"() {
     "use strict";
     import_jsx_runtime74 = __toESM(require_jsx_runtime(), 1);
     import_react63 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.investor.decisions-DXwbrSj3.js
-var app_investor_decisions_DXwbrSj3_exports = {};
-__export(app_investor_decisions_DXwbrSj3_exports, {
+// dist/server/assets/app.investor.decisions-Dtge_4Lf.js
+var app_investor_decisions_Dtge_4Lf_exports = {};
+__export(app_investor_decisions_Dtge_4Lf_exports, {
   component: () => DecisionsPage
 });
 function DecisionsPage() {
@@ -70084,14 +70275,14 @@ function DecisionsPage() {
   ] });
 }
 var import_jsx_runtime75, import_react64;
-var init_app_investor_decisions_DXwbrSj3 = __esm({
-  "dist/server/assets/app.investor.decisions-DXwbrSj3.js"() {
+var init_app_investor_decisions_Dtge_4Lf = __esm({
+  "dist/server/assets/app.investor.decisions-Dtge_4Lf.js"() {
     "use strict";
     import_jsx_runtime75 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_lucide_react();
     init_modern2();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_date_fns();
     import_react64 = __toESM(require_react(), 1);
     init_dist7();
@@ -70099,9 +70290,9 @@ var init_app_investor_decisions_DXwbrSj3 = __esm({
   }
 });
 
-// dist/server/assets/app.investor.deal-rooms-BrIEflu7.js
-var app_investor_deal_rooms_BrIEflu7_exports = {};
-__export(app_investor_deal_rooms_BrIEflu7_exports, {
+// dist/server/assets/app.investor.deal-rooms-DQcs69Xo.js
+var app_investor_deal_rooms_DQcs69Xo_exports = {};
+__export(app_investor_deal_rooms_DQcs69Xo_exports, {
   component: () => DealRoomsPage
 });
 function DealRoomsPage() {
@@ -70196,14 +70387,14 @@ function DealRoomsPage() {
   ] });
 }
 var import_jsx_runtime76, import_react65, STATUS_TO_LABEL;
-var init_app_investor_deal_rooms_BrIEflu7 = __esm({
-  "dist/server/assets/app.investor.deal-rooms-BrIEflu7.js"() {
+var init_app_investor_deal_rooms_DQcs69Xo = __esm({
+  "dist/server/assets/app.investor.deal-rooms-DQcs69Xo.js"() {
     "use strict";
     import_jsx_runtime76 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     init_lucide_react();
     init_modern2();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_date_fns();
     init_utils_H80jjgLf();
     import_react65 = __toESM(require_react(), 1);
@@ -70238,9 +70429,9 @@ var init_app_investor_deal_rooms_BrIEflu7 = __esm({
   }
 });
 
-// dist/server/assets/app.investor.deal-flow-krX72u5s.js
-var app_investor_deal_flow_krX72u5s_exports = {};
-__export(app_investor_deal_flow_krX72u5s_exports, {
+// dist/server/assets/app.investor.deal-flow-DKnjqfyh.js
+var app_investor_deal_flow_DKnjqfyh_exports = {};
+__export(app_investor_deal_flow_DKnjqfyh_exports, {
   component: () => DealFlowPage
 });
 function DealFlowPage() {
@@ -70326,24 +70517,24 @@ function DealFlowPage() {
   ] });
 }
 var import_jsx_runtime77, import_react66;
-var init_app_investor_deal_flow_krX72u5s = __esm({
-  "dist/server/assets/app.investor.deal-flow-krX72u5s.js"() {
+var init_app_investor_deal_flow_DKnjqfyh = __esm({
+  "dist/server/assets/app.investor.deal-flow-DKnjqfyh.js"() {
     "use strict";
     import_jsx_runtime77 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react66 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_date_fns();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/app.investor.analysis-BWpIxOIl.js
-var app_investor_analysis_BWpIxOIl_exports = {};
-__export(app_investor_analysis_BWpIxOIl_exports, {
+// dist/server/assets/app.investor.analysis-B6SJgkS_.js
+var app_investor_analysis_B6SJgkS_exports = {};
+__export(app_investor_analysis_B6SJgkS_exports, {
   component: () => AnalysisPage
 });
 import "node:async_hooks";
@@ -70477,14 +70668,14 @@ function AnalysisPage() {
   ] });
 }
 var import_jsx_runtime78, import_react67;
-var init_app_investor_analysis_BWpIxOIl = __esm({
-  "dist/server/assets/app.investor.analysis-BWpIxOIl.js"() {
+var init_app_investor_analysis_B6SJgkS = __esm({
+  "dist/server/assets/app.investor.analysis-B6SJgkS_.js"() {
     "use strict";
     import_jsx_runtime78 = __toESM(require_jsx_runtime(), 1);
     import_react67 = __toESM(require_react(), 1);
     init_lucide_react();
     init_modern2();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_deal_brief_fn_D15ylBUr();
     init_dist7();
     init_clsx();
@@ -70492,9 +70683,9 @@ var init_app_investor_analysis_BWpIxOIl = __esm({
   }
 });
 
-// dist/server/assets/app.deal-room._id-BMN6-kql.js
-var app_deal_room_id_BMN6_kql_exports = {};
-__export(app_deal_room_id_BMN6_kql_exports, {
+// dist/server/assets/app.deal-room._id-CBTjriLe.js
+var app_deal_room_id_CBTjriLe_exports = {};
+__export(app_deal_room_id_CBTjriLe_exports, {
   component: () => DealRoom
 });
 function AIChat({ scope, starters, initialAssistant, className = "", compact = false }) {
@@ -72421,8 +72612,8 @@ function QA({
   ] });
 }
 var import_jsx_runtime79, import_react68, statusMeta, cycle2, DOCS, STAGES5, SECTION_META, DECISION_TO_DB, DB_TO_DECISION, tabs2, CATEGORY_COLORS;
-var init_app_deal_room_id_BMN6_kql = __esm({
-  "dist/server/assets/app.deal-room._id-BMN6-kql.js"() {
+var init_app_deal_room_id_CBTjriLe = __esm({
+  "dist/server/assets/app.deal-room._id-CBTjriLe.js"() {
     "use strict";
     import_jsx_runtime79 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -72432,7 +72623,7 @@ var init_app_deal_room_id_BMN6_kql = __esm({
     init_lucide_react();
     init_modern2();
     init_backend_CMfy16B4();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_utils_H80jjgLf();
     init_store_LLbTvev();
     init_clsx();
@@ -72525,9 +72716,9 @@ var init_app_deal_room_id_BMN6_kql = __esm({
   }
 });
 
-// dist/server/assets/app.deal-room._id_.nda-C8PIKXIh.js
-var app_deal_room_id_nda_C8PIKXIh_exports = {};
-__export(app_deal_room_id_nda_C8PIKXIh_exports, {
+// dist/server/assets/app.deal-room._id_.nda-DxFwoDaF.js
+var app_deal_room_id_nda_DxFwoDaF_exports = {};
+__export(app_deal_room_id_nda_DxFwoDaF_exports, {
   component: () => NdaPage
 });
 function buildNdaText(startupName, founderName, investorName, date) {
@@ -72758,24 +72949,24 @@ function NdaPage() {
   ] }) });
 }
 var import_jsx_runtime80, import_react69;
-var init_app_deal_room_id_nda_C8PIKXIh = __esm({
-  "dist/server/assets/app.deal-room._id_.nda-C8PIKXIh.js"() {
+var init_app_deal_room_id_nda_DxFwoDaF = __esm({
+  "dist/server/assets/app.deal-room._id_.nda-DxFwoDaF.js"() {
     "use strict";
     import_jsx_runtime80 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
     import_react69 = __toESM(require_react(), 1);
     init_modern2();
     init_lucide_react();
-    init_router_D87oKCVm();
+    init_router_3WmBSyta();
     init_Logo_CIkq6vsm();
     init_dist7();
     init_clsx();
   }
 });
 
-// dist/server/assets/router-D87oKCVm.js
-var router_D87oKCVm_exports = {};
-__export(router_D87oKCVm_exports, {
+// dist/server/assets/router-3WmBSyta.js
+var router_3WmBSyta_exports = {};
+__export(router_3WmBSyta_exports, {
   L: () => LANGUAGES,
   R: () => Route$w,
   a: () => useI18n,
@@ -73003,8 +73194,8 @@ function DefaultErrorComponent({ error, reset }) {
   ] }) });
 }
 var import_jsx_runtime81, import_react70, url, anonKey, supabase, AuthContext, ThemeContext, STORAGE_KEY$1, LANGUAGES, en2, es, fr2, de3, dicts, STORAGE_KEY2, I18nContext, Toaster3, appCss, queryClient, Route$P, $$splitComponentImporter$O, Route$O, $$splitComponentImporter$N, Route$N, $$splitComponentImporter$M, Route$M, $$splitComponentImporter$L, Route$L, $$splitComponentImporter$K, Route$K, $$splitComponentImporter$J, Route$J, $$splitComponentImporter$I, Route$I, $$splitComponentImporter$H, Route$H, $$splitComponentImporter$G, Route$G, $$splitComponentImporter$F, Route$F, $$splitComponentImporter$E, Route$E, $$splitComponentImporter$D, Route$D, $$splitComponentImporter$C, Route$C, $$splitComponentImporter$B, Route$B, $$splitComponentImporter$A, Route$A, $$splitComponentImporter$z, Route$z, $$splitComponentImporter$y, Route$y, $$splitComponentImporter$x, Route$x, $$splitComponentImporter$w, Route$w, $$splitComponentImporter$v, Route$v, $$splitComponentImporter$u, Route$u, $$splitComponentImporter$t, Route$t, $$splitComponentImporter$s, Route$s, $$splitComponentImporter$r, Route$r, $$splitComponentImporter$q, Route$q, $$splitComponentImporter$p, Route$p, $$splitComponentImporter$o, Route$o, $$splitComponentImporter$n, Route$n, $$splitComponentImporter$m, Route$m, $$splitComponentImporter$l, Route$l, $$splitComponentImporter$k, Route$k, $$splitComponentImporter$j, Route$j, $$splitComponentImporter$i, Route$i, $$splitComponentImporter$h, Route$h, $$splitComponentImporter$g, Route$g, $$splitComponentImporter$f, Route$f, $$splitComponentImporter$e, Route$e, $$splitComponentImporter$d, Route$d, $$splitComponentImporter$c, Route$c, $$splitComponentImporter$b, Route$b, $$splitComponentImporter$a, Route$a, $$splitComponentImporter$9, Route$9, $$splitComponentImporter$8, Route$8, $$splitComponentImporter$7, Route$7, $$splitComponentImporter$6, Route$6, $$splitComponentImporter$5, Route$5, $$splitComponentImporter$4, Route$4, $$splitComponentImporter$3, Route$3, $$splitComponentImporter$2, Route$2, $$splitComponentImporter$1, Route$1, $$splitComponentImporter, Route2, TermsRoute, SignUpRoute, SignInRoute, PrivacyRoute, PricingRoute, InvestorsRoute, FoundersRoute, ForgotPasswordRoute, DebugRoute, AppRoute, AboutRoute, IndexRoute, AppIndexRoute, SolutionsVcDealRoomRoute, SolutionsRaise1mRoute, SolutionsInvestorPipelineRoute, SolutionsFundraisingCrmRoute, SolutionsDueDiligenceRoute, JoinTokenRoute, AuthCallbackRoute, AppUsersRoute, AppSettingsRoute, AppReportsRoute, AppProfileRoute, AppPipelineRoute, AppNotificationsRoute, AppMessagesRoute, AppMeetingsRoute, AppLeadsRoute, AppInvestorRoute, AppEmailRoute, AppDocumentsRoute, AppDealRoomsRoute, AppAuditRoute, AppAdvisorRoute, AppInvestorIndexRoute, AppSettingsSecurityRoute, AppSettingsNotificationsRoute, AppSettingsDomainRoute, AppSettingsBillingRoute, AppInvestorTeamRoute, AppInvestorStartupsRoute, AppInvestorPortfolioRoute, AppInvestorPipelineRoute, AppInvestorDiligenceRoute, AppInvestorDecisionsRoute, AppInvestorDealRoomsRoute, AppInvestorDealFlowRoute, AppInvestorAnalysisRoute, AppDealRoomIdRoute, AppDealRoomIdNdaRoute, AppInvestorRouteChildren, AppInvestorRouteWithChildren, AppSettingsRouteChildren, AppSettingsRouteWithChildren, AppRouteChildren, AppRouteWithChildren, rootRouteChildren, routeTree, getRouter, router;
-var init_router_D87oKCVm = __esm({
-  "dist/server/assets/router-D87oKCVm.js"() {
+var init_router_3WmBSyta = __esm({
+  "dist/server/assets/router-3WmBSyta.js"() {
     "use strict";
     import_jsx_runtime81 = __toESM(require_jsx_runtime(), 1);
     init_esm5();
@@ -73334,7 +73525,7 @@ var init_router_D87oKCVm = __esm({
         }
       );
     };
-    appCss = "/assets/styles-BHJyw8Lt.css";
+    appCss = "/assets/styles-SiEUTrmS.css";
     queryClient = new QueryClient();
     Route$P = createRootRoute({
       head: () => ({
@@ -73361,7 +73552,7 @@ var init_router_D87oKCVm = __esm({
       component: RootComponent,
       notFoundComponent: NotFoundComponent
     });
-    $$splitComponentImporter$O = () => Promise.resolve().then(() => (init_terms_CGOhguBt(), terms_CGOhguBt_exports));
+    $$splitComponentImporter$O = () => Promise.resolve().then(() => (init_terms_DLxpKBr3(), terms_DLxpKBr3_exports));
     Route$O = createFileRoute("/terms")({
       head: () => ({
         meta: [{
@@ -73373,15 +73564,15 @@ var init_router_D87oKCVm = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$O, "component")
     });
-    $$splitComponentImporter$N = () => Promise.resolve().then(() => (init_sign_up_DIsOg3SU(), sign_up_DIsOg3SU_exports));
+    $$splitComponentImporter$N = () => Promise.resolve().then(() => (init_sign_up_CI0HOuEm(), sign_up_CI0HOuEm_exports));
     Route$N = createFileRoute("/sign-up")({
       component: lazyRouteComponent($$splitComponentImporter$N, "component")
     });
-    $$splitComponentImporter$M = () => Promise.resolve().then(() => (init_sign_in_CS27ggak(), sign_in_CS27ggak_exports));
+    $$splitComponentImporter$M = () => Promise.resolve().then(() => (init_sign_in_CJa9HVxz(), sign_in_CJa9HVxz_exports));
     Route$M = createFileRoute("/sign-in")({
       component: lazyRouteComponent($$splitComponentImporter$M, "component")
     });
-    $$splitComponentImporter$L = () => Promise.resolve().then(() => (init_privacy_Bo4BP_49(), privacy_Bo4BP_49_exports));
+    $$splitComponentImporter$L = () => Promise.resolve().then(() => (init_privacy_DJqaic4z(), privacy_DJqaic4z_exports));
     Route$L = createFileRoute("/privacy")({
       head: () => ({
         meta: [{
@@ -73393,7 +73584,7 @@ var init_router_D87oKCVm = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$L, "component")
     });
-    $$splitComponentImporter$K = () => Promise.resolve().then(() => (init_pricing_C29OZ4Bu(), pricing_C29OZ4Bu_exports));
+    $$splitComponentImporter$K = () => Promise.resolve().then(() => (init_pricing_Cuxs2FXG(), pricing_Cuxs2FXG_exports));
     Route$K = createFileRoute("/pricing")({
       head: () => ({
         meta: [{
@@ -73405,7 +73596,7 @@ var init_router_D87oKCVm = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$K, "component")
     });
-    $$splitComponentImporter$J = () => Promise.resolve().then(() => (init_investors_BXVI1BaT(), investors_BXVI1BaT_exports));
+    $$splitComponentImporter$J = () => Promise.resolve().then(() => (init_investors_CXKCVG4l(), investors_CXKCVG4l_exports));
     Route$J = createFileRoute("/investors")({
       head: () => ({
         meta: [{
@@ -73417,7 +73608,7 @@ var init_router_D87oKCVm = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$J, "component")
     });
-    $$splitComponentImporter$I = () => Promise.resolve().then(() => (init_founders_CTj0emoq(), founders_CTj0emoq_exports));
+    $$splitComponentImporter$I = () => Promise.resolve().then(() => (init_founders_BnB4fwmd(), founders_BnB4fwmd_exports));
     Route$I = createFileRoute("/founders")({
       head: () => ({
         meta: [{
@@ -73429,7 +73620,7 @@ var init_router_D87oKCVm = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$I, "component")
     });
-    $$splitComponentImporter$H = () => Promise.resolve().then(() => (init_forgot_password_l9VNuX2o(), forgot_password_l9VNuX2o_exports));
+    $$splitComponentImporter$H = () => Promise.resolve().then(() => (init_forgot_password_DeiTzYlS(), forgot_password_DeiTzYlS_exports));
     Route$H = createFileRoute("/forgot-password")({
       component: lazyRouteComponent($$splitComponentImporter$H, "component")
     });
@@ -73437,7 +73628,7 @@ var init_router_D87oKCVm = __esm({
     Route$G = createFileRoute("/debug")({
       component: lazyRouteComponent($$splitComponentImporter$G, "component")
     });
-    $$splitComponentImporter$F = () => Promise.resolve().then(() => (init_app_DFx2ogJX(), app_DFx2ogJX_exports));
+    $$splitComponentImporter$F = () => Promise.resolve().then(() => (init_app_eleWCjsI(), app_eleWCjsI_exports));
     Route$F = createFileRoute("/app")({
       beforeLoad: async () => {
         if (typeof window === "undefined") return;
@@ -73462,7 +73653,7 @@ var init_router_D87oKCVm = __esm({
       },
       component: lazyRouteComponent($$splitComponentImporter$F, "component")
     });
-    $$splitComponentImporter$E = () => Promise.resolve().then(() => (init_about_PFps4NVP(), about_PFps4NVP_exports));
+    $$splitComponentImporter$E = () => Promise.resolve().then(() => (init_about_W5ckLSw0(), about_W5ckLSw0_exports));
     Route$E = createFileRoute("/about")({
       head: () => ({
         meta: [{
@@ -73474,7 +73665,7 @@ var init_router_D87oKCVm = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$E, "component")
     });
-    $$splitComponentImporter$D = () => Promise.resolve().then(() => (init_index_D0_umLqO(), index_D0_umLqO_exports));
+    $$splitComponentImporter$D = () => Promise.resolve().then(() => (init_index_BUzdUS1j(), index_BUzdUS1j_exports));
     Route$D = createFileRoute("/")({
       head: () => ({
         meta: [{
@@ -73492,11 +73683,11 @@ var init_router_D87oKCVm = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$D, "component")
     });
-    $$splitComponentImporter$C = () => Promise.resolve().then(() => (init_app_index_B05kkWeL(), app_index_B05kkWeL_exports));
+    $$splitComponentImporter$C = () => Promise.resolve().then(() => (init_app_index_BfTpDU6I(), app_index_BfTpDU6I_exports));
     Route$C = createFileRoute("/app/")({
       component: lazyRouteComponent($$splitComponentImporter$C, "component")
     });
-    $$splitComponentImporter$B = () => Promise.resolve().then(() => (init_solutions_vc_deal_room_BxyhShsL(), solutions_vc_deal_room_BxyhShsL_exports));
+    $$splitComponentImporter$B = () => Promise.resolve().then(() => (init_solutions_vc_deal_room_C8wozciX(), solutions_vc_deal_room_C8wozciX_exports));
     Route$B = createFileRoute("/solutions/vc-deal-room")({
       head: () => ({
         meta: [{
@@ -73508,7 +73699,7 @@ var init_router_D87oKCVm = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$B, "component")
     });
-    $$splitComponentImporter$A = () => Promise.resolve().then(() => (init_solutions_raise_1m_BCxQn053(), solutions_raise_1m_BCxQn053_exports));
+    $$splitComponentImporter$A = () => Promise.resolve().then(() => (init_solutions_raise_1m_B9l2SqhA(), solutions_raise_1m_B9l2SqhA_exports));
     Route$A = createFileRoute("/solutions/raise-1m")({
       head: () => ({
         meta: [{
@@ -73520,7 +73711,7 @@ var init_router_D87oKCVm = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$A, "component")
     });
-    $$splitComponentImporter$z = () => Promise.resolve().then(() => (init_solutions_investor_pipeline_Dl645HLJ(), solutions_investor_pipeline_Dl645HLJ_exports));
+    $$splitComponentImporter$z = () => Promise.resolve().then(() => (init_solutions_investor_pipeline_TeIhdO2E(), solutions_investor_pipeline_TeIhdO2E_exports));
     Route$z = createFileRoute("/solutions/investor-pipeline")({
       head: () => ({
         meta: [{
@@ -73532,7 +73723,7 @@ var init_router_D87oKCVm = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$z, "component")
     });
-    $$splitComponentImporter$y = () => Promise.resolve().then(() => (init_solutions_fundraising_crm_DInBRKWM(), solutions_fundraising_crm_DInBRKWM_exports));
+    $$splitComponentImporter$y = () => Promise.resolve().then(() => (init_solutions_fundraising_crm_Dd1jnQIP(), solutions_fundraising_crm_Dd1jnQIP_exports));
     Route$y = createFileRoute("/solutions/fundraising-crm")({
       head: () => ({
         meta: [{
@@ -73544,7 +73735,7 @@ var init_router_D87oKCVm = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$y, "component")
     });
-    $$splitComponentImporter$x = () => Promise.resolve().then(() => (init_solutions_due_diligence_BnLkGrz(), solutions_due_diligence_BnLkGrz_exports));
+    $$splitComponentImporter$x = () => Promise.resolve().then(() => (init_solutions_due_diligence_RhXl7QTB(), solutions_due_diligence_RhXl7QTB_exports));
     Route$x = createFileRoute("/solutions/due-diligence")({
       head: () => ({
         meta: [{
@@ -73556,31 +73747,31 @@ var init_router_D87oKCVm = __esm({
       }),
       component: lazyRouteComponent($$splitComponentImporter$x, "component")
     });
-    $$splitComponentImporter$w = () => Promise.resolve().then(() => (init_join_token_DgU6TIUM(), join_token_DgU6TIUM_exports));
+    $$splitComponentImporter$w = () => Promise.resolve().then(() => (init_join_token_DzY3fXeU(), join_token_DzY3fXeU_exports));
     Route$w = createFileRoute("/join/$token")({
       component: lazyRouteComponent($$splitComponentImporter$w, "component")
     });
-    $$splitComponentImporter$v = () => Promise.resolve().then(() => (init_auth_callback_BUqeg_Il(), auth_callback_BUqeg_Il_exports));
+    $$splitComponentImporter$v = () => Promise.resolve().then(() => (init_auth_callback_DC3KIXww(), auth_callback_DC3KIXww_exports));
     Route$v = createFileRoute("/auth/callback")({
       component: lazyRouteComponent($$splitComponentImporter$v, "component")
     });
-    $$splitComponentImporter$u = () => Promise.resolve().then(() => (init_app_users_B1nxjekQ(), app_users_B1nxjekQ_exports));
+    $$splitComponentImporter$u = () => Promise.resolve().then(() => (init_app_users_WC5z1T4d(), app_users_WC5z1T4d_exports));
     Route$u = createFileRoute("/app/users")({
       component: lazyRouteComponent($$splitComponentImporter$u, "component")
     });
-    $$splitComponentImporter$t = () => Promise.resolve().then(() => (init_app_settings_CT9jEZPA(), app_settings_CT9jEZPA_exports));
+    $$splitComponentImporter$t = () => Promise.resolve().then(() => (init_app_settings_Ci3cam_c(), app_settings_Ci3cam_c_exports));
     Route$t = createFileRoute("/app/settings")({
       component: lazyRouteComponent($$splitComponentImporter$t, "component")
     });
-    $$splitComponentImporter$s = () => Promise.resolve().then(() => (init_app_reports_DRhNjuwv(), app_reports_DRhNjuwv_exports));
+    $$splitComponentImporter$s = () => Promise.resolve().then(() => (init_app_reports_Cl_3iIAk(), app_reports_Cl_3iIAk_exports));
     Route$s = createFileRoute("/app/reports")({
       component: lazyRouteComponent($$splitComponentImporter$s, "component")
     });
-    $$splitComponentImporter$r = () => Promise.resolve().then(() => (init_app_profile_Df8qWlz1(), app_profile_Df8qWlz1_exports));
+    $$splitComponentImporter$r = () => Promise.resolve().then(() => (init_app_profile_CS2pXV3j(), app_profile_CS2pXV3j_exports));
     Route$r = createFileRoute("/app/profile")({
       component: lazyRouteComponent($$splitComponentImporter$r, "component")
     });
-    $$splitComponentImporter$q = () => Promise.resolve().then(() => (init_app_pipeline_BuuPy3oF(), app_pipeline_BuuPy3oF_exports));
+    $$splitComponentImporter$q = () => Promise.resolve().then(() => (init_app_pipeline_DPWS7aB1(), app_pipeline_DPWS7aB1_exports));
     Route$q = createFileRoute("/app/pipeline")({
       component: lazyRouteComponent($$splitComponentImporter$q, "component")
     });
@@ -73588,15 +73779,15 @@ var init_router_D87oKCVm = __esm({
     Route$p = createFileRoute("/app/notifications")({
       component: lazyRouteComponent($$splitComponentImporter$p, "component")
     });
-    $$splitComponentImporter$o = () => Promise.resolve().then(() => (init_app_messages_DicGSXFC(), app_messages_DicGSXFC_exports));
+    $$splitComponentImporter$o = () => Promise.resolve().then(() => (init_app_messages_hc_LZaDH(), app_messages_hc_LZaDH_exports));
     Route$o = createFileRoute("/app/messages")({
       component: lazyRouteComponent($$splitComponentImporter$o, "component")
     });
-    $$splitComponentImporter$n = () => Promise.resolve().then(() => (init_app_meetings_DECizoTT(), app_meetings_DECizoTT_exports));
+    $$splitComponentImporter$n = () => Promise.resolve().then(() => (init_app_meetings_Qtejk3m2(), app_meetings_Qtejk3m2_exports));
     Route$n = createFileRoute("/app/meetings")({
       component: lazyRouteComponent($$splitComponentImporter$n, "component")
     });
-    $$splitComponentImporter$m = () => Promise.resolve().then(() => (init_app_leads_DwwijI6p(), app_leads_DwwijI6p_exports));
+    $$splitComponentImporter$m = () => Promise.resolve().then(() => (init_app_leads_GkB1J6I(), app_leads_GkB1J6I_exports));
     Route$m = createFileRoute("/app/leads")({
       component: lazyRouteComponent($$splitComponentImporter$m, "component")
     });
@@ -73637,11 +73828,11 @@ var init_router_D87oKCVm = __esm({
     Route$k = createFileRoute("/app/email")({
       component: lazyRouteComponent($$splitComponentImporter$k, "component")
     });
-    $$splitComponentImporter$j = () => Promise.resolve().then(() => (init_app_documents_Q7Iqbc5K(), app_documents_Q7Iqbc5K_exports));
+    $$splitComponentImporter$j = () => Promise.resolve().then(() => (init_app_documents_CrDCKLJ4(), app_documents_CrDCKLJ4_exports));
     Route$j = createFileRoute("/app/documents")({
       component: lazyRouteComponent($$splitComponentImporter$j, "component")
     });
-    $$splitComponentImporter$i = () => Promise.resolve().then(() => (init_app_deal_rooms_Bqx2lRnb(), app_deal_rooms_Bqx2lRnb_exports));
+    $$splitComponentImporter$i = () => Promise.resolve().then(() => (init_app_deal_rooms_DKLM9syq(), app_deal_rooms_DKLM9syq_exports));
     Route$i = createFileRoute("/app/deal-rooms")({
       component: lazyRouteComponent($$splitComponentImporter$i, "component")
     });
@@ -73649,19 +73840,19 @@ var init_router_D87oKCVm = __esm({
     Route$h = createFileRoute("/app/audit")({
       component: lazyRouteComponent($$splitComponentImporter$h, "component")
     });
-    $$splitComponentImporter$g = () => Promise.resolve().then(() => (init_app_advisor_B8DcT1lZ(), app_advisor_B8DcT1lZ_exports));
+    $$splitComponentImporter$g = () => Promise.resolve().then(() => (init_app_advisor_BjVQm5bj(), app_advisor_BjVQm5bj_exports));
     Route$g = createFileRoute("/app/advisor")({
       component: lazyRouteComponent($$splitComponentImporter$g, "component")
     });
-    $$splitComponentImporter$f = () => Promise.resolve().then(() => (init_app_investor_index_BeH9bP0I(), app_investor_index_BeH9bP0I_exports));
+    $$splitComponentImporter$f = () => Promise.resolve().then(() => (init_app_investor_index_W3vemrDz(), app_investor_index_W3vemrDz_exports));
     Route$f = createFileRoute("/app/investor/")({
       component: lazyRouteComponent($$splitComponentImporter$f, "component")
     });
-    $$splitComponentImporter$e = () => Promise.resolve().then(() => (init_app_settings_security_8FbTvjHA(), app_settings_security_8FbTvjHA_exports));
+    $$splitComponentImporter$e = () => Promise.resolve().then(() => (init_app_settings_security_BkofCVaf(), app_settings_security_BkofCVaf_exports));
     Route$e = createFileRoute("/app/settings/security")({
       component: lazyRouteComponent($$splitComponentImporter$e, "component")
     });
-    $$splitComponentImporter$d = () => Promise.resolve().then(() => (init_app_settings_notifications_MHIIgkbG(), app_settings_notifications_MHIIgkbG_exports));
+    $$splitComponentImporter$d = () => Promise.resolve().then(() => (init_app_settings_notifications_CdTGOAKs(), app_settings_notifications_CdTGOAKs_exports));
     Route$d = createFileRoute("/app/settings/notifications")({
       component: lazyRouteComponent($$splitComponentImporter$d, "component")
     });
@@ -73673,47 +73864,47 @@ var init_router_D87oKCVm = __esm({
     Route$b = createFileRoute("/app/settings/billing")({
       component: lazyRouteComponent($$splitComponentImporter$b, "component")
     });
-    $$splitComponentImporter$a = () => Promise.resolve().then(() => (init_app_investor_team_VPgxIgWQ(), app_investor_team_VPgxIgWQ_exports));
+    $$splitComponentImporter$a = () => Promise.resolve().then(() => (init_app_investor_team_DPrbMsTE(), app_investor_team_DPrbMsTE_exports));
     Route$a = createFileRoute("/app/investor/team")({
       component: lazyRouteComponent($$splitComponentImporter$a, "component")
     });
-    $$splitComponentImporter$9 = () => Promise.resolve().then(() => (init_app_investor_startups_BUMJTeOn(), app_investor_startups_BUMJTeOn_exports));
+    $$splitComponentImporter$9 = () => Promise.resolve().then(() => (init_app_investor_startups_DiOFyqTc(), app_investor_startups_DiOFyqTc_exports));
     Route$9 = createFileRoute("/app/investor/startups")({
       component: lazyRouteComponent($$splitComponentImporter$9, "component")
     });
-    $$splitComponentImporter$8 = () => Promise.resolve().then(() => (init_app_investor_portfolio_CFPCLrzr(), app_investor_portfolio_CFPCLrzr_exports));
+    $$splitComponentImporter$8 = () => Promise.resolve().then(() => (init_app_investor_portfolio_DO02sZEP(), app_investor_portfolio_DO02sZEP_exports));
     Route$8 = createFileRoute("/app/investor/portfolio")({
       component: lazyRouteComponent($$splitComponentImporter$8, "component")
     });
-    $$splitComponentImporter$7 = () => Promise.resolve().then(() => (init_app_investor_pipeline_A1jWEfuL(), app_investor_pipeline_A1jWEfuL_exports));
+    $$splitComponentImporter$7 = () => Promise.resolve().then(() => (init_app_investor_pipeline_D9_cB4CL(), app_investor_pipeline_D9_cB4CL_exports));
     Route$7 = createFileRoute("/app/investor/pipeline")({
       component: lazyRouteComponent($$splitComponentImporter$7, "component")
     });
-    $$splitComponentImporter$6 = () => Promise.resolve().then(() => (init_app_investor_diligence_ctT9GQwY(), app_investor_diligence_ctT9GQwY_exports));
+    $$splitComponentImporter$6 = () => Promise.resolve().then(() => (init_app_investor_diligence_T3Yd3Zl(), app_investor_diligence_T3Yd3Zl_exports));
     Route$6 = createFileRoute("/app/investor/diligence")({
       component: lazyRouteComponent($$splitComponentImporter$6, "component")
     });
-    $$splitComponentImporter$5 = () => Promise.resolve().then(() => (init_app_investor_decisions_DXwbrSj3(), app_investor_decisions_DXwbrSj3_exports));
+    $$splitComponentImporter$5 = () => Promise.resolve().then(() => (init_app_investor_decisions_Dtge_4Lf(), app_investor_decisions_Dtge_4Lf_exports));
     Route$5 = createFileRoute("/app/investor/decisions")({
       component: lazyRouteComponent($$splitComponentImporter$5, "component")
     });
-    $$splitComponentImporter$4 = () => Promise.resolve().then(() => (init_app_investor_deal_rooms_BrIEflu7(), app_investor_deal_rooms_BrIEflu7_exports));
+    $$splitComponentImporter$4 = () => Promise.resolve().then(() => (init_app_investor_deal_rooms_DQcs69Xo(), app_investor_deal_rooms_DQcs69Xo_exports));
     Route$4 = createFileRoute("/app/investor/deal-rooms")({
       component: lazyRouteComponent($$splitComponentImporter$4, "component")
     });
-    $$splitComponentImporter$3 = () => Promise.resolve().then(() => (init_app_investor_deal_flow_krX72u5s(), app_investor_deal_flow_krX72u5s_exports));
+    $$splitComponentImporter$3 = () => Promise.resolve().then(() => (init_app_investor_deal_flow_DKnjqfyh(), app_investor_deal_flow_DKnjqfyh_exports));
     Route$3 = createFileRoute("/app/investor/deal-flow")({
       component: lazyRouteComponent($$splitComponentImporter$3, "component")
     });
-    $$splitComponentImporter$2 = () => Promise.resolve().then(() => (init_app_investor_analysis_BWpIxOIl(), app_investor_analysis_BWpIxOIl_exports));
+    $$splitComponentImporter$2 = () => Promise.resolve().then(() => (init_app_investor_analysis_B6SJgkS(), app_investor_analysis_B6SJgkS_exports));
     Route$2 = createFileRoute("/app/investor/analysis")({
       component: lazyRouteComponent($$splitComponentImporter$2, "component")
     });
-    $$splitComponentImporter$1 = () => Promise.resolve().then(() => (init_app_deal_room_id_BMN6_kql(), app_deal_room_id_BMN6_kql_exports));
+    $$splitComponentImporter$1 = () => Promise.resolve().then(() => (init_app_deal_room_id_CBTjriLe(), app_deal_room_id_CBTjriLe_exports));
     Route$1 = createFileRoute("/app/deal-room/$id")({
       component: lazyRouteComponent($$splitComponentImporter$1, "component")
     });
-    $$splitComponentImporter = () => Promise.resolve().then(() => (init_app_deal_room_id_nda_C8PIKXIh(), app_deal_room_id_nda_C8PIKXIh_exports));
+    $$splitComponentImporter = () => Promise.resolve().then(() => (init_app_deal_room_id_nda_DxFwoDaF(), app_deal_room_id_nda_DxFwoDaF_exports));
     Route2 = createFileRoute("/app/deal-room/$id_/nda")({
       component: lazyRouteComponent($$splitComponentImporter, "component")
     });
@@ -74139,7 +74330,7 @@ function getResponse() {
   return getH3Event().res;
 }
 async function getStartManifest(matchedRoutes) {
-  const { tsrStartManifest: tsrStartManifest2 } = await Promise.resolve().then(() => (init_tanstack_start_manifest_v_5AxDneNO(), tanstack_start_manifest_v_5AxDneNO_exports));
+  const { tsrStartManifest: tsrStartManifest2 } = await Promise.resolve().then(() => (init_tanstack_start_manifest_v_DNpmMjf(), tanstack_start_manifest_v_DNpmMjf_exports));
   const startManifest = tsrStartManifest2();
   const rootRoute = startManifest.routes[rootRouteId] = startManifest.routes[rootRouteId] || {};
   rootRoute.assets = rootRoute.assets || [];
@@ -74597,7 +74788,7 @@ function getStartResponseHeaders(opts) {
 }
 async function loadEntries() {
   const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-    Promise.resolve().then(() => (init_router_D87oKCVm(), router_D87oKCVm_exports)).then((n2) => n2.r),
+    Promise.resolve().then(() => (init_router_3WmBSyta(), router_3WmBSyta_exports)).then((n2) => n2.r),
     Promise.resolve().then(() => (init_start_HYkvq4Ni(), start_HYkvq4Ni_exports)),
     Promise.resolve().then(() => (init_tanstack_start_plugin_adapters_Cwee5PKy(), tanstack_start_plugin_adapters_Cwee5PKy_exports))
   ]);
@@ -74935,25 +75126,25 @@ var init_server4 = __esm({
     eventStorage = globalObj$1[GLOBAL_EVENT_STORAGE_KEY];
     HEADERS = { TSS_SHELL: "X-TSS_SHELL" };
     manifest = {
-      "56f68b50d6d653ae4f4287eb005bbb35fecea7fa7ce69a4b2a6cc974383a502e": {
-        functionName: "generateDealBrief_createServerFn_handler",
-        importer: () => Promise.resolve().then(() => (init_deal_brief_fn_B8dVSAf7(), deal_brief_fn_B8dVSAf7_exports))
-      },
       "b0451d818a4af8f61f8d6702b0a87626ab580dea9833910b8d678173c48d62e2": {
         functionName: "sendAdvisorMessage_createServerFn_handler",
         importer: () => Promise.resolve().then(() => (init_advisor_fn_CDvwbxoI(), advisor_fn_CDvwbxoI_exports))
       },
-      "08b07e340aa3dd2c22b3ea45b5ff6e1a1e3844f3dadeb4cfd75858793e9c8fb3": {
-        functionName: "generateReply_createServerFn_handler",
-        importer: () => Promise.resolve().then(() => (init_reply_fn_CHtXOihs(), reply_fn_CHtXOihs_exports))
+      "56f68b50d6d653ae4f4287eb005bbb35fecea7fa7ce69a4b2a6cc974383a502e": {
+        functionName: "generateDealBrief_createServerFn_handler",
+        importer: () => Promise.resolve().then(() => (init_deal_brief_fn_B8dVSAf7(), deal_brief_fn_B8dVSAf7_exports))
+      },
+      "1d719b02e5cbb8bfb1f5fdbf08bea97cdac2cfff952491ca07a2d91de6f74c81": {
+        functionName: "generateOutreachEmail_createServerFn_handler",
+        importer: () => Promise.resolve().then(() => (init_ai_fn_C4515MCI(), ai_fn_C4515MCI_exports))
       },
       "272077c9c144c7cbae7da95efd3b0536517866897833aab391e7e9e60debb102": {
         functionName: "generateLinkedInMessage_createServerFn_handler",
         importer: () => Promise.resolve().then(() => (init_linkedin_fn_DKhD_nX(), linkedin_fn_DKhD_nX_exports))
       },
-      "1d719b02e5cbb8bfb1f5fdbf08bea97cdac2cfff952491ca07a2d91de6f74c81": {
-        functionName: "generateOutreachEmail_createServerFn_handler",
-        importer: () => Promise.resolve().then(() => (init_ai_fn_C4515MCI(), ai_fn_C4515MCI_exports))
+      "08b07e340aa3dd2c22b3ea45b5ff6e1a1e3844f3dadeb4cfd75858793e9c8fb3": {
+        functionName: "generateReply_createServerFn_handler",
+        importer: () => Promise.resolve().then(() => (init_reply_fn_CHtXOihs(), reply_fn_CHtXOihs_exports))
       }
     };
     TSS_FORMDATA_CONTEXT = "__TSS_CONTEXT";
@@ -75403,6 +75594,7 @@ lucide-react/dist/esm/icons/copy.js:
 lucide-react/dist/esm/icons/credit-card.js:
 lucide-react/dist/esm/icons/download.js:
 lucide-react/dist/esm/icons/external-link.js:
+lucide-react/dist/esm/icons/eye.js:
 lucide-react/dist/esm/icons/file-check.js:
 lucide-react/dist/esm/icons/file-question-mark.js:
 lucide-react/dist/esm/icons/file-spreadsheet.js:
@@ -75434,6 +75626,7 @@ lucide-react/dist/esm/icons/monitor.js:
 lucide-react/dist/esm/icons/moon.js:
 lucide-react/dist/esm/icons/paperclip.js:
 lucide-react/dist/esm/icons/pause.js:
+lucide-react/dist/esm/icons/pen-line.js:
 lucide-react/dist/esm/icons/pencil.js:
 lucide-react/dist/esm/icons/plus.js:
 lucide-react/dist/esm/icons/printer.js:
@@ -75451,6 +75644,7 @@ lucide-react/dist/esm/icons/star.js:
 lucide-react/dist/esm/icons/sticky-note.js:
 lucide-react/dist/esm/icons/sun.js:
 lucide-react/dist/esm/icons/table-2.js:
+lucide-react/dist/esm/icons/text-align-start.js:
 lucide-react/dist/esm/icons/thumbs-up.js:
 lucide-react/dist/esm/icons/trash-2.js:
 lucide-react/dist/esm/icons/trending-up.js:

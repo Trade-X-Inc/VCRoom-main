@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Building2, Globe, Users, Upload, Pencil, Trash2, Plus, X, Loader2, Check,
+  Eye, Edit3, Download, Zap, AlignLeft,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
@@ -13,52 +14,28 @@ export const Route = createFileRoute("/app/profile")({
   component: Profile,
 });
 
+// ── Types ──────────────────────────────────────────────────────────
+
 interface StartupRow {
-  id: string;
-  company_name: string;
-  sector: string | null;
-  stage: string | null;
-  country: string | null;
-  funding_target: string | null;
-  valuation: string | null;
-  traction: string | null;
-  revenue: string | null;
-  team_size: number | null;
-  description: string | null;
-  website: string | null;
-  problem: string | null;
-  solution: string | null;
-  business_model: string | null;
-  use_of_funds: string | null;
-  logo_url: string | null;
-  pitch_deck_url: string | null;
-  tagline: string | null;
-  founded_year: number | null;
-  previous_funding: string | null;
-  current_investors: string | null;
-  market_size: string | null;
-  competitive_advantage: string | null;
-  why_now: string | null;
-  founder_name: string | null;
-  founder_email: string | null;
-  founder_linkedin: string | null;
-  cofounder_name: string | null;
-  cofounder_linkedin: string | null;
-  key_metric: string | null;
-  growth_rate: string | null;
-  customer_count: string | null;
+  id: string; company_name: string; sector: string | null; stage: string | null;
+  country: string | null; funding_target: string | null; valuation: string | null;
+  traction: string | null; revenue: string | null; team_size: number | null;
+  description: string | null; website: string | null; problem: string | null;
+  solution: string | null; business_model: string | null; use_of_funds: string | null;
+  logo_url: string | null; pitch_deck_url: string | null; tagline: string | null;
+  founded_year: number | null; previous_funding: string | null;
+  current_investors: string | null; market_size: string | null;
+  competitive_advantage: string | null; why_now: string | null;
+  founder_name: string | null; founder_email: string | null;
+  founder_linkedin: string | null; cofounder_name: string | null;
+  cofounder_linkedin: string | null; key_metric: string | null;
+  growth_rate: string | null; customer_count: string | null;
 }
 
 interface TeamMember {
-  id: string;
-  full_name: string;
-  role: string;
-  email: string | null;
-  linkedin_url: string | null;
-  bio: string | null;
-  photo_url: string | null;
-  tag: string | null;
-  display_order: number;
+  id: string; full_name: string; role: string; email: string | null;
+  linkedin_url: string | null; bio: string | null; photo_url: string | null;
+  tag: string | null; display_order: number;
 }
 
 const STAGES = ["Pre-idea", "Pre-seed", "Seed", "Series A", "Series B", "Growth", "Profitable"];
@@ -90,63 +67,47 @@ const emptyForm: FormState = {
 
 function fromStartup(s: StartupRow): FormState {
   return {
-    company_name: s.company_name ?? "",
-    sector: s.sector ?? "",
-    stage: s.stage ?? "",
-    country: s.country ?? "",
-    funding_target: s.funding_target ?? "",
-    valuation: s.valuation ?? "",
-    traction: s.traction ?? "",
-    revenue: s.revenue ?? "",
-    team_size: s.team_size?.toString() ?? "",
-    description: s.description ?? "",
-    website: s.website ?? "",
-    problem: s.problem ?? "",
-    solution: s.solution ?? "",
-    business_model: s.business_model ?? "",
-    use_of_funds: s.use_of_funds ?? "",
-    tagline: s.tagline ?? "",
-    founded_year: s.founded_year?.toString() ?? "",
-    previous_funding: s.previous_funding ?? "",
-    current_investors: s.current_investors ?? "",
-    market_size: s.market_size ?? "",
-    competitive_advantage: s.competitive_advantage ?? "",
-    why_now: s.why_now ?? "",
-    founder_name: s.founder_name ?? "",
-    founder_email: s.founder_email ?? "",
-    founder_linkedin: s.founder_linkedin ?? "",
-    cofounder_name: s.cofounder_name ?? "",
-    cofounder_linkedin: s.cofounder_linkedin ?? "",
-    key_metric: s.key_metric ?? "",
-    growth_rate: s.growth_rate ?? "",
+    company_name: s.company_name ?? "", sector: s.sector ?? "", stage: s.stage ?? "",
+    country: s.country ?? "", funding_target: s.funding_target ?? "",
+    valuation: s.valuation ?? "", traction: s.traction ?? "", revenue: s.revenue ?? "",
+    team_size: s.team_size?.toString() ?? "", description: s.description ?? "",
+    website: s.website ?? "", problem: s.problem ?? "", solution: s.solution ?? "",
+    business_model: s.business_model ?? "", use_of_funds: s.use_of_funds ?? "",
+    tagline: s.tagline ?? "", founded_year: s.founded_year?.toString() ?? "",
+    previous_funding: s.previous_funding ?? "", current_investors: s.current_investors ?? "",
+    market_size: s.market_size ?? "", competitive_advantage: s.competitive_advantage ?? "",
+    why_now: s.why_now ?? "", founder_name: s.founder_name ?? "",
+    founder_email: s.founder_email ?? "", founder_linkedin: s.founder_linkedin ?? "",
+    cofounder_name: s.cofounder_name ?? "", cofounder_linkedin: s.cofounder_linkedin ?? "",
+    key_metric: s.key_metric ?? "", growth_rate: s.growth_rate ?? "",
     customer_count: s.customer_count ?? "",
   };
 }
+
+// ── Component ──────────────────────────────────────────────────────
 
 function Profile() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: startup, isLoading } = useQuery<StartupRow | null>({
-    queryKey: ["my-startup", user?.id],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("startups")
-        .select("*")
-        .eq("founder_id", user!.id)
-        .limit(1)
-        .maybeSingle();
-      return data as StartupRow | null;
-    },
-  });
-
+  const [mode, setMode] = useState<"edit" | "view">("edit");
+  const [tab, setTab] = useState<"quick" | "full">("quick");
   const [form, setForm] = useState<FormState>(emptyForm);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [deckName, setDeckName] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [logoUploading, setLogoUploading] = useState(false);
   const [deckUploading, setDeckUploading] = useState(false);
+
+  const { data: startup, isLoading } = useQuery<StartupRow | null>({
+    queryKey: ["my-startup", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("startups").select("*").eq("founder_id", user!.id).limit(1).maybeSingle();
+      return data as StartupRow | null;
+    },
+  });
 
   useEffect(() => {
     if (startup) {
@@ -159,9 +120,11 @@ function Profile() {
     }
   }, [startup]);
 
-  const field = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    setForm((f) => ({ ...f, [k]: e.target.value }));
+  const field = (k: keyof FormState) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+      setForm((f) => ({ ...f, [k]: e.target.value }));
 
+  // STEP 1: Check-then-insert-or-update (no upsert with onConflict)
   const handleSave = async () => {
     if (!user?.id) return;
     setSaving(true);
@@ -197,17 +160,32 @@ function Profile() {
         key_metric: form.key_metric || null,
         growth_rate: form.growth_rate || null,
         customer_count: form.customer_count || null,
+        updated_at: new Date().toISOString(),
       };
-      const { error } = await supabase.from("startups").upsert(
-        { ...payload, founder_id: user.id },
-        { onConflict: "founder_id" },
-      );
-      if (error) throw error;
-      toast.success("Profile saved");
-      queryClient.invalidateQueries({ queryKey: ["my-startup", user.id] });
-      queryClient.invalidateQueries({ queryKey: ["my-startup-overview"] });
-    } catch (e: any) {
-      toast.error(e.message ?? "Save failed");
+
+      const { data: existing } = await supabase
+        .from("startups").select("id").eq("founder_id", user.id).maybeSingle();
+
+      let error;
+      if (existing?.id) {
+        const { error: updateError } = await supabase
+          .from("startups").update(payload).eq("id", existing.id);
+        error = updateError;
+      } else {
+        const { error: insertError } = await supabase
+          .from("startups").insert({ ...payload, founder_id: user.id, created_at: new Date().toISOString() });
+        error = insertError;
+      }
+
+      if (error) {
+        toast.error("Failed to save: " + error.message);
+      } else {
+        toast.success("Profile saved");
+        queryClient.invalidateQueries({ queryKey: ["my-startup", user.id] });
+        queryClient.invalidateQueries({ queryKey: ["my-startup-overview"] });
+        queryClient.invalidateQueries({ queryKey: ["shell-startup", user.id] });
+        setMode("view");
+      }
     } finally {
       setSaving(false);
     }
@@ -255,19 +233,8 @@ function Profile() {
     }
   };
 
-  const SaveBtn = ({ full = false }: { full?: boolean }) => (
-    <button
-      onClick={handleSave}
-      disabled={saving}
-      className={cn(
-        "inline-flex items-center gap-2 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-60",
-        full && "w-full justify-center",
-      )}
-    >
-      {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-      Save changes
-    </button>
-  );
+  // STEP 4: PDF via print
+  const handleDownloadPDF = () => window.print();
 
   const initials = form.company_name
     ? form.company_name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()
@@ -283,14 +250,201 @@ function Profile() {
     );
   }
 
+  // ── STEP 3: View Mode ──────────────────────────────────────────────
+  if (mode === "view") {
+    const filled = (v: string | null | undefined) => v && v.trim().length > 0;
+
+    const pairs: [string, string | null | undefined][] = [
+      ["Stage", form.stage], ["Sector", form.sector], ["Country", form.country],
+      ["Website", form.website], ["Founded", form.founded_year],
+      ["Team size", form.team_size], ["Revenue / ARR", form.revenue],
+      ["Growth rate", form.growth_rate], ["Customers", form.customer_count],
+      ["Key metric", form.key_metric], ["Funding target", form.funding_target],
+      ["Valuation", form.valuation], ["Previous funding", form.previous_funding],
+      ["Current investors", form.current_investors], ["Market size", form.market_size],
+    ].filter(([, v]) => filled(v)) as [string, string][];
+
+    return (
+      <>
+        {/* STEP 4: Print CSS */}
+        <style>{`
+          @media print {
+            aside, header, .no-print { display: none !important; }
+            body { background: white !important; }
+            .print-card { box-shadow: none !important; border: 1px solid #e5e7eb !important; }
+          }
+        `}</style>
+
+        <div className="p-6 lg:p-8 max-w-5xl mx-auto">
+          <div className="flex items-center justify-between flex-wrap gap-3 mb-6 no-print">
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight">Company Profile</h1>
+              <p className="text-sm text-muted-foreground mt-0.5">How investors see your startup.</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleDownloadPDF}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent"
+              >
+                <Download className="h-4 w-4" /> Download PDF
+              </button>
+              <button
+                onClick={() => setMode("edit")}
+                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"
+              >
+                <Edit3 className="h-4 w-4" /> Edit profile
+              </button>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-border/60 bg-card shadow-card overflow-hidden print-card">
+            <div className="h-28 bg-gradient-mesh relative">
+              <div className="absolute inset-0 noise opacity-40" />
+            </div>
+            <div className="px-6 pb-6 -mt-10">
+              <div className="flex items-end gap-4">
+                <div className="grid h-20 w-20 place-items-center rounded-2xl bg-gradient-brand text-brand-foreground text-2xl font-semibold border-4 border-background shadow-elev overflow-hidden shrink-0">
+                  {logoUrl
+                    ? <img src={logoUrl} alt="logo" className="h-full w-full object-cover" />
+                    : <span>{initials}</span>}
+                </div>
+                <div className="pb-1">
+                  <h2 className="text-2xl font-bold">{form.company_name || "Unnamed Company"}</h2>
+                  {filled(form.tagline) && <p className="text-sm text-muted-foreground mt-0.5">{form.tagline}</p>}
+                  <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    {filled(form.stage) && (
+                      <span className="rounded-full bg-brand/10 text-brand text-xs px-2.5 py-0.5 font-medium">{form.stage}</span>
+                    )}
+                    {filled(form.sector) && (
+                      <span className="rounded-full bg-violet/10 text-violet text-xs px-2.5 py-0.5 font-medium">{form.sector}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {filled(form.description) && (
+            <div className="mt-4 rounded-xl border border-border/60 bg-card p-5 shadow-card print-card">
+              <div className="text-sm font-semibold mb-2">About</div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{form.description}</p>
+            </div>
+          )}
+
+          {pairs.length > 0 && (
+            <div className="mt-4 rounded-xl border border-border/60 bg-card p-5 shadow-card print-card">
+              <div className="text-sm font-semibold mb-3">Key details</div>
+              <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2.5">
+                {pairs.map(([label, val]) => (
+                  <div key={label} className="flex items-center justify-between border-b border-border/40 pb-2">
+                    <span className="text-xs text-muted-foreground">{label}</span>
+                    <span className="text-sm font-medium">{val}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {(filled(form.problem) || filled(form.solution)) && (
+            <div className="mt-4 grid sm:grid-cols-2 gap-4">
+              {filled(form.problem) && (
+                <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card print-card">
+                  <div className="text-sm font-semibold mb-2">Problem</div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{form.problem}</p>
+                </div>
+              )}
+              {filled(form.solution) && (
+                <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card print-card">
+                  <div className="text-sm font-semibold mb-2">Solution</div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{form.solution}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {(filled(form.traction) || filled(form.business_model) || filled(form.use_of_funds) || filled(form.why_now) || filled(form.competitive_advantage)) && (
+            <div className="mt-4 space-y-4">
+              {[
+                ["Traction highlights", form.traction],
+                ["Business model", form.business_model],
+                ["Use of funds", form.use_of_funds],
+                ["Why now?", form.why_now],
+                ["Competitive advantage", form.competitive_advantage],
+              ].filter(([, v]) => filled(v)).map(([label, val]) => (
+                <div key={label as string} className="rounded-xl border border-border/60 bg-card p-5 shadow-card print-card">
+                  <div className="text-sm font-semibold mb-2">{label}</div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{val}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {(filled(form.founder_name) || filled(form.founder_email)) && (
+            <div className="mt-4 rounded-xl border border-border/60 bg-card p-5 shadow-card print-card">
+              <div className="text-sm font-semibold mb-3">Contact</div>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {[
+                  ["Founder", form.founder_name],
+                  ["Email", form.founder_email],
+                  ["LinkedIn", form.founder_linkedin],
+                  ["Co-founder", form.cofounder_name],
+                  ["Co-founder LinkedIn", form.cofounder_linkedin],
+                ].filter(([, v]) => filled(v)).map(([label, val]) => (
+                  <div key={label as string}>
+                    <div className="text-xs text-muted-foreground">{label}</div>
+                    <div className="text-sm font-medium mt-0.5">{val}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {startup?.id && (
+            <div className="mt-4 no-print">
+              <TeamMembersSection startupId={startup.id} readOnly />
+            </div>
+          )}
+        </div>
+      </>
+    );
+  }
+
+  // ── Edit Mode ──────────────────────────────────────────────────────
+
+  const SaveBtn = ({ full = false }: { full?: boolean }) => (
+    <button
+      onClick={handleSave}
+      disabled={saving}
+      className={cn(
+        "inline-flex items-center gap-2 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-60",
+        full && "w-full justify-center",
+      )}
+    >
+      {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+      Save changes
+    </button>
+  );
+
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto">
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{startup ? "Company Profile" : "Create your profile"}</h1>
-          <div className="text-sm text-muted-foreground">{startup ? "Edit your startup details, team, and pitch." : "Set up your startup profile so investors know who you are."}</div>
+          <h1 className="text-2xl font-semibold tracking-tight">{startup ? "Edit profile" : "Create your profile"}</h1>
+          <div className="text-sm text-muted-foreground">
+            {startup ? "Edit your startup details, team, and pitch." : "Set up your startup profile so investors know who you are."}
+          </div>
         </div>
-        <SaveBtn />
+        <div className="flex items-center gap-2">
+          {startup && (
+            <button
+              onClick={() => setMode("view")}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent"
+            >
+              <Eye className="h-4 w-4" /> View profile
+            </button>
+          )}
+          <SaveBtn />
+        </div>
       </div>
 
       {/* Hero card */}
@@ -321,138 +475,136 @@ function Profile() {
         </div>
       </div>
 
-      <div className="mt-5 grid lg:grid-cols-3 gap-4">
-        {/* Left: form sections */}
-        <div className="lg:col-span-2 space-y-4">
-
-          {/* SECTION 1 — Company basics */}
-          <FormSection title="Company basics">
-            <Field label="Company name *" value={form.company_name} onChange={field("company_name")} placeholder="Atlas Robotics" />
-            <Field label="Tagline" value={form.tagline} onChange={field("tagline")} placeholder="One line that explains your company" />
-            <div className="grid sm:grid-cols-2 gap-3">
-              <Field label="Website" value={form.website} onChange={field("website")} placeholder="https://example.com" />
-              <Field label="Founded year" value={form.founded_year} onChange={field("founded_year")} placeholder="2022" type="number" />
-              <Field label="Country / HQ" value={form.country} onChange={field("country")} placeholder="San Francisco, USA" />
-              <Field label="Team size" value={form.team_size} onChange={field("team_size")} placeholder="12" type="number" />
-              <Field label="Sector" value={form.sector} onChange={field("sector")} placeholder="B2B SaaS, Fintech, AI..." />
-              <div>
-                <label className="text-xs text-muted-foreground">Stage</label>
-                <select value={form.stage} onChange={field("stage")} className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50">
-                  <option value="">Select stage</option>
-                  {STAGES.map((s) => <option key={s}>{s}</option>)}
-                </select>
-              </div>
-            </div>
-          </FormSection>
-
-          {/* SECTION 2 — Fundraising */}
-          <FormSection title="Fundraising">
-            <div className="grid sm:grid-cols-2 gap-3">
-              <Field label="Funding target" value={form.funding_target} onChange={field("funding_target")} placeholder="$5M" />
-              <Field label="Pre-money valuation" value={form.valuation} onChange={field("valuation")} placeholder="$20M" />
-              <Field label="Previous funding raised" value={form.previous_funding} onChange={field("previous_funding")} placeholder="$500K pre-seed" />
-              <Field label="Current investors" value={form.current_investors} onChange={field("current_investors")} placeholder="Y Combinator, Sequoia" />
-            </div>
-            <TextArea label="Use of funds" value={form.use_of_funds} onChange={field("use_of_funds")} placeholder="40% engineering, 30% sales, 30% ops" rows={2} />
-          </FormSection>
-
-          {/* SECTION 3 — Traction & metrics */}
-          <FormSection title="Traction & metrics">
-            <div className="grid sm:grid-cols-2 gap-3">
-              <Field label="Revenue / ARR" value={form.revenue} onChange={field("revenue")} placeholder="$1.2M ARR" />
-              <Field label="Growth rate" value={form.growth_rate} onChange={field("growth_rate")} placeholder="+15% MoM" />
-              <Field label="Customer count" value={form.customer_count} onChange={field("customer_count")} placeholder="500 paying customers" />
-              <Field label="Key metric" value={form.key_metric} onChange={field("key_metric")} placeholder="Your most important metric" />
-            </div>
-            <TextArea label="Traction highlights" value={form.traction} onChange={field("traction")} placeholder="Key traction highlights..." rows={3} />
-          </FormSection>
-
-          {/* SECTION 4 — Pitch content */}
-          <FormSection title="Pitch content">
-            <TextArea label="Problem" value={form.problem} onChange={field("problem")} placeholder="What problem are you solving?" rows={4} />
-            <TextArea label="Solution" value={form.solution} onChange={field("solution")} placeholder="How does your product solve it?" rows={4} />
-            <TextArea label="Business model" value={form.business_model} onChange={field("business_model")} placeholder="How do you make money?" rows={3} />
-            <Field label="Market size" value={form.market_size} onChange={field("market_size") as any} placeholder="$50B TAM, $5B SAM…" />
-            <TextArea label="Competitive advantage" value={form.competitive_advantage} onChange={field("competitive_advantage")} placeholder="What makes you hard to replicate?" rows={3} />
-            <TextArea label="Why now?" value={form.why_now} onChange={field("why_now")} placeholder="What tailwind or market shift makes this the right time?" rows={2} />
-          </FormSection>
-
-          {/* SECTION 5 — Contact */}
-          <FormSection title="Contact">
-            <div className="grid sm:grid-cols-2 gap-3">
-              <Field label="Founder name" value={form.founder_name} onChange={field("founder_name")} placeholder="Jane Smith" />
-              <Field label="Founder email" value={form.founder_email} onChange={field("founder_email")} placeholder="jane@startup.com" type="email" />
-              <Field label="Founder LinkedIn" value={form.founder_linkedin} onChange={field("founder_linkedin")} placeholder="linkedin.com/in/janesmith" />
-              <Field label="Co-founder name" value={form.cofounder_name} onChange={field("cofounder_name")} placeholder="Alex Lee" />
-              <Field label="Co-founder LinkedIn" value={form.cofounder_linkedin} onChange={field("cofounder_linkedin")} placeholder="linkedin.com/in/alexlee" />
-            </div>
-          </FormSection>
-
-          <div className="pb-2">
-            <SaveBtn full />
-          </div>
-        </div>
-
-        {/* Right col */}
-        <div className="space-y-4">
-          {/* Pitch deck */}
-          <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-            <div className="text-sm font-semibold mb-3">Pitch deck</div>
-            {deckName ? (
-              <div className="rounded-lg border border-border/60 bg-accent/30 p-3">
-                <div className="text-sm font-medium truncate">{deckName}</div>
-                <div className="text-xs text-muted-foreground mt-0.5 mb-2">Uploaded</div>
-                <label className="text-xs text-brand hover:underline cursor-pointer">
-                  Replace
-                  <input type="file" accept=".pdf,.pptx,.key" className="sr-only" onChange={(e) => e.target.files?.[0] && handleDeckUpload(e.target.files[0])} />
-                </label>
-              </div>
-            ) : (
-              <label className="rounded-xl border-2 border-dashed border-border/80 bg-card p-5 text-center cursor-pointer hover:border-brand/50 hover:bg-accent/20 transition-colors block">
-                {deckUploading
-                  ? <Loader2 className="h-5 w-5 text-muted-foreground mx-auto animate-spin" />
-                  : <Upload className="h-5 w-5 text-muted-foreground mx-auto" />}
-                <div className="text-sm font-medium mt-2">{deckUploading ? "Uploading…" : "Upload pitch deck"}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">PDF, PPTX or Keynote</div>
-                <input type="file" accept=".pdf,.pptx,.key" className="sr-only" onChange={(e) => e.target.files?.[0] && handleDeckUpload(e.target.files[0])} />
-              </label>
-            )}
-          </div>
-
-          {/* Stats preview */}
-          <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-            <div className="text-sm font-semibold mb-3">Overview</div>
-            <div className="space-y-2.5">
-              {([
-                [Globe, "Stage", form.stage],
-                [Users, "Team", form.team_size],
-                [Building2, "Sector", form.sector],
-              ] as [any, string, string][]).map(([Icon, label, val]) => (
-                <div key={label} className="flex items-center gap-2.5 text-sm">
-                  <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <span className="text-muted-foreground text-xs">{label}</span>
-                  <span className="ml-auto font-medium text-sm">{val || "—"}</span>
-                </div>
-              ))}
-              {form.growth_rate && (
-                <div className="flex items-center gap-2.5 text-sm">
-                  <span className="text-muted-foreground text-xs">Growth</span>
-                  <span className="ml-auto font-medium text-sm text-success">{form.growth_rate}</span>
-                </div>
-              )}
-              {form.customer_count && (
-                <div className="flex items-center gap-2.5 text-sm">
-                  <span className="text-muted-foreground text-xs">Customers</span>
-                  <span className="ml-auto font-medium text-sm">{form.customer_count}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+      {/* STEP 6: Quick setup / Full details tabs */}
+      <div className="mt-5 flex items-center gap-1 rounded-lg border border-border/60 bg-muted/30 p-1 w-fit">
+        <button
+          onClick={() => setTab("quick")}
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors",
+            tab === "quick" ? "bg-background text-foreground font-medium shadow-xs" : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          <Zap className="h-3.5 w-3.5" /> Quick setup
+        </button>
+        <button
+          onClick={() => setTab("full")}
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors",
+            tab === "full" ? "bg-background text-foreground font-medium shadow-xs" : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          <AlignLeft className="h-3.5 w-3.5" /> Full details
+        </button>
       </div>
 
-      {/* Team members */}
-      {startup?.id && <TeamMembersSection startupId={startup.id} />}
+      {tab === "quick" ? (
+        // QUICK SETUP: 5 fields
+        <div className="mt-4 grid lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2">
+            <FormSection title="Quick setup">
+              <Field label="Company name" value={form.company_name} onChange={field("company_name")} placeholder="Atlas Robotics" />
+              <Field label="Tagline" value={form.tagline} onChange={field("tagline")} placeholder="One line that explains your company" />
+              <Field label="Website" value={form.website} onChange={field("website")} placeholder="https://example.com" />
+              <Field label="Country / HQ" value={form.country} onChange={field("country")} placeholder="San Francisco, USA" />
+              <Field label="Sector" value={form.sector} onChange={field("sector")} placeholder="B2B SaaS, Fintech, AI..." />
+              <div className="pt-2">
+                <SaveBtn full />
+              </div>
+            </FormSection>
+          </div>
+          <div>
+            <RightCol
+              form={form}
+              deckName={deckName}
+              deckUploading={deckUploading}
+              onDeckUpload={handleDeckUpload}
+            />
+          </div>
+        </div>
+      ) : (
+        // FULL DETAILS: all sections
+        <div className="mt-4 grid lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2 space-y-4">
+            <FormSection title="Company basics">
+              <Field label="Company name" value={form.company_name} onChange={field("company_name")} placeholder="Atlas Robotics" />
+              <Field label="Tagline" value={form.tagline} onChange={field("tagline")} placeholder="One line that explains your company" />
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Field label="Website" value={form.website} onChange={field("website")} placeholder="https://example.com" />
+                <Field label="Founded year" value={form.founded_year} onChange={field("founded_year")} placeholder="2022" />
+                <Field label="Country / HQ" value={form.country} onChange={field("country")} placeholder="San Francisco, USA" />
+                <Field label="Team size" value={form.team_size} onChange={field("team_size")} placeholder="12" />
+                <Field label="Sector" value={form.sector} onChange={field("sector")} placeholder="B2B SaaS, Fintech, AI..." />
+                <div>
+                  <label className="text-xs text-muted-foreground">Stage</label>
+                  <select value={form.stage} onChange={field("stage")} className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50">
+                    <option value="">Select stage</option>
+                    {STAGES.map((s) => <option key={s}>{s}</option>)}
+                  </select>
+                </div>
+              </div>
+              <TextArea label="Description" value={form.description} onChange={field("description")} placeholder="What does your company do?" rows={3} />
+            </FormSection>
+
+            <FormSection title="Fundraising">
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Field label="Funding target" value={form.funding_target} onChange={field("funding_target")} placeholder="$5M" />
+                <Field label="Pre-money valuation" value={form.valuation} onChange={field("valuation")} placeholder="$20M" />
+                <Field label="Previous funding raised" value={form.previous_funding} onChange={field("previous_funding")} placeholder="$500K pre-seed" />
+                <Field label="Current investors" value={form.current_investors} onChange={field("current_investors")} placeholder="Y Combinator, Sequoia" />
+              </div>
+              <TextArea label="Use of funds" value={form.use_of_funds} onChange={field("use_of_funds")} placeholder="40% engineering, 30% sales, 30% ops" rows={2} />
+            </FormSection>
+
+            <FormSection title="Traction & metrics">
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Field label="Revenue / ARR" value={form.revenue} onChange={field("revenue")} placeholder="$1.2M ARR" />
+                <Field label="Growth rate" value={form.growth_rate} onChange={field("growth_rate")} placeholder="+15% MoM" />
+                <Field label="Customer count" value={form.customer_count} onChange={field("customer_count")} placeholder="500 paying customers" />
+                <Field label="Key metric" value={form.key_metric} onChange={field("key_metric")} placeholder="Your most important metric" />
+              </div>
+              <TextArea label="Traction highlights" value={form.traction} onChange={field("traction")} placeholder="Key traction highlights..." rows={3} />
+            </FormSection>
+
+            <FormSection title="Pitch content">
+              <TextArea label="Problem" value={form.problem} onChange={field("problem")} placeholder="What problem are you solving?" rows={4} />
+              <TextArea label="Solution" value={form.solution} onChange={field("solution")} placeholder="How does your product solve it?" rows={4} />
+              <TextArea label="Business model" value={form.business_model} onChange={field("business_model")} placeholder="How do you make money?" rows={3} />
+              <Field label="Market size" value={form.market_size} onChange={field("market_size") as any} placeholder="$50B TAM, $5B SAM…" />
+              <TextArea label="Competitive advantage" value={form.competitive_advantage} onChange={field("competitive_advantage")} placeholder="What makes you hard to replicate?" rows={3} />
+              <TextArea label="Why now?" value={form.why_now} onChange={field("why_now")} placeholder="What tailwind or market shift makes this the right time?" rows={2} />
+            </FormSection>
+
+            <FormSection title="Contact">
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Field label="Founder name" value={form.founder_name} onChange={field("founder_name")} placeholder="Jane Smith" />
+                <Field label="Founder email" value={form.founder_email} onChange={field("founder_email")} placeholder="jane@startup.com" />
+                <Field label="Founder LinkedIn" value={form.founder_linkedin} onChange={field("founder_linkedin")} placeholder="linkedin.com/in/janesmith" />
+                <Field label="Co-founder name" value={form.cofounder_name} onChange={field("cofounder_name")} placeholder="Alex Lee" />
+                <Field label="Co-founder LinkedIn" value={form.cofounder_linkedin} onChange={field("cofounder_linkedin")} placeholder="linkedin.com/in/alexlee" />
+              </div>
+            </FormSection>
+
+            <div className="pb-2">
+              <SaveBtn full />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <RightCol
+              form={form}
+              deckName={deckName}
+              deckUploading={deckUploading}
+              onDeckUpload={handleDeckUpload}
+            />
+          </div>
+        </div>
+      )}
+
+      {startup?.id && (
+        <div className="mt-8">
+          <TeamMembersSection startupId={startup.id} />
+        </div>
+      )}
 
       {!startup?.id && !isLoading && (
         <div className="mt-6 rounded-xl border border-dashed border-border/60 bg-card p-6 text-center text-sm text-muted-foreground">
@@ -463,7 +615,73 @@ function Profile() {
   );
 }
 
-// ── Reusable field components ──────────────────────────────────────────────
+// ── Right column (shared between tabs) ────────────────────────────
+
+function RightCol({ form, deckName, deckUploading, onDeckUpload }: {
+  form: FormState;
+  deckName: string | null;
+  deckUploading: boolean;
+  onDeckUpload: (f: File) => void;
+}) {
+  return (
+    <>
+      <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+        <div className="text-sm font-semibold mb-3">Pitch deck</div>
+        {deckName ? (
+          <div className="rounded-lg border border-border/60 bg-accent/30 p-3">
+            <div className="text-sm font-medium truncate">{deckName}</div>
+            <div className="text-xs text-muted-foreground mt-0.5 mb-2">Uploaded</div>
+            <label className="text-xs text-brand hover:underline cursor-pointer">
+              Replace
+              <input type="file" accept=".pdf,.pptx,.key" className="sr-only" onChange={(e) => e.target.files?.[0] && onDeckUpload(e.target.files[0])} />
+            </label>
+          </div>
+        ) : (
+          <label className="rounded-xl border-2 border-dashed border-border/80 bg-card p-5 text-center cursor-pointer hover:border-brand/50 hover:bg-accent/20 transition-colors block">
+            {deckUploading
+              ? <Loader2 className="h-5 w-5 text-muted-foreground mx-auto animate-spin" />
+              : <Upload className="h-5 w-5 text-muted-foreground mx-auto" />}
+            <div className="text-sm font-medium mt-2">{deckUploading ? "Uploading…" : "Upload pitch deck"}</div>
+            <div className="text-xs text-muted-foreground mt-0.5">PDF, PPTX or Keynote</div>
+            <input type="file" accept=".pdf,.pptx,.key" className="sr-only" onChange={(e) => e.target.files?.[0] && onDeckUpload(e.target.files[0])} />
+          </label>
+        )}
+      </div>
+
+      <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+        <div className="text-sm font-semibold mb-3">Overview</div>
+        <div className="space-y-2.5">
+          {([
+            [Globe, "Stage", form.stage],
+            [Users, "Team", form.team_size],
+            [Building2, "Sector", form.sector],
+          ] as [any, string, string][]).map(([Icon, label, val]) => (
+            <div key={label} className="flex items-center gap-2.5 text-sm">
+              <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
+              <span className="text-muted-foreground text-xs">{label}</span>
+              <span className="ml-auto font-medium text-sm">{val || "—"}</span>
+            </div>
+          ))}
+          {form.growth_rate && (
+            <div className="flex items-center gap-2.5 text-sm">
+              <span className="text-muted-foreground text-xs">Growth</span>
+              <span className="ml-auto font-medium text-sm text-success">{form.growth_rate}</span>
+            </div>
+          )}
+          {form.customer_count && (
+            <div className="flex items-center gap-2.5 text-sm">
+              <span className="text-muted-foreground text-xs">Customers</span>
+              <span className="ml-auto font-medium text-sm">{form.customer_count}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ── Reusable field components ──────────────────────────────────────
+
 function FormSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
@@ -511,10 +729,10 @@ function TextArea({ label, value, onChange, placeholder, rows = 3 }: {
   );
 }
 
-// ── Team Members Section ───────────────────────────────────────────────────
-function TeamMembersSection({ startupId }: { startupId: string }) {
-  const queryClient = useQueryClient();
+// ── Team Members Section ───────────────────────────────────────────
 
+function TeamMembersSection({ startupId, readOnly = false }: { startupId: string; readOnly?: boolean }) {
+  const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -528,25 +746,14 @@ function TeamMembersSection({ startupId }: { startupId: string }) {
     queryKey: ["team-members", startupId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("team_members")
-        .select("*")
-        .eq("startup_id", startupId)
-        .order("display_order", { ascending: true });
+        .from("team_members").select("*").eq("startup_id", startupId).order("display_order", { ascending: true });
       if (error) throw error;
       return (data ?? []) as TeamMember[];
     },
   });
 
   const openEdit = (m: TeamMember) => {
-    setMf({
-      full_name: m.full_name,
-      role: m.role,
-      email: m.email ?? "",
-      linkedin_url: m.linkedin_url ?? "",
-      bio: m.bio ?? "",
-      tag: m.tag ?? "Employee",
-      photo_url: m.photo_url ?? "",
-    });
+    setMf({ full_name: m.full_name, role: m.role, email: m.email ?? "", linkedin_url: m.linkedin_url ?? "", bio: m.bio ?? "", tag: m.tag ?? "Employee", photo_url: m.photo_url ?? "" });
     setEditingId(m.id);
     setShowForm(true);
   };
@@ -574,29 +781,19 @@ function TeamMembersSection({ startupId }: { startupId: string }) {
   };
 
   const handleSubmit = async () => {
-    if (!mf.full_name.trim() || !mf.role.trim()) {
-      toast.error("Name and role are required");
-      return;
-    }
     setSubmitting(true);
     try {
       const payload = {
-        full_name: mf.full_name,
-        role: mf.role,
-        email: mf.email || null,
-        linkedin_url: mf.linkedin_url || null,
-        bio: mf.bio || null,
-        tag: mf.tag || null,
-        photo_url: mf.photo_url || null,
+        full_name: mf.full_name, role: mf.role, email: mf.email || null,
+        linkedin_url: mf.linkedin_url || null, bio: mf.bio || null,
+        tag: mf.tag || null, photo_url: mf.photo_url || null,
       };
       if (editingId) {
         const { error } = await supabase.from("team_members").update(payload).eq("id", editingId);
         if (error) throw error;
         toast.success("Team member updated");
       } else {
-        const { error } = await supabase
-          .from("team_members")
-          .insert({ ...payload, startup_id: startupId, display_order: members.length });
+        const { error } = await supabase.from("team_members").insert({ ...payload, startup_id: startupId, display_order: members.length });
         if (error) throw error;
         toast.success("Team member added");
       }
@@ -625,26 +822,26 @@ function TeamMembersSection({ startupId }: { startupId: string }) {
   };
 
   const tagColor: Record<string, string> = {
-    Founder: "bg-violet/10 text-violet",
-    "Co-Founder": "bg-violet/10 text-violet",
-    Advisor: "bg-warning/10 text-warning",
-    Employee: "bg-brand/10 text-brand",
+    Founder: "bg-violet/10 text-violet", "Co-Founder": "bg-violet/10 text-violet",
+    Advisor: "bg-warning/10 text-warning", Employee: "bg-brand/10 text-brand",
     "Board Member": "bg-success/10 text-success",
   };
 
   return (
-    <div className="mt-8">
+    <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold tracking-tight">Team members</h2>
-        <button
-          onClick={() => { closeForm(); setShowForm((v) => !v); }}
-          className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent"
-        >
-          <Plus className="h-3.5 w-3.5" /> Add member
-        </button>
+        {!readOnly && (
+          <button
+            onClick={() => { closeForm(); setShowForm((v) => !v); }}
+            className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent"
+          >
+            <Plus className="h-3.5 w-3.5" /> Add member
+          </button>
+        )}
       </div>
 
-      {showForm && (
+      {!readOnly && showForm && (
         <div className="mb-5 rounded-xl border border-brand/30 bg-card p-5 shadow-card">
           <div className="flex items-center justify-between mb-4">
             <div className="text-sm font-semibold">{editingId ? "Edit team member" : "New team member"}</div>
@@ -664,14 +861,13 @@ function TeamMembersSection({ startupId }: { startupId: string }) {
               </label>
               <span className="text-xs text-muted-foreground">Click avatar to upload photo</span>
             </div>
-
             <div className="grid sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-muted-foreground">Full name *</label>
+                <label className="text-xs text-muted-foreground">Full name</label>
                 <input value={mf.full_name} onChange={setField("full_name")} placeholder="Jane Smith" className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground">Role / title *</label>
+                <label className="text-xs text-muted-foreground">Role / title</label>
                 <input value={mf.role} onChange={setField("role")} placeholder="CTO" className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
               </div>
               <div>
@@ -682,7 +878,7 @@ function TeamMembersSection({ startupId }: { startupId: string }) {
               </div>
               <div>
                 <label className="text-xs text-muted-foreground">Email</label>
-                <input value={mf.email} onChange={setField("email")} type="email" placeholder="jane@company.com" className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
+                <input value={mf.email} onChange={setField("email")} placeholder="jane@company.com" className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
               </div>
               <div className="sm:col-span-2">
                 <label className="text-xs text-muted-foreground">LinkedIn URL</label>
@@ -701,7 +897,6 @@ function TeamMembersSection({ startupId }: { startupId: string }) {
                 />
               </div>
             </div>
-
             <div className="flex justify-end gap-2 pt-1">
               <button onClick={closeForm} className="rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent">Cancel</button>
               <button
@@ -719,9 +914,7 @@ function TeamMembersSection({ startupId }: { startupId: string }) {
 
       {isLoading ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="rounded-xl border border-border/60 bg-card p-4 h-24 animate-pulse" />
-          ))}
+          {[1, 2, 3].map((i) => <div key={i} className="rounded-xl border border-border/60 bg-card p-4 h-24 animate-pulse" />)}
         </div>
       ) : members.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border/60 bg-card p-8 text-center">
@@ -737,9 +930,7 @@ function TeamMembersSection({ startupId }: { startupId: string }) {
               <div key={m.id} className="rounded-xl border border-border/60 bg-card p-4 shadow-card">
                 <div className="flex items-start gap-3">
                   <div className="grid h-10 w-10 place-items-center rounded-full bg-accent border border-border/60 overflow-hidden text-xs font-semibold shrink-0">
-                    {m.photo_url
-                      ? <img src={m.photo_url} alt={m.full_name} className="h-full w-full object-cover" />
-                      : inits}
+                    {m.photo_url ? <img src={m.photo_url} alt={m.full_name} className="h-full w-full object-cover" /> : inits}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-semibold truncate">{m.full_name}</div>
@@ -750,18 +941,20 @@ function TeamMembersSection({ startupId }: { startupId: string }) {
                       </span>
                     )}
                   </div>
-                  <div className="flex gap-1 shrink-0">
-                    <button onClick={() => openEdit(m)} className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground">
-                      <Pencil className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(m.id)}
-                      disabled={deletingId === m.id}
-                      className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive disabled:opacity-40"
-                    >
-                      {deletingId === m.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
-                    </button>
-                  </div>
+                  {!readOnly && (
+                    <div className="flex gap-1 shrink-0">
+                      <button onClick={() => openEdit(m)} className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground">
+                        <Pencil className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(m.id)}
+                        disabled={deletingId === m.id}
+                        className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive disabled:opacity-40"
+                      >
+                        {deletingId === m.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                      </button>
+                    </div>
+                  )}
                 </div>
                 {m.bio && <div className="mt-2 text-xs text-muted-foreground line-clamp-2">{m.bio}</div>}
               </div>
