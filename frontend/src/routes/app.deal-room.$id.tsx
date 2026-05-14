@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type FormEvent, type ReactNode } from "react";
 import { formatDistanceToNow, format } from "date-fns";
 import { toast } from "sonner";
 import {
@@ -15,7 +15,6 @@ import { AIChat } from "@/components/ai/AIChat";
 import { DealRoomChat } from "@/components/app/DealRoomChat";
 import { DDChecklist } from "@/components/app/DDChecklist";
 import { Dropzone } from "@/components/app/Dropzone";
-import { InterviewRoom } from "@/components/app/InterviewRoom";
 import { useAuth } from "@/lib/auth";
 import { supabase, logActivity, createNotification } from "@/lib/supabase";
 import { ReviewTab } from "@/components/app/ReviewTab";
@@ -49,7 +48,7 @@ function DealRoom() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const userName = user?.name ?? "User";
+  const userName = user?.fullName ?? "User";
 
   // ── Supabase queries ──────────────────────────────────────────
   const { data: room } = useQuery({
@@ -62,7 +61,8 @@ function DealRoom() {
         .select("*, startups(*)")
         .eq("id", dealRoomId)
         .maybeSingle();
-      return data ?? null;
+      if (error) throw error;
+      return data;
     },
   });
 
@@ -172,10 +172,8 @@ function DealRoom() {
   const isInvestor = memberRow ? (memberRow.role === "investor" || memberRow.role === "viewer") : user?.role === "investor";
   const isFounder = memberRow ? memberRow.role === "founder" : user?.role !== "investor";
 
-  const dealRoomName = (room as any)?.startups?.company_name
-    ? `${(room as any).startups.company_name} — Deal Room`
-    : "Deal Room";
-  const companyName = (room as any)?.startups?.company_name ?? "Unknown Company";
+  const startupCompanyName = (room as any)?.startups?.company_name;
+  const companyName = startupCompanyName ?? "Unknown Company";
 
   const visibleTabs = tabs.filter((t) => {
     if (isInvestor) return ["overview", "documents", "qa", "notes", "decision"].includes(t.k);
@@ -211,8 +209,9 @@ function DealRoom() {
     );
   }
 
-  try { return (
-    <div className="flex h-[calc(100vh-4rem)] relative">
+  try {
+    return (
+      <div className="flex h-[calc(100vh-4rem)] relative">
       {/* Sidebar */}
       <aside className="w-[260px] border-r border-border/60 bg-sidebar flex flex-col">
         <div className="p-5 border-b border-border/60">
@@ -323,17 +322,15 @@ function DealRoom() {
         </>
       )}
     </div>
-  ); } catch (error) {
+  );
+  } catch (error) {
     console.error("DealRoom render error:", error);
     return (
-      <div className="flex h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 p-8 text-center">
-        <p className="text-muted-foreground">Something went wrong loading this deal room.</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="text-brand underline text-sm"
-        >
-          Reload
-        </button>
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
+        <div className="rounded-2xl border border-border/60 bg-card p-6 text-center">
+          <div className="text-sm font-medium text-destructive">Something went wrong loading the deal room.</div>
+          <div className="text-xs text-muted-foreground mt-2">Try refreshing the page or contact support.</div>
+        </div>
       </div>
     );
   }
@@ -446,7 +443,7 @@ function DealRoomOverview({
     progressSteps.length - 1,
   );
 
-  const addTask = async (e: React.FormEvent) => {
+  const addTask = async (e: FormEvent) => {
     e.preventDefault();
     if (!taskTitle.trim() || !user?.id) return;
     setSavingTask(true);
@@ -725,7 +722,7 @@ function DealRoomOverview({
   );
 }
 
-function Metric({ icon: Icon, label, value }: { icon: any; label: string; value: React.ReactNode }) {
+function Metric({ icon: Icon, label, value }: { icon: any; label: string; value: ReactNode }) {
   return (
     <div className="rounded-lg border border-border/60 bg-background p-3">
       <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -1062,7 +1059,7 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
     },
   });
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
     if (!body.trim() || !userId) return;
     setSaving(true);
@@ -1195,7 +1192,7 @@ function MeetingsTab({ dealRoomId, userId }: { dealRoomId: string; userId: strin
     },
   });
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
     if (!f.title || !f.scheduledAt || !userId) return;
     setSaving(true);
@@ -1410,7 +1407,7 @@ function Decision({ isInvestor, dealRoomId, userId, queryClient }: { isInvestor:
         <>
           <div className="mt-6 grid grid-cols-3 gap-3">
             {([
-              ["accept", "Accept", "Move to term sheet", ThumbsUp, "success"],
+              ["accepted", "Accept", "Move to term sheet", ThumbsUp, "success"],
               ["hold", "Request info", "Ask for more diligence", HelpCircle, "warning"],
               ["pass", "Pass", "Decline this round", ThumbsDown, "destructive"],
             ] as const).map(([k, l, sub, I, c]) => (
@@ -1551,7 +1548,7 @@ function QA({
         metadata: { authorName: userName, authorRole: "Investor" },
       })
       .select("id")
-      .single();
+      .maybeSingle();
     if (data?.id) {
       await logActivity(dealRoomId, userId, "Asked a structured Q&A question", { question: text });
       setQuestion("");
@@ -1602,7 +1599,8 @@ function QA({
         .select("user_id")
         .eq("deal_room_id", dealRoomId)
         .neq("user_id", userId!);
-      for (const m of members ?? []) {
+      const membersList = members ?? [];
+      for (const m of membersList) {
         await createNotification(
           m.user_id,
           "New Q&A message",
