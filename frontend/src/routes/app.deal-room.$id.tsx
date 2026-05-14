@@ -56,13 +56,12 @@ function DealRoom() {
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("deal_rooms")
         .select("*, startups(*)")
         .eq("id", dealRoomId)
-        .single();
-      if (error) throw error;
-      return data;
+        .maybeSingle();
+      return data ?? null;
     },
   });
 
@@ -190,13 +189,13 @@ function DealRoom() {
       body: q.question,
       is_qa: true,
       metadata: { side: q.side, authorRole: q.authorRole, authorName: q.authorName },
-    }).select("id").single();
+    }).select("id").maybeSingle();
     queryClient.invalidateQueries({ queryKey: ["deal-room-qa", dealRoomId] });
     return data?.id;
   };
 
   const handleSaveAnswer = async (questionId: string, answer: string) => {
-    const { data: existing } = await supabase.from("messages").select("metadata").eq("id", questionId).single();
+    const { data: existing } = await supabase.from("messages").select("metadata").eq("id", questionId).maybeSingle();
     await supabase.from("messages").update({
       metadata: { ...(existing?.metadata ?? {}), answer, answeredAt: new Date().toISOString(), editedAt: new Date().toISOString() },
     }).eq("id", questionId);
@@ -211,7 +210,7 @@ function DealRoom() {
     );
   }
 
-  return (
+  try { return (
     <div className="flex h-[calc(100vh-4rem)] relative">
       {/* Sidebar */}
       <aside className="w-[260px] border-r border-border/60 bg-sidebar flex flex-col">
@@ -323,7 +322,20 @@ function DealRoom() {
         </>
       )}
     </div>
-  );
+  ); } catch (error) {
+    console.error("DealRoom render error:", error);
+    return (
+      <div className="flex h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 p-8 text-center">
+        <p className="text-muted-foreground">Something went wrong loading this deal room.</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="text-brand underline text-sm"
+        >
+          Reload
+        </button>
+      </div>
+    );
+  }
 }
 
 // ── Deal Room Overview (unified for founder + investor) ───────────
@@ -1367,7 +1379,7 @@ function QA({ dealRoomId, userId, userName }: { dealRoomId: string; userId: stri
           if (msg.private_to_org) return;
           let senderName = userName;
           if (msg.sender_id !== userId) {
-            const { data } = await supabase.from("users").select("full_name").eq("id", msg.sender_id).single();
+            const { data } = await supabase.from("users").select("full_name").eq("id", msg.sender_id).maybeSingle();
             senderName = data?.full_name ?? "Unknown";
           }
           setMsgs((xs) => xs.find((x) => x.id === msg.id) ? xs : [...xs, { ...msg, users: { full_name: senderName } }]);
@@ -1392,7 +1404,7 @@ function QA({ dealRoomId, userId, userName }: { dealRoomId: string; userId: stri
       .from("messages")
       .insert({ deal_room_id: dealRoomId, sender_id: userId, body: text, private_to_org: false })
       .select("id")
-      .single();
+      .maybeSingle();
     if (data?.id) {
       setMsgs((xs) => xs.map((x) => x.id === optId ? { ...x, id: data.id, _opt: false } : x));
       // Notify other deal room members
