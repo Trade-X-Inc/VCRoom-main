@@ -15,7 +15,6 @@ import { AIChat } from "@/components/ai/AIChat";
 import { DealRoomChat } from "@/components/app/DealRoomChat";
 import { DDChecklist } from "@/components/app/DDChecklist";
 import { Dropzone } from "@/components/app/Dropzone";
-import { InterviewRoom } from "@/components/app/InterviewRoom";
 import { useAuth } from "@/lib/auth";
 import { supabase, logActivity, createNotification } from "@/lib/supabase";
 import { ReviewTab } from "@/components/app/ReviewTab";
@@ -49,7 +48,7 @@ function DealRoom() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const userName = user?.name ?? "User";
+  const userName = user?.fullName ?? "User";
 
   // ── Supabase queries ──────────────────────────────────────────
   const { data: room } = useQuery({
@@ -61,7 +60,7 @@ function DealRoom() {
         .from("deal_rooms")
         .select("*, startups(*)")
         .eq("id", dealRoomId)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -191,13 +190,13 @@ function DealRoom() {
       body: q.question,
       is_qa: true,
       metadata: { side: q.side, authorRole: q.authorRole, authorName: q.authorName },
-    }).select("id").single();
+    }).select("id").maybeSingle();
     queryClient.invalidateQueries({ queryKey: ["deal-room-qa", dealRoomId] });
     return data?.id;
   };
 
   const handleSaveAnswer = async (questionId: string, answer: string) => {
-    const { data: existing } = await supabase.from("messages").select("metadata").eq("id", questionId).single();
+    const { data: existing } = await supabase.from("messages").select("metadata").eq("id", questionId).maybeSingle();
     await supabase.from("messages").update({
       metadata: { ...(existing?.metadata ?? {}), answer, answeredAt: new Date().toISOString(), editedAt: new Date().toISOString() },
     }).eq("id", questionId);
@@ -1500,7 +1499,7 @@ function QA({
           if (msg.private_to_org) return;
           let senderName = userName;
           if (msg.sender_id !== userId) {
-            const { data } = await supabase.from("users").select("full_name").eq("id", msg.sender_id).single();
+            const { data } = await supabase.from("users").select("full_name").eq("id", msg.sender_id).maybeSingle();
             senderName = data?.full_name ?? "Unknown";
           }
           setMsgs((xs) => xs.find((x) => x.id === msg.id) ? xs : [...xs, { ...msg, users: { full_name: senderName } }]);
@@ -1539,7 +1538,7 @@ function QA({
         metadata: { authorName: userName, authorRole: "Investor" },
       })
       .select("id")
-      .single();
+      .maybeSingle();
     if (data?.id) {
       await logActivity(dealRoomId, userId, "Asked a structured Q&A question", { question: text });
       setQuestion("");
@@ -1581,7 +1580,7 @@ function QA({
       .from("messages")
       .insert({ deal_room_id: dealRoomId, sender_id: userId, body: text, private_to_org: false, is_qa: false })
       .select("id")
-      .single();
+      .maybeSingle();
     if (data?.id) {
       setMsgs((xs) => xs.map((x) => x.id === optId ? { ...x, id: data.id, _opt: false } : x));
       // Notify other deal room members
