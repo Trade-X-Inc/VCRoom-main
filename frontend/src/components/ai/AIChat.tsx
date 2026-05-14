@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Sparkles, Send, Loader2, User } from "lucide-react";
-import { postJson } from "@/lib/backend";
+import { getAIAdvice } from "@/lib/advisor-fn";
 
 export interface ChatMsg {
   id: string;
@@ -10,14 +10,15 @@ export interface ChatMsg {
 }
 
 interface Props {
-  scope?: string;          // e.g. "Atlas Robotics deal room"
+  userId?: string;
+  scope?: string;
   starters?: string[];
   initialAssistant?: string;
   className?: string;
   compact?: boolean;
 }
 
-export function AIChat({ scope, starters, initialAssistant, className = "", compact = false }: Props) {
+export function AIChat({ userId, scope, starters, initialAssistant, className = "", compact = false }: Props) {
   const [msgs, setMsgs] = useState<ChatMsg[]>(() => [
     {
       id: "m0",
@@ -40,10 +41,12 @@ export function AIChat({ scope, starters, initialAssistant, className = "", comp
     setInput("");
     setMsgs((xs) => [...xs, { id: `u${Date.now()}`, role: "user", content: t, ts: Date.now() }]);
     setThinking(true);
-    const endpoint = scope?.toLowerCase().includes("deal room") ? "/api/ai/memo" : "/api/ai/summary";
     try {
-      const response = await postJson<{ summary?: string; memo?: string }>(endpoint, { context: `${scope ?? "workspace"}\n\nUser prompt: ${t}` });
-      const reply = response.memo || response.summary || "No AI response generated.";
+      const openAIKey = import.meta.env.VITE_OPENAI_API_KEY || "";
+      const history = msgs.slice(1).map((m) => ({ role: m.role as string, content: m.content }));
+      const contextPrefix = scope ? `Context: ${scope}\n\n` : "";
+      const result = await getAIAdvice({ data: { userId: userId || "", message: contextPrefix + t, history, openAIKey } });
+      const reply = result.reply || "No AI response generated.";
       setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: reply, ts: Date.now() }]);
     } catch (error) {
       setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: `AI request failed: ${error instanceof Error ? error.message : "unknown error"}`, ts: Date.now() }]);

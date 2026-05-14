@@ -78,7 +78,8 @@ export const getAIAdvice = createServerFn({ method: "POST" })
       "You are an expert fundraising advisor for startup founders.",
       context ? `\nCurrent context:\n${context}` : "",
       "\nHelp with: pipeline strategy, investor outreach, meeting prep, deal room advice.",
-      "Be specific, direct, and actionable. Max 150 words. End with one clear next action.",
+      "\nFormat responses using markdown: **bold** for key terms, bullet points for lists, short paragraphs.",
+      "Be specific, direct, and actionable. Max 150 words. End with one clear **next action**.",
     ].join("");
 
     try {

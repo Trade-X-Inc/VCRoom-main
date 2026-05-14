@@ -22,13 +22,13 @@ export const generateLinkedInMessage = createServerFn({ method: "POST" })
     if (!supabaseUrl || !serviceKey) throw new Error("Supabase not configured");
     const adminClient = createClient(supabaseUrl, serviceKey);
 
-    const { data: lead, error: leadErr } = await adminClient
+    const { data: lead } = await adminClient
       .from("vc_leads")
       .select("*")
       .eq("id", data.leadId)
-      .single();
-    if (leadErr || !lead) throw new Error("Lead not found");
-    if (lead.founder_id !== data.userId) throw new Error("Unauthorized");
+      .eq("founder_id", data.userId)
+      .maybeSingle();
+    if (!lead) throw new Error("Lead not found");
 
     const { data: startup } = await adminClient
       .from("startups")

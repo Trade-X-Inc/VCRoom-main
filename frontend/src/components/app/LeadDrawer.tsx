@@ -314,11 +314,14 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
 
   const handleGenerateEmail = async (type: "cold" | "followup") => {
     if (!user?.id || !lead) return;
+    console.log("Lead ID:", lead?.id);
+    console.log("User ID:", user?.id);
     setEmailType(type);
     setGeneratingEmail(true);
     setGeneratedEmail("");
     try {
       const openAIKey = import.meta.env.VITE_OPENAI_API_KEY || "";
+      console.log("OpenAI Key present:", !!openAIKey);
       const result = await generateOutreachEmail({ data: { userId: user.id, leadId: lead.id, type, openAIKey } });
       setGeneratedEmail(`Subject: ${result.subject}\n\n${result.body}`);
     } catch (err: any) {
@@ -371,7 +374,7 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
 
   const handleScheduleMeeting = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!lead?.id) return;
+    if (!lead?.id || !user?.id) return;
     setSchedulingMeeting(true);
     try {
       const { error } = await supabase.from("meetings").insert({
@@ -382,13 +385,28 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
         platform: mf.platform,
         meeting_link: mf.meeting_link || null,
         notes: mf.notes || null,
+        created_by: user.id,
       });
       if (error) throw error;
+
+      // Promote lead status to Meeting Booked if it's early in the pipeline
+      const promotable: LeadStatus[] = ["New", "Shortlisted", "Contacted", "Replied"];
+      if (promotable.includes(f.status)) {
+        await supabase
+          .from("vc_leads")
+          .update({ status: "Meeting Booked", updated_at: new Date().toISOString() })
+          .eq("id", lead.id)
+          .eq("founder_id", user.id);
+        setF((s) => ({ ...s, status: "Meeting Booked" }));
+      }
+
       toast.success("Meeting scheduled");
       setShowMeetingForm(false);
       setMf({ title: "", scheduled_at: "", meeting_type: "Intro", platform: "Zoom", meeting_link: "", notes: "" });
       refetchMeetings();
-      queryClient.invalidateQueries({ queryKey: ["meetings"] });
+      queryClient.invalidateQueries({ queryKey: ["lead-meetings", lead.id] });
+      queryClient.invalidateQueries({ queryKey: ["my-meetings", user.id] });
+      queryClient.invalidateQueries({ queryKey: ["leads", user.id] });
     } catch (err: any) {
       toast.error(err.message || "Failed to schedule");
     } finally {

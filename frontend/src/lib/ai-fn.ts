@@ -42,14 +42,14 @@ export const generateOutreachEmail = createServerFn({ method: "POST" })
       .gte("created_at", oneHourAgo);
     if ((count ?? 0) >= 10) throw new Error("Rate limit exceeded");
 
-    // 2. Fetch lead
-    const { data: lead, error: leadErr } = await adminClient
+    // 2. Fetch lead (filter by founder_id to avoid RLS issues and implicit auth check)
+    const { data: lead } = await adminClient
       .from("vc_leads")
       .select("*")
       .eq("id", data.leadId)
-      .single();
-    if (leadErr || !lead) throw new Error("Lead not found");
-    if (lead.founder_id !== data.userId) throw new Error("Unauthorized");
+      .eq("founder_id", data.userId)
+      .maybeSingle();
+    if (!lead) throw new Error("Lead not found");
 
     // 3. Fetch startup profile
     const { data: startup } = await adminClient

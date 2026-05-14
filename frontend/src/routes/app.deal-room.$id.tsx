@@ -53,6 +53,8 @@ function DealRoom() {
   // ── Supabase queries ──────────────────────────────────────────
   const { data: room } = useQuery({
     queryKey: ["deal-room", dealRoomId],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("deal_rooms")
@@ -67,6 +69,8 @@ function DealRoom() {
   const { data: memberRow } = useQuery({
     queryKey: ["deal-room-member", dealRoomId, user?.id],
     enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     queryFn: async () => {
       const { data } = await supabase
         .from("deal_room_members")
@@ -80,6 +84,8 @@ function DealRoom() {
 
   const { data: memberList = [] } = useQuery({
     queryKey: ["deal-room-members", dealRoomId],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     queryFn: async () => {
       const { data } = await supabase
         .from("deal_room_members")
@@ -91,6 +97,8 @@ function DealRoom() {
 
   const { data: qaMessages = [] } = useQuery({
     queryKey: ["deal-room-qa", dealRoomId],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     queryFn: async () => {
       const { data } = await supabase
         .from("messages")
@@ -105,6 +113,8 @@ function DealRoom() {
   const { data: ndaAcceptance, isLoading: ndaLoading } = useQuery({
     queryKey: ["nda-acceptance", dealRoomId, user?.id],
     enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     queryFn: async () => {
       const { data } = await supabase
         .from("nda_acceptances")
@@ -293,6 +303,7 @@ function DealRoom() {
             <div className="flex-1 min-h-0">
               <AIChat
                 compact
+                userId={user?.id}
                 scope={`the ${companyName} deal room`}
                 initialAssistant="I have context on this deal room — documents, Q&A, diligence checklist, and team. Ask me anything."
                 starters={isInvestor ? [
@@ -336,6 +347,7 @@ function DealRoomOverview({
 
   const { data: recentActivity = [] } = useQuery({
     queryKey: ["activities-overview", dealRoomId],
+    staleTime: 2 * 60 * 1000,
     queryFn: async () => {
       const { data } = await supabase
         .from("activities")
@@ -648,6 +660,8 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
 
   const { data: docs = [] } = useQuery({
     queryKey: ["documents", dealRoomId],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     queryFn: async () => {
       const { data } = await supabase
         .from("documents")
@@ -907,6 +921,8 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
 
   const { data: notes = [], isLoading, isError } = useQuery({
     queryKey: ["notes", dealRoomId],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     queryFn: async () => {
       const filter = userId ? `private.eq.false,author_id.eq.${userId}` : "private.eq.false";
       const { data, error } = await supabase
@@ -981,6 +997,7 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
 function Timeline({ dealRoomId }: { dealRoomId: string }) {
   const { data: events = [], isLoading, isError } = useQuery({
     queryKey: ["activities", dealRoomId],
+    staleTime: 2 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("activities")
@@ -1039,6 +1056,8 @@ function MeetingsTab({ dealRoomId, userId }: { dealRoomId: string; userId: strin
 
   const { data: meetings = [], isLoading, isError } = useQuery({
     queryKey: ["meetings", dealRoomId],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("meetings")

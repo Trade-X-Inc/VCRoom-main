@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 
-type BriefInput = { dealRoomId: string; userId: string };
+type BriefInput = { dealRoomId: string; userId: string; openAIKey?: string };
 
 export interface DealBriefResult {
   matchScore: number;
@@ -81,6 +81,7 @@ Recent activity: ${activitySummary || "None"}`;
 
     // 5. Call OpenAI
     const apiKey =
+      data.openAIKey ||
       process.env.OPENAI_API_KEY ||
       (globalThis as any).OPENAI_API_KEY ||
       import.meta.env.VITE_OPENAI_API_KEY || "";
