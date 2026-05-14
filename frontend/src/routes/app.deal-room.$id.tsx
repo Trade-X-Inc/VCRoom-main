@@ -7,7 +7,8 @@ import {
   Calendar, Gavel, Download, CheckCircle2, AlertTriangle, Clock, Plus,
   ArrowLeft, Lock, Sparkles, X, MessagesSquare, ThumbsUp, ThumbsDown,
   HelpCircle, Building2, TrendingUp, Users, DollarSign, Target, Shield,
-  Send, AlertCircle, Eye, UserPlus, Loader2, ExternalLink,
+  Send, AlertCircle, Eye, UserPlus, Loader2, ExternalLink, ChevronDown,
+  Check, ClipboardList,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AIChat } from "@/components/ai/AIChat";
@@ -260,7 +261,7 @@ function DealRoom() {
         )}
         {tab === "documents" && <Documents dealRoomId={dealRoomId} isFounder={isFounder} userId={user?.id} />}
         {tab === "chat" && <div className="h-full"><DealRoomChat /></div>}
-        {tab === "qa" && <QA dealRoomId={dealRoomId} userId={user?.id} userName={userName} />}
+        {tab === "qa" && <QA dealRoomId={dealRoomId} userId={user?.id} userName={userName} isInvestor={isInvestor} isFounder={isFounder} />}
         {tab === "checklist" && <DDChecklist />}
         {tab === "notes" && <Notes dealRoomId={dealRoomId} userId={user?.id} />}
         {tab === "timeline" && <Timeline dealRoomId={dealRoomId} />}
@@ -355,10 +356,16 @@ function DealRoomOverview({
   onTabChange: (tab: string) => void;
 }) {
   const startup = room?.startups;
-  const [showProblem, setShowProblem] = useState(false);
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskAssignee, setTaskAssignee] = useState("");
+  const [taskDueDate, setTaskDueDate] = useState("");
+  const [savingTask, setSavingTask] = useState(false);
 
   const { data: recentActivity = [] } = useQuery({
     queryKey: ["activities-overview", dealRoomId],
+    enabled: !!user?.id,
     staleTime: 2 * 60 * 1000,
     queryFn: async () => {
       const { data } = await supabase
@@ -371,274 +378,301 @@ function DealRoomOverview({
     },
   });
 
-  const daysOpen = room?.created_at
-    ? Math.floor((Date.now() - new Date(room.created_at).getTime()) / 86400000)
-    : 0;
-  const lastActivity = (recentActivity as any[])[0]?.created_at;
+  const { data: dealTasks = [] } = useQuery({
+    queryKey: ["deal-tasks", dealRoomId],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("deal_tasks")
+        .select("*, assignee:users!deal_tasks_assignee_id_fkey(full_name, email)")
+        .eq("deal_room_id", dealRoomId)
+        .order("completed", { ascending: true })
+        .order("due_date", { ascending: true, nullsFirst: false })
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+  });
 
-  const memberStatusColor = (accepted: boolean) =>
-    accepted ? "bg-success/10 text-success" : "bg-warning/10 text-warning";
+  const { data: latestDecision } = useQuery({
+    queryKey: ["overview-decision", dealRoomId],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("decisions")
+        .select("status, created_at, users(full_name)")
+        .eq("deal_room_id", dealRoomId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return data ?? null;
+    },
+  });
+
+  const docsShared = useQuery({
+    queryKey: ["overview-doc-count", dealRoomId],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("documents")
+        .select("id", { count: "exact", head: true })
+        .eq("deal_room_id", dealRoomId);
+      return count ?? 0;
+    },
+  });
+
+  const qaCount = useQuery({
+    queryKey: ["overview-qa-count", dealRoomId],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("messages")
+        .select("id", { count: "exact", head: true })
+        .eq("deal_room_id", dealRoomId)
+        .eq("is_qa", true);
+      return count ?? 0;
+    },
+  });
+
+  const decisionLabel = getDecisionLabel((latestDecision as any)?.status);
+  const progressSteps = [
+    { label: "NDA Signed", complete: true },
+    { label: "Documents Shared", complete: (docsShared.data ?? 0) > 0 },
+    { label: "Q&A Complete", complete: (qaCount.data ?? 0) > 0 && (qaMessagesAnswered(recentActivity as any[]) || decisionLabel !== "Under Review") },
+    { label: "Review Done", complete: decisionLabel === "Term Sheet" || decisionLabel === "Passed" },
+    { label: "Decision", complete: decisionLabel === "Term Sheet" || decisionLabel === "Passed" },
+  ];
+  const currentStepIndex = Math.min(
+    progressSteps.findIndex((step) => !step.complete) === -1 ? progressSteps.length - 1 : progressSteps.findIndex((step) => !step.complete),
+    progressSteps.length - 1,
+  );
+
+  const addTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!taskTitle.trim() || !user?.id) return;
+    setSavingTask(true);
+    try {
+      await supabase.from("deal_tasks").insert({
+        deal_room_id: dealRoomId,
+        title: taskTitle.trim(),
+        assignee_id: taskAssignee || null,
+        due_date: taskDueDate || null,
+        created_by: user.id,
+      });
+      await logActivity(dealRoomId, user.id, "Added a deal task", { title: taskTitle.trim() });
+      await queryClient.invalidateQueries({ queryKey: ["deal-tasks", dealRoomId] });
+      await queryClient.invalidateQueries({ queryKey: ["activities-overview", dealRoomId] });
+      setTaskTitle("");
+      setTaskAssignee("");
+      setTaskDueDate("");
+      toast.success("Task added");
+    } finally {
+      setSavingTask(false);
+    }
+  };
+
+  const toggleTask = async (task: any) => {
+    if (!user?.id) return;
+    await supabase.from("deal_tasks").update({ completed: !task.completed }).eq("id", task.id);
+    await logActivity(dealRoomId, user.id, `${task.completed ? "Reopened" : "Completed"} a deal task`, { title: task.title });
+    queryClient.invalidateQueries({ queryKey: ["deal-tasks", dealRoomId] });
+    queryClient.invalidateQueries({ queryKey: ["activities-overview", dealRoomId] });
+  };
+
+  const summary = startup?.tagline || startup?.description || startup?.traction || "Shared diligence workspace for this investment opportunity.";
+  const profileLink = isInvestor ? "/app/investor/startups" : "/app/profile";
+  const decisionMeta = DECISION_BADGES[decisionLabel];
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
-      {/* Header */}
+    <div className="p-8 max-w-6xl mx-auto">
       <div className="flex items-start justify-between gap-6 mb-6">
         <div>
           <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
-            {isInvestor ? "Reviewing" : "Deal Room"}
+            Shared deal workspace
           </div>
           <h2 className="mt-1 text-2xl font-semibold tracking-tight">
             {startup?.company_name ?? "Deal Room"}
           </h2>
-          {startup?.tagline && (
-            <p className="mt-1 text-sm text-muted-foreground">{startup.tagline}</p>
-          )}
+          <p className="mt-1 text-sm text-muted-foreground">Diligence, tasks, decisions, and activity in one place.</p>
         </div>
-        <div className="flex gap-2 shrink-0">
-          {isFounder ? (
-            <>
-              <button
-                onClick={() => onTabChange("documents")}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent"
-              >
-                <UserPlus className="h-4 w-4" /> Invite
-              </button>
-              <button
-                onClick={() => onTabChange("chat")}
-                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"
-              >
-                <Send className="h-4 w-4" /> Send update
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => onTabChange("qa")}
-                className="inline-flex items-center gap-1.5 rounded-md border border-warning/40 bg-warning/10 text-warning px-3 py-2 text-sm hover:bg-warning/15"
-              >
-                <HelpCircle className="h-4 w-4" /> Request info
-              </button>
-              <button
-                onClick={() => onTabChange("decision")}
-                className="inline-flex items-center gap-1.5 rounded-md border border-success/40 bg-success/10 text-success px-3 py-2 text-sm hover:bg-success/15"
-              >
-                <ThumbsUp className="h-4 w-4" /> Submit review
-              </button>
-            </>
-          )}
-        </div>
+        <span className="inline-flex items-center gap-1.5 rounded-md border border-success/30 bg-success/10 px-2.5 py-1 text-xs font-medium text-success">
+          <CheckCircle2 className="h-3.5 w-3.5" /> NDA signed
+        </span>
       </div>
 
-      {/* Two-column layout: 60% left / 40% right */}
       <div className="grid md:grid-cols-5 gap-5">
-        {/* LEFT — company summary + participants */}
         <div className="md:col-span-3 space-y-4">
-          <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-            <div className="flex items-start gap-3">
-              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-bold text-sm">
-                {startup?.company_name?.[0] ?? "D"}
+          <section className="rounded-xl border border-border/60 bg-card p-6 shadow-card">
+            <div className="flex items-start gap-4">
+              <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl border border-border/60 bg-gradient-brand text-xl font-bold text-brand-foreground">
+                {startup?.logo_url
+                  ? <img src={startup.logo_url} alt={`${startup?.company_name ?? "Company"} logo`} className="h-full w-full object-cover" />
+                  : (startup?.company_name?.[0] ?? "D")}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-semibold">{startup?.company_name ?? "Company"}</div>
-                {startup?.tagline && (
-                  <div className="text-xs text-muted-foreground mt-0.5">{startup.tagline}</div>
-                )}
-                <div className="flex flex-wrap gap-1.5 mt-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="text-xl font-semibold tracking-tight">{startup?.company_name ?? "Company"}</h3>
                   {startup?.stage && (
-                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-brand/10 text-brand">
+                    <span className="rounded-full bg-brand/10 px-2.5 py-1 text-xs font-medium text-brand">
                       {startup.stage}
                     </span>
                   )}
                   {startup?.sector && (
-                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-accent text-muted-foreground">
+                    <span className="rounded-full bg-accent px-2.5 py-1 text-xs font-medium text-muted-foreground">
                       {startup.sector}
                     </span>
                   )}
                 </div>
+                <div className="mt-4 rounded-lg border border-border/60 bg-background p-3">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Funding target</div>
+                  <div className="mt-1 text-lg font-semibold">{formatMoney(startup?.funding_target)}</div>
+                </div>
+                <p className="mt-4 text-sm leading-relaxed text-muted-foreground line-clamp-2">{summary}</p>
+                <Link to={profileLink as any} className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline">
+                  View full profile <ExternalLink className="h-3.5 w-3.5" />
+                </Link>
               </div>
             </div>
+          </section>
 
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              {startup?.funding_target && (
-                <div className="rounded-lg bg-accent/50 p-3">
-                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Raising</div>
-                  <div className="text-sm font-semibold mt-0.5">{startup.funding_target}</div>
-                </div>
-              )}
-              {startup?.revenue && (
-                <div className="rounded-lg bg-accent/50 p-3">
-                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider">ARR</div>
-                  <div className="text-sm font-semibold mt-0.5">{startup.revenue}</div>
-                </div>
-              )}
-              {startup?.team_size && (
-                <div className="rounded-lg bg-accent/50 p-3">
-                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Team size</div>
-                  <div className="text-sm font-semibold mt-0.5">{startup.team_size}</div>
-                </div>
-              )}
-              {startup?.website && (
-                <div className="rounded-lg bg-accent/50 p-3">
-                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Website</div>
-                  <a
-                    href={startup.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-semibold text-brand mt-0.5 flex items-center gap-1 hover:underline"
-                  >
-                    <ExternalLink className="h-3 w-3" /> Visit
-                  </a>
-                </div>
-              )}
-            </div>
-
-            {(startup?.problem || startup?.solution) && (
-              <div className="mt-3 border-t border-border/60 pt-3">
-                <button
-                  onClick={() => setShowProblem((v) => !v)}
-                  className="text-xs text-brand hover:underline"
-                >
-                  {showProblem ? "Hide" : "Show"} problem / solution
-                </button>
-                {showProblem && (
-                  <div className="mt-2 space-y-3">
-                    {startup.problem && (
-                      <div>
-                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Problem</div>
-                        <div className="text-sm mt-1">{startup.problem}</div>
-                      </div>
-                    )}
-                    {startup.solution && (
-                      <div>
-                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Solution</div>
-                        <div className="text-sm mt-1">{startup.solution}</div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Participants */}
-          <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-            <div className="flex items-center justify-between mb-3">
+          <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+            <div className="mb-5 flex items-center justify-between">
               <div className="text-sm font-semibold inline-flex items-center gap-2">
-                <Users className="h-4 w-4 text-brand" /> Participants
+                <TrendingUp className="h-4 w-4 text-brand" /> Deal progress
               </div>
-              {isFounder && (
-                <button className="text-xs inline-flex items-center gap-1 text-muted-foreground hover:text-foreground">
-                  <UserPlus className="h-3.5 w-3.5" /> Invite
-                </button>
-              )}
+              <span className="text-xs text-muted-foreground">Current: {progressSteps[currentStepIndex].label}</span>
             </div>
-            {memberList.length === 0 ? (
-              <div className="text-xs text-muted-foreground">No participants yet.</div>
-            ) : (
-              <div className="divide-y divide-border/60">
-                {(memberList as any[]).map((m) => (
-                  <div key={m.id} className="flex items-center gap-3 py-2.5">
-                    <div className="grid h-8 w-8 place-items-center rounded-full bg-accent text-[11px] font-semibold shrink-0">
-                      {(m.users?.full_name ?? "?").split(" ").map((s: string) => s[0]).slice(0, 2).join("")}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium truncate">{m.users?.full_name ?? "Unknown"}</div>
-                      <div className="text-xs text-muted-foreground truncate">{m.users?.email ?? ""}</div>
-                    </div>
-                    <div className="flex flex-col items-end gap-1 shrink-0">
-                      <span className="text-[10px] capitalize text-muted-foreground">{m.role}</span>
-                      <span className={cn("text-[10px] px-2 py-0.5 rounded", memberStatusColor(!!m.accepted_at))}>
-                        {m.accepted_at ? "NDA Accepted" : "Invited"}
-                      </span>
+            <div className="grid grid-cols-5 gap-2">
+              {progressSteps.map((step, index) => {
+                const current = index === currentStepIndex;
+                const completed = step.complete && index < currentStepIndex;
+                return (
+                  <div key={step.label} className="relative min-w-0">
+                    {index < progressSteps.length - 1 && (
+                      <div className={cn("absolute left-[calc(50%+1rem)] right-[calc(-50%+1rem)] top-4 h-0.5", completed ? "bg-success" : "bg-border")} />
+                    )}
+                    <div className="relative z-10 flex flex-col items-center gap-2 text-center">
+                      <div className={cn(
+                        "grid h-8 w-8 place-items-center rounded-full border text-xs font-semibold",
+                        completed && "border-success bg-success text-white",
+                        current && "border-brand bg-brand text-brand-foreground shadow-glow",
+                        !completed && !current && "border-border bg-background text-muted-foreground",
+                      )}>
+                        {completed ? <Check className="h-4 w-4" /> : index + 1}
+                      </div>
+                      <div className={cn("text-[11px] leading-tight", current ? "font-semibold text-foreground" : "text-muted-foreground")}>{step.label}</div>
                     </div>
                   </div>
-                ))}
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <div className="text-sm font-semibold inline-flex items-center gap-2">
+                  <ClipboardList className="h-4 w-4 text-brand" /> Deal tasks
+                </div>
+                <p className="mt-0.5 text-xs text-muted-foreground">Shared next steps visible to both parties.</p>
               </div>
-            )}
-          </div>
+              <span className="text-xs text-muted-foreground">{(dealTasks as any[]).filter((t) => t.completed).length}/{(dealTasks as any[]).length} complete</span>
+            </div>
+
+            <div className="divide-y divide-border/60 rounded-lg border border-border/60">
+              {(dealTasks as any[]).length === 0 && (
+                <div className="p-4 text-sm text-muted-foreground">No shared tasks yet.</div>
+              )}
+              {(dealTasks as any[]).map((task) => (
+                <div key={task.id} className="flex items-center gap-3 px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={!!task.completed}
+                    onChange={() => toggleTask(task)}
+                    className="h-4 w-4 rounded border-border accent-[var(--brand)]"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className={cn("text-sm font-medium truncate", task.completed && "text-muted-foreground line-through")}>{task.title}</div>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      <span>{task.assignee?.full_name || task.assignee?.email || "Unassigned"}</span>
+                      <span>•</span>
+                      <span>{task.due_date ? format(new Date(`${task.due_date}T00:00:00`), "MMM d") : "No due date"}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <form onSubmit={addTask} className="mt-4 grid gap-2 md:grid-cols-[1fr_150px_140px_auto]">
+              <input
+                value={taskTitle}
+                onChange={(e) => setTaskTitle(e.target.value)}
+                placeholder="Add a shared task"
+                className="rounded-md border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
+              />
+              <select
+                value={taskAssignee}
+                onChange={(e) => setTaskAssignee(e.target.value)}
+                className="rounded-md border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
+              >
+                <option value="">Unassigned</option>
+                {(memberList as any[]).map((member) => (
+                  <option key={member.user_id} value={member.user_id}>
+                    {member.users?.full_name || member.users?.email || member.role}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="date"
+                value={taskDueDate}
+                onChange={(e) => setTaskDueDate(e.target.value)}
+                className="rounded-md border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
+              />
+              <button
+                type="submit"
+                disabled={!taskTitle.trim() || savingTask}
+                className="inline-flex items-center justify-center gap-1.5 rounded-md bg-gradient-brand px-3 py-2 text-sm font-medium text-brand-foreground shadow-glow disabled:opacity-50"
+              >
+                {savingTask ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                Add task
+              </button>
+            </form>
+          </section>
         </div>
 
-        {/* RIGHT — deal status + recent activity */}
         <div className="md:col-span-2 space-y-4">
-          <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-            <div className="text-sm font-semibold mb-3">Deal status</div>
-            <div className="space-y-2.5">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Stage</span>
-                <span className="font-medium capitalize">{room?.status ?? "Active"}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Days open</span>
-                <span className="font-medium">{daysOpen}</span>
-              </div>
-              {lastActivity && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Last activity</span>
-                  <span className="font-medium">{formatDistanceToNow(new Date(lastActivity), { addSuffix: true })}</span>
-                </div>
-              )}
+          <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+            <div className="text-sm font-semibold">Decision status</div>
+            <div className={cn("mt-4 inline-flex w-full items-center justify-center rounded-xl px-4 py-5 text-xl font-semibold", decisionMeta.className)}>
+              {decisionLabel}
             </div>
-            <div className="mt-4 border-t border-border/60 pt-4">
-              <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-2">Quick actions</div>
-              <div className="space-y-1.5">
-                {isFounder ? (
-                  <>
-                    <button
-                      onClick={() => onTabChange("documents")}
-                      className="w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2"
-                    >
-                      <FileText className="h-3.5 w-3.5 text-brand" /> Upload document
-                    </button>
-                    <button
-                      onClick={() => onTabChange("meetings")}
-                      className="w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2"
-                    >
-                      <Calendar className="h-3.5 w-3.5 text-brand" /> Schedule meeting
-                    </button>
-                    <button
-                      onClick={() => onTabChange("chat")}
-                      className="w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2"
-                    >
-                      <Send className="h-3.5 w-3.5 text-brand" /> Send investor update
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => onTabChange("documents")}
-                      className="w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2"
-                    >
-                      <FileText className="h-3.5 w-3.5 text-brand" /> Request document
-                    </button>
-                    <button
-                      onClick={() => onTabChange("qa")}
-                      className="w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2"
-                    >
-                      <MessageSquare className="h-3.5 w-3.5 text-brand" /> Ask a question
-                    </button>
-                    <button
-                      onClick={() => onTabChange("decision")}
-                      className="w-full text-left text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-accent flex items-center gap-2"
-                    >
-                      <ThumbsUp className="h-3.5 w-3.5 text-success" /> Submit review
-                    </button>
-                  </>
-                )}
-              </div>
+            <div className="mt-3 text-xs text-muted-foreground">
+              {(latestDecision as any)?.created_at
+                ? `Updated ${formatDistanceToNow(new Date((latestDecision as any).created_at), { addSuffix: true })}`
+                : "No investor decision submitted yet."}
             </div>
-          </div>
+          </section>
 
-          <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+          <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+            <div className="text-sm font-semibold mb-3">Key metrics</div>
+            <div className="grid grid-cols-2 gap-3">
+              <Metric icon={DollarSign} label="ARR" value={formatMoney(startup?.revenue)} />
+              <Metric icon={Users} label="Team size" value={startup?.team_size ?? "—"} />
+              <Metric icon={Building2} label="Stage" value={startup?.stage ?? "—"} />
+              <Metric icon={Target} label="Raise amount" value={formatMoney(startup?.funding_target)} />
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
             <div className="text-sm font-semibold mb-3">Recent activity</div>
             {(recentActivity as any[]).length === 0 ? (
               <div className="text-xs text-muted-foreground">No activity yet.</div>
             ) : (
-              <div className="space-y-2.5">
-                {(recentActivity as any[]).map((e) => (
-                  <div key={e.id} className="flex items-start gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-brand mt-1.5 shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm truncate">{e.action}</div>
+              <div className="space-y-3">
+                {(recentActivity as any[]).slice(0, 5).map((e) => (
+                  <div key={e.id} className="flex items-start gap-2.5">
+                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-brand" />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm">{e.action}</div>
                       <div className="text-xs text-muted-foreground">
                         {formatDistanceToNow(new Date(e.created_at), { addSuffix: true })}
                       </div>
@@ -647,11 +681,91 @@ function DealRoomOverview({
                 ))}
               </div>
             )}
-          </div>
+          </section>
+
+          <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+            <div className="text-sm font-semibold mb-3">Quick actions</div>
+            <div className="space-y-2">
+              {isFounder ? (
+                <>
+                  <button
+                    onClick={() => onTabChange("documents")}
+                    className="w-full rounded-md border border-border/60 px-3 py-2 text-left text-sm hover:bg-accent"
+                  >
+                    <FileText className="mr-2 inline h-4 w-4 text-brand" /> Upload doc
+                  </button>
+                  <button
+                    onClick={() => onTabChange("meetings")}
+                    className="w-full rounded-md border border-border/60 px-3 py-2 text-left text-sm hover:bg-accent"
+                  >
+                    <Calendar className="mr-2 inline h-4 w-4 text-brand" /> Schedule meeting
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => onTabChange("documents")}
+                    className="w-full rounded-md border border-border/60 px-3 py-2 text-left text-sm hover:bg-accent"
+                  >
+                    <FileText className="mr-2 inline h-4 w-4 text-brand" /> Request doc
+                  </button>
+                  <button
+                    onClick={() => onTabChange("decision")}
+                    className="w-full rounded-md border border-success/40 bg-success/10 px-3 py-2 text-left text-sm text-success hover:bg-success/15"
+                  >
+                    <ThumbsUp className="mr-2 inline h-4 w-4" /> Submit decision
+                  </button>
+                </>
+              )}
+            </div>
+          </section>
         </div>
       </div>
     </div>
   );
+}
+
+function Metric({ icon: Icon, label, value }: { icon: any; label: string; value: React.ReactNode }) {
+  return (
+    <div className="rounded-lg border border-border/60 bg-background p-3">
+      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <Icon className="h-3.5 w-3.5" /> {label}
+      </div>
+      <div className="mt-1 text-sm font-semibold">{value || "—"}</div>
+    </div>
+  );
+}
+
+const DECISION_BADGES: Record<string, { className: string }> = {
+  "Under Review": { className: "bg-brand/10 text-brand border border-brand/20" },
+  Interested: { className: "bg-success/10 text-success border border-success/20" },
+  "Term Sheet": { className: "bg-violet/10 text-violet border border-violet/20" },
+  Passed: { className: "bg-destructive/10 text-destructive border border-destructive/20" },
+};
+
+function getDecisionLabel(status?: string | null) {
+  const normalized = String(status ?? "").toLowerCase();
+  if (["pass", "passed", "rejected"].includes(normalized)) return "Passed";
+  if (["accepted", "accept", "invest", "term_sheet", "term sheet"].includes(normalized)) return "Term Sheet";
+  if (["interested", "hold", "request info", "requested_info"].includes(normalized)) return "Interested";
+  return "Under Review";
+}
+
+function formatMoney(value: unknown) {
+  if (value === null || value === undefined || value === "") return "—";
+  if (typeof value === "number") {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      notation: value >= 1000000 ? "compact" : "standard",
+      maximumFractionDigits: value >= 1000000 ? 1 : 0,
+    }).format(value);
+  }
+  return String(value);
+}
+
+function qaMessagesAnswered(activity: any[]) {
+  return activity.some((item) => String(item.action ?? "").toLowerCase().includes("answer"));
 }
 
 // ── Documents ─────────────────────────────────────────────────────
@@ -1345,27 +1459,46 @@ function Decision({ isInvestor, dealRoomId, userId, queryClient }: { isInvestor:
   );
 }
 
-// ── Q&A real-time chat ────────────────────────────────────────────
-function QA({ dealRoomId, userId, userName }: { dealRoomId: string; userId: string | undefined; userName: string }) {
+// ── Structured Q&A + live discussion ──────────────────────────────
+function QA({
+  dealRoomId,
+  userId,
+  userName,
+  isInvestor,
+  isFounder,
+}: {
+  dealRoomId: string;
+  userId: string | undefined;
+  userName: string;
+  isInvestor: boolean;
+  isFounder: boolean;
+}) {
   const [msgs, setMsgs] = useState<any[]>([]);
   const [input, setInput] = useState("");
+  const [question, setQuestion] = useState("");
+  const [answerDrafts, setAnswerDrafts] = useState<Record<string, string>>({});
+  const [openQaId, setOpenQaId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [sending, setSending] = useState(false);
+  const [asking, setAsking] = useState(false);
+  const [answeringId, setAnsweringId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const loadMessages = async () => {
+    const { data, error } = await supabase
+      .from("messages")
+      .select("*, users(full_name)")
+      .eq("deal_room_id", dealRoomId)
+      .eq("private_to_org", false)
+      .order("created_at", { ascending: true });
+    if (error) setLoadError(true);
+    else setMsgs(data ?? []);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    (async () => {
-      const { data, error } = await supabase
-        .from("messages")
-        .select("*, users(full_name)")
-        .eq("deal_room_id", dealRoomId)
-        .eq("private_to_org", false)
-        .order("created_at", { ascending: true });
-      if (error) setLoadError(true);
-      else setMsgs(data ?? []);
-      setLoading(false);
-    })();
+    loadMessages();
   }, [dealRoomId]);
 
   useEffect(() => {
@@ -1385,6 +1518,13 @@ function QA({ dealRoomId, userId, userName }: { dealRoomId: string; userId: stri
           setMsgs((xs) => xs.find((x) => x.id === msg.id) ? xs : [...xs, { ...msg, users: { full_name: senderName } }]);
         },
       )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "messages", filter: "deal_room_id=eq." + dealRoomId },
+        (payload) => {
+          setMsgs((xs) => xs.map((x) => x.id === (payload.new as any).id ? { ...x, ...(payload.new as any) } : x));
+        },
+      )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [dealRoomId, userId, userName]);
@@ -1393,16 +1533,65 @@ function QA({ dealRoomId, userId, userName }: { dealRoomId: string; userId: stri
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [msgs]);
 
+  const structured = msgs.filter((m) => !!m.is_qa);
+  const discussion = msgs.filter((m) => !m.is_qa);
+
+  const askQuestion = async () => {
+    const text = question.trim();
+    if (!text || !userId || !isInvestor) return;
+    setAsking(true);
+    const { data } = await supabase
+      .from("messages")
+      .insert({
+        deal_room_id: dealRoomId,
+        sender_id: userId,
+        body: text,
+        private_to_org: false,
+        is_qa: true,
+        metadata: { authorName: userName, authorRole: "Investor" },
+      })
+      .select("id")
+      .single();
+    if (data?.id) {
+      await logActivity(dealRoomId, userId, "Asked a structured Q&A question", { question: text });
+      setQuestion("");
+      setOpenQaId(data.id);
+    }
+    setAsking(false);
+  };
+
+  const saveAnswer = async (messageId: string) => {
+    const answer = (answerDrafts[messageId] ?? "").trim();
+    if (!answer || !userId || !isFounder) return;
+    setAnsweringId(messageId);
+    const current = msgs.find((m) => m.id === messageId);
+    await supabase
+      .from("messages")
+      .update({
+        metadata: {
+          ...(current?.metadata ?? {}),
+          answer,
+          answeredBy: userName,
+          answeredAt: new Date().toISOString(),
+        },
+      })
+      .eq("id", messageId);
+    await logActivity(dealRoomId, userId, "Answered a structured Q&A question", { question_id: messageId });
+    setAnswerDrafts((drafts) => ({ ...drafts, [messageId]: "" }));
+    setAnsweringId(null);
+    toast.success("Answer posted");
+  };
+
   const send = async () => {
     const text = input.trim();
     if (!text || !userId) return;
     setSending(true);
     const optId = crypto.randomUUID();
-    setMsgs((xs) => [...xs, { id: optId, sender_id: userId, body: text, created_at: new Date().toISOString(), private_to_org: false, users: { full_name: userName }, _opt: true }]);
+    setMsgs((xs) => [...xs, { id: optId, sender_id: userId, body: text, created_at: new Date().toISOString(), private_to_org: false, is_qa: false, users: { full_name: userName }, _opt: true }]);
     setInput("");
     const { data } = await supabase
       .from("messages")
-      .insert({ deal_room_id: dealRoomId, sender_id: userId, body: text, private_to_org: false })
+      .insert({ deal_room_id: dealRoomId, sender_id: userId, body: text, private_to_org: false, is_qa: false })
       .select("id")
       .maybeSingle();
     if (data?.id) {
@@ -1428,67 +1617,198 @@ function QA({ dealRoomId, userId, userName }: { dealRoomId: string; userId: stri
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="px-8 pt-6 pb-4 border-b border-border/60 shrink-0">
-        <h2 className="text-xl font-semibold tracking-tight">Q&amp;A Discussion</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Public deal room discussion thread.</p>
-      </div>
+    <div className="h-full overflow-y-auto p-8">
+      <div className="mx-auto max-w-5xl space-y-6">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight">Q&amp;A</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Structured diligence questions stay separate from the live discussion.</p>
+          </div>
+          {isInvestor && (
+            <button
+              onClick={() => document.getElementById("ask-question-box")?.focus()}
+              className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand px-3 py-2 text-sm font-medium text-brand-foreground shadow-glow"
+            >
+              <Plus className="h-4 w-4" /> Ask question
+            </button>
+          )}
+        </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-8 py-4 space-y-3">
-        {loading && <div className="text-sm text-muted-foreground animate-pulse">Loading…</div>}
-        {loadError && <p className="text-sm text-destructive">Could not load data. Please refresh.</p>}
-        {!loading && !loadError && msgs.length === 0 && (
-          <div className="text-sm text-muted-foreground">No messages yet. Start the conversation.</div>
-        )}
-        {msgs.map((m, i) => {
-          const isMe = m.sender_id === userId;
-          const name = isMe ? userName : (m.users?.full_name ?? "Unknown");
-          const prev = msgs[i - 1];
-          const grouped = prev && prev.sender_id === m.sender_id;
-          const initials = name.split(" ").map((s: string) => s[0]).slice(0, 2).join("");
-          return (
-            <div key={m.id} className={cn("flex gap-3", isMe ? "flex-row-reverse" : "")}>
-              <div className={cn("h-8 w-8 shrink-0", grouped && "invisible")}>
-                <div className={cn("grid h-8 w-8 place-items-center rounded-full text-[10px] font-semibold", isMe ? "bg-gradient-brand text-brand-foreground" : "bg-accent")}>
-                  {initials}
-                </div>
-              </div>
-              <div className={cn("max-w-[72%]", isMe && "items-end flex flex-col")}>
-                {!grouped && (
-                  <div className={cn("flex items-center gap-2 mb-1 text-[11px]", isMe && "flex-row-reverse")}>
-                    <span className="font-medium">{name}</span>
-                    <span className="text-muted-foreground">{format(new Date(m.created_at), "h:mm a")}</span>
-                  </div>
-                )}
-                <div className={cn("rounded-2xl px-3.5 py-2 text-sm", isMe ? "bg-gradient-brand text-brand-foreground rounded-tr-sm" : "bg-accent rounded-tl-sm")}>
-                  {m.body}
-                </div>
+        <section className="rounded-xl border border-border/60 bg-card shadow-card">
+          <div className="border-b border-border/60 p-5">
+            <div className="text-sm font-semibold">Structured Q&amp;A</div>
+            <div className="mt-1 text-xs text-muted-foreground">Investor questions and founder answers, organized as expandable cards.</div>
+          </div>
+
+          {isInvestor && (
+            <div className="border-b border-border/60 p-5">
+              <textarea
+                id="ask-question-box"
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                rows={3}
+                placeholder="Ask a diligence question for the founder..."
+                className="w-full resize-none rounded-md border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
+              />
+              <div className="mt-3 flex justify-end">
+                <button
+                  onClick={askQuestion}
+                  disabled={!question.trim() || asking}
+                  className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand px-3 py-2 text-sm font-medium text-brand-foreground disabled:opacity-50"
+                >
+                  {asking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                  Ask question
+                </button>
               </div>
             </div>
-          );
-        })}
-      </div>
+          )}
 
-      <div className="px-8 py-4 border-t border-border/60 bg-background shrink-0">
-        <div className="flex items-end gap-2 rounded-xl border border-border/60 bg-card px-3 py-2 focus-within:border-brand/50 focus-within:ring-2 focus-within:ring-brand/10 transition">
-          <textarea
-            rows={1}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-            placeholder="Ask a question or leave a comment…"
-            className="flex-1 bg-transparent text-sm resize-none outline-none max-h-32 py-1"
-          />
-          <button
-            onClick={send}
-            disabled={!input.trim() || !userId || sending}
-            className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs disabled:opacity-50"
-          >
-            {sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
-            Send
-          </button>
-        </div>
+          <div className="divide-y divide-border/60">
+            {loading && <div className="p-5 text-sm text-muted-foreground animate-pulse">Loading…</div>}
+            {loadError && <p className="p-5 text-sm text-destructive">Could not load data. Please refresh.</p>}
+            {!loading && !loadError && structured.length === 0 && (
+              <div className="p-5 text-sm text-muted-foreground">No structured questions yet.</div>
+            )}
+            {structured.map((item) => {
+              const answer = item.metadata?.answer ?? "";
+              const author = item.metadata?.authorName || item.users?.full_name || "Investor";
+              const open = openQaId === item.id;
+              const words = countWords(answer);
+              return (
+                <div key={item.id}>
+                  <button
+                    onClick={() => setOpenQaId(open ? null : item.id)}
+                    className="flex w-full items-start gap-3 p-5 text-left hover:bg-accent/40"
+                  >
+                    <div className={cn("mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full", answer ? "bg-success/10 text-success" : "bg-brand/10 text-brand")}>
+                      {answer ? <CheckCircle2 className="h-4 w-4" /> : <HelpCircle className="h-4 w-4" />}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-semibold">{item.body}</div>
+                      <div className="mt-1 text-xs text-muted-foreground">
+                        Asked by {author} · {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
+                      </div>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-3">
+                      <span className={cn("rounded-full px-2 py-1 text-[11px] font-medium", answer ? "bg-success/10 text-success" : "bg-warning/10 text-warning")}>
+                        {answer ? `${words} words` : "Awaiting answer"}
+                      </span>
+                      <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-180")} />
+                    </div>
+                  </button>
+                  {open && (
+                    <div className="border-t border-border/60 bg-background/60 px-5 py-4">
+                      {answer ? (
+                        <div>
+                          <div className="mb-2 flex items-center justify-between gap-3 text-xs text-muted-foreground">
+                            <span>Founder answer</span>
+                            <span>{words} words</span>
+                          </div>
+                          <p className="text-sm leading-relaxed">{answer}</p>
+                          {item.metadata?.answeredAt && (
+                            <div className="mt-3 text-xs text-muted-foreground">
+                              Answered by {item.metadata?.answeredBy || "Founder"} · {formatDistanceToNow(new Date(item.metadata.answeredAt), { addSuffix: true })}
+                            </div>
+                          )}
+                        </div>
+                      ) : isFounder ? (
+                        <div>
+                          <textarea
+                            value={answerDrafts[item.id] ?? ""}
+                            onChange={(e) => setAnswerDrafts((drafts) => ({ ...drafts, [item.id]: e.target.value }))}
+                            rows={4}
+                            placeholder="Answer this question..."
+                            className="w-full resize-none rounded-md border border-border/60 bg-card px-3 py-2 text-sm outline-none focus:border-brand/50"
+                          />
+                          <div className="mt-3 flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">{countWords(answerDrafts[item.id] ?? "")} words</span>
+                            <button
+                              onClick={() => saveAnswer(item.id)}
+                              disabled={!answerDrafts[item.id]?.trim() || answeringId === item.id}
+                              className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand px-3 py-2 text-sm font-medium text-brand-foreground disabled:opacity-50"
+                            >
+                              {answeringId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                              Post answer
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-muted-foreground">The founder has not answered this question yet.</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="rounded-xl border border-border/60 bg-card shadow-card">
+          <div className="border-b border-border/60 p-5">
+            <div className="text-sm font-semibold">Live discussion</div>
+            <div className="mt-1 text-xs text-muted-foreground">Informal back-and-forth for quick clarifications.</div>
+          </div>
+
+          <div ref={scrollRef} className="max-h-[360px] overflow-y-auto px-5 py-4 space-y-3">
+            {loading && <div className="text-sm text-muted-foreground animate-pulse">Loading…</div>}
+            {!loading && !loadError && discussion.length === 0 && (
+              <div className="text-sm text-muted-foreground">No live discussion yet.</div>
+            )}
+            {discussion.map((m, i) => {
+              const isMe = m.sender_id === userId;
+              const name = isMe ? userName : (m.users?.full_name ?? "Unknown");
+              const prev = discussion[i - 1];
+              const grouped = prev && prev.sender_id === m.sender_id;
+              const initials = name.split(" ").map((s: string) => s[0]).slice(0, 2).join("");
+              return (
+                <div key={m.id} className={cn("flex gap-3", isMe ? "flex-row-reverse" : "")}>
+                  <div className={cn("h-8 w-8 shrink-0", grouped && "invisible")}>
+                    <div className={cn("grid h-8 w-8 place-items-center rounded-full text-[10px] font-semibold", isMe ? "bg-gradient-brand text-brand-foreground" : "bg-accent")}>
+                      {initials}
+                    </div>
+                  </div>
+                  <div className={cn("max-w-[72%]", isMe && "items-end flex flex-col")}>
+                    {!grouped && (
+                      <div className={cn("mb-1 flex items-center gap-2 text-[11px]", isMe && "flex-row-reverse")}>
+                        <span className="font-medium">{name}</span>
+                        <span className="text-muted-foreground">{format(new Date(m.created_at), "h:mm a")}</span>
+                      </div>
+                    )}
+                    <div className={cn("rounded-2xl px-3.5 py-2 text-sm", isMe ? "bg-gradient-brand text-brand-foreground rounded-tr-sm" : "bg-accent rounded-tl-sm")}>
+                      {m.body}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="border-t border-border/60 bg-background px-5 py-4">
+            <div className="flex items-end gap-2 rounded-xl border border-border/60 bg-card px-3 py-2 transition focus-within:border-brand/50 focus-within:ring-2 focus-within:ring-brand/10">
+              <textarea
+                rows={1}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+                placeholder="Post to live discussion..."
+                className="max-h-32 flex-1 resize-none bg-transparent py-1 text-sm outline-none"
+              />
+              <button
+                onClick={send}
+                disabled={!input.trim() || !userId || sending}
+                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand px-3 py-1.5 text-xs text-brand-foreground disabled:opacity-50"
+              >
+                {sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                Send
+              </button>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
+}
+
+function countWords(value: string) {
+  return value.trim() ? value.trim().split(/\s+/).length : 0;
 }
