@@ -1,8 +1,9 @@
 import { useState, useRef, type DragEvent } from "react";
 import { Upload, FileText, X, CheckCircle2, XCircle } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
-import { uploadDocument, supabase } from "@/lib/supabase";
+import { uploadDocument, supabase, logActivity } from "@/lib/supabase";
 
 export interface UploadedFile {
   id: string;
@@ -48,18 +49,26 @@ export function Dropzone({
     if (dealRoomId && user?.id) {
       next.forEach(async (nf) => {
         setFiles((xs) => xs.map((x) => x.id === nf.id ? { ...x, progress: 10 } : x));
-        const result = await uploadDocument(nf.rawFile!, dealRoomId, user.id);
-        if (result) {
-          await supabase.from("documents").insert({
+        try {
+          const result = await uploadDocument(nf.rawFile!, dealRoomId, user.id);
+          if (!result) throw new Error("Storage upload returned null");
+
+          const { error: insertError } = await supabase.from("documents").insert({
             deal_room_id: dealRoomId,
             uploader_id: user.id,
             storage_path: result.path,
             category: "General",
             status: "uploaded",
           });
+          if (insertError) throw insertError;
+
+          await logActivity(dealRoomId, user.id, "Uploaded a document", { filename: nf.name });
           setFiles((xs) => xs.map((x) => x.id === nf.id ? { ...x, progress: 100 } : x));
+          toast.success(`${nf.name} uploaded`);
           onUploadComplete?.();
-        } else {
+        } catch (err) {
+          console.error("Document upload failed:", err);
+          toast.error(`Failed to upload ${nf.name}`);
           setFiles((xs) => xs.map((x) => x.id === nf.id ? { ...x, error: true } : x));
         }
       });

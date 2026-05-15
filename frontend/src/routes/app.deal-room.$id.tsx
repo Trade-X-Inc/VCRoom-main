@@ -774,14 +774,16 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
 
   const { data: docs = [] } = useQuery({
     queryKey: ["documents", dealRoomId],
+    enabled: !!userId,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("documents")
         .select("*, users(full_name)")
         .eq("deal_room_id", dealRoomId)
         .order("created_at", { ascending: false });
+      if (error) throw error;
       return data ?? [];
     },
   });
@@ -1056,11 +1058,19 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
     if (!body.trim() || !userId) return;
     setSaving(true);
     try {
-      await supabase.from("notes").insert({ deal_room_id: dealRoomId, author_id: userId, body: body.trim(), private: isPrivate });
+      const { error } = await supabase
+        .from("notes")
+        .insert({ deal_room_id: dealRoomId, author_id: userId, body: body.trim(), private: isPrivate });
+      if (error) throw error;
       await logActivity(dealRoomId, userId, "Added a note");
       queryClient.invalidateQueries({ queryKey: ["notes", dealRoomId] });
+      queryClient.invalidateQueries({ queryKey: ["activities-overview", dealRoomId] });
       setBody("");
       setIsPrivate(false);
+      toast.success("Note saved");
+    } catch (err) {
+      console.error("Failed to save note:", err);
+      toast.error("Failed to save note — check console for details");
     } finally {
       setSaving(false);
     }
@@ -1190,7 +1200,7 @@ function MeetingsTab({ dealRoomId, userId }: { dealRoomId: string; userId: strin
     if (!f.title || !f.scheduledAt || !userId) return;
     setSaving(true);
     try {
-      await supabase.from("meetings").insert({
+      const { error } = await supabase.from("meetings").insert({
         deal_room_id: dealRoomId,
         title: f.title,
         scheduled_at: new Date(f.scheduledAt).toISOString(),
@@ -1198,10 +1208,16 @@ function MeetingsTab({ dealRoomId, userId }: { dealRoomId: string; userId: strin
         notes: f.notes || null,
         created_by: userId,
       });
-      await logActivity(dealRoomId, userId, "Scheduled a meeting");
+      if (error) throw error;
+      await logActivity(dealRoomId, userId, "Scheduled a meeting", { title: f.title });
       queryClient.invalidateQueries({ queryKey: ["meetings", dealRoomId] });
+      queryClient.invalidateQueries({ queryKey: ["activities-overview", dealRoomId] });
       setF({ title: "", scheduledAt: "", meetingLink: "", notes: "" });
       setShowForm(false);
+      toast.success("Meeting scheduled");
+    } catch (err) {
+      console.error("Failed to schedule meeting:", err);
+      toast.error("Failed to schedule meeting — check console for details");
     } finally {
       setSaving(false);
     }
