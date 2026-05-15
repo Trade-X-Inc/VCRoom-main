@@ -372,7 +372,7 @@ function DealRoomOverview({
     queryFn: async () => {
       const { data } = await supabase
         .from("deal_tasks")
-        .select("*, assignee:users!deal_tasks_assignee_id_fkey(full_name, email)")
+        .select("*, assignee:users!assignee_id(full_name, email)")
         .eq("deal_room_id", dealRoomId)
         .order("completed", { ascending: true })
         .order("due_date", { ascending: true, nullsFirst: false })

@@ -26,7 +26,7 @@ export function DDChecklist({ dealRoomId, userId }: { dealRoomId: string; userId
     queryFn: async () => {
       const { data, error } = await supabase
         .from("deal_tasks")
-        .select("*, assignee:users!deal_tasks_assignee_id_fkey(full_name)")
+        .select("*, assignee:users!assignee_id(full_name)")
         .eq("deal_room_id", dealRoomId)
         .order("completed", { ascending: true })
         .order("created_at", { ascending: false });

@@ -54,11 +54,14 @@ function DealRooms() {
         .select(`
           id, status, created_at, updated_at,
           deal_room_members(user_id, role, users(full_name, email)),
-          deal_room_documents(id)
+          documents(id)
         `)
         .eq("startup_id", startup!.id)
         .order("updated_at", { ascending: false });
-      if (error) throw error;
+      if (error) {
+        console.error("Deal rooms query failed:", error);
+        throw error;
+      }
       return (data ?? []) as any[];
     },
   });
@@ -91,7 +94,7 @@ function DealRooms() {
           const members: any[] = r.deal_room_members ?? [];
           const investorMember = members.find((m: any) => m.role !== "founder");
           const investorName = investorMember?.users?.full_name ?? investorMember?.users?.email ?? "Investor pending";
-          const docsCount: number = (r.deal_room_documents ?? []).length;
+          const docsCount: number = (r.documents ?? []).length;
           const daysOpen = Math.floor((Date.now() - new Date(r.created_at).getTime()) / 86400000);
           const lastActivity = r.updated_at
             ? formatDistanceToNow(new Date(r.updated_at), { addSuffix: true })
