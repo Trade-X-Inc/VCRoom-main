@@ -26,7 +26,7 @@ export function DDChecklist({ dealRoomId, userId }: { dealRoomId: string; userId
     queryFn: async () => {
       const { data, error } = await supabase
         .from("deal_tasks")
-        .select("*, assignee:users!assignee_id(full_name)")
+        .select("id, title, assignee_id, due_date, completed, created_by, created_at")
         .eq("deal_room_id", dealRoomId)
         .order("completed", { ascending: true })
         .order("created_at", { ascending: false });
@@ -143,9 +143,6 @@ export function DDChecklist({ dealRoomId, userId }: { dealRoomId: string; userId
                   </div>
                   <div className="col-span-4 text-right text-xs text-muted-foreground">
                     {task.due_date && new Date(task.due_date).toLocaleDateString()}
-                    {task.assignee?.full_name && (
-                      <span className="ml-2 text-muted-foreground/70">{task.assignee.full_name}</span>
-                    )}
                   </div>
                 </div>
               );

@@ -372,7 +372,7 @@ function DealRoomOverview({
     queryFn: async () => {
       const { data } = await supabase
         .from("deal_tasks")
-        .select("*, assignee:users!assignee_id(full_name, email)")
+        .select("id, title, assignee_id, due_date, completed, created_by, created_at")
         .eq("deal_room_id", dealRoomId)
         .order("completed", { ascending: true })
         .order("due_date", { ascending: true, nullsFirst: false })
@@ -581,7 +581,7 @@ function DealRoomOverview({
                   <div className="flex-1 min-w-0">
                     <div className={cn("text-sm font-medium truncate", task.completed && "text-muted-foreground line-through")}>{task.title}</div>
                     <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      <span>{task.assignee?.full_name || task.assignee?.email || "Unassigned"}</span>
+                      <span>{"Unassigned"}</span>
                       <span>•</span>
                       <span>{task.due_date ? format(new Date(`${task.due_date}T00:00:00`), "MMM d") : "No due date"}</span>
                     </div>
