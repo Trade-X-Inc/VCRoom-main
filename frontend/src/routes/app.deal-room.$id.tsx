@@ -97,6 +97,7 @@ function DealRoom() {
 
   const { data: qaMessages = [] } = useQuery({
     queryKey: ["deal-room-qa", dealRoomId],
+    enabled: !!user?.id,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     queryFn: async () => {
@@ -262,7 +263,7 @@ function DealRoom() {
         {tab === "documents" && <Documents dealRoomId={dealRoomId} isFounder={isFounder} userId={user?.id} />}
         {tab === "chat" && <div className="h-full"><DealRoomChat /></div>}
         {tab === "qa" && <QA dealRoomId={dealRoomId} userId={user?.id} userName={userName} isInvestor={isInvestor} isFounder={isFounder} />}
-        {tab === "checklist" && <DDChecklist />}
+        {tab === "checklist" && <DDChecklist dealRoomId={dealRoomId} userId={user?.id} />}
         {tab === "notes" && <Notes dealRoomId={dealRoomId} userId={user?.id} />}
         {tab === "timeline" && <Timeline dealRoomId={dealRoomId} />}
         {tab === "meetings" && <MeetingsTab dealRoomId={dealRoomId} userId={user?.id} />}
@@ -1034,6 +1035,7 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
 
   const { data: notes = [], isLoading, isError } = useQuery({
     queryKey: ["notes", dealRoomId],
+    enabled: !!userId,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     queryFn: async () => {
@@ -1169,6 +1171,7 @@ function MeetingsTab({ dealRoomId, userId }: { dealRoomId: string; userId: strin
 
   const { data: meetings = [], isLoading, isError } = useQuery({
     queryKey: ["meetings", dealRoomId],
+    enabled: !!userId,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     queryFn: async () => {
@@ -1485,8 +1488,9 @@ function QA({
   };
 
   useEffect(() => {
+    if (!userId) return;
     loadMessages();
-  }, [dealRoomId]);
+  }, [dealRoomId, userId]);
 
   useEffect(() => {
     const channel = supabase
