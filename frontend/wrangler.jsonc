@@ -6,7 +6,7 @@
   "vars": {
     "VITE_SUPABASE_URL": "https://ldimninnjlvxozubheib.supabase.co",
     "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI",
-    "VITE_APP_URL": "https://main.vcroom-main.pages.dev",
+    "VITE_APP_URL": "https://vcroom-main.pages.dev",
     "SUPABASE_URL": "https://ldimninnjlvxozubheib.supabase.co"
   }
 }
