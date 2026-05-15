@@ -1,18 +1,81 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Building2, ExternalLink, Clock } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { Building2, ExternalLink, Clock, Plus, X, Loader2 } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 
 export const Route = createFileRoute("/app/investor/startups")({
   component: StartupsPage,
 });
 
+const STATUSES = ["Sourcing", "Reviewing", "Diligence", "Passed", "Invested", "Watching"] as const;
+type Status = (typeof STATUSES)[number];
+
+const TAB_STATUSES = ["All", "Sourcing", "Reviewing", "Diligence", "Passed", "Invested"] as const;
+
+const STATUS_STYLES: Record<string, string> = {
+  Sourcing: "bg-blue-500/10 text-blue-600 border-blue-500/30",
+  Reviewing: "bg-amber-500/10 text-amber-600 border-amber-500/30",
+  Diligence: "bg-purple-500/10 text-purple-600 border-purple-500/30",
+  Passed: "bg-muted text-muted-foreground border-border/60",
+  Invested: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
+  Watching: "bg-indigo-500/10 text-indigo-600 border-indigo-500/30",
+};
+
+const STAGES = ["Pre-seed", "Seed", "Series A", "Series B", "Growth"];
+
+interface AddForm {
+  company_name: string;
+  website: string;
+  sector: string;
+  stage: string;
+  description: string;
+  source: string;
+  initial_score: number;
+  notes: string;
+  status: Status;
+}
+
+const EMPTY_ADD: AddForm = {
+  company_name: "",
+  website: "",
+  sector: "",
+  stage: "Seed",
+  description: "",
+  source: "",
+  initial_score: 5,
+  notes: "",
+  status: "Sourcing",
+};
+
 function StartupsPage() {
   const { user } = useAuth();
+  const qc = useQueryClient();
+  const [activeTab, setActiveTab] = useState<(typeof TAB_STATUSES)[number]>("All");
+  const [showAdd, setShowAdd] = useState(false);
+  const [addForm, setAddForm] = useState<AddForm>(EMPTY_ADD);
+  const [saving, setSaving] = useState(false);
 
-  const { data: startups = [], isLoading, isError } = useQuery({
+  // Watchlist (manually-added companies)
+  const { data: watchlist = [], isLoading: watchlistLoading } = useQuery({
+    queryKey: ["investor-watchlist", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("investor_watchlist")
+        .select("*")
+        .eq("investor_id", user!.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  // Deal-room startups (existing data)
+  const { data: dealRoomStartups = [], isLoading: drLoading } = useQuery({
     queryKey: ["investor-startups", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
@@ -34,94 +97,360 @@ function StartupsPage() {
           updatedAt: r.deal_rooms?.updated_at,
           ...(r.deal_rooms?.startups ?? {}),
         }))
-        .filter((s: any) => !!s.id)
-        .sort((a: any, b: any) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
+        .filter((s: any) => !!s.id);
     },
   });
 
-  if (isLoading) {
-    return (
-      <div className="p-6 lg:p-8 max-w-[1400px] mx-auto">
-        <div className="h-8 w-48 rounded-lg bg-muted animate-pulse mb-2" />
-        <div className="h-4 w-64 rounded bg-muted/60 animate-pulse" />
-        <div className="mt-6 grid md:grid-cols-2 gap-4">
-          {[1, 2, 3, 4].map((i) => <div key={i} className="rounded-2xl border border-border/60 bg-card h-44 animate-pulse" />)}
-        </div>
-      </div>
-    );
-  }
+  const set = <K extends keyof AddForm>(k: K, v: AddForm[K]) => setAddForm((f) => ({ ...f, [k]: v }));
+
+  const submitAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user?.id) return;
+    if (!addForm.company_name.trim()) {
+      toast.error("Company name is required");
+      return;
+    }
+    setSaving(true);
+    try {
+      const { error } = await supabase.from("investor_watchlist").insert({
+        investor_id: user.id,
+        company_name: addForm.company_name.trim(),
+        website: addForm.website,
+        sector: addForm.sector,
+        stage: addForm.stage,
+        description: addForm.description,
+        source: addForm.source,
+        initial_score: addForm.initial_score,
+        notes: addForm.notes,
+        status: addForm.status,
+      });
+      if (error) throw error;
+      toast.success(`${addForm.company_name} added`);
+      setAddForm(EMPTY_ADD);
+      setShowAdd(false);
+      qc.invalidateQueries({ queryKey: ["investor-watchlist", user.id] });
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || "Could not save company");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const filteredWatchlist = useMemo(() => {
+    if (activeTab === "All") return watchlist;
+    return watchlist.filter((w: any) => w.status === activeTab);
+  }, [watchlist, activeTab]);
+
+  const countFor = (s: (typeof TAB_STATUSES)[number]) =>
+    s === "All" ? watchlist.length : watchlist.filter((w: any) => w.status === s).length;
+
+  const isLoading = watchlistLoading || drLoading;
 
   return (
     <div className="p-6 lg:p-8 max-w-[1400px] mx-auto">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Startups</h1>
-        <div className="text-sm text-muted-foreground">
-          {startups.length} compan{startups.length !== 1 ? "ies" : "y"} in your deal flow
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Startups</h1>
+          <div className="text-sm text-muted-foreground">
+            {watchlist.length} on watchlist · {dealRoomStartups.length} active deal room{dealRoomStartups.length !== 1 ? "s" : ""}
+          </div>
         </div>
+        <button
+          onClick={() => setShowAdd(true)}
+          className="inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-glow"
+        >
+          <Plus className="h-4 w-4" /> Add company
+        </button>
       </div>
 
-      {isError ? (
-        <div className="mt-8 rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground">
-          Could not load data. Please refresh.
-        </div>
-      ) : startups.length === 0 ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center">
-          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
-            <Building2 className="h-6 w-6" />
-          </div>
-          <h3 className="mt-4 text-lg font-semibold">No startups yet</h3>
-          <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
-            You'll see companies here when founders invite you to their deal room.
-          </p>
-        </div>
-      ) : (
-        <div className="mt-6 grid md:grid-cols-2 gap-4">
-          {startups.map((c: any) => (
-            <Link
-              key={c.id}
-              to="/app/deal-room/$id"
-              params={{ id: c.dealRoomId }}
-              className="block rounded-2xl border border-border/60 bg-card p-5 hover:shadow-card transition-shadow group"
+      {/* Status tabs */}
+      <div className="mt-5 flex flex-wrap items-center gap-1 border-b border-border/60">
+        {TAB_STATUSES.map((s) => {
+          const active = activeTab === s;
+          return (
+            <button
+              key={s}
+              onClick={() => setActiveTab(s)}
+              className={
+                "px-3 py-2 text-sm -mb-px border-b-2 transition-colors " +
+                (active
+                  ? "border-brand text-foreground font-medium"
+                  : "border-transparent text-muted-foreground hover:text-foreground")
+              }
             >
-              <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold shrink-0">
-                  {(c.company_name || "S")[0]}
+              {s} <span className="ml-1 text-xs text-muted-foreground">({countFor(s)})</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Deal-room startups section */}
+      {dealRoomStartups.length > 0 && activeTab === "All" && (
+        <div className="mt-6">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-3">
+            Active deal rooms
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            {dealRoomStartups.map((c: any) => (
+              <Link
+                key={c.id}
+                to="/app/deal-room/$id"
+                params={{ id: c.dealRoomId }}
+                className="block rounded-2xl border border-border/60 bg-card p-5 hover:shadow-card transition-shadow group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold shrink-0">
+                    {(c.company_name || "S")[0]}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold truncate group-hover:text-brand transition-colors">{c.company_name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {c.sector || "General"} · {c.stage || "Stage unknown"}
+                    </div>
+                  </div>
+                  <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold truncate group-hover:text-brand transition-colors">{c.company_name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {c.sector || "General"} · {c.stage || "Stage unknown"}
+                {c.tagline && <p className="mt-3 text-sm text-muted-foreground line-clamp-1">{c.tagline}</p>}
+                <div className="mt-4 grid grid-cols-3 gap-2 pt-4 border-t border-border/60">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Revenue</div>
+                    <div className="text-sm font-medium">{c.revenue || "—"}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Ask</div>
+                    <div className="text-sm font-medium">{c.funding_target || "—"}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Team</div>
+                    <div className="text-sm font-medium">{c.team_size || "—"}</div>
                   </div>
                 </div>
-                <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-              </div>
-              {c.tagline && (
-                <p className="mt-3 text-sm text-muted-foreground line-clamp-1">{c.tagline}</p>
-              )}
-              <div className="mt-4 grid grid-cols-3 gap-2 pt-4 border-t border-border/60">
-                <div>
-                  <div className="text-xs text-muted-foreground">Revenue</div>
-                  <div className="text-sm font-medium">{c.revenue || "—"}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-muted-foreground">Ask</div>
-                  <div className="text-sm font-medium">{c.funding_target || "—"}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-muted-foreground">Team</div>
-                  <div className="text-sm font-medium">{c.team_size || "—"}</div>
-                </div>
-              </div>
-              {c.updatedAt && (
-                <div className="mt-3 flex items-center gap-1 text-xs text-muted-foreground">
-                  <Clock className="h-3 w-3" />
-                  {formatDistanceToNow(new Date(c.updatedAt), { addSuffix: true })}
-                </div>
-              )}
-            </Link>
-          ))}
+                {c.updatedAt && (
+                  <div className="mt-3 flex items-center gap-1 text-xs text-muted-foreground">
+                    <Clock className="h-3 w-3" />
+                    {formatDistanceToNow(new Date(c.updatedAt), { addSuffix: true })}
+                  </div>
+                )}
+              </Link>
+            ))}
+          </div>
         </div>
       )}
+
+      {/* Watchlist section */}
+      <div className="mt-6">
+        {activeTab === "All" && watchlist.length > 0 && (
+          <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-3">
+            Watchlist
+          </div>
+        )}
+
+        {isLoading ? (
+          <div className="grid md:grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="rounded-2xl border border-border/60 bg-card h-40 animate-pulse" />
+            ))}
+          </div>
+        ) : filteredWatchlist.length === 0 && (activeTab !== "All" || dealRoomStartups.length === 0) ? (
+          <div className="rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center">
+            <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
+              <Building2 className="h-6 w-6" />
+            </div>
+            <h3 className="mt-4 text-lg font-semibold">No companies in {activeTab.toLowerCase()}</h3>
+            <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
+              Add a company you're tracking and move it through your pipeline.
+            </p>
+            <button
+              onClick={() => setShowAdd(true)}
+              className="mt-4 inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-to-r from-purple-600 to-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
+            >
+              <Plus className="h-4 w-4" /> Add company
+            </button>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-4">
+            {filteredWatchlist.map((c: any) => (
+              <div key={c.id} className="rounded-2xl border border-border/60 bg-card p-5">
+                <div className="flex items-center gap-3">
+                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold shrink-0">
+                    {(c.company_name || "S")[0]}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold truncate">{c.company_name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {c.sector || "General"} · {c.stage || "Stage unknown"}
+                    </div>
+                  </div>
+                  <span
+                    className={
+                      "text-[10px] px-2 py-0.5 rounded-full border font-medium " +
+                      (STATUS_STYLES[c.status] || STATUS_STYLES.Sourcing)
+                    }
+                  >
+                    {c.status}
+                  </span>
+                </div>
+                {c.description && (
+                  <p className="mt-3 text-sm text-muted-foreground line-clamp-2">{c.description}</p>
+                )}
+                <div className="mt-4 grid grid-cols-3 gap-2 pt-4 border-t border-border/60 text-xs">
+                  <div>
+                    <div className="text-muted-foreground">Score</div>
+                    <div className="font-medium tabular-nums">{c.initial_score ?? "—"}/10</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">Source</div>
+                    <div className="font-medium truncate">{c.source || "—"}</div>
+                  </div>
+                  <div className="text-right">
+                    {c.website && (
+                      <a
+                        href={c.website.startsWith("http") ? c.website : `https://${c.website}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-brand hover:underline"
+                      >
+                        Site <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Add company modal */}
+      {showAdd && (
+        <div
+          className="fixed inset-0 z-50 bg-foreground/30 backdrop-blur-sm grid place-items-center p-4"
+          onClick={() => !saving && setShowAdd(false)}
+        >
+          <div
+            className="w-full max-w-xl rounded-2xl bg-card border border-border/60 shadow-elev max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border/60 sticky top-0 bg-card">
+              <div className="text-sm font-semibold">Add company</div>
+              <button onClick={() => setShowAdd(false)} disabled={saving} className="text-muted-foreground hover:text-foreground">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <form onSubmit={submitAdd} className="p-5 space-y-4">
+              <Field label="Company name *">
+                <input
+                  required
+                  value={addForm.company_name}
+                  onChange={(e) => set("company_name", e.target.value)}
+                  className="modal-input"
+                  placeholder="Acme Inc."
+                />
+              </Field>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Website">
+                  <input value={addForm.website} onChange={(e) => set("website", e.target.value)} className="modal-input" placeholder="acme.com" />
+                </Field>
+                <Field label="Sector">
+                  <input value={addForm.sector} onChange={(e) => set("sector", e.target.value)} className="modal-input" placeholder="AI / DevTools" />
+                </Field>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Stage">
+                  <select value={addForm.stage} onChange={(e) => set("stage", e.target.value)} className="modal-input">
+                    {STAGES.map((s) => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </Field>
+                <Field label="Status">
+                  <select value={addForm.status} onChange={(e) => set("status", e.target.value as Status)} className="modal-input">
+                    {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </Field>
+              </div>
+
+              <Field label="Description">
+                <textarea
+                  value={addForm.description}
+                  onChange={(e) => set("description", e.target.value)}
+                  rows={2}
+                  className="modal-input"
+                  placeholder="What does the company do?"
+                />
+              </Field>
+
+              <Field label="How you found them (source)">
+                <input value={addForm.source} onChange={(e) => set("source", e.target.value)} className="modal-input" placeholder="LinkedIn intro, conference, etc." />
+              </Field>
+
+              <Field label={`Initial score — ${addForm.initial_score}/10`}>
+                <input
+                  type="range"
+                  min={1}
+                  max={10}
+                  step={1}
+                  value={addForm.initial_score}
+                  onChange={(e) => set("initial_score", Number(e.target.value))}
+                  className="w-full accent-purple-600"
+                />
+              </Field>
+
+              <Field label="Notes">
+                <textarea
+                  value={addForm.notes}
+                  onChange={(e) => set("notes", e.target.value)}
+                  rows={2}
+                  className="modal-input"
+                  placeholder="Anything you want to remember."
+                />
+              </Field>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAdd(false)}
+                  disabled={saving}
+                  className="rounded-[10px] border border-border/60 px-3 py-1.5 text-sm hover:bg-accent"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-1.5 text-sm font-medium text-white shadow-glow disabled:opacity-60"
+                >
+                  {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                  Add
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        .modal-input {
+          width: 100%;
+          border-radius: 10px;
+          border: 1px solid hsl(var(--border) / 0.6);
+          background: hsl(var(--background));
+          padding: 0.5rem 0.75rem;
+          font-size: 0.875rem;
+          outline: none;
+        }
+        .modal-input:focus { border-color: hsl(var(--brand) / 0.5); }
+      `}</style>
     </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <div className="text-xs font-medium text-muted-foreground mb-1.5">{label}</div>
+      {children}
+    </label>
   );
 }

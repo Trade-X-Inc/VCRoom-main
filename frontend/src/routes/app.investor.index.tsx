@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { CheckCircle2, Sparkles, Inbox } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -25,7 +25,28 @@ const DB_STATUS_TO_STAGE: Record<string, string> = {
 
 function InvestorDashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+
+  // Gate: require investor profile before showing dashboard
+  const { data: profile, isLoading: profileLoading } = useQuery({
+    queryKey: ["investor-profile-gate", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("investor_profiles")
+        .select("*")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  useEffect(() => {
+    if (!profileLoading && user?.id && profile === null) {
+      navigate({ to: "/app/investor/profile", search: {} });
+    }
+  }, [profile, profileLoading, user?.id, navigate]);
 
   const today = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   const greet = (() => {

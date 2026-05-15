@@ -38,6 +38,7 @@ const investorNav: NavItem[] = [
   { to: "/app/investor/startups", labelKey: "app.startups", icon: Building2 },
   { to: "/app/investor/diligence", labelKey: "app.diligence", icon: ClipboardCheck },
   { to: "/app/investor/analysis", labelKey: "app.analysis", icon: Brain },
+  { to: "/app/investor/advisor", labelKey: "AI Advisor", icon: Sparkles },
   { to: "/app/investor/decisions", labelKey: "app.decisions", icon: Gavel },
   { to: "/app/investor/portfolio", labelKey: "Portfolio", icon: PieChart },
   { to: "/app/meetings", labelKey: "app.meetings", icon: Calendar },
