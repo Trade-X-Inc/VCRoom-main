@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { Sparkles, Send, Loader2, User } from "lucide-react";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
 import { useAuth } from "@/lib/auth";
 import { getInvestorAdvice } from "@/lib/investor-advisor-fn";
 
@@ -112,13 +113,17 @@ function InvestorAdvisor() {
                 {m.role === "user" ? <User className="h-4 w-4" /> : <Sparkles className="h-4 w-4 text-brand" />}
               </div>
               <div
-                className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
+                className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                   m.role === "user"
                     ? "bg-gradient-brand text-brand-foreground"
                     : "bg-card border border-border/60 shadow-card"
                 }`}
               >
-                {m.content}
+                {m.role === "user" ? m.content : (
+                  <div className="[&_p]:mb-1.5 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:space-y-0.5 [&_ol]:list-decimal [&_ol]:pl-4 [&_strong]:font-semibold">
+                    <ReactMarkdown>{m.content}</ReactMarkdown>
+                  </div>
+                )}
               </div>
             </div>
           ))}

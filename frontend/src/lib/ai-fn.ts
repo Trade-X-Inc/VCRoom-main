@@ -6,7 +6,22 @@ Return ONLY valid JSON in this exact format:
 {"subject":"...","body":"..."}
 No markdown, no explanation, just the JSON object.`;
 
-type EmailInput = { leadId: string; type: "cold" | "followup"; userId: string; openAIKey?: string };
+type LeadData = {
+  id: string;
+  investor_name: string;
+  firm_name?: string | null;
+  sector?: string | null;
+  stage?: string | null;
+  status?: string | null;
+  notes?: string | null;
+};
+
+type EmailInput = {
+  leadData: LeadData;
+  type: "cold" | "followup";
+  userId: string;
+  openAIKey?: string;
+};
 
 export const generateOutreachEmail = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): EmailInput => data as EmailInput)
@@ -31,6 +46,7 @@ export const generateOutreachEmail = createServerFn({ method: "POST" })
       };
     }
     const adminClient = createClient(supabaseUrl, serviceKey);
+    const lead = data.leadData;
 
     // 1. Rate limit: max 10 per hour
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
@@ -42,16 +58,7 @@ export const generateOutreachEmail = createServerFn({ method: "POST" })
       .gte("created_at", oneHourAgo);
     if ((count ?? 0) >= 10) throw new Error("Rate limit exceeded");
 
-    // 2. Fetch lead (filter by founder_id to avoid RLS issues and implicit auth check)
-    const { data: lead } = await adminClient
-      .from("vc_leads")
-      .select("*")
-      .eq("id", data.leadId)
-      .eq("founder_id", data.userId)
-      .maybeSingle();
-    if (!lead) throw new Error("Lead not found");
-
-    // 3. Fetch startup profile
+    // 2. Fetch startup profile
     const { data: startup } = await adminClient
       .from("startups")
       .select("*")
@@ -59,7 +66,7 @@ export const generateOutreachEmail = createServerFn({ method: "POST" })
       .limit(1)
       .maybeSingle();
 
-    // 4. Build prompt
+    // 3. Build prompt
     const userPrompt =
       data.type === "cold"
         ? `Write a cold outreach email from ${startup?.company_name ?? "our startup"} founder to ${lead.investor_name} at ${lead.firm_name ?? "their firm"}.
@@ -73,7 +80,7 @@ Notes context: ${lead.notes ?? "none"}.
 Keep it under 80 words. Reference prior contact.
 Be warm but direct.`;
 
-    // 5. Call OpenAI
+    // 4. Call OpenAI
     if (!openAIKey) {
       return {
         subject: "Unable to generate",
@@ -98,15 +105,15 @@ Be warm but direct.`;
     });
     if (!resp.ok) throw new Error("OpenAI request failed");
 
-    // 6. Parse response
+    // 5. Parse response
     const json = await resp.json() as { choices: Array<{ message: { content: string } }> };
     const raw = json.choices[0]?.message?.content ?? "";
     const parsed = JSON.parse(raw) as { subject: string; body: string };
     if (!parsed.subject || !parsed.body) throw new Error("Invalid AI response");
 
-    // 7. Log usage
+    // 6. Log usage
     await adminClient.from("ai_usage").insert({ user_id: data.userId, action: "email_gen" });
 
-    // 8. Return
+    // 7. Return
     return { subject: parsed.subject, body: parsed.body };
   });

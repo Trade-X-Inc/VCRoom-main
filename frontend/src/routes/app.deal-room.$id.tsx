@@ -261,7 +261,7 @@ function DealRoom() {
           />
         )}
         {tab === "documents" && <Documents dealRoomId={dealRoomId} isFounder={isFounder} userId={user?.id} />}
-        {tab === "chat" && <div className="h-full"><DealRoomChat /></div>}
+        {tab === "chat" && <div className="h-full"><DealRoomChat dealRoomId={dealRoomId} userId={user?.id} userName={userName} /></div>}
         {tab === "qa" && <QA dealRoomId={dealRoomId} userId={user?.id} userName={userName} isInvestor={isInvestor} isFounder={isFounder} />}
         {tab === "checklist" && <DDChecklist dealRoomId={dealRoomId} userId={user?.id} />}
         {tab === "notes" && <Notes dealRoomId={dealRoomId} userId={user?.id} />}
@@ -1489,6 +1489,7 @@ function QA({
   const [sending, setSending] = useState(false);
   const [asking, setAsking] = useState(false);
   const [answeringId, setAnsweringId] = useState<string | null>(null);
+  const [draftingAiReplyId, setDraftingAiReplyId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const loadMessages = async () => {
@@ -1727,16 +1728,52 @@ function QA({
                             placeholder="Answer this question..."
                             className="w-full resize-none rounded-md border border-border/60 bg-card px-3 py-2 text-sm outline-none focus:border-brand/50"
                           />
-                          <div className="mt-3 flex items-center justify-between">
+                          <div className="mt-3 flex items-center justify-between gap-2">
                             <span className="text-xs text-muted-foreground">{countWords(answerDrafts[item.id] ?? "")} words</span>
-                            <button
-                              onClick={() => saveAnswer(item.id)}
-                              disabled={!answerDrafts[item.id]?.trim() || answeringId === item.id}
-                              className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand px-3 py-2 text-sm font-medium text-brand-foreground disabled:opacity-50"
-                            >
-                              {answeringId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                              Post answer
-                            </button>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={async () => {
+                                  if (!userId || draftingAiReplyId === item.id) return;
+                                  setDraftingAiReplyId(item.id);
+                                  try {
+                                    const openAIKey = import.meta.env.VITE_OPENAI_API_KEY || "";
+                                    const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+                                      method: "POST",
+                                      headers: { "Content-Type": "application/json", Authorization: `Bearer ${openAIKey}` },
+                                      body: JSON.stringify({
+                                        model: "gpt-4o-mini",
+                                        max_tokens: 300,
+                                        temperature: 0.7,
+                                        messages: [
+                                          { role: "system", content: "You are a startup founder assistant. Write a clear, professional answer to an investor due-diligence question. Return only the answer text, under 120 words, no markdown symbols." },
+                                          { role: "user", content: `Investor question: "${item.body}"\n\nWrite a founder's answer.` },
+                                        ],
+                                      }),
+                                    });
+                                    const json = await resp.json() as { choices: Array<{ message: { content: string } }> };
+                                    const draft = (json.choices[0]?.message?.content ?? "").trim();
+                                    if (draft) setAnswerDrafts((d) => ({ ...d, [item.id]: draft }));
+                                  } catch {
+                                    toast.error("AI draft failed");
+                                  } finally {
+                                    setDraftingAiReplyId(null);
+                                  }
+                                }}
+                                disabled={draftingAiReplyId === item.id}
+                                className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 text-brand px-3 py-2 text-sm font-medium hover:bg-brand/5 disabled:opacity-50"
+                              >
+                                {draftingAiReplyId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                                AI Draft
+                              </button>
+                              <button
+                                onClick={() => saveAnswer(item.id)}
+                                disabled={!answerDrafts[item.id]?.trim() || answeringId === item.id}
+                                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand px-3 py-2 text-sm font-medium text-brand-foreground disabled:opacity-50"
+                              >
+                                {answeringId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                                Post answer
+                              </button>
+                            </div>
                           </div>
                         </div>
                       ) : (

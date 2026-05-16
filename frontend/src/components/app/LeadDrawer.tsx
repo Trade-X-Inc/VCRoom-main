@@ -186,6 +186,7 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
   const [generatingLinkedIn, setGeneratingLinkedIn] = useState(false);
   const [generatedLinkedIn, setGeneratedLinkedIn] = useState("");
   const [investorReply, setInvestorReply] = useState("");
+  const [replyTone, setReplyTone] = useState("Professional");
   const [generatingReply, setGeneratingReply] = useState(false);
   const [generatedReply, setGeneratedReply] = useState("");
 
@@ -209,6 +210,7 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
     setGeneratedLinkedIn("");
     setGeneratedReply("");
     setInvestorReply("");
+    setReplyTone("Professional");
     setShowMeetingForm(false);
     setNewNote("");
     if (lead) {
@@ -322,7 +324,7 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
     try {
       const openAIKey = import.meta.env.VITE_OPENAI_API_KEY || "";
       console.log("OpenAI Key present:", !!openAIKey);
-      const result = await generateOutreachEmail({ data: { userId: user.id, leadId: lead.id, type, openAIKey } });
+      const result = await generateOutreachEmail({ data: { userId: user.id, leadData: lead, type, openAIKey } });
       setGeneratedEmail(`Subject: ${result.subject}\n\n${result.body}`);
     } catch (err: any) {
       toast.error(err.message || "Failed to generate email");
@@ -337,7 +339,7 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
     setGeneratedLinkedIn("");
     try {
       const openAIKey = import.meta.env.VITE_OPENAI_API_KEY || "";
-      const result = await generateLinkedInMessage({ data: { userId: user.id, leadId: lead.id, openAIKey } });
+      const result = await generateLinkedInMessage({ data: { userId: user.id, leadData: lead, openAIKey } });
       setGeneratedLinkedIn(result.message);
     } catch (err: any) {
       toast.error(err.message || "Failed to generate LinkedIn message");
@@ -352,7 +354,7 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
     setGeneratedReply("");
     try {
       const openAIKey = import.meta.env.VITE_OPENAI_API_KEY || "";
-      const result = await generateReply({ data: { userId: user.id, leadId: lead.id, investorReply: investorReply.trim(), openAIKey } });
+      const result = await generateReply({ data: { userId: user.id, leadData: lead, investorReply: investorReply.trim(), tone: replyTone, openAIKey } });
       setGeneratedReply(result.reply);
     } catch (err: any) {
       toast.error(err.message || "Failed to generate reply");
@@ -756,10 +758,21 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
                         <textarea
                           value={investorReply}
                           onChange={(e) => setInvestorReply(e.target.value)}
-                          rows={3}
+                          rows={6}
                           placeholder="Paste the investor's email or message here…"
                           className={cn(inputCls, "resize-none text-xs")}
                         />
+                      </Field>
+                      <Field label="Reply tone">
+                        <select
+                          value={replyTone}
+                          onChange={(e) => setReplyTone(e.target.value)}
+                          className={inputCls}
+                        >
+                          {["Professional", "Enthusiastic", "Concise", "Follow-up", "Decline gracefully"].map((t) => (
+                            <option key={t}>{t}</option>
+                          ))}
+                        </select>
                       </Field>
                       <button
                         type="button"

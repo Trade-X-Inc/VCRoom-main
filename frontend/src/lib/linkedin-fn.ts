@@ -1,7 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 
-type LinkedInInput = { userId: string; leadId: string; openAIKey?: string };
+type LeadData = {
+  id: string;
+  investor_name: string;
+  firm_name?: string | null;
+  sector?: string | null;
+  stage?: string | null;
+};
+
+type LinkedInInput = { userId: string; leadData: LeadData; openAIKey?: string };
 
 export const generateLinkedInMessage = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): LinkedInInput => data as LinkedInInput)
@@ -21,14 +29,7 @@ export const generateLinkedInMessage = createServerFn({ method: "POST" })
       import.meta.env.VITE_OPENAI_API_KEY || "";
     if (!supabaseUrl || !serviceKey) throw new Error("Supabase not configured");
     const adminClient = createClient(supabaseUrl, serviceKey);
-
-    const { data: lead } = await adminClient
-      .from("vc_leads")
-      .select("*")
-      .eq("id", data.leadId)
-      .eq("founder_id", data.userId)
-      .maybeSingle();
-    if (!lead) throw new Error("Lead not found");
+    const lead = data.leadData;
 
     const { data: startup } = await adminClient
       .from("startups")
