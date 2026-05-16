@@ -62,39 +62,47 @@ function Advisor() {
     },
   });
 
-  const [msgs, setMsgs] = useState<ChatMsg[]>([
-    {
-      id: "m0",
-      role: "assistant",
-      content: "I'm your AI fundraising advisor. I have live context on your pipeline, leads, and deal rooms. Ask me anything about your raise.",
-    },
-  ]);
+  const WELCOME: ChatMsg = {
+    id: "m0",
+    role: "assistant",
+    content: "I'm your AI fundraising advisor. I have live context on your pipeline, leads, and deal rooms. Ask me anything about your raise.",
+  };
+
+  const [msgs, setMsgs] = useState<ChatMsg[]>([WELCOME]);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
   const [errorBanner, setErrorBanner] = useState<string | null>(null);
+  const historyApplied = useRef(false);
 
-  // Load persisted messages on mount
+  const { data: savedHistory } = useQuery({
+    queryKey: ["advisor-messages", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("advisor_messages")
+        .select("role, content, created_at")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: true })
+        .limit(20);
+      return (data ?? []) as Array<{ role: string; content: string; created_at: string }>;
+    },
+  });
+
+  // Prepend persisted history once, keeping welcome message first
   useEffect(() => {
-    if (!user?.id) return;
-    supabase
-      .from("advisor_messages")
-      .select("id, role, content")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: true })
-      .limit(20)
-      .then(({ data }) => {
-        if (data && data.length > 0) {
-          setMsgs((current) => [
-            current[0], // keep welcome message
-            ...data.map((m: any) => ({
-              id: m.id,
-              role: m.role as "user" | "assistant",
-              content: m.content,
-            })),
-          ]);
-        }
-      });
-  }, [user?.id]);
+    if (historyApplied.current || !savedHistory) return;
+    historyApplied.current = true;
+    if (savedHistory.length > 0) {
+      setMsgs([
+        WELCOME,
+        ...savedHistory.map((m, i) => ({
+          id: `h${i}`,
+          role: m.role as "user" | "assistant",
+          content: m.content,
+        })),
+      ]);
+    }
+  }, [savedHistory]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -121,11 +129,8 @@ function Advisor() {
       if (result.error === "missing_key") {
         setErrorBanner("OpenAI API key not configured. Contact your admin.");
       } else if (user?.id && !result.error) {
-        // Persist both turns — fire and forget
-        supabase.from("advisor_messages").insert([
-          { user_id: user.id, role: "user", content: t },
-          { user_id: user.id, role: "assistant", content: result.reply },
-        ]);
+        supabase.from("advisor_messages").insert({ user_id: user.id, role: "user", content: t });
+        supabase.from("advisor_messages").insert({ user_id: user.id, role: "assistant", content: result.reply });
       }
     } catch (e: any) {
       toast.error("Request failed. Please try again.");
