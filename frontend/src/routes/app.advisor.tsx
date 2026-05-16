@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Sparkles, Send, Loader2, User } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
@@ -28,6 +29,38 @@ const STARTERS = [
 function Advisor() {
   const { user } = useAuth();
   const endRef = useRef<HTMLDivElement>(null);
+
+  const { data: startupCtx } = useQuery({
+    queryKey: ["advisor-ctx", user?.id],
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const [{ data: startup }, { count: leadCount }, { count: meetingCount }] = await Promise.all([
+        supabase.from("startups")
+          .select("company_name, stage, sector, funding_target, revenue, traction")
+          .eq("founder_id", user!.id)
+          .maybeSingle(),
+        supabase.from("vc_leads")
+          .select("*", { count: "exact", head: true })
+          .eq("founder_id", user!.id),
+        supabase.from("meetings")
+          .select("*", { count: "exact", head: true })
+          .eq("created_by", user!.id)
+          .gte("scheduled_at", new Date().toISOString()),
+      ]);
+      if (!startup) return null;
+      return {
+        companyName: startup.company_name ?? undefined,
+        stage: startup.stage ?? undefined,
+        sector: startup.sector ?? undefined,
+        fundingTarget: startup.funding_target ?? undefined,
+        revenue: startup.revenue ?? undefined,
+        traction: startup.traction ?? undefined,
+        leadCount: leadCount ?? 0,
+        meetingCount: meetingCount ?? 0,
+      };
+    },
+  });
 
   const [msgs, setMsgs] = useState<ChatMsg[]>([
     {
@@ -80,7 +113,9 @@ function Advisor() {
     try {
       const openAIKey = import.meta.env.VITE_OPENAI_API_KEY || "";
       const history = msgs.slice(1).map((m) => ({ role: m.role as string, content: m.content }));
-      const result = await getAIAdvice({ data: { userId: user.id, message: t, history, openAIKey } });
+      const result = await getAIAdvice({
+        data: { userId: user.id, message: t, history, openAIKey, startupContext: startupCtx ?? undefined },
+      });
 
       setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: result.reply }]);
       if (result.error === "missing_key") {

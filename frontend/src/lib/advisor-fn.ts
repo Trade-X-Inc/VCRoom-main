@@ -1,11 +1,22 @@
 import { createServerFn } from "@tanstack/react-start";
-import { createClient } from "@supabase/supabase-js";
+
+type StartupContext = {
+  companyName?: string;
+  stage?: string;
+  sector?: string;
+  fundingTarget?: string;
+  revenue?: string;
+  traction?: string;
+  leadCount?: number;
+  meetingCount?: number;
+};
 
 type AdvisorInput = {
   userId: string;
   message: string;
   history: Array<{ role: string; content: string }>;
   openAIKey?: string;
+  startupContext?: StartupContext;
 };
 
 type AdvisorResult = {
@@ -21,16 +32,6 @@ export const getAIAdvice = createServerFn({ method: "POST" })
       process.env.OPENAI_API_KEY ||
       (globalThis as any).OPENAI_API_KEY || "";
 
-    const supabaseUrl =
-      process.env.SUPABASE_URL ||
-      (globalThis as any).SUPABASE_URL ||
-      import.meta.env.VITE_SUPABASE_URL || "";
-
-    const supabaseKey =
-      process.env.SUPABASE_SERVICE_ROLE_KEY ||
-      (globalThis as any).SUPABASE_SERVICE_ROLE_KEY ||
-      import.meta.env.VITE_SUPABASE_ANON_KEY || "";
-
     if (!openAIKey) {
       return {
         reply: "AI Advisor is not configured yet. Please add your OpenAI API key to get started.",
@@ -39,43 +40,21 @@ export const getAIAdvice = createServerFn({ method: "POST" })
     }
 
     let context = "";
-    if (supabaseUrl && supabaseKey) {
-      try {
-        const admin = createClient(supabaseUrl, supabaseKey);
-
-        const [{ data: startup }, { data: leads }, { data: meetings }] = await Promise.all([
-          admin.from("startups")
-            .select("company_name, stage, sector, funding_target, revenue, traction")
-            .eq("founder_id", data.userId)
-            .maybeSingle(),
-          admin.from("vc_leads")
-            .select("investor_name, firm_name, status, follow_up_date")
-            .eq("founder_id", data.userId),
-          admin.from("meetings")
-            .select("title, scheduled_at")
-            .eq("created_by", data.userId)
-            .gte("scheduled_at", new Date().toISOString())
-            .limit(3),
-        ]);
-
-        if (startup) {
-          context = [
-            `Company: ${startup.company_name || "Not set"}`,
-            `Stage: ${startup.stage || "Not set"}`,
-            `Sector: ${startup.sector || "Not set"}`,
-            `Raising: ${startup.funding_target || "Not set"}`,
-            `ARR/Revenue: ${startup.revenue || "Not set"}`,
-            `Traction: ${startup.traction || "Not set"}`,
-            `Active leads: ${leads?.length || 0}`,
-            `Upcoming meetings: ${meetings?.length || 0}`,
-          ].join("\n");
-        }
-      } catch (e) {
-        console.error("Context fetch failed:", e);
-      }
+    if (data.startupContext) {
+      const sc = data.startupContext;
+      context = [
+        `Company: ${sc.companyName || "Not set"}`,
+        `Stage: ${sc.stage || "Not set"}`,
+        `Sector: ${sc.sector || "Not set"}`,
+        `Raising: ${sc.fundingTarget || "Not set"}`,
+        `ARR/Revenue: ${sc.revenue || "Not set"}`,
+        `Traction: ${sc.traction || "Not set"}`,
+        `Active leads: ${sc.leadCount ?? 0}`,
+        `Upcoming meetings: ${sc.meetingCount ?? 0}`,
+      ].join("\n");
     }
 
-    // Build personalized identity from fetched startup data
+    // Build personalized identity from client-supplied startup context
     let advisorIdentity = "You are an expert startup fundraising advisor.";
     if (context) {
       const lines = context.split("\n");

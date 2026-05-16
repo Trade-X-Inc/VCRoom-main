@@ -51,11 +51,7 @@ function DealRooms() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("deal_rooms")
-        .select(`
-          id, status, created_at, updated_at,
-          deal_room_members(user_id, role),
-          documents(id)
-        `)
+        .select("id, status, created_at, updated_at")
         .eq("startup_id", startup!.id)
         .order("updated_at", { ascending: false });
       if (error) {
