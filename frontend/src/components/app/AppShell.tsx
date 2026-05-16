@@ -193,6 +193,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
               <Link
                 key={n.to}
                 to={n.to as any}
+                preload="intent"
                 className={cn(
                   "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors group",
                   active ? "bg-accent text-foreground font-medium shadow-xs" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
@@ -221,6 +222,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                   <Link
                     key={n.to}
                     to={n.to as any}
+                    preload="intent"
                     className={cn(
                       "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
                       active ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",

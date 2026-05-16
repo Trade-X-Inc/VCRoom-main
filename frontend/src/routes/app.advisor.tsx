@@ -4,6 +4,7 @@ import { Sparkles, Send, Loader2, User } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 import { getAIAdvice } from "@/lib/advisor-fn";
 
 export const Route = createFileRoute("/app/advisor")({
@@ -39,6 +40,29 @@ function Advisor() {
   const [thinking, setThinking] = useState(false);
   const [errorBanner, setErrorBanner] = useState<string | null>(null);
 
+  // Load persisted messages on mount
+  useEffect(() => {
+    if (!user?.id) return;
+    supabase
+      .from("advisor_messages")
+      .select("id, role, content")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: true })
+      .limit(20)
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          setMsgs((current) => [
+            current[0], // keep welcome message
+            ...data.map((m: any) => ({
+              id: m.id,
+              role: m.role as "user" | "assistant",
+              content: m.content,
+            })),
+          ]);
+        }
+      });
+  }, [user?.id]);
+
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [msgs, thinking]);
@@ -61,6 +85,12 @@ function Advisor() {
       setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: result.reply }]);
       if (result.error === "missing_key") {
         setErrorBanner("OpenAI API key not configured. Contact your admin.");
+      } else if (user?.id && !result.error) {
+        // Persist both turns — fire and forget
+        supabase.from("advisor_messages").insert([
+          { user_id: user.id, role: "user", content: t },
+          { user_id: user.id, role: "assistant", content: result.reply },
+        ]);
       }
     } catch (e: any) {
       toast.error("Request failed. Please try again.");

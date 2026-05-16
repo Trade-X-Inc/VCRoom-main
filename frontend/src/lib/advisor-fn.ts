@@ -64,8 +64,9 @@ export const getAIAdvice = createServerFn({ method: "POST" })
             `Stage: ${startup.stage || "Not set"}`,
             `Sector: ${startup.sector || "Not set"}`,
             `Raising: ${startup.funding_target || "Not set"}`,
-            `ARR: ${startup.revenue || "Not set"}`,
-            `Total leads: ${leads?.length || 0}`,
+            `ARR/Revenue: ${startup.revenue || "Not set"}`,
+            `Traction: ${startup.traction || "Not set"}`,
+            `Active leads: ${leads?.length || 0}`,
             `Upcoming meetings: ${meetings?.length || 0}`,
           ].join("\n");
         }
@@ -74,12 +75,28 @@ export const getAIAdvice = createServerFn({ method: "POST" })
       }
     }
 
+    // Build personalized identity from fetched startup data
+    let advisorIdentity = "You are an expert startup fundraising advisor.";
+    if (context) {
+      const lines = context.split("\n");
+      const get = (prefix: string) => lines.find((l) => l.startsWith(prefix))?.split(": ")[1]?.trim() ?? "";
+      const company = get("Company");
+      const stage = get("Stage");
+      const sector = get("Sector");
+      const raising = get("Raising");
+      if (company && company !== "Not set") {
+        advisorIdentity = `You are an expert startup fundraising advisor for ${company}, a ${stage !== "Not set" ? stage : "early-stage"} ${sector !== "Not set" ? sector : "tech"} startup raising ${raising !== "Not set" ? raising : "their next round"}.`;
+      }
+    }
+
     const systemPrompt = [
-      "You are an expert fundraising advisor for startup founders.",
-      context ? `\nCurrent context:\n${context}` : "",
-      "\nHelp with: pipeline strategy, investor outreach, meeting prep, deal room advice.",
-      "\nFormat responses using markdown: **bold** for key terms, bullet points for lists, short paragraphs.",
-      "Be specific, direct, and actionable. Max 150 words. End with one clear **next action**.",
+      advisorIdentity,
+      "\nYou have full context on this founder's pipeline, leads, and meetings.",
+      "Give specific, actionable advice — not generic tips.",
+      "Use bullet points and clear structure. Max 200 words.",
+      "Never say you cannot access information — use the context provided to give real advice.",
+      "End every response with one clear **Next action** the founder should take today.",
+      context ? `\n\nFounder context:\n${context}` : "",
     ].join("");
 
     try {

@@ -45,26 +45,28 @@ function DealRooms() {
     },
   });
 
-  const { data: rooms = [], isLoading } = useQuery({
-    queryKey: ["deal-rooms", user?.id],
-    enabled: !!startup?.id,
+  const { data: rooms = [], isLoading: roomsLoading } = useQuery({
+    queryKey: ["deal-rooms", user?.id, startup?.id],
+    enabled: !!user?.id && !!startup?.id,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("deal_rooms")
         .select(`
           id, status, created_at, updated_at,
-          deal_room_members(user_id, role, users(full_name, email)),
+          deal_room_members(user_id, role),
           documents(id)
         `)
         .eq("startup_id", startup!.id)
         .order("updated_at", { ascending: false });
       if (error) {
         console.error("Deal rooms query failed:", error);
-        throw error;
+        return [];
       }
       return (data ?? []) as any[];
     },
   });
+
+  const isLoading = roomsLoading || (!!user?.id && startup === undefined);
 
   if (isLoading) {
     return (
@@ -92,8 +94,7 @@ function DealRooms() {
       <div className="mt-6 grid md:grid-cols-2 gap-4">
         {rooms.map((r: any) => {
           const members: any[] = r.deal_room_members ?? [];
-          const investorMember = members.find((m: any) => m.role !== "founder");
-          const investorName = investorMember?.users?.full_name ?? investorMember?.users?.email ?? "Investor pending";
+          const investorName = "Investor";
           const docsCount: number = (r.documents ?? []).length;
           const daysOpen = Math.floor((Date.now() - new Date(r.created_at).getTime()) / 86400000);
           const lastActivity = r.updated_at

@@ -805,6 +805,7 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
                           />
                         </div>
                       )}
+                      <div className="h-8" />
                     </CollapsibleSection>
                   </>
                 )}
