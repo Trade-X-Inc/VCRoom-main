@@ -275,7 +275,8 @@ function InvestorDashboard() {
         {roomsData.length === 0 ? (
           <div className="p-10 text-center text-sm text-muted-foreground">
             <Briefcase className="mx-auto h-8 w-8 opacity-40 mb-2" />
-            No active deal rooms yet
+            <div className="font-medium">No deals yet</div>
+            <div className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">Founders will invite you to their deal rooms — you'll see them here.</div>
           </div>
         ) : (
           <div className="divide-y divide-border/60">

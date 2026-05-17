@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Briefcase, Clock, Shield } from "lucide-react";
+import { Briefcase, Clock, Shield, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -79,10 +79,16 @@ function DealRoomsPage() {
             <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
               <Briefcase className="h-6 w-6" />
             </div>
-            <h3 className="mt-4 text-lg font-semibold">No active deal rooms</h3>
+            <h3 className="mt-4 text-lg font-semibold">No deal rooms yet</h3>
             <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
-              Founders' deal room invitations appear here once you've been accepted.
+              When a founder invites you to their data room, it'll appear here. Browse startups to discover deals to invest in.
             </p>
+            <Link
+              to="/app/investor/startups"
+              className="mt-5 inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm font-medium shadow-glow"
+            >
+              Browse startups <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">

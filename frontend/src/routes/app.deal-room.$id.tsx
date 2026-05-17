@@ -8,7 +8,7 @@ import {
   ArrowLeft, Lock, Sparkles, X, MessagesSquare, ThumbsUp, ThumbsDown,
   HelpCircle, Building2, TrendingUp, Users, DollarSign, Target, Shield,
   Send, AlertCircle, Eye, UserPlus, Loader2, ExternalLink, ChevronDown,
-  Check, ClipboardList,
+  Check, ClipboardList, Copy,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AIChat } from "@/components/ai/AIChat";
@@ -350,6 +350,7 @@ function DealRoomOverview({
   const [taskAssignee, setTaskAssignee] = useState("");
   const [taskDueDate, setTaskDueDate] = useState("");
   const [savingTask, setSavingTask] = useState(false);
+  const [showInvite, setShowInvite] = useState(false);
 
   const { data: recentActivity = [] } = useQuery({
     queryKey: ["activities-overview", dealRoomId],
@@ -433,6 +434,20 @@ function DealRoomOverview({
     },
   });
 
+  const { data: pendingInvites = [], refetch: refetchInvites } = useQuery({
+    queryKey: ["pending-invites", dealRoomId],
+    enabled: !!user?.id && isFounder,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("invites")
+        .select("token, email, role, created_at, accepted_at")
+        .eq("deal_room_id", dealRoomId)
+        .is("accepted_at", null)
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+  });
+
   // Deal health score (0–80, -10 if stale)
   const docsCount = docsShared.data ?? 0;
   const qCount = qaCount.data ?? 0;
@@ -498,6 +513,39 @@ function DealRoomOverview({
     await logActivity(dealRoomId, user.id, `${task.completed ? "Reopened" : "Completed"} a deal task`, { title: task.title });
     queryClient.invalidateQueries({ queryKey: ["deal-tasks", dealRoomId] });
     queryClient.invalidateQueries({ queryKey: ["activities-overview", dealRoomId] });
+  };
+
+  const founderMembers = (memberList as any[]).filter((m) => m.role === "founder");
+  const investorMembers = (memberList as any[]).filter((m) => m.role === "investor" || m.role === "viewer");
+  const baseOrigin = typeof window !== "undefined" ? window.location.origin : "https://main.vcroom-main.pages.dev";
+
+  const handleCopyInviteLink = (token: string) => {
+    navigator.clipboard.writeText(`${baseOrigin}/join/${token}`);
+    toast.success("Invite link copied");
+  };
+
+  const handleCancelInvite = async (token: string) => {
+    await supabase.from("invites").delete().eq("token", token);
+    void refetchInvites();
+    toast.success("Invite cancelled");
+  };
+
+  const handleResendInvite = async (inv: any) => {
+    if (!user?.id) return;
+    const res = await fetch("/api/invites", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        dealRoomId,
+        email: inv.email,
+        role: "investor",
+        invitedBy: user.id,
+        founderName: user?.fullName ?? user?.email ?? "The founder",
+        startupName: startup?.company_name ?? "Unknown",
+      }),
+    });
+    if (res.ok) { toast.success("Invite resent"); void refetchInvites(); }
+    else toast.error("Failed to resend");
   };
 
   const summary = startup?.tagline || startup?.description || startup?.traction || "Shared diligence workspace for this investment opportunity.";
@@ -741,6 +789,99 @@ function DealRoomOverview({
           </section>
 
           <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-sm font-semibold inline-flex items-center gap-2">
+                <Users className="h-4 w-4 text-brand" /> Team & Participants
+              </div>
+              {isFounder && (
+                <button
+                  onClick={() => setShowInvite(true)}
+                  className="inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-2.5 py-1 text-xs shadow-glow"
+                >
+                  <UserPlus className="h-3 w-3" /> Invite
+                </button>
+              )}
+            </div>
+
+            {/* Founder team */}
+            {founderMembers.length > 0 && (
+              <div className="mb-3">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Founder team</div>
+                <div className="space-y-1.5">
+                  {founderMembers.map((m: any) => (
+                    <div key={m.id} className="flex items-center gap-2">
+                      <div className="grid h-6 w-6 place-items-center rounded-full bg-gradient-brand text-brand-foreground text-[9px] font-semibold shrink-0">
+                        {(m.users?.full_name || "F").split(" ").map((s: string) => s[0]).join("").slice(0, 2).toUpperCase()}
+                      </div>
+                      <span className="text-xs font-medium truncate flex-1">{m.users?.full_name ?? m.users?.email ?? "Founder"}</span>
+                      <span className="text-[9px] bg-brand/10 text-brand rounded px-1.5 py-0.5 shrink-0">Founder</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Investor team */}
+            {investorMembers.length > 0 && (
+              <div className="mb-3">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Investor team</div>
+                <div className="space-y-1.5">
+                  {investorMembers.map((m: any) => (
+                    <div key={m.id} className="flex items-center gap-2">
+                      <div className="grid h-6 w-6 place-items-center rounded-full bg-accent text-muted-foreground text-[9px] font-semibold shrink-0">
+                        {(m.users?.full_name || "I").split(" ").map((s: string) => s[0]).join("").slice(0, 2).toUpperCase()}
+                      </div>
+                      <span className="text-xs font-medium truncate flex-1">{m.users?.full_name ?? m.users?.email ?? "Investor"}</span>
+                      <span className="text-[9px] bg-success/10 text-success rounded px-1.5 py-0.5 shrink-0">Investor</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Pending invites (founders only) */}
+            {isFounder && (pendingInvites as any[]).length > 0 && (
+              <div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Pending invites</div>
+                <div className="space-y-1.5">
+                  {(pendingInvites as any[]).map((inv) => (
+                    <div key={inv.token} className="flex items-center gap-1.5 text-xs">
+                      <span className="truncate text-muted-foreground flex-1 min-w-0">{inv.email}</span>
+                      <span className="shrink-0 text-[9px] bg-warning/10 text-warning rounded px-1.5 py-0.5">Pending</span>
+                      <button
+                        onClick={() => handleCopyInviteLink(inv.token)}
+                        className="shrink-0 grid h-5 w-5 place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-accent"
+                        title="Copy invite link"
+                      >
+                        <Copy className="h-3 w-3" />
+                      </button>
+                      <button
+                        onClick={() => handleResendInvite(inv)}
+                        className="shrink-0 grid h-5 w-5 place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-accent"
+                        title="Resend invite"
+                      >
+                        <Send className="h-3 w-3" />
+                      </button>
+                      <button
+                        onClick={() => handleCancelInvite(inv.token)}
+                        className="shrink-0 grid h-5 w-5 place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/5"
+                        title="Cancel invite"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Empty state */}
+            {founderMembers.length === 0 && investorMembers.length === 0 && (pendingInvites as any[]).length === 0 && (
+              <div className="text-xs text-muted-foreground">No participants yet.</div>
+            )}
+          </section>
+
+          <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
             <div className="text-sm font-semibold mb-3">Quick actions</div>
             <div className="space-y-2">
               {isFounder ? (
@@ -778,6 +919,18 @@ function DealRoomOverview({
           </section>
         </div>
       </div>
+
+      {showInvite && (
+        <InviteModal
+          dealRoomId={dealRoomId}
+          dealRoomName={startup?.company_name ? `${startup.company_name} — Deal Room` : "Deal Room"}
+          companyName={startup?.company_name ?? "Unknown"}
+          founderName={user?.fullName ?? user?.email ?? "The founder"}
+          invitedBy={user?.id ?? ""}
+          onClose={() => setShowInvite(false)}
+          onSent={() => { void refetchInvites(); }}
+        />
+      )}
     </div>
   );
 }
@@ -1094,6 +1247,159 @@ function ParticipantsSection({ dealRoomId }: { dealRoomId: string }) {
         )}
       </div>
     </div>
+  );
+}
+
+// ── Invite Modal ──────────────────────────────────────────────────
+function InviteModal({
+  dealRoomId, dealRoomName, companyName, founderName, invitedBy, onClose, onSent,
+}: {
+  dealRoomId: string;
+  dealRoomName: string;
+  companyName: string;
+  founderName: string;
+  invitedBy: string;
+  onClose: () => void;
+  onSent: () => void;
+}) {
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+  const [sentLink, setSentLink] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const send = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !invitedBy) return;
+    setSending(true);
+    setError("");
+    try {
+      const res = await fetch("/api/invites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          dealRoomId,
+          email,
+          role: "investor",
+          invitedBy,
+          dealRoomName,
+          founderName,
+          startupName: companyName,
+          message: message || undefined,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Failed to send invite");
+      setSentLink(json.inviteLink);
+      onSent();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send invite");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(sentLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <>
+      <div className="fixed inset-0 z-50 bg-foreground/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+        <div
+          className="pointer-events-auto w-full max-w-md rounded-2xl border border-border/60 bg-card shadow-elev p-6"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div className="text-base font-semibold">Invite investor to deal room</div>
+            <button
+              onClick={onClose}
+              className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          {sentLink ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 rounded-lg bg-success/10 text-success px-3 py-2 text-sm">
+                <CheckCircle2 className="h-4 w-4 shrink-0" />
+                Invite sent to {email}
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground mb-1.5">Or share this link directly</div>
+                <div className="flex items-center gap-2">
+                  <input
+                    readOnly
+                    value={sentLink}
+                    className="flex-1 rounded-md border border-border/60 bg-background px-3 py-1.5 text-xs font-mono text-muted-foreground focus:outline-none min-w-0"
+                  />
+                  <button
+                    onClick={copyLink}
+                    className="shrink-0 inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent"
+                  >
+                    {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
+                    {copied ? "Copied" : "Copy"}
+                  </button>
+                </div>
+              </div>
+              <button
+                onClick={onClose}
+                className="w-full rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm font-medium shadow-glow"
+              >
+                Done
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={send} className="space-y-3">
+              <div>
+                <label className="text-xs text-muted-foreground">Investor email *</label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="investor@firm.com"
+                  className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Personal message (optional)</label>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  rows={3}
+                  placeholder="Hi, I'd love to share our deal room with you…"
+                  className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
+                />
+              </div>
+              {error && <p className="text-xs text-destructive">{error}</p>}
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex-1 rounded-md border border-border/60 px-4 py-2 text-sm hover:bg-accent"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!email || sending}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm font-medium shadow-glow disabled:opacity-50"
+                >
+                  {sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                  {sending ? "Sending…" : "Send invite"}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
 

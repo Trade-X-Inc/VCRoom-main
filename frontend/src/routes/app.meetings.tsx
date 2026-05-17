@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format, isToday, isFuture, isPast, isThisWeek, startOfWeek, addWeeks } from "date-fns";
@@ -38,6 +38,7 @@ type VCLeadOption = { id: string; investor_name: string; firm_name: string | nul
 
 function Meetings() {
   const { user } = useAuth();
+  const isInvestor = user?.role === "investor";
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [pastOpen, setPastOpen] = useState(false);
@@ -179,21 +180,23 @@ function Meetings() {
                 className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
               />
             </div>
-            <div>
-              <label className="text-xs text-muted-foreground">VC lead</label>
-              <select
-                value={f.vcLeadId}
-                onChange={(e) => set("vcLeadId", e.target.value)}
-                className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
-              >
-                <option value="">— None —</option>
-                {vcLeads.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.investor_name}{l.firm_name ? ` · ${l.firm_name}` : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {!isInvestor && (
+              <div>
+                <label className="text-xs text-muted-foreground">VC lead</label>
+                <select
+                  value={f.vcLeadId}
+                  onChange={(e) => set("vcLeadId", e.target.value)}
+                  className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                >
+                  <option value="">— None —</option>
+                  {vcLeads.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.investor_name}{l.firm_name ? ` · ${l.firm_name}` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div>
               <label className="text-xs text-muted-foreground">Platform</label>
               <select
@@ -255,14 +258,16 @@ function Meetings() {
           </div>
           <div className="text-sm font-medium">No meetings scheduled yet</div>
           <div className="text-xs text-muted-foreground max-w-xs">
-            Schedule meetings directly here or set a lead's status to trigger a meeting.
+            {isInvestor
+              ? "Schedule meetings with founders directly from here."
+              : "Schedule meetings directly here or set a lead's status to trigger a meeting."}
           </div>
-          <Link
-            to="/app/leads"
-            className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent"
+          <button
+            onClick={() => setShowForm(true)}
+            className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"
           >
-            Go to VC Leads
-          </Link>
+            <Plus className="h-4 w-4" /> Schedule meeting
+          </button>
         </div>
       )}
 
