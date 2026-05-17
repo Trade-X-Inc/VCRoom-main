@@ -4,6 +4,7 @@ import { Logo } from "@/components/brand/Logo";
 import { ShieldCheck, ArrowRight, Lock, Check, AlertTriangle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/join/$token")({
   component: JoinFlow,
@@ -26,6 +27,7 @@ function JoinFlow() {
   const { token } = Route.useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [invite, setInvite] = useState<InviteInfo | null>(null);
   const [loadError, setLoadError] = useState("");
@@ -63,6 +65,8 @@ function JoinFlow() {
       setInvite(data as InviteInfo);
       if (user?.fullName) {
         setFormData((f) => ({ ...f, fullName: user.fullName }));
+        // Already logged in — skip profile step, go straight to NDA
+        setStep(2);
       }
     }
     loadInvite();
@@ -96,6 +100,9 @@ function JoinFlow() {
         .from("invites")
         .update({ accepted_at: new Date().toISOString() })
         .eq("token", token);
+
+      // Invalidate deal flow cache so new room appears immediately
+      await queryClient.invalidateQueries();
 
       // Auto-redirect based on role
       const destination = user?.role === "investor" ? "/app/investor/" : "/app/";

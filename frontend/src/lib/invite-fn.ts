@@ -78,6 +78,29 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
       "https://vcroom-main.pages.dev";
     const inviteLink = `${baseUrl}/join/${invite.token}`;
 
+    // Notify existing user if they already have an account
+    try {
+      const { data: existingUser } = await client
+        .from("users")
+        .select("id")
+        .eq("email", data.email)
+        .maybeSingle();
+      if (existingUser?.id) {
+        const roomName = data.startupName ?? data.dealRoomName ?? "a deal room";
+        const senderName = data.founderName ?? "A founder";
+        await client.from("notifications").insert({
+          user_id: existingUser.id,
+          title: "You have been invited to a deal room",
+          body: `${senderName} invited you to the ${roomName} deal room`,
+          type: "deal_room_invite",
+          deal_room_id: data.dealRoomId,
+          action_url: inviteLink,
+        });
+      }
+    } catch {
+      // Non-blocking — ignore notification errors
+    }
+
     const resendKey =
       (globalThis as any).RESEND_API_KEY ||
       process.env.RESEND_API_KEY ||
