@@ -79,24 +79,17 @@ function JoinFlow() {
     try {
       let userId = user?.id;
 
-      // If not logged in, sign up anonymously with the invite email as hint
+      // If not logged in, require sign in
       if (!userId) {
-        const anonEmail = invite.email ?? `guest_${token.slice(0, 8)}@ventureroom.app`;
-        const { data: authData, error: authErr } = await supabase.auth.signInAnonymously();
-        if (authErr || !authData.user) throw new Error("Authentication failed. Please sign in first.");
-        userId = authData.user.id;
+        throw new Error("Please sign in before accepting this invite.");
       }
 
-      // Upsert into deal_room_members
-      const { error: memberErr } = await supabase.from("deal_room_members").upsert(
-        {
-          deal_room_id: invite.deal_room_id,
-          user_id: userId,
-          role: invite.role,
-        },
-        { onConflict: "deal_room_id,user_id" },
-      );
-      if (memberErr) throw memberErr;
+      // Insert member record — plain insert, ignore if already a member
+      await supabase.from("deal_room_members").insert({
+        deal_room_id: invite.deal_room_id,
+        user_id: userId,
+        role: "investor",
+      });
 
       // Mark invite as accepted
       await supabase
@@ -104,7 +97,9 @@ function JoinFlow() {
         .update({ accepted_at: new Date().toISOString() })
         .eq("token", token);
 
-      setStep(3);
+      // Auto-redirect based on role
+      const destination = user?.role === "investor" ? "/app/investor/" : "/app/";
+      void navigate({ to: destination as any });
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
