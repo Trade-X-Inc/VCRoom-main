@@ -421,6 +421,40 @@ function DealRoomOverview({
     },
   });
 
+  const meetingsCount = useQuery({
+    queryKey: ["overview-meetings-count", dealRoomId],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("meetings")
+        .select("id", { count: "exact", head: true })
+        .eq("deal_room_id", dealRoomId);
+      return count ?? 0;
+    },
+  });
+
+  // Deal health score (0–80, -10 if stale)
+  const docsCount = docsShared.data ?? 0;
+  const qCount = qaCount.data ?? 0;
+  const meetCount = meetingsCount.data ?? 0;
+  const tasks = dealTasks as any[];
+  const completedTasks = tasks.filter((t) => t.completed).length;
+  const lastActivityAt = (recentActivity as any[])[0]?.created_at ?? null;
+  const daysSinceActivity = lastActivityAt
+    ? (Date.now() - new Date(lastActivityAt).getTime()) / (1000 * 60 * 60 * 24)
+    : null;
+  let healthScore = 0;
+  if (docsCount > 0) healthScore += 20;
+  if (tasks.length > 0 && completedTasks / tasks.length > 0.5) healthScore += 20;
+  if (qCount > 0) healthScore += 20;
+  if (meetCount > 0) healthScore += 20;
+  if (daysSinceActivity !== null && daysSinceActivity > 7) healthScore -= 10;
+  healthScore = Math.max(0, healthScore);
+  const healthFill = Math.round((healthScore / 80) * 100);
+  const healthColor = healthScore >= 57 ? "bg-success" : healthScore >= 33 ? "bg-warning" : "bg-destructive";
+  const healthLabel = healthScore >= 57 ? "On track" : healthScore >= 33 ? "In progress" : "Early stage";
+  const healthTextColor = healthScore >= 57 ? "text-success" : healthScore >= 33 ? "text-warning" : "text-destructive";
+
   const decisionLabel = getDecisionLabel((latestDecision as any)?.status);
   const progressSteps = [
     { label: "NDA Signed", complete: true },
@@ -648,6 +682,41 @@ function DealRoomOverview({
               <Metric icon={Building2} label="Stage" value={startup?.stage ?? "—"} />
               <Metric icon={Target} label="Raise amount" value={formatMoney(startup?.funding_target)} />
             </div>
+          </section>
+
+          <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-sm font-semibold">Deal health</div>
+              <span className={cn("text-xs font-medium", healthTextColor)}>{healthLabel}</span>
+            </div>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+                <div
+                  className={cn("h-full rounded-full transition-all duration-500", healthColor)}
+                  style={{ width: `${healthFill}%` }}
+                />
+              </div>
+              <span className="text-sm font-semibold tabular-nums shrink-0">{healthScore}<span className="text-xs font-normal text-muted-foreground">/80</span></span>
+            </div>
+            <div className="grid grid-cols-2 gap-1.5 text-xs">
+              {[
+                { label: "Documents", done: docsCount > 0, value: `${docsCount} file${docsCount !== 1 ? "s" : ""}` },
+                { label: "Q&A", done: qCount > 0, value: `${qCount} message${qCount !== 1 ? "s" : ""}` },
+                { label: "Tasks", done: tasks.length > 0 && completedTasks / Math.max(tasks.length, 1) > 0.5, value: `${completedTasks}/${tasks.length} done` },
+                { label: "Meetings", done: meetCount > 0, value: `${meetCount} held` },
+              ].map(({ label, done, value }) => (
+                <div key={label} className={cn("flex items-center gap-1.5 rounded-md px-2 py-1.5", done ? "bg-success/5 text-success" : "bg-muted/40 text-muted-foreground")}>
+                  <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", done ? "bg-success" : "bg-muted-foreground/40")} />
+                  <span className="font-medium">{label}</span>
+                  <span className="ml-auto tabular-nums">{value}</span>
+                </div>
+              ))}
+            </div>
+            {daysSinceActivity !== null && daysSinceActivity > 7 && (
+              <div className="mt-2 text-[10px] text-warning flex items-center gap-1">
+                <AlertTriangle className="h-3 w-3" /> No activity in {Math.floor(daysSinceActivity)} days (−10 pts)
+              </div>
+            )}
           </section>
 
           <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">

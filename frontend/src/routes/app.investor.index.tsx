@@ -1,12 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CheckCircle2, Sparkles, Inbox } from "lucide-react";
+import { CheckCircle2, Sparkles, Inbox, Briefcase, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { formatDistanceToNow } from "date-fns";
 import { AttentionStrip, type AttentionItem } from "@/components/app/AttentionStrip";
 import { AIBriefPanel, type AIBriefData } from "@/components/app/AIBriefPanel";
 import { generateDealBrief } from "@/lib/deal-brief-fn";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/investor/")({
   component: InvestorDashboard,
@@ -94,6 +96,37 @@ function InvestorDashboard() {
         .in("deal_room_id", roomIds)
         .order("created_at", { ascending: false });
       return data ?? [];
+    },
+  });
+
+  // Watchlist count
+  const { data: watchlistCount = 0 } = useQuery({
+    queryKey: ["investor-watchlist-count", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("investor_watchlist")
+        .select("id", { count: "exact", head: true })
+        .eq("investor_id", user!.id);
+      return count ?? 0;
+    },
+  });
+
+  // Meetings this month (in rooms this investor belongs to)
+  const _now = new Date();
+  const startOfMonth = new Date(_now.getFullYear(), _now.getMonth(), 1).toISOString();
+  const endOfMonth = new Date(_now.getFullYear(), _now.getMonth() + 1, 0, 23, 59, 59).toISOString();
+  const { data: meetingsThisMonth = 0 } = useQuery({
+    queryKey: ["investor-meetings-month", user?.id, _now.getMonth(), _now.getFullYear()],
+    enabled: !!user?.id && roomIds.length > 0,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("meetings")
+        .select("id", { count: "exact", head: true })
+        .in("deal_room_id", roomIds)
+        .gte("scheduled_at", startOfMonth)
+        .lte("scheduled_at", endOfMonth);
+      return count ?? 0;
     },
   });
 
@@ -221,10 +254,10 @@ function InvestorDashboard() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { l: "Active deals", v: `${roomIds.length}`, s: roomIds.length !== 1 ? "deal rooms" : "deal room" },
-          { l: "In diligence", v: `${inDiligence}`, s: "—" },
-          { l: "Decisions this month", v: `${decisionsThisMonth}`, s: "—" },
-          { l: "Avg deal score", v: "—", s: "—" },
+          { l: "Active deal rooms", v: `${roomIds.length}`, s: roomIds.length !== 1 ? "rooms" : "room" },
+          { l: "Watchlist", v: `${watchlistCount}`, s: watchlistCount !== 1 ? "companies" : "company" },
+          { l: "Meetings this month", v: `${meetingsThisMonth}`, s: "scheduled" },
+          { l: "Decisions made", v: `${decisionsData.length}`, s: "total" },
         ].map((k) => (
           <div key={k.l} className="rounded-2xl border border-border/60 bg-card p-4">
             <div className="text-xs text-muted-foreground">{k.l}</div>
@@ -235,15 +268,57 @@ function InvestorDashboard() {
       </div>
 
       <section className="rounded-2xl border border-border/60 bg-card overflow-hidden">
-        <div className="px-5 py-3 border-b border-border/60 text-sm font-semibold">Deal flow by stage</div>
-        <div className="grid grid-cols-3 md:grid-cols-6 divide-y md:divide-y-0 md:divide-x divide-border/60">
-          {STAGES.map((s) => (
-            <Link key={s} to="/app/investor/deal-flow" className="px-4 py-4 hover:bg-accent/40 transition-colors">
-              <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{s}</div>
-              <div className="mt-1 text-lg font-semibold tabular-nums">{stageCounts[s] ?? 0}</div>
-            </Link>
-          ))}
+        <div className="px-5 py-3 border-b border-border/60 flex items-center justify-between">
+          <div className="text-sm font-semibold">Deal pipeline</div>
+          <span className="text-xs text-muted-foreground">{roomsData.length} deal{roomsData.length !== 1 ? "s" : ""}</span>
         </div>
+        {roomsData.length === 0 ? (
+          <div className="p-10 text-center text-sm text-muted-foreground">
+            <Briefcase className="mx-auto h-8 w-8 opacity-40 mb-2" />
+            No active deal rooms yet
+          </div>
+        ) : (
+          <div className="divide-y divide-border/60">
+            {roomsData.map((room) => {
+              const startup = (room as any).startups;
+              const status = latestStatus[room.id] ?? null;
+              const stage = DB_STATUS_TO_STAGE[status ?? ""] ?? "Sourced";
+              const stageColors: Record<string, string> = {
+                Sourced: "bg-muted text-muted-foreground",
+                Reviewing: "bg-brand/10 text-brand",
+                Diligence: "bg-warning/10 text-warning",
+                Partner: "bg-violet/10 text-violet",
+                "Term Sheet": "bg-success/10 text-success",
+                Closed: "bg-destructive/10 text-destructive",
+              };
+              return (
+                <div key={room.id} className="flex items-center gap-4 px-5 py-3 hover:bg-accent/30 transition-colors">
+                  <div className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold text-sm shrink-0">
+                    {(startup?.company_name || "D")[0]}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium truncate">{startup?.company_name ?? "Unnamed"}</div>
+                    <div className="text-xs text-muted-foreground">{startup?.sector || "—"} · {startup?.stage || "—"}</div>
+                  </div>
+                  <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground">
+                    <Clock className="h-3 w-3" />
+                    {room.updated_at ? formatDistanceToNow(new Date(room.updated_at as string), { addSuffix: true }) : "—"}
+                  </div>
+                  <span className={cn("shrink-0 text-[10px] font-medium rounded-full px-2 py-0.5", stageColors[stage] ?? "bg-muted text-muted-foreground")}>
+                    {stage}
+                  </span>
+                  <Link
+                    to="/app/deal-room/$id"
+                    params={{ id: room.id }}
+                    className="shrink-0 rounded-md border border-border/60 px-2.5 py-1 text-xs hover:bg-accent transition-colors"
+                  >
+                    Open →
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       <div className="grid lg:grid-cols-[1fr_400px] gap-5">

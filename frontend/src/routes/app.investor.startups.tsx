@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Building2, ExternalLink, Clock, Plus, X, Loader2 } from "lucide-react";
+import { Building2, ExternalLink, Clock, Plus, X, Loader2, ChevronRight } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/investor/startups")({
   component: StartupsPage,
@@ -58,6 +59,8 @@ function StartupsPage() {
   const [showAdd, setShowAdd] = useState(false);
   const [addForm, setAddForm] = useState<AddForm>(EMPTY_ADD);
   const [saving, setSaving] = useState(false);
+  const [selectedWatchlist, setSelectedWatchlist] = useState<any | null>(null);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   // Watchlist (manually-added companies)
   const { data: watchlist = [], isLoading: watchlistLoading } = useQuery({
@@ -271,25 +274,27 @@ function StartupsPage() {
         ) : (
           <div className="grid md:grid-cols-2 gap-4">
             {filteredWatchlist.map((c: any) => (
-              <div key={c.id} className="rounded-2xl border border-border/60 bg-card p-5">
+              <button
+                key={c.id}
+                onClick={() => setSelectedWatchlist(c)}
+                className="rounded-2xl border border-border/60 bg-card p-5 text-left hover:shadow-card hover:border-brand/30 transition-all group"
+              >
                 <div className="flex items-center gap-3">
                   <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold shrink-0">
                     {(c.company_name || "S")[0]}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold truncate">{c.company_name}</div>
+                    <div className="font-semibold truncate group-hover:text-brand transition-colors">{c.company_name}</div>
                     <div className="text-xs text-muted-foreground">
                       {c.sector || "General"} · {c.stage || "Stage unknown"}
                     </div>
                   </div>
-                  <span
-                    className={
-                      "text-[10px] px-2 py-0.5 rounded-full border font-medium " +
-                      (STATUS_STYLES[c.status] || STATUS_STYLES.Sourcing)
-                    }
-                  >
-                    {c.status}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={cn("text-[10px] px-2 py-0.5 rounded-full border font-medium", STATUS_STYLES[c.status] || STATUS_STYLES.Sourcing)}>
+                      {c.status}
+                    </span>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
                 </div>
                 {c.description && (
                   <p className="mt-3 text-sm text-muted-foreground line-clamp-2">{c.description}</p>
@@ -305,18 +310,13 @@ function StartupsPage() {
                   </div>
                   <div className="text-right">
                     {c.website && (
-                      <a
-                        href={c.website.startsWith("http") ? c.website : `https://${c.website}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-brand hover:underline"
-                      >
+                      <span className="inline-flex items-center gap-1 text-brand">
                         Site <ExternalLink className="h-3 w-3" />
-                      </a>
+                      </span>
                     )}
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         )}
@@ -428,6 +428,116 @@ function StartupsPage() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Watchlist detail drawer */}
+      {selectedWatchlist && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm"
+            onClick={() => setSelectedWatchlist(null)}
+          />
+          <aside className="fixed inset-y-0 right-0 z-50 w-full max-w-md border-l border-border/60 bg-background shadow-elev flex flex-col">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
+              <div className="flex items-center gap-3">
+                <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold shrink-0">
+                  {(selectedWatchlist.company_name || "S")[0]}
+                </div>
+                <div>
+                  <div className="font-semibold">{selectedWatchlist.company_name}</div>
+                  <div className="text-xs text-muted-foreground">{selectedWatchlist.sector || "—"} · {selectedWatchlist.stage || "—"}</div>
+                </div>
+              </div>
+              <button onClick={() => setSelectedWatchlist(null)} className="text-muted-foreground hover:text-foreground">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-5 space-y-5">
+              {/* Status */}
+              <div>
+                <div className="text-xs font-medium text-muted-foreground mb-1.5">Status</div>
+                <select
+                  value={selectedWatchlist.status}
+                  onChange={async (e) => {
+                    if (!user?.id) return;
+                    const newStatus = e.target.value;
+                    setUpdatingStatus(true);
+                    try {
+                      const { error } = await supabase
+                        .from("investor_watchlist")
+                        .update({ status: newStatus })
+                        .eq("id", selectedWatchlist.id);
+                      if (error) throw error;
+                      setSelectedWatchlist({ ...selectedWatchlist, status: newStatus });
+                      qc.invalidateQueries({ queryKey: ["investor-watchlist", user.id] });
+                      toast.success("Status updated");
+                    } catch (err: any) {
+                      toast.error(err?.message || "Could not update status");
+                    } finally {
+                      setUpdatingStatus(false);
+                    }
+                  }}
+                  disabled={updatingStatus}
+                  className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                >
+                  {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+
+              {/* Score */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-xs font-medium text-muted-foreground mb-1">Initial score</div>
+                  <div className="text-2xl font-semibold tabular-nums">{selectedWatchlist.initial_score ?? "—"}<span className="text-sm font-normal text-muted-foreground">/10</span></div>
+                </div>
+                <div>
+                  <div className="text-xs font-medium text-muted-foreground mb-1">Source</div>
+                  <div className="text-sm font-medium">{selectedWatchlist.source || "—"}</div>
+                </div>
+              </div>
+
+              {/* Description */}
+              {selectedWatchlist.description && (
+                <div>
+                  <div className="text-xs font-medium text-muted-foreground mb-1.5">Description</div>
+                  <p className="text-sm leading-relaxed text-foreground">{selectedWatchlist.description}</p>
+                </div>
+              )}
+
+              {/* Notes */}
+              {selectedWatchlist.notes && (
+                <div>
+                  <div className="text-xs font-medium text-muted-foreground mb-1.5">Notes</div>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{selectedWatchlist.notes}</p>
+                </div>
+              )}
+
+              {/* Website */}
+              {selectedWatchlist.website && (
+                <div>
+                  <div className="text-xs font-medium text-muted-foreground mb-1.5">Website</div>
+                  <a
+                    href={selectedWatchlist.website.startsWith("http") ? selectedWatchlist.website : `https://${selectedWatchlist.website}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 text-sm text-brand hover:underline"
+                  >
+                    {selectedWatchlist.website} <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                </div>
+              )}
+
+              {/* Added date */}
+              {selectedWatchlist.created_at && (
+                <div className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  Added {formatDistanceToNow(new Date(selectedWatchlist.created_at), { addSuffix: true })}
+                </div>
+              )}
+            </div>
+          </aside>
+        </>
       )}
 
       <style>{`
