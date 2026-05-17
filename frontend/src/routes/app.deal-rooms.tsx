@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
+import { sendInviteEmail } from "@/lib/invite-fn";
 
 export const Route = createFileRoute("/app/deal-rooms")({
   component: DealRooms,
@@ -413,13 +414,11 @@ function CreateRoomForm({
         action: `Deal room created for ${investorName.trim()}${investorFirm.trim() ? ` · ${investorFirm.trim()}` : ""} · ${dealType}${fundingTarget ? ` · $${fundingTarget}` : ""}`,
       });
 
-      // 4. Send invite email via API if email provided
+      // 4. Send invite email via server fn if email provided
       let inviteLink: string | undefined;
       if (inviteEmail.trim()) {
-        const res = await fetch("/api/invites", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        const result = await sendInviteEmail({
+          data: {
             dealRoomId: newRoom.id,
             email: inviteEmail.trim(),
             role: "investor",
@@ -428,13 +427,12 @@ function CreateRoomForm({
             founderName: founderName || undefined,
             startupName: selectedStartup?.company_name,
             message: personalMessage.trim() || undefined,
-          }),
+          },
         });
-        const json = await res.json();
-        if (res.ok) {
-          inviteLink = json.inviteLink;
+        if (result.success) {
+          inviteLink = result.inviteLink;
         } else {
-          console.warn("Invite email failed:", json.error);
+          console.warn("Invite email failed:", result.error);
         }
       }
 

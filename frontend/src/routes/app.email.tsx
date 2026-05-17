@@ -1,8 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Sparkles, Send, Copy, RotateCw, Mail } from "lucide-react";
+import { Sparkles, Send, Copy, RotateCw } from "lucide-react";
 import { useState } from "react";
-import { postJson } from "@/lib/backend";
-
 export const Route = createFileRoute("/app/email")({
   component: EmailComposer,
 });
@@ -20,24 +18,13 @@ function EmailComposer() {
   const [tab, setTab] = useState("cold");
   const [to, setTo] = useState("");
   const [body, setBody] = useState(sample);
-  const [sending, setSending] = useState(false);
   const [status, setStatus] = useState("");
-  const sendInvite = async () => {
-    setSending(true);
-    setStatus("");
-    try {
-      await postJson("/api/invites", {
-        to,
-        subject: "Venture Room — Invitation",
-        message: body,
-        inviteLink: window.location.origin + "/join",
-      });
-      setStatus("Invite email sent.");
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Failed to send.");
-    } finally {
-      setSending(false);
-    }
+  const sendInvite = () => {
+    if (!to) { setStatus("Enter a recipient email first."); return; }
+    const subject = encodeURIComponent("Venture Room — Invitation");
+    const bodyEncoded = encodeURIComponent(body);
+    window.open(`mailto:${to}?subject=${subject}&body=${bodyEncoded}`, "_blank");
+    setStatus("Opened in your email client.");
   };
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto">
@@ -109,7 +96,7 @@ function EmailComposer() {
             <div className="text-xs text-muted-foreground">Reading time: 28s · Tone: direct · Sentiment: confident</div>
             <div className="flex gap-2">
               <button className="inline-flex items-center gap-1.5 rounded-md border border-border/60 bg-background px-3 py-2 text-sm hover:bg-accent"><Copy className="h-3.5 w-3.5" /> Copy</button>
-              <button onClick={sendInvite} disabled={sending} className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow disabled:opacity-60"><Send className="h-3.5 w-3.5" /> {sending ? "Sending..." : "Send"}</button>
+              <button onClick={sendInvite} className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"><Send className="h-3.5 w-3.5" /> Send</button>
             </div>
           </div>
           {status && <div className="px-5 pb-4 text-xs text-muted-foreground">{status}</div>}

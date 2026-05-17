@@ -24,6 +24,7 @@ import {
   type QAQuestion, type Participant,
 } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { sendInviteEmail } from "@/lib/invite-fn";
 
 export const Route = createFileRoute("/app/deal-room/$id")({
   component: DealRoom,
@@ -532,20 +533,22 @@ function DealRoomOverview({
 
   const handleResendInvite = async (inv: any) => {
     if (!user?.id) return;
-    const res = await fetch("/api/invites", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        dealRoomId,
-        email: inv.email,
-        role: "investor",
-        invitedBy: user.id,
-        founderName: user?.fullName ?? user?.email ?? "The founder",
-        startupName: startup?.company_name ?? "Unknown",
-      }),
-    });
-    if (res.ok) { toast.success("Invite resent"); void refetchInvites(); }
-    else toast.error("Failed to resend");
+    try {
+      const result = await sendInviteEmail({
+        data: {
+          dealRoomId,
+          email: inv.email,
+          role: "investor",
+          invitedBy: user.id,
+          founderName: (user as any)?.fullName ?? user?.email ?? "The founder",
+          startupName: startup?.company_name ?? "Unknown",
+        },
+      });
+      if (result.success) { toast.success("Invite resent"); void refetchInvites(); }
+      else toast.error("Failed to resend");
+    } catch {
+      toast.error("Failed to resend");
+    }
   };
 
   const summary = startup?.tagline || startup?.description || startup?.traction || "Shared diligence workspace for this investment opportunity.";
@@ -1275,10 +1278,8 @@ function InviteModal({
     setSending(true);
     setError("");
     try {
-      const res = await fetch("/api/invites", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const result = await sendInviteEmail({
+        data: {
           dealRoomId,
           email,
           role: "investor",
@@ -1287,11 +1288,10 @@ function InviteModal({
           founderName,
           startupName: companyName,
           message: message || undefined,
-        }),
+        },
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Failed to send invite");
-      setSentLink(json.inviteLink);
+      if (!result.success) throw new Error(result.error ?? "Failed to send invite");
+      setSentLink(result.inviteLink ?? "");
       onSent();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to send invite");

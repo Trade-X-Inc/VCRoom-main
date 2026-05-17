@@ -1,0 +1,127 @@
+import { createServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
+
+type InviteInput = {
+  dealRoomId: string;
+  email: string;
+  role?: "viewer" | "investor" | "founder";
+  invitedBy: string;
+  dealRoomName?: string;
+  founderName?: string;
+  startupName?: string;
+  message?: string;
+};
+
+type InviteResult = {
+  success: boolean;
+  emailSent: boolean;
+  token?: string;
+  inviteLink?: string;
+  error?: string;
+  message?: string;
+};
+
+export const sendInviteEmail = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown): InviteInput => data as InviteInput)
+  .handler(async ({ data }: { data: InviteInput }): Promise<InviteResult> => {
+    const supabaseUrl =
+      process.env.SUPABASE_URL ||
+      (globalThis as any).SUPABASE_URL ||
+      (import.meta.env as any).VITE_SUPABASE_URL ||
+      "";
+    const serviceKey =
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      (globalThis as any).SUPABASE_SERVICE_ROLE_KEY ||
+      "";
+
+    if (!supabaseUrl || !serviceKey) {
+      throw new Error("Server configuration error: missing Supabase credentials");
+    }
+
+    const adminClient = createClient(supabaseUrl, serviceKey);
+
+    const role = data.role ?? "investor";
+    const { data: invite, error: dbErr } = await adminClient
+      .from("invites")
+      .insert({
+        deal_room_id: data.dealRoomId,
+        email: data.email,
+        role,
+        invited_by: data.invitedBy,
+      })
+      .select("token")
+      .single();
+
+    if (dbErr || !invite) {
+      throw new Error(dbErr?.message ?? "Failed to create invite record");
+    }
+
+    const baseUrl =
+      process.env.SITE_URL ||
+      (globalThis as any).SITE_URL ||
+      "https://main.vcroom-main.pages.dev";
+    const inviteLink = `${baseUrl}/join/${invite.token}`;
+
+    const resendKey =
+      process.env.RESEND_API_KEY ||
+      (globalThis as any).RESEND_API_KEY ||
+      "";
+    const fromEmail =
+      process.env.RESEND_FROM_EMAIL ||
+      (globalThis as any).RESEND_FROM_EMAIL ||
+      "onboarding@resend.dev";
+
+    if (!resendKey) {
+      return {
+        success: true,
+        emailSent: false,
+        token: invite.token,
+        inviteLink,
+        message: "Invite created. Email not sent — copy link manually.",
+      };
+    }
+
+    const roomName = data.startupName ?? data.dealRoomName ?? "a deal room";
+    const senderName = data.founderName ?? "A founder";
+
+    const emailHtml = `
+      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;padding:40px 20px;color:#111827">
+        <h1 style="font-size:22px;font-weight:700;margin:0 0 8px">You've been invited to a deal room</h1>
+        <p style="color:#6b7280;margin:0 0 24px;font-size:15px">${senderName} has invited you to evaluate <strong>${roomName}</strong> on VentureRoom.</p>
+        ${data.message ? `<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin:0 0 24px"><p style="color:#374151;margin:0;font-size:14px;white-space:pre-line">${data.message}</p></div>` : ""}
+        <a href="${inviteLink}" style="background:#6C5CE7;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;font-weight:600;font-size:15px">View deal room →</a>
+        <p style="color:#9ca3af;font-size:12px;margin:32px 0 0">This link expires in 7 days. If you didn't expect this, you can ignore it.</p>
+      </div>
+    `;
+
+    const emailRes = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${resendKey}`,
+      },
+      body: JSON.stringify({
+        from: fromEmail,
+        to: data.email,
+        subject: `${senderName} invited you to the ${roomName} deal room`,
+        html: emailHtml,
+      }),
+    });
+
+    if (!emailRes.ok) {
+      return {
+        success: true,
+        emailSent: false,
+        token: invite.token,
+        inviteLink,
+        message: "Invite created but email failed to send.",
+      };
+    }
+
+    return {
+      success: true,
+      emailSent: true,
+      token: invite.token,
+      inviteLink,
+    };
+  });
