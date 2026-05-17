@@ -170,6 +170,29 @@ function JoinTeamFlow() {
                 Go to dashboard <ArrowRight className="h-4 w-4" />
               </button>
             </div>
+          ) : invite.email && user.email && invite.email.toLowerCase() !== user.email.toLowerCase() ? (
+            <>
+              <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background px-3 py-1 text-xs">
+                <Users className="h-3.5 w-3.5 text-brand" /> Team invite
+              </div>
+              <h2 className="mt-3 text-2xl font-semibold tracking-tight">Wrong account</h2>
+              <div className="mt-4 rounded-xl border border-warning/40 bg-warning/5 p-4 text-sm text-warning-foreground">
+                This invite was sent to <span className="font-semibold">{invite.email}</span>.<br />
+                You're signed in as <span className="font-semibold">{user.email}</span>.<br />
+                Please sign in with the invited account to accept.
+              </div>
+              <button
+                onClick={() =>
+                  navigate({
+                    to: "/sign-in" as any,
+                    search: { redirect: `/join/team/${token}` } as any,
+                  })
+                }
+                className="mt-6 w-full rounded-md bg-gradient-brand text-brand-foreground py-3 text-sm font-medium shadow-glow inline-flex items-center justify-center gap-2"
+              >
+                <LogIn className="h-4 w-4" /> Sign in with invited account
+              </button>
+            </>
           ) : !user ? (
             <>
               <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background px-3 py-1 text-xs">

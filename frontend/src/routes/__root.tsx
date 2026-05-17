@@ -4,6 +4,10 @@ import { AuthProvider } from "@/lib/auth";
 import { ThemeProvider } from "@/lib/theme";
 import { I18nProvider } from "@/lib/i18n";
 import { Toaster } from "@/components/ui/sonner";
+import { setupAuthListener } from "@/lib/auth-store";
+
+// Single auth listener — must run once before any route beforeLoad
+if (typeof window !== 'undefined') setupAuthListener();
 
 const queryClient = new QueryClient();
 

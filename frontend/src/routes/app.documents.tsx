@@ -46,6 +46,12 @@ function getFileIconProps(fileName: string): { Icon: any; colorCls: string } {
   return { Icon: File, colorCls: "text-muted-foreground" };
 }
 
+function nameFromPath(storagePath: string): string {
+  const last = storagePath.split("/").pop() ?? "";
+  // Strip leading timestamp prefix (13-digit unix ms) if present
+  return last.replace(/^\d{13}-/, "") || last || "Untitled";
+}
+
 function DocIcon({ fileName, size = "md" }: { fileName: string; size?: "sm" | "md" | "lg" }) {
   const { Icon, colorCls } = getFileIconProps(fileName);
   const cls = size === "sm" ? "h-5 w-5" : size === "lg" ? "h-10 w-10" : "h-7 w-7";
@@ -69,11 +75,14 @@ function Documents() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("documents")
-        .select("id, category, status, storage_path, file_name, file_size, created_at, deal_room_id")
+        .select("id, category, status, storage_path, created_at, deal_room_id")
         .eq("uploader_id", user!.id)
         .order("created_at", { ascending: false })
         .limit(100);
-      if (error) throw error;
+      if (error) {
+        console.error("Documents fetch error:", error);
+        throw error;
+      }
       return data ?? [];
     },
   });
@@ -248,7 +257,7 @@ function Documents() {
         ) : viewMode === "grid" ? (
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {filtered.map((d) => {
-              const fname = (d.file_name as string) || "";
+              const fname = nameFromPath(d.storage_path as string ?? "");
               return (
                 <div key={d.id} className="group rounded-xl border border-border/60 bg-card p-4 hover:shadow-card transition-shadow flex flex-col gap-3">
                   <div className="flex items-center justify-center h-16">
@@ -269,7 +278,7 @@ function Documents() {
                   </div>
                   <div className="text-[10px] text-muted-foreground/60 flex items-center justify-between">
                     <span>{d.created_at ? formatDistanceToNow(new Date(d.created_at as string), { addSuffix: true }) : "—"}</span>
-                    <span>{Math.max(1, Math.round((Number(d.file_size) || 0) / 1024))} KB</span>
+                    <span>—</span>
                   </div>
                   <div className="flex gap-1 pt-1 border-t border-border/40">
                     <button
@@ -315,7 +324,7 @@ function Documents() {
               <div className="col-span-1 text-right">Actions</div>
             </div>
             {filtered.map((d) => {
-              const fname = (d.file_name as string) || "";
+              const fname = nameFromPath(d.storage_path as string ?? "");
               return (
                 <div
                   key={d.id}
@@ -335,9 +344,7 @@ function Documents() {
                       {(d.category as string) || "Other"}
                     </span>
                   </div>
-                  <div className="col-span-2 text-xs text-muted-foreground">
-                    {Math.max(1, Math.round((Number(d.file_size) || 0) / 1024))} KB
-                  </div>
+                  <div className="col-span-2 text-xs text-muted-foreground">—</div>
                   <div className="col-span-2 text-xs text-muted-foreground">
                     {d.created_at ? formatDistanceToNow(new Date(d.created_at as string), { addSuffix: true }) : "—"}
                   </div>
@@ -456,7 +463,6 @@ function UploadModal({
   const fileRef = useRef<HTMLInputElement>(null);
   const [category, setCategory] = useState<DocCategory>(initialCategory);
   const [file, setFile] = useState<File | null>(null);
-  const [docName, setDocName] = useState("");
   const [uploading, setUploading] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -467,7 +473,6 @@ function UploadModal({
       return;
     }
     setFile(f);
-    if (!docName) setDocName(f.name);
   };
 
   const handleUpload = async () => {
@@ -484,8 +489,6 @@ function UploadModal({
         category,
         status: "uploaded",
         storage_path: path,
-        file_name: docName || file.name,
-        file_size: file.size,
         deal_room_id: null,
       });
       if (insertErr) throw insertErr;
@@ -563,18 +566,6 @@ function UploadModal({
               )}
             </div>
             <input ref={fileRef} type="file" className="hidden" onChange={handleFileChange} />
-          </div>
-
-          {/* Document name */}
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1.5">Document name</label>
-            <input
-              type="text"
-              value={docName}
-              onChange={(e) => setDocName(e.target.value)}
-              placeholder="Auto-filled from filename"
-              className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
-            />
           </div>
 
         </div>

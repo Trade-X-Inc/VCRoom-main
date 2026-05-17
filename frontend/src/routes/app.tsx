@@ -1,16 +1,13 @@
-import { createFileRoute, redirect, isRedirect } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { AppShell } from "@/components/app/AppShell";
-import { supabase } from "@/lib/supabase";
+import { useAuthStore } from "@/lib/auth-store";
 
 export const Route = createFileRoute("/app")({
-  beforeLoad: async () => {
+  beforeLoad: () => {
     if (typeof window === 'undefined') return;
-    try {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) throw redirect({ to: "/sign-in", search: {} });
-    } catch (err) {
-      if (isRedirect(err)) throw err;
-    }
+    const { user, initialized } = useAuthStore.getState();
+    // Only redirect if we know the user is definitely not authenticated
+    if (initialized && !user) throw redirect({ to: "/sign-in", search: {} });
   },
   component: AppShell,
 });
