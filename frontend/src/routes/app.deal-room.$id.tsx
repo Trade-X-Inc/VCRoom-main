@@ -534,12 +534,16 @@ function DealRoomOverview({
   const handleResendInvite = async (inv: any) => {
     if (!user?.id) return;
     try {
+      const { data: { session } } = await supabase.auth.getSession();
       const result = await sendInviteEmail({
         data: {
           dealRoomId,
           email: inv.email,
           role: "investor",
           invitedBy: user.id,
+          userAccessToken: session?.access_token ?? "",
+          supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+          supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
           founderName: (user as any)?.fullName ?? user?.email ?? "The founder",
           startupName: startup?.company_name ?? "Unknown",
         },
@@ -1278,12 +1282,16 @@ function InviteModal({
     setSending(true);
     setError("");
     try {
+      const { data: { session } } = await supabase.auth.getSession();
       const result = await sendInviteEmail({
         data: {
           dealRoomId,
           email,
           role: "investor",
           invitedBy,
+          userAccessToken: session?.access_token ?? "",
+          supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+          supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
           dealRoomName,
           founderName,
           startupName: companyName,

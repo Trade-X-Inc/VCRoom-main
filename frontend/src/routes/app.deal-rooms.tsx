@@ -74,11 +74,14 @@ function DealRooms() {
   const handleDelete = async (roomId: string) => {
     setDeletingId(roomId);
     try {
-      const { error } = await supabase
-        .from("deal_rooms")
-        .delete()
-        .eq("id", roomId)
-        .eq("startup_id", startup!.id);
+      await supabase.from("invites").delete().eq("deal_room_id", roomId);
+      await supabase.from("deal_room_members").delete().eq("deal_room_id", roomId);
+      await supabase.from("activities").delete().eq("deal_room_id", roomId);
+      await supabase.from("messages").delete().eq("deal_room_id", roomId);
+      await supabase.from("deal_tasks").delete().eq("deal_room_id", roomId);
+      await supabase.from("notes").delete().eq("deal_room_id", roomId);
+      await supabase.from("documents").delete().eq("deal_room_id", roomId);
+      const { error } = await supabase.from("deal_rooms").delete().eq("id", roomId);
       if (error) throw error;
       queryClient.invalidateQueries({ queryKey: ["deal-rooms", user?.id, startup?.id] });
       toast.success("Deal room deleted");
@@ -259,7 +262,7 @@ function DealRooms() {
           );
         })}
 
-        {sortedRooms.length === 0 && (
+        {!!startup?.id && !roomsLoading && sortedRooms.length === 0 && (
           <div className="col-span-2 rounded-xl border border-dashed border-border/60 p-12 text-center">
             <Briefcase className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
             <div className="text-sm font-medium">
@@ -416,12 +419,16 @@ function CreateRoomForm({
       // 4. Send invite email via server fn if email provided
       let inviteLink: string | undefined;
       if (inviteEmail.trim()) {
+        const { data: { session } } = await supabase.auth.getSession();
         const result = await sendInviteEmail({
           data: {
             dealRoomId: newRoom.id,
             email: inviteEmail.trim(),
             role: "investor",
             invitedBy: userId,
+            userAccessToken: session?.access_token ?? "",
+            supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+            supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
             dealRoomName: `${selectedStartup?.company_name ?? "Deal Room"} — Deal Room`,
             founderName: founderName || undefined,
             startupName: selectedStartup?.company_name,

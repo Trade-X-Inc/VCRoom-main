@@ -6,6 +6,9 @@ type InviteInput = {
   email: string;
   role?: "viewer" | "investor" | "founder";
   invitedBy: string;
+  userAccessToken: string;
+  supabaseUrl?: string;
+  supabaseAnonKey?: string;
   dealRoomName?: string;
   founderName?: string;
   startupName?: string;
@@ -25,26 +28,30 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): InviteInput => data as InviteInput)
   .handler(async ({ data }: { data: InviteInput }): Promise<InviteResult> => {
     const supabaseUrl =
-      process.env.SUPABASE_URL ||
+      data.supabaseUrl ||
       process.env.VITE_SUPABASE_URL ||
-      (globalThis as any).SUPABASE_URL ||
       (globalThis as any).VITE_SUPABASE_URL ||
+      process.env.SUPABASE_URL ||
+      (globalThis as any).SUPABASE_URL ||
       "";
-    const serviceKey =
-      process.env.SUPABASE_SERVICE_ROLE_KEY ||
-      (globalThis as any).SUPABASE_SERVICE_ROLE_KEY ||
+    const supabaseAnonKey =
+      data.supabaseAnonKey ||
       process.env.VITE_SUPABASE_ANON_KEY ||
       (globalThis as any).VITE_SUPABASE_ANON_KEY ||
+      process.env.SUPABASE_ANON_KEY ||
+      (globalThis as any).SUPABASE_ANON_KEY ||
       "";
 
-    if (!supabaseUrl || !serviceKey) {
-      throw new Error("Server configuration error: missing Supabase credentials");
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return { success: false, emailSent: false, error: "Missing Supabase config" };
     }
 
-    const adminClient = createClient(supabaseUrl, serviceKey);
+    const client = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: `Bearer ${data.userAccessToken}` } },
+    });
 
     const role = data.role ?? "investor";
-    const { data: invite, error: dbErr } = await adminClient
+    const { data: invite, error: dbErr } = await client
       .from("invites")
       .insert({
         deal_room_id: data.dealRoomId,
@@ -56,22 +63,22 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
       .single();
 
     if (dbErr || !invite) {
-      throw new Error(dbErr?.message ?? "Failed to create invite record");
+      return { success: false, emailSent: false, error: dbErr?.message ?? "Failed to create invite record" };
     }
 
     const baseUrl =
-      process.env.SITE_URL ||
       (globalThis as any).SITE_URL ||
+      process.env.SITE_URL ||
       "https://main.vcroom-main.pages.dev";
     const inviteLink = `${baseUrl}/join/${invite.token}`;
 
     const resendKey =
-      process.env.RESEND_API_KEY ||
       (globalThis as any).RESEND_API_KEY ||
+      process.env.RESEND_API_KEY ||
       "";
     const fromEmail =
-      process.env.RESEND_FROM_EMAIL ||
       (globalThis as any).RESEND_FROM_EMAIL ||
+      process.env.RESEND_FROM_EMAIL ||
       "onboarding@resend.dev";
 
     if (!resendKey) {
@@ -97,34 +104,27 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
       </div>
     `;
 
-    const emailRes = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${resendKey}`,
-      },
-      body: JSON.stringify({
-        from: fromEmail,
-        to: data.email,
-        subject: `${senderName} invited you to the ${roomName} deal room`,
-        html: emailHtml,
-      }),
-    });
+    try {
+      const emailRes = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${resendKey}`,
+        },
+        body: JSON.stringify({
+          from: fromEmail,
+          to: data.email,
+          subject: `${senderName} invited you to the ${roomName} deal room`,
+          html: emailHtml,
+        }),
+      });
 
-    if (!emailRes.ok) {
-      return {
-        success: true,
-        emailSent: false,
-        token: invite.token,
-        inviteLink,
-        message: "Invite created but email failed to send.",
-      };
+      if (!emailRes.ok) {
+        return { success: true, emailSent: false, token: invite.token, inviteLink, message: "Invite created but email failed to send." };
+      }
+    } catch {
+      return { success: true, emailSent: false, token: invite.token, inviteLink, message: "Invite created but email failed to send." };
     }
 
-    return {
-      success: true,
-      emailSent: true,
-      token: invite.token,
-      inviteLink,
-    };
+    return { success: true, emailSent: true, token: invite.token, inviteLink };
   });
