@@ -35,30 +35,36 @@ function Advisor() {
     enabled: !!user?.id,
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
-      const [{ data: startup }, { count: leadCount }, { count: meetingCount }] = await Promise.all([
-        supabase.from("startups")
-          .select("company_name, stage, sector, funding_target, revenue, traction")
-          .eq("founder_id", user!.id)
-          .maybeSingle(),
-        supabase.from("vc_leads")
-          .select("*", { count: "exact", head: true })
-          .eq("founder_id", user!.id),
-        supabase.from("meetings")
-          .select("*", { count: "exact", head: true })
-          .eq("created_by", user!.id)
-          .gte("scheduled_at", new Date().toISOString()),
-      ]);
-      if (!startup) return null;
-      return {
-        companyName: startup.company_name ?? undefined,
-        stage: startup.stage ?? undefined,
-        sector: startup.sector ?? undefined,
-        fundingTarget: startup.funding_target ?? undefined,
-        revenue: startup.revenue ?? undefined,
-        traction: startup.traction ?? undefined,
-        leadCount: leadCount ?? 0,
-        meetingCount: meetingCount ?? 0,
-      };
+      try {
+        const [{ data: startup, error: sErr }, { count: leadCount }, { count: meetingCount }] = await Promise.all([
+          supabase.from("startups")
+            .select("company_name, stage, sector, funding_target, revenue, traction")
+            .eq("founder_id", user!.id)
+            .maybeSingle(),
+          supabase.from("vc_leads")
+            .select("*", { count: "exact", head: true })
+            .eq("founder_id", user!.id),
+          supabase.from("meetings")
+            .select("*", { count: "exact", head: true })
+            .eq("created_by", user!.id)
+            .gte("scheduled_at", new Date().toISOString()),
+        ]);
+        if (sErr) { console.error("Advisor startup ctx error:", sErr); return null; }
+        if (!startup) return null;
+        return {
+          companyName: startup.company_name ?? undefined,
+          stage: startup.stage ?? undefined,
+          sector: startup.sector ?? undefined,
+          fundingTarget: startup.funding_target ?? undefined,
+          revenue: startup.revenue ?? undefined,
+          traction: startup.traction ?? undefined,
+          leadCount: leadCount ?? 0,
+          meetingCount: meetingCount ?? 0,
+        };
+      } catch (e) {
+        console.error("Advisor ctx fetch failed:", e);
+        return null;
+      }
     },
   });
 
@@ -92,6 +98,7 @@ function Advisor() {
   useEffect(() => {
     if (historyApplied.current || !savedHistory) return;
     historyApplied.current = true;
+    console.log("Advisor history loaded:", savedHistory.length);
     if (savedHistory.length > 0) {
       setMsgs([
         WELCOME,
@@ -129,8 +136,16 @@ function Advisor() {
       if (result.error === "missing_key") {
         setErrorBanner("OpenAI API key not configured. Contact your admin.");
       } else if (user?.id && !result.error) {
-        supabase.from("advisor_messages").insert({ user_id: user.id, role: "user", content: t });
-        supabase.from("advisor_messages").insert({ user_id: user.id, role: "assistant", content: result.reply });
+        void supabase.from("advisor_messages").insert({ user_id: user.id, role: "user", content: t })
+          .then(({ error }) => {
+            if (error) console.error("Advisor save error (user):", error);
+            else console.log("Advisor message saved: user");
+          });
+        void supabase.from("advisor_messages").insert({ user_id: user.id, role: "assistant", content: result.reply })
+          .then(({ error }) => {
+            if (error) console.error("Advisor save error (assistant):", error);
+            else console.log("Advisor message saved: assistant");
+          });
       }
     } catch (e: any) {
       toast.error("Request failed. Please try again.");

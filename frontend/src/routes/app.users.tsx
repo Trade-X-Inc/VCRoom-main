@@ -108,7 +108,7 @@ function UsersPage() {
   };
 
   const copyInviteLink = (token: string) => {
-    const link = `${window.location.origin}/join/${token}`;
+    const link = `${window.location.origin}/join/team/${token}`;
     navigator.clipboard?.writeText(link);
     toast.success("Link copied");
   };
@@ -338,7 +338,7 @@ function InviteModal({ userId, onClose, onSent }: { userId: string; onClose: () 
     }
   };
 
-  const inviteLink = sentToken ? `${window.location.origin}/join/${sentToken}` : null;
+  const inviteLink = sentToken ? `${window.location.origin}/join/team/${sentToken}` : null;
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/40 backdrop-blur-sm p-4" onClick={onClose}>

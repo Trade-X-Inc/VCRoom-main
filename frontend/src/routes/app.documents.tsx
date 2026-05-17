@@ -82,14 +82,21 @@ function Documents() {
     queryKey: ["founder-deal-rooms-docs", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
+      // deal_rooms has no founder_id — go through startup first
+      const { data: startup } = await supabase
+        .from("startups")
+        .select("id, company_name")
+        .eq("founder_id", user!.id)
+        .maybeSingle();
+      if (!startup) return [];
       const { data } = await supabase
         .from("deal_rooms")
-        .select("id, startups(company_name)")
-        .eq("founder_id", user!.id)
+        .select("id")
+        .eq("startup_id", startup.id)
         .limit(20);
       return (data ?? []).map((r: any) => ({
         id: r.id,
-        name: r.startups?.company_name ?? r.id,
+        name: startup.company_name ? `${startup.company_name} — Deal Room` : r.id,
       }));
     },
   });
@@ -450,7 +457,6 @@ function UploadModal({
   const [category, setCategory] = useState<DocCategory>(initialCategory);
   const [file, setFile] = useState<File | null>(null);
   const [docName, setDocName] = useState("");
-  const [description, setDescription] = useState("");
   const [uploading, setUploading] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -480,8 +486,6 @@ function UploadModal({
         storage_path: path,
         file_name: docName || file.name,
         file_size: file.size,
-        file_type: file.type || "application/octet-stream",
-        description: description || null,
         deal_room_id: null,
       });
       if (insertErr) throw insertErr;
@@ -573,17 +577,6 @@ function UploadModal({
             />
           </div>
 
-          {/* Description */}
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1.5">Description (optional)</label>
-            <input
-              type="text"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description of this document"
-              className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
-            />
-          </div>
         </div>
 
         <div className="px-6 py-4 border-t border-border/60 flex items-center justify-end gap-2">

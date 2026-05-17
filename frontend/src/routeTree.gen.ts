@@ -46,6 +46,7 @@ import { Route as AppAuditRouteImport } from './routes/app.audit'
 import { Route as AppAdvisorRouteImport } from './routes/app.advisor'
 import { Route as ApiTestAiRouteImport } from './routes/api.test-ai'
 import { Route as AppInvestorIndexRouteImport } from './routes/app.investor.index'
+import { Route as JoinTeamTokenRouteImport } from './routes/join.team.$token'
 import { Route as AppSettingsSecurityRouteImport } from './routes/app.settings.security'
 import { Route as AppSettingsNotificationsRouteImport } from './routes/app.settings.notifications'
 import { Route as AppSettingsDomainRouteImport } from './routes/app.settings.domain'
@@ -250,6 +251,11 @@ const AppInvestorIndexRoute = AppInvestorIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppInvestorRoute,
 } as any)
+const JoinTeamTokenRoute = JoinTeamTokenRouteImport.update({
+  id: '/join/team/$token',
+  path: '/join/team/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppSettingsSecurityRoute = AppSettingsSecurityRouteImport.update({
   id: '/security',
   path: '/security',
@@ -390,6 +396,7 @@ export interface FileRoutesByFullPath {
   '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
+  '/join/team/$token': typeof JoinTeamTokenRoute
   '/app/investor/': typeof AppInvestorIndexRoute
   '/app/deal-room/$id/nda': typeof AppDealRoomIdNdaRoute
 }
@@ -444,6 +451,7 @@ export interface FileRoutesByTo {
   '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
+  '/join/team/$token': typeof JoinTeamTokenRoute
   '/app/investor': typeof AppInvestorIndexRoute
   '/app/deal-room/$id/nda': typeof AppDealRoomIdNdaRoute
 }
@@ -501,6 +509,7 @@ export interface FileRoutesById {
   '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
+  '/join/team/$token': typeof JoinTeamTokenRoute
   '/app/investor/': typeof AppInvestorIndexRoute
   '/app/deal-room/$id_/nda': typeof AppDealRoomIdNdaRoute
 }
@@ -559,6 +568,7 @@ export interface FileRouteTypes {
     | '/app/settings/domain'
     | '/app/settings/notifications'
     | '/app/settings/security'
+    | '/join/team/$token'
     | '/app/investor/'
     | '/app/deal-room/$id/nda'
   fileRoutesByTo: FileRoutesByTo
@@ -613,6 +623,7 @@ export interface FileRouteTypes {
     | '/app/settings/domain'
     | '/app/settings/notifications'
     | '/app/settings/security'
+    | '/join/team/$token'
     | '/app/investor'
     | '/app/deal-room/$id/nda'
   id:
@@ -669,6 +680,7 @@ export interface FileRouteTypes {
     | '/app/settings/domain'
     | '/app/settings/notifications'
     | '/app/settings/security'
+    | '/join/team/$token'
     | '/app/investor/'
     | '/app/deal-room/$id_/nda'
   fileRoutesById: FileRoutesById
@@ -694,6 +706,7 @@ export interface RootRouteChildren {
   SolutionsInvestorPipelineRoute: typeof SolutionsInvestorPipelineRoute
   SolutionsRaise1mRoute: typeof SolutionsRaise1mRoute
   SolutionsVcDealRoomRoute: typeof SolutionsVcDealRoomRoute
+  JoinTeamTokenRoute: typeof JoinTeamTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -957,6 +970,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorIndexRouteImport
       parentRoute: typeof AppInvestorRoute
     }
+    '/join/team/$token': {
+      id: '/join/team/$token'
+      path: '/join/team/$token'
+      fullPath: '/join/team/$token'
+      preLoaderRoute: typeof JoinTeamTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/settings/security': {
       id: '/app/settings/security'
       path: '/security'
@@ -1196,6 +1216,7 @@ const rootRouteChildren: RootRouteChildren = {
   SolutionsInvestorPipelineRoute: SolutionsInvestorPipelineRoute,
   SolutionsRaise1mRoute: SolutionsRaise1mRoute,
   SolutionsVcDealRoomRoute: SolutionsVcDealRoomRoute,
+  JoinTeamTokenRoute: JoinTeamTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

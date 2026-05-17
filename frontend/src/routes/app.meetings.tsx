@@ -59,7 +59,7 @@ function Meetings() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("meetings")
-        .select("*, vc_leads(investor_name, firm_name, email)")
+        .select("*, vc_leads!vc_lead_id(investor_name, firm_name, email)")
         .eq("created_by", user!.id)
         .order("scheduled_at", { ascending: true });
       if (error) throw error;
