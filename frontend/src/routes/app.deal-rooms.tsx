@@ -404,7 +404,6 @@ function CreateRoomForm({
         deal_room_id: newRoom.id,
         user_id: userId,
         role: "founder",
-        accepted_at: new Date().toISOString(),
       });
 
       // 3. Log activity

@@ -26,12 +26,15 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
   .handler(async ({ data }: { data: InviteInput }): Promise<InviteResult> => {
     const supabaseUrl =
       process.env.SUPABASE_URL ||
+      process.env.VITE_SUPABASE_URL ||
       (globalThis as any).SUPABASE_URL ||
-      (import.meta.env as any).VITE_SUPABASE_URL ||
+      (globalThis as any).VITE_SUPABASE_URL ||
       "";
     const serviceKey =
       process.env.SUPABASE_SERVICE_ROLE_KEY ||
       (globalThis as any).SUPABASE_SERVICE_ROLE_KEY ||
+      process.env.VITE_SUPABASE_ANON_KEY ||
+      (globalThis as any).VITE_SUPABASE_ANON_KEY ||
       "";
 
     if (!supabaseUrl || !serviceKey) {
