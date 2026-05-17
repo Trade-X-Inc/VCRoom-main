@@ -42,6 +42,7 @@ function JoinFlow() {
 
   useEffect(() => {
     async function loadInvite() {
+      console.log('Token from URL:', token);
       const { data, error } = await supabase
         .from("invites")
         .select("token, deal_room_id, email, role, invited_by, expires_at, deal_rooms(id, startups(company_name))")
@@ -49,11 +50,13 @@ function JoinFlow() {
         .is("accepted_at", null)
         .single();
 
+      console.log('Invite query result:', data, error);
+
       if (error || !data) {
         setLoadError("This invite link is invalid or has already been used.");
         return;
       }
-      if (new Date(data.expires_at) < new Date()) {
+      if (data.expires_at && new Date(data.expires_at) < new Date()) {
         setLoadError("This invite link has expired. Please request a new one.");
         return;
       }
@@ -63,7 +66,7 @@ function JoinFlow() {
       }
     }
     loadInvite();
-  }, [token, user?.name]);
+  }, [token, user?.fullName]);
 
   const companyName =
     invite?.deal_rooms?.startups?.company_name ?? "the startup";
@@ -90,8 +93,6 @@ function JoinFlow() {
           deal_room_id: invite.deal_room_id,
           user_id: userId,
           role: invite.role,
-          invited_by: invite.invited_by,
-          accepted_at: new Date().toISOString(),
         },
         { onConflict: "deal_room_id,user_id" },
       );

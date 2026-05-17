@@ -52,6 +52,7 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
     });
 
     const role = data.role ?? "investor";
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
     const { data: invite, error: dbErr } = await client
       .from("invites")
       .insert({
@@ -59,6 +60,7 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
         email: data.email,
         role,
         invited_by: data.invitedBy,
+        expires_at: expiresAt,
       })
       .select("token")
       .single();
