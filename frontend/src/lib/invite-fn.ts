@@ -9,6 +9,7 @@ type InviteInput = {
   userAccessToken: string;
   supabaseUrl?: string;
   supabaseAnonKey?: string;
+  appUrl?: string;
   dealRoomName?: string;
   founderName?: string;
   startupName?: string;
@@ -67,9 +68,12 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
     }
 
     const baseUrl =
+      data.appUrl ||
+      (globalThis as any).VITE_APP_URL ||
+      process.env.VITE_APP_URL ||
       (globalThis as any).SITE_URL ||
       process.env.SITE_URL ||
-      "https://main.vcroom-main.pages.dev";
+      "https://vcroom-main.pages.dev";
     const inviteLink = `${baseUrl}/join/${invite.token}`;
 
     const resendKey =

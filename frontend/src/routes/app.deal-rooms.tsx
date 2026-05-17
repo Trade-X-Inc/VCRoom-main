@@ -429,6 +429,7 @@ function CreateRoomForm({
             userAccessToken: session?.access_token ?? "",
             supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
             supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+            appUrl: import.meta.env.VITE_APP_URL,
             dealRoomName: `${selectedStartup?.company_name ?? "Deal Room"} — Deal Room`,
             founderName: founderName || undefined,
             startupName: selectedStartup?.company_name,
