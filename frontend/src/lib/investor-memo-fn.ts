@@ -30,8 +30,9 @@ export const generateInvestorMemo = createServerFn({ method: "POST" })
 
     const openAIKey =
       data.openAIKey ||
-      process.env.OPENAI_API_KEY ||
       (globalThis as any).OPENAI_API_KEY ||
+      (globalThis as any).VITE_OPENAI_API_KEY ||
+      process.env.OPENAI_API_KEY ||
       "";
 
     if (!supabaseUrl || !supabaseKey || !openAIKey) {
@@ -68,7 +69,7 @@ export const generateInvestorMemo = createServerFn({ method: "POST" })
     // 3. Fetch Q&A messages
     const { data: messages } = await client
       .from("messages")
-      .select("content, sender_role")
+      .select("body, metadata, is_qa")
       .eq("deal_room_id", data.dealRoomId)
       .order("created_at", { ascending: false })
       .limit(20);
@@ -85,8 +86,9 @@ export const generateInvestorMemo = createServerFn({ method: "POST" })
 
     const docList = (docs ?? []).map((d) => `${d.name}${d.category ? ` (${d.category})` : ""}`).join(", ") || "None uploaded";
     const qaSummary = (messages ?? [])
+      .filter((m) => m.is_qa)
       .slice(0, 8)
-      .map((m) => `[${m.sender_role ?? "user"}]: ${m.content}`)
+      .map((m) => `[${m.metadata?.authorRole ?? "Investor"}]: ${m.body}${m.metadata?.answer ? `\n  → ${m.metadata.answer}` : ""}`)
       .join("\n") || "No Q&A yet";
 
     const prompt = `You are an experienced VC analyst. Generate a structured investment memo for this startup based on the available data.
