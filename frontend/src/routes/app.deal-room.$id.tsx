@@ -8,7 +8,7 @@ import {
   ArrowLeft, Lock, Sparkles, X, MessagesSquare, ThumbsUp, ThumbsDown,
   HelpCircle, Building2, TrendingUp, Users, DollarSign, Target, Shield,
   Send, AlertCircle, Eye, UserPlus, Loader2, ExternalLink, ChevronDown,
-  Check, ClipboardList, Copy, Trash2,
+  Check, ClipboardList, Copy, Trash2, Pencil,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AIChat } from "@/components/ai/AIChat";
@@ -25,6 +25,8 @@ import {
 } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { sendInviteEmail } from "@/lib/invite-fn";
+import { generateDocumentSummary } from "@/lib/document-summary-fn";
+import { getQASuggestions } from "@/lib/qa-suggestions-fn";
 
 export const Route = createFileRoute("/app/deal-room/$id")({
   component: DealRoom,
@@ -269,7 +271,7 @@ function DealRoom() {
         )}
         {tab === "documents" && <Documents dealRoomId={dealRoomId} isFounder={isFounder} userId={user?.id} />}
         {tab === "chat" && <div className="h-full"><DealRoomChat dealRoomId={dealRoomId} userId={user?.id} userName={userName} /></div>}
-        {tab === "qa" && <QA dealRoomId={dealRoomId} userId={user?.id} userName={userName} isInvestor={isInvestor} isFounder={isFounder} />}
+        {tab === "qa" && <QA dealRoomId={dealRoomId} userId={user?.id} userName={userName} isInvestor={isInvestor} isFounder={isFounder} companyName={(room as any)?.startups?.company_name ?? ""} sector={(room as any)?.startups?.sector ?? ""} />}
         {tab === "checklist" && <DDChecklist dealRoomId={dealRoomId} userId={user?.id} />}
         {tab === "notes" && <Notes dealRoomId={dealRoomId} userId={user?.id} />}
         {tab === "timeline" && <Timeline dealRoomId={dealRoomId} />}
@@ -1036,6 +1038,10 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
   const [showLibrary, setShowLibrary] = useState(false);
   const [addingFromLib, setAddingFromLib] = useState<string | null>(null);
   const pendingDeletes = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const [expandedSummaryId, setExpandedSummaryId] = useState<string | null>(null);
+  const [generatingSummaryId, setGeneratingSummaryId] = useState<string | null>(null);
+  const [editingSummaryId, setEditingSummaryId] = useState<string | null>(null);
+  const [summaryEdits, setSummaryEdits] = useState<Record<string, string>>({});
 
   const { data: docs = [] } = useQuery({
     queryKey: ["documents", dealRoomId],
@@ -1082,6 +1088,46 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
     setAddingFromLib(null);
     toast.success("Document added to deal room");
     setShowLibrary(false);
+  };
+
+  const generateSummary = async (doc: any) => {
+    setGeneratingSummaryId(doc.id);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const result = await generateDocumentSummary({
+        data: {
+          documentPath: doc.storage_path,
+          documentName: doc.name || doc.storage_path?.split("/").pop() || "Document",
+          dealRoomId,
+          openAIKey: import.meta.env.VITE_OPENAI_API_KEY,
+          supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+          supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+          userAccessToken: session?.access_token ?? "",
+        },
+      });
+      await supabase.from("documents").update({ ai_summary: result.summary }).eq("id", doc.id);
+      queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+      setExpandedSummaryId(doc.id);
+      toast.success("Summary generated");
+    } catch {
+      toast.error("Failed to generate summary");
+    } finally {
+      setGeneratingSummaryId(null);
+    }
+  };
+
+  const saveSummaryEdit = async (docId: string) => {
+    const text = summaryEdits[docId]?.trim();
+    if (!text) return;
+    const { error } = await supabase
+      .from("documents")
+      .update({ ai_summary: text, summary_edited: true })
+      .eq("id", docId);
+    if (error) { toast.error("Failed to save summary"); return; }
+    queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+    setEditingSummaryId(null);
+    setSummaryEdits((s) => { const n = { ...s }; delete n[docId]; return n; });
+    toast.success("Summary saved");
   };
 
   const handleDeleteDoc = (doc: any) => {
@@ -1216,43 +1262,124 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
         <div className="mt-5 rounded-xl border border-border/60 bg-card shadow-card divide-y divide-border/60">
           {(docs as any[]).map((doc) => {
             const catColor = CATEGORY_COLORS[doc.category] ?? "bg-accent text-muted-foreground";
+            const isExpanded = expandedSummaryId === doc.id;
+            const isEditing = editingSummaryId === doc.id;
             return (
-              <div key={doc.id} className="flex items-center gap-3 px-5 py-3 hover:bg-accent/40 group">
-                <div className="grid h-8 w-8 place-items-center rounded-md bg-accent">
-                  <FileText className="h-4 w-4 text-brand" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium truncate">
-                    {doc.name || (doc.storage_path?.split("/").pop() ?? "Document")}
+              <div key={doc.id}>
+                <div className="flex items-center gap-3 px-5 py-3 hover:bg-accent/40 group">
+                  <div className="grid h-8 w-8 place-items-center rounded-md bg-accent shrink-0">
+                    <FileText className="h-4 w-4 text-brand" />
                   </div>
-                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                    {doc.category && (
-                      <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full", catColor)}>{doc.category}</span>
-                    )}
-                    <span className="text-xs text-muted-foreground">
-                      {doc.users?.full_name ?? "Unknown"} · {new Date(doc.created_at).toLocaleDateString()}
-                    </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium truncate">
+                      {doc.name || (doc.storage_path?.split("/").pop() ?? "Document")}
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                      {doc.category && (
+                        <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full", catColor)}>{doc.category}</span>
+                      )}
+                      <span className="text-xs text-muted-foreground">
+                        {doc.users?.full_name ?? "Unknown"} · {new Date(doc.created_at).toLocaleDateString()}
+                      </span>
+                      <button
+                        onClick={() => setExpandedSummaryId(isExpanded ? null : doc.id)}
+                        className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <ChevronDown className={cn("h-3 w-3 transition-transform", isExpanded && "rotate-180")} />
+                        AI Summary
+                        {doc.ai_summary && (
+                          <span className={cn("ml-0.5 px-1 py-0.5 rounded text-[9px] font-medium", doc.summary_edited ? "bg-brand/10 text-brand" : "bg-muted/60 text-muted-foreground")}>
+                            {doc.summary_edited ? "Edited" : "AI"}
+                          </span>
+                        )}
+                      </button>
+                    </div>
                   </div>
-                </div>
-                {doc.status === "ready" ? (
-                  <span className="inline-flex items-center gap-1 text-success text-xs"><CheckCircle2 className="h-3.5 w-3.5" /> Ready</span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 text-warning text-xs"><AlertTriangle className="h-3.5 w-3.5" /> Review</span>
-                )}
-                <button
-                  onClick={() => handleDownload(doc.storage_path)}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <Download className="h-4 w-4" />
-                </button>
-                {isFounder && (
+                  {doc.status === "ready" ? (
+                    <span className="inline-flex items-center gap-1 text-success text-xs"><CheckCircle2 className="h-3.5 w-3.5" /> Ready</span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-warning text-xs"><AlertTriangle className="h-3.5 w-3.5" /> Review</span>
+                  )}
                   <button
-                    onClick={() => handleDeleteDoc(doc)}
-                    title="Delete document"
-                    className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => handleDownload(doc.storage_path)}
+                    className="text-muted-foreground hover:text-foreground"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Download className="h-4 w-4" />
                   </button>
+                  {isFounder && (
+                    <button
+                      onClick={() => handleDeleteDoc(doc)}
+                      title="Delete document"
+                      className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+
+                {isExpanded && (
+                  <div className="px-5 pb-4 bg-muted/20 border-t border-border/40">
+                    <div className="ml-11">
+                      {isEditing ? (
+                        <div className="pt-3 space-y-2">
+                          <textarea
+                            value={summaryEdits[doc.id] ?? doc.ai_summary ?? ""}
+                            onChange={(e) => setSummaryEdits((s) => ({ ...s, [doc.id]: e.target.value }))}
+                            rows={4}
+                            className="w-full resize-none rounded-md border border-border/60 bg-background px-3 py-2 text-xs outline-none focus:border-brand/50"
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => saveSummaryEdit(doc.id)}
+                              className="inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs"
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={() => setEditingSummaryId(null)}
+                              className="inline-flex items-center gap-1 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : doc.ai_summary ? (
+                        <div className="pt-3">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">AI Summary</div>
+                            {isFounder && (
+                              <button
+                                onClick={() => {
+                                  setEditingSummaryId(doc.id);
+                                  setSummaryEdits((s) => ({ ...s, [doc.id]: doc.ai_summary! }));
+                                }}
+                                className="inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground"
+                              >
+                                <Pencil className="h-3 w-3" /> Edit
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line">{doc.ai_summary}</p>
+                        </div>
+                      ) : (
+                        <div className="pt-3">
+                          {isFounder ? (
+                            <button
+                              onClick={() => generateSummary(doc)}
+                              disabled={generatingSummaryId === doc.id}
+                              className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-xs hover:bg-brand/10 disabled:opacity-50"
+                            >
+                              {generatingSummaryId === doc.id
+                                ? <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</>
+                                : <><Sparkles className="h-3 w-3" /> Generate AI Summary</>}
+                            </button>
+                          ) : (
+                            <p className="text-xs text-muted-foreground">No AI summary available yet.</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
             );
@@ -2077,12 +2204,16 @@ function QA({
   userName,
   isInvestor,
   isFounder,
+  companyName = "",
+  sector = "",
 }: {
   dealRoomId: string;
   userId: string | undefined;
   userName: string;
   isInvestor: boolean;
   isFounder: boolean;
+  companyName?: string;
+  sector?: string;
 }) {
   const [msgs, setMsgs] = useState<any[]>([]);
   const [input, setInput] = useState("");
@@ -2095,6 +2226,8 @@ function QA({
   const [asking, setAsking] = useState(false);
   const [answeringId, setAnsweringId] = useState<string | null>(null);
   const [draftingAiReplyId, setDraftingAiReplyId] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const suggestionsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const loadMessages = async () => {
@@ -2169,6 +2302,27 @@ function QA({
       await logActivity(dealRoomId, userId, "Asked a structured Q&A question", { question: text });
       setQuestion("");
       setOpenQaId(data.id);
+      // Fetch AI suggestions for follow-up questions
+      try {
+        const result = await getQASuggestions({
+          data: {
+            question: text,
+            startupName: companyName || "the startup",
+            sector: sector || "tech",
+            previousQuestions: msgs.filter((m) => m.is_qa).map((m) => m.body).slice(-5),
+            openAIKey: import.meta.env.VITE_OPENAI_API_KEY,
+            supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+            supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+          },
+        });
+        if (result.suggestions.length > 0) {
+          setSuggestions(result.suggestions);
+          if (suggestionsTimerRef.current) clearTimeout(suggestionsTimerRef.current);
+          suggestionsTimerRef.current = setTimeout(() => setSuggestions([]), 30000);
+        }
+      } catch {
+        // suggestions are non-critical, silently skip
+      }
     }
     setAsking(false);
   };
@@ -2258,11 +2412,40 @@ function QA({
               <textarea
                 id="ask-question-box"
                 value={question}
-                onChange={(e) => setQuestion(e.target.value)}
+                onChange={(e) => {
+                  setQuestion(e.target.value);
+                  if (e.target.value && suggestions.length > 0) {
+                    setSuggestions([]);
+                    if (suggestionsTimerRef.current) clearTimeout(suggestionsTimerRef.current);
+                  }
+                }}
                 rows={3}
                 placeholder="Ask a diligence question for the founder..."
                 className="w-full resize-none rounded-md border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
               />
+              {suggestions.length > 0 && (
+                <div className="mt-2">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5 flex items-center gap-1">
+                    <Sparkles className="h-3 w-3 text-brand" /> Suggested follow-ups
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {suggestions.map((s, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          setQuestion(s);
+                          setSuggestions([]);
+                          if (suggestionsTimerRef.current) clearTimeout(suggestionsTimerRef.current);
+                          document.getElementById("ask-question-box")?.focus();
+                        }}
+                        className="inline-flex items-center gap-1 rounded-full border border-brand/30 bg-brand/5 text-brand px-3 py-1 text-xs hover:bg-brand/10 transition-colors"
+                      >
+                        <HelpCircle className="h-3 w-3 shrink-0" /> {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="mt-3 flex justify-end">
                 <button
                   onClick={askQuestion}

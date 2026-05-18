@@ -27,11 +27,10 @@ export const generateInvestorMemo = createServerFn({ method: "POST" })
       process.env.SUPABASE_ANON_KEY ||
       (globalThis as any).SUPABASE_ANON_KEY ||
       "";
-
     const openAIKey =
       data.openAIKey ||
-      (globalThis as any).OPENAI_API_KEY ||
       (globalThis as any).VITE_OPENAI_API_KEY ||
+      (globalThis as any).OPENAI_API_KEY ||
       process.env.OPENAI_API_KEY ||
       "";
 
@@ -55,7 +54,7 @@ export const generateInvestorMemo = createServerFn({ method: "POST" })
     const { data: startup } = room?.startup_id
       ? await client
           .from("startups")
-          .select("company_name, sector, stage, funding_target, traction, description, revenue, founder_name")
+          .select("company_name, sector, stage, funding_target, traction, description, revenue, founder_name, team_size")
           .eq("id", room.startup_id)
           .maybeSingle()
       : { data: null };
@@ -84,38 +83,61 @@ export const generateInvestorMemo = createServerFn({ method: "POST" })
     const doneTasks = tasks?.filter((t) => t.completed).length ?? 0;
     const taskCompletion = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
 
-    const docList = (docs ?? []).map((d) => `${d.name}${d.category ? ` (${d.category})` : ""}`).join(", ") || "None uploaded";
-    const qaSummary = (messages ?? [])
-      .filter((m) => m.is_qa)
-      .slice(0, 8)
-      .map((m) => `[${m.metadata?.authorRole ?? "Investor"}]: ${m.body}${m.metadata?.answer ? `\n  → ${m.metadata.answer}` : ""}`)
-      .join("\n") || "No Q&A yet";
+    const docList =
+      (docs ?? []).map((d) => `${d.name}${d.category ? ` (${d.category})` : ""}`).join(", ") ||
+      "None uploaded";
+    const qaSummary =
+      (messages ?? [])
+        .filter((m) => m.is_qa)
+        .slice(0, 8)
+        .map(
+          (m) =>
+            `Q: ${m.body}${m.metadata?.answer ? `\nA: ${m.metadata.answer}` : " [unanswered]"}`,
+        )
+        .join("\n\n") || "No Q&A yet";
 
-    const prompt = `You are an experienced VC analyst. Generate a structured investment memo for this startup based on the available data.
+    const prompt = `Generate an investment memo for this startup:
 
-Startup: ${startup?.company_name ?? "Unknown"}
+Company: ${startup?.company_name ?? "Unknown"}
 Sector: ${startup?.sector ?? "Unknown"}
 Stage: ${startup?.stage ?? "Unknown"}
-Raise: ${startup?.funding_target ?? "Unknown"}
+Raising: ${startup?.funding_target ?? "Unknown"}
 Revenue: ${startup?.revenue ?? "Not disclosed"}
 Traction: ${startup?.traction ?? "Not provided"}
-Founder: ${startup?.founder_name ?? "Unknown"}
-Description: ${startup?.description ?? "Not provided"}
+Team size: ${startup?.team_size ?? "Unknown"}
 
-Documents provided: ${docList}
-Q&A summary:
+Documents in data room: ${docList}
+Q&A exchanges:
 ${qaSummary}
 Diligence completion: ${taskCompletion}%
 
-Generate a memo with these sections:
-## Executive Summary
-## Team Assessment
-## Market Opportunity
-## Traction & Metrics
-## Key Risks
-## Investment Recommendation
+Generate a memo with EXACTLY this structure:
 
-Be specific and data-driven. Flag any missing information as gaps. Use markdown formatting.`;
+## Executive Summary
+[2-3 sentences on the opportunity]
+
+## Market Opportunity
+Rating: X/10
+[Assessment of market size and timing]
+
+## Team Assessment
+Rating: X/10
+[Assessment of founding team]
+
+## Traction & Metrics
+[Key numbers and growth indicators]
+
+## Key Risks
+- [Risk 1]
+- [Risk 2]
+- [Risk 3]
+
+## Red Flags
+[Any concerning issues, or 'None identified']
+
+## Investment Recommendation
+Verdict: [STRONG BUY / BUY / HOLD / PASS]
+[2-3 sentence rationale]`;
 
     const resp = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -125,10 +147,14 @@ Be specific and data-driven. Flag any missing information as gaps. Use markdown 
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        max_tokens: 1200,
+        max_tokens: 1600,
         temperature: 0.3,
         messages: [
-          { role: "system", content: "You are an experienced VC investment analyst. Write concise, professional investment memos in markdown format." },
+          {
+            role: "system",
+            content:
+              "You are a senior VC analyst with 15 years of experience. Generate structured investment memos.",
+          },
           { role: "user", content: prompt },
         ],
       }),

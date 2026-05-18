@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Brain, Loader2, Download, CheckCircle2, AlertTriangle, Lightbulb, FileText, Copy, Check as CheckIcon, RefreshCw } from "lucide-react";
+import { Brain, Loader2, Download, CheckCircle2, AlertTriangle, Lightbulb, FileText, Copy, Check as CheckIcon, RefreshCw, Save } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { generateDealBrief } from "@/lib/deal-brief-fn";
@@ -19,6 +20,9 @@ function AnalysisPage() {
   const [generatingMemo, setGeneratingMemo] = useState(false);
   const [memoError, setMemoError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [savingMemo, setSavingMemo] = useState(false);
+  const [memoSaved, setMemoSaved] = useState(false);
+  const [memoGeneratedAt, setMemoGeneratedAt] = useState<Date | null>(null);
 
   // Fetch deal rooms user belongs to
   const { data: rooms = [], isLoading: roomsLoading } = useQuery({
@@ -66,6 +70,8 @@ function AnalysisPage() {
         },
       });
       setMemoText(result.memo);
+      setMemoGeneratedAt(new Date());
+      setMemoSaved(false);
     } catch {
       setMemoError("Failed to generate memo. Please try again.");
     } finally {
@@ -78,6 +84,25 @@ function AnalysisPage() {
     await navigator.clipboard.writeText(memoText);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleSaveMemo = async () => {
+    if (!memoText || !selectedRoomId) return;
+    setSavingMemo(true);
+    try {
+      const { error } = await supabase
+        .from("deal_rooms")
+        .update({ investor_memo: memoText, memo_generated_at: new Date().toISOString() })
+        .eq("id", selectedRoomId);
+      if (error) throw error;
+      setMemoSaved(true);
+      setTimeout(() => setMemoSaved(false), 3000);
+      toast.success("Memo saved to deal room");
+    } catch {
+      toast.error("Failed to save memo");
+    } finally {
+      setSavingMemo(false);
+    }
   };
 
   const downloadMemo = () => {
@@ -255,6 +280,14 @@ function AnalysisPage() {
                       {copied ? "Copied" : "Copy memo"}
                     </button>
                     <button
+                      onClick={handleSaveMemo}
+                      disabled={savingMemo || memoSaved}
+                      className="inline-flex items-center gap-1.5 rounded-[10px] border border-border/60 px-2.5 py-1.5 text-xs hover:bg-accent disabled:opacity-50"
+                    >
+                      {memoSaved ? <CheckIcon className="h-3 w-3 text-success" /> : <Save className="h-3 w-3" />}
+                      {memoSaved ? "Saved" : savingMemo ? "Saving…" : "Save memo"}
+                    </button>
+                    <button
                       onClick={handleGenerateMemo}
                       disabled={generatingMemo}
                       className="inline-flex items-center gap-1.5 rounded-[10px] border border-border/60 px-2.5 py-1.5 text-xs hover:bg-accent disabled:opacity-50"
@@ -292,8 +325,15 @@ function AnalysisPage() {
             )}
 
             {memoText && (
-              <div className="p-6 prose prose-sm prose-neutral dark:prose-invert max-w-none text-sm leading-relaxed">
-                <ReactMarkdown>{memoText}</ReactMarkdown>
+              <div>
+                <div className="p-6 prose prose-sm prose-neutral dark:prose-invert max-w-none text-sm leading-relaxed">
+                  <ReactMarkdown>{memoText}</ReactMarkdown>
+                </div>
+                {memoGeneratedAt && (
+                  <div className="px-6 pb-4 text-[11px] text-muted-foreground border-t border-border/40 pt-3">
+                    Generated {memoGeneratedAt.toLocaleString()}
+                  </div>
+                )}
               </div>
             )}
 
