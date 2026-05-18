@@ -65,6 +65,12 @@ const emptyForm: FormState = {
   key_metric: "", growth_rate: "", customer_count: "",
 };
 
+const formatNumber = (val: string) => {
+  const num = val.replace(/[^0-9]/g, "");
+  return num ? Number(num).toLocaleString() : "";
+};
+const cleanNumber = (val: string) => val.replace(/,/g, "");
+
 function fromStartup(s: StartupRow): FormState {
   return {
     company_name: s.company_name ?? "", sector: s.sector ?? "", stage: s.stage ?? "",
@@ -138,7 +144,7 @@ function Profile() {
         valuation: form.valuation || null,
         traction: form.traction || null,
         revenue: form.revenue || null,
-        team_size: form.team_size ? parseInt(form.team_size, 10) : null,
+        team_size: form.team_size ? parseInt(cleanNumber(form.team_size), 10) : null,
         description: form.description || null,
         website: form.website || null,
         problem: form.problem || null,
@@ -542,7 +548,7 @@ function Profile() {
                 <Field label="Website" value={form.website} onChange={field("website")} placeholder="https://example.com" />
                 <Field label="Founded year" value={form.founded_year} onChange={field("founded_year")} placeholder="2022" />
                 <Field label="Country / HQ" value={form.country} onChange={field("country")} placeholder="San Francisco, USA" />
-                <Field label="Team size" value={form.team_size} onChange={field("team_size")} placeholder="12" />
+                <Field label="Team size" value={form.team_size} onChange={field("team_size")} placeholder="e.g. 12" title="Number of full-time team members" />
                 <Field label="Sector" value={form.sector} onChange={field("sector")} placeholder="B2B SaaS, Fintech, AI..." />
                 <div>
                   <label className="text-xs text-muted-foreground">Stage</label>
@@ -557,8 +563,8 @@ function Profile() {
 
             <FormSection title="Fundraising">
               <div className="grid sm:grid-cols-2 gap-3">
-                <Field label="Funding target" value={form.funding_target} onChange={field("funding_target")} placeholder="$5M" />
-                <Field label="Pre-money valuation" value={form.valuation} onChange={field("valuation")} placeholder="$20M" />
+                <Field label="Funding target" value={form.funding_target} onChange={field("funding_target")} placeholder="e.g. 2,000,000" title="Enter amount in USD, use commas for thousands (e.g. 2,000,000)" onBlur={(e) => setForm((f) => ({ ...f, funding_target: formatNumber(e.target.value) }))} />
+                <Field label="Pre-money valuation" value={form.valuation} onChange={field("valuation")} placeholder="e.g. 20,000,000" title="Pre-money valuation in USD" onBlur={(e) => setForm((f) => ({ ...f, valuation: formatNumber(e.target.value) }))} />
                 <Field label="Previous funding raised" value={form.previous_funding} onChange={field("previous_funding")} placeholder="$500K pre-seed" />
                 <Field label="Current investors" value={form.current_investors} onChange={field("current_investors")} placeholder="Y Combinator, Sequoia" />
               </div>
@@ -567,7 +573,7 @@ function Profile() {
 
             <FormSection title="Traction & metrics">
               <div className="grid sm:grid-cols-2 gap-3">
-                <Field label="Revenue / ARR" value={form.revenue} onChange={field("revenue")} placeholder="$1.2M ARR" />
+                <Field label="Revenue / ARR" value={form.revenue} onChange={field("revenue")} placeholder="e.g. 500,000" title="Annual revenue in USD" onBlur={(e) => setForm((f) => ({ ...f, revenue: formatNumber(e.target.value) }))} />
                 <Field label="Growth rate" value={form.growth_rate} onChange={field("growth_rate")} placeholder="+15% MoM" />
                 <Field label="Customer count" value={form.customer_count} onChange={field("customer_count")} placeholder="500 paying customers" />
                 <Field label="Key metric" value={form.key_metric} onChange={field("key_metric")} placeholder="Your most important metric" />
@@ -701,10 +707,12 @@ function FormSection({ title, children }: { title: string; children: React.React
   );
 }
 
-function Field({ label, value, onChange, placeholder, type = "text" }: {
+function Field({ label, value, onChange, placeholder, type = "text", onBlur, title }: {
   label: string; value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string; type?: string;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  title?: string;
 }) {
   return (
     <div>
@@ -713,7 +721,9 @@ function Field({ label, value, onChange, placeholder, type = "text" }: {
         type={type}
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
         placeholder={placeholder}
+        title={title}
         className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
       />
     </div>

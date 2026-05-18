@@ -54,10 +54,11 @@ function DealRoom() {
   // ── Supabase queries ──────────────────────────────────────────
   const { data: room } = useQuery({
     queryKey: ["deal-room", dealRoomId],
+    enabled: !!user?.id,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("deal_rooms")
         .select("*, startups(*)")
         .eq("id", dealRoomId)
@@ -568,12 +569,16 @@ function DealRoomOverview({
       <div className="flex items-start justify-between gap-6 mb-6">
         <div>
           <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
-            Shared deal workspace
+            {isInvestor ? "Investor Deal Room" : "Founder Deal Room"}
           </div>
           <h2 className="mt-1 text-2xl font-semibold tracking-tight">
-            {startup?.company_name ?? "Deal Room"}
+            {startup?.company_name ?? (room as any)?.investor_company ?? "Deal Room"}
           </h2>
-          <p className="mt-1 text-sm text-muted-foreground">Diligence, tasks, decisions, and activity in one place.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {isInvestor
+              ? `Investor Deal Room · ${(room as any)?.status ?? "Due Diligence"}`
+              : "Diligence, tasks, decisions, and activity in one place."}
+          </p>
         </div>
         <span className="inline-flex items-center gap-1.5 rounded-md border border-success/30 bg-success/10 px-2.5 py-1 text-xs font-medium text-success">
           <CheckCircle2 className="h-3.5 w-3.5" /> NDA signed
@@ -607,6 +612,27 @@ function DealRoomOverview({
                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Funding target</div>
                   <div className="mt-1 text-lg font-semibold">{formatMoney(startup?.funding_target)}</div>
                 </div>
+                {(startup?.revenue || startup?.team_size) && (
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    {startup?.revenue && (
+                      <div className="rounded-md border border-border/60 bg-background p-2.5">
+                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">ARR</div>
+                        <div className="mt-0.5 text-sm font-semibold truncate">{startup.revenue}</div>
+                      </div>
+                    )}
+                    {startup?.team_size && (
+                      <div className="rounded-md border border-border/60 bg-background p-2.5">
+                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Team</div>
+                        <div className="mt-0.5 text-sm font-semibold">{startup.team_size}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {startup?.traction && (
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    <span className="font-semibold text-foreground">Traction: </span>{startup.traction}
+                  </p>
+                )}
                 <p className="mt-4 text-sm leading-relaxed text-muted-foreground line-clamp-2">{summary}</p>
                 <Link to={profileLink as any} className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline">
                   View full profile <ExternalLink className="h-3.5 w-3.5" />
