@@ -16,7 +16,9 @@ const FALLBACK = "Document uploaded. AI summary not available for this file type
 export const generateDocumentSummary = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): SummaryInput => data as SummaryInput)
   .handler(async ({ data }: { data: SummaryInput }): Promise<{ summary: string }> => {
-    console.log('Summary fn called:', { documentPath: data.documentPath, documentName: data.documentName });
+    console.log('=== SUMMARY FN START ===');
+    console.log('Document path:', data.documentPath);
+    console.log('Document name:', data.documentName);
 
     const supabaseUrl =
       data.supabaseUrl ||
@@ -37,21 +39,26 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
       '';
 
     console.log('OpenAI key present:', !!openAIKey);
-    console.log('Supabase URL:', supabaseUrl?.slice(0, 20));
+    console.log('OpenAI key length:', openAIKey?.length);
+    console.log('Supabase URL:', supabaseUrl?.slice(0, 30));
 
-    if (!supabaseUrl || !supabaseKey || !openAIKey) return { summary: FALLBACK };
+    if (!openAIKey) {
+      throw new Error('OpenAI API key not configured. Check Cloudflare environment variables.');
+    }
+    if (!supabaseUrl || !supabaseKey) return { summary: FALLBACK };
 
     const client = createClient(supabaseUrl, supabaseKey, {
       global: { headers: { Authorization: `Bearer ${data.userAccessToken ?? ""}` } },
     });
 
-    const { data: blob, error } = await client.storage
+    const { data: blob, error: dlError } = await client.storage
       .from("documents")
       .download(data.documentPath);
 
-    console.log('File download result:', { error: error?.message, dataSize: (blob as any)?.size });
+    console.log('Download error:', dlError?.message ?? 'none');
+    console.log('Blob size:', (blob as any)?.size);
 
-    if (error || !blob) return { summary: FALLBACK };
+    if (dlError || !blob) return { summary: FALLBACK };
 
     let textContent = "";
     try {

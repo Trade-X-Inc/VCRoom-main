@@ -140,6 +140,10 @@ function Documents() {
     await supabase.storage.from("documents").remove([storagePath]);
     const { error } = await supabase.from("documents").delete().eq("id", id).eq("uploader_id", user!.id);
     if (error) { toast.error(error.message); return; }
+    // Remove from cache immediately, then sync
+    queryClient.setQueryData(["documents", user?.id], (old: any) =>
+      (old ?? []).filter((d: any) => d.id !== id)
+    );
     queryClient.invalidateQueries({ queryKey: ["documents", user?.id] });
     toast.success("Document deleted");
   };

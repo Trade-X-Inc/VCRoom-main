@@ -1161,7 +1161,13 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
         const { error: storageError } = await supabase.storage.from("documents").remove([doc.storage_path]);
         console.log("Storage delete result:", storageError ?? "success");
       }
-      queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+      // Remove from cache immediately, then sync with DB
+      queryClient.setQueryData(["documents", dealRoomId], (old: any) =>
+        (old ?? []).filter((d: any) => d.id !== doc.id)
+      );
+      queryClient.invalidateQueries({
+        predicate: (q) => (q.queryKey as string[]).includes(dealRoomId),
+      });
     }, 5000);
     pendingDeletes.current.set(doc.id, timer);
     toastId = toast(`"${docName}" will be deleted`, {
