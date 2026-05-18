@@ -79,7 +79,7 @@ function InvestorDashboard() {
     queryFn: async () => {
       const { data } = await supabase
         .from("deal_rooms")
-        .select("id, created_at, updated_at, startup_id, investor_decision, startups(company_name, sector, stage, funding_target)")
+        .select("id, created_at, updated_at, startup_id, investor_decision, investor_company, investor_name, startups(company_name, sector, stage, funding_target)")
         .in("id", roomIds);
       return data ?? [];
     },
@@ -282,6 +282,11 @@ function InvestorDashboard() {
           <div className="divide-y divide-border/60">
             {roomsData.map((room) => {
               const startup = (room as any).startups;
+              const displayName =
+                startup?.company_name ||
+                (room as any).investor_company ||
+                ((room as any).investor_name ? `Deal with ${(room as any).investor_name}` : null) ||
+                "Unnamed";
               const status = latestStatus[room.id] ?? null;
               const stage = DB_STATUS_TO_STAGE[status ?? ""] ?? "Sourced";
               const stageColors: Record<string, string> = {
@@ -295,10 +300,10 @@ function InvestorDashboard() {
               return (
                 <div key={room.id} className="flex items-center gap-4 px-5 py-3 hover:bg-accent/30 transition-colors">
                   <div className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold text-sm shrink-0">
-                    {(startup?.company_name || "D")[0]}
+                    {displayName[0] ?? "D"}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate">{startup?.company_name ?? "Unnamed"}</div>
+                    <div className="text-sm font-medium truncate">{displayName}</div>
                     <div className="text-xs text-muted-foreground">{startup?.sector || "—"} · {startup?.stage || "—"}</div>
                   </div>
                   <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground">

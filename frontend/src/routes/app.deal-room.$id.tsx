@@ -180,7 +180,7 @@ function DealRoom() {
   const companyName = (room as any)?.startups?.company_name ?? "Unknown Company";
 
   const visibleTabs = tabs.filter((t) => {
-    if (isInvestor) return ["overview", "documents", "qa", "notes", "decision"].includes(t.k);
+    if (isInvestor) return ["overview", "documents", "qa", "checklist", "notes", "timeline", "meetings", "decision"].includes(t.k);
     return t.k !== "decision";
   });
 
@@ -268,10 +268,13 @@ function DealRoom() {
         {tab === "notes" && <Notes dealRoomId={dealRoomId} userId={user?.id} />}
         {tab === "timeline" && <Timeline dealRoomId={dealRoomId} />}
         {tab === "meetings" && <MeetingsTab dealRoomId={dealRoomId} userId={user?.id} />}
-        {tab === "decision" && (
+        {tab === "decision" && isInvestor && (
+          <InvestorDecisionTab dealRoomId={dealRoomId} userId={user?.id} />
+        )}
+        {tab === "decision" && !isInvestor && (
           <ReviewTab
             dealRoomId={dealRoomId}
-            currentUserRole={isFounder ? "founder" : "investor"}
+            currentUserRole="founder"
             startupId={(room as any)?.startup_id ?? ""}
           />
         )}
@@ -1684,6 +1687,168 @@ function MeetingCard({ m }: { m: any }) {
           <ExternalLink className="h-3 w-3" /> Join meeting
         </a>
       )}
+    </div>
+  );
+}
+
+// ── Investor Decision Tab ─────────────────────────────────────────
+function InvestorDecisionTab({ dealRoomId, userId }: { dealRoomId: string; userId?: string }) {
+  const queryClient = useQueryClient();
+  const [saving, setSaving] = useState(false);
+  const [savingAssessment, setSavingAssessment] = useState(false);
+  const [notes, setNotes] = useState("");
+  const [scores, setScores] = useState<Record<string, number>>({
+    team: 0, market: 0, product: 0, traction: 0, deal_terms: 0, overall_fit: 0,
+  });
+  const [loaded, setLoaded] = useState(false);
+
+  const { data: decisionData } = useQuery({
+    queryKey: ["investor-decision-tab", dealRoomId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("deal_rooms")
+        .select("investor_decision, investor_scores, investor_notes")
+        .eq("id", dealRoomId)
+        .single();
+      return data;
+    },
+  });
+
+  useEffect(() => {
+    if (decisionData && !loaded) {
+      setNotes((decisionData as any).investor_notes ?? "");
+      if ((decisionData as any).investor_scores) {
+        setScores((s) => ({ ...s, ...((decisionData as any).investor_scores as Record<string, number>) }));
+      }
+      setLoaded(true);
+    }
+  }, [decisionData, loaded]);
+
+  const currentDecision = (decisionData as any)?.investor_decision as string | null;
+
+  const handleDecision = async (d: string) => {
+    setSaving(true);
+    try {
+      await supabase.from("deal_rooms").update({ investor_decision: d }).eq("id", dealRoomId);
+      await queryClient.invalidateQueries({ queryKey: ["investor-decision-tab", dealRoomId] });
+      await queryClient.invalidateQueries({ queryKey: ["investor-decisions-rooms"] });
+      await queryClient.invalidateQueries({ queryKey: ["investor-rooms"] });
+      toast.success(`Decision set: ${d}`);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSaveAssessment = async () => {
+    setSavingAssessment(true);
+    try {
+      await supabase.from("deal_rooms").update({ investor_notes: notes, investor_scores: scores }).eq("id", dealRoomId);
+      await queryClient.invalidateQueries({ queryKey: ["investor-decision-tab", dealRoomId] });
+      toast.success("Assessment saved");
+    } finally {
+      setSavingAssessment(false);
+    }
+  };
+
+  const setScore = (key: string, val: number) => setScores((s) => ({ ...s, [key]: val }));
+
+  const scoreCategories = [
+    { key: "team", label: "Team" },
+    { key: "market", label: "Market" },
+    { key: "product", label: "Product" },
+    { key: "traction", label: "Traction" },
+    { key: "deal_terms", label: "Deal terms" },
+    { key: "overall_fit", label: "Overall fit" },
+  ];
+
+  const decisionConfig = {
+    invest: { label: "Invest", emoji: "✅", cls: "border-success/40 text-success hover:bg-success/10", activeCls: "bg-success/15 border-success text-success font-semibold" },
+    hold: { label: "Hold", emoji: "⏸", cls: "border-warning/40 text-warning hover:bg-warning/10", activeCls: "bg-warning/15 border-warning text-warning font-semibold" },
+    pass: { label: "Pass", emoji: "❌", cls: "border-destructive/40 text-destructive hover:bg-destructive/10", activeCls: "bg-destructive/15 border-destructive text-destructive font-semibold" },
+  } as const;
+
+  return (
+    <div className="p-8 max-w-2xl mx-auto">
+      <h2 className="text-xl font-semibold tracking-tight">Investment Decision</h2>
+      <p className="mt-1 text-sm text-muted-foreground">Your confidential assessment of this deal</p>
+
+      {/* Decision buttons */}
+      <div className="mt-6 grid grid-cols-3 gap-3">
+        {(["invest", "hold", "pass"] as const).map((key) => {
+          const cfg = decisionConfig[key];
+          return (
+            <button
+              key={key}
+              onClick={() => handleDecision(key)}
+              disabled={saving}
+              className={cn(
+                "rounded-xl border px-4 py-5 text-sm transition-all disabled:opacity-50 flex flex-col items-center gap-2",
+                currentDecision === key ? cfg.activeCls : cfg.cls,
+              )}
+            >
+              <span className="text-2xl">{cfg.emoji}</span>
+              <span>{cfg.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {currentDecision && (
+        <div className="mt-3 text-xs text-muted-foreground">
+          Current decision: <span className="font-medium capitalize">{currentDecision}</span>
+        </div>
+      )}
+
+      {/* Scoring */}
+      <div className="mt-8 rounded-xl border border-border/60 bg-card p-5 shadow-card">
+        <div className="text-sm font-semibold mb-4">Scoring</div>
+        <div className="space-y-4">
+          {scoreCategories.map(({ key, label }) => (
+            <div key={key} className="flex items-center gap-4">
+              <div className="w-24 text-sm text-muted-foreground shrink-0">{label}</div>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    onClick={() => setScore(key, star)}
+                    className={cn(
+                      "text-xl leading-none transition-colors hover:text-warning",
+                      star <= (scores[key] ?? 0) ? "text-warning" : "text-muted-foreground/25",
+                    )}
+                  >
+                    ★
+                  </button>
+                ))}
+              </div>
+              <span className="ml-auto text-xs text-muted-foreground shrink-0">
+                {scores[key] ? `${scores[key]}/5` : "—"}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Notes */}
+      <div className="mt-5">
+        <div className="text-sm font-semibold mb-2">Decision notes</div>
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Your private notes about this investment decision…"
+          rows={5}
+          className="w-full rounded-xl border border-border/60 bg-background px-4 py-3 text-sm resize-none focus:outline-none focus:border-brand/50"
+        />
+      </div>
+
+      <button
+        onClick={handleSaveAssessment}
+        disabled={savingAssessment}
+        className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-50"
+      >
+        {savingAssessment && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+        Save assessment
+      </button>
     </div>
   );
 }

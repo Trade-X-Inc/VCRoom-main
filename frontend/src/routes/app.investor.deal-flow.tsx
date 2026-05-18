@@ -47,23 +47,31 @@ function DealFlowPage() {
         .select(`
           deal_room_id,
           deal_rooms(
-            id, updated_at, status,
+            id, updated_at, status, investor_company, investor_name,
             startups(company_name, sector, stage, funding_target, description, tagline)
           )
         `)
         .eq("user_id", user!.id);
       if (error) throw error;
       return (data ?? [])
-        .map((r: any) => ({
+        .map((r: any) => {
+          const dr = r.deal_rooms;
+          const companyName =
+            dr?.startups?.company_name ||
+            dr?.investor_company ||
+            (dr?.investor_name ? `Deal with ${dr.investor_name}` : null) ||
+            "Unnamed";
+          return {
           id: r.deal_room_id,
-          updatedAt: r.deal_rooms?.updated_at,
-          status: r.deal_rooms?.status,
-          company: r.deal_rooms?.startups?.company_name ?? "Unnamed",
-          sector: r.deal_rooms?.startups?.sector,
-          stage: r.deal_rooms?.startups?.stage,
-          fundingTarget: r.deal_rooms?.startups?.funding_target,
-          blurb: r.deal_rooms?.startups?.tagline || r.deal_rooms?.startups?.description,
-        }))
+          updatedAt: dr?.updated_at,
+          status: dr?.status,
+          company: companyName,
+          sector: dr?.startups?.sector,
+          stage: dr?.startups?.stage,
+          fundingTarget: dr?.startups?.funding_target,
+          blurb: dr?.startups?.tagline || dr?.startups?.description,
+        };
+        })
         .filter((r) => !!r.id)
         .sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
     },

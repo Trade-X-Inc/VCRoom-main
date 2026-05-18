@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Building2, Globe, Users, Upload, Pencil, Trash2, Plus, X, Loader2, Check,
-  Eye, Edit3, Download, Zap, AlignLeft,
+  Eye, Edit3, Download, Zap, AlignLeft, AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
@@ -446,6 +446,16 @@ function Profile() {
           <SaveBtn />
         </div>
       </div>
+
+      {startup && !form.company_name.trim() && (
+        <div className="mt-4 flex items-start gap-3 rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning">
+          <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+          <span>
+            <span className="font-semibold">Company name is missing.</span>{" "}
+            Investors currently see "Unnamed" in their deal flow. Add your startup name below to fix this.
+          </span>
+        </div>
+      )}
 
       {/* Hero card */}
       <div className="mt-6 rounded-2xl border border-border/60 bg-card shadow-card overflow-hidden">
