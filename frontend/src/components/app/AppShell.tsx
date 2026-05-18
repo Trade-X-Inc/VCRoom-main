@@ -33,7 +33,7 @@ const founderNav: NavItem[] = [
 
 const investorNav: NavItem[] = [
   { to: "/app/investor", labelKey: "app.overview", icon: LayoutGrid },
-  { to: "/app/investor/deal-flow", labelKey: "Deal Flow", icon: Inbox, badge: "12" },
+  { to: "/app/investor/deal-flow", labelKey: "Deal Flow", icon: Inbox },
   { to: "/app/investor/pipeline", labelKey: "My Pipeline", icon: Kanban },
   { to: "/app/investor/startups", labelKey: "app.startups", icon: Building2 },
   { to: "/app/investor/diligence", labelKey: "app.diligence", icon: ClipboardCheck },
@@ -108,6 +108,19 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
     },
   });
 
+  // Investor deal room count (investor only)
+  const { data: investorDealCount } = useQuery({
+    queryKey: ["shell-investor-deal-count", user?.id],
+    enabled: !!user?.id && isInvestor,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("deal_room_members")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user!.id);
+      return count ?? 0;
+    },
+  });
+
   // Role-based navigation guard
   useEffect(() => {
     if (!user) return;
@@ -119,7 +132,8 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       path !== "/app/advisor" &&
       !path.startsWith("/app/profile") &&
       !path.startsWith("/app/settings") &&
-      !path.startsWith("/app/meetings")
+      !path.startsWith("/app/meetings") &&
+      !path.startsWith("/app/deal-room")
     ) {
       navigate({ to: "/app/investor/" });
     }
@@ -187,6 +201,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
             const badge = (() => {
               if (n.to === "/app/leads") return leadCount && leadCount > 0 ? String(leadCount) : undefined;
               if (n.to === "/app/deal-rooms") return dealRoomCount && dealRoomCount > 0 ? String(dealRoomCount) : undefined;
+              if (n.to === "/app/investor/deal-flow") return investorDealCount && investorDealCount > 0 ? String(investorDealCount) : undefined;
               return n.badge;
             })();
             return (
