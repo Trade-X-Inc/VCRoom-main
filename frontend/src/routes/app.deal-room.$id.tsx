@@ -8,7 +8,7 @@ import {
   ArrowLeft, Lock, Sparkles, X, MessagesSquare, ThumbsUp, ThumbsDown,
   HelpCircle, Building2, TrendingUp, Users, DollarSign, Target, Shield,
   Send, AlertCircle, Eye, UserPlus, Loader2, ExternalLink, ChevronDown,
-  Check, ClipboardList, Copy, Trash2, Pencil,
+  Check, ClipboardList, Copy, Trash2, Pencil, Image, Film,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AIChat } from "@/components/ai/AIChat";
@@ -1033,15 +1033,25 @@ const CATEGORY_COLORS: Record<string, string> = {
   "Other": "bg-accent text-muted-foreground",
 };
 
+function getFileTypeStyle(ext: string): { bg: string; color: string; Icon: any } {
+  if (ext === "pdf") return { bg: "bg-red-500/10", color: "text-red-500", Icon: FileText };
+  if (["docx", "doc"].includes(ext)) return { bg: "bg-blue-500/10", color: "text-blue-500", Icon: FileText };
+  if (["xlsx", "xls", "csv"].includes(ext)) return { bg: "bg-green-500/10", color: "text-green-500", Icon: FileText };
+  if (["pptx", "ppt"].includes(ext)) return { bg: "bg-orange-500/10", color: "text-orange-500", Icon: FileText };
+  if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) return { bg: "bg-purple-500/10", color: "text-purple-500", Icon: Image };
+  if (["mp4", "mov", "avi", "webm"].includes(ext)) return { bg: "bg-orange-500/10", color: "text-orange-500", Icon: Film };
+  return { bg: "bg-accent", color: "text-muted-foreground", Icon: FileText };
+}
+
 function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFounder: boolean; userId?: string }) {
   const queryClient = useQueryClient();
   const [showLibrary, setShowLibrary] = useState(false);
   const [addingFromLib, setAddingFromLib] = useState<string | null>(null);
   const pendingDeletes = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
-  const [expandedSummaryId, setExpandedSummaryId] = useState<string | null>(null);
   const [generatingSummaryId, setGeneratingSummaryId] = useState<string | null>(null);
   const [editingSummaryId, setEditingSummaryId] = useState<string | null>(null);
   const [summaryEdits, setSummaryEdits] = useState<Record<string, string>>({});
+  const [previewDoc, setPreviewDoc] = useState<any | null>(null);
 
   const { data: docs = [] } = useQuery({
     queryKey: ["documents", dealRoomId],
@@ -1111,7 +1121,6 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
       });
       await supabase.from("documents").update({ ai_summary: result.summary }).eq("id", doc.id);
       queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
-      setExpandedSummaryId(doc.id);
       toast.success("Summary generated");
     } catch {
       toast.error("Failed to generate summary");
@@ -1263,128 +1272,152 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
       )}
 
       {(docs as any[]).length > 0 && (
-        <div className="mt-5 rounded-xl border border-border/60 bg-card shadow-card divide-y divide-border/60">
+        <div className="mt-5 space-y-3">
           {(docs as any[]).map((doc) => {
-            const catColor = CATEGORY_COLORS[doc.category] ?? "bg-accent text-muted-foreground";
-            const isExpanded = expandedSummaryId === doc.id;
+            const rawName = doc.name || doc.storage_path?.split("/").pop() || "Document";
+            const displayName = rawName.replace(/^\d{13}-/, "");
+            const ext = displayName.split(".").pop()?.toLowerCase() ?? "";
+            const hasSummary = !!doc.ai_summary;
+            const isGenerating = generatingSummaryId === doc.id;
             const isEditing = editingSummaryId === doc.id;
+            const catColor = CATEGORY_COLORS[doc.category] ?? "bg-accent text-muted-foreground";
+            const { bg: iconBg, color: iconColor, Icon: FileIcon } = getFileTypeStyle(ext);
+
             return (
-              <div key={doc.id}>
-                <div className="flex items-center gap-3 px-5 py-3 hover:bg-accent/40 group">
-                  <div className="grid h-8 w-8 place-items-center rounded-md bg-accent shrink-0">
-                    <FileText className="h-4 w-4 text-brand" />
+              <div
+                key={doc.id}
+                className={cn(
+                  "rounded-xl bg-card shadow-card overflow-hidden",
+                  hasSummary
+                    ? "border border-border/60"
+                    : "border border-dashed border-border/60"
+                )}
+              >
+                {/* Doc header row */}
+                <div className="flex items-center gap-3 px-4 py-3">
+                  <div className={cn("grid h-9 w-9 place-items-center rounded-lg shrink-0", iconBg)}>
+                    <FileIcon className={cn("h-4 w-4", iconColor)} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate">
-                      {doc.name || (doc.storage_path?.split("/").pop() ?? "Document")}
-                    </div>
-                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-medium truncate">{displayName}</span>
                       {doc.category && (
-                        <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full", catColor)}>{doc.category}</span>
+                        <span className={cn("shrink-0 text-[10px] px-1.5 py-0.5 rounded-full", catColor)}>
+                          {doc.category}
+                        </span>
                       )}
-                      <span className="text-xs text-muted-foreground">
-                        {doc.users?.full_name ?? "Unknown"} · {new Date(doc.created_at).toLocaleDateString()}
-                      </span>
+                    </div>
+                    <div className="mt-0.5 text-xs text-muted-foreground">
+                      {doc.users?.full_name ?? "Unknown"} · {new Date(doc.created_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={() => setPreviewDoc(doc)}
+                      className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+                      title="Preview"
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleDownload(doc.storage_path)}
+                      className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+                      title="Download"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                    </button>
+                    {isFounder && (
                       <button
-                        onClick={() => setExpandedSummaryId(isExpanded ? null : doc.id)}
-                        className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                        onClick={() => handleDeleteDoc(doc)}
+                        title="Delete document"
+                        className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/5"
                       >
-                        <ChevronDown className={cn("h-3 w-3 transition-transform", isExpanded && "rotate-180")} />
-                        AI Summary
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* AI Summary row — always visible */}
+                <div className={cn(
+                  "border-t px-4 py-2.5",
+                  hasSummary ? "border-brand/20 bg-brand/5" : "border-border/40"
+                )}>
+                  {isEditing ? (
+                    <div className="space-y-2">
+                      <textarea
+                        value={summaryEdits[doc.id] ?? doc.ai_summary ?? ""}
+                        onChange={(e) => setSummaryEdits((s) => ({ ...s, [doc.id]: e.target.value }))}
+                        rows={4}
+                        className="w-full resize-none rounded-md border border-border/60 bg-background px-3 py-2 text-xs outline-none focus:border-brand/50"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => saveSummaryEdit(doc.id)}
+                          className="inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditingSummaryId(null)}
+                          className="inline-flex items-center gap-1 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-start gap-3">
+                      <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
+                        <Sparkles className="h-3.5 w-3.5 text-brand shrink-0" />
+                        <span className="text-xs font-medium text-brand">AI Summary</span>
                         {doc.ai_summary && (
-                          <span className={cn("ml-0.5 px-1 py-0.5 rounded text-[9px] font-medium", doc.summary_edited ? "bg-brand/10 text-brand" : "bg-muted/60 text-muted-foreground")}>
+                          <span className={cn("px-1 py-0.5 rounded text-[9px] font-medium shrink-0", doc.summary_edited ? "bg-brand/10 text-brand" : "bg-muted/60 text-muted-foreground")}>
                             {doc.summary_edited ? "Edited" : "AI"}
                           </span>
                         )}
-                      </button>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        {hasSummary ? (
+                          <p className="text-xs text-foreground/80 leading-relaxed whitespace-pre-line line-clamp-3">{doc.ai_summary}</p>
+                        ) : (
+                          <p className="text-xs text-muted-foreground italic">Not generated yet</p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {hasSummary && isFounder && (
+                          <button
+                            onClick={() => {
+                              setEditingSummaryId(doc.id);
+                              setSummaryEdits((s) => ({ ...s, [doc.id]: doc.ai_summary! }));
+                            }}
+                            className="grid h-6 w-6 place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-accent"
+                            title="Edit summary"
+                          >
+                            <Pencil className="h-3 w-3" />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => generateSummary(doc)}
+                          disabled={isGenerating}
+                          className={cn(
+                            "inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium disabled:opacity-50 transition-colors",
+                            hasSummary
+                              ? "text-muted-foreground hover:text-foreground border border-border/60 hover:bg-accent"
+                              : "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-sm"
+                          )}
+                        >
+                          {isGenerating
+                            ? <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</>
+                            : hasSummary
+                              ? "Regenerate"
+                              : <><Sparkles className="h-3 w-3" /> Generate</>
+                          }
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  {doc.status === "ready" ? (
-                    <span className="inline-flex items-center gap-1 text-success text-xs"><CheckCircle2 className="h-3.5 w-3.5" /> Ready</span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 text-warning text-xs"><AlertTriangle className="h-3.5 w-3.5" /> Review</span>
-                  )}
-                  <button
-                    onClick={() => handleDownload(doc.storage_path)}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    <Download className="h-4 w-4" />
-                  </button>
-                  {isFounder && (
-                    <button
-                      onClick={() => handleDeleteDoc(doc)}
-                      title="Delete document"
-                      className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
                   )}
                 </div>
-
-                {isExpanded && (
-                  <div className="px-5 pb-4 bg-muted/20 border-t border-border/40">
-                    <div className="ml-11">
-                      {isEditing ? (
-                        <div className="pt-3 space-y-2">
-                          <textarea
-                            value={summaryEdits[doc.id] ?? doc.ai_summary ?? ""}
-                            onChange={(e) => setSummaryEdits((s) => ({ ...s, [doc.id]: e.target.value }))}
-                            rows={4}
-                            className="w-full resize-none rounded-md border border-border/60 bg-background px-3 py-2 text-xs outline-none focus:border-brand/50"
-                          />
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => saveSummaryEdit(doc.id)}
-                              className="inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs"
-                            >
-                              Save
-                            </button>
-                            <button
-                              onClick={() => setEditingSummaryId(null)}
-                              className="inline-flex items-center gap-1 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
-                      ) : doc.ai_summary ? (
-                        <div className="pt-3">
-                          <div className="flex items-center justify-between mb-1.5">
-                            <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">AI Summary</div>
-                            {isFounder && (
-                              <button
-                                onClick={() => {
-                                  setEditingSummaryId(doc.id);
-                                  setSummaryEdits((s) => ({ ...s, [doc.id]: doc.ai_summary! }));
-                                }}
-                                className="inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground"
-                              >
-                                <Pencil className="h-3 w-3" /> Edit
-                              </button>
-                            )}
-                          </div>
-                          <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line">{doc.ai_summary}</p>
-                        </div>
-                      ) : (
-                        <div className="pt-3">
-                          {isFounder ? (
-                            <button
-                              onClick={() => generateSummary(doc)}
-                              disabled={generatingSummaryId === doc.id}
-                              className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-xs hover:bg-brand/10 disabled:opacity-50"
-                            >
-                              {generatingSummaryId === doc.id
-                                ? <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</>
-                                : <><Sparkles className="h-3 w-3" /> Generate AI Summary</>}
-                            </button>
-                          ) : (
-                            <p className="text-xs text-muted-foreground">No AI summary available yet.</p>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
               </div>
             );
           })}
@@ -1404,11 +1437,76 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
           </div>
         </div>
       )}
+
+      {previewDoc && (
+        <DocPreviewModal doc={previewDoc} onClose={() => setPreviewDoc(null)} />
+      )}
     </div>
   );
 }
 
 // ── Participants ───────────────────────────────────────────────────
+function DocPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
+  const [url, setUrl] = useState<string | null>(null);
+  const rawName = doc.name || doc.storage_path?.split("/").pop() || "Document";
+  const displayName = rawName.replace(/^\d{13}-/, "");
+  const ext = displayName.split(".").pop()?.toLowerCase() ?? "";
+  const isImage = ["png", "jpg", "jpeg", "gif", "webp"].includes(ext);
+
+  useEffect(() => {
+    supabase.storage.from("documents").createSignedUrl(doc.storage_path, 300).then(({ data }) => {
+      if (data?.signedUrl) setUrl(data.signedUrl);
+    });
+  }, [doc.storage_path]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm grid place-items-center p-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-2xl rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
+          <div className="text-sm font-semibold truncate">{displayName}</div>
+          <button
+            onClick={onClose}
+            className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="p-6">
+          {isImage && url ? (
+            <img src={url} alt={displayName} className="max-w-full max-h-[60vh] object-contain mx-auto rounded-lg" />
+          ) : (
+            <div className="flex flex-col items-center gap-4 py-8 text-center">
+              <div className="grid h-16 w-16 place-items-center rounded-2xl bg-accent">
+                <FileText className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <div>
+                <div className="text-sm font-medium">{displayName}</div>
+                <div className="text-xs text-muted-foreground mt-1">This file type requires downloading to view.</div>
+              </div>
+              {url && (
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 text-sm font-medium shadow-sm"
+                >
+                  <Download className="h-4 w-4" /> Download to view
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ParticipantsSection({ dealRoomId }: { dealRoomId: string }) {
   const all = useParticipants();
   const list = all.filter((p) => p.dealRoomId === dealRoomId);
