@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, Circle, Clock, AlertTriangle, Plus, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 type TaskStatus = "todo" | "in_progress" | "done" | "blocked";
 
@@ -40,15 +41,18 @@ export function DDChecklist({ dealRoomId, userId }: { dealRoomId: string; userId
     if (!title.trim() || !userId) return;
     setSaving(true);
     try {
-      await supabase.from("deal_tasks").insert({
+      const { error } = await supabase.from("deal_tasks").insert({
         deal_room_id: dealRoomId,
         title: title.trim(),
         created_by: userId,
       });
+      if (error) throw error;
       queryClient.invalidateQueries({ queryKey: ["deal-tasks-checklist", dealRoomId] });
       queryClient.invalidateQueries({ queryKey: ["deal-tasks", dealRoomId] });
       setTitle("");
       setShowForm(false);
+    } catch {
+      toast.error("Failed to save checklist item");
     } finally {
       setSaving(false);
     }
