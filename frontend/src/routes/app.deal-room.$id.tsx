@@ -1118,11 +1118,10 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
         },
       });
       await supabase.from("documents").update({ ai_summary: result.summary }).eq("id", doc.id);
-      // Optimistic update so summary shows immediately without waiting for refetch
+      // DB write is confirmed — update cache directly, no refetch needed
       queryClient.setQueryData(["documents", dealRoomId], (old: any) =>
         (old ?? []).map((d: any) => d.id === doc.id ? { ...d, ai_summary: result.summary } : d)
       );
-      queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
       toast.success("Summary generated");
     } catch {
       toast.error("Failed to generate summary");
@@ -1147,16 +1146,20 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
 
   const handleDeleteDoc = (doc: any) => {
     const docName: string = doc.name || doc.storage_path?.split("/").pop() || "Document";
+    console.log("Delete initiated for:", doc.id, "storage:", doc.storage_path);
     let toastId: string | number;
     const timer = setTimeout(async () => {
       pendingDeletes.current.delete(doc.id);
-      const { error } = await supabase.from("documents").delete().eq("id", doc.id);
-      if (error) {
-        toast.error(`Failed to delete "${docName}"`);
+      console.log("Executing delete for doc:", doc.id);
+      const { error: dbError } = await supabase.from("documents").delete().eq("id", doc.id);
+      console.log("DB delete result:", dbError ?? "success");
+      if (dbError) {
+        toast.error(`Failed to delete "${docName}": ${dbError.message}`);
         return;
       }
       if (doc.storage_path) {
-        await supabase.storage.from("documents").remove([doc.storage_path]);
+        const { error: storageError } = await supabase.storage.from("documents").remove([doc.storage_path]);
+        console.log("Storage delete result:", storageError ?? "success");
       }
       queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
     }, 5000);

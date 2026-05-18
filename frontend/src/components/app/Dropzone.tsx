@@ -57,7 +57,7 @@ export function Dropzone({
             deal_room_id: dealRoomId,
             uploader_id: user.id,
             storage_path: result.path,
-            category: "General",
+            category: "Other",
             status: "uploaded",
           });
           if (insertError) throw insertError;

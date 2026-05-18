@@ -551,7 +551,7 @@ function UploadModal({
                   </div>
                   <button
                     type="button"
-                    onClick={(e) => { e.stopPropagation(); setFile(null); setDocName(""); }}
+                    onClick={(e) => { e.stopPropagation(); setFile(null); }}
                     className="mt-2 text-xs text-muted-foreground hover:text-destructive underline"
                   >
                     Remove
