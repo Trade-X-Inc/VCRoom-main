@@ -16,6 +16,8 @@ const FALLBACK = "Document uploaded. AI summary not available for this file type
 export const generateDocumentSummary = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): SummaryInput => data as SummaryInput)
   .handler(async ({ data }: { data: SummaryInput }): Promise<{ summary: string }> => {
+    console.log('Summary fn called:', { documentPath: data.documentPath, documentName: data.documentName });
+
     const supabaseUrl =
       data.supabaseUrl ||
       process.env.VITE_SUPABASE_URL ||
@@ -33,6 +35,9 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
       process.env.OPENAI_API_KEY ||
       "";
 
+    console.log('OpenAI key present:', !!openAIKey);
+    console.log('Supabase URL:', supabaseUrl?.slice(0, 20));
+
     if (!supabaseUrl || !supabaseKey || !openAIKey) return { summary: FALLBACK };
 
     const client = createClient(supabaseUrl, supabaseKey, {
@@ -42,6 +47,8 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
     const { data: blob, error } = await client.storage
       .from("documents")
       .download(data.documentPath);
+
+    console.log('File download result:', { error: error?.message, dataSize: (blob as any)?.size });
 
     if (error || !blob) return { summary: FALLBACK };
 
@@ -56,6 +63,8 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
     } catch {
       return { summary: FALLBACK };
     }
+
+    console.log('Text extracted length:', textContent?.length);
 
     if (!textContent || textContent.length < 20) return { summary: FALLBACK };
 
@@ -86,6 +95,7 @@ Keep each paragraph under 60 words. Be specific, not generic.`;
       }),
     });
 
+    console.log('OpenAI response status:', resp.status);
     if (!resp.ok) return { summary: FALLBACK };
     const json = (await resp.json()) as { choices: Array<{ message: { content: string } }> };
     return { summary: json.choices[0]?.message?.content ?? FALLBACK };

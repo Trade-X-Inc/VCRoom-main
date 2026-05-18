@@ -1091,6 +1091,10 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
   };
 
   const generateSummary = async (doc: any) => {
+    console.log('Calling summary with:', {
+      documentPath: doc.storage_path,
+      openAIKey: !!import.meta.env.VITE_OPENAI_API_KEY,
+    });
     setGeneratingSummaryId(doc.id);
     try {
       const { data: { session } } = await supabase.auth.getSession();

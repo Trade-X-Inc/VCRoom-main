@@ -13,6 +13,7 @@ type MemoInput = {
 export const generateInvestorMemo = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): MemoInput => data as MemoInput)
   .handler(async ({ data }: { data: MemoInput }): Promise<{ memo: string }> => {
+    console.log('Memo fn called');
     const supabaseUrl =
       data.supabaseUrl ||
       process.env.VITE_SUPABASE_URL ||
@@ -33,6 +34,8 @@ export const generateInvestorMemo = createServerFn({ method: "POST" })
       (globalThis as any).OPENAI_API_KEY ||
       process.env.OPENAI_API_KEY ||
       "";
+
+    console.log('OpenAI key present:', !!openAIKey);
 
     if (!supabaseUrl || !supabaseKey || !openAIKey) {
       return {
@@ -58,6 +61,8 @@ export const generateInvestorMemo = createServerFn({ method: "POST" })
           .eq("id", room.startup_id)
           .maybeSingle()
       : { data: null };
+
+    console.log('Startup data:', { name: startup?.company_name, sector: startup?.sector, stage: startup?.stage });
 
     // 2. Fetch documents list
     const { data: docs } = await client
