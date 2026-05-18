@@ -237,7 +237,12 @@ function DealRoom() {
           {visibleTabs.map((t) => (
             <button
               key={t.k}
-              onClick={() => setTab(t.k)}
+              onClick={() => {
+                queryClient.invalidateQueries({
+                  predicate: (query) => (query.queryKey as string[]).includes(dealRoomId),
+                });
+                setTab(t.k);
+              }}
               className={`w-full flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors ${tab === t.k ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60"}`}
             >
               <t.i className={`h-4 w-4 ${tab === t.k ? "text-brand" : ""}`} />
