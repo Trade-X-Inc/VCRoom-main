@@ -1033,6 +1033,8 @@ const CATEGORY_COLORS: Record<string, string> = {
   "Other": "bg-accent text-muted-foreground",
 };
 
+const TEXT_EXTS = new Set(["pdf", "docx", "doc", "xlsx", "xls", "csv", "pptx", "ppt", "txt"]);
+
 function getFileTypeStyle(ext: string): { bg: string; color: string; Icon: any } {
   if (ext === "pdf") return { bg: "bg-red-500/10", color: "text-red-500", Icon: FileText };
   if (["docx", "doc"].includes(ext)) return { bg: "bg-blue-500/10", color: "text-blue-500", Icon: FileText };
@@ -1061,7 +1063,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
     queryFn: async () => {
       const { data, error } = await supabase
         .from("documents")
-        .select("*, users(full_name)")
+        .select("*, uploader:users!uploader_id(full_name)")
         .eq("deal_room_id", dealRoomId)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -1101,10 +1103,6 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
   };
 
   const generateSummary = async (doc: any) => {
-    console.log('Calling summary with:', {
-      documentPath: doc.storage_path,
-      openAIKey: !!import.meta.env.VITE_OPENAI_API_KEY,
-    });
     setGeneratingSummaryId(doc.id);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -1120,6 +1118,10 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
         },
       });
       await supabase.from("documents").update({ ai_summary: result.summary }).eq("id", doc.id);
+      // Optimistic update so summary shows immediately without waiting for refetch
+      queryClient.setQueryData(["documents", dealRoomId], (old: any) =>
+        (old ?? []).map((d: any) => d.id === doc.id ? { ...d, ai_summary: result.summary } : d)
+      );
       queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
       toast.success("Summary generated");
     } catch {
@@ -1280,6 +1282,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
             const hasSummary = !!doc.ai_summary;
             const isGenerating = generatingSummaryId === doc.id;
             const isEditing = editingSummaryId === doc.id;
+            const supportsAI = TEXT_EXTS.has(ext);
             const catColor = CATEGORY_COLORS[doc.category] ?? "bg-accent text-muted-foreground";
             const { bg: iconBg, color: iconColor, Icon: FileIcon } = getFileTypeStyle(ext);
 
@@ -1288,9 +1291,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
                 key={doc.id}
                 className={cn(
                   "rounded-xl bg-card shadow-card overflow-hidden",
-                  hasSummary
-                    ? "border border-border/60"
-                    : "border border-dashed border-border/60"
+                  hasSummary ? "border border-border/60" : "border border-dashed border-border/60"
                 )}
               >
                 {/* Doc header row */}
@@ -1308,7 +1309,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
                       )}
                     </div>
                     <div className="mt-0.5 text-xs text-muted-foreground">
-                      {doc.users?.full_name ?? "Unknown"} · {new Date(doc.created_at).toLocaleDateString()}
+                      {doc.uploader?.full_name ?? "Unknown"} · {new Date(doc.created_at).toLocaleDateString()}
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
@@ -1338,86 +1339,87 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
                   </div>
                 </div>
 
-                {/* AI Summary row — always visible */}
-                <div className={cn(
-                  "border-t px-4 py-2.5",
-                  hasSummary ? "border-brand/20 bg-brand/5" : "border-border/40"
-                )}>
-                  {isEditing ? (
-                    <div className="space-y-2">
-                      <textarea
-                        value={summaryEdits[doc.id] ?? doc.ai_summary ?? ""}
-                        onChange={(e) => setSummaryEdits((s) => ({ ...s, [doc.id]: e.target.value }))}
-                        rows={4}
-                        className="w-full resize-none rounded-md border border-border/60 bg-background px-3 py-2 text-xs outline-none focus:border-brand/50"
-                      />
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => saveSummaryEdit(doc.id)}
-                          className="inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs"
-                        >
-                          Save
-                        </button>
-                        <button
-                          onClick={() => setEditingSummaryId(null)}
-                          className="inline-flex items-center gap-1 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent"
-                        >
-                          Cancel
-                        </button>
+                {/* AI Summary section — only for text-based files */}
+                {supportsAI && (
+                  <div className="border-t border-border/40">
+                    {isEditing ? (
+                      <div className="px-4 py-3 space-y-2">
+                        <textarea
+                          value={summaryEdits[doc.id] ?? doc.ai_summary ?? ""}
+                          onChange={(e) => setSummaryEdits((s) => ({ ...s, [doc.id]: e.target.value }))}
+                          rows={5}
+                          className="w-full resize-none rounded-md border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => saveSummaryEdit(doc.id)}
+                            className="inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => setEditingSummaryId(null)}
+                            className="inline-flex items-center gap-1 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent"
+                          >
+                            Cancel
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-start gap-3">
-                      <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
-                        <Sparkles className="h-3.5 w-3.5 text-brand shrink-0" />
-                        <span className="text-xs font-medium text-brand">AI Summary</span>
-                        {doc.ai_summary && (
-                          <span className={cn("px-1 py-0.5 rounded text-[9px] font-medium shrink-0", doc.summary_edited ? "bg-brand/10 text-brand" : "bg-muted/60 text-muted-foreground")}>
+                    ) : hasSummary ? (
+                      <div className="px-4 py-3">
+                        {/* Summary header */}
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <Sparkles className="h-3.5 w-3.5 text-brand shrink-0" />
+                          <span className="text-xs font-medium text-brand flex-1">AI Summary</span>
+                          <span className={cn("px-1.5 py-0.5 rounded text-[9px] font-medium", doc.summary_edited ? "bg-brand/10 text-brand" : "bg-muted/60 text-muted-foreground")}>
                             {doc.summary_edited ? "Edited" : "AI"}
                           </span>
-                        )}
+                        </div>
+                        {/* Summary panel */}
+                        <div className="rounded-lg border-l-2 border-brand/40 bg-muted/30 pl-3 pr-3 py-3">
+                          <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-line">{doc.ai_summary}</p>
+                          <div className="flex gap-2 mt-3">
+                            <button
+                              onClick={() => generateSummary(doc)}
+                              disabled={isGenerating}
+                              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground border border-border/60 rounded-md px-2.5 py-1 hover:bg-accent disabled:opacity-50"
+                            >
+                              {isGenerating ? <><Loader2 className="h-3 w-3 animate-spin" /> Regenerating…</> : "Regenerate"}
+                            </button>
+                            {isFounder && (
+                              <button
+                                onClick={() => {
+                                  setEditingSummaryId(doc.id);
+                                  setSummaryEdits((s) => ({ ...s, [doc.id]: doc.ai_summary! }));
+                                }}
+                                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground border border-border/60 rounded-md px-2.5 py-1 hover:bg-accent"
+                              >
+                                <Pencil className="h-3 w-3" /> Edit
+                              </button>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        {hasSummary ? (
-                          <p className="text-xs text-foreground/80 leading-relaxed whitespace-pre-line line-clamp-3">{doc.ai_summary}</p>
-                        ) : (
-                          <p className="text-xs text-muted-foreground italic">Not generated yet</p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        {hasSummary && isFounder && (
-                          <button
-                            onClick={() => {
-                              setEditingSummaryId(doc.id);
-                              setSummaryEdits((s) => ({ ...s, [doc.id]: doc.ai_summary! }));
-                            }}
-                            className="grid h-6 w-6 place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-accent"
-                            title="Edit summary"
-                          >
-                            <Pencil className="h-3 w-3" />
-                          </button>
-                        )}
+                    ) : (
+                      /* No summary yet — compact generate row */
+                      <div className="flex items-center gap-2 px-4 py-2.5">
+                        <Sparkles className="h-3.5 w-3.5 text-brand shrink-0" />
+                        <span className="text-xs font-medium text-brand flex-1">AI Summary</span>
+                        <span className="text-xs text-muted-foreground italic mr-2">Not generated yet</span>
                         <button
                           onClick={() => generateSummary(doc)}
                           disabled={isGenerating}
-                          className={cn(
-                            "inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium disabled:opacity-50 transition-colors",
-                            hasSummary
-                              ? "text-muted-foreground hover:text-foreground border border-border/60 hover:bg-accent"
-                              : "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-sm"
-                          )}
+                          className="inline-flex items-center gap-1 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-2.5 py-1 text-xs font-medium shadow-sm disabled:opacity-50"
                         >
                           {isGenerating
                             ? <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</>
-                            : hasSummary
-                              ? "Regenerate"
-                              : <><Sparkles className="h-3 w-3" /> Generate</>
+                            : <><Sparkles className="h-3 w-3" /> Generate</>
                           }
                         </button>
                       </div>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}
