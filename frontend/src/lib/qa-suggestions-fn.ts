@@ -17,8 +17,9 @@ export const getQASuggestions = createServerFn({ method: "POST" })
       data.openAIKey ||
       (globalThis as any).VITE_OPENAI_API_KEY ||
       (globalThis as any).OPENAI_API_KEY ||
+      process.env.VITE_OPENAI_API_KEY ||
       process.env.OPENAI_API_KEY ||
-      "";
+      '';
 
     if (!openAIKey) return { suggestions: [] };
 

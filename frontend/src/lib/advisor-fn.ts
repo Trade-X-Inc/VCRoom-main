@@ -29,8 +29,11 @@ export const getAIAdvice = createServerFn({ method: "POST" })
   .handler(async ({ data }: { data: AdvisorInput }): Promise<AdvisorResult> => {
     const openAIKey =
       data.openAIKey ||
+      (globalThis as any).VITE_OPENAI_API_KEY ||
+      (globalThis as any).OPENAI_API_KEY ||
+      process.env.VITE_OPENAI_API_KEY ||
       process.env.OPENAI_API_KEY ||
-      (globalThis as any).OPENAI_API_KEY || "";
+      '';
 
     if (!openAIKey) {
       return {

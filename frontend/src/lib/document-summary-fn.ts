@@ -32,8 +32,9 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
       data.openAIKey ||
       (globalThis as any).VITE_OPENAI_API_KEY ||
       (globalThis as any).OPENAI_API_KEY ||
+      process.env.VITE_OPENAI_API_KEY ||
       process.env.OPENAI_API_KEY ||
-      "";
+      '';
 
     console.log('OpenAI key present:', !!openAIKey);
     console.log('Supabase URL:', supabaseUrl?.slice(0, 20));
