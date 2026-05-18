@@ -1,9 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { CheckCircle2, Circle, ClipboardCheck, FileUp } from "lucide-react";
+import { CheckCircle2, Circle, ClipboardCheck, FileText, ExternalLink } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { formatDistanceToNow } from "date-fns";
 
 export const Route = createFileRoute("/app/investor/diligence")({
   component: DiligencePage,
@@ -13,55 +14,53 @@ function DiligencePage() {
   const { user } = useAuth();
   const [selectedRoomId, setSelectedRoomId] = useState<string>("");
 
-  // Fetch deal rooms the investor belongs to (with company names)
+  // Fetch deal rooms the investor belongs to
   const { data: rooms = [] } = useQuery({
     queryKey: ["investor-diligence-rooms", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
       const { data } = await supabase
         .from("deal_room_members")
-        .select("deal_room_id, deal_rooms(id, name, startups(company_name))")
+        .select("deal_room_id, deal_rooms(id, startups(company_name))")
         .eq("user_id", user!.id);
       return (data ?? []).map((r: any) => ({
         id: r.deal_room_id,
-        name: r.deal_rooms?.startups?.company_name ?? r.deal_rooms?.name ?? r.deal_room_id,
+        name: r.deal_rooms?.startups?.company_name ?? r.deal_room_id,
       }));
     },
   });
 
-  // Fetch due diligence items for selected room
-  const { data: items = [] } = useQuery({
-    queryKey: ["due-diligence", selectedRoomId],
+  // Fetch deal tasks as checklist
+  const { data: tasks = [] } = useQuery({
+    queryKey: ["investor-tasks", selectedRoomId],
     enabled: !!selectedRoomId,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("due_diligence_items")
-        .select("id, section, label, status")
+      const { data } = await supabase
+        .from("deal_tasks")
+        .select("id, title, completed")
         .eq("deal_room_id", selectedRoomId)
         .order("created_at", { ascending: true });
-      if (error) throw error;
       return data ?? [];
     },
   });
 
-  const sections = Object.entries(
-    items.reduce<Record<string, { id: string; label: string; done: boolean }[]>>((acc, item: any) => {
-      const key = item.section || "General";
-      if (!acc[key]) acc[key] = [];
-      acc[key].push({
-        id: item.id,
-        label: item.label || item.section || "Item",
-        done: String(item.status).toLowerCase().includes("done"),
-      });
-      return acc;
-    }, {}),
-  ).map(([t, list]) => ({ t, items: list }));
+  // Fetch documents for the deal room
+  const { data: docs = [] } = useQuery({
+    queryKey: ["investor-docs", selectedRoomId],
+    enabled: !!selectedRoomId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("documents")
+        .select("id, name, category, created_at, deal_room_id")
+        .eq("deal_room_id", selectedRoomId)
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+  });
 
-  const total = items.length;
-  const doneCount = items.filter((i: any) => String(i.status).toLowerCase().includes("done")).length;
+  const total = tasks.length;
+  const doneCount = tasks.filter((t: any) => t.completed).length;
   const progress = total ? Math.round((doneCount / total) * 100) : 0;
-
-  const sectionKeys = ["Legal", "Financial", "Technical", "Commercial", "Team"];
 
   return (
     <div className="p-6 lg:p-8 max-w-[1400px] mx-auto">
@@ -91,70 +90,78 @@ function DiligencePage() {
         </div>
       ) : (
         <div className="mt-6 grid lg:grid-cols-[1fr_360px] gap-5">
+          {/* Left: Task checklist */}
           <div className="space-y-4">
             <div className="rounded-2xl border border-border/60 bg-card p-5">
               <div className="flex items-center justify-between">
-                <div className="text-sm font-semibold">Overall progress</div>
-                <div className="text-sm tabular-nums">{progress}%</div>
+                <div className="text-sm font-semibold">Diligence checklist</div>
+                <div className="text-sm tabular-nums text-muted-foreground">{doneCount}/{total} · {progress}%</div>
               </div>
               <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
                 <div className="h-full bg-gradient-brand transition-all" style={{ width: `${progress}%` }} />
               </div>
-              <div className="mt-3 grid grid-cols-5 gap-2 text-[11px] text-muted-foreground">
-                {sectionKeys.map((sk) => {
-                  const sec = sections.find((s) => s.t.toLowerCase() === sk.toLowerCase());
-                  const done = sec?.items.filter((i) => i.done).length ?? 0;
-                  const tot = sec?.items.length ?? 0;
-                  return (
-                    <div key={sk} className="rounded-md border border-border/60 px-2 py-1.5 text-center">
-                      {sk} {done}/{tot}
-                    </div>
-                  );
-                })}
-              </div>
             </div>
 
-            {sections.length === 0 ? (
+            {tasks.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border/60 bg-card p-8 text-center text-sm text-muted-foreground">
-                No checklist items yet.
+                No checklist items yet. Tasks added by the founder will appear here.
               </div>
             ) : (
-              sections.map((s) => {
-                const done = s.items.filter((i) => i.done).length;
-                return (
-                  <div key={s.t} className="rounded-2xl border border-border/60 bg-card overflow-hidden">
-                    <div className="flex items-center justify-between px-5 py-3 border-b border-border/60">
-                      <div className="text-sm font-semibold">{s.t}</div>
-                      <div className="text-xs text-muted-foreground">{done}/{s.items.length}</div>
+              <div className="rounded-2xl border border-border/60 bg-card overflow-hidden">
+                <div className="divide-y divide-border/60">
+                  {tasks.map((task: any) => (
+                    <div key={task.id} className="flex items-center gap-3 px-5 py-3">
+                      {task.completed
+                        ? <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
+                        : <Circle className="h-4 w-4 text-muted-foreground shrink-0" />}
+                      <span className={`text-sm ${task.completed ? "text-muted-foreground line-through" : ""}`}>
+                        {task.title}
+                      </span>
                     </div>
-                    <div className="divide-y divide-border/60">
-                      {s.items.map((item) => (
-                        <div key={item.id} className="flex items-center gap-3 px-5 py-3">
-                          {item.done
-                            ? <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
-                            : <Circle className="h-4 w-4 text-muted-foreground shrink-0" />}
-                          <span className={`text-sm ${item.done ? "text-muted-foreground line-through" : ""}`}>
-                            {item.label}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })
+                  ))}
+                </div>
+              </div>
             )}
+
+            <Link
+              to="/app/deal-room/$id"
+              params={{ id: selectedRoomId }}
+              className="inline-flex items-center gap-1.5 text-xs text-brand hover:underline"
+            >
+              Open full deal room <ExternalLink className="h-3 w-3" />
+            </Link>
           </div>
 
-          <div>
-            <div className="rounded-2xl border border-border/60 bg-card p-5">
-              <div className="flex items-center justify-between">
-                <div className="text-sm font-semibold">Document requests</div>
-                <button className="inline-flex items-center gap-1 text-xs rounded-[10px] border border-border/60 px-2 py-1 hover:bg-accent">
-                  <FileUp className="h-3.5 w-3.5" /> Request
-                </button>
-              </div>
-              <div className="mt-4 text-sm text-muted-foreground text-center py-6">No requests yet.</div>
+          {/* Right: Document review */}
+          <div className="rounded-2xl border border-border/60 bg-card overflow-hidden self-start">
+            <div className="px-5 py-3 border-b border-border/60 flex items-center justify-between">
+              <div className="text-sm font-semibold">Document review</div>
+              <span className="text-xs text-muted-foreground">{docs.length} file{docs.length !== 1 ? "s" : ""}</span>
             </div>
+            {docs.length === 0 ? (
+              <div className="p-8 text-sm text-muted-foreground text-center">
+                No documents uploaded yet.
+              </div>
+            ) : (
+              <div className="divide-y divide-border/60">
+                {docs.map((doc: any) => (
+                  <div key={doc.id} className="flex items-center gap-3 px-5 py-3">
+                    <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm truncate">{doc.name}</div>
+                      {doc.category && (
+                        <div className="text-xs text-muted-foreground">{doc.category}</div>
+                      )}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground shrink-0">
+                      {doc.created_at
+                        ? formatDistanceToNow(new Date(doc.created_at), { addSuffix: true })
+                        : "—"}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

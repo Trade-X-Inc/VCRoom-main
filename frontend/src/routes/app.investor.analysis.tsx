@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Brain, Loader2, Download, CheckCircle2, AlertTriangle, Lightbulb } from "lucide-react";
+import { Brain, Loader2, Download, CheckCircle2, AlertTriangle, Lightbulb, FileText, Copy, Check as CheckIcon, RefreshCw } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { generateDealBrief } from "@/lib/deal-brief-fn";
+import { generateInvestorMemo } from "@/lib/investor-memo-fn";
+import ReactMarkdown from "react-markdown";
 
 export const Route = createFileRoute("/app/investor/analysis")({
   component: AnalysisPage,
@@ -13,6 +15,10 @@ export const Route = createFileRoute("/app/investor/analysis")({
 function AnalysisPage() {
   const { user } = useAuth();
   const [selectedRoomId, setSelectedRoomId] = useState("");
+  const [memoText, setMemoText] = useState<string | null>(null);
+  const [generatingMemo, setGeneratingMemo] = useState(false);
+  const [memoError, setMemoError] = useState("");
+  const [copied, setCopied] = useState(false);
 
   // Fetch deal rooms user belongs to
   const { data: rooms = [], isLoading: roomsLoading } = useQuery({
@@ -42,6 +48,37 @@ function AnalysisPage() {
   });
 
   const selectedName = rooms.find((r) => r.id === selectedRoomId)?.name ?? "Company";
+
+  const handleGenerateMemo = async () => {
+    if (!selectedRoomId || !user?.id) return;
+    setGeneratingMemo(true);
+    setMemoError("");
+    try {
+      const session = await supabase.auth.getSession();
+      const result = await generateInvestorMemo({
+        data: {
+          dealRoomId: selectedRoomId,
+          userId: user.id,
+          supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+          supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+          userAccessToken: session.data.session?.access_token ?? "",
+          openAIKey: import.meta.env.VITE_OPENAI_API_KEY,
+        },
+      });
+      setMemoText(result.memo);
+    } catch {
+      setMemoError("Failed to generate memo. Please try again.");
+    } finally {
+      setGeneratingMemo(false);
+    }
+  };
+
+  const handleCopy = async () => {
+    if (!memoText) return;
+    await navigator.clipboard.writeText(memoText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const downloadMemo = () => {
     if (!brief) return;
@@ -83,7 +120,7 @@ function AnalysisPage() {
         ) : (
           <select
             value={selectedRoomId}
-            onChange={(e) => setSelectedRoomId(e.target.value)}
+            onChange={(e) => { setSelectedRoomId(e.target.value); setMemoText(null); setMemoError(""); }}
             className="rounded-[10px] border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
           >
             <option value="">Select a company to analyse…</option>
@@ -198,6 +235,73 @@ function AnalysisPage() {
             >
               <Download className="h-3.5 w-3.5" /> Download memo
             </button>
+          </div>
+
+          {/* Full AI Memo section */}
+          <div className="rounded-2xl border border-border/60 bg-card overflow-hidden">
+            <div className="px-5 py-4 border-b border-border/60 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-brand" />
+                <span className="text-sm font-semibold">Full Investment Memo</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {memoText && (
+                  <>
+                    <button
+                      onClick={handleCopy}
+                      className="inline-flex items-center gap-1.5 rounded-[10px] border border-border/60 px-2.5 py-1.5 text-xs hover:bg-accent"
+                    >
+                      {copied ? <CheckIcon className="h-3 w-3 text-success" /> : <Copy className="h-3 w-3" />}
+                      {copied ? "Copied" : "Copy memo"}
+                    </button>
+                    <button
+                      onClick={handleGenerateMemo}
+                      disabled={generatingMemo}
+                      className="inline-flex items-center gap-1.5 rounded-[10px] border border-border/60 px-2.5 py-1.5 text-xs hover:bg-accent disabled:opacity-50"
+                    >
+                      <RefreshCw className={`h-3 w-3 ${generatingMemo ? "animate-spin" : ""}`} />
+                      Regenerate
+                    </button>
+                  </>
+                )}
+                {!memoText && (
+                  <button
+                    onClick={handleGenerateMemo}
+                    disabled={generatingMemo}
+                    className="inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs font-medium shadow-glow disabled:opacity-50"
+                  >
+                    {generatingMemo ? (
+                      <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</>
+                    ) : (
+                      <><Brain className="h-3 w-3" /> Generate Full Memo</>
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {memoError && (
+              <div className="px-5 py-3 text-sm text-destructive">{memoError}</div>
+            )}
+
+            {generatingMemo && !memoText && (
+              <div className="p-10 flex flex-col items-center gap-3">
+                <Loader2 className="h-7 w-7 animate-spin text-brand" />
+                <div className="text-sm text-muted-foreground">Writing investment memo for {selectedName}…</div>
+              </div>
+            )}
+
+            {memoText && (
+              <div className="p-6 prose prose-sm prose-neutral dark:prose-invert max-w-none text-sm leading-relaxed">
+                <ReactMarkdown>{memoText}</ReactMarkdown>
+              </div>
+            )}
+
+            {!memoText && !generatingMemo && !memoError && (
+              <div className="p-8 text-center text-sm text-muted-foreground">
+                Click "Generate Full Memo" to produce a structured VC investment memo from deal room data.
+              </div>
+            )}
           </div>
         </div>
       ) : null}

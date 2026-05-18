@@ -95,6 +95,12 @@ function JoinFlow() {
         role: "investor",
       });
 
+      // Mark deal room as active now that investor has accepted
+      await supabase
+        .from("deal_rooms")
+        .update({ status: "active" })
+        .eq("id", invite.deal_room_id);
+
       // Mark invite as accepted
       await supabase
         .from("invites")

@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Inbox, Search, Clock, Plus, Loader2 } from "lucide-react";
+import { Inbox, Search, Clock, Plus, Loader2, ArrowRight } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -14,6 +14,7 @@ export const Route = createFileRoute("/app/investor/deal-flow")({
 function DealFlowPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [addingWatchlist, setAddingWatchlist] = useState<string | null>(null);
 
@@ -163,6 +164,12 @@ function DealFlowPage() {
                         ? <Loader2 className="h-2.5 w-2.5 animate-spin" />
                         : <Plus className="h-2.5 w-2.5" />}
                       Watchlist
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); void navigate({ to: "/app/deal-room/$id", params: { id: room.id } }); }}
+                      className="inline-flex items-center gap-1 rounded-md bg-brand/10 text-brand px-2 py-0.5 text-[10px] font-medium hover:bg-brand/20"
+                    >
+                      Open <ArrowRight className="h-2.5 w-2.5" />
                     </button>
                   </div>
                 </div>

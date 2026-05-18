@@ -79,7 +79,7 @@ function InvestorDashboard() {
     queryFn: async () => {
       const { data } = await supabase
         .from("deal_rooms")
-        .select("id, created_at, updated_at, startup_id, startups(company_name, sector, stage, funding_target)")
+        .select("id, created_at, updated_at, startup_id, investor_decision, startups(company_name, sector, stage, funding_target)")
         .in("id", roomIds);
       return data ?? [];
     },
@@ -257,7 +257,7 @@ function InvestorDashboard() {
           { l: "Active deal rooms", v: `${roomIds.length}`, s: roomIds.length !== 1 ? "rooms" : "room" },
           { l: "Watchlist", v: `${watchlistCount}`, s: watchlistCount !== 1 ? "companies" : "company" },
           { l: "Meetings this month", v: `${meetingsThisMonth}`, s: "scheduled" },
-          { l: "Decisions made", v: `${decisionsData.length}`, s: "total" },
+          { l: "Decisions made", v: `${roomsData.filter((r: any) => r.investor_decision != null).length}`, s: "total" },
         ].map((k) => (
           <div key={k.l} className="rounded-2xl border border-border/60 bg-card p-4">
             <div className="text-xs text-muted-foreground">{k.l}</div>
