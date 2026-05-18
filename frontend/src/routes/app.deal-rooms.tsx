@@ -34,7 +34,8 @@ function DealRooms() {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState<"all" | "active" | "pending" | "closed">("all");
   const [sort, setSort] = useState<"newest" | "oldest" | "active">("newest");
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deleteModal, setDeleteModal] = useState<{ id: string; step: 2 | 3 } | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const { user } = useAuth();
@@ -89,7 +90,8 @@ function DealRooms() {
       toast.error("Failed to delete deal room");
     } finally {
       setDeletingId(null);
-      setConfirmDeleteId(null);
+      setDeleteModal(null);
+      setDeleteConfirmText("");
       setMenuOpenId(null);
     }
   };
@@ -192,40 +194,19 @@ function DealRooms() {
                   </span>
                   <div className="relative">
                     <button
-                      onClick={(e) => { e.stopPropagation(); setMenuOpenId(menuOpenId === r.id ? null : r.id); setConfirmDeleteId(null); }}
+                      onClick={(e) => { e.stopPropagation(); setMenuOpenId(menuOpenId === r.id ? null : r.id); }}
                       className="grid h-6 w-6 place-items-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
                     >
                       <MoreHorizontal className="h-3.5 w-3.5" />
                     </button>
                     {menuOpenId === r.id && (
                       <div className="absolute right-0 top-7 z-20 min-w-[160px] rounded-lg border border-border/60 bg-card shadow-elev py-1">
-                        {confirmDeleteId === r.id ? (
-                          <div className="px-3 py-2 space-y-2">
-                            <div className="text-xs text-destructive font-medium">Delete this room?</div>
-                            <div className="flex gap-2">
-                              <button
-                                onClick={(e) => { e.stopPropagation(); handleDelete(r.id); }}
-                                disabled={deletingId === r.id}
-                                className="flex-1 rounded bg-destructive text-white text-xs py-1 disabled:opacity-50"
-                              >
-                                {deletingId === r.id ? "Deleting…" : "Yes, delete"}
-                              </button>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(null); setMenuOpenId(null); }}
-                                className="flex-1 rounded border border-border/60 text-xs py-1 hover:bg-accent"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(r.id); }}
-                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-destructive hover:bg-destructive/5"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" /> Delete deal room
-                          </button>
-                        )}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setDeleteModal({ id: r.id, step: 2 }); setMenuOpenId(null); }}
+                          className="flex items-center gap-2 w-full px-3 py-2 text-xs text-destructive hover:bg-destructive/5"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" /> Delete deal room
+                        </button>
                       </div>
                     )}
                   </div>
@@ -293,6 +274,75 @@ function DealRooms() {
           onClose={() => setOpen(false)}
           onCreated={() => queryClient.invalidateQueries({ queryKey: ["deal-rooms", user?.id, startup?.id] })}
         />
+      )}
+
+      {deleteModal && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/30 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl border border-border/60 bg-card shadow-elev p-6 space-y-4">
+            {deleteModal.step === 2 ? (
+              <>
+                <div className="flex items-start gap-3">
+                  <div className="grid h-10 w-10 place-items-center rounded-full bg-destructive/10 shrink-0">
+                    <Trash2 className="h-5 w-5 text-destructive" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">Delete deal room?</div>
+                    <div className="text-sm text-muted-foreground mt-1">
+                      This permanently deletes the deal room and all its data — documents, messages, tasks, and notes. This cannot be undone.
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={() => setDeleteModal(null)}
+                    className="flex-1 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => setDeleteModal({ id: deleteModal.id, step: 3 })}
+                    className="flex-1 rounded-md bg-destructive/10 text-destructive border border-destructive/20 px-3 py-2 text-sm hover:bg-destructive/20"
+                  >
+                    I understand, continue
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <div className="font-semibold text-destructive">Final confirmation</div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    Type <span className="font-mono font-semibold text-foreground">DELETE</span> to permanently delete this deal room.
+                  </div>
+                </div>
+                <input
+                  autoFocus
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="Type DELETE to confirm"
+                  className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-destructive/50 font-mono"
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => { setDeleteModal(null); setDeleteConfirmText(""); }}
+                    className="flex-1 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => handleDelete(deleteModal.id)}
+                    disabled={deleteConfirmText !== "DELETE" || deletingId === deleteModal.id}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-md bg-destructive text-white px-3 py-2 text-sm disabled:opacity-50"
+                  >
+                    {deletingId === deleteModal.id
+                      ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Deleting…</>
+                      : "Delete permanently"}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

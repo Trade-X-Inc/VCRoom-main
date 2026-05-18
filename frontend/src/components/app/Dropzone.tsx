@@ -18,7 +18,7 @@ export interface UploadedFile {
 export function Dropzone({
   onFiles,
   title = "Drag & drop or click to upload",
-  hint = "Up to 50 MB · PDF, DOCX, XLSX, PNG",
+  hint = "Up to 50 MB · PDF, DOCX, XLSX, PPTX, PNG, JPG, CSV, TXT, MP4",
   dealRoomId,
   onUploadComplete,
 }: {
@@ -115,6 +115,7 @@ export function Dropzone({
           type="file"
           multiple
           className="hidden"
+          accept=".pdf,.docx,.xlsx,.pptx,.png,.jpg,.jpeg,.txt,.csv,.mp4"
           onChange={(e) => handleFiles(e.target.files)}
         />
       </div>

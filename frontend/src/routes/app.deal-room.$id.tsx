@@ -8,7 +8,7 @@ import {
   ArrowLeft, Lock, Sparkles, X, MessagesSquare, ThumbsUp, ThumbsDown,
   HelpCircle, Building2, TrendingUp, Users, DollarSign, Target, Shield,
   Send, AlertCircle, Eye, UserPlus, Loader2, ExternalLink, ChevronDown,
-  Check, ClipboardList, Copy,
+  Check, ClipboardList, Copy, Trash2,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AIChat } from "@/components/ai/AIChat";
@@ -1035,6 +1035,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
   const queryClient = useQueryClient();
   const [showLibrary, setShowLibrary] = useState(false);
   const [addingFromLib, setAddingFromLib] = useState<string | null>(null);
+  const pendingDeletes = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   const { data: docs = [] } = useQuery({
     queryKey: ["documents", dealRoomId],
@@ -1083,10 +1084,33 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
     setShowLibrary(false);
   };
 
-  const removeFromRoom = async (docId: string) => {
-    await supabase.from("documents").update({ deal_room_id: null }).eq("id", docId);
-    queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
-    toast.success("Removed from deal room");
+  const handleDeleteDoc = (doc: any) => {
+    const docName: string = doc.name || doc.storage_path?.split("/").pop() || "Document";
+    let toastId: string | number;
+    const timer = setTimeout(async () => {
+      pendingDeletes.current.delete(doc.id);
+      const { error } = await supabase.from("documents").delete().eq("id", doc.id);
+      if (error) {
+        toast.error(`Failed to delete "${docName}"`);
+        return;
+      }
+      if (doc.storage_path) {
+        await supabase.storage.from("documents").remove([doc.storage_path]);
+      }
+      queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+    }, 5000);
+    pendingDeletes.current.set(doc.id, timer);
+    toastId = toast(`"${docName}" will be deleted`, {
+      action: {
+        label: "Undo",
+        onClick: () => {
+          const t = pendingDeletes.current.get(doc.id);
+          if (t) { clearTimeout(t); pendingDeletes.current.delete(doc.id); }
+          toast.dismiss(toastId);
+        },
+      },
+      duration: 5000,
+    });
   };
 
   return (
@@ -1223,11 +1247,11 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
                 </button>
                 {isFounder && (
                   <button
-                    onClick={() => removeFromRoom(doc.id)}
-                    title="Remove from deal room"
+                    onClick={() => handleDeleteDoc(doc)}
+                    title="Delete document"
                     className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <X className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 )}
               </div>
