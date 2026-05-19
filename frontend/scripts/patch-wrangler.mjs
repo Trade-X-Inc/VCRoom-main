@@ -1,15 +1,56 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { execSync } from "child_process";
 
-// 1. Remove "assets" key from dist/client/wrangler.json
-// Pages does not support the "assets" config key.
+// 1. Clean dist/client/wrangler.json for Cloudflare Pages compatibility.
+// The @cloudflare/vite-plugin generates fields that are only valid for
+// Workers, not Pages. Remove them all before deployment.
 const pagesWranglerPath = "dist/client/wrangler.json";
 if (existsSync(pagesWranglerPath)) {
   const cfg = JSON.parse(readFileSync(pagesWranglerPath, "utf8"));
-  if (cfg.assets !== undefined) {
-    delete cfg.assets;
-    writeFileSync(pagesWranglerPath, JSON.stringify(cfg));
-    console.log("✓ Removed 'assets' key from dist/client/wrangler.json");
+
+  const invalidTopLevel = [
+    "assets",
+    "triggers",
+    "definedEnvironments",
+    "ai_search_namespaces",
+    "ai_search",
+    "secrets_store_secrets",
+    "unsafe_hello_world",
+    "flagship",
+    "worker_loaders",
+    "ratelimits",
+    "vpc_services",
+    "vpc_networks",
+    "python_modules",
+  ];
+  const removed = [];
+  for (const field of invalidTopLevel) {
+    if (cfg[field] !== undefined) {
+      delete cfg[field];
+      removed.push(field);
+    }
+  }
+
+  // Strip non-standard sub-fields from "dev" block
+  if (cfg.dev && typeof cfg.dev === "object") {
+    const validDevFields = new Set(["ip", "port", "inspector_port", "local_protocol", "upstream_protocol", "host"]);
+    for (const key of Object.keys(cfg.dev)) {
+      if (!validDevFields.has(key)) {
+        delete cfg.dev[key];
+        removed.push(`dev.${key}`);
+      }
+    }
+    if (Object.keys(cfg.dev).length === 0) {
+      delete cfg.dev;
+      removed.push("dev (emptied)");
+    }
+  }
+
+  writeFileSync(pagesWranglerPath, JSON.stringify(cfg, null, 2));
+  if (removed.length > 0) {
+    console.log(`✓ Cleaned dist/client/wrangler.json (removed: ${removed.join(", ")})`);
+  } else {
+    console.log("✓ dist/client/wrangler.json already clean");
   }
 }
 

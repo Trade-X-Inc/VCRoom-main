@@ -1,7 +1,7 @@
 {
   "name": "vcroom-main",
   "compatibility_date": "2024-09-23",
-  "compatibility_flags": ["nodejs_compat_v2"],
+  "compatibility_flags": ["nodejs_compat"],
   "pages_build_output_dir": "./dist/client",
   "vars": {
     "VITE_SUPABASE_URL": "https://ldimninnjlvxozubheib.supabase.co",
