@@ -19,6 +19,12 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
     console.log('=== SUMMARY FN START ===');
     console.log('Document path:', data.documentPath);
     console.log('Document name:', data.documentName);
+    console.log('=== ENV CHECK ===');
+    console.log('Keys available on globalThis:',
+      Object.keys(globalThis as any).filter((k) => k.includes('OPENAI') || k.includes('API'))
+    );
+    console.log('OPENAI_API_KEY exists:', !!(globalThis as any).OPENAI_API_KEY);
+    console.log('OPENAI_API_KEY length:', ((globalThis as any).OPENAI_API_KEY ?? '').length);
 
     const supabaseUrl =
       data.supabaseUrl ||
@@ -31,11 +37,12 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
       (globalThis as any).VITE_SUPABASE_ANON_KEY ||
       "";
     const openAIKey =
-      data.openAIKey ||
-      (globalThis as any).VITE_OPENAI_API_KEY ||
       (globalThis as any).OPENAI_API_KEY ||
-      process.env.VITE_OPENAI_API_KEY ||
+      (globalThis as any)['OPENAI_API_KEY'] ||
+      (globalThis as any).VITE_OPENAI_API_KEY ||
+      data.openAIKey ||
       process.env.OPENAI_API_KEY ||
+      process.env.VITE_OPENAI_API_KEY ||
       '';
 
     console.log('OpenAI key present:', !!openAIKey);

@@ -1342,7 +1342,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
                     >
                       <Download className="h-3.5 w-3.5" />
                     </button>
-                    {isFounder && (
+                    {(isFounder || doc.uploader_id === userId) && (
                       <button
                         onClick={() => handleDeleteDoc(doc)}
                         title="Delete document"
