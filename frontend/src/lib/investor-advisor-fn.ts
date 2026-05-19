@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
+import { getEnvVar } from "@/lib/env";
 
 type InvestorAdvisorInput = {
   userId: string;
@@ -15,13 +16,13 @@ type InvestorAdvisorResult = {
 export const getInvestorAdvice = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): InvestorAdvisorInput => data as InvestorAdvisorInput)
   .handler(async ({ data }: { data: InvestorAdvisorInput }): Promise<InvestorAdvisorResult> => {
-    const openAIKey = process.env.OPENAI_API_KEY || '';
+    const openAIKey = getEnvVar("OPENAI_API_KEY");
     if (!openAIKey) {
       throw new Error('OpenAI API key not configured on server');
     }
 
-    const supabaseUrl = process.env.SUPABASE_URL || "";
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+    const supabaseUrl = getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
+    const supabaseKey = getEnvVar("SUPABASE_SERVICE_ROLE_KEY") || getEnvVar("VITE_SUPABASE_SERVICE_ROLE_KEY");
 
     let profile: any = null;
     let watchlistCount = 0;

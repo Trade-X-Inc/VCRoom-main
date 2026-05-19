@@ -1,10 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
+import { getEnvVar } from "@/lib/env";
 
-const adminClient = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+function getAdminClient() {
+  const url = getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
+  const key = getEnvVar("SUPABASE_SERVICE_ROLE_KEY") || getEnvVar("VITE_SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !key) throw new Error(`Missing Supabase config. URL: ${!!url}, KEY: ${!!key}`);
+  return createClient(url, key, { auth: { persistSession: false } });
+}
 
 type BriefInput = { dealRoomId: string; userId: string };
 
@@ -21,7 +24,7 @@ export const generateDealBrief = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): BriefInput => data as BriefInput)
   .handler(async ({ data }: { data: BriefInput }): Promise<DealBriefResult> => {
     // 1. Verify investor is a member of this deal room
-    const { data: member } = await adminClient
+    const { data: member } = await getAdminClient()
       .from("deal_room_members")
       .select("user_id")
       .eq("deal_room_id", data.dealRoomId)
@@ -30,14 +33,14 @@ export const generateDealBrief = createServerFn({ method: "POST" })
     if (!member) throw new Error("Unauthorized");
 
     // 2. Fetch deal room + startup profile
-    const { data: room } = await adminClient
+    const { data: room } = await getAdminClient()
       .from("deal_rooms")
       .select("startup_id")
       .eq("id", data.dealRoomId)
       .single();
 
     const { data: startup } = room?.startup_id
-      ? await adminClient
+      ? await getAdminClient()
           .from("startups")
           .select("company_name, sector, stage, funding_target, traction, description")
           .eq("id", room.startup_id)
@@ -45,7 +48,7 @@ export const generateDealBrief = createServerFn({ method: "POST" })
       : { data: null };
 
     // 3. Fetch recent activities
-    const { data: activities } = await adminClient
+    const { data: activities } = await getAdminClient()
       .from("activities")
       .select("action, created_at")
       .eq("deal_room_id", data.dealRoomId)
@@ -66,7 +69,7 @@ Description: ${startup?.description ?? "None provided"}
 Recent activity: ${activitySummary || "None"}`;
 
     // 5. Call OpenAI
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = getEnvVar("OPENAI_API_KEY");
     if (!apiKey) {
       // Graceful fallback when OpenAI is not configured
       return {

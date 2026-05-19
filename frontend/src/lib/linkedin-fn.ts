@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
+import { getEnvVar } from "@/lib/env";
 
 type LeadData = {
   id: string;
@@ -14,9 +15,9 @@ type LinkedInInput = { userId: string; leadData: LeadData; openAIKey?: string };
 export const generateLinkedInMessage = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): LinkedInInput => data as LinkedInInput)
   .handler(async ({ data }: { data: LinkedInInput }) => {
-    const supabaseUrl = process.env.SUPABASE_URL || "";
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-    const openAIKey = data.openAIKey || process.env.OPENAI_API_KEY || "";
+    const supabaseUrl = getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
+    const serviceKey = getEnvVar("SUPABASE_SERVICE_ROLE_KEY") || getEnvVar("VITE_SUPABASE_SERVICE_ROLE_KEY");
+    const openAIKey = data.openAIKey || getEnvVar("OPENAI_API_KEY");
     if (!supabaseUrl || !serviceKey) throw new Error("Supabase not configured");
     const adminClient = createClient(supabaseUrl, serviceKey);
     const lead = data.leadData;

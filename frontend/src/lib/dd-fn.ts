@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
+import { getEnvVar } from "@/lib/env";
 
-// ─── admin client (service role) — same pattern as src/server/ai.ts ──────────
 function getAdminClient() {
-  const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || "";
-  if (!url || !key) throw new Error("Missing Supabase config");
+  const url = getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
+  const key = getEnvVar("SUPABASE_SERVICE_ROLE_KEY") || getEnvVar("VITE_SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !key) throw new Error(`Missing Supabase config. URL: ${!!url}, KEY: ${!!key}`);
   return createClient(url, key, { auth: { persistSession: false } });
 }
 

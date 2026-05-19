@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
+import { getEnvVar } from "@/lib/env";
 
 type SummaryInput = {
   documentPath: string;
@@ -15,9 +16,9 @@ const FALLBACK = "Document uploaded. AI summary not available for this file type
 export const generateDocumentSummary = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): SummaryInput => data as SummaryInput)
   .handler(async ({ data }: { data: SummaryInput }): Promise<{ summary: string | null; error?: string }> => {
-    const supabaseUrl = data.supabaseUrl || process.env.SUPABASE_URL || "";
-    const supabaseKey = data.supabaseAnonKey || process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-    const openAIKey = process.env.OPENAI_API_KEY || '';
+    const supabaseUrl = data.supabaseUrl || getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
+    const supabaseKey = data.supabaseAnonKey || getEnvVar("SUPABASE_SERVICE_ROLE_KEY") || getEnvVar("VITE_SUPABASE_SERVICE_ROLE_KEY");
+    const openAIKey = getEnvVar("OPENAI_API_KEY");
     console.log('Supabase URL:', supabaseUrl?.slice(0, 30));
 
     if (!openAIKey) {
