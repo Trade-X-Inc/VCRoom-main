@@ -15,7 +15,7 @@ const FALLBACK = "Document uploaded. AI summary not available for this file type
 
 export const generateDocumentSummary = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): SummaryInput => data as SummaryInput)
-  .handler(async ({ data }: { data: SummaryInput }): Promise<{ summary: string }> => {
+  .handler(async ({ data }: { data: SummaryInput }): Promise<{ summary: string | null; error?: string }> => {
     console.log('=== SUMMARY FN START ===');
     console.log('Document path:', data.documentPath);
     console.log('Document name:', data.documentName);
@@ -43,9 +43,11 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
     console.log('Supabase URL:', supabaseUrl?.slice(0, 30));
 
     if (!openAIKey) {
-      throw new Error('OpenAI API key not configured. Check Cloudflare environment variables.');
+      return { summary: null, error: 'OpenAI API key not configured. Check Cloudflare environment variables.' };
     }
-    if (!supabaseUrl || !supabaseKey) return { summary: FALLBACK };
+    if (!supabaseUrl || !supabaseKey) {
+      return { summary: null, error: 'Supabase configuration missing.' };
+    }
 
     const client = createClient(supabaseUrl, supabaseKey, {
       global: { headers: { Authorization: `Bearer ${data.userAccessToken ?? ""}` } },
@@ -58,7 +60,9 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
     console.log('Download error:', dlError?.message ?? 'none');
     console.log('Blob size:', (blob as any)?.size);
 
-    if (dlError || !blob) return { summary: FALLBACK };
+    if (dlError || !blob) {
+      return { summary: null, error: `File download failed: ${dlError?.message ?? 'file not found'}` };
+    }
 
     let textContent = "";
     try {
@@ -69,12 +73,14 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
         .slice(0, 3000)
         .trim();
     } catch {
-      return { summary: FALLBACK };
+      return { summary: null, error: 'Failed to extract text from file.' };
     }
 
     console.log('Text extracted length:', textContent?.length);
 
-    if (!textContent || textContent.length < 20) return { summary: FALLBACK };
+    if (!textContent || textContent.length < 20) {
+      return { summary: null, error: 'File has no readable text content (binary or empty).' };
+    }
 
     const prompt = `Document: ${data.documentName}
 Content preview: ${textContent}
@@ -104,7 +110,12 @@ Keep each paragraph under 60 words. Be specific, not generic.`;
     });
 
     console.log('OpenAI response status:', resp.status);
-    if (!resp.ok) return { summary: FALLBACK };
+    if (!resp.ok) {
+      const errBody = await resp.json().catch(() => ({})) as any;
+      return { summary: null, error: `OpenAI error ${resp.status}: ${errBody?.error?.message ?? 'unknown'}` };
+    }
     const json = (await resp.json()) as { choices: Array<{ message: { content: string } }> };
-    return { summary: json.choices[0]?.message?.content ?? FALLBACK };
+    const content = json.choices[0]?.message?.content;
+    if (!content) return { summary: null, error: 'OpenAI returned empty response.' };
+    return { summary: content };
   });

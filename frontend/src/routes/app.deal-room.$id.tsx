@@ -1117,14 +1117,23 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
           userAccessToken: session?.access_token ?? "",
         },
       });
+      if (result.error) {
+        toast.error(`AI Summary failed: ${result.error}`);
+        return;
+      }
+      if (!result.summary) {
+        toast.error("AI Summary returned empty. Check Cloudflare logs.");
+        return;
+      }
       await supabase.from("documents").update({ ai_summary: result.summary }).eq("id", doc.id);
-      // DB write is confirmed — update cache directly, no refetch needed
+      // DB write confirmed — update cache directly, no refetch needed
       queryClient.setQueryData(["documents", dealRoomId], (old: any) =>
         (old ?? []).map((d: any) => d.id === doc.id ? { ...d, ai_summary: result.summary } : d)
       );
       toast.success("Summary generated");
-    } catch {
-      toast.error("Failed to generate summary");
+    } catch (err) {
+      console.error("Summary generation error:", err);
+      toast.error(err instanceof Error ? err.message : `Unknown error: ${String(err)}`);
     } finally {
       setGeneratingSummaryId(null);
     }
@@ -1161,13 +1170,10 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
         const { error: storageError } = await supabase.storage.from("documents").remove([doc.storage_path]);
         console.log("Storage delete result:", storageError ?? "success");
       }
-      // Remove from cache immediately, then sync with DB
+      // DB confirmed deleted — update cache directly, no refetch (refetch would race and restore the row)
       queryClient.setQueryData(["documents", dealRoomId], (old: any) =>
         (old ?? []).filter((d: any) => d.id !== doc.id)
       );
-      queryClient.invalidateQueries({
-        predicate: (q) => (q.queryKey as string[]).includes(dealRoomId),
-      });
     }, 5000);
     pendingDeletes.current.set(doc.id, timer);
     toastId = toast(`"${docName}" will be deleted`, {
