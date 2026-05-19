@@ -1,32 +1,20 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 
-function getSupabase(token: string) {
-  const url =
-    process.env.VITE_SUPABASE_URL ||
-    (globalThis as any).VITE_SUPABASE_URL ||
-    process.env.SUPABASE_URL ||
-    (globalThis as any).SUPABASE_URL ||
-    "";
-  const key =
-    process.env.VITE_SUPABASE_ANON_KEY ||
-    (globalThis as any).VITE_SUPABASE_ANON_KEY ||
-    process.env.SUPABASE_ANON_KEY ||
-    (globalThis as any).SUPABASE_ANON_KEY ||
-    "";
+function getAdminClient() {
+  const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || "";
   if (!url || !key) throw new Error("Missing Supabase config");
-  return createClient(url, key, {
-    global: { headers: { Authorization: `Bearer ${token}` } },
-  });
+  return createClient(url, key, { auth: { persistSession: false } });
 }
 
-// ─── getNotifications: fetch all notifications for current user ──────────────
+// ─── getNotifications ─────────────────────────────────────────────────────────
 export const getNotifications = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): { userId: string; userAccessToken: string } => data as any,
   )
   .handler(async ({ data }) => {
-    const sb = getSupabase(data.userAccessToken);
+    const sb = getAdminClient();
     const { data: notifs, error } = await sb
       .from("notifications")
       .select("id, kind, title, body, read, meta, created_at")
@@ -39,29 +27,30 @@ export const getNotifications = createServerFn({ method: "POST" })
     return { notifications, unreadCount };
   });
 
-// ─── markNotificationRead: mark one notification as read ─────────────────────
+// ─── markNotificationRead ─────────────────────────────────────────────────────
 export const markNotificationRead = createServerFn({ method: "POST" })
   .inputValidator(
-    (data: unknown): { notificationId: string; userAccessToken: string } =>
+    (data: unknown): { notificationId: string; userId: string; userAccessToken: string } =>
       data as any,
   )
   .handler(async ({ data }) => {
-    const sb = getSupabase(data.userAccessToken);
+    const sb = getAdminClient();
     const { error } = await sb
       .from("notifications")
       .update({ read: true })
-      .eq("id", data.notificationId);
+      .eq("id", data.notificationId)
+      .eq("user_id", data.userId); // scope to owner
     if (error) return { success: false, error: error.message };
     return { success: true };
   });
 
-// ─── markAllRead: mark all notifications as read for a user ─────────────────
+// ─── markAllNotificationsRead ─────────────────────────────────────────────────
 export const markAllNotificationsRead = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): { userId: string; userAccessToken: string } => data as any,
   )
   .handler(async ({ data }) => {
-    const sb = getSupabase(data.userAccessToken);
+    const sb = getAdminClient();
     const { error } = await sb
       .from("notifications")
       .update({ read: true })

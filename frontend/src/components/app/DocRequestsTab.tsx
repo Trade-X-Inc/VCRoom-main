@@ -70,7 +70,7 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
   const { data, isLoading } = useQuery({
     queryKey: ["doc-requests", dealRoomId],
     enabled: !!dealRoomId && !!token,
-    queryFn: () => getDocRequests({ data: { dealRoomId, userAccessToken: token } }),
+    queryFn: () => getDocRequests({ data: { dealRoomId, userId: userId ?? "", userAccessToken: token } }),
     refetchInterval: 30_000, // poll every 30s
   });
 
@@ -124,6 +124,7 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
           requestedBy: req.requested_by,
           title: req.title,
           dealRoomId,
+          userId: userId ?? "",
           userAccessToken: token,
         },
       }),

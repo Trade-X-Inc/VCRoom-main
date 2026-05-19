@@ -1,58 +1,63 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 
-function getSupabase(token: string) {
-  const url =
-    process.env.VITE_SUPABASE_URL ||
-    (globalThis as any).VITE_SUPABASE_URL ||
-    process.env.SUPABASE_URL ||
-    (globalThis as any).SUPABASE_URL ||
-    "";
-  const key =
-    process.env.VITE_SUPABASE_ANON_KEY ||
-    (globalThis as any).VITE_SUPABASE_ANON_KEY ||
-    process.env.SUPABASE_ANON_KEY ||
-    (globalThis as any).SUPABASE_ANON_KEY ||
-    "";
+function getAdminClient() {
+  const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || "";
   if (!url || !key) throw new Error("Missing Supabase config");
-  return createClient(url, key, {
-    global: { headers: { Authorization: `Bearer ${token}` } },
-  });
+  return createClient(url, key, { auth: { persistSession: false } });
 }
 
-// ─── getDocRequests: fetch all requests for a deal room ──────────────────────
+// ─── getDocRequests ───────────────────────────────────────────────────────────
 export const getDocRequests = createServerFn({ method: "POST" })
   .inputValidator(
-    (data: unknown): { dealRoomId: string; userAccessToken: string } =>
+    (data: unknown): { dealRoomId: string; userId: string; userAccessToken: string } =>
       data as any,
   )
   .handler(async ({ data }) => {
-    const sb = getSupabase(data.userAccessToken);
+    const sb = getAdminClient();
+
+    // Verify membership
+    const { data: member } = await sb
+      .from("deal_room_members")
+      .select("user_id")
+      .eq("deal_room_id", data.dealRoomId)
+      .eq("user_id", data.userId)
+      .maybeSingle();
+    if (!member) return { requests: [], error: "Unauthorized" };
+
     const { data: requests, error } = await sb
       .from("document_requests")
-      .select(
-        "id, title, description, status, created_at, updated_at, requested_by, for_user_id, document_id",
-      )
+      .select("id, title, description, status, created_at, updated_at, requested_by, for_user_id, document_id")
       .eq("deal_room_id", data.dealRoomId)
       .order("created_at", { ascending: false });
     if (error) return { requests: [], error: error.message };
     return { requests: requests ?? [] };
   });
 
-// ─── createDocRequest: investor requests a document from founder ─────────────
+// ─── createDocRequest ─────────────────────────────────────────────────────────
 export const createDocRequest = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
       dealRoomId: string;
-      requestedBy: string;   // investor user id
-      forUserId: string;     // founder user id
+      requestedBy: string;
+      forUserId: string;
       title: string;
       description?: string;
       userAccessToken: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
-    const sb = getSupabase(data.userAccessToken);
+    const sb = getAdminClient();
+
+    // Verify requester is a member
+    const { data: member } = await sb
+      .from("deal_room_members")
+      .select("user_id")
+      .eq("deal_room_id", data.dealRoomId)
+      .eq("user_id", data.requestedBy)
+      .maybeSingle();
+    if (!member) return { success: false, error: "Unauthorized" };
 
     const { data: req, error } = await sb
       .from("document_requests")
@@ -78,27 +83,35 @@ export const createDocRequest = createServerFn({ method: "POST" })
         body: `An investor requested: "${data.title}"`,
         meta: { deal_room_id: data.dealRoomId, request_id: req.id },
       });
-    } catch {
-      // non-blocking
-    }
+    } catch { /* non-blocking */ }
 
     return { success: true, requestId: req.id };
   });
 
-// ─── fulfillDocRequest: founder marks request as uploaded/fulfilled ───────────
+// ─── fulfillDocRequest ────────────────────────────────────────────────────────
 export const fulfillDocRequest = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
       requestId: string;
       documentId?: string;
-      requestedBy: string;  // investor user id — to notify them
+      requestedBy: string;
       title: string;
       dealRoomId: string;
+      userId: string;
       userAccessToken: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
-    const sb = getSupabase(data.userAccessToken);
+    const sb = getAdminClient();
+
+    // Verify fulfiller is a member
+    const { data: member } = await sb
+      .from("deal_room_members")
+      .select("user_id")
+      .eq("deal_room_id", data.dealRoomId)
+      .eq("user_id", data.userId)
+      .maybeSingle();
+    if (!member) return { success: false, error: "Unauthorized" };
 
     const { error } = await sb
       .from("document_requests")
@@ -120,9 +133,7 @@ export const fulfillDocRequest = createServerFn({ method: "POST" })
         body: `The founder uploaded: "${data.title}"`,
         meta: { deal_room_id: data.dealRoomId, request_id: data.requestId },
       });
-    } catch {
-      // non-blocking
-    }
+    } catch { /* non-blocking */ }
 
     return { success: true };
   });

@@ -1,39 +1,33 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 
-// ─── helpers ─────────────────────────────────────────────────────────────────
-function getSupabase(token: string) {
-  const url =
-    process.env.VITE_SUPABASE_URL ||
-    (globalThis as any).VITE_SUPABASE_URL ||
-    process.env.SUPABASE_URL ||
-    (globalThis as any).SUPABASE_URL ||
-    "";
-  const key =
-    process.env.VITE_SUPABASE_ANON_KEY ||
-    (globalThis as any).VITE_SUPABASE_ANON_KEY ||
-    process.env.SUPABASE_ANON_KEY ||
-    (globalThis as any).SUPABASE_ANON_KEY ||
-    "";
+// ─── admin client (service role) — same pattern as src/server/ai.ts ──────────
+function getAdminClient() {
+  const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || "";
   if (!url || !key) throw new Error("Missing Supabase config");
-  return createClient(url, key, {
-    global: { headers: { Authorization: `Bearer ${token}` } },
-  });
+  return createClient(url, key, { auth: { persistSession: false } });
 }
 
-// ─── types ───────────────────────────────────────────────────────────────────
-type TokenInput = { userAccessToken: string };
-
-// ─── getDDData: fetch categories + checklist for a deal room ─────────────────
+// ─── getDDData ────────────────────────────────────────────────────────────────
 export const getDDData = createServerFn({ method: "POST" })
   .inputValidator(
-    (data: unknown): { dealRoomId: string } & TokenInput =>
-      data as { dealRoomId: string } & TokenInput,
+    (data: unknown): { dealRoomId: string; userId: string; userAccessToken: string } =>
+      data as any,
   )
   .handler(async ({ data }) => {
-    const sb = getSupabase(data.userAccessToken);
+    const sb = getAdminClient();
 
-    // Seed categories if none exist yet
+    // Verify user is a member
+    const { data: member } = await sb
+      .from("deal_room_members")
+      .select("user_id")
+      .eq("deal_room_id", data.dealRoomId)
+      .eq("user_id", data.userId)
+      .maybeSingle();
+    if (!member) return { categories: [], items: [], error: "Unauthorized" };
+
+    // Seed if first time
     const { data: existing } = await sb
       .from("dd_categories")
       .select("id")
@@ -60,18 +54,27 @@ export const getDDData = createServerFn({ method: "POST" })
     return { categories: categories ?? [], items: items ?? [] };
   });
 
-// ─── updateDDStatus: investor updates category status ────────────────────────
+// ─── updateDDStatus ───────────────────────────────────────────────────────────
 export const updateDDStatus = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
       dealRoomId: string;
+      userId: string;
       category: string;
       status: string;
       userAccessToken: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
-    const sb = getSupabase(data.userAccessToken);
+    const sb = getAdminClient();
+    const { data: member } = await sb
+      .from("deal_room_members")
+      .select("user_id")
+      .eq("deal_room_id", data.dealRoomId)
+      .eq("user_id", data.userId)
+      .maybeSingle();
+    if (!member) return { success: false, error: "Unauthorized" };
+
     const { error } = await sb
       .from("dd_categories")
       .update({ status: data.status, updated_at: new Date().toISOString() })
@@ -81,18 +84,27 @@ export const updateDDStatus = createServerFn({ method: "POST" })
     return { success: true };
   });
 
-// ─── updateDDNotes: investor saves notes for a category ──────────────────────
+// ─── updateDDNotes ────────────────────────────────────────────────────────────
 export const updateDDNotes = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
       dealRoomId: string;
+      userId: string;
       category: string;
       notes: string;
       userAccessToken: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
-    const sb = getSupabase(data.userAccessToken);
+    const sb = getAdminClient();
+    const { data: member } = await sb
+      .from("deal_room_members")
+      .select("user_id")
+      .eq("deal_room_id", data.dealRoomId)
+      .eq("user_id", data.userId)
+      .maybeSingle();
+    if (!member) return { success: false, error: "Unauthorized" };
+
     const { error } = await sb
       .from("dd_categories")
       .update({ investor_notes: data.notes, updated_at: new Date().toISOString() })
@@ -102,17 +114,27 @@ export const updateDDNotes = createServerFn({ method: "POST" })
     return { success: true };
   });
 
-// ─── toggleChecklistItem: check/uncheck a checklist item ─────────────────────
+// ─── toggleChecklistItem ──────────────────────────────────────────────────────
 export const toggleChecklistItem = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
       itemId: string;
+      userId: string;
+      dealRoomId: string;
       checked: boolean;
       userAccessToken: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
-    const sb = getSupabase(data.userAccessToken);
+    const sb = getAdminClient();
+    const { data: member } = await sb
+      .from("deal_room_members")
+      .select("user_id")
+      .eq("deal_room_id", data.dealRoomId)
+      .eq("user_id", data.userId)
+      .maybeSingle();
+    if (!member) return { success: false, error: "Unauthorized" };
+
     const { error } = await sb
       .from("dd_checklist_items")
       .update({ checked: data.checked })
