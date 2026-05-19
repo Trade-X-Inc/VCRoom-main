@@ -26,19 +26,9 @@ type EmailInput = {
 export const generateOutreachEmail = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): EmailInput => data as EmailInput)
   .handler(async ({ data }: { data: EmailInput }) => {
-    const supabaseUrl =
-      process.env.SUPABASE_URL ||
-      (globalThis as any).SUPABASE_URL ||
-      (import.meta.env as any).VITE_SUPABASE_URL || "";
-    const serviceKey =
-      process.env.SUPABASE_SERVICE_ROLE_KEY ||
-      (globalThis as any).SUPABASE_SERVICE_ROLE_KEY ||
-      (import.meta.env as any).VITE_SUPABASE_ANON_KEY || "";
-    const openAIKey =
-      data.openAIKey ||
-      process.env.OPENAI_API_KEY ||
-      (globalThis as any).OPENAI_API_KEY ||
-      import.meta.env.VITE_OPENAI_API_KEY || "";
+    const supabaseUrl = process.env.SUPABASE_URL || "";
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+    const openAIKey = data.openAIKey || process.env.OPENAI_API_KEY || "";
     if (!supabaseUrl || !serviceKey) {
       return {
         subject: "Unable to generate",

@@ -15,25 +15,13 @@ type InvestorAdvisorResult = {
 export const getInvestorAdvice = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): InvestorAdvisorInput => data as InvestorAdvisorInput)
   .handler(async ({ data }: { data: InvestorAdvisorInput }): Promise<InvestorAdvisorResult> => {
-    const openAIKey =
-      (globalThis as any).OPENAI_API_KEY ||
-      (globalThis as any).VITE_OPENAI_API_KEY ||
-      (globalThis as any).env?.OPENAI_API_KEY ||
-      process.env.OPENAI_API_KEY ||
-      '';
+    const openAIKey = process.env.OPENAI_API_KEY || '';
     if (!openAIKey) {
       throw new Error('OpenAI API key not configured on server');
     }
 
-    const supabaseUrl =
-      process.env.SUPABASE_URL ||
-      (globalThis as any).SUPABASE_URL ||
-      import.meta.env.VITE_SUPABASE_URL || "";
-
-    const supabaseKey =
-      process.env.SUPABASE_SERVICE_ROLE_KEY ||
-      (globalThis as any).SUPABASE_SERVICE_ROLE_KEY ||
-      import.meta.env.VITE_SUPABASE_ANON_KEY || "";
+    const supabaseUrl = process.env.SUPABASE_URL || "";
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
     let profile: any = null;
     let watchlistCount = 0;

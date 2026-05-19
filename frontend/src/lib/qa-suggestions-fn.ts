@@ -10,12 +10,7 @@ type SuggestionsInput = {
 export const getQASuggestions = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): SuggestionsInput => data as SuggestionsInput)
   .handler(async ({ data }: { data: SuggestionsInput }): Promise<{ suggestions: string[] }> => {
-    const openAIKey =
-      (globalThis as any).OPENAI_API_KEY ||
-      (globalThis as any).VITE_OPENAI_API_KEY ||
-      (globalThis as any).env?.OPENAI_API_KEY ||
-      process.env.OPENAI_API_KEY ||
-      '';
+    const openAIKey = process.env.OPENAI_API_KEY || '';
     if (!openAIKey) {
       throw new Error('OpenAI API key not configured on server');
     }

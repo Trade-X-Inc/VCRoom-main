@@ -15,37 +15,9 @@ const FALLBACK = "Document uploaded. AI summary not available for this file type
 export const generateDocumentSummary = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): SummaryInput => data as SummaryInput)
   .handler(async ({ data }: { data: SummaryInput }): Promise<{ summary: string | null; error?: string }> => {
-    console.log('=== SUMMARY FN START ===');
-    console.log('Document path:', data.documentPath);
-    console.log('Document name:', data.documentName);
-    console.log('=== ENV CHECK ===');
-    console.log('Keys available on globalThis:',
-      Object.keys(globalThis as any).filter((k) => k.includes('OPENAI') || k.includes('API'))
-    );
-    console.log('globalThis.OPENAI_API_KEY exists:', !!(globalThis as any).OPENAI_API_KEY);
-    console.log('globalThis.env?.OPENAI_API_KEY exists:', !!(globalThis as any).env?.OPENAI_API_KEY);
-    console.log('process.env.OPENAI_API_KEY exists:', !!process.env.OPENAI_API_KEY);
-    console.log('process.env.OPENAI_API_KEY length:', (process.env.OPENAI_API_KEY ?? '').length);
-
-    const supabaseUrl =
-      data.supabaseUrl ||
-      process.env.VITE_SUPABASE_URL ||
-      (globalThis as any).VITE_SUPABASE_URL ||
-      "";
-    const supabaseKey =
-      data.supabaseAnonKey ||
-      process.env.VITE_SUPABASE_ANON_KEY ||
-      (globalThis as any).VITE_SUPABASE_ANON_KEY ||
-      "";
-    const openAIKey =
-      (globalThis as any).OPENAI_API_KEY ||
-      (globalThis as any).VITE_OPENAI_API_KEY ||
-      (globalThis as any).env?.OPENAI_API_KEY ||
-      process.env.OPENAI_API_KEY ||
-      '';
-
-    console.log('OpenAI key present:', !!openAIKey);
-    console.log('OpenAI key length:', openAIKey?.length);
+    const supabaseUrl = data.supabaseUrl || process.env.SUPABASE_URL || "";
+    const supabaseKey = data.supabaseAnonKey || process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+    const openAIKey = process.env.OPENAI_API_KEY || '';
     console.log('Supabase URL:', supabaseUrl?.slice(0, 30));
 
     if (!openAIKey) {

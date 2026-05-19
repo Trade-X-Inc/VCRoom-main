@@ -15,14 +15,8 @@ export interface DealBriefResult {
 export const generateDealBrief = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): BriefInput => data as BriefInput)
   .handler(async ({ data }: { data: BriefInput }): Promise<DealBriefResult> => {
-    const supabaseUrl =
-      process.env.SUPABASE_URL ||
-      (globalThis as any).SUPABASE_URL ||
-      (import.meta.env as any).VITE_SUPABASE_URL || "";
-    const serviceKey =
-      process.env.SUPABASE_SERVICE_ROLE_KEY ||
-      (globalThis as any).SUPABASE_SERVICE_ROLE_KEY ||
-      (import.meta.env as any).VITE_SUPABASE_ANON_KEY || "";
+    const supabaseUrl = process.env.SUPABASE_URL || "";
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
     if (!supabaseUrl || !serviceKey) {
       return {
         matchScore: 72, matchLabel: "Moderate fit",

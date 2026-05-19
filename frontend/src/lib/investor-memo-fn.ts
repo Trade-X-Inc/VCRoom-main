@@ -12,30 +12,13 @@ type MemoInput = {
 export const generateInvestorMemo = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): MemoInput => data as MemoInput)
   .handler(async ({ data }: { data: MemoInput }): Promise<{ memo: string }> => {
-    const openAIKey =
-      (globalThis as any).OPENAI_API_KEY ||
-      (globalThis as any).VITE_OPENAI_API_KEY ||
-      (globalThis as any).env?.OPENAI_API_KEY ||
-      process.env.OPENAI_API_KEY ||
-      '';
+    const openAIKey = process.env.OPENAI_API_KEY || '';
     if (!openAIKey) {
       throw new Error('OpenAI API key not configured on server');
     }
 
-    const supabaseUrl =
-      data.supabaseUrl ||
-      process.env.VITE_SUPABASE_URL ||
-      (globalThis as any).VITE_SUPABASE_URL ||
-      process.env.SUPABASE_URL ||
-      (globalThis as any).SUPABASE_URL ||
-      "";
-    const supabaseKey =
-      data.supabaseAnonKey ||
-      process.env.VITE_SUPABASE_ANON_KEY ||
-      (globalThis as any).VITE_SUPABASE_ANON_KEY ||
-      process.env.SUPABASE_ANON_KEY ||
-      (globalThis as any).SUPABASE_ANON_KEY ||
-      "";
+    const supabaseUrl = data.supabaseUrl || process.env.SUPABASE_URL || "";
+    const supabaseKey = data.supabaseAnonKey || process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Supabase configuration missing on server');

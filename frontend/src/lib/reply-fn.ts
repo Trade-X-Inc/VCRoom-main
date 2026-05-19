@@ -21,19 +21,9 @@ type ReplyInput = {
 export const generateReply = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): ReplyInput => data as ReplyInput)
   .handler(async ({ data }: { data: ReplyInput }) => {
-    const supabaseUrl =
-      process.env.SUPABASE_URL ||
-      (globalThis as any).SUPABASE_URL ||
-      (import.meta.env as any).VITE_SUPABASE_URL || "";
-    const serviceKey =
-      process.env.SUPABASE_SERVICE_ROLE_KEY ||
-      (globalThis as any).SUPABASE_SERVICE_ROLE_KEY ||
-      (import.meta.env as any).VITE_SUPABASE_ANON_KEY || "";
-    const openAIKey =
-      data.openAIKey ||
-      process.env.OPENAI_API_KEY ||
-      (globalThis as any).OPENAI_API_KEY ||
-      import.meta.env.VITE_OPENAI_API_KEY || "";
+    const supabaseUrl = process.env.SUPABASE_URL || "";
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+    const openAIKey = data.openAIKey || process.env.OPENAI_API_KEY || "";
     if (!supabaseUrl || !serviceKey) throw new Error("Supabase not configured");
     const adminClient = createClient(supabaseUrl, serviceKey);
     const lead = data.leadData;
