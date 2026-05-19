@@ -12,6 +12,7 @@ export const getQASuggestions = createServerFn({ method: "POST" })
   .handler(async ({ data }: { data: SuggestionsInput }): Promise<{ suggestions: string[] }> => {
     const openAIKey =
       (globalThis as any).OPENAI_API_KEY ||
+      (globalThis as any).VITE_OPENAI_API_KEY ||
       (globalThis as any).env?.OPENAI_API_KEY ||
       process.env.OPENAI_API_KEY ||
       '';
