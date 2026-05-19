@@ -1173,6 +1173,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
       queryClient.setQueryData(["documents", dealRoomId], (old: any) =>
         (old ?? []).filter((d: any) => d.id !== doc.id)
       );
+      toast.success(`"${docName}" deleted`);
     }, 5000);
     pendingDeletes.current.set(doc.id, timer);
     toastId = toast(`"${docName}" will be deleted`, {

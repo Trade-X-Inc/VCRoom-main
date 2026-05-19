@@ -12,7 +12,11 @@ type MemoInput = {
 export const generateInvestorMemo = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): MemoInput => data as MemoInput)
   .handler(async ({ data }: { data: MemoInput }): Promise<{ memo: string }> => {
-    const openAIKey = (globalThis as any).OPENAI_API_KEY || '';
+    const openAIKey =
+      (globalThis as any).OPENAI_API_KEY ||
+      (globalThis as any).env?.OPENAI_API_KEY ||
+      process.env.OPENAI_API_KEY ||
+      '';
     if (!openAIKey) {
       throw new Error('OpenAI API key not configured on server');
     }
