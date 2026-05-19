@@ -18,6 +18,7 @@ import { Dropzone } from "@/components/app/Dropzone";
 import { useAuth } from "@/lib/auth";
 import { supabase, logActivity, createNotification } from "@/lib/supabase";
 import { ReviewTab } from "@/components/app/ReviewTab";
+import { DocRequestsTab } from "@/components/app/DocRequestsTab";
 import {
   useParticipants, useGeneratedNdaDocs,
   participantsStore, qaStore,
@@ -41,6 +42,7 @@ const tabs = [
   { k: "notes", l: "Notes", i: StickyNote },
   { k: "timeline", l: "Activity", i: Activity },
   { k: "meetings", l: "Meetings", i: Calendar },
+  { k: "requests", l: "Requests", i: ClipboardList },
   { k: "decision", l: "Review", i: Gavel },
 ];
 
@@ -183,7 +185,7 @@ function DealRoom() {
   const companyName = (room as any)?.startups?.company_name ?? "Unknown Company";
 
   const visibleTabs = tabs.filter((t) => {
-    if (isInvestor) return ["overview", "documents", "qa", "checklist", "notes", "timeline", "meetings", "decision"].includes(t.k);
+    if (isInvestor) return ["overview", "documents", "qa", "checklist", "notes", "timeline", "meetings", "requests", "decision"].includes(t.k);
     return t.k !== "decision";
   });
 
@@ -276,6 +278,15 @@ function DealRoom() {
         {tab === "notes" && <Notes dealRoomId={dealRoomId} userId={user?.id} />}
         {tab === "timeline" && <Timeline dealRoomId={dealRoomId} />}
         {tab === "meetings" && <MeetingsTab dealRoomId={dealRoomId} userId={user?.id} />}
+        {tab === "requests" && (
+          <DocRequestsTab
+            dealRoomId={dealRoomId}
+            isInvestor={isInvestor}
+            isFounder={isFounder}
+            userId={user?.id}
+            founderUserId={(room as any)?.startups?.founder_id ?? undefined}
+          />
+        )}
         {tab === "decision" && isInvestor && (
           <InvestorDecisionTab dealRoomId={dealRoomId} userId={user?.id} />
         )}

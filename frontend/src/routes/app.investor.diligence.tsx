@@ -1,22 +1,57 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { CheckCircle2, Circle, ClipboardCheck, FileText, ExternalLink } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/lib/auth";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState, useCallback } from "react";
+import {
+  ClipboardCheck, ChevronDown, ChevronUp, CheckCircle2, Circle,
+  Flag, Clock, Eye, AlertTriangle, FileText, StickyNote, Save,
+  Loader2, ExternalLink,
+} from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuthStore } from "@/lib/auth-store";
 import { supabase } from "@/lib/supabase";
-import { formatDistanceToNow } from "date-fns";
+import { getDDData, updateDDStatus, updateDDNotes, toggleChecklistItem } from "@/lib/dd-fn";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app/investor/diligence")({
   component: DiligencePage,
 });
 
-function DiligencePage() {
-  const { user } = useAuth();
-  const [selectedRoomId, setSelectedRoomId] = useState<string>("");
+// ─── constants ───────────────────────────────────────────────────────────────
 
-  // Fetch deal rooms the investor belongs to
+const CATEGORIES = ["Financials", "Team", "Legal", "Market", "Product", "References"] as const;
+type DDCategory = (typeof CATEGORIES)[number];
+
+const STATUSES = ["Pending", "In Review", "Complete", "Red Flag"] as const;
+type DDStatus = (typeof STATUSES)[number];
+
+const STATUS_CONFIG: Record<DDStatus, { label: string; icon: any; cls: string; dot: string }> = {
+  Pending:    { label: "Pending",    icon: Clock,         cls: "bg-muted text-muted-foreground",       dot: "bg-muted-foreground" },
+  "In Review":{ label: "In Review", icon: Eye,           cls: "bg-brand/10 text-brand",               dot: "bg-brand" },
+  Complete:   { label: "Complete",  icon: CheckCircle2,  cls: "bg-success/10 text-success",           dot: "bg-success" },
+  "Red Flag": { label: "Red Flag",  icon: Flag,          cls: "bg-destructive/10 text-destructive",   dot: "bg-destructive" },
+};
+
+const CAT_ICON: Record<DDCategory, string> = {
+  Financials: "💰", Team: "👥", Legal: "⚖️", Market: "📊", Product: "🚀", References: "🤝",
+};
+
+// ─── component ───────────────────────────────────────────────────────────────
+
+function DiligencePage() {
+  const user = useAuthStore((s) => s.user);
+  const session = useAuthStore((s) => s.session);
+  const token = session?.access_token ?? "";
+  const qc = useQueryClient();
+
+  const [selectedRoomId, setSelectedRoomId] = useState("");
+  const [expandedCat, setExpandedCat] = useState<DDCategory | null>("Financials");
+  const [editingNotes, setEditingNotes] = useState<DDCategory | null>(null);
+  const [noteDraft, setNoteDraft] = useState("");
+
+  // ── fetch deal rooms investor belongs to
   const { data: rooms = [] } = useQuery({
-    queryKey: ["investor-diligence-rooms", user?.id],
+    queryKey: ["investor-dd-rooms", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
       const { data } = await supabase
@@ -30,140 +65,341 @@ function DiligencePage() {
     },
   });
 
-  // Fetch deal tasks as checklist
-  const { data: tasks = [] } = useQuery({
-    queryKey: ["investor-tasks", selectedRoomId],
-    enabled: !!selectedRoomId,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("deal_tasks")
-        .select("id, title, completed")
-        .eq("deal_room_id", selectedRoomId)
-        .order("created_at", { ascending: true });
-      return data ?? [];
+  // ── fetch DD data for selected room
+  const { data: ddData, isLoading: ddLoading } = useQuery({
+    queryKey: ["dd-data", selectedRoomId],
+    enabled: !!selectedRoomId && !!token,
+    queryFn: () => getDDData({ data: { dealRoomId: selectedRoomId, userAccessToken: token } }),
+  });
+
+  const categories = ddData?.categories ?? [];
+  const checklistItems = ddData?.items ?? [];
+
+  // ── helpers
+  const getCatData = (cat: DDCategory) =>
+    categories.find((c: any) => c.category === cat) ?? { status: "Pending", investor_notes: "" };
+
+  const getCatItems = (cat: DDCategory) =>
+    checklistItems.filter((i: any) => i.category === cat);
+
+  const getProgress = (cat: DDCategory) => {
+    const items = getCatItems(cat);
+    if (!items.length) return 0;
+    return Math.round((items.filter((i: any) => i.checked).length / items.length) * 100);
+  };
+
+  const overallProgress = () => {
+    if (!checklistItems.length) return 0;
+    return Math.round((checklistItems.filter((i: any) => i.checked).length / checklistItems.length) * 100);
+  };
+
+  // ── mutations
+  const statusMut = useMutation({
+    mutationFn: (vars: { category: string; status: string }) =>
+      updateDDStatus({ data: { dealRoomId: selectedRoomId, userAccessToken: token, ...vars } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["dd-data", selectedRoomId] }),
+    onError: () => toast.error("Failed to update status"),
+  });
+
+  const notesMut = useMutation({
+    mutationFn: (vars: { category: string; notes: string }) =>
+      updateDDNotes({ data: { dealRoomId: selectedRoomId, userAccessToken: token, ...vars } }),
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({ queryKey: ["dd-data", selectedRoomId] });
+      setEditingNotes(null);
+      toast.success("Notes saved");
+    },
+    onError: () => toast.error("Failed to save notes"),
+  });
+
+  const checkMut = useMutation({
+    mutationFn: (vars: { itemId: string; checked: boolean }) =>
+      toggleChecklistItem({ data: { userAccessToken: token, ...vars } }),
+    onMutate: async (vars) => {
+      await qc.cancelQueries({ queryKey: ["dd-data", selectedRoomId] });
+      const prev = qc.getQueryData(["dd-data", selectedRoomId]);
+      qc.setQueryData(["dd-data", selectedRoomId], (old: any) => ({
+        ...old,
+        items: old?.items?.map((i: any) =>
+          i.id === vars.itemId ? { ...i, checked: vars.checked } : i,
+        ),
+      }));
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      qc.setQueryData(["dd-data", selectedRoomId], ctx?.prev);
+      toast.error("Failed to update item");
     },
   });
 
-  // Fetch documents for the deal room
-  const { data: docs = [] } = useQuery({
-    queryKey: ["investor-docs", selectedRoomId],
-    enabled: !!selectedRoomId,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("documents")
-        .select("id, name, category, created_at, deal_room_id")
-        .eq("deal_room_id", selectedRoomId)
-        .order("created_at", { ascending: false });
-      return data ?? [];
-    },
-  });
+  const handleSaveNotes = useCallback(
+    (cat: DDCategory) => notesMut.mutate({ category: cat, notes: noteDraft }),
+    [noteDraft, notesMut],
+  );
 
-  const total = tasks.length;
-  const doneCount = tasks.filter((t: any) => t.completed).length;
-  const progress = total ? Math.round((doneCount / total) * 100) : 0;
-
+  // ─── render ──────────────────────────────────────────────────────────────
   return (
-    <div className="p-6 lg:p-8 max-w-[1400px] mx-auto">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Due Diligence</h1>
-        <div className="text-sm text-muted-foreground">Track diligence progress across your active deals</div>
+    <div className="p-6 lg:p-8 max-w-[1200px] mx-auto">
+      {/* Header */}
+      <div className="flex items-end justify-between flex-wrap gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Due Diligence</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            6-category tracker — checklists, notes, and status per category
+          </p>
+        </div>
+        {selectedRoomId && (
+          <Link
+            to="/app/deal-room/$id"
+            params={{ id: selectedRoomId }}
+            className="inline-flex items-center gap-1.5 text-xs text-brand hover:underline"
+          >
+            Open deal room <ExternalLink className="h-3 w-3" />
+          </Link>
+        )}
       </div>
 
+      {/* Room selector */}
       <div className="mt-5">
         <select
           value={selectedRoomId}
           onChange={(e) => setSelectedRoomId(e.target.value)}
-          className="rounded-[10px] border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+          className="rounded-[10px] border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 min-w-[220px]"
         >
           <option value="">Select a company…</option>
-          {rooms.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+          {rooms.map((r: any) => (
+            <option key={r.id} value={r.id}>{r.name}</option>
+          ))}
         </select>
       </div>
 
+      {/* Empty state */}
       {!selectedRoomId ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center">
-          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
+        <div className="mt-10 rounded-2xl border border-dashed border-border/60 bg-card p-14 text-center">
+          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground mb-4">
             <ClipboardCheck className="h-6 w-6" />
           </div>
-          <h3 className="mt-4 text-lg font-semibold">Select a company to view due diligence</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Companies in your active deal flow appear in the dropdown above.</p>
+          <h3 className="text-base font-semibold">Select a company to begin</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Your active deal flow companies appear in the dropdown above.
+          </p>
+        </div>
+      ) : ddLoading ? (
+        <div className="mt-10 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading due diligence data…
         </div>
       ) : (
-        <div className="mt-6 grid lg:grid-cols-[1fr_360px] gap-5">
-          {/* Left: Task checklist */}
-          <div className="space-y-4">
-            <div className="rounded-2xl border border-border/60 bg-card p-5">
-              <div className="flex items-center justify-between">
-                <div className="text-sm font-semibold">Diligence checklist</div>
-                <div className="text-sm tabular-nums text-muted-foreground">{doneCount}/{total} · {progress}%</div>
-              </div>
-              <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
-                <div className="h-full bg-gradient-brand transition-all" style={{ width: `${progress}%` }} />
-              </div>
+        <>
+          {/* Overall progress bar */}
+          <div className="mt-6 rounded-2xl border border-border/60 bg-card p-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-semibold">Overall progress</span>
+              <span className="text-sm tabular-nums text-muted-foreground font-medium">
+                {checklistItems.filter((i: any) => i.checked).length}/{checklistItems.length} items · {overallProgress()}%
+              </span>
             </div>
-
-            {tasks.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-border/60 bg-card p-8 text-center text-sm text-muted-foreground">
-                No checklist items yet. Tasks added by the founder will appear here.
-              </div>
-            ) : (
-              <div className="rounded-2xl border border-border/60 bg-card overflow-hidden">
-                <div className="divide-y divide-border/60">
-                  {tasks.map((task: any) => (
-                    <div key={task.id} className="flex items-center gap-3 px-5 py-3">
-                      {task.completed
-                        ? <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
-                        : <Circle className="h-4 w-4 text-muted-foreground shrink-0" />}
-                      <span className={`text-sm ${task.completed ? "text-muted-foreground line-through" : ""}`}>
-                        {task.title}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <Link
-              to="/app/deal-room/$id"
-              params={{ id: selectedRoomId }}
-              className="inline-flex items-center gap-1.5 text-xs text-brand hover:underline"
-            >
-              Open full deal room <ExternalLink className="h-3 w-3" />
-            </Link>
-          </div>
-
-          {/* Right: Document review */}
-          <div className="rounded-2xl border border-border/60 bg-card overflow-hidden self-start">
-            <div className="px-5 py-3 border-b border-border/60 flex items-center justify-between">
-              <div className="text-sm font-semibold">Document review</div>
-              <span className="text-xs text-muted-foreground">{docs.length} file{docs.length !== 1 ? "s" : ""}</span>
+            <div className="h-2.5 rounded-full bg-muted overflow-hidden">
+              <div
+                className="h-full bg-gradient-brand transition-all duration-500"
+                style={{ width: `${overallProgress()}%` }}
+              />
             </div>
-            {docs.length === 0 ? (
-              <div className="p-8 text-sm text-muted-foreground text-center">
-                No documents uploaded yet.
-              </div>
-            ) : (
-              <div className="divide-y divide-border/60">
-                {docs.map((doc: any) => (
-                  <div key={doc.id} className="flex items-center gap-3 px-5 py-3">
-                    <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm truncate">{doc.name}</div>
-                      {doc.category && (
-                        <div className="text-xs text-muted-foreground">{doc.category}</div>
-                      )}
-                    </div>
-                    <div className="text-[10px] text-muted-foreground shrink-0">
-                      {doc.created_at
-                        ? formatDistanceToNow(new Date(doc.created_at), { addSuffix: true })
-                        : "—"}
-                    </div>
+            {/* Category status pills */}
+            <div className="mt-4 flex flex-wrap gap-2">
+              {CATEGORIES.map((cat) => {
+                const catData = getCatData(cat);
+                const cfg = STATUS_CONFIG[catData.status as DDStatus] ?? STATUS_CONFIG.Pending;
+                return (
+                  <div key={cat} className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium", cfg.cls)}>
+                    <span className={cn("h-1.5 w-1.5 rounded-full", cfg.dot)} />
+                    {CAT_ICON[cat]} {cat}
                   </div>
-                ))}
-              </div>
-            )}
+                );
+              })}
+            </div>
           </div>
-        </div>
+
+          {/* Category accordion */}
+          <div className="mt-4 space-y-3">
+            {CATEGORIES.map((cat) => {
+              const catData = getCatData(cat);
+              const items = getCatItems(cat);
+              const progress = getProgress(cat);
+              const isExpanded = expandedCat === cat;
+              const status = (catData.status as DDStatus) ?? "Pending";
+              const cfg = STATUS_CONFIG[status];
+              const StatusIcon = cfg.icon;
+              const isEditingNote = editingNotes === cat;
+
+              return (
+                <div
+                  key={cat}
+                  className="rounded-2xl border border-border/60 bg-card overflow-hidden"
+                >
+                  {/* Category header */}
+                  <button
+                    onClick={() => setExpandedCat(isExpanded ? null : cat)}
+                    className="w-full flex items-center gap-4 px-5 py-4 hover:bg-accent/40 transition-colors text-left"
+                  >
+                    <span className="text-xl">{CAT_ICON[cat]}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-sm">{cat}</span>
+                        <span className={cn("inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium", cfg.cls)}>
+                          <StatusIcon className="h-3 w-3" />
+                          {cfg.label}
+                        </span>
+                      </div>
+                      <div className="mt-1.5 flex items-center gap-3">
+                        <div className="flex-1 max-w-[200px] h-1.5 rounded-full bg-muted overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-brand transition-all"
+                            style={{ width: `${progress}%` }}
+                          />
+                        </div>
+                        <span className="text-[11px] text-muted-foreground tabular-nums">
+                          {items.filter((i: any) => i.checked).length}/{items.length}
+                        </span>
+                      </div>
+                    </div>
+                    {isExpanded
+                      ? <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
+                      : <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />}
+                  </button>
+
+                  {/* Expanded content */}
+                  {isExpanded && (
+                    <div className="border-t border-border/60">
+                      <div className="grid lg:grid-cols-[1fr_280px] divide-y lg:divide-y-0 lg:divide-x divide-border/60">
+
+                        {/* Left: checklist */}
+                        <div className="p-5 space-y-2">
+                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                            Checklist
+                          </div>
+                          {items.length === 0 ? (
+                            <p className="text-sm text-muted-foreground">No items yet.</p>
+                          ) : (
+                            items.map((item: any) => (
+                              <button
+                                key={item.id}
+                                onClick={() => checkMut.mutate({ itemId: item.id, checked: !item.checked })}
+                                className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-accent/50 transition-colors text-left group"
+                              >
+                                {item.checked
+                                  ? <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
+                                  : <Circle className="h-4 w-4 text-muted-foreground shrink-0 group-hover:text-foreground transition-colors" />}
+                                <span className={cn(
+                                  "text-sm flex-1",
+                                  item.checked ? "line-through text-muted-foreground" : "",
+                                )}>
+                                  {item.label}
+                                </span>
+                              </button>
+                            ))
+                          )}
+                        </div>
+
+                        {/* Right: status + notes */}
+                        <div className="p-5 space-y-5">
+                          {/* Status selector */}
+                          <div>
+                            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                              Status
+                            </div>
+                            <div className="grid grid-cols-2 gap-1.5">
+                              {STATUSES.map((s) => {
+                                const scfg = STATUS_CONFIG[s];
+                                const SIcon = scfg.icon;
+                                const isActive = status === s;
+                                return (
+                                  <button
+                                    key={s}
+                                    onClick={() => statusMut.mutate({ category: cat, status: s })}
+                                    disabled={statusMut.isPending}
+                                    className={cn(
+                                      "flex items-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-medium transition-all",
+                                      isActive
+                                        ? cn(scfg.cls, "border-current")
+                                        : "border-border/60 text-muted-foreground hover:bg-accent",
+                                    )}
+                                  >
+                                    <SIcon className="h-3.5 w-3.5 shrink-0" />
+                                    {s}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          {/* Notes */}
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                Investor Notes
+                              </div>
+                              {!isEditingNote && (
+                                <button
+                                  onClick={() => {
+                                    setEditingNotes(cat);
+                                    setNoteDraft(catData.investor_notes ?? "");
+                                  }}
+                                  className="inline-flex items-center gap-1 text-[10px] text-brand hover:underline"
+                                >
+                                  <StickyNote className="h-3 w-3" />
+                                  {catData.investor_notes ? "Edit" : "Add note"}
+                                </button>
+                              )}
+                            </div>
+
+                            {isEditingNote ? (
+                              <div className="space-y-2">
+                                <textarea
+                                  value={noteDraft}
+                                  onChange={(e) => setNoteDraft(e.target.value)}
+                                  rows={4}
+                                  placeholder="Add your internal notes for this category…"
+                                  className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:border-brand/50"
+                                />
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => setEditingNotes(null)}
+                                    className="flex-1 rounded-md border border-border/60 py-1.5 text-xs hover:bg-accent"
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    onClick={() => handleSaveNotes(cat)}
+                                    disabled={notesMut.isPending}
+                                    className="flex-1 inline-flex items-center justify-center gap-1 rounded-md bg-gradient-brand text-brand-foreground py-1.5 text-xs shadow-glow"
+                                  >
+                                    {notesMut.isPending
+                                      ? <Loader2 className="h-3 w-3 animate-spin" />
+                                      : <Save className="h-3 w-3" />}
+                                    Save
+                                  </button>
+                                </div>
+                              </div>
+                            ) : catData.investor_notes ? (
+                              <div className="rounded-lg bg-muted/40 border border-border/40 px-3 py-2.5 text-sm text-muted-foreground whitespace-pre-wrap">
+                                {catData.investor_notes}
+                              </div>
+                            ) : (
+                              <div className="rounded-lg border border-dashed border-border/60 px-3 py-4 text-center">
+                                <FileText className="h-4 w-4 text-muted-foreground/40 mx-auto mb-1" />
+                                <p className="text-xs text-muted-foreground/60">No notes yet</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );
