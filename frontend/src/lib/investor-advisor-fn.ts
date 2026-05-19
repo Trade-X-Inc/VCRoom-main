@@ -5,7 +5,6 @@ type InvestorAdvisorInput = {
   userId: string;
   message: string;
   history: Array<{ role: string; content: string }>;
-  openAIKey?: string;
 };
 
 type InvestorAdvisorResult = {
@@ -16,10 +15,10 @@ type InvestorAdvisorResult = {
 export const getInvestorAdvice = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): InvestorAdvisorInput => data as InvestorAdvisorInput)
   .handler(async ({ data }: { data: InvestorAdvisorInput }): Promise<InvestorAdvisorResult> => {
-    const openAIKey =
-      data.openAIKey ||
-      process.env.OPENAI_API_KEY ||
-      (globalThis as any).OPENAI_API_KEY || "";
+    const openAIKey = (globalThis as any).OPENAI_API_KEY || '';
+    if (!openAIKey) {
+      throw new Error('OpenAI API key not configured on server');
+    }
 
     const supabaseUrl =
       process.env.SUPABASE_URL ||
@@ -30,13 +29,6 @@ export const getInvestorAdvice = createServerFn({ method: "POST" })
       process.env.SUPABASE_SERVICE_ROLE_KEY ||
       (globalThis as any).SUPABASE_SERVICE_ROLE_KEY ||
       import.meta.env.VITE_SUPABASE_ANON_KEY || "";
-
-    if (!openAIKey) {
-      return {
-        reply: "AI Advisor is not configured yet. Please add your OpenAI API key to get started.",
-        error: "missing_key",
-      };
-    }
 
     let profile: any = null;
     let watchlistCount = 0;

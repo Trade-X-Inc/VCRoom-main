@@ -66,7 +66,6 @@ function AnalysisPage() {
           supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
           supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
           userAccessToken: session.data.session?.access_token ?? "",
-          openAIKey: import.meta.env.VITE_OPENAI_API_KEY,
         },
       });
       setMemoText(result.memo);

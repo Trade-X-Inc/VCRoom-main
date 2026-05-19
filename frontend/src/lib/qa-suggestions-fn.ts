@@ -5,23 +5,15 @@ type SuggestionsInput = {
   startupName: string;
   sector: string;
   previousQuestions: string[];
-  openAIKey?: string;
-  supabaseUrl?: string;
-  supabaseAnonKey?: string;
 };
 
 export const getQASuggestions = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): SuggestionsInput => data as SuggestionsInput)
   .handler(async ({ data }: { data: SuggestionsInput }): Promise<{ suggestions: string[] }> => {
-    const openAIKey =
-      data.openAIKey ||
-      (globalThis as any).VITE_OPENAI_API_KEY ||
-      (globalThis as any).OPENAI_API_KEY ||
-      process.env.VITE_OPENAI_API_KEY ||
-      process.env.OPENAI_API_KEY ||
-      '';
-
-    if (!openAIKey) return { suggestions: [] };
+    const openAIKey = (globalThis as any).OPENAI_API_KEY || '';
+    if (!openAIKey) {
+      throw new Error('OpenAI API key not configured on server');
+    }
 
     const prev =
       data.previousQuestions.length > 0
@@ -66,7 +58,7 @@ Return ONLY a JSON array of 3 strings. No explanation, no markdown, just the arr
         return { suggestions: parsed.slice(0, 3) };
       }
     } catch {
-      // silently fail
+      // silently fail — suggestions are non-critical
     }
     return { suggestions: [] };
   });

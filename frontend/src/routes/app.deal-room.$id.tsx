@@ -1111,7 +1111,6 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
           documentPath: doc.storage_path,
           documentName: doc.name || doc.storage_path?.split("/").pop() || "Document",
           dealRoomId,
-          openAIKey: import.meta.env.VITE_OPENAI_API_KEY,
           supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
           supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
           userAccessToken: session?.access_token ?? "",
@@ -2429,9 +2428,6 @@ function QA({
             startupName: companyName || "the startup",
             sector: sector || "tech",
             previousQuestions: msgs.filter((m) => m.is_qa).map((m) => m.body).slice(-5),
-            openAIKey: import.meta.env.VITE_OPENAI_API_KEY,
-            supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
-            supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
           },
         });
         if (result.suggestions.length > 0) {

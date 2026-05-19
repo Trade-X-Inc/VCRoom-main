@@ -4,7 +4,6 @@ import { createClient } from "@supabase/supabase-js";
 type MemoInput = {
   dealRoomId: string;
   userId: string;
-  openAIKey?: string;
   supabaseUrl?: string;
   supabaseAnonKey?: string;
   userAccessToken?: string;
@@ -13,7 +12,11 @@ type MemoInput = {
 export const generateInvestorMemo = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): MemoInput => data as MemoInput)
   .handler(async ({ data }: { data: MemoInput }): Promise<{ memo: string }> => {
-    console.log('Memo fn called');
+    const openAIKey = (globalThis as any).OPENAI_API_KEY || '';
+    if (!openAIKey) {
+      throw new Error('OpenAI API key not configured on server');
+    }
+
     const supabaseUrl =
       data.supabaseUrl ||
       process.env.VITE_SUPABASE_URL ||
@@ -28,20 +31,9 @@ export const generateInvestorMemo = createServerFn({ method: "POST" })
       process.env.SUPABASE_ANON_KEY ||
       (globalThis as any).SUPABASE_ANON_KEY ||
       "";
-    const openAIKey =
-      data.openAIKey ||
-      (globalThis as any).VITE_OPENAI_API_KEY ||
-      (globalThis as any).OPENAI_API_KEY ||
-      process.env.VITE_OPENAI_API_KEY ||
-      process.env.OPENAI_API_KEY ||
-      '';
 
-    console.log('OpenAI key present:', !!openAIKey);
-
-    if (!supabaseUrl || !supabaseKey || !openAIKey) {
-      return {
-        memo: `## Investment Memo\n\n*AI analysis requires OpenAI and Supabase configuration.*`,
-      };
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Supabase configuration missing on server');
     }
 
     const client = createClient(supabaseUrl, supabaseKey, {
@@ -62,8 +54,6 @@ export const generateInvestorMemo = createServerFn({ method: "POST" })
           .eq("id", room.startup_id)
           .maybeSingle()
       : { data: null };
-
-    console.log('Startup data:', { name: startup?.company_name, sector: startup?.sector, stage: startup?.stage });
 
     // 2. Fetch documents list
     const { data: docs } = await client
@@ -166,7 +156,10 @@ Verdict: [STRONG BUY / BUY / HOLD / PASS]
       }),
     });
 
-    if (!resp.ok) throw new Error("OpenAI request failed");
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({})) as any;
+      throw new Error(`OpenAI error ${resp.status}: ${err?.error?.message ?? 'unknown'}`);
+    }
     const json = (await resp.json()) as { choices: Array<{ message: { content: string } }> };
     return { memo: json.choices[0]?.message?.content ?? "" };
   });

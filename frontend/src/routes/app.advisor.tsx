@@ -126,10 +126,9 @@ function Advisor() {
     setThinking(true);
 
     try {
-      const openAIKey = import.meta.env.VITE_OPENAI_API_KEY || "";
       const history = msgs.slice(1).map((m) => ({ role: m.role as string, content: m.content }));
       const result = await getAIAdvice({
-        data: { userId: user.id, message: t, history, openAIKey, startupContext: startupCtx ?? undefined },
+        data: { userId: user.id, message: t, history, startupContext: startupCtx ?? undefined },
       });
 
       setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: result.reply }]);

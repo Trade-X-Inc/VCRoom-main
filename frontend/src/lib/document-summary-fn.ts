@@ -5,7 +5,6 @@ type SummaryInput = {
   documentPath: string;
   documentName: string;
   dealRoomId: string;
-  openAIKey?: string;
   supabaseUrl?: string;
   supabaseAnonKey?: string;
   userAccessToken?: string;
@@ -36,14 +35,7 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
       process.env.VITE_SUPABASE_ANON_KEY ||
       (globalThis as any).VITE_SUPABASE_ANON_KEY ||
       "";
-    const openAIKey =
-      (globalThis as any).OPENAI_API_KEY ||
-      (globalThis as any)['OPENAI_API_KEY'] ||
-      (globalThis as any).VITE_OPENAI_API_KEY ||
-      data.openAIKey ||
-      process.env.OPENAI_API_KEY ||
-      process.env.VITE_OPENAI_API_KEY ||
-      '';
+    const openAIKey = (globalThis as any).OPENAI_API_KEY || '';
 
     console.log('OpenAI key present:', !!openAIKey);
     console.log('OpenAI key length:', openAIKey?.length);

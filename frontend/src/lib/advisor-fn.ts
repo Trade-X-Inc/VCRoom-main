@@ -15,7 +15,6 @@ type AdvisorInput = {
   userId: string;
   message: string;
   history: Array<{ role: string; content: string }>;
-  openAIKey?: string;
   startupContext?: StartupContext;
 };
 
@@ -27,19 +26,9 @@ type AdvisorResult = {
 export const getAIAdvice = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): AdvisorInput => data as AdvisorInput)
   .handler(async ({ data }: { data: AdvisorInput }): Promise<AdvisorResult> => {
-    const openAIKey =
-      data.openAIKey ||
-      (globalThis as any).VITE_OPENAI_API_KEY ||
-      (globalThis as any).OPENAI_API_KEY ||
-      process.env.VITE_OPENAI_API_KEY ||
-      process.env.OPENAI_API_KEY ||
-      '';
-
+    const openAIKey = (globalThis as any).OPENAI_API_KEY || '';
     if (!openAIKey) {
-      return {
-        reply: "AI Advisor is not configured yet. Please add your OpenAI API key to get started.",
-        error: "missing_key",
-      };
+      throw new Error('OpenAI API key not configured on server');
     }
 
     let context = "";
@@ -57,7 +46,6 @@ export const getAIAdvice = createServerFn({ method: "POST" })
       ].join("\n");
     }
 
-    // Build personalized identity from client-supplied startup context
     let advisorIdentity = "You are an expert startup fundraising advisor.";
     if (context) {
       const lines = context.split("\n");
