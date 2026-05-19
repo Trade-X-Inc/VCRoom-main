@@ -1,6 +1,6 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 export default defineConfig({
-  cloudflare: true,
+  cloudflare: false,
   vite: {
     envPrefix: ["VITE_", "NEXT_PUBLIC_"],
     server: {
