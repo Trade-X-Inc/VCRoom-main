@@ -74,11 +74,7 @@ Description: ${startup?.description ?? "None provided"}
 Recent activity: ${activitySummary || "None"}`;
 
     // 5. Call OpenAI
-    const apiKey =
-      data.openAIKey ||
-      process.env.OPENAI_API_KEY ||
-      (globalThis as any).OPENAI_API_KEY ||
-      import.meta.env.VITE_OPENAI_API_KEY || "";
+    const apiKey = data.openAIKey || process.env.OPENAI_API_KEY || "";
     if (!apiKey) {
       // Graceful fallback when OpenAI is not configured
       return {
