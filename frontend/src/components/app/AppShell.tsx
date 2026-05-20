@@ -3,7 +3,7 @@ import { Logo } from "@/components/brand/Logo";
 import {
   LayoutGrid, Users, Building2, FileText, Briefcase,
   Calendar, Sparkles, Search, Settings, ChevronsLeft, Plus, Inbox, Gavel,
-  PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, Kanban, BarChart3,
+  PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, Kanban, BarChart3, UserCircle2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -42,6 +42,7 @@ const investorNav: NavItem[] = [
   { to: "/app/investor/decisions", labelKey: "app.decisions", icon: Gavel },
   { to: "/app/investor/portfolio", labelKey: "Portfolio", icon: PieChart },
   { to: "/app/meetings", labelKey: "app.meetings", icon: Calendar },
+  { to: "/app/investor/profile", labelKey: "Profile", icon: UserCircle2 },
 ];
 
 const workspaceNavFounder: NavItem[] = [
@@ -181,7 +182,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                     </div>
                   </>
                 ) : (
-                  <Link to={"/app/profile" as any} className="text-xs font-medium text-brand hover:underline">
+                  <Link to={(isInvestor ? "/app/investor/profile" : "/app/profile") as any} className="text-xs font-medium text-brand hover:underline">
                     Set up your profile →
                   </Link>
                 )}

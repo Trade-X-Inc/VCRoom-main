@@ -1,6 +1,8 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Settings, Globe, Bell, CreditCard, Shield, Building2, User, Users, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -58,26 +60,76 @@ function SettingsLayout() {
 
 function General() {
   const { user } = useAuth();
+  const isInvestor = user?.role === "investor";
+  const [workspaceName, setWorkspaceName] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const { data: startup } = useQuery({
     queryKey: ["startup", user?.id],
-    enabled: !!user?.id,
+    enabled: !!user?.id && !isInvestor,
     queryFn: async () => {
       const { data } = await supabase
         .from("startups")
-        .select("id, name, website, description")
+        .select("id, company_name, website, description")
         .eq("founder_id", user!.id);
       return data?.[0] ?? null;
     },
   });
 
-  const companyName = startup?.name ?? user?.workspace ?? "";
-  const slug = companyName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const { data: investorProfile } = useQuery({
+    queryKey: ["investor-profile-settings", user?.id],
+    enabled: !!user?.id && isInvestor,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("investor_profiles")
+        .select("id, fund_name")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  useEffect(() => {
+    if (isInvestor) {
+      setWorkspaceName(investorProfile?.fund_name ?? user?.fullName ?? "");
+    } else {
+      setWorkspaceName(startup?.company_name ?? user?.workspace ?? "");
+    }
+  }, [startup, investorProfile, isInvestor, user]);
+
+  const slug = workspaceName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+  async function handleSave() {
+    if (!user?.id || !workspaceName.trim()) return;
+    setSaving(true);
+    try {
+      if (isInvestor) {
+        await supabase.from("investor_profiles").update({ fund_name: workspaceName.trim() }).eq("user_id", user.id);
+      } else {
+        await supabase.from("startups").update({ company_name: workspaceName.trim() }).eq("founder_id", user.id);
+      }
+      toast.success("Settings saved");
+    } catch {
+      toast.error("Failed to save settings");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <div className="space-y-5">
       <Card title="Workspace">
-        <Field label="Workspace name" value={companyName} placeholder="Your company name" />
+        <div>
+          <label className="text-xs text-muted-foreground">Workspace name</label>
+          <div className="mt-1 flex items-center rounded-md border border-border/60 bg-background overflow-hidden">
+            <input
+              value={workspaceName}
+              onChange={(e) => setWorkspaceName(e.target.value)}
+              placeholder="Your company name"
+              className="flex-1 px-3 py-2 text-sm bg-transparent focus:outline-none"
+            />
+          </div>
+        </div>
         <Field label="Public URL slug" value={slug} prefix="ventureroom.app/" placeholder="your-company" />
         <Sel label="Default language" options={["English", "Español", "Français", "Deutsch", "العربية"]} />
         <Sel label="Time zone" options={["UTC", "America/Los_Angeles", "America/New_York", "Europe/London", "Asia/Dubai"]} />
@@ -119,7 +171,7 @@ function General() {
         </div>
       </Card>
 
-      <SaveBar />
+      <SaveBar onSave={handleSave} saving={saving} />
     </div>
   );
 }
@@ -174,11 +226,17 @@ export function Sel({ label, options }: { label: string; options: string[] }) {
   );
 }
 
-export function SaveBar() {
+export function SaveBar({ onSave, saving }: { onSave?: () => void; saving?: boolean }) {
   return (
     <div className="flex justify-end gap-2">
       <button className="rounded-md border border-border/60 px-4 py-2 text-sm hover:bg-accent">Reset</button>
-      <button className="rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow">Save changes</button>
+      <button
+        onClick={onSave}
+        disabled={saving}
+        className="rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-50"
+      >
+        {saving ? "Saving…" : "Save changes"}
+      </button>
     </div>
   );
 }
