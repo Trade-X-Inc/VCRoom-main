@@ -8,7 +8,6 @@ import { formatDistanceToNow } from "date-fns";
 import { AttentionStrip, type AttentionItem } from "@/components/app/AttentionStrip";
 import { AIBriefPanel, type AIBriefData } from "@/components/app/AIBriefPanel";
 import { generateDealBrief } from "@/lib/deal-brief-fn";
-import { checkEnv } from "./api.env-check";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/investor/")({
@@ -388,17 +387,6 @@ function InvestorDashboard() {
           if (selectedRoomId) window.location.href = `/app/deal-room/${selectedRoomId}`;
         }}
       />
-
-      {/* TEMP DEBUG — remove after env check */}
-      <button
-        onClick={async () => {
-          const r = await checkEnv();
-          alert(JSON.stringify(r, null, 2));
-        }}
-        style={{ position: "fixed", bottom: 20, right: 20, zIndex: 9999, background: "red", color: "white", padding: "8px 16px", borderRadius: 8 }}
-      >
-        ENV CHECK
-      </button>
     </div>
   );
 }
