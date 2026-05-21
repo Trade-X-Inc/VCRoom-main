@@ -1,22 +1,28 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
-import { getEnvVar } from "@/lib/env";
 
-function getAdminClient() {
-  const url = getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
-  const key = getEnvVar("SUPABASE_SERVICE_ROLE_KEY") || getEnvVar("VITE_SUPABASE_SERVICE_ROLE_KEY");
-  if (!url || !key) throw new Error(`Missing Supabase config. URL: ${!!url}, KEY: ${!!key}`);
-  return createClient(url, key, { auth: { persistSession: false } });
+function getAdminClient(url?: string, key?: string) {
+  const resolvedUrl = url ||
+    (import.meta.env as any).VITE_SUPABASE_URL ||
+    process.env.SUPABASE_URL || "";
+  const resolvedKey = key ||
+    (import.meta.env as any).VITE_SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+  if (!resolvedUrl || !resolvedKey)
+    throw new Error(`Missing Supabase config URL:${!!resolvedUrl} KEY:${!!resolvedKey}`);
+  return createClient(resolvedUrl, resolvedKey, { auth: { persistSession: false } });
 }
 
 // ─── getDDData ────────────────────────────────────────────────────────────────
 export const getDDData = createServerFn({ method: "POST" })
   .inputValidator(
-    (data: unknown): { dealRoomId: string; userId: string; userAccessToken: string } =>
-      data as any,
+    (data: unknown): {
+      dealRoomId: string; userId: string; userAccessToken: string;
+      supabaseUrl?: string; supabaseKey?: string;
+    } => data as any,
   )
   .handler(async ({ data }) => {
-    const sb = getAdminClient();
+    const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
 
     // Verify user is a member
     const { data: member } = await sb
@@ -58,15 +64,12 @@ export const getDDData = createServerFn({ method: "POST" })
 export const updateDDStatus = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
-      dealRoomId: string;
-      userId: string;
-      category: string;
-      status: string;
-      userAccessToken: string;
+      dealRoomId: string; userId: string; category: string; status: string;
+      userAccessToken: string; supabaseUrl?: string; supabaseKey?: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
-    const sb = getAdminClient();
+    const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
     const { data: member } = await sb
       .from("deal_room_members")
       .select("user_id")
@@ -88,15 +91,12 @@ export const updateDDStatus = createServerFn({ method: "POST" })
 export const updateDDNotes = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
-      dealRoomId: string;
-      userId: string;
-      category: string;
-      notes: string;
-      userAccessToken: string;
+      dealRoomId: string; userId: string; category: string; notes: string;
+      userAccessToken: string; supabaseUrl?: string; supabaseKey?: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
-    const sb = getAdminClient();
+    const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
     const { data: member } = await sb
       .from("deal_room_members")
       .select("user_id")
@@ -118,15 +118,12 @@ export const updateDDNotes = createServerFn({ method: "POST" })
 export const toggleChecklistItem = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
-      itemId: string;
-      userId: string;
-      dealRoomId: string;
-      checked: boolean;
-      userAccessToken: string;
+      itemId: string; userId: string; dealRoomId: string; checked: boolean;
+      userAccessToken: string; supabaseUrl?: string; supabaseKey?: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
-    const sb = getAdminClient();
+    const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
     const { data: member } = await sb
       .from("deal_room_members")
       .select("user_id")

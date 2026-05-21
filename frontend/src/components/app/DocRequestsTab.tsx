@@ -58,6 +58,8 @@ const STATUS_CONFIG = {
 export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, founderUserId }: Props) {
   const session = useAuthStore((s) => s.session);
   const token = session?.access_token ?? "";
+  const supabaseKey = (import.meta.env as any).VITE_SUPABASE_SERVICE_ROLE_KEY || "";
+  const supabaseUrl = (import.meta.env as any).VITE_SUPABASE_URL || "";
   const qc = useQueryClient();
 
   const [showForm, setShowForm] = useState(false);
@@ -70,7 +72,7 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
   const { data, isLoading } = useQuery({
     queryKey: ["doc-requests", dealRoomId],
     enabled: !!dealRoomId && !!token,
-    queryFn: () => getDocRequests({ data: { dealRoomId, userId: userId ?? "", userAccessToken: token } }),
+    queryFn: () => getDocRequests({ data: { dealRoomId, userId: userId ?? "", userAccessToken: token, supabaseUrl, supabaseKey } }),
     refetchInterval: 30_000, // poll every 30s
   });
 
@@ -101,6 +103,8 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
           title: title.trim(),
           description: description.trim() || undefined,
           userAccessToken: token,
+          supabaseUrl,
+          supabaseKey,
         },
       }),
     onSuccess: (res) => {
@@ -126,6 +130,8 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
           dealRoomId,
           userId: userId ?? "",
           userAccessToken: token,
+          supabaseUrl,
+          supabaseKey,
         },
       }),
     onSuccess: (res) => {

@@ -40,6 +40,9 @@ function DiligencePage() {
   const userId = user?.id ?? "";
   const qc = useQueryClient();
 
+  const supabaseKey = (import.meta.env as any).VITE_SUPABASE_SERVICE_ROLE_KEY || "";
+  const supabaseUrl = (import.meta.env as any).VITE_SUPABASE_URL || "";
+
   const [selectedRoomId, setSelectedRoomId] = useState("");
   const [expandedCat, setExpandedCat] = useState<DDCategory | null>("Financials");
   const [editingNotes, setEditingNotes] = useState<DDCategory | null>(null);
@@ -64,7 +67,7 @@ function DiligencePage() {
     queryKey: ["dd-data", selectedRoomId, userId],
     enabled: !!selectedRoomId && !!token && !!userId,
     queryFn: () =>
-      getDDData({ data: { dealRoomId: selectedRoomId, userId, userAccessToken: token } }),
+      getDDData({ data: { dealRoomId: selectedRoomId, userId, userAccessToken: token, supabaseUrl, supabaseKey } }),
   });
 
   const categories = ddData?.categories ?? [];
@@ -86,14 +89,14 @@ function DiligencePage() {
 
   const statusMut = useMutation({
     mutationFn: (vars: { category: string; status: string }) =>
-      updateDDStatus({ data: { dealRoomId: selectedRoomId, userId, userAccessToken: token, ...vars } }),
+      updateDDStatus({ data: { dealRoomId: selectedRoomId, userId, userAccessToken: token, supabaseUrl, supabaseKey, ...vars } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["dd-data", selectedRoomId, userId] }),
     onError: () => toast.error("Failed to update status"),
   });
 
   const notesMut = useMutation({
     mutationFn: (vars: { category: string; notes: string }) =>
-      updateDDNotes({ data: { dealRoomId: selectedRoomId, userId, userAccessToken: token, ...vars } }),
+      updateDDNotes({ data: { dealRoomId: selectedRoomId, userId, userAccessToken: token, supabaseUrl, supabaseKey, ...vars } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["dd-data", selectedRoomId, userId] });
       setEditingNotes(null);
@@ -104,7 +107,7 @@ function DiligencePage() {
 
   const checkMut = useMutation({
     mutationFn: (vars: { itemId: string; checked: boolean }) =>
-      toggleChecklistItem({ data: { dealRoomId: selectedRoomId, userId, userAccessToken: token, ...vars } }),
+      toggleChecklistItem({ data: { dealRoomId: selectedRoomId, userId, userAccessToken: token, supabaseUrl, supabaseKey, ...vars } }),
     onMutate: async (vars) => {
       await qc.cancelQueries({ queryKey: ["dd-data", selectedRoomId, userId] });
       const prev = qc.getQueryData(["dd-data", selectedRoomId, userId]);
