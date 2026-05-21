@@ -78,6 +78,23 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
 
   const requests: DocRequest[] = (data?.requests ?? []) as DocRequest[];
 
+  // ── fallback: resolve founder user_id from deal_room_members if prop missing
+  const { data: founderMember } = useQuery({
+    queryKey: ["deal-room-founder", dealRoomId],
+    enabled: !!dealRoomId && !founderUserId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("deal_room_members")
+        .select("user_id, role")
+        .eq("deal_room_id", dealRoomId)
+        .eq("role", "founder")
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  const resolvedFounderId = founderUserId || founderMember?.user_id || "";
+
   // ── fetch founder's uploaded docs (for founder to link when fulfilling)
   const { data: founderDocs = [] } = useQuery({
     queryKey: ["deal-room-docs", dealRoomId],
@@ -99,7 +116,7 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
         data: {
           dealRoomId,
           requestedBy: userId!,
-          forUserId: founderUserId ?? "",
+          forUserId: resolvedFounderId,
           title: title.trim(),
           description: description.trim() || undefined,
           userAccessToken: token,
@@ -210,7 +227,7 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
             </button>
             <button
               onClick={() => createMut.mutate()}
-              disabled={!title.trim() || createMut.isPending || !founderUserId}
+              disabled={!title.trim() || createMut.isPending || !resolvedFounderId}
               className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-1.5 text-sm shadow-glow disabled:opacity-50"
             >
               {createMut.isPending
@@ -219,7 +236,7 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
               Send request
             </button>
           </div>
-          {!founderUserId && (
+          {!resolvedFounderId && (
             <p className="text-xs text-warning flex items-center gap-1">
               <AlertCircle className="h-3 w-3" />
               Founder user ID not found — request cannot be sent yet.

@@ -284,7 +284,11 @@ function DealRoom() {
             isInvestor={isInvestor}
             isFounder={isFounder}
             userId={user?.id}
-            founderUserId={(room as any)?.startups?.founder_id ?? undefined}
+            founderUserId={
+              Array.isArray((room as any)?.startups)
+                ? (room as any)?.startups?.[0]?.founder_id
+                : (room as any)?.startups?.founder_id ?? undefined
+            }
           />
         )}
         {tab === "decision" && isInvestor && (
