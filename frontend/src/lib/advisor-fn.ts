@@ -16,6 +16,7 @@ type AdvisorInput = {
   message: string;
   history: Array<{ role: string; content: string }>;
   startupContext?: StartupContext;
+  openAIKey?: string;
 };
 
 type AdvisorResult = {
@@ -27,9 +28,8 @@ export const getAIAdvice = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): AdvisorInput => data as AdvisorInput)
   .handler(async ({ data }: { data: AdvisorInput }): Promise<AdvisorResult> => {
     const openAIKey =
-      (globalThis as any).OPENAI_API_KEY ||
-      (globalThis as any).VITE_OPENAI_API_KEY ||
-      (globalThis as any).env?.OPENAI_API_KEY ||
+      data.openAIKey ||
+      (import.meta.env as any).VITE_OPENAI_API_KEY ||
       process.env.OPENAI_API_KEY ||
       '';
     if (!openAIKey) {

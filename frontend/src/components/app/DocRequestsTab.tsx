@@ -6,6 +6,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/lib/auth-store";
 import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 import { getDocRequests, createDocRequest, fulfillDocRequest } from "@/lib/doc-request-fn";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -30,7 +31,9 @@ interface Props {
   isInvestor: boolean;
   isFounder: boolean;
   userId: string | undefined;
-  founderUserId?: string; // needed for investor to target the right founder
+  founderUserId?: string;
+  supabaseUrl?: string;
+  supabaseKey?: string;
 }
 
 // ─── status config ────────────────────────────────────────────────────────────
@@ -78,12 +81,17 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
 
   const requests: DocRequest[] = (data?.requests ?? []) as DocRequest[];
 
-  // ── fallback: resolve founder user_id from deal_room_members if prop missing
+  // ── fallback: resolve founder user_id via service role (bypasses RLS)
   const { data: founderMember } = useQuery({
     queryKey: ["deal-room-founder", dealRoomId],
-    enabled: !!dealRoomId && !founderUserId,
+    enabled: !!dealRoomId && !founderUserId && !!supabaseKey,
     queryFn: async () => {
-      const { data } = await supabase
+      const adminSb = createClient(
+        supabaseUrl || (import.meta.env as any).VITE_SUPABASE_URL || "",
+        supabaseKey || (import.meta.env as any).VITE_SUPABASE_SERVICE_ROLE_KEY || "",
+        { auth: { persistSession: false } },
+      );
+      const { data } = await adminSb
         .from("deal_room_members")
         .select("user_id, role")
         .eq("deal_room_id", dealRoomId)
