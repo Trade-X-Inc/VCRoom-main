@@ -213,6 +213,13 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
         </div>
       </div>
 
+      {isFounder && (
+        <div className="mb-4 rounded-lg bg-muted/40 border border-border/40 px-4 py-2.5 text-xs text-muted-foreground flex items-center gap-2">
+          <Eye className="h-3.5 w-3.5 shrink-0" />
+          This is your investor's due diligence checklist. Items marked complete mean the investor has reviewed them.
+        </div>
+      )}
+
       {/* Overall progress bar */}
       <div className="mb-6 h-2 rounded-full bg-muted overflow-hidden">
         <div
@@ -279,12 +286,14 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                     <div className="p-5">
                       <div className="flex items-center justify-between mb-3">
                         <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Checklist</div>
-                        <button
-                          onClick={() => { setAddingItem(cat); setNewItemLabel(""); }}
-                          className="inline-flex items-center gap-1 text-[10px] text-brand hover:underline"
-                        >
-                          <Plus className="h-3 w-3" /> Add item
-                        </button>
+                        {!isFounder && (
+                          <button
+                            onClick={() => { setAddingItem(cat); setNewItemLabel(""); }}
+                            className="inline-flex items-center gap-1 text-[10px] text-brand hover:underline"
+                          >
+                            <Plus className="h-3 w-3" /> Add item
+                          </button>
+                        )}
                       </div>
 
                       {addingItem === cat && (
@@ -315,8 +324,8 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                           {items.map((item: any) => (
                             <button
                               key={item.id}
-                              onClick={() => toggleItem(item.id, !item.checked)}
-                              className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-accent/50 transition-colors text-left group"
+                              onClick={isFounder ? undefined : () => toggleItem(item.id, !item.checked)}
+                              className={cn("w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-left group transition-colors", isFounder ? "cursor-default" : "hover:bg-accent/50")}
                             >
                               {item.checked
                                 ? <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
@@ -334,30 +343,36 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                     <div className="p-5 space-y-5">
                       <div>
                         <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Status</div>
-                        <div className="grid grid-cols-2 gap-1.5">
-                          {STATUSES.map((s) => {
-                            const scfg = STATUS_CONFIG[s];
-                            const SIcon = scfg.icon;
-                            return (
-                              <button
-                                key={s}
-                                onClick={() => updateStatus(cat, s)}
-                                className={cn(
-                                  "flex items-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-medium transition-all",
-                                  status === s ? cn(scfg.cls, "border-current") : "border-border/60 text-muted-foreground hover:bg-accent",
-                                )}
-                              >
-                                <SIcon className="h-3.5 w-3.5 shrink-0" />{s}
-                              </button>
-                            );
-                          })}
-                        </div>
+                        {isFounder ? (
+                          <span className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium", cfg.cls)}>
+                            <StatusIcon className="h-3.5 w-3.5" />{cfg.label}
+                          </span>
+                        ) : (
+                          <div className="grid grid-cols-2 gap-1.5">
+                            {STATUSES.map((s) => {
+                              const scfg = STATUS_CONFIG[s];
+                              const SIcon = scfg.icon;
+                              return (
+                                <button
+                                  key={s}
+                                  onClick={() => updateStatus(cat, s)}
+                                  className={cn(
+                                    "flex items-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-medium transition-all",
+                                    status === s ? cn(scfg.cls, "border-current") : "border-border/60 text-muted-foreground hover:bg-accent",
+                                  )}
+                                >
+                                  <SIcon className="h-3.5 w-3.5 shrink-0" />{s}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
 
                       <div>
                         <div className="flex items-center justify-between mb-2">
                           <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Notes</div>
-                          {!isEditingNote && (
+                          {!isEditingNote && !isFounder && (
                             <button
                               onClick={() => { setEditingNotes(cat); setNoteDraft(catData.investor_notes ?? ""); }}
                               className="inline-flex items-center gap-1 text-[10px] text-brand hover:underline"

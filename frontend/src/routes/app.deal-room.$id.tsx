@@ -9,6 +9,7 @@ import {
   HelpCircle, Building2, TrendingUp, Users, DollarSign, Target, Shield,
   Send, AlertCircle, Eye, UserPlus, Loader2, ExternalLink, ChevronDown,
   Check, ClipboardList, Copy, Trash2, Pencil, Image, Film,
+  ChevronUp, Lightbulb,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AIChat } from "@/components/ai/AIChat";
@@ -378,6 +379,7 @@ function DealRoomOverview({
   const [taskDueDate, setTaskDueDate] = useState("");
   const [savingTask, setSavingTask] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const { data: recentActivity = [] } = useQuery({
     queryKey: ["activities-overview", dealRoomId],
@@ -586,8 +588,56 @@ function DealRoomOverview({
   const profileLink = isInvestor ? "/app/investor/startups" : "/app/profile";
   const decisionMeta = DECISION_BADGES[decisionLabel];
 
+  const founderSteps = [
+    { title: "Complete your profile", body: "Fill in your startup's profile — stage, sector, funding target, revenue, and team size. Investors read this first." },
+    { title: "Upload your pitch deck", body: "Go to the Documents tab and upload your deck. The AI will auto-summarise it for investors." },
+    { title: "Answer investor questions", body: "Check the Q&A tab — investors may post questions. Prompt, thorough answers build trust." },
+    { title: "Track due diligence", body: "Open the Checklist tab to see which documents the investor needs. Upload them and mark each as fulfilled." },
+    { title: "Watch for the decision", body: "The investor will post their decision (Pass / Term Sheet / Investing) in the Decisions tab. You'll be notified." },
+  ];
+  const investorSteps = [
+    { title: "Review the pitch", body: "Start with the Overview tab — company card, funding target, and key metrics at a glance." },
+    { title: "Dig into documents", body: "Open the Documents tab to read the deck, financials, and any uploaded files. Use the AI Summary button for a quick brief." },
+    { title: "Run due diligence", body: "The Checklist tab has 6 DD categories pre-loaded. Check off items as you review them, set statuses, and add private notes." },
+    { title: "Request missing docs", body: "In the Documents tab use 'Documents needed' to tell the founder what you still require. They can mark items as uploaded." },
+    { title: "Post your decision", body: "When you're ready, go to the Decisions tab and post a formal decision — Pass, Term Sheet, or Investing." },
+  ];
+  const tutorialSteps = isFounder ? founderSteps : investorSteps;
+
   return (
     <div className="p-8 max-w-6xl mx-auto">
+      {/* How it works tutorial */}
+      <div className="mb-5 rounded-xl border border-brand/20 bg-brand/5 overflow-hidden">
+        <button
+          onClick={() => setShowTutorial((v) => !v)}
+          className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-brand/10 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <Lightbulb className="h-4 w-4 text-brand shrink-0" />
+            <span className="text-sm font-semibold">How it works</span>
+            <span className="text-[10px] text-muted-foreground">{isFounder ? "Founder guide" : "Investor guide"}</span>
+          </div>
+          {showTutorial
+            ? <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
+            : <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />}
+        </button>
+        {showTutorial && (
+          <div className="px-4 pb-4 pt-1 border-t border-brand/10">
+            <ol className="space-y-3 mt-2">
+              {tutorialSteps.map(({ title, body }, i) => (
+                <li key={title} className="flex gap-3">
+                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/15 text-[10px] font-bold text-brand">{i + 1}</span>
+                  <div>
+                    <div className="text-xs font-semibold">{title}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">{body}</div>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+      </div>
+
       <div className="flex items-start justify-between gap-6 mb-6">
         <div>
           <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">

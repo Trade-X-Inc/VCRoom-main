@@ -108,14 +108,38 @@ function DiligencePage() {
           <Loader2 className="h-4 w-4 animate-spin" /> Loading portfolio…
         </div>
       ) : rooms.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border/60 bg-card p-16 text-center">
-          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground mb-4">
-            <ClipboardCheck className="h-6 w-6" />
+        <div className="space-y-4">
+          <div className="rounded-2xl border border-dashed border-border/60 bg-card p-16 text-center">
+            <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground mb-4">
+              <ClipboardCheck className="h-6 w-6" />
+            </div>
+            <h3 className="text-base font-semibold">No active deals yet</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Join deal rooms to start tracking due diligence.
+            </p>
           </div>
-          <h3 className="text-base font-semibold">No active deals yet</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Join deal rooms to start tracking due diligence.
-          </p>
+          <div className="rounded-2xl border border-brand/20 bg-brand/5 p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <ClipboardCheck className="h-4 w-4 text-brand shrink-0" />
+              <span className="text-sm font-semibold">How it works</span>
+            </div>
+            <ol className="space-y-3">
+              {[
+                { n: "1", title: "Get invited to a deal room", body: "Founders share a deal room link with you. Once you accept, the company appears in this portfolio view." },
+                { n: "2", title: "Review the DD checklist", body: "Inside each deal room, open the Checklist tab. You'll find 6 categories (Financials, Team, Legal, Market, Product, References) pre-loaded with standard items." },
+                { n: "3", title: "Track progress & add notes", body: "Check off items as you review them, set category statuses (Pending → In Review → Complete), and add private investor notes per category." },
+                { n: "4", title: "Monitor your portfolio here", body: "This page gives you a live snapshot of DD progress across all your active deals — color-coded by status so you can spot red flags at a glance." },
+              ].map(({ n, title, body }) => (
+                <li key={n} className="flex gap-3">
+                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/15 text-[10px] font-bold text-brand">{n}</span>
+                  <div>
+                    <div className="text-xs font-semibold">{title}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">{body}</div>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       ) : (
         <>

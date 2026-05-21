@@ -154,14 +154,38 @@ function AnalysisPage() {
       </div>
 
       {!selectedRoomId ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center">
-          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
-            <Brain className="h-6 w-6" />
+        <div className="mt-8 space-y-4">
+          <div className="rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center">
+            <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
+              <Brain className="h-6 w-6" />
+            </div>
+            <h3 className="mt-4 text-lg font-semibold">Select a company to generate AI analysis</h3>
+            <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
+              Analysis is generated from data inside the deal room — pitch deck, documents, and company profile.
+            </p>
           </div>
-          <h3 className="mt-4 text-lg font-semibold">Select a company to generate AI analysis</h3>
-          <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
-            Analysis is generated from data inside the deal room — pitch deck, documents, and company profile.
-          </p>
+          <div className="rounded-2xl border border-brand/20 bg-brand/5 p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Lightbulb className="h-4 w-4 text-brand shrink-0" />
+              <span className="text-sm font-semibold">How it works</span>
+            </div>
+            <ol className="space-y-3">
+              {[
+                { n: "1", title: "Join a deal room", body: "You must be a member of a deal room for a company to appear in the dropdown above." },
+                { n: "2", title: "AI reads the deal room", body: "The analysis engine scans the pitch deck, uploaded documents, company profile, and any summaries in the deal room." },
+                { n: "3", title: "Thesis match score", body: "You receive a 0–100 match score against your investment thesis, plus a narrative breakdown of strengths, risks, and opportunities." },
+                { n: "4", title: "Generate investor memo", body: "Once analysis is complete you can one-click generate a full investment memo — ready to share with your partners." },
+              ].map(({ n, title, body }) => (
+                <li key={n} className="flex gap-3">
+                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/15 text-[10px] font-bold text-brand">{n}</span>
+                  <div>
+                    <div className="text-xs font-semibold">{title}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">{body}</div>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       ) : briefLoading ? (
         <div className="mt-8 rounded-2xl border border-border/60 bg-card p-12 flex flex-col items-center gap-4">
