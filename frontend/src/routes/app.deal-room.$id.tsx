@@ -18,7 +18,7 @@ import { Dropzone } from "@/components/app/Dropzone";
 import { useAuth } from "@/lib/auth";
 import { supabase, logActivity, createNotification } from "@/lib/supabase";
 import { ReviewTab } from "@/components/app/ReviewTab";
-import { DocRequestsTab } from "@/components/app/DocRequestsTab";
+import { DocumentWishlist } from "@/components/app/DocumentWishlist";
 import {
   useParticipants, useGeneratedNdaDocs,
   participantsStore, qaStore,
@@ -42,7 +42,6 @@ const tabs = [
   { k: "notes", l: "Notes", i: StickyNote },
   { k: "timeline", l: "Activity", i: Activity },
   { k: "meetings", l: "Meetings", i: Calendar },
-  { k: "requests", l: "Requests", i: ClipboardList },
   { k: "decision", l: "Review", i: Gavel },
 ];
 
@@ -185,7 +184,7 @@ function DealRoom() {
   const companyName = (room as any)?.startups?.company_name ?? "Unknown Company";
 
   const visibleTabs = tabs.filter((t) => {
-    if (isInvestor) return ["overview", "documents", "qa", "checklist", "notes", "timeline", "meetings", "requests", "decision"].includes(t.k);
+    if (isInvestor) return ["overview", "documents", "qa", "checklist", "notes", "timeline", "meetings", "decision"].includes(t.k);
     return t.k !== "decision";
   });
 
@@ -271,26 +270,27 @@ function DealRoom() {
             onTabChange={setTab}
           />
         )}
-        {tab === "documents" && <Documents dealRoomId={dealRoomId} isFounder={isFounder} userId={user?.id} />}
+        {tab === "documents" && (
+          <div className="flex flex-col h-full">
+            <div className="px-4 pt-4">
+              <DocumentWishlist
+                dealRoomId={dealRoomId}
+                isInvestor={isInvestor}
+                isFounder={isFounder}
+                userId={user?.id}
+              />
+            </div>
+            <div className="flex-1">
+              <Documents dealRoomId={dealRoomId} isFounder={isFounder} userId={user?.id} />
+            </div>
+          </div>
+        )}
         {tab === "chat" && <div className="h-full"><DealRoomChat dealRoomId={dealRoomId} userId={user?.id} userName={userName} /></div>}
         {tab === "qa" && <QA dealRoomId={dealRoomId} userId={user?.id} userName={userName} isInvestor={isInvestor} isFounder={isFounder} companyName={(room as any)?.startups?.company_name ?? ""} sector={(room as any)?.startups?.sector ?? ""} />}
         {tab === "checklist" && <DDChecklist dealRoomId={dealRoomId} userId={user?.id} />}
         {tab === "notes" && <Notes dealRoomId={dealRoomId} userId={user?.id} />}
         {tab === "timeline" && <Timeline dealRoomId={dealRoomId} />}
         {tab === "meetings" && <MeetingsTab dealRoomId={dealRoomId} userId={user?.id} />}
-        {tab === "requests" && (
-          <DocRequestsTab
-            dealRoomId={dealRoomId}
-            isInvestor={isInvestor}
-            isFounder={isFounder}
-            userId={user?.id}
-            founderUserId={
-              Array.isArray((room as any)?.startups)
-                ? (room as any)?.startups?.[0]?.founder_id
-                : (room as any)?.startups?.founder_id ?? undefined
-            }
-          />
-        )}
         {tab === "decision" && isInvestor && (
           <InvestorDecisionTab dealRoomId={dealRoomId} userId={user?.id} />
         )}
