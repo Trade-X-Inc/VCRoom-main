@@ -64,6 +64,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
   const [newItemLabel, setNewItemLabel] = useState("");
   const [vaultOpen, setVaultOpen] = useState(true);
   const [vaultDocOpen, setVaultDocOpen] = useState<Record<string, boolean>>({});
+  const [vaultFilter, setVaultFilter] = useState<string>("All");
 
   useEffect(() => {
     if (!dealRoomId || !userId) return;
@@ -117,7 +118,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
     queryFn: async () => {
       const { data } = await supabase
         .from("documents")
-        .select("id, storage_path, category, ai_summary, name")
+        .select("id, storage_path, category, ai_summary, file_name")
         .eq("deal_room_id", dealRoomId);
       return data ?? [];
     },
@@ -137,6 +138,17 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
 
   const categories = ddData?.categories ?? [];
   const checklistItems = ddData?.items ?? [];
+
+  const nameFromPath = (doc: any): string => {
+    if (doc.file_name) return doc.file_name;
+    const last = (doc.storage_path || "").split("/").pop() ?? "";
+    return last.replace(/^\d{13}-/, "") || "Untitled";
+  };
+
+  const vaultCategories = ["All", ...Array.from(new Set(dealDocs.map((d: any) => d.category || "Other"))) as string[]];
+  const filteredVaultDocs = vaultFilter === "All"
+    ? dealDocs
+    : dealDocs.filter((d: any) => (d.category || "Other") === vaultFilter);
 
   const getCatData = (cat: DDCategory) =>
     categories.find((c: any) => c.category === cat) ?? { id: null, status: "Pending", investor_notes: "" };
@@ -298,9 +310,28 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                 No documents uploaded yet. Documents uploaded in the Documents tab will appear here for review.
               </div>
             ) : (
-              dealDocs.map((doc: any) => {
+              <>
+                {vaultCategories.length > 2 && (
+                  <div className="flex gap-1 px-4 py-2 border-b border-border/60 overflow-x-auto">
+                    {vaultCategories.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setVaultFilter(cat)}
+                        className={cn(
+                          "shrink-0 rounded-full px-3 py-1 text-xs transition-colors",
+                          vaultFilter === cat
+                            ? "bg-brand text-brand-foreground"
+                            : "border border-border/60 hover:bg-accent",
+                        )}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {filteredVaultDocs.map((doc: any) => {
                 const review = getDocReview(doc.id);
-                const docName = doc.name || doc.storage_path?.split("/").pop()?.replace(/^\d{13}-/, "") || "Document";
+                const docName = nameFromPath(doc);
                 return (
                   <div key={doc.id} className="p-4">
                     <div className="flex items-start gap-3">
@@ -368,7 +399,8 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                     )}
                   </div>
                 );
-              })
+              })}
+              </>
             )}
           </div>
         )}
@@ -447,7 +479,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                       <div className="space-y-3">
                         {catDocs.map((doc: any) => {
                           const review = getDocReview(doc.id);
-                          const docName = doc.name || doc.storage_path?.split("/").pop()?.replace(/^\d{13}-/, "") || "Document";
+                          const docName = nameFromPath(doc);
                           return (
                             <div key={doc.id} className="rounded-xl border border-border/60 bg-background overflow-hidden">
                               <div className="flex items-center gap-3 px-4 py-3">
