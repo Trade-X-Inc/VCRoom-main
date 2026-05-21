@@ -39,6 +39,15 @@ const DEFAULT_ITEMS: Record<DDCategory, string[]> = {
   References: ["Customer references (3+)", "Investor references", "Partner / vendor references"],
 };
 
+const CAT_TO_DOC_CATEGORY: Record<DDCategory, string[]> = {
+  Financials: ["Financials"],
+  Team:       ["Team"],
+  Legal:      ["Legal"],
+  Market:     ["Market Research"],
+  Product:    ["Product"],
+  References: ["Other"],
+};
+
 interface Props {
   dealRoomId: string;
   userId: string | undefined;
@@ -100,12 +109,43 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
     },
   });
 
+  const { data: dealDocs = [] } = useQuery({
+    queryKey: ["dd-docs", dealRoomId],
+    enabled: !!dealRoomId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("documents")
+        .select("id, storage_path, category, ai_summary, name")
+        .eq("deal_room_id", dealRoomId);
+      return data ?? [];
+    },
+  });
+
+  const { data: reviews = [] } = useQuery({
+    queryKey: ["doc-reviews", dealRoomId],
+    enabled: !!dealRoomId && !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("document_reviews")
+        .select("*")
+        .eq("deal_room_id", dealRoomId);
+      return data ?? [];
+    },
+  });
+
   const categories = ddData?.categories ?? [];
   const checklistItems = ddData?.items ?? [];
 
   const getCatData = (cat: DDCategory) =>
     categories.find((c: any) => c.category === cat) ?? { id: null, status: "Pending", investor_notes: "" };
   const getCatItems = (cat: DDCategory) => checklistItems.filter((i: any) => i.category === cat);
+  const getCatDocs = (cat: DDCategory) =>
+    dealDocs.filter((d: any) =>
+      CAT_TO_DOC_CATEGORY[cat].includes(d.category) || !d.category
+    );
+  const getDocReview = (docId: string) =>
+    reviews.find((r: any) => r.document_id === docId);
+
   const getProgress = (cat: DDCategory) => {
     const items = getCatItems(cat);
     if (!items.length) return 0;
@@ -147,7 +187,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
     qc.invalidateQueries({ queryKey: ["dd-workstation", dealRoomId] });
   };
 
-  const saveNotes = async (cat: DDCategory) => {
+  const saveFeedback = async (cat: DDCategory) => {
     const catData = getCatData(cat);
     if (catData.id) {
       await supabase
@@ -162,7 +202,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
     }
     qc.invalidateQueries({ queryKey: ["dd-workstation", dealRoomId] });
     setEditingNotes(null);
-    toast.success("Notes saved");
+    toast.success("Feedback saved");
   };
 
   const addItem = async (cat: DDCategory) => {
@@ -233,6 +273,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
         {CATEGORIES.map((cat) => {
           const catData = getCatData(cat);
           const items = getCatItems(cat);
+          const catDocs = getCatDocs(cat);
           const progress = getProgress(cat);
           const isExpanded = expandedCat === cat;
           const status = (catData.status as DDStatus) ?? "Pending";
@@ -258,7 +299,12 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                     </span>
                     {catData.investor_notes && (
                       <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
-                        <StickyNote className="h-3 w-3" /> Notes
+                        <StickyNote className="h-3 w-3" /> Feedback
+                      </span>
+                    )}
+                    {catDocs.length > 0 && (
+                      <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                        <FileText className="h-3 w-3" /> {catDocs.length} doc{catDocs.length !== 1 ? "s" : ""}
                       </span>
                     )}
                   </div>
@@ -281,6 +327,79 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                   <div className="px-5 py-2 bg-muted/20">
                     <p className="text-xs text-muted-foreground">{description}</p>
                   </div>
+
+                  {/* Documents section */}
+                  <div className="border-b border-border/60 p-5">
+                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                      Documents ({catDocs.length})
+                    </div>
+                    {catDocs.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">
+                        No documents in this category yet. Upload documents and categorize them to see them here.
+                      </p>
+                    ) : (
+                      <div className="space-y-3">
+                        {catDocs.map((doc: any) => {
+                          const review = getDocReview(doc.id);
+                          const docName = doc.name || doc.storage_path?.split("/").pop()?.replace(/^\d{13}-/, "") || "Document";
+                          return (
+                            <div key={doc.id} className="rounded-xl border border-border/60 bg-background overflow-hidden">
+                              <div className="flex items-center gap-3 px-4 py-3">
+                                <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-sm font-medium truncate">{docName}</div>
+                                  {doc.ai_summary && (
+                                    <div className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                                      {doc.ai_summary}
+                                    </div>
+                                  )}
+                                </div>
+                                {review?.verdict && (
+                                  <span className={cn(
+                                    "text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0",
+                                    review.verdict === "accepted" && "bg-success/10 text-success",
+                                    review.verdict === "rejected" && "bg-destructive/10 text-destructive",
+                                    review.verdict === "needs_revision" && "bg-warning/10 text-warning",
+                                  )}>
+                                    {review.verdict === "accepted" ? "✓ Accepted"
+                                      : review.verdict === "rejected" ? "✗ Rejected"
+                                      : "↻ Needs revision"}
+                                  </span>
+                                )}
+                              </div>
+
+                              {isInvestor && (
+                                <DocumentReviewPanel
+                                  doc={doc}
+                                  review={review}
+                                  dealRoomId={dealRoomId}
+                                  userId={userId}
+                                  category={cat}
+                                  onReviewed={() => {
+                                    qc.invalidateQueries({ queryKey: ["doc-reviews", dealRoomId] });
+                                    qc.invalidateQueries({ queryKey: ["dd-workstation", dealRoomId] });
+                                  }}
+                                />
+                              )}
+
+                              {isFounder && review?.feedback && (
+                                <div className={cn(
+                                  "px-4 py-2.5 text-xs border-t",
+                                  review.verdict === "rejected" && "bg-destructive/5 border-destructive/20 text-destructive",
+                                  review.verdict === "needs_revision" && "bg-warning/5 border-warning/20 text-warning",
+                                  review.verdict === "accepted" && "bg-success/5 border-success/20 text-success",
+                                )}>
+                                  <span className="font-medium">Investor feedback: </span>
+                                  {review.feedback}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
                   <div className="grid lg:grid-cols-[1fr_260px] divide-y lg:divide-y-0 lg:divide-x divide-border/60">
                     {/* Checklist */}
                     <div className="p-5">
@@ -339,7 +458,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                       )}
                     </div>
 
-                    {/* Status + Notes */}
+                    {/* Status + Feedback */}
                     <div className="p-5 space-y-5">
                       <div>
                         <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Status</div>
@@ -371,14 +490,14 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
 
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Notes</div>
+                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Feedback</div>
                           {!isEditingNote && !isFounder && (
                             <button
                               onClick={() => { setEditingNotes(cat); setNoteDraft(catData.investor_notes ?? ""); }}
                               className="inline-flex items-center gap-1 text-[10px] text-brand hover:underline"
                             >
                               <StickyNote className="h-3 w-3" />
-                              {catData.investor_notes ? "Edit" : "Add"}
+                              {catData.investor_notes ? "Edit feedback" : "Add feedback"}
                             </button>
                           )}
                         </div>
@@ -388,7 +507,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                               value={noteDraft}
                               onChange={(e) => setNoteDraft(e.target.value)}
                               rows={4}
-                              placeholder="Internal notes for this category…"
+                              placeholder="Internal feedback for this category…"
                               className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:border-brand/50"
                             />
                             <div className="flex gap-2">
@@ -396,7 +515,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                                 className="flex-1 rounded-md border border-border/60 py-1.5 text-xs hover:bg-accent">
                                 Cancel
                               </button>
-                              <button onClick={() => saveNotes(cat)}
+                              <button onClick={() => saveFeedback(cat)}
                                 className="flex-1 inline-flex items-center justify-center gap-1 rounded-md bg-gradient-brand text-brand-foreground py-1.5 text-xs shadow-glow">
                                 <Save className="h-3 w-3" /> Save
                               </button>
@@ -409,7 +528,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                         ) : (
                           <div className="rounded-lg border border-dashed border-border/60 px-3 py-4 text-center">
                             <FileText className="h-4 w-4 text-muted-foreground/40 mx-auto mb-1" />
-                            <p className="text-xs text-muted-foreground/60">No notes yet</p>
+                            <p className="text-xs text-muted-foreground/60">No feedback yet</p>
                           </div>
                         )}
                       </div>
@@ -421,6 +540,131 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
           );
         })}
       </div>
+    </div>
+  );
+}
+
+// ── Document review panel (investors only) ────────────────────────
+function DocumentReviewPanel({ doc, review, dealRoomId, userId, category, onReviewed }: {
+  doc: any;
+  review: any;
+  dealRoomId: string;
+  userId: string | undefined;
+  category: string;
+  onReviewed: () => void;
+}) {
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedback, setFeedback] = useState(review?.feedback ?? "");
+  const [saving, setSaving] = useState(false);
+
+  const submitReview = async (verdict: string) => {
+    if (!userId) return;
+    setSaving(true);
+    try {
+      await supabase.from("document_reviews").upsert({
+        document_id: doc.id,
+        deal_room_id: dealRoomId,
+        reviewer_id: userId,
+        category,
+        verdict,
+        feedback: feedback.trim() || null,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "document_id,reviewer_id" });
+      onReviewed();
+      setShowFeedback(false);
+      toast.success(
+        verdict === "accepted" ? "Document accepted"
+          : verdict === "rejected" ? "Document rejected"
+          : "Document flagged for revision"
+      );
+    } catch {
+      toast.error("Failed to save review");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="border-t border-border/60 px-4 py-3 bg-muted/20">
+      {!showFeedback ? (
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs text-muted-foreground mr-1">Review:</span>
+          <button
+            onClick={() => submitReview("accepted")}
+            disabled={saving}
+            className={cn(
+              "inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+              review?.verdict === "accepted"
+                ? "bg-success text-success-foreground"
+                : "border border-success/40 text-success hover:bg-success/10",
+            )}
+          >
+            <CheckCircle2 className="h-3 w-3" /> Accept
+          </button>
+          <button
+            onClick={() => setShowFeedback(true)}
+            disabled={saving}
+            className={cn(
+              "inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+              review?.verdict === "needs_revision"
+                ? "bg-warning text-warning-foreground"
+                : "border border-warning/40 text-warning hover:bg-warning/10",
+            )}
+          >
+            <StickyNote className="h-3 w-3" /> Needs revision
+          </button>
+          <button
+            onClick={() => setShowFeedback(true)}
+            disabled={saving}
+            className={cn(
+              "inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+              review?.verdict === "rejected"
+                ? "bg-destructive text-destructive-foreground"
+                : "border border-destructive/40 text-destructive hover:bg-destructive/10",
+            )}
+          >
+            <Flag className="h-3 w-3" /> Reject
+          </button>
+          {review?.feedback && (
+            <span className="text-[10px] text-muted-foreground italic ml-1">
+              "{review.feedback.slice(0, 40)}{review.feedback.length > 40 ? "…" : ""}"
+            </span>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <textarea
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
+            placeholder="Add feedback for the founder (what needs to change, what's missing…)"
+            rows={2}
+            autoFocus
+            className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-xs resize-none focus:outline-none focus:border-brand/50"
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowFeedback(false)}
+              className="rounded-md border border-border/60 px-2.5 py-1 text-xs hover:bg-accent"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => submitReview("needs_revision")}
+              disabled={saving}
+              className="rounded-md border border-warning/40 text-warning px-2.5 py-1 text-xs hover:bg-warning/10 disabled:opacity-50"
+            >
+              {saving ? <Loader2 className="h-3 w-3 animate-spin inline" /> : "Flag for revision"}
+            </button>
+            <button
+              onClick={() => submitReview("rejected")}
+              disabled={saving}
+              className="rounded-md border border-destructive/40 text-destructive px-2.5 py-1 text-xs hover:bg-destructive/10 disabled:opacity-50"
+            >
+              {saving ? <Loader2 className="h-3 w-3 animate-spin inline" /> : "Reject"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
