@@ -1126,8 +1126,8 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
   const { data: docs = [] } = useQuery({
     queryKey: ["documents", dealRoomId],
     enabled: !!userId,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: 0,
+    gcTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("documents")
@@ -1192,10 +1192,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
         return;
       }
       await supabase.from("documents").update({ ai_summary: result.summary }).eq("id", doc.id);
-      // DB write confirmed — update cache directly, no refetch needed
-      queryClient.setQueryData(["documents", dealRoomId], (old: any) =>
-        (old ?? []).map((d: any) => d.id === doc.id ? { ...d, ai_summary: result.summary } : d)
-      );
+      queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
       toast.success("Summary generated");
     } catch (err) {
       console.error("Summary generation error:", err);
