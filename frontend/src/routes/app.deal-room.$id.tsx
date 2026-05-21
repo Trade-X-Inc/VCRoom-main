@@ -20,6 +20,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase, logActivity, createNotification } from "@/lib/supabase";
 import { ReviewTab } from "@/components/app/ReviewTab";
 import { DocumentWishlist } from "@/components/app/DocumentWishlist";
+import { DealTermsCard } from "@/components/app/DealTermsCard";
 import {
   useParticipants, useGeneratedNdaDocs,
   participantsStore, qaStore,
@@ -38,7 +39,7 @@ const tabs = [
   { k: "overview", l: "Overview", i: LayoutGrid },
   { k: "documents", l: "Documents", i: FileText },
   { k: "qa", l: "Q&A", i: MessageSquare },
-  { k: "checklist", l: "Checklist", i: ListChecks },
+  { k: "checklist", l: "Workstation", i: LayoutGrid },
   { k: "chat", l: "Team chat", i: MessagesSquare },
   { k: "notes", l: "Notes", i: StickyNote },
   { k: "timeline", l: "Activity", i: Activity },
@@ -592,13 +593,13 @@ function DealRoomOverview({
     { title: "Complete your profile", body: "Fill in your startup's profile — stage, sector, funding target, revenue, and team size. Investors read this first." },
     { title: "Upload your pitch deck", body: "Go to the Documents tab and upload your deck. The AI will auto-summarise it for investors." },
     { title: "Answer investor questions", body: "Check the Q&A tab — investors may post questions. Prompt, thorough answers build trust." },
-    { title: "Track due diligence", body: "Open the Checklist tab to see which documents the investor needs. Upload them and mark each as fulfilled." },
+    { title: "Track due diligence", body: "Open the Workstation tab to see which documents the investor needs. Upload them and mark each as fulfilled." },
     { title: "Watch for the decision", body: "The investor will post their decision (Pass / Term Sheet / Investing) in the Decisions tab. You'll be notified." },
   ];
   const investorSteps = [
     { title: "Review the pitch", body: "Start with the Overview tab — company card, funding target, and key metrics at a glance." },
     { title: "Dig into documents", body: "Open the Documents tab to read the deck, financials, and any uploaded files. Use the AI Summary button for a quick brief." },
-    { title: "Run due diligence", body: "The Checklist tab has 6 DD categories pre-loaded. Check off items as you review them, set statuses, and add private notes." },
+    { title: "Run due diligence", body: "The Workstation tab has 6 DD categories pre-loaded. Check off items as you review them, set statuses, and add private notes." },
     { title: "Request missing docs", body: "In the Documents tab use 'Documents needed' to tell the founder what you still require. They can mark items as uploaded." },
     { title: "Post your decision", body: "When you're ready, go to the Decisions tab and post a formal decision — Pass, Term Sheet, or Investing." },
   ];
@@ -712,6 +713,8 @@ function DealRoomOverview({
               </div>
             </div>
           </section>
+
+          <DealTermsCard dealRoomId={dealRoomId} isFounder={isFounder} isInvestor={isInvestor} />
 
           <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
             <div className="mb-5 flex items-center justify-between">
