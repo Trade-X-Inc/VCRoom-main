@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ClipboardList, Plus, X, Loader2, CheckCircle2, Clock,
   Upload, FileText, AlertCircle, Send,
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuthStore } from "@/lib/auth-store";
 import { supabase } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 import { getDocRequests, createDocRequest, fulfillDocRequest } from "@/lib/doc-request-fn";
@@ -59,11 +58,18 @@ const STATUS_CONFIG = {
 // ─── component ───────────────────────────────────────────────────────────────
 
 export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, founderUserId }: Props) {
-  const session = useAuthStore((s) => s.session);
-  const token = session?.access_token ?? "";
+  const [token, setToken] = useState("");
   const supabaseKey = (import.meta.env as any).VITE_SUPABASE_SERVICE_ROLE_KEY || "";
   const supabaseUrl = (import.meta.env as any).VITE_SUPABASE_URL || "";
   const qc = useQueryClient();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setToken(data.session?.access_token ?? ""));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setToken(session?.access_token ?? "");
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
@@ -84,24 +90,30 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
   // ── fallback: resolve founder user_id via service role (bypasses RLS)
   const { data: founderMember } = useQuery({
     queryKey: ["deal-room-founder", dealRoomId],
-    enabled: !!dealRoomId && !founderUserId && !!supabaseKey,
+    enabled: !!dealRoomId && !founderUserId,
     queryFn: async () => {
-      const adminSb = createClient(
-        supabaseUrl || (import.meta.env as any).VITE_SUPABASE_URL || "",
-        supabaseKey || (import.meta.env as any).VITE_SUPABASE_SERVICE_ROLE_KEY || "",
-        { auth: { persistSession: false } },
-      );
+      const resolvedKey = supabaseKey ||
+        (import.meta.env as any).VITE_SUPABASE_SERVICE_ROLE_KEY || "";
+      const resolvedUrl = supabaseUrl ||
+        (import.meta.env as any).VITE_SUPABASE_URL ||
+        "https://ldimninnjlvxozubheib.supabase.co";
+      const adminSb = resolvedKey
+        ? createClient(resolvedUrl, resolvedKey, { auth: { persistSession: false } })
+        : supabase;
       const { data } = await adminSb
         .from("deal_room_members")
         .select("user_id, role")
         .eq("deal_room_id", dealRoomId)
         .eq("role", "founder")
         .maybeSingle();
+      console.log("[DocRequest] founderMember result:", data);
       return data;
     },
   });
 
   const resolvedFounderId = founderUserId || founderMember?.user_id || "";
+  console.log("[DocRequest] founderUserId prop:", founderUserId);
+  console.log("[DocRequest] resolvedFounderId:", resolvedFounderId);
 
   // ── fetch founder's uploaded docs (for founder to link when fulfilling)
   const { data: founderDocs = [] } = useQuery({

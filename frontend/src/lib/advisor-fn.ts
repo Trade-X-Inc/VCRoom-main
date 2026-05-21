@@ -51,28 +51,33 @@ export const getAIAdvice = createServerFn({ method: "POST" })
       ].join("\n");
     }
 
+    const lines = context ? context.split("\n") : [];
+    const get = (prefix: string) => lines.find((l) => l.startsWith(prefix))?.split(": ")[1]?.trim() ?? "Not set";
+    const company = get("Company");
+    const stage = get("Stage");
+    const sector = get("Sector");
+    const raising = get("Raising");
+
     let advisorIdentity = "You are an expert startup fundraising advisor.";
-    if (context) {
-      const lines = context.split("\n");
-      const get = (prefix: string) => lines.find((l) => l.startsWith(prefix))?.split(": ")[1]?.trim() ?? "";
-      const company = get("Company");
-      const stage = get("Stage");
-      const sector = get("Sector");
-      const raising = get("Raising");
-      if (company && company !== "Not set") {
-        advisorIdentity = `You are an expert startup fundraising advisor for ${company}, a ${stage !== "Not set" ? stage : "early-stage"} ${sector !== "Not set" ? sector : "tech"} startup raising ${raising !== "Not set" ? raising : "their next round"}.`;
-      }
+    if (company && company !== "Not set") {
+      advisorIdentity = `You are an expert startup fundraising advisor for ${company}, a ${stage !== "Not set" ? stage : "early-stage"} ${sector !== "Not set" ? sector : "tech"} startup raising ${raising !== "Not set" ? raising : "their next round"}.`;
     }
 
     const systemPrompt = [
       advisorIdentity,
-      "\nYou have full context on this founder's pipeline, leads, and meetings.",
-      "Give specific, actionable advice — not generic tips.",
-      "Use bullet points and clear structure. Max 200 words.",
-      "Never say you cannot access information — use the context provided to give real advice.",
-      "End every response with one clear **Next action** the founder should take today.",
-      context ? `\n\nFounder context:\n${context}` : "",
-    ].join("");
+      "You are inside a deal room. Be concise, structured, and deal-specific.",
+      "RULES:",
+      "- Maximum 150 words per response",
+      "- Use bold headers (**Header**) and bullet points only",
+      "- Only discuss THIS deal, THIS company, THIS raise",
+      "- Never give generic fundraising advice",
+      "- Focus on: documents, DD status, risks, next steps for THIS deal",
+      "- If asked something unrelated to the deal, redirect back to the deal",
+      company !== "Not set" ? `Company: ${company}` : "",
+      stage !== "Not set" ? `Stage: ${stage}` : "",
+      sector !== "Not set" ? `Sector: ${sector}` : "",
+      raising !== "Not set" ? `Raising: ${raising}` : "",
+    ].filter(Boolean).join("\n");
 
     try {
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -83,7 +88,7 @@ export const getAIAdvice = createServerFn({ method: "POST" })
         },
         body: JSON.stringify({
           model: "gpt-4o-mini",
-          max_tokens: 400,
+          max_tokens: 300,
           messages: [
             { role: "system", content: systemPrompt },
             ...data.history.slice(-6),
