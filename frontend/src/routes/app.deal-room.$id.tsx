@@ -13,7 +13,7 @@ import {
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AIChat } from "@/components/ai/AIChat";
 import { DealRoomChat } from "@/components/app/DealRoomChat";
-import { DDChecklist } from "@/components/app/DDChecklist";
+import { DDWorkstation } from "@/components/app/DDWorkstation";
 import { Dropzone } from "@/components/app/Dropzone";
 import { useAuth } from "@/lib/auth";
 import { supabase, logActivity, createNotification } from "@/lib/supabase";
@@ -287,7 +287,7 @@ function DealRoom() {
         )}
         {tab === "chat" && <div className="h-full"><DealRoomChat dealRoomId={dealRoomId} userId={user?.id} userName={userName} /></div>}
         {tab === "qa" && <QA dealRoomId={dealRoomId} userId={user?.id} userName={userName} isInvestor={isInvestor} isFounder={isFounder} companyName={(room as any)?.startups?.company_name ?? ""} sector={(room as any)?.startups?.sector ?? ""} />}
-        {tab === "checklist" && <DDChecklist dealRoomId={dealRoomId} userId={user?.id} />}
+        {tab === "checklist" && <DDWorkstation dealRoomId={dealRoomId} userId={user?.id} isInvestor={isInvestor} isFounder={isFounder} />}
         {tab === "notes" && <Notes dealRoomId={dealRoomId} userId={user?.id} />}
         {tab === "timeline" && <Timeline dealRoomId={dealRoomId} />}
         {tab === "meetings" && <MeetingsTab dealRoomId={dealRoomId} userId={user?.id} />}
