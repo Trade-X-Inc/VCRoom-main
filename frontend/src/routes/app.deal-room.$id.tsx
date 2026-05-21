@@ -1121,6 +1121,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
   const [generatingSummaryId, setGeneratingSummaryId] = useState<string | null>(null);
   const [editingSummaryId, setEditingSummaryId] = useState<string | null>(null);
   const [summaryEdits, setSummaryEdits] = useState<Record<string, string>>({});
+  const [summaryExpanded, setSummaryExpanded] = useState<Record<string, boolean>>({});
   const [previewDoc, setPreviewDoc] = useState<any | null>(null);
 
   const { data: docs = [] } = useQuery({
@@ -1193,6 +1194,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
       }
       await supabase.from("documents").update({ ai_summary: result.summary }).eq("id", doc.id);
       queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+      setSummaryExpanded((s) => ({ ...s, [doc.id]: true }));
       toast.success("Summary generated");
     } catch (err) {
       console.error("Summary generation error:", err);
@@ -1446,38 +1448,46 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
                       </div>
                     ) : hasSummary ? (
                       <div className="px-4 py-3">
-                        {/* Summary header */}
-                        <div className="flex items-center gap-1.5 mb-2">
-                          <Sparkles className="h-3.5 w-3.5 text-brand shrink-0" />
-                          <span className="text-xs font-medium text-brand flex-1">AI Summary</span>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => setSummaryExpanded((s) => ({ ...s, [doc.id]: !s[doc.id] }))}
+                            className="inline-flex items-center gap-1.5 text-xs text-brand hover:underline flex-1"
+                          >
+                            <Sparkles className="h-3.5 w-3.5 shrink-0" />
+                            AI Summary
+                            {summaryExpanded[doc.id]
+                              ? <ChevronUp className="h-3 w-3" />
+                              : <ChevronDown className="h-3 w-3" />}
+                          </button>
                           <span className={cn("px-1.5 py-0.5 rounded text-[9px] font-medium", doc.summary_edited ? "bg-brand/10 text-brand" : "bg-muted/60 text-muted-foreground")}>
                             {doc.summary_edited ? "Edited" : "AI"}
                           </span>
                         </div>
-                        {/* Summary panel */}
-                        <div className="rounded-lg border-l-2 border-brand/40 bg-muted/30 pl-3 pr-3 py-3">
-                          <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-line">{doc.ai_summary}</p>
-                          <div className="flex gap-2 mt-3">
-                            <button
-                              onClick={() => generateSummary(doc)}
-                              disabled={isGenerating}
-                              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground border border-border/60 rounded-md px-2.5 py-1 hover:bg-accent disabled:opacity-50"
-                            >
-                              {isGenerating ? <><Loader2 className="h-3 w-3 animate-spin" /> Regenerating…</> : "Regenerate"}
-                            </button>
-                            {isFounder && (
+                        {summaryExpanded[doc.id] && (
+                          <div className="mt-2 rounded-lg border-l-2 border-brand/40 bg-muted/30 pl-3 pr-3 py-3">
+                            <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-line">{doc.ai_summary}</p>
+                            <div className="flex gap-2 mt-3">
                               <button
-                                onClick={() => {
-                                  setEditingSummaryId(doc.id);
-                                  setSummaryEdits((s) => ({ ...s, [doc.id]: doc.ai_summary! }));
-                                }}
-                                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground border border-border/60 rounded-md px-2.5 py-1 hover:bg-accent"
+                                onClick={() => generateSummary(doc)}
+                                disabled={isGenerating}
+                                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground border border-border/60 rounded-md px-2.5 py-1 hover:bg-accent disabled:opacity-50"
                               >
-                                <Pencil className="h-3 w-3" /> Edit
+                                {isGenerating ? <><Loader2 className="h-3 w-3 animate-spin" /> Regenerating…</> : "Regenerate"}
                               </button>
-                            )}
+                              {isFounder && (
+                                <button
+                                  onClick={() => {
+                                    setEditingSummaryId(doc.id);
+                                    setSummaryEdits((s) => ({ ...s, [doc.id]: doc.ai_summary! }));
+                                  }}
+                                  className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground border border-border/60 rounded-md px-2.5 py-1 hover:bg-accent"
+                                >
+                                  <Pencil className="h-3 w-3" /> Edit
+                                </button>
+                              )}
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     ) : (
                       /* No summary yet — compact generate row */

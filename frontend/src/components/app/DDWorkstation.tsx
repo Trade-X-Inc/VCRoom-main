@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
   CheckCircle2, Circle, ChevronDown, ChevronUp, Flag, Clock, Eye,
-  StickyNote, Save, Loader2, FileText, Plus,
+  StickyNote, Save, Loader2, FileText, Plus, Sparkles,
   BarChart3, TrendingUp, Users, Scale, Target, Handshake,
 } from "lucide-react";
 
@@ -62,6 +62,8 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
   const [noteDraft, setNoteDraft] = useState("");
   const [addingItem, setAddingItem] = useState<DDCategory | null>(null);
   const [newItemLabel, setNewItemLabel] = useState("");
+  const [vaultOpen, setVaultOpen] = useState(true);
+  const [vaultDocOpen, setVaultDocOpen] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!dealRoomId || !userId) return;
@@ -172,37 +174,36 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
   };
 
   const updateStatus = async (cat: DDCategory, status: string) => {
-    const catData = getCatData(cat);
-    if (catData.id) {
-      await supabase
-        .from("dd_categories")
-        .update({ status, updated_at: new Date().toISOString() })
-        .eq("id", catData.id);
-    } else {
-      await supabase.from("dd_categories").upsert(
-        { deal_room_id: dealRoomId, category: cat, status },
+    try {
+      const { error } = await supabase.from("dd_categories").upsert(
+        { deal_room_id: dealRoomId, category: cat, status, updated_at: new Date().toISOString() },
         { onConflict: "deal_room_id,category" },
       );
+      if (error) throw error;
+      qc.invalidateQueries({ queryKey: ["dd-workstation", dealRoomId] });
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update status");
     }
-    qc.invalidateQueries({ queryKey: ["dd-workstation", dealRoomId] });
   };
 
   const saveFeedback = async (cat: DDCategory) => {
-    const catData = getCatData(cat);
-    if (catData.id) {
-      await supabase
-        .from("dd_categories")
-        .update({ investor_notes: noteDraft, updated_at: new Date().toISOString() })
-        .eq("id", catData.id);
-    } else {
-      await supabase.from("dd_categories").upsert(
-        { deal_room_id: dealRoomId, category: cat, investor_notes: noteDraft },
+    try {
+      const { error } = await supabase.from("dd_categories").upsert(
+        {
+          deal_room_id: dealRoomId,
+          category: cat,
+          investor_notes: noteDraft,
+          updated_at: new Date().toISOString(),
+        },
         { onConflict: "deal_room_id,category" },
       );
+      if (error) throw error;
+      qc.invalidateQueries({ queryKey: ["dd-workstation", dealRoomId] });
+      setEditingNotes(null);
+      toast.success("Feedback saved");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to save feedback");
     }
-    qc.invalidateQueries({ queryKey: ["dd-workstation", dealRoomId] });
-    setEditingNotes(null);
-    toast.success("Feedback saved");
   };
 
   const addItem = async (cat: DDCategory) => {
@@ -266,6 +267,111 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
           className="h-full bg-gradient-brand transition-all duration-500"
           style={{ width: `${overallProgress()}%` }}
         />
+      </div>
+
+      {/* Document Vault */}
+      <div className="mb-6 rounded-2xl border border-border/60 bg-card overflow-hidden">
+        <button
+          onClick={() => setVaultOpen((v) => !v)}
+          className="w-full flex items-center justify-between px-5 py-4 hover:bg-accent/40 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="grid h-9 w-9 place-items-center rounded-xl bg-muted shrink-0">
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <div className="text-left">
+              <div className="text-sm font-semibold">Document Vault</div>
+              <div className="text-xs text-muted-foreground">
+                {dealDocs.length} document{dealDocs.length !== 1 ? "s" : ""} · {reviews.filter((r: any) => r.verdict === "accepted").length} accepted · {reviews.filter((r: any) => r.verdict === "needs_revision").length} need revision
+              </div>
+            </div>
+          </div>
+          {vaultOpen
+            ? <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
+            : <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />}
+        </button>
+
+        {vaultOpen && (
+          <div className="border-t border-border/60 divide-y divide-border/60">
+            {dealDocs.length === 0 ? (
+              <div className="p-6 text-center text-sm text-muted-foreground">
+                No documents uploaded yet. Documents uploaded in the Documents tab will appear here for review.
+              </div>
+            ) : (
+              dealDocs.map((doc: any) => {
+                const review = getDocReview(doc.id);
+                const docName = doc.name || doc.storage_path?.split("/").pop()?.replace(/^\d{13}-/, "") || "Document";
+                return (
+                  <div key={doc.id} className="p-4">
+                    <div className="flex items-start gap-3">
+                      <FileText className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-medium truncate">{docName}</span>
+                          {doc.category && (
+                            <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full">
+                              {doc.category}
+                            </span>
+                          )}
+                          {review?.verdict && (
+                            <span className={cn(
+                              "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
+                              review.verdict === "accepted" && "bg-success/10 text-success",
+                              review.verdict === "rejected" && "bg-destructive/10 text-destructive",
+                              review.verdict === "needs_revision" && "bg-warning/10 text-warning",
+                            )}>
+                              {review.verdict === "accepted" ? "✓ Accepted"
+                                : review.verdict === "rejected" ? "✗ Rejected"
+                                : "↻ Needs revision"}
+                            </span>
+                          )}
+                        </div>
+                        {doc.ai_summary && (
+                          <button
+                            onClick={() => setVaultDocOpen((s) => ({ ...s, [doc.id]: !s[doc.id] }))}
+                            className="mt-1 text-[10px] text-brand hover:underline inline-flex items-center gap-1"
+                          >
+                            <Sparkles className="h-3 w-3" />
+                            AI Summary {vaultDocOpen[doc.id] ? "▲" : "▼"}
+                          </button>
+                        )}
+                        {vaultDocOpen[doc.id] && doc.ai_summary && (
+                          <div className="mt-2 rounded-lg bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+                            {doc.ai_summary}
+                          </div>
+                        )}
+                        {isFounder && review?.feedback && (
+                          <div className={cn(
+                            "mt-2 rounded-lg px-3 py-2 text-xs",
+                            review.verdict === "needs_revision" && "bg-warning/10 text-warning",
+                            review.verdict === "rejected" && "bg-destructive/10 text-destructive",
+                            review.verdict === "accepted" && "bg-success/10 text-success",
+                          )}>
+                            <span className="font-medium">Feedback: </span>{review.feedback}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {isInvestor && (
+                      <div className="mt-2">
+                        <DocumentReviewPanel
+                          doc={doc}
+                          review={review}
+                          dealRoomId={dealRoomId}
+                          userId={userId}
+                          category={doc.category || "Other"}
+                          onReviewed={() => {
+                            qc.invalidateQueries({ queryKey: ["doc-reviews", dealRoomId] });
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        )}
       </div>
 
       {/* Category accordion */}
