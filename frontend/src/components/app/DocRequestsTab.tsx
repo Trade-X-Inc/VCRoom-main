@@ -185,6 +185,14 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
   const done = requests.filter((r) => r.status !== "pending");
 
   // ─── render ──────────────────────────────────────────────────────────────
+  console.log("[DocRequest Debug]", {
+    founderUserId,
+    founderMember,
+    resolvedFounderId,
+    supabaseKey: supabaseKey?.slice(0, 10),
+    isInvestor,
+    dealRoomId,
+  });
   return (
     <div className="p-5 max-w-3xl mx-auto space-y-5">
       {/* Header */}

@@ -7,8 +7,8 @@ type SummaryInput = {
   documentName: string;
   dealRoomId: string;
   supabaseUrl?: string;
-  supabaseAnonKey?: string;
-  userAccessToken?: string;
+  supabaseKey?: string;
+  openAIKey?: string;
 };
 
 const FALLBACK = "Document uploaded. AI summary not available for this file type. Please review manually.";
@@ -17,8 +17,8 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): SummaryInput => data as SummaryInput)
   .handler(async ({ data }: { data: SummaryInput }): Promise<{ summary: string | null; error?: string }> => {
     const supabaseUrl = data.supabaseUrl || getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
-    const supabaseKey = data.supabaseAnonKey || getEnvVar("SUPABASE_SERVICE_ROLE_KEY") || getEnvVar("VITE_SUPABASE_SERVICE_ROLE_KEY");
-    const openAIKey = getEnvVar("OPENAI_API_KEY");
+    const supabaseKey = data.supabaseKey || getEnvVar("SUPABASE_SERVICE_ROLE_KEY") || getEnvVar("VITE_SUPABASE_SERVICE_ROLE_KEY");
+    const openAIKey = data.openAIKey || getEnvVar("OPENAI_API_KEY") || (import.meta.env as any).VITE_OPENAI_API_KEY || "";
     console.log('Supabase URL:', supabaseUrl?.slice(0, 30));
 
     if (!openAIKey) {
@@ -28,9 +28,7 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
       return { summary: null, error: 'Supabase configuration missing.' };
     }
 
-    const client = createClient(supabaseUrl, supabaseKey, {
-      global: { headers: { Authorization: `Bearer ${data.userAccessToken ?? ""}` } },
-    });
+    const client = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false } });
 
     const { data: blob, error: dlError } = await client.storage
       .from("documents")

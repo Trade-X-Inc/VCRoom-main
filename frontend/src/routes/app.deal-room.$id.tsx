@@ -1120,15 +1120,14 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
   const generateSummary = async (doc: any) => {
     setGeneratingSummaryId(doc.id);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
       const result = await generateDocumentSummary({
         data: {
           documentPath: doc.storage_path,
           documentName: doc.name || doc.storage_path?.split("/").pop() || "Document",
           dealRoomId,
           supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
-          supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-          userAccessToken: session?.access_token ?? "",
+          supabaseKey: (import.meta.env as any).VITE_SUPABASE_SERVICE_ROLE_KEY || "",
+          openAIKey: import.meta.env.VITE_OPENAI_API_KEY || "",
         },
       });
       if (result.error) {

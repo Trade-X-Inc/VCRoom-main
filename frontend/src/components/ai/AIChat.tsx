@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Sparkles, Send, Loader2, User } from "lucide-react";
 import { getAIAdvice } from "@/lib/advisor-fn";
+import ReactMarkdown from "react-markdown";
 
 export interface ChatMsg {
   id: string;
@@ -66,7 +67,11 @@ export function AIChat({ userId, scope, starters, initialAssistant, className = 
                 {m.role === "user" ? <User className="h-4 w-4" /> : <Sparkles className="h-4 w-4 text-brand" />}
               </div>
               <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.role === "user" ? "bg-gradient-brand text-brand-foreground" : "bg-card border border-border/60 shadow-card"}`}>
-                {m.content}
+                {m.role === "assistant" ? (
+                  <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0">
+                    <ReactMarkdown>{m.content}</ReactMarkdown>
+                  </div>
+                ) : m.content}
               </div>
             </div>
           ))}
