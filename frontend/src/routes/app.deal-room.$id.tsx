@@ -189,6 +189,9 @@ function DealRoom() {
     if (isInvestor) return ["overview", "documents", "qa", "checklist", "notes", "timeline", "meetings", "decision"].includes(t.k);
     return t.k !== "decision";
   });
+  const displayTabs = visibleTabs.map((t) =>
+    t.k === "checklist" && isFounder ? { ...t, l: "Deal Report" } : t
+  );
 
   // ── Q&A Supabase callbacks ────────────────────────────────────
   const handleAddQuestion = async (q: QAQuestion): Promise<string | undefined> => {
@@ -239,7 +242,7 @@ function DealRoom() {
           </div>
         </div>
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
-          {visibleTabs.map((t) => (
+          {displayTabs.map((t) => (
             <button
               key={t.k}
               onClick={() => {

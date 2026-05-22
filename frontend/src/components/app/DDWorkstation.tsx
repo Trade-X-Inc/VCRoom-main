@@ -72,17 +72,25 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
       .limit(1);
     if (existing && existing.length > 0) return;
 
-    await supabase.from("dd_categories").insert(
-      CATEGORIES.map((cat) => ({ deal_room_id: dealRoomId, category: cat, status: "Pending" })),
-    );
-    const rows: { deal_room_id: string; category: string; label: string; checked: boolean }[] = [];
-    for (const cat of CATEGORIES) {
-      for (const label of DEFAULT_ITEMS[cat]) {
-        rows.push({ deal_room_id: dealRoomId, category: cat, label, checked: false });
+    try {
+      const { error: catErr } = await supabase.from("dd_categories").insert(
+        CATEGORIES.map((cat) => ({ deal_room_id: dealRoomId, category: cat, status: "Pending" })),
+      );
+      if (catErr) throw catErr;
+
+      const rows: { deal_room_id: string; category: string; label: string; checked: boolean }[] = [];
+      for (const cat of CATEGORIES) {
+        for (const label of DEFAULT_ITEMS[cat]) {
+          rows.push({ deal_room_id: dealRoomId, category: cat, label, checked: false });
+        }
       }
+      const { error: itemErr } = await supabase.from("dd_checklist_items").insert(rows);
+      if (itemErr) throw itemErr;
+
+      qc.invalidateQueries({ queryKey: ["dd-workstation", dealRoomId] });
+    } catch (err: any) {
+      console.error("DD seed failed:", err?.message ?? err);
     }
-    await supabase.from("dd_checklist_items").insert(rows);
-    qc.invalidateQueries({ queryKey: ["dd-workstation", dealRoomId] });
   };
 
   const { data: ddData, isLoading } = useQuery({
