@@ -30,6 +30,8 @@ interface ProfileForm {
   portfolio_companies: string;
   linkedin_url: string;
   website: string;
+  red_flags: string;
+  key_metrics: string;
 }
 
 interface TeamMember {
@@ -51,7 +53,7 @@ const EMPTY_FORM: ProfileForm = {
   fund_name: "", your_name: "", role: "Partner", fund_size: "",
   thesis: "", sectors: "", stages: [], check_size_min: "",
   check_size_max: "", geography: "", portfolio_companies: "",
-  linkedin_url: "", website: "",
+  linkedin_url: "", website: "", red_flags: "", key_metrics: "",
 };
 
 // ── Main page ─────────────────────────────────────────────────────
@@ -92,6 +94,8 @@ function InvestorProfilePage() {
         portfolio_companies: existing.portfolio_companies ?? "",
         linkedin_url: existing.linkedin_url ?? "",
         website: existing.website ?? "",
+        red_flags: existing.red_flags ?? "",
+        key_metrics: existing.key_metrics ?? "",
       });
     } else if (user?.fullName) {
       setForm((f) => ({ ...f, your_name: user.fullName }));
@@ -133,6 +137,8 @@ function InvestorProfilePage() {
         portfolio_companies: form.portfolio_companies,
         linkedin_url: form.linkedin_url,
         website: form.website,
+        red_flags: form.red_flags,
+        key_metrics: form.key_metrics,
         updated_at: new Date().toISOString(),
       }, { onConflict: "user_id" });
       if (error) throw error;
@@ -255,6 +261,24 @@ function InvestorProfilePage() {
             <Field label="Geography">
               <input value={form.geography} onChange={(e) => set("geography", e.target.value)}
                 className={input} placeholder="North America, Europe" />
+            </Field>
+            <Field label="What you DON'T invest in (red flags)">
+              <textarea
+                value={form.red_flags}
+                onChange={(e) => set("red_flags", e.target.value)}
+                rows={2}
+                className={cn(input, "resize-none")}
+                placeholder="No crypto, no consumer apps, no pre-revenue hardware..."
+              />
+            </Field>
+            <Field label="Key metrics you look for">
+              <textarea
+                value={form.key_metrics}
+                onChange={(e) => set("key_metrics", e.target.value)}
+                rows={2}
+                className={cn(input, "resize-none")}
+                placeholder="MoM growth >10%, ARR >$100K, NPS >50, <18mo runway..."
+              />
             </Field>
           </Section>
 

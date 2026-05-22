@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
   CheckCircle2, Circle, ChevronDown, ChevronUp, Flag, Clock, Eye,
-  StickyNote, Save, Loader2, FileText, Plus, Sparkles, Trash2,
+  StickyNote, Save, Loader2, FileText, Plus, Sparkles, Trash2, Download,
   BarChart3, TrendingUp, Users, Scale, Target, Handshake,
 } from "lucide-react";
 
@@ -54,8 +54,10 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
   const [addingItem, setAddingItem] = useState<DDCategory | null>(null);
   const [newItemLabel, setNewItemLabel] = useState("");
   const [vaultOpen, setVaultOpen] = useState(true);
-  const [vaultDocOpen, setVaultDocOpen] = useState<Record<string, boolean>>({});
   const [vaultFilter, setVaultFilter] = useState<string>("All");
+  const [expandedDoc, setExpandedDoc] = useState<string | null>(null);
+  const [thesisAnalysis, setThesisAnalysis] = useState<Record<string, string>>({});
+  const [analyzingDoc, setAnalyzingDoc] = useState<string | null>(null);
 
   useEffect(() => {
     if (!dealRoomId || !userId) return;
@@ -124,6 +126,19 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
         .select("*")
         .eq("deal_room_id", dealRoomId);
       return data ?? [];
+    },
+  });
+
+  const { data: investorProfile } = useQuery({
+    queryKey: ["investor-profile-thesis", userId],
+    enabled: !!userId && isInvestor,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("investor_profiles")
+        .select("thesis, sectors, stages, check_size_min, check_size_max, red_flags, key_metrics, fund_name")
+        .eq("user_id", userId!)
+        .maybeSingle();
+      return data;
     },
   });
 
@@ -228,6 +243,51 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
     toast.success("Item added");
   };
 
+  const analyzeAgainstThesis = async (doc: any) => {
+    if (!investorProfile || !doc.ai_summary) return;
+    setAnalyzingDoc(doc.id);
+    try {
+      const openAIKey = (import.meta.env as any).VITE_OPENAI_API_KEY || "";
+      const thesis = [
+        investorProfile.thesis && `Thesis: ${investorProfile.thesis}`,
+        investorProfile.sectors && `Sectors: ${investorProfile.sectors}`,
+        investorProfile.stages && `Stages: ${investorProfile.stages}`,
+        investorProfile.check_size_min && `Check size: ${investorProfile.check_size_min} - ${investorProfile.check_size_max}`,
+        investorProfile.red_flags && `Red flags (won't invest in): ${investorProfile.red_flags}`,
+        investorProfile.key_metrics && `Key metrics I look for: ${investorProfile.key_metrics}`,
+      ].filter(Boolean).join("\n");
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${openAIKey}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          max_tokens: 200,
+          messages: [
+            {
+              role: "system",
+              content: "You are a VC analyst. Given an investor's thesis and a document summary, provide a brief thesis alignment analysis. Use ✅ for matches, ⚠️ for concerns, ❌ for red flags. Be specific and concise. Max 5 bullet points.",
+            },
+            {
+              role: "user",
+              content: `INVESTOR THESIS:\n${thesis}\n\nDOCUMENT SUMMARY:\n${doc.ai_summary}\n\nAnalyze alignment:`,
+            },
+          ],
+        }),
+      });
+      const result = await response.json();
+      const analysis = result.choices?.[0]?.message?.content || "Could not analyze";
+      setThesisAnalysis((prev) => ({ ...prev, [doc.id]: analysis }));
+    } catch {
+      setThesisAnalysis((prev) => ({ ...prev, [doc.id]: "Analysis failed" }));
+    } finally {
+      setAnalyzingDoc(null);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="p-8 flex items-center justify-center gap-2 text-sm text-muted-foreground">
@@ -326,76 +386,149 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                   </div>
                 )}
                 {filteredVaultDocs.map((doc: any) => {
-                const review = getDocReview(doc.id);
-                const docName = nameFromPath(doc);
-                return (
-                  <div key={doc.id} className="p-4">
-                    <div className="flex items-start gap-3">
-                      <FileText className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm font-medium truncate">{docName}</span>
-                          {doc.category && (
-                            <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full">
-                              {doc.category}
-                            </span>
+                  const review = getDocReview(doc.id);
+                  const docName = nameFromPath(doc);
+                  const isDocExpanded = expandedDoc === doc.id;
+                  const publicUrl = (() => {
+                    const { data } = supabase.storage.from("documents").getPublicUrl(doc.storage_path);
+                    return data.publicUrl;
+                  })();
+                  return (
+                    <div key={doc.id} className="border-b border-border/60 last:border-0">
+                      {/* Clickable header row */}
+                      <button
+                        onClick={() => setExpandedDoc(isDocExpanded ? null : doc.id)}
+                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent/30 transition-colors text-left"
+                      >
+                        <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm font-medium truncate">{docName}</span>
+                            {doc.category && (
+                              <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-full">
+                                {doc.category}
+                              </span>
+                            )}
+                            {review?.verdict && (
+                              <span className={cn(
+                                "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
+                                review.verdict === "accepted" && "bg-success/10 text-success",
+                                review.verdict === "rejected" && "bg-destructive/10 text-destructive",
+                                review.verdict === "needs_revision" && "bg-warning/10 text-warning",
+                              )}>
+                                {review.verdict === "accepted" ? "✓ Accepted"
+                                  : review.verdict === "rejected" ? "✗ Rejected"
+                                  : "↻ Needs revision"}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {isDocExpanded
+                          ? <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
+                          : <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />}
+                      </button>
+
+                      {/* Expanded panel */}
+                      {isDocExpanded && (
+                        <div className="px-4 pb-4 space-y-4 bg-muted/10">
+                          {/* AI Summary */}
+                          {doc.ai_summary ? (
+                            <div className="rounded-xl border border-border/60 bg-card p-4">
+                              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                <Sparkles className="h-3 w-3" /> AI Summary
+                              </div>
+                              <p className="text-sm text-foreground/90 leading-relaxed">{doc.ai_summary}</p>
+                            </div>
+                          ) : (
+                            <div className="rounded-xl border border-dashed border-border/60 p-4 text-center text-xs text-muted-foreground">
+                              No AI summary yet. Generate one from the Documents tab.
+                            </div>
                           )}
-                          {review?.verdict && (
-                            <span className={cn(
-                              "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
-                              review.verdict === "accepted" && "bg-success/10 text-success",
-                              review.verdict === "rejected" && "bg-destructive/10 text-destructive",
-                              review.verdict === "needs_revision" && "bg-warning/10 text-warning",
+
+                          {/* Thesis alignment — investor only */}
+                          {isInvestor && investorProfile && (
+                            <div className="rounded-xl border border-border/60 bg-card p-4">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                  Thesis Alignment
+                                </div>
+                                {doc.ai_summary && !thesisAnalysis[doc.id] && (
+                                  <button
+                                    onClick={() => void analyzeAgainstThesis(doc)}
+                                    disabled={analyzingDoc === doc.id}
+                                    className="inline-flex items-center gap-1 text-[10px] text-brand hover:underline disabled:opacity-50"
+                                  >
+                                    {analyzingDoc === doc.id
+                                      ? <><Loader2 className="h-3 w-3 animate-spin" /> Analyzing…</>
+                                      : <><Sparkles className="h-3 w-3" /> Analyze against my thesis</>}
+                                  </button>
+                                )}
+                              </div>
+                              {thesisAnalysis[doc.id] ? (
+                                <div className="text-sm whitespace-pre-wrap leading-relaxed">
+                                  {thesisAnalysis[doc.id]}
+                                </div>
+                              ) : (
+                                <div className="text-xs text-muted-foreground">
+                                  {!doc.ai_summary
+                                    ? "Generate an AI summary first, then analyze thesis alignment."
+                                    : !investorProfile.thesis
+                                    ? "Add your investment thesis in your Profile to enable alignment analysis."
+                                    : "Click 'Analyze against my thesis' to see how this document aligns with your investment criteria."}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Preview + Download */}
+                          <div className="flex gap-2">
+                            <a
+                              href={publicUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent transition-colors"
+                            >
+                              <Eye className="h-3.5 w-3.5" /> Preview
+                            </a>
+                            <a
+                              href={publicUrl}
+                              download
+                              className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent transition-colors"
+                            >
+                              <Download className="h-3.5 w-3.5" /> Download
+                            </a>
+                          </div>
+
+                          {/* Review panel — investor only */}
+                          {isInvestor && (
+                            <DocumentReviewPanel
+                              doc={doc}
+                              review={review}
+                              dealRoomId={dealRoomId}
+                              userId={userId}
+                              category={doc.category || "Other"}
+                              onReviewed={() => {
+                                qc.invalidateQueries({ queryKey: ["doc-reviews", dealRoomId] });
+                              }}
+                            />
+                          )}
+
+                          {/* Founder sees feedback */}
+                          {isFounder && review?.feedback && (
+                            <div className={cn(
+                              "rounded-lg px-3 py-2.5 text-xs",
+                              review.verdict === "needs_revision" && "bg-warning/10 text-warning border border-warning/20",
+                              review.verdict === "rejected" && "bg-destructive/10 text-destructive border border-destructive/20",
+                              review.verdict === "accepted" && "bg-success/10 text-success border border-success/20",
                             )}>
-                              {review.verdict === "accepted" ? "✓ Accepted"
-                                : review.verdict === "rejected" ? "✗ Rejected"
-                                : "↻ Needs revision"}
-                            </span>
+                              <span className="font-medium">Investor feedback: </span>{review.feedback}
+                            </div>
                           )}
                         </div>
-                        {doc.ai_summary && (
-                          <button
-                            onClick={() => setVaultDocOpen((s) => ({ ...s, [doc.id]: !s[doc.id] }))}
-                            className="mt-1 text-[10px] text-brand hover:underline inline-flex items-center gap-1"
-                          >
-                            <Sparkles className="h-3 w-3" />
-                            AI Summary {vaultDocOpen[doc.id] ? "▲" : "▼"}
-                          </button>
-                        )}
-                        {vaultDocOpen[doc.id] && doc.ai_summary && (
-                          <div className="mt-2 rounded-lg bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-                            {doc.ai_summary}
-                          </div>
-                        )}
-                        {isFounder && review?.feedback && (
-                          <div className={cn(
-                            "mt-2 rounded-lg px-3 py-2 text-xs",
-                            review.verdict === "needs_revision" && "bg-warning/10 text-warning",
-                            review.verdict === "rejected" && "bg-destructive/10 text-destructive",
-                            review.verdict === "accepted" && "bg-success/10 text-success",
-                          )}>
-                            <span className="font-medium">Feedback: </span>{review.feedback}
-                          </div>
-                        )}
-                      </div>
+                      )}
                     </div>
-                    {isInvestor && (
-                      <div className="mt-2">
-                        <DocumentReviewPanel
-                          doc={doc}
-                          review={review}
-                          dealRoomId={dealRoomId}
-                          userId={userId}
-                          category={doc.category || "Other"}
-                          onReviewed={() => {
-                            qc.invalidateQueries({ queryKey: ["doc-reviews", dealRoomId] });
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+                  );
+                })}
               </>
             )}
           </div>
