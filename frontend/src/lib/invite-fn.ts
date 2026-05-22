@@ -10,6 +10,7 @@ type InviteInput = {
   supabaseUrl?: string;
   supabaseAnonKey?: string;
   appUrl?: string;
+  resendKey?: string;
   dealRoomName?: string;
   founderName?: string;
   startupName?: string;
@@ -102,6 +103,7 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
     }
 
     const resendKey =
+      data.resendKey ||
       (globalThis as any).RESEND_API_KEY ||
       process.env.RESEND_API_KEY ||
       "";
