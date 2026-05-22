@@ -77,7 +77,7 @@ function Hero() {
           <div>
             <div className="hs-a hs-a1 inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/8 px-3 py-1 text-[11px] font-medium text-brand">
               <span className="h-1.5 w-1.5 rounded-full bg-brand animate-pulse-glow" />
-              Now in beta · Join 200+ founders
+              Early access — free during beta
               <ArrowRight className="h-3 w-3" />
             </div>
 
@@ -104,7 +104,7 @@ function Hero() {
             </div>
 
             <div className="hs-a hs-a5 mt-6 flex flex-wrap gap-x-5 gap-y-2">
-              {["No credit card", "Free during beta", "SOC 2 Type II"].map((t) => (
+              {["No credit card", "Free during beta", "Bank-grade encryption"].map((t) => (
                 <span key={t} className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
                   <CheckCircle2 className="h-3.5 w-3.5 text-success" /> {t}
                 </span>
@@ -136,7 +136,7 @@ function DealRoomMockup() {
           </div>
           <div className="flex-1 mx-3">
             <div className="mx-auto w-44 rounded-md bg-muted text-center py-0.5 text-[10px] text-muted-foreground">
-              hockeystick.app/deal-room
+              ventureroom.app/deal-room
             </div>
           </div>
         </div>
@@ -474,7 +474,7 @@ function Features() {
   ];
 
   return (
-    <section className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+    <section id="features" className="mx-auto max-w-7xl px-6 py-24 md:py-32">
       <div className="flex items-end justify-between gap-8 mb-14 flex-wrap">
         <div className="max-w-lg">
           <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-3">Features</div>
@@ -495,9 +495,6 @@ function Features() {
             </div>
             <div className="hs text-[15px] font-bold tracking-tight mb-2">{title}</div>
             <div className="text-[13px] text-muted-foreground leading-relaxed">{desc}</div>
-            <div className="mt-5 flex items-center gap-1 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-              Learn more <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
-            </div>
           </div>
         ))}
       </div>
@@ -535,7 +532,7 @@ function Stats() {
 // ── 7. DUAL CTA ───────────────────────────────────────────────────
 function DualCTA() {
   return (
-    <section className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+    <section id="get-started" className="mx-auto max-w-7xl px-6 py-24 md:py-32">
       <div className="grid md:grid-cols-2 gap-4">
         {/* Founders */}
         <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card p-10 md:p-12 group">
