@@ -1125,7 +1125,6 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
   const [generatingSummaryId, setGeneratingSummaryId] = useState<string | null>(null);
   const [editingSummaryId, setEditingSummaryId] = useState<string | null>(null);
   const [summaryEdits, setSummaryEdits] = useState<Record<string, string>>({});
-  const [summaryExpanded, setSummaryExpanded] = useState<Record<string, boolean>>({});
   const [previewDoc, setPreviewDoc] = useState<any | null>(null);
 
   const { data: docs = [] } = useQuery({
@@ -1198,7 +1197,6 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
       }
       await supabase.from("documents").update({ ai_summary: result.summary }).eq("id", doc.id);
       queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId], refetchType: "active" });
-      setSummaryExpanded((s) => ({ ...s, [doc.id]: true }));
       toast.success("Summary generated");
     } catch (err) {
       console.error("Summary generation error:", err);
@@ -1208,19 +1206,6 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
     }
   };
 
-  const saveSummaryEdit = async (docId: string) => {
-    const text = summaryEdits[docId]?.trim();
-    if (!text) return;
-    const { error } = await supabase
-      .from("documents")
-      .update({ ai_summary: text, summary_edited: true })
-      .eq("id", docId);
-    if (error) { toast.error("Failed to save summary"); return; }
-    queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
-    setEditingSummaryId(null);
-    setSummaryEdits((s) => { const n = { ...s }; delete n[docId]; return n; });
-    toast.success("Summary saved");
-  };
 
   const handleDeleteDoc = (doc: any) => {
     const docName: string = doc.name || doc.storage_path?.split("/").pop() || "Document";
@@ -1427,71 +1412,79 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
                 {/* AI Summary section — only for text-based files */}
                 {supportsAI && (
                   <div className="border-t border-border/40">
-                    {isEditing ? (
-                      <div className="px-4 py-3 space-y-2">
-                        <textarea
-                          value={summaryEdits[doc.id] ?? doc.ai_summary ?? ""}
-                          onChange={(e) => setSummaryEdits((s) => ({ ...s, [doc.id]: e.target.value }))}
-                          rows={5}
-                          className="w-full resize-none rounded-md border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
-                        />
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => saveSummaryEdit(doc.id)}
-                            className="inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs"
-                          >
-                            Save
-                          </button>
-                          <button
-                            onClick={() => setEditingSummaryId(null)}
-                            className="inline-flex items-center gap-1 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    ) : hasSummary ? (
-                      <div className="px-4 py-3">
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            onClick={() => setSummaryExpanded((s) => ({ ...s, [doc.id]: !s[doc.id] }))}
-                            className="inline-flex items-center gap-1.5 text-xs text-brand hover:underline flex-1"
-                          >
-                            <Sparkles className="h-3.5 w-3.5 shrink-0" />
-                            AI Summary
-                            {summaryExpanded[doc.id]
-                              ? <ChevronUp className="h-3 w-3" />
-                              : <ChevronDown className="h-3 w-3" />}
-                          </button>
-                          <span className={cn("px-1.5 py-0.5 rounded text-[9px] font-medium", doc.summary_edited ? "bg-brand/10 text-brand" : "bg-muted/60 text-muted-foreground")}>
-                            {doc.summary_edited ? "Edited" : "AI"}
-                          </span>
-                        </div>
-                        {summaryExpanded[doc.id] && (
-                          <div className="mt-2 rounded-lg border-l-2 border-brand/40 bg-muted/30 pl-3 pr-3 py-3">
-                            <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-line">{doc.ai_summary}</p>
-                            <div className="flex gap-2 mt-3">
+                    {hasSummary ? (
+                      <div className="px-4 pb-3">
+                        <div className="rounded-lg border border-brand/20 bg-brand/5 p-3">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-1.5 text-xs font-medium text-brand">
+                              <Sparkles className="h-3 w-3" />
+                              AI Summary
+                              <span className={cn("px-1.5 py-0.5 rounded text-[9px] font-medium ml-1",
+                                doc.summary_edited ? "bg-brand/10 text-brand" : "bg-muted/60 text-muted-foreground")}>
+                                {doc.summary_edited ? "Edited" : "AI"}
+                              </span>
+                            </div>
+                            <div className="flex gap-2">
                               <button
                                 onClick={() => generateSummary(doc)}
                                 disabled={isGenerating}
-                                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground border border-border/60 rounded-md px-2.5 py-1 hover:bg-accent disabled:opacity-50"
+                                className="text-[10px] text-muted-foreground hover:text-foreground border border-border/60 rounded px-2 py-0.5 hover:bg-accent disabled:opacity-50"
                               >
-                                {isGenerating ? <><Loader2 className="h-3 w-3 animate-spin" /> Regenerating…</> : "Regenerate"}
+                                {isGenerating ? "Regenerating…" : "Regenerate"}
                               </button>
-                              {isFounder && (
+                              {isFounder && !isEditing && (
                                 <button
                                   onClick={() => {
                                     setEditingSummaryId(doc.id);
                                     setSummaryEdits((s) => ({ ...s, [doc.id]: doc.ai_summary! }));
                                   }}
-                                  className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground border border-border/60 rounded-md px-2.5 py-1 hover:bg-accent"
+                                  className="text-[10px] text-muted-foreground hover:text-foreground border border-border/60 rounded px-2 py-0.5 hover:bg-accent"
                                 >
-                                  <Pencil className="h-3 w-3" /> Edit
+                                  Edit
                                 </button>
                               )}
                             </div>
                           </div>
-                        )}
+                          {isEditing ? (
+                            <div className="space-y-2">
+                              <textarea
+                                value={summaryEdits[doc.id] ?? ""}
+                                onChange={(e) => setSummaryEdits((s) => ({ ...s, [doc.id]: e.target.value }))}
+                                rows={4}
+                                className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-xs resize-none focus:outline-none focus:border-brand/50"
+                              />
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => setEditingSummaryId(null)}
+                                  className="text-[10px] border border-border/60 rounded px-2 py-1 hover:bg-accent"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  onClick={async () => {
+                                    const text = summaryEdits[doc.id]?.trim();
+                                    if (!text) return;
+                                    const { error } = await supabase.from("documents")
+                                      .update({ ai_summary: text, summary_edited: true })
+                                      .eq("id", doc.id);
+                                    if (error) { toast.error("Failed to save summary"); return; }
+                                    queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+                                    setEditingSummaryId(null);
+                                    setSummaryEdits((s) => { const n = { ...s }; delete n[doc.id]; return n; });
+                                    toast.success("Summary saved");
+                                  }}
+                                  className="text-[10px] bg-gradient-brand text-brand-foreground rounded px-2 py-1"
+                                >
+                                  Save
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-xs text-foreground/90 leading-relaxed whitespace-pre-line">
+                              {doc.ai_summary}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     ) : (
                       /* No summary yet — compact generate row */
@@ -1506,8 +1499,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
                         >
                           {isGenerating
                             ? <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</>
-                            : <><Sparkles className="h-3 w-3" /> Generate</>
-                          }
+                            : <><Sparkles className="h-3 w-3" /> Generate</>}
                         </button>
                       </div>
                     )}

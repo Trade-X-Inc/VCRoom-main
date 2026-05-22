@@ -318,6 +318,154 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
     );
   }
 
+  if (isFounder) {
+    return (
+      <div className="p-6 max-w-4xl mx-auto space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold tracking-tight">Deal Report</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Your investor's due diligence progress and feedback on your documents.
+          </p>
+        </div>
+
+        {/* DD Progress grid */}
+        <div className="rounded-2xl border border-border/60 bg-card p-5">
+          <div className="text-sm font-semibold mb-4">Due Diligence Progress</div>
+          <div className="mb-3 h-2 rounded-full bg-muted overflow-hidden">
+            <div className="h-full bg-gradient-brand transition-all duration-500"
+              style={{ width: `${overallProgress()}%` }} />
+          </div>
+          <p className="text-xs text-muted-foreground mb-4">
+            {checklistItems.filter((i: any) => i.checked).length} of {checklistItems.length} items reviewed
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {CATEGORIES.map((cat) => {
+              const catData = getCatData(cat);
+              const status = (catData.status as DDStatus) ?? "Pending";
+              const cfg = STATUS_CONFIG[status];
+              const StatusIcon = cfg.icon;
+              const items = getCatItems(cat);
+              const progress = getProgress(cat);
+              const { icon: CatIcon, color } = CAT_CONFIG[cat];
+              return (
+                <div key={cat} className={cn(
+                  "rounded-xl border p-3 space-y-2",
+                  status === "Red Flag" ? "border-destructive/30 bg-destructive/5" :
+                  status === "Complete" ? "border-success/30 bg-success/5" :
+                  "border-border/60 bg-background"
+                )}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <CatIcon className={cn("h-3.5 w-3.5", color)} />
+                      <span className="text-xs font-medium">{cat}</span>
+                    </div>
+                    <span className={cn("inline-flex items-center gap-0.5 text-[10px] font-medium rounded-full px-1.5 py-0.5", cfg.cls)}>
+                      <StatusIcon className="h-2.5 w-2.5" />{cfg.label}
+                    </span>
+                  </div>
+                  <div className="h-1 rounded-full bg-muted overflow-hidden">
+                    <div className="h-full bg-gradient-brand" style={{ width: `${progress}%` }} />
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">{items.filter((i: any) => i.checked).length}/{items.length} items</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Document feedback */}
+        <div className="rounded-2xl border border-border/60 bg-card overflow-hidden">
+          <div className="px-5 py-4 border-b border-border/60">
+            <div className="text-sm font-semibold">Document Feedback</div>
+            <div className="text-xs text-muted-foreground mt-0.5">Investor feedback on your uploaded documents</div>
+          </div>
+          {dealDocs.length === 0 ? (
+            <div className="p-8 text-center text-sm text-muted-foreground">
+              No documents uploaded yet. Upload documents in the Document Vault tab.
+            </div>
+          ) : (
+            <div className="divide-y divide-border/60">
+              {dealDocs.map((doc: any) => {
+                const review = getDocReview(doc.id);
+                const docName = nameFromPath(doc);
+                return (
+                  <div key={doc.id} className="flex items-start gap-3 px-5 py-4">
+                    <FileText className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-medium truncate">{docName}</span>
+                        {review?.verdict ? (
+                          <span className={cn(
+                            "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
+                            review.verdict === "accepted" && "bg-success/10 text-success",
+                            review.verdict === "rejected" && "bg-destructive/10 text-destructive",
+                            review.verdict === "needs_revision" && "bg-warning/10 text-warning",
+                          )}>
+                            {review.verdict === "accepted" ? "✓ Accepted"
+                              : review.verdict === "rejected" ? "✗ Rejected"
+                              : "↻ Needs revision"}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+                            Pending review
+                          </span>
+                        )}
+                      </div>
+                      {review?.feedback && (
+                        <div className={cn(
+                          "mt-2 rounded-lg px-3 py-2 text-xs",
+                          review.verdict === "needs_revision" && "bg-warning/10 text-warning border border-warning/20",
+                          review.verdict === "rejected" && "bg-destructive/10 text-destructive border border-destructive/20",
+                          review.verdict === "accepted" && "bg-success/10 text-success border border-success/20",
+                        )}>
+                          <span className="font-medium">Feedback: </span>{review.feedback}
+                        </div>
+                      )}
+                      {!review && (
+                        <p className="text-xs text-muted-foreground mt-0.5">Waiting for investor to review</p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Category feedback */}
+        <div className="rounded-2xl border border-border/60 bg-card overflow-hidden">
+          <div className="px-5 py-4 border-b border-border/60">
+            <div className="text-sm font-semibold">Category Feedback</div>
+            <div className="text-xs text-muted-foreground mt-0.5">Investor notes per due diligence category</div>
+          </div>
+          <div className="divide-y divide-border/60">
+            {CATEGORIES.map((cat) => {
+              const catData = getCatData(cat);
+              if (!catData.investor_notes) return null;
+              const { icon: CatIcon, color } = CAT_CONFIG[cat];
+              return (
+                <div key={cat} className="flex items-start gap-3 px-5 py-4">
+                  <CatIcon className={cn("h-4 w-4 shrink-0 mt-0.5", color)} />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium mb-1">{cat}</div>
+                    <div className="text-xs text-muted-foreground bg-muted/40 rounded-lg px-3 py-2">
+                      {catData.investor_notes}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            {CATEGORIES.every((cat) => !getCatData(cat).investor_notes) && (
+              <div className="p-6 text-center text-sm text-muted-foreground">
+                No feedback yet from your investor.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const checkedCount = checklistItems.filter((i: any) => i.checked).length;
 
   return (
