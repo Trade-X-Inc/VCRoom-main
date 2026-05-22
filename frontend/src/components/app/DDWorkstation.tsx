@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   CheckCircle2, Circle, ChevronDown, ChevronUp, Flag, Clock, Eye,
   StickyNote, Save, Loader2, FileText, Plus, Sparkles, Trash2, Download,
-  BarChart3, TrendingUp, Users, Scale, Target, Handshake,
+  BarChart3, TrendingUp, Users, Scale, Target, Handshake, Play, Image, ExternalLink,
 } from "lucide-react";
 
 const CATEGORIES = ["Financials", "Team", "Legal", "Market", "Product", "References"] as const;
@@ -137,6 +137,19 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
         .from("investor_profiles")
         .select("thesis, sectors, stages, check_size_min, check_size_max, red_flags, key_metrics, fund_name")
         .eq("user_id", userId!)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  const { data: roomMedia } = useQuery({
+    queryKey: ["room-media", dealRoomId],
+    enabled: !!dealRoomId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("deal_rooms")
+        .select("pitch_deck_url, product_video_url, product_images")
+        .eq("id", dealRoomId)
         .maybeSingle();
       return data;
     },
@@ -389,10 +402,6 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                   const review = getDocReview(doc.id);
                   const docName = nameFromPath(doc);
                   const isDocExpanded = expandedDoc === doc.id;
-                  const publicUrl = (() => {
-                    const { data } = supabase.storage.from("documents").getPublicUrl(doc.storage_path);
-                    return data.publicUrl;
-                  })();
                   return (
                     <div key={doc.id} className="border-b border-border/60 last:border-0">
                       {/* Clickable header row */}
@@ -483,26 +492,35 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                           {/* Preview + Download */}
                           <div className="flex gap-2">
                             <button
-                              onClick={() => {
+                              onClick={async () => {
+                                const { data } = await supabase.storage
+                                  .from("documents")
+                                  .createSignedUrl(doc.storage_path, 300);
+                                if (!data?.signedUrl) { toast.error("Could not load preview"); return; }
+                                const url = data.signedUrl;
                                 const ext = (doc.file_name || doc.storage_path || "").split(".").pop()?.toLowerCase() ?? "";
                                 const isOffice = ["pptx", "docx", "xlsx", "ppt", "doc", "xls"].includes(ext);
                                 if (isOffice) {
-                                  window.open(`https://docs.google.com/gview?url=${encodeURIComponent(publicUrl)}&embedded=false`, "_blank");
+                                  window.open(`https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=false`, "_blank");
                                 } else {
-                                  window.open(publicUrl, "_blank");
+                                  window.open(url, "_blank");
                                 }
                               }}
                               className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent transition-colors"
                             >
                               <Eye className="h-3.5 w-3.5" /> Preview
                             </button>
-                            <a
-                              href={publicUrl}
-                              download
+                            <button
+                              onClick={async () => {
+                                const { data } = await supabase.storage
+                                  .from("documents")
+                                  .createSignedUrl(doc.storage_path, 300);
+                                if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+                              }}
                               className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent transition-colors"
                             >
                               <Download className="h-3.5 w-3.5" /> Download
-                            </a>
+                            </button>
                           </div>
 
                           {/* Review panel — investor only */}
@@ -535,6 +553,105 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                     </div>
                   );
                 })}
+                {/* Media & Links */}
+                <div className="border-t border-border/60 px-5 py-4">
+                  <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                    Media &amp; Links
+                  </div>
+                  <div className="space-y-3">
+                    {/* Pitch deck */}
+                    <div className="flex items-center gap-3">
+                      <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs text-muted-foreground mb-1">Pitch Deck URL</div>
+                        {isFounder ? (
+                          <input
+                            type="url"
+                            defaultValue={roomMedia?.pitch_deck_url ?? ""}
+                            placeholder="https://docsend.com/view/..."
+                            onBlur={async (e) => {
+                              await supabase.from("deal_rooms")
+                                .update({ pitch_deck_url: e.target.value || null })
+                                .eq("id", dealRoomId);
+                            }}
+                            className="w-full rounded-md border border-border/60 bg-background px-3 py-1.5 text-xs focus:outline-none focus:border-brand/50"
+                          />
+                        ) : roomMedia?.pitch_deck_url ? (
+                          <a href={roomMedia.pitch_deck_url} target="_blank" rel="noopener noreferrer"
+                            className="text-xs text-brand hover:underline flex items-center gap-1">
+                            <ExternalLink className="h-3 w-3" /> View pitch deck
+                          </a>
+                        ) : (
+                          <span className="text-xs text-muted-foreground italic">Not provided</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Product video */}
+                    <div className="flex items-center gap-3">
+                      <Play className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs text-muted-foreground mb-1">Product Video URL (YouTube/Loom/Vimeo)</div>
+                        {isFounder ? (
+                          <input
+                            type="url"
+                            defaultValue={roomMedia?.product_video_url ?? ""}
+                            placeholder="https://youtube.com/watch?v=..."
+                            onBlur={async (e) => {
+                              await supabase.from("deal_rooms")
+                                .update({ product_video_url: e.target.value || null })
+                                .eq("id", dealRoomId);
+                            }}
+                            className="w-full rounded-md border border-border/60 bg-background px-3 py-1.5 text-xs focus:outline-none focus:border-brand/50"
+                          />
+                        ) : roomMedia?.product_video_url ? (
+                          <a href={roomMedia.product_video_url} target="_blank" rel="noopener noreferrer"
+                            className="text-xs text-brand hover:underline flex items-center gap-1">
+                            <ExternalLink className="h-3 w-3" /> Watch product video
+                          </a>
+                        ) : (
+                          <span className="text-xs text-muted-foreground italic">Not provided</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Product images */}
+                    <div className="flex items-start gap-3">
+                      <Image className="h-4 w-4 text-muted-foreground shrink-0 mt-1" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs text-muted-foreground mb-1">Product Images (Google Drive or direct image URLs)</div>
+                        {isFounder && (
+                          <input
+                            type="url"
+                            placeholder="Paste URL and press Enter or click away to add…"
+                            onBlur={async (e) => {
+                              if (!e.target.value.trim()) return;
+                              const existing = (roomMedia?.product_images as string[]) ?? [];
+                              await supabase.from("deal_rooms")
+                                .update({ product_images: [...existing, e.target.value.trim()] })
+                                .eq("id", dealRoomId);
+                              e.target.value = "";
+                              qc.invalidateQueries({ queryKey: ["room-media", dealRoomId] });
+                            }}
+                            className="w-full rounded-md border border-border/60 bg-background px-3 py-1.5 text-xs focus:outline-none focus:border-brand/50 mb-2"
+                          />
+                        )}
+                        {((roomMedia?.product_images as string[]) ?? []).length > 0 ? (
+                          <div className="flex gap-2 flex-wrap">
+                            {(roomMedia?.product_images as string[]).map((imgUrl, i) => (
+                              <a key={i} href={imgUrl} target="_blank" rel="noopener noreferrer"
+                                className="text-xs text-brand hover:underline border border-border/60 rounded px-2 py-1">
+                                Image {i + 1} ↗
+                              </a>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground italic">No images added</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </>
             )}
           </div>
