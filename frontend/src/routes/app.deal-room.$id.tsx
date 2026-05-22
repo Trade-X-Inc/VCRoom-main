@@ -1194,7 +1194,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
         return;
       }
       await supabase.from("documents").update({ ai_summary: result.summary }).eq("id", doc.id);
-      queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+      queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId], refetchType: "active" });
       setSummaryExpanded((s) => ({ ...s, [doc.id]: true }));
       toast.success("Summary generated");
     } catch (err) {
