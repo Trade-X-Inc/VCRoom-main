@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
   CheckCircle2, Circle, ChevronDown, ChevronUp, Flag, Clock, Eye,
-  StickyNote, Save, Loader2, FileText, Plus, Sparkles, Trash2, Download,
+  StickyNote, Save, Loader2, FileText, Plus, Sparkles, Trash2, Download, RefreshCw,
   BarChart3, TrendingUp, Users, Scale, Target, Handshake, Play, Image, ExternalLink,
 } from "lucide-react";
 
@@ -108,6 +108,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
   const { data: dealDocs = [] } = useQuery({
     queryKey: ["dd-docs", dealRoomId],
     enabled: !!dealRoomId,
+    staleTime: 0,
     queryFn: async () => {
       const { data } = await supabase
         .from("documents")
@@ -367,9 +368,17 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
               </div>
             </div>
           </div>
-          {vaultOpen
-            ? <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
-            : <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={(e) => { e.stopPropagation(); qc.invalidateQueries({ queryKey: ["dd-docs", dealRoomId] }); }}
+              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 px-1"
+            >
+              <RefreshCw className="h-3 w-3" /> Refresh
+            </button>
+            {vaultOpen
+              ? <ChevronUp className="h-4 w-4 text-muted-foreground" />
+              : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+          </div>
         </button>
 
         {vaultOpen && (

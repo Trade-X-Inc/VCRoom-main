@@ -23,6 +23,49 @@ type DocCategory = (typeof CATEGORIES)[number];
 
 const TAB_LABELS = ["All", ...CATEGORIES] as const;
 
+const EXPECTED_DOCS: Record<DocCategory, string[]> = {
+  "Pitch Deck": [
+    "Pitch Deck (PDF or PPTX)",
+    "One-pager / Executive Summary",
+    "Company Blurb (1-2 paragraphs)",
+  ],
+  "Financials": [
+    "Last 3 years P&L",
+    "Current balance sheet",
+    "Cash flow statement",
+    "Revenue projections (3 years)",
+    "Cap table",
+    "Current MRR/ARR metrics",
+  ],
+  "Legal": [
+    "Certificate of incorporation",
+    "Shareholder agreement",
+    "IP ownership / assignments",
+    "Pending litigation disclosure",
+    "Key contracts",
+  ],
+  "Market Research": [
+    "TAM/SAM/SOM analysis",
+    "Competitive landscape",
+    "Customer research / surveys",
+    "Market sizing model",
+  ],
+  "Team": [
+    "Founder CVs / LinkedIn profiles",
+    "Org chart",
+    "Key employee contracts",
+    "Advisory board list",
+  ],
+  "Product": [
+    "Product roadmap",
+    "Tech architecture overview",
+    "Demo recording / video link",
+    "Key metrics dashboard",
+    "Product screenshots",
+  ],
+  "Other": [],
+};
+
 type ViewMode = "list" | "grid";
 
 const CAT_COLOR: Record<string, string> = {
@@ -107,6 +150,19 @@ function Documents() {
         id: r.id,
         name: startup.company_name ? `${startup.company_name} — Deal Room` : r.id,
       }));
+    },
+  });
+
+  const { data: startupMedia } = useQuery({
+    queryKey: ["startup-media-docs", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("startups")
+        .select("id, product_video_url, pitch_deck_url")
+        .eq("founder_id", user!.id)
+        .maybeSingle();
+      return data;
     },
   });
 
@@ -199,6 +255,46 @@ function Documents() {
             <Upload className="h-4 w-4" /> Upload document
           </button>
         </div>
+      </div>
+
+      {/* Media & Links */}
+      <div className="mt-6 rounded-xl border border-border/60 bg-card p-4">
+        <div className="text-sm font-semibold mb-3">Media &amp; Links</div>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground">Product Video URL (YouTube/Loom/Vimeo)</label>
+            <input
+              type="url"
+              defaultValue={startupMedia?.product_video_url ?? ""}
+              placeholder="https://youtube.com/watch?v=..."
+              className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+              onBlur={async (e) => {
+                if (!startupMedia?.id) return;
+                await supabase.from("startups")
+                  .update({ product_video_url: e.target.value || null })
+                  .eq("id", startupMedia.id);
+              }}
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground">Pitch Deck Link (DocSend/Google Drive)</label>
+            <input
+              type="url"
+              defaultValue={startupMedia?.pitch_deck_url ?? ""}
+              placeholder="https://docsend.com/view/..."
+              className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+              onBlur={async (e) => {
+                if (!startupMedia?.id) return;
+                await supabase.from("startups")
+                  .update({ pitch_deck_url: e.target.value || null })
+                  .eq("id", startupMedia.id);
+              }}
+            />
+          </div>
+        </div>
+        <p className="text-[10px] text-muted-foreground mt-2">
+          These links are saved to your founder profile and visible to investors in your deal rooms.
+        </p>
       </div>
 
       {/* Category tabs */}
@@ -390,6 +486,59 @@ function Documents() {
           </div>
         )}
       </div>
+
+      {/* Expected documents for this category */}
+      {activeTab !== "All" && (EXPECTED_DOCS[activeTab as DocCategory] ?? []).length > 0 && (
+        <div className="mt-4">
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
+            Recommended documents for this category
+          </div>
+          <div className="rounded-xl border border-dashed border-border/60 divide-y divide-border/40 overflow-hidden">
+            {(EXPECTED_DOCS[activeTab as DocCategory] ?? []).map((docName) => (
+              <div
+                key={docName}
+                className="flex items-center gap-3 px-4 py-3 bg-muted/20 hover:bg-muted/40 transition-colors"
+              >
+                <div className="grid h-8 w-8 place-items-center rounded-lg bg-muted shrink-0">
+                  <FileText className="h-4 w-4 text-muted-foreground/50" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm text-muted-foreground">{docName}</div>
+                  <div className="text-[10px] text-muted-foreground/60 mt-0.5">Not uploaded yet</div>
+                </div>
+                <label className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 text-brand px-3 py-1.5 text-xs cursor-pointer hover:bg-brand/5 transition-colors shrink-0">
+                  <Upload className="h-3 w-3" /> Upload
+                  <input
+                    type="file"
+                    className="sr-only"
+                    accept=".pdf,.pptx,.ppt,.docx,.doc,.xlsx,.xls,.csv,.png,.jpg,.jpeg"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file || !user?.id) return;
+                      const path = `personal/${user.id}/${Date.now()}-${file.name}`;
+                      const { error: upErr } = await supabase.storage
+                        .from("documents")
+                        .upload(path, file);
+                      if (upErr) { toast.error("Upload failed"); return; }
+                      await supabase.from("documents").insert({
+                        uploader_id: user.id,
+                        storage_path: path,
+                        category: activeTab,
+                        file_name: file.name,
+                        file_size: file.size,
+                        status: "uploaded",
+                      });
+                      queryClient.invalidateQueries({ queryKey: ["documents", user.id] });
+                      toast.success(`${file.name} uploaded`);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Upload Modal */}
       {showUpload && (
