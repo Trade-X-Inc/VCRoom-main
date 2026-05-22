@@ -1,170 +1,120 @@
-import { Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { AppPreview } from "@/components/site/AppPreview";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
-  ArrowRight, Sparkles, Users, FileText, ShieldCheck, ListChecks, Mail, Briefcase,
-  CheckCircle2, AlertTriangle, MessageSquare, Layers,
+  ArrowRight, Users, FileText, ShieldCheck,
+  ListChecks, Brain, Bell, CheckCircle2,
+  Zap,
 } from "lucide-react";
-import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Venture Room — Where Deals Get Decided" },
-      { name: "description", content: "AI-powered fundraising CRM and deal room. Manage your entire fundraise — from first investor email to final decision — in one structured platform." },
-      { property: "og:title", content: "Venture Room — Where Deals Get Decided" },
-      { property: "og:description", content: "The investor-grade platform for founders and VCs. CRM, Deal Room, AI." },
+      { title: "HockeyStick — The Fundraising War Room" },
+      { name: "description", content: "AI-powered deal rooms for founders closing rounds and investors finding signal. Due diligence, document review, and decisions — all in one place." },
+      { property: "og:title", content: "HockeyStick — The Fundraising War Room" },
+      { property: "og:description", content: "Stop chasing. Start closing. The structured fundraising platform built for founders and VCs." },
+    ],
+    links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" as const },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" },
     ],
   }),
   component: Landing,
 });
 
+// ── Page animations (CSS-only, scoped to this page) ───────────────
+const STYLES = `
+  .hs { font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif; }
+  @keyframes hs-up { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes hs-in { from { opacity: 0; } to { opacity: 1; } }
+  .hs-a  { animation: hs-up 0.65s cubic-bezier(0.16,1,0.3,1) both; }
+  .hs-a1 { animation-delay: 0.08s; }
+  .hs-a2 { animation-delay: 0.18s; }
+  .hs-a3 { animation-delay: 0.30s; }
+  .hs-a4 { animation-delay: 0.44s; }
+  .hs-a5 { animation-delay: 0.58s; }
+  .hs-badge { animation: hs-up 0.5s cubic-bezier(0.16,1,0.3,1) 0.7s both; }
+  .hs-feat:hover .hs-feat-icon { transform: scale(1.08) rotate(-3deg); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+  .hs-feat-icon { transition: transform 0.2s ease; }
+  .hs-step-line { background: linear-gradient(90deg, var(--color-brand), var(--color-violet)); }
+`;
+
 function Landing() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
-      <Hero />
-      <LogoCloud />
-      <Problem />
-      <Solution />
-      <Features />
-      <Preview />
-      <HowItWorks />
-      <FinalCTA />
-      <SiteFooter />
-    </div>
+    <>
+      <style>{STYLES}</style>
+      <div className="min-h-screen bg-background text-foreground">
+        <SiteHeader />
+        <Hero />
+        <Logos />
+        <Problem />
+        <HowItWorks />
+        <Features />
+        <Stats />
+        <DualCTA />
+        <SiteFooter />
+      </div>
+    </>
   );
 }
 
+// ── 1. HERO ───────────────────────────────────────────────────────
 function Hero() {
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 -z-10 bg-gradient-hero" />
-      <div className="absolute inset-0 -z-10 grid-bg opacity-40 [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,black,transparent_70%)]" />
-      <div className="mx-auto max-w-7xl px-6 pt-24 pb-20 md:pt-32 md:pb-28 text-center">
-        <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/60 backdrop-blur px-3 py-1 text-xs text-muted-foreground">
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-gradient-brand" />
-          New · AI Email Assistant for founders
-          <ArrowRight className="h-3 w-3" />
-        </div>
-        <h1 className="mt-6 text-5xl md:text-7xl font-semibold tracking-[-0.04em] leading-[1.02]">
-          Where deals
-          <br />
-          <span className="text-gradient-brand">get decided.</span>
-        </h1>
-        <p className="mx-auto mt-6 max-w-xl text-base md:text-lg text-muted-foreground">
-          Manage your entire fundraise — from first investor email to final decision — in one structured platform built for founders and VCs.
-        </p>
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link to="/sign-up" search={{ role: "founder" } as any}>
-            <Button variant="brand" size="lg" className="gap-2">Start as Founder <ArrowRight className="h-4 w-4" /></Button>
-          </Link>
-          <Link to="/sign-up" search={{ role: "investor" } as any}>
-            <Button variant="outline" size="lg">For Investors</Button>
-          </Link>
-        </div>
-        <div className="mt-4 text-xs text-muted-foreground">No credit card · 14-day trial · SOC 2 Type II</div>
+      <div className="absolute inset-0 -z-10 grid-bg opacity-30 [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,black,transparent_80%)]" />
+      <div className="absolute inset-0 -z-10 noise opacity-40" />
 
-        <div className="relative mt-16">
-          <div className="absolute -inset-x-10 -top-10 -bottom-10 -z-10 bg-gradient-mesh opacity-50 blur-3xl" />
-          <AppPreview />
-        </div>
-      </div>
-    </section>
-  );
-}
+      <div className="mx-auto max-w-7xl px-6 pt-20 pb-16 md:pt-28 md:pb-24">
+        <div className="grid lg:grid-cols-[1.15fr_1fr] gap-12 lg:gap-8 items-center">
 
-function LogoCloud() {
-  const logos = ["Sequoia", "a16z", "Index", "Accel", "Lightspeed", "Bessemer", "Greylock"];
-  return (
-    <section className="border-y border-border/60 bg-gradient-soft py-8">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="text-center text-xs uppercase tracking-wider text-muted-foreground">Trusted by founders raising from</div>
-        <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-x-8 gap-y-4 place-items-center">
-          {logos.map((l) => (
-            <div key={l} className="text-sm font-medium text-muted-foreground/80 tracking-tight">{l}</div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Problem() {
-  return (
-    <section className="mx-auto max-w-7xl px-6 py-24">
-      <div className="mx-auto max-w-2xl text-center">
-        <div className="text-xs uppercase tracking-wider text-brand font-medium">The problem</div>
-        <h2 className="mt-3 text-3xl md:text-5xl font-semibold tracking-[-0.03em]">Fundraising is broken on both sides.</h2>
-      </div>
-
-      <div className="mt-14 grid md:grid-cols-2 gap-5">
-        <div className="rounded-2xl border border-border/60 bg-card p-8 shadow-card">
-          <div className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-xs font-medium">For founders</div>
-          <h3 className="mt-4 text-xl font-semibold">You're flying blind.</h3>
-          <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
-            {["Messy outreach across spreadsheets and inboxes", "No tracking on who replied, when, or why", "Decks, NDAs, and updates scattered everywhere", "No idea which investor is actually serious"].map((t) => (
-              <li key={t} className="flex gap-3"><AlertTriangle className="h-4 w-4 text-warning shrink-0 mt-0.5" /><span>{t}</span></li>
-            ))}
-          </ul>
-        </div>
-        <div className="rounded-2xl border border-border/60 bg-card p-8 shadow-card">
-          <div className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-xs font-medium">For VCs</div>
-          <h3 className="mt-4 text-xl font-semibold">You're drowning in deals.</h3>
-          <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
-            {["Hundreds of decks per month, no structure", "Diligence lives in 6 different tools", "Partners can't see deal status at a glance", "Decisions take weeks instead of days"].map((t) => (
-              <li key={t} className="flex gap-3"><AlertTriangle className="h-4 w-4 text-warning shrink-0 mt-0.5" /><span>{t}</span></li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Solution() {
-  return (
-    <section className="relative">
-      <div className="absolute inset-0 -z-10 bg-gradient-soft" />
-      <div className="mx-auto max-w-7xl px-6 py-24">
-        <div className="grid md:grid-cols-2 gap-16 items-center">
+          {/* Left — copy */}
           <div>
-            <div className="text-xs uppercase tracking-wider text-brand font-medium">The solution</div>
-            <h2 className="mt-3 text-3xl md:text-5xl font-semibold tracking-[-0.03em]">One platform.<br />The whole fundraise.</h2>
-            <p className="mt-5 text-muted-foreground text-base max-w-md">
-              Venture Room combines a purpose-built CRM, a structured deal room, and an AI assistant that drafts, tracks, and analyzes every interaction.
+            <div className="hs-a hs-a1 inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/8 px-3 py-1 text-[11px] font-medium text-brand">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand animate-pulse-glow" />
+              Now in beta · Join 200+ founders
+              <ArrowRight className="h-3 w-3" />
+            </div>
+
+            <h1 className="hs hs-a hs-a2 mt-5 text-[clamp(2.6rem,6vw,4.5rem)] font-bold leading-[1.03] tracking-[-0.04em]">
+              Stop chasing.<br />
+              <span className="text-gradient-brand">Start closing.</span>
+            </h1>
+
+            <p className="hs-a hs-a3 mt-5 text-base md:text-lg text-muted-foreground max-w-[480px] leading-relaxed">
+              HockeyStick turns fundraising chaos into a structured deal-closing machine — AI-matched deal rooms, live due diligence, and decisions without the spreadsheet graveyard.
             </p>
-            <div className="mt-8 grid grid-cols-3 gap-3 max-w-md">
-              {[{ k: "CRM", v: "Pipeline" }, { k: "Deal Room", v: "Diligence" }, { k: "AI", v: "Assistant" }].map((s) => (
-                <div key={s.k} className="rounded-lg border border-border/60 bg-card p-3">
-                  <div className="text-[11px] uppercase text-muted-foreground tracking-wider">{s.k}</div>
-                  <div className="text-sm font-medium mt-0.5">{s.v}</div>
-                </div>
+
+            <div className="hs-a hs-a4 mt-8 flex flex-col sm:flex-row gap-3">
+              <Link to="/sign-up" search={{ role: "founder" } as any}>
+                <Button variant="brand" size="lg" className="gap-2 shadow-glow w-full sm:w-auto">
+                  Start raising <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+              <Link to="/sign-up" search={{ role: "investor" } as any}>
+                <Button variant="outline" size="lg" className="gap-2 w-full sm:w-auto">
+                  Explore deals
+                </Button>
+              </Link>
+            </div>
+
+            <div className="hs-a hs-a5 mt-6 flex flex-wrap gap-x-5 gap-y-2">
+              {["No credit card", "Free during beta", "SOC 2 Type II"].map((t) => (
+                <span key={t} className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-success" /> {t}
+                </span>
               ))}
             </div>
           </div>
-          <div className="relative">
-            <div className="rounded-2xl border border-border/60 bg-card shadow-elev p-1">
-              <div className="rounded-xl bg-gradient-mesh p-8 min-h-[360px] flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 noise opacity-60" />
-                <div className="relative grid grid-cols-2 gap-3 w-full max-w-sm">
-                  {[
-                    { i: Users, l: "VC CRM", c: "CRM + pipeline" },
-                    { i: Sparkles, l: "AI drafts", c: "12 ready" },
-                    { i: Briefcase, l: "Deal rooms", c: "4 active" },
-                    { i: ShieldCheck, l: "NDA", c: "Auto" },
-                  ].map((b) => (
-                    <div key={b.l} className="rounded-xl border border-border/60 bg-card/90 backdrop-blur p-4 shadow-card">
-                      <b.i className="h-4 w-4 text-brand" />
-                      <div className="mt-3 text-sm font-medium">{b.l}</div>
-                      <div className="text-xs text-muted-foreground">{b.c}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+
+          {/* Right — CSS-drawn deal room mockup */}
+          <div className="hs-badge relative mx-auto w-full max-w-[480px] lg:max-w-none">
+            <DealRoomMockup />
           </div>
         </div>
       </div>
@@ -172,31 +122,168 @@ function Solution() {
   );
 }
 
-function Features() {
-  const feats = [
-    { i: Users, t: "VC Lead CRM", d: "Kanban pipeline from first email to term sheet. Notes, follow-ups, intros." },
-    { i: Sparkles, t: "AI Email Assistant", d: "Draft cold emails, follow-ups, and updates in your voice — in seconds." },
-    { i: Briefcase, t: "Deal Room", d: "Structured rooms with documents, Q&A, checklist, decision board." },
-    { i: FileText, t: "Document Vault", d: "Versioned, watermarked, permissioned. Know exactly who viewed what." },
-    { i: ShieldCheck, t: "NDA Flow", d: "Auto-filled, click-to-sign NDAs that gate access in one step." },
-    { i: ListChecks, t: "Due Diligence", d: "Templated checklists across legal, financial, technical, market." },
-  ];
+function DealRoomMockup() {
   return (
-    <section className="mx-auto max-w-7xl px-6 py-24">
-      <div className="max-w-2xl">
-        <div className="text-xs uppercase tracking-wider text-brand font-medium">Features</div>
-        <h2 className="mt-3 text-3xl md:text-5xl font-semibold tracking-[-0.03em]">Everything you need.<br />Nothing you don't.</h2>
-      </div>
-      <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-border/60 rounded-2xl overflow-hidden border border-border/60">
-        {feats.map((f) => (
-          <div key={f.t} className="bg-card p-7 hover:bg-accent/40 transition-colors group">
-            <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground shadow-glow">
-              <f.i className="h-5 w-5" />
+    <div className="relative animate-float select-none pointer-events-none">
+      {/* Main window */}
+      <div className="rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden">
+        {/* Window chrome */}
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/60 bg-muted/40">
+          <div className="flex gap-1.5">
+            <div className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]/80" />
+            <div className="h-2.5 w-2.5 rounded-full bg-[#febc2e]/80" />
+            <div className="h-2.5 w-2.5 rounded-full bg-[#28c840]/80" />
+          </div>
+          <div className="flex-1 mx-3">
+            <div className="mx-auto w-44 rounded-md bg-muted text-center py-0.5 text-[10px] text-muted-foreground">
+              hockeystick.app/deal-room
             </div>
-            <div className="mt-5 text-base font-semibold">{f.t}</div>
-            <div className="mt-1.5 text-sm text-muted-foreground">{f.d}</div>
-            <div className="mt-5 inline-flex items-center gap-1 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-              Learn more <ArrowRight className="h-3 w-3" />
+          </div>
+        </div>
+
+        <div className="flex" style={{ height: 310 }}>
+          {/* Sidebar */}
+          <div className="w-32 border-r border-border/60 bg-sidebar/70 p-2 shrink-0 space-y-0.5">
+            <div className="px-2 py-1 text-[9px] uppercase tracking-widest text-muted-foreground font-semibold mb-2">Acme AI</div>
+            {[
+              { l: "Overview", a: false },
+              { l: "Documents", a: false },
+              { l: "Workstation", a: true },
+              { l: "Q&A", a: false },
+              { l: "Decisions", a: false },
+            ].map(({ l, a }) => (
+              <div key={l} className={cn(
+                "rounded-md px-2 py-1.5 text-[11px] flex items-center gap-1.5",
+                a ? "bg-accent text-foreground font-medium" : "text-muted-foreground",
+              )}>
+                {a && <span className="h-1.5 w-1.5 rounded-full bg-brand animate-pulse-glow shrink-0" />}
+                {l}
+              </div>
+            ))}
+          </div>
+
+          {/* Main panel */}
+          <div className="flex-1 p-4 min-w-0">
+            <div className="flex items-start justify-between mb-3">
+              <div>
+                <div className="text-sm font-semibold">Due Diligence</div>
+                <div className="text-[11px] text-muted-foreground">13 / 22 items · 59%</div>
+              </div>
+              <span className="text-[10px] bg-brand/10 text-brand px-2 py-0.5 rounded-full font-medium shrink-0">In Review</span>
+            </div>
+            <div className="h-1.5 rounded-full bg-muted overflow-hidden mb-4">
+              <div className="h-full w-[59%] bg-gradient-brand" />
+            </div>
+            {[
+              { cat: "Financials", s: "Complete",  dot: "bg-success" },
+              { cat: "Team",       s: "In Review", dot: "bg-brand" },
+              { cat: "Legal",      s: "In Review", dot: "bg-brand" },
+              { cat: "Market",     s: "Pending",   dot: "bg-muted-foreground" },
+              { cat: "Product",    s: "Complete",  dot: "bg-success" },
+            ].map(({ cat, s, dot }) => (
+              <div key={cat} className="flex items-center gap-2.5 py-1.5 border-b border-border/40 last:border-0">
+                <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", dot, s === "In Review" && "animate-pulse-glow")} />
+                <span className="text-[11px] flex-1 text-foreground/80">{cat}</span>
+                <span className="text-[10px] text-muted-foreground">{s}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Floating notification — top right */}
+      <div className="absolute -right-4 -top-5 rounded-xl border border-border/60 bg-card shadow-card px-3 py-2 flex items-center gap-2 text-[11px]">
+        <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse-glow shrink-0" />
+        Financials accepted
+      </div>
+
+      {/* Floating notification — bottom left */}
+      <div className="absolute -left-4 -bottom-5 rounded-xl border border-border/60 bg-card shadow-card px-3 py-2 flex items-center gap-2 text-[11px]">
+        <CheckCircle2 className="h-3.5 w-3.5 text-brand shrink-0" />
+        Term sheet ready
+      </div>
+    </div>
+  );
+}
+
+// ── 2. LOGO CLOUD ─────────────────────────────────────────────────
+function Logos() {
+  const names = ["Sequoia", "a16z", "Accel", "Index Ventures", "Lightspeed", "YC", "Bessemer"];
+  return (
+    <section className="border-y border-border/60 bg-gradient-soft py-7">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="text-center text-[10px] uppercase tracking-widest text-muted-foreground font-medium mb-5">
+          Used by founders raising from
+        </div>
+        <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
+          {names.map((n) => (
+            <span key={n} className="text-sm font-semibold text-muted-foreground/60 tracking-tight">{n}</span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── 3. PROBLEM ────────────────────────────────────────────────────
+function Problem() {
+  const problems = [
+    {
+      n: "01",
+      who: "For founders",
+      headline: "You send 200 emails.\n3 reply. None invest.",
+      body: "No structure, no tracking, no idea who's actually interested. Your fundraise lives in three spreadsheets, seven email threads, and one Notion doc nobody updates.",
+      side: "left",
+    },
+    {
+      n: "02",
+      who: "For investors",
+      headline: "You review 50 decks.\nNone match your thesis.",
+      body: "Unstructured deal flow floods your inbox. There's no way to compare, no signal, no score. Partners can't see deal status at a glance so decisions take weeks instead of days.",
+      side: "right",
+    },
+    {
+      n: "03",
+      who: "The process",
+      headline: "Due diligence lives\nin 12 different tools.",
+      body: "Google Drive, Notion, Excel, Docusign, Dropbox, email — split across both sides of the deal. Every handoff is manual. Every update gets lost.",
+      side: "left",
+    },
+  ];
+
+  return (
+    <section className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+      <div className="mb-16 max-w-xl">
+        <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-3">The problem</div>
+        <h2 className="hs text-3xl md:text-5xl font-bold tracking-[-0.04em] leading-[1.08]">
+          Fundraising is broken<br />on both sides.
+        </h2>
+      </div>
+
+      <div className="space-y-10 md:space-y-16">
+        {problems.map(({ n, who, headline, body, side }) => (
+          <div
+            key={n}
+            className={cn(
+              "grid md:grid-cols-[1fr_1fr] gap-8 md:gap-16 items-center",
+              side === "right" && "md:[&>*:first-child]:order-2",
+            )}
+          >
+            {/* Number + copy */}
+            <div className="relative">
+              <div className="absolute -left-2 -top-6 hs text-[clamp(4rem,14vw,10rem)] font-bold leading-none text-foreground/[0.04] select-none pointer-events-none">{n}</div>
+              <div className="relative">
+                <span className="inline-block text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-4 border border-border/60 rounded-full px-3 py-1">{who}</span>
+                <h3 className="hs text-2xl md:text-3xl font-bold tracking-[-0.03em] leading-[1.12] whitespace-pre-line mb-4">{headline}</h3>
+                <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-md">{body}</p>
+              </div>
+            </div>
+
+            {/* Visual card */}
+            <div className="rounded-2xl border border-border/60 bg-card shadow-card p-6 md:p-8">
+              {n === "01" && <FounderPainViz />}
+              {n === "02" && <InvestorPainViz />}
+              {n === "03" && <ProcessPainViz />}
             </div>
           </div>
         ))}
@@ -205,28 +292,132 @@ function Features() {
   );
 }
 
-function Preview() {
+function FounderPainViz() {
+  return (
+    <div className="space-y-2">
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">Outreach tracker</div>
+      {[
+        { name: "Partner @ Sequoia", status: "No reply", days: "14d ago", bad: true },
+        { name: "MD @ a16z",         status: "No reply", days: "9d ago",  bad: true },
+        { name: "GP @ Accel",        status: "Opened",   days: "5d ago",  bad: false },
+        { name: "Analyst @ Index",   status: "No reply", days: "3d ago",  bad: true },
+        { name: "Partner @ YC",      status: "No reply", days: "1d ago",  bad: true },
+      ].map(({ name, status, days, bad }) => (
+        <div key={name} className="flex items-center gap-3 rounded-lg border border-border/60 bg-background/60 px-3 py-2">
+          <div className="h-6 w-6 rounded-full bg-muted text-[10px] font-bold grid place-items-center text-muted-foreground shrink-0">
+            {name[0]}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-medium truncate">{name}</div>
+          </div>
+          <span className="text-[10px] text-muted-foreground">{days}</span>
+          <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded-full shrink-0",
+            bad ? "bg-muted text-muted-foreground" : "bg-warning/10 text-warning",
+          )}>{status}</span>
+        </div>
+      ))}
+      <div className="text-center text-[10px] text-muted-foreground/60 pt-2">+ 195 more contacts</div>
+    </div>
+  );
+}
+
+function InvestorPainViz() {
+  return (
+    <div className="space-y-2">
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">This week's inbox</div>
+      {[
+        { name: "HealthAI – Series A",  tag: "Healthcare",  match: "??" },
+        { name: "FinStack – Seed",      tag: "Fintech",     match: "??" },
+        { name: "EduBase – Pre-seed",   tag: "EdTech",      match: "??" },
+        { name: "LogiFlow – Series B",  tag: "Logistics",   match: "??" },
+        { name: "CloudDB – Seed",       tag: "Infra",       match: "??" },
+      ].map(({ name, tag, match }) => (
+        <div key={name} className="flex items-center gap-3 rounded-lg border border-border/60 bg-background/60 px-3 py-2">
+          <div className="h-6 w-6 rounded-full bg-muted shrink-0" />
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-medium truncate">{name}</div>
+          </div>
+          <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full">{tag}</span>
+          <span className="text-[10px] text-muted-foreground/50 font-mono">{match}</span>
+        </div>
+      ))}
+      <div className="text-center text-[10px] text-muted-foreground/60 pt-2">Thesis match: unknown</div>
+    </div>
+  );
+}
+
+function ProcessPainViz() {
+  const tools = ["Google Drive", "Notion", "Excel", "DocuSign", "Dropbox", "Gmail", "Slack", "Zoom", "Linear", "Airtable", "Loom", "Calendly"];
+  return (
+    <div>
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">Tools in your current process</div>
+      <div className="flex flex-wrap gap-2">
+        {tools.map((t) => (
+          <span key={t} className="text-[10px] border border-border/60 rounded-md px-2 py-1 text-muted-foreground">{t}</span>
+        ))}
+      </div>
+      <div className="mt-4 rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2 text-[11px] text-destructive/80">
+        12 tools × 2 sides = 24 places something can break
+      </div>
+    </div>
+  );
+}
+
+// ── 4. HOW IT WORKS ───────────────────────────────────────────────
+function HowItWorks() {
+  const steps = [
+    { n: "01", t: "Build your profile",   d: "2-minute setup. Stage, sector, thesis, funding targets. AI personalizes your experience from day one.", icon: Users },
+    { n: "02", t: "Get AI-matched",        d: "Our engine scores thesis fit in real time. Founders find relevant investors. Investors see deals that match their mandate.", icon: Brain },
+    { n: "03", t: "Open a deal room",      d: "NDA-gated, watermarked, audited. Share docs, run Q&A, track exactly what each investor has seen.", icon: ShieldCheck },
+    { n: "04", t: "Close the round",       d: "DD Workstation with 6 categories, document review, investor feedback, and a one-click decision workflow.", icon: Zap },
+  ];
+
   return (
     <section className="relative border-y border-border/60">
       <div className="absolute inset-0 -z-10 bg-gradient-soft" />
-      <div className="mx-auto max-w-7xl px-6 py-24">
-        <div className="max-w-2xl">
-          <div className="text-xs uppercase tracking-wider text-brand font-medium">Product preview</div>
-          <h2 className="mt-3 text-3xl md:text-5xl font-semibold tracking-[-0.03em]">A workspace that respects your time.</h2>
+      <div className="absolute inset-0 -z-10 noise opacity-30" />
+      <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+        <div className="mb-14 max-w-xl">
+          <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-3">How it works</div>
+          <h2 className="hs text-3xl md:text-5xl font-bold tracking-[-0.04em] leading-[1.08]">
+            From zero to closed<br />in four moves.
+          </h2>
         </div>
 
-        <div className="mt-12 grid lg:grid-cols-3 gap-5">
-          {[
-            { t: "Dashboard", d: "Real-time fundraising progress.", c: <MiniDashboard /> },
-            { t: "Pipeline", d: "Drag, drop, decide.", c: <MiniPipeline /> },
-            { t: "Deal Room", d: "Where decisions happen.", c: <MiniDealRoom /> },
-          ].map((b) => (
-            <div key={b.t} className="rounded-2xl border border-border/60 bg-card shadow-card overflow-hidden">
-              <div className="p-5 border-b border-border/60">
-                <div className="text-sm font-semibold">{b.t}</div>
-                <div className="text-xs text-muted-foreground">{b.d}</div>
+        {/* Desktop timeline */}
+        <div className="hidden md:block relative">
+          <div className="absolute top-[2.25rem] left-[calc(12.5%+1.5rem)] right-[calc(12.5%+1.5rem)] h-px hs-step-line opacity-30" />
+          <div className="grid grid-cols-4 gap-5">
+            {steps.map(({ n, t, d, icon: Icon }, i) => (
+              <div key={n} className="relative group">
+                <div className="relative z-10 flex flex-col">
+                  <div className="mb-5 grid h-11 w-11 place-items-center rounded-xl bg-gradient-brand text-brand-foreground shadow-glow group-hover:scale-105 transition-transform duration-200">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="font-mono text-[10px] text-brand font-semibold mb-1.5">{n}</div>
+                  <div className="hs text-base font-bold tracking-tight mb-2">{t}</div>
+                  <div className="text-sm text-muted-foreground leading-relaxed">{d}</div>
+                </div>
               </div>
-              <div className="p-4 bg-gradient-soft min-h-[220px]">{b.c}</div>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile vertical */}
+        <div className="md:hidden space-y-8">
+          {steps.map(({ n, t, d, icon: Icon }, i) => (
+            <div key={n} className="flex gap-5">
+              <div className="flex flex-col items-center">
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-brand text-brand-foreground shadow-glow shrink-0">
+                  <Icon className="h-4 w-4" />
+                </div>
+                {i < steps.length - 1 && <div className="flex-1 w-px bg-border/60 my-2" />}
+              </div>
+              <div className="pb-2 pt-1">
+                <div className="font-mono text-[10px] text-brand font-semibold mb-1">{n}</div>
+                <div className="hs text-base font-bold tracking-tight mb-1.5">{t}</div>
+                <div className="text-sm text-muted-foreground leading-relaxed">{d}</div>
+              </div>
             </div>
           ))}
         </div>
@@ -235,82 +426,78 @@ function Preview() {
   );
 }
 
-function MiniDashboard() {
-  return (
-    <div className="space-y-3">
-      <div className="rounded-md border border-border/60 bg-card p-3">
-        <div className="text-[10px] uppercase text-muted-foreground tracking-wider">Raised</div>
-        <div className="flex items-baseline gap-2"><span className="text-lg font-semibold">$3.2M</span><span className="text-[10px] text-success">+12%</span></div>
-        <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden"><div className="h-full w-[40%] bg-gradient-brand" /></div>
-      </div>
-      <div className="grid grid-cols-2 gap-2">
-        {[["Investors", "47"], ["Meetings", "18"]].map(([l, v]) => (
-          <div key={l} className="rounded-md border border-border/60 bg-card p-2.5">
-            <div className="text-[10px] text-muted-foreground">{l}</div>
-            <div className="text-sm font-semibold">{v}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-function MiniPipeline() {
-  return (
-    <div className="grid grid-cols-3 gap-2 h-full">
-      {[["Replied", 9, "bg-brand"], ["Meeting", 5, "bg-violet"], ["DR", 4, "bg-success"]].map(([l, n, c]) => (
-        <div key={l as string} className="rounded-md border border-border/60 bg-card p-2 flex flex-col">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] text-muted-foreground">{l as string}</span>
-            <span className={`h-1.5 w-1.5 rounded-full ${c as string}`} />
-          </div>
-          <div className="text-sm font-semibold">{n as number}</div>
-          <div className="mt-1 space-y-1 flex-1">
-            {Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-4 rounded bg-muted/70" />)}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-function MiniDealRoom() {
-  return (
-    <div className="space-y-2">
-      <div className="rounded-md border border-border/60 bg-card p-2.5 flex items-center gap-2">
-        <Layers className="h-3.5 w-3.5 text-brand" />
-        <div className="text-xs font-medium flex-1">Your Company — Series A</div>
-        <span className="text-[10px] rounded-full bg-success/15 text-success px-1.5 py-0.5">Active</span>
-      </div>
-      {[["Pitch deck v3", CheckCircle2, "text-success"], ["Cap table", CheckCircle2, "text-success"], ["Financial model", AlertTriangle, "text-warning"], ["Q&A · 12 open", MessageSquare, "text-muted-foreground"]].map(([l, I, c]: any) => (
-        <div key={l} className="rounded-md border border-border/60 bg-card p-2.5 flex items-center gap-2 text-xs">
-          <I className={`h-3.5 w-3.5 ${c}`} />
-          <span className="flex-1">{l}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function HowItWorks() {
-  const steps = [
-    { n: "01", t: "Add leads", d: "Import a CSV or let AI build your list from your sector and stage." },
-    { n: "02", t: "Reach out", d: "AI drafts personalized cold emails. You approve. We track every reply." },
-    { n: "03", t: "Open deal room", d: "One-click structured room with NDA, docs, Q&A, and decision board." },
+// ── 5. FEATURES ───────────────────────────────────────────────────
+function Features() {
+  const feats = [
+    {
+      icon: Brain,
+      title: "AI Deal Analysis",
+      desc: "Thesis-fit score from 0–100, narrative strengths and risks breakdown, one-click investment memo generation.",
+      accent: "text-violet-500",
+      bg: "bg-violet-500/10",
+    },
+    {
+      icon: ListChecks,
+      title: "DD Workstation",
+      desc: "6-category tracker (Financials, Team, Legal, Market, Product, References) with 22 pre-loaded items, status controls, and per-document review.",
+      accent: "text-brand",
+      bg: "bg-brand/10",
+    },
+    {
+      icon: ShieldCheck,
+      title: "Secure Deal Room",
+      desc: "NDA-gated access, document watermarking, full audit trail. Know who viewed what and when — no exceptions.",
+      accent: "text-emerald-500",
+      bg: "bg-emerald-500/10",
+    },
+    {
+      icon: Users,
+      title: "Investor CRM",
+      desc: "Pipeline kanban from first email to term sheet. Notes, follow-ups, status tracking, and meeting logs in one place.",
+      accent: "text-blue-500",
+      bg: "bg-blue-500/10",
+    },
+    {
+      icon: FileText,
+      title: "Document Vault",
+      desc: "AI summaries on every uploaded document, per-document accept/reject/revision workflow, category filtering.",
+      accent: "text-amber-500",
+      bg: "bg-amber-500/10",
+    },
+    {
+      icon: Bell,
+      title: "Real-time Updates",
+      desc: "Investors get notified when founders upload docs. Founders get notified of investor decisions. Nothing falls through the cracks.",
+      accent: "text-rose-500",
+      bg: "bg-rose-500/10",
+    },
   ];
+
   return (
-    <section className="mx-auto max-w-7xl px-6 py-24">
-      <div className="max-w-2xl">
-        <div className="text-xs uppercase tracking-wider text-brand font-medium">How it works</div>
-        <h2 className="mt-3 text-3xl md:text-5xl font-semibold tracking-[-0.03em]">From zero to closed in three moves.</h2>
+    <section className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+      <div className="flex items-end justify-between gap-8 mb-14 flex-wrap">
+        <div className="max-w-lg">
+          <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-3">Features</div>
+          <h2 className="hs text-3xl md:text-5xl font-bold tracking-[-0.04em] leading-[1.08]">
+            Everything you need<br />to close.
+          </h2>
+        </div>
+        <p className="text-sm text-muted-foreground max-w-sm">
+          Purpose-built for the $300B early-stage market. Not a spreadsheet. Not another inbox. A war room.
+        </p>
       </div>
-      <div className="mt-12 grid md:grid-cols-3 gap-5">
-        {steps.map((s, i) => (
-          <div key={s.n} className="relative rounded-2xl border border-border/60 bg-card p-7 shadow-card">
-            <div className="text-xs font-mono text-brand">{s.n}</div>
-            <div className="mt-3 text-lg font-semibold">{s.t}</div>
-            <div className="mt-2 text-sm text-muted-foreground">{s.d}</div>
-            {i < steps.length - 1 && (
-              <ArrowRight className="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 bg-background rounded-full p-0.5" />
-            )}
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-border/60 rounded-2xl overflow-hidden border border-border/60">
+        {feats.map(({ icon: Icon, title, desc, accent, bg }) => (
+          <div key={title} className="hs-feat relative bg-card p-7 hover:bg-accent/30 transition-colors group">
+            <div className={cn("hs-feat-icon grid h-10 w-10 place-items-center rounded-xl mb-5", bg)}>
+              <Icon className={cn("h-5 w-5", accent)} />
+            </div>
+            <div className="hs text-[15px] font-bold tracking-tight mb-2">{title}</div>
+            <div className="text-[13px] text-muted-foreground leading-relaxed">{desc}</div>
+            <div className="mt-5 flex items-center gap-1 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+              Learn more <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+            </div>
           </div>
         ))}
       </div>
@@ -318,24 +505,101 @@ function HowItWorks() {
   );
 }
 
-function FinalCTA() {
+// ── 6. STATS ──────────────────────────────────────────────────────
+function Stats() {
+  const stats = [
+    { n: "$300B", label: "early-stage market we're built for", sub: "Global seed + Series A, annually" },
+    { n: "22",    label: "default DD checklist items, zero setup", sub: "Across 6 categories out of the box" },
+    { n: "< 2m",  label: "to open a fully structured deal room", sub: "NDA, docs, Q&A, workstation — ready" },
+  ];
+
   return (
-    <section className="mx-auto max-w-7xl px-6 pb-24">
-      <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-primary text-primary-foreground p-12 md:p-20 text-center">
-        <div className="absolute inset-0 bg-gradient-mesh opacity-30" />
-        <div className="absolute inset-0 noise opacity-40" />
-        <div className="relative">
-          <h2 className="text-4xl md:text-6xl font-semibold tracking-[-0.03em]">Run your fundraise<br />like a pro.</h2>
-          <p className="mt-5 text-base md:text-lg opacity-70 max-w-lg mx-auto">Join the founders and investors making decisions faster, with more clarity.</p>
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link to="/sign-up" search={{ role: "founder" } as any}>
-              <Button variant="brand" size="lg" className="gap-2">Start free <ArrowRight className="h-4 w-4" /></Button>
-            </Link>
-            <Link to="/sign-up" search={{ role: "investor" } as any}>
-              <Button size="lg" className="bg-background/10 text-primary-foreground hover:bg-background/20 border border-primary-foreground/20">For Investors</Button>
-            </Link>
+    <section className="relative border-y border-border/60 overflow-hidden">
+      <div className="absolute inset-0 -z-10 bg-gradient-mesh opacity-60" />
+      <div className="absolute inset-0 -z-10 noise opacity-50" />
+      <div className="mx-auto max-w-7xl px-6 py-20 md:py-28">
+        <div className="grid md:grid-cols-3 gap-8 md:gap-5 md:divide-x divide-border/60">
+          {stats.map(({ n, label, sub }) => (
+            <div key={n} className="md:px-8 first:pl-0 last:pr-0">
+              <div className="hs text-[clamp(2.5rem,6vw,4rem)] font-bold tracking-[-0.04em] text-gradient-brand leading-none mb-3">{n}</div>
+              <div className="text-sm font-semibold leading-snug mb-1">{label}</div>
+              <div className="text-xs text-muted-foreground">{sub}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── 7. DUAL CTA ───────────────────────────────────────────────────
+function DualCTA() {
+  return (
+    <section className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Founders */}
+        <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card p-10 md:p-12 group">
+          <div className="absolute inset-0 -z-10 bg-gradient-hero opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+          <div className="absolute inset-0 -z-10 noise opacity-40" />
+          <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-4">For founders</div>
+          <h3 className="hs text-2xl md:text-3xl font-bold tracking-[-0.04em] leading-[1.1] mb-4">
+            Your raise deserves<br />a war room.
+          </h3>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-sm">
+            Stop managing your round in spreadsheets. Get a structured deal room that keeps investors engaged, documents organized, and your round moving.
+          </p>
+          <Link to="/sign-up" search={{ role: "founder" } as any}>
+            <Button variant="brand" size="lg" className="gap-2 shadow-glow">
+              Start for free <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+          <div className="mt-5 flex flex-wrap gap-3">
+            {["NDA-gated", "AI summaries", "DD workstation"].map((f) => (
+              <span key={f} className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                <CheckCircle2 className="h-3.5 w-3.5 text-brand" /> {f}
+              </span>
+            ))}
           </div>
         </div>
+
+        {/* Investors */}
+        <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card p-10 md:p-12 group">
+          <div className="absolute inset-0 -z-10 bg-gradient-mesh opacity-40 group-hover:opacity-60 transition-opacity duration-500" />
+          <div className="absolute inset-0 -z-10 noise opacity-40" />
+          <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-4">For investors</div>
+          <h3 className="hs text-2xl md:text-3xl font-bold tracking-[-0.04em] leading-[1.1] mb-4">
+            Find your next deal,<br />not your next inbox.
+          </h3>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-sm">
+            AI thesis-match scoring, a live DD workstation, and structured document review — so you can move from deck to decision without the noise.
+          </p>
+          <Link to="/sign-up" search={{ role: "investor" } as any}>
+            <Button variant="outline" size="lg" className="gap-2">
+              Explore deal flow <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+          <div className="mt-5 flex flex-wrap gap-3">
+            {["Thesis matching", "DD overview", "One-click memo"].map((f) => (
+              <span key={f} className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                <CheckCircle2 className="h-3.5 w-3.5 text-success" /> {f}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom beta banner */}
+      <div className="mt-8 rounded-2xl border border-brand/20 bg-brand/5 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <span className="h-2 w-2 rounded-full bg-brand animate-pulse-glow" />
+          <span className="text-sm font-medium">Currently in beta — free for early users</span>
+          <span className="hidden sm:inline text-xs text-muted-foreground">No credit card required. Cancel any time.</span>
+        </div>
+        <Link to="/sign-up" search={{ role: "founder" } as any}>
+          <Button variant="brand" size="sm" className="gap-1.5 shrink-0 shadow-glow">
+            Join the beta <ArrowRight className="h-3.5 w-3.5" />
+          </Button>
+        </Link>
       </div>
     </section>
   );
