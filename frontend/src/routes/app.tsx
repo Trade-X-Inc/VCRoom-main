@@ -7,7 +7,7 @@ export const Route = createFileRoute("/app")({
     if (typeof window === 'undefined') return;
     const { user, initialized } = useAuthStore.getState();
     // Only redirect if we know the user is definitely not authenticated
-    if (initialized && !user) throw redirect({ to: "/sign-in", search: {} });
+    if (initialized && !user) throw redirect({ to: "/sign-in", search: {}, replace: true });
   },
   component: AppShell,
 });

@@ -11,7 +11,7 @@ export const Route = createFileRoute("/app/investor")({
 
       // If store not initialized yet, let through — AppShell handles the guard
       if (!initialized) return;
-      if (!user) throw redirect({ to: "/sign-in", search: {} });
+      if (!user) throw redirect({ to: "/sign-in", search: {}, replace: true });
 
       const { data: userRecord } = await supabase
         .from("users")

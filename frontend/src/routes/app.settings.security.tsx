@@ -51,7 +51,7 @@ function Security() {
             <div className="text-sm font-medium">Sign out of all devices</div>
             <div className="text-xs text-muted-foreground">Ends every active session.</div>
           </div>
-          <button onClick={() => { signOut(); nav({ to: "/sign-in", search: { redirect: "/app" } }); }} className="rounded-md border border-destructive/40 text-destructive px-3 py-2 text-sm hover:bg-destructive/10 inline-flex items-center gap-1.5">
+          <button onClick={() => { signOut(); nav({ to: "/sign-in", search: { redirect: "/app" }, replace: true }); }} className="rounded-md border border-destructive/40 text-destructive px-3 py-2 text-sm hover:bg-destructive/10 inline-flex items-center gap-1.5">
             <Trash2 className="h-3.5 w-3.5" /> Sign out everywhere
           </button>
         </div>
