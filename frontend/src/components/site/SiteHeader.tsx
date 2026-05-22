@@ -14,14 +14,14 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           <LangSwitcher />
           <ThemeToggle />
-          <Link to="/sign-in" search={{ redirect: "/app" }} className="hidden sm:inline-flex">
-            <Button variant="ghost" size="sm">Sign in</Button>
-          </Link>
-          <Link to="/sign-up" search={{ role: "founder" } as any}>
-            <Button variant="brand" size="sm" className="gap-1.5">
+          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+            <Link to="/sign-in" search={{ redirect: "/app" }}>Sign in</Link>
+          </Button>
+          <Button asChild variant="brand" size="sm" className="gap-1.5">
+            <Link to="/sign-up" search={{ role: "founder" } as any}>
               Get started <ArrowRight className="h-3.5 w-3.5" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </div>
     </header>

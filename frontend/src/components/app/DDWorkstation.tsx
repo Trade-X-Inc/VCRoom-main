@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
   CheckCircle2, Circle, ChevronDown, ChevronUp, Flag, Clock, Eye,
-  StickyNote, Save, Loader2, FileText, Plus, Sparkles,
+  StickyNote, Save, Loader2, FileText, Plus, Sparkles, Trash2,
   BarChart3, TrendingUp, Users, Scale, Target, Handshake,
 } from "lucide-react";
 
@@ -37,15 +37,6 @@ const DEFAULT_ITEMS: Record<DDCategory, string[]> = {
   Market:     ["TAM/SAM/SOM analysis", "Competitive landscape", "Customer research / surveys"],
   Product:    ["Product roadmap", "Tech architecture overview", "Demo access / sandbox", "Key metrics dashboard"],
   References: ["Customer references (3+)", "Investor references", "Partner / vendor references"],
-};
-
-const CAT_TO_DOC_CATEGORY: Record<DDCategory, string[]> = {
-  Financials: ["Financials"],
-  Team:       ["Team"],
-  Legal:      ["Legal"],
-  Market:     ["Market Research"],
-  Product:    ["Product"],
-  References: ["Other"],
 };
 
 interface Props {
@@ -153,10 +144,6 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
   const getCatData = (cat: DDCategory) =>
     categories.find((c: any) => c.category === cat) ?? { id: null, status: "Pending", investor_notes: "" };
   const getCatItems = (cat: DDCategory) => checklistItems.filter((i: any) => i.category === cat);
-  const getCatDocs = (cat: DDCategory) =>
-    dealDocs.filter((d: any) =>
-      CAT_TO_DOC_CATEGORY[cat].includes(d.category) || !d.category
-    );
   const getDocReview = (docId: string) =>
     reviews.find((r: any) => r.document_id === docId);
 
@@ -183,6 +170,15 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
       toast.error("Failed to update");
       qc.invalidateQueries({ queryKey: ["dd-workstation", dealRoomId] });
     }
+  };
+
+  const deleteItem = async (itemId: string) => {
+    const { error } = await supabase
+      .from("dd_checklist_items")
+      .delete()
+      .eq("id", itemId);
+    if (error) { toast.error(error.message); return; }
+    qc.invalidateQueries({ queryKey: ["dd-workstation", dealRoomId] });
   };
 
   const updateStatus = async (cat: DDCategory, status: string) => {
@@ -411,7 +407,6 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
         {CATEGORIES.map((cat) => {
           const catData = getCatData(cat);
           const items = getCatItems(cat);
-          const catDocs = getCatDocs(cat);
           const progress = getProgress(cat);
           const isExpanded = expandedCat === cat;
           const status = (catData.status as DDStatus) ?? "Pending";
@@ -440,11 +435,6 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                         <StickyNote className="h-3 w-3" /> Feedback
                       </span>
                     )}
-                    {catDocs.length > 0 && (
-                      <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
-                        <FileText className="h-3 w-3" /> {catDocs.length} doc{catDocs.length !== 1 ? "s" : ""}
-                      </span>
-                    )}
                   </div>
                   <div className="mt-1.5 flex items-center gap-3">
                     <div className="flex-1 max-w-[160px] h-1.5 rounded-full bg-muted overflow-hidden">
@@ -466,77 +456,6 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                     <p className="text-xs text-muted-foreground">{description}</p>
                   </div>
 
-                  {/* Documents section */}
-                  <div className="border-b border-border/60 p-5">
-                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                      Documents ({catDocs.length})
-                    </div>
-                    {catDocs.length === 0 ? (
-                      <p className="text-xs text-muted-foreground">
-                        No documents in this category yet. Upload documents and categorize them to see them here.
-                      </p>
-                    ) : (
-                      <div className="space-y-3">
-                        {catDocs.map((doc: any) => {
-                          const review = getDocReview(doc.id);
-                          const docName = nameFromPath(doc);
-                          return (
-                            <div key={doc.id} className="rounded-xl border border-border/60 bg-background overflow-hidden">
-                              <div className="flex items-center gap-3 px-4 py-3">
-                                <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                                <div className="flex-1 min-w-0">
-                                  <div className="text-sm font-medium truncate">{docName}</div>
-                                  {doc.ai_summary && (
-                                    <div className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                                      {doc.ai_summary}
-                                    </div>
-                                  )}
-                                </div>
-                                {review?.verdict && (
-                                  <span className={cn(
-                                    "text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0",
-                                    review.verdict === "accepted" && "bg-success/10 text-success",
-                                    review.verdict === "rejected" && "bg-destructive/10 text-destructive",
-                                    review.verdict === "needs_revision" && "bg-warning/10 text-warning",
-                                  )}>
-                                    {review.verdict === "accepted" ? "✓ Accepted"
-                                      : review.verdict === "rejected" ? "✗ Rejected"
-                                      : "↻ Needs revision"}
-                                  </span>
-                                )}
-                              </div>
-
-                              {isInvestor && (
-                                <DocumentReviewPanel
-                                  doc={doc}
-                                  review={review}
-                                  dealRoomId={dealRoomId}
-                                  userId={userId}
-                                  category={cat}
-                                  onReviewed={() => {
-                                    qc.invalidateQueries({ queryKey: ["doc-reviews", dealRoomId] });
-                                    qc.invalidateQueries({ queryKey: ["dd-workstation", dealRoomId] });
-                                  }}
-                                />
-                              )}
-
-                              {isFounder && review?.feedback && (
-                                <div className={cn(
-                                  "px-4 py-2.5 text-xs border-t",
-                                  review.verdict === "rejected" && "bg-destructive/5 border-destructive/20 text-destructive",
-                                  review.verdict === "needs_revision" && "bg-warning/5 border-warning/20 text-warning",
-                                  review.verdict === "accepted" && "bg-success/5 border-success/20 text-success",
-                                )}>
-                                  <span className="font-medium">Investor feedback: </span>
-                                  {review.feedback}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
 
                   <div className="grid lg:grid-cols-[1fr_260px] divide-y lg:divide-y-0 lg:divide-x divide-border/60">
                     {/* Checklist */}
@@ -590,6 +509,14 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                               <span className={cn("text-sm flex-1", item.checked ? "line-through text-muted-foreground" : "")}>
                                 {item.label}
                               </span>
+                              {isInvestor && (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); void deleteItem(item.id); }}
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity ml-auto text-muted-foreground hover:text-destructive shrink-0"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              )}
                             </button>
                           ))}
                         </div>
