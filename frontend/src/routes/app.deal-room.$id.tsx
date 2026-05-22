@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { formatDistanceToNow, format } from "date-fns";
 import { toast } from "sonner";
 import {
-  LayoutGrid, FileText, MessageSquare, ListChecks, StickyNote, Activity,
+  LayoutGrid, FileText, FolderOpen, MessageSquare, ListChecks, StickyNote, Activity,
   Calendar, Gavel, Download, CheckCircle2, AlertTriangle, Clock, Plus,
   ArrowLeft, Lock, Sparkles, X, MessagesSquare, ThumbsUp, ThumbsDown,
   HelpCircle, Building2, TrendingUp, Users, DollarSign, Target, Shield,
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/app/deal-room/$id")({
 
 const tabs = [
   { k: "overview", l: "Overview", i: LayoutGrid },
-  { k: "documents", l: "Documents", i: FileText },
+  { k: "documents", l: "Document Vault", i: FolderOpen },
   { k: "qa", l: "Q&A", i: MessageSquare },
   { k: "checklist", l: "Workstation", i: LayoutGrid },
   { k: "chat", l: "Team chat", i: MessagesSquare },
@@ -1544,6 +1544,8 @@ function DocPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
   const displayName = rawName.replace(/^\d{13}-/, "");
   const ext = displayName.split(".").pop()?.toLowerCase() ?? "";
   const isImage = ["png", "jpg", "jpeg", "gif", "webp"].includes(ext);
+  const isPdf = ext === "pdf";
+  const isOffice = ["pptx", "docx", "xlsx", "ppt", "doc", "xls"].includes(ext);
 
   useEffect(() => {
     supabase.storage.from("documents").createSignedUrl(doc.storage_path, 300).then(({ data }) => {
@@ -1557,7 +1559,7 @@ function DocPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-2xl rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden"
+        className="w-full max-w-4xl rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
@@ -1570,27 +1572,37 @@ function DocPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
           </button>
         </div>
         <div className="p-6">
-          {isImage && url ? (
+          {!url ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : isImage ? (
             <img src={url} alt={displayName} className="max-w-full max-h-[60vh] object-contain mx-auto rounded-lg" />
+          ) : isPdf ? (
+            <iframe
+              src={url}
+              className="w-full h-[70vh] rounded-lg border border-border/60"
+              title={displayName}
+            />
+          ) : isOffice ? (
+            <iframe
+              src={`https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`}
+              className="w-full h-[70vh] rounded-lg border border-border/60"
+              title={displayName}
+            />
           ) : (
             <div className="flex flex-col items-center gap-4 py-8 text-center">
               <div className="grid h-16 w-16 place-items-center rounded-2xl bg-accent">
                 <FileText className="h-8 w-8 text-muted-foreground" />
               </div>
-              <div>
-                <div className="text-sm font-medium">{displayName}</div>
-                <div className="text-xs text-muted-foreground mt-1">This file type requires downloading to view.</div>
-              </div>
-              {url && (
-                <a
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 text-sm font-medium shadow-sm"
-                >
-                  <Download className="h-4 w-4" /> Download to view
-                </a>
-              )}
+              <p className="text-sm text-muted-foreground">Preview not available for this file type.</p>
+              <a
+                href={url}
+                download={displayName}
+                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm"
+              >
+                <Download className="h-4 w-4" /> Download to view
+              </a>
             </div>
           )}
         </div>

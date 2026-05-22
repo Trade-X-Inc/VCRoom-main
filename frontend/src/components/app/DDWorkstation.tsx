@@ -482,14 +482,20 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
 
                           {/* Preview + Download */}
                           <div className="flex gap-2">
-                            <a
-                              href={publicUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <button
+                              onClick={() => {
+                                const ext = (doc.file_name || doc.storage_path || "").split(".").pop()?.toLowerCase() ?? "";
+                                const isOffice = ["pptx", "docx", "xlsx", "ppt", "doc", "xls"].includes(ext);
+                                if (isOffice) {
+                                  window.open(`https://docs.google.com/gview?url=${encodeURIComponent(publicUrl)}&embedded=false`, "_blank");
+                                } else {
+                                  window.open(publicUrl, "_blank");
+                                }
+                              }}
                               className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent transition-colors"
                             >
                               <Eye className="h-3.5 w-3.5" /> Preview
-                            </a>
+                            </button>
                             <a
                               href={publicUrl}
                               download
