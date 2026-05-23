@@ -24,10 +24,7 @@ export function setupAuthListener() {
   if (authListenerSetup) return
   authListenerSetup = true
 
-  supabase.auth.getSession().then(({ data }) => {
-    useAuthStore.getState().setUser(data.session?.user ?? null)
-  })
-
+  // auth.tsx already calls getSession(); rely on INITIAL_SESSION event here
   supabase.auth.onAuthStateChange((_event, session) => {
     useAuthStore.getState().setUser(session?.user ?? null)
   })

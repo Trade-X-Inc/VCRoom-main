@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   ClipboardList, Plus, X, Loader2, CheckCircle2, Clock,
-  Upload, FileText, AlertCircle, Send,
+  Upload, AlertCircle, Send,
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -58,18 +58,9 @@ const STATUS_CONFIG = {
 // ─── component ───────────────────────────────────────────────────────────────
 
 export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, founderUserId }: Props) {
-  const [token, setToken] = useState("");
   const supabaseKey = (import.meta.env as any).VITE_SUPABASE_SERVICE_ROLE_KEY || "";
   const supabaseUrl = (import.meta.env as any).VITE_SUPABASE_URL || "";
   const qc = useQueryClient();
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setToken(data.session?.access_token ?? ""));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      setToken(session?.access_token ?? "");
-    });
-    return () => subscription.unsubscribe();
-  }, []);
 
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
@@ -80,9 +71,13 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
   // ── fetch requests
   const { data, isLoading } = useQuery({
     queryKey: ["doc-requests", dealRoomId],
-    enabled: !!dealRoomId && !!token,
-    queryFn: () => getDocRequests({ data: { dealRoomId, userId: userId ?? "", userAccessToken: token, supabaseUrl, supabaseKey } }),
-    refetchInterval: 30_000, // poll every 30s
+    enabled: !!dealRoomId,
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token ?? "";
+      return getDocRequests({ data: { dealRoomId, userId: userId ?? "", userAccessToken: token, supabaseUrl, supabaseKey } });
+    },
+    refetchInterval: 30_000,
   });
 
   const requests: DocRequest[] = (data?.requests ?? []) as DocRequest[];
@@ -131,8 +126,10 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
 
   // ── create request (investor only)
   const createMut = useMutation({
-    mutationFn: () =>
-      createDocRequest({
+    mutationFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token ?? "";
+      return createDocRequest({
         data: {
           dealRoomId,
           requestedBy: userId!,
@@ -143,7 +140,8 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
           supabaseUrl,
           supabaseKey,
         },
-      }),
+      });
+    },
     onSuccess: (res) => {
       if (!res.success) { toast.error(res.error ?? "Failed to create request"); return; }
       toast.success("Request sent to founder");
@@ -157,8 +155,10 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
 
   // ── fulfill request (founder only)
   const fulfillMut = useMutation({
-    mutationFn: (req: DocRequest) =>
-      fulfillDocRequest({
+    mutationFn: async (req: DocRequest) => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token ?? "";
+      return fulfillDocRequest({
         data: {
           requestId: req.id,
           documentId: selectedDocId || undefined,
@@ -170,7 +170,8 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
           supabaseUrl,
           supabaseKey,
         },
-      }),
+      });
+    },
     onSuccess: (res) => {
       if (!res.success) { toast.error(res.error ?? "Failed to fulfill"); return; }
       toast.success("Marked as fulfilled — investor notified");

@@ -264,7 +264,7 @@ function DealRoom() {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto">
+      <main key={tab} className="flex-1 overflow-y-auto">
         {tab === "overview" && (
           <DealRoomOverview
             dealRoomId={dealRoomId}
@@ -403,6 +403,7 @@ function DealRoomOverview({
   const { data: dealTasks = [] } = useQuery({
     queryKey: ["deal-tasks", dealRoomId],
     enabled: !!user?.id,
+    staleTime: 30_000,
     queryFn: async () => {
       const { data } = await supabase
         .from("deal_tasks")
