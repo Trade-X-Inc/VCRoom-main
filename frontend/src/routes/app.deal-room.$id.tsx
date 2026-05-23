@@ -9,7 +9,7 @@ import {
   HelpCircle, Building2, TrendingUp, Users, DollarSign, Target, Shield,
   Send, AlertCircle, Eye, UserPlus, Loader2, ExternalLink, ChevronDown,
   Check, ClipboardList, Copy, Trash2, Pencil, Image, Film,
-  ChevronUp, Lightbulb,
+  ChevronUp, Lightbulb, Upload,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AIChat } from "@/components/ai/AIChat";
@@ -1129,6 +1129,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
   const [previewDoc, setPreviewDoc] = useState<any | null>(null);
   const summaryExpandedRef = useRef<Record<string, boolean>>({});
   const [summaryExpandedTick, setSummaryExpandedTick] = useState(0);
+  const [activeDocTab, setActiveDocTab] = useState("All");
   const isSummaryExpanded = (docId: string) => summaryExpandedRef.current[docId] ?? false;
   const toggleSummary = (docId: string) => {
     summaryExpandedRef.current[docId] = !summaryExpandedRef.current[docId];
@@ -1208,7 +1209,9 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
         return;
       }
       await supabase.from("documents").update({ ai_summary: result.summary }).eq("id", doc.id);
-      queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId], refetchType: "active" });
+      queryClient.setQueryData(["documents", dealRoomId], (old: any[]) =>
+        (old ?? []).map((d: any) => d.id === doc.id ? { ...d, ai_summary: result.summary } : d)
+      );
       queryClient.invalidateQueries({ queryKey: ["dd-docs", dealRoomId] });
       expandSummary(doc.id);
       toast.success("Summary generated");
@@ -1258,6 +1261,29 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
     });
   };
 
+  const DOC_CATEGORIES = ["All", "Pitch Deck", "Financials", "Legal", "Market Research", "Team", "Product", "Other"] as const;
+
+  const DEAL_ROOM_EXPECTED_DOCS = [
+    { category: "Pitch Deck", name: "Pitch Deck (PDF or PPTX)" },
+    { category: "Pitch Deck", name: "Executive Summary / One-pager" },
+    { category: "Financials", name: "Last 3 years P&L" },
+    { category: "Financials", name: "Revenue projections (3 years)" },
+    { category: "Financials", name: "Cap table" },
+    { category: "Legal", name: "Certificate of incorporation" },
+    { category: "Legal", name: "Shareholder agreement" },
+    { category: "Team", name: "Founder CVs / LinkedIn" },
+    { category: "Product", name: "Product roadmap" },
+    { category: "Market Research", name: "TAM/SAM/SOM analysis" },
+  ];
+
+  const filteredDocs = activeDocTab === "All"
+    ? (docs as any[])
+    : (docs as any[]).filter((d: any) => (d.category || "Other") === activeDocTab);
+
+  const expectedForTab = activeDocTab !== "All"
+    ? DEAL_ROOM_EXPECTED_DOCS.filter((e) => e.category === activeDocTab)
+    : [];
+
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="flex items-center justify-between">
@@ -1285,6 +1311,24 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
           />
         </div>
       )}
+
+      {/* Category tabs */}
+      <div className="flex gap-1 mt-5 pb-2 overflow-x-auto border-b border-border/60">
+        {DOC_CATEGORIES.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setActiveDocTab(cat)}
+            className={cn(
+              "shrink-0 rounded-full px-3 py-1 text-xs transition-colors",
+              activeDocTab === cat
+                ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white"
+                : "border border-border/60 hover:bg-accent"
+            )}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
 
       {/* Library modal */}
       {showLibrary && (
@@ -1357,9 +1401,9 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
         </div>
       )}
 
-      {(docs as any[]).length > 0 && (
+      {filteredDocs.length > 0 && (
         <div className="mt-5 space-y-3">
-          {(docs as any[]).map((doc) => {
+          {filteredDocs.map((doc) => {
             const rawName = doc.name || doc.storage_path?.split("/").pop() || "Document";
             const displayName = rawName.replace(/^\d{13}-/, "");
             const ext = displayName.split(".").pop()?.toLowerCase() ?? "";
@@ -1536,7 +1580,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
         </div>
       )}
 
-      {(docs as any[]).length === 0 && (
+      {filteredDocs.length === 0 && activeDocTab === "All" && (
         <div className="mt-8 rounded-xl border border-border/60 bg-card shadow-card p-10 flex flex-col items-center gap-3 text-center">
           <div className="grid h-12 w-12 place-items-center rounded-full bg-accent">
             <FileText className="h-5 w-5 text-muted-foreground" />
@@ -1546,6 +1590,56 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
             {isFounder
               ? "Upload files above or add from your document library."
               : "The founder hasn't shared any documents yet."}
+          </div>
+        </div>
+      )}
+
+      {/* Expected docs for active category */}
+      {activeDocTab !== "All" && expectedForTab.length > 0 && (
+        <div className="pb-4">
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 mt-4">
+            Recommended for this category
+          </div>
+          <div className="rounded-xl border border-dashed border-border/60 divide-y divide-border/40 overflow-hidden">
+            {expectedForTab.map((expected) => (
+              <div key={expected.name} className="flex items-center gap-3 px-4 py-3 bg-muted/20">
+                <div className="grid h-8 w-8 place-items-center rounded-lg bg-muted shrink-0">
+                  <FileText className="h-4 w-4 text-muted-foreground/50" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm text-muted-foreground">{expected.name}</div>
+                  <div className="text-[10px] text-muted-foreground/60 mt-0.5">Not uploaded yet</div>
+                </div>
+                {isFounder && (
+                  <label className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 text-brand px-3 py-1.5 text-xs cursor-pointer hover:bg-brand/5 transition-colors shrink-0">
+                    <Upload className="h-3 w-3" /> Upload
+                    <input
+                      type="file"
+                      className="sr-only"
+                      accept=".pdf,.pptx,.ppt,.docx,.doc,.xlsx,.xls,.csv,.png,.jpg,.jpeg"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file || !userId) return;
+                        const path = `${dealRoomId}/${userId}/${Date.now()}-${file.name}`;
+                        const { error: upErr } = await supabase.storage.from("documents").upload(path, file);
+                        if (upErr) { toast.error("Upload failed"); return; }
+                        await supabase.from("documents").insert({
+                          deal_room_id: dealRoomId,
+                          uploader_id: userId,
+                          storage_path: path,
+                          category: expected.category,
+                          file_name: file.name,
+                          file_size: file.size,
+                        });
+                        queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+                        toast.success(`${file.name} uploaded`);
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       )}
