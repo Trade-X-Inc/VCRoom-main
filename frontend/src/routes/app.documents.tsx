@@ -175,8 +175,17 @@ function Documents() {
     return counts;
   }, [docs]);
 
+  // Pitch deck doc is always shown first
+  const pitchDeckDoc = docs.find((d) =>
+    (d.category as string) === "Pitch Deck" ||
+    /(pitch.?deck|pitch|deck)/i.test(nameFromPath((d.storage_path as string) ?? ""))
+  );
+
   const filtered = activeTab === "All"
-    ? docs
+    ? [
+        ...(pitchDeckDoc ? [pitchDeckDoc] : []),
+        ...docs.filter((d) => d.id !== pitchDeckDoc?.id),
+      ]
     : docs.filter((d) => ((d.category as string) || "Other") === activeTab);
 
   const handleDownload = async (storagePath: string) => {
@@ -258,44 +267,7 @@ function Documents() {
       </div>
 
       {/* Media & Links */}
-      <div className="mt-6 rounded-xl border border-border/60 bg-card p-4">
-        <div className="text-sm font-semibold mb-3">Media &amp; Links</div>
-        <div className="grid sm:grid-cols-2 gap-3">
-          <div>
-            <label className="text-xs text-muted-foreground">Product Video URL (YouTube/Loom/Vimeo)</label>
-            <input
-              type="url"
-              defaultValue={startupMedia?.product_video_url ?? ""}
-              placeholder="https://youtube.com/watch?v=..."
-              className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
-              onBlur={async (e) => {
-                if (!startupMedia?.id) return;
-                await supabase.from("startups")
-                  .update({ product_video_url: e.target.value || null })
-                  .eq("id", startupMedia.id);
-              }}
-            />
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground">Pitch Deck Link (DocSend/Google Drive)</label>
-            <input
-              type="url"
-              defaultValue={startupMedia?.pitch_deck_url ?? ""}
-              placeholder="https://docsend.com/view/..."
-              className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
-              onBlur={async (e) => {
-                if (!startupMedia?.id) return;
-                await supabase.from("startups")
-                  .update({ pitch_deck_url: e.target.value || null })
-                  .eq("id", startupMedia.id);
-              }}
-            />
-          </div>
-        </div>
-        <p className="text-[10px] text-muted-foreground mt-2">
-          These links are saved to your founder profile and visible to investors in your deal rooms.
-        </p>
-      </div>
+      <MediaLinksPanel startupMedia={startupMedia ?? null} userId={user!.id} queryClient={queryClient} />
 
       {/* Category tabs */}
       <div className="mt-6 flex items-center gap-1 overflow-x-auto pb-0.5 border-b border-border/60">
@@ -423,17 +395,26 @@ function Documents() {
               <div className="col-span-2">Uploaded</div>
               <div className="col-span-1 text-right">Actions</div>
             </div>
-            {filtered.map((d) => {
+            {filtered.map((d, idx) => {
               const fname = nameFromPath(d.storage_path as string ?? "");
+              const isPitchDeck = activeTab === "All" && idx === 0 && !!pitchDeckDoc && d.id === pitchDeckDoc.id;
               return (
                 <div
                   key={d.id}
-                  className="grid grid-cols-12 px-5 py-3 border-b border-border/60 last:border-0 hover:bg-accent/40 items-center text-sm group"
+                  className={cn(
+                    "grid grid-cols-12 px-5 py-3 border-b border-border/60 last:border-0 hover:bg-accent/40 items-center text-sm group",
+                    isPitchDeck && "bg-brand/5 border-l-2 border-l-brand"
+                  )}
                 >
                   <div className="col-span-5 flex items-center gap-3 min-w-0">
                     <DocIcon fileName={fname} size="sm" />
                     <div className="min-w-0">
-                      <div className="font-medium truncate" title={fname}>{fname || "Untitled"}</div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="font-medium truncate" title={fname}>{fname || "Untitled"}</div>
+                        {isPitchDeck && (
+                          <span className="shrink-0 text-[9px] font-semibold bg-brand/20 text-brand px-1.5 py-0.5 rounded-full">📌 PINNED</span>
+                        )}
+                      </div>
                       {d.status === "uploaded"
                         ? <span className="text-[10px] text-success flex items-center gap-0.5"><CheckCircle2 className="h-3 w-3" />Uploaded</span>
                         : <span className="text-[10px] text-warning flex items-center gap-0.5"><AlertTriangle className="h-3 w-3" />Review needed</span>}
@@ -602,6 +583,118 @@ function Documents() {
   );
 }
 
+function MediaLinksPanel({ startupMedia, userId, queryClient }: {
+  startupMedia: { id: string; product_video_url?: string | null; pitch_deck_url?: string | null } | null;
+  userId: string;
+  queryClient: any;
+}) {
+  const [videoUrl, setVideoUrl] = useState(startupMedia?.product_video_url ?? "");
+  const [savingVideo, setSavingVideo] = useState(false);
+  const [uploadingDeck, setUploadingDeck] = useState(false);
+  const deckRef = useRef<HTMLInputElement>(null);
+
+  const saveVideoUrl = async () => {
+    if (!startupMedia?.id) { toast.error("Startup profile not found — set up Company Profile first"); return; }
+    setSavingVideo(true);
+    await supabase.from("startups").update({ product_video_url: videoUrl || null }).eq("id", startupMedia.id);
+    queryClient.invalidateQueries({ queryKey: ["startup-media-docs", userId] });
+    toast.success("Video link saved");
+    setSavingVideo(false);
+  };
+
+  const uploadPitchDeck = async (file: File) => {
+    if (!userId) return;
+    if (file.size > 50 * 1024 * 1024) { toast.error("File too large — max 50MB"); return; }
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    if (!["pdf", "pptx", "ppt"].includes(ext ?? "")) { toast.error("Pitch deck must be PDF or PPTX"); return; }
+    setUploadingDeck(true);
+    try {
+      const path = `personal/${userId}/${Date.now()}-${file.name}`;
+      const { error: upErr } = await supabase.storage.from("documents").upload(path, file, { upsert: true });
+      if (upErr) throw upErr;
+      await supabase.from("documents").insert({
+        uploader_id: userId,
+        category: "Pitch Deck",
+        status: "uploaded",
+        storage_path: path,
+        file_name: file.name,
+        file_size: file.size,
+        deal_room_id: null,
+      });
+      queryClient.invalidateQueries({ queryKey: ["documents", userId] });
+      toast.success(`${file.name} uploaded as Pitch Deck`);
+    } catch (e: any) {
+      toast.error(e.message || "Upload failed");
+    } finally {
+      setUploadingDeck(false);
+    }
+  };
+
+  return (
+    <div className="mt-6 rounded-xl border border-border/60 bg-card p-5">
+      <div className="text-sm font-semibold mb-4">Media &amp; Links</div>
+      <div className="grid sm:grid-cols-2 gap-5">
+        {/* Product Video URL — with explicit Save button */}
+        <div>
+          <label className="text-xs font-medium text-muted-foreground block mb-1.5">
+            Product Video URL
+            <span className="font-normal ml-1 opacity-60">(YouTube / Loom / Vimeo)</span>
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="url"
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
+              placeholder="https://youtube.com/watch?v=..."
+              className="flex-1 rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+            />
+            <button
+              onClick={saveVideoUrl}
+              disabled={savingVideo}
+              className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow disabled:opacity-50 shrink-0"
+            >
+              {savingVideo ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Save"}
+            </button>
+          </div>
+          {startupMedia?.product_video_url && (
+            <a href={startupMedia.product_video_url} target="_blank" rel="noopener noreferrer"
+              className="mt-1.5 text-[11px] text-brand hover:underline inline-flex items-center gap-1">
+              ↗ Currently saved: {startupMedia.product_video_url.slice(0, 40)}{startupMedia.product_video_url.length > 40 ? "…" : ""}
+            </a>
+          )}
+        </div>
+
+        {/* Pitch Deck — file upload (PDF/PPTX) */}
+        <div>
+          <label className="text-xs font-medium text-muted-foreground block mb-1.5">
+            Pitch Deck
+            <span className="font-normal ml-1 opacity-60">(PDF or PPTX — replaces DocSend link)</span>
+          </label>
+          <button
+            onClick={() => deckRef.current?.click()}
+            disabled={uploadingDeck}
+            className="w-full inline-flex items-center justify-center gap-2 rounded-md border-2 border-dashed border-brand/40 bg-brand/5 text-brand px-4 py-2.5 text-sm font-medium hover:bg-brand/10 transition-colors disabled:opacity-50"
+          >
+            {uploadingDeck
+              ? <><Loader2 className="h-4 w-4 animate-spin" /> Uploading…</>
+              : <><Upload className="h-4 w-4" /> Upload Pitch Deck (PDF / PPTX)</>}
+          </button>
+          <input
+            ref={deckRef}
+            type="file"
+            className="hidden"
+            accept=".pdf,.pptx,.ppt"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadPitchDeck(f); e.target.value = ""; }}
+          />
+          <p className="text-[10px] text-muted-foreground mt-1.5">
+            Investors can preview this directly in the deal room. Pinned to the top of all document views.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function UploadModal({
   userId,
   initialCategory,
@@ -642,6 +735,8 @@ function UploadModal({
         category,
         status: "uploaded",
         storage_path: path,
+        file_name: file.name,
+        file_size: file.size,
         deal_room_id: null,
       });
       if (insertErr) throw insertErr;

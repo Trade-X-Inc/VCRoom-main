@@ -1232,28 +1232,51 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
       const ext = fileName.split(".").pop()?.toLowerCase() ?? "";
 
       let textContent = "";
-      const decoder = new TextDecoder("utf-8", { fatal: false });
-      const fullText = decoder.decode(new Uint8Array(arrayBuffer));
 
       if (["pptx", "ppt"].includes(ext)) {
-        for (const pattern of [/<a:t[^>]*?>([^<]+)<\/a:t>/g, /<a:t>([^<]+)<\/a:t>/g]) {
-          const matches = [...fullText.matchAll(pattern)];
-          if (matches.length > 5) {
-            const extracted = matches
+        // PPTX is a ZIP archive — must unzip before regexing XML
+        try {
+          const { default: JSZip } = await import("jszip");
+          const zip = await JSZip.loadAsync(arrayBuffer);
+          const slideTexts: string[] = [];
+          const slideFiles = Object.keys(zip.files)
+            .filter((name) => /^ppt\/slides\/slide\d+\.xml$/.test(name))
+            .sort((a, b) => parseInt(a.match(/\d+/)?.[0] ?? "0") - parseInt(b.match(/\d+/)?.[0] ?? "0"));
+          for (const slideFile of slideFiles) {
+            const xml = await zip.files[slideFile].async("string");
+            const matches = [...xml.matchAll(/<a:t[^>]*?>([^<]+)<\/a:t>/g)];
+            const slideText = matches
               .map((m) => m[1].trim())
               .filter((t) => t.length > 1 && /[a-zA-Z]/.test(t))
-              .join(" • ")
-              .slice(0, 4000);
-            if (extracted.length > textContent.length) textContent = extracted;
+              .join(" ");
+            if (slideText) slideTexts.push(slideText);
           }
+          textContent = slideTexts.join(" • ").slice(0, 4000);
+        } catch (zipErr) {
+          console.warn("JSZip PPTX extraction failed:", zipErr);
+          textContent = "";
         }
       } else if (["docx", "doc"].includes(ext)) {
-        textContent = [...fullText.matchAll(/<w:t[^>]*?>([^<]+)<\/w:t>/g)]
-          .map((m) => m[1].trim())
-          .filter((t) => t.length > 0 && /[a-zA-Z]/.test(t))
-          .join(" ")
-          .slice(0, 4000);
+        // DOCX is also a ZIP archive
+        try {
+          const { default: JSZip } = await import("jszip");
+          const zip = await JSZip.loadAsync(arrayBuffer);
+          const wordDoc = zip.files["word/document.xml"];
+          if (wordDoc) {
+            const xml = await wordDoc.async("string");
+            textContent = [...xml.matchAll(/<w:t[^>]*?>([^<]+)<\/w:t>/g)]
+              .map((m) => m[1].trim())
+              .filter((t) => t.length > 0 && /[a-zA-Z]/.test(t))
+              .join(" ")
+              .slice(0, 4000);
+          }
+        } catch (zipErr) {
+          console.warn("JSZip DOCX extraction failed:", zipErr);
+          textContent = "";
+        }
       } else {
+        const decoder = new TextDecoder("utf-8", { fatal: false });
+        const fullText = decoder.decode(new Uint8Array(arrayBuffer));
         textContent = fullText
           .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, " ")
           .replace(/\s+/g, " ")

@@ -7,6 +7,7 @@ import {
   CheckCircle2, Circle, ChevronDown, ChevronUp, Flag, Clock, Eye,
   StickyNote, Save, Loader2, FileText, Plus, Sparkles, Trash2, Download, RefreshCw,
   BarChart3, TrendingUp, Users, Scale, Target, Handshake, Play, Image, ExternalLink,
+  Star, Zap, DollarSign,
 } from "lucide-react";
 
 const CATEGORIES = ["Financials", "Team", "Legal", "Market", "Product", "References"] as const;
@@ -58,6 +59,8 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
   const [expandedDoc, setExpandedDoc] = useState<string | null>(null);
   const [thesisAnalysis, setThesisAnalysis] = useState<Record<string, string>>({});
   const [analyzingDoc, setAnalyzingDoc] = useState<string | null>(null);
+  const [scorecard, setScorecard] = useState<Record<string, number>>({});
+  const [scorecardOpen, setScorecardOpen] = useState(false);
 
   useEffect(() => {
     if (!dealRoomId || !userId) return;
@@ -267,37 +270,79 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
   };
 
   const analyzeAgainstThesis = async (doc: any) => {
-    if (!investorProfile || !doc.ai_summary) return;
+    if (!investorProfile) return;
+    const openAIKey = (import.meta.env as any).VITE_OPENAI_API_KEY || "";
+    if (!openAIKey) { toast.error("OpenAI API key not configured"); return; }
+
     setAnalyzingDoc(doc.id);
     try {
-      const openAIKey = (import.meta.env as any).VITE_OPENAI_API_KEY || "";
       const thesis = [
         investorProfile.thesis && `Thesis: ${investorProfile.thesis}`,
         investorProfile.sectors && `Sectors: ${investorProfile.sectors}`,
         investorProfile.stages && `Stages: ${investorProfile.stages}`,
-        investorProfile.check_size_min && `Check size: ${investorProfile.check_size_min} - ${investorProfile.check_size_max}`,
-        investorProfile.red_flags && `Red flags (won't invest in): ${investorProfile.red_flags}`,
-        investorProfile.key_metrics && `Key metrics I look for: ${investorProfile.key_metrics}`,
+        investorProfile.check_size_min && `Check size: $${investorProfile.check_size_min}–$${investorProfile.check_size_max}`,
+        investorProfile.red_flags && `Won't invest in: ${investorProfile.red_flags}`,
+        investorProfile.key_metrics && `Key metrics: ${investorProfile.key_metrics}`,
       ].filter(Boolean).join("\n");
+
+      // Use ai_summary if available; otherwise read the document directly
+      let docContent = doc.ai_summary || "";
+      if (!docContent && doc.storage_path) {
+        try {
+          const { data: sd } = await supabase.storage.from("documents").createSignedUrl(doc.storage_path, 60);
+          if (sd?.signedUrl) {
+            const buf = await (await fetch(sd.signedUrl)).arrayBuffer();
+            const fileName = doc.file_name || doc.storage_path?.split("/").pop() || "";
+            const ext = fileName.split(".").pop()?.toLowerCase() ?? "";
+            if (["pptx", "ppt"].includes(ext)) {
+              try {
+                const { default: JSZip } = await import("jszip");
+                const zip = await JSZip.loadAsync(buf);
+                const slides = Object.keys(zip.files)
+                  .filter((n) => /^ppt\/slides\/slide\d+\.xml$/.test(n))
+                  .sort((a, b) => parseInt(a.match(/\d+/)?.[0]??"0") - parseInt(b.match(/\d+/)?.[0]??"0"));
+                const texts: string[] = [];
+                for (const s of slides) {
+                  const xml = await zip.files[s].async("string");
+                  const t = [...xml.matchAll(/<a:t[^>]*?>([^<]+)<\/a:t>/g)]
+                    .map((m) => m[1].trim()).filter((t) => t.length > 1 && /[a-zA-Z]/.test(t)).join(" ");
+                  if (t) texts.push(t);
+                }
+                docContent = texts.join(" • ").slice(0, 3000);
+              } catch { /* zip failed */ }
+            } else if (["docx", "doc"].includes(ext)) {
+              try {
+                const { default: JSZip } = await import("jszip");
+                const zip = await JSZip.loadAsync(buf);
+                const wd = zip.files["word/document.xml"];
+                if (wd) {
+                  const xml = await wd.async("string");
+                  docContent = [...xml.matchAll(/<w:t[^>]*?>([^<]+)<\/w:t>/g)]
+                    .map((m) => m[1].trim()).filter((t) => /[a-zA-Z]/.test(t)).join(" ").slice(0, 3000);
+                }
+              } catch { /* zip failed */ }
+            } else {
+              const raw = new TextDecoder("utf-8", { fatal: false }).decode(new Uint8Array(buf));
+              docContent = raw.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, " ").replace(/\s+/g, " ").slice(0, 3000).trim();
+            }
+          }
+        } catch { /* signed URL failed */ }
+      }
+
+      const fileName = doc.file_name || doc.storage_path?.split("/").pop()?.replace(/^\d{13}-/, "") || "document";
+      const docContext = docContent
+        ? `Document: ${fileName}\n\nContent:\n${docContent}`
+        : `Document: ${fileName} (category: ${doc.category || "Other"}) — could not extract text, analyze by name/category and flag for manual review.`;
 
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${openAIKey}`,
-        },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${openAIKey}` },
         body: JSON.stringify({
           model: "gpt-4o-mini",
-          max_tokens: 200,
+          max_tokens: 300,
           messages: [
-            {
-              role: "system",
-              content: "You are a VC analyst. Given an investor's thesis and a document summary, provide a brief thesis alignment analysis. Use ✅ for matches, ⚠️ for concerns, ❌ for red flags. Be specific and concise. Max 5 bullet points.",
-            },
-            {
-              role: "user",
-              content: `INVESTOR THESIS:\n${thesis}\n\nDOCUMENT SUMMARY:\n${doc.ai_summary}\n\nAnalyze alignment:`,
-            },
+            { role: "system", content: "You are a VC analyst. Analyze how a startup document aligns with an investor's thesis. Use ✅ strong match, ⚠️ partial/concern, ❌ red flag/mismatch. Be specific. Max 5 bullets. End with a one-line overall verdict." },
+            { role: "user", content: `INVESTOR THESIS:\n${thesis}\n\n${docContext}\n\nAnalyze thesis alignment:` },
           ],
         }),
       });
@@ -305,7 +350,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
       const analysis = result.choices?.[0]?.message?.content || "Could not analyze";
       setThesisAnalysis((prev) => ({ ...prev, [doc.id]: analysis }));
     } catch {
-      setThesisAnalysis((prev) => ({ ...prev, [doc.id]: "Analysis failed" }));
+      setThesisAnalysis((prev) => ({ ...prev, [doc.id]: "Analysis failed. Please try again." }));
     } finally {
       setAnalyzingDoc(null);
     }
@@ -605,39 +650,49 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
 
                       {/* Expanded panel */}
                       {isDocExpanded && (
-                        <div className="px-4 pb-4 space-y-4 bg-muted/10">
-                          {/* AI Summary */}
+                        <div className="px-4 pb-4 space-y-3 bg-muted/10">
+                          {/* AI Summary — show if exists, otherwise nudge but don't block thesis */}
                           {doc.ai_summary ? (
                             <div className="rounded-xl border border-border/60 bg-card p-4">
                               <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
                                 <Sparkles className="h-3 w-3" /> AI Summary
                               </div>
-                              <p className="text-sm text-foreground/90 leading-relaxed">{doc.ai_summary}</p>
+                              <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">{doc.ai_summary}</p>
                             </div>
-                          ) : (
-                            <div className="rounded-xl border border-dashed border-border/60 p-4 text-center text-xs text-muted-foreground">
-                              No AI summary yet. Generate one from the Documents tab.
+                          ) : isInvestor && (
+                            <div className="rounded-lg border border-dashed border-border/60 px-3 py-2.5 text-[11px] text-muted-foreground flex items-center gap-2">
+                              <Sparkles className="h-3 w-3 shrink-0" />
+                              No AI summary yet — you can still run thesis alignment directly below (AI reads the file).
                             </div>
                           )}
 
-                          {/* Thesis alignment — investor only */}
-                          {isInvestor && investorProfile && (
-                            <div className="rounded-xl border border-border/60 bg-card p-4">
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                  Thesis Alignment
+                          {/* Thesis Alignment — investor only, NOT gated on ai_summary */}
+                          {isInvestor && (
+                            <div className="rounded-xl border border-brand/25 bg-brand/5 p-4">
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="text-xs font-semibold text-brand uppercase tracking-wider flex items-center gap-1.5">
+                                  <Sparkles className="h-3.5 w-3.5" /> Thesis Alignment
                                 </div>
-                                {doc.ai_summary && !thesisAnalysis[doc.id] && (
-                                  <button
-                                    onClick={() => void analyzeAgainstThesis(doc)}
-                                    disabled={analyzingDoc === doc.id}
-                                    className="inline-flex items-center gap-1 text-[10px] text-brand hover:underline disabled:opacity-50"
-                                  >
-                                    {analyzingDoc === doc.id
-                                      ? <><Loader2 className="h-3 w-3 animate-spin" /> Analyzing…</>
-                                      : <><Sparkles className="h-3 w-3" /> Analyze against my thesis</>}
-                                  </button>
-                                )}
+                                <div className="flex items-center gap-2">
+                                  {thesisAnalysis[doc.id] && (
+                                    <button
+                                      onClick={() => setThesisAnalysis((p) => { const n = {...p}; delete n[doc.id]; return n; })}
+                                      className="text-[10px] text-muted-foreground hover:text-foreground"
+                                    >Re-analyze</button>
+                                  )}
+                                  {!thesisAnalysis[doc.id] && (
+                                    <button
+                                      onClick={() => void analyzeAgainstThesis(doc)}
+                                      disabled={analyzingDoc === doc.id || !investorProfile?.thesis}
+                                      title={!investorProfile?.thesis ? "Add thesis in your Profile first" : ""}
+                                      className="inline-flex items-center gap-1.5 rounded-md bg-brand text-brand-foreground px-3 py-1.5 text-xs font-medium hover:opacity-90 disabled:opacity-40 transition-opacity"
+                                    >
+                                      {analyzingDoc === doc.id
+                                        ? <><Loader2 className="h-3 w-3 animate-spin" /> Analyzing…</>
+                                        : <><Sparkles className="h-3 w-3" /> Analyze against my thesis</>}
+                                    </button>
+                                  )}
+                                </div>
                               </div>
                               {thesisAnalysis[doc.id] ? (
                                 <div className="text-sm whitespace-pre-wrap leading-relaxed">
@@ -645,11 +700,11 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                                 </div>
                               ) : (
                                 <div className="text-xs text-muted-foreground">
-                                  {!doc.ai_summary
-                                    ? "Generate an AI summary first, then analyze thesis alignment."
-                                    : !investorProfile.thesis
-                                    ? "Add your investment thesis in your Profile to enable alignment analysis."
-                                    : "Click 'Analyze against my thesis' to see how this document aligns with your investment criteria."}
+                                  {!investorProfile?.thesis
+                                    ? "Add your investment thesis in Profile → then click Analyze."
+                                    : doc.ai_summary
+                                    ? "Click Analyze to compare this document against your thesis."
+                                    : "Click Analyze — AI will read the file directly and compare against your thesis."}
                                 </div>
                               )}
                             </div>
@@ -725,33 +780,68 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                     Media &amp; Links
                   </div>
                   <div className="space-y-3">
-                    {/* Pitch deck */}
-                    <div className="flex items-center gap-3">
-                      <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs text-muted-foreground mb-1">Pitch Deck URL</div>
-                        {isFounder ? (
-                          <input
-                            type="url"
-                            defaultValue={roomMedia?.pitch_deck_url ?? ""}
-                            placeholder="https://docsend.com/view/..."
-                            onBlur={async (e) => {
-                              await supabase.from("deal_rooms")
-                                .update({ pitch_deck_url: e.target.value || null })
-                                .eq("id", dealRoomId);
-                            }}
-                            className="w-full rounded-md border border-border/60 bg-background px-3 py-1.5 text-xs focus:outline-none focus:border-brand/50"
-                          />
-                        ) : roomMedia?.pitch_deck_url ? (
-                          <a href={roomMedia.pitch_deck_url} target="_blank" rel="noopener noreferrer"
-                            className="text-xs text-brand hover:underline flex items-center gap-1">
-                            <ExternalLink className="h-3 w-3" /> View pitch deck
-                          </a>
-                        ) : (
-                          <span className="text-xs text-muted-foreground italic">Not provided</span>
-                        )}
-                      </div>
-                    </div>
+                    {/* Pitch Deck — uploaded file takes priority over URL */}
+                    {(() => {
+                      const uploadedDeck = dealDocs.find((d: any) =>
+                        (d.category === "Pitch Deck") ||
+                        /(pitch.?deck|pitch|deck)/i.test(d.file_name || d.storage_path || "")
+                      );
+                      return (
+                        <div className="flex items-start gap-3">
+                          <FileText className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-xs font-medium mb-1.5">Pitch Deck</div>
+                            {uploadedDeck ? (
+                              <div className="space-y-1.5">
+                                <button
+                                  onClick={async () => {
+                                    const { data } = await supabase.storage
+                                      .from("documents")
+                                      .createSignedUrl(uploadedDeck.storage_path, 300);
+                                    if (!data?.signedUrl) { toast.error("Could not open file"); return; }
+                                    const ext = (uploadedDeck.file_name || uploadedDeck.storage_path || "").split(".").pop()?.toLowerCase() ?? "";
+                                    const isOffice = ["pptx", "ppt"].includes(ext);
+                                    window.open(isOffice ? `https://docs.google.com/gview?url=${encodeURIComponent(data.signedUrl)}&embedded=false` : data.signedUrl, "_blank");
+                                  }}
+                                  className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-xs font-medium hover:bg-brand/15 transition-colors"
+                                >
+                                  <FileText className="h-3 w-3" />
+                                  {uploadedDeck.file_name || uploadedDeck.storage_path?.split("/").pop()?.replace(/^\d{13}-/, "") || "Pitch Deck"} ↗
+                                </button>
+                                {roomMedia?.pitch_deck_url && (
+                                  <a href={roomMedia.pitch_deck_url} target="_blank" rel="noopener noreferrer"
+                                    className="text-[10px] text-muted-foreground hover:underline flex items-center gap-1">
+                                    <ExternalLink className="h-3 w-3" /> Also: external link
+                                  </a>
+                                )}
+                              </div>
+                            ) : isFounder ? (
+                              <div className="space-y-1.5">
+                                <p className="text-[11px] text-muted-foreground">Upload a PDF/PPTX in Document Vault (category: Pitch Deck), or paste a link below.</p>
+                                <input
+                                  type="url"
+                                  defaultValue={roomMedia?.pitch_deck_url ?? ""}
+                                  placeholder="https://docsend.com/view/..."
+                                  onBlur={async (e) => {
+                                    await supabase.from("deal_rooms")
+                                      .update({ pitch_deck_url: e.target.value || null })
+                                      .eq("id", dealRoomId);
+                                  }}
+                                  className="w-full rounded-md border border-border/60 bg-background px-3 py-1.5 text-xs focus:outline-none focus:border-brand/50"
+                                />
+                              </div>
+                            ) : roomMedia?.pitch_deck_url ? (
+                              <a href={roomMedia.pitch_deck_url} target="_blank" rel="noopener noreferrer"
+                                className="text-xs text-brand hover:underline flex items-center gap-1">
+                                <ExternalLink className="h-3 w-3" /> View pitch deck
+                              </a>
+                            ) : (
+                              <span className="text-xs text-muted-foreground italic">No pitch deck uploaded yet</span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })()}
 
                     {/* Product video */}
                     <div className="flex items-center gap-3">
@@ -823,6 +913,103 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
           </div>
         )}
       </div>
+
+      {/* ── Investor Scorecard — non-AI structured investment analysis ── */}
+      {isInvestor && (() => {
+        const dims = [
+          { key: "team",       label: "Team & Founders",        icon: Users,      desc: "Experience, domain expertise, coachability" },
+          { key: "market",     label: "Market Size & Timing",   icon: TrendingUp, desc: "TAM/SAM/SOM, timing, tailwinds" },
+          { key: "product",    label: "Product & Tech",         icon: Zap,        desc: "Differentiation, moat, tech risk" },
+          { key: "traction",   label: "Traction & Metrics",     icon: BarChart3,  desc: "Revenue, growth, retention, KPIs" },
+          { key: "financials", label: "Financials & Use of Funds", icon: DollarSign, desc: "Burn, runway, unit economics" },
+          { key: "fit",        label: "Thesis Fit",             icon: Target,     desc: "Stage, sector, check size match" },
+        ] as const;
+        const scores = Object.values(scorecard);
+        const avg = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+        const verdict = avg >= 4.2 ? { l: "Strong Pass", c: "text-success bg-success/10 border-success/30" }
+          : avg >= 3.5 ? { l: "Lean Pass", c: "text-brand bg-brand/10 border-brand/30" }
+          : avg >= 2.8 ? { l: "Watch List", c: "text-warning bg-warning/10 border-warning/30" }
+          : avg >= 2 ? { l: "Lean No", c: "text-orange-500 bg-orange-500/10 border-orange-500/30" }
+          : scores.length > 0 ? { l: "Pass", c: "text-destructive bg-destructive/10 border-destructive/30" }
+          : null;
+        return (
+          <div className="mb-6 rounded-2xl border border-border/60 bg-card overflow-hidden">
+            <button
+              onClick={() => setScorecardOpen((v) => !v)}
+              className="w-full flex items-center justify-between px-5 py-4 hover:bg-accent/40 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="grid h-9 w-9 place-items-center rounded-xl bg-brand/10 shrink-0">
+                  <Star className="h-4 w-4 text-brand" />
+                </div>
+                <div className="text-left">
+                  <div className="text-sm font-semibold">Investment Scorecard</div>
+                  <div className="text-xs text-muted-foreground">Rate this startup across 6 VC dimensions</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 shrink-0">
+                {scores.length > 0 && verdict && (
+                  <span className={cn("text-xs font-bold px-2.5 py-1 rounded-lg border", verdict.c)}>
+                    {avg.toFixed(1)}/5 · {verdict.l}
+                  </span>
+                )}
+                {scorecardOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+              </div>
+            </button>
+            {scorecardOpen && (
+              <div className="border-t border-border/60 px-5 py-4 space-y-4">
+                <div className="grid gap-3">
+                  {dims.map(({ key, label, icon: Icon, desc }) => (
+                    <div key={key} className="flex items-center gap-3">
+                      <div className="w-44 shrink-0">
+                        <div className="flex items-center gap-1.5">
+                          <Icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                          <span className="text-xs font-medium">{label}</span>
+                        </div>
+                        <div className="text-[10px] text-muted-foreground leading-tight mt-0.5 pl-5">{desc}</div>
+                      </div>
+                      <div className="flex items-center gap-1.5 flex-1">
+                        {[1,2,3,4,5].map((s) => (
+                          <button
+                            key={s}
+                            onClick={() => setScorecard((p) => ({ ...p, [key]: s }))}
+                            className={cn(
+                              "h-8 w-8 rounded-md text-xs font-bold transition-all border",
+                              (scorecard[key] ?? 0) >= s
+                                ? s >= 4 ? "bg-success text-success-foreground border-success"
+                                  : s === 3 ? "bg-brand text-brand-foreground border-brand"
+                                  : "bg-warning text-warning-foreground border-warning"
+                                : "border-border/60 text-muted-foreground hover:border-brand/50 hover:text-brand"
+                            )}
+                          >{s}</button>
+                        ))}
+                        {scorecard[key] && (
+                          <span className="text-[10px] text-muted-foreground ml-1">
+                            {["","Poor","Below avg","Average","Strong","Exceptional"][scorecard[key]]}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {scores.length >= 3 && verdict && (
+                  <div className={cn("rounded-xl border p-4 flex items-center justify-between", verdict.c)}>
+                    <div>
+                      <div className="text-xs opacity-70 mb-0.5">Overall verdict · {scores.length}/6 scored</div>
+                      <div className="text-xl font-bold">{verdict.l}</div>
+                      <div className="text-xs opacity-70 mt-0.5">Average: {avg.toFixed(1)} / 5</div>
+                    </div>
+                    <button onClick={() => setScorecard({})} className="text-[11px] opacity-60 hover:opacity-100">Reset</button>
+                  </div>
+                )}
+                <p className="text-[10px] text-muted-foreground bg-muted/40 rounded-lg px-3 py-2">
+                  Score each dimension 1–5 based on your review. Local to this session — copy to your CRM notes.
+                </p>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Category accordion */}
       <div className="space-y-3">
