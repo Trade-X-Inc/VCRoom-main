@@ -41,8 +41,11 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
       return { summary: null, error: `File download failed: ${dlError?.message ?? 'file not found'}` };
     }
 
-    const fileName = data.documentName || data.documentPath?.split("/").pop() || "";
-    const ext = fileName.split(".").pop()?.toLowerCase() ?? "";
+    const fileName = data.documentName ||
+      data.documentPath?.split("/").pop()?.replace(/^\d{13}-/, "") || "";
+    const pathFileName = data.documentPath?.split("/").pop() || "";
+    const ext = (fileName.split(".").pop() || pathFileName.split(".").pop() || "").toLowerCase();
+    console.log("[summary-fn] fileName:", fileName, "ext:", ext, "path:", data.documentPath?.slice(-50));
     let textContent = "";
 
     if (["pptx", "ppt"].includes(ext)) {

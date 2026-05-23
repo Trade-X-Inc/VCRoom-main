@@ -1210,7 +1210,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
       const result = await generateDocumentSummary({
         data: {
           documentPath: doc.storage_path,
-          documentName: doc.name || doc.storage_path?.split("/").pop() || "Document",
+          documentName: doc.file_name || doc.name || doc.storage_path?.split("/").pop() || "Document",
           dealRoomId,
           supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
           supabaseKey: (import.meta.env as any).VITE_SUPABASE_SERVICE_ROLE_KEY || "",
