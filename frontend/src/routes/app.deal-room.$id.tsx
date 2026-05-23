@@ -28,7 +28,6 @@ import {
 } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { sendInviteEmail } from "@/lib/invite-fn";
-import { generateDocumentSummary } from "@/lib/document-summary-fn";
 import { getQASuggestions } from "@/lib/qa-suggestions-fn";
 
 export const Route = createFileRoute("/app/deal-room/$id")({
@@ -1207,34 +1206,107 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
   const generateSummary = async (doc: any) => {
     setGeneratingSummaryId(doc.id);
     try {
-      const result = await generateDocumentSummary({
-        data: {
-          documentPath: doc.storage_path,
-          documentName: doc.file_name || doc.name || doc.storage_path?.split("/").pop() || "Document",
-          dealRoomId,
-          supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
-          supabaseKey: (import.meta.env as any).VITE_SUPABASE_SERVICE_ROLE_KEY || "",
-          openAIKey: import.meta.env.VITE_OPENAI_API_KEY || "",
+      const openAIKey = (import.meta.env as any).VITE_OPENAI_API_KEY || "";
+      if (!openAIKey) {
+        toast.error("OpenAI API key not configured");
+        return;
+      }
+
+      const { data: signedData, error: signedError } = await supabase.storage
+        .from("documents")
+        .createSignedUrl(doc.storage_path, 60);
+      if (signedError || !signedData?.signedUrl) {
+        toast.error("Could not access file");
+        return;
+      }
+
+      const response = await fetch(signedData.signedUrl);
+      if (!response.ok) {
+        toast.error("File download failed");
+        return;
+      }
+
+      const arrayBuffer = await response.arrayBuffer();
+      const fileName = doc.file_name ||
+        doc.storage_path?.split("/").pop()?.replace(/^\d{13}-/, "") || "";
+      const ext = fileName.split(".").pop()?.toLowerCase() ?? "";
+
+      let textContent = "";
+      const decoder = new TextDecoder("utf-8", { fatal: false });
+      const fullText = decoder.decode(new Uint8Array(arrayBuffer));
+
+      if (["pptx", "ppt"].includes(ext)) {
+        for (const pattern of [/<a:t[^>]*?>([^<]+)<\/a:t>/g, /<a:t>([^<]+)<\/a:t>/g]) {
+          const matches = [...fullText.matchAll(pattern)];
+          if (matches.length > 5) {
+            const extracted = matches
+              .map((m) => m[1].trim())
+              .filter((t) => t.length > 1 && /[a-zA-Z]/.test(t))
+              .join(" • ")
+              .slice(0, 4000);
+            if (extracted.length > textContent.length) textContent = extracted;
+          }
+        }
+      } else if (["docx", "doc"].includes(ext)) {
+        textContent = [...fullText.matchAll(/<w:t[^>]*?>([^<]+)<\/w:t>/g)]
+          .map((m) => m[1].trim())
+          .filter((t) => t.length > 0 && /[a-zA-Z]/.test(t))
+          .join(" ")
+          .slice(0, 4000);
+      } else {
+        textContent = fullText
+          .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, " ")
+          .replace(/\s+/g, " ")
+          .slice(0, 4000)
+          .trim();
+      }
+
+      const prompt = textContent && textContent.length > 50
+        ? `Document: ${fileName}\n\nContent:\n${textContent.slice(0, 3000)}\n\nWrite 3-5 bullet points summarizing the key facts. Be specific — use actual names, numbers, and data from the content.`
+        : `Document: ${fileName} (${ext?.toUpperCase()})\n\nCould not extract readable text from this file type. Briefly describe what this type of document typically contains in a startup fundraising context, in 2-3 bullet points.`;
+
+      const aiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${openAIKey}`,
         },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          max_tokens: 300,
+          messages: [
+            {
+              role: "system",
+              content: "You are a VC analyst. Write concise, specific document summaries. Use bullet points. Never invent facts not in the document.",
+            },
+            { role: "user", content: prompt },
+          ],
+        }),
       });
-      if (result.error) {
-        toast.error(`AI Summary failed: ${result.error}`);
+
+      if (!aiResponse.ok) {
+        const err = await aiResponse.json();
+        toast.error(`OpenAI error: ${(err as any)?.error?.message || aiResponse.status}`);
         return;
       }
-      if (!result.summary) {
-        toast.error("AI Summary returned empty. Check Cloudflare logs.");
+
+      const aiData = await aiResponse.json() as { choices: Array<{ message: { content: string } }> };
+      const summary = aiData.choices?.[0]?.message?.content || "";
+      if (!summary) {
+        toast.error("AI returned empty response");
         return;
       }
-      await supabase.from("documents").update({ ai_summary: result.summary }).eq("id", doc.id);
+
+      await supabase.from("documents").update({ ai_summary: summary }).eq("id", doc.id);
       queryClient.setQueryData(["documents", dealRoomId], (old: any[]) =>
-        (old ?? []).map((d: any) => d.id === doc.id ? { ...d, ai_summary: result.summary } : d)
+        (old ?? []).map((d: any) => d.id === doc.id ? { ...d, ai_summary: summary } : d)
       );
       queryClient.invalidateQueries({ queryKey: ["dd-docs", dealRoomId] });
       expandSummary(doc.id);
       toast.success("Summary generated");
     } catch (err) {
-      console.error("Summary generation error:", err);
-      toast.error(err instanceof Error ? err.message : `Unknown error: ${String(err)}`);
+      console.error("Summary error:", err);
+      toast.error(err instanceof Error ? err.message : "Summary failed");
     } finally {
       setGeneratingSummaryId(null);
     }
