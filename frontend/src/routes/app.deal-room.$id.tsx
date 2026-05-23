@@ -1127,6 +1127,17 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
   const [editingSummaryId, setEditingSummaryId] = useState<string | null>(null);
   const [summaryEdits, setSummaryEdits] = useState<Record<string, string>>({});
   const [previewDoc, setPreviewDoc] = useState<any | null>(null);
+  const summaryExpandedRef = useRef<Record<string, boolean>>({});
+  const [summaryExpandedTick, setSummaryExpandedTick] = useState(0);
+  const isSummaryExpanded = (docId: string) => summaryExpandedRef.current[docId] ?? false;
+  const toggleSummary = (docId: string) => {
+    summaryExpandedRef.current[docId] = !summaryExpandedRef.current[docId];
+    setSummaryExpandedTick((t) => t + 1);
+  };
+  const expandSummary = (docId: string) => {
+    summaryExpandedRef.current[docId] = true;
+    setSummaryExpandedTick((t) => t + 1);
+  };
 
   const { data: docs = [] } = useQuery({
     queryKey: ["documents", dealRoomId],
@@ -1198,6 +1209,8 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
       }
       await supabase.from("documents").update({ ai_summary: result.summary }).eq("id", doc.id);
       queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId], refetchType: "active" });
+      queryClient.invalidateQueries({ queryKey: ["dd-docs", dealRoomId] });
+      expandSummary(doc.id);
       toast.success("Summary generated");
     } catch (err) {
       console.error("Summary generation error:", err);
@@ -1414,78 +1427,89 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
                 {supportsAI && (
                   <div className="border-t border-border/40">
                     {hasSummary ? (
-                      <div className="px-4 pb-3">
-                        <div className="rounded-lg border border-brand/20 bg-brand/5 p-3">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-1.5 text-xs font-medium text-brand">
-                              <Sparkles className="h-3 w-3" />
-                              AI Summary
-                              <span className={cn("px-1.5 py-0.5 rounded text-[9px] font-medium ml-1",
-                                doc.summary_edited ? "bg-brand/10 text-brand" : "bg-muted/60 text-muted-foreground")}>
-                                {doc.summary_edited ? "Edited" : "AI"}
-                              </span>
-                            </div>
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => generateSummary(doc)}
-                                disabled={isGenerating}
-                                className="text-[10px] text-muted-foreground hover:text-foreground border border-border/60 rounded px-2 py-0.5 hover:bg-accent disabled:opacity-50"
-                              >
-                                {isGenerating ? "Regenerating…" : "Regenerate"}
-                              </button>
-                              {isFounder && !isEditing && (
-                                <button
-                                  onClick={() => {
-                                    setEditingSummaryId(doc.id);
-                                    setSummaryEdits((s) => ({ ...s, [doc.id]: doc.ai_summary! }));
-                                  }}
-                                  className="text-[10px] text-muted-foreground hover:text-foreground border border-border/60 rounded px-2 py-0.5 hover:bg-accent"
-                                >
-                                  Edit
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                          {isEditing ? (
-                            <div className="space-y-2">
-                              <textarea
-                                value={summaryEdits[doc.id] ?? ""}
-                                onChange={(e) => setSummaryEdits((s) => ({ ...s, [doc.id]: e.target.value }))}
-                                rows={4}
-                                className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-xs resize-none focus:outline-none focus:border-brand/50"
-                              />
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={() => setEditingSummaryId(null)}
-                                  className="text-[10px] border border-border/60 rounded px-2 py-1 hover:bg-accent"
-                                >
-                                  Cancel
-                                </button>
-                                <button
-                                  onClick={async () => {
-                                    const text = summaryEdits[doc.id]?.trim();
-                                    if (!text) return;
-                                    const { error } = await supabase.from("documents")
-                                      .update({ ai_summary: text, summary_edited: true })
-                                      .eq("id", doc.id);
-                                    if (error) { toast.error("Failed to save summary"); return; }
-                                    queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
-                                    setEditingSummaryId(null);
-                                    setSummaryEdits((s) => { const n = { ...s }; delete n[doc.id]; return n; });
-                                    toast.success("Summary saved");
-                                  }}
-                                  className="text-[10px] bg-gradient-brand text-brand-foreground rounded px-2 py-1"
-                                >
-                                  Save
-                                </button>
+                      <div className="px-4 py-2.5">
+                        <button
+                          onClick={() => toggleSummary(doc.id)}
+                          className="flex items-center gap-1.5 text-xs text-brand hover:underline w-full text-left"
+                        >
+                          <Sparkles className="h-3.5 w-3.5 shrink-0" />
+                          <span className="flex-1">AI Summary</span>
+                          <span className={cn(
+                            "px-1.5 py-0.5 rounded text-[9px] font-medium",
+                            doc.summary_edited ? "bg-brand/10 text-brand" : "bg-muted/60 text-muted-foreground"
+                          )}>
+                            {doc.summary_edited ? "Edited" : "AI"}
+                          </span>
+                          {isSummaryExpanded(doc.id)
+                            ? <ChevronUp className="h-3 w-3 shrink-0" />
+                            : <ChevronDown className="h-3 w-3 shrink-0" />}
+                        </button>
+                        {isSummaryExpanded(doc.id) && (
+                          <div className="mt-2 rounded-lg border-l-2 border-brand/40 bg-muted/30 px-3 py-3">
+                            {isEditing ? (
+                              <div className="space-y-2">
+                                <textarea
+                                  value={summaryEdits[doc.id] ?? ""}
+                                  onChange={(e) => setSummaryEdits((s) => ({ ...s, [doc.id]: e.target.value }))}
+                                  rows={4}
+                                  className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-xs resize-none focus:outline-none focus:border-brand/50"
+                                />
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => setEditingSummaryId(null)}
+                                    className="text-[10px] border border-border/60 rounded px-2 py-1 hover:bg-accent"
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    onClick={async () => {
+                                      const text = summaryEdits[doc.id]?.trim();
+                                      if (!text) return;
+                                      const { error } = await supabase.from("documents")
+                                        .update({ ai_summary: text, summary_edited: true })
+                                        .eq("id", doc.id);
+                                      if (error) { toast.error("Failed to save summary"); return; }
+                                      queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+                                      queryClient.invalidateQueries({ queryKey: ["dd-docs", dealRoomId] });
+                                      setEditingSummaryId(null);
+                                      setSummaryEdits((s) => { const n = { ...s }; delete n[doc.id]; return n; });
+                                      toast.success("Summary saved");
+                                    }}
+                                    className="text-[10px] bg-gradient-brand text-brand-foreground rounded px-2 py-1"
+                                  >
+                                    Save
+                                  </button>
+                                </div>
                               </div>
-                            </div>
-                          ) : (
-                            <p className="text-xs text-foreground/90 leading-relaxed whitespace-pre-line">
-                              {doc.ai_summary}
-                            </p>
-                          )}
-                        </div>
+                            ) : (
+                              <>
+                                <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-line">
+                                  {doc.ai_summary}
+                                </p>
+                                <div className="flex gap-2 mt-2">
+                                  <button
+                                    onClick={() => generateSummary(doc)}
+                                    disabled={isGenerating}
+                                    className="text-[10px] text-muted-foreground hover:text-foreground border border-border/60 rounded px-2 py-0.5 hover:bg-accent disabled:opacity-50"
+                                  >
+                                    {isGenerating ? "Regenerating…" : "Regenerate"}
+                                  </button>
+                                  {isFounder && (
+                                    <button
+                                      onClick={() => {
+                                        setEditingSummaryId(doc.id);
+                                        setSummaryEdits((s) => ({ ...s, [doc.id]: doc.ai_summary! }));
+                                      }}
+                                      className="text-[10px] text-muted-foreground hover:text-foreground border border-border/60 rounded px-2 py-0.5 hover:bg-accent"
+                                    >
+                                      Edit
+                                    </button>
+                                  )}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
                       </div>
                     ) : (
                       /* No summary yet — compact generate row */

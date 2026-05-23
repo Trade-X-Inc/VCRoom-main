@@ -117,6 +117,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
     queryKey: ["dd-docs", dealRoomId],
     enabled: !!dealRoomId,
     staleTime: 0,
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const { data } = await supabase
         .from("documents")
