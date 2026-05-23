@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { Plus, X, CheckCircle2, Clock, FileText } from "lucide-react";
+import { Plus, X, CheckCircle2, ClipboardList } from "lucide-react";
 import { toast } from "sonner";
-import { formatDistanceToNow } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface Props {
   dealRoomId: string;
@@ -44,7 +44,7 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
         status: "pending",
       });
       if (error) throw error;
-      toast.success("Document added to wishlist");
+      toast.success("Document requested");
       setTitle("");
       setAdding(false);
       qc.invalidateQueries({ queryKey: ["doc-wishlist", dealRoomId] });
@@ -66,28 +66,26 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
   };
 
   const handleDelete = async (id: string) => {
-    const { error } = await supabase
-      .from("document_requests")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("document_requests").delete().eq("id", id);
     if (error) { toast.error(error.message); return; }
     qc.invalidateQueries({ queryKey: ["doc-wishlist", dealRoomId] });
   };
 
-  const pending = requests.filter((r: any) => r.status === "pending");
-  const fulfilled = requests.filter((r: any) => r.status === "fulfilled");
+  const pending = (requests as any[]).filter((r) => r.status === "pending");
+  const fulfilled = (requests as any[]).filter((r) => r.status === "fulfilled");
 
   if (requests.length === 0 && !isInvestor) return null;
 
   return (
     <div className="mb-4 rounded-xl border border-brand/20 bg-brand/5 overflow-hidden">
+      {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-brand/10">
         <div className="flex items-center gap-2">
-          <FileText className="h-4 w-4 text-brand" />
+          <ClipboardList className="h-4 w-4 text-brand" />
           <span className="text-sm font-semibold">Documents needed</span>
-          {pending.length > 0 && (
-            <span className="text-[10px] bg-brand/10 text-brand px-1.5 py-0.5 rounded-full font-medium">
-              {pending.length} pending
+          {requests.length > 0 && (
+            <span className="text-[10px] text-muted-foreground">
+              {requests.length} requested · {fulfilled.length} uploaded
             </span>
           )}
         </div>
@@ -101,49 +99,53 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
         )}
       </div>
 
+      {/* Add form */}
       {adding && (
         <div className="px-4 py-3 border-b border-brand/10 bg-background/50 flex gap-2">
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-            placeholder="e.g. Audited financials 2024, Cap table, Customer contracts…"
+            placeholder="e.g. Audited financials 2024, Cap table…"
             autoFocus
             className="flex-1 rounded-md border border-border/60 bg-background px-3 py-1.5 text-sm focus:outline-none focus:border-brand/50"
           />
           <button
             onClick={handleAdd}
             disabled={!title.trim() || saving}
-            className="rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs shadow-glow disabled:opacity-50"
+            className="rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-1.5 text-xs disabled:opacity-50"
           >
             Add
           </button>
-          <button
-            onClick={() => { setAdding(false); setTitle(""); }}
-            className="text-muted-foreground hover:text-foreground"
-          >
+          <button onClick={() => { setAdding(false); setTitle(""); }} className="text-muted-foreground hover:text-foreground">
             <X className="h-4 w-4" />
           </button>
         </div>
       )}
 
-      {requests.length === 0 ? (
+      {/* Empty state */}
+      {requests.length === 0 && (
         <div className="px-4 py-3 text-xs text-muted-foreground">
-          No documents requested yet. Click "Add request" to specify what you need.
+          {isInvestor
+            ? "Use this to tell the founder exactly what documents you need. They'll be notified immediately."
+            : "The investor hasn't requested any specific documents yet."}
         </div>
-      ) : (
+      )}
+
+      {/* List */}
+      {requests.length > 0 && (
         <div className="divide-y divide-brand/10">
           {pending.map((r: any) => (
             <div key={r.id} className="flex items-center gap-3 px-4 py-2.5">
-              <Clock className="h-3.5 w-3.5 text-warning shrink-0" />
-              <span className="flex-1 text-sm">{r.title}</span>
-              <span className="text-[10px] text-muted-foreground">
-                {formatDistanceToNow(new Date(r.created_at), { addSuffix: true })}
+              <span className="relative flex h-2 w-2 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500" />
               </span>
+              <span className="flex-1 text-sm">{r.title}</span>
               {isFounder && (
                 <button
                   onClick={() => handleFulfill(r.id)}
-                  className="text-[10px] text-success hover:underline"
+                  className="text-[10px] text-success hover:underline shrink-0"
                 >
                   Mark uploaded
                 </button>
@@ -151,7 +153,7 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
               {isInvestor && (
                 <button
                   onClick={() => handleDelete(r.id)}
-                  className="text-muted-foreground hover:text-destructive"
+                  className="text-muted-foreground hover:text-destructive shrink-0"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -159,10 +161,10 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
             </div>
           ))}
           {fulfilled.map((r: any) => (
-            <div key={r.id} className="flex items-center gap-3 px-4 py-2.5 opacity-60">
+            <div key={r.id} className={cn("flex items-center gap-3 px-4 py-2.5 opacity-60")}>
               <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0" />
               <span className="flex-1 text-sm line-through text-muted-foreground">{r.title}</span>
-              <span className="text-[10px] text-success">Uploaded</span>
+              <span className="text-[10px] text-success shrink-0">Uploaded</span>
             </div>
           ))}
         </div>

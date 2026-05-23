@@ -1261,9 +1261,22 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
           .trim();
       }
 
-      const prompt = textContent && textContent.length > 50
-        ? `Document: ${fileName}\n\nContent:\n${textContent.slice(0, 3000)}\n\nWrite 3-5 bullet points summarizing the key facts. Be specific — use actual names, numbers, and data from the content.`
-        : `Document: ${fileName} (${ext?.toUpperCase()})\n\nCould not extract readable text from this file type. Briefly describe what this type of document typically contains in a startup fundraising context, in 2-3 bullet points.`;
+      // Quality gate — skip OpenAI if extraction failed
+      const hasRealContent = textContent.length > 100 &&
+        /[a-zA-Z]{3,}/.test(textContent) &&
+        textContent.split(" ").filter((w) => w.length > 3).length > 10;
+
+      if (!hasRealContent) {
+        const honestMessage = `Could not extract readable text from this ${ext.toUpperCase()} file.\n\nTo review this document:\n• Click the Preview button to open it\n• Or click Download to save and open locally\n\nManual review recommended before making investment decisions.`;
+        await supabase.from("documents").update({ ai_summary: honestMessage }).eq("id", doc.id);
+        queryClient.setQueryData(["documents", dealRoomId], (old: any[]) =>
+          (old ?? []).map((d: any) => d.id === doc.id ? { ...d, ai_summary: honestMessage } : d)
+        );
+        queryClient.invalidateQueries({ queryKey: ["dd-docs", dealRoomId] });
+        expandSummary(doc.id);
+        toast.success("Document processed");
+        return;
+      }
 
       const aiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
@@ -1277,9 +1290,12 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
           messages: [
             {
               role: "system",
-              content: "You are a VC analyst. Write concise, specific document summaries. Use bullet points. Never invent facts not in the document.",
+              content: "You are a VC analyst. Summarize ONLY using facts explicitly stated in the provided text. If the text does not contain clear startup or business information, respond with exactly: 'Could not extract meaningful content from this document. Please review it directly.' Never invent or assume information. Use 3-5 bullet points maximum.",
             },
-            { role: "user", content: prompt },
+            {
+              role: "user",
+              content: `Document: ${fileName}\n\nContent:\n${textContent.slice(0, 3000)}\n\nWrite 3-5 bullet points summarizing the key facts. Be specific — use actual names, numbers, and data from the content.`,
+            },
           ],
         }),
       });
@@ -1393,7 +1409,12 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
       </div>
 
       {isFounder && (
-        <div className="mt-5">
+        <div className="mt-5 space-y-3">
+          {(docs as any[]).length === 0 && (
+            <div className="rounded-lg bg-brand/5 border border-brand/20 px-4 py-3 text-xs text-muted-foreground">
+              💡 <strong>Tip:</strong> Documents you upload here are shared with the investor. Upload each document once — they will appear in the investor's workstation automatically.
+            </div>
+          )}
           <Dropzone
             dealRoomId={dealRoomId}
             onUploadComplete={() => queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] })}
@@ -1549,11 +1570,18 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
                     >
                       <Download className="h-3.5 w-3.5" />
                     </button>
-                    {(isFounder || doc.uploader_id === userId) && (
+                    {isFounder && (
                       <button
-                        onClick={() => handleDeleteDoc(doc)}
-                        title="Delete document"
-                        className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/5"
+                        onClick={async () => {
+                          if (!confirm("Remove this document from the deal room?")) return;
+                          await supabase.from("documents")
+                            .update({ deal_room_id: null })
+                            .eq("id", doc.id);
+                          queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+                          toast.success("Document removed from deal room");
+                        }}
+                        title="Remove from deal room"
+                        className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
