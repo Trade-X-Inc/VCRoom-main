@@ -1118,6 +1118,23 @@ function getFileTypeStyle(ext: string): { bg: string; color: string; Icon: any }
   return { bg: "bg-accent", color: "text-muted-foreground", Icon: FileText };
 }
 
+function formatFileSize(bytes: number | null): string {
+  if (!bytes) return "";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+const CAT_BORDER: Record<string, string> = {
+  "Pitch Deck": "border-l-purple-500",
+  "Financials": "border-l-green-500",
+  "Legal": "border-l-red-500",
+  "Market Research": "border-l-violet-500",
+  "Team": "border-l-blue-500",
+  "Product": "border-l-orange-500",
+  "Other": "border-l-muted-foreground/40",
+};
+
 function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFounder: boolean; userId?: string }) {
   const queryClient = useQueryClient();
   const [showLibrary, setShowLibrary] = useState(false);
@@ -1287,7 +1304,10 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold tracking-tight">Documents</h2>
+        <h2 className="text-xl font-semibold tracking-tight">
+          Document Vault
+          <span className="text-sm font-normal text-muted-foreground ml-2">{(docs as any[]).length} files</span>
+        </h2>
         <div className="flex gap-2">
           {isFounder && (
             <button
@@ -1297,9 +1317,6 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
               <Plus className="h-4 w-4" /> Add from library
             </button>
           )}
-          <button className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent">
-            Request document
-          </button>
         </div>
       </div>
 
@@ -1412,14 +1429,16 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
             const isEditing = editingSummaryId === doc.id;
             const supportsAI = TEXT_EXTS.has(ext);
             const catColor = CATEGORY_COLORS[doc.category] ?? "bg-accent text-muted-foreground";
+            const catBorder = CAT_BORDER[doc.category] ?? "border-l-muted-foreground/40";
             const { bg: iconBg, color: iconColor, Icon: FileIcon } = getFileTypeStyle(ext);
+            const fileSize = formatFileSize(doc.file_size ?? null);
 
             return (
               <div
                 key={doc.id}
                 className={cn(
-                  "rounded-xl bg-card shadow-card overflow-hidden",
-                  hasSummary ? "border border-border/60" : "border border-dashed border-border/60"
+                  "rounded-xl bg-card shadow-card overflow-hidden border border-border/60 border-l-4",
+                  catBorder
                 )}
               >
                 {/* Doc header row */}
@@ -1431,13 +1450,16 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-medium truncate">{displayName}</span>
                       {doc.category && (
-                        <span className={cn("shrink-0 text-[10px] px-1.5 py-0.5 rounded-full", catColor)}>
+                        <span className={cn("shrink-0 text-[10px] px-1.5 py-0.5 rounded-full font-medium", catColor)}>
                           {doc.category}
                         </span>
                       )}
                     </div>
-                    <div className="mt-0.5 text-xs text-muted-foreground">
-                      {doc.uploader?.full_name ?? "Unknown"} · {new Date(doc.created_at).toLocaleDateString()}
+                    <div className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <span>{doc.uploader?.full_name ?? "Unknown"}</span>
+                      <span>·</span>
+                      <span>{new Date(doc.created_at).toLocaleDateString()}</span>
+                      {fileSize && <><span>·</span><span>{fileSize}</span></>}
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
@@ -1581,16 +1603,44 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
       )}
 
       {filteredDocs.length === 0 && activeDocTab === "All" && (
-        <div className="mt-8 rounded-xl border border-border/60 bg-card shadow-card p-10 flex flex-col items-center gap-3 text-center">
-          <div className="grid h-12 w-12 place-items-center rounded-full bg-accent">
-            <FileText className="h-5 w-5 text-muted-foreground" />
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="grid h-16 w-16 place-items-center rounded-2xl bg-muted mx-auto mb-4">
+            <FolderOpen className="h-7 w-7 text-muted-foreground/50" />
           </div>
-          <div className="text-sm font-medium">No documents yet</div>
-          <div className="text-xs text-muted-foreground max-w-xs">
+          <p className="text-sm font-medium">No documents yet</p>
+          <p className="text-xs text-muted-foreground mt-1 mb-4">
             {isFounder
-              ? "Upload files above or add from your document library."
+              ? "Upload your pitch deck and key documents to share with investors."
               : "The founder hasn't shared any documents yet."}
-          </div>
+          </p>
+          {isFounder && (
+            <label className="inline-flex items-center gap-1.5 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 text-sm cursor-pointer shadow-sm">
+              <Upload className="h-4 w-4" /> Upload first document
+              <input
+                type="file"
+                className="sr-only"
+                accept=".pdf,.pptx,.ppt,.docx,.doc,.xlsx,.xls,.csv,.png,.jpg,.jpeg"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file || !userId) return;
+                  const path = `${dealRoomId}/${userId}/${Date.now()}-${file.name}`;
+                  const { error } = await supabase.storage.from("documents").upload(path, file);
+                  if (error) { toast.error("Upload failed"); return; }
+                  await supabase.from("documents").insert({
+                    deal_room_id: dealRoomId,
+                    uploader_id: userId,
+                    storage_path: path,
+                    file_name: file.name,
+                    file_size: file.size,
+                    category: "Other",
+                  });
+                  queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+                  toast.success("Uploaded!");
+                  e.target.value = "";
+                }}
+              />
+            </label>
+          )}
         </div>
       )}
 
