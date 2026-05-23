@@ -48,19 +48,33 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
     if (["pptx", "ppt"].includes(ext)) {
       try {
         const arrayBuffer = await (blob as Blob).arrayBuffer();
+        const bytes = new Uint8Array(arrayBuffer);
         const decoder = new TextDecoder("utf-8", { fatal: false });
-        const rawText = decoder.decode(new Uint8Array(arrayBuffer));
-        const atMatches = rawText.match(/<a:t[^>]*>([^<]+)<\/a:t>/g) ?? [];
-        const tMatches = rawText.match(/<t[^>]*>([^<]+)<\/t>/g) ?? [];
-        const allMatches = atMatches.length >= tMatches.length ? atMatches : tMatches;
-        textContent = allMatches
-          .map((m) => m.replace(/<[^>]+>/g, "").trim())
-          .filter((t) => t.length > 1)
-          .join(" ")
-          .replace(/\s+/g, " ")
-          .slice(0, 4000)
-          .trim();
-      } catch {
+        const fullText = decoder.decode(bytes);
+
+        const patterns = [
+          /<a:t[^>]*?>([^<]{2,})<\/a:t>/g,
+          /<a:t>([^<]{2,})<\/a:t>/g,
+          /<w:t[^>]*?>([^<]{2,})<\/w:t>/g,
+        ];
+
+        let bestResult = "";
+        for (const pattern of patterns) {
+          const matches = [...fullText.matchAll(pattern)];
+          if (matches.length > 5) {
+            const extracted = matches
+              .map((m) => m[1].trim())
+              .filter((t) => t.length > 1 && /[a-zA-Z]/.test(t))
+              .join(" • ")
+              .slice(0, 3000);
+            if (extracted.length > bestResult.length) bestResult = extracted;
+          }
+        }
+
+        textContent = bestResult;
+        console.log(`[PPTX extract] fileName: ${fileName}, chars: ${textContent.length}, preview: ${textContent.slice(0, 100)}`);
+      } catch (err) {
+        console.log(`[PPTX extract] failed: ${err}`);
         textContent = "";
       }
     } else if (["docx", "doc"].includes(ext)) {
@@ -98,17 +112,6 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
       textContent = `Document: ${fileName} (${ext.toUpperCase()}). File could not be parsed for text content. Please describe what a ${ext.toUpperCase()} document in a startup fundraising context typically contains.`;
     }
 
-    const prompt = `Analyze this document and provide a structured summary with:
-1. What this document is
-2. Key findings and data points
-3. What's strong/notable
-4. What's missing or unclear
-5. Relevance for investment due diligence
-
-Document name: ${fileName}
-Document content:
-${textContent.slice(0, 3000)}`;
-
     const resp = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -117,11 +120,17 @@ ${textContent.slice(0, 3000)}`;
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        max_tokens: 400,
+        max_tokens: 250,
         temperature: 0.3,
         messages: [
-          { role: "system", content: "You are a senior VC analyst. Analyze startup documents and provide structured, specific summaries. Focus on investment-relevant details: metrics, market size, team, traction, financials. Be direct and concise." },
-          { role: "user", content: prompt },
+          {
+            role: "system",
+            content: "You are a VC analyst. Write a brief document summary in 3-5 bullet points max. Be specific — use actual numbers, names, and facts from the content. If the content appears garbled or unreadable, say exactly: 'Could not extract readable content from this file. Please preview the document directly.' Never invent details.",
+          },
+          {
+            role: "user",
+            content: `Document: ${fileName} (${ext?.toUpperCase()})\n\nContent extracted:\n${textContent.slice(0, 3000)}\n\nWrite 3-5 bullet points summarizing the key facts. If content is garbled binary data rather than readable text, say you cannot summarize it.`,
+          },
         ],
       }),
     });
