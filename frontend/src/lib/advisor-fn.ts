@@ -17,6 +17,7 @@ type AdvisorInput = {
   history: Array<{ role: string; content: string }>;
   startupContext?: StartupContext;
   openAIKey?: string;
+  pageContext?: string;  // current page/feature for targeted advice
 };
 
 type AdvisorResult = {
@@ -63,20 +64,47 @@ export const getAIAdvice = createServerFn({ method: "POST" })
       advisorIdentity = `You are an expert startup fundraising advisor for ${company}, a ${stage !== "Not set" ? stage : "early-stage"} ${sector !== "Not set" ? sector : "tech"} startup raising ${raising !== "Not set" ? raising : "their next round"}.`;
     }
 
+    // Detect the page/feature context from the message prefix
+    const msg = data.message || "";
+    const pageContext = (() => {
+      if (msg.includes("Context: the") && msg.includes("deal room")) return "deal_room";
+      if (msg.toLowerCase().includes("document vault") || msg.toLowerCase().includes("document request")) return "document_vault";
+      if (msg.toLowerCase().includes("workstation") || msg.toLowerCase().includes("thesis alignment") || msg.toLowerCase().includes("due diligence")) return "workstation";
+      if (msg.toLowerCase().includes("q&a") || msg.toLowerCase().includes("question")) return "qa";
+      if (msg.toLowerCase().includes("pipeline") || msg.toLowerCase().includes("lead")) return "pipeline";
+      if (msg.toLowerCase().includes("meeting")) return "meetings";
+      if (msg.toLowerCase().includes("team") || msg.toLowerCase().includes("invite")) return "team";
+      return "general";
+    })();
+
+    // Page-specific guidance injected into system prompt
+    const pageGuidance: Record<string, string> = {
+      deal_room: `You are the AI advisor inside a VentureRoom deal room. A deal room is a shared, secure space between a startup founder and an investor. It contains: Document Vault (uploaded files with AI summaries), Q&A (async questions between both parties), Workstation (investor's due diligence, thesis alignment scoring, document review), Team Chat (private internal team messaging), Notes, Activity log, and Meetings. Focus on deal-specific actions. If the user asks about uploading documents, tell them to use the Document Vault tab. If they ask about diligence, point them to the Workstation. If they ask about questions from investors, use the Q&A tab.`,
+      document_vault: `The user is in the Document Vault. They can: upload files (PDF, PPTX, DOCX, XLSX, CSV, images, max 50MB), add docs from their personal library, generate AI summaries per document. Category tabs: Pitch Deck (always pinned first 📌), Financials, Legal, Market Research, Team, Product, Other. Investors can request specific documents using the 'Documents needed' panel — founders respond by uploading a file, sharing a link (Google Drive/DocSend), or marking as uploaded. Help them organise and complete their document set.`,
+      workstation: `The user is in the Investor Workstation (Due Diligence). This is the investor's private workspace. Key features: Document review with thesis alignment analysis per file (AI reads the full document and compares against the investor's thesis from their Profile), Investment Scorecard (rate the startup 1-5 across Team, Market, Product, Traction, Financials, Thesis Fit), Media & Links (pitch deck auto-detected from Document Vault). Thesis alignment requires: investor fills their Profile with thesis/sectors/stages/check_size/red_flags/key_metrics. Then they click 'Analyze against my thesis' on any document — works even without AI summary.`,
+      qa: `The user is in the Q&A section. This is structured async Q&A between the investor and founder. Questions are organized as expandable cards. Investors post questions, founders answer. Both parties can see the exchange. Help them frame good due diligence questions or answers. Common investor questions: business model, unit economics, team background, competitive moat, go-to-market, key risks.`,
+      pipeline: `The user is asking about their investor pipeline. VentureRoom tracks VC leads with stages, activities, and notes. Help them prioritize outreach, identify investors to follow up, or analyze their funnel conversion. Be specific about which leads need attention based on their context.`,
+      meetings: `The user is asking about meetings. VentureRoom lets you schedule investor meetings, track outcomes, and log notes. Help them prepare for upcoming meetings, summarize past ones, or decide next steps after a meeting.`,
+      team: `The user is asking about team/invites. In VentureRoom, founders can invite team members and investors to deal rooms. Investors join via secure invite links and sign NDAs on entry. Help them manage their team or understand the invite flow.`,
+      general: `You are the AI advisor for VentureRoom — a VC deal room platform. Key features founders use: Document Vault (secure file sharing), Q&A (async investor questions), Deal Rooms (shared spaces with investors), AI Advisor (fundraising guidance), Pipeline (track investors), Meetings. Key features investors use: Workstation (due diligence), Thesis Alignment (AI-powered document analysis against their investment thesis), Investment Scorecard, Deal Flow, AI Analysis. Help with fundraising strategy, investor relations, and deal room usage.`,
+    };
+
+    const platformContext = pageGuidance[pageContext] || pageGuidance.general;
+
     const systemPrompt = [
       advisorIdentity,
-      "You are inside a deal room. Be concise, structured, and deal-specific.",
-      "RULES:",
-      "- Maximum 150 words per response",
-      "- Use bold headers (**Header**) and bullet points only",
-      "- Only discuss THIS deal, THIS company, THIS raise",
-      "- Never give generic fundraising advice",
-      "- Focus on: documents, DD status, risks, next steps for THIS deal",
-      "- If asked something unrelated to the deal, redirect back to the deal",
-      company !== "Not set" ? `Company: ${company}` : "",
-      stage !== "Not set" ? `Stage: ${stage}` : "",
-      sector !== "Not set" ? `Sector: ${sector}` : "",
-      raising !== "Not set" ? `Raising: ${raising}` : "",
+      "",
+      "PLATFORM CONTEXT:",
+      platformContext,
+      "",
+      "RESPONSE RULES:",
+      "- Maximum 200 words per response",
+      "- Use **bold** for key terms and bullet points for lists",
+      "- Be specific to this user's situation — not generic advice",
+      "- If they ask about a VentureRoom feature, explain exactly where to find it and how to use it",
+      "- If they ask a general fundraising question, answer it with their company context in mind",
+      "- Never say 'I don't know' — always give your best guidance and suggest the relevant VentureRoom feature",
+      company !== "Not set" ? `\nUSER COMPANY: ${company} | Stage: ${stage} | Sector: ${sector} | Raising: ${raising}` : "",
     ].filter(Boolean).join("\n");
 
     try {

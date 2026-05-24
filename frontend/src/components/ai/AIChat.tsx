@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import { Sparkles, Send, Loader2, User } from "lucide-react";
 import { getAIAdvice } from "@/lib/advisor-fn";
 import ReactMarkdown from "react-markdown";
@@ -17,9 +18,28 @@ interface Props {
   initialAssistant?: string;
   className?: string;
   compact?: boolean;
+  pageContext?: string;
 }
 
-export function AIChat({ userId, scope, starters, initialAssistant, className = "", compact = false }: Props) {
+export function AIChat({ userId, scope, starters, initialAssistant, className = "", compact = false, pageContext: pageContextProp }: Props) {
+  const routerState = useRouterState();
+  const pathname = routerState.location.pathname;
+
+  // Auto-detect page context from URL for targeted AI responses
+  const pageContext = pageContextProp ?? (() => {
+    if (pathname.includes("/deal-room/")) {
+      if (pathname.includes("vault") || scope?.includes("vault")) return "document_vault";
+      if (pathname.includes("workstation") || scope?.includes("workstation")) return "workstation";
+      if (pathname.includes("qa") || scope?.includes("Q&A")) return "qa";
+      return "deal_room";
+    }
+    if (pathname.includes("/pipeline") || pathname.includes("/leads")) return "pipeline";
+    if (pathname.includes("/meetings")) return "meetings";
+    if (pathname.includes("/advisor")) return "general";
+    if (pathname.includes("/documents")) return "document_vault";
+    return "general";
+  })();
+
   const [msgs, setMsgs] = useState<ChatMsg[]>(() => [
     {
       id: "m0",
@@ -46,7 +66,7 @@ export function AIChat({ userId, scope, starters, initialAssistant, className = 
       const openAIKey = import.meta.env.VITE_OPENAI_API_KEY || "";
       const history = msgs.slice(1).map((m) => ({ role: m.role as string, content: m.content }));
       const contextPrefix = scope ? `Context: ${scope}\n\n` : "";
-      const result = await getAIAdvice({ data: { userId: userId || "", message: contextPrefix + t, history, openAIKey } });
+      const result = await getAIAdvice({ data: { userId: userId || "", message: contextPrefix + t, history, openAIKey, pageContext } });
       const reply = result.reply || "No AI response generated.";
       setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: reply, ts: Date.now() }]);
     } catch (error) {
