@@ -71,7 +71,7 @@ function StartupsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "ventureroom_startups_sample.csv";
+    a.download = "hockystick_startup_sample.csv";
     a.click();
     URL.revokeObjectURL(url);
   };

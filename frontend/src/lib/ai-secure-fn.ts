@@ -3,10 +3,10 @@ import { createServerFn } from "@tanstack/react-start";
 // ── getEnvVar: reads from server env only (never exposed to browser) ──
 function getEnvVar(key: string): string {
   return (
+    (typeof process !== "undefined" && process.env[key] ? process.env[key] : "") ||
     (import.meta.env as any)[key] ||
-    (typeof process !== "undefined" ? process.env[key] : "") ||
     ""
-  );
+  ) as string;
 }
 
 // ── Types ──
