@@ -285,9 +285,9 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
         investorProfile.key_metrics && `Key metrics: ${investorProfile.key_metrics}`,
       ].filter(Boolean).join("\n");
 
-      // Use ai_summary if available; otherwise read the document directly
-      let docContent = doc.ai_summary || "";
-      if (!docContent && doc.storage_path) {
+      // Always read the full file — 4-bullet summary loses critical details
+      let docContent = "";
+      if (doc.storage_path) {
         try {
           const { data: sd } = await supabase.storage.from("documents").createSignedUrl(doc.storage_path, 60);
           if (sd?.signedUrl) {
@@ -330,9 +330,14 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
       }
 
       const fileName = doc.file_name || doc.storage_path?.split("/").pop()?.replace(/^\d{13}-/, "") || "document";
+      const summaryHint = doc.ai_summary && doc.ai_summary.length > 50 && !doc.ai_summary.startsWith("Could not")
+        ? `\n\nAI SUMMARY (bonus context):\n${doc.ai_summary}`
+        : "";
       const docContext = docContent
-        ? `Document: ${fileName}\n\nContent:\n${docContent}`
-        : `Document: ${fileName} (category: ${doc.category || "Other"}) — could not extract text, analyze by name/category and flag for manual review.`;
+        ? `Document: ${fileName}\n\nFULL EXTRACTED CONTENT:\n${docContent}${summaryHint}`
+        : doc.ai_summary && !doc.ai_summary.startsWith("Could not")
+        ? `Document: ${fileName}\n\nAI SUMMARY (full text unavailable):\n${doc.ai_summary}`
+        : `Document: ${fileName} (category: ${doc.category || "Other"}) — text extraction failed.`;
 
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
@@ -341,7 +346,13 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
           model: "gpt-4o-mini",
           max_tokens: 300,
           messages: [
-            { role: "system", content: "You are a VC analyst. Analyze how a startup document aligns with an investor's thesis. Use ✅ strong match, ⚠️ partial/concern, ❌ red flag/mismatch. Be specific. Max 5 bullets. End with a one-line overall verdict." },
+            { role: "system", content: `You are a senior VC analyst. Analyze how a startup document aligns with an investor's thesis.
+CRITICAL RULES:
+- Quote SPECIFIC numbers from the document (e.g. "$0.6M pre-seed", "$20T market", "8% CAGR")
+- Do NOT confuse example use-cases with the company sector (a trade-tech platform using rice as an example is NOT agriculture)
+- If round stage mismatches investor preference, flag it as a hard ❌
+- Use ✅ strong match, ⚠️ concern, ❌ red flag. Max 5 bullets.
+- End with: **Overall Verdict**: one sentence` },
             { role: "user", content: `INVESTOR THESIS:\n${thesis}\n\n${docContext}\n\nAnalyze thesis alignment:` },
           ],
         }),

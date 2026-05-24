@@ -9,7 +9,17 @@ import { setupAuthListener } from "@/lib/auth-store";
 // Single auth listener — must run once before any route beforeLoad
 if (typeof window !== 'undefined') setupAuthListener();
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30 * 1000,
+      gcTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      retry: 1,
+    },
+  },
+});
 
 import appCss from "../styles.css?url";
 

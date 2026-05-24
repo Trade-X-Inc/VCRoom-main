@@ -560,6 +560,7 @@ function DealRoomOverview({
   const handleCancelInvite = async (token: string) => {
     await supabase.from("invites").delete().eq("token", token);
     void refetchInvites();
+    queryClient.invalidateQueries({ queryKey: ["deal-room-members", dealRoomId] });
     toast.success("Invite cancelled");
   };
 
@@ -582,7 +583,11 @@ function DealRoomOverview({
           startupName: startup?.company_name ?? "Unknown",
         },
       });
-      if (result.success) { toast.success("Invite resent"); void refetchInvites(); }
+      if (result.success) {
+        toast.success("Invite resent");
+        void refetchInvites();
+        queryClient.invalidateQueries({ queryKey: ["deal-room-members", dealRoomId] });
+      }
       else toast.error("Failed to resend");
     } catch {
       toast.error("Failed to resend");
@@ -1044,7 +1049,10 @@ function DealRoomOverview({
           founderName={user?.fullName ?? user?.email ?? "The founder"}
           invitedBy={user?.id ?? ""}
           onClose={() => setShowInvite(false)}
-          onSent={() => { void refetchInvites(); }}
+          onSent={() => {
+            void refetchInvites();
+            queryClient.invalidateQueries({ queryKey: ["deal-room-members", dealRoomId] });
+          }}
         />
       )}
     </div>
@@ -1296,6 +1304,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
           (old ?? []).map((d: any) => d.id === doc.id ? { ...d, ai_summary: honestMessage } : d)
         );
         queryClient.invalidateQueries({ queryKey: ["dd-docs", dealRoomId] });
+        queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
         expandSummary(doc.id);
         toast.success("Document processed");
         return;
