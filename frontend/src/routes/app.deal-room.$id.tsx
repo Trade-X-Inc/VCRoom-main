@@ -1452,13 +1452,27 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
     { category: "Market Research", name: "TAM/SAM/SOM analysis" },
   ];
 
+  // Pitch deck always pinned first
+  const pitchDeckDoc = (docs as any[]).find((d) =>
+    d.category === "Pitch Deck" || /(pitch.?deck|pitch|deck)/i.test(d.file_name || d.storage_path || "")
+  );
   const filteredDocs = activeDocTab === "All"
-    ? (docs as any[])
+    ? [
+        ...(pitchDeckDoc ? [pitchDeckDoc] : []),
+        ...(docs as any[]).filter((d) => d.id !== pitchDeckDoc?.id),
+      ]
     : (docs as any[]).filter((d: any) => (d.category || "Other") === activeDocTab);
 
   const expectedForTab = activeDocTab !== "All"
     ? DEAL_ROOM_EXPECTED_DOCS.filter((e) => e.category === activeDocTab)
     : [];
+
+  // Count per category for tab badges
+  const catCounts = (docs as any[]).reduce((acc: Record<string, number>, d) => {
+    const cat = d.category || "Other";
+    acc[cat] = (acc[cat] || 0) + 1;
+    return acc;
+  }, {});
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
@@ -1481,11 +1495,22 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
 
       {isFounder && (
         <div className="mt-5 space-y-3">
-          {(docs as any[]).length === 0 && (
-            <div className="rounded-lg bg-brand/5 border border-brand/20 px-4 py-3 text-xs text-muted-foreground">
-              💡 <strong>Tip:</strong> Documents you upload here are shared with the investor. Upload each document once — they will appear in the investor's workstation automatically.
+          <div className="rounded-lg bg-muted/40 border border-border/60 px-4 py-3 text-xs text-muted-foreground space-y-1">
+            <div>💡 <strong>Documents shared here are visible to the investor</strong> and appear in their Workstation automatically.</div>
+            <div className="flex flex-wrap gap-1.5 mt-1.5">
+              {[
+                { ext: "PDF", color: "text-red-600 bg-red-500/10" },
+                { ext: "PPTX", color: "text-orange-600 bg-orange-500/10" },
+                { ext: "DOCX", color: "text-blue-600 bg-blue-500/10" },
+                { ext: "XLSX", color: "text-green-600 bg-green-500/10" },
+                { ext: "CSV",  color: "text-green-600 bg-green-500/10" },
+                { ext: "PNG/JPG", color: "text-purple-600 bg-purple-500/10" },
+              ].map(({ ext, color }) => (
+                <span key={ext} className={cn("rounded px-1.5 py-0.5 text-[9px] font-bold uppercase", color)}>{ext}</span>
+              ))}
+              <span className="text-[10px] text-muted-foreground self-center">· Max 50MB per file</span>
             </div>
-          )}
+          </div>
           <Dropzone
             dealRoomId={dealRoomId}
             onUploadComplete={() => queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] })}
@@ -1493,22 +1518,30 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
         </div>
       )}
 
-      {/* Category tabs */}
+      {/* Category tabs with count badges */}
       <div className="flex gap-1 mt-5 pb-2 overflow-x-auto border-b border-border/60">
-        {DOC_CATEGORIES.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setActiveDocTab(cat)}
-            className={cn(
-              "shrink-0 rounded-full px-3 py-1 text-xs transition-colors",
-              activeDocTab === cat
-                ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white"
-                : "border border-border/60 hover:bg-accent"
-            )}
-          >
-            {cat}
-          </button>
-        ))}
+        {DOC_CATEGORIES.map((cat) => {
+          const count = cat === "All" ? (docs as any[]).length : (catCounts[cat] ?? 0);
+          return (
+            <button
+              key={cat}
+              onClick={() => setActiveDocTab(cat)}
+              className={cn(
+                "shrink-0 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs transition-colors",
+                activeDocTab === cat
+                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white"
+                  : "border border-border/60 hover:bg-accent"
+              )}
+            >
+              {cat}
+              {count > 0 && (
+                <span className={cn("rounded-full px-1.5 py-0.5 text-[9px] font-bold", activeDocTab === cat ? "bg-white/20" : "bg-accent text-muted-foreground")}>
+                  {count}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {/* Library modal */}
@@ -1613,6 +1646,9 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-medium truncate">{displayName}</span>
+                      {activeDocTab === "All" && pitchDeckDoc?.id === doc.id && (
+                        <span className="shrink-0 text-[9px] font-bold bg-brand/20 text-brand px-1.5 py-0.5 rounded-full">📌 PINNED</span>
+                      )}
                       {doc.category && (
                         <span className={cn("shrink-0 text-[10px] px-1.5 py-0.5 rounded-full font-medium", catColor)}>
                           {doc.category}
