@@ -59,6 +59,22 @@ function StartupsPage() {
   const [activeTab, setActiveTab] = useState<(typeof TAB_STATUSES)[number]>("All");
   const [showAdd, setShowAdd] = useState(false);
   const [csvOpen, setCsvOpen] = useState(false);
+
+  const downloadSampleCsv = () => {
+    const csv = [
+      "company_name,website,sector,stage,description,source,notes",
+      "Atlas Robotics,https://atlasrobotics.com,Robotics,Seed,Build robots for defence,Conference,Met at TechCrunch",
+      "HealthAI,https://healthai.io,HealthTech,Series A,AI diagnostics platform,LinkedIn,Strong team",
+      "ClimateX,https://climatex.co,CleanTech,Pre-seed,Carbon capture tech,AngelList,Interesting space",
+    ].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ventureroom_startups_sample.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
   const [addForm, setAddForm] = useState<AddForm>(EMPTY_ADD);
   const [saving, setSaving] = useState(false);
   const [selectedWatchlist, setSelectedWatchlist] = useState<any | null>(null);
