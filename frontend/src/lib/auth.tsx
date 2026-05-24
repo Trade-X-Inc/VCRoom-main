@@ -52,9 +52,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
+    const currentUserIdRef = { current: null as string | null }
+
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
         const appUser = await buildUser(session.user)
+        currentUserIdRef.current = appUser.id
         setUser(appUser)
       }
       setLoading(false)
@@ -67,12 +70,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return
         }
         if (session?.user) {
-          setUser((prev) => {
-            if (prev && prev.id === session.user.id) return prev
-            buildUser(session.user).then(setUser)
-            return prev
-          })
+          if (currentUserIdRef.current === session.user.id) {
+            setLoading(false)
+            return
+          }
+          const appUser = await buildUser(session.user)
+          currentUserIdRef.current = appUser.id
+          setUser(appUser)
         } else {
+          currentUserIdRef.current = null
           setUser(null)
         }
         setLoading(false)

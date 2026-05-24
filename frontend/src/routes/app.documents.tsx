@@ -594,25 +594,37 @@ function MediaLinksPanel({ startupMedia, userId, queryClient }: {
   const deckRef = useRef<HTMLInputElement>(null);
 
   const saveVideoUrl = async () => {
-    if (!startupMedia?.id) { toast.error("Startup profile not found — set up Company Profile first"); return; }
+    if (!startupMedia?.id) { toast.error("Set up your Company Profile first"); return; }
     setSavingVideo(true);
-    await supabase.from("startups").update({ product_video_url: videoUrl || null }).eq("id", startupMedia.id);
-    queryClient.invalidateQueries({ queryKey: ["startup-media-docs", userId] });
-    toast.success("Video link saved");
-    setSavingVideo(false);
+    try {
+      const { error } = await supabase.from("startups")
+        .update({ product_video_url: videoUrl || null })
+        .eq("id", startupMedia.id);
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ["startup-media-docs", userId] });
+      toast.success("Video link saved");
+    } catch (e: any) {
+      toast.error(e.message || "Save failed");
+    } finally {
+      setSavingVideo(false);
+    }
   };
 
-  const uploadPitchDeck = async (file: File) => {
+  const uploadDeck = async (file: File) => {
     if (!userId) return;
     if (file.size > 50 * 1024 * 1024) { toast.error("File too large — max 50MB"); return; }
-    const ext = file.name.split(".").pop()?.toLowerCase();
-    if (!["pdf", "pptx", "ppt"].includes(ext ?? "")) { toast.error("Pitch deck must be PDF or PPTX"); return; }
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+    if (!["pdf","pptx","ppt","docx","doc","xlsx","xls","csv"].includes(ext)) {
+      toast.error("Supported: PDF, PPTX, DOCX, XLSX, CSV"); return;
+    }
     setUploadingDeck(true);
     try {
-      const path = `personal/${userId}/${Date.now()}-${file.name}`;
-      const { error: upErr } = await supabase.storage.from("documents").upload(path, file, { upsert: true });
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const path = `personal/${userId}/${Date.now()}-${safeName}`;
+      const { error: upErr } = await supabase.storage
+        .from("documents").upload(path, file, { upsert: true, cacheControl: "3600" });
       if (upErr) throw upErr;
-      await supabase.from("documents").insert({
+      const { error: dbErr } = await supabase.from("documents").insert({
         uploader_id: userId,
         category: "Pitch Deck",
         status: "uploaded",
@@ -621,7 +633,9 @@ function MediaLinksPanel({ startupMedia, userId, queryClient }: {
         file_size: file.size,
         deal_room_id: null,
       });
+      if (dbErr) throw dbErr;
       queryClient.invalidateQueries({ queryKey: ["documents", userId] });
+      queryClient.invalidateQueries({ queryKey: ["startup-media-docs", userId] });
       toast.success(`${file.name} uploaded as Pitch Deck`);
     } catch (e: any) {
       toast.error(e.message || "Upload failed");
@@ -684,7 +698,7 @@ function MediaLinksPanel({ startupMedia, userId, queryClient }: {
             type="file"
             className="hidden"
             accept=".pdf,.pptx,.ppt"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadPitchDeck(f); e.target.value = ""; }}
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadDeck(f); e.target.value = ""; }}
           />
           <p className="text-[10px] text-muted-foreground mt-1.5">
             Investors can preview this directly in the deal room. Pinned to the top of all document views.
