@@ -2,7 +2,7 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 export default defineConfig({
   cloudflare: true,
   vite: {
-    envPrefix: ["VITE_", "NEXT_PUBLIC_"],
+    envPrefix: ["VITE_", "NEXT_PUBLIC_", "OPENAI_"],
     server: {
       host: "0.0.0.0",
       port: 8080,

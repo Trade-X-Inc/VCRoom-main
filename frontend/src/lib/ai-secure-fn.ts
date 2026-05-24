@@ -5,6 +5,7 @@ function getEnvVar(key: string): string {
   return (
     (typeof process !== "undefined" && process.env[key] ? process.env[key] : "") ||
     (import.meta.env as any)[key] ||
+    (import.meta.env as any)[`VITE_${key}`] ||
     ""
   ) as string;
 }

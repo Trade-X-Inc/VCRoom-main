@@ -46,6 +46,11 @@ if (existsSync(pagesWranglerPath)) {
     }
   }
 
+  // Add nodejs_compat so process.env works in Cloudflare Workers at runtime
+  if (!cfg.compatibility_flags) cfg.compatibility_flags = [];
+  if (!cfg.compatibility_flags.includes("nodejs_compat")) {
+    cfg.compatibility_flags.push("nodejs_compat");
+  }
   writeFileSync(pagesWranglerPath, JSON.stringify(cfg, null, 2));
   if (removed.length > 0) {
     console.log(`✓ Cleaned dist/client/wrangler.json (removed: ${removed.join(", ")})`);

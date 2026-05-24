@@ -49,8 +49,9 @@ export const getAIAdvice = createServerFn({ method: "POST" })
       } catch { /* fail open */ }
     }
     const openAIKey =
-      (typeof process !== "undefined" ? process.env.OPENAI_API_KEY : "") ||
+      (typeof process !== "undefined" && process.env.OPENAI_API_KEY) ||
       (import.meta.env as any).OPENAI_API_KEY ||
+      (import.meta.env as any).VITE_OPENAI_API_KEY ||
       "";
     if (!openAIKey) {
       throw new Error('OpenAI API key not configured on server');
