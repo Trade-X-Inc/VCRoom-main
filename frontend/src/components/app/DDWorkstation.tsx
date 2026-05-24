@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { analyzeThesisAlignment, generateDocSummary } from "@/lib/ai-secure-fn";
 
 function formatThesisText(text: string) {
   const lines = text.split("\n").filter((l) => l.trim());
@@ -288,9 +289,6 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
 
   const analyzeAgainstThesis = async (doc: any) => {
     if (!investorProfile) return;
-    const openAIKey = (import.meta.env as any).VITE_OPENAI_API_KEY || "";
-    if (!openAIKey) { toast.error("OpenAI API key not configured"); return; }
-
     setAnalyzingDoc(doc.id);
     try {
       const thesis = [
@@ -356,27 +354,16 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
         ? `Document: ${fileName}\n\nAI SUMMARY (full text unavailable):\n${doc.ai_summary}`
         : `Document: ${fileName} (category: ${doc.category || "Other"}) — text extraction failed.`;
 
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${openAIKey}` },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          max_tokens: 300,
-          messages: [
-            { role: "system", content: `You are a senior VC analyst. Analyze how a startup document aligns with an investor's thesis.
-CRITICAL RULES:
-- Quote SPECIFIC numbers from the document (e.g. "$0.6M pre-seed", "$20T market", "8% CAGR")
-- Do NOT confuse example use-cases with the company sector (a trade-tech platform using rice as an example is NOT agriculture)
-- If round stage mismatches investor preference, flag it as a hard ❌
-- Use ✅ strong match, ⚠️ concern, ❌ red flag. Max 5 bullets.
-- End with: **Overall Verdict**: one sentence` },
-            { role: "user", content: `INVESTOR THESIS:\n${thesis}\n\n${docContext}\n\nAnalyze thesis alignment:` },
-          ],
-        }),
+      const result = await analyzeThesisAlignment({
+        data: {
+          userId: investorProfile.user_id || "",
+          investorThesis: thesis,
+          documentContext: docContext,
+          fileName,
+        }
       });
-      const result = await response.json();
-      const analysis = result.choices?.[0]?.message?.content || "Could not analyze";
-      setThesisAnalysis((prev) => ({ ...prev, [doc.id]: analysis }));
+      if (result.error) throw new Error(result.reply);
+      setThesisAnalysis((prev) => ({ ...prev, [doc.id]: result.reply }));
     } catch {
       setThesisAnalysis((prev) => ({ ...prev, [doc.id]: "Analysis failed. Please try again." }));
     } finally {

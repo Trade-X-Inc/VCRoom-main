@@ -20,6 +20,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase, logActivity, createNotification } from "@/lib/supabase";
 import { ReviewTab } from "@/components/app/ReviewTab";
 import { DocumentWishlist } from "@/components/app/DocumentWishlist";
+import { generateDocSummary, secureAICall } from "@/lib/ai-secure-fn";
 import { DealTermsCard } from "@/components/app/DealTermsCard";
 import {
   useParticipants, useGeneratedNdaDocs,
@@ -1253,12 +1254,6 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
   const generateSummary = async (doc: any) => {
     setGeneratingSummaryId(doc.id);
     try {
-      const openAIKey = (import.meta.env as any).VITE_OPENAI_API_KEY || "";
-      if (!openAIKey) {
-        toast.error("OpenAI API key not configured");
-        return;
-      }
-
       const { data: signedData, error: signedError } = await supabase.storage
         .from("documents")
         .createSignedUrl(doc.storage_path, 60);
@@ -1349,35 +1344,14 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
         return;
       }
 
-      const aiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${openAIKey}`,
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          max_tokens: 300,
-          messages: [
-            {
-              role: "system",
-              content: "You are a VC analyst. Summarize ONLY using facts explicitly stated in the provided text. If the text does not contain clear startup or business information, respond with exactly: 'Could not extract meaningful content from this document. Please review it directly.' Never invent or assume information. Use 3-5 bullet points maximum.",
-            },
-            {
-              role: "user",
-              content: `Document: ${fileName}\n\nContent:\n${textContent.slice(0, 3000)}\n\nWrite 3-5 bullet points summarizing the key facts. Be specific — use actual names, numbers, and data from the content.`,
-            },
-          ],
-        }),
+      const aiData = await generateDocSummary({
+        data: {
+          userId: userId || "",
+          documentContent: textContent.slice(0, 3000),
+          fileName,
+          category: doc.category,
+        }
       });
-
-      if (!aiResponse.ok) {
-        const err = await aiResponse.json();
-        toast.error(`OpenAI error: ${(err as any)?.error?.message || aiResponse.status}`);
-        return;
-      }
-
-      const aiData = await aiResponse.json() as { choices: Array<{ message: { content: string } }> };
       const summary = aiData.choices?.[0]?.message?.content || "";
       if (!summary) {
         toast.error("AI returned empty response");
@@ -3099,22 +3073,15 @@ function QA({
                                   if (!userId || draftingAiReplyId === item.id) return;
                                   setDraftingAiReplyId(item.id);
                                   try {
-                                    const openAIKey = import.meta.env.VITE_OPENAI_API_KEY || "";
-                                    const resp = await fetch("https://api.openai.com/v1/chat/completions", {
-                                      method: "POST",
-                                      headers: { "Content-Type": "application/json", Authorization: `Bearer ${openAIKey}` },
-                                      body: JSON.stringify({
-                                        model: "gpt-4o-mini",
-                                        max_tokens: 300,
-                                        temperature: 0.7,
-                                        messages: [
-                                          { role: "system", content: "You are a startup founder assistant. Write a clear, professional answer to an investor due-diligence question. Return only the answer text, under 120 words, no markdown symbols." },
-                                          { role: "user", content: `Investor question: "${item.body}"\n\nWrite a founder's answer.` },
-                                        ],
-                                      }),
+                                    const aiResp = await secureAICall({
+                                      data: {
+                                        userId: userId || "",
+                                        systemPrompt: "You are a startup founder assistant. Write a clear, professional answer to an investor due-diligence question. Return only the answer text, under 120 words, no markdown symbols.",
+                                        userMessage: `Investor question: "${item.body}"\n\nWrite a founder's answer.`,
+                                        maxTokens: 300,
+                                      }
                                     });
-                                    const json = await resp.json() as { choices: Array<{ message: { content: string } }> };
-                                    const draft = (json.choices[0]?.message?.content ?? "").trim();
+                                    const draft = (aiResp.reply ?? "").trim();
                                     if (draft) setAnswerDrafts((d) => ({ ...d, [item.id]: draft }));
                                   } catch {
                                     toast.error("AI draft failed");
