@@ -95,7 +95,7 @@ function DealRoom() {
     queryFn: async () => {
       const { data } = await supabase
         .from("deal_room_members")
-        .select("*, users(full_name, email, role)")
+        .select("*, users(full_name, email, role, avatar_url)")
         .eq("deal_room_id", dealRoomId);
       return data ?? [];
     },
@@ -415,6 +415,22 @@ function DealRoomOverview({
     },
   });
 
+  const { data: investorProfilesInRoom = [] } = useQuery({
+    queryKey: ["room-investor-profiles", dealRoomId],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const investorUserIds = (memberList as any[])
+        .filter((m) => m.role === "investor" || m.role === "viewer")
+        .map((m) => m.user_id);
+      if (investorUserIds.length === 0) return [];
+      const { data } = await supabase
+        .from("investor_profiles")
+        .select("user_id, fund_name, your_name, role, fund_size, sectors, stages, check_size_min, check_size_max, geography, linkedin_url, thesis")
+        .in("user_id", investorUserIds);
+      return data ?? [];
+    },
+  });
+
   const { data: latestDecision } = useQuery({
     queryKey: ["overview-decision", dealRoomId],
     enabled: !!user?.id,
@@ -669,59 +685,92 @@ function DealRoomOverview({
 
       <div className="grid md:grid-cols-5 gap-5">
         <div className="md:col-span-3 space-y-4">
-          <section className="rounded-xl border border-border/60 bg-card p-6 shadow-card">
-            <div className="flex items-start gap-4">
-              <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl border border-border/60 bg-gradient-brand text-xl font-bold text-brand-foreground">
-                {startup?.logo_url
-                  ? <img src={startup.logo_url} alt={`${startup?.company_name ?? "Company"} logo`} className="h-full w-full object-cover" />
-                  : (startup?.company_name?.[0] ?? "D")}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-xl font-semibold tracking-tight">{startup?.company_name ?? "Company"}</h3>
-                  {startup?.stage && (
-                    <span className="rounded-full bg-brand/10 px-2.5 py-1 text-xs font-medium text-brand">
-                      {startup.stage}
-                    </span>
-                  )}
-                  {startup?.sector && (
-                    <span className="rounded-full bg-accent px-2.5 py-1 text-xs font-medium text-muted-foreground">
-                      {startup.sector}
-                    </span>
-                  )}
+          <div className="grid sm:grid-cols-2 gap-4">
+            {/* STARTUP CARD */}
+            <section className="rounded-xl border border-brand/25 bg-card p-5 shadow-card">
+              <div className="mb-3"><span className="text-[9px] uppercase tracking-widest font-bold text-brand bg-brand/10 px-2 py-0.5 rounded-full">Startup</span></div>
+              <div className="flex items-start gap-3">
+                <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl border border-border/60 bg-gradient-brand text-base font-bold text-brand-foreground">
+                  {startup?.logo_url ? <img src={startup.logo_url} alt={startup?.company_name ?? "Co"} className="h-full w-full object-cover rounded-xl" /> : (startup?.company_name?.[0] ?? "S")}
                 </div>
-                <div className="mt-4 rounded-lg border border-border/60 bg-background p-3">
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Funding target</div>
-                  <div className="mt-1 text-lg font-semibold">{formatMoney(startup?.funding_target)}</div>
-                </div>
-                {(startup?.revenue || startup?.team_size) && (
-                  <div className="mt-3 grid grid-cols-2 gap-2">
-                    {startup?.revenue && (
-                      <div className="rounded-md border border-border/60 bg-background p-2.5">
-                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">ARR</div>
-                        <div className="mt-0.5 text-sm font-semibold truncate">{startup.revenue}</div>
-                      </div>
-                    )}
-                    {startup?.team_size && (
-                      <div className="rounded-md border border-border/60 bg-background p-2.5">
-                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Team</div>
-                        <div className="mt-0.5 text-sm font-semibold">{startup.team_size}</div>
-                      </div>
-                    )}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm leading-tight truncate">{startup?.company_name ?? "Company"}</h3>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {startup?.stage && <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[9px] font-medium text-brand">{startup.stage}</span>}
+                    {startup?.sector && <span className="rounded-full bg-accent px-2 py-0.5 text-[9px] text-muted-foreground">{startup.sector}</span>}
                   </div>
-                )}
-                {startup?.traction && (
-                  <p className="mt-3 text-xs text-muted-foreground">
-                    <span className="font-semibold text-foreground">Traction: </span>{startup.traction}
-                  </p>
-                )}
-                <p className="mt-4 text-sm leading-relaxed text-muted-foreground line-clamp-2">{summary}</p>
-                <Link to={profileLink as any} className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline">
-                  View full profile <ExternalLink className="h-3.5 w-3.5" />
-                </Link>
+                </div>
               </div>
-            </div>
-          </section>
+              <div className="mt-3 grid grid-cols-2 gap-1.5">
+                <div className="rounded-lg bg-background border border-border/50 p-2">
+                  <div className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Raise</div>
+                  <div className="text-xs font-bold mt-0.5">{formatMoney(startup?.funding_target)}</div>
+                </div>
+                <div className="rounded-lg bg-background border border-border/50 p-2">
+                  <div className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">ARR</div>
+                  <div className="text-xs font-bold mt-0.5">{formatMoney(startup?.revenue)}</div>
+                </div>
+              </div>
+              {startup?.traction && <p className="mt-2 text-[10px] text-muted-foreground line-clamp-2"><span className="font-semibold text-foreground">Traction: </span>{startup.traction}</p>}
+              {founderMembers.length > 0 && (
+                <div className="mt-3 pt-2.5 border-t border-border/40 space-y-1.5">
+                  <div className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Team</div>
+                  {founderMembers.map((m: any) => (
+                    <div key={m.id} className="flex items-center gap-2">
+                      {m.users?.avatar_url ? <img src={m.users.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover border-2 border-brand/20 shrink-0" /> : <div className="grid h-7 w-7 place-items-center rounded-full bg-brand/15 text-brand text-[9px] font-bold border-2 border-brand/20 shrink-0">{(m.users?.full_name || "F").split(" ").map((s: string) => s[0]).join("").slice(0,2).toUpperCase()}</div>}
+                      <div className="min-w-0"><div className="text-[10px] font-semibold truncate">{m.users?.full_name ?? m.users?.email ?? "Founder"}</div><div className="text-[9px] text-muted-foreground">{m.designation || "Founder"}</div></div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <Link to="/app/profile" className="mt-3 inline-flex items-center gap-1 text-[10px] text-brand hover:underline">View profile <ExternalLink className="h-3 w-3" /></Link>
+            </section>
+            {/* INVESTOR CARD */}
+            {(() => {
+              const invP = investorProfilesInRoom[0];
+              return (
+                <section className="rounded-xl border border-success/25 bg-card p-5 shadow-card">
+                  <div className="mb-3"><span className="text-[9px] uppercase tracking-widest font-bold text-success bg-success/10 px-2 py-0.5 rounded-full">Investor</span></div>
+                  {invP || investorMembers.length > 0 ? (<>
+                    <div className="flex items-start gap-3">
+                      <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl border border-border/60 bg-success/10 text-base font-bold text-success">{(invP?.fund_name || investorMembers[0]?.users?.full_name || "V")[0].toUpperCase()}</div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm leading-tight truncate">{invP?.fund_name || "Venture Fund"}</h3>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {invP?.sectors && <span className="rounded-full bg-success/10 px-2 py-0.5 text-[9px] font-medium text-success truncate max-w-[100px]">{String(invP.sectors).split(",")[0].trim()}</span>}
+                          {invP?.stages && <span className="rounded-full bg-accent px-2 py-0.5 text-[9px] text-muted-foreground">{String(invP.stages).split(",")[0].trim()}</span>}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-3 grid grid-cols-2 gap-1.5">
+                      <div className="rounded-lg bg-background border border-border/50 p-2">
+                        <div className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Check size</div>
+                        <div className="text-[10px] font-bold mt-0.5">{invP?.check_size_min && invP?.check_size_max ? `$${Number(invP.check_size_min).toLocaleString()} – $${Number(invP.check_size_max).toLocaleString()}` : "—"}</div>
+                      </div>
+                      <div className="rounded-lg bg-background border border-border/50 p-2">
+                        <div className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Geography</div>
+                        <div className="text-[10px] font-bold mt-0.5 truncate">{invP?.geography || "—"}</div>
+                      </div>
+                    </div>
+                    {invP?.thesis && <p className="mt-2 text-[10px] text-muted-foreground line-clamp-2"><span className="font-semibold text-foreground">Thesis: </span>{invP.thesis}</p>}
+                    {investorMembers.length > 0 && (
+                      <div className="mt-3 pt-2.5 border-t border-border/40 space-y-1.5">
+                        <div className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Team</div>
+                        {investorMembers.map((m: any) => {
+                          const mp = investorProfilesInRoom.find((p: any) => p.user_id === m.user_id);
+                          return (<div key={m.id} className="flex items-center gap-2">
+                            {m.users?.avatar_url ? <img src={m.users.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover border-2 border-success/20 shrink-0" /> : <div className="grid h-7 w-7 place-items-center rounded-full bg-success/15 text-success text-[9px] font-bold border-2 border-success/20 shrink-0">{(m.users?.full_name || "I").split(" ").map((s: string) => s[0]).join("").slice(0,2).toUpperCase()}</div>}
+                            <div className="min-w-0"><div className="text-[10px] font-semibold truncate">{m.users?.full_name ?? m.users?.email ?? "Investor"}</div><div className="text-[9px] text-muted-foreground">{mp?.role || "Investor"}{mp?.fund_name ? ` · ${mp.fund_name}` : ""}</div></div>
+                          </div>);
+                        })}
+                      </div>
+                    )}
+                    {invP?.linkedin_url && <a href={invP.linkedin_url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-[10px] text-brand hover:underline">LinkedIn <ExternalLink className="h-3 w-3" /></a>}
+                  </>) : (<div className="py-6 text-center"><div className="text-xs text-muted-foreground">No investor joined yet.</div></div>)}
+                </section>
+              );
+            })()}
+          </div>
 
           <DealTermsCard dealRoomId={dealRoomId} isFounder={isFounder} isInvestor={isInvestor} />
 
@@ -910,52 +959,42 @@ function DealRoomOverview({
           </section>
 
           <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-4">
               <div className="text-sm font-semibold inline-flex items-center gap-2">
-                <Users className="h-4 w-4 text-brand" /> Team & Participants
+                <Users className="h-4 w-4 text-brand" /> Participants
               </div>
               {isFounder && (
-                <button
-                  onClick={() => setShowInvite(true)}
-                  className="inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-2.5 py-1 text-xs shadow-glow"
-                >
+                <button onClick={() => setShowInvite(true)} className="inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-2.5 py-1 text-xs shadow-glow">
                   <UserPlus className="h-3 w-3" /> Invite
                 </button>
               )}
             </div>
-
-            {/* Founder team */}
             {founderMembers.length > 0 && (
-              <div className="mb-3">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Founder team</div>
-                <div className="space-y-1.5">
+              <div className="mb-4">
+                <div className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold mb-2 flex items-center gap-1.5"><div className="h-1.5 w-1.5 rounded-full bg-brand" /> Startup team</div>
+                <div className="space-y-2.5">
                   {founderMembers.map((m: any) => (
-                    <div key={m.id} className="flex items-center gap-2">
-                      <div className="grid h-6 w-6 place-items-center rounded-full bg-gradient-brand text-brand-foreground text-[9px] font-semibold shrink-0">
-                        {(m.users?.full_name || "F").split(" ").map((s: string) => s[0]).join("").slice(0, 2).toUpperCase()}
-                      </div>
-                      <span className="text-xs font-medium truncate flex-1">{m.users?.full_name ?? m.users?.email ?? "Founder"}</span>
-                      <span className="text-[9px] bg-brand/10 text-brand rounded px-1.5 py-0.5 shrink-0">Founder</span>
+                    <div key={m.id} className="flex items-center gap-2.5">
+                      {m.users?.avatar_url ? <img src={m.users.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover border-2 border-brand/20 shrink-0" /> : <div className="grid h-8 w-8 place-items-center rounded-full bg-brand/15 text-brand text-[10px] font-bold border-2 border-brand/20 shrink-0">{(m.users?.full_name || "F").split(" ").map((s: string) => s[0]).join("").slice(0,2).toUpperCase()}</div>}
+                      <div className="flex-1 min-w-0"><div className="text-xs font-semibold truncate">{m.users?.full_name ?? m.users?.email ?? "Founder"}</div><div className="text-[9px] text-muted-foreground">{m.designation || "Founder"}</div></div>
+                      <span className="text-[9px] bg-brand/10 text-brand rounded-full px-2 py-0.5 shrink-0">Founder</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
-
-            {/* Investor team */}
             {investorMembers.length > 0 && (
               <div className="mb-3">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Investor team</div>
-                <div className="space-y-1.5">
-                  {investorMembers.map((m: any) => (
-                    <div key={m.id} className="flex items-center gap-2">
-                      <div className="grid h-6 w-6 place-items-center rounded-full bg-accent text-muted-foreground text-[9px] font-semibold shrink-0">
-                        {(m.users?.full_name || "I").split(" ").map((s: string) => s[0]).join("").slice(0, 2).toUpperCase()}
-                      </div>
-                      <span className="text-xs font-medium truncate flex-1">{m.users?.full_name ?? m.users?.email ?? "Investor"}</span>
-                      <span className="text-[9px] bg-success/10 text-success rounded px-1.5 py-0.5 shrink-0">Investor</span>
-                    </div>
-                  ))}
+                <div className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold mb-2 flex items-center gap-1.5"><div className="h-1.5 w-1.5 rounded-full bg-success" /> Investor team</div>
+                <div className="space-y-2.5">
+                  {investorMembers.map((m: any) => {
+                    const mp = investorProfilesInRoom.find((p: any) => p.user_id === m.user_id);
+                    return (<div key={m.id} className="flex items-center gap-2.5">
+                      {m.users?.avatar_url ? <img src={m.users.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover border-2 border-success/20 shrink-0" /> : <div className="grid h-8 w-8 place-items-center rounded-full bg-success/15 text-success text-[10px] font-bold border-2 border-success/20 shrink-0">{(m.users?.full_name || "I").split(" ").map((s: string) => s[0]).join("").slice(0,2).toUpperCase()}</div>}
+                      <div className="flex-1 min-w-0"><div className="text-xs font-semibold truncate">{m.users?.full_name ?? m.users?.email ?? "Investor"}</div><div className="text-[9px] text-muted-foreground">{mp?.role || "Investor"}{mp?.fund_name ? ` · ${mp.fund_name}` : ""}</div></div>
+                      <span className="text-[9px] bg-success/10 text-success rounded-full px-2 py-0.5 shrink-0">Investor</span>
+                    </div>);
+                  })}
                 </div>
               </div>
             )}
