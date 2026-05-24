@@ -62,9 +62,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+          setLoading(false)
+          return
+        }
         if (session?.user) {
-          const appUser = await buildUser(session.user)
-          setUser(appUser)
+          setUser((prev) => {
+            if (prev && prev.id === session.user.id) return prev
+            buildUser(session.user).then(setUser)
+            return prev
+          })
         } else {
           setUser(null)
         }

@@ -5,7 +5,7 @@ import {
   Calendar, Sparkles, Search, Settings, ChevronsLeft, Plus, Inbox, Gavel,
   PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, Kanban, BarChart3, UserCircle2,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/app/NotificationBell";
@@ -122,11 +122,10 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
     },
   });
 
-  // Role-based navigation guard
+  const lastRedirectRef = useRef<string>("");
   useEffect(() => {
     if (!user) return;
-
-    if (
+    const investorOutOfBounds =
       isInvestor &&
       !path.startsWith("/app/investor") &&
       !workspaceNavInvestor.some((n) => path.startsWith(n.to)) &&
@@ -134,14 +133,18 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       !path.startsWith("/app/profile") &&
       !path.startsWith("/app/settings") &&
       !path.startsWith("/app/meetings") &&
-      !path.startsWith("/app/deal-room")
-    ) {
+      !path.startsWith("/app/deal-room");
+    const founderOutOfBounds = !isInvestor && path.startsWith("/app/investor");
+    if (investorOutOfBounds && lastRedirectRef.current !== "investor") {
+      lastRedirectRef.current = "investor";
       navigate({ to: "/app/investor/" });
-    }
-    if (!isInvestor && path.startsWith("/app/investor")) {
+    } else if (founderOutOfBounds && lastRedirectRef.current !== "founder") {
+      lastRedirectRef.current = "founder";
       navigate({ to: "/app" });
+    } else if (!investorOutOfBounds && !founderOutOfBounds) {
+      lastRedirectRef.current = "";
     }
-  }, [user, isInvestor, navigate, path]);
+  }, [isInvestor, path]);  // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!user) {
     return <div className="min-h-screen bg-background grid place-items-center text-sm text-muted-foreground">Redirecting…</div>;

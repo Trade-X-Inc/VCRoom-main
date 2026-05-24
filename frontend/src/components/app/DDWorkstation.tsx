@@ -1,5 +1,22 @@
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+
+function formatThesisText(text: string) {
+  const lines = text.split("\n").filter((l) => l.trim());
+  const renderInline = (s: string) =>
+    s.split(/(\*\*[^*]+\*\*)/g).map((part, j) =>
+      part.startsWith("**") && part.endsWith("**")
+        ? <strong key={j} className="font-semibold text-foreground">{part.slice(2, -2)}</strong>
+        : <span key={j}>{part}</span>
+    );
+  return lines.map((line, i) => {
+    const trimmed = line.trim();
+    if (/overall verdict/i.test(trimmed)) {
+      return <div key={i} className="mt-2 pt-2 border-t border-border/40 font-medium">{renderInline(trimmed)}</div>;
+    }
+    return <div key={i} className="leading-relaxed">{renderInline(trimmed)}</div>;
+  });
+}
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -706,8 +723,8 @@ CRITICAL RULES:
                                 </div>
                               </div>
                               {thesisAnalysis[doc.id] ? (
-                                <div className="text-sm whitespace-pre-wrap leading-relaxed">
-                                  {thesisAnalysis[doc.id]}
+                                <div className="text-sm leading-relaxed space-y-1.5">
+                                  {formatThesisText(thesisAnalysis[doc.id])}
                                 </div>
                               ) : (
                                 <div className="text-xs text-muted-foreground">
