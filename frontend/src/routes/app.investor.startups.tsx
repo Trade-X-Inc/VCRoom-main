@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { Building2, ExternalLink, Clock, Plus, X, Loader2, ChevronRight } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { Building2, ExternalLink, Clock, Plus, X, Loader2, ChevronRight, Upload, Download } from "lucide-react";
+import Papa from "papaparse";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -57,6 +58,7 @@ function StartupsPage() {
   const qc = useQueryClient();
   const [activeTab, setActiveTab] = useState<(typeof TAB_STATUSES)[number]>("All");
   const [showAdd, setShowAdd] = useState(false);
+  const [csvOpen, setCsvOpen] = useState(false);
   const [addForm, setAddForm] = useState<AddForm>(EMPTY_ADD);
   const [saving, setSaving] = useState(false);
   const [selectedWatchlist, setSelectedWatchlist] = useState<any | null>(null);
@@ -164,6 +166,18 @@ function StartupsPage() {
           className="inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-glow"
         >
           <Plus className="h-4 w-4" /> Add company
+        </button>
+        <button
+          onClick={downloadSampleCsv}
+          className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent"
+        >
+          <Download className="h-4 w-4" /> Sample CSV
+        </button>
+        <button
+          onClick={() => setCsvOpen(true)}
+          className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent"
+        >
+          <Upload className="h-4 w-4" /> Import CSV
         </button>
       </div>
 
@@ -321,6 +335,18 @@ function StartupsPage() {
           </div>
         )}
       </div>
+
+      {/* Bulk CSV Import Modal */}
+      {csvOpen && user?.id && (
+        <StartupCsvImportModal
+          userId={user.id}
+          onClose={() => setCsvOpen(false)}
+          onImported={() => {
+            setCsvOpen(false);
+            qc.invalidateQueries({ queryKey: ["investor-watchlist", user.id] });
+          }}
+        />
+      )}
 
       {/* Add company modal */}
       {showAdd && (
@@ -562,5 +588,157 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <div className="text-xs font-medium text-muted-foreground mb-1.5">{label}</div>
       {children}
     </label>
+  );
+}
+
+
+// ── Startup CSV Import Modal ────────────────────────────────────────
+const STARTUP_PREVIEW_COLS = ["company_name", "sector", "stage", "website", "source"] as const;
+
+function mapStartupRow(raw: Record<string, string>) {
+  const name = (raw["company_name"] || raw["name"] || raw["Company"] || raw["Company Name"] || "").trim();
+  if (!name) return null;
+  return {
+    company_name: name,
+    website: (raw["website"] || raw["Website"] || raw["url"] || "").trim() || null,
+    sector: (raw["sector"] || raw["Sector"] || raw["industry"] || raw["Industry"] || "").trim() || null,
+    stage: (raw["stage"] || raw["Stage"] || "").trim() || null,
+    description: (raw["description"] || raw["Description"] || raw["tagline"] || "").trim() || null,
+    source: (raw["source"] || raw["Source"] || "").trim() || null,
+    notes: (raw["notes"] || raw["Notes"] || "").trim() || null,
+    status: "Reviewing" as const,
+    initial_score: null,
+  };
+}
+
+function StartupCsvImportModal({
+  userId, onClose, onImported,
+}: { userId: string; onClose: () => void; onImported: () => void; }) {
+  const fileRef = useRef<React.ElementRef<"input">>(null);
+  const [mapped, setMapped] = useState<ReturnType<typeof mapStartupRow>[] | null>(null);
+  const [skipped, setSkipped] = useState(0);
+  const [importing, setImporting] = useState(false);
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    Papa.parse<Record<string, string>>(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        const valid: ReturnType<typeof mapStartupRow>[] = [];
+        let skip = 0;
+        results.data.forEach((r) => {
+          const m = mapStartupRow(r);
+          if (m) valid.push(m);
+          else skip++;
+        });
+        setMapped(valid);
+        setSkipped(skip);
+      },
+    });
+  };
+
+  const doImport = async () => {
+    if (!mapped || mapped.length === 0 || !userId) return;
+    setImporting(true);
+    try {
+      const rows = mapped.filter(Boolean).map((r) => ({ ...r, investor_id: userId }));
+      const { error } = await supabase.from("investor_watchlist").insert(rows);
+      if (error) throw error;
+      toast.success(`${rows.length} companies imported`);
+      onImported();
+    } catch (err: any) {
+      toast.error(err.message || "Import failed");
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/30 backdrop-blur-sm p-4" onClick={onClose}>
+      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-2xl rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden">
+        <div className="px-6 py-4 border-b border-border/60 flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-semibold">Import startups from CSV</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">Required column: <code className="bg-muted px-1 rounded">company_name</code> · Optional: website, sector, stage, description, source, notes</p>
+          </div>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
+        </div>
+
+        <div className="px-6 py-5 space-y-4">
+          {!mapped && (
+            <div
+              onClick={() => fileRef.current?.click()}
+              className="rounded-xl border-2 border-dashed border-border/60 bg-muted/30 hover:bg-accent/40 hover:border-brand/50 p-10 text-center cursor-pointer transition-all"
+            >
+              <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-3" />
+              <p className="text-sm font-medium">Click to select a CSV file</p>
+              <p className="text-xs text-muted-foreground mt-1">Download the sample CSV first to see the expected format</p>
+              <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={handleFile} />
+            </div>
+          )}
+
+          {mapped && (
+            <>
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium">
+                  {mapped.length} companies ready to import
+                  {skipped > 0 && <span className="ml-2 text-xs text-warning">({skipped} skipped — missing company name)</span>}
+                </p>
+                <button onClick={() => { setMapped(null); setSkipped(0); }} className="text-xs text-muted-foreground hover:text-foreground underline">
+                  Choose different file
+                </button>
+              </div>
+              <div className="rounded-xl border border-border/60 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="bg-muted/30 border-b border-border/60">
+                        {STARTUP_PREVIEW_COLS.map((col) => (
+                          <th key={col} className="px-3 py-2 text-left font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap">
+                            {col.replace(/_/g, " ")}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/60">
+                      {mapped.slice(0, 6).map((row, i) => (
+                        <tr key={i} className="hover:bg-accent/30">
+                          {STARTUP_PREVIEW_COLS.map((col) => (
+                            <td key={col} className="px-3 py-2 truncate max-w-[160px]">
+                              {(row as any)?.[col] || <span className="text-muted-foreground/50">—</span>}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {mapped.length > 6 && (
+                  <div className="px-3 py-2 bg-muted/20 border-t border-border/60 text-xs text-muted-foreground">
+                    + {mapped.length - 6} more companies
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className="px-6 py-4 border-t border-border/60 flex items-center justify-end gap-2">
+          <button onClick={onClose} className="rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent">Cancel</button>
+          <button
+            onClick={doImport}
+            disabled={!mapped || mapped.length === 0 || importing}
+            className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-1.5 text-sm shadow-glow disabled:opacity-50"
+          >
+            {importing
+              ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Importing…</>
+              : <>Import {mapped ? `${mapped.length} companies` : "all"}</>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
