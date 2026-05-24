@@ -28,6 +28,26 @@ type AdvisorResult = {
 export const getAIAdvice = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): AdvisorInput => data as AdvisorInput)
   .handler(async ({ data }: { data: AdvisorInput }): Promise<AdvisorResult> => {
+    // ── AI Usage Cap Check ──
+    if (data.userId) {
+      try {
+        const supabaseUrl = (import.meta.env as any).VITE_SUPABASE_URL || process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
+        const supabaseKey = (import.meta.env as any).VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || "";
+        if (supabaseUrl && supabaseKey) {
+          const usageResp = await fetch(`${supabaseUrl}/rest/v1/rpc/check_and_increment_ai_usage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "apikey": supabaseKey, "Authorization": `Bearer ${supabaseKey}` },
+            body: JSON.stringify({ p_user_id: data.userId, p_feature: "advisor" }),
+          });
+          if (usageResp.ok) {
+            const usageResult = await usageResp.json() as any;
+            if (!usageResult.allowed) {
+              return { reply: usageResult.message || "You've reached your daily AI limit (20 calls/day on free plan). Usage resets at midnight.", error: "usage_limit" };
+            }
+          }
+        }
+      } catch { /* fail open */ }
+    }
     const openAIKey =
       process.env.OPENAI_API_KEY ||
       (import.meta.env as any).VITE_OPENAI_API_KEY ||

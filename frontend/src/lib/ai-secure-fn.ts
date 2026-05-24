@@ -37,6 +37,35 @@ type AIResult = {
   error: string | null;
 };
 
+// ── Check AI usage cap via Supabase RPC ──
+async function checkUsageCap(userId: string, feature: string): Promise<{ allowed: boolean; message?: string; used?: number; limit?: number }> {
+  if (!userId) return { allowed: true }; // no user = server-side call, allow
+  try {
+    const supabaseUrl = getEnvVar("VITE_SUPABASE_URL") || getEnvVar("SUPABASE_URL");
+    const supabaseKey = getEnvVar("VITE_SUPABASE_ANON_KEY") || getEnvVar("SUPABASE_ANON_KEY");
+    if (!supabaseUrl || !supabaseKey) return { allowed: true };
+    const resp = await fetch(`${supabaseUrl}/rest/v1/rpc/check_and_increment_ai_usage`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": supabaseKey,
+        "Authorization": `Bearer ${supabaseKey}`,
+      },
+      body: JSON.stringify({ p_user_id: userId, p_feature: feature }),
+    });
+    if (!resp.ok) return { allowed: true }; // fail open — don't block on infra error
+    const result = await resp.json() as any;
+    return {
+      allowed: result.allowed ?? true,
+      message: result.message,
+      used: result.used,
+      limit: result.limit,
+    };
+  } catch {
+    return { allowed: true }; // fail open
+  }
+}
+
 async function callOpenAI(
   systemPrompt: string,
   userMessage: string,
@@ -75,6 +104,10 @@ async function callOpenAI(
 export const analyzeThesisAlignment = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): ThesisInput => data as ThesisInput)
   .handler(async ({ data }): Promise<AIResult> => {
+    const usageCheck = await checkUsageCap(data.userId, "thesis");
+    if (!usageCheck.allowed) {
+      return { reply: usageCheck.message || "Daily AI limit reached.", error: "usage_limit" };
+    }
     try {
       const systemPrompt = `You are a senior VC analyst. Analyze how a startup document aligns with an investor's thesis.
 CRITICAL RULES:
@@ -95,6 +128,10 @@ CRITICAL RULES:
 export const generateDocSummary = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): SummaryInput => data as SummaryInput)
   .handler(async ({ data }): Promise<AIResult> => {
+    const usageCheck = await checkUsageCap(data.userId, "summary");
+    if (!usageCheck.allowed) {
+      return { reply: usageCheck.message || "Daily AI limit reached.", error: "usage_limit" };
+    }
     try {
       const systemPrompt = `You are a VC analyst reading startup documents. Extract key facts in exactly 4 concise bullet points. Each bullet: one sentence, start with a ✦ symbol. Focus on: business model, market size, traction/revenue, team or product highlights. No fluff.`;
       const userMessage = `Document: ${data.fileName}\nCategory: ${data.category || "Other"}\n\nContent:\n${data.documentContent}`;
@@ -109,6 +146,10 @@ export const generateDocSummary = createServerFn({ method: "POST" })
 export const secureAICall = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): GenericAIInput => data as GenericAIInput)
   .handler(async ({ data }): Promise<AIResult> => {
+    const usageCheck = await checkUsageCap(data.userId, "qa_draft");
+    if (!usageCheck.allowed) {
+      return { reply: usageCheck.message || "Daily AI limit reached.", error: "usage_limit" };
+    }
     try {
       const reply = await callOpenAI(
         data.systemPrompt,

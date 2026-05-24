@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Settings, Globe, Bell, CreditCard, Shield, Building2, User, Users, Trash2 } from "lucide-react";
+import { Settings, Globe, Bell, CreditCard, Shield, Building2, User, Users, Trash2, Zap, Brain } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
@@ -97,6 +97,24 @@ function General() {
     }
   }, [startup, investorProfile, isInvestor, user]);
 
+  // AI Usage query
+  const { data: aiUsage } = useQuery({
+    queryKey: ["ai-usage-today", user?.id],
+    enabled: !!user?.id,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const today = new Date().toISOString().split("T")[0];
+      const [usageRes, planRes] = await Promise.all([
+        supabase.from("ai_usage").select("call_count").eq("user_id", user!.id).eq("usage_date", today),
+        supabase.from("user_plans").select("plan, ai_calls_daily_limit").eq("user_id", user!.id).maybeSingle(),
+      ]);
+      const used = (usageRes.data ?? []).reduce((sum: number, r: any) => sum + (r.call_count ?? 0), 0);
+      const plan = planRes.data?.plan ?? "free";
+      const limit = planRes.data?.ai_calls_daily_limit ?? 20;
+      return { used, limit, plan };
+    },
+  });
+
   const slug = workspaceName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
   async function handleSave() {
@@ -168,6 +186,69 @@ function General() {
             <span>Delete account</span>
             <span className="ml-auto text-[10px] text-muted-foreground/60">Contact support</span>
           </button>
+        </div>
+      </Card>
+
+      {/* AI Usage Meter */}
+      <Card title="AI Usage">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Brain className="h-4 w-4 text-brand" />
+              <span className="text-sm font-medium">Daily AI calls</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={cn(
+                "text-xs font-semibold px-2 py-0.5 rounded-full",
+                aiUsage?.plan === "pro" || aiUsage?.plan === "enterprise"
+                  ? "bg-success/15 text-success"
+                  : "bg-brand/15 text-brand"
+              )}>
+                {aiUsage?.plan === "pro" ? "Pro" : aiUsage?.plan === "enterprise" ? "Enterprise" : "Free"}
+              </span>
+            </div>
+          </div>
+
+          {aiUsage?.plan === "free" && (
+            <>
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>{aiUsage?.used ?? 0} of {aiUsage?.limit ?? 20} calls used today</span>
+                <span>Resets midnight UTC</span>
+              </div>
+              <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                <div
+                  className={cn(
+                    "h-2 rounded-full transition-all",
+                    (aiUsage?.used ?? 0) >= (aiUsage?.limit ?? 20)
+                      ? "bg-destructive"
+                      : (aiUsage?.used ?? 0) >= (aiUsage?.limit ?? 20) * 0.8
+                      ? "bg-warning"
+                      : "bg-brand"
+                  )}
+                  style={{ width: `${Math.min(100, ((aiUsage?.used ?? 0) / (aiUsage?.limit ?? 20)) * 100)}%` }}
+                />
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Free plan includes 20 AI calls per day across Advisor, Thesis Alignment, Document Summaries, and Q&A drafts.
+              </p>
+              <div className="rounded-lg border border-brand/20 bg-brand/5 px-3 py-2.5 flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-semibold text-foreground">Upgrade to Pro — Unlimited AI</div>
+                  <div className="text-[10px] text-muted-foreground mt-0.5">Unlimited AI calls · Unlimited deal rooms · Priority support</div>
+                </div>
+                <button className="text-[11px] font-semibold text-brand hover:underline shrink-0 ml-3">
+                  Coming soon →
+                </button>
+              </div>
+            </>
+          )}
+
+          {(aiUsage?.plan === "pro" || aiUsage?.plan === "enterprise") && (
+            <div className="flex items-center gap-2 text-xs text-success">
+              <Zap className="h-3.5 w-3.5" />
+              <span>Unlimited AI calls on your {aiUsage.plan} plan</span>
+            </div>
+          )}
         </div>
       </Card>
 
