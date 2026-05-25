@@ -417,13 +417,24 @@ function DealRoomOverview({
     },
   });
 
-  const investorUserIds = (memberList as any[])
-    .filter((m) => m.role === "investor" || m.role === "viewer")
-    .map((m) => m.user_id);
+  const { data: investorMembers = [] } = useQuery({
+    queryKey: ["investor-members", dealRoomId],
+    enabled: !!dealRoomId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("deal_room_members")
+        .select("id, user_id, role, users(full_name, avatar_url)")
+        .eq("deal_room_id", dealRoomId)
+        .eq("role", "investor");
+      return data ?? [];
+    },
+  });
+
+  const investorUserIds = (investorMembers as any[]).map((m) => m.user_id);
 
   const { data: investorProfilesInRoom = [] } = useQuery({
     queryKey: ["room-investor-profiles", dealRoomId, investorUserIds.join(",")],
-    enabled: !!user?.id && memberList.length > 0,
+    enabled: !!user?.id && (investorMembers as any[]).length > 0,
     queryFn: async () => {
       if (investorUserIds.length === 0) return [];
       const { data } = await supabase
@@ -568,7 +579,6 @@ function DealRoomOverview({
   };
 
   const founderMembers = (memberList as any[]).filter((m) => m.role === "founder");
-  const investorMembers = (memberList as any[]).filter((m) => m.role === "investor" || m.role === "viewer");
   const baseOrigin = typeof window !== "undefined" ? window.location.origin : "https://main.vcroom-main.pages.dev";
 
   const handleCopyInviteLink = (token: string) => {
