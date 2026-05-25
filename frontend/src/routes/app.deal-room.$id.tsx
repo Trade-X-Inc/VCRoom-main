@@ -9,7 +9,7 @@ import {
   HelpCircle, Building2, TrendingUp, Users, DollarSign, Target, Shield,
   Send, AlertCircle, Eye, UserPlus, Loader2, ExternalLink, ChevronDown,
   Check, ClipboardList, Copy, Trash2, Pencil, Image, Film,
-  ChevronUp, Lightbulb, Upload,
+  ChevronUp, Lightbulb, Upload, Link as LinkIcon,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AIChat } from "@/components/ai/AIChat";
@@ -286,7 +286,7 @@ function DealRoom() {
               />
             </div>
             <div className="flex-1">
-              <Documents dealRoomId={dealRoomId} isFounder={isFounder} userId={user?.id} />
+              <Documents dealRoomId={dealRoomId} isFounder={isFounder} isInvestor={isInvestor} userId={user?.id} />
             </div>
           </div>
         )}
@@ -1183,9 +1183,14 @@ const CAT_BORDER: Record<string, string> = {
   "Other": "border-l-muted-foreground/40",
 };
 
-function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFounder: boolean; userId?: string }) {
+function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: string; isFounder: boolean; isInvestor: boolean; userId?: string }) {
   const queryClient = useQueryClient();
   const [showLibrary, setShowLibrary] = useState(false);
+  const [activeVaultTab, setActiveVaultTab] = useState<"documents" | "links">("documents");
+  const [showAddLink, setShowAddLink] = useState(false);
+  const [linkName, setLinkName] = useState("");
+  const [linkUrl, setLinkUrl] = useState("");
+  const [addingLink, setAddingLink] = useState(false);
   const [addingFromLib, setAddingFromLib] = useState<string | null>(null);
   const pendingDeletes = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const [generatingSummaryId, setGeneratingSummaryId] = useState<string | null>(null);
@@ -1234,6 +1239,76 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
       return data ?? [];
     },
   });
+
+  const { data: dealRoomLinks = [] } = useQuery({
+    queryKey: ["deal-room-links", dealRoomId],
+    enabled: !!dealRoomId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("deal_room_links")
+        .select("*, users(full_name)")
+        .eq("deal_room_id", dealRoomId)
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+  });
+
+  // Investor documents — uploaded by investor into this deal room
+  const { data: investorDocs = [] } = useQuery({
+    queryKey: ["investor-documents", dealRoomId, userId],
+    enabled: !!userId && !!dealRoomId,
+    staleTime: 0,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("documents")
+        .select("*, uploader:uploader_id(full_name, avatar_url)")
+        .eq("deal_room_id", dealRoomId)
+        .eq("uploaded_by_role", "investor")
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+  });
+
+  // Founder sees investor docs marked shared; investor sees all their own
+  const visibleInvestorDocs = isFounder
+    ? (investorDocs as any[]).filter((d) => d.visibility !== "private")
+    : investorDocs;
+
+  const [investorDocVisibility, setInvestorDocVisibility] = useState<Record<string, "shared" | "private">>({});
+
+  const updateDocVisibility = async (docId: string, visibility: "shared" | "private") => {
+    setInvestorDocVisibility((prev) => ({ ...prev, [docId]: visibility }));
+    await supabase.from("documents").update({ visibility }).eq("id", docId);
+    queryClient.invalidateQueries({ queryKey: ["investor-documents", dealRoomId, userId] });
+  };
+
+  const removeInvestorDoc = async (docId: string) => {
+    await supabase.from("documents").update({ deal_room_id: null }).eq("id", docId);
+    queryClient.invalidateQueries({ queryKey: ["investor-documents", dealRoomId, userId] });
+    toast.success("Document removed");
+  };
+
+  const addLink = async () => {
+    if (!linkName.trim() || !linkUrl.trim() || !userId) return;
+    setAddingLink(true);
+    const url = linkUrl.startsWith("http") ? linkUrl : `https://${linkUrl}`;
+    await supabase.from("deal_room_links").insert({
+      deal_room_id: dealRoomId,
+      uploader_id: userId,
+      name: linkName.trim(),
+      url,
+      visibility: "shared",
+    });
+    queryClient.invalidateQueries({ queryKey: ["deal-room-links", dealRoomId] });
+    setLinkName(""); setLinkUrl(""); setShowAddLink(false); setAddingLink(false);
+    toast.success("Link added");
+  };
+
+  const removeLink = async (linkId: string) => {
+    await supabase.from("deal_room_links").delete().eq("id", linkId);
+    queryClient.invalidateQueries({ queryKey: ["deal-room-links", dealRoomId] });
+    toast.success("Link removed");
+  };
 
   const ndaDocs = useGeneratedNdaDocs().filter((d) => d.dealRoomId === dealRoomId);
 
@@ -1476,12 +1551,30 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold tracking-tight">
-          Document Vault
-          <span className="text-sm font-normal text-muted-foreground ml-2">{(docs as any[]).length} files</span>
-        </h2>
+        <div className="flex items-center gap-1 rounded-xl bg-muted/50 p-1">
+          <button
+            onClick={() => setActiveVaultTab("documents")}
+            className={cn(
+              "px-4 py-1.5 rounded-lg text-sm font-medium transition-colors",
+              activeVaultTab === "documents" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            📁 Documents
+            <span className="ml-1.5 text-[10px] text-muted-foreground">({(docs as any[]).length})</span>
+          </button>
+          <button
+            onClick={() => setActiveVaultTab("links")}
+            className={cn(
+              "px-4 py-1.5 rounded-lg text-sm font-medium transition-colors",
+              activeVaultTab === "links" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            🔗 Links
+            <span className="ml-1.5 text-[10px] text-muted-foreground">({(dealRoomLinks as any[]).length})</span>
+          </button>
+        </div>
         <div className="flex gap-2">
-          {isFounder && (
+          {activeVaultTab === "documents" && isFounder && (
             <button
               onClick={() => setShowLibrary(true)}
               className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-sm hover:bg-brand/10"
@@ -1489,9 +1582,18 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
               <Plus className="h-4 w-4" /> Add from library
             </button>
           )}
+          {activeVaultTab === "links" && (
+            <button
+              onClick={() => setShowAddLink(true)}
+              className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow"
+            >
+              <Plus className="h-4 w-4" /> Add link
+            </button>
+          )}
         </div>
       </div>
 
+      {activeVaultTab === "documents" && (<>
       {isFounder && (
         <div className="mt-5 space-y-3">
           <div className="rounded-lg bg-muted/40 border border-border/60 px-4 py-3 text-xs text-muted-foreground space-y-1">
@@ -1890,6 +1992,219 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
                 )}
               </div>
             ))}
+          </div>
+        </div>
+      )}
+      {/* Investor Documents Section */}
+      {(isInvestor || (isFounder && visibleInvestorDocs.length > 0)) && (
+        <div className="mt-8">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h3 className="text-sm font-semibold flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-md bg-success/10 text-success px-2 py-0.5 text-[11px] font-semibold">
+                  🔒 Investor Documents
+                </span>
+              </h3>
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                {isInvestor
+                  ? "Only you can upload here. Choose visibility per document."
+                  : "Documents shared with you by the investor."}
+              </p>
+            </div>
+          </div>
+
+          {/* Investor upload dropzone — only investor sees this */}
+          {isInvestor && (
+            <div className="mb-4">
+              <Dropzone
+                dealRoomId={dealRoomId}
+                uploadedByRole="investor"
+                onUploadComplete={() => {
+                  queryClient.invalidateQueries({ queryKey: ["investor-documents", dealRoomId, userId] });
+                }}
+              />
+            </div>
+          )}
+
+          {/* Investor doc list */}
+          {visibleInvestorDocs.length === 0 && isInvestor && (
+            <div className="rounded-xl border border-dashed border-border/60 p-8 text-center">
+              <FileText className="h-8 w-8 mx-auto mb-2 text-muted-foreground/30" />
+              <p className="text-sm text-muted-foreground">No investor documents yet. Upload above.</p>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            {visibleInvestorDocs.map((doc: any) => {
+              const rawName = doc.name || doc.storage_path?.split("/").pop() || "Document";
+              const displayName = rawName.replace(/^\d{13}-/, "");
+              const ext = displayName.split(".").pop()?.toLowerCase() ?? "";
+              const { bg: iconBg, color: iconColor, Icon: FileIcon } = getFileTypeStyle(ext);
+              const currentVisibility = investorDocVisibility[doc.id] ?? doc.visibility ?? "shared";
+
+              return (
+                <div key={doc.id} className="flex items-center gap-3 rounded-xl border border-border/60 bg-card px-4 py-3 shadow-card border-l-4 border-l-success/60">
+                  <div className={cn("grid h-9 w-9 place-items-center rounded-lg shrink-0", iconBg)}>
+                    <FileIcon className={cn("h-4 w-4", iconColor)} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium truncate">{displayName}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {doc.uploader?.full_name ?? "Investor"} · {new Date(doc.created_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                  {/* Visibility toggle — investor only */}
+                  {isInvestor && (
+                    <div className="flex items-center gap-1 rounded-lg bg-muted/60 p-0.5 shrink-0">
+                      {(["shared", "private"] as const).map((v) => (
+                        <button
+                          key={v}
+                          onClick={() => updateDocVisibility(doc.id, v)}
+                          className={cn(
+                            "px-2 py-1 rounded-md text-[10px] font-medium transition-colors",
+                            currentVisibility === v
+                              ? v === "shared"
+                                ? "bg-success text-white shadow-sm"
+                                : "bg-warning text-warning-foreground shadow-sm"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          {v === "shared" ? "🌐 Shared" : "🔒 Private"}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {isFounder && (
+                    <span className="text-[10px] text-success bg-success/10 px-2 py-0.5 rounded-full shrink-0">
+                      🌐 Shared
+                    </span>
+                  )}
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={() => handleDownload(doc.storage_path)}
+                      className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+                      title="Download"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                    </button>
+                    {isInvestor && (
+                      <button
+                        onClick={() => removeInvestorDoc(doc.id)}
+                        className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                        title="Remove"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+      </>)}
+
+      {/* Links Tab */}
+      {activeVaultTab === "links" && (
+        <div className="mt-5 space-y-3">
+          {(dealRoomLinks as any[]).length === 0 && (
+            <div className="rounded-xl border border-dashed border-border/60 p-10 text-center">
+              <LinkIcon className="h-8 w-8 mx-auto mb-2 text-muted-foreground/30" />
+              <p className="text-sm font-medium">No links yet</p>
+              <p className="text-xs text-muted-foreground mt-1">Add product videos, Loom recordings, external documents, or any URL</p>
+              <button
+                onClick={() => setShowAddLink(true)}
+                className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow"
+              >
+                <Plus className="h-4 w-4" /> Add first link
+              </button>
+            </div>
+          )}
+          {(dealRoomLinks as any[]).map((link: any) => (
+            <div key={link.id} className="flex items-center gap-3 rounded-xl border border-border/60 bg-card px-4 py-3 shadow-card">
+              <div className="grid h-9 w-9 place-items-center rounded-lg bg-brand/10 shrink-0">
+                <LinkIcon className="h-4 w-4 text-brand" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium truncate">{link.name}</div>
+                <div className="text-xs text-muted-foreground truncate">{link.url}</div>
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+                  title="Open link"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+                {link.uploader_id === userId && (
+                  <button
+                    onClick={() => removeLink(link.id)}
+                    className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                    title="Remove link"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Add Link Modal */}
+      {showAddLink && (
+        <div
+          className="fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm grid place-items-center p-4"
+          onClick={() => setShowAddLink(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl border border-border/60 bg-card shadow-elev"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-5 border-b border-border/60">
+              <div className="text-sm font-semibold">Add a link</div>
+              <button onClick={() => setShowAddLink(false)} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Link name</label>
+                <input
+                  value={linkName}
+                  onChange={(e) => setLinkName(e.target.value)}
+                  placeholder="e.g. Product Demo Video, Financial Model..."
+                  className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">URL</label>
+                <input
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                  placeholder="https://..."
+                  type="url"
+                  className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-1">
+                <button onClick={() => setShowAddLink(false)} className="px-4 py-2 rounded-md border border-border/60 text-sm hover:bg-accent">
+                  Cancel
+                </button>
+                <button
+                  onClick={addLink}
+                  disabled={!linkName.trim() || !linkUrl.trim() || addingLink}
+                  className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-50"
+                >
+                  {addingLink ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+                  Add link
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

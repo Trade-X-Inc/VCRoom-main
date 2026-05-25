@@ -20,12 +20,14 @@ export function Dropzone({
   title = "Drag & drop or click to upload",
   hint = "Up to 50 MB · PDF, DOCX, XLSX, PPTX, PNG, JPG, CSV, TXT, MP4",
   dealRoomId,
+  uploadedByRole,
   onUploadComplete,
 }: {
   onFiles?: (files: UploadedFile[]) => void;
   title?: string;
   hint?: string;
   dealRoomId?: string;
+  uploadedByRole?: string;
   onUploadComplete?: () => void;
 }) {
   const [isOver, setIsOver] = useState(false);
@@ -59,6 +61,7 @@ export function Dropzone({
             storage_path: result.path,
             category: "Other",
             status: "uploaded",
+            ...(uploadedByRole ? { uploaded_by_role: uploadedByRole } : {}),
           });
           if (insertError) throw insertError;
 
