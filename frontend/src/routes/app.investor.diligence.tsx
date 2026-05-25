@@ -107,34 +107,19 @@ function DiligencePage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("deal_room_members")
-        .select(`
-          deal_room_id,
-          deal_rooms (
-            id,
-            startup_id,
-            startups (
-              id,
-              company_name,
-              stage,
-              sector,
-              description,
-              team_size,
-              website,
-              founder_id
-            )
-          )
-        `)
+        .select("deal_room_id, deal_rooms(id, startup_id, startups(id, company_name, stage, sector, description, team_size, website, founder_id))")
         .eq("user_id", userId);
 
-      console.log("DD startups raw:", data, error);
+      console.log("startups raw:", data, error);
 
-      const seen = new Set<string>();
+      const seen = new Set();
       const results: any[] = [];
       (data ?? []).forEach((m: any) => {
-        const s = (m.deal_rooms as any)?.startups;
+        const s = m.deal_rooms?.startups;
+        const roomId = m.deal_rooms?.id;
         if (s && !seen.has(s.id)) {
           seen.add(s.id);
-          results.push({ ...s, dealRoomId: m.deal_room_id });
+          results.push({ ...s, dealRoomId: roomId });
         }
       });
       return results;

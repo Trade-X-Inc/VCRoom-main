@@ -31,23 +31,22 @@ function AnalysisPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("deal_room_members")
-        .select(`
-          deal_room_id,
-          deal_rooms (
-            id,
-            startups (
-              company_name
-            )
-          )
-        `)
+        .select("deal_room_id, deal_rooms(id, startup_id, startups(id, company_name, stage, sector, description, team_size, website, founder_id))")
         .eq("user_id", user!.id);
-      if (error) throw error;
-      return (data ?? [])
-        .map((r: any) => ({
-          id: r.deal_room_id,
-          name: (r.deal_rooms as any)?.startups?.company_name ?? r.deal_room_id,
-        }))
-        .filter((r) => !!r.id);
+
+      console.log("startups raw:", data, error);
+
+      const seen = new Set();
+      const results: any[] = [];
+      (data ?? []).forEach((m: any) => {
+        const s = m.deal_rooms?.startups;
+        const roomId = m.deal_rooms?.id;
+        if (s && !seen.has(s.id)) {
+          seen.add(s.id);
+          results.push({ ...s, dealRoomId: roomId });
+        }
+      });
+      return results.map((s: any) => ({ id: s.dealRoomId, name: s.company_name ?? s.dealRoomId })).filter((r: any) => !!r.id);
     },
   });
 
