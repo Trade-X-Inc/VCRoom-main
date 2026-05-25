@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
   FileText, Upload, CheckCircle2, AlertTriangle,
   Download, Trash2, Loader2, LayoutGrid, List,
-  File, Table2, Image, Video, X, Plus,
+  File, Table2, Image, Video, X, Plus, ExternalLink, Link as LinkIcon,
 } from "lucide-react";
 import { useMemo, useState, useRef } from "react";
 import { supabase } from "@/lib/supabase";
@@ -267,7 +267,7 @@ function Documents() {
       </div>
 
       {/* Media & Links */}
-      <MediaLinksPanel startupMedia={startupMedia ?? null} userId={user!.id} queryClient={queryClient} />
+      <MediaLinksPanel startupMedia={startupMedia ?? null} userId={user!.id} queryClient={queryClient} dealRooms={dealRooms} />
 
       {/* Category tabs */}
       <div className="mt-6 flex items-center gap-1 overflow-x-auto pb-0.5 border-b border-border/60">
@@ -583,15 +583,65 @@ function Documents() {
   );
 }
 
-function MediaLinksPanel({ startupMedia, userId, queryClient }: {
+function MediaLinksPanel({ startupMedia, userId, queryClient, dealRooms }: {
   startupMedia: { id: string; product_video_url?: string | null; pitch_deck_url?: string | null } | null;
   userId: string;
   queryClient: any;
+  dealRooms: any[];
 }) {
   const [videoUrl, setVideoUrl] = useState(startupMedia?.product_video_url ?? "");
   const [savingVideo, setSavingVideo] = useState(false);
   const [uploadingDeck, setUploadingDeck] = useState(false);
   const deckRef = useRef<HTMLInputElement>(null);
+  const [showAddLink, setShowAddLink] = useState(false);
+  const [linkName, setLinkName] = useState("");
+  const [linkUrl, setLinkUrl] = useState("");
+  const [newLinkDealRoomId, setNewLinkDealRoomId] = useState("");
+  const [addingLink, setAddingLink] = useState(false);
+
+  const { data: links = [] } = useQuery({
+    queryKey: ["founder-links", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("deal_room_links")
+        .select("id, name, url, deal_room_id, created_at")
+        .eq("uploader_id", userId)
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+  });
+
+  const addLink = async () => {
+    if (!linkName.trim() || !linkUrl.trim()) return;
+    setAddingLink(true);
+    try {
+      const { error } = await supabase.from("deal_room_links").insert({
+        uploader_id: userId,
+        name: linkName.trim(),
+        url: linkUrl.trim(),
+        ...(newLinkDealRoomId ? { deal_room_id: newLinkDealRoomId } : {}),
+      });
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ["founder-links", userId] });
+      setShowAddLink(false);
+      setLinkName("");
+      setLinkUrl("");
+      setNewLinkDealRoomId("");
+      toast.success("Link added");
+    } catch (e: any) {
+      toast.error(e.message || "Failed to add link");
+    } finally {
+      setAddingLink(false);
+    }
+  };
+
+  const removeLink = async (id: string) => {
+    const { error } = await supabase.from("deal_room_links").delete().eq("id", id).eq("uploader_id", userId);
+    if (error) { toast.error(error.message); return; }
+    queryClient.invalidateQueries({ queryKey: ["founder-links", userId] });
+    toast.success("Link removed");
+  };
 
   const saveVideoUrl = async () => {
     if (!startupMedia?.id) { toast.error("Set up your Company Profile first"); return; }
@@ -645,6 +695,7 @@ function MediaLinksPanel({ startupMedia, userId, queryClient }: {
   };
 
   return (
+    <>
     <div className="mt-6 rounded-xl border border-border/60 bg-card p-5">
       <div className="text-sm font-semibold mb-4">Media &amp; Links</div>
       <div className="grid sm:grid-cols-2 gap-5">
@@ -705,7 +756,127 @@ function MediaLinksPanel({ startupMedia, userId, queryClient }: {
           </p>
         </div>
       </div>
+
+      {/* Saved links */}
+      <div className="mt-5 pt-5 border-t border-border/60">
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+            <LinkIcon className="h-3.5 w-3.5" /> Saved Links
+            {(links as any[]).length > 0 && (
+              <span className="text-[10px] font-bold bg-muted px-1.5 py-0.5 rounded-full">{(links as any[]).length}</span>
+            )}
+          </div>
+          <button
+            onClick={() => setShowAddLink(true)}
+            className="inline-flex items-center gap-1 text-xs text-brand hover:underline"
+          >
+            <Plus className="h-3 w-3" /> Add link
+          </button>
+        </div>
+        {(links as any[]).length === 0 ? (
+          <p className="text-xs text-muted-foreground/60 italic">No links saved yet. Add deal room links, demo URLs, or resources.</p>
+        ) : (
+          <div className="space-y-2">
+            {(links as any[]).map((link: any) => (
+              <div key={link.id} className="flex items-center gap-3 rounded-lg border border-border/60 bg-background px-3 py-2">
+                <ExternalLink className="h-3.5 w-3.5 text-brand shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium truncate">{link.name}</div>
+                  <div className="text-[10px] text-muted-foreground truncate">{link.url}</div>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <a href={link.url} target="_blank" rel="noopener noreferrer"
+                    className="grid h-6 w-6 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+                    title="Open link">
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                  <button
+                    onClick={() => removeLink(link.id)}
+                    className="grid h-6 w-6 place-items-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                    title="Remove link">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
+
+    {/* Add link modal */}
+    {showAddLink && (
+      <div
+        className="fixed inset-0 z-50 grid place-items-center bg-foreground/30 backdrop-blur-sm p-4"
+        onClick={() => setShowAddLink(false)}
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="w-full max-w-sm rounded-2xl border border-border/60 bg-card shadow-elev p-6"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold">Add link</h3>
+            <button onClick={() => setShowAddLink(false)} className="text-muted-foreground hover:text-foreground">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs text-muted-foreground block mb-1">Link name *</label>
+              <input
+                type="text"
+                value={linkName}
+                onChange={(e) => setLinkName(e.target.value)}
+                placeholder="e.g. Demo video, Product Hunt, Deck"
+                className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground block mb-1">URL *</label>
+              <input
+                type="url"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                placeholder="https://..."
+                className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+              />
+            </div>
+            {dealRooms.length > 0 && (
+              <div>
+                <label className="text-xs text-muted-foreground block mb-1">Deal room (optional)</label>
+                <select
+                  value={newLinkDealRoomId}
+                  onChange={(e) => setNewLinkDealRoomId(e.target.value)}
+                  className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                >
+                  <option value="">None</option>
+                  {dealRooms.map((r: any) => (
+                    <option key={r.id} value={r.id}>{r.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+          <div className="flex gap-2 mt-5">
+            <button
+              onClick={() => setShowAddLink(false)}
+              className="flex-1 rounded-md border border-border/60 py-2 text-sm hover:bg-accent"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={addLink}
+              disabled={!linkName.trim() || !linkUrl.trim() || addingLink}
+              className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground py-2 text-sm shadow-glow disabled:opacity-50"
+            >
+              {addingLink && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              Add link
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
 
