@@ -43,6 +43,7 @@ const investorNav: NavItem[] = [
   { to: "/app/investor/decisions", labelKey: "app.decisions", icon: Gavel },
   { to: "/app/investor/portfolio", labelKey: "Portfolio", icon: PieChart },
   { to: "/app/meetings", labelKey: "app.meetings", icon: Calendar },
+  { to: "/app/messages", labelKey: "Team Chat", icon: MessageSquare },
   { to: "/app/investor/profile", labelKey: "Profile", icon: UserCircle2 },
 ];
 
@@ -134,11 +135,12 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       !path.startsWith("/app/profile") &&
       !path.startsWith("/app/settings") &&
       !path.startsWith("/app/meetings") &&
-      !path.startsWith("/app/deal-room");
+      !path.startsWith("/app/deal-room") &&
+      !path.startsWith("/app/messages");
     const founderOutOfBounds = !isInvestor && path.startsWith("/app/investor");
     if (investorOutOfBounds && lastRedirectRef.current !== "investor") {
       lastRedirectRef.current = "investor";
-      navigate({ to: "/app/investor/" });
+      navigate({ to: "/app/investor" });
     } else if (founderOutOfBounds && lastRedirectRef.current !== "founder") {
       lastRedirectRef.current = "founder";
       navigate({ to: "/app" });

@@ -1229,7 +1229,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
         .from("documents")
         .select("*")
         .eq("uploader_id", userId!)
-        .is("deal_room_id", null)
+        .neq("deal_room_id", dealRoomId) // exclude docs already in THIS room
         .order("created_at", { ascending: false });
       return data ?? [];
     },
@@ -1240,6 +1240,30 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
   const handleDownload = async (storagePath: string) => {
     const { data } = await supabase.storage.from("documents").createSignedUrl(storagePath, 3600);
     if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+  };
+
+  const handleDocRemove = (doc: any) => {
+    queryClient.setQueryData(["documents", dealRoomId], (old: any[]) =>
+      (old ?? []).filter((d) => d.id !== doc.id)
+    );
+    const rawName = doc.name || doc.storage_path?.split("/").pop() || "Document";
+    const displayName = rawName.replace(/^\d{13}-/, "");
+    let toastId: string | number;
+    const timer = setTimeout(async () => {
+      await supabase.from("documents").update({ deal_room_id: null }).eq("id", doc.id);
+      queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+    }, 5000);
+    toastId = toast(`"${displayName}" removed`, {
+      action: {
+        label: "Undo",
+        onClick: () => {
+          clearTimeout(timer);
+          queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+          toast.dismiss(toastId);
+        },
+      },
+      duration: 5000,
+    });
   };
 
   const addFromLibrary = async (docId: string) => {
@@ -1541,8 +1565,9 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
             <div className="p-3 max-h-80 overflow-y-auto">
               {libLoading && <div className="text-sm text-muted-foreground p-3 animate-pulse">Loading…</div>}
               {!libLoading && (libraryDocs as any[]).length === 0 && (
-                <div className="text-sm text-muted-foreground p-3">
-                  No personal documents without a deal room. Upload documents in the Documents page first.
+                <div className="text-sm text-muted-foreground p-3 text-center py-6">
+                  <FileText className="h-8 w-8 mx-auto mb-2 text-muted-foreground/30" />
+                  No documents to add. Upload documents from the main Documents page first.
                 </div>
               )}
               {(libraryDocs as any[]).map((doc) => (
@@ -1654,14 +1679,7 @@ function Documents({ dealRoomId, isFounder, userId }: { dealRoomId: string; isFo
                     </button>
                     {isFounder && (
                       <button
-                        onClick={async () => {
-                          if (!confirm("Remove this document from the deal room?")) return;
-                          await supabase.from("documents")
-                            .update({ deal_room_id: null })
-                            .eq("id", doc.id);
-                          queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
-                          toast.success("Document removed from deal room");
-                        }}
+                        onClick={() => handleDocRemove(doc)}
                         title="Remove from deal room"
                         className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                       >
@@ -2219,11 +2237,16 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
                   key={v}
                   type="button"
                   onClick={() => setNoteVisibility(v)}
-                  className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                  className={cn(
+                    "px-2.5 py-1 rounded-md text-xs font-medium transition-colors",
                     noteVisibility === v
-                      ? "bg-card shadow-sm text-foreground"
+                      ? v === "public"
+                        ? "bg-brand text-white shadow-sm"
+                        : v === "team"
+                        ? "bg-blue-500 text-white shadow-sm"
+                        : "bg-warning text-warning-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  )}
                 >
                   {v === "public" ? "🌐 Public" : v === "team" ? "👥 Team" : "🔒 Private"}
                 </button>
