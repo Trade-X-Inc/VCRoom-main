@@ -105,24 +105,42 @@ function DiligencePage() {
     queryKey: ["dd-startups", userId],
     enabled: !!userId,
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Step 1: get deal room IDs this investor belongs to
+      const { data: memberRows, error: e1 } = await supabase
         .from("deal_room_members")
-        .select("deal_room_id, deal_rooms(id, startup_id, startups(id, company_name, stage, sector, description, team_size, website, founder_id))")
+        .select("deal_room_id")
         .eq("user_id", userId);
+      console.log("member rows:", memberRows, e1);
 
-      console.log("startups raw:", data, error);
+      const dealRoomIds = (memberRows ?? []).map((m: any) => m.deal_room_id).filter(Boolean);
+      if (dealRoomIds.length === 0) return [];
 
-      const seen = new Set();
-      const results: any[] = [];
-      (data ?? []).forEach((m: any) => {
-        const s = m.deal_rooms?.startups;
-        const roomId = m.deal_rooms?.id;
-        if (s && !seen.has(s.id)) {
-          seen.add(s.id);
-          results.push({ ...s, dealRoomId: roomId });
-        }
+      // Step 2: get startup_id for each deal room
+      const { data: roomRows, error: e2 } = await supabase
+        .from("deal_rooms")
+        .select("id, startup_id")
+        .in("id", dealRoomIds);
+      console.log("room rows:", roomRows, e2);
+
+      const startupIds = (roomRows ?? []).map((r: any) => r.startup_id).filter(Boolean);
+      if (startupIds.length === 0) return [];
+
+      // Step 3: get startup details
+      const { data: startupRows, error: e3 } = await supabase
+        .from("startups")
+        .select("id, company_name, stage, sector, description, team_size, website, founder_id")
+        .in("id", startupIds);
+      console.log("startup rows:", startupRows, e3);
+
+      const startupToDealRoom: Record<string, string> = {};
+      (roomRows ?? []).forEach((r: any) => {
+        if (r.startup_id) startupToDealRoom[r.startup_id] = r.id;
       });
-      return results;
+
+      return (startupRows ?? []).map((s: any) => ({
+        ...s,
+        dealRoomId: startupToDealRoom[s.id] ?? null,
+      }));
     },
   });
 

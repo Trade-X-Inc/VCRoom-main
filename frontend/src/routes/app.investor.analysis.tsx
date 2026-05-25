@@ -29,24 +29,29 @@ function AnalysisPage() {
     queryKey: ["investor-analysis-rooms", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Step 1: get deal room IDs this investor belongs to
+      const { data: memberRows, error: e1 } = await supabase
         .from("deal_room_members")
-        .select("deal_room_id, deal_rooms(id, startup_id, startups(id, company_name, stage, sector, description, team_size, website, founder_id))")
+        .select("deal_room_id")
         .eq("user_id", user!.id);
+      console.log("analysis member rows:", memberRows, e1);
 
-      console.log("startups raw:", data, error);
+      const dealRoomIds = (memberRows ?? []).map((m: any) => m.deal_room_id).filter(Boolean);
+      if (dealRoomIds.length === 0) return [];
 
-      const seen = new Set();
-      const results: any[] = [];
-      (data ?? []).forEach((m: any) => {
-        const s = m.deal_rooms?.startups;
-        const roomId = m.deal_rooms?.id;
-        if (s && !seen.has(s.id)) {
-          seen.add(s.id);
-          results.push({ ...s, dealRoomId: roomId });
-        }
-      });
-      return results.map((s: any) => ({ id: s.dealRoomId, name: s.company_name ?? s.dealRoomId })).filter((r: any) => !!r.id);
+      // Step 2: get startup name for each deal room
+      const { data: roomRows, error: e2 } = await supabase
+        .from("deal_rooms")
+        .select("id, startup_id, startups(company_name)")
+        .in("id", dealRoomIds);
+      console.log("analysis room rows:", roomRows, e2);
+
+      return (roomRows ?? [])
+        .map((r: any) => ({
+          id: r.id,
+          name: (r.startups as any)?.company_name ?? r.id,
+        }))
+        .filter((r) => !!r.id);
     },
   });
 
