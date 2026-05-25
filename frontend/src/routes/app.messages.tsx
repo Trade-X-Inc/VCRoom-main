@@ -74,7 +74,6 @@ function MessagesPage() {
       sender_id: user.id,
       body: draft.trim(),
       workspace_channel: workspaceChannel,
-      private: false,
     });
     setSending(false);
 
