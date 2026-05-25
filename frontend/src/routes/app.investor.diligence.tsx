@@ -105,22 +105,38 @@ function DiligencePage() {
     queryKey: ["dd-startups", userId],
     enabled: !!userId,
     queryFn: async () => {
-      const { data: members } = await supabase
+      const { data, error } = await supabase
         .from("deal_room_members")
-        .select("deal_room_id, deal_rooms(id, startup_id, startups(id, company_name, stage, sector, description, team_size, website, founder_id, users:founder_id(full_name, avatar_url)))")
+        .select(`
+          deal_room_id,
+          deal_rooms (
+            id,
+            startup_id,
+            startups (
+              id,
+              company_name,
+              stage,
+              sector,
+              description,
+              team_size,
+              website,
+              founder_id
+            )
+          )
+        `)
         .eq("user_id", userId);
+
+      console.log("DD startups raw:", data, error);
 
       const seen = new Set<string>();
       const results: any[] = [];
-
-      (members ?? []).forEach((m: any) => {
+      (data ?? []).forEach((m: any) => {
         const s = (m.deal_rooms as any)?.startups;
         if (s && !seen.has(s.id)) {
           seen.add(s.id);
           results.push({ ...s, dealRoomId: m.deal_room_id });
         }
       });
-
       return results;
     },
   });

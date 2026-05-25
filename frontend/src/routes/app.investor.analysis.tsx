@@ -31,13 +31,21 @@ function AnalysisPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("deal_room_members")
-        .select("deal_room_id, deal_rooms(id, startups(company_name))")
+        .select(`
+          deal_room_id,
+          deal_rooms (
+            id,
+            startups (
+              company_name
+            )
+          )
+        `)
         .eq("user_id", user!.id);
       if (error) throw error;
       return (data ?? [])
         .map((r: any) => ({
           id: r.deal_room_id,
-          name: r.deal_rooms?.startups?.company_name ?? r.deal_room_id,
+          name: (r.deal_rooms as any)?.startups?.company_name ?? r.deal_room_id,
         }))
         .filter((r) => !!r.id);
     },
