@@ -70,21 +70,22 @@ function MessagesPage() {
     console.log("workspaceChannel:", workspaceChannel);
     if (!draft.trim() || !workspaceChannel || !user?.id) return;
     setSending(true);
-    try {
-      const { error } = await supabase.from("messages").insert({
-        sender_id: user.id,
-        body: draft.trim(),
-        workspace_channel: workspaceChannel,
-        private: false,
-      });
-      if (error) throw error;
-      setDraft("");
-      qc.invalidateQueries({ queryKey: ["team-messages", workspaceChannel] });
-    } catch {
-      toast.error("Failed to send");
-    } finally {
-      setSending(false);
+    const { error } = await supabase.from("messages").insert({
+      sender_id: user.id,
+      body: draft.trim(),
+      workspace_channel: workspaceChannel,
+      private: false,
+    });
+    setSending(false);
+
+    if (error) {
+      console.error("Send error:", error);
+      toast.error("Failed to send: " + error.message);
+      return;
     }
+
+    setDraft("");
+    qc.invalidateQueries({ queryKey: ["team-messages", workspaceChannel] });
   };
 
   const handleKey = (e: React.KeyboardEvent) => {
