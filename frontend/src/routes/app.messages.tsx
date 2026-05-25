@@ -39,7 +39,7 @@ function MessagesPage() {
 
   // Messages for this workspace channel
   const { data: messages = [] } = useQuery({
-    queryKey: ["team-messages", workspaceChannel],
+    queryKey: ["workspace-messages", workspaceChannel],
     enabled: !!workspaceChannel,
     refetchInterval: 5000,
     queryFn: async () => {
@@ -67,9 +67,9 @@ function MessagesPage() {
   }, [messages]);
 
   const sendMessage = async () => {
-    console.log("workspaceChannel:", workspaceChannel);
     if (!draft.trim() || !workspaceChannel || !user?.id) return;
     setSending(true);
+    console.log("workspaceChannel:", workspaceChannel);
     const { error } = await supabase.from("messages").insert({
       sender_id: user.id,
       body: draft.trim(),
@@ -84,7 +84,7 @@ function MessagesPage() {
     }
 
     setDraft("");
-    qc.invalidateQueries({ queryKey: ["team-messages", workspaceChannel] });
+    qc.invalidateQueries({ queryKey: ["workspace-messages", workspaceChannel] });
   };
 
   const handleKey = (e: React.KeyboardEvent) => {
