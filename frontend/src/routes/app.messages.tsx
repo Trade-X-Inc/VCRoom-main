@@ -67,13 +67,14 @@ function MessagesPage() {
   }, [messages]);
 
   const sendMessage = async () => {
+    console.log("workspaceChannel:", workspaceChannel);
     if (!draft.trim() || !workspaceChannel || !user?.id) return;
     setSending(true);
     try {
       const { error } = await supabase.from("messages").insert({
-        workspace_channel: workspaceChannel,
         sender_id: user.id,
         body: draft.trim(),
+        workspace_channel: workspaceChannel,
         private: false,
       });
       if (error) throw error;
