@@ -51,15 +51,20 @@ function AuthCallback() {
 
         const role =
           existing?.role ||
-          pending ||
           session.user.user_metadata?.role ||
+          pending ||
           'founder'
+
+        // Never downgrade an existing investor to founder
+        const finalRole = existing?.role === 'investor' && role === 'founder'
+          ? 'investor'
+          : role
 
         setMsg(`Welcome! Loading your dashboard...`)
 
         await supabase.from('users').upsert({
           id: userId,
-          role,
+          role: finalRole,
           full_name:
             session.user.user_metadata?.full_name ||
             session.user.user_metadata?.name ||
@@ -68,7 +73,7 @@ function AuthCallback() {
         }, { onConflict: 'id' })
 
         window.location.href =
-          role === 'investor'
+          finalRole === 'investor'
             ? '/app/investor/'
             : '/app'
       } catch (err) {
