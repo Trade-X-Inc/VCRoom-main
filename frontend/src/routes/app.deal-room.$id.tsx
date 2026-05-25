@@ -97,7 +97,7 @@ function DealRoom() {
     queryFn: async () => {
       const { data } = await supabase
         .from("deal_room_members")
-        .select("*, users(full_name, avatar_url)")
+        .select("id, user_id, role, deal_room_id, users(full_name, avatar_url)")
         .eq("deal_room_id", dealRoomId);
       return data ?? [];
     },

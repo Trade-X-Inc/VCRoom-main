@@ -100,18 +100,11 @@ function DiligencePage() {
     },
   });
 
-  // Fetch all startups from VC leads + deal room members
+  // Fetch all startups the investor is in via deal room members
   const { data: startups = [], isLoading: startupsLoading } = useQuery({
     queryKey: ["dd-startups", userId],
     enabled: !!userId,
     queryFn: async () => {
-      // From VC leads
-      const { data: leads } = await supabase
-        .from("vc_leads")
-        .select("startup_id, startups(id, company_name, stage, sector, description, team_size, website, founder_id, users:founder_id(full_name, avatar_url))")
-        .eq("investor_id", userId);
-
-      // From deal room members
       const { data: members } = await supabase
         .from("deal_room_members")
         .select("deal_room_id, deal_rooms(id, startup_id, startups(id, company_name, stage, sector, description, team_size, website, founder_id, users:founder_id(full_name, avatar_url)))")
@@ -120,22 +113,11 @@ function DiligencePage() {
       const seen = new Set<string>();
       const results: any[] = [];
 
-      (leads ?? []).forEach((l: any) => {
-        if (l.startups && !seen.has(l.startups.id)) {
-          seen.add(l.startups.id);
-          results.push({ ...l.startups, dealRoomId: null });
-        }
-      });
-
       (members ?? []).forEach((m: any) => {
-        const s = m.deal_rooms?.startups;
+        const s = (m.deal_rooms as any)?.startups;
         if (s && !seen.has(s.id)) {
           seen.add(s.id);
           results.push({ ...s, dealRoomId: m.deal_room_id });
-        } else if (s && seen.has(s.id)) {
-          // Update dealRoomId for existing
-          const existing = results.find((r) => r.id === s.id);
-          if (existing) existing.dealRoomId = m.deal_room_id;
         }
       });
 
