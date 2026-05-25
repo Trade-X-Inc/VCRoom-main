@@ -91,6 +91,7 @@ function DealRoom() {
 
   const { data: memberList = [] } = useQuery({
     queryKey: ["deal-room-members", dealRoomId],
+    enabled: !!user?.id,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     queryFn: async () => {
@@ -1556,7 +1557,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: 
             onClick={() => setActiveVaultTab("documents")}
             className={cn(
               "px-4 py-1.5 rounded-lg text-sm font-medium transition-colors",
-              activeVaultTab === "documents" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+              activeVaultTab === "documents" ? "bg-brand text-white shadow-sm" : "text-muted-foreground hover:text-foreground"
             )}
           >
             📁 Documents
@@ -1566,7 +1567,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: 
             onClick={() => setActiveVaultTab("links")}
             className={cn(
               "px-4 py-1.5 rounded-lg text-sm font-medium transition-colors",
-              activeVaultTab === "links" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+              activeVaultTab === "links" ? "bg-brand text-white shadow-sm" : "text-muted-foreground hover:text-foreground"
             )}
           >
             🔗 Links

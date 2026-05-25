@@ -27,7 +27,7 @@ function MessagesPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("deal_room_members")
-        .select("deal_room_id, deal_rooms(id, name, startups(company_name))")
+        .select("deal_room_id, deal_rooms(id, name, startup_id, startups(company_name))")
         .eq("user_id", user!.id)
         .order("deal_room_id");
       return (data ?? []).map((r: any) => ({
