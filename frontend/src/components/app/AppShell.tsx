@@ -2,7 +2,7 @@ import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-route
 import { Logo } from "@/components/brand/Logo";
 import {
   LayoutGrid, Users, Building2, FileText, Briefcase,
-  Calendar, Sparkles, Search, Settings, ChevronsLeft, Plus, Inbox, Gavel,
+  MessageSquare, Calendar, Sparkles, Search, Settings, ChevronsLeft, Plus, Inbox, Gavel,
   PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, Kanban, BarChart3, UserCircle2,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -29,6 +29,7 @@ const founderNav: NavItem[] = [
   { to: "/app/meetings", labelKey: "app.meetings", icon: Calendar },
   { to: "/app/reports", labelKey: "reports.title", icon: BarChart3 },
   { to: "/app/advisor", labelKey: "app.advisor", icon: Sparkles },
+  { to: "/app/messages", labelKey: "Team Chat", icon: MessageSquare },
 ];
 
 const investorNav: NavItem[] = [

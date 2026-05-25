@@ -416,13 +416,14 @@ function DealRoomOverview({
     },
   });
 
+  const investorUserIds = (memberList as any[])
+    .filter((m) => m.role === "investor" || m.role === "viewer")
+    .map((m) => m.user_id);
+
   const { data: investorProfilesInRoom = [] } = useQuery({
-    queryKey: ["room-investor-profiles", dealRoomId],
-    enabled: !!user?.id,
+    queryKey: ["room-investor-profiles", dealRoomId, investorUserIds.join(",")],
+    enabled: !!user?.id && memberList.length > 0,
     queryFn: async () => {
-      const investorUserIds = (memberList as any[])
-        .filter((m) => m.role === "investor" || m.role === "viewer")
-        .map((m) => m.user_id);
       if (investorUserIds.length === 0) return [];
       const { data } = await supabase
         .from("investor_profiles")
@@ -2154,7 +2155,7 @@ function InviteModal({
 function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | undefined }) {
   const queryClient = useQueryClient();
   const [body, setBody] = useState("");
-  const [isPrivate, setIsPrivate] = useState(false);
+  const [noteVisibility, setNoteVisibility] = useState<"public" | "team" | "private">("public");
   const [saving, setSaving] = useState(false);
 
   const { data: notes = [], isLoading, isError } = useQuery({
@@ -2182,13 +2183,13 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
     try {
       const { error } = await supabase
         .from("notes")
-        .insert({ deal_room_id: dealRoomId, author_id: userId, body: body.trim(), private: isPrivate });
+        .insert({ deal_room_id: dealRoomId, author_id: userId, body: body.trim(), private: noteVisibility === "private", visibility: noteVisibility });
       if (error) throw error;
       await logActivity(dealRoomId, userId, "Added a note");
       queryClient.invalidateQueries({ queryKey: ["notes", dealRoomId] });
       queryClient.invalidateQueries({ queryKey: ["activities-overview", dealRoomId] });
       setBody("");
-      setIsPrivate(false);
+      setNoteVisibility("public");
       toast.success("Note saved");
     } catch (err) {
       console.error("Failed to save note:", err);
@@ -2212,8 +2213,25 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
         />
         <div className="flex items-center justify-between">
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} className="h-4 w-4 accent-[var(--brand)]" />
-            <span className="text-xs text-muted-foreground">Private (only visible to me)</span>
+            <div className="flex items-center gap-1 rounded-lg bg-muted/60 p-0.5">
+              {(["public", "team", "private"] as const).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setNoteVisibility(v)}
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                    noteVisibility === v
+                      ? "bg-card shadow-sm text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {v === "public" ? "🌐 Public" : v === "team" ? "👥 Team" : "🔒 Private"}
+                </button>
+              ))}
+            </div>
+            <span className="text-[10px] text-muted-foreground">
+              {noteVisibility === "public" ? "Visible to all deal room members" : noteVisibility === "team" ? "Visible to your role only (founder or investor)" : "Only visible to you"}
+            </span>
           </label>
           <button type="submit" disabled={!body.trim() || saving} className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow disabled:opacity-50">
             {saving && <Loader2 className="h-3 w-3 animate-spin" />}
@@ -2231,7 +2249,12 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
             <div className="flex items-center gap-2 text-xs">
               <span className="font-medium">{n.author_id === userId ? "You" : (n.users?.full_name ?? "Unknown")}</span>
               <span className="text-muted-foreground">{formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}</span>
-              {n.private && <span className="ml-auto text-[10px] uppercase tracking-wider text-warning">Private</span>}
+              {(n.private || n.visibility === "private") && (
+                      <span className="ml-auto text-[10px] uppercase tracking-wider text-warning bg-warning/10 px-1.5 py-0.5 rounded-full">🔒 Private</span>
+                    )}
+                    {n.visibility === "team" && !n.private && (
+                      <span className="ml-auto text-[10px] uppercase tracking-wider text-brand bg-brand/10 px-1.5 py-0.5 rounded-full">👥 Team</span>
+                    )}
             </div>
             <div className="mt-2 text-sm">{n.body}</div>
           </div>
