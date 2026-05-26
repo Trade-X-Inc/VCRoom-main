@@ -62,8 +62,9 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", type: "image/svg+xml", href: "/logo-dark.svg" },
-      { rel: "apple-touch-icon", href: "/logo-dark.svg" },
+      { rel: "icon", type: "image/svg+xml", href: "/logo-dark.svg?v=2" },
+      { rel: "shortcut icon", href: "/logo-dark.svg?v=2" },
+      { rel: "apple-touch-icon", href: "/logo-dark.svg?v=2" },
     ],
   }),
   shellComponent: RootShell,
