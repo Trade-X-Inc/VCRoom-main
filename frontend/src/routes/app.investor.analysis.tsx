@@ -24,56 +24,57 @@ function AnalysisPage() {
   const [memoSaved, setMemoSaved] = useState(false);
   const [memoGeneratedAt, setMemoGeneratedAt] = useState<Date | null>(null);
 
-  // Fetch deal rooms user belongs to
+  // Fetch all startups directly
   const { data: rooms = [], isLoading: roomsLoading } = useQuery({
     queryKey: ["investor-analysis-rooms", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      // Step 1: get deal room IDs this investor belongs to
-      const { data: memberRows, error: e1 } = await supabase
-        .from("deal_room_members")
-        .select("deal_room_id")
-        .eq("user_id", user!.id);
-      console.log("analysis member rows:", memberRows, e1);
-
-      const dealRoomIds = (memberRows ?? []).map((m: any) => m.deal_room_id).filter(Boolean);
-      if (dealRoomIds.length === 0) return [];
-
-      // Step 2: get startup name for each deal room
-      const { data: roomRows, error: e2 } = await supabase
-        .from("deal_rooms")
-        .select("id, startup_id, startups(company_name)")
-        .in("id", dealRoomIds);
-      console.log("analysis room rows:", roomRows, e2);
-
-      return (roomRows ?? [])
-        .map((r: any) => ({
-          id: r.id,
-          name: (r.startups as any)?.company_name ?? r.id,
-        }))
-        .filter((r) => !!r.id);
+      const { data, error } = await supabase
+        .from("startups")
+        .select("id, company_name, stage, sector, description, team_size, website, founder_id");
+      console.log("all startups:", data, error);
+      return (data ?? []).map((s: any) => ({ id: s.id, name: s.company_name ?? s.id }));
     },
   });
+
+  // Separate query for deal room membership (needed to resolve deal room ID for AI calls)
+  const { data: memberRooms = [] } = useQuery({
+    queryKey: ["investor-rooms", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("deal_room_members")
+        .select("deal_room_id, deal_rooms(startup_id)")
+        .eq("user_id", user!.id);
+      return data ?? [];
+    },
+  });
+
+  const getDealRoomId = (startupId: string) => {
+    const match = (memberRooms as any[]).find((m: any) => (m.deal_rooms as any)?.startup_id === startupId);
+    return match?.deal_room_id ?? null;
+  };
+  const activeDealRoomId = getDealRoomId(selectedRoomId);
 
   // Generate deal brief when a room is selected
   const { data: brief, isLoading: briefLoading, isError: briefError } = useQuery({
     queryKey: ["ai-brief-analysis", selectedRoomId, user?.id],
-    enabled: !!selectedRoomId && !!user?.id,
+    enabled: !!selectedRoomId && !!activeDealRoomId && !!user?.id,
     staleTime: 30 * 60 * 1000,
-    queryFn: async () => generateDealBrief({ data: { dealRoomId: selectedRoomId, userId: user!.id } }),
+    queryFn: async () => generateDealBrief({ data: { dealRoomId: activeDealRoomId!, userId: user!.id } }),
   });
 
   const selectedName = rooms.find((r) => r.id === selectedRoomId)?.name ?? "Company";
 
   const handleGenerateMemo = async () => {
-    if (!selectedRoomId || !user?.id) return;
+    if (!selectedRoomId || !activeDealRoomId || !user?.id) return;
     setGeneratingMemo(true);
     setMemoError("");
     try {
       const session = await supabase.auth.getSession();
       const result = await generateInvestorMemo({
         data: {
-          dealRoomId: selectedRoomId,
+          dealRoomId: activeDealRoomId,
           userId: user.id,
           supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
           supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
@@ -98,13 +99,13 @@ function AnalysisPage() {
   };
 
   const handleSaveMemo = async () => {
-    if (!memoText || !selectedRoomId) return;
+    if (!memoText || !activeDealRoomId) return;
     setSavingMemo(true);
     try {
       const { error } = await supabase
         .from("deal_rooms")
         .update({ investor_memo: memoText, memo_generated_at: new Date().toISOString() })
-        .eq("id", selectedRoomId);
+        .eq("id", activeDealRoomId);
       if (error) throw error;
       setMemoSaved(true);
       setTimeout(() => setMemoSaved(false), 3000);

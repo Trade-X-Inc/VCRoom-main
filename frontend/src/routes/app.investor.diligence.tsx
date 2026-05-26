@@ -100,49 +100,36 @@ function DiligencePage() {
     },
   });
 
-  // Fetch all startups the investor is in via deal room members
+  // Fetch all startups directly
   const { data: startups = [], isLoading: startupsLoading } = useQuery({
     queryKey: ["dd-startups", userId],
     enabled: !!userId,
     queryFn: async () => {
-      // Step 1: get deal room IDs this investor belongs to
-      const { data: memberRows, error: e1 } = await supabase
-        .from("deal_room_members")
-        .select("deal_room_id")
-        .eq("user_id", userId);
-      console.log("member rows:", memberRows, e1);
-
-      const dealRoomIds = (memberRows ?? []).map((m: any) => m.deal_room_id).filter(Boolean);
-      if (dealRoomIds.length === 0) return [];
-
-      // Step 2: get startup_id for each deal room
-      const { data: roomRows, error: e2 } = await supabase
-        .from("deal_rooms")
-        .select("id, startup_id")
-        .in("id", dealRoomIds);
-      console.log("room rows:", roomRows, e2);
-
-      const startupIds = (roomRows ?? []).map((r: any) => r.startup_id).filter(Boolean);
-      if (startupIds.length === 0) return [];
-
-      // Step 3: get startup details
-      const { data: startupRows, error: e3 } = await supabase
+      const { data, error } = await supabase
         .from("startups")
-        .select("id, company_name, stage, sector, description, team_size, website, founder_id")
-        .in("id", startupIds);
-      console.log("startup rows:", startupRows, e3);
-
-      const startupToDealRoom: Record<string, string> = {};
-      (roomRows ?? []).forEach((r: any) => {
-        if (r.startup_id) startupToDealRoom[r.startup_id] = r.id;
-      });
-
-      return (startupRows ?? []).map((s: any) => ({
-        ...s,
-        dealRoomId: startupToDealRoom[s.id] ?? null,
-      }));
+        .select("id, company_name, stage, sector, description, team_size, website, founder_id");
+      console.log("all startups:", data, error);
+      return data ?? [];
     },
   });
+
+  // Separate query for deal room membership (for "Open Deal Room" button)
+  const { data: memberRooms = [] } = useQuery({
+    queryKey: ["investor-rooms", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("deal_room_members")
+        .select("deal_room_id, deal_rooms(startup_id)")
+        .eq("user_id", userId);
+      return data ?? [];
+    },
+  });
+
+  const getDealRoomId = (startupId: string) => {
+    const match = (memberRooms as any[]).find((m: any) => (m.deal_rooms as any)?.startup_id === startupId);
+    return match?.deal_room_id ?? null;
+  };
 
   // DD checklist state for selected startup (stored in Supabase)
   const { data: ddState = {} } = useQuery({
@@ -306,7 +293,7 @@ function DiligencePage() {
                     </span>
                   )}
                 </div>
-                {s.dealRoomId && (
+                {getDealRoomId(s.id) && (
                   <div className="mt-1 ml-10 flex items-center gap-1">
                     <Briefcase className="h-2.5 w-2.5 text-brand" />
                     <span className="text-[9px] text-brand">In deal room</span>
@@ -356,10 +343,10 @@ function DiligencePage() {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                {selectedStartup.dealRoomId ? (
+                {getDealRoomId(selectedStartup.id) ? (
                   <Link
                     to="/app/deal-room/$id"
-                    params={{ id: selectedStartup.dealRoomId }}
+                    params={{ id: getDealRoomId(selectedStartup.id)! }}
                     className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow"
                   >
                     <Briefcase className="h-4 w-4" /> Open Deal Room <ExternalLink className="h-3.5 w-3.5" />
@@ -575,8 +562,8 @@ function DiligencePage() {
               <div className="text-xs text-muted-foreground">
                 <span className="font-semibold text-foreground">Document analysis is in the Deal Room.</span>{" "}
                 This checklist covers profile review and thesis match. For deep document analysis — pitch decks, financials, legal docs — open the Deal Room Workstation.
-                {selectedStartup.dealRoomId
-                  ? <Link to="/app/deal-room/$id" params={{ id: selectedStartup.dealRoomId }} className="ml-1 text-brand hover:underline">Go to workstation →</Link>
+                {getDealRoomId(selectedStartup.id)
+                  ? <Link to="/app/deal-room/$id" params={{ id: getDealRoomId(selectedStartup.id)! }} className="ml-1 text-brand hover:underline">Go to workstation →</Link>
                   : <Link to="/app/deal-rooms" className="ml-1 text-brand hover:underline">Create a deal room →</Link>
                 }
               </div>
