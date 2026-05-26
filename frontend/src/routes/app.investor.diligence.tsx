@@ -100,15 +100,16 @@ function DiligencePage() {
     },
   });
 
-  // Fetch all startups directly
+  // Fetch investor's watchlist companies
   const { data: startups = [], isLoading: startupsLoading } = useQuery({
-    queryKey: ["dd-startups", userId],
+    queryKey: ["investor-watchlist-dd", userId],
     enabled: !!userId,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("startups")
-        .select("id, company_name, stage, sector, description, team_size, website, founder_id");
-      console.log("all startups:", data, error);
+      const { data } = await supabase
+        .from("investor_watchlist")
+        .select("*")
+        .eq("investor_id", userId)
+        .order("created_at", { ascending: false });
       return data ?? [];
     },
   });

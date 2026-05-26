@@ -24,15 +24,16 @@ function AnalysisPage() {
   const [memoSaved, setMemoSaved] = useState(false);
   const [memoGeneratedAt, setMemoGeneratedAt] = useState<Date | null>(null);
 
-  // Fetch all startups directly
+  // Fetch investor's watchlist companies
   const { data: rooms = [], isLoading: roomsLoading } = useQuery({
-    queryKey: ["investor-analysis-rooms", user?.id],
+    queryKey: ["investor-watchlist-analysis", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("startups")
-        .select("id, company_name, stage, sector, description, team_size, website, founder_id");
-      console.log("all startups:", data, error);
+      const { data } = await supabase
+        .from("investor_watchlist")
+        .select("*")
+        .eq("investor_id", user!.id)
+        .order("created_at", { ascending: false });
       return (data ?? []).map((s: any) => ({ id: s.id, name: s.company_name ?? s.id }));
     },
   });

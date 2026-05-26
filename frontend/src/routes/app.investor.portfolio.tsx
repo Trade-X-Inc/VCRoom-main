@@ -70,6 +70,20 @@ function PortfolioPage() {
     },
   });
 
+  // Watchlist companies with status = 'Invested'
+  const { data: watchlistInvested = [] } = useQuery({
+    queryKey: ["portfolio-watchlist-invested", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("investor_watchlist")
+        .select("*")
+        .eq("investor_id", user!.id)
+        .eq("status", "Invested");
+      return data ?? [];
+    },
+  });
+
   const statusLabel: Record<string, string> = {
     accept: "Invested",
     invest: "Invested",
@@ -85,9 +99,9 @@ function PortfolioPage() {
 
       <div className="mt-6 rounded-2xl border border-border/60 bg-card p-6 grid grid-cols-2 md:grid-cols-4 gap-6">
         {[
-          ["Portfolio companies", `${invested.length}`],
+          ["Portfolio companies", `${invested.length + watchlistInvested.length}`],
           ["Term sheets signed", `${invested.filter((i) => i.status === "term_sheet").length}`],
-          ["Investments closed", `${invested.filter((i) => ["accept", "invest"].includes(i.status)).length}`],
+          ["Investments closed", `${invested.filter((i) => ["accept", "invest"].includes(i.status)).length + watchlistInvested.length}`],
           ["Avg ticket", "—"],
         ].map(([l, v]) => (
           <div key={l}>
@@ -106,14 +120,14 @@ function PortfolioPage() {
           <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground">
             Could not load data. Please refresh.
           </div>
-        ) : invested.length === 0 ? (
+        ) : invested.length === 0 && watchlistInvested.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center">
             <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
               <PieChart className="h-6 w-6" />
             </div>
             <h3 className="mt-4 text-lg font-semibold">No portfolio companies yet</h3>
             <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
-              Companies appear here after you mark a deal as Invested in the Decision Board.
+              Companies appear here after you mark a deal as Invested in the Decision Board or watchlist.
             </p>
           </div>
         ) : (
@@ -154,6 +168,38 @@ function PortfolioPage() {
                   </div>
                 )}
               </Link>
+            ))}
+            {watchlistInvested.map((c: any) => (
+              <div
+                key={c.id}
+                className="rounded-2xl border border-border/60 bg-card p-5"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold shrink-0">
+                    {(c.company_name ?? "?")[0]}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold truncate">{c.company_name}</div>
+                    <div className="text-xs text-muted-foreground">{c.sector || "—"} · {c.stage || "—"}</div>
+                  </div>
+                  <span className="text-[10px] font-medium rounded-full bg-success/10 text-success px-2 py-0.5 shrink-0">
+                    Invested
+                  </span>
+                </div>
+                {c.website && (
+                  <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <TrendingUp className="h-3.5 w-3.5 text-success" />
+                    {c.website}
+                  </div>
+                )}
+                {c.notes && <p className="mt-2 text-xs text-muted-foreground line-clamp-2">{c.notes}</p>}
+                {c.created_at && (
+                  <div className="mt-3 flex items-center gap-1 text-[10px] text-muted-foreground border-t border-border/60 pt-3">
+                    <Clock className="h-2.5 w-2.5" />
+                    Added {formatDistanceToNow(new Date(c.created_at), { addSuffix: true })}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         )}
