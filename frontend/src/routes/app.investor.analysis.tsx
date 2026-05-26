@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { secureAICall } from "@/lib/ai-secure-fn";
 import { generateInvestorMemo } from "@/lib/investor-memo-fn";
 import ReactMarkdown from "react-markdown";
 
@@ -86,54 +87,45 @@ function AnalysisPage() {
     setAnalysis(null);
 
     try {
-      const key = import.meta.env.VITE_OPENAI_API_KEY ?? "";
-      if (!key) throw new Error("OpenAI API key not configured");
+      const thesis = (investorProfile as any)?.thesis ?? "Not specified";
 
-      const thesis = (investorProfile as any)?.thesis ?? "Early-stage technology companies with strong founding teams";
-      const stages = ((investorProfile as any)?.preferred_stages as string[] | null)?.join(", ") ?? "Any stage";
-      const sectors = ((investorProfile as any)?.preferred_sectors as string[] | null)?.join(", ") ?? "Any sector";
+      const systemPrompt =
+        "You are an expert VC analyst. Respond ONLY with valid JSON — no markdown fences, no explanation, just the raw JSON object.";
 
-      const prompt = `You are a senior VC investment analyst. Analyze this startup for investment fit.
+      const userMessage = `Analyze this company for investment potential.
 
-INVESTOR THESIS:
-${thesis}
-Preferred stages: ${stages}
-Preferred sectors: ${sectors}
-
-STARTUP PROFILE:
 Company: ${selectedCompany.company_name}
 Sector: ${selectedCompany.sector || "Not specified"}
 Stage: ${selectedCompany.stage || "Not specified"}
 Description: ${selectedCompany.description || "Not provided"}
 Notes: ${selectedCompany.notes || "None"}
-Website: ${selectedCompany.website || "Not provided"}
 
-Return ONLY valid JSON with this exact shape:
-{
-  "matchScore": <integer 0-100>,
-  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
-  "risks": ["<risk 1>", "<risk 2>", "<risk 3>"],
-  "mitigants": ["<mitigant 1>", "<mitigant 2>"],
-  "nextAction": "<recommended next step for the investor>"
-}`;
+Investor thesis: ${thesis}
 
-      const res = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${key}`,
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [{ role: "user", content: prompt }],
-          response_format: { type: "json_object" },
-          temperature: 0.3,
-        }),
+Provide:
+1. Thesis Match Score (0-100)
+2. Top 3 Strengths
+3. Top 3 Risks
+4. Risk Mitigants
+5. Recommended Next Action
+
+Be concise and specific.
+
+Return this exact JSON shape:
+{"matchScore":<integer>,"strengths":["...","...","..."],"risks":["...","...","..."],"mitigants":["...","..."],"nextAction":"..."}`;
+
+      const result = await secureAICall({
+        data: { userId: user.id, systemPrompt, userMessage, maxTokens: 600 },
       });
-      if (!res.ok) throw new Error(`OpenAI error: ${res.status}`);
-      const json = await res.json();
-      const content = json.choices?.[0]?.message?.content ?? "{}";
-      setAnalysis(JSON.parse(content));
+
+      if (result.error === "usage_limit") {
+        setAnalysisError(result.reply);
+        return;
+      }
+
+      const jsonMatch = result.reply.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error("Invalid response — could not parse analysis");
+      setAnalysis(JSON.parse(jsonMatch[0]));
     } catch (err: any) {
       setAnalysisError(err?.message ?? "Analysis failed. Please try again.");
     } finally {

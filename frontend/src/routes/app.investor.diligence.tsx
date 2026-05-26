@@ -141,7 +141,7 @@ function DiligencePage() {
         .from("investor_dd_lite")
         .select("category, item_index, checked, status")
         .eq("investor_id", userId)
-        .eq("startup_id", selectedStartupId!);
+        .eq("watchlist_id", selectedStartupId!);
       const state: Record<string, any> = {};
       (data ?? []).forEach((row: any) => {
         const key = `${row.category}::${row.item_index}`;
@@ -156,11 +156,11 @@ function DiligencePage() {
     mutationFn: async ({ category, index, checked }: { category: string; index: number; checked: boolean }) => {
       await supabase.from("investor_dd_lite").upsert({
         investor_id: userId,
-        startup_id: selectedStartupId,
+        watchlist_id: selectedStartupId,
         category,
         item_index: index,
         checked,
-      }, { onConflict: "investor_id,startup_id,category,item_index" });
+      }, { onConflict: "investor_id,watchlist_id,category,item_index" });
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["lite-dd-state", userId, selectedStartupId] }),
   });
@@ -169,12 +169,12 @@ function DiligencePage() {
     mutationFn: async ({ category, status }: { category: string; status: string }) => {
       await supabase.from("investor_dd_lite").upsert({
         investor_id: userId,
-        startup_id: selectedStartupId,
+        watchlist_id: selectedStartupId,
         category,
-        item_index: -1, // sentinel for status row
+        item_index: -1,
         checked: false,
         status,
-      }, { onConflict: "investor_id,startup_id,category,item_index" });
+      }, { onConflict: "investor_id,watchlist_id,category,item_index" });
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["lite-dd-state", userId, selectedStartupId] }),
   });

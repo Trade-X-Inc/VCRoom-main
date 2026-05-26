@@ -49,7 +49,7 @@ function MessagesPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("messages")
-        .select("id, body, sender_id, created_at, users:sender_id(full_name, avatar_url)")
+        .select("id, body, sender_id, created_at, workspace_channel")
         .eq("workspace_channel", workspaceChannel!)
         .order("created_at", { ascending: true })
         .limit(200);
@@ -60,7 +60,7 @@ function MessagesPage() {
   // Derive unique team members from message senders
   const teamMembers = Object.values(
     (messages as any[]).reduce((acc: Record<string, any>, msg: any) => {
-      if (!acc[msg.sender_id]) acc[msg.sender_id] = { id: msg.sender_id, ...msg.users };
+      if (!acc[msg.sender_id]) acc[msg.sender_id] = { id: msg.sender_id };
       return acc;
     }, {})
   );
@@ -113,7 +113,7 @@ function MessagesPage() {
     if (withinWindow) {
       last.messages.push(msg);
     } else {
-      grouped.push({ messages: [msg], sender: { id: msg.sender_id, ...msg.users }, isOwn });
+      grouped.push({ messages: [msg], sender: { id: msg.sender_id }, isOwn });
     }
   });
 
