@@ -63,6 +63,7 @@ function Landing() {
         <Features />
         <Stats />
         <DualCTA />
+        <Resources />
         <SiteFooter />
       </div>
     </>
@@ -215,17 +216,11 @@ function DealRoomMockup() {
 
 // ── 2. LOGO CLOUD ─────────────────────────────────────────────────
 function Logos() {
-  const names = ["Sequoia", "a16z", "Accel", "Index Ventures", "Lightspeed", "YC", "Bessemer"];
   return (
     <section className="border-y border-border/60 bg-gradient-soft py-7">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="text-center text-[10px] uppercase tracking-widest text-muted-foreground font-medium mb-5">
-          Trusted by founders raising from top VCs
-        </div>
-        <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
-          {names.map((n) => (
-            <span key={n} className="text-sm font-semibold text-muted-foreground/60 tracking-tight">{n}</span>
-          ))}
+        <div className="text-center text-sm text-muted-foreground">
+          Trusted by founders and investors at every stage of the journey.
         </div>
       </div>
     </section>
@@ -604,6 +599,73 @@ function DualCTA() {
             Join the beta <ArrowRight className="h-3.5 w-3.5" />
           </Button>
         </Link>
+      </div>
+    </section>
+  );
+}
+
+// ── 8. RESOURCES ──────────────────────────────────────────────────
+const ACCELERATORS = [
+  { name: "Y Combinator", desc: "The world's most prestigious accelerator. $500K for 7%.", href: "https://ycombinator.com/apply", cta: "Apply →" },
+  { name: "Techstars", desc: "3-month program, $120K investment, global network.", href: "https://techstars.com/apply", cta: "Apply →" },
+  { name: "500 Global", desc: "Early-stage VC with accelerator programs worldwide.", href: "https://500.co", cta: "Apply →" },
+  { name: "Antler", desc: "Build your company from day zero with co-founders.", href: "https://antler.co", cta: "Apply →" },
+  { name: "Entrepreneur First", desc: "Pre-team, pre-idea — they back individuals.", href: "https://joinef.com", cta: "Apply →" },
+  { name: "Seedcamp", desc: "Europe's leading pre-seed and seed fund.", href: "https://seedcamp.com", cta: "Apply →" },
+];
+
+const GRANTS = [
+  { name: "SBIR / STTR", desc: "US government grants up to $2M for tech startups.", href: "https://sbir.gov", cta: "Learn more →" },
+  { name: "Google for Startups", desc: "Cloud credits, mentorship, and global community.", href: "https://startup.google.com", cta: "Learn more →" },
+  { name: "AWS Activate", desc: "Up to $100K in AWS credits for startups.", href: "https://aws.amazon.com/activate", cta: "Learn more →" },
+  { name: "Microsoft for Startups", desc: "Azure credits, GitHub, and go-to-market support.", href: "https://microsoft.com/startups", cta: "Learn more →" },
+  { name: "Innovate UK", desc: "UK government funding for innovative businesses.", href: "https://innovateuk.ukri.org", cta: "Learn more →" },
+  { name: "EU Horizon", desc: "European research and innovation funding.", href: "https://ec.europa.eu/info/funding-tenders", cta: "Learn more →" },
+];
+
+function ResourceCard({ name, desc, href, cta }: { name: string; desc: string; href: string; cta: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block rounded-xl border border-border/60 bg-card p-4 hover:shadow-card hover:border-brand/30 transition-all group"
+    >
+      <div className="font-semibold text-sm group-hover:text-brand transition-colors">{name}</div>
+      <div className="text-xs text-muted-foreground mt-1 leading-relaxed">{desc}</div>
+      <div className="text-brand text-xs mt-2 group-hover:underline">{cta}</div>
+    </a>
+  );
+}
+
+function Resources() {
+  return (
+    <section className="border-t border-border/60 bg-gradient-soft">
+      <div className="mx-auto max-w-7xl px-6 py-20 md:py-28">
+        <div className="mb-12">
+          <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-3">Startup Resources</div>
+          <h2 className="hs text-3xl md:text-4xl font-bold tracking-[-0.04em] leading-[1.08] mb-3">
+            Everything you need to fund your startup.
+          </h2>
+          <p className="text-sm text-muted-foreground max-w-xl">
+            Applications, grants, and programs trusted by thousands of founders.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-10">
+          <div>
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-foreground/70 mb-4">Top Accelerators</h3>
+            <div className="grid gap-3">
+              {ACCELERATORS.map((r) => <ResourceCard key={r.name} {...r} />)}
+            </div>
+          </div>
+          <div>
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-foreground/70 mb-4">Grants &amp; Programs</h3>
+            <div className="grid gap-3">
+              {GRANTS.map((r) => <ResourceCard key={r.name} {...r} />)}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
