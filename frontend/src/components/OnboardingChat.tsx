@@ -137,7 +137,7 @@ export function OnboardingChat({
   // Opening message
   useEffect(() => {
     addAI(
-      "Hey 👋 I'm the Hockeystick AI. Are you a founder raising capital, or an investor managing deal flow?",
+      "Hey 👋 I'm the Hockystick AI. Are you a founder raising capital, or an investor managing deal flow?",
     );
   }, []); // eslint-disable-line
 
@@ -157,7 +157,7 @@ export function OnboardingChat({
         setPhase("freetext");
         setIsLoading(true);
         askOnboardingAI({ data: { message: clean, history: [] } })
-          .then((r) => addAI(r.reply || "Sign up to explore Hockeystick!"))
+          .then((r) => addAI(r.reply || "Sign up to explore Hockystick!"))
           .catch(() => addAI("Great question! Sign up to explore the platform directly."))
           .finally(() => setIsLoading(false));
       }
@@ -181,13 +181,13 @@ export function OnboardingChat({
       setTimeout(() => addAI("What's your biggest challenge right now?"), 550);
     } else if (phase === "f-challenge") {
       setConvChallenge(reply);
-      const ctaMsg = F_CTA[reply] ?? "Hockeystick is built for exactly this challenge.";
+      const ctaMsg = F_CTA[reply] ?? "Hockystick is built for exactly this challenge.";
       setTimeout(
         () => addAI(ctaMsg, { label: "Start for free →", href: "/sign-up?role=founder" }),
         550,
       );
       setTimeout(() => {
-        addAI("Have a question? Ask me anything about Hockeystick.");
+        addAI("Have a question? Ask me anything about Hockystick.");
         setPhase("freetext");
       }, 1900);
       if (!savedRef.current) {
@@ -200,13 +200,13 @@ export function OnboardingChat({
       setTimeout(() => addAI("What would help you most?"), 550);
     } else if (phase === "i-need") {
       setConvChallenge(reply);
-      const ctaMsg = I_CTA[reply] ?? "Hockeystick is built for investors like you.";
+      const ctaMsg = I_CTA[reply] ?? "Hockystick is built for investors like you.";
       setTimeout(
         () => addAI(ctaMsg, { label: "Get started free →", href: "/sign-up?role=investor" }),
         550,
       );
       setTimeout(() => {
-        addAI("Have a question? Ask me anything about Hockeystick.");
+        addAI("Have a question? Ask me anything about Hockystick.");
         setPhase("freetext");
       }, 1900);
       if (!savedRef.current) {
@@ -232,7 +232,7 @@ export function OnboardingChat({
       const result = await askOnboardingAI({ data: { message: text, history } });
       addAI(result.reply || "Try signing up to explore the full platform!");
     } catch {
-      addAI("Sorry, I hit a snag. Sign up to explore Hockeystick directly!");
+      addAI("Sorry, I hit a snag. Sign up to explore Hockystick directly!");
     } finally {
       setIsLoading(false);
     }
@@ -253,7 +253,7 @@ export function OnboardingChat({
           <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-success border-2 border-card animate-pulse-glow" />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-semibold leading-none">Talk to Hockeystick AI</div>
+          <div className="text-sm font-semibold leading-none">Talk to Hockystick AI</div>
           <div className="text-[11px] text-muted-foreground mt-0.5">Usually replies instantly</div>
         </div>
         {variant === "floating" && (
@@ -389,7 +389,7 @@ export function OnboardingChat({
             }
           }}
           className="relative grid h-14 w-14 place-items-center rounded-full bg-gradient-brand text-brand-foreground shadow-glow hover:scale-105 active:scale-95 transition-transform"
-          aria-label="Talk to Hockeystick AI"
+          aria-label="Talk to Hockystick AI"
         >
           {isExpanded ? (
             <X className="h-6 w-6" />

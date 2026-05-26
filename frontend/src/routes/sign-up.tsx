@@ -90,7 +90,7 @@ function SignUp() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center">
               <span className="text-white text-sm font-bold">H</span>
             </div>
-            <span className="font-semibold text-foreground">Hockeystick</span>
+            <span className="font-semibold text-foreground">Hockystick</span>
           </div>
           <h1 className="text-2xl font-semibold text-foreground mb-1">Create your account</h1>
           <p className="text-muted-foreground text-sm">Choose your role to get started</p>

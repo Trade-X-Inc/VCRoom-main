@@ -21,7 +21,7 @@ function EmailComposer() {
   const [status, setStatus] = useState("");
   const sendInvite = () => {
     if (!to) { setStatus("Enter a recipient email first."); return; }
-    const subject = encodeURIComponent("Hockeystick — Invitation");
+    const subject = encodeURIComponent("Hockystick — Invitation");
     const bodyEncoded = encodeURIComponent(body);
     window.open(`mailto:${to}?subject=${subject}&body=${bodyEncoded}`, "_blank");
     setStatus("Opened in your email client.");

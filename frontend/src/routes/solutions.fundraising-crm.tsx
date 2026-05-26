@@ -5,7 +5,7 @@ import { Layers } from "lucide-react";
 export const Route = createFileRoute("/solutions/fundraising-crm")({
   head: () => ({
     meta: [
-      { title: "Fundraising CRM for Startups — Hockeystick" },
+      { title: "Fundraising CRM for Startups — Hockystick" },
       { name: "description", content: "The fundraising CRM built for startups. Pipeline, AI email, follow-ups, and analytics." },
     ],
   }),
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/solutions/fundraising-crm")({
     <SolutionPage
       eyebrow="Fundraising CRM"
       title="The CRM built for raising capital."
-      sub="Salesforce wasn't built for raising a Series A. Hockeystick is. Pipeline, outreach, and follow-ups designed for fundraising."
+      sub="Salesforce wasn't built for raising a Series A. Hockystick is. Pipeline, outreach, and follow-ups designed for fundraising."
       Icon={Layers}
       features={[
         ["Investor-aware pipeline", "Stages that match how raises actually work — from intro to term sheet."],

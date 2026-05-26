@@ -32,4 +32,4 @@ Disallow: /
 User-agent: FacebookBot
 Disallow: /
 
-Sitemap: https://hockeystick.app/sitemap.xml
+Sitemap: https://hockystick.app/sitemap.xml

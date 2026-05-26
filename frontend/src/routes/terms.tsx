@@ -5,8 +5,8 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Terms of Service — Hockeystick" },
-      { name: "description", content: "Terms of Service for Hockeystick." },
+      { title: "Terms of Service — Hockystick" },
+      { name: "description", content: "Terms of Service for Hockystick." },
     ],
   }),
   component: TermsPage,
@@ -15,11 +15,11 @@ export const Route = createFileRoute("/terms")({
 const sections = [
   {
     title: "1. Acceptance of Terms",
-    body: "By accessing or using Hockeystick, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the platform. Continued use of the platform constitutes acceptance of any updates to these terms.",
+    body: "By accessing or using Hockystick, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the platform. Continued use of the platform constitutes acceptance of any updates to these terms.",
   },
   {
     title: "2. Use of Service",
-    body: "You may use Hockeystick solely for lawful purposes related to fundraising, investor relations, and deal management. You must not misuse the platform, attempt to gain unauthorised access, or use it to transmit harmful content. We reserve the right to suspend accounts that violate these conditions.",
+    body: "You may use Hockystick solely for lawful purposes related to fundraising, investor relations, and deal management. You must not misuse the platform, attempt to gain unauthorised access, or use it to transmit harmful content. We reserve the right to suspend accounts that violate these conditions.",
   },
   {
     title: "3. User Accounts",
@@ -27,7 +27,7 @@ const sections = [
   },
   {
     title: "4. Confidentiality",
-    body: "Deal room content, investor data, and uploaded documents are confidential and intended only for authorised participants. You agree not to share, reproduce, or distribute confidential materials without the consent of all relevant parties. Hockeystick applies access controls and audit logging to support this commitment.",
+    body: "Deal room content, investor data, and uploaded documents are confidential and intended only for authorised participants. You agree not to share, reproduce, or distribute confidential materials without the consent of all relevant parties. Hockystick applies access controls and audit logging to support this commitment.",
   },
   {
     title: "5. Payments",
@@ -39,7 +39,7 @@ const sections = [
   },
   {
     title: "7. Limitation of Liability",
-    body: "To the maximum extent permitted by law, Hockeystick shall not be liable for any indirect, incidental, or consequential damages arising from your use of the platform. Our total liability for any claim shall not exceed the amount you paid in the 12 months preceding the claim. The platform is provided on an 'as is' basis without warranties of any kind.",
+    body: "To the maximum extent permitted by law, Hockystick shall not be liable for any indirect, incidental, or consequential damages arising from your use of the platform. Our total liability for any claim shall not exceed the amount you paid in the 12 months preceding the claim. The platform is provided on an 'as is' basis without warranties of any kind.",
   },
   {
     title: "8. Governing Law",

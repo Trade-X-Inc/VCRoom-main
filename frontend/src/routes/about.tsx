@@ -8,8 +8,8 @@ import { Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About Us — Hockeystick" },
-      { name: "description", content: "Learn about the mission behind Hockeystick and how we're transforming venture capital interactions." },
+      { title: "About Us — Hockystick" },
+      { name: "description", content: "Learn about the mission behind Hockystick and how we're transforming venture capital interactions." },
     ],
   }),
   component: About,
@@ -26,7 +26,7 @@ function About() {
             Building the operating system for the next generation of venture.
           </h1>
           <p className="mt-8 text-lg md:text-xl text-muted-foreground leading-relaxed">
-            Hockeystick was born out of a simple observation: fundraising is the most critical part of a startup's journey, yet it remains one of the most fragmented and unstructured processes.
+            Hockystick was born out of a simple observation: fundraising is the most critical part of a startup's journey, yet it remains one of the most fragmented and unstructured processes.
           </p>
           <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
             We're building a platform that bridges the gap between founders and investors, providing a structured, secure, and AI-enhanced workspace where deals don't just get discussed—they get decided.

@@ -579,7 +579,7 @@ function DealRoomOverview({
   };
 
   const founderMembers = (memberList as any[]).filter((m) => m.role === "founder");
-  const baseOrigin = typeof window !== "undefined" ? window.location.origin : "https://hockeystick.app";
+  const baseOrigin = typeof window !== "undefined" ? window.location.origin : "https://hockystick.app";
 
   const handleCopyInviteLink = (token: string) => {
     navigator.clipboard.writeText(`${baseOrigin}/join/${token}`);
@@ -606,7 +606,7 @@ function DealRoomOverview({
           userAccessToken: session?.access_token ?? "",
           supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
           supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-          appUrl: import.meta.env.VITE_APP_URL || "https://hockeystick.app",
+          appUrl: import.meta.env.VITE_APP_URL || "https://hockystick.app",
           resendKey: (import.meta.env as any).VITE_RESEND_API_KEY || "",
           founderName: (user as any)?.fullName ?? user?.email ?? "The founder",
           startupName: startup?.company_name ?? "Unknown",
@@ -2374,7 +2374,7 @@ function InviteModal({
           userAccessToken: session?.access_token ?? "",
           supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
           supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-          appUrl: import.meta.env.VITE_APP_URL || "https://hockeystick.app",
+          appUrl: import.meta.env.VITE_APP_URL || "https://hockystick.app",
           resendKey: (import.meta.env as any).VITE_RESEND_API_KEY || "",
           dealRoomName,
           founderName,

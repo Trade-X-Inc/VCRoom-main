@@ -132,7 +132,7 @@ function JoinTeamFlow() {
               You've been invited to join the team.
             </h1>
             <p className="mt-4 text-primary-foreground/70">
-              {invite.companyName} has invited you to collaborate on their fundraising campaign on Hockeystick.
+              {invite.companyName} has invited you to collaborate on their fundraising campaign on Hockystick.
             </p>
             <div className="mt-10 space-y-3 text-sm">
               {[
@@ -161,7 +161,7 @@ function JoinTeamFlow() {
               </div>
               <h2 className="mt-5 text-2xl font-semibold tracking-tight">Welcome to the team!</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                You've joined {invite.companyName} on Hockeystick.
+                You've joined {invite.companyName} on Hockystick.
               </p>
               <button
                 onClick={() => navigate({ to: "/app" as any })}
@@ -225,7 +225,7 @@ function JoinTeamFlow() {
                 You've been invited to join {invite.companyName}
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Accept this invitation to collaborate with {invite.companyName} on Hockeystick.
+                Accept this invitation to collaborate with {invite.companyName} on Hockystick.
               </p>
               <div className="mt-6 rounded-xl border border-border/60 bg-card p-4 text-sm space-y-2">
                 <div className="flex justify-between">

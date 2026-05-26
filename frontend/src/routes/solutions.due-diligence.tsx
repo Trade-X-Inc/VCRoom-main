@@ -5,7 +5,7 @@ import { ListChecks } from "lucide-react";
 export const Route = createFileRoute("/solutions/due-diligence")({
   head: () => ({
     meta: [
-      { title: "Startup Due Diligence Platform — Hockeystick" },
+      { title: "Startup Due Diligence Platform — Hockystick" },
       { name: "description", content: "Templated due diligence across legal, financial, technical, and market." },
     ],
   }),

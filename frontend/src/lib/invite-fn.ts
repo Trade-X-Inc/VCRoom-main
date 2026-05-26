@@ -76,7 +76,7 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
       process.env.VITE_APP_URL ||
       (globalThis as any).SITE_URL ||
       process.env.SITE_URL ||
-      "https://hockeystick.app";
+      "https://hockystick.app";
     const inviteLink = `${baseUrl}/join/${invite.token}`;
 
     // Notify existing user if they already have an account
@@ -128,7 +128,7 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
     const emailHtml = `
       <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;padding:40px 20px;color:#111827">
         <h1 style="font-size:22px;font-weight:700;margin:0 0 8px">You've been invited to a deal room</h1>
-        <p style="color:#6b7280;margin:0 0 24px;font-size:15px">${senderName} has invited you to evaluate <strong>${roomName}</strong> on Hockeystick.</p>
+        <p style="color:#6b7280;margin:0 0 24px;font-size:15px">${senderName} has invited you to evaluate <strong>${roomName}</strong> on Hockystick.</p>
         ${data.message ? `<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin:0 0 24px"><p style="color:#374151;margin:0;font-size:14px;white-space:pre-line">${data.message}</p></div>` : ""}
         <a href="${inviteLink}" style="background:#6C5CE7;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;font-weight:600;font-size:15px">View deal room →</a>
         <p style="color:#9ca3af;font-size:12px;margin:32px 0 0">This link expires in 7 days. If you didn't expect this, you can ignore it.</p>

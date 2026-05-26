@@ -22,7 +22,7 @@ export function AuthLayout({ title, subtitle, children, footer }: { title: strin
               ))}
             </div>
           </div>
-          <div className="text-xs text-primary-foreground/50">© Hockeystick</div>
+          <div className="text-xs text-primary-foreground/50">© Hockystick</div>
         </div>
       </div>
 

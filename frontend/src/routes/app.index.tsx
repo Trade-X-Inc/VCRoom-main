@@ -100,7 +100,7 @@ function HowItWorksModal({ onClose }: { onClose: () => void }) {
         className="w-full max-w-lg rounded-2xl border border-border/60 bg-card shadow-elev p-8"
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold">How Hockeystick works</h2>
+          <h2 className="text-lg font-semibold">How Hockystick works</h2>
           <button
             onClick={onClose}
             className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -238,7 +238,7 @@ function FounderOnboarding({
     <div className="rounded-xl border border-border/60 bg-card shadow-card p-5 mb-6">
       <div className="flex items-center justify-between mb-3">
         <div>
-          <div className="text-sm font-semibold">Get started with Hockeystick</div>
+          <div className="text-sm font-semibold">Get started with Hockystick</div>
           <div className="text-xs text-muted-foreground">{completed} of {steps.length} steps complete</div>
         </div>
         <button
@@ -528,7 +528,7 @@ function Overview() {
       <div className="p-6 lg:p-8 max-w-4xl mx-auto">
         <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Welcome to Hockeystick 👋</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Welcome to Hockystick 👋</h1>
             <p className="mt-1.5 text-sm text-muted-foreground">
               Let's get your fundraise set up. Complete these steps to get started.
             </p>

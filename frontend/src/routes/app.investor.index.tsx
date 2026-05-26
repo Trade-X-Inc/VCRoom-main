@@ -83,7 +83,7 @@ function InvestorOnboarding({
     <div className="rounded-xl border border-border/60 bg-card shadow-card p-5">
       <div className="flex items-center justify-between mb-3">
         <div>
-          <div className="text-sm font-semibold">Get started with Hockeystick</div>
+          <div className="text-sm font-semibold">Get started with Hockystick</div>
           <div className="text-xs text-muted-foreground">{completed} of {steps.length} steps complete</div>
         </div>
         <button

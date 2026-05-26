@@ -50,7 +50,7 @@ These obligations do not apply to information that:
 
 5. MONITORING AND WATERMARKING
 
-All materials accessed via the Hockeystick deal room are electronically watermarked and access-logged. Activity within the deal room is monitored. Any breach of this Agreement may result in immediate revocation of access and legal action.
+All materials accessed via the Hockystick deal room are electronically watermarked and access-logged. Activity within the deal room is monitored. Any breach of this Agreement may result in immediate revocation of access and legal action.
 
 6. TERM
 
@@ -79,7 +79,7 @@ Representative: ${founderName}
 Accepting Party: ${investorName}
 Date of Acceptance: ${date}
 
-This agreement is executed electronically via Hockeystick. By checking the acknowledgement box and clicking "Accept & Enter Deal Room", you agree to be legally bound by the terms above.`;
+This agreement is executed electronically via Hockystick. By checking the acknowledgement box and clicking "Accept & Enter Deal Room", you agree to be legally bound by the terms above.`;
 }
 
 function NdaPage() {

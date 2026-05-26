@@ -14,19 +14,19 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Hockeystick — AI-Powered Deal Rooms for Founders & Investors" },
-      { name: "description", content: "Hockeystick is the private deal flow platform trusted by founders and VCs. Secure deal rooms, AI due diligence, investor pipeline management, and real-time collaboration." },
+      { title: "Hockystick — AI-Powered Deal Rooms for Founders & Investors" },
+      { name: "description", content: "Hockystick is the private deal flow platform trusted by founders and VCs. Secure deal rooms, AI due diligence, investor pipeline management, and real-time collaboration." },
       { name: "keywords", content: "deal room software, VC deal flow, startup fundraising platform, investor due diligence, AI investment analysis, deal flow management, startup investor platform" },
-      { property: "og:title", content: "Hockeystick — AI-Powered Deal Rooms" },
+      { property: "og:title", content: "Hockystick — AI-Powered Deal Rooms" },
       { property: "og:description", content: "The private platform for founders raising capital and VCs managing deal flow. Secure, AI-powered, built for closing deals." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://hockeystick.app" },
+      { property: "og:url", content: "https://hockystick.app" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Hockeystick — Where deals get done" },
+      { name: "twitter:title", content: "Hockystick — Where deals get done" },
       { name: "twitter:description", content: "AI-powered deal rooms for founders and investors." },
     ],
     links: [
-      { rel: "canonical", href: "https://hockeystick.app" },
+      { rel: "canonical", href: "https://hockystick.app" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" as const },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" },
@@ -94,7 +94,7 @@ function Hero() {
         </h1>
 
         <p className="hs-a hs-a3 mt-5 text-base md:text-lg text-muted-foreground max-w-[520px] mx-auto leading-relaxed">
-          HockeyStick turns fundraising chaos into a structured deal-closing machine — AI-matched deal rooms, live due diligence, and decisions without the spreadsheet graveyard.
+          Hockystick turns fundraising chaos into a structured deal-closing machine — AI-matched deal rooms, live due diligence, and decisions without the spreadsheet graveyard.
         </p>
 
         <div className="hs-a hs-a4 mt-8 flex flex-col sm:flex-row gap-3 justify-center">
@@ -149,7 +149,7 @@ function ChatSection() {
               AI-Powered Onboarding
             </div>
             <h2 className="hs text-4xl md:text-5xl font-black text-white leading-tight tracking-[-0.03em]">
-              Not sure if Hockeystick<br />is right for you?
+              Not sure if Hockystick<br />is right for you?
             </h2>
             <p className="mt-5 text-lg md:text-xl text-gray-300 max-w-lg leading-relaxed">
               Don't read the docs. Just ask. Our AI knows the product inside out — tell it who you are and what you're trying to solve. It'll tell you honestly if we're a fit.
