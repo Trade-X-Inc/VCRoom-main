@@ -72,7 +72,13 @@ function saveConv(
 
 // ── Component ──────────────────────────────────────────────────────
 
-export function OnboardingChat({ variant }: { variant: "embedded" | "floating" }) {
+export function OnboardingChat({
+  variant,
+  triggerMessage,
+}: {
+  variant: "embedded" | "floating";
+  triggerMessage?: string | null;
+}) {
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [shown, setShown] = useState<Record<number, string>>({});
   const [phase, setPhase] = useState<Phase>("role");
@@ -84,6 +90,7 @@ export function OnboardingChat({ variant }: { variant: "embedded" | "floating" }
   const [isExpanded, setIsExpanded] = useState(false);
   const [hasUnread, setHasUnread] = useState(false);
   const savedRef = useRef(false);
+  const triggeredRef = useRef(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -133,6 +140,29 @@ export function OnboardingChat({ variant }: { variant: "embedded" | "floating" }
       "Hey 👋 I'm the Hockeystick AI. Are you a founder raising capital, or an investor managing deal flow?",
     );
   }, []); // eslint-disable-line
+
+  // Auto-trigger from conversation starters (fires once after opening message appears)
+  useEffect(() => {
+    if (!triggerMessage || triggeredRef.current || msgs.length === 0) return;
+    triggeredRef.current = true;
+    const clean = triggerMessage.replace(/\s*→\s*$/, "").trim();
+    const t = clean.toLowerCase();
+    setTimeout(() => {
+      if (t.includes("founder") || t.includes("raising") || t.includes("seed")) {
+        handleQuickReply("I'm a Founder");
+      } else if (t.includes("vc") || t.includes("investor") || t.includes("50") || t.includes("deal")) {
+        handleQuickReply("I'm an Investor");
+      } else {
+        addUser(clean);
+        setPhase("freetext");
+        setIsLoading(true);
+        askOnboardingAI({ data: { message: clean, history: [] } })
+          .then((r) => addAI(r.reply || "Sign up to explore Hockeystick!"))
+          .catch(() => addAI("Great question! Sign up to explore the platform directly."))
+          .finally(() => setIsLoading(false));
+      }
+    }, 1000);
+  }, [msgs.length, triggerMessage]); // eslint-disable-line
 
   function handleQuickReply(reply: string) {
     addUser(reply);

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { OnboardingChat } from "@/components/OnboardingChat";
@@ -58,6 +59,7 @@ function Landing() {
       <div className="min-h-screen bg-background text-foreground">
         <SiteHeader />
         <Hero />
+        <ChatSection />
         <Logos />
         <Problem />
         <HowItWorks />
@@ -66,7 +68,6 @@ function Landing() {
         <DualCTA />
         <Resources />
         <SiteFooter />
-        <OnboardingChat variant="floating" />
       </div>
     </>
   );
@@ -80,51 +81,96 @@ function Hero() {
       <div className="absolute inset-0 -z-10 grid-bg opacity-30 [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,black,transparent_80%)]" />
       <div className="absolute inset-0 -z-10 noise opacity-40" />
 
-      <div className="mx-auto max-w-7xl px-6 pt-20 pb-16 md:pt-28 md:pb-24">
-        <div className="grid lg:grid-cols-[1.15fr_1fr] gap-12 lg:gap-8 items-center">
+      <div className="mx-auto max-w-4xl px-6 pt-20 pb-16 md:pt-28 md:pb-24 text-center">
+        <div className="hs-a hs-a1 inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/8 px-3 py-1 text-[11px] font-medium text-brand">
+          <span className="h-1.5 w-1.5 rounded-full bg-brand animate-pulse-glow" />
+          Early access — free during beta
+          <ArrowRight className="h-3 w-3" />
+        </div>
 
-          {/* Left — copy */}
+        <h1 className="hs hs-a hs-a2 mt-5 text-[clamp(2.6rem,6vw,4.5rem)] font-bold leading-[1.03] tracking-[-0.04em]">
+          Stop chasing.<br />
+          <span className="text-gradient-brand">Start closing.</span>
+        </h1>
+
+        <p className="hs-a hs-a3 mt-5 text-base md:text-lg text-muted-foreground max-w-[520px] mx-auto leading-relaxed">
+          HockeyStick turns fundraising chaos into a structured deal-closing machine — AI-matched deal rooms, live due diligence, and decisions without the spreadsheet graveyard.
+        </p>
+
+        <div className="hs-a hs-a4 mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+          <Link to="/sign-up" search={{ role: "founder" } as any}>
+            <Button variant="brand" size="lg" className="gap-2 shadow-glow w-full sm:w-auto">
+              Start raising <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+          <Link to="/sign-up" search={{ role: "investor" } as any}>
+            <Button variant="outline" size="lg" className="gap-2 w-full sm:w-auto">
+              Explore deals
+            </Button>
+          </Link>
+        </div>
+
+        <div className="hs-a hs-a5 mt-6 flex flex-wrap gap-x-5 gap-y-2 justify-center">
+          {["No credit card", "Free during beta", "Bank-grade encryption"].map((t) => (
+            <span key={t} className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+              <CheckCircle2 className="h-3.5 w-3.5 text-success" /> {t}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── 1b. CHAT SECTION ──────────────────────────────────────────────
+function ChatSection() {
+  const [starterId, setStarterId] = useState(0);
+  const [starterText, setStarterText] = useState<string | null>(null);
+
+  const starters = [
+    "I'm a founder raising my seed round →",
+    "I'm a VC reviewing 50+ deals →",
+    "I just want to see how it works →",
+  ];
+
+  function handleStarter(text: string) {
+    setStarterText(text);
+    setStarterId((n) => n + 1);
+  }
+
+  return (
+    <section className="bg-gradient-to-br from-gray-950 to-purple-950 py-24">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="grid lg:grid-cols-[3fr_2fr] gap-12 lg:gap-16 items-center">
+
+          {/* Left — 60% */}
           <div>
-            <div className="hs-a hs-a1 inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/8 px-3 py-1 text-[11px] font-medium text-brand">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand animate-pulse-glow" />
-              Early access — free during beta
-              <ArrowRight className="h-3 w-3" />
+            <div className="text-[10px] uppercase tracking-widest font-semibold text-purple-400 mb-5">
+              AI-Powered Onboarding
             </div>
-
-            <h1 className="hs hs-a hs-a2 mt-5 text-[clamp(2.6rem,6vw,4.5rem)] font-bold leading-[1.03] tracking-[-0.04em]">
-              Stop chasing.<br />
-              <span className="text-gradient-brand">Start closing.</span>
-            </h1>
-
-            <p className="hs-a hs-a3 mt-5 text-base md:text-lg text-muted-foreground max-w-[480px] leading-relaxed">
-              HockeyStick turns fundraising chaos into a structured deal-closing machine — AI-matched deal rooms, live due diligence, and decisions without the spreadsheet graveyard.
+            <h2 className="hs text-4xl md:text-5xl font-black text-white leading-tight tracking-[-0.03em]">
+              Not sure if Hockeystick<br />is right for you?
+            </h2>
+            <p className="mt-5 text-lg md:text-xl text-gray-300 max-w-lg leading-relaxed">
+              Don't read the docs. Just ask. Our AI knows the product inside out — tell it who you are and what you're trying to solve. It'll tell you honestly if we're a fit.
             </p>
 
-            <div className="hs-a hs-a4 mt-8 flex flex-col sm:flex-row gap-3">
-              <Link to="/sign-up" search={{ role: "founder" } as any}>
-                <Button variant="brand" size="lg" className="gap-2 shadow-glow w-full sm:w-auto">
-                  Start raising <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-              <Link to="/sign-up" search={{ role: "investor" } as any}>
-                <Button variant="outline" size="lg" className="gap-2 w-full sm:w-auto">
-                  Explore deals
-                </Button>
-              </Link>
-            </div>
-
-            <div className="hs-a hs-a5 mt-6 flex flex-wrap gap-x-5 gap-y-2">
-              {["No credit card", "Free during beta", "Bank-grade encryption"].map((t) => (
-                <span key={t} className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-success" /> {t}
-                </span>
+            <div className="mt-8 flex flex-col gap-3">
+              {starters.map((text) => (
+                <button
+                  key={text}
+                  onClick={() => handleStarter(text)}
+                  className="text-left rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-purple-400/50 px-5 py-4 text-sm font-medium text-gray-200 hover:text-white transition-all group"
+                >
+                  <span className="group-hover:text-purple-300 transition-colors">{text}</span>
+                </button>
               ))}
             </div>
           </div>
 
-          {/* Right — AI onboarding chat */}
-          <div className="hs-badge relative mx-auto w-full max-w-[480px] lg:max-w-none">
-            <OnboardingChat variant="embedded" />
+          {/* Right — 40% */}
+          <div className="shadow-2xl rounded-2xl ring-1 ring-white/10">
+            <OnboardingChat key={starterId} variant="embedded" triggerMessage={starterText} />
           </div>
         </div>
       </div>
