@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 export function Logo({
   withWordmark = true,
   size = "default",
@@ -5,19 +7,34 @@ export function Logo({
   withWordmark?: boolean;
   size?: "default" | "lg";
 }) {
-  const badge =
-    size === "lg"
-      ? "grid h-9 w-9 place-items-center rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 text-white font-bold text-base shrink-0"
-      : "grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 text-white font-bold text-sm shrink-0";
-  const wordmark =
-    size === "lg"
-      ? "font-bold text-[17px] tracking-tight text-foreground"
-      : "font-bold text-[15px] tracking-tight text-foreground";
+  const [isDark, setIsDark] = useState(
+    () => typeof document !== "undefined" && document.documentElement.classList.contains("dark")
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  const logoSrc = isDark ? "/logo-dark.svg" : "/logo-light.svg";
+  const logoSize = size === "lg" ? "h-10 w-10" : "h-8 w-8";
 
   return (
     <div className="flex items-center gap-2">
-      <div className={badge}>H</div>
-      {withWordmark && <span className={wordmark}>Hockeystick</span>}
+      <img
+        src={logoSrc}
+        alt="Hockeystick"
+        className={`${logoSize} rounded-lg object-contain`}
+        style={{ imageRendering: "crisp-edges" }}
+      />
+      {withWordmark && (
+        <span className={`font-bold tracking-tight text-foreground ${size === "lg" ? "text-[18px]" : "text-[15px]"}`}>
+          Hockeystick
+        </span>
+      )}
     </div>
   );
 }
