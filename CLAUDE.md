@@ -6,7 +6,7 @@ Stack: TanStack Start + Vite + React 19 +
 Supabase + Cloudflare Pages + TypeScript
 
 ## Live URL
-https://main.vcroom-main.pages.dev
+https://hockeystick.app
 
 ## Critical Rules — NEVER VIOLATE
 1. NEVER touch src/lib/auth.tsx
