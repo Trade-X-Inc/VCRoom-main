@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Brain, Loader2, Download, CheckCircle2, AlertTriangle, Lightbulb, FileText, Copy, Check as CheckIcon, RefreshCw, Save } from "lucide-react";
+import {
+  Brain, Loader2, Download, CheckCircle2, AlertTriangle, Lightbulb,
+  FileText, Copy, Check as CheckIcon, RefreshCw, Save, Globe, Tag,
+} from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { generateDealBrief } from "@/lib/deal-brief-fn";
 import { generateInvestorMemo } from "@/lib/investor-memo-fn";
 import ReactMarkdown from "react-markdown";
 
@@ -15,7 +17,10 @@ export const Route = createFileRoute("/app/investor/analysis")({
 
 function AnalysisPage() {
   const { user } = useAuth();
-  const [selectedRoomId, setSelectedRoomId] = useState("");
+  const [selectedId, setSelectedId] = useState("");
+  const [analysis, setAnalysis] = useState<any | null>(null);
+  const [generating, setGenerating] = useState(false);
+  const [analysisError, setAnalysisError] = useState("");
   const [memoText, setMemoText] = useState<string | null>(null);
   const [generatingMemo, setGeneratingMemo] = useState(false);
   const [memoError, setMemoError] = useState("");
@@ -24,8 +29,8 @@ function AnalysisPage() {
   const [memoSaved, setMemoSaved] = useState(false);
   const [memoGeneratedAt, setMemoGeneratedAt] = useState<Date | null>(null);
 
-  // Fetch investor's watchlist companies
-  const { data: rooms = [], isLoading: roomsLoading } = useQuery({
+  // Full watchlist items
+  const { data: watchlist = [], isLoading: watchlistLoading } = useQuery({
     queryKey: ["investor-watchlist-analysis", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
@@ -34,11 +39,25 @@ function AnalysisPage() {
         .select("*")
         .eq("investor_id", user!.id)
         .order("created_at", { ascending: false });
-      return (data ?? []).map((s: any) => ({ id: s.id, name: s.company_name ?? s.id }));
+      return data ?? [];
     },
   });
 
-  // Separate query for deal room membership (needed to resolve deal room ID for AI calls)
+  // Investor thesis for analysis context
+  const { data: investorProfile } = useQuery({
+    queryKey: ["investor-profile-analysis", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("investor_profiles")
+        .select("thesis, preferred_stages, preferred_sectors, min_ticket, max_ticket")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  // Deal room membership — needed for memo generation only
   const { data: memberRooms = [] } = useQuery({
     queryKey: ["investor-rooms", user?.id],
     enabled: !!user?.id,
@@ -51,24 +70,79 @@ function AnalysisPage() {
     },
   });
 
-  const getDealRoomId = (startupId: string) => {
-    const match = (memberRooms as any[]).find((m: any) => (m.deal_rooms as any)?.startup_id === startupId);
+  const getDealRoomId = (id: string) => {
+    const match = (memberRooms as any[]).find((m: any) => (m.deal_rooms as any)?.startup_id === id);
     return match?.deal_room_id ?? null;
   };
-  const activeDealRoomId = getDealRoomId(selectedRoomId);
+  const activeDealRoomId = getDealRoomId(selectedId);
 
-  // Generate deal brief when a room is selected
-  const { data: brief, isLoading: briefLoading, isError: briefError } = useQuery({
-    queryKey: ["ai-brief-analysis", selectedRoomId, user?.id],
-    enabled: !!selectedRoomId && !!activeDealRoomId && !!user?.id,
-    staleTime: 30 * 60 * 1000,
-    queryFn: async () => generateDealBrief({ data: { dealRoomId: activeDealRoomId!, userId: user!.id } }),
-  });
+  const selectedCompany = (watchlist as any[]).find((w: any) => w.id === selectedId);
+  const selectedName = selectedCompany?.company_name ?? "Company";
 
-  const selectedName = rooms.find((r) => r.id === selectedRoomId)?.name ?? "Company";
+  const handleGenerateAnalysis = async () => {
+    if (!selectedCompany || !user?.id) return;
+    setGenerating(true);
+    setAnalysisError("");
+    setAnalysis(null);
+
+    try {
+      const key = import.meta.env.VITE_OPENAI_API_KEY ?? "";
+      if (!key) throw new Error("OpenAI API key not configured");
+
+      const thesis = (investorProfile as any)?.thesis ?? "Early-stage technology companies with strong founding teams";
+      const stages = ((investorProfile as any)?.preferred_stages as string[] | null)?.join(", ") ?? "Any stage";
+      const sectors = ((investorProfile as any)?.preferred_sectors as string[] | null)?.join(", ") ?? "Any sector";
+
+      const prompt = `You are a senior VC investment analyst. Analyze this startup for investment fit.
+
+INVESTOR THESIS:
+${thesis}
+Preferred stages: ${stages}
+Preferred sectors: ${sectors}
+
+STARTUP PROFILE:
+Company: ${selectedCompany.company_name}
+Sector: ${selectedCompany.sector || "Not specified"}
+Stage: ${selectedCompany.stage || "Not specified"}
+Description: ${selectedCompany.description || "Not provided"}
+Notes: ${selectedCompany.notes || "None"}
+Website: ${selectedCompany.website || "Not provided"}
+
+Return ONLY valid JSON with this exact shape:
+{
+  "matchScore": <integer 0-100>,
+  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
+  "risks": ["<risk 1>", "<risk 2>", "<risk 3>"],
+  "mitigants": ["<mitigant 1>", "<mitigant 2>"],
+  "nextAction": "<recommended next step for the investor>"
+}`;
+
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${key}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [{ role: "user", content: prompt }],
+          response_format: { type: "json_object" },
+          temperature: 0.3,
+        }),
+      });
+      if (!res.ok) throw new Error(`OpenAI error: ${res.status}`);
+      const json = await res.json();
+      const content = json.choices?.[0]?.message?.content ?? "{}";
+      setAnalysis(JSON.parse(content));
+    } catch (err: any) {
+      setAnalysisError(err?.message ?? "Analysis failed. Please try again.");
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   const handleGenerateMemo = async () => {
-    if (!selectedRoomId || !activeDealRoomId || !user?.id) return;
+    if (!selectedId || !activeDealRoomId || !user?.id) return;
     setGeneratingMemo(true);
     setMemoError("");
     try {
@@ -118,29 +192,29 @@ function AnalysisPage() {
     }
   };
 
-  const downloadMemo = () => {
-    if (!brief) return;
+  const downloadAnalysis = () => {
+    if (!analysis) return;
     const text = [
-      `Investment Memo — ${selectedName}`,
-      `Thesis Match: ${brief.matchScore ?? "—"}/100`,
+      `Investment Analysis — ${selectedName}`,
+      `Thesis Match: ${analysis.matchScore ?? "—"}/100`,
       "",
       "STRENGTHS",
-      ...(brief.strengths ?? []).map((s: string) => `• ${s}`),
+      ...(analysis.strengths ?? []).map((s: string) => `• ${s}`),
       "",
       "RISKS",
-      ...(brief.risks ?? []).map((r: string) => `• ${r}`),
+      ...(analysis.risks ?? []).map((r: string) => `• ${r}`),
       "",
       "MITIGANTS",
-      ...(brief.mitigants ?? []).map((m: string) => `• ${m}`),
+      ...(analysis.mitigants ?? []).map((m: string) => `• ${m}`),
       "",
       "NEXT ACTION",
-      brief.nextAction ?? "—",
+      analysis.nextAction ?? "—",
     ].join("\n");
     const blob = new Blob([text], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `investment-memo-${selectedName.toLowerCase().replace(/\s+/g, "-")}.txt`;
+    a.download = `analysis-${selectedName.toLowerCase().replace(/\s+/g, "-")}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -149,25 +223,37 @@ function AnalysisPage() {
     <div className="p-6 lg:p-8 max-w-[1400px] mx-auto">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">AI Analysis</h1>
-        <div className="text-sm text-muted-foreground">Thesis fit, risks, and investment memo — generated from deal room data</div>
+        <div className="text-sm text-muted-foreground">
+          Thesis fit, risks, and investment memo — generated from your watchlist
+        </div>
       </div>
 
+      {/* Company selector */}
       <div className="mt-5">
-        {roomsLoading ? (
+        {watchlistLoading ? (
           <div className="h-9 w-48 rounded-[10px] bg-muted animate-pulse" />
         ) : (
           <select
-            value={selectedRoomId}
-            onChange={(e) => { setSelectedRoomId(e.target.value); setMemoText(null); setMemoError(""); }}
+            value={selectedId}
+            onChange={(e) => {
+              setSelectedId(e.target.value);
+              setMemoText(null);
+              setMemoError("");
+              setAnalysis(null);
+              setAnalysisError("");
+            }}
             className="rounded-[10px] border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
           >
             <option value="">Select a company to analyse…</option>
-            {rooms.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+            {(watchlist as any[]).map((r: any) => (
+              <option key={r.id} value={r.id}>{r.company_name}</option>
+            ))}
           </select>
         )}
       </div>
 
-      {!selectedRoomId ? (
+      {/* Empty state */}
+      {!selectedId && (
         <div className="mt-8 space-y-4">
           <div className="rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center">
             <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
@@ -175,7 +261,7 @@ function AnalysisPage() {
             </div>
             <h3 className="mt-4 text-lg font-semibold">Select a company to generate AI analysis</h3>
             <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
-              Analysis is generated from data inside the deal room — pitch deck, documents, and company profile.
+              Analysis is generated from your watchlist data — no deal room required.
             </p>
           </div>
           <div className="rounded-2xl border border-brand/20 bg-brand/5 p-6">
@@ -185,10 +271,10 @@ function AnalysisPage() {
             </div>
             <ol className="space-y-3">
               {[
-                { n: "1", title: "Join a deal room", body: "You must be a member of a deal room for a company to appear in the dropdown above." },
-                { n: "2", title: "AI reads the deal room", body: "The analysis engine scans the pitch deck, uploaded documents, company profile, and any summaries in the deal room." },
-                { n: "3", title: "Thesis match score", body: "You receive a 0–100 match score against your investment thesis, plus a narrative breakdown of strengths, risks, and opportunities." },
-                { n: "4", title: "Generate investor memo", body: "Once analysis is complete you can one-click generate a full investment memo — ready to share with your partners." },
+                { n: "1", title: "Select a watchlist company", body: "Any company on your watchlist can be analysed — no deal room required." },
+                { n: "2", title: "AI matches against your thesis", body: "The engine scores the company against your investment thesis, preferred stages, and sectors." },
+                { n: "3", title: "Get strengths, risks & next steps", body: "You receive a 0–100 match score plus strengths, risks, mitigants, and a recommended next action." },
+                { n: "4", title: "Generate full investment memo", body: "If the company has a deal room, you can also generate a full investment memo from deal room documents." },
               ].map(({ n, title, body }) => (
                 <li key={n} className="flex gap-3">
                   <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/15 text-[10px] font-bold text-brand">{n}</span>
@@ -201,187 +287,260 @@ function AnalysisPage() {
             </ol>
           </div>
         </div>
-      ) : briefLoading ? (
-        <div className="mt-8 rounded-2xl border border-border/60 bg-card p-12 flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-brand" />
-          <div className="text-sm text-muted-foreground">Generating AI analysis for {selectedName}…</div>
-        </div>
-      ) : briefError ? (
-        <div className="mt-8 rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground">
-          Could not generate analysis. Please try again.
-        </div>
-      ) : brief ? (
+      )}
+
+      {/* Company selected */}
+      {selectedId && (
         <div className="mt-6 space-y-5">
-          {/* Thesis match score */}
-          <div className="rounded-2xl border border-border/60 bg-card p-6 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-mesh opacity-[0.06]" />
-            <div className="relative">
-              <div className="text-xs uppercase tracking-wider text-brand font-medium">Investment thesis match</div>
-              <div className="mt-3 flex items-baseline gap-3">
-                <span className="text-5xl font-semibold tabular-nums">{brief.matchScore ?? "—"}</span>
-                <span className="text-sm text-muted-foreground">/ 100</span>
-              </div>
-              <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
-                <div
-                  className="h-full bg-gradient-brand transition-all"
-                  style={{ width: `${Math.min(100, brief.matchScore ?? 0)}%` }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Strengths / Risks / Mitigants */}
-          <div className="grid md:grid-cols-3 gap-4">
+          {/* Company details card + Generate button */}
+          {selectedCompany && (
             <div className="rounded-2xl border border-border/60 bg-card p-5">
-              <div className="flex items-center gap-2 text-success text-sm font-semibold mb-3">
-                <CheckCircle2 className="h-4 w-4" /> Strengths
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div className="flex items-center gap-3">
+                  <div className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-brand text-brand-foreground text-lg font-bold shrink-0">
+                    {(selectedCompany.company_name ?? "?")[0]}
+                  </div>
+                  <div>
+                    <h2 className="text-base font-semibold">{selectedCompany.company_name}</h2>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-0.5">
+                      {selectedCompany.stage && (
+                        <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                          <Tag className="h-3 w-3" /> {selectedCompany.stage}
+                        </span>
+                      )}
+                      {selectedCompany.sector && (
+                        <span className="text-xs text-muted-foreground">· {selectedCompany.sector}</span>
+                      )}
+                      {selectedCompany.website && (
+                        <a
+                          href={selectedCompany.website.startsWith("http") ? selectedCompany.website : `https://${selectedCompany.website}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-0.5 text-xs text-brand hover:underline"
+                        >
+                          <Globe className="h-3 w-3" /> {selectedCompany.website}
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={handleGenerateAnalysis}
+                  disabled={generating}
+                  className="inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-glow disabled:opacity-50 shrink-0"
+                >
+                  {generating
+                    ? <><Loader2 className="h-4 w-4 animate-spin" /> Analysing…</>
+                    : <><Brain className="h-4 w-4" /> Generate Analysis</>
+                  }
+                </button>
               </div>
-              {(brief.strengths ?? []).length === 0 ? (
-                <div className="text-sm text-muted-foreground">No data.</div>
-              ) : (
-                <ul className="space-y-2">
-                  {(brief.strengths as string[]).map((s, i) => (
-                    <li key={i} className="text-sm text-muted-foreground flex gap-2">
-                      <span className="text-success shrink-0">·</span>{s}
-                    </li>
-                  ))}
-                </ul>
+              {selectedCompany.description && (
+                <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{selectedCompany.description}</p>
               )}
-            </div>
-            <div className="rounded-2xl border border-border/60 bg-card p-5">
-              <div className="flex items-center gap-2 text-destructive text-sm font-semibold mb-3">
-                <AlertTriangle className="h-4 w-4" /> Risks
-              </div>
-              {(brief.risks ?? []).length === 0 ? (
-                <div className="text-sm text-muted-foreground">No data.</div>
-              ) : (
-                <ul className="space-y-2">
-                  {(brief.risks as string[]).map((r, i) => (
-                    <li key={i} className="text-sm text-muted-foreground flex gap-2">
-                      <span className="text-destructive shrink-0">·</span>{r}
-                    </li>
-                  ))}
-                </ul>
+              {selectedCompany.notes && (
+                <div className="mt-2 rounded-lg bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
+                  <span className="font-semibold text-foreground">Notes: </span>{selectedCompany.notes}
+                </div>
               )}
-            </div>
-            <div className="rounded-2xl border border-border/60 bg-card p-5">
-              <div className="flex items-center gap-2 text-brand text-sm font-semibold mb-3">
-                <Lightbulb className="h-4 w-4" /> Mitigants
-              </div>
-              {(brief.mitigants ?? []).length === 0 ? (
-                <div className="text-sm text-muted-foreground">No data.</div>
-              ) : (
-                <ul className="space-y-2">
-                  {(brief.mitigants as string[]).map((m, i) => (
-                    <li key={i} className="text-sm text-muted-foreground flex gap-2">
-                      <span className="text-brand shrink-0">·</span>{m}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-
-          {/* Next action + download */}
-          {brief.nextAction && (
-            <div className="rounded-2xl border border-border/60 bg-card p-5">
-              <div className="text-sm font-semibold mb-2">Recommended next action</div>
-              <p className="text-sm text-muted-foreground">{brief.nextAction}</p>
             </div>
           )}
 
-          <div className="flex justify-end">
-            <button
-              onClick={downloadMemo}
-              className="inline-flex items-center gap-1.5 rounded-[10px] border border-border/60 px-3 py-1.5 text-sm hover:bg-accent"
-            >
-              <Download className="h-3.5 w-3.5" /> Download memo
-            </button>
-          </div>
+          {/* Generating spinner */}
+          {generating && (
+            <div className="rounded-2xl border border-border/60 bg-card p-12 flex flex-col items-center gap-4">
+              <Loader2 className="h-8 w-8 animate-spin text-brand" />
+              <div className="text-sm text-muted-foreground">Analysing {selectedName} against your thesis…</div>
+            </div>
+          )}
 
-          {/* Full AI Memo section */}
-          <div className="rounded-2xl border border-border/60 bg-card overflow-hidden">
-            <div className="px-5 py-4 border-b border-border/60 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-brand" />
-                <span className="text-sm font-semibold">Full Investment Memo</span>
+          {/* Analysis error */}
+          {analysisError && !generating && (
+            <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-5 text-sm text-destructive">
+              {analysisError}
+            </div>
+          )}
+
+          {/* Analysis results */}
+          {analysis && !generating && (
+            <>
+              {/* Thesis match score */}
+              <div className="rounded-2xl border border-border/60 bg-card p-6 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-mesh opacity-[0.06]" />
+                <div className="relative">
+                  <div className="text-xs uppercase tracking-wider text-brand font-medium">Investment thesis match</div>
+                  <div className="mt-3 flex items-baseline gap-3">
+                    <span className="text-5xl font-semibold tabular-nums">{analysis.matchScore ?? "—"}</span>
+                    <span className="text-sm text-muted-foreground">/ 100</span>
+                  </div>
+                  <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-brand transition-all"
+                      style={{ width: `${Math.min(100, analysis.matchScore ?? 0)}%` }}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                {memoText && (
-                  <>
-                    <button
-                      onClick={handleCopy}
-                      className="inline-flex items-center gap-1.5 rounded-[10px] border border-border/60 px-2.5 py-1.5 text-xs hover:bg-accent"
-                    >
-                      {copied ? <CheckIcon className="h-3 w-3 text-success" /> : <Copy className="h-3 w-3" />}
-                      {copied ? "Copied" : "Copy memo"}
-                    </button>
-                    <button
-                      onClick={handleSaveMemo}
-                      disabled={savingMemo || memoSaved}
-                      className="inline-flex items-center gap-1.5 rounded-[10px] border border-border/60 px-2.5 py-1.5 text-xs hover:bg-accent disabled:opacity-50"
-                    >
-                      {memoSaved ? <CheckIcon className="h-3 w-3 text-success" /> : <Save className="h-3 w-3" />}
-                      {memoSaved ? "Saved" : savingMemo ? "Saving…" : "Save memo"}
-                    </button>
+
+              {/* Strengths / Risks / Mitigants */}
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="rounded-2xl border border-border/60 bg-card p-5">
+                  <div className="flex items-center gap-2 text-success text-sm font-semibold mb-3">
+                    <CheckCircle2 className="h-4 w-4" /> Strengths
+                  </div>
+                  {(analysis.strengths ?? []).length === 0 ? (
+                    <div className="text-sm text-muted-foreground">No data.</div>
+                  ) : (
+                    <ul className="space-y-2">
+                      {(analysis.strengths as string[]).map((s, i) => (
+                        <li key={i} className="text-sm text-muted-foreground flex gap-2">
+                          <span className="text-success shrink-0">·</span>{s}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div className="rounded-2xl border border-border/60 bg-card p-5">
+                  <div className="flex items-center gap-2 text-destructive text-sm font-semibold mb-3">
+                    <AlertTriangle className="h-4 w-4" /> Risks
+                  </div>
+                  {(analysis.risks ?? []).length === 0 ? (
+                    <div className="text-sm text-muted-foreground">No data.</div>
+                  ) : (
+                    <ul className="space-y-2">
+                      {(analysis.risks as string[]).map((r, i) => (
+                        <li key={i} className="text-sm text-muted-foreground flex gap-2">
+                          <span className="text-destructive shrink-0">·</span>{r}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div className="rounded-2xl border border-border/60 bg-card p-5">
+                  <div className="flex items-center gap-2 text-brand text-sm font-semibold mb-3">
+                    <Lightbulb className="h-4 w-4" /> Mitigants
+                  </div>
+                  {(analysis.mitigants ?? []).length === 0 ? (
+                    <div className="text-sm text-muted-foreground">No data.</div>
+                  ) : (
+                    <ul className="space-y-2">
+                      {(analysis.mitigants as string[]).map((m, i) => (
+                        <li key={i} className="text-sm text-muted-foreground flex gap-2">
+                          <span className="text-brand shrink-0">·</span>{m}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+
+              {analysis.nextAction && (
+                <div className="rounded-2xl border border-border/60 bg-card p-5">
+                  <div className="text-sm font-semibold mb-2">Recommended next action</div>
+                  <p className="text-sm text-muted-foreground">{analysis.nextAction}</p>
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={handleGenerateAnalysis}
+                  disabled={generating}
+                  className="inline-flex items-center gap-1.5 rounded-[10px] border border-border/60 px-3 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" /> Re-analyse
+                </button>
+                <button
+                  onClick={downloadAnalysis}
+                  className="inline-flex items-center gap-1.5 rounded-[10px] border border-border/60 px-3 py-1.5 text-sm hover:bg-accent"
+                >
+                  <Download className="h-3.5 w-3.5" /> Download analysis
+                </button>
+              </div>
+            </>
+          )}
+
+          {/* Full Investment Memo — only available if deal room exists */}
+          {activeDealRoomId && (
+            <div className="rounded-2xl border border-border/60 bg-card overflow-hidden">
+              <div className="px-5 py-4 border-b border-border/60 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-brand" />
+                  <span className="text-sm font-semibold">Full Investment Memo</span>
+                  <span className="text-xs text-muted-foreground">(from deal room documents)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {memoText && (
+                    <>
+                      <button
+                        onClick={handleCopy}
+                        className="inline-flex items-center gap-1.5 rounded-[10px] border border-border/60 px-2.5 py-1.5 text-xs hover:bg-accent"
+                      >
+                        {copied ? <CheckIcon className="h-3 w-3 text-success" /> : <Copy className="h-3 w-3" />}
+                        {copied ? "Copied" : "Copy memo"}
+                      </button>
+                      <button
+                        onClick={handleSaveMemo}
+                        disabled={savingMemo || memoSaved}
+                        className="inline-flex items-center gap-1.5 rounded-[10px] border border-border/60 px-2.5 py-1.5 text-xs hover:bg-accent disabled:opacity-50"
+                      >
+                        {memoSaved ? <CheckIcon className="h-3 w-3 text-success" /> : <Save className="h-3 w-3" />}
+                        {memoSaved ? "Saved" : savingMemo ? "Saving…" : "Save memo"}
+                      </button>
+                      <button
+                        onClick={handleGenerateMemo}
+                        disabled={generatingMemo}
+                        className="inline-flex items-center gap-1.5 rounded-[10px] border border-border/60 px-2.5 py-1.5 text-xs hover:bg-accent disabled:opacity-50"
+                      >
+                        <RefreshCw className={`h-3 w-3 ${generatingMemo ? "animate-spin" : ""}`} />
+                        Regenerate
+                      </button>
+                    </>
+                  )}
+                  {!memoText && (
                     <button
                       onClick={handleGenerateMemo}
                       disabled={generatingMemo}
-                      className="inline-flex items-center gap-1.5 rounded-[10px] border border-border/60 px-2.5 py-1.5 text-xs hover:bg-accent disabled:opacity-50"
+                      className="inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs font-medium shadow-glow disabled:opacity-50"
                     >
-                      <RefreshCw className={`h-3 w-3 ${generatingMemo ? "animate-spin" : ""}`} />
-                      Regenerate
+                      {generatingMemo
+                        ? <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</>
+                        : <><Brain className="h-3 w-3" /> Generate Full Memo</>
+                      }
                     </button>
-                  </>
-                )}
-                {!memoText && (
-                  <button
-                    onClick={handleGenerateMemo}
-                    disabled={generatingMemo}
-                    className="inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs font-medium shadow-glow disabled:opacity-50"
-                  >
-                    {generatingMemo ? (
-                      <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</>
-                    ) : (
-                      <><Brain className="h-3 w-3" /> Generate Full Memo</>
-                    )}
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {memoError && (
-              <div className="px-5 py-3 text-sm text-destructive">{memoError}</div>
-            )}
-
-            {generatingMemo && !memoText && (
-              <div className="p-10 flex flex-col items-center gap-3">
-                <Loader2 className="h-7 w-7 animate-spin text-brand" />
-                <div className="text-sm text-muted-foreground">Writing investment memo for {selectedName}…</div>
-              </div>
-            )}
-
-            {memoText && (
-              <div>
-                <div className="p-6 prose prose-sm prose-neutral dark:prose-invert max-w-none text-sm leading-relaxed">
-                  <ReactMarkdown>{memoText}</ReactMarkdown>
+                  )}
                 </div>
-                {memoGeneratedAt && (
-                  <div className="px-6 pb-4 text-[11px] text-muted-foreground border-t border-border/40 pt-3">
-                    Generated {memoGeneratedAt.toLocaleString()}
-                  </div>
-                )}
               </div>
-            )}
 
-            {!memoText && !generatingMemo && !memoError && (
-              <div className="p-8 text-center text-sm text-muted-foreground">
-                Click "Generate Full Memo" to produce a structured VC investment memo from deal room data.
-              </div>
-            )}
-          </div>
+              {memoError && (
+                <div className="px-5 py-3 text-sm text-destructive">{memoError}</div>
+              )}
+              {generatingMemo && !memoText && (
+                <div className="p-10 flex flex-col items-center gap-3">
+                  <Loader2 className="h-7 w-7 animate-spin text-brand" />
+                  <div className="text-sm text-muted-foreground">Writing investment memo for {selectedName}…</div>
+                </div>
+              )}
+              {memoText && (
+                <div>
+                  <div className="p-6 prose prose-sm prose-neutral dark:prose-invert max-w-none text-sm leading-relaxed">
+                    <ReactMarkdown>{memoText}</ReactMarkdown>
+                  </div>
+                  {memoGeneratedAt && (
+                    <div className="px-6 pb-4 text-[11px] text-muted-foreground border-t border-border/40 pt-3">
+                      Generated {memoGeneratedAt.toLocaleString()}
+                    </div>
+                  )}
+                </div>
+              )}
+              {!memoText && !generatingMemo && !memoError && (
+                <div className="p-8 text-center text-sm text-muted-foreground">
+                  Click "Generate Full Memo" to produce a structured VC investment memo from deal room documents.
+                </div>
+              )}
+            </div>
+          )}
         </div>
-      ) : null}
+      )}
     </div>
   );
 }

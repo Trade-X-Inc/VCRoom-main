@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
-import { Building2, ExternalLink, Clock, Plus, X, Loader2, ChevronRight, Upload, Download, List, LayoutGrid, Grid3x3 } from "lucide-react";
+import { Building2, ExternalLink, Clock, Plus, X, Loader2, ChevronRight, Upload, Download, List, LayoutGrid, Grid3x3, Pencil, Trash2 } from "lucide-react";
 import Papa from "papaparse";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -80,6 +80,11 @@ function StartupsPage() {
   const [saving, setSaving] = useState(false);
   const [selectedWatchlist, setSelectedWatchlist] = useState<any | null>(null);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [editingCompany, setEditingCompany] = useState<any | null>(null);
+  const [editForm, setEditForm] = useState<AddForm>(EMPTY_ADD);
+  const [editSaving, setEditSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Watchlist (manually-added companies)
   const { data: watchlist = [], isLoading: watchlistLoading } = useQuery({
@@ -156,6 +161,72 @@ function StartupsPage() {
       toast.error(err?.message || "Could not save company");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const openEdit = (company: any) => {
+    setEditForm({
+      company_name: company.company_name ?? "",
+      website: company.website ?? "",
+      sector: company.sector ?? "",
+      stage: company.stage ?? "Seed",
+      description: company.description ?? "",
+      source: company.source ?? "",
+      initial_score: company.initial_score ?? 5,
+      notes: company.notes ?? "",
+      status: company.status ?? "Sourcing",
+    });
+    setEditingCompany(company);
+  };
+
+  const submitEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user?.id || !editingCompany) return;
+    setEditSaving(true);
+    try {
+      const { error } = await supabase
+        .from("investor_watchlist")
+        .update({
+          company_name: editForm.company_name.trim(),
+          website: editForm.website,
+          sector: editForm.sector,
+          stage: editForm.stage,
+          description: editForm.description,
+          source: editForm.source,
+          initial_score: editForm.initial_score,
+          notes: editForm.notes,
+          status: editForm.status,
+        })
+        .eq("id", editingCompany.id)
+        .eq("investor_id", user.id);
+      if (error) throw error;
+      toast.success("Company updated");
+      setEditingCompany(null);
+      qc.invalidateQueries({ queryKey: ["investor-watchlist", user.id] });
+    } catch (err: any) {
+      toast.error(err?.message || "Could not update");
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!user?.id || !deleteTarget) return;
+    setDeleting(true);
+    try {
+      const { error } = await supabase
+        .from("investor_watchlist")
+        .delete()
+        .eq("id", deleteTarget.id)
+        .eq("investor_id", user.id);
+      if (error) throw error;
+      toast.success(`${deleteTarget.company_name} deleted`);
+      setDeleteTarget(null);
+      qc.invalidateQueries({ queryKey: ["investor-watchlist", user.id] });
+    } catch (err: any) {
+      toast.error(err?.message || "Could not delete");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -373,8 +444,22 @@ function StartupsPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-2 justify-end">
-                        {c.website && <a href={c.website} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-brand hover:underline text-xs flex items-center gap-0.5">Site <ExternalLink className="h-3 w-3" /></a>}
+                      <div className="flex items-center gap-1.5 justify-end">
+                        {c.website && <a href={c.website} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-brand hover:underline text-xs flex items-center gap-0.5 mr-1">Site <ExternalLink className="h-3 w-3" /></a>}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); openEdit(c); }}
+                          className="p-1.5 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+                          title="Edit"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setDeleteTarget(c); }}
+                          className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
                         <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                     </td>
@@ -387,22 +472,39 @@ function StartupsPage() {
           /* ── ICON / COMPACT GRID VIEW ── */
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             {filteredWatchlist.map((c: any) => (
-              <button
+              <div
                 key={c.id}
-                onClick={() => setSelectedWatchlist(c)}
                 className="rounded-xl border border-border/60 bg-card p-4 text-left hover:shadow-card hover:border-brand/30 transition-all group flex flex-col items-center text-center gap-2"
               >
-                <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-brand text-brand-foreground text-xl font-bold group-hover:scale-105 transition-transform">
-                  {(c.company_name || "S")[0]}
+                <button onClick={() => setSelectedWatchlist(c)} className="flex flex-col items-center gap-2 w-full">
+                  <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-brand text-brand-foreground text-xl font-bold group-hover:scale-105 transition-transform">
+                    {(c.company_name || "S")[0]}
+                  </div>
+                  <div className="w-full">
+                    <div className="font-semibold text-xs truncate group-hover:text-brand transition-colors">{c.company_name}</div>
+                    <div className="text-[10px] text-muted-foreground truncate">{c.sector || "General"}</div>
+                  </div>
+                  <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full border font-medium w-full text-center truncate", STATUS_STYLES[c.status] || STATUS_STYLES.Sourcing)}>
+                    {c.status}
+                  </span>
+                </button>
+                <div className="flex items-center gap-1 mt-1">
+                  <button
+                    onClick={() => openEdit(c)}
+                    className="p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground"
+                    title="Edit"
+                  >
+                    <Pencil className="h-3 w-3" />
+                  </button>
+                  <button
+                    onClick={() => setDeleteTarget(c)}
+                    className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                    title="Delete"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </button>
                 </div>
-                <div className="w-full">
-                  <div className="font-semibold text-xs truncate group-hover:text-brand transition-colors">{c.company_name}</div>
-                  <div className="text-[10px] text-muted-foreground truncate">{c.sector || "General"}</div>
-                </div>
-                <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full border font-medium w-full text-center truncate", STATUS_STYLES[c.status] || STATUS_STYLES.Sourcing)}>
-                  {c.status}
-                </span>
-              </button>
+              </div>
             ))}
           </div>
         ) : (
@@ -443,12 +545,32 @@ function StartupsPage() {
                     <div className="text-muted-foreground">Source</div>
                     <div className="font-medium truncate">{c.source || "—"}</div>
                   </div>
-                  <div className="text-right">
+                  <div className="flex items-center justify-end gap-1">
                     {c.website && (
-                      <span className="inline-flex items-center gap-1 text-brand">
+                      <a
+                        href={c.website.startsWith("http") ? c.website : `https://${c.website}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-0.5 text-brand hover:underline mr-auto"
+                      >
                         Site <ExternalLink className="h-3 w-3" />
-                      </span>
+                      </a>
                     )}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); openEdit(c); }}
+                      className="p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground"
+                      title="Edit"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setDeleteTarget(c); }}
+                      className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                      title="Delete"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
                   </div>
                 </div>
               </button>
@@ -685,6 +807,115 @@ function StartupsPage() {
             </div>
           </aside>
         </>
+      )}
+
+      {/* Edit company modal */}
+      {editingCompany && (
+        <div
+          className="fixed inset-0 z-50 bg-foreground/30 backdrop-blur-sm grid place-items-center p-4"
+          onClick={() => !editSaving && setEditingCompany(null)}
+        >
+          <div
+            className="w-full max-w-xl rounded-2xl bg-card border border-border/60 shadow-elev max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border/60 sticky top-0 bg-card">
+              <div className="text-sm font-semibold">Edit — {editingCompany.company_name}</div>
+              <button onClick={() => setEditingCompany(null)} disabled={editSaving} className="text-muted-foreground hover:text-foreground">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <form onSubmit={submitEdit} className="p-5 space-y-4">
+              <Field label="Company name *">
+                <input
+                  required
+                  value={editForm.company_name}
+                  onChange={(e) => setEditForm((f) => ({ ...f, company_name: e.target.value }))}
+                  className="modal-input"
+                />
+              </Field>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Website">
+                  <input value={editForm.website} onChange={(e) => setEditForm((f) => ({ ...f, website: e.target.value }))} className="modal-input" />
+                </Field>
+                <Field label="Sector">
+                  <input value={editForm.sector} onChange={(e) => setEditForm((f) => ({ ...f, sector: e.target.value }))} className="modal-input" />
+                </Field>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Stage">
+                  <select value={editForm.stage} onChange={(e) => setEditForm((f) => ({ ...f, stage: e.target.value }))} className="modal-input">
+                    {STAGES.map((s) => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </Field>
+                <Field label="Status">
+                  <select value={editForm.status} onChange={(e) => setEditForm((f) => ({ ...f, status: e.target.value as Status }))} className="modal-input">
+                    {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </Field>
+              </div>
+              <Field label="Description">
+                <textarea value={editForm.description} onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))} rows={2} className="modal-input" />
+              </Field>
+              <Field label="Notes">
+                <textarea value={editForm.notes} onChange={(e) => setEditForm((f) => ({ ...f, notes: e.target.value }))} rows={2} className="modal-input" />
+              </Field>
+              <Field label={`Score — ${editForm.initial_score}/10`}>
+                <input
+                  type="range" min={1} max={10} step={1}
+                  value={editForm.initial_score}
+                  onChange={(e) => setEditForm((f) => ({ ...f, initial_score: Number(e.target.value) }))}
+                  className="w-full accent-purple-600"
+                />
+              </Field>
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button type="button" onClick={() => setEditingCompany(null)} disabled={editSaving} className="rounded-[10px] border border-border/60 px-3 py-1.5 text-sm hover:bg-accent">
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={editSaving}
+                  className="inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-1.5 text-sm font-medium text-white shadow-glow disabled:opacity-60"
+                >
+                  {editSaving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                  Save changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete confirmation modal */}
+      {deleteTarget && (
+        <div
+          className="fixed inset-0 z-50 bg-foreground/30 backdrop-blur-sm grid place-items-center p-4"
+          onClick={() => !deleting && setDeleteTarget(null)}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl bg-card border border-border/60 shadow-elev p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="grid h-10 w-10 place-items-center rounded-full bg-destructive/10 mb-4">
+              <Trash2 className="h-5 w-5 text-destructive" />
+            </div>
+            <h3 className="text-base font-semibold">Delete {deleteTarget.company_name}?</h3>
+            <p className="mt-1 text-sm text-muted-foreground">This will permanently remove the company from your watchlist. This cannot be undone.</p>
+            <div className="flex items-center justify-end gap-2 mt-5">
+              <button onClick={() => setDeleteTarget(null)} disabled={deleting} className="rounded-[10px] border border-border/60 px-3 py-1.5 text-sm hover:bg-accent">
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="inline-flex items-center gap-1.5 rounded-[10px] bg-destructive text-destructive-foreground px-4 py-1.5 text-sm font-medium disabled:opacity-60"
+              >
+                {deleting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <style>{`
