@@ -1,23 +1,23 @@
-export function Logo({ withWordmark = true }: { withWordmark?: boolean }) {
-  if (withWordmark) {
-    return (
-      <div className="inline-flex items-center">
-        <img
-          src="/logo-dark.svg"
-          alt="Hockeystick"
-          className="h-8 dark:hidden"
-        />
-        <img
-          src="/logo-light.svg"
-          alt="Hockeystick"
-          className="h-8 hidden dark:block"
-        />
-      </div>
-    );
-  }
+export function Logo({
+  withWordmark = true,
+  size = "default",
+}: {
+  withWordmark?: boolean;
+  size?: "default" | "lg";
+}) {
+  const badge =
+    size === "lg"
+      ? "grid h-9 w-9 place-items-center rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 text-white font-bold text-base shrink-0"
+      : "grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 text-white font-bold text-sm shrink-0";
+  const wordmark =
+    size === "lg"
+      ? "font-bold text-[17px] tracking-tight text-foreground"
+      : "font-bold text-[15px] tracking-tight text-foreground";
+
   return (
-    <div className="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600">
-      <span className="text-white text-sm font-bold">H</span>
+    <div className="flex items-center gap-2">
+      <div className={badge}>H</div>
+      {withWordmark && <span className={wordmark}>Hockeystick</span>}
     </div>
   );
 }

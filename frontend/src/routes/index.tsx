@@ -12,12 +12,19 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "HockeyStick — The Fundraising War Room" },
-      { name: "description", content: "AI-powered deal rooms for founders closing rounds and investors finding signal. Due diligence, document review, and decisions — all in one place." },
-      { property: "og:title", content: "HockeyStick — The Fundraising War Room" },
-      { property: "og:description", content: "Stop chasing. Start closing. The structured fundraising platform built for founders and VCs." },
+      { title: "Hockeystick — AI-Powered Deal Rooms for Founders & Investors" },
+      { name: "description", content: "Hockeystick is the private deal flow platform trusted by founders and VCs. Secure deal rooms, AI due diligence, investor pipeline management, and real-time collaboration." },
+      { name: "keywords", content: "deal room software, VC deal flow, startup fundraising platform, investor due diligence, AI investment analysis, deal flow management, startup investor platform" },
+      { property: "og:title", content: "Hockeystick — AI-Powered Deal Rooms" },
+      { property: "og:description", content: "The private platform for founders raising capital and VCs managing deal flow. Secure, AI-powered, built for closing deals." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://hockeystick.app" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Hockeystick — Where deals get done" },
+      { name: "twitter:description", content: "AI-powered deal rooms for founders and investors." },
     ],
     links: [
+      { rel: "canonical", href: "https://hockeystick.app" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" as const },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" },
@@ -213,7 +220,7 @@ function Logos() {
     <section className="border-y border-border/60 bg-gradient-soft py-7">
       <div className="mx-auto max-w-7xl px-6">
         <div className="text-center text-[10px] uppercase tracking-widest text-muted-foreground font-medium mb-5">
-          Used by founders raising from
+          Trusted by founders raising from top VCs
         </div>
         <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
           {names.map((n) => (
@@ -256,7 +263,7 @@ function Problem() {
       <div className="mb-16 max-w-xl">
         <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-3">The problem</div>
         <h2 className="hs text-3xl md:text-5xl font-bold tracking-[-0.04em] leading-[1.08]">
-          Fundraising is broken<br />on both sides.
+          Built for both sides<br />of the table.
         </h2>
       </div>
 
@@ -479,7 +486,7 @@ function Features() {
         <div className="max-w-lg">
           <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-3">Features</div>
           <h2 className="hs text-3xl md:text-5xl font-bold tracking-[-0.04em] leading-[1.08]">
-            Everything you need<br />to close.
+            Everything you need<br />to close your round.
           </h2>
         </div>
         <p className="text-sm text-muted-foreground max-w-sm">
