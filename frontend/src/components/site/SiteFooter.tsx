@@ -2,72 +2,53 @@ import { Link } from "@tanstack/react-router";
 import { Logo } from "@/components/brand/Logo";
 
 export function SiteFooter() {
-  const cols = [
-    {
-      title: "Product",
-      links: [
-        ["For Founders", "/founders"],
-        ["For Investors", "/investors"],
-        ["Sign in", "/sign-in"],
-        ["Pricing", "/pricing"],
-      ],
-    },
-    {
-      title: "Solutions",
-      links: [
-        ["Fundraising CRM", "/solutions/fundraising-crm"],
-        ["VC Deal Room", "/solutions/vc-deal-room"],
-        ["Due Diligence", "/solutions/due-diligence"],
-        ["Investor Pipeline", "/solutions/investor-pipeline"],
-        ["Raise your first $1M", "/solutions/raise-1m"],
-      ],
-    },
-    {
-      title: "Company",
-      links: [
-        ["About", "/"],
-        ["Customers", "/"],
-        ["Careers", "/"],
-        ["Contact", "/"],
-      ],
-    },
-    {
-      title: "Resources",
-      links: [
-        ["Changelog", "/"],
-        ["Security", "/"],
-        ["Terms", "/terms"],
-        ["Privacy", "/privacy"],
-      ],
-    },
-  ];
-
   return (
     <footer className="border-t border-border/60 bg-gradient-soft">
-      <div className="mx-auto max-w-7xl px-6 py-16">
-        <div className="grid grid-cols-2 gap-10 md:grid-cols-6">
-          <div className="col-span-2">
+      <div className="mx-auto max-w-7xl px-6 py-12">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
+          <div className="max-w-xs">
             <Logo />
-            <p className="mt-4 max-w-xs text-sm text-muted-foreground">
+            <p className="mt-4 text-sm text-muted-foreground">
               The investor-grade platform where deals get decided.
             </p>
           </div>
-          {cols.map((c) => (
-            <div key={c.title}>
-              <div className="text-xs font-semibold uppercase tracking-wider text-foreground/80">{c.title}</div>
-              <ul className="mt-4 space-y-2.5">
-                {c.links.map(([label, to]) => (
-                  <li key={label}>
-                    <Link to={to as string} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                      {label}
-                    </Link>
-                  </li>
-                ))}
+
+          <div className="flex flex-wrap gap-x-10 gap-y-6">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-wider text-foreground/80 mb-3">Platform</div>
+              <ul className="space-y-2.5">
+                <li>
+                  <Link to="/sign-up" search={{ role: "founder" } as any} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    Get started
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/sign-in" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    Sign in
+                  </Link>
+                </li>
               </ul>
             </div>
-          ))}
+
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-wider text-foreground/80 mb-3">Legal</div>
+              <ul className="space-y-2.5">
+                <li>
+                  <Link to="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    Terms
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    Privacy
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
-        <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-border/60 pt-6 md:flex-row md:items-center">
+
+        <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-border/60 pt-6 md:flex-row md:items-center">
           <div className="text-xs text-muted-foreground">© {new Date().getFullYear()} Hockeystick, Inc. All rights reserved.</div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-success animate-pulse-glow" />
