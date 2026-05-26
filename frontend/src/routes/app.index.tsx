@@ -181,6 +181,115 @@ function OnboardingStep({
   );
 }
 
+// ── Founder onboarding checklist ───────────────────────────────────
+
+function FounderOnboarding({
+  startup,
+  docs,
+  dealRooms,
+  investorMembers,
+}: {
+  startup: any;
+  docs: any[];
+  dealRooms: any[];
+  investorMembers: any[];
+}) {
+  const [dismissed, setDismissed] = useState(
+    () => typeof localStorage !== "undefined" && !!localStorage.getItem("hs_onboarding_founder_dismissed"),
+  );
+
+  const steps = [
+    {
+      id: "profile",
+      label: "Complete your company profile",
+      description: "Add your pitch, team, and financials",
+      done: !!(startup?.name),
+      href: "/app/profile",
+    },
+    {
+      id: "docs",
+      label: "Upload your pitch deck",
+      description: "Share documents with investors securely",
+      done: docs.length > 0,
+      href: "/app/documents",
+    },
+    {
+      id: "dealroom",
+      label: "Create your first deal room",
+      description: "Your private space to close deals",
+      done: dealRooms.length > 0,
+      href: "/app/deal-rooms",
+    },
+    {
+      id: "investor",
+      label: "Invite your first investor",
+      description: "Send a secure deal room invitation",
+      done: investorMembers.length > 0,
+      href: "/app/deal-rooms",
+    },
+  ];
+
+  const completed = steps.filter((s) => s.done).length;
+  if (dismissed || completed === steps.length) return null;
+
+  const pct = Math.round((completed / steps.length) * 100);
+
+  return (
+    <div className="rounded-xl border border-border/60 bg-card shadow-card p-5 mb-6">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <div className="text-sm font-semibold">Get started with Hockeystick</div>
+          <div className="text-xs text-muted-foreground">{completed} of {steps.length} steps complete</div>
+        </div>
+        <button
+          onClick={() => {
+            localStorage.setItem("hs_onboarding_founder_dismissed", "1");
+            setDismissed(true);
+          }}
+          className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+          title="Dismiss"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </div>
+      <div className="h-1.5 rounded-full bg-muted overflow-hidden mb-4">
+        <div
+          className="h-full bg-gradient-brand rounded-full transition-all duration-500"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {steps.map((step) => (
+          <Link
+            key={step.id}
+            to={step.href as any}
+            className={cn(
+              "rounded-lg border px-3 py-2.5 flex items-start gap-2.5 transition-colors",
+              step.done
+                ? "border-success/30 bg-success/5 opacity-70 pointer-events-none"
+                : "border-border/60 bg-background/60 hover:bg-accent",
+            )}
+          >
+            <div className="mt-0.5 shrink-0">
+              {step.done ? (
+                <CheckCircle2 className="h-4 w-4 text-success" />
+              ) : (
+                <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/30" />
+              )}
+            </div>
+            <div>
+              <div className={cn("text-xs font-medium leading-tight", step.done && "text-muted-foreground")}>
+                {step.label}
+              </div>
+              <div className="text-[11px] text-muted-foreground mt-0.5 leading-tight">{step.description}</div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Stat card ──────────────────────────────────────────────────────
 
 function Stat({
@@ -316,6 +425,34 @@ function Overview() {
         .order("updated_at", { ascending: false })
         .limit(3);
       return (data ?? []) as DealRoom[];
+    },
+  });
+
+  const { data: docs = [] } = useQuery({
+    queryKey: ["my-docs-any", startup?.id],
+    enabled: !!startup?.id,
+    queryFn: async () => {
+      const { data: rooms } = await supabase
+        .from("deal_rooms").select("id").eq("startup_id", startup!.id);
+      const ids = (rooms ?? []).map((r: any) => r.id);
+      if (ids.length === 0) return [];
+      const { data } = await supabase
+        .from("documents").select("id").in("deal_room_id", ids).limit(1);
+      return data ?? [];
+    },
+  });
+
+  const { data: investorMembers = [] } = useQuery({
+    queryKey: ["investor-members-any", startup?.id],
+    enabled: !!startup?.id,
+    queryFn: async () => {
+      const { data: rooms } = await supabase
+        .from("deal_rooms").select("id").eq("startup_id", startup!.id);
+      const ids = (rooms ?? []).map((r: any) => r.id);
+      if (ids.length === 0) return [];
+      const { data } = await supabase
+        .from("deal_room_members").select("role").in("deal_room_id", ids).eq("role", "investor").limit(1);
+      return data ?? [];
     },
   });
 
@@ -478,6 +615,7 @@ function Overview() {
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto">
+      <FounderOnboarding startup={startup} docs={docs} dealRooms={dealRooms} investorMembers={investorMembers} />
       {/* Header */}
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
