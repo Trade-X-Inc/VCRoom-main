@@ -21,21 +21,25 @@ function MessagesPage() {
 
   const isInvestor = user?.role === "investor";
 
-  // Resolve workspace channel ID:
-  // Founders → their startup_id; Investors → their user_id
-  const { data: workspaceChannel, isLoading: channelLoading } = useQuery({
-    queryKey: ["workspace-channel", user?.id, isInvestor],
-    enabled: !!user?.id,
+  // Startup ID for founders (investors use their user_id directly)
+  const { data: startupId, isLoading: startupLoading } = useQuery({
+    queryKey: ["my-startup-id", user?.id],
+    enabled: !!user?.id && !isInvestor,
     queryFn: async () => {
-      if (isInvestor) return user!.id;
       const { data } = await supabase
         .from("startups")
         .select("id")
         .eq("founder_id", user!.id)
         .maybeSingle();
-      return data?.id ?? user!.id;
+      return data?.id ?? null;
     },
   });
+
+  const workspaceChannel = isInvestor
+    ? user?.id
+    : startupId ?? user?.id;
+
+  const channelLoading = !isInvestor && startupLoading;
 
   // Messages for this workspace channel
   const { data: messages = [] } = useQuery({
@@ -122,6 +126,9 @@ function MessagesPage() {
       .toUpperCase();
 
   const channelReady = !!workspaceChannel && !channelLoading;
+
+  console.log("AUTH USER:", user?.id, "ROLE:", user?.role);
+  console.log("WORKSPACE CHANNEL:", workspaceChannel);
 
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
