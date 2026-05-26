@@ -86,20 +86,6 @@ function DiligencePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedCat, setExpandedCat] = useState<DDCategory | null>("Financials");
 
-  // Fetch investor's thesis
-  const { data: investorProfile } = useQuery({
-    queryKey: ["investor-profile-dd", userId],
-    enabled: !!userId,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("investor_profiles")
-        .select("thesis, preferred_stages, preferred_sectors, min_ticket, max_ticket")
-        .eq("user_id", userId)
-        .maybeSingle();
-      return data;
-    },
-  });
-
   // Fetch investor's watchlist companies
   const { data: startups = [], isLoading: startupsLoading } = useQuery({
     queryKey: ["investor-watchlist-dd", userId],
@@ -199,33 +185,13 @@ function DiligencePage() {
     return { done, total, pct: Math.round((done / total) * 100) };
   };
 
-  // Thesis match scoring
-  const getThesisMatch = (startup: any) => {
-    if (!investorProfile) return null;
-    let score = 0; let max = 0;
-    const { preferred_stages, preferred_sectors } = investorProfile;
+  const PREFERRED_STAGES = ["Seed", "Series A"];
 
-    if (preferred_stages?.length) {
-      max += 40;
-      if (preferred_stages.includes(startup.stage)) score += 40;
-    }
-    if (preferred_sectors?.length) {
-      max += 40;
-      if (preferred_sectors.some((s: string) => startup.sector?.toLowerCase().includes(s.toLowerCase()))) score += 40;
-    }
-    max += 20; // bonus for having description
-    if (startup.description?.length > 50) score += 20;
-
-    if (max === 0) return null;
-    return Math.round((score / max) * 100);
-  };
-
-  const selectedStartup = startups.find((s) => s.id === selectedStartupId);
-  const filteredStartups = startups.filter((s) =>
+  const selectedStartup = startups.find((s: any) => s.id === selectedStartupId);
+  const filteredStartups = (startups as any[]).filter((s: any) =>
     s.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.sector?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const thesisMatch = selectedStartup ? getThesisMatch(selectedStartup) : null;
   const totalProgress = selectedStartupId ? getTotalProgress() : null;
 
   return (
@@ -265,8 +231,8 @@ function DiligencePage() {
               <p className="text-xs text-muted-foreground">No companies yet. Add founders to your pipeline first.</p>
             </div>
           )}
-          {filteredStartups.map((s) => {
-            const match = getThesisMatch(s);
+          {filteredStartups.map((s: any) => {
+            const stageMatch = PREFERRED_STAGES.includes(s.stage ?? "");
             const isSelected = selectedStartupId === s.id;
             return (
               <button
@@ -285,12 +251,9 @@ function DiligencePage() {
                     <div className="text-xs font-semibold truncate">{s.company_name}</div>
                     <div className="text-[10px] text-muted-foreground truncate">{s.stage} · {s.sector || "—"}</div>
                   </div>
-                  {match !== null && (
-                    <span className={cn(
-                      "text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0",
-                      match >= 70 ? "bg-success/15 text-success" : match >= 40 ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
-                    )}>
-                      {match}%
+                  {stageMatch && (
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0 bg-success/15 text-success">
+                      ✓
                     </span>
                   )}
                 </div>
@@ -401,53 +364,43 @@ function DiligencePage() {
                 )}
               </div>
 
-              {/* Thesis match */}
+              {/* Quick fit indicators */}
               <div className="rounded-xl border border-border/60 bg-card p-4 space-y-3">
-                <div className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Thesis Match</div>
-                {thesisMatch === null ? (
-                  <div className="text-xs text-muted-foreground">
-                    No thesis set.{" "}
-                    <Link to="/app/investor/profile" className="text-brand hover:underline">Set your thesis →</Link>
+                <div className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Quick Fit</div>
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground flex items-center gap-1.5">
+                      <TrendingUp className="h-3 w-3" /> Stage
+                    </span>
+                    {PREFERRED_STAGES.includes(selectedStartup.stage ?? "")
+                      ? <span className="flex items-center gap-1 text-success font-medium"><CheckCircle2 className="h-3.5 w-3.5" /> {selectedStartup.stage}</span>
+                      : <span className="text-muted-foreground">{selectedStartup.stage || "—"}</span>
+                    }
                   </div>
-                ) : (
-                  <>
-                    <div className="flex items-end gap-2">
-                      <div className={cn(
-                        "text-3xl font-bold",
-                        thesisMatch >= 70 ? "text-success" : thesisMatch >= 40 ? "text-warning" : "text-muted-foreground"
-                      )}>
-                        {thesisMatch}%
-                      </div>
-                      <div className="text-xs text-muted-foreground mb-1">fit score</div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground flex items-center gap-1.5">
+                      <Target className="h-3 w-3" /> Sector
+                    </span>
+                    {selectedStartup.sector
+                      ? <span className="rounded-full bg-brand/10 text-brand px-2 py-0.5 text-[10px] font-medium">{selectedStartup.sector}</span>
+                      : <span className="text-muted-foreground">—</span>
+                    }
+                  </div>
+                  {selectedStartup.initial_score != null && (
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <Flag className="h-3 w-3" /> Score
+                      </span>
+                      <span className="font-semibold tabular-nums">{selectedStartup.initial_score}/10</span>
                     </div>
-                    <div className="h-2 rounded-full bg-muted overflow-hidden">
-                      <div
-                        className={cn("h-full rounded-full transition-all",
-                          thesisMatch >= 70 ? "bg-success" : thesisMatch >= 40 ? "bg-warning" : "bg-muted-foreground/40"
-                        )}
-                        style={{ width: `${thesisMatch}%` }}
-                      />
+                  )}
+                  {selectedStartup.source && (
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground">Source</span>
+                      <span className="font-medium truncate max-w-[120px]">{selectedStartup.source}</span>
                     </div>
-                    <div className="space-y-1.5 mt-2">
-                      {investorProfile?.preferred_stages?.length > 0 && (
-                        <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-muted-foreground flex items-center gap-1"><TrendingUp className="h-3 w-3" /> Stage</span>
-                          {investorProfile.preferred_stages.includes(selectedStartup.stage)
-                            ? <span className="text-success flex items-center gap-0.5"><CheckCircle2 className="h-3 w-3" /> Match</span>
-                            : <span className="text-muted-foreground">No match ({selectedStartup.stage})</span>}
-                        </div>
-                      )}
-                      {investorProfile?.preferred_sectors?.length > 0 && (
-                        <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-muted-foreground flex items-center gap-1"><Target className="h-3 w-3" /> Sector</span>
-                          {investorProfile.preferred_sectors.some((s: string) => selectedStartup.sector?.toLowerCase().includes(s.toLowerCase()))
-                            ? <span className="text-success flex items-center gap-0.5"><CheckCircle2 className="h-3 w-3" /> Match</span>
-                            : <span className="text-muted-foreground">No match</span>}
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
+                  )}
+                </div>
               </div>
 
               {/* DD progress */}
