@@ -5,7 +5,7 @@ import { Sparkles } from "lucide-react";
 export const Route = createFileRoute("/solutions/raise-1m")({
   head: () => ({
     meta: [
-      { title: "Raise Your First $1M — Venture Room" },
+      { title: "Raise Your First $1M — Hockeystick" },
       { name: "description", content: "The complete playbook and platform to raise your first million." },
     ],
   }),

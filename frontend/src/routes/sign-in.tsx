@@ -60,9 +60,9 @@ function SignIn() {
           </Link>
           <Link to="/" className="flex items-center gap-2 mb-6">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center">
-              <span className="text-white text-sm font-bold">VR</span>
+              <span className="text-white text-sm font-bold">H</span>
             </div>
-            <span className="font-semibold text-foreground">Venture Room</span>
+            <span className="font-semibold text-foreground">Hockeystick</span>
           </Link>
           <h1 className="text-2xl font-semibold text-foreground mb-1">Welcome back</h1>
           <p className="text-muted-foreground text-sm">Sign in to your workspace</p>

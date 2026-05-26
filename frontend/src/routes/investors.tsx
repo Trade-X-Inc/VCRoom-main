@@ -5,7 +5,7 @@ import { Briefcase } from "lucide-react";
 export const Route = createFileRoute("/investors")({
   head: () => ({
     meta: [
-      { title: "For Investors — Venture Room" },
+      { title: "For Investors — Hockeystick" },
       { name: "description", content: "Evaluate, diligence, and decide. The structured deal room investors actually use." },
     ],
   }),

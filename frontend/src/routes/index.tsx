@@ -136,7 +136,7 @@ function DealRoomMockup() {
           </div>
           <div className="flex-1 mx-3">
             <div className="mx-auto w-44 rounded-md bg-muted text-center py-0.5 text-[10px] text-muted-foreground">
-              ventureroom.app/deal-room
+              hockeystick.app/deal-room
             </div>
           </div>
         </div>

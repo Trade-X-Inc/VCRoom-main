@@ -5,8 +5,8 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy — Venture Room" },
-      { name: "description", content: "Privacy Policy for Venture Room." },
+      { title: "Privacy Policy — Hockeystick" },
+      { name: "description", content: "Privacy Policy for Hockeystick." },
     ],
   }),
   component: PrivacyPage,
@@ -19,7 +19,7 @@ const sections = [
   },
   {
     title: "2. How We Use Information",
-    body: "We use your information to provide and improve the Venture Room platform, send transactional and product emails, and respond to support requests. We may use aggregated, anonymised data for analytics and product development. We do not sell your personal information to third parties.",
+    body: "We use your information to provide and improve the Hockeystick platform, send transactional and product emails, and respond to support requests. We may use aggregated, anonymised data for analytics and product development. We do not sell your personal information to third parties.",
   },
   {
     title: "3. Data Sharing",
@@ -39,7 +39,7 @@ const sections = [
   },
   {
     title: "7. Contact Us",
-    body: "If you have questions about this Privacy Policy or how we handle your data, please contact our privacy team at privacy@ventureroom.app. For data deletion requests or GDPR inquiries, we aim to respond within 30 days. Our registered address is Venture Room, Inc., Delaware, United States.",
+    body: "If you have questions about this Privacy Policy or how we handle your data, please contact our privacy team at privacy@ventureroom.app. For data deletion requests or GDPR inquiries, we aim to respond within 30 days. Our registered address is Hockeystick, Inc., Delaware, United States.",
   },
 ];
 

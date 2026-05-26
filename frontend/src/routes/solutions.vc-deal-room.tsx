@@ -5,7 +5,7 @@ import { Briefcase } from "lucide-react";
 export const Route = createFileRoute("/solutions/vc-deal-room")({
   head: () => ({
     meta: [
-      { title: "VC Deal Room Software — Venture Room" },
+      { title: "VC Deal Room Software — Hockeystick" },
       { name: "description", content: "Structured deal rooms with NDA, document vault, Q&A, and decision board." },
     ],
   }),

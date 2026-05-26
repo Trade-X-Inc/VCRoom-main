@@ -5,7 +5,7 @@ import { TrendingUp } from "lucide-react";
 export const Route = createFileRoute("/solutions/investor-pipeline")({
   head: () => ({
     meta: [
-      { title: "Investor Pipeline Management Tool — Venture Room" },
+      { title: "Investor Pipeline Management Tool — Hockeystick" },
       { name: "description", content: "Manage every investor relationship across the full lifecycle of your raise." },
     ],
   }),
