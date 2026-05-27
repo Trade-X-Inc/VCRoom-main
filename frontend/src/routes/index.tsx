@@ -1,3 +1,4 @@
+// Landing page v2 — rebuilt 2026-05-27
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";

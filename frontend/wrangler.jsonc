@@ -1,5 +1,5 @@
 {
-  // build: 2026-05-27T force-redeploy
+  // Force redeploy: 2026-05-27
   "name": "vcroom-main",
   "compatibility_date": "2024-09-23",
   "compatibility_flags": ["nodejs_compat"],
