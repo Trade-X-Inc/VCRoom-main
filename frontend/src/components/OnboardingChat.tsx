@@ -111,7 +111,7 @@ export function OnboardingChat({
 
   // Auto-scroll
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [msgs.length, shown]);
 
   // Unread badge

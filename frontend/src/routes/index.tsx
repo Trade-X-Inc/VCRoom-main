@@ -428,6 +428,9 @@ function ChatSection() {
                   {text}
                 </button>
               ))}
+              <p className="text-gray-500 text-sm mt-4">
+                Select a role above or type directly to start a live conversation with our AI.
+              </p>
             </div>
           </div>
 
