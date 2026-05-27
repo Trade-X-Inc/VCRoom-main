@@ -5,11 +5,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { OnboardingChat } from "@/components/OnboardingChat";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  ArrowRight, Users, FileText, ShieldCheck,
-  ListChecks, Brain, Bell, CheckCircle2,
-  Zap,
-} from "lucide-react";
+import { ArrowRight, Users, ShieldCheck, ListChecks, CheckCircle2, Zap } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -35,20 +31,15 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-// ── Page animations (CSS-only, scoped to this page) ───────────────
 const STYLES = `
   .hs { font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif; }
   @keyframes hs-up { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes hs-in { from { opacity: 0; } to { opacity: 1; } }
   .hs-a  { animation: hs-up 0.65s cubic-bezier(0.16,1,0.3,1) both; }
   .hs-a1 { animation-delay: 0.08s; }
   .hs-a2 { animation-delay: 0.18s; }
   .hs-a3 { animation-delay: 0.30s; }
   .hs-a4 { animation-delay: 0.44s; }
   .hs-a5 { animation-delay: 0.58s; }
-  .hs-badge { animation: hs-up 0.5s cubic-bezier(0.16,1,0.3,1) 0.7s both; }
-  .hs-feat:hover .hs-feat-icon { transform: scale(1.08) rotate(-3deg); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
-  .hs-feat-icon { transition: transform 0.2s ease; }
   .hs-step-line { background: linear-gradient(90deg, var(--color-brand), var(--color-violet)); }
 `;
 
@@ -59,15 +50,16 @@ function Landing() {
       <div className="min-h-screen bg-background text-foreground">
         <SiteHeader />
         <Hero />
-        <ChatSection />
-        <Logos />
-        <Problem />
+        <Pain />
+        <SolutionStatement />
         <HowItWorks />
-        <Features />
-        <Stats />
-        <DualCTA />
+        <ProofNumbers />
+        <ForFoundersInvestors />
+        <ChatSection />
         <Resources />
+        <FinalCTA />
         <SiteFooter />
+        <OnboardingChat variant="floating" />
       </div>
     </>
   );
@@ -76,277 +68,170 @@ function Landing() {
 // ── 1. HERO ───────────────────────────────────────────────────────
 function Hero() {
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-hidden flex items-center min-h-[calc(100vh-64px)]">
       <div className="absolute inset-0 -z-10 bg-gradient-hero" />
       <div className="absolute inset-0 -z-10 grid-bg opacity-30 [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,black,transparent_80%)]" />
       <div className="absolute inset-0 -z-10 noise opacity-40" />
 
-      <div className="mx-auto max-w-4xl px-6 pt-20 pb-16 md:pt-28 md:pb-24 text-center">
+      <div className="mx-auto max-w-5xl px-6 py-24 text-center w-full">
         <div className="hs-a hs-a1 inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/8 px-3 py-1 text-[11px] font-medium text-brand">
           <span className="h-1.5 w-1.5 rounded-full bg-brand animate-pulse-glow" />
           Early access — free during beta
           <ArrowRight className="h-3 w-3" />
         </div>
 
-        <h1 className="hs hs-a hs-a2 mt-5 text-[clamp(2.6rem,6vw,4.5rem)] font-bold leading-[1.03] tracking-[-0.04em]">
-          Stop chasing.<br />
-          <span className="text-gradient-brand">Start closing.</span>
+        <h1 className="hs hs-a hs-a2 mt-6 text-[clamp(3rem,7vw,5rem)] font-black leading-[1.0] tracking-[-0.04em]">
+          The deal room where<br />
+          <span className="text-gradient-brand">trust gets built.</span>
         </h1>
 
-        <p className="hs-a hs-a3 mt-5 text-base md:text-lg text-muted-foreground max-w-[520px] mx-auto leading-relaxed">
-          Hockystick turns fundraising chaos into a structured deal-closing machine — AI-matched deal rooms, live due diligence, and decisions without the spreadsheet graveyard.
+        <p className="hs-a hs-a3 mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          Founders and investors waste months on back-and-forth emails, scattered documents, and zero
+          visibility. Hockystick replaces all of it — one room, every deal, no chaos.
         </p>
 
-        <div className="hs-a hs-a4 mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+        <div className="hs-a hs-a4 mt-8 flex flex-col sm:flex-row gap-4 justify-center">
           <Link to="/sign-up" search={{ role: "founder" } as any}>
             <Button variant="brand" size="lg" className="gap-2 shadow-glow w-full sm:w-auto">
-              Start raising <ArrowRight className="h-4 w-4" />
+              I'm raising capital <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
           <Link to="/sign-up" search={{ role: "investor" } as any}>
             <Button variant="outline" size="lg" className="gap-2 w-full sm:w-auto">
-              Explore deals
+              I invest in startups <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
         </div>
 
-        <div className="hs-a hs-a5 mt-6 flex flex-wrap gap-x-5 gap-y-2 justify-center">
-          {["No credit card", "Free during beta", "Bank-grade encryption"].map((t) => (
-            <span key={t} className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-              <CheckCircle2 className="h-3.5 w-3.5 text-success" /> {t}
-            </span>
+        <p className="hs-a hs-a5 mt-4 text-sm text-muted-foreground">
+          No credit card · Free during beta · Setup in 2 minutes
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// ── 2. PAIN ───────────────────────────────────────────────────────
+function Pain() {
+  const cards = [
+    {
+      icon: "📧",
+      stat: "200 emails sent",
+      who: "The Founder",
+      body: "You spend 3 months crafting the perfect pitch. You send it to 200 investors. 12 open it. 3 reply. 1 ghosts you after 4 meetings. You never know why.",
+    },
+    {
+      icon: "📥",
+      stat: "50 decks this week",
+      who: "The Investor",
+      body: "Deals flood your inbox with no structure, no context, no thesis match. Your analyst spends 20 hours on a company you'd pass in 5 minutes if you had the right data.",
+    },
+    {
+      icon: "🔧",
+      stat: "12 tools, 0 clarity",
+      who: "The Process",
+      body: "Google Drive, Notion, DocuSign, email, Slack — the deal lives across 12 tools and 2 inboxes. Every update is manual. Every handoff breaks.",
+    },
+  ];
+
+  return (
+    <section className="bg-gray-950 text-white py-24 md:py-32">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="text-[10px] uppercase tracking-widest font-semibold text-purple-400 mb-5">
+          The Reality
+        </div>
+        <h2 className="hs text-3xl md:text-4xl font-bold text-white mb-14 max-w-xl leading-[1.1]">
+          Raising capital is broken.<br />
+          Everyone knows it. Nobody fixed it.
+        </h2>
+
+        <div className="grid md:grid-cols-3 gap-5">
+          {cards.map(({ icon, stat, who, body }) => (
+            <div key={who} className="rounded-xl border border-white/10 bg-white/5 p-6">
+              <div className="text-3xl mb-4">{icon}</div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-purple-400 mb-2">
+                {who}
+              </div>
+              <div className="text-xl font-bold text-white mb-3">{stat}</div>
+              <p className="text-sm text-gray-400 leading-relaxed">{body}</p>
+            </div>
           ))}
         </div>
-      </div>
-    </section>
-  );
-}
 
-// ── 1b. CHAT SECTION ──────────────────────────────────────────────
-function ChatSection() {
-  const [starterId, setStarterId] = useState(0);
-  const [starterText, setStarterText] = useState<string | null>(null);
-
-  const starters = [
-    "I'm a founder raising my seed round →",
-    "I'm a VC reviewing 50+ deals →",
-    "I just want to see how it works →",
-  ];
-
-  function handleStarter(text: string) {
-    setStarterText(text);
-    setStarterId((n) => n + 1);
-  }
-
-  return (
-    <section className="bg-gradient-to-br from-gray-950 to-purple-950 py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="grid lg:grid-cols-[3fr_2fr] gap-12 lg:gap-16 items-center">
-
-          {/* Left — 60% */}
-          <div>
-            <div className="text-[10px] uppercase tracking-widest font-semibold text-purple-400 mb-5">
-              AI-Powered Onboarding
-            </div>
-            <h2 className="hs text-4xl md:text-5xl font-black text-white leading-tight tracking-[-0.03em]">
-              Not sure if Hockystick<br />is right for you?
-            </h2>
-            <p className="mt-5 text-lg md:text-xl text-gray-300 max-w-lg leading-relaxed">
-              Don't read the docs. Just ask. Our AI knows the product inside out — tell it who you are and what you're trying to solve. It'll tell you honestly if we're a fit.
-            </p>
-
-            <div className="mt-8 flex flex-col gap-3">
-              {starters.map((text) => (
-                <button
-                  key={text}
-                  onClick={() => handleStarter(text)}
-                  className="text-left rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-purple-400/50 px-5 py-4 text-sm font-medium text-gray-200 hover:text-white transition-all group"
-                >
-                  <span className="group-hover:text-purple-300 transition-colors">{text}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Right — 40% */}
-          <div className="shadow-2xl rounded-2xl ring-1 ring-white/10">
-            <OnboardingChat key={starterId} variant="embedded" triggerMessage={starterText} />
-          </div>
+        <div className="mt-14 text-center">
+          <p className="text-2xl font-semibold text-white mb-6">
+            There's no shared space. No trust layer. No single source of truth.
+          </p>
+          <a href="#how-it-works">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 px-6 py-3 text-sm font-medium text-white transition-colors cursor-pointer">
+              See how Hockystick fixes this <ArrowRight className="h-4 w-4" />
+            </span>
+          </a>
         </div>
       </div>
     </section>
   );
 }
 
-// ── 2. LOGO CLOUD ─────────────────────────────────────────────────
-function Logos() {
+// ── 3. SOLUTION STATEMENT ─────────────────────────────────────────
+function SolutionStatement() {
   return (
-    <section className="border-y border-border/60 bg-gradient-soft py-7">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="text-center text-sm text-muted-foreground">
-          Trusted by founders and investors at every stage of the journey.
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── 3. PROBLEM ────────────────────────────────────────────────────
-function Problem() {
-  const problems = [
-    {
-      n: "01",
-      who: "For founders",
-      headline: "You send 200 emails.\n3 reply. None invest.",
-      body: "No structure, no tracking, no idea who's actually interested. Your fundraise lives in three spreadsheets, seven email threads, and one Notion doc nobody updates.",
-      side: "left",
-    },
-    {
-      n: "02",
-      who: "For investors",
-      headline: "You review 50 decks.\nNone match your thesis.",
-      body: "Unstructured deal flow floods your inbox. There's no way to compare, no signal, no score. Partners can't see deal status at a glance so decisions take weeks instead of days.",
-      side: "right",
-    },
-    {
-      n: "03",
-      who: "The process",
-      headline: "Due diligence lives\nin 12 different tools.",
-      body: "Google Drive, Notion, Excel, Docusign, Dropbox, email — split across both sides of the deal. Every handoff is manual. Every update gets lost.",
-      side: "left",
-    },
-  ];
-
-  return (
-    <section className="mx-auto max-w-7xl px-6 py-24 md:py-32">
-      <div className="mb-16 max-w-xl">
-        <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-3">The problem</div>
-        <h2 className="hs text-3xl md:text-5xl font-bold tracking-[-0.04em] leading-[1.08]">
-          Built for both sides<br />of the table.
+    <section className="bg-background py-24 md:py-32">
+      <div className="mx-auto max-w-3xl px-6 text-center">
+        <h2 className="hs text-[clamp(2.5rem,6vw,4rem)] font-black leading-tight tracking-[-0.04em]">
+          One room.<br />
+          Both sides.<br />
+          Every deal.
         </h2>
-      </div>
-
-      <div className="space-y-10 md:space-y-16">
-        {problems.map(({ n, who, headline, body, side }) => (
-          <div
-            key={n}
-            className={cn(
-              "grid md:grid-cols-[1fr_1fr] gap-8 md:gap-16 items-center",
-              side === "right" && "md:[&>*:first-child]:order-2",
-            )}
-          >
-            {/* Number + copy */}
-            <div className="relative">
-              <div className="absolute -left-2 -top-6 hs text-[clamp(4rem,14vw,10rem)] font-bold leading-none text-foreground/[0.04] select-none pointer-events-none">{n}</div>
-              <div className="relative">
-                <span className="inline-block text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-4 border border-border/60 rounded-full px-3 py-1">{who}</span>
-                <h3 className="hs text-2xl md:text-3xl font-bold tracking-[-0.03em] leading-[1.12] whitespace-pre-line mb-4">{headline}</h3>
-                <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-md">{body}</p>
-              </div>
-            </div>
-
-            {/* Visual card */}
-            <div className="rounded-2xl border border-border/60 bg-card shadow-card p-6 md:p-8">
-              {n === "01" && <FounderPainViz />}
-              {n === "02" && <InvestorPainViz />}
-              {n === "03" && <ProcessPainViz />}
-            </div>
-          </div>
-        ))}
+        <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          Hockystick gives founders and investors a private, encrypted space to share documents, run due
+          diligence, ask questions, and make decisions — without the friction, the chaos, or the email
+          thread from hell.
+        </p>
       </div>
     </section>
-  );
-}
-
-function FounderPainViz() {
-  return (
-    <div className="space-y-2">
-      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">Outreach tracker</div>
-      {[
-        { name: "Partner @ Sequoia", status: "No reply", days: "14d ago", bad: true },
-        { name: "MD @ a16z",         status: "No reply", days: "9d ago",  bad: true },
-        { name: "GP @ Accel",        status: "Opened",   days: "5d ago",  bad: false },
-        { name: "Analyst @ Index",   status: "No reply", days: "3d ago",  bad: true },
-        { name: "Partner @ YC",      status: "No reply", days: "1d ago",  bad: true },
-      ].map(({ name, status, days, bad }) => (
-        <div key={name} className="flex items-center gap-3 rounded-lg border border-border/60 bg-background/60 px-3 py-2">
-          <div className="h-6 w-6 rounded-full bg-muted text-[10px] font-bold grid place-items-center text-muted-foreground shrink-0">
-            {name[0]}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-xs font-medium truncate">{name}</div>
-          </div>
-          <span className="text-[10px] text-muted-foreground">{days}</span>
-          <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded-full shrink-0",
-            bad ? "bg-muted text-muted-foreground" : "bg-warning/10 text-warning",
-          )}>{status}</span>
-        </div>
-      ))}
-      <div className="text-center text-[10px] text-muted-foreground/60 pt-2">+ 195 more contacts</div>
-    </div>
-  );
-}
-
-function InvestorPainViz() {
-  return (
-    <div className="space-y-2">
-      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">This week's inbox</div>
-      {[
-        { name: "HealthAI – Series A",  tag: "Healthcare",  match: "??" },
-        { name: "FinStack – Seed",      tag: "Fintech",     match: "??" },
-        { name: "EduBase – Pre-seed",   tag: "EdTech",      match: "??" },
-        { name: "LogiFlow – Series B",  tag: "Logistics",   match: "??" },
-        { name: "CloudDB – Seed",       tag: "Infra",       match: "??" },
-      ].map(({ name, tag, match }) => (
-        <div key={name} className="flex items-center gap-3 rounded-lg border border-border/60 bg-background/60 px-3 py-2">
-          <div className="h-6 w-6 rounded-full bg-muted shrink-0" />
-          <div className="flex-1 min-w-0">
-            <div className="text-xs font-medium truncate">{name}</div>
-          </div>
-          <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full">{tag}</span>
-          <span className="text-[10px] text-muted-foreground/50 font-mono">{match}</span>
-        </div>
-      ))}
-      <div className="text-center text-[10px] text-muted-foreground/60 pt-2">Thesis match: unknown</div>
-    </div>
-  );
-}
-
-function ProcessPainViz() {
-  const tools = ["Google Drive", "Notion", "Excel", "DocuSign", "Dropbox", "Gmail", "Slack", "Zoom", "Linear", "Airtable", "Loom", "Calendly"];
-  return (
-    <div>
-      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">Tools in your current process</div>
-      <div className="flex flex-wrap gap-2">
-        {tools.map((t) => (
-          <span key={t} className="text-[10px] border border-border/60 rounded-md px-2 py-1 text-muted-foreground">{t}</span>
-        ))}
-      </div>
-      <div className="mt-4 rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2 text-[11px] text-destructive/80">
-        12 tools × 2 sides = 24 places something can break
-      </div>
-    </div>
   );
 }
 
 // ── 4. HOW IT WORKS ───────────────────────────────────────────────
 function HowItWorks() {
   const steps = [
-    { n: "01", t: "Build your profile",   d: "2-minute setup. Stage, sector, thesis, funding targets. AI personalizes your experience from day one.", icon: Users },
-    { n: "02", t: "Get AI-matched",        d: "Our engine scores thesis fit in real time. Founders find relevant investors. Investors see deals that match their mandate.", icon: Brain },
-    { n: "03", t: "Open a deal room",      d: "NDA-gated, watermarked, audited. Share docs, run Q&A, track exactly what each investor has seen.", icon: ShieldCheck },
-    { n: "04", t: "Close the round",       d: "DD Workstation with 6 categories, document review, investor feedback, and a one-click decision workflow.", icon: Zap },
+    {
+      n: "01",
+      t: "Build your profile",
+      d: "2 minutes. Add your stage, sector, thesis, and funding targets. AI personalizes everything from day one.",
+      icon: Users,
+    },
+    {
+      n: "02",
+      t: "Open a deal room",
+      d: "Invite your investor (or founder). They sign an NDA. Documents are shared, watermarked, and audited automatically.",
+      icon: ShieldCheck,
+    },
+    {
+      n: "03",
+      t: "Run due diligence",
+      d: "6-category DD checklist. AI analysis. Document review with accept/revision workflow. Q&A between both parties.",
+      icon: ListChecks,
+    },
+    {
+      n: "04",
+      t: "Make the decision",
+      d: "Investor submits a decision: Invest, Hold, or Pass. Founder gets notified. Term sheet next.",
+      icon: Zap,
+    },
   ];
 
   return (
-    <section className="relative border-y border-border/60">
+    <section id="how-it-works" className="relative border-y border-border/60">
       <div className="absolute inset-0 -z-10 bg-gradient-soft" />
-      <div className="absolute inset-0 -z-10 noise opacity-30" />
       <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
         <div className="mb-14 max-w-xl">
-          <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-3">How it works</div>
+          <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-3">
+            How it works
+          </div>
           <h2 className="hs text-3xl md:text-5xl font-bold tracking-[-0.04em] leading-[1.08]">
-            From zero to closed<br />in four moves.
+            From first contact to closed deal — structured.
           </h2>
         </div>
 
@@ -354,7 +239,7 @@ function HowItWorks() {
         <div className="hidden md:block relative">
           <div className="absolute top-[2.25rem] left-[calc(12.5%+1.5rem)] right-[calc(12.5%+1.5rem)] h-px hs-step-line opacity-30" />
           <div className="grid grid-cols-4 gap-5">
-            {steps.map(({ n, t, d, icon: Icon }, i) => (
+            {steps.map(({ n, t, d, icon: Icon }) => (
               <div key={n} className="relative group">
                 <div className="relative z-10 flex flex-col">
                   <div className="mb-5 grid h-11 w-11 place-items-center rounded-xl bg-gradient-brand text-brand-foreground shadow-glow group-hover:scale-105 transition-transform duration-200">
@@ -392,101 +277,25 @@ function HowItWorks() {
   );
 }
 
-// ── 5. FEATURES ───────────────────────────────────────────────────
-function Features() {
-  const feats = [
-    {
-      icon: Brain,
-      title: "AI Deal Analysis",
-      desc: "Thesis-fit score from 0–100, narrative strengths and risks breakdown, one-click investment memo generation.",
-      accent: "text-violet-500",
-      bg: "bg-violet-500/10",
-    },
-    {
-      icon: ListChecks,
-      title: "DD Workstation",
-      desc: "6-category tracker (Financials, Team, Legal, Market, Product, References) with 22 pre-loaded items, status controls, and per-document review.",
-      accent: "text-brand",
-      bg: "bg-brand/10",
-    },
-    {
-      icon: ShieldCheck,
-      title: "Secure Deal Room",
-      desc: "NDA-gated access, document watermarking, full audit trail. Know who viewed what and when — no exceptions.",
-      accent: "text-emerald-500",
-      bg: "bg-emerald-500/10",
-    },
-    {
-      icon: Users,
-      title: "Investor CRM",
-      desc: "Pipeline kanban from first email to term sheet. Notes, follow-ups, status tracking, and meeting logs in one place.",
-      accent: "text-blue-500",
-      bg: "bg-blue-500/10",
-    },
-    {
-      icon: FileText,
-      title: "Document Vault",
-      desc: "AI summaries on every uploaded document, per-document accept/reject/revision workflow, category filtering.",
-      accent: "text-amber-500",
-      bg: "bg-amber-500/10",
-    },
-    {
-      icon: Bell,
-      title: "Real-time Updates",
-      desc: "Investors get notified when founders upload docs. Founders get notified of investor decisions. Nothing falls through the cracks.",
-      accent: "text-rose-500",
-      bg: "bg-rose-500/10",
-    },
-  ];
-
-  return (
-    <section id="features" className="mx-auto max-w-7xl px-6 py-24 md:py-32">
-      <div className="flex items-end justify-between gap-8 mb-14 flex-wrap">
-        <div className="max-w-lg">
-          <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-3">Features</div>
-          <h2 className="hs text-3xl md:text-5xl font-bold tracking-[-0.04em] leading-[1.08]">
-            Everything you need<br />to close your round.
-          </h2>
-        </div>
-        <p className="text-sm text-muted-foreground max-w-sm">
-          Purpose-built for the $300B early-stage market. Not a spreadsheet. Not another inbox. A war room.
-        </p>
-      </div>
-
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-border/60 rounded-2xl overflow-hidden border border-border/60">
-        {feats.map(({ icon: Icon, title, desc, accent, bg }) => (
-          <div key={title} className="hs-feat relative bg-card p-7 hover:bg-accent/30 transition-colors group">
-            <div className={cn("hs-feat-icon grid h-10 w-10 place-items-center rounded-xl mb-5", bg)}>
-              <Icon className={cn("h-5 w-5", accent)} />
-            </div>
-            <div className="hs text-[15px] font-bold tracking-tight mb-2">{title}</div>
-            <div className="text-[13px] text-muted-foreground leading-relaxed">{desc}</div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-// ── 6. STATS ──────────────────────────────────────────────────────
-function Stats() {
+// ── 5. PROOF NUMBERS ─────────────────────────────────────────────
+function ProofNumbers() {
   const stats = [
-    { n: "$300B", label: "early-stage market we're built for", sub: "Global seed + Series A, annually" },
-    { n: "22",    label: "default DD checklist items, zero setup", sub: "Across 6 categories out of the box" },
-    { n: "< 2m",  label: "to open a fully structured deal room", sub: "NDA, docs, Q&A, workstation — ready" },
+    { n: "< 2 min",      label: "to open a fully structured deal room" },
+    { n: "6 categories", label: "of due diligence, pre-loaded" },
+    { n: "100%",         label: "encrypted & watermarked documents" },
+    { n: "1 room",       label: "replaces 12 tools" },
   ];
 
   return (
-    <section className="relative border-y border-border/60 overflow-hidden">
-      <div className="absolute inset-0 -z-10 bg-gradient-mesh opacity-60" />
-      <div className="absolute inset-0 -z-10 noise opacity-50" />
-      <div className="mx-auto max-w-7xl px-6 py-20 md:py-28">
-        <div className="grid md:grid-cols-3 gap-8 md:gap-5 md:divide-x divide-border/60">
-          {stats.map(({ n, label, sub }) => (
-            <div key={n} className="md:px-8 first:pl-0 last:pr-0">
-              <div className="hs text-[clamp(2.5rem,6vw,4rem)] font-bold tracking-[-0.04em] text-gradient-brand leading-none mb-3">{n}</div>
-              <div className="text-sm font-semibold leading-snug mb-1">{label}</div>
-              <div className="text-xs text-muted-foreground">{sub}</div>
+    <section className="bg-gradient-to-r from-purple-600 to-indigo-600 py-20">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:divide-x divide-white/20">
+          {stats.map(({ n, label }) => (
+            <div key={n} className="md:px-8 first:pl-0 last:pr-0 text-center md:text-left">
+              <div className="hs text-[clamp(2rem,5vw,3rem)] font-bold text-white leading-none mb-2">
+                {n}
+              </div>
+              <div className="text-sm text-white/70 leading-snug">{label}</div>
             </div>
           ))}
         </div>
@@ -495,96 +304,160 @@ function Stats() {
   );
 }
 
-// ── 7. DUAL CTA ───────────────────────────────────────────────────
-function DualCTA() {
-  return (
-    <section id="get-started" className="mx-auto max-w-7xl px-6 py-24 md:py-32">
-      <div className="grid md:grid-cols-2 gap-4">
-        {/* Founders */}
-        <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card p-10 md:p-12 group">
-          <div className="absolute inset-0 -z-10 bg-gradient-hero opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
-          <div className="absolute inset-0 -z-10 noise opacity-40" />
-          <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-4">For founders</div>
-          <h3 className="hs text-2xl md:text-3xl font-bold tracking-[-0.04em] leading-[1.1] mb-4">
-            Your raise deserves<br />a war room.
-          </h3>
-          <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-sm">
-            Stop managing your round in spreadsheets. Get a structured deal room that keeps investors engaged, documents organized, and your round moving.
-          </p>
-          <Link to="/sign-up" search={{ role: "founder" } as any}>
-            <Button variant="brand" size="lg" className="gap-2 shadow-glow">
-              Start for free <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
-          <div className="mt-5 flex flex-wrap gap-3">
-            {["NDA-gated", "AI summaries", "DD workstation"].map((f) => (
-              <span key={f} className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                <CheckCircle2 className="h-3.5 w-3.5 text-brand" /> {f}
-              </span>
-            ))}
-          </div>
-        </div>
+// ── 6. FOR FOUNDERS / FOR INVESTORS ──────────────────────────────
+function ForFoundersInvestors() {
+  const founderFeatures = [
+    "NDA-gated investor access",
+    "Document vault with AI summaries",
+    "Real-time investor activity tracking",
+    "Q&A thread per investor",
+    "Due diligence workstation",
+  ];
+  const investorFeatures = [
+    "Thesis-match AI scoring (0–100)",
+    "Deal flow pipeline kanban",
+    "One-click investment memo",
+    "6-category DD tracker",
+    "Portfolio management",
+  ];
 
-        {/* Investors */}
-        <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card p-10 md:p-12 group">
-          <div className="absolute inset-0 -z-10 bg-gradient-mesh opacity-40 group-hover:opacity-60 transition-opacity duration-500" />
-          <div className="absolute inset-0 -z-10 noise opacity-40" />
-          <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-4">For investors</div>
-          <h3 className="hs text-2xl md:text-3xl font-bold tracking-[-0.04em] leading-[1.1] mb-4">
-            Find your next deal,<br />not your next inbox.
-          </h3>
-          <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-sm">
-            AI thesis-match scoring, a live DD workstation, and structured document review — so you can move from deck to decision without the noise.
-          </p>
-          <Link to="/sign-up" search={{ role: "investor" } as any}>
-            <Button variant="outline" size="lg" className="gap-2">
-              Explore deal flow <ArrowRight className="h-4 w-4" />
-            </Button>
+  return (
+    <section className="grid md:grid-cols-2">
+      {/* Left — dark purple */}
+      <div className="bg-gradient-to-br from-purple-950 to-purple-900 p-12 md:p-16 flex flex-col">
+        <div className="text-[10px] uppercase tracking-widest font-semibold text-purple-400 mb-5">
+          For Founders
+        </div>
+        <h2 className="hs text-3xl md:text-4xl font-bold text-white leading-[1.1] tracking-[-0.03em] mb-5">
+          Your raise deserves a war room.
+        </h2>
+        <p className="text-purple-200/80 text-base leading-relaxed mb-8 max-w-sm">
+          Stop managing 200 investor relationships in a spreadsheet. Get a structured deal room that keeps
+          investors engaged, documents organized, and your round moving — without the chaos.
+        </p>
+        <ul className="space-y-3 mb-10">
+          {founderFeatures.map((f) => (
+            <li key={f} className="flex items-center gap-3 text-sm text-purple-100">
+              <CheckCircle2 className="h-4 w-4 text-purple-400 shrink-0" />
+              {f}
+            </li>
+          ))}
+        </ul>
+        <div className="mt-auto">
+          <Link to="/sign-up" search={{ role: "founder" } as any}>
+            <span className="inline-flex items-center gap-2 rounded-full bg-white text-purple-900 font-semibold px-6 py-3 text-sm hover:bg-purple-50 transition-colors shadow-lg cursor-pointer">
+              Start raising free <ArrowRight className="h-4 w-4" />
+            </span>
           </Link>
-          <div className="mt-5 flex flex-wrap gap-3">
-            {["Thesis matching", "DD overview", "One-click memo"].map((f) => (
-              <span key={f} className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                <CheckCircle2 className="h-3.5 w-3.5 text-success" /> {f}
-              </span>
-            ))}
-          </div>
         </div>
       </div>
 
-      {/* Bottom beta banner */}
-      <div className="mt-8 rounded-2xl border border-brand/20 bg-brand/5 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className="h-2 w-2 rounded-full bg-brand animate-pulse-glow" />
-          <span className="text-sm font-medium">Currently in beta — free for early users</span>
-          <span className="hidden sm:inline text-xs text-muted-foreground">No credit card required. Cancel any time.</span>
+      {/* Right — dark indigo */}
+      <div className="bg-gradient-to-br from-indigo-950 to-indigo-900 p-12 md:p-16 flex flex-col">
+        <div className="text-[10px] uppercase tracking-widest font-semibold text-indigo-400 mb-5">
+          For Investors
         </div>
-        <Link to="/sign-up" search={{ role: "founder" } as any}>
-          <Button variant="brand" size="sm" className="gap-1.5 shrink-0 shadow-glow">
-            Join the beta <ArrowRight className="h-3.5 w-3.5" />
-          </Button>
-        </Link>
+        <h2 className="hs text-3xl md:text-4xl font-bold text-white leading-[1.1] tracking-[-0.03em] mb-5">
+          Find signal. Skip the noise.
+        </h2>
+        <p className="text-indigo-200/80 text-base leading-relaxed mb-8 max-w-sm">
+          AI thesis-match scoring, a live DD workstation, and structured document review — so you can move
+          from deck to decision without drowning in unstructured deal flow.
+        </p>
+        <ul className="space-y-3 mb-10">
+          {investorFeatures.map((f) => (
+            <li key={f} className="flex items-center gap-3 text-sm text-indigo-100">
+              <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
+              {f}
+            </li>
+          ))}
+        </ul>
+        <div className="mt-auto">
+          <Link to="/sign-up" search={{ role: "investor" } as any}>
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/30 text-white font-semibold px-6 py-3 text-sm hover:bg-white/10 transition-colors cursor-pointer">
+              Explore deal flow <ArrowRight className="h-4 w-4" />
+            </span>
+          </Link>
+        </div>
       </div>
     </section>
   );
 }
 
-// ── 8. RESOURCES ──────────────────────────────────────────────────
+// ── 7. AI CHAT SECTION ────────────────────────────────────────────
+function ChatSection() {
+  const [starterId, setStarterId] = useState(0);
+  const [starterText, setStarterText] = useState<string | null>(null);
+
+  const starters = [
+    "I'm a founder raising my first round →",
+    "I'm a VC reviewing 50+ deals a month →",
+    "I just want to understand how it works →",
+  ];
+
+  function handleStarter(text: string) {
+    setStarterText(text);
+    setStarterId((n) => n + 1);
+  }
+
+  return (
+    <section className="bg-gray-950 py-24">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Left */}
+          <div>
+            <div className="text-[10px] uppercase tracking-widest font-semibold text-purple-400 mb-5">
+              Talk to us
+            </div>
+            <h2 className="hs text-4xl md:text-5xl font-black text-white leading-tight tracking-[-0.03em]">
+              Not sure if<br />
+              Hockystick is<br />
+              right for you?
+            </h2>
+            <p className="mt-5 text-lg text-gray-400 max-w-md leading-relaxed">
+              Don't read another landing page. Just tell us who you are and what you're trying to solve.
+              Our AI will tell you — honestly — if we're the right fit.
+            </p>
+            <div className="mt-8 flex flex-col gap-3">
+              {starters.map((text) => (
+                <button
+                  key={text}
+                  onClick={() => handleStarter(text)}
+                  className="text-left rounded-full border border-white/20 text-white hover:bg-white hover:text-gray-950 px-5 py-2.5 text-sm font-medium transition-all"
+                >
+                  {text}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Right — chat widget */}
+          <div className="shadow-2xl rounded-2xl ring-1 ring-white/10">
+            <OnboardingChat key={starterId} variant="embedded" triggerMessage={starterText} />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── 8. STARTUP RESOURCES ─────────────────────────────────────────
 const ACCELERATORS = [
-  { name: "Y Combinator", desc: "The world's most prestigious accelerator. $500K for 7%.", href: "https://ycombinator.com/apply", cta: "Apply →" },
-  { name: "Techstars", desc: "3-month program, $120K investment, global network.", href: "https://techstars.com/apply", cta: "Apply →" },
-  { name: "500 Global", desc: "Early-stage VC with accelerator programs worldwide.", href: "https://500.co", cta: "Apply →" },
-  { name: "Antler", desc: "Build your company from day zero with co-founders.", href: "https://antler.co", cta: "Apply →" },
-  { name: "Entrepreneur First", desc: "Pre-team, pre-idea — they back individuals.", href: "https://joinef.com", cta: "Apply →" },
-  { name: "Seedcamp", desc: "Europe's leading pre-seed and seed fund.", href: "https://seedcamp.com", cta: "Apply →" },
+  { name: "Y Combinator",        desc: "The world's most prestigious accelerator. $500K for 7%.",  href: "https://ycombinator.com/apply",           cta: "Apply →" },
+  { name: "Techstars",           desc: "3-month program, $120K investment, global network.",        href: "https://techstars.com/apply",              cta: "Apply →" },
+  { name: "500 Global",          desc: "Early-stage VC with accelerator programs worldwide.",       href: "https://500.co",                           cta: "Apply →" },
+  { name: "Antler",              desc: "Build your company from day zero with co-founders.",        href: "https://antler.co",                        cta: "Apply →" },
+  { name: "Entrepreneur First",  desc: "Pre-team, pre-idea — they back individuals.",               href: "https://joinef.com",                       cta: "Apply →" },
+  { name: "Seedcamp",            desc: "Europe's leading pre-seed and seed fund.",                  href: "https://seedcamp.com",                     cta: "Apply →" },
 ];
 
 const GRANTS = [
-  { name: "SBIR / STTR", desc: "US government grants up to $2M for tech startups.", href: "https://sbir.gov", cta: "Learn more →" },
-  { name: "Google for Startups", desc: "Cloud credits, mentorship, and global community.", href: "https://startup.google.com", cta: "Learn more →" },
-  { name: "AWS Activate", desc: "Up to $100K in AWS credits for startups.", href: "https://aws.amazon.com/activate", cta: "Learn more →" },
-  { name: "Microsoft for Startups", desc: "Azure credits, GitHub, and go-to-market support.", href: "https://microsoft.com/startups", cta: "Learn more →" },
-  { name: "Innovate UK", desc: "UK government funding for innovative businesses.", href: "https://innovateuk.ukri.org", cta: "Learn more →" },
-  { name: "EU Horizon", desc: "European research and innovation funding.", href: "https://ec.europa.eu/info/funding-tenders", cta: "Learn more →" },
+  { name: "SBIR / STTR",             desc: "US government grants up to $2M for tech startups.",       href: "https://sbir.gov",                           cta: "Learn more →" },
+  { name: "Google for Startups",     desc: "Cloud credits, mentorship, and global community.",         href: "https://startup.google.com",                 cta: "Learn more →" },
+  { name: "AWS Activate",            desc: "Up to $100K in AWS credits for startups.",                 href: "https://aws.amazon.com/activate",             cta: "Learn more →" },
+  { name: "Microsoft for Startups",  desc: "Azure credits, GitHub, and go-to-market support.",         href: "https://microsoft.com/startups",              cta: "Learn more →" },
+  { name: "Innovate UK",             desc: "UK government funding for innovative businesses.",          href: "https://innovateuk.ukri.org",                 cta: "Learn more →" },
+  { name: "EU Horizon",              desc: "European research and innovation funding.",                 href: "https://ec.europa.eu/info/funding-tenders",   cta: "Learn more →" },
 ];
 
 function ResourceCard({ name, desc, href, cta }: { name: string; desc: string; href: string; cta: string }) {
@@ -607,7 +480,9 @@ function Resources() {
     <section className="border-t border-border/60 bg-gradient-soft">
       <div className="mx-auto max-w-7xl px-6 py-20 md:py-28">
         <div className="mb-12">
-          <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-3">Startup Resources</div>
+          <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-3">
+            Startup Resources
+          </div>
           <h2 className="hs text-3xl md:text-4xl font-bold tracking-[-0.04em] leading-[1.08] mb-3">
             Everything you need to fund your startup.
           </h2>
@@ -618,18 +493,56 @@ function Resources() {
 
         <div className="grid md:grid-cols-2 gap-10">
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-widest text-foreground/70 mb-4">Top Accelerators</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-foreground/70 mb-4">
+              Top Accelerators
+            </h3>
             <div className="grid gap-3">
               {ACCELERATORS.map((r) => <ResourceCard key={r.name} {...r} />)}
             </div>
           </div>
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-widest text-foreground/70 mb-4">Grants &amp; Programs</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-foreground/70 mb-4">
+              Grants &amp; Programs
+            </h3>
             <div className="grid gap-3">
               {GRANTS.map((r) => <ResourceCard key={r.name} {...r} />)}
             </div>
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
+
+// ── 9. FINAL CTA ─────────────────────────────────────────────────
+function FinalCTA() {
+  return (
+    <section className="bg-gradient-to-r from-purple-600 to-indigo-600 py-20">
+      <div className="mx-auto max-w-4xl px-6 text-center">
+        <h2 className="hs text-4xl md:text-5xl font-black text-white leading-tight tracking-[-0.03em]">
+          The deal room is ready.<br />
+          Are you?
+        </h2>
+        <p className="mt-4 text-lg text-white/70 max-w-xl mx-auto">
+          Join founders and investors already using Hockystick to close deals faster, with less friction.
+        </p>
+
+        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+          <Link to="/sign-up" search={{ role: "founder" } as any}>
+            <span className="inline-flex items-center justify-center gap-2 rounded-full bg-white text-purple-900 font-semibold px-8 py-4 text-base hover:bg-purple-50 transition-colors shadow-lg w-full sm:w-auto cursor-pointer">
+              Start raising <ArrowRight className="h-5 w-5" />
+            </span>
+          </Link>
+          <Link to="/sign-up" search={{ role: "investor" } as any}>
+            <span className="inline-flex items-center justify-center gap-2 rounded-full border border-white/40 text-white font-semibold px-8 py-4 text-base hover:bg-white/10 transition-colors w-full sm:w-auto cursor-pointer">
+              Start investing <ArrowRight className="h-5 w-5" />
+            </span>
+          </Link>
+        </div>
+
+        <p className="mt-6 text-sm text-white/50">
+          Free during beta · No credit card · 2-minute setup
+        </p>
       </div>
     </section>
   );

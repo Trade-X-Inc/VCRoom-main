@@ -9,7 +9,7 @@ export function SiteFooter() {
           <div className="max-w-xs">
             <Logo />
             <p className="mt-4 text-sm text-muted-foreground">
-              The investor-grade platform where deals get decided.
+              Where deals get done.
             </p>
           </div>
 
