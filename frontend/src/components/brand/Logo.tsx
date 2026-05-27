@@ -11,7 +11,7 @@ export function Logo({
     <div className="flex items-center gap-2">
       <img
         src="/logo-dark.svg"
-        alt="Hockeystick"
+        alt="Hockystick"
         width={dim}
         height={dim}
         className="rounded-lg shrink-0"
@@ -19,7 +19,7 @@ export function Logo({
       />
       {withWordmark && (
         <span className={`font-bold tracking-tight text-foreground ${size === "lg" ? "text-[18px]" : "text-[15px]"}`}>
-          Hockeystick
+          Hockystick
         </span>
       )}
     </div>
