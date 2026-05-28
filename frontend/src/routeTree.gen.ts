@@ -9,15 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WaitlistRouteImport } from './routes/waitlist'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as InviteRouteImport } from './routes/invite'
 import { Route as InvestorsRouteImport } from './routes/investors'
 import { Route as FoundersRouteImport } from './routes/founders'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as DebugRouteImport } from './routes/debug'
+import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -28,19 +32,25 @@ import { Route as SolutionsInvestorPipelineRouteImport } from './routes/solution
 import { Route as SolutionsFundraisingCrmRouteImport } from './routes/solutions.fundraising-crm'
 import { Route as SolutionsDueDiligenceRouteImport } from './routes/solutions.due-diligence'
 import { Route as JoinTokenRouteImport } from './routes/join.$token'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AppWallRouteImport } from './routes/app.wall'
 import { Route as AppUsersRouteImport } from './routes/app.users'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppReportsRouteImport } from './routes/app.reports'
+import { Route as AppReferralsRouteImport } from './routes/app.referrals'
 import { Route as AppProfileRouteImport } from './routes/app.profile'
 import { Route as AppPipelineRouteImport } from './routes/app.pipeline'
 import { Route as AppNotificationsRouteImport } from './routes/app.notifications'
+import { Route as AppNewsRouteImport } from './routes/app.news'
 import { Route as AppMessagesRouteImport } from './routes/app.messages'
 import { Route as AppMeetingsRouteImport } from './routes/app.meetings'
 import { Route as AppLeadsRouteImport } from './routes/app.leads'
 import { Route as AppInvestorRouteImport } from './routes/app.investor'
+import { Route as AppIntegrationsRouteImport } from './routes/app.integrations'
 import { Route as AppEmailRouteImport } from './routes/app.email'
 import { Route as AppDocumentsRouteImport } from './routes/app.documents'
+import { Route as AppDirectoryRouteImport } from './routes/app.directory'
 import { Route as AppDealRoomsRouteImport } from './routes/app.deal-rooms'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
 import { Route as AppAdvisorRouteImport } from './routes/app.advisor'
@@ -65,6 +75,11 @@ import { Route as AppInvestorAdvisorRouteImport } from './routes/app.investor.ad
 import { Route as AppDealRoomIdRouteImport } from './routes/app.deal-room.$id'
 import { Route as AppDealRoomIdNdaRouteImport } from './routes/app.deal-room.$id_.nda'
 
+const WaitlistRoute = WaitlistRouteImport.update({
+  id: '/waitlist',
+  path: '/waitlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -90,6 +105,11 @@ const PricingRoute = PricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InviteRoute = InviteRouteImport.update({
+  id: '/invite',
+  path: '/invite',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvestorsRoute = InvestorsRouteImport.update({
   id: '/investors',
   path: '/investors',
@@ -105,9 +125,19 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeedbackRoute = FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DebugRoute = DebugRouteImport.update({
   id: '/debug',
   path: '/debug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -161,10 +191,20 @@ const JoinTokenRoute = JoinTokenRouteImport.update({
   path: '/join/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => BlogRoute,
+} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppWallRoute = AppWallRouteImport.update({
+  id: '/wall',
+  path: '/wall',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppUsersRoute = AppUsersRouteImport.update({
   id: '/users',
@@ -181,6 +221,11 @@ const AppReportsRoute = AppReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => AppRoute,
 } as any)
+const AppReferralsRoute = AppReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProfileRoute = AppProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -194,6 +239,11 @@ const AppPipelineRoute = AppPipelineRouteImport.update({
 const AppNotificationsRoute = AppNotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNewsRoute = AppNewsRouteImport.update({
+  id: '/news',
+  path: '/news',
   getParentRoute: () => AppRoute,
 } as any)
 const AppMessagesRoute = AppMessagesRouteImport.update({
@@ -216,6 +266,11 @@ const AppInvestorRoute = AppInvestorRouteImport.update({
   path: '/investor',
   getParentRoute: () => AppRoute,
 } as any)
+const AppIntegrationsRoute = AppIntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppEmailRoute = AppEmailRouteImport.update({
   id: '/email',
   path: '/email',
@@ -224,6 +279,11 @@ const AppEmailRoute = AppEmailRouteImport.update({
 const AppDocumentsRoute = AppDocumentsRouteImport.update({
   id: '/documents',
   path: '/documents',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDirectoryRoute = AppDirectoryRouteImport.update({
+  id: '/directory',
+  path: '/directory',
   getParentRoute: () => AppRoute,
 } as any)
 const AppDealRoomsRoute = AppDealRoomsRouteImport.update({
@@ -347,32 +407,42 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/app': typeof AppRouteWithChildren
+  '/blog': typeof BlogRouteWithChildren
   '/debug': typeof DebugRoute
+  '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
   '/investors': typeof InvestorsRoute
+  '/invite': typeof InviteRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
+  '/waitlist': typeof WaitlistRoute
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
+  '/app/directory': typeof AppDirectoryRoute
   '/app/documents': typeof AppDocumentsRoute
   '/app/email': typeof AppEmailRoute
+  '/app/integrations': typeof AppIntegrationsRoute
   '/app/investor': typeof AppInvestorRouteWithChildren
   '/app/leads': typeof AppLeadsRoute
   '/app/meetings': typeof AppMeetingsRoute
   '/app/messages': typeof AppMessagesRoute
+  '/app/news': typeof AppNewsRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/pipeline': typeof AppPipelineRoute
   '/app/profile': typeof AppProfileRoute
+  '/app/referrals': typeof AppReferralsRoute
   '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/users': typeof AppUsersRoute
+  '/app/wall': typeof AppWallRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/join/$token': typeof JoinTokenRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
   '/solutions/fundraising-crm': typeof SolutionsFundraisingCrmRoute
@@ -403,31 +473,41 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/blog': typeof BlogRouteWithChildren
   '/debug': typeof DebugRoute
+  '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
   '/investors': typeof InvestorsRoute
+  '/invite': typeof InviteRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
+  '/waitlist': typeof WaitlistRoute
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
+  '/app/directory': typeof AppDirectoryRoute
   '/app/documents': typeof AppDocumentsRoute
   '/app/email': typeof AppEmailRoute
+  '/app/integrations': typeof AppIntegrationsRoute
   '/app/leads': typeof AppLeadsRoute
   '/app/meetings': typeof AppMeetingsRoute
   '/app/messages': typeof AppMessagesRoute
+  '/app/news': typeof AppNewsRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/pipeline': typeof AppPipelineRoute
   '/app/profile': typeof AppProfileRoute
+  '/app/referrals': typeof AppReferralsRoute
   '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/users': typeof AppUsersRoute
+  '/app/wall': typeof AppWallRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/join/$token': typeof JoinTokenRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
   '/solutions/fundraising-crm': typeof SolutionsFundraisingCrmRoute
@@ -460,32 +540,42 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/app': typeof AppRouteWithChildren
+  '/blog': typeof BlogRouteWithChildren
   '/debug': typeof DebugRoute
+  '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
   '/investors': typeof InvestorsRoute
+  '/invite': typeof InviteRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
+  '/waitlist': typeof WaitlistRoute
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
+  '/app/directory': typeof AppDirectoryRoute
   '/app/documents': typeof AppDocumentsRoute
   '/app/email': typeof AppEmailRoute
+  '/app/integrations': typeof AppIntegrationsRoute
   '/app/investor': typeof AppInvestorRouteWithChildren
   '/app/leads': typeof AppLeadsRoute
   '/app/meetings': typeof AppMeetingsRoute
   '/app/messages': typeof AppMessagesRoute
+  '/app/news': typeof AppNewsRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/pipeline': typeof AppPipelineRoute
   '/app/profile': typeof AppProfileRoute
+  '/app/referrals': typeof AppReferralsRoute
   '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/users': typeof AppUsersRoute
+  '/app/wall': typeof AppWallRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/join/$token': typeof JoinTokenRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
   '/solutions/fundraising-crm': typeof SolutionsFundraisingCrmRoute
@@ -519,32 +609,42 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/app'
+    | '/blog'
     | '/debug'
+    | '/feedback'
     | '/forgot-password'
     | '/founders'
     | '/investors'
+    | '/invite'
     | '/pricing'
     | '/privacy'
     | '/sign-in'
     | '/sign-up'
     | '/terms'
+    | '/waitlist'
     | '/api/test-ai'
     | '/app/advisor'
     | '/app/audit'
     | '/app/deal-rooms'
+    | '/app/directory'
     | '/app/documents'
     | '/app/email'
+    | '/app/integrations'
     | '/app/investor'
     | '/app/leads'
     | '/app/meetings'
     | '/app/messages'
+    | '/app/news'
     | '/app/notifications'
     | '/app/pipeline'
     | '/app/profile'
+    | '/app/referrals'
     | '/app/reports'
     | '/app/settings'
     | '/app/users'
+    | '/app/wall'
     | '/auth/callback'
+    | '/blog/$slug'
     | '/join/$token'
     | '/solutions/due-diligence'
     | '/solutions/fundraising-crm'
@@ -575,31 +675,41 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/blog'
     | '/debug'
+    | '/feedback'
     | '/forgot-password'
     | '/founders'
     | '/investors'
+    | '/invite'
     | '/pricing'
     | '/privacy'
     | '/sign-in'
     | '/sign-up'
     | '/terms'
+    | '/waitlist'
     | '/api/test-ai'
     | '/app/advisor'
     | '/app/audit'
     | '/app/deal-rooms'
+    | '/app/directory'
     | '/app/documents'
     | '/app/email'
+    | '/app/integrations'
     | '/app/leads'
     | '/app/meetings'
     | '/app/messages'
+    | '/app/news'
     | '/app/notifications'
     | '/app/pipeline'
     | '/app/profile'
+    | '/app/referrals'
     | '/app/reports'
     | '/app/settings'
     | '/app/users'
+    | '/app/wall'
     | '/auth/callback'
+    | '/blog/$slug'
     | '/join/$token'
     | '/solutions/due-diligence'
     | '/solutions/fundraising-crm'
@@ -631,32 +741,42 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/app'
+    | '/blog'
     | '/debug'
+    | '/feedback'
     | '/forgot-password'
     | '/founders'
     | '/investors'
+    | '/invite'
     | '/pricing'
     | '/privacy'
     | '/sign-in'
     | '/sign-up'
     | '/terms'
+    | '/waitlist'
     | '/api/test-ai'
     | '/app/advisor'
     | '/app/audit'
     | '/app/deal-rooms'
+    | '/app/directory'
     | '/app/documents'
     | '/app/email'
+    | '/app/integrations'
     | '/app/investor'
     | '/app/leads'
     | '/app/meetings'
     | '/app/messages'
+    | '/app/news'
     | '/app/notifications'
     | '/app/pipeline'
     | '/app/profile'
+    | '/app/referrals'
     | '/app/reports'
     | '/app/settings'
     | '/app/users'
+    | '/app/wall'
     | '/auth/callback'
+    | '/blog/$slug'
     | '/join/$token'
     | '/solutions/due-diligence'
     | '/solutions/fundraising-crm'
@@ -689,15 +809,19 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AppRoute: typeof AppRouteWithChildren
+  BlogRoute: typeof BlogRouteWithChildren
   DebugRoute: typeof DebugRoute
+  FeedbackRoute: typeof FeedbackRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   FoundersRoute: typeof FoundersRoute
   InvestorsRoute: typeof InvestorsRoute
+  InviteRoute: typeof InviteRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   TermsRoute: typeof TermsRoute
+  WaitlistRoute: typeof WaitlistRoute
   ApiTestAiRoute: typeof ApiTestAiRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   JoinTokenRoute: typeof JoinTokenRoute
@@ -711,6 +835,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/waitlist': {
+      id: '/waitlist'
+      path: '/waitlist'
+      fullPath: '/waitlist'
+      preLoaderRoute: typeof WaitlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -746,6 +877,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/invite': {
+      id: '/invite'
+      path: '/invite'
+      fullPath: '/invite'
+      preLoaderRoute: typeof InviteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/investors': {
       id: '/investors'
       path: '/investors'
@@ -767,11 +905,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/debug': {
       id: '/debug'
       path: '/debug'
       fullPath: '/debug'
       preLoaderRoute: typeof DebugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -844,12 +996,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JoinTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof BlogRoute
+    }
     '/auth/callback': {
       id: '/auth/callback'
       path: '/auth/callback'
       fullPath: '/auth/callback'
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/app/wall': {
+      id: '/app/wall'
+      path: '/wall'
+      fullPath: '/app/wall'
+      preLoaderRoute: typeof AppWallRouteImport
+      parentRoute: typeof AppRoute
     }
     '/app/users': {
       id: '/app/users'
@@ -872,6 +1038,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppReportsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/referrals': {
+      id: '/app/referrals'
+      path: '/referrals'
+      fullPath: '/app/referrals'
+      preLoaderRoute: typeof AppReferralsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/profile': {
       id: '/app/profile'
       path: '/profile'
@@ -891,6 +1064,13 @@ declare module '@tanstack/react-router' {
       path: '/notifications'
       fullPath: '/app/notifications'
       preLoaderRoute: typeof AppNotificationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/news': {
+      id: '/app/news'
+      path: '/news'
+      fullPath: '/app/news'
+      preLoaderRoute: typeof AppNewsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/messages': {
@@ -921,6 +1101,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/integrations': {
+      id: '/app/integrations'
+      path: '/integrations'
+      fullPath: '/app/integrations'
+      preLoaderRoute: typeof AppIntegrationsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/email': {
       id: '/app/email'
       path: '/email'
@@ -933,6 +1120,13 @@ declare module '@tanstack/react-router' {
       path: '/documents'
       fullPath: '/app/documents'
       preLoaderRoute: typeof AppDocumentsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/directory': {
+      id: '/app/directory'
+      path: '/directory'
+      fullPath: '/app/directory'
+      preLoaderRoute: typeof AppDirectoryRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/deal-rooms': {
@@ -1155,18 +1349,23 @@ interface AppRouteChildren {
   AppAdvisorRoute: typeof AppAdvisorRoute
   AppAuditRoute: typeof AppAuditRoute
   AppDealRoomsRoute: typeof AppDealRoomsRoute
+  AppDirectoryRoute: typeof AppDirectoryRoute
   AppDocumentsRoute: typeof AppDocumentsRoute
   AppEmailRoute: typeof AppEmailRoute
+  AppIntegrationsRoute: typeof AppIntegrationsRoute
   AppInvestorRoute: typeof AppInvestorRouteWithChildren
   AppLeadsRoute: typeof AppLeadsRoute
   AppMeetingsRoute: typeof AppMeetingsRoute
   AppMessagesRoute: typeof AppMessagesRoute
+  AppNewsRoute: typeof AppNewsRoute
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppPipelineRoute: typeof AppPipelineRoute
   AppProfileRoute: typeof AppProfileRoute
+  AppReferralsRoute: typeof AppReferralsRoute
   AppReportsRoute: typeof AppReportsRoute
   AppSettingsRoute: typeof AppSettingsRouteWithChildren
   AppUsersRoute: typeof AppUsersRoute
+  AppWallRoute: typeof AppWallRoute
   AppIndexRoute: typeof AppIndexRoute
   AppDealRoomIdRoute: typeof AppDealRoomIdRoute
   AppDealRoomIdNdaRoute: typeof AppDealRoomIdNdaRoute
@@ -1176,18 +1375,23 @@ const AppRouteChildren: AppRouteChildren = {
   AppAdvisorRoute: AppAdvisorRoute,
   AppAuditRoute: AppAuditRoute,
   AppDealRoomsRoute: AppDealRoomsRoute,
+  AppDirectoryRoute: AppDirectoryRoute,
   AppDocumentsRoute: AppDocumentsRoute,
   AppEmailRoute: AppEmailRoute,
+  AppIntegrationsRoute: AppIntegrationsRoute,
   AppInvestorRoute: AppInvestorRouteWithChildren,
   AppLeadsRoute: AppLeadsRoute,
   AppMeetingsRoute: AppMeetingsRoute,
   AppMessagesRoute: AppMessagesRoute,
+  AppNewsRoute: AppNewsRoute,
   AppNotificationsRoute: AppNotificationsRoute,
   AppPipelineRoute: AppPipelineRoute,
   AppProfileRoute: AppProfileRoute,
+  AppReferralsRoute: AppReferralsRoute,
   AppReportsRoute: AppReportsRoute,
   AppSettingsRoute: AppSettingsRouteWithChildren,
   AppUsersRoute: AppUsersRoute,
+  AppWallRoute: AppWallRoute,
   AppIndexRoute: AppIndexRoute,
   AppDealRoomIdRoute: AppDealRoomIdRoute,
   AppDealRoomIdNdaRoute: AppDealRoomIdNdaRoute,
@@ -1195,19 +1399,33 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface BlogRouteChildren {
+  BlogSlugRoute: typeof BlogSlugRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogSlugRoute: BlogSlugRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AppRoute: AppRouteWithChildren,
+  BlogRoute: BlogRouteWithChildren,
   DebugRoute: DebugRoute,
+  FeedbackRoute: FeedbackRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   FoundersRoute: FoundersRoute,
   InvestorsRoute: InvestorsRoute,
+  InviteRoute: InviteRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   TermsRoute: TermsRoute,
+  WaitlistRoute: WaitlistRoute,
   ApiTestAiRoute: ApiTestAiRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   JoinTokenRoute: JoinTokenRoute,

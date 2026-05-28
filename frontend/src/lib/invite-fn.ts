@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
+import { sendEmail, APP_URL } from "./email/resend";
+import { dealRoomInviteEmail } from "./email/templates";
 
 type InviteInput = {
   dealRoomId: string;
@@ -10,7 +12,6 @@ type InviteInput = {
   supabaseUrl?: string;
   supabaseAnonKey?: string;
   appUrl?: string;
-  resendKey?: string;
   dealRoomName?: string;
   founderName?: string;
   startupName?: string;
@@ -70,16 +71,10 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
       return { success: false, emailSent: false, error: dbErr?.message ?? "Failed to create invite record" };
     }
 
-    const baseUrl =
-      data.appUrl ||
-      (globalThis as any).VITE_APP_URL ||
-      process.env.VITE_APP_URL ||
-      (globalThis as any).SITE_URL ||
-      process.env.SITE_URL ||
-      "https://hockystick.app";
-    const inviteLink = `${baseUrl}/join/${invite.token}`;
+    const resolvedAppUrl = import.meta.env.VITE_APP_URL || data.appUrl || APP_URL;
+    const inviteLink = `${resolvedAppUrl}/join/${invite.token}`;
 
-    // Notify existing user if they already have an account
+    // In-app notification for existing users
     try {
       const { data: existingUser } = await client
         .from("users")
@@ -99,63 +94,43 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
         });
       }
     } catch {
-      // Non-blocking — ignore notification errors
+      // Non-blocking
     }
 
-    const resendKey =
-      data.resendKey ||
-      (globalThis as any).RESEND_API_KEY ||
-      process.env.RESEND_API_KEY ||
-      "";
-    const fromEmail =
-      (globalThis as any).RESEND_FROM_EMAIL ||
-      process.env.RESEND_FROM_EMAIL ||
-      "onboarding@resend.dev";
+    // Send branded invite email via Resend
+    const companyName = data.startupName ?? data.dealRoomName ?? "a deal room";
+    const senderName = data.founderName ?? "A founder";
 
-    if (!resendKey) {
+    try {
+      const { subject, html } = dealRoomInviteEmail({
+        investorName: "there",
+        founderName: senderName,
+        companyName,
+        inviteLink,
+      });
+
+      // Append personal message block if provided
+      const finalHtml = data.message
+        ? html.replace(
+            "</div>\n    <p class=\"meta center\">",
+            `<div class="highlight" style="margin-bottom:16px;"><p style="white-space:pre-line;">${data.message}</p></div>\n    </div>\n    <p class="meta center">`,
+          )
+        : html;
+
+      await sendEmail({
+        to: data.email,
+        subject,
+        html: finalHtml,
+        tags: [{ name: "type", value: "deal-room-invite" }],
+      });
+      return { success: true, emailSent: true, token: invite.token, inviteLink };
+    } catch {
       return {
         success: true,
         emailSent: false,
         token: invite.token,
         inviteLink,
-        message: "Invite created. Email not sent — copy link manually.",
+        message: "Invite created but email failed to send.",
       };
     }
-
-    const roomName = data.startupName ?? data.dealRoomName ?? "a deal room";
-    const senderName = data.founderName ?? "A founder";
-
-    const emailHtml = `
-      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;padding:40px 20px;color:#111827">
-        <h1 style="font-size:22px;font-weight:700;margin:0 0 8px">You've been invited to a deal room</h1>
-        <p style="color:#6b7280;margin:0 0 24px;font-size:15px">${senderName} has invited you to evaluate <strong>${roomName}</strong> on Hockystick.</p>
-        ${data.message ? `<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin:0 0 24px"><p style="color:#374151;margin:0;font-size:14px;white-space:pre-line">${data.message}</p></div>` : ""}
-        <a href="${inviteLink}" style="background:#6C5CE7;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;font-weight:600;font-size:15px">View deal room →</a>
-        <p style="color:#9ca3af;font-size:12px;margin:32px 0 0">This link expires in 7 days. If you didn't expect this, you can ignore it.</p>
-      </div>
-    `;
-
-    try {
-      const emailRes = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${resendKey}`,
-        },
-        body: JSON.stringify({
-          from: fromEmail,
-          to: data.email,
-          subject: `${senderName} invited you to the ${roomName} deal room`,
-          html: emailHtml,
-        }),
-      });
-
-      if (!emailRes.ok) {
-        return { success: true, emailSent: false, token: invite.token, inviteLink, message: "Invite created but email failed to send." };
-      }
-    } catch {
-      return { success: true, emailSent: false, token: invite.token, inviteLink, message: "Invite created but email failed to send." };
-    }
-
-    return { success: true, emailSent: true, token: invite.token, inviteLink };
   });

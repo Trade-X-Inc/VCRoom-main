@@ -1,12 +1,13 @@
 // Landing page v2 — rebuilt 2026-05-27
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { OnboardingChat } from "@/components/OnboardingChat";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Users, ShieldCheck, ListChecks, CheckCircle2, Zap } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -45,18 +46,23 @@ const STYLES = `
 `;
 
 function Landing() {
+  const { dir } = useI18n();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <>
       <style>{STYLES}</style>
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen bg-background text-foreground" dir={dir}>
         <SiteHeader />
         <Hero />
+        <ChatSection />
         <Pain />
         <SolutionStatement />
         <HowItWorks />
         <ProofNumbers />
         <ForFoundersInvestors />
-        <ChatSection />
         <Resources />
         <FinalCTA />
         <SiteFooter />
@@ -68,6 +74,7 @@ function Landing() {
 
 // ── 1. HERO ───────────────────────────────────────────────────────
 function Hero() {
+  const { t, lang } = useI18n();
   return (
     <section className="relative overflow-hidden flex items-center min-h-[calc(100vh-64px)]">
       <div className="absolute inset-0 -z-10 bg-gradient-hero" />
@@ -82,30 +89,32 @@ function Hero() {
         </div>
 
         <h1 className="hs hs-a hs-a2 mt-6 text-[clamp(3rem,7vw,5rem)] font-black leading-[1.0] tracking-[-0.04em]">
-          The deal room where<br />
-          <span className="text-gradient-brand">trust gets built.</span>
+          {lang === "en" ? (
+            <>The deal room where<br /><span className="text-gradient-brand">trust gets built.</span></>
+          ) : (
+            <span className="text-gradient-brand">{t("landing.hero.headline")}</span>
+          )}
         </h1>
 
         <p className="hs-a hs-a3 mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Founders and investors waste months on back-and-forth emails, scattered documents, and zero
-          visibility. Hockystick replaces all of it — one room, every deal, no chaos.
+          {t("landing.hero.subheadline")}
         </p>
 
         <div className="hs-a hs-a4 mt-8 flex flex-col sm:flex-row gap-4 justify-center">
           <Link to="/sign-up" search={{ role: "founder" } as any}>
             <Button variant="brand" size="lg" className="gap-2 shadow-glow w-full sm:w-auto">
-              I'm raising capital <ArrowRight className="h-4 w-4" />
+              {t("landing.hero.cta.founder")} <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
           <Link to="/sign-up" search={{ role: "investor" } as any}>
             <Button variant="outline" size="lg" className="gap-2 w-full sm:w-auto">
-              I invest in startups <ArrowRight className="h-4 w-4" />
+              {t("landing.hero.cta.investor")} <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
         </div>
 
         <p className="hs-a hs-a5 mt-4 text-sm text-muted-foreground">
-          No credit card · Free during beta · Setup in 2 minutes
+          {t("landing.hero.trust")}
         </p>
       </div>
     </section>
@@ -114,6 +123,7 @@ function Hero() {
 
 // ── 2. PAIN ───────────────────────────────────────────────────────
 function Pain() {
+  const { t } = useI18n();
   const cards = [
     {
       icon: "📧",
@@ -142,8 +152,7 @@ function Pain() {
           The Reality
         </div>
         <h2 className="hs text-3xl md:text-4xl font-bold text-white mb-14 max-w-xl leading-[1.1]">
-          Raising capital is broken.<br />
-          Everyone knows it. Nobody fixed it.
+          {t("landing.pain.headline")}
         </h2>
 
         <div className="grid md:grid-cols-3 gap-5">
@@ -387,57 +396,101 @@ function ForFoundersInvestors() {
 
 // ── 7. AI CHAT SECTION ────────────────────────────────────────────
 function ChatSection() {
-  const [starterId, setStarterId] = useState(0);
-  const [starterText, setStarterText] = useState<string | null>(null);
-
-  const starters = [
-    "I'm a founder raising my first round →",
-    "I'm a VC reviewing 50+ deals a month →",
-    "I just want to understand how it works →",
-  ];
-
-  function handleStarter(text: string) {
-    setStarterText(text);
-    setStarterId((n) => n + 1);
-  }
-
+  const { t } = useI18n();
   return (
-    <section className="bg-gray-950 py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left */}
+    <section id="talk-to-ai" className="bg-gray-950 py-0">
+      {/* Hero banner above chat */}
+      <div className="max-w-7xl mx-auto px-6 pt-20 pb-12">
+        <div className="flex items-center gap-2 mb-6">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-green-500/15 px-3 py-1 text-[11px] font-semibold text-green-400 uppercase tracking-wider">
+            <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+            AI Agent · Online 24/7
+          </span>
+        </div>
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
-            <div className="text-[10px] uppercase tracking-widest font-semibold text-purple-400 mb-5">
-              Talk to us
-            </div>
-            <h2 className="hs text-4xl md:text-5xl font-black text-white leading-tight tracking-[-0.03em]">
-              Not sure if<br />
-              Hockystick is<br />
-              right for you?
+            <h2 className="text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-purple-300">
+                {t("landing.chat.headline")}
+              </span>
             </h2>
-            <p className="mt-5 text-lg text-gray-400 max-w-md leading-relaxed">
-              Don't read another landing page. Just tell us who you are and what you're trying to solve.
-              Our AI will tell you — honestly — if we're the right fit.
+            <p className="mt-5 text-lg text-gray-400 max-w-lg leading-relaxed">
+              {t("landing.chat.subheadline")}
             </p>
-            <div className="mt-8 flex flex-col gap-3">
-              {starters.map((text) => (
-                <button
-                  key={text}
-                  onClick={() => handleStarter(text)}
-                  className="text-left rounded-full border border-white/20 text-white hover:bg-white hover:text-gray-950 px-5 py-2.5 text-sm font-medium transition-all"
-                >
-                  {text}
-                </button>
+            <div className="mt-6 flex flex-wrap gap-4">
+              {["Smart Answers", "Personalized Guidance", "Instant Setup Help"].map((badge) => (
+                <span key={badge} className="inline-flex items-center gap-1.5 text-sm text-gray-300">
+                  <svg className="h-4 w-4 text-green-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  {badge}
+                </span>
               ))}
-              <p className="text-gray-500 text-sm mt-4">
-                Select a role above or type directly to start a live conversation with our AI.
-              </p>
+            </div>
+          </div>
+          <div className="text-gray-400 text-sm space-y-2 lg:text-right">
+            <div className="text-2xl font-bold text-white">Free during beta</div>
+            <div>No credit card · 2-minute setup · Cancel anytime</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Wide chat widget */}
+      <div className="max-w-7xl mx-auto px-6 pb-20">
+        <div className="rounded-2xl border border-white/10 bg-gray-900 overflow-hidden shadow-2xl">
+          {/* Chat header */}
+          <div className="flex items-center gap-3 px-6 py-4 border-b border-white/10 bg-gray-900/80">
+            <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-violet-600 to-purple-600">
+              <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+              </svg>
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-white">Talk to Hockystick AI</div>
+              <div className="text-[11px] text-green-400 flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+                Usually replies instantly
+              </div>
             </div>
           </div>
 
-          {/* Right — chat widget */}
-          <div className="shadow-2xl rounded-2xl ring-1 ring-white/10">
-            <OnboardingChat key={starterId} variant="embedded" triggerMessage={starterText} />
+          {/* Quick questions grid */}
+          <div className="px-6 py-5 border-b border-white/10">
+            <p className="text-[11px] uppercase tracking-wider text-gray-500 mb-3 font-semibold">Quick questions</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {[
+                { icon: "🚀", text: "How can Hockystick help my startup raise faster?" },
+                { icon: "🎯", text: "Who are the right investors for me?" },
+                { icon: "📊", text: "What's included in the free beta plan?" },
+                { icon: "🔒", text: "How is my data protected?" },
+                { icon: "📈", text: "How does AI due diligence work?" },
+                { icon: "💬", text: "I have another question..." },
+              ].map((q) => (
+                <button
+                  key={q.text}
+                  onClick={() => window.dispatchEvent(new CustomEvent("hs-chat-send", { detail: q.text }))}
+                  className="flex items-start gap-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-violet-500/50 p-3 text-left transition-all"
+                >
+                  <span className="text-base shrink-0">{q.icon}</span>
+                  <span className="text-xs text-gray-300 leading-relaxed">{q.text}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Chat messages area */}
+          <div>
+            <OnboardingChat variant="embedded" darkMode={true} />
+          </div>
+
+          {/* Bottom trust strip */}
+          <div className="px-6 py-3 border-t border-white/10 bg-gray-900/50">
+            <div className="flex flex-wrap gap-6 justify-center text-[11px] text-gray-500">
+              <span>⚡ Instant answers</span>
+              <span>🎯 Personalized for your stage</span>
+              <span>🔒 Private &amp; secure</span>
+              <span>🌍 Real platform insights</span>
+            </div>
           </div>
         </div>
       </div>

@@ -23,8 +23,28 @@ export function SiteFooter() {
                   </Link>
                 </li>
                 <li>
+                  <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    Pricing
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/blog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    Blog
+                  </Link>
+                </li>
+                <li>
                   <Link to="/sign-in" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     Sign in
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/waitlist" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    Waitlist
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/feedback" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    Feedback
                   </Link>
                 </li>
               </ul>

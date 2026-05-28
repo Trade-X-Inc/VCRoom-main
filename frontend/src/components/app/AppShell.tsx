@@ -3,7 +3,7 @@ import { Logo } from "@/components/brand/Logo";
 import {
   LayoutGrid, Users, Building2, FileText, Briefcase,
   MessageSquare, Calendar, Sparkles, Search, Settings, ChevronsLeft, Plus, Inbox, Gavel,
-  PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, Kanban, BarChart3, UserCircle2,
+  PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, Kanban, BarChart3, UserCircle2, Gift, Globe, Trophy, Newspaper, Plug,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -16,6 +16,7 @@ import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/lib/supabase";
 import { useProfile } from "@/lib/store";
+import { FeedbackButton } from "@/components/app/FeedbackButton";
 
 interface NavItem { to: string; labelKey: string; icon: any; badge?: string; }
 
@@ -29,7 +30,10 @@ const founderNav: NavItem[] = [
   { to: "/app/meetings", labelKey: "app.meetings", icon: Calendar },
   { to: "/app/reports", labelKey: "reports.title", icon: BarChart3 },
   { to: "/app/advisor", labelKey: "app.advisor", icon: Sparkles },
+  { to: "/app/referrals", labelKey: "Referrals", icon: Gift },
   { to: "/app/messages", labelKey: "Team Chat", icon: MessageSquare },
+  { to: "/app/directory", labelKey: "Directory", icon: Globe },
+  { to: "/app/wall", labelKey: "The Wall", icon: Trophy },
 ];
 
 const investorNav: NavItem[] = [
@@ -42,19 +46,24 @@ const investorNav: NavItem[] = [
   { to: "/app/investor/advisor", labelKey: "AI Advisor", icon: Sparkles },
   { to: "/app/investor/decisions", labelKey: "app.decisions", icon: Gavel },
   { to: "/app/investor/portfolio", labelKey: "Portfolio", icon: PieChart },
+  { to: "/app/news", labelKey: "Market News", icon: Newspaper },
   { to: "/app/meetings", labelKey: "app.meetings", icon: Calendar },
   { to: "/app/messages", labelKey: "Team Chat", icon: MessageSquare },
   { to: "/app/investor/profile", labelKey: "Profile", icon: UserCircle2 },
+  { to: "/app/directory", labelKey: "Directory", icon: Globe },
+  { to: "/app/wall", labelKey: "The Wall", icon: Trophy },
 ];
 
 const workspaceNavFounder: NavItem[] = [
   { to: "/app/users", labelKey: "app.users", icon: UserCog },
   { to: "/app/audit", labelKey: "app.audit", icon: ShieldCheck },
+  { to: "/app/integrations", labelKey: "Integrations", icon: Plug },
   { to: "/app/settings", labelKey: "app.settings", icon: Settings },
 ];
 
 const workspaceNavInvestor: NavItem[] = [
   { to: "/app/investor/team", labelKey: "Team", icon: Users },
+  { to: "/app/integrations", labelKey: "Integrations", icon: Plug },
   { to: "/app/settings", labelKey: "app.settings", icon: Settings },
 ];
 
@@ -203,7 +212,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
               {isInvestor ? "Investor" : t("app.workspace")}
             </div>
           )}
-          {nav.map((n) => {
+          {nav.map((n, index) => {
             const active = path === n.to || path === n.to + "/" || (n.to !== "/app" && n.to !== "/app/investor" && path.startsWith(n.to));
             const badge = (() => {
               if (n.to === "/app/leads") return leadCount && leadCount > 0 ? String(leadCount) : undefined;
@@ -211,25 +220,35 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
               if (n.to === "/app/investor/deal-flow") return investorDealCount && investorDealCount > 0 ? String(investorDealCount) : undefined;
               return n.badge;
             })();
+            
+            // Show COMMUNITY section label before directory item
+            const showCommunityLabel = n.to === "/app/directory" && !collapsed;
+            
             return (
-              <Link
-                key={n.to}
-                to={n.to as any}
-                preload="intent"
-                className={cn(
-                  "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors group",
-                  active ? "bg-accent text-foreground font-medium shadow-xs" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
-                  collapsed && "justify-center px-0",
+              <div key={n.to}>
+                {showCommunityLabel && (
+                  <div className="px-2 pt-4 pb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                    Community
+                  </div>
                 )}
-              >
-                <n.icon className={cn("h-4 w-4", active && "text-brand")} />
-                {!collapsed && <span className="flex-1">{t(n.labelKey)}</span>}
-                {!collapsed && badge && (
-                  <span className="text-[10px] rounded-full bg-background border border-border/60 px-1.5 py-0.5 text-muted-foreground">
-                    {badge}
-                  </span>
-                )}
-              </Link>
+                <Link
+                  to={n.to as any}
+                  preload="intent"
+                  className={cn(
+                    "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors group",
+                    active ? "bg-accent text-foreground font-medium shadow-xs" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
+                    collapsed && "justify-center px-0",
+                  )}
+                >
+                  <n.icon className={cn("h-4 w-4", active && "text-brand")} />
+                  {!collapsed && <span className="flex-1">{t(n.labelKey)}</span>}
+                  {!collapsed && badge && (
+                    <span className="text-[10px] rounded-full bg-background border border-border/60 px-1.5 py-0.5 text-muted-foreground">
+                      {badge}
+                    </span>
+                  )}
+                </Link>
+              </div>
             );
           })}
 
@@ -299,6 +318,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
           </div>
         </header>
         <main className="flex-1 min-w-0">{children ?? <Outlet />}</main>
+        <FeedbackButton />
       </div>
     </div>
   );

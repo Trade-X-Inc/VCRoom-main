@@ -30,6 +30,7 @@ import {
 import { cn } from "@/lib/utils";
 import { sendInviteEmail } from "@/lib/invite-fn";
 import { getQASuggestions } from "@/lib/qa-suggestions-fn";
+import { triggerDecisionEmail, triggerMeetingEmail, triggerDocumentUploadedEmail } from "@/lib/email/triggers";
 
 export const Route = createFileRoute("/app/deal-room/$id")({
   component: DealRoom,
@@ -1625,7 +1626,14 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: 
           </div>
           <Dropzone
             dealRoomId={dealRoomId}
-            onUploadComplete={() => queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] })}
+            onUploadComplete={(fileName) => {
+              queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+              if (fileName && userId) {
+                triggerDocumentUploadedEmail({
+                  data: { dealRoomId, documentName: fileName, uploaderUserId: userId },
+                }).catch(() => {});
+              }
+            }}
           />
         </div>
       )}
@@ -2709,6 +2717,17 @@ function MeetingsTab({ dealRoomId, userId }: { dealRoomId: string; userId: strin
       setF({ title: "", scheduledAt: "", meetingLink: "", notes: "" });
       setShowForm(false);
       toast.success("Meeting scheduled");
+      if (userId) {
+        triggerMeetingEmail({
+          data: {
+            dealRoomId,
+            organizerUserId: userId,
+            meetingTitle: f.title,
+            meetingDate: new Date(f.scheduledAt).toLocaleString("en-US", { dateStyle: "full", timeStyle: "short" }),
+            meetingLink: f.meetingLink || undefined,
+          },
+        }).catch(() => {});
+      }
     } catch (err) {
       console.error("Failed to schedule meeting:", err);
       toast.error("Failed to schedule meeting — check console for details");
@@ -2841,6 +2860,14 @@ function InvestorDecisionTab({ dealRoomId, userId }: { dealRoomId: string; userI
       await queryClient.invalidateQueries({ queryKey: ["investor-decisions-rooms"] });
       await queryClient.invalidateQueries({ queryKey: ["investor-rooms"] });
       toast.success(`Decision set: ${d}`);
+      if (userId && (d === "invest" || d === "hold" || d === "pass")) {
+        const decisionMap: Record<string, "Invest" | "Hold" | "Pass"> = {
+          invest: "Invest", hold: "Hold", pass: "Pass",
+        };
+        triggerDecisionEmail({
+          data: { dealRoomId, investorUserId: userId, decision: decisionMap[d], note: notes || undefined },
+        }).catch(() => {});
+      }
     } finally {
       setSaving(false);
     }

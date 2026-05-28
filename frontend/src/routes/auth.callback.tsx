@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { triggerWelcomeEmail } from '@/lib/email/triggers'
 
 export const Route = createFileRoute('/auth/callback')({
   component: AuthCallback
@@ -62,15 +63,24 @@ function AuthCallback() {
 
         setMsg(`Welcome! Loading your dashboard...`)
 
-        await supabase.from('users').upsert({
+        const fullName =
+          session.user.user_metadata?.full_name ||
+          session.user.user_metadata?.name ||
+          userEmail.split('@')[0];
+
+        const { data: upsertResult } = await supabase.from('users').upsert({
           id: userId,
           role: finalRole,
-          full_name:
-            session.user.user_metadata?.full_name ||
-            session.user.user_metadata?.name ||
-            userEmail.split('@')[0],
+          full_name: fullName,
           updated_at: new Date().toISOString()
-        }, { onConflict: 'id' })
+        }, { onConflict: 'id' }).select('id').maybeSingle();
+
+        // Send welcome email only on first sign-up (no prior role = new user)
+        if (!existing?.role && upsertResult) {
+          triggerWelcomeEmail({
+            data: { name: fullName, role: finalRole as "founder" | "investor", email: userEmail },
+          }).catch(() => {});
+        }
 
         window.location.href =
           finalRole === 'investor'

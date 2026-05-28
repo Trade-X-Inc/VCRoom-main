@@ -2,13 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   Building2, Loader2, Save, Plus, X, Pencil, Trash2,
-  Globe, Users, Linkedin, ExternalLink, UserCircle2,
+  Globe, Users, Linkedin, ExternalLink, UserCircle2, Mail,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
+import { sendInviteEmail } from "@/lib/invite-fn";
 
 export const Route = createFileRoute("/app/investor/profile")({
   component: InvestorProfilePage,
@@ -350,7 +351,11 @@ function InvestorProfilePage() {
       {/* Team section — only shown after profile is saved */}
       {existing?.id ? (
         <div className="mt-8">
-          <InvestorTeamSection profileId={existing.id} />
+          <InvestorTeamSection
+            profileId={existing.id}
+            fundName={existing.fund_name ?? ""}
+            yourName={existing.your_name ?? ""}
+          />
         </div>
       ) : (
         <div className="mt-6 rounded-xl border border-dashed border-border/60 bg-card p-6 text-center text-sm text-muted-foreground">
@@ -363,14 +368,15 @@ function InvestorProfilePage() {
 
 // ── Team section ──────────────────────────────────────────────────
 
-function InvestorTeamSection({ profileId }: { profileId: string }) {
+function InvestorTeamSection({ profileId, fundName, yourName }: { profileId: string; fundName: string; yourName: string }) {
+  const { user } = useAuth();
   const qc = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const blank = { name: "", role: "", linkedin_url: "", bio: "" };
+  const blank = { name: "", role: "", linkedin_url: "", bio: "", email: "" };
   const [mf, setMf] = useState(blank);
 
   const { data: members = [], isLoading } = useQuery<TeamMember[]>({
@@ -387,7 +393,7 @@ function InvestorTeamSection({ profileId }: { profileId: string }) {
   });
 
   const openEdit = (m: TeamMember) => {
-    setMf({ name: m.name, role: m.role, linkedin_url: m.linkedin_url ?? "", bio: m.bio ?? "" });
+    setMf({ name: m.name, role: m.role, linkedin_url: m.linkedin_url ?? "", bio: m.bio ?? "", email: "" });
     setEditingId(m.id);
     setShowForm(true);
   };
@@ -412,7 +418,37 @@ function InvestorTeamSection({ profileId }: { profileId: string }) {
         const { error } = await supabase.from("investor_team_members")
           .insert({ investor_profile_id: profileId, name: mf.name.trim(), role: mf.role.trim(), linkedin_url: mf.linkedin_url || null, bio: mf.bio || null });
         if (error) throw error;
-        toast.success("Team member added");
+
+        if (mf.email.trim() && user?.id) {
+          try {
+            const { data: { session } } = await supabase.auth.getSession();
+            const result = await sendInviteEmail({
+              data: {
+                dealRoomId: profileId,
+                email: mf.email.trim(),
+                role: "investor",
+                invitedBy: user.id,
+                userAccessToken: session?.access_token ?? "",
+                supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+                supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+                appUrl: import.meta.env.VITE_APP_URL,
+                dealRoomName: fundName || "the fund",
+                founderName: yourName || undefined,
+              },
+            });
+            if (result.success) {
+              toast.success(result.emailSent ? "Team member added & invite sent" : "Team member added — copy invite link: " + result.inviteLink);
+            } else {
+              toast.success("Team member added");
+              toast.warning("Invite email could not be sent: " + result.error);
+            }
+          } catch {
+            toast.success("Team member added");
+            toast.warning("Invite email failed — member was still added");
+          }
+        } else {
+          toast.success("Team member added");
+        }
       }
       qc.invalidateQueries({ queryKey: ["investor-team", profileId] });
       closeForm();
@@ -478,6 +514,20 @@ function InvestorTeamSection({ profileId }: { profileId: string }) {
               <input value={mf.linkedin_url} onChange={(e) => setMf((f) => ({ ...f, linkedin_url: e.target.value }))}
                 className={cn(input, "mt-1")} placeholder="https://linkedin.com/in/…" />
             </div>
+            {!editingId && (
+              <div>
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <Mail className="h-3 w-3" /> Email (optional — sends an invite)
+                </label>
+                <input
+                  type="email"
+                  value={mf.email}
+                  onChange={(e) => setMf((f) => ({ ...f, email: e.target.value }))}
+                  className={cn(input, "mt-1")}
+                  placeholder="partner@fund.com"
+                />
+              </div>
+            )}
             <div>
               <label className="text-xs text-muted-foreground">Short bio</label>
               <textarea value={mf.bio} onChange={(e) => setMf((f) => ({ ...f, bio: e.target.value }))}

@@ -71,11 +71,12 @@ export default createAPIHandler({
         return json({ success: false, error: dbErr?.message ?? 'Failed to create invite record' }, 500)
       }
 
-      const baseUrl =
-        process.env.SITE_URL ||
-        (globalThis as any).SITE_URL ||
+      const appUrl =
+        import.meta.env.VITE_APP_URL ||
+        process.env.VITE_APP_URL ||
+        (globalThis as any).VITE_APP_URL ||
         'https://hockystick.app'
-      const inviteLink = `${baseUrl}/join/${invite.token}`
+      const inviteLink = `${appUrl}/join/${invite.token}`
       const roomName = startupName ?? dealRoomName ?? 'a deal room'
       const senderName = founderName ?? 'A founder'
       const resendKey =

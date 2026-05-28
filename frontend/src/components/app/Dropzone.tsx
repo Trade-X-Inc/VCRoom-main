@@ -28,7 +28,7 @@ export function Dropzone({
   hint?: string;
   dealRoomId?: string;
   uploadedByRole?: string;
-  onUploadComplete?: () => void;
+  onUploadComplete?: (fileName?: string) => void;
 }) {
   const [isOver, setIsOver] = useState(false);
   const [files, setFiles] = useState<UploadedFile[]>([]);
@@ -68,7 +68,7 @@ export function Dropzone({
           await logActivity(dealRoomId, user.id, "Uploaded a document", { filename: nf.name });
           setFiles((xs) => xs.map((x) => x.id === nf.id ? { ...x, progress: 100 } : x));
           toast.success(`${nf.name} uploaded`);
-          onUploadComplete?.();
+          onUploadComplete?.(nf.name);
         } catch (err) {
           console.error("Document upload failed:", err);
           toast.error(`Failed to upload ${nf.name}`);

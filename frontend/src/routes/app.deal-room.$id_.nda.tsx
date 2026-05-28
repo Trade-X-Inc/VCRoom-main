@@ -5,6 +5,7 @@ import { Shield, Lock, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase, logActivity } from "@/lib/supabase";
 import { Logo } from "@/components/brand/Logo";
+import { triggerNdaSignedEmail } from "@/lib/email/triggers";
 
 export const Route = createFileRoute("/app/deal-room/$id_/nda")({
   component: NdaPage,
@@ -175,6 +176,9 @@ function NdaPage() {
         { onConflict: "deal_room_id,user_id" },
       );
       await logActivity(dealRoomId, user.id, "Signed the NDA");
+      triggerNdaSignedEmail({
+        data: { dealRoomId, investorUserId: user.id },
+      }).catch(() => {});
       // Prime the cache so DealRoom doesn't redirect back here
       queryClient.setQueryData(
         ["nda-acceptance", dealRoomId, user.id],

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { MessageCircle, X, Send, ArrowRight, Loader2 } from "lucide-react";
+import { MessageCircle, X, Send, ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { askOnboardingAI } from "@/lib/onboarding-chat-fn";
 import { cn } from "@/lib/utils";
@@ -75,9 +75,11 @@ function saveConv(
 export function OnboardingChat({
   variant,
   triggerMessage,
+  darkMode = false,
 }: {
   variant: "embedded" | "floating";
   triggerMessage?: string | null;
+  darkMode?: boolean;
 }) {
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [shown, setShown] = useState<Record<number, string>>({});
@@ -109,12 +111,7 @@ export function OnboardingChat({
     return () => clearInterval(iv);
   }, [msgs.length]); // eslint-disable-line
 
-  // Auto-scroll
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }, [msgs.length, shown]);
-
-  // Unread badge
+  // Unread badge (floating only)
   useEffect(() => {
     if (variant === "floating" && !isExpanded && msgs.length > 0) {
       const last = msgs[msgs.length - 1];
@@ -141,7 +138,7 @@ export function OnboardingChat({
     );
   }, []); // eslint-disable-line
 
-  // Auto-trigger from conversation starters (fires once after opening message appears)
+  // Auto-trigger from conversation starters
   useEffect(() => {
     if (!triggerMessage || triggeredRef.current || msgs.length === 0) return;
     triggeredRef.current = true;
@@ -216,18 +213,15 @@ export function OnboardingChat({
     }
   }
 
-  async function handleSend() {
-    const text = input.trim();
+  async function sendMessage(text: string) {
     if (!text || isLoading) return;
-    setInput("");
+    setPhase("freetext");
     addUser(text);
     setIsLoading(true);
-
     const history = msgs.slice(-6).map((m) => ({
       role: m.role === "ai" ? ("assistant" as const) : ("user" as const),
       content: m.text,
     }));
-
     try {
       const result = await askOnboardingAI({ data: { message: text, history } });
       addAI(result.reply || "Try signing up to explore the full platform!");
@@ -238,33 +232,76 @@ export function OnboardingChat({
     }
   }
 
+  // Keep ref pointing to latest sendMessage to avoid stale closure in event listener
+  const sendMessageRef = useRef(sendMessage);
+  sendMessageRef.current = sendMessage;
+
+  // Listen for quick-question clicks from the parent ChatSection
+  useEffect(() => {
+    const handler = (e: CustomEvent) => {
+      if (e.detail) sendMessageRef.current(e.detail);
+    };
+    window.addEventListener("hs-chat-send", handler as EventListener);
+    return () => window.removeEventListener("hs-chat-send", handler as EventListener);
+  }, []);
+
+  async function handleSend() {
+    const text = input.trim();
+    if (!text) return;
+    setInput("");
+    await sendMessage(text);
+  }
+
   const quickReplies = phase !== "freetext" ? (QUICK_REPLIES[phase] ?? []) : [];
+
+  // ── Derived dark-mode classes ─────────────────────────────────────
+
+  const aiBubble = darkMode
+    ? "bg-gray-800 text-white rounded-tl-sm"
+    : "bg-muted text-foreground rounded-tl-sm";
+  const userBubble = darkMode
+    ? "bg-violet-600 text-white rounded-tr-sm"
+    : "bg-gradient-brand text-brand-foreground rounded-tr-sm";
+  const dotColor = darkMode ? "bg-gray-400/50" : "bg-muted-foreground/50";
+  const qrBtn = darkMode
+    ? "border-violet-500/40 bg-violet-500/10 text-violet-300 hover:bg-violet-500 hover:text-white"
+    : "border-brand/40 bg-brand/5 text-brand hover:bg-brand hover:text-brand-foreground";
+  const inputWrap = darkMode
+    ? "border-white/20 bg-gray-800/80 focus-within:border-violet-500/50"
+    : "border-border/60 bg-background/80 focus-within:border-brand/50";
+  const inputText = darkMode ? "text-white placeholder:text-gray-500" : "placeholder:text-muted-foreground";
+  const sendBtn = darkMode ? "bg-violet-600" : "bg-gradient-brand";
+  const ctaBtn = darkMode
+    ? "bg-violet-500 text-white hover:bg-violet-400"
+    : "bg-brand text-brand-foreground shadow-glow hover:opacity-90";
 
   // ── Chat UI ────────────────────────────────────────────────────────
 
   const chatUI = (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center gap-2.5 px-4 py-3 border-b border-border/60 shrink-0">
-        <div className="relative shrink-0">
-          <div className="h-8 w-8 rounded-full bg-gradient-brand grid place-items-center shadow-glow">
-            <MessageCircle className="h-4 w-4 text-brand-foreground" />
+      {/* Header — shown only in light mode (dark mode provides its own) */}
+      {!darkMode && (
+        <div className="flex items-center gap-2.5 px-4 py-3 border-b border-border/60 shrink-0">
+          <div className="relative shrink-0">
+            <div className="h-8 w-8 rounded-full bg-gradient-brand grid place-items-center shadow-glow">
+              <MessageCircle className="h-4 w-4 text-brand-foreground" />
+            </div>
+            <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-success border-2 border-card animate-pulse-glow" />
           </div>
-          <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-success border-2 border-card animate-pulse-glow" />
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold leading-none">Talk to Hockystick AI</div>
+            <div className="text-[11px] text-muted-foreground mt-0.5">Usually replies instantly</div>
+          </div>
+          {variant === "floating" && (
+            <button
+              onClick={() => setIsExpanded(false)}
+              className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground shrink-0"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-sm font-semibold leading-none">Talk to Hockystick AI</div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">Usually replies instantly</div>
-        </div>
-        {variant === "floating" && (
-          <button
-            onClick={() => setIsExpanded(false)}
-            className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground shrink-0"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        )}
-      </div>
+      )}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
@@ -274,21 +311,14 @@ export function OnboardingChat({
           const fullyTyped = text === msg.text;
           return (
             <div key={msg.id} className={cn("flex", isAI ? "justify-start" : "justify-end")}>
-              <div
-                className={cn(
-                  "max-w-[82%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap",
-                  isAI
-                    ? "bg-muted text-foreground rounded-tl-sm"
-                    : "bg-gradient-brand text-brand-foreground rounded-tr-sm",
-                )}
-              >
+              <div className={cn("max-w-[82%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap", isAI ? aiBubble : userBubble)}>
                 {text}
                 {msg.cta && fullyTyped && (
                   <div className="mt-3">
                     <a
                       href={msg.cta.href}
                       onClick={() => saveConv(convRole, convStage, convChallenge, true)}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-brand px-3.5 py-1.5 text-[12px] font-semibold text-brand-foreground shadow-glow hover:opacity-90 transition-opacity"
+                      className={cn("inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition-opacity", ctaBtn)}
                     >
                       {msg.cta.label} <ArrowRight className="h-3 w-3" />
                     </a>
@@ -301,10 +331,10 @@ export function OnboardingChat({
 
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-muted rounded-2xl rounded-tl-sm px-3.5 py-3 flex gap-1.5 items-center">
-              <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50 animate-bounce [animation-delay:0ms]" />
-              <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50 animate-bounce [animation-delay:150ms]" />
-              <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50 animate-bounce [animation-delay:300ms]" />
+            <div className={cn("rounded-2xl rounded-tl-sm px-3.5 py-3 flex gap-1.5 items-center", darkMode ? "bg-gray-800" : "bg-muted")}>
+              <span className={cn("h-1.5 w-1.5 rounded-full animate-bounce [animation-delay:0ms]", dotColor)} />
+              <span className={cn("h-1.5 w-1.5 rounded-full animate-bounce [animation-delay:150ms]", dotColor)} />
+              <span className={cn("h-1.5 w-1.5 rounded-full animate-bounce [animation-delay:300ms]", dotColor)} />
             </div>
           </div>
         )}
@@ -319,7 +349,7 @@ export function OnboardingChat({
             <button
               key={r}
               onClick={() => handleQuickReply(r)}
-              className="rounded-full border border-brand/40 bg-brand/5 text-brand hover:bg-brand hover:text-brand-foreground px-3 py-1.5 text-[13px] font-medium transition-colors"
+              className={cn("rounded-full border px-3 py-1.5 text-[13px] font-medium transition-colors", qrBtn)}
             >
               {r}
             </button>
@@ -330,19 +360,19 @@ export function OnboardingChat({
       {/* Free text input */}
       {phase === "freetext" && (
         <div className="px-4 pb-4 shrink-0">
-          <div className="flex items-center gap-2 rounded-xl border border-border/60 bg-background/80 px-3 py-2 focus-within:border-brand/50 transition-colors">
+          <div className={cn("flex items-center gap-2 rounded-xl border px-3 py-2 transition-colors", inputWrap)}>
             <input
               ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
               placeholder="Ask me anything..."
-              className="flex-1 text-sm bg-transparent outline-none placeholder:text-muted-foreground"
+              className={cn("flex-1 text-sm bg-transparent outline-none", inputText)}
             />
             <button
               onClick={handleSend}
               disabled={!input.trim() || isLoading}
-              className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-brand text-brand-foreground disabled:opacity-40 transition-opacity shrink-0"
+              className={cn("grid h-7 w-7 place-items-center rounded-lg text-white disabled:opacity-40 transition-opacity shrink-0", sendBtn)}
             >
               <Send className="h-3.5 w-3.5" />
             </button>
@@ -355,6 +385,13 @@ export function OnboardingChat({
   // ── Embedded ───────────────────────────────────────────────────────
 
   if (variant === "embedded") {
+    if (darkMode) {
+      return (
+        <div className="flex flex-col h-[360px]">
+          {chatUI}
+        </div>
+      );
+    }
     return (
       <div className="w-full rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden flex flex-col h-[480px]">
         {chatUI}
@@ -373,29 +410,21 @@ export function OnboardingChat({
       )}
 
       <div className="relative group">
-        {/* Tooltip */}
         {!isExpanded && (
           <div className="absolute bottom-16 right-0 bg-foreground text-background text-[12px] font-medium rounded-lg px-3 py-1.5 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-card">
             Ask anything 💬
           </div>
         )}
-
         <button
           onClick={() => {
             setIsExpanded((v) => !v);
             setHasUnread(false);
-            if (!isExpanded) {
-              setTimeout(() => inputRef.current?.focus(), 300);
-            }
+            if (!isExpanded) setTimeout(() => inputRef.current?.focus(), 300);
           }}
           className="relative grid h-14 w-14 place-items-center rounded-full bg-gradient-brand text-brand-foreground shadow-glow hover:scale-105 active:scale-95 transition-transform"
           aria-label="Talk to Hockystick AI"
         >
-          {isExpanded ? (
-            <X className="h-6 w-6" />
-          ) : (
-            <MessageCircle className="h-6 w-6" />
-          )}
+          {isExpanded ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
           {hasUnread && !isExpanded && (
             <span className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-destructive border-2 border-background animate-pulse-glow" />
           )}

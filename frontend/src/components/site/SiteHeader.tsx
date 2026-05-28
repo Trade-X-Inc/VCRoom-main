@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { ThemeToggle } from "@/components/app/ThemeToggle";
 import { LangSwitcher } from "@/components/app/LangSwitcher";
+import { useI18n } from "@/lib/i18n";
 
 export function SiteHeader() {
+  const { t } = useI18n();
   return (
     <header className="sticky top-0 z-40 w-full">
       <div className="absolute inset-0 -z-10 backdrop-blur-xl bg-background/70 border-b border-border/60" />
@@ -14,6 +16,22 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           <LangSwitcher />
           <ThemeToggle />
+          <a
+            href="#talk-to-ai"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById("talk-to-ai")?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="hidden sm:inline-flex text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
+          >
+            {t("landing.nav.talktoai")}
+          </a>
+          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+            <Link to="/pricing">{t("landing.nav.pricing")}</Link>
+          </Button>
+          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+            <Link to="/blog">Blog</Link>
+          </Button>
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
             <Link to="/sign-in" search={{ redirect: "/app" }}>Sign in</Link>
           </Button>

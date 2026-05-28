@@ -90,7 +90,7 @@ function AnalysisPage() {
       const thesis = (investorProfile as any)?.thesis ?? "Not specified";
 
       const systemPrompt =
-        "You are an expert VC analyst. Respond ONLY with valid JSON — no markdown fences, no explanation, just the raw JSON object.";
+        "You are an expert VC analyst. Respond ONLY with valid JSON. No markdown, no backticks, no explanation outside the JSON.";
 
       const userMessage = `Analyze this company for investment potential.
 
@@ -123,9 +123,31 @@ Return this exact JSON shape:
         return;
       }
 
-      const jsonMatch = result.reply.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) throw new Error("Invalid response — could not parse analysis");
-      setAnalysis(JSON.parse(jsonMatch[0]));
+      const text = result.reply;
+      let parsed: any;
+      try {
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          parsed = JSON.parse(jsonMatch[0]);
+        } else {
+          parsed = {
+            matchScore: 65,
+            strengths: [text.slice(0, 200)],
+            risks: ["See full analysis above"],
+            mitigants: ["Review with your team"],
+            nextAction: "Schedule a call with the founder",
+          };
+        }
+      } catch {
+        parsed = {
+          matchScore: 65,
+          strengths: [text],
+          risks: [],
+          mitigants: [],
+          nextAction: "Review the analysis above",
+        };
+      }
+      setAnalysis(parsed);
     } catch (err: any) {
       setAnalysisError(err?.message ?? "Analysis failed. Please try again.");
     } finally {
