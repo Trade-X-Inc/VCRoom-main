@@ -4,7 +4,7 @@ import { getEnvVar } from "@/lib/env";
 
 function getAdminClient() {
   const url = getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
-  const key = getEnvVar("SUPABASE_SERVICE_ROLE_KEY") || getEnvVar("VITE_SUPABASE_SERVICE_ROLE_KEY");
+  const key = getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
   if (!url || !key) throw new Error(`Missing Supabase config. URL: ${!!url}, KEY: ${!!key}`);
   return createClient(url, key, { auth: { persistSession: false } });
 }

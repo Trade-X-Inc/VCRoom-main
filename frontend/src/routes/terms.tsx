@@ -52,6 +52,11 @@ function TermsPage() {
     <div className="min-h-screen bg-background flex flex-col">
       <SiteHeader />
       <main className="flex-1 mx-auto w-full max-w-3xl px-6 py-16">
+        <div className="mb-8">
+          <a href="/" className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors mb-8 block">
+            ← Back to Hockystick
+          </a>
+        </div>
         <div className="mb-10">
           <p className="text-xs font-semibold uppercase tracking-widest text-brand mb-3">Legal</p>
           <h1 className="text-4xl font-semibold tracking-tight">Terms of Service</h1>
@@ -64,6 +69,11 @@ function TermsPage() {
               <p className="text-sm text-muted-foreground leading-relaxed">{s.body}</p>
             </section>
           ))}
+        </div>
+        <div className="mt-16 pt-8 border-t border-border/40">
+          <a href="/" className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors">
+            ← Back to Hockystick
+          </a>
         </div>
       </main>
       <SiteFooter />

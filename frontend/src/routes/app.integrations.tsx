@@ -1,268 +1,127 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { Lock, CheckCircle, Bell } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/integrations")({
-  head: () => ({
-    meta: [{ title: "Integrations — Hockystick" }],
-  }),
-  beforeLoad: async ({ context }) => {
-    if (!context.user?.id) {
-      throw new Error("Unauthorized");
-    }
-  },
+  head: () => ({ meta: [{ title: "Integrations — Hockystick" }] }),
   component: Integrations,
 });
 
-interface ComingSoonIntegration {
-  name: string;
-  slug: string;
-  description: string;
-  color: string;
-  waiting?: number;
-}
+const COMING_SOON = [
+  { name: "Salesforce", slug: "salesforce", desc: "Enterprise CRM sync for fund management", color: "from-blue-600 to-cyan-600", waiting: 189 },
+  { name: "Notion", slug: "notion", desc: "Export deal notes and DD reports to Notion", color: "from-gray-700 to-gray-900", waiting: 412 },
+  { name: "Slack", slug: "slack", desc: "Get deal room notifications in Slack", color: "from-purple-600 to-indigo-600", waiting: 567 },
+  { name: "Zapier", slug: "zapier", desc: "Connect Hockystick to 5,000+ apps", color: "from-orange-500 to-yellow-500", waiting: 321 },
+  { name: "Linear", slug: "linear", desc: "Create tasks from deal room action items", color: "from-blue-500 to-purple-600", waiting: 156 },
+];
 
-const comingSoonIntegrations: ComingSoonIntegration[] = [
-  {
-    name: "HubSpot CRM",
-    slug: "hubspot",
-    description: "Sync your VC pipeline with HubSpot contacts",
-    color: "from-orange-600 to-red-600",
-    waiting: 234,
-  },
-  {
-    name: "Salesforce",
-    slug: "salesforce",
-    description: "Enterprise CRM sync for fund management",
-    color: "from-blue-600 to-cyan-600",
-    waiting: 189,
-  },
-  {
-    name: "Notion",
-    slug: "notion",
-    description: "Export deal notes and DD reports to Notion",
-    color: "from-gray-700 to-gray-900",
-    waiting: 412,
-  },
-  {
-    name: "Slack",
-    slug: "slack",
-    description: "Get deal room notifications in Slack",
-    color: "from-purple-600 to-indigo-600",
-    waiting: 567,
-  },
-  {
-    name: "Zapier",
-    slug: "zapier",
-    description: "Connect Hockystick to 5,000+ apps",
-    color: "from-orange-500 to-yellow-500",
-    waiting: 321,
-  },
-  {
-    name: "Linear",
-    slug: "linear",
-    description: "Create tasks from deal room action items",
-    color: "from-blue-500 to-purple-600",
-    waiting: 156,
-  },
+const LIVE = [
+  { abbr: "HS", name: "HubSpot CRM", sub: "Contacts sync", desc: "Contacts and signups sync automatically to HubSpot CRM.", color: "from-orange-600 to-red-600" },
+  { abbr: "GC", name: "Google Calendar", sub: "Meetings sync", desc: "Deal room meetings sync automatically to Google Calendar.", color: "from-blue-600 to-red-600" },
+  { abbr: "EM", name: "Email Notifications", sub: "Via Resend", desc: "Instant email alerts for important deal room updates.", color: "from-purple-600 to-indigo-600" },
+  { abbr: "DW", name: "Document Watermarking", sub: "Automatic", desc: "All documents are watermarked with recipient info for security.", color: "from-amber-600 to-orange-600" },
 ];
 
 function Integrations() {
   const { user } = useAuth();
-  const [notifyingIntegration, setNotifyingIntegration] = useState<string | null>(null);
+  const [notifying, setNotifying] = useState<string | null>(null);
+  const [notified, setNotified] = useState<Set<string>>(new Set());
 
-  const handleNotifyMe = async (integration: ComingSoonIntegration) => {
-    if (!user?.email) {
-      toast.error("Email not found");
-      return;
-    }
-
-    setNotifyingIntegration(integration.slug);
-
+  const handleNotify = async (slug: string, name: string) => {
+    if (!user?.email) { toast.error("Email not found"); return; }
+    setNotifying(slug);
     try {
-      const { error } = await supabase.from("waitlist_entries").insert({
+      await supabase.from("waitlist_entries").insert({
         full_name: user.full_name || "",
         email: user.email,
         role: user.role,
-        company: "",
-        problem: `Integration notification: ${integration.name}`,
-        referral_code: `integration-${integration.slug}`,
+        problem: `Integration notification: ${name}`,
       });
-
-      if (error) throw error;
-
-      toast.success(`You'll be notified when ${integration.name} launches!`);
+      toast.success(`We'll notify you when ${name} launches.`);
+      setNotified((s) => new Set(s).add(slug));
     } catch (err) {
-      toast.error((err as any).message || "Failed to save notification");
+      toast.error((err as any).message || "Failed to save");
     } finally {
-      setNotifyingIntegration(null);
+      setNotifying(null);
     }
   };
 
   return (
-    <div className="space-y-12">
-      {/* Header */}
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-10">
       <div>
-        <h1 className="text-3xl font-semibold mb-2">Integrations</h1>
-        <p className="text-muted-foreground">
-          Connect Hockystick with your existing tools
-        </p>
+        <h1 className="text-2xl font-semibold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
+          Integrations
+        </h1>
+        <p className="text-muted-foreground text-sm mt-1">Connect Hockystick with your existing tools.</p>
       </div>
 
-      {/* Section 1: Available Now */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">Available now</h2>
-        <div className="grid md:grid-cols-3 gap-4">
-          {/* Google Calendar */}
-          <div className="bg-card border border-border/60 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-600 to-red-600 flex items-center justify-center text-white font-semibold text-sm">
-                GC
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold">Google Calendar</h3>
-                <p className="text-xs text-muted-foreground">Meetings sync</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 text-sm text-green-400 mb-4">
-              <CheckCircle className="h-4 w-4" />
-              <span>Connected</span>
-            </div>
-
-            <p className="text-sm text-muted-foreground">
-              Your deal room meetings sync automatically to Google Calendar.
-            </p>
-          </div>
-
-          {/* Email Notifications */}
-          <div className="bg-card border border-border/60 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white font-semibold text-sm">
-                EN
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold">Email Notifications</h3>
-                <p className="text-xs text-muted-foreground">Via Resend</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 text-sm text-green-400 mb-4">
-              <CheckCircle className="h-4 w-4" />
-              <span>Active</span>
-            </div>
-
-            <p className="text-sm text-muted-foreground">
-              Get instant email alerts for important deal room updates.
-            </p>
-          </div>
-
-          {/* Document Watermarking */}
-          <div className="bg-card border border-border/60 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center text-white font-semibold text-sm">
-                DW
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold">Document Watermarking</h3>
-                <p className="text-xs text-muted-foreground">Automatic</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 text-sm text-green-400 mb-4">
-              <CheckCircle className="h-4 w-4" />
-              <span>Active</span>
-            </div>
-
-            <p className="text-sm text-muted-foreground">
-              All documents are watermarked with recipient info for security.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Section 2: Coming Soon */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4">Coming soon</h2>
-        <div className="grid md:grid-cols-3 gap-4">
-          {comingSoonIntegrations.map((integration) => (
-            <div
-              key={integration.slug}
-              className="bg-card border border-border/60 rounded-xl p-6 opacity-75"
-            >
-              <div className="flex items-start justify-between gap-2 mb-4">
-                <div className="flex items-center gap-3 flex-1">
-                  <div
-                    className={`h-10 w-10 rounded-lg bg-gradient-to-br ${integration.color} flex items-center justify-center text-white font-semibold text-sm`}
-                  >
-                    {integration.name.substring(0, 2).toUpperCase()}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold">{integration.name}</h3>
-                  </div>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4">Live now</h2>
+        <div className="grid sm:grid-cols-3 gap-4">
+          {LIVE.map((item) => (
+            <div key={item.name} className="rounded-xl border border-border/60 bg-card shadow-sm p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className={`h-9 w-9 rounded-lg bg-gradient-to-br ${item.color} flex items-center justify-center text-white font-bold text-xs shrink-0`}>
+                  {item.abbr}
                 </div>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground bg-background rounded px-2 py-1">
-                  <Lock className="h-3 w-3" />
-                  Q3 2026
+                <div>
+                  <div className="text-sm font-semibold text-foreground">{item.name}</div>
+                  <div className="text-[11px] text-muted-foreground">{item.sub}</div>
                 </div>
               </div>
-
-              <p className="text-sm text-muted-foreground mb-4">
-                {integration.description}
-              </p>
-
-              <Button
-                onClick={() => handleNotifyMe(integration)}
-                disabled={notifyingIntegration === integration.slug}
-                variant="outline"
-                size="sm"
-                className="w-full gap-2 mb-3"
-              >
-                <Bell className="h-3.5 w-3.5" />
-                {notifyingIntegration === integration.slug
-                  ? "Saving..."
-                  : "Notify me"}
-              </Button>
-
-              <p className="text-xs text-muted-foreground text-center">
-                {integration.waiting || 0} waiting
-              </p>
+              <div className="flex items-center gap-1.5 text-xs text-green-600 mb-2">
+                <CheckCircle className="h-3.5 w-3.5" /> Active
+              </div>
+              <p className="text-xs text-muted-foreground">{item.desc}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Section 3: API Access */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">Build your own</h2>
-        <div className="bg-gradient-to-br from-purple-950/30 to-indigo-950/30 border border-purple-500/20 rounded-xl p-8">
-          <div className="max-w-2xl">
-            <h3 className="text-xl font-semibold mb-3">API Access</h3>
-            <p className="text-muted-foreground mb-6">
-              Build custom integrations with our REST API. Connect Hockystick to your proprietary systems, data warehouses, and internal tools.
-            </p>
-
-            <div className="bg-background/50 border border-purple-500/10 rounded-lg p-4 mb-6">
-              <p className="text-sm text-muted-foreground">
-                🔑 Full API documentation available with our <span className="font-semibold text-foreground">Fund plan ($199/mo)</span>
-              </p>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4">Coming Q3 2026</h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {COMING_SOON.map((item) => (
+            <div key={item.slug} className="rounded-xl border border-border/60 bg-card shadow-sm p-5 opacity-80 hover:opacity-100 transition-opacity">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <div className={`h-9 w-9 rounded-lg bg-gradient-to-br ${item.color} flex items-center justify-center text-white font-bold text-xs shrink-0`}>
+                    {item.name.slice(0, 2).toUpperCase()}
+                  </div>
+                  <div className="text-sm font-semibold text-foreground">{item.name}</div>
+                </div>
+                <div className="flex items-center gap-1 text-[10px] text-muted-foreground bg-muted rounded px-2 py-0.5">
+                  <Lock className="h-3 w-3" /> Q3
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mb-4">{item.desc}</p>
+              {notified.has(item.slug) ? (
+                <p className="text-xs text-[#7C3AED] font-medium text-center">You'll be notified.</p>
+              ) : (
+                <button onClick={() => handleNotify(item.slug, item.name)} disabled={notifying === item.slug}
+                  className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-[#7C3AED]/40 text-[#7C3AED] px-3 py-2 text-xs font-semibold hover:bg-[#7C3AED]/5 transition-colors disabled:opacity-50">
+                  <Bell className="h-3.5 w-3.5" />
+                  {notifying === item.slug ? "Saving..." : "Notify me"}
+                </button>
+              )}
+              <p className="text-[10px] text-muted-foreground text-center mt-2">{item.waiting} waiting</p>
             </div>
-
-            <p className="text-sm text-muted-foreground">
-              Questions? Reach out to{" "}
-              <a
-                href="mailto:hello@hockystick.app"
-                className="text-purple-400 hover:text-purple-300 font-medium"
-              >
-                hello@hockystick.app
-              </a>
-            </p>
-          </div>
+          ))}
         </div>
+      </div>
+
+      <div className="rounded-xl border border-[#7C3AED]/20 bg-gradient-to-br from-purple-950/10 to-indigo-950/10 p-7">
+        <h2 className="text-base font-semibold mb-2" style={{ fontFamily: "Syne, sans-serif" }}>API Access</h2>
+        <p className="text-sm text-muted-foreground mb-4">
+          Build custom integrations with our REST API. Available on the Fund plan ($199/mo).
+        </p>
+        <a href="mailto:hello@hockystick.app"
+          className="inline-flex items-center gap-2 rounded-lg bg-[#7C3AED] text-white px-4 py-2 text-sm font-semibold hover:bg-[#6d28d9] transition-colors">
+          Contact us
+        </a>
       </div>
     </div>
   );

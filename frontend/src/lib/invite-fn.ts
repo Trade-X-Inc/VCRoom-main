@@ -71,7 +71,11 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
       return { success: false, emailSent: false, error: dbErr?.message ?? "Failed to create invite record" };
     }
 
-    const resolvedAppUrl = import.meta.env.VITE_APP_URL || data.appUrl || APP_URL;
+    const resolvedAppUrl =
+      (globalThis as any).__cf_env?.VITE_APP_URL ||
+      import.meta.env.VITE_APP_URL ||
+      data.appUrl ||
+      APP_URL;
     const inviteLink = `${resolvedAppUrl}/join/${invite.token}`;
 
     // In-app notification for existing users
@@ -117,13 +121,19 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
           )
         : html;
 
-      await sendEmail({
+      const emailResult = await sendEmail({
         to: data.email,
         subject,
         html: finalHtml,
         tags: [{ name: "type", value: "deal-room-invite" }],
       });
-      return { success: true, emailSent: true, token: invite.token, inviteLink };
+      return {
+        success: true,
+        emailSent: !!emailResult,
+        token: invite.token,
+        inviteLink,
+        message: emailResult ? undefined : "Invite created but email failed to send.",
+      };
     } catch {
       return {
         success: true,

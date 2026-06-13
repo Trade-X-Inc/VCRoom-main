@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { Turnstile } from '@marsidev/react-turnstile'
 
 export const Route = createFileRoute('/sign-up')({
   component: SignUp
@@ -16,6 +17,7 @@ function SignUp() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [done, setDone] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState('')
 
   const saveRole = async (userId: string, userRole: Role, fullName: string) => {
     await supabase.from('users').upsert(
@@ -42,7 +44,10 @@ function SignUp() {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { role, full_name: name } }
+      options: {
+        data: { role, full_name: name },
+        captchaToken: turnstileToken || undefined,
+      }
     })
 
     if (error) {
@@ -171,9 +176,14 @@ function SignUp() {
                 placeholder="Password (min 6 chars)"
                 className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
+              <Turnstile
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY ?? ''}
+                onSuccess={(token) => setTurnstileToken(token)}
+                options={{ theme: 'dark' }}
+              />
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !turnstileToken}
                 className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
               >
                 {loading ? 'Creating account...' : `Create ${role} account →`}

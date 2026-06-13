@@ -17,8 +17,9 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): SummaryInput => data as SummaryInput)
   .handler(async ({ data }: { data: SummaryInput }): Promise<{ summary: string | null; error?: string }> => {
     const supabaseUrl = data.supabaseUrl || getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
-    const supabaseKey = data.supabaseKey || getEnvVar("SUPABASE_SERVICE_ROLE_KEY") || getEnvVar("VITE_SUPABASE_SERVICE_ROLE_KEY");
-    const openAIKey = data.openAIKey || getEnvVar("OPENAI_API_KEY") || (import.meta.env as any).VITE_OPENAI_API_KEY || "";
+    const supabaseKey = data.supabaseKey || getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
+    const cfEnv = (globalThis as any).__cf_env || {};
+    const openAIKey = cfEnv.OPENAI_API_KEY || getEnvVar("OPENAI_API_KEY") || "";
     console.log('Supabase URL:', supabaseUrl?.slice(0, 30));
 
     if (!openAIKey) {

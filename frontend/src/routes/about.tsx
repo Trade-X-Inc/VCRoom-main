@@ -1,42 +1,108 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { SiteHeader } from "@/components/site/SiteHeader";
-import { SiteFooter } from "@/components/site/SiteFooter";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { SiteHeader } from '@/components/site/SiteHeader'
+import { SiteFooter } from '@/components/site/SiteFooter'
+import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute("/about")({
-  head: () => ({
-    meta: [
-      { title: "About Us — Hockystick" },
-      { name: "description", content: "Learn about the mission behind Hockystick and how we're transforming venture capital interactions." },
-    ],
-  }),
+export const Route = createFileRoute('/about')({
   component: About,
-});
+})
 
 function About() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-[#0A0A0B]">
       <SiteHeader />
-      <main className="mx-auto max-w-7xl px-6 py-24 md:py-32">
-        <div className="max-w-3xl">
-          <div className="text-xs uppercase tracking-wider text-brand font-medium">Our Mission</div>
-          <h1 className="mt-3 text-4xl md:text-6xl font-semibold tracking-[-0.03em] leading-tight">
-            Building the operating system for the next generation of venture.
-          </h1>
-          <p className="mt-8 text-lg md:text-xl text-muted-foreground leading-relaxed">
-            Hockystick was born out of a simple observation: fundraising is the most critical part of a startup's journey, yet it remains one of the most fragmented and unstructured processes.
-          </p>
-          <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-            We're building a platform that bridges the gap between founders and investors, providing a structured, secure, and AI-enhanced workspace where deals don't just get discussed—they get decided.
-          </p>
-          <div className="mt-12">
-            <Link to="/sign-up"><Button size="lg" className="gap-2">Join the journey <ArrowRight className="h-4 w-4" /></Button></Link>
+      <main className="max-w-3xl mx-auto px-6 py-24">
+        <a href="/" className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors mb-12 block">
+          ← Back to Hockystick
+        </a>
+
+        <p className="text-xs text-[#7C3AED] uppercase tracking-[0.2em] mb-4">
+          About
+        </p>
+        <h1 className="font-syne font-bold text-4xl text-white mb-6 leading-tight">
+          Built in Dubai.<br />
+          For the founders who don't know the right people.
+        </h1>
+        <p className="text-white/60 text-lg leading-relaxed mb-12">
+          Most fundraising platforms are built for Silicon Valley.
+          They assume you have a warm network, a Stanford alumni
+          connection, or a prior exit. Most MENA founders have none
+          of these.
+        </p>
+
+        <div className="space-y-8 mb-16">
+          <div>
+            <h2 className="font-syne font-bold text-xl text-white mb-3">
+              The problem we're solving
+            </h2>
+            <p className="text-white/60 leading-relaxed">
+              The GCC has a structural trust gap between founders and
+              investors. Founders can't get meetings without warm intros.
+              Investors receive hundreds of pitch decks with no way to
+              verify what's real. Both sides lose. Deals don't close.
+              Good companies don't get funded.
+            </p>
           </div>
+
+          <div>
+            <h2 className="font-syne font-bold text-xl text-white mb-3">
+              What Hockystick does
+            </h2>
+            <p className="text-white/60 leading-relaxed">
+              Hockystick replaces the pitch deck with a verified founder
+              profile. Investors browse structured, AI-reviewed profiles
+              with staged access to documents — from public overview to
+              full due diligence — all inside encrypted deal rooms.
+              Both founders and investors are verified. The platform
+              manufactures trust at scale, without requiring either
+              side to know each other first.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="font-syne font-bold text-xl text-white mb-3">
+              Where we're based
+            </h2>
+            <p className="text-white/60 leading-relaxed">
+              Hockystick is based at DIFC FinTech Hive, Dubai —
+              the region's leading financial technology hub.
+              We are GCC-first and global by design. Our platform
+              is built for MENA founders raising from regional and
+              international investors.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="font-syne font-bold text-xl text-white mb-3">
+              Our principles
+            </h2>
+            <div className="space-y-3">
+              {[
+                'We only claim what we can prove. Wrong information in investment contexts is worse than none.',
+                'Two-way verification. We verify investors too — not just founders.',
+                'Staged access. Sensitive documents only unlock when trust is established.',
+                'No warm intros required. Merit replaces connections.',
+              ].map((p, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <span className="text-[#7C3AED] mt-0.5">✦</span>
+                  <p className="text-white/60 text-sm leading-relaxed">{p}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4">
+          <a href="/trust"
+            className="px-6 py-3 border border-white/15 rounded-xl text-sm text-white/70 hover:border-white/30 hover:text-white transition-colors text-center">
+            How our verification works →
+          </a>
+          <a href="/contact"
+            className="px-6 py-3 bg-[#7C3AED] rounded-xl text-sm text-white hover:bg-[#6d28d9] transition-colors text-center">
+            Get in touch →
+          </a>
         </div>
       </main>
       <SiteFooter />
     </div>
-  );
+  )
 }

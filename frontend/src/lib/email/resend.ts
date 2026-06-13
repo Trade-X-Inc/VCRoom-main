@@ -1,18 +1,20 @@
-const FROM_EMAIL = "Hockystick <hello@hockystick.app>";
-const REPLY_TO = "hello@hockystick.app";
+import { getEnvVar } from "@/lib/env";
 
-export const APP_URL =
-  (typeof process !== "undefined" && process.env.VITE_APP_URL) ||
-  (globalThis as any).VITE_APP_URL ||
-  "https://hockystick.app";
+function getResendKey(): string {
+  const cfEnv = (globalThis as any).__cf_env || {};
+  const key =
+    cfEnv.RESEND_API_KEY ||
+    (typeof process !== "undefined" ? process.env?.RESEND_API_KEY : "") ||
+    (import.meta as any).env?.VITE_RESEND_API_KEY ||
+    "";
 
-function getResendKey() {
-  return (
-    (typeof process !== "undefined" && process.env.RESEND_API_KEY) ||
-    (globalThis as any).RESEND_API_KEY ||
-    ""
-  );
+  if (!key) {
+    console.error("[Resend] No API key found. Checked: __cf_env.RESEND_API_KEY, process.env.RESEND_API_KEY, import.meta.env.VITE_RESEND_API_KEY");
+  }
+  return key;
 }
+
+export const APP_URL = getEnvVar("VITE_APP_URL") || "https://hockystick.app";
 
 export async function sendEmail({
   to,
@@ -26,34 +28,44 @@ export async function sendEmail({
   html: string;
   replyTo?: string;
   tags?: { name: string; value: string }[];
-}) {
-  const key = getResendKey();
-  if (!key) {
-    console.warn("sendEmail: no RESEND_API_KEY — skipping");
+}): Promise<{ id: string } | null> {
+  const apiKey = getResendKey();
+
+  if (!apiKey) {
+    console.error("[Resend] RESEND_API_KEY not set — email skipped:", subject);
     return null;
   }
+
+  console.log("[Resend] Sending:", subject, "→", to);
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${key}`,
+      Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: FROM_EMAIL,
+      from: "Hockystick <hello@hockystick.app>",
       to: Array.isArray(to) ? to : [to],
       subject,
       html,
-      reply_to: replyTo || REPLY_TO,
-      tags,
+      reply_to: replyTo || "hello@hockystick.app",
+      tags: tags || [],
     }),
   });
 
+  const responseText = await res.text();
+  console.log("[Resend] Status:", res.status);
+  console.log("[Resend] Response:", responseText);
+
   if (!res.ok) {
-    const err = await res.text();
-    console.error("Resend error:", err);
-    throw new Error(`Email failed: ${err}`);
+    console.error("[Resend] Failed:", res.status, responseText);
+    return null;
   }
 
-  return res.json();
+  try {
+    return JSON.parse(responseText);
+  } catch {
+    return null;
+  }
 }

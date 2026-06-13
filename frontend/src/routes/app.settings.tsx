@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Settings, Globe, Bell, CreditCard, Shield, Building2, User, Users, Trash2, Zap, Brain } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Settings, Bell, Shield, Building2, User, Loader2, Camera } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
@@ -12,10 +12,8 @@ export const Route = createFileRoute("/app/settings")({
 });
 
 const tabs = [
-  { to: "/app/settings", label: "General", icon: Building2, exact: true },
-  { to: "/app/settings/domain", label: "Domain & Email", icon: Globe },
+  { to: "/app/settings", label: "Profile", icon: User, exact: true },
   { to: "/app/settings/notifications", label: "Notifications", icon: Bell },
-  { to: "/app/settings/billing", label: "Billing", icon: CreditCard },
   { to: "/app/settings/security", label: "Security", icon: Shield },
 ];
 
@@ -24,14 +22,13 @@ function SettingsLayout() {
   const isIndex = path === "/app/settings";
 
   return (
-    <div className="p-6 lg:p-8 max-w-6xl mx-auto">
-      <div className="flex items-center gap-2">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
+      <div className="flex items-center gap-2 mb-6">
         <Settings className="h-5 w-5 text-brand" />
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
       </div>
-      <p className="text-sm text-muted-foreground mt-1">Manage workspace, domain, notifications, billing and security.</p>
 
-      <div className="mt-6 grid lg:grid-cols-[220px_1fr] gap-6">
+      <div className="grid lg:grid-cols-[200px_1fr] gap-6">
         <nav className="space-y-1">
           {tabs.map((t) => {
             const active = t.exact ? path === t.to : path.startsWith(t.to);
@@ -44,45 +41,107 @@ function SettingsLayout() {
                   active ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
                 )}
               >
-                <t.icon className={cn("h-4 w-4", active && "text-brand")} /> {t.label}
+                <t.icon className={cn("h-4 w-4", active && "text-brand")} />
+                {t.label}
               </Link>
             );
           })}
         </nav>
 
         <div className="min-w-0">
-          {isIndex ? <General /> : <Outlet />}
+          {isIndex ? <ProfileSettings /> : <Outlet />}
         </div>
       </div>
     </div>
   );
 }
 
-function General() {
-  const { user } = useAuth();
-  const isInvestor = user?.role === "investor";
-  const [workspaceName, setWorkspaceName] = useState("");
-  const [saving, setSaving] = useState(false);
+// ── Shared card wrapper ───────────────────────────────────────────────────────
+function Card({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-xl border border-border/60 bg-card p-5 space-y-4">
+      <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+      {children}
+    </section>
+  );
+}
 
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1">
+      <label className="text-xs font-medium text-muted-foreground">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+const inputCls = "w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/10";
+const disabledCls = "w-full rounded-md border border-border/40 bg-muted/40 px-3 py-2 text-sm text-muted-foreground cursor-not-allowed";
+
+// ── SECTION 1+2: Profile + Company ───────────────────────────────────────────
+function ProfileSettings() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const isInvestor = user?.role === "investor";
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  // Profile state
+  const [fullName, setFullName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  // Company state (founder only)
+  const [companyName, setCompanyName] = useState("");
+  const [website, setWebsite] = useState("");
+  const [description, setDescription] = useState("");
+  const [stage, setStage] = useState("");
+  const [country, setCountry] = useState("");
+  const [savingCompany, setSavingCompany] = useState(false);
+
+  // Load user profile
+  const { data: userRow } = useQuery({
+    queryKey: ["settings-user", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("users")
+        .select("full_name, avatar_url")
+        .eq("id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  useEffect(() => {
+    if (userRow) {
+      setFullName(userRow.full_name ?? "");
+      setAvatarUrl(userRow.avatar_url ?? null);
+    }
+  }, [userRow]);
+
+  // Load startup (founders)
   const { data: startup } = useQuery({
-    queryKey: ["startup", user?.id],
+    queryKey: ["settings-startup", user?.id],
     enabled: !!user?.id && !isInvestor,
     queryFn: async () => {
       const { data } = await supabase
         .from("startups")
-        .select("id, company_name, website, description")
-        .eq("founder_id", user!.id);
-      return data?.[0] ?? null;
+        .select("id, company_name, website, description, stage, country")
+        .eq("founder_id", user!.id)
+        .maybeSingle();
+      return data;
     },
   });
 
+  // Load investor profile
   const { data: investorProfile } = useQuery({
-    queryKey: ["investor-profile-settings", user?.id],
+    queryKey: ["settings-investor-profile", user?.id],
     enabled: !!user?.id && isInvestor,
     queryFn: async () => {
       const { data } = await supabase
         .from("investor_profiles")
-        .select("id, fund_name")
+        .select("fund_name, website, geography")
         .eq("user_id", user!.id)
         .maybeSingle();
       return data;
@@ -90,234 +149,193 @@ function General() {
   });
 
   useEffect(() => {
-    if (isInvestor) {
-      setWorkspaceName(investorProfile?.fund_name ?? user?.fullName ?? "");
-    } else {
-      setWorkspaceName(startup?.company_name ?? user?.workspace ?? "");
+    if (!isInvestor && startup) {
+      setCompanyName(startup.company_name ?? "");
+      setWebsite(startup.website ?? "");
+      setDescription(startup.description ?? "");
+      setStage(startup.stage ?? "");
+      setCountry(startup.country ?? "");
+    } else if (isInvestor && investorProfile) {
+      setCompanyName(investorProfile.fund_name ?? "");
+      setWebsite(investorProfile.website ?? "");
+      setCountry(investorProfile.geography ?? "");
     }
-  }, [startup, investorProfile, isInvestor, user]);
+  }, [startup, investorProfile, isInvestor]);
 
-  // AI Usage query
-  const { data: aiUsage } = useQuery({
-    queryKey: ["ai-usage-today", user?.id],
-    enabled: !!user?.id,
-    staleTime: 60_000,
-    queryFn: async () => {
-      const today = new Date().toISOString().split("T")[0];
-      const [usageRes, planRes] = await Promise.all([
-        supabase.from("ai_usage").select("call_count").eq("user_id", user!.id).eq("usage_date", today),
-        supabase.from("user_plans").select("plan, ai_calls_daily_limit").eq("user_id", user!.id).maybeSingle(),
-      ]);
-      const used = (usageRes.data ?? []).reduce((sum: number, r: any) => sum + (r.call_count ?? 0), 0);
-      const plan = planRes.data?.plan ?? "free";
-      const limit = planRes.data?.ai_calls_daily_limit ?? 20;
-      return { used, limit, plan };
-    },
-  });
+  // Avatar upload
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user?.id) return;
+    setUploadingAvatar(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${user.id}/avatar.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { upsert: true });
+      if (upErr) throw upErr;
+      const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+      const url = urlData.publicUrl + `?v=${Date.now()}`;
+      await supabase.from("users").update({ avatar_url: url }).eq("id", user.id);
+      setAvatarUrl(url);
+      qc.invalidateQueries({ queryKey: ["settings-user"] });
+      toast.success("Avatar updated");
+    } catch (err: any) {
+      toast.error(err.message || "Upload failed");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
 
-  const slug = workspaceName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  // Save profile
+  const saveProfile = async () => {
+    if (!user?.id) return;
+    setSavingProfile(true);
+    try {
+      const { error } = await supabase
+        .from("users")
+        .update({ full_name: fullName.trim(), updated_at: new Date().toISOString() })
+        .eq("id", user.id);
+      if (error) throw error;
+      qc.invalidateQueries({ queryKey: ["settings-user"] });
+      toast.success("Profile saved");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save profile");
+    } finally {
+      setSavingProfile(false);
+    }
+  };
 
-  async function handleSave() {
-    if (!user?.id || !workspaceName.trim()) return;
-    setSaving(true);
+  // Save company / investor details
+  const saveCompany = async () => {
+    if (!user?.id) return;
+    setSavingCompany(true);
     try {
       if (isInvestor) {
-        await supabase.from("investor_profiles").update({ fund_name: workspaceName.trim() }).eq("user_id", user.id);
+        const { error } = await supabase
+          .from("investor_profiles")
+          .update({ fund_name: companyName.trim(), website: website.trim(), geography: country.trim(), updated_at: new Date().toISOString() })
+          .eq("user_id", user.id);
+        if (error) throw error;
       } else {
-        await supabase.from("startups").update({ company_name: workspaceName.trim() }).eq("founder_id", user.id);
+        if (!startup?.id) throw new Error("No startup found. Create a company profile first.");
+        const { error } = await supabase
+          .from("startups")
+          .update({ company_name: companyName.trim(), website: website.trim(), description: description.trim(), stage: stage || null, country: country.trim(), updated_at: new Date().toISOString() })
+          .eq("id", startup.id);
+        if (error) throw error;
       }
-      toast.success("Settings saved");
-    } catch {
-      toast.error("Failed to save settings");
+      qc.invalidateQueries({ queryKey: ["settings-startup", "settings-investor-profile"] });
+      toast.success("Saved");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save");
     } finally {
-      setSaving(false);
+      setSavingCompany(false);
     }
-  }
+  };
+
+  const initials = fullName ? fullName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) : user?.email?.[0]?.toUpperCase() ?? "?";
 
   return (
     <div className="space-y-5">
-      <Card title="Workspace">
-        <div>
-          <label className="text-xs text-muted-foreground">Workspace name</label>
-          <div className="mt-1 flex items-center rounded-md border border-border/60 bg-background overflow-hidden">
-            <input
-              value={workspaceName}
-              onChange={(e) => setWorkspaceName(e.target.value)}
-              placeholder="Your company name"
-              className="flex-1 px-3 py-2 text-sm bg-transparent focus:outline-none"
-            />
+      {/* Section 1 — Profile */}
+      <Card title="Profile">
+        {/* Avatar */}
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <div className="h-16 w-16 rounded-full overflow-hidden bg-gradient-brand flex items-center justify-center text-brand-foreground font-semibold text-lg shrink-0">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="avatar" className="h-full w-full object-cover" />
+              ) : (
+                <span>{initials}</span>
+              )}
+            </div>
+            <button
+              onClick={() => fileRef.current?.click()}
+              disabled={uploadingAvatar}
+              className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-background border border-border/60 grid place-items-center hover:bg-accent transition-colors"
+            >
+              {uploadingAvatar ? <Loader2 className="h-3 w-3 animate-spin" /> : <Camera className="h-3 w-3 text-muted-foreground" />}
+            </button>
+            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+          </div>
+          <div>
+            <div className="text-sm font-medium">{fullName || user?.email}</div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              <span className="inline-block px-2 py-0.5 rounded-full bg-brand/10 text-brand font-medium capitalize">{user?.role ?? "founder"}</span>
+            </div>
           </div>
         </div>
-        <Field label="Public URL slug" value={slug} prefix="ventureroom.app/" placeholder="your-company" />
-        <Sel label="Default language" options={["English", "Español", "Français", "Deutsch", "العربية"]} />
-        <Sel label="Time zone" options={["UTC", "America/Los_Angeles", "America/New_York", "Europe/London", "Asia/Dubai"]} />
-      </Card>
 
-      <Card title="Account">
-        <div className="space-y-2">
-          <Link
-            to="/app/profile"
-            className="flex items-center justify-between rounded-lg border border-border/60 px-4 py-3 text-sm hover:bg-accent transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <User className="h-4 w-4 text-muted-foreground" />
-              <span>Edit profile</span>
-            </div>
-            <span className="text-xs text-muted-foreground">→</span>
-          </Link>
-          <Link
-            to="/app/users"
-            className="flex items-center justify-between rounded-lg border border-border/60 px-4 py-3 text-sm hover:bg-accent transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-muted-foreground" />
-              <span>Team & users</span>
-            </div>
-            <span className="text-xs text-muted-foreground">→</span>
-          </Link>
-        </div>
-        <div className="pt-2 border-t border-border/60 mt-2">
+        <Field label="Full name">
+          <input className={inputCls} value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your full name" />
+        </Field>
+
+        <Field label="Email address">
+          <input className={disabledCls} value={user?.email ?? ""} disabled readOnly />
+          <p className="text-[11px] text-muted-foreground mt-1">Email cannot be changed. Contact support if needed.</p>
+        </Field>
+
+        <div className="flex justify-end pt-1">
           <button
-            disabled
-            title="Contact support to delete your account"
-            className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm text-destructive/40 cursor-not-allowed w-full"
+            onClick={saveProfile}
+            disabled={savingProfile}
+            className="inline-flex items-center gap-1.5 rounded-md bg-brand text-brand-foreground px-4 py-2 text-sm font-medium hover:bg-brand/90 disabled:opacity-60 transition-colors"
           >
-            <Trash2 className="h-4 w-4" />
-            <span>Delete account</span>
-            <span className="ml-auto text-[10px] text-muted-foreground/60">Contact support</span>
+            {savingProfile && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            Save profile
           </button>
         </div>
       </Card>
 
-      {/* AI Usage Meter */}
-      <Card title="AI Usage">
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Brain className="h-4 w-4 text-brand" />
-              <span className="text-sm font-medium">Daily AI calls</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className={cn(
-                "text-xs font-semibold px-2 py-0.5 rounded-full",
-                aiUsage?.plan === "pro" || aiUsage?.plan === "enterprise"
-                  ? "bg-success/15 text-success"
-                  : "bg-brand/15 text-brand"
-              )}>
-                {aiUsage?.plan === "pro" ? "Pro" : aiUsage?.plan === "enterprise" ? "Enterprise" : "Free"}
-              </span>
-            </div>
-          </div>
+      {/* Section 2 — Company / Fund */}
+      <Card title={isInvestor ? "Fund details" : "Company info"}>
+        <Field label={isInvestor ? "Fund name" : "Company name"}>
+          <input className={inputCls} value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder={isInvestor ? "Acme Ventures" : "Acme Inc."} />
+        </Field>
 
-          {aiUsage?.plan === "free" && (
-            <>
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>{aiUsage?.used ?? 0} of {aiUsage?.limit ?? 20} calls used today</span>
-                <span>Resets midnight UTC</span>
-              </div>
-              <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                <div
-                  className={cn(
-                    "h-2 rounded-full transition-all",
-                    (aiUsage?.used ?? 0) >= (aiUsage?.limit ?? 20)
-                      ? "bg-destructive"
-                      : (aiUsage?.used ?? 0) >= (aiUsage?.limit ?? 20) * 0.8
-                      ? "bg-warning"
-                      : "bg-brand"
-                  )}
-                  style={{ width: `${Math.min(100, ((aiUsage?.used ?? 0) / (aiUsage?.limit ?? 20)) * 100)}%` }}
-                />
-              </div>
-              <p className="text-[11px] text-muted-foreground">
-                Free plan includes 20 AI calls per day across Advisor, Thesis Alignment, Document Summaries, and Q&A drafts.
-              </p>
-              <div className="rounded-lg border border-brand/20 bg-brand/5 px-3 py-2.5 flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-semibold text-foreground">Upgrade to Pro — Unlimited AI</div>
-                  <div className="text-[10px] text-muted-foreground mt-0.5">Unlimited AI calls · Unlimited deal rooms · Priority support</div>
-                </div>
-                <button className="text-[11px] font-semibold text-brand hover:underline shrink-0 ml-3">
-                  Coming soon →
-                </button>
-              </div>
-            </>
-          )}
+        <Field label="Website">
+          <input className={inputCls} value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://example.com" type="url" />
+        </Field>
 
-          {(aiUsage?.plan === "pro" || aiUsage?.plan === "enterprise") && (
-            <div className="flex items-center gap-2 text-xs text-success">
-              <Zap className="h-3.5 w-3.5" />
-              <span>Unlimited AI calls on your {aiUsage.plan} plan</span>
-            </div>
-          )}
+        {!isInvestor && (
+          <>
+            <Field label="One-liner description">
+              <textarea
+                className={inputCls + " resize-none"}
+                rows={2}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="What your company does in one sentence"
+              />
+            </Field>
+
+            <Field label="Funding stage">
+              <select className={inputCls} value={stage} onChange={(e) => setStage(e.target.value)}>
+                <option value="">Select stage…</option>
+                {["Pre-seed", "Seed", "Series A", "Series B", "Series C+", "Growth"].map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </Field>
+          </>
+        )}
+
+        <Field label="Location / country">
+          <input className={inputCls} value={country} onChange={(e) => setCountry(e.target.value)} placeholder="San Francisco, USA" />
+        </Field>
+
+        <div className="flex justify-end pt-1">
+          <button
+            onClick={saveCompany}
+            disabled={savingCompany}
+            className="inline-flex items-center gap-1.5 rounded-md bg-brand text-brand-foreground px-4 py-2 text-sm font-medium hover:bg-brand/90 disabled:opacity-60 transition-colors"
+          >
+            {savingCompany && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            {isInvestor ? "Save fund details" : "Save company info"}
+          </button>
         </div>
       </Card>
-
-      <SaveBar onSave={handleSave} saving={saving} />
-    </div>
-  );
-}
-
-export function Card({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section className="rounded-xl border border-border/60 bg-card shadow-card p-5 space-y-3">
-      <h2 className="text-sm font-semibold">{title}</h2>
-      {children}
-    </section>
-  );
-}
-
-export function Field({
-  label,
-  value,
-  defaultValue,
-  prefix,
-  placeholder,
-}: {
-  label: string;
-  value?: string;
-  defaultValue?: string;
-  prefix?: string;
-  placeholder?: string;
-}) {
-  return (
-    <div>
-      <label className="text-xs text-muted-foreground">{label}</label>
-      <div className="mt-1 flex items-center rounded-md border border-border/60 bg-background overflow-hidden">
-        {prefix && (
-          <span className="text-xs text-muted-foreground px-3 border-r border-border/60 bg-muted/30 py-2">{prefix}</span>
-        )}
-        <input
-          defaultValue={value ?? defaultValue ?? ""}
-          placeholder={placeholder}
-          className="flex-1 px-3 py-2 text-sm bg-transparent focus:outline-none"
-        />
-      </div>
-    </div>
-  );
-}
-
-export function Sel({ label, options }: { label: string; options: string[] }) {
-  return (
-    <div>
-      <label className="text-xs text-muted-foreground">{label}</label>
-      <select className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm">
-        {options.map((o) => <option key={o}>{o}</option>)}
-      </select>
-    </div>
-  );
-}
-
-export function SaveBar({ onSave, saving }: { onSave?: () => void; saving?: boolean }) {
-  return (
-    <div className="flex justify-end gap-2">
-      <button className="rounded-md border border-border/60 px-4 py-2 text-sm hover:bg-accent">Reset</button>
-      <button
-        onClick={onSave}
-        disabled={saving}
-        className="rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-50"
-      >
-        {saving ? "Saving…" : "Save changes"}
-      </button>
     </div>
   );
 }

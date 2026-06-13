@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
@@ -12,45 +11,34 @@ export const Route = createFileRoute("/waitlist")({
   head: () => ({
     meta: [
       { title: "Waitlist — Hockystick" },
-      { name: "description", content: "Join the Hockystick waitlist and be among the first to access our platform." },
+      { name: "description", content: "Join the Hockystick waitlist." },
     ],
   }),
   component: Waitlist,
 });
 
 function Waitlist() {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    role: "",
-    company: "",
-    problem: "",
-  });
+  const [form, setForm] = useState({ fullName: "", email: "", role: "", company: "", problem: "" });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const set = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       const { error } = await supabase.from("waitlist_entries").insert({
-        full_name: formData.fullName,
-        email: formData.email,
-        role: formData.role || null,
-        company: formData.company || null,
-        problem: formData.problem || null,
+        full_name: form.fullName,
+        email: form.email,
+        role: form.role || null,
+        company: form.company || null,
+        problem: form.problem || null,
       });
-
       if (error) throw error;
-
       setSubmitted(true);
-      setFormData({ fullName: "", email: "", role: "", company: "", problem: "" });
-      toast.success("You're on the list. We'll be in touch.");
+      toast.success("You're on the list.");
     } catch (err) {
       toast.error((err as any).message || "Failed to join waitlist");
     } finally {
@@ -61,92 +49,63 @@ function Waitlist() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
-      <main className="mx-auto max-w-2xl px-6 py-24 md:py-32">
+
+      {/* Dark hero */}
+      <div className="bg-[#0a0a0b] py-20 px-6 text-center">
+        <div className="inline-block px-3 py-1 rounded-full border border-[#7C3AED]/30 bg-[#7C3AED]/10 mb-5">
+          <span className="text-sm text-[#7C3AED] font-medium">Free during beta</span>
+        </div>
+        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
+          Join the Hockystick waitlist.
+        </h1>
+        <p className="mt-4 text-lg text-gray-400 max-w-xl mx-auto">
+          Be among the first to access the deal room where trust gets built.
+        </p>
+      </div>
+
+      <main className="mx-auto max-w-xl px-6 py-16">
         {submitted ? (
-          <div className="text-center">
+          <div className="text-center py-12">
             <div className="text-5xl mb-4">✓</div>
-            <h1 className="text-3xl md:text-4xl font-semibold mb-4">You're on the list</h1>
-            <p className="text-lg text-muted-foreground">
-              We'll be in touch soon. Keep an eye on your inbox for updates.
-            </p>
+            <h2 className="text-2xl font-bold mb-3" style={{ fontFamily: "Syne, sans-serif" }}>You're on the list.</h2>
+            <p className="text-muted-foreground">We'll be in touch. Keep an eye on your inbox.</p>
           </div>
         ) : (
-          <>
-            <div className="mb-12">
-              <h1 className="text-3xl md:text-4xl font-semibold mb-4">Join the waitlist</h1>
-              <p className="text-lg text-muted-foreground">
-                Be among the first to experience the operating system for venture capital.
-              </p>
+          <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-gray-100 bg-white shadow-lg p-8">
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Full name</label>
+              <Input name="fullName" value={form.fullName} onChange={set} required placeholder="Your name" />
             </div>
-
-            <form onSubmit={handleSubmit} className="space-y-6 bg-card border border-border/60 rounded-xl p-8">
-              <div>
-                <label className="block text-sm font-medium mb-2">Full name</label>
-                <Input
-                  type="text"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  required
-                  placeholder="Your name"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Email</label>
-                <Input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  placeholder="you@company.com"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Role</label>
-                <select
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-border/60 rounded-lg bg-background text-foreground"
-                >
-                  <option value="">Select your role</option>
-                  <option value="founder">Founder</option>
-                  <option value="investor">Investor</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Company name</label>
-                <Input
-                  type="text"
-                  name="company"
-                  value={formData.company}
-                  onChange={handleChange}
-                  placeholder="Your company (optional)"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">What problem are you trying to solve?</label>
-                <Textarea
-                  name="problem"
-                  value={formData.problem}
-                  onChange={handleChange}
-                  placeholder="Tell us about your challenge..."
-                  className="min-h-32"
-                />
-              </div>
-
-              <Button type="submit" disabled={loading} className="w-full">
-                {loading ? "Joining..." : "Join the waitlist"}
-              </Button>
-            </form>
-          </>
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Email</label>
+              <Input type="email" name="email" value={form.email} onChange={set} required placeholder="you@company.com" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Role</label>
+              <select name="role" value={form.role} onChange={set}
+                className="w-full px-3 py-2 border border-border/60 rounded-lg bg-background text-foreground text-sm">
+                <option value="">Select your role</option>
+                <option value="founder">Founder</option>
+                <option value="investor">Investor</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Company</label>
+              <Input name="company" value={form.company} onChange={set} placeholder="Your company (optional)" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1.5">What problem are you trying to solve?</label>
+              <Textarea name="problem" value={form.problem} onChange={set}
+                placeholder="Tell us about your challenge..." className="min-h-28" />
+            </div>
+            <button type="submit" disabled={loading}
+              className="w-full py-3 rounded-lg bg-[#7C3AED] text-white font-semibold text-sm hover:bg-[#6d28d9] transition-colors disabled:opacity-50">
+              {loading ? "Joining..." : "Join the waitlist"}
+            </button>
+          </form>
         )}
       </main>
+
       <SiteFooter />
     </div>
   );

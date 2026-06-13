@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WaitlistRouteImport } from './routes/waitlist'
+import { Route as TrustRouteImport } from './routes/trust'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
@@ -17,20 +18,25 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as InviteRouteImport } from './routes/invite'
 import { Route as InvestorsRouteImport } from './routes/investors'
+import { Route as GrantsRouteImport } from './routes/grants'
 import { Route as FoundersRouteImport } from './routes/founders'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as DebugRouteImport } from './routes/debug'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AppRouteImport } from './routes/app'
+import { Route as AcceleratorsRouteImport } from './routes/accelerators'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as SolutionsVcDealRoomRouteImport } from './routes/solutions.vc-deal-room'
 import { Route as SolutionsRaise1mRouteImport } from './routes/solutions.raise-1m'
 import { Route as SolutionsInvestorPipelineRouteImport } from './routes/solutions.investor-pipeline'
 import { Route as SolutionsFundraisingCrmRouteImport } from './routes/solutions.fundraising-crm'
 import { Route as SolutionsDueDiligenceRouteImport } from './routes/solutions.due-diligence'
+import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as JoinTokenRouteImport } from './routes/join.$token'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
@@ -54,7 +60,14 @@ import { Route as AppDirectoryRouteImport } from './routes/app.directory'
 import { Route as AppDealRoomsRouteImport } from './routes/app.deal-rooms'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
 import { Route as AppAdvisorRouteImport } from './routes/app.advisor'
+import { Route as AppAcceleratorsRouteImport } from './routes/app.accelerators'
 import { Route as ApiTestAiRouteImport } from './routes/api.test-ai'
+import { Route as ApiHubspotSyncRouteImport } from './routes/api.hubspot-sync'
+import { Route as ApiHubspotNewsletterRouteImport } from './routes/api.hubspot-newsletter'
+import { Route as ApiEmailtestRouteImport } from './routes/api.emailtest'
+import { Route as ApiEmailTestRouteImport } from './routes/api.email-test'
+import { Route as ApiAdminDataRouteImport } from './routes/api.admin-data'
+import { Route as ApiAdminRouteImport } from './routes/api.admin'
 import { Route as AppInvestorIndexRouteImport } from './routes/app.investor.index'
 import { Route as JoinTeamTokenRouteImport } from './routes/join.team.$token'
 import { Route as AppSettingsSecurityRouteImport } from './routes/app.settings.security'
@@ -73,11 +86,18 @@ import { Route as AppInvestorDealFlowRouteImport } from './routes/app.investor.d
 import { Route as AppInvestorAnalysisRouteImport } from './routes/app.investor.analysis'
 import { Route as AppInvestorAdvisorRouteImport } from './routes/app.investor.advisor'
 import { Route as AppDealRoomIdRouteImport } from './routes/app.deal-room.$id'
+import { Route as ApiInternalEmailTestRouteImport } from './routes/api.internal.email-test'
+import { Route as ApiInternalDataRouteImport } from './routes/api.internal.data'
 import { Route as AppDealRoomIdNdaRouteImport } from './routes/app.deal-room.$id_.nda'
 
 const WaitlistRoute = WaitlistRouteImport.update({
   id: '/waitlist',
   path: '/waitlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrustRoute = TrustRouteImport.update({
+  id: '/trust',
+  path: '/trust',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -115,6 +135,11 @@ const InvestorsRoute = InvestorsRouteImport.update({
   path: '/investors',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GrantsRoute = GrantsRouteImport.update({
+  id: '/grants',
+  path: '/grants',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FoundersRoute = FoundersRouteImport.update({
   id: '/founders',
   path: '/founders',
@@ -135,6 +160,11 @@ const DebugRoute = DebugRouteImport.update({
   path: '/debug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogRoute = BlogRouteImport.update({
   id: '/blog',
   path: '/blog',
@@ -143,6 +173,11 @@ const BlogRoute = BlogRouteImport.update({
 const AppRoute = AppRouteImport.update({
   id: '/app',
   path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcceleratorsRoute = AcceleratorsRouteImport.update({
+  id: '/accelerators',
+  path: '/accelerators',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -154,6 +189,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => BlogRoute,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
@@ -184,6 +224,11 @@ const SolutionsFundraisingCrmRoute = SolutionsFundraisingCrmRouteImport.update({
 const SolutionsDueDiligenceRoute = SolutionsDueDiligenceRouteImport.update({
   id: '/solutions/due-diligence',
   path: '/solutions/due-diligence',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PSlugRoute = PSlugRouteImport.update({
+  id: '/p/$slug',
+  path: '/p/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JoinTokenRoute = JoinTokenRouteImport.update({
@@ -301,9 +346,44 @@ const AppAdvisorRoute = AppAdvisorRouteImport.update({
   path: '/advisor',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAcceleratorsRoute = AppAcceleratorsRouteImport.update({
+  id: '/accelerators',
+  path: '/accelerators',
+  getParentRoute: () => AppRoute,
+} as any)
 const ApiTestAiRoute = ApiTestAiRouteImport.update({
   id: '/api/test-ai',
   path: '/api/test-ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiHubspotSyncRoute = ApiHubspotSyncRouteImport.update({
+  id: '/api/hubspot-sync',
+  path: '/api/hubspot-sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiHubspotNewsletterRoute = ApiHubspotNewsletterRouteImport.update({
+  id: '/api/hubspot-newsletter',
+  path: '/api/hubspot-newsletter',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEmailtestRoute = ApiEmailtestRouteImport.update({
+  id: '/api/emailtest',
+  path: '/api/emailtest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEmailTestRoute = ApiEmailTestRouteImport.update({
+  id: '/api/email-test',
+  path: '/api/email-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminDataRoute = ApiAdminDataRouteImport.update({
+  id: '/api/admin-data',
+  path: '/api/admin-data',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminRoute = ApiAdminRouteImport.update({
+  id: '/api/admin',
+  path: '/api/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppInvestorIndexRoute = AppInvestorIndexRouteImport.update({
@@ -397,6 +477,16 @@ const AppDealRoomIdRoute = AppDealRoomIdRouteImport.update({
   path: '/deal-room/$id',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiInternalEmailTestRoute = ApiInternalEmailTestRouteImport.update({
+  id: '/api/internal/email-test',
+  path: '/api/internal/email-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiInternalDataRoute = ApiInternalDataRouteImport.update({
+  id: '/api/internal/data',
+  path: '/api/internal/data',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppDealRoomIdNdaRoute = AppDealRoomIdNdaRouteImport.update({
   id: '/deal-room/$id_/nda',
   path: '/deal-room/$id/nda',
@@ -406,12 +496,15 @@ const AppDealRoomIdNdaRoute = AppDealRoomIdNdaRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/accelerators': typeof AcceleratorsRoute
   '/app': typeof AppRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
+  '/contact': typeof ContactRoute
   '/debug': typeof DebugRoute
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
+  '/grants': typeof GrantsRoute
   '/investors': typeof InvestorsRoute
   '/invite': typeof InviteRoute
   '/pricing': typeof PricingRoute
@@ -419,8 +512,16 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
+  '/trust': typeof TrustRoute
   '/waitlist': typeof WaitlistRoute
+  '/api/admin': typeof ApiAdminRoute
+  '/api/admin-data': typeof ApiAdminDataRoute
+  '/api/email-test': typeof ApiEmailTestRoute
+  '/api/emailtest': typeof ApiEmailtestRoute
+  '/api/hubspot-newsletter': typeof ApiHubspotNewsletterRoute
+  '/api/hubspot-sync': typeof ApiHubspotSyncRoute
   '/api/test-ai': typeof ApiTestAiRoute
+  '/app/accelerators': typeof AppAcceleratorsRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
@@ -444,12 +545,16 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/join/$token': typeof JoinTokenRoute
+  '/p/$slug': typeof PSlugRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
   '/solutions/fundraising-crm': typeof SolutionsFundraisingCrmRoute
   '/solutions/investor-pipeline': typeof SolutionsInvestorPipelineRoute
   '/solutions/raise-1m': typeof SolutionsRaise1mRoute
   '/solutions/vc-deal-room': typeof SolutionsVcDealRoomRoute
   '/app/': typeof AppIndexRoute
+  '/blog/': typeof BlogIndexRoute
+  '/api/internal/data': typeof ApiInternalDataRoute
+  '/api/internal/email-test': typeof ApiInternalEmailTestRoute
   '/app/deal-room/$id': typeof AppDealRoomIdRoute
   '/app/investor/advisor': typeof AppInvestorAdvisorRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
@@ -473,11 +578,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/blog': typeof BlogRouteWithChildren
+  '/accelerators': typeof AcceleratorsRoute
+  '/contact': typeof ContactRoute
   '/debug': typeof DebugRoute
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
+  '/grants': typeof GrantsRoute
   '/investors': typeof InvestorsRoute
   '/invite': typeof InviteRoute
   '/pricing': typeof PricingRoute
@@ -485,8 +592,16 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
+  '/trust': typeof TrustRoute
   '/waitlist': typeof WaitlistRoute
+  '/api/admin': typeof ApiAdminRoute
+  '/api/admin-data': typeof ApiAdminDataRoute
+  '/api/email-test': typeof ApiEmailTestRoute
+  '/api/emailtest': typeof ApiEmailtestRoute
+  '/api/hubspot-newsletter': typeof ApiHubspotNewsletterRoute
+  '/api/hubspot-sync': typeof ApiHubspotSyncRoute
   '/api/test-ai': typeof ApiTestAiRoute
+  '/app/accelerators': typeof AppAcceleratorsRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
@@ -509,12 +624,16 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/join/$token': typeof JoinTokenRoute
+  '/p/$slug': typeof PSlugRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
   '/solutions/fundraising-crm': typeof SolutionsFundraisingCrmRoute
   '/solutions/investor-pipeline': typeof SolutionsInvestorPipelineRoute
   '/solutions/raise-1m': typeof SolutionsRaise1mRoute
   '/solutions/vc-deal-room': typeof SolutionsVcDealRoomRoute
   '/app': typeof AppIndexRoute
+  '/blog': typeof BlogIndexRoute
+  '/api/internal/data': typeof ApiInternalDataRoute
+  '/api/internal/email-test': typeof ApiInternalEmailTestRoute
   '/app/deal-room/$id': typeof AppDealRoomIdRoute
   '/app/investor/advisor': typeof AppInvestorAdvisorRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
@@ -539,12 +658,15 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/accelerators': typeof AcceleratorsRoute
   '/app': typeof AppRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
+  '/contact': typeof ContactRoute
   '/debug': typeof DebugRoute
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
+  '/grants': typeof GrantsRoute
   '/investors': typeof InvestorsRoute
   '/invite': typeof InviteRoute
   '/pricing': typeof PricingRoute
@@ -552,8 +674,16 @@ export interface FileRoutesById {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
+  '/trust': typeof TrustRoute
   '/waitlist': typeof WaitlistRoute
+  '/api/admin': typeof ApiAdminRoute
+  '/api/admin-data': typeof ApiAdminDataRoute
+  '/api/email-test': typeof ApiEmailTestRoute
+  '/api/emailtest': typeof ApiEmailtestRoute
+  '/api/hubspot-newsletter': typeof ApiHubspotNewsletterRoute
+  '/api/hubspot-sync': typeof ApiHubspotSyncRoute
   '/api/test-ai': typeof ApiTestAiRoute
+  '/app/accelerators': typeof AppAcceleratorsRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
@@ -577,12 +707,16 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/join/$token': typeof JoinTokenRoute
+  '/p/$slug': typeof PSlugRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
   '/solutions/fundraising-crm': typeof SolutionsFundraisingCrmRoute
   '/solutions/investor-pipeline': typeof SolutionsInvestorPipelineRoute
   '/solutions/raise-1m': typeof SolutionsRaise1mRoute
   '/solutions/vc-deal-room': typeof SolutionsVcDealRoomRoute
   '/app/': typeof AppIndexRoute
+  '/blog/': typeof BlogIndexRoute
+  '/api/internal/data': typeof ApiInternalDataRoute
+  '/api/internal/email-test': typeof ApiInternalEmailTestRoute
   '/app/deal-room/$id': typeof AppDealRoomIdRoute
   '/app/investor/advisor': typeof AppInvestorAdvisorRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
@@ -608,12 +742,15 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/accelerators'
     | '/app'
     | '/blog'
+    | '/contact'
     | '/debug'
     | '/feedback'
     | '/forgot-password'
     | '/founders'
+    | '/grants'
     | '/investors'
     | '/invite'
     | '/pricing'
@@ -621,8 +758,16 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/terms'
+    | '/trust'
     | '/waitlist'
+    | '/api/admin'
+    | '/api/admin-data'
+    | '/api/email-test'
+    | '/api/emailtest'
+    | '/api/hubspot-newsletter'
+    | '/api/hubspot-sync'
     | '/api/test-ai'
+    | '/app/accelerators'
     | '/app/advisor'
     | '/app/audit'
     | '/app/deal-rooms'
@@ -646,12 +791,16 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/join/$token'
+    | '/p/$slug'
     | '/solutions/due-diligence'
     | '/solutions/fundraising-crm'
     | '/solutions/investor-pipeline'
     | '/solutions/raise-1m'
     | '/solutions/vc-deal-room'
     | '/app/'
+    | '/blog/'
+    | '/api/internal/data'
+    | '/api/internal/email-test'
     | '/app/deal-room/$id'
     | '/app/investor/advisor'
     | '/app/investor/analysis'
@@ -675,11 +824,13 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
-    | '/blog'
+    | '/accelerators'
+    | '/contact'
     | '/debug'
     | '/feedback'
     | '/forgot-password'
     | '/founders'
+    | '/grants'
     | '/investors'
     | '/invite'
     | '/pricing'
@@ -687,8 +838,16 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/terms'
+    | '/trust'
     | '/waitlist'
+    | '/api/admin'
+    | '/api/admin-data'
+    | '/api/email-test'
+    | '/api/emailtest'
+    | '/api/hubspot-newsletter'
+    | '/api/hubspot-sync'
     | '/api/test-ai'
+    | '/app/accelerators'
     | '/app/advisor'
     | '/app/audit'
     | '/app/deal-rooms'
@@ -711,12 +870,16 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/join/$token'
+    | '/p/$slug'
     | '/solutions/due-diligence'
     | '/solutions/fundraising-crm'
     | '/solutions/investor-pipeline'
     | '/solutions/raise-1m'
     | '/solutions/vc-deal-room'
     | '/app'
+    | '/blog'
+    | '/api/internal/data'
+    | '/api/internal/email-test'
     | '/app/deal-room/$id'
     | '/app/investor/advisor'
     | '/app/investor/analysis'
@@ -740,12 +903,15 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/accelerators'
     | '/app'
     | '/blog'
+    | '/contact'
     | '/debug'
     | '/feedback'
     | '/forgot-password'
     | '/founders'
+    | '/grants'
     | '/investors'
     | '/invite'
     | '/pricing'
@@ -753,8 +919,16 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/terms'
+    | '/trust'
     | '/waitlist'
+    | '/api/admin'
+    | '/api/admin-data'
+    | '/api/email-test'
+    | '/api/emailtest'
+    | '/api/hubspot-newsletter'
+    | '/api/hubspot-sync'
     | '/api/test-ai'
+    | '/app/accelerators'
     | '/app/advisor'
     | '/app/audit'
     | '/app/deal-rooms'
@@ -778,12 +952,16 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/join/$token'
+    | '/p/$slug'
     | '/solutions/due-diligence'
     | '/solutions/fundraising-crm'
     | '/solutions/investor-pipeline'
     | '/solutions/raise-1m'
     | '/solutions/vc-deal-room'
     | '/app/'
+    | '/blog/'
+    | '/api/internal/data'
+    | '/api/internal/email-test'
     | '/app/deal-room/$id'
     | '/app/investor/advisor'
     | '/app/investor/analysis'
@@ -808,12 +986,15 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AcceleratorsRoute: typeof AcceleratorsRoute
   AppRoute: typeof AppRouteWithChildren
   BlogRoute: typeof BlogRouteWithChildren
+  ContactRoute: typeof ContactRoute
   DebugRoute: typeof DebugRoute
   FeedbackRoute: typeof FeedbackRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   FoundersRoute: typeof FoundersRoute
+  GrantsRoute: typeof GrantsRoute
   InvestorsRoute: typeof InvestorsRoute
   InviteRoute: typeof InviteRoute
   PricingRoute: typeof PricingRoute
@@ -821,15 +1002,25 @@ export interface RootRouteChildren {
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   TermsRoute: typeof TermsRoute
+  TrustRoute: typeof TrustRoute
   WaitlistRoute: typeof WaitlistRoute
+  ApiAdminRoute: typeof ApiAdminRoute
+  ApiAdminDataRoute: typeof ApiAdminDataRoute
+  ApiEmailTestRoute: typeof ApiEmailTestRoute
+  ApiEmailtestRoute: typeof ApiEmailtestRoute
+  ApiHubspotNewsletterRoute: typeof ApiHubspotNewsletterRoute
+  ApiHubspotSyncRoute: typeof ApiHubspotSyncRoute
   ApiTestAiRoute: typeof ApiTestAiRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   JoinTokenRoute: typeof JoinTokenRoute
+  PSlugRoute: typeof PSlugRoute
   SolutionsDueDiligenceRoute: typeof SolutionsDueDiligenceRoute
   SolutionsFundraisingCrmRoute: typeof SolutionsFundraisingCrmRoute
   SolutionsInvestorPipelineRoute: typeof SolutionsInvestorPipelineRoute
   SolutionsRaise1mRoute: typeof SolutionsRaise1mRoute
   SolutionsVcDealRoomRoute: typeof SolutionsVcDealRoomRoute
+  ApiInternalDataRoute: typeof ApiInternalDataRoute
+  ApiInternalEmailTestRoute: typeof ApiInternalEmailTestRoute
   JoinTeamTokenRoute: typeof JoinTeamTokenRoute
 }
 
@@ -840,6 +1031,13 @@ declare module '@tanstack/react-router' {
       path: '/waitlist'
       fullPath: '/waitlist'
       preLoaderRoute: typeof WaitlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trust': {
+      id: '/trust'
+      path: '/trust'
+      fullPath: '/trust'
+      preLoaderRoute: typeof TrustRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -891,6 +1089,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvestorsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/grants': {
+      id: '/grants'
+      path: '/grants'
+      fullPath: '/grants'
+      preLoaderRoute: typeof GrantsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/founders': {
       id: '/founders'
       path: '/founders'
@@ -919,6 +1124,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DebugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog': {
       id: '/blog'
       path: '/blog'
@@ -931,6 +1143,13 @@ declare module '@tanstack/react-router' {
       path: '/app'
       fullPath: '/app'
       preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accelerators': {
+      id: '/accelerators'
+      path: '/accelerators'
+      fullPath: '/accelerators'
+      preLoaderRoute: typeof AcceleratorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -946,6 +1165,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof BlogRoute
     }
     '/app/': {
       id: '/app/'
@@ -987,6 +1213,13 @@ declare module '@tanstack/react-router' {
       path: '/solutions/due-diligence'
       fullPath: '/solutions/due-diligence'
       preLoaderRoute: typeof SolutionsDueDiligenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/p/$slug': {
+      id: '/p/$slug'
+      path: '/p/$slug'
+      fullPath: '/p/$slug'
+      preLoaderRoute: typeof PSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/join/$token': {
@@ -1150,11 +1383,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdvisorRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/accelerators': {
+      id: '/app/accelerators'
+      path: '/accelerators'
+      fullPath: '/app/accelerators'
+      preLoaderRoute: typeof AppAcceleratorsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/api/test-ai': {
       id: '/api/test-ai'
       path: '/api/test-ai'
       fullPath: '/api/test-ai'
       preLoaderRoute: typeof ApiTestAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/hubspot-sync': {
+      id: '/api/hubspot-sync'
+      path: '/api/hubspot-sync'
+      fullPath: '/api/hubspot-sync'
+      preLoaderRoute: typeof ApiHubspotSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/hubspot-newsletter': {
+      id: '/api/hubspot-newsletter'
+      path: '/api/hubspot-newsletter'
+      fullPath: '/api/hubspot-newsletter'
+      preLoaderRoute: typeof ApiHubspotNewsletterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/emailtest': {
+      id: '/api/emailtest'
+      path: '/api/emailtest'
+      fullPath: '/api/emailtest'
+      preLoaderRoute: typeof ApiEmailtestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/email-test': {
+      id: '/api/email-test'
+      path: '/api/email-test'
+      fullPath: '/api/email-test'
+      preLoaderRoute: typeof ApiEmailTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin-data': {
+      id: '/api/admin-data'
+      path: '/api/admin-data'
+      fullPath: '/api/admin-data'
+      preLoaderRoute: typeof ApiAdminDataRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin': {
+      id: '/api/admin'
+      path: '/api/admin'
+      fullPath: '/api/admin'
+      preLoaderRoute: typeof ApiAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/investor/': {
@@ -1283,6 +1565,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDealRoomIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api/internal/email-test': {
+      id: '/api/internal/email-test'
+      path: '/api/internal/email-test'
+      fullPath: '/api/internal/email-test'
+      preLoaderRoute: typeof ApiInternalEmailTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/internal/data': {
+      id: '/api/internal/data'
+      path: '/api/internal/data'
+      fullPath: '/api/internal/data'
+      preLoaderRoute: typeof ApiInternalDataRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/deal-room/$id_/nda': {
       id: '/app/deal-room/$id_/nda'
       path: '/deal-room/$id/nda'
@@ -1346,6 +1642,7 @@ const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
+  AppAcceleratorsRoute: typeof AppAcceleratorsRoute
   AppAdvisorRoute: typeof AppAdvisorRoute
   AppAuditRoute: typeof AppAuditRoute
   AppDealRoomsRoute: typeof AppDealRoomsRoute
@@ -1372,6 +1669,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAcceleratorsRoute: AppAcceleratorsRoute,
   AppAdvisorRoute: AppAdvisorRoute,
   AppAuditRoute: AppAuditRoute,
   AppDealRoomsRoute: AppDealRoomsRoute,
@@ -1401,10 +1699,12 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface BlogRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
 }
 
 const BlogRouteChildren: BlogRouteChildren = {
   BlogSlugRoute: BlogSlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
 }
 
 const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
@@ -1412,12 +1712,15 @@ const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AcceleratorsRoute: AcceleratorsRoute,
   AppRoute: AppRouteWithChildren,
   BlogRoute: BlogRouteWithChildren,
+  ContactRoute: ContactRoute,
   DebugRoute: DebugRoute,
   FeedbackRoute: FeedbackRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   FoundersRoute: FoundersRoute,
+  GrantsRoute: GrantsRoute,
   InvestorsRoute: InvestorsRoute,
   InviteRoute: InviteRoute,
   PricingRoute: PricingRoute,
@@ -1425,15 +1728,25 @@ const rootRouteChildren: RootRouteChildren = {
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   TermsRoute: TermsRoute,
+  TrustRoute: TrustRoute,
   WaitlistRoute: WaitlistRoute,
+  ApiAdminRoute: ApiAdminRoute,
+  ApiAdminDataRoute: ApiAdminDataRoute,
+  ApiEmailTestRoute: ApiEmailTestRoute,
+  ApiEmailtestRoute: ApiEmailtestRoute,
+  ApiHubspotNewsletterRoute: ApiHubspotNewsletterRoute,
+  ApiHubspotSyncRoute: ApiHubspotSyncRoute,
   ApiTestAiRoute: ApiTestAiRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   JoinTokenRoute: JoinTokenRoute,
+  PSlugRoute: PSlugRoute,
   SolutionsDueDiligenceRoute: SolutionsDueDiligenceRoute,
   SolutionsFundraisingCrmRoute: SolutionsFundraisingCrmRoute,
   SolutionsInvestorPipelineRoute: SolutionsInvestorPipelineRoute,
   SolutionsRaise1mRoute: SolutionsRaise1mRoute,
   SolutionsVcDealRoomRoute: SolutionsVcDealRoomRoute,
+  ApiInternalDataRoute: ApiInternalDataRoute,
+  ApiInternalEmailTestRoute: ApiInternalEmailTestRoute,
   JoinTeamTokenRoute: JoinTeamTokenRoute,
 }
 export const routeTree = rootRouteImport

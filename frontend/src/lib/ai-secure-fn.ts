@@ -73,7 +73,17 @@ async function callOpenAI(
   history: Array<{ role: string; content: string }> = [],
   maxTokens = 400
 ): Promise<string> {
-  const apiKey = getEnvVar("OPENAI_API_KEY");
+  // __cf_env is injected at request time by patch-wrangler.mjs — always check it first
+  const cfEnv = (globalThis as any).__cf_env || {};
+  const apiKey =
+    cfEnv.OPENAI_API_KEY ||
+    cfEnv.OPEN_AI_API_KEY ||
+    cfEnv["OPEN AI API KEY"] ||
+    getEnvVar("OPENAI_API_KEY") ||
+    "";
+
+  console.log("[AI] callOpenAI — key exists:", !!apiKey, "prefix:", apiKey ? apiKey.slice(0, 8) : "MISSING");
+
   if (!apiKey) throw new Error("OpenAI API key not configured on server");
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -95,10 +105,13 @@ async function callOpenAI(
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({})) as any;
+    console.error("[AI] OpenAI error:", response.status, err?.error?.message);
     throw new Error(err?.error?.message || `OpenAI error ${response.status}`);
   }
   const result = await response.json() as any;
-  return result.choices[0].message.content;
+  const content = result.choices?.[0]?.message?.content || "";
+  if (!content) throw new Error("AI returned empty response");
+  return content;
 }
 
 // ── Thesis Alignment — replaces direct browser call in DDWorkstation ──
@@ -134,9 +147,9 @@ export const generateDocSummary = createServerFn({ method: "POST" })
       return { reply: usageCheck.message || "Daily AI limit reached.", error: "usage_limit" };
     }
     try {
-      const systemPrompt = `You are a VC analyst reading startup documents. Extract key facts in exactly 4 concise bullet points. Each bullet: one sentence, start with a ✦ symbol. Focus on: business model, market size, traction/revenue, team or product highlights. No fluff.`;
-      const userMessage = `Document: ${data.fileName}\nCategory: ${data.category || "Other"}\n\nContent:\n${data.documentContent}`;
-      const reply = await callOpenAI(systemPrompt, userMessage, [], 300);
+      const systemPrompt = `You are a VC analyst reviewing startup documents. Write a concise document summary in 4-6 bullet points. Each bullet starts with ✦. Be specific — extract real numbers, percentages, and facts from the content. Cover: business model, market size/opportunity, traction or revenue metrics, and key risks or highlights. If the document is a financial model, focus on unit economics and projections. If it's a pitch deck, focus on the problem, solution, and go-to-market. Never invent data not present in the text.`;
+      const userMessage = `Document: ${data.fileName}\nCategory: ${data.category || "Other"}\n\nExtracted content:\n${data.documentContent}`;
+      const reply = await callOpenAI(systemPrompt, userMessage, [], 400);
       return { reply, error: null };
     } catch (err: any) {
       return { reply: `Summary failed: ${err.message}`, error: err.message };

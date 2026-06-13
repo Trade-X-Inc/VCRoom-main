@@ -7,6 +7,15 @@ import { toast } from "sonner";
 
 const FUNDING_STAGES = ["Pre-seed", "Seed", "Series A", "Series B", "Series C"] as const;
 
+function formatCurrency(val: unknown): string {
+  if (!val) return "—";
+  const n = Number(val);
+  if (isNaN(n) || n === 0) return "—";
+  if (n >= 1_000_000) return "$" + (n / 1_000_000).toFixed(1) + "M";
+  if (n >= 1_000) return "$" + (n / 1_000).toFixed(0) + "K";
+  return "$" + n.toLocaleString();
+}
+
 interface Round {
   name: string;
   amount: string;
@@ -260,10 +269,10 @@ export function DealTermsCard({ dealRoomId, isFounder, isInvestor }: Props) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               { label: "Stage", value: terms?.funding_stage },
-              { label: "Funding ask", value: terms?.funding_ask },
-              { label: "Pre-money val.", value: terms?.pre_money_valuation },
-              { label: "Equity offered", value: terms?.equity_offered },
-            ].map(({ label, value }) => value ? (
+              { label: "Funding ask", value: formatCurrency(terms?.funding_ask) },
+              { label: "Pre-money val.", value: formatCurrency(terms?.pre_money_valuation) },
+              { label: "Equity offered", value: terms?.equity_offered ? (String(terms.equity_offered).includes("%") ? String(terms.equity_offered) : `${terms.equity_offered}%`) : "—" },
+            ].map(({ label, value }) => value && value !== "—" ? (
               <div key={label} className="rounded-lg border border-border/60 bg-background p-3">
                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</div>
                 <div className="mt-1 text-sm font-semibold">{value}</div>

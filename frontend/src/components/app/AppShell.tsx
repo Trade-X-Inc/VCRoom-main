@@ -2,76 +2,137 @@ import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-route
 import { Logo } from "@/components/brand/Logo";
 import {
   LayoutGrid, Users, Building2, FileText, Briefcase,
-  MessageSquare, Calendar, Sparkles, Search, Settings, ChevronsLeft, Plus, Inbox, Gavel,
-  PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, Kanban, BarChart3, UserCircle2, Gift, Globe, Trophy, Newspaper, Plug,
+  MessageSquare, MessageCircle, Calendar, Sparkles, Search, Settings, ChevronsLeft, Plus, Inbox, Gavel,
+  PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, Kanban, BarChart3, UserCircle2, Gift, Globe, Trophy, Newspaper, Plug, Menu, X, Rocket,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/app/NotificationBell";
 import { UserMenu } from "@/components/app/UserMenu";
 import { ThemeToggle } from "@/components/app/ThemeToggle";
-import { LangSwitcher } from "@/components/app/LangSwitcher";
 import { useAuth } from "@/lib/auth";
-import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/lib/supabase";
 import { useProfile } from "@/lib/store";
-import { FeedbackButton } from "@/components/app/FeedbackButton";
 
-interface NavItem { to: string; labelKey: string; icon: any; badge?: string; }
+interface NavItem { to: string; label: string; icon: any; badge?: string; }
 
 const founderNav: NavItem[] = [
-  { to: "/app", labelKey: "app.overview", icon: LayoutGrid },
-  { to: "/app/leads", labelKey: "app.leads", icon: Users },
-  { to: "/app/pipeline", labelKey: "app.pipeline", icon: Kanban },
-  { to: "/app/deal-rooms", labelKey: "app.dealRooms", icon: Briefcase },
-  { to: "/app/profile", labelKey: "app.profile", icon: Building2 },
-  { to: "/app/documents", labelKey: "app.documents", icon: FileText },
-  { to: "/app/meetings", labelKey: "app.meetings", icon: Calendar },
-  { to: "/app/reports", labelKey: "reports.title", icon: BarChart3 },
-  { to: "/app/advisor", labelKey: "app.advisor", icon: Sparkles },
-  { to: "/app/referrals", labelKey: "Referrals", icon: Gift },
-  { to: "/app/messages", labelKey: "Team Chat", icon: MessageSquare },
-  { to: "/app/directory", labelKey: "Directory", icon: Globe },
-  { to: "/app/wall", labelKey: "The Wall", icon: Trophy },
+  { to: "/app", label: "Overview", icon: LayoutGrid },
+  { to: "/app/leads", label: "VC Leads", icon: Users },
+  { to: "/app/pipeline", label: "Pipeline", icon: Kanban },
+  { to: "/app/deal-rooms", label: "Deal Rooms", icon: Briefcase },
+  { to: "/app/profile", label: "Company Profile", icon: Building2 },
+  { to: "/app/documents", label: "Documents", icon: FileText },
+  { to: "/app/meetings", label: "Meetings", icon: Calendar },
+  { to: "/app/reports", label: "Reports", icon: BarChart3 },
+  { to: "/app/advisor", label: "AI Advisor", icon: Sparkles },
+  { to: "/app/messages", label: "Team Chat", icon: MessageSquare },
+  { to: "/app/directory", label: "Directory", icon: Globe },
+  { to: "/app/accelerators", label: "Accelerators", icon: Rocket },
+  { to: "/app/wall", label: "The Wall", icon: Trophy },
+  { to: "/app/referrals", label: "Referrals", icon: Gift },
 ];
 
 const investorNav: NavItem[] = [
-  { to: "/app/investor", labelKey: "app.overview", icon: LayoutGrid },
-  { to: "/app/investor/deal-flow", labelKey: "Deal Flow", icon: Inbox },
-  { to: "/app/investor/pipeline", labelKey: "My Pipeline", icon: Kanban },
-  { to: "/app/investor/startups", labelKey: "app.startups", icon: Building2 },
-  { to: "/app/investor/diligence", labelKey: "app.diligence", icon: ClipboardCheck },
-  { to: "/app/investor/analysis", labelKey: "app.analysis", icon: Brain },
-  { to: "/app/investor/advisor", labelKey: "AI Advisor", icon: Sparkles },
-  { to: "/app/investor/decisions", labelKey: "app.decisions", icon: Gavel },
-  { to: "/app/investor/portfolio", labelKey: "Portfolio", icon: PieChart },
-  { to: "/app/news", labelKey: "Market News", icon: Newspaper },
-  { to: "/app/meetings", labelKey: "app.meetings", icon: Calendar },
-  { to: "/app/messages", labelKey: "Team Chat", icon: MessageSquare },
-  { to: "/app/investor/profile", labelKey: "Profile", icon: UserCircle2 },
-  { to: "/app/directory", labelKey: "Directory", icon: Globe },
-  { to: "/app/wall", labelKey: "The Wall", icon: Trophy },
+  { to: "/app/investor", label: "Overview", icon: LayoutGrid },
+  { to: "/app/investor/deal-flow", label: "Deal Flow", icon: Inbox },
+  { to: "/app/investor/pipeline", label: "My Pipeline", icon: Kanban },
+  { to: "/app/investor/startups", label: "Startups", icon: Building2 },
+  { to: "/app/investor/diligence", label: "Due Diligence", icon: ClipboardCheck },
+  { to: "/app/investor/analysis", label: "AI Analysis", icon: Brain },
+  { to: "/app/investor/advisor", label: "AI Advisor", icon: Sparkles },
+  { to: "/app/investor/decisions", label: "Decisions", icon: Gavel },
+  { to: "/app/investor/portfolio", label: "Portfolio", icon: PieChart },
+  { to: "/app/meetings", label: "Meetings", icon: Calendar },
+  { to: "/app/messages", label: "Team Chat", icon: MessageSquare },
+  { to: "/app/directory", label: "Directory", icon: Globe },
+  { to: "/app/wall", label: "The Wall", icon: Trophy },
+  { to: "/app/referrals", label: "Referrals", icon: Gift },
 ];
 
 const workspaceNavFounder: NavItem[] = [
-  { to: "/app/users", labelKey: "app.users", icon: UserCog },
-  { to: "/app/audit", labelKey: "app.audit", icon: ShieldCheck },
-  { to: "/app/integrations", labelKey: "Integrations", icon: Plug },
-  { to: "/app/settings", labelKey: "app.settings", icon: Settings },
+  { to: "/app/users", label: "Team & Users", icon: UserCog },
+  { to: "/app/audit", label: "Audit Log", icon: ShieldCheck },
+  { to: "/app/integrations", label: "Integrations", icon: Plug },
+  { to: "/app/settings", label: "Settings", icon: Settings },
 ];
 
 const workspaceNavInvestor: NavItem[] = [
-  { to: "/app/investor/team", labelKey: "Team", icon: Users },
-  { to: "/app/integrations", labelKey: "Integrations", icon: Plug },
-  { to: "/app/settings", labelKey: "app.settings", icon: Settings },
+  { to: "/app/investor/profile", label: "Profile", icon: UserCircle2 },
+  { to: "/app/investor/team", label: "Team", icon: Users },
+  { to: "/app/integrations", label: "Integrations", icon: Plug },
+  { to: "/app/settings", label: "Settings", icon: Settings },
 ];
+
+function FeedbackModal({ onClose }: { onClose: () => void }) {
+  const { user } = useAuth();
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const submit = async () => {
+    if (!rating) { toast.error("Please select a rating"); return; }
+    setSaving(true);
+    try {
+      await supabase.from("feedback").insert({
+        user_id: user?.id,
+        email: user?.email,
+        rating,
+        message: comment.trim(),
+        created_at: new Date().toISOString(),
+      });
+      toast.success("Thank you for your feedback!");
+      onClose();
+    } catch (e: any) {
+      toast.error(e.message || "Failed to submit");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+      <div className="bg-card border border-border/60 rounded-2xl p-6 w-full max-w-sm shadow-xl space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-sm">How is your experience?</h3>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
+        </div>
+        <div className="flex gap-2 justify-center">
+          {[1,2,3,4,5].map((s) => (
+            <button key={s} onClick={() => setRating(s)}
+              className={`text-2xl transition-transform hover:scale-110 ${s <= rating ? "opacity-100" : "opacity-30"}`}>
+              ⭐
+            </button>
+          ))}
+        </div>
+        <textarea
+          rows={3}
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          placeholder="Any comments? (optional)"
+          className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:border-brand/50"
+        />
+        <div className="flex gap-2">
+          <button onClick={onClose} className="flex-1 rounded-lg border border-border/60 py-2 text-sm hover:bg-accent transition-colors">Cancel</button>
+          <button onClick={submit} disabled={saving || !rating}
+            className="flex-1 rounded-lg bg-brand text-brand-foreground py-2 text-sm font-medium hover:bg-brand/90 disabled:opacity-50 transition-colors">
+            {saving ? "Sending…" : "Submit"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function AppShell({ children }: { children?: React.ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [collapsed, setCollapsed] = useState(false);
-  const { user } = useAuth();
-  const { t } = useI18n();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const profile = useProfile();
 
@@ -145,7 +206,11 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       !path.startsWith("/app/settings") &&
       !path.startsWith("/app/meetings") &&
       !path.startsWith("/app/deal-room") &&
-      !path.startsWith("/app/messages");
+      !path.startsWith("/app/messages") &&
+      !path.startsWith("/app/news") &&
+      !path.startsWith("/app/directory") &&
+      !path.startsWith("/app/wall") &&
+      !path.startsWith("/app/referrals");
     const founderOutOfBounds = !isInvestor && path.startsWith("/app/investor");
     if (investorOutOfBounds && lastRedirectRef.current !== "investor") {
       lastRedirectRef.current = "investor";
@@ -158,6 +223,10 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
     }
   }, [isInvestor, path]);  // eslint-disable-line react-hooks/exhaustive-deps
 
+  if (authLoading) {
+    return <div className="min-h-screen bg-background grid place-items-center text-sm text-muted-foreground">Loading…</div>;
+  }
+
   if (!user) {
     return <div className="min-h-screen bg-background grid place-items-center text-sm text-muted-foreground">Redirecting…</div>;
   }
@@ -168,14 +237,34 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background flex">
-      <aside className={cn("border-r border-border/60 bg-sidebar flex flex-col transition-all", collapsed ? "w-[68px]" : "w-[248px]")}>
-        <div className="h-16 flex items-center px-4 border-b border-border/60">
+      {/* Mobile overlay backdrop */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      <aside className={cn(
+        "border-r border-border/60 bg-sidebar flex flex-col transition-all duration-200 z-50",
+        // Desktop: always visible, collapsible
+        "hidden md:flex",
+        collapsed ? "md:w-[68px]" : "md:w-[248px]",
+        // Mobile: fixed overlay, slides in
+        mobileOpen && "!flex fixed inset-y-0 left-0 w-[248px] shadow-xl",
+      )}>
+        <div className="h-14 md:h-16 flex items-center px-4 border-b border-border/60 shrink-0">
           <Link to="/" className="flex-1"><Logo withWordmark={!collapsed} /></Link>
+          {/* Desktop collapse button */}
           {!collapsed && (
-            <button onClick={() => setCollapsed(true)} className="text-muted-foreground hover:text-foreground">
+            <button onClick={() => setCollapsed(true)} className="hidden md:block text-muted-foreground hover:text-foreground">
               <ChevronsLeft className="h-4 w-4" />
             </button>
           )}
+          {/* Mobile close button */}
+          <button onClick={() => setMobileOpen(false)} className="md:hidden text-muted-foreground hover:text-foreground">
+            <X className="h-4 w-4" />
+          </button>
         </div>
 
         <div className="px-3 py-3">
@@ -209,7 +298,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
         <nav className="flex-1 px-2 space-y-0.5 overflow-y-auto">
           {!collapsed && (
             <div className="px-2 pt-3 pb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-              {isInvestor ? "Investor" : t("app.workspace")}
+              {isInvestor ? "Investor" : "Workspace"}
             </div>
           )}
           {nav.map((n, index) => {
@@ -234,6 +323,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                 <Link
                   to={n.to as any}
                   preload="intent"
+                  onClick={() => setMobileOpen(false)}
                   className={cn(
                     "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors group",
                     active ? "bg-accent text-foreground font-medium shadow-xs" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
@@ -241,7 +331,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                   )}
                 >
                   <n.icon className={cn("h-4 w-4", active && "text-brand")} />
-                  {!collapsed && <span className="flex-1">{t(n.labelKey)}</span>}
+                  {!collapsed && <span className="flex-1">{n.label}</span>}
                   {!collapsed && badge && (
                     <span className="text-[10px] rounded-full bg-background border border-border/60 px-1.5 py-0.5 text-muted-foreground">
                       {badge}
@@ -255,8 +345,16 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
           {!collapsed && (
             <>
               <div className="px-2 pt-4 pb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                {t("app.admin")}
+                Admin
               </div>
+              {/* Feedback button — opens modal, no navigation */}
+              <button
+                onClick={() => { setFeedbackOpen(true); setMobileOpen(false); }}
+                className="w-full flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span>Feedback</span>
+              </button>
               {workspaceNav.map((n) => {
                 const active = path.startsWith(n.to);
                 return (
@@ -264,13 +362,14 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                     key={n.to}
                     to={n.to as any}
                     preload="intent"
+                    onClick={() => setMobileOpen(false)}
                     className={cn(
                       "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
                       active ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
                     )}
                   >
                     <n.icon className={cn("h-4 w-4", active && "text-brand")} />
-                    <span>{t(n.labelKey)}</span>
+                    <span>{n.label}</span>
                   </Link>
                 );
               })}
@@ -296,30 +395,39 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 border-b border-border/60 bg-background/80 backdrop-blur-xl sticky top-0 z-20 flex items-center px-6 gap-3">
-          <div className="flex-1 max-w-md">
-            <div className="relative">
+        <header className="h-14 md:h-16 border-b border-border/60 bg-background/80 backdrop-blur-xl sticky top-0 z-20 flex items-center px-3 md:px-6 gap-2 md:gap-3">
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="md:hidden grid h-9 w-9 place-items-center rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground shrink-0"
+          >
+            <Menu className="h-4 w-4" />
+          </button>
+
+          {/* Search — hidden on mobile, visible md+ */}
+          <div className="hidden md:flex flex-1 max-w-md">
+            <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
-                placeholder={t("app.search")}
+                placeholder="Search investors, documents, deals…"
                 className="w-full rounded-md border border-border/60 bg-background/60 pl-9 pr-12 py-2 text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/10"
               />
               <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground border border-border/60 rounded px-1.5 py-0.5">⌘K</kbd>
             </div>
           </div>
-          <div className="ml-auto flex items-center gap-2">
-            <button className="grid h-9 w-9 place-items-center rounded-md border border-border/60 hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
+
+          <div className="ml-auto flex items-center gap-1.5 md:gap-2">
+            <button className="hidden md:grid h-9 w-9 place-items-center rounded-md border border-border/60 hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
               <Plus className="h-4 w-4" />
             </button>
-            <LangSwitcher />
             <ThemeToggle />
             <NotificationBell />
             <UserMenu />
           </div>
         </header>
-        <main className="flex-1 min-w-0">{children ?? <Outlet />}</main>
-        <FeedbackButton />
+        <main className="flex-1 min-w-0 overflow-x-hidden">{children ?? <Outlet />}</main>
       </div>
+      {feedbackOpen && <FeedbackModal onClose={() => setFeedbackOpen(false)} />}
     </div>
   );
 }

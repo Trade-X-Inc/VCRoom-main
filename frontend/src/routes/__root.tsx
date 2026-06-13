@@ -2,7 +2,6 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts, ScrollRestoration 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/lib/auth";
 import { ThemeProvider } from "@/lib/theme";
-import { I18nProvider } from "@/lib/i18n";
 import { Toaster } from "@/components/ui/sonner";
 import { setupAuthListener } from "@/lib/auth-store";
 
@@ -45,26 +44,52 @@ function NotFoundComponent() {
   );
 }
 
+const JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Hockystick",
+  "url": "https://hockystick.app",
+  "description": "AI-powered deal rooms for founders raising capital and VCs managing deal flow.",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "49", "priceCurrency": "USD" },
+  "creator": { "@type": "Organization", "name": "Hockystick", "url": "https://hockystick.app" },
+});
+
 export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1.0" },
-      { title: "Hockystick — Where deals get done" },
-      { name: "description", content: "AI-powered fundraising platform for founders and investors. Manage VC outreach, create secure deal rooms, and close your round faster." },
+      { title: "Hockystick — Verified Fundraising for MENA Founders" },
+      { name: "description", content: "Connect with verified investors. Replace warm intros with manufactured trust. Built for GCC & MENA startups." },
       { name: "author", content: "Hockystick" },
+      { name: "robots", content: "index, follow" },
       { name: "theme-color", content: "#6C5CE7" },
-      { property: "og:title", content: "Hockystick — Where deals get done" },
-      { property: "og:description", content: "AI-powered fundraising platform for founders and investors. Manage VC outreach, create secure deal rooms, and close your round faster." },
+      // Open Graph
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:title", content: "Hockystick — Verified Fundraising for MENA Founders" },
+      { property: "og:description", content: "Connect with verified investors. Replace warm intros with manufactured trust. Built for GCC & MENA startups." },
+      { property: "og:url", content: "https://hockystick.app" },
+      { property: "og:site_name", content: "Hockystick" },
+      { property: "og:image", content: "https://hockystick.app/og-image.png" },
+      { property: "og:image:type", content: "image/png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "Hockystick — Verified Fundraising for MENA Founders" },
+      // Twitter / X
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@hockystickapp" },
+      { name: "twitter:title", content: "Hockystick — Verified Fundraising for MENA Founders" },
+      { name: "twitter:description", content: "Connect with verified investors. Replace warm intros with manufactured trust. Built for GCC & MENA startups." },
+      { name: "twitter:image", content: "https://hockystick.app/og-image.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", type: "image/svg+xml", href: "/logo-dark.svg?v=2" },
-      { rel: "shortcut icon", href: "/logo-dark.svg?v=2" },
-      { rel: "apple-touch-icon", href: "/logo-dark.svg?v=2" },
+      { rel: "canonical", href: "https://hockystick.app" },
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "shortcut icon", href: "/favicon.svg" },
+      { rel: "apple-touch-icon", href: "/favicon.svg" },
     ],
   }),
   shellComponent: RootShell,
@@ -77,6 +102,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON_LD }} />
       </head>
       <body>
         {children}
@@ -88,20 +114,13 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
-  if (typeof window !== 'undefined') {
-    console.log('[env-check] VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL?.slice(0, 20) ?? 'MISSING')
-    console.log('[env-check] VITE_SUPABASE_ANON_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? 'present' : 'MISSING')
-    console.log('[env-check] VITE_GOOGLE_CLIENT_ID:', import.meta.env.VITE_GOOGLE_CLIENT_ID ? 'present' : 'MISSING')
-  }
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <I18nProvider>
-          <AuthProvider>
-            <Outlet />
-            <Toaster />
-          </AuthProvider>
-        </I18nProvider>
+        <AuthProvider>
+          <Outlet />
+          <Toaster />
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

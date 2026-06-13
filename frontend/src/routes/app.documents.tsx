@@ -1,1026 +1,1211 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
-  FileText, Upload, CheckCircle2, AlertTriangle,
-  Download, Trash2, Loader2, LayoutGrid, List,
-  File, Table2, Image, Video, X, Plus, ExternalLink, Link as LinkIcon,
+  FileText, CheckCircle2, AlertCircle, Zap,
+  ArrowRight, ChevronDown, Loader2, X, Upload,
 } from "lucide-react";
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/documents")({
   component: Documents,
 });
 
-const CATEGORIES = [
-  "Pitch Deck", "Financials", "Legal", "Market Research", "Team", "Product", "Other",
-] as const;
-type DocCategory = (typeof CATEGORIES)[number];
+const STAGE_OPTIONS = ["Pre-seed", "Seed", "Series A", "Series B"] as const;
+type Stage = (typeof STAGE_OPTIONS)[number];
 
-const TAB_LABELS = ["All", ...CATEGORIES] as const;
-
-const EXPECTED_DOCS: Record<DocCategory, string[]> = {
-  "Pitch Deck": [
-    "Pitch Deck (PDF or PPTX)",
-    "One-pager / Executive Summary",
-    "Company Blurb (1-2 paragraphs)",
-  ],
-  "Financials": [
-    "Last 3 years P&L",
-    "Current balance sheet",
-    "Cash flow statement",
-    "Revenue projections (3 years)",
-    "Cap table",
-    "Current MRR/ARR metrics",
-  ],
-  "Legal": [
-    "Certificate of incorporation",
-    "Shareholder agreement",
-    "IP ownership / assignments",
-    "Pending litigation disclosure",
-    "Key contracts",
-  ],
-  "Market Research": [
-    "TAM/SAM/SOM analysis",
-    "Competitive landscape",
-    "Customer research / surveys",
-    "Market sizing model",
-  ],
-  "Team": [
-    "Founder CVs / LinkedIn profiles",
-    "Org chart",
-    "Key employee contracts",
-    "Advisory board list",
-  ],
-  "Product": [
-    "Product roadmap",
-    "Tech architecture overview",
-    "Demo recording / video link",
-    "Key metrics dashboard",
-    "Product screenshots",
-  ],
-  "Other": [],
+const STAGE_GUIDANCE: Record<Stage, string> = {
+  "Pre-seed": "Focus on problem, solution, team, and use of funds",
+  "Seed": "Add traction, market sizing, business model, and financials",
+  "Series A": "Complete all financials, cap table, and customer references",
+  "Series B": "Full DD pack required — all documents should be complete",
 };
 
-type ViewMode = "list" | "grid";
-
-const CAT_COLOR: Record<string, string> = {
-  "Pitch Deck":      "bg-brand/10 text-brand",
-  "Financials":      "bg-success/10 text-success",
-  "Legal":           "bg-destructive/10 text-destructive",
-  "Market Research": "bg-violet/10 text-violet",
-  "Team":            "bg-warning/10 text-warning",
-  "Product":         "bg-brand/15 text-brand",
-  "Other":           "bg-muted text-muted-foreground",
+// DB stores lowercase; display capitalised
+const TEMPLATE_CATEGORIES = ["All", "market", "financials", "team", "product", "legal"] as const;
+const CATEGORY_LABELS: Record<string, string> = {
+  All: "All", market: "Market", financials: "Financials",
+  team: "Team", product: "Product", legal: "Legal",
 };
 
-function getFileIconProps(fileName: string): { Icon: any; colorCls: string } {
-  const ext = (fileName.split(".").pop() ?? "").toLowerCase();
-  if (ext === "pdf") return { Icon: FileText, colorCls: "text-red-500" };
-  if (["pptx", "ppt", "key"].includes(ext)) return { Icon: FileText, colorCls: "text-orange-500" };
-  if (["xlsx", "xls", "csv"].includes(ext)) return { Icon: Table2, colorCls: "text-green-600" };
-  if (["doc", "docx"].includes(ext)) return { Icon: FileText, colorCls: "text-blue-500" };
-  if (["png", "jpg", "jpeg", "gif", "svg", "webp"].includes(ext)) return { Icon: Image, colorCls: "text-purple-500" };
-  if (["mp4", "mov", "avi", "webm"].includes(ext)) return { Icon: Video, colorCls: "text-pink-500" };
-  return { Icon: File, colorCls: "text-muted-foreground" };
+type TemplateCategory = (typeof TEMPLATE_CATEGORIES)[number];
+
+interface DocumentTemplate {
+  id: string;
+  slug: string;
+  name: string;
+  category: string;
+  is_required: boolean;
+  stage_relevance: string[];
+  ai_prompt?: string;
+  sort_order: number;
 }
 
-function nameFromPath(storagePath: string): string {
-  const last = storagePath.split("/").pop() ?? "";
-  // Strip leading timestamp prefix (13-digit unix ms) if present
-  return last.replace(/^\d{13}-/, "") || last || "Untitled";
+interface AIFeedback {
+  overall_score: number;
+  signal: "strong" | "adequate" | "weak" | "critical";
+  summary: string;
+  strengths: string[];
+  gaps: string[];
+  recommendations: string[];
+  investor_flag: string | null;
 }
 
-function DocIcon({ fileName, size = "md" }: { fileName: string; size?: "sm" | "md" | "lg" }) {
-  const { Icon, colorCls } = getFileIconProps(fileName);
-  const cls = size === "sm" ? "h-5 w-5" : size === "lg" ? "h-10 w-10" : "h-7 w-7";
-  return <Icon className={cn(cls, colorCls, "shrink-0")} />;
+interface FounderDocument {
+  id: string;
+  startup_id: string;
+  template_id: string;
+  template_slug: string;
+  title: string;
+  content: Record<string, string>;
+  completeness_score: number;
+  status: "empty" | "draft" | "ai_extracted" | "complete" | "needs_review";
+  file_path?: string;
+  file_name?: string;
+  file_size?: number;
+  ai_feedback?: AIFeedback | null;
+  visibility?: string | null;
+  updated_at: string;
+}
+
+// ── Template field definitions ─────────────────────────────────────
+const TEMPLATE_FIELDS: Record<string, Array<{
+  key: string;
+  label: string;
+  type: "text" | "textarea" | "number" | "percentage";
+  placeholder: string;
+  required: boolean;
+}>> = {
+  "problem-solution": [
+    { key: "problem", label: "What problem do you solve?", type: "textarea", placeholder: "Describe the specific pain your customers face. Be concrete — what breaks, costs money, or wastes time?", required: true },
+    { key: "solution", label: "How do you solve it?", type: "textarea", placeholder: "Your solution mechanism — not features, but how it works fundamentally", required: true },
+    { key: "why_us", label: "Why is this team uniquely positioned?", type: "textarea", placeholder: "Domain expertise, unfair advantage, founder-market fit...", required: true },
+    { key: "why_now", label: "Why is now the right time?", type: "textarea", placeholder: "What market shift, technology change, or regulatory event makes this possible now?", required: true },
+    { key: "customer_proof", label: "Customer validation", type: "textarea", placeholder: "Quotes, pilots, LOIs, early customers who confirmed the problem", required: false },
+  ],
+  "financial-model": [
+    { key: "revenue_last_12m", label: "Revenue last 12 months (USD)", type: "number", placeholder: "0", required: true },
+    { key: "revenue_year1", label: "Projected revenue Year 1 (USD)", type: "number", placeholder: "0", required: true },
+    { key: "revenue_year2", label: "Projected revenue Year 2 (USD)", type: "number", placeholder: "0", required: false },
+    { key: "revenue_year3", label: "Projected revenue Year 3 (USD)", type: "number", placeholder: "0", required: false },
+    { key: "monthly_burn", label: "Monthly burn rate (USD)", type: "number", placeholder: "0", required: true },
+    { key: "runway_months", label: "Current runway (months)", type: "number", placeholder: "0", required: true },
+    { key: "cac", label: "Customer acquisition cost (USD)", type: "number", placeholder: "0", required: false },
+    { key: "ltv", label: "Customer lifetime value (USD)", type: "number", placeholder: "0", required: false },
+    { key: "gross_margin", label: "Gross margin (%)", type: "percentage", placeholder: "0", required: false },
+    { key: "assumptions", label: "Key assumptions", type: "textarea", placeholder: "Describe the main assumptions behind your projections...", required: false },
+  ],
+  "cap-table": [
+    { key: "founder_name", label: "Founder name", type: "text", placeholder: "Full name", required: true },
+    { key: "founder_ownership", label: "Founder ownership (%)", type: "percentage", placeholder: "0", required: true },
+    { key: "cofounder_name", label: "Co-founder name", type: "text", placeholder: "Full name (if applicable)", required: false },
+    { key: "cofounder_ownership", label: "Co-founder ownership (%)", type: "percentage", placeholder: "0", required: false },
+    { key: "investor_ownership", label: "Total investor ownership (%)", type: "percentage", placeholder: "0", required: false },
+    { key: "option_pool", label: "Option pool (%)", type: "percentage", placeholder: "0", required: false },
+    { key: "previous_rounds", label: "Previous rounds raised", type: "textarea", placeholder: "e.g. Pre-seed $500K from Angel investors in 2023", required: false },
+    { key: "current_investors", label: "Current investor names", type: "textarea", placeholder: "List all current investors", required: false },
+  ],
+  "market-sizing": [
+    { key: "tam_size", label: "Total addressable market (USD)", type: "number", placeholder: "0", required: true },
+    { key: "tam_source", label: "TAM source / methodology", type: "text", placeholder: "e.g. Gartner 2024, bottom-up calculation", required: true },
+    { key: "sam_size", label: "Serviceable addressable market (USD)", type: "number", placeholder: "0", required: true },
+    { key: "target_customer", label: "Target customer profile", type: "textarea", placeholder: "Job title, company size, industry...", required: true },
+    { key: "geography", label: "Target geography", type: "text", placeholder: "e.g. GCC, MENA, Global", required: true },
+    { key: "market_timing", label: "Why is now the right time?", type: "textarea", placeholder: "What market shift makes this the right moment...", required: false },
+  ],
+  "traction-summary": [
+    { key: "arr_mrr", label: "ARR or MRR (USD)", type: "number", placeholder: "0", required: false },
+    { key: "growth_rate", label: "Growth rate", type: "text", placeholder: "e.g. +34% MoM", required: false },
+    { key: "customer_count", label: "Paying customers", type: "number", placeholder: "0", required: false },
+    { key: "key_metric", label: "Key traction metric", type: "text", placeholder: "The one number that proves traction", required: true },
+    { key: "traction_narrative", label: "Traction story", type: "textarea", placeholder: "What happened, when, what it means...", required: true },
+    { key: "notable_customers", label: "Notable customers / logos", type: "text", placeholder: "e.g. Aramco, ADNOC (anonymise if needed)", required: false },
+  ],
+  "team-bios": [
+    { key: "founder_name", label: "Founder full name", type: "text", placeholder: "", required: true },
+    { key: "founder_role", label: "Founder role", type: "text", placeholder: "CEO / CTO / Founder", required: true },
+    { key: "founder_background", label: "Founder background", type: "textarea", placeholder: "Previous companies, education, domain expertise...", required: true },
+    { key: "founder_linkedin", label: "Founder LinkedIn URL", type: "text", placeholder: "https://linkedin.com/in/...", required: false },
+    { key: "cofounder_name", label: "Co-founder full name", type: "text", placeholder: "Leave blank if none", required: false },
+    { key: "cofounder_role", label: "Co-founder role", type: "text", placeholder: "", required: false },
+    { key: "cofounder_background", label: "Co-founder background", type: "textarea", placeholder: "", required: false },
+    { key: "key_hires", label: "Key hires", type: "textarea", placeholder: "Name, role, why they matter...", required: false },
+    { key: "advisors", label: "Advisors", type: "textarea", placeholder: "Name, domain, why they matter...", required: false },
+  ],
+  "business-model": [
+    { key: "revenue_model", label: "Revenue model", type: "text", placeholder: "SaaS / transactional / marketplace / services", required: true },
+    { key: "pricing", label: "Pricing structure", type: "textarea", placeholder: "How you charge, tiers, per-unit...", required: true },
+    { key: "cac", label: "Customer acquisition cost", type: "text", placeholder: "e.g. $200 per customer", required: false },
+    { key: "ltv", label: "Customer lifetime value", type: "text", placeholder: "e.g. $2,400 over 24 months", required: false },
+    { key: "payback_period", label: "Payback period", type: "text", placeholder: "e.g. 8 months", required: false },
+    { key: "burn_rate", label: "Monthly burn rate", type: "text", placeholder: "e.g. $45,000/month", required: true },
+    { key: "runway", label: "Runway", type: "text", placeholder: "e.g. 18 months", required: true },
+  ],
+  "competitive-landscape": [
+    { key: "main_competitors", label: "Main competitors", type: "textarea", placeholder: "List named competitors investors will ask about", required: true },
+    { key: "differentiation", label: "Key differentiation", type: "textarea", placeholder: "What you have that they do not — be specific", required: true },
+    { key: "moat", label: "Defensible moat", type: "textarea", placeholder: "Network effect / IP / switching cost / brand...", required: true },
+    { key: "competitive_matrix", label: "Competitive positioning", type: "textarea", placeholder: "How you compare on key dimensions...", required: false },
+  ],
+  "use-of-funds": [
+    { key: "product_engineering", label: "Product & Engineering (%)", type: "percentage", placeholder: "0", required: true },
+    { key: "team_expansion", label: "Team expansion (%)", type: "percentage", placeholder: "0", required: true },
+    { key: "sales_marketing", label: "Sales & Marketing (%)", type: "percentage", placeholder: "0", required: true },
+    { key: "operations", label: "Operations (%)", type: "percentage", placeholder: "0", required: true },
+    { key: "milestones_18m", label: "18-month milestones", type: "textarea", placeholder: "What this round gets you to...", required: true },
+    { key: "next_round", label: "Target for next round", type: "text", placeholder: "e.g. Series A at $20M on $5M ARR", required: false },
+  ],
+  "product-roadmap": [
+    { key: "current_state", label: "Current product state", type: "textarea", placeholder: "What exists today — MVP, beta, GA...", required: true },
+    { key: "q1_milestones", label: "Next 90 days", type: "textarea", placeholder: "Specific deliverables and launch targets", required: true },
+    { key: "q2_q3_milestones", label: "Q2–Q3 milestones", type: "textarea", placeholder: "Key features, market expansion, or revenue targets", required: false },
+    { key: "q4_milestones", label: "End of year goals", type: "textarea", placeholder: "What does success look like at 12 months?", required: false },
+    { key: "tech_stack", label: "Core technology", type: "text", placeholder: "Key technologies powering the product", required: false },
+    { key: "ip_moat", label: "IP / proprietary elements", type: "textarea", placeholder: "Patents filed, proprietary algorithms, unique data...", required: false },
+  ],
+  "tech-stack-overview": [
+    { key: "architecture", label: "System architecture", type: "textarea", placeholder: "How the system is structured — frontend, backend, infrastructure", required: true },
+    { key: "tech_stack", label: "Technology stack", type: "text", placeholder: "e.g. React, Node.js, AWS, PostgreSQL", required: true },
+    { key: "scalability", label: "Scalability approach", type: "textarea", placeholder: "How does it scale? What are the current limits?", required: false },
+    { key: "ip_patents", label: "IP and patents", type: "textarea", placeholder: "Filed or granted patents, proprietary algorithms, trade secrets", required: false },
+    { key: "security", label: "Security measures", type: "textarea", placeholder: "Data protection, compliance (SOC2, GDPR, etc.)", required: false },
+  ],
+  "customer-references": [
+    { key: "top_customers", label: "Top customers by revenue", type: "textarea", placeholder: "Company name (anonymise if needed), industry, contract value", required: true },
+    { key: "reference_contacts", label: "Reference contacts", type: "textarea", placeholder: "2-3 customers willing to speak to investors. Name + email.", required: false },
+    { key: "churn_rate", label: "Monthly churn rate", type: "text", placeholder: "e.g. 2.3% monthly", required: false },
+    { key: "nps_score", label: "NPS or satisfaction score", type: "text", placeholder: "e.g. NPS 67", required: false },
+    { key: "notable_logos", label: "Notable logos / names", type: "text", placeholder: "Recognisable customers you can name publicly", required: false },
+  ],
+  "incorporation-docs": [
+    { key: "company_legal_name", label: "Legal company name", type: "text", placeholder: "Full registered legal name", required: true },
+    { key: "incorporation_date", label: "Incorporation date", type: "text", placeholder: "DD/MM/YYYY", required: true },
+    { key: "jurisdiction", label: "Jurisdiction", type: "text", placeholder: "e.g. DIFC, Cayman Islands, Delaware", required: true },
+    { key: "company_number", label: "Company registration number", type: "text", placeholder: "", required: true },
+    { key: "registered_address", label: "Registered address", type: "text", placeholder: "", required: false },
+    { key: "upload_note", label: "Document upload", type: "textarea", placeholder: "Describe the document or note its location. Upload option coming soon.", required: false },
+  ],
+  "shareholder-agreements": [
+    { key: "sha_date", label: "SHA date", type: "text", placeholder: "Date of most recent shareholder agreement", required: false },
+    { key: "key_terms", label: "Key terms summary", type: "textarea", placeholder: "Pro-rata rights, drag-along, tag-along, board composition...", required: false },
+    { key: "prior_term_sheets", label: "Prior term sheets", type: "textarea", placeholder: "Summary of any previous term sheets or convertible notes", required: false },
+    { key: "upload_note", label: "Document upload", type: "textarea", placeholder: "Note the document location. Upload option coming soon.", required: false },
+  ],
+  "bank-statements": [
+    { key: "bank_name", label: "Bank name", type: "text", placeholder: "Primary operating bank", required: true },
+    { key: "current_balance", label: "Current cash balance (USD)", type: "number", placeholder: "0", required: true },
+    { key: "monthly_burn", label: "Monthly burn rate (USD)", type: "number", placeholder: "0", required: true },
+    { key: "runway_months", label: "Runway (months)", type: "number", placeholder: "0", required: true },
+    { key: "upload_note", label: "Statement upload", type: "textarea", placeholder: "Upload of actual statements required for deal room. Note period covered here.", required: false },
+  ],
+  "esop": [
+    { key: "option_pool_size", label: "Option pool size (%)", type: "percentage", placeholder: "e.g. 10", required: true },
+    { key: "total_shares_reserved", label: "Total shares reserved for ESOP", type: "number", placeholder: "0", required: false },
+    { key: "vesting_schedule", label: "Vesting schedule", type: "text", placeholder: "e.g. 4 years with 1 year cliff", required: true },
+    { key: "cliff_period", label: "Cliff period", type: "text", placeholder: "e.g. 12 months", required: false },
+    { key: "jurisdiction", label: "ESOP jurisdiction", type: "text", placeholder: "e.g. DIFC, Cayman Islands, Delaware", required: false },
+    { key: "key_grants", label: "Key employee grants", type: "textarea", placeholder: "List key grants: role, shares/%, vesting status...", required: false },
+    { key: "remaining_pool", label: "Remaining unallocated pool (%)", type: "percentage", placeholder: "e.g. 6.5", required: false },
+    { key: "notes", label: "Additional notes", type: "textarea", placeholder: "Any special terms, accelerated vesting triggers, good/bad leaver provisions...", required: false },
+  ],
+};
+
+function getStatusBorderColor(status?: string) {
+  switch (status) {
+    case "draft": return "border-l-amber-500/60";
+    case "ai_extracted": return "border-l-blue-500/60";
+    case "complete": return "border-l-green-500/60";
+    default: return "border-l-white/10";
+  }
+}
+
+function getStatusIcon(status: string): { Icon: any; color: string; label: string } {
+  switch (status) {
+    case "empty":
+      return { Icon: () => <div className="w-5 h-5 rounded-full border-2 border-white/20 shrink-0" />, color: "text-white/20", label: "Not started" };
+    case "draft":
+      return { Icon: AlertCircle, color: "text-amber-400", label: "In progress" };
+    case "ai_extracted":
+      return { Icon: Zap, color: "text-blue-400", label: "AI extracted — needs review" };
+    case "complete":
+      return { Icon: CheckCircle2, color: "text-green-400", label: "Complete" };
+    case "needs_review":
+      return { Icon: AlertCircle, color: "text-amber-400", label: "Needs attention" };
+    default:
+      return { Icon: FileText, color: "text-white/40", label: status };
+  }
+}
+
+// Stage access tiers for display badges
+const STAGE2_SLUGS = new Set(["competitive-landscape", "product-roadmap", "tech-stack-overview", "traction-summary"]);
+const STAGE3_SLUGS = new Set(["financial-model", "cap-table", "incorporation-docs", "shareholder-agreements", "bank-statements", "customer-references"]);
+
+const simulationToDoc: Record<string, string> = {
+  competitive: "competitive-landscape",
+  competition: "competitive-landscape",
+  market: "market-sizing",
+  revenue: "financial-model",
+  financial: "financial-model",
+  traction: "traction-summary",
+  customer: "traction-summary",
+  team: "team-bios",
+  technology: "tech-stack-overview",
+  product: "product-roadmap",
+  business: "business-model",
+};
+
+function getRelevantDoc(text: string): string | null {
+  const lower = text.toLowerCase();
+  for (const [keyword, slug] of Object.entries(simulationToDoc)) {
+    if (lower.includes(keyword)) return slug;
+  }
+  return null;
+}
+
+interface SimulationResult {
+  first_question: string;
+  red_flag: string;
+  strongest_point: string;
+  deal_killer: string | null;
+  overall_verdict: string;
+  score: number;
 }
 
 function Documents() {
   const { user } = useAuth();
-  const [showUpload, setShowUpload] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>("All");
-  const [viewMode, setViewMode] = useState<ViewMode>("list");
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [addRoomDocId, setAddRoomDocId] = useState<string | null>(null);
-  const [addRoomId, setAddRoomId] = useState("");
-  const [addingRoom, setAddingRoom] = useState(false);
+  const [selectedStage, setSelectedStage] = useState<Stage>("Seed");
+  const [selectedCategory, setSelectedCategory] = useState<TemplateCategory>("All");
+  const [editingDoc, setEditingDoc] = useState<FounderDocument | null>(null);
+  const [showInstructions, setShowInstructions] = useState(true);
+  const [uploading, setUploading] = useState<string | null>(null);
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [simulation, setSimulation] = useState<SimulationResult | null>(null);
   const queryClient = useQueryClient();
 
-  const { data: docs = [], isLoading } = useQuery({
-    queryKey: ["documents", user?.id],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("documents")
-        .select("id, category, status, storage_path, created_at, deal_room_id")
-        .eq("uploader_id", user!.id)
-        .order("created_at", { ascending: false })
-        .limit(100);
-      if (error) {
-        console.error("Documents fetch error:", error);
-        throw error;
-      }
-      return data ?? [];
-    },
-  });
-
-  const { data: dealRooms = [] } = useQuery({
-    queryKey: ["founder-deal-rooms-docs", user?.id],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      // deal_rooms has no founder_id — go through startup first
-      const { data: startup } = await supabase
-        .from("startups")
-        .select("id, company_name")
-        .eq("founder_id", user!.id)
-        .maybeSingle();
-      if (!startup) return [];
-      const { data } = await supabase
-        .from("deal_rooms")
-        .select("id")
-        .eq("startup_id", startup.id)
-        .limit(20);
-      return (data ?? []).map((r: any) => ({
-        id: r.id,
-        name: startup.company_name ? `${startup.company_name} — Deal Room` : r.id,
-      }));
-    },
-  });
-
-  const { data: startupMedia } = useQuery({
-    queryKey: ["startup-media-docs", user?.id],
+  // Fetch startup
+  const { data: startup } = useQuery({
+    queryKey: ["startup", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
       const { data } = await supabase
         .from("startups")
-        .select("id, product_video_url, pitch_deck_url")
+        .select("id, company_name, stage")
         .eq("founder_id", user!.id)
         .maybeSingle();
       return data;
     },
   });
 
-  const tabCounts = useMemo(() => {
-    const counts: Record<string, number> = { All: docs.length };
-    for (const d of docs) {
-      const key = (d.category as string) || "Other";
-      counts[key] = (counts[key] ?? 0) + 1;
+  // Fetch templates
+  const { data: templates = [] } = useQuery({
+    queryKey: ["document-templates"],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("document_templates")
+        .select("*")
+        .order("sort_order");
+      return (data ?? []) as DocumentTemplate[];
+    },
+  });
+
+  // Fetch founder documents
+  const { data: founderDocs = [], refetch: refetchFounderDocs } = useQuery({
+    queryKey: ["founder-documents", startup?.id],
+    enabled: !!startup?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("founder_documents")
+        .select("*")
+        .eq("startup_id", startup!.id);
+      return (data ?? []) as FounderDocument[];
+    },
+  });
+
+  // Merge templates with founder documents
+  const documentsWithStatus = useMemo(() => {
+    return templates.map(template => ({
+      ...template,
+      founderDoc: founderDocs.find(d => d.template_slug === template.slug) ?? null,
+    }));
+  }, [templates, founderDocs]);
+
+  // Normalise stage to DB format: "Series A" → "series-a"
+  const stageKey = selectedStage.toLowerCase().replace(/\s+/g, "-");
+
+  // Filter by stage and category
+  const filteredDocs = useMemo(() => {
+    let filtered = documentsWithStatus;
+    filtered = filtered.filter(t => t.stage_relevance.includes(stageKey as any));
+    if (selectedCategory !== "All") {
+      filtered = filtered.filter(t => t.category === selectedCategory);
     }
-    return counts;
-  }, [docs]);
+    return filtered;
+  }, [documentsWithStatus, stageKey, selectedCategory]);
 
-  // Pitch deck doc is always shown first
-  const pitchDeckDoc = docs.find((d) =>
-    (d.category as string) === "Pitch Deck" ||
-    /(pitch.?deck|pitch|deck)/i.test(nameFromPath((d.storage_path as string) ?? ""))
-  );
+  // Calculate readiness score
+  const { readinessScore, completedRequired, requiredCount } = useMemo(() => {
+    const requiredTemplates = documentsWithStatus.filter(t => t.is_required);
+    const completed = requiredTemplates.filter(t => {
+      const doc = founderDocs.find(d => d.template_slug === t.slug);
+      return doc?.status === "complete";
+    }).length;
+    return {
+      readinessScore: requiredTemplates.length > 0
+        ? Math.round((completed / requiredTemplates.length) * 100)
+        : 0,
+      completedRequired: completed,
+      requiredCount: requiredTemplates.length,
+    };
+  }, [documentsWithStatus, founderDocs]);
 
-  const filtered = activeTab === "All"
-    ? [
-        ...(pitchDeckDoc ? [pitchDeckDoc] : []),
-        ...docs.filter((d) => d.id !== pitchDeckDoc?.id),
-      ]
-    : docs.filter((d) => ((d.category as string) || "Other") === activeTab);
-
-  const handleDownload = async (storagePath: string) => {
-    const { data, error } = await supabase.storage
-      .from("documents")
-      .createSignedUrl(storagePath, 3600);
-    if (error || !data?.signedUrl) {
-      toast.error(error?.message || "Unable to create download link.");
-      return;
+  // Get guidance message
+  const guidanceMessage = useMemo(() => {
+    const financialModel = founderDocs.find(d => d.template_slug === "financial-model");
+    const capTable = founderDocs.find(d => d.template_slug === "cap-table");
+    if (!financialModel || financialModel.status === "empty") {
+      return "Investors always ask for your financial model first. Complete it before opening deal rooms.";
     }
-    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
-  };
+    if (!capTable || capTable.status === "empty") {
+      return "Your cap table is required before any term sheet can be discussed.";
+    }
+    if (readinessScore === 100) {
+      return "Your document pack is investor-ready. You can now request deal rooms with confidence.";
+    }
+    return `You've completed ${completedRequired} of ${requiredCount} required documents.`;
+  }, [founderDocs, readinessScore, completedRequired, requiredCount]);
 
-  const handleDelete = async (id: string, storagePath: string) => {
-    if (deletingId !== id) { setDeletingId(id); return; }
-    setDeletingId(null);
-    await supabase.storage.from("documents").remove([storagePath]);
-    const { error } = await supabase.from("documents").delete().eq("id", id).eq("uploader_id", user!.id);
-    if (error) { toast.error(error.message); return; }
-    // Remove from cache immediately, then sync
-    queryClient.setQueryData(["documents", user?.id], (old: any) =>
-      (old ?? []).filter((d: any) => d.id !== id)
+  // Overall investor-readiness score (60% required completion + 40% AI scores)
+  const overallScore = useMemo(() => {
+    if (!founderDocs?.length) return 0;
+    const completed = founderDocs.filter(d =>
+      d.status === "complete" || d.status === "ai_extracted"
     );
-    queryClient.invalidateQueries({ queryKey: ["documents", user?.id] });
-    toast.success("Document deleted");
-  };
+    const required = founderDocs.filter(d => {
+      const t = documentsWithStatus.find(t => t.slug === d.template_slug);
+      return t?.is_required;
+    });
+    const requiredComplete = required.filter(d =>
+      d.status === "complete" || d.status === "ai_extracted"
+    );
+    const completionScore = required.length > 0
+      ? (requiredComplete.length / required.length) * 60
+      : 0;
+    const avgAIScore = completed.length > 0
+      ? completed.reduce((sum, d) => {
+          const score = (d.ai_feedback as Record<string, unknown>)?.overall_score as number ?? 0;
+          return sum + score;
+        }, 0) / completed.length
+      : 0;
+    const aiScore = (avgAIScore / 10) * 40;
+    return Math.round(completionScore + aiScore);
+  }, [founderDocs, documentsWithStatus]);
 
-  const handleAddToRoom = async () => {
-    if (!addRoomDocId || !addRoomId) return;
-    setAddingRoom(true);
-    const { error } = await supabase
-      .from("documents")
-      .update({ deal_room_id: addRoomId })
-      .eq("id", addRoomDocId);
-    if (error) toast.error(error.message);
-    else {
-      toast.success("Added to deal room");
-      queryClient.invalidateQueries({ queryKey: ["documents", user?.id] });
+  const readinessLabel = overallScore >= 80
+    ? "Investor ready"
+    : overallScore >= 60
+    ? "Getting there"
+    : overallScore >= 40
+    ? "Needs work"
+    : "Early stage";
+
+  const readinessColor = overallScore >= 80
+    ? "text-green-400"
+    : overallScore >= 60
+    ? "text-[#7C3AED]"
+    : overallScore >= 40
+    ? "text-amber-400"
+    : "text-red-400";
+
+  const readinessBarColor = overallScore >= 80
+    ? "bg-green-500"
+    : overallScore >= 60
+    ? "bg-[#7C3AED]"
+    : overallScore >= 40
+    ? "bg-amber-500"
+    : "bg-red-500";
+
+  async function runReadinessSimulation() {
+    if (!startup?.id) return;
+    setIsSimulating(true);
+    try {
+      const docSummary = founderDocs
+        ?.filter(d => d.status === "complete" || d.status === "ai_extracted")
+        .map(d => {
+          const content = d.content as Record<string, string>;
+          const fields = Object.entries(content ?? {})
+            .filter(([, v]) => v?.trim())
+            .map(([k, v]) => `${k}: ${v}`)
+            .join(". ");
+          return `[${d.template_slug}]: ${fields}`;
+        })
+        .join("\n\n");
+
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/simulate-investor`,
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${session?.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            docSummary,
+            stage: startup?.stage ?? "seed",
+            sector: (startup as any)?.sector ?? "",
+          }),
+        }
+      );
+      const data = await res.json();
+      if (data.simulation) {
+        setSimulation(data.simulation);
+      }
+    } catch (e) {
+      console.error("[simulate-investor]", e);
+    } finally {
+      setIsSimulating(false);
     }
-    setAddRoomDocId(null);
-    setAddRoomId("");
-    setAddingRoom(false);
-  };
+  }
 
-  const preSelectCategory = (activeTab === "All" ? "Pitch Deck" : activeTab) as DocCategory;
+  async function handleFileUpload(templateSlug: string, templateName: string, templateId: string, file: File) {
+    if (!startup?.id) return;
+    setUploading(templateSlug);
+    try {
+      const filePath = `founder-docs/${startup.id}/${templateSlug}/${file.name}`;
+      const { error: uploadError } = await supabase.storage
+        .from("documents")
+        .upload(filePath, file, { upsert: true });
+      if (uploadError) throw uploadError;
+      const { error: upsertError } = await supabase.from("founder_documents").upsert({
+        startup_id: startup.id,
+        template_id: templateId,
+        template_slug: templateSlug,
+        title: templateName,
+        status: "complete",
+        file_path: filePath,
+        file_name: file.name,
+        file_size: file.size,
+        content: {},
+        completeness_score: 100,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "startup_id,template_slug" });
+      if (upsertError) throw upsertError;
+      toast.success(`${templateName} uploaded`);
+      refetchFounderDocs();
+    } catch (e: any) {
+      toast.error(e.message || "Upload failed");
+    } finally {
+      setUploading(null);
+    }
+  }
+
+  if (user?.role === "investor") {
+    return (
+      <div className="p-6 lg:p-8 max-w-2xl mx-auto text-center py-20">
+        <FileText className="h-10 w-10 text-muted-foreground/30 mx-auto mb-4" />
+        <h2 className="text-lg font-semibold mb-2">Documents are for founders</h2>
+        <p className="text-sm text-muted-foreground">This section is only available to startup founders.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex items-end justify-between flex-wrap gap-4">
+      <div className="flex items-start justify-between gap-6 mb-8">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Documents</h1>
-          <div className="text-sm text-muted-foreground">
-            {docs.length} file{docs.length !== 1 ? "s" : ""} · access controlled
-          </div>
+          <h1 className="text-3xl font-bold text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>Documents</h1>
+          <p className="text-sm text-muted-foreground">Your document workspace — guided by AI</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 rounded-md border border-border/60 p-0.5">
-            <button
-              onClick={() => setViewMode("list")}
-              className={cn("grid h-7 w-7 place-items-center rounded text-muted-foreground transition-colors", viewMode === "list" && "bg-accent text-foreground")}
+          <span className="text-sm text-muted-foreground">Stage:</span>
+          <div className="relative inline-flex">
+            <select
+              value={selectedStage}
+              onChange={(e) => setSelectedStage(e.target.value as Stage)}
+              className="appearance-none bg-card border border-border/60 rounded-md px-3 py-1.5 text-sm pr-8 focus:outline-none focus:border-brand/50 cursor-pointer"
             >
-              <List className="h-3.5 w-3.5" />
-            </button>
-            <button
-              onClick={() => setViewMode("grid")}
-              className={cn("grid h-7 w-7 place-items-center rounded text-muted-foreground transition-colors", viewMode === "grid" && "bg-accent text-foreground")}
-            >
-              <LayoutGrid className="h-3.5 w-3.5" />
-            </button>
+              {STAGE_OPTIONS.map(stage => (
+                <option key={stage} value={stage}>{stage}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           </div>
-          <button
-            onClick={() => setShowUpload(true)}
-            className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"
-          >
-            <Upload className="h-4 w-4" /> Upload document
-          </button>
         </div>
       </div>
 
-      {/* Media & Links */}
-      <MediaLinksPanel startupMedia={startupMedia ?? null} userId={user!.id} queryClient={queryClient} dealRooms={dealRooms} />
-
-      {/* Category tabs */}
-      <div className="mt-6 flex items-center gap-1 overflow-x-auto pb-0.5 border-b border-border/60">
-        {TAB_LABELS.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={cn(
-              "shrink-0 px-3 py-2 text-sm border-b-2 transition-colors whitespace-nowrap",
-              activeTab === tab
-                ? "border-brand text-foreground font-medium"
-                : "border-transparent text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {tab}
-            {tabCounts[tab] !== undefined && (
-              <span className={cn("ml-1.5 text-xs", activeTab === tab ? "text-brand" : "text-muted-foreground/60")}>
-                {tabCounts[tab]}
+      {/* Readiness panel */}
+      <div className="mb-6 p-6 rounded-2xl" style={{ background: '#0d0d1a', border: '1px solid #1e1e3a' }}>
+        <div className="flex items-start justify-between mb-4 gap-4 flex-wrap">
+          <div>
+            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: '#7c6baa' }}>Investor readiness</p>
+            <div className="flex items-baseline gap-3 flex-wrap">
+              <span className="text-4xl font-bold" style={{ fontFamily: "Syne, sans-serif", color: '#ffffff' }}>
+                {overallScore}
               </span>
+              <span className="text-sm" style={{ color: '#7c6baa' }}>/100</span>
+              <span className={`text-sm font-medium ${readinessColor}`}>{readinessLabel}</span>
+            </div>
+          </div>
+          <button
+            onClick={runReadinessSimulation}
+            disabled={isSimulating || overallScore < 30}
+            className="px-4 py-2 rounded-lg text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 shrink-0"
+            style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.3)', color: '#a78bfa' }}
+          >
+            {isSimulating ? (
+              <><Loader2 className="h-3.5 w-3.5 animate-spin" />Simulating…</>
+            ) : (
+              <>✦ Simulate investor review</>
             )}
           </button>
-        ))}
+        </div>
+
+        {/* Progress bar */}
+        <div className="h-2 rounded-full mb-4" style={{ background: '#1e1e3a' }}>
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${readinessBarColor}`}
+            style={{ width: `${overallScore}%` }}
+          />
+        </div>
+
+        {/* Quick gap indicators */}
+        <div className="flex flex-wrap gap-2">
+          {documentsWithStatus
+            .filter(d => d.is_required &&
+              d.founderDoc?.status !== "complete" &&
+              d.founderDoc?.status !== "ai_extracted")
+            .slice(0, 4)
+            .map(d => (
+              <span key={d.id} className="text-xs px-2 py-1 rounded-full" style={{ background: '#2d0a0a', border: '1px solid #7f1d1d', color: '#fca5a5' }}>
+                Missing: {d.name}
+              </span>
+            ))
+          }
+          {founderDocs
+            .filter(d => {
+              const score = (d.ai_feedback as Record<string, unknown>)?.overall_score as number;
+              return score && score < 5 && (d.status === "complete" || d.status === "ai_extracted");
+            })
+            .slice(0, 2)
+            .map(d => {
+              const t = documentsWithStatus.find(t => t.slug === d.template_slug);
+              return (
+                <span key={d.id} className="text-xs px-2 py-1 rounded-full" style={{ background: '#1c1200', border: '1px solid #78350f', color: '#fcd34d' }}>
+                  Weak: {t?.name ?? d.template_slug}
+                </span>
+              );
+            })
+          }
+          {documentsWithStatus.filter(d =>
+            d.is_required &&
+            d.founderDoc?.status !== "complete" &&
+            d.founderDoc?.status !== "ai_extracted"
+          ).length === 0 && founderDocs.length > 0 && (
+            <span className="text-xs" style={{ color: '#4a4a6a' }}>All required documents complete</span>
+          )}
+        </div>
       </div>
 
-      {/* Content */}
-      <div className="mt-4">
-        {isLoading ? (
-          <div className="space-y-2">
-            {[1, 2, 3].map((n) => (
-              <div key={n} className="flex items-center gap-3 rounded-xl border border-border/60 bg-card p-4">
-                <div className="h-9 w-9 rounded-md bg-muted animate-pulse shrink-0" />
-                <div className="flex-1 space-y-1.5">
-                  <div className="h-4 w-48 rounded bg-muted animate-pulse" />
-                  <div className="h-3 w-24 rounded bg-muted/60 animate-pulse" />
+      {/* Investor simulation results */}
+      {simulation && (
+        <div className="mb-6 p-6 rounded-2xl" style={{ background: '#1a1035', border: '1px solid #4c1d95' }}>
+          <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-wider mb-1" style={{ color: '#a78bfa' }}>✦ Investor simulation</p>
+              <p className="text-sm" style={{ color: '#7c6baa' }}>How a VC analyst would read your profile right now</p>
+            </div>
+            <div className="text-right shrink-0">
+              <p className="text-2xl font-bold" style={{ fontFamily: "Syne, sans-serif", color: '#ffffff' }}>
+                {simulation.score}/10
+              </p>
+              <p className="text-xs" style={{ color: '#7c6baa' }}>investment interest score</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="p-4 rounded-xl" style={{ background: '#0f0f1a', border: '1px solid #2d2d4a' }}>
+              <p className="text-xs uppercase tracking-wider mb-2" style={{ color: '#7c6baa' }}>Overall verdict</p>
+              <p className="text-sm leading-relaxed" style={{ color: '#e2e0f0' }}>{simulation.overall_verdict}</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="p-4 rounded-xl" style={{ background: '#1c1200', border: '1px solid #78350f' }}>
+                <p className="text-xs uppercase tracking-wider mb-2" style={{ color: '#f59e0b' }}>First question they'll ask</p>
+                <p className="text-sm leading-relaxed" style={{ color: '#c4b5fd' }}>"{simulation.first_question}"</p>
+                {(() => {
+                  const slug = getRelevantDoc(simulation.first_question);
+                  if (!slug) return null;
+                  return (
+                    <a href={`/app/documents?open=${slug}`} className="mt-2 inline-block text-xs text-amber-400/70 hover:text-amber-400 underline underline-offset-2">
+                      Fix this document →
+                    </a>
+                  );
+                })()}
+              </div>
+
+              <div className="p-4 rounded-xl" style={{ background: '#001a0f', border: '1px solid #14532d' }}>
+                <p className="text-xs uppercase tracking-wider mb-2" style={{ color: '#22c55e' }}>Strongest point</p>
+                <p className="text-sm leading-relaxed" style={{ color: '#e2e0f0' }}>{simulation.strongest_point}</p>
+              </div>
+
+              <div className="p-4 rounded-xl" style={{ background: '#1a0505', border: '1px solid #7f1d1d' }}>
+                <p className="text-xs uppercase tracking-wider mb-2" style={{ color: '#ef4444' }}>⚠ Red flag they'll spot</p>
+                <p className="text-sm leading-relaxed" style={{ color: '#e2e0f0' }}>{simulation.red_flag}</p>
+                {(() => {
+                  const slug = getRelevantDoc(simulation.red_flag);
+                  if (!slug) return null;
+                  return (
+                    <a href={`/app/documents?open=${slug}`} className="mt-2 inline-block text-xs text-red-400/70 hover:text-red-400 underline underline-offset-2">
+                      Fix this document →
+                    </a>
+                  );
+                })()}
+              </div>
+
+              {simulation.deal_killer && (
+                <div className="p-4 rounded-xl" style={{ background: '#1a0000', border: '1px solid #991b1b' }}>
+                  <p className="text-xs uppercase tracking-wider mb-2" style={{ color: '#f87171' }}>✗ Potential deal killer</p>
+                  <p className="text-sm leading-relaxed" style={{ color: '#e2e0f0' }}>{simulation.deal_killer}</p>
+                  {(() => {
+                    const slug = getRelevantDoc(simulation.deal_killer!);
+                    if (!slug) return null;
+                    return (
+                      <a href={`/app/documents?open=${slug}`} className="mt-2 inline-block text-xs text-red-400/70 hover:text-red-400 underline underline-offset-2">
+                        Fix this document →
+                      </a>
+                    );
+                  })()}
                 </div>
+              )}
+            </div>
+          </div>
+
+          <button
+            onClick={() => setSimulation(null)}
+            className="mt-4 text-xs transition-colors"
+            style={{ color: '#4a4a6a' }}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* How it works — collapsible */}
+      <div className="mb-6 border border-white/8 rounded-xl p-5 bg-white/[0.02]">
+        <div
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => setShowInstructions(prev => !prev)}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-[#7C3AED]">✦</span>
+            <span className="text-sm font-medium text-foreground">How your document workspace works</span>
+          </div>
+          <span className="text-muted-foreground text-xs">{showInstructions ? "Hide" : "Show"}</span>
+        </div>
+        {showInstructions && (
+          <div className="mt-4 grid sm:grid-cols-3 gap-4">
+            {[
+              { n: "01", title: "Fill or upload", body: "Fill each document using our structured template, or upload your existing file. AI extracts the key information automatically." },
+              { n: "02", title: "AI reviews for gaps", body: "Our AI checks each document against what investors actually ask for your stage. It flags weak areas and tells you what to improve." },
+              { n: "03", title: "Investors see what matters", body: "Stage 2 documents unlock when an investor connects. Stage 3 (financials, cap table, legal) unlock only inside a deal room. You control all access." },
+            ].map(({ n, title, body }) => (
+              <div key={n} className="bg-white/5 rounded-lg p-4">
+                <div className="text-[#7C3AED] text-lg font-semibold mb-2">{n}</div>
+                <div className="text-sm font-medium text-foreground mb-1">{title}</div>
+                <div className="text-xs text-muted-foreground leading-relaxed">{body}</div>
               </div>
             ))}
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border/60 bg-card py-16 text-center">
-            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-accent mx-auto mb-4">
-              <FileText className="h-7 w-7 text-muted-foreground/50" />
-            </div>
-            <div className="text-sm font-medium">
-              {activeTab === "All" ? "No documents yet" : `No files in ${activeTab}`}
-            </div>
-            <div className="text-xs text-muted-foreground mt-1 mb-4 max-w-sm mx-auto">
-              {activeTab === "All"
-                ? "Upload your pitch deck and data room documents to share with investors"
-                : `Upload your ${activeTab.toLowerCase()} documents here.`}
-            </div>
-            <button
-              onClick={() => setShowUpload(true)}
-              className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"
-            >
-              <Upload className="h-4 w-4" /> Upload now
-            </button>
-          </div>
-        ) : viewMode === "grid" ? (
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {filtered.map((d) => {
-              const fname = nameFromPath(d.storage_path as string ?? "");
-              return (
-                <div key={d.id} className="group rounded-xl border border-border/60 bg-card p-4 hover:shadow-card transition-shadow flex flex-col gap-3">
-                  <div className="flex items-center justify-center h-16">
-                    <DocIcon fileName={fname} size="lg" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium truncate" title={fname}>
-                      {fname.length > 24 ? fname.slice(0, 24) + "…" : fname || "Untitled"}
-                    </div>
-                    <div className="mt-1.5 flex items-center justify-between gap-1">
-                      <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded-full", CAT_COLOR[(d.category as string) || "Other"])}>
-                        {(d.category as string) || "Other"}
-                      </span>
-                      {d.status === "uploaded"
-                        ? <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0" />
-                        : <AlertTriangle className="h-3.5 w-3.5 text-warning shrink-0" />}
-                    </div>
-                  </div>
-                  <div className="text-[10px] text-muted-foreground/60 flex items-center justify-between">
-                    <span>{d.created_at ? formatDistanceToNow(new Date(d.created_at as string), { addSuffix: true }) : "—"}</span>
-                    <span>—</span>
-                  </div>
-                  <div className="flex gap-1 pt-1 border-t border-border/40">
-                    <button
-                      onClick={() => handleDownload(d.storage_path as string)}
-                      title="Download"
-                      className="flex-1 grid place-items-center h-7 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-                    >
-                      <Download className="h-3.5 w-3.5" />
-                    </button>
-                    {dealRooms.length > 0 && (
-                      <button
-                        onClick={() => { setAddRoomDocId(d.id as string); setAddRoomId(""); }}
-                        title="Add to deal room"
-                        className="flex-1 grid place-items-center h-7 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-                      >
-                        <Plus className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                    <button
-                      onClick={() => handleDelete(d.id as string, d.storage_path as string)}
-                      title={deletingId === d.id ? "Click again to confirm" : "Delete"}
-                      className={cn(
-                        "flex-1 grid place-items-center h-7 rounded-md transition-colors",
-                        deletingId === d.id
-                          ? "text-destructive bg-destructive/10"
-                          : "text-muted-foreground hover:bg-destructive/10 hover:text-destructive",
-                      )}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
-            <div className="grid grid-cols-12 px-5 py-3 border-b border-border/60 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
-              <div className="col-span-5">Name</div>
-              <div className="col-span-2">Category</div>
-              <div className="col-span-2">Size</div>
-              <div className="col-span-2">Uploaded</div>
-              <div className="col-span-1 text-right">Actions</div>
-            </div>
-            {filtered.map((d, idx) => {
-              const fname = nameFromPath(d.storage_path as string ?? "");
-              const isPitchDeck = activeTab === "All" && idx === 0 && !!pitchDeckDoc && d.id === pitchDeckDoc.id;
-              return (
-                <div
-                  key={d.id}
-                  className={cn(
-                    "grid grid-cols-12 px-5 py-3 border-b border-border/60 last:border-0 hover:bg-accent/40 items-center text-sm group",
-                    isPitchDeck && "bg-brand/5 border-l-2 border-l-brand"
-                  )}
-                >
-                  <div className="col-span-5 flex items-center gap-3 min-w-0">
-                    <DocIcon fileName={fname} size="sm" />
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <div className="font-medium truncate" title={fname}>{fname || "Untitled"}</div>
-                        {isPitchDeck && (
-                          <span className="shrink-0 text-[9px] font-semibold bg-brand/20 text-brand px-1.5 py-0.5 rounded-full">📌 PINNED</span>
-                        )}
-                      </div>
-                      {d.status === "uploaded"
-                        ? <span className="text-[10px] text-success flex items-center gap-0.5"><CheckCircle2 className="h-3 w-3" />Uploaded</span>
-                        : <span className="text-[10px] text-warning flex items-center gap-0.5"><AlertTriangle className="h-3 w-3" />Review needed</span>}
-                    </div>
-                  </div>
-                  <div className="col-span-2">
-                    <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded-full", CAT_COLOR[(d.category as string) || "Other"])}>
-                      {(d.category as string) || "Other"}
-                    </span>
-                  </div>
-                  <div className="col-span-2 text-xs text-muted-foreground">—</div>
-                  <div className="col-span-2 text-xs text-muted-foreground">
-                    {d.created_at ? formatDistanceToNow(new Date(d.created_at as string), { addSuffix: true }) : "—"}
-                  </div>
-                  <div className="col-span-1 flex items-center justify-end gap-1">
-                    <button
-                      onClick={() => handleDownload(d.storage_path as string)}
-                      title="Download"
-                      className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Download className="h-4 w-4" />
-                    </button>
-                    {dealRooms.length > 0 && (
-                      <button
-                        onClick={() => { setAddRoomDocId(d.id as string); setAddRoomId(""); }}
-                        title="Add to deal room"
-                        className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </button>
-                    )}
-                    <button
-                      onClick={() => handleDelete(d.id as string, d.storage_path as string)}
-                      title={deletingId === d.id ? "Click again to confirm delete" : "Delete"}
-                      className={cn(
-                        "grid h-7 w-7 place-items-center rounded-md opacity-0 group-hover:opacity-100 transition-opacity",
-                        deletingId === d.id
-                          ? "text-destructive"
-                          : "text-muted-foreground hover:text-destructive",
-                      )}
-                    >
-                      {deletingId === d.id
-                        ? <Loader2 className="h-4 w-4 animate-spin" />
-                        : <Trash2 className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
           </div>
         )}
       </div>
 
-      {/* Expected documents for this category */}
-      {activeTab !== "All" && (EXPECTED_DOCS[activeTab as DocCategory] ?? []).length > 0 && (
-        <div className="mt-4">
-          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
-            Recommended documents for this category
-          </div>
-          <div className="rounded-xl border border-dashed border-border/60 divide-y divide-border/40 overflow-hidden">
-            {(EXPECTED_DOCS[activeTab as DocCategory] ?? []).map((docName) => (
-              <div
-                key={docName}
-                className="flex items-center gap-3 px-4 py-3 bg-muted/20 hover:bg-muted/40 transition-colors"
+      {/* Stage guidance */}
+      <div className="mb-6 p-4 rounded-xl border border-[#7C3AED]/20 bg-[#7C3AED]/5">
+        <p className="text-[#7C3AED] text-xs font-semibold uppercase tracking-wider mb-1">Stage guidance — {selectedStage}</p>
+        <p className="text-[#7C3AED]/80 text-sm mt-1">{STAGE_GUIDANCE[selectedStage]}</p>
+      </div>
+
+      {/* Main content: sidebar + documents */}
+      <div className="grid grid-cols-12 gap-6">
+        {/* Sidebar categories */}
+        <div className="col-span-3">
+          <div className="space-y-1">
+            {TEMPLATE_CATEGORIES.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={cn(
+                  "w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                  selectedCategory === cat
+                    ? "bg-brand text-white"
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                )}
               >
-                <div className="grid h-8 w-8 place-items-center rounded-lg bg-muted shrink-0">
-                  <FileText className="h-4 w-4 text-muted-foreground/50" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm text-muted-foreground">{docName}</div>
-                  <div className="text-[10px] text-muted-foreground/60 mt-0.5">Not uploaded yet</div>
-                </div>
-                <label className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 text-brand px-3 py-1.5 text-xs cursor-pointer hover:bg-brand/5 transition-colors shrink-0">
-                  <Upload className="h-3 w-3" /> Upload
-                  <input
-                    type="file"
-                    className="sr-only"
-                    accept=".pdf,.pptx,.ppt,.docx,.doc,.xlsx,.xls,.csv,.png,.jpg,.jpeg"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file || !user?.id) return;
-                      const path = `personal/${user.id}/${Date.now()}-${file.name}`;
-                      const { error: upErr } = await supabase.storage
-                        .from("documents")
-                        .upload(path, file);
-                      if (upErr) { toast.error("Upload failed"); return; }
-                      await supabase.from("documents").insert({
-                        uploader_id: user.id,
-                        storage_path: path,
-                        category: activeTab,
-                        file_name: file.name,
-                        file_size: file.size,
-                        status: "uploaded",
-                      });
-                      queryClient.invalidateQueries({ queryKey: ["documents", user.id] });
-                      toast.success(`${file.name} uploaded`);
-                      e.target.value = "";
-                    }}
-                  />
-                </label>
-              </div>
+                {CATEGORY_LABELS[cat] ?? cat}
+              </button>
             ))}
           </div>
         </div>
-      )}
 
-      {/* Upload Modal */}
-      {showUpload && (
-        <UploadModal
-          userId={user!.id}
-          initialCategory={preSelectCategory}
-          onClose={() => setShowUpload(false)}
-          onUploaded={() => {
-            queryClient.invalidateQueries({ queryKey: ["documents", user?.id] });
-            setShowUpload(false);
+        {/* Documents list */}
+        <div className="col-span-9">
+          <div className="space-y-3">
+            {filteredDocs.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border/60 bg-card py-12 text-center">
+                <FileText className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
+                <p className="text-sm font-medium text-muted-foreground">No documents in this category</p>
+              </div>
+            ) : (
+              filteredDocs.map(template => {
+                const doc = template.founderDoc;
+                const status = doc?.status ?? "empty";
+                const { Icon: StatusIcon, color: statusColor } = getStatusIcon(status);
+                const buttonAction = !doc || status === "empty" ? "Start"
+                  : status === "ai_extracted" ? "Review"
+                  : status === "draft" ? "Continue"
+                  : "Edit";
+                const isUploading = uploading === template.slug;
+                const isStage2 = STAGE2_SLUGS.has(template.slug);
+                const isStage3 = STAGE3_SLUGS.has(template.slug);
+                const hasFeedback = !!(doc?.ai_feedback && typeof doc.ai_feedback === "object" && Object.keys(doc.ai_feedback).length > 0);
+                const feedbackScore = hasFeedback ? (doc!.ai_feedback as AIFeedback).overall_score : undefined;
+                const feedbackSignal = hasFeedback ? (doc!.ai_feedback as AIFeedback).signal : undefined;
+
+                return (
+                  <div
+                    key={template.id}
+                    className={cn(
+                      "rounded-xl border border-border/60 bg-card p-5 hover:border-border transition-all border-l-2",
+                      getStatusBorderColor(status)
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                          <StatusIcon className={cn("h-4 w-4 shrink-0", statusColor)} />
+                          <h3 className="text-sm font-semibold text-foreground">{template.name}</h3>
+                          {hasFeedback && feedbackScore !== undefined && (
+                            <span className={cn(
+                              "text-xs font-bold px-2 py-0.5 rounded-full",
+                              feedbackSignal === "strong" ? "bg-green-500/15 text-green-400"
+                              : feedbackSignal === "adequate" ? "bg-amber-500/15 text-amber-400"
+                              : "bg-red-500/15 text-red-400"
+                            )}>
+                              {feedbackScore}/10
+                            </span>
+                          )}
+                          {template.is_required ? (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-red-500/15 text-red-400">
+                              Required
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-white/5 text-white/40">
+                              Optional
+                            </span>
+                          )}
+                          {isStage3 && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-orange-400/10 text-orange-400">
+                              Deal room
+                            </span>
+                          )}
+                          {isStage2 && !isStage3 && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-purple-400/10 text-purple-400">
+                              Detail pack
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {doc?.file_name
+                            ? `📎 ${doc.file_name}`
+                            : doc && status !== "empty"
+                            ? doc.title
+                            : `Create your ${template.name.toLowerCase()}`}
+                        </p>
+                        {doc && doc.completeness_score > 0 && status !== "complete" && (
+                          <div className="mt-2 flex items-center gap-2">
+                            <div className="flex-1 bg-white/10 h-1 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-amber-400 rounded-full transition-all"
+                                style={{ width: `${doc.completeness_score}%` }}
+                              />
+                            </div>
+                            <span className="text-[10px] text-muted-foreground tabular-nums">{doc.completeness_score}%</span>
+                          </div>
+                        )}
+                        {/* Per-document coaching hint */}
+                        {hasFeedback && Array.isArray((doc!.ai_feedback as Record<string, unknown>).recommendations) && (
+                          <p className="text-xs text-amber-400/80 mt-1.5">
+                            → {((doc!.ai_feedback as Record<string, unknown[]>).recommendations)[0]}
+                          </p>
+                        )}
+
+                        {doc && (status === "complete" || status === "ai_extracted") && (
+                          <button
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              const newVisibility = doc.visibility === "deal_room" ? "stage2" : "deal_room";
+                              await supabase.from("founder_documents").update({ visibility: newVisibility }).eq("id", doc.id);
+                              refetchFounderDocs();
+                            }}
+                            title={doc.visibility === "deal_room" ? "Visible in deal room — click to restrict" : "Not in deal room — click to include"}
+                            className={cn(
+                              "mt-1.5 text-xs px-2 py-0.5 rounded-full transition-colors",
+                              doc.visibility === "deal_room"
+                                ? "bg-orange-500/15 text-orange-400 hover:bg-orange-500/25"
+                                : "bg-white/8 text-white/40 hover:bg-white/15"
+                            )}
+                          >
+                            {doc.visibility === "deal_room" ? "🏛 Deal room" : "+ Add to deal room"}
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        {/* Start/Edit button */}
+                        <button
+                          onClick={() => {
+                            setEditingDoc(doc ?? {
+                              id: "",
+                              startup_id: startup?.id ?? "",
+                              template_id: template.id,
+                              template_slug: template.slug,
+                              title: template.name,
+                              content: {},
+                              completeness_score: 0,
+                              status: "empty",
+                              updated_at: new Date().toISOString(),
+                            });
+                          }}
+                          className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs font-medium hover:shadow-glow transition-shadow"
+                        >
+                          {buttonAction} <ArrowRight className="h-3 w-3" />
+                        </button>
+
+                        {/* Upload instead */}
+                        {isUploading ? (
+                          <div className="px-2 py-1.5">
+                            <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                          </div>
+                        ) : (
+                          <label className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer px-1 py-1.5">
+                            <Upload className="h-3 w-3" />
+                            Upload
+                            <input
+                              type="file"
+                              className="sr-only"
+                              accept=".pdf,.pptx,.ppt,.xlsx,.xls,.docx,.doc,.csv"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleFileUpload(template.slug, template.name, template.id, file);
+                                e.target.value = "";
+                              }}
+                            />
+                          </label>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Document Editor Modal */}
+      {editingDoc && (
+        <DocumentEditorModal
+          doc={editingDoc}
+          template={templates.find(t => t.id === editingDoc.template_id)}
+          startup={startup}
+          onClose={() => setEditingDoc(null)}
+          onSave={() => {
+            queryClient.invalidateQueries({ queryKey: ["founder-documents"] });
+            setEditingDoc(null);
           }}
         />
       )}
-
-      {/* Add to deal room modal */}
-      {addRoomDocId && (
-        <div
-          className="fixed inset-0 z-50 grid place-items-center bg-foreground/30 backdrop-blur-sm p-4"
-          onClick={() => setAddRoomDocId(null)}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-sm rounded-2xl border border-border/60 bg-card shadow-elev p-6"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold">Add to deal room</h3>
-              <button onClick={() => setAddRoomDocId(null)} className="text-muted-foreground hover:text-foreground">
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <select
-              value={addRoomId}
-              onChange={(e) => setAddRoomId(e.target.value)}
-              className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 mb-4"
-            >
-              <option value="">Select deal room…</option>
-              {dealRooms.map((r: any) => (
-                <option key={r.id} value={r.id}>{r.name}</option>
-              ))}
-            </select>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setAddRoomDocId(null)}
-                className="flex-1 rounded-md border border-border/60 py-2 text-sm hover:bg-accent"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddToRoom}
-                disabled={!addRoomId || addingRoom}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground py-2 text-sm shadow-glow disabled:opacity-50"
-              >
-                {addingRoom && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                Add to room
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
-function MediaLinksPanel({ startupMedia, userId, queryClient, dealRooms }: {
-  startupMedia: { id: string; product_video_url?: string | null; pitch_deck_url?: string | null } | null;
-  userId: string;
-  queryClient: any;
-  dealRooms: any[];
-}) {
-  const [videoUrl, setVideoUrl] = useState(startupMedia?.product_video_url ?? "");
-  const [savingVideo, setSavingVideo] = useState(false);
-  const [uploadingDeck, setUploadingDeck] = useState(false);
-  const deckRef = useRef<HTMLInputElement>(null);
-  const [showAddLink, setShowAddLink] = useState(false);
-  const [linkName, setLinkName] = useState("");
-  const [linkUrl, setLinkUrl] = useState("");
-  const [newLinkDealRoomId, setNewLinkDealRoomId] = useState("");
-  const [addingLink, setAddingLink] = useState(false);
+interface DocumentEditorModalProps {
+  doc: FounderDocument;
+  template?: DocumentTemplate;
+  startup?: any;
+  onClose: () => void;
+  onSave: () => void;
+}
 
-  const { data: links = [] } = useQuery({
-    queryKey: ["founder-links", userId],
-    enabled: !!userId,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("deal_room_links")
-        .select("id, name, url, deal_room_id, created_at")
-        .eq("uploader_id", userId)
-        .order("created_at", { ascending: false });
-      return data ?? [];
-    },
-  });
+function DocumentEditorModal({ doc, template, startup, onClose, onSave }: DocumentEditorModalProps) {
+  const [content, setContent] = useState<Record<string, string>>(doc.content ?? {});
+  const [saving, setSaving] = useState(false);
+  const [isReviewing, setIsReviewing] = useState(false);
+  const [reviewFeedback, setReviewFeedback] = useState<AIFeedback | null>(doc.ai_feedback ?? null);
+  const [reviewError, setReviewError] = useState<string | null>(null);
 
-  const addLink = async () => {
-    if (!linkName.trim() || !linkUrl.trim()) return;
-    setAddingLink(true);
+  const fields = template ? (TEMPLATE_FIELDS[template.slug] ?? []) : [];
+
+  // Live completeness
+  const liveScore = useMemo(() => {
+    if (fields.length === 0) return doc.completeness_score;
+    const filled = fields.filter(f => (content[f.key] ?? "").trim().length > 0).length;
+    return Math.round((filled / fields.length) * 100);
+  }, [content, fields, doc.completeness_score]);
+
+  const handleSave = async () => {
+    if (!startup?.id || !template) return;
+    setSaving(true);
     try {
-      const { error } = await supabase.from("deal_room_links").insert({
-        uploader_id: userId,
-        name: linkName.trim(),
-        url: linkUrl.trim(),
-        ...(newLinkDealRoomId ? { deal_room_id: newLinkDealRoomId } : {}),
-      });
-      if (error) throw error;
-      queryClient.invalidateQueries({ queryKey: ["founder-links", userId] });
-      setShowAddLink(false);
-      setLinkName("");
-      setLinkUrl("");
-      setNewLinkDealRoomId("");
-      toast.success("Link added");
-    } catch (e: any) {
-      toast.error(e.message || "Failed to add link");
-    } finally {
-      setAddingLink(false);
-    }
-  };
+      const filled = fields.filter(f => (content[f.key] ?? "").trim().length > 0).length;
+      const score = fields.length > 0 ? Math.round((filled / fields.length) * 100) : 0;
+      const status = score === 100 ? "complete" : score > 0 ? "draft" : "empty";
 
-  const removeLink = async (id: string) => {
-    const { error } = await supabase.from("deal_room_links").delete().eq("id", id).eq("uploader_id", userId);
-    if (error) { toast.error(error.message); return; }
-    queryClient.invalidateQueries({ queryKey: ["founder-links", userId] });
-    toast.success("Link removed");
-  };
+      const { error } = await supabase.from("founder_documents").upsert({
+        startup_id: startup.id,
+        template_id: template.id,
+        template_slug: template.slug,
+        title: template.name,
+        content,
+        completeness_score: score,
+        status,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "startup_id,template_slug" });
 
-  const saveVideoUrl = async () => {
-    if (!startupMedia?.id) { toast.error("Set up your Company Profile first"); return; }
-    setSavingVideo(true);
-    try {
-      const { error } = await supabase.from("startups")
-        .update({ product_video_url: videoUrl || null })
-        .eq("id", startupMedia.id);
       if (error) throw error;
-      queryClient.invalidateQueries({ queryKey: ["startup-media-docs", userId] });
-      toast.success("Video link saved");
+      toast.success("Document saved");
+      onSave();
     } catch (e: any) {
       toast.error(e.message || "Save failed");
     } finally {
-      setSavingVideo(false);
+      setSaving(false);
     }
   };
 
-  const uploadDeck = async (file: File) => {
-    if (!userId) return;
-    if (file.size > 50 * 1024 * 1024) { toast.error("File too large — max 50MB"); return; }
-    const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
-    if (!["pdf","pptx","ppt","docx","doc","xlsx","xls","csv"].includes(ext)) {
-      toast.error("Supported: PDF, PPTX, DOCX, XLSX, CSV"); return;
-    }
-    setUploadingDeck(true);
-    try {
-      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-      const path = `personal/${userId}/${Date.now()}-${safeName}`;
-      const { error: upErr } = await supabase.storage
-        .from("documents").upload(path, file, { upsert: true, cacheControl: "3600" });
-      if (upErr) throw upErr;
-      const { error: dbErr } = await supabase.from("documents").insert({
-        uploader_id: userId,
-        category: "Pitch Deck",
-        status: "uploaded",
-        storage_path: path,
-        file_name: file.name,
-        file_size: file.size,
-        deal_room_id: null,
-      });
-      if (dbErr) throw dbErr;
-      queryClient.invalidateQueries({ queryKey: ["documents", userId] });
-      queryClient.invalidateQueries({ queryKey: ["startup-media-docs", userId] });
-      toast.success(`${file.name} uploaded as Pitch Deck`);
-    } catch (e: any) {
-      toast.error(e.message || "Upload failed");
-    } finally {
-      setUploadingDeck(false);
-    }
-  };
-
-  return (
-    <>
-    <div className="mt-6 rounded-xl border border-border/60 bg-card p-5">
-      <div className="text-sm font-semibold mb-4">Media &amp; Links</div>
-      <div className="grid sm:grid-cols-2 gap-5">
-        {/* Product Video URL — with explicit Save button */}
-        <div>
-          <label className="text-xs font-medium text-muted-foreground block mb-1.5">
-            Product Video URL
-            <span className="font-normal ml-1 opacity-60">(YouTube / Loom / Vimeo)</span>
-          </label>
-          <div className="flex gap-2">
-            <input
-              type="url"
-              value={videoUrl}
-              onChange={(e) => setVideoUrl(e.target.value)}
-              placeholder="https://youtube.com/watch?v=..."
-              className="flex-1 rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
-            />
-            <button
-              onClick={saveVideoUrl}
-              disabled={savingVideo}
-              className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow disabled:opacity-50 shrink-0"
-            >
-              {savingVideo ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Save"}
-            </button>
-          </div>
-          {startupMedia?.product_video_url && (
-            <a href={startupMedia.product_video_url} target="_blank" rel="noopener noreferrer"
-              className="mt-1.5 text-[11px] text-brand hover:underline inline-flex items-center gap-1">
-              ↗ Currently saved: {startupMedia.product_video_url.slice(0, 40)}{startupMedia.product_video_url.length > 40 ? "…" : ""}
-            </a>
-          )}
-        </div>
-
-        {/* Pitch Deck — file upload (PDF/PPTX) */}
-        <div>
-          <label className="text-xs font-medium text-muted-foreground block mb-1.5">
-            Pitch Deck
-            <span className="font-normal ml-1 opacity-60">(PDF or PPTX — replaces DocSend link)</span>
-          </label>
-          <button
-            onClick={() => deckRef.current?.click()}
-            disabled={uploadingDeck}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-md border-2 border-dashed border-brand/40 bg-brand/5 text-brand px-4 py-2.5 text-sm font-medium hover:bg-brand/10 transition-colors disabled:opacity-50"
-          >
-            {uploadingDeck
-              ? <><Loader2 className="h-4 w-4 animate-spin" /> Uploading…</>
-              : <><Upload className="h-4 w-4" /> Upload Pitch Deck (PDF / PPTX)</>}
-          </button>
-          <input
-            ref={deckRef}
-            type="file"
-            className="hidden"
-            accept=".pdf,.pptx,.ppt"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadDeck(f); e.target.value = ""; }}
-          />
-          <p className="text-[10px] text-muted-foreground mt-1.5">
-            Investors can preview this directly in the deal room. Pinned to the top of all document views.
-          </p>
-        </div>
-      </div>
-
-      {/* Saved links */}
-      <div className="mt-5 pt-5 border-t border-border/60">
-        <div className="flex items-center justify-between mb-3">
-          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-            <LinkIcon className="h-3.5 w-3.5" /> Saved Links
-            {(links as any[]).length > 0 && (
-              <span className="text-[10px] font-bold bg-muted px-1.5 py-0.5 rounded-full">{(links as any[]).length}</span>
-            )}
-          </div>
-          <button
-            onClick={() => setShowAddLink(true)}
-            className="inline-flex items-center gap-1 text-xs text-brand hover:underline"
-          >
-            <Plus className="h-3 w-3" /> Add link
-          </button>
-        </div>
-        {(links as any[]).length === 0 ? (
-          <p className="text-xs text-muted-foreground/60 italic">No links saved yet. Add deal room links, demo URLs, or resources.</p>
-        ) : (
-          <div className="space-y-2">
-            {(links as any[]).map((link: any) => (
-              <div key={link.id} className="flex items-center gap-3 rounded-lg border border-border/60 bg-background px-3 py-2">
-                <ExternalLink className="h-3.5 w-3.5 text-brand shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium truncate">{link.name}</div>
-                  <div className="text-[10px] text-muted-foreground truncate">{link.url}</div>
-                </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  <a href={link.url} target="_blank" rel="noopener noreferrer"
-                    className="grid h-6 w-6 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
-                    title="Open link">
-                    <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
-                  <button
-                    onClick={() => removeLink(link.id)}
-                    className="grid h-6 w-6 place-items-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                    title="Remove link">
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-
-    {/* Add link modal */}
-    {showAddLink && (
-      <div
-        className="fixed inset-0 z-50 grid place-items-center bg-foreground/30 backdrop-blur-sm p-4"
-        onClick={() => setShowAddLink(false)}
-      >
-        <div
-          onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-sm rounded-2xl border border-border/60 bg-card shadow-elev p-6"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold">Add link</h3>
-            <button onClick={() => setShowAddLink(false)} className="text-muted-foreground hover:text-foreground">
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-          <div className="space-y-3">
-            <div>
-              <label className="text-xs text-muted-foreground block mb-1">Link name *</label>
-              <input
-                type="text"
-                value={linkName}
-                onChange={(e) => setLinkName(e.target.value)}
-                placeholder="e.g. Demo video, Product Hunt, Deck"
-                className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
-              />
-            </div>
-            <div>
-              <label className="text-xs text-muted-foreground block mb-1">URL *</label>
-              <input
-                type="url"
-                value={linkUrl}
-                onChange={(e) => setLinkUrl(e.target.value)}
-                placeholder="https://..."
-                className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
-              />
-            </div>
-            {dealRooms.length > 0 && (
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">Deal room (optional)</label>
-                <select
-                  value={newLinkDealRoomId}
-                  onChange={(e) => setNewLinkDealRoomId(e.target.value)}
-                  className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
-                >
-                  <option value="">None</option>
-                  {dealRooms.map((r: any) => (
-                    <option key={r.id} value={r.id}>{r.name}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-          </div>
-          <div className="flex gap-2 mt-5">
-            <button
-              onClick={() => setShowAddLink(false)}
-              className="flex-1 rounded-md border border-border/60 py-2 text-sm hover:bg-accent"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={addLink}
-              disabled={!linkName.trim() || !linkUrl.trim() || addingLink}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground py-2 text-sm shadow-glow disabled:opacity-50"
-            >
-              {addingLink && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-              Add link
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
-    </>
-  );
-}
-
-function UploadModal({
-  userId,
-  initialCategory,
-  onClose,
-  onUploaded,
-}: {
-  userId: string;
-  initialCategory: DocCategory;
-  onClose: () => void;
-  onUploaded: () => void;
-}) {
-  const fileRef = useRef<HTMLInputElement>(null);
-  const [category, setCategory] = useState<DocCategory>(initialCategory);
-  const [file, setFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    if (f.size > 50 * 1024 * 1024) {
-      toast.error("File too large. Maximum size is 50MB.");
+  const handleAIReview = async () => {
+    if (isReviewing || !template) return;
+    const filledFields = Object.values(content).filter(v => v && String(v).trim()).length;
+    if (filledFields === 0) {
+      setReviewError("Fill in some fields first before requesting a review.");
       return;
     }
-    setFile(f);
-  };
-
-  const handleUpload = async () => {
-    if (!file) return;
-    setUploading(true);
+    setIsReviewing(true);
+    setReviewError(null);
+    setReviewFeedback(null);
     try {
-      const path = `personal/${userId}/${Date.now()}-${file.name}`;
-      const { error: uploadErr } = await supabase.storage
-        .from("documents")
-        .upload(path, file, { upsert: true });
-      if (uploadErr) throw uploadErr;
-      const { error: insertErr } = await supabase.from("documents").insert({
-        uploader_id: userId,
-        category,
-        status: "uploaded",
-        storage_path: path,
-        file_name: file.name,
-        file_size: file.size,
-        deal_room_id: null,
+      const { data, error } = await supabase.functions.invoke("review-document", {
+        body: {
+          templateSlug: template.slug,
+          content,
+          stage: startup?.stage ?? "seed",
+        },
       });
-      if (insertErr) throw insertErr;
-      toast.success("Document uploaded");
-      onUploaded();
-    } catch (e: any) {
-      toast.error(e.message || "Upload failed");
+      if (error) throw new Error(error.message);
+      if (!data?.success) throw new Error("Review failed");
+      setReviewFeedback(data.feedback);
+      if (startup?.id) {
+        await supabase.from("founder_documents")
+          .update({ ai_feedback: data.feedback, status: "needs_review", updated_at: new Date().toISOString() })
+          .eq("startup_id", startup.id)
+          .eq("template_slug", template.slug);
+      }
+    } catch (err) {
+      setReviewError(err instanceof Error ? err.message : "Review failed. Try again.");
     } finally {
-      setUploading(false);
+      setIsReviewing(false);
     }
   };
+
+  const inputCls = "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#7C3AED]/60 focus:ring-1 focus:ring-[#7C3AED]/20";
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-foreground/30 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 grid place-items-center bg-black/70 backdrop-blur-sm p-4 overflow-y-auto"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden"
+        className="w-full max-w-3xl rounded-2xl border border-white/10 bg-[#111118] shadow-2xl overflow-hidden my-auto"
       >
-        <div className="px-6 py-4 border-b border-border/60 flex items-center justify-between">
-          <h3 className="text-base font-semibold">Upload document</h3>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
-            <X className="h-4 w-4" />
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#111118] z-10">
+          <div className="flex-1 min-w-0 pr-4">
+            <h2 className="text-base font-semibold text-white" style={{ fontFamily: "Syne, sans-serif" }}>{template?.name ?? "Document"}</h2>
+            <div className="flex items-center gap-2 mt-1.5">
+              <div className="flex-1 bg-white/10 h-1 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#7C3AED] rounded-full transition-all duration-300"
+                  style={{ width: `${liveScore}%` }}
+                />
+              </div>
+              <span className="text-[10px] text-white/40 tabular-nums shrink-0">{liveScore}% complete</span>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-white/40 hover:text-white transition-colors shrink-0">
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="px-6 py-5 space-y-4">
-          {/* Category */}
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1.5">Category *</label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value as DocCategory)}
-              className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
-            >
-              {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
-            </select>
-          </div>
-
-          {/* File input */}
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1.5">File *</label>
-            <div
-              onClick={() => fileRef.current?.click()}
-              className={cn(
-                "rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-colors",
-                file
-                  ? "border-brand/50 bg-brand/5"
-                  : "border-border/60 bg-muted/20 hover:border-brand/40 hover:bg-accent/20",
-              )}
-            >
-              {file ? (
-                <div>
-                  <CheckCircle2 className="h-6 w-6 text-success mx-auto mb-2" />
-                  <div className="text-sm font-medium truncate">{file.name}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">
-                    {Math.round(file.size / 1024)} KB
-                  </div>
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); setFile(null); }}
-                    className="mt-2 text-xs text-muted-foreground hover:text-destructive underline"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  <Upload className="h-6 w-6 text-muted-foreground mx-auto mb-2" />
-                  <div className="text-sm font-medium">Click to select file</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">All file types · max 50MB</div>
-                </div>
-              )}
+        {/* Fields */}
+        <div className="px-6 py-6 space-y-5 max-h-[calc(100vh-200px)] overflow-y-auto">
+          {fields.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-sm text-white/40">No fields configured for this template yet.</p>
             </div>
-            <input ref={fileRef} type="file" className="hidden" onChange={handleFileChange} />
-          </div>
-
+          ) : (
+            fields.map(field => (
+              <div key={field.key}>
+                <label className="text-xs uppercase tracking-wider text-white/40 font-medium block mb-1.5">
+                  {field.label}
+                  {field.required && <span className="text-red-400 ml-1">*</span>}
+                </label>
+                {field.type === "textarea" ? (
+                  <textarea
+                    value={content[field.key] ?? ""}
+                    onChange={(e) => setContent(prev => ({ ...prev, [field.key]: e.target.value }))}
+                    placeholder={field.placeholder}
+                    className={cn(inputCls, "resize-none min-h-[100px]")}
+                  />
+                ) : field.type === "number" ? (
+                  <input
+                    type="number"
+                    value={content[field.key] ?? ""}
+                    onChange={(e) => setContent(prev => ({ ...prev, [field.key]: e.target.value }))}
+                    placeholder={field.placeholder}
+                    className={inputCls}
+                  />
+                ) : field.type === "percentage" ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={content[field.key] ?? ""}
+                      onChange={(e) => setContent(prev => ({ ...prev, [field.key]: e.target.value }))}
+                      placeholder={field.placeholder}
+                      className={cn(inputCls, "flex-1")}
+                    />
+                    <span className="text-sm text-white/40">%</span>
+                  </div>
+                ) : (
+                  <input
+                    type="text"
+                    value={content[field.key] ?? ""}
+                    onChange={(e) => setContent(prev => ({ ...prev, [field.key]: e.target.value }))}
+                    placeholder={field.placeholder}
+                    className={inputCls}
+                  />
+                )}
+              </div>
+            ))
+          )}
         </div>
 
-        <div className="px-6 py-4 border-t border-border/60 flex items-center justify-end gap-2">
+        {/* Error */}
+        {reviewError && (
+          <div className="mx-6 mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+            {reviewError}
+          </div>
+        )}
+
+        {/* AI Feedback */}
+        {reviewFeedback && (
+          <div className="mx-6 mb-6 space-y-4">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/8">
+              <div className="flex-1 min-w-0 pr-4">
+                <p className="text-xs text-white/40 uppercase tracking-wider mb-1">AI Review</p>
+                <p className="text-sm text-white leading-relaxed">{reviewFeedback.summary}</p>
+              </div>
+              <div className={cn(
+                "shrink-0 w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold border-2",
+                reviewFeedback.signal === "strong" ? "border-green-500 text-green-400"
+                : reviewFeedback.signal === "adequate" ? "border-amber-500 text-amber-400"
+                : reviewFeedback.signal === "weak" ? "border-orange-500 text-orange-400"
+                : "border-red-500 text-red-400"
+              )}>
+                {reviewFeedback.overall_score}
+              </div>
+            </div>
+
+            {reviewFeedback.investor_flag && (
+              <div className="p-3 rounded-lg bg-red-500/8 border border-red-500/20">
+                <p className="text-xs text-red-400 uppercase tracking-wider mb-1">⚠ Investor will push back on</p>
+                <p className="text-sm text-white/80">{reviewFeedback.investor_flag}</p>
+              </div>
+            )}
+
+            {reviewFeedback.strengths?.length > 0 && (
+              <div>
+                <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Strengths</p>
+                <ul className="space-y-1">
+                  {reviewFeedback.strengths.map((s, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-white/70">
+                      <span className="text-green-400 mt-0.5 shrink-0">✓</span>{s}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {reviewFeedback.gaps?.length > 0 && (
+              <div>
+                <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Gaps to address</p>
+                <ul className="space-y-1">
+                  {reviewFeedback.gaps.map((g, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-white/70">
+                      <span className="text-amber-400 mt-0.5 shrink-0">→</span>{g}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {reviewFeedback.recommendations?.length > 0 && (
+              <div>
+                <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Fix these</p>
+                <ul className="space-y-1">
+                  {reviewFeedback.recommendations.map((r, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-white/70">
+                      <span className="text-[#7C3AED] mt-0.5 shrink-0 font-bold">{i + 1}</span>{r}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-white/10 flex items-center justify-between sticky bottom-0 bg-[#111118]">
           <button
             onClick={onClose}
-            className="rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent"
+            className="rounded-lg border border-white/10 px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
           >
-            Cancel
+            Close
           </button>
-          <button
-            onClick={handleUpload}
-            disabled={!file || uploading}
-            className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-1.5 text-sm shadow-glow disabled:opacity-50"
-          >
-            {uploading ? (
-              <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Uploading…</>
-            ) : (
-              <><Upload className="h-3.5 w-3.5" /> Upload</>
-            )}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleAIReview}
+              disabled={isReviewing}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#7C3AED]/40 text-[#7C3AED] px-4 py-2 text-sm hover:bg-[#7C3AED]/10 disabled:opacity-50 transition-colors"
+            >
+              {isReviewing && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              {isReviewing ? "Reviewing…" : "AI Review"}
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#7C3AED] text-white px-4 py-2 text-sm font-medium hover:bg-[#6d28d9] disabled:opacity-50 transition-colors"
+            >
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+              Save
+            </button>
+          </div>
         </div>
       </div>
     </div>

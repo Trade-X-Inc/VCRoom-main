@@ -92,6 +92,69 @@ if(typeof MessageChannel==="undefined"){
   globalThis.MessageChannel=_MC;
 }
 `;
-const workerCode = readFileSync("dist/client/_worker.js", "utf8");
+
+// 4. Patch _worker.js to expose Cloudflare Pages secrets via process.env
+// CF Pages passes secrets as the `env` parameter of fetch(request, env, ctx).
+// TanStack Start's createServerEntry swallows this — it only uses `request`.
+// We wrap the default export so secrets are injected before any handler runs.
+const cfEnvPatch = `\
+(function patchCFEnv() {
+  const __orig = self.__cfWorkerExports || {};
+  const __origFetch = typeof __orig.fetch === 'function' ? __orig.fetch.bind(__orig) : null;
+  if (!__origFetch) return;
+  __orig.fetch = async function(request, env, ctx) {
+    if (env && typeof env === 'object') {
+      try {
+        globalThis.__cf_env = env;
+        for (const [k, v] of Object.entries(env)) {
+          if (typeof v === 'string' && typeof process !== 'undefined' && process.env && !process.env[k]) {
+            process.env[k] = v;
+          }
+        }
+      } catch(e) {}
+    }
+    return __origFetch(request, env, ctx);
+  };
+})();
+`;
+
+let workerCode = readFileSync("dist/client/_worker.js", "utf8");
+
+// Wrap default export to inject CF env on every request.
+// The init_serverN() call number changes each build, so we use a regex.
+const initCallMatch = workerCode.match(/init_server\d*\(\);\nexport \{/);
+if (initCallMatch) {
+  const initCall = initCallMatch[0].replace('\nexport {', '');   // e.g. "init_server4();"
+  const injection = `\
+${initCall}
+// Inject CF env into globalThis.__cf_env and process.env before any handler runs
+const __origServer = server;
+const __patchedServer = {
+  async fetch(request, env, ctx) {
+    if (env && typeof env === 'object') {
+      try {
+        globalThis.__cf_env = { ...env };
+        for (const [k, v] of Object.entries(env)) {
+          if (typeof v === 'string' && typeof process !== 'undefined' && process.env && !process.env[k]) {
+            process.env[k] = v;
+          }
+        }
+        const safeKeys = Object.keys(env).filter(k => !k.includes('KEY') && !k.includes('SECRET') && !k.includes('TOKEN'));
+        const secretKeys = Object.keys(env).filter(k => k.includes('KEY') || k.includes('SECRET') || k.includes('TOKEN'));
+        console.log('[Worker] CF env keys available:', safeKeys);
+        console.log('[Worker] Secret keys present:', secretKeys.map(k => k + '=' + (env[k] ? '\\u2713' : '\\u2717')));
+      } catch(e) { console.error('[Worker] env injection error:', e); }
+    }
+    return __origServer.fetch(request, env, ctx);
+  }
+};
+export {`;
+  workerCode = workerCode.replace(initCallMatch[0], injection);
+  workerCode = workerCode.replace(/\bserver as default\b/, "__patchedServer as default");
+  console.log("✓ dist/client/_worker.js patched (CF env injection)");
+} else {
+  console.warn("⚠ Could not find export marker in _worker.js — CF env patch skipped");
+}
+
 writeFileSync("dist/client/_worker.js", polyfill + workerCode);
 console.log("✓ dist/client/_worker.js ready (with MessageChannel polyfill)");

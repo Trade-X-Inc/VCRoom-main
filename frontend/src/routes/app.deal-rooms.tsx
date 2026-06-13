@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { syncContactToHubSpot } from "@/lib/hubspot";
 import { Briefcase, ArrowUpRight, Plus, X, Loader2, Search, MoreHorizontal, Trash2, CheckCircle2, Copy, Check } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -69,6 +70,20 @@ function DealRooms() {
         return [];
       }
       return (data ?? []) as any[];
+    },
+  });
+
+  const roomIds = (rooms as any[]).map((r: any) => r.id);
+  const { data: docViews = [] } = useQuery({
+    queryKey: ["doc-view-counts", user?.id, roomIds.join(",")],
+    enabled: !!user?.id && roomIds.length > 0,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("document_views")
+        .select("deal_room_id, viewer_name, created_at")
+        .in("deal_room_id", roomIds)
+        .order("created_at", { ascending: false });
+      return data ?? [];
     },
   });
 
@@ -172,6 +187,7 @@ function DealRooms() {
           const status = r.status ?? "new";
           const initials = investorName.split(" ").map((s: string) => s[0]).join("").slice(0, 2).toUpperCase();
 
+          const roomViews = (docViews as any[]).filter((v: any) => v.deal_room_id === r.id);
           return (
             <div
               key={r.id}
@@ -213,7 +229,7 @@ function DealRooms() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-center">
+              <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="rounded-lg bg-muted/30 p-2">
                   <div className="text-base font-semibold tabular-nums">{daysOpen}</div>
                   <div className="text-[10px] text-muted-foreground">days open</div>
@@ -221,6 +237,10 @@ function DealRooms() {
                 <div className="rounded-lg bg-muted/30 p-2">
                   <div className="text-[11px] text-muted-foreground truncate">{lastActivity}</div>
                   <div className="text-[10px] text-muted-foreground">last activity</div>
+                </div>
+                <div className="rounded-lg bg-muted/30 p-2">
+                  <div className="text-base font-semibold tabular-nums">{roomViews.length}</div>
+                  <div className="text-[10px] text-muted-foreground">doc views</div>
                 </div>
               </div>
 
@@ -495,6 +515,20 @@ function CreateRoomForm({
 
       onCreated();
       setCreatedRoom({ id: newRoom.id, inviteLink, email: inviteEmail.trim() });
+
+      // Sync founder to HubSpot with deal room activity — fire and forget
+      const { data: { session: s } } = await supabase.auth.getSession();
+      if (s?.user?.email) {
+        syncContactToHubSpot({
+          data: {
+            email: s.user.email,
+            properties: {
+              lifecyclestage: "marketingqualifiedlead",
+              deal_room_created: "true",
+            },
+          },
+        }).catch(() => {});
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create deal room.");
     } finally {

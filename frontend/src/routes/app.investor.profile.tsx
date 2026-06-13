@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { sendInviteEmail } from "@/lib/invite-fn";
+import { VerificationBadge } from "@/components/shared/VerificationBadge";
 
 export const Route = createFileRoute("/app/investor/profile")({
   component: InvestorProfilePage,
@@ -57,6 +58,21 @@ const EMPTY_FORM: ProfileForm = {
   linkedin_url: "", website: "", red_flags: "", key_metrics: "",
 };
 
+// ── Helpers ───────────────────────────────────────────────────────
+
+function CheckRow({ label, passed }: { label: string; passed: boolean | null | undefined }) {
+  return (
+    <div className="flex items-center gap-2 text-xs">
+      <span className={passed ? "text-green-400" : "text-muted-foreground/30"}>
+        {passed ? "✓" : "○"}
+      </span>
+      <span className={passed ? "text-foreground/70" : "text-muted-foreground/40"}>
+        {label}
+      </span>
+    </div>
+  );
+}
+
 // ── Main page ─────────────────────────────────────────────────────
 
 function InvestorProfilePage() {
@@ -76,6 +92,20 @@ function InvestorProfilePage() {
         .eq("user_id", user!.id)
         .maybeSingle();
       return data;
+    },
+  });
+
+  const { data: verification } = useQuery({
+    queryKey: ["my-verification", user?.id],
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("investor_verifications")
+        .select("verification_tier, overall_score, website_resolves, linkedin_valid, email_domain_matches, notes")
+        .eq("investor_id", user!.id)
+        .maybeSingle();
+      return data ?? null;
     },
   });
 
@@ -343,6 +373,47 @@ function InvestorProfilePage() {
                 className="inline-flex items-center gap-1 text-xs text-brand hover:underline ml-3">
                 <ExternalLink className="h-3 w-3" /> Website
               </a>
+            )}
+          </div>
+
+          {/* Verification status card */}
+          <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-card">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-sm font-semibold">Verification status</div>
+              <VerificationBadge tier={verification?.verification_tier ?? "none"} size="sm" />
+            </div>
+
+            {(!verification || verification.verification_tier === "none") && (
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Your profile hasn't been verified yet. Verification runs automatically every 24 hours.
+                Make sure your website and LinkedIn URL are filled in your profile.
+              </p>
+            )}
+
+            {verification?.verification_tier === "checked" && (
+              <>
+                <div className="space-y-1.5 mb-3">
+                  <CheckRow label="Website verified" passed={verification.website_resolves} />
+                  <CheckRow label="LinkedIn URL valid" passed={verification.linkedin_valid} />
+                  <CheckRow label="Email domain matches website" passed={verification.email_domain_matches} />
+                </div>
+                <p className="text-xs text-muted-foreground/60 leading-relaxed">
+                  "Hockystick Checked" confirms your digital presence is consistent. It does not verify fund size, portfolio claims, or investment history.
+                </p>
+              </>
+            )}
+
+            {verification?.verification_tier === "verified" && (
+              <>
+                <div className="space-y-1.5 mb-3">
+                  <CheckRow label="Website verified" passed={verification.website_resolves} />
+                  <CheckRow label="LinkedIn URL valid" passed={verification.linkedin_valid} />
+                  <CheckRow label="Email domain matches website" passed={verification.email_domain_matches} />
+                </div>
+                {verification.notes && (
+                  <p className="text-xs text-muted-foreground/60 leading-relaxed">{verification.notes}</p>
+                )}
+              </>
             )}
           </div>
         </div>

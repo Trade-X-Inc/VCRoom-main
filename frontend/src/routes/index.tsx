@@ -6,16 +6,15 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { OnboardingChat } from "@/components/OnboardingChat";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Users, ShieldCheck, ListChecks, CheckCircle2, Zap } from "lucide-react";
-import { useI18n } from "@/lib/i18n";
+import { ArrowRight, Users, ShieldCheck, ListChecks, CheckCircle2, Zap, Shield, Sparkles, BarChart2, Newspaper, Globe, Award, Link2, FileText, BadgeCheck, Mail, DollarSign, Wrench } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Hockystick — AI-Powered Deal Rooms for Founders & Investors" },
-      { name: "description", content: "Hockystick is the private deal flow platform trusted by founders and VCs. Secure deal rooms, AI due diligence, investor pipeline management, and real-time collaboration." },
+      { title: "Hockystick — Verified Fundraising for MENA Founders" },
+      { name: "description", content: "Replace your pitch deck with a verified founder profile. Connect with investors through structured, staged access. Built for GCC and MENA founders." },
       { name: "keywords", content: "deal room software, VC deal flow, startup fundraising platform, investor due diligence, AI investment analysis, deal flow management, startup investor platform" },
-      { property: "og:title", content: "Hockystick — AI-Powered Deal Rooms" },
+      { property: "og:title", content: "Hockystick — Verified Fundraising for MENA Founders" },
       { property: "og:description", content: "The private platform for founders raising capital and VCs managing deal flow. Secure, AI-powered, built for closing deals." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://hockystick.app" },
@@ -46,7 +45,6 @@ const STYLES = `
 `;
 
 function Landing() {
-  const { dir } = useI18n();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -54,7 +52,7 @@ function Landing() {
   return (
     <>
       <style>{STYLES}</style>
-      <div className="min-h-screen bg-background text-foreground" dir={dir}>
+      <div className="min-h-screen bg-background text-foreground">
         <SiteHeader />
         <Hero />
         <ChatSection />
@@ -62,6 +60,7 @@ function Landing() {
         <SolutionStatement />
         <HowItWorks />
         <ProofNumbers />
+        <WhatsInside />
         <ForFoundersInvestors />
         <Resources />
         <FinalCTA />
@@ -74,48 +73,57 @@ function Landing() {
 
 // ── 1. HERO ───────────────────────────────────────────────────────
 function Hero() {
-  const { t, lang } = useI18n();
   return (
     <section className="relative overflow-hidden flex items-center min-h-[calc(100vh-64px)]">
       <div className="absolute inset-0 -z-10 bg-gradient-hero" />
       <div className="absolute inset-0 -z-10 grid-bg opacity-30 [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,black,transparent_80%)]" />
       <div className="absolute inset-0 -z-10 noise opacity-40" />
 
-      <div className="mx-auto max-w-5xl px-6 py-24 text-center w-full">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 py-24 text-center w-full">
         <div className="hs-a hs-a1 inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/8 px-3 py-1 text-[11px] font-medium text-brand">
           <span className="h-1.5 w-1.5 rounded-full bg-brand animate-pulse-glow" />
           Early access — free during beta
           <ArrowRight className="h-3 w-3" />
         </div>
 
-        <h1 className="hs hs-a hs-a2 mt-6 text-[clamp(3rem,7vw,5rem)] font-black leading-[1.0] tracking-[-0.04em]">
-          {lang === "en" ? (
-            <>The deal room where<br /><span className="text-gradient-brand">trust gets built.</span></>
-          ) : (
-            <span className="text-gradient-brand">{t("landing.hero.headline")}</span>
-          )}
+        <h1 className="hs hs-a hs-a2 mt-6 text-[clamp(2.5rem,7vw,5rem)] font-black leading-[1.0] tracking-[-0.04em]">
+          <span className="text-gradient-brand">Verified founders. Serious investors. Deals that close.</span>
         </h1>
 
         <p className="hs-a hs-a3 mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          {t("landing.hero.subheadline")}
+          Hockystick replaces the pitch deck with a verified founder profile — and gives investors a structured path from discovery to deal room. Built for GCC and MENA, open globally.
         </p>
 
         <div className="hs-a hs-a4 mt-8 flex flex-col sm:flex-row gap-4 justify-center">
           <Link to="/sign-up" search={{ role: "founder" } as any}>
             <Button variant="brand" size="lg" className="gap-2 shadow-glow w-full sm:w-auto">
-              {t("landing.hero.cta.founder")} <ArrowRight className="h-4 w-4" />
+              I'm raising capital <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
           <Link to="/sign-up" search={{ role: "investor" } as any}>
             <Button variant="outline" size="lg" className="gap-2 w-full sm:w-auto">
-              {t("landing.hero.cta.investor")} <ArrowRight className="h-4 w-4" />
+              I invest in startups <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
         </div>
 
         <p className="hs-a hs-a5 mt-4 text-sm text-muted-foreground">
-          {t("landing.hero.trust")}
+          Used by founders across GCC, USA and Europe · Verified deal rooms · Free during beta
         </p>
+        <div className="hs-a hs-a5 mt-5 flex items-center justify-center gap-3">
+          <a href="https://x.com/hockystickapp" target="_blank" rel="noopener noreferrer" title="@hockystickapp on X"
+            className="grid h-8 w-8 place-items-center rounded-lg bg-white/10 text-muted-foreground hover:bg-[#7C3AED] hover:text-white transition-all">
+            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.735-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+          <a href="https://linkedin.com/company/hockystick" target="_blank" rel="noopener noreferrer" title="Hockystick on LinkedIn"
+            className="grid h-8 w-8 place-items-center rounded-lg bg-white/10 text-muted-foreground hover:bg-[#7C3AED] hover:text-white transition-all">
+            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+          </a>
+        </div>
       </div>
     </section>
   );
@@ -123,22 +131,21 @@ function Hero() {
 
 // ── 2. PAIN ───────────────────────────────────────────────────────
 function Pain() {
-  const { t } = useI18n();
-  const cards = [
+  const cards: { Icon: React.ElementType; stat: string; who: string; body: string }[] = [
     {
-      icon: "📧",
+      Icon: Mail,
       stat: "200 emails sent",
       who: "The Founder",
       body: "You spend 3 months crafting the perfect pitch. You send it to 200 investors. 12 open it. 3 reply. 1 ghosts you after 4 meetings. You never know why.",
     },
     {
-      icon: "📥",
+      Icon: DollarSign,
       stat: "50 decks this week",
       who: "The Investor",
       body: "Deals flood your inbox with no structure, no context, no thesis match. Your analyst spends 20 hours on a company you'd pass in 5 minutes if you had the right data.",
     },
     {
-      icon: "🔧",
+      Icon: Wrench,
       stat: "12 tools, 0 clarity",
       who: "The Process",
       body: "Google Drive, Notion, DocuSign, email, Slack — the deal lives across 12 tools and 2 inboxes. Every update is manual. Every handoff breaks.",
@@ -152,13 +159,15 @@ function Pain() {
           The Reality
         </div>
         <h2 className="hs text-3xl md:text-4xl font-bold text-white mb-14 max-w-xl leading-[1.1]">
-          {t("landing.pain.headline")}
+          Fundraising is broken on both sides.
         </h2>
 
         <div className="grid md:grid-cols-3 gap-5">
-          {cards.map(({ icon, stat, who, body }) => (
+          {cards.map(({ Icon, stat, who, body }) => (
             <div key={who} className="rounded-xl border border-white/10 bg-white/5 p-6">
-              <div className="text-3xl mb-4">{icon}</div>
+              <div className="mb-4 h-10 w-10 rounded-lg bg-white/8 flex items-center justify-center text-purple-400">
+                <Icon size={20} />
+              </div>
               <div className="text-[10px] font-semibold uppercase tracking-widest text-purple-400 mb-2">
                 {who}
               </div>
@@ -209,7 +218,7 @@ function HowItWorks() {
     {
       n: "01",
       t: "Build your profile",
-      d: "2 minutes. Add your stage, sector, thesis, and funding targets. AI personalizes everything from day one.",
+      d: "Complete your verified founder profile. Upload your pitch deck — AI extracts key data automatically. Build your Document Intelligence Centre with 16 templates.",
       icon: Users,
     },
     {
@@ -221,13 +230,13 @@ function HowItWorks() {
     {
       n: "03",
       t: "Run due diligence",
-      d: "6-category DD checklist. AI analysis. Document review with accept/revision workflow. Q&A between both parties.",
+      d: "AI-reviewed documents, investor simulation, thesis matching, and structured Q&A — all before your first investor meeting.",
       icon: ListChecks,
     },
     {
       n: "04",
       t: "Make the decision",
-      d: "Investor submits a decision: Invest, Hold, or Pass. Founder gets notified. Term sheet next.",
+      d: "Investor records Invest, Hold, or Pass with mandatory reasoning. Term sheet builder included. Founder notified at every step.",
       icon: Zap,
     },
   ];
@@ -290,10 +299,10 @@ function HowItWorks() {
 // ── 5. PROOF NUMBERS ─────────────────────────────────────────────
 function ProofNumbers() {
   const stats = [
-    { n: "< 2 min",      label: "to open a fully structured deal room" },
-    { n: "6 categories", label: "of due diligence, pre-loaded" },
+    { n: "< 5 min",      label: "to build a complete investor profile" },
+    { n: "16 templates", label: "in the Document Intelligence Centre" },
     { n: "100%",         label: "encrypted & watermarked documents" },
-    { n: "1 room",       label: "replaces 12 tools" },
+    { n: "3 stages",     label: "of verified access from public to deal room" },
   ];
 
   return (
@@ -314,20 +323,68 @@ function ProofNumbers() {
   );
 }
 
+// ── 5b. WHAT'S INSIDE ────────────────────────────────────────────
+function WhatsInside() {
+  const features: { Icon: React.ElementType; title: string; desc: string; tag: string }[] = [
+    { Icon: Shield,     title: "NDA-Gated Deal Rooms",    desc: "Investors sign before seeing a single document. Every file is watermarked and tracked.", tag: "Live" },
+    { Icon: Sparkles,   title: "AI Document Review",      desc: "16 structured document templates reviewed by AI. VC-grade scoring, gap analysis, and investor simulation before you go live.", tag: "Live" },
+    { Icon: BarChart2,  title: "Thesis Matching",         desc: "Investors receive daily alerts when a verified founder matches their sector, stage, and geography. No cold outreach needed.", tag: "Live" },
+    { Icon: Newspaper,  title: "Market News Feed",        desc: "Latest startup funding rounds and VC moves — curated for investors managing deal flow.", tag: "Live" },
+    { Icon: Globe,      title: "Founder Directory",       desc: "Discover and connect with verified founders and investors in your sector.", tag: "Beta" },
+    { Icon: BadgeCheck, title: "Investor Verification",   desc: "Both founders and investors are verified. Website, LinkedIn, and public signals checked daily. Hockystick Checked badge on every profile.", tag: "Live" },
+    { Icon: Link2,      title: "CRM Integrations",        desc: "HubSpot CRM sync live. Notion, Slack and Zapier integrations coming Q3.", tag: "Live" },
+    { Icon: FileText,   title: "Deal Brief",              desc: "When an investor connects with a founder, AI generates a curated deal brief: key metrics, strengths, red flags, and DD questions — pre-done.", tag: "Live" },
+  ];
+
+  return (
+    <section className="py-20 bg-white dark:bg-background">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center mb-12">
+          <span className="text-[11px] uppercase tracking-widest font-semibold text-[#7C3AED]">EVERYTHING INCLUDED</span>
+          <h2 className="text-4xl font-black mt-3 tracking-tight text-gray-900 dark:text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
+            One platform. Every tool you need.
+          </h2>
+          <p className="text-gray-500 dark:text-muted-foreground mt-3 max-w-xl mx-auto">
+            From first investor contact to closed round — Hockystick covers every step.
+          </p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {features.map((f) => (
+            <div key={f.title} className="rounded-xl border border-gray-100 dark:border-border/60 bg-white dark:bg-card p-5 shadow-sm hover:shadow-md hover:border-[#7C3AED]/30 transition-all">
+              <div className="mb-3 h-9 w-9 rounded-lg bg-[#7C3AED]/10 flex items-center justify-center text-[#7C3AED]">
+                <f.Icon size={18} />
+              </div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-foreground">{f.title}</h3>
+                <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded-full", {
+                  "bg-green-100 text-green-700": f.tag === "Live",
+                  "bg-purple-100 text-purple-700": f.tag === "Beta",
+                  "bg-gray-100 text-gray-500": f.tag === "Coming Q3",
+                })}>{f.tag}</span>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-muted-foreground leading-relaxed">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ── 6. FOR FOUNDERS / FOR INVESTORS ──────────────────────────────
 function ForFoundersInvestors() {
   const founderFeatures = [
     "NDA-gated investor access",
-    "Document vault with AI summaries",
+    "Document Intelligence Centre (16 templates)",
     "Real-time investor activity tracking",
     "Q&A thread per investor",
     "Due diligence workstation",
   ];
   const investorFeatures = [
     "Thesis-match AI scoring (0–100)",
-    "Deal flow pipeline kanban",
-    "One-click investment memo",
-    "6-category DD tracker",
+    "Daily thesis match alerts",
+    "AI-generated deal brief per founder",
+    "Hockystick Verified investor badge",
     "Portfolio management",
   ];
 
@@ -396,26 +453,25 @@ function ForFoundersInvestors() {
 
 // ── 7. AI CHAT SECTION ────────────────────────────────────────────
 function ChatSection() {
-  const { t } = useI18n();
   return (
     <section id="talk-to-ai" className="bg-gray-950 py-0">
       {/* Hero banner above chat */}
-      <div className="max-w-7xl mx-auto px-6 pt-20 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 pb-8 sm:pb-12">
         <div className="flex items-center gap-2 mb-6">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-green-500/15 px-3 py-1 text-[11px] font-semibold text-green-400 uppercase tracking-wider">
             <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
             AI Agent · Online 24/7
           </span>
         </div>
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <div>
-            <h2 className="text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight">
+            <h3 className="text-3xl sm:text-4xl lg:text-6xl font-black text-white leading-tight tracking-tight">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-purple-300">
-                {t("landing.chat.headline")}
+                Ask our AI anything about Hockystick
               </span>
-            </h2>
+            </h3>
             <p className="mt-5 text-lg text-gray-400 max-w-lg leading-relaxed">
-              {t("landing.chat.subheadline")}
+              Our AI knows Hockystick inside out — features, pricing, how it works for your specific situation. Ask anything. Get real answers. No sales calls.
             </p>
             <div className="mt-6 flex flex-wrap gap-4">
               {["Smart Answers", "Personalized Guidance", "Instant Setup Help"].map((badge) => (
@@ -436,7 +492,7 @@ function ChatSection() {
       </div>
 
       {/* Wide chat widget */}
-      <div className="max-w-7xl mx-auto px-6 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-12 sm:pb-20">
         <div className="rounded-2xl border border-white/10 bg-gray-900 overflow-hidden shadow-2xl">
           {/* Chat header */}
           <div className="flex items-center gap-3 px-6 py-4 border-b border-white/10 bg-gray-900/80">
@@ -459,19 +515,19 @@ function ChatSection() {
             <p className="text-[11px] uppercase tracking-wider text-gray-500 mb-3 font-semibold">Quick questions</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {[
-                { icon: "🚀", text: "How can Hockystick help my startup raise faster?" },
-                { icon: "🎯", text: "Who are the right investors for me?" },
-                { icon: "📊", text: "What's included in the free beta plan?" },
-                { icon: "🔒", text: "How is my data protected?" },
-                { icon: "📈", text: "How does AI due diligence work?" },
-                { icon: "💬", text: "I have another question..." },
+                { Icon: Shield,     text: "How do deal rooms work?" },
+                { Icon: Sparkles,   text: "What does AI due diligence check?" },
+                { Icon: DollarSign, text: "Is it free to use?" },
+                { Icon: CheckCircle2, text: "How does thesis matching work?" },
+                { Icon: ShieldCheck,  text: "How secure is my data?" },
+                { Icon: Mail,         text: "How do I invite investors?" },
               ].map((q) => (
                 <button
                   key={q.text}
                   onClick={() => window.dispatchEvent(new CustomEvent("hs-chat-send", { detail: q.text }))}
                   className="flex items-start gap-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-violet-500/50 p-3 text-left transition-all"
                 >
-                  <span className="text-base shrink-0">{q.icon}</span>
+                  <q.Icon size={14} className="shrink-0 mt-0.5 text-purple-400" />
                   <span className="text-xs text-gray-300 leading-relaxed">{q.text}</span>
                 </button>
               ))}
@@ -480,16 +536,32 @@ function ChatSection() {
 
           {/* Chat messages area */}
           <div>
+            <div className="text-center py-4 px-6 border-b border-white/10">
+              <div className="inline-flex items-center gap-2 bg-[#7C3AED]/15 border border-[#7C3AED]/30 rounded-full px-4 py-2 mb-2">
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-sm font-medium text-white">Live AI Chat</span>
+              </div>
+              <p className="text-white/50 text-xs">
+                Select your role and ask our AI anything about Hockystick. It can answer 10 questions.
+              </p>
+            </div>
             <OnboardingChat variant="embedded" darkMode={true} />
           </div>
 
           {/* Bottom trust strip */}
           <div className="px-6 py-3 border-t border-white/10 bg-gray-900/50">
             <div className="flex flex-wrap gap-6 justify-center text-[11px] text-gray-500">
-              <span>⚡ Instant answers</span>
-              <span>🎯 Personalized for your stage</span>
-              <span>🔒 Private &amp; secure</span>
-              <span>🌍 Real platform insights</span>
+              {[
+                { Icon: Zap,        label: "Instant answers" },
+                { Icon: ListChecks, label: "Personalized for your stage" },
+                { Icon: ShieldCheck, label: "Private & secure" },
+                { Icon: Globe,      label: "Real platform insights" },
+              ].map(({ Icon, label }) => (
+                <span key={label} className="flex items-center gap-1.5">
+                  <Icon size={11} className="text-gray-500" />
+                  {label}
+                </span>
+              ))}
             </div>
           </div>
         </div>
@@ -577,11 +649,10 @@ function FinalCTA() {
     <section className="bg-gradient-to-r from-purple-600 to-indigo-600 py-20">
       <div className="mx-auto max-w-4xl px-6 text-center">
         <h2 className="hs text-4xl md:text-5xl font-black text-white leading-tight tracking-[-0.03em]">
-          The deal room is ready.<br />
-          Are you?
+          Your verified profile is one step away.
         </h2>
         <p className="mt-4 text-lg text-white/70 max-w-xl mx-auto">
-          Join founders and investors already using Hockystick to close deals faster, with less friction.
+          Build your structured founder profile, connect with verified investors, and run due diligence — all in one place.
         </p>
 
         <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">

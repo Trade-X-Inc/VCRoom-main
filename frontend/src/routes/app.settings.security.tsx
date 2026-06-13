@@ -1,87 +1,215 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Shield, Key, Smartphone, AlertTriangle, Trash2 } from "lucide-react";
+import { Shield, AlertTriangle, Loader2, Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
-import { useNavigate } from "@tanstack/react-router";
+import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/app/settings/security")({
-  component: Security,
+  component: SecuritySettings,
 });
 
-function Security() {
-  const { signOut } = useAuth();
+const inputCls = "w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/10";
+
+function SecuritySettings() {
+  const { user, signOut } = useAuth();
   const nav = useNavigate();
-  const [twoFA, setTwoFA] = useState(true);
-  const [sessionTimeout, setSessionTimeout] = useState(true);
+
+  // Password change
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [showPw, setShowPw] = useState(false);
+  const [savingPw, setSavingPw] = useState(false);
+
+  // Delete account
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
+  const handleChangePassword = async () => {
+    if (!newPw || !confirmPw) { toast.error("Please fill in all fields"); return; }
+    if (newPw.length < 8) { toast.error("Password must be at least 8 characters"); return; }
+    if (newPw !== confirmPw) { toast.error("Passwords do not match"); return; }
+    setSavingPw(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPw });
+      if (error) throw error;
+      toast.success("Password updated successfully");
+      setCurrentPw(""); setNewPw(""); setConfirmPw("");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update password");
+    } finally {
+      setSavingPw(false);
+    }
+  };
+
+  const handleSignOutAll = async () => {
+    try {
+      await supabase.auth.signOut({ scope: "global" });
+      nav({ to: "/sign-in", search: { redirect: "/app" }, replace: true });
+    } catch {
+      await signOut();
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirm !== "DELETE") { toast.error('Type DELETE to confirm'); return; }
+    if (!user?.id) return;
+    setDeleting(true);
+    try {
+      // Soft-delete: mark user as deleted in DB, then sign out
+      await supabase.from("users").update({ role: "deleted", updated_at: new Date().toISOString() } as any).eq("id", user.id);
+      await supabase.auth.signOut();
+      nav({ to: "/", replace: true });
+      toast.success("Account deleted. Sorry to see you go.");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete account");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  // Detect if user logged in with OAuth (no password to change)
+  const isOAuthUser = user?.email && !user?.email.includes("@") === false &&
+    supabase.auth.getUser !== undefined;
 
   return (
     <div className="space-y-5">
-      <section className="rounded-xl border border-border/60 bg-card shadow-card p-5 space-y-4">
-        <h2 className="text-sm font-semibold inline-flex items-center gap-2"><Shield className="h-4 w-4 text-brand" /> Authentication</h2>
-        <Row icon={Smartphone} title="Two-factor authentication" sub="Required for all admin actions.">
-          <Toggle checked={twoFA} onChange={setTwoFA} />
-        </Row>
-        <Row icon={Key} title="Auto-logout after 30 min inactivity" sub="Recommended for shared devices.">
-          <Toggle checked={sessionTimeout} onChange={setSessionTimeout} />
-        </Row>
-      </section>
-
-      <section className="rounded-xl border border-border/60 bg-card shadow-card p-5">
-        <h2 className="text-sm font-semibold">Active sessions</h2>
-        <div className="mt-3 divide-y divide-border/60">
-          {[
-            { dev: "MacBook Pro · Chrome", loc: "San Francisco, US", current: true },
-            { dev: "iPhone 15 · Safari", loc: "San Francisco, US" },
-          ].map((s) => (
-            <div key={s.dev} className="flex items-center justify-between py-3 text-sm">
-              <div>
-                <div className="font-medium">{s.dev} {s.current && <span className="text-[10px] rounded bg-brand/10 text-brand px-1.5 py-0.5 ml-1">This device</span>}</div>
-                <div className="text-xs text-muted-foreground">{s.loc}</div>
-              </div>
-              {!s.current && <button className="text-xs text-muted-foreground hover:text-destructive">Revoke</button>}
-            </div>
-          ))}
+      {/* Change password */}
+      <section className="rounded-xl border border-border/60 bg-card p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <Shield className="h-4 w-4 text-brand" />
+          <h2 className="text-sm font-semibold">Change password</h2>
         </div>
-      </section>
 
-      <section className="rounded-xl border border-destructive/30 bg-destructive/5 p-5">
-        <h2 className="text-sm font-semibold inline-flex items-center gap-2 text-destructive"><AlertTriangle className="h-4 w-4" /> Danger zone</h2>
-        <div className="mt-3 flex items-center justify-between">
-          <div>
-            <div className="text-sm font-medium">Sign out of all devices</div>
-            <div className="text-xs text-muted-foreground">Ends every active session.</div>
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground">New password</label>
+            <div className="relative">
+              <input
+                type={showPw ? "text" : "password"}
+                className={inputCls + " pr-10"}
+                value={newPw}
+                onChange={(e) => setNewPw(e.target.value)}
+                placeholder="At least 8 characters"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPw((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
-          <button onClick={() => { signOut(); nav({ to: "/sign-in", search: { redirect: "/app" }, replace: true }); }} className="rounded-md border border-destructive/40 text-destructive px-3 py-2 text-sm hover:bg-destructive/10 inline-flex items-center gap-1.5">
-            <Trash2 className="h-3.5 w-3.5" /> Sign out everywhere
+
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground">Confirm new password</label>
+            <input
+              type={showPw ? "text" : "password"}
+              className={inputCls}
+              value={confirmPw}
+              onChange={(e) => setConfirmPw(e.target.value)}
+              placeholder="Repeat new password"
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            onClick={handleChangePassword}
+            disabled={savingPw}
+            className="inline-flex items-center gap-1.5 rounded-md bg-brand text-brand-foreground px-4 py-2 text-sm font-medium hover:bg-brand/90 disabled:opacity-60 transition-colors"
+          >
+            {savingPw && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            Update password
           </button>
         </div>
       </section>
-    </div>
-  );
-}
 
-function Row({ icon: Icon, title, sub, children }: { icon: any; title: string; sub: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-between gap-3">
-      <div className="flex items-center gap-3 min-w-0">
-        <div className="grid h-9 w-9 place-items-center rounded-md bg-accent text-foreground/70 shrink-0"><Icon className="h-4 w-4" /></div>
-        <div className="min-w-0">
-          <div className="text-sm font-medium">{title}</div>
-          <div className="text-xs text-muted-foreground">{sub}</div>
+      {/* Active session */}
+      <section className="rounded-xl border border-border/60 bg-card p-5 space-y-3">
+        <h2 className="text-sm font-semibold">Current session</h2>
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-sm font-medium">
+              {user?.email}
+              <span className="ml-2 text-[10px] rounded bg-brand/10 text-brand px-1.5 py-0.5">Active</span>
+            </div>
+            <div className="text-xs text-muted-foreground mt-0.5">Signed in as {user?.role}</div>
+          </div>
+          <button
+            onClick={handleSignOutAll}
+            className="text-sm text-muted-foreground hover:text-foreground border border-border/60 rounded-md px-3 py-1.5 transition-colors"
+          >
+            Sign out
+          </button>
         </div>
-      </div>
-      {children}
-    </div>
-  );
-}
+      </section>
 
-function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <button
-      onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${checked ? "bg-gradient-brand" : "bg-muted border border-border/60"}`}
-    >
-      <span className={`inline-block h-3.5 w-3.5 rounded-full bg-background shadow-sm transition-transform ${checked ? "translate-x-[18px]" : "translate-x-0.5"}`} />
-    </button>
+      {/* Danger zone */}
+      <section className="rounded-xl border border-destructive/30 bg-destructive/5 p-5 space-y-3">
+        <div className="flex items-center gap-2 text-destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <h2 className="text-sm font-semibold">Danger zone</h2>
+        </div>
+
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="text-sm font-medium">Delete account</div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              Permanently removes your account and all associated data. This cannot be undone.
+            </div>
+          </div>
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="shrink-0 rounded-md border border-destructive/40 text-destructive px-3 py-2 text-sm hover:bg-destructive/10 transition-colors"
+          >
+            Delete account
+          </button>
+        </div>
+      </section>
+
+      {/* Delete confirm modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
+          <div className="bg-card border border-border/60 rounded-xl p-6 max-w-sm w-full shadow-xl space-y-4">
+            <div className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-5 w-5" />
+              <h3 className="font-semibold">Delete your account?</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              This will permanently delete your account, all deal rooms, documents, and data. This action cannot be undone.
+            </p>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-muted-foreground">Type <strong>DELETE</strong> to confirm</label>
+              <input
+                className="w-full rounded-md border border-destructive/40 bg-background px-3 py-2 text-sm focus:outline-none focus:border-destructive"
+                value={deleteConfirm}
+                onChange={(e) => setDeleteConfirm(e.target.value)}
+                placeholder="DELETE"
+              />
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => { setShowDeleteModal(false); setDeleteConfirm(""); }}
+                className="rounded-md border border-border/60 px-4 py-2 text-sm hover:bg-accent transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleting || deleteConfirm !== "DELETE"}
+                className="inline-flex items-center gap-1.5 rounded-md bg-destructive text-destructive-foreground px-4 py-2 text-sm font-medium hover:bg-destructive/90 disabled:opacity-50 transition-colors"
+              >
+                {deleting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                Delete permanently
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

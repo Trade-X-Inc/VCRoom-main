@@ -5,7 +5,6 @@ import {
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { createClient } from "@supabase/supabase-js";
 import { getDocRequests, createDocRequest, fulfillDocRequest } from "@/lib/doc-request-fn";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -58,7 +57,7 @@ const STATUS_CONFIG = {
 // ─── component ───────────────────────────────────────────────────────────────
 
 export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, founderUserId }: Props) {
-  const supabaseKey = (import.meta.env as any).VITE_SUPABASE_SERVICE_ROLE_KEY || "";
+  const supabaseKey = "";
   const supabaseUrl = (import.meta.env as any).VITE_SUPABASE_URL || "";
   const qc = useQueryClient();
 
@@ -87,14 +86,8 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
     queryKey: ["deal-room-founder", dealRoomId],
     enabled: !!dealRoomId && !founderUserId,
     queryFn: async () => {
-      const resolvedKey = supabaseKey ||
-        (import.meta.env as any).VITE_SUPABASE_SERVICE_ROLE_KEY || "";
-      const resolvedUrl = supabaseUrl ||
-        (import.meta.env as any).VITE_SUPABASE_URL ||
-        "https://ldimninnjlvxozubheib.supabase.co";
-      const adminSb = resolvedKey
-        ? createClient(resolvedUrl, resolvedKey, { auth: { persistSession: false } })
-        : supabase;
+      const resolvedUrl = supabaseUrl || (import.meta.env as any).VITE_SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
+      const adminSb = supabase;
       const { data } = await adminSb
         .from("deal_room_members")
         .select("user_id, role")

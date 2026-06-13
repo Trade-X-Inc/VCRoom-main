@@ -11,6 +11,15 @@ export interface ChatMsg {
   ts: number;
 }
 
+interface StartupContext {
+  companyName?: string;
+  stage?: string;
+  sector?: string;
+  fundingTarget?: string;
+  revenue?: string;
+  traction?: string;
+}
+
 interface Props {
   userId?: string;
   scope?: string;
@@ -19,9 +28,10 @@ interface Props {
   className?: string;
   compact?: boolean;
   pageContext?: string;
+  startupContext?: StartupContext;
 }
 
-export function AIChat({ userId, scope, starters, initialAssistant, className = "", compact = false, pageContext: pageContextProp }: Props) {
+export function AIChat({ userId, scope, starters, initialAssistant, className = "", compact = false, pageContext: pageContextProp, startupContext }: Props) {
   const routerState = useRouterState();
   const pathname = routerState.location.pathname;
 
@@ -63,10 +73,9 @@ export function AIChat({ userId, scope, starters, initialAssistant, className = 
     setMsgs((xs) => [...xs, { id: `u${Date.now()}`, role: "user", content: t, ts: Date.now() }]);
     setThinking(true);
     try {
-      const openAIKey = import.meta.env.VITE_OPENAI_API_KEY || "";
       const history = msgs.slice(1).map((m) => ({ role: m.role as string, content: m.content }));
       const contextPrefix = scope ? `Context: ${scope}\n\n` : "";
-      const result = await getAIAdvice({ data: { userId: userId || "", message: contextPrefix + t, history, openAIKey, pageContext } });
+      const result = await getAIAdvice({ data: { userId: userId || "", message: contextPrefix + t, history, pageContext, startupContext } });
       const reply = result.reply || "No AI response generated.";
       setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: reply, ts: Date.now() }]);
     } catch (error) {

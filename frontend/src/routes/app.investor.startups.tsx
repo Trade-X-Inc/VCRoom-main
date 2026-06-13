@@ -60,6 +60,8 @@ function StartupsPage() {
   const [showAdd, setShowAdd] = useState(false);
   const [csvOpen, setCsvOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "grid" | "icon">("grid");
+  const [platformFilter, setPlatformFilter] = useState<"all" | "hockystick">("all");
+  const [stageFilter, setStageFilter] = useState<string | null>(null);
 
   const downloadSampleCsv = () => {
     const csv = [
@@ -231,9 +233,46 @@ function StartupsPage() {
   };
 
   const filteredWatchlist = useMemo(() => {
-    if (activeTab === "All") return watchlist;
-    return watchlist.filter((w: any) => w.status === activeTab);
-  }, [watchlist, activeTab]);
+    if (activeTab === "All") return stageFilter ? watchlist.filter((w: any) => w.stage === stageFilter) : watchlist;
+    return watchlist.filter((w: any) => w.status === activeTab && (!stageFilter || w.stage === stageFilter));
+  }, [watchlist, activeTab, stageFilter]);
+
+  // Platform-generated vc_leads (created via Connect)
+  const { data: platformLeads = [], isLoading: platformLoading } = useQuery({
+    queryKey: ["platform-vc-leads", user?.id],
+    enabled: !!user?.id && platformFilter === "hockystick",
+    staleTime: 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("vc_leads")
+        .select(`
+          id,
+          investor_name,
+          firm_name,
+          sector,
+          stage,
+          status,
+          source,
+          discovery_request_id,
+          discovery_requests!vc_leads_discovery_request_id_fkey (
+            id,
+            status,
+            startup_id,
+            startups (
+              company_name,
+              sector,
+              stage,
+              country,
+              funding_target
+            )
+          )
+        `)
+        .eq("source", "Hockystick")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
 
   const countFor = (s: (typeof TAB_STATUSES)[number]) =>
     s === "All" ? watchlist.length : watchlist.filter((w: any) => w.status === s).length;
@@ -295,6 +334,28 @@ function StartupsPage() {
           </button>
           </div>
         </div>
+      </div>
+
+      {/* Stage filter row */}
+      <div className="mt-3 px-8 pb-3 flex items-center gap-2">
+        {[
+          { key: null, label: "All stages" },
+          { key: "Pre-seed", label: "Pre-seed" },
+          { key: "Seed", label: "Seed" },
+          { key: "Series A", label: "Series A" },
+          { key: "Series B", label: "Series B" },
+        ].map((b) => {
+          const active = stageFilter === b.key;
+          return (
+            <button
+              key={String(b.key)}
+              onClick={() => setStageFilter(b.key)}
+              className={`px-3 py-1 rounded-md text-sm ${active ? "bg-brand text-white" : "bg-white/5 text-white/60 hover:bg-white/10"}`}
+            >
+              {b.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Status tabs */}
@@ -373,6 +434,65 @@ function StartupsPage() {
 
       {/* Watchlist section */}
       <div className="mt-6">
+        {/* Platform filter toggle */}
+        <div className="flex items-center gap-2 mb-4">
+          <button
+            onClick={() => setPlatformFilter("all")}
+            className={`px-3 py-1 rounded-md text-sm ${platformFilter === "all" ? "bg-brand text-brand-foreground" : "text-muted-foreground hover:bg-accent"}`}
+          >
+            All leads
+          </button>
+          <button
+            onClick={() => setPlatformFilter("hockystick")}
+            className={`px-3 py-1 rounded-md text-sm ${platformFilter === "hockystick" ? "bg-brand text-brand-foreground" : "text-muted-foreground hover:bg-accent"}`}
+          >
+            From Hockystick
+          </button>
+        </div>
+
+        {/* Platform leads view */}
+        {/* Hockystick platform leads */}
+        {platformFilter === "hockystick" && (
+          platformLoading ? (
+            <div className="grid md:grid-cols-2 gap-4">
+              {[1, 2].map((i) => (
+                <div key={i} className="rounded-2xl border border-border/60 bg-card h-40 animate-pulse" />
+              ))}
+            </div>
+          ) : platformLeads.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center">
+              <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
+                <Building2 className="h-6 w-6" />
+              </div>
+              <h3 className="mt-4 text-lg font-semibold">No platform leads yet</h3>
+              <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">Connect with founders from the Directory to generate platform leads.</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-4">
+              {platformLeads.map((l: any) => {
+                const startup = l.discovery_requests?.startups;
+                const company = startup?.company_name ?? l.investor_name;
+                const badge = l.status === "New" ? "Pending founder response" : l.status === "Replied" ? "Connected" : l.status === "Rejected" ? "Declined" : l.status;
+                const badgeCls = l.status === "New" ? "bg-amber-500/10 text-amber-600" : l.status === "Replied" ? "bg-success/10 text-success" : l.status === "Rejected" ? "bg-destructive/10 text-destructive" : "bg-muted/10 text-muted-foreground";
+                return (
+                  <div key={l.id} className="rounded-2xl border border-border/60 bg-card p-5">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-semibold">{company}</div>
+                        <div className="text-xs text-muted-foreground">{startup?.sector ?? l.sector} · {startup?.stage ?? l.stage}</div>
+                      </div>
+                      <div className={`text-xs px-2 py-1 rounded ${badgeCls}`}>{badge}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )
+        )}
+
+        {/* All leads / watchlist */}
+        {platformFilter === "all" && (
+        <>
         {activeTab === "All" && watchlist.length > 0 && (
           <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-3">
             Watchlist
@@ -577,6 +697,8 @@ function StartupsPage() {
             ))}
           </div>
         )}
+        </>
+        )}
       </div>
 
       {/* Bulk CSV Import Modal */}
@@ -723,6 +845,7 @@ function StartupsPage() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-5 space-y-5">
+
               {/* Status */}
               <div>
                 <div className="text-xs font-medium text-muted-foreground mb-1.5">Status</div>

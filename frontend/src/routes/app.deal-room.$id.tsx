@@ -21,7 +21,9 @@ import { supabase, logActivity, createNotification } from "@/lib/supabase";
 import { ReviewTab } from "@/components/app/ReviewTab";
 import { DocumentWishlist } from "@/components/app/DocumentWishlist";
 import { generateDocSummary, secureAICall } from "@/lib/ai-secure-fn";
+import { extractDocumentText } from "@/lib/document-extractor";
 import { DealTermsCard } from "@/components/app/DealTermsCard";
+import { VerificationBadge } from "@/components/shared/VerificationBadge";
 import {
   useParticipants, useGeneratedNdaDocs,
   participantsStore, qaStore,
@@ -218,41 +220,58 @@ function DealRoom() {
 
   if (!user?.id || ndaLoading || !ndaAcceptance) {
     return (
-      <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
+      <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] items-center justify-center">
         <div className="text-sm text-muted-foreground animate-pulse">Verifying access…</div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] relative">
-      {/* Sidebar */}
-      <aside className="w-[260px] border-r border-border/60 bg-sidebar flex flex-col">
-        <div className="p-5 border-b border-border/60">
-          <Link to={"/app/deal-rooms" as any} className="text-xs text-muted-foreground inline-flex items-center gap-1 hover:text-foreground"><ArrowLeft className="h-3 w-3" /> All deal rooms</Link>
-          <div className="mt-3 flex items-center gap-2.5">
-            <div className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold">
+    <div className="flex flex-col md:flex-row h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] relative">
+      {/* Sidebar — vertical on desktop, header+tabs on mobile */}
+      <aside className="md:w-[260px] border-b md:border-b-0 md:border-r border-border/60 bg-sidebar flex flex-col shrink-0">
+        {/* Company header — always visible */}
+        <div className="px-4 py-3 md:p-5 border-b border-border/60">
+          <Link to={"/app/deal-rooms" as any} className="text-xs text-muted-foreground inline-flex items-center gap-1 hover:text-foreground">
+            <ArrowLeft className="h-3 w-3" /> All deal rooms
+          </Link>
+          <div className="mt-2 md:mt-3 flex items-center gap-2.5">
+            <div className="grid h-8 w-8 md:h-9 md:w-9 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold shrink-0">
               {companyName[0] ?? "D"}
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <div className="text-sm font-semibold truncate">{companyName}</div>
               <div className="text-[11px] text-muted-foreground">{isInvestor ? "Founder · Deal Room" : "Investor · Deal Room"}</div>
             </div>
+            <div className="md:hidden inline-flex items-center gap-1 text-[10px] text-success shrink-0">
+              <span className="h-1.5 w-1.5 rounded-full bg-success" /> Active
+            </div>
           </div>
-          <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] text-success">
+          <div className="hidden md:flex mt-3 items-center gap-1.5 text-[11px] text-success">
             <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse-glow" /> Active · NDA signed
           </div>
         </div>
-        <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
+
+        {/* Mobile: horizontal scrolling tabs */}
+        <nav className="flex md:hidden overflow-x-auto scrollbar-hide gap-1 px-3 py-2 flex-shrink-0">
           {displayTabs.map((t) => (
             <button
               key={t.k}
-              onClick={() => {
-                queryClient.invalidateQueries({
-                  predicate: (query) => (query.queryKey as string[]).includes(dealRoomId),
-                });
-                setTab(t.k);
-              }}
+              onClick={() => { queryClient.invalidateQueries({ predicate: (q) => (q.queryKey as string[]).includes(dealRoomId) }); setTab(t.k); }}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs whitespace-nowrap flex-shrink-0 transition-colors ${tab === t.k ? "bg-brand text-brand-foreground font-medium" : "text-muted-foreground hover:bg-accent/60"}`}
+            >
+              <t.i className="h-3.5 w-3.5" />
+              {t.l}
+            </button>
+          ))}
+        </nav>
+
+        {/* Desktop: vertical nav */}
+        <nav className="hidden md:flex flex-1 flex-col p-2 space-y-0.5 overflow-y-auto">
+          {displayTabs.map((t) => (
+            <button
+              key={t.k}
+              onClick={() => { queryClient.invalidateQueries({ predicate: (q) => (q.queryKey as string[]).includes(dealRoomId) }); setTab(t.k); }}
               className={`w-full flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors ${tab === t.k ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60"}`}
             >
               <t.i className={`h-4 w-4 ${tab === t.k ? "text-brand" : ""}`} />
@@ -260,13 +279,13 @@ function DealRoom() {
             </button>
           ))}
         </nav>
-        <div className="p-4 border-t border-border/60 text-[11px] text-muted-foreground">
+        <div className="hidden md:flex p-4 border-t border-border/60 text-[11px] text-muted-foreground">
           <Lock className="h-3 w-3 inline mr-1" /> Encrypted · watermarked
         </div>
       </aside>
 
       {/* Main content */}
-      <main key={tab} className="flex-1 overflow-y-auto">
+      <main key={tab} className="flex-1 overflow-y-auto min-h-0">
         {tab === "overview" && (
           <DealRoomOverview
             dealRoomId={dealRoomId}
@@ -288,7 +307,8 @@ function DealRoom() {
               />
             </div>
             <div className="flex-1">
-              <Documents dealRoomId={dealRoomId} isFounder={isFounder} isInvestor={isInvestor} userId={user?.id} />
+              {console.log("[deal-room] room:", room?.id, (room as any)?.startup_id) as any}
+              <Documents dealRoomId={dealRoomId} isFounder={isFounder} isInvestor={isInvestor} userId={user?.id} startupId={(room as any)?.startup_id} />
             </div>
           </div>
         )}
@@ -340,6 +360,14 @@ function DealRoom() {
                 compact
                 userId={user?.id}
                 scope={`the ${companyName} deal room`}
+                startupContext={{
+                  companyName: (room as any)?.startups?.company_name,
+                  stage: (room as any)?.startups?.stage,
+                  sector: (room as any)?.startups?.sector,
+                  fundingTarget: (room as any)?.startups?.funding_target,
+                  revenue: (room as any)?.startups?.revenue,
+                  traction: (room as any)?.startups?.traction,
+                }}
                 initialAssistant="I have context on this deal room — documents, Q&A, diligence checklist, and team. Ask me anything."
                 starters={isInvestor ? [
                   "Summarize this deal in 3 bullets.",
@@ -443,6 +471,54 @@ function DealRoomOverview({
         .select("user_id, fund_name, your_name, role, fund_size, sectors, stages, check_size_min, check_size_max, geography, linkedin_url, thesis")
         .in("user_id", investorUserIds);
       return data ?? [];
+    },
+  });
+
+  // Fallback: fetch investor profile by email then name — runs for both founder and investor views
+  const roomInvestorName = (room as any)?.investor_name ?? "";
+  const roomInvestorEmail = (room as any)?.investor_email ?? "";
+  const profileSelect = "user_id, your_name, fund_name, role, sectors, stages, geography, check_size_min, check_size_max, linkedin_url, website, thesis, verification_tier, email";
+  const { data: fallbackInvestorProfile } = useQuery({
+    queryKey: ["fallback-investor", roomInvestorEmail || roomInvestorName],
+    enabled: !!(roomInvestorEmail || roomInvestorName),
+    queryFn: async () => {
+      console.log("[fallback-investor] searching — email:", roomInvestorEmail, "name:", roomInvestorName);
+      // Email is authoritative — try first
+      if (roomInvestorEmail) {
+        const { data: byEmail, error: emailErr } = await supabase
+          .from("investor_profiles")
+          .select(profileSelect)
+          .eq("email", roomInvestorEmail)
+          .maybeSingle();
+        console.log("[fallback-investor] email query result:", byEmail, "error:", emailErr?.message);
+        if (byEmail) return byEmail;
+      }
+      // Fallback: match by display name
+      if (roomInvestorName) {
+        const { data: byName, error: nameErr } = await supabase
+          .from("investor_profiles")
+          .select(profileSelect)
+          .eq("your_name", roomInvestorName)
+          .maybeSingle();
+        console.log("[fallback-investor] name query result:", byName, "error:", nameErr?.message);
+        return byName ?? null;
+      }
+      return null;
+    },
+  });
+
+  const investorUserId = (investorProfilesInRoom as any[])[0]?.user_id ?? fallbackInvestorProfile?.user_id;
+  const { data: investorVerification } = useQuery({
+    queryKey: ["investor-verification", investorUserId],
+    enabled: !!investorUserId,
+    staleTime: 10 * 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("investor_verifications")
+        .select("verification_tier, overall_score, website_resolves, linkedin_valid, email_domain_matches, notes")
+        .eq("investor_id", investorUserId)
+        .maybeSingle();
+      return data ?? null;
     },
   });
 
@@ -608,7 +684,6 @@ function DealRoomOverview({
           supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
           supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
           appUrl: import.meta.env.VITE_APP_URL || "https://hockystick.app",
-          resendKey: (import.meta.env as any).VITE_RESEND_API_KEY || "",
           founderName: (user as any)?.fullName ?? user?.email ?? "The founder",
           startupName: startup?.company_name ?? "Unknown",
         },
@@ -741,15 +816,23 @@ function DealRoomOverview({
             </section>
             {/* INVESTOR CARD */}
             {(() => {
-              const invP = investorProfilesInRoom[0];
+              const invP = (investorProfilesInRoom as any[])[0] ?? fallbackInvestorProfile;
+              const hasInvestor = invP || investorMembers.length > 0 || !!roomInvestorName;
               return (
                 <section className="rounded-xl border border-success/25 bg-card p-5 shadow-card">
                   <div className="mb-3"><span className="text-[9px] uppercase tracking-widest font-bold text-success bg-success/10 px-2 py-0.5 rounded-full">Investor</span></div>
-                  {invP || investorMembers.length > 0 ? (<>
+                  {hasInvestor ? (<>
                     <div className="flex items-start gap-3">
-                      <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl border border-border/60 bg-success/10 text-base font-bold text-success">{(invP?.fund_name || investorMembers[0]?.users?.full_name || "V")[0].toUpperCase()}</div>
+                      <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl border border-border/60 bg-success/10 text-base font-bold text-success">{(invP?.fund_name || roomInvestorName || "V")[0].toUpperCase()}</div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-sm leading-tight truncate">{invP?.fund_name || "Venture Fund"}</h3>
+                        <h3 className="font-semibold text-sm leading-tight truncate">{invP?.fund_name ?? roomInvestorName ?? "Investor"}</h3>
+                        <div className="text-[10px] text-muted-foreground truncate">
+                          {invP?.your_name ?? roomInvestorName ?? ""}
+                          {invP?.role ? ` · ${invP.role}` : ""}
+                        </div>
+                        <div className="mt-1">
+                          <VerificationBadge tier={investorVerification?.verification_tier ?? invP?.verification_tier} size="sm" />
+                        </div>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {invP?.sectors && <span className="rounded-full bg-success/10 px-2 py-0.5 text-[9px] font-medium text-success truncate max-w-[100px]">{String(invP.sectors).split(",")[0].trim()}</span>}
                           {invP?.stages && <span className="rounded-full bg-accent px-2 py-0.5 text-[9px] text-muted-foreground">{String(invP.stages).split(",")[0].trim()}</span>}
@@ -759,19 +842,23 @@ function DealRoomOverview({
                     <div className="mt-3 grid grid-cols-2 gap-1.5">
                       <div className="rounded-lg bg-background border border-border/50 p-2">
                         <div className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Check size</div>
-                        <div className="text-[10px] font-bold mt-0.5">{invP?.check_size_min && invP?.check_size_max ? `$${Number(invP.check_size_min).toLocaleString()} – $${Number(invP.check_size_max).toLocaleString()}` : "—"}</div>
+                        <div className="text-[10px] font-bold mt-0.5">
+                          {invP?.check_size_min && invP?.check_size_max
+                            ? `${invP.check_size_min} – ${invP.check_size_max}`
+                            : invP?.check_size_min ?? invP?.check_size_max ?? (roomInvestorName && !invP ? "…" : "—")}
+                        </div>
                       </div>
                       <div className="rounded-lg bg-background border border-border/50 p-2">
                         <div className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Geography</div>
-                        <div className="text-[10px] font-bold mt-0.5 truncate">{invP?.geography || "—"}</div>
+                        <div className="text-[10px] font-bold mt-0.5 truncate">{invP?.geography ?? (roomInvestorName && !invP ? "…" : "—")}</div>
                       </div>
                     </div>
                     {invP?.thesis && <p className="mt-2 text-[10px] text-muted-foreground line-clamp-2"><span className="font-semibold text-foreground">Thesis: </span>{invP.thesis}</p>}
                     {investorMembers.length > 0 && (
                       <div className="mt-3 pt-2.5 border-t border-border/40 space-y-1.5">
                         <div className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Team</div>
-                        {investorMembers.map((m: any) => {
-                          const mp = investorProfilesInRoom.find((p: any) => p.user_id === m.user_id);
+                        {(investorMembers as any[]).map((m: any) => {
+                          const mp = (investorProfilesInRoom as any[]).find((p: any) => p.user_id === m.user_id);
                           return (<div key={m.id} className="flex items-center gap-2">
                             {m.users?.avatar_url ? <img src={m.users.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover border-2 border-success/20 shrink-0" /> : <div className="grid h-7 w-7 place-items-center rounded-full bg-success/15 text-success text-[9px] font-bold border-2 border-success/20 shrink-0">{(m.users?.full_name || "I").split(" ").map((s: string) => s[0]).join("").slice(0,2).toUpperCase()}</div>}
                             <div className="min-w-0"><div className="text-[10px] font-semibold truncate">{m.users?.full_name ?? m.users?.email ?? "Investor"}</div><div className="text-[9px] text-muted-foreground">{mp?.role || "Investor"}{mp?.fund_name ? ` · ${mp.fund_name}` : ""}</div></div>
@@ -807,7 +894,7 @@ function DealRoomOverview({
                     <div className="relative z-10 flex flex-col items-center gap-2 text-center">
                       <div className={cn(
                         "grid h-8 w-8 place-items-center rounded-full border text-xs font-semibold",
-                        completed && "border-success bg-success text-white",
+                        completed && "border-success bg-success text-success-foreground",
                         current && "border-brand bg-brand text-brand-foreground shadow-glow",
                         !completed && !current && "border-border bg-background text-muted-foreground",
                       )}>
@@ -856,17 +943,17 @@ function DealRoomOverview({
               ))}
             </div>
 
-            <form onSubmit={addTask} className="mt-4 grid gap-2 md:grid-cols-[1fr_150px_140px_auto]">
+            <form onSubmit={addTask} className="mt-4 flex flex-wrap items-center gap-2 w-full">
               <input
                 value={taskTitle}
                 onChange={(e) => setTaskTitle(e.target.value)}
                 placeholder="Add a shared task"
-                className="rounded-md border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
+                className="flex-1 min-w-0 rounded-md border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
               />
               <select
                 value={taskAssignee}
                 onChange={(e) => setTaskAssignee(e.target.value)}
-                className="rounded-md border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
+                className="w-32 shrink-0 rounded-md border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
               >
                 <option value="">Unassigned</option>
                 {(memberList as any[]).map((member) => (
@@ -879,12 +966,12 @@ function DealRoomOverview({
                 type="date"
                 value={taskDueDate}
                 onChange={(e) => setTaskDueDate(e.target.value)}
-                className="rounded-md border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
+                className="w-36 shrink-0 rounded-md border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
               />
               <button
                 type="submit"
                 disabled={!taskTitle.trim() || savingTask}
-                className="inline-flex items-center justify-center gap-1.5 rounded-md bg-gradient-brand px-3 py-2 text-sm font-medium text-brand-foreground shadow-glow disabled:opacity-50"
+                className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-md bg-gradient-brand px-3 py-2 text-sm font-medium text-brand-foreground shadow-glow disabled:opacity-50"
               >
                 {savingTask ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                 Add task
@@ -1140,15 +1227,14 @@ function getDecisionLabel(status?: string | null) {
 
 function formatMoney(value: unknown) {
   if (value === null || value === undefined || value === "") return "—";
-  if (typeof value === "number") {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      notation: value >= 1000000 ? "compact" : "standard",
-      maximumFractionDigits: value >= 1000000 ? 1 : 0,
-    }).format(value);
-  }
-  return String(value);
+  const n = Number(value);
+  if (isNaN(n) || n === 0) return "—";
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    notation: n >= 1000000 ? "compact" : "standard",
+    maximumFractionDigits: n >= 1000000 ? 1 : 0,
+  }).format(n);
 }
 
 function qaMessagesAnswered(activity: any[]) {
@@ -1195,9 +1281,20 @@ const CAT_BORDER: Record<string, string> = {
   "Other": "border-l-muted-foreground/40",
 };
 
-function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: string; isFounder: boolean; isInvestor: boolean; userId?: string }) {
+function formatRelativeTime(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (mins < 60) return `${mins}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  return `${days}d ago`;
+}
+
+function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { dealRoomId: string; isFounder: boolean; isInvestor: boolean; userId?: string; startupId?: string }) {
   const queryClient = useQueryClient();
   const [showLibrary, setShowLibrary] = useState(false);
+  const [viewingDoc, setViewingDoc] = useState<any | null>(null);
   const [activeVaultTab, setActiveVaultTab] = useState<"documents" | "links">("documents");
   const [showAddLink, setShowAddLink] = useState(false);
   const [linkName, setLinkName] = useState("");
@@ -1221,6 +1318,34 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: 
     summaryExpandedRef.current[docId] = true;
     setSummaryExpandedTick((t) => t + 1);
   };
+
+  async function trackDocumentView(params: {
+    documentId?: string;
+    founderDocumentId?: string;
+  }) {
+    if (!isInvestor) return;
+    try {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) return;
+      const { data: profile } = await supabase
+        .from("investor_profiles")
+        .select("your_name, fund_name")
+        .eq("user_id", authUser.id)
+        .maybeSingle();
+      const viewerName = profile?.your_name ?? profile?.fund_name ?? "Investor";
+      await supabase.from("document_views").insert({
+        document_id: params.documentId ?? null,
+        founder_document_id: params.founderDocumentId ?? null,
+        deal_room_id: dealRoomId,
+        startup_id: startupId,
+        viewer_id: authUser.id,
+        viewer_role: "investor",
+        viewer_name: viewerName,
+      });
+    } catch (e) {
+      console.error("[trackDocumentView]", e);
+    }
+  }
 
   const { data: docs = [] } = useQuery({
     queryKey: ["documents", dealRoomId],
@@ -1277,6 +1402,26 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: 
         .eq("deal_room_id", dealRoomId)
         .eq("uploaded_by_role", "investor")
         .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+  });
+
+  // Platform documents from founder_documents (deal_room visibility)
+  console.log("[platform-docs] startupId:", startupId, "isFounder:", isFounder, "isInvestor:", isInvestor);
+  const { data: platformDocs = [] } = useQuery({
+    queryKey: ["platform-docs", startupId],
+    enabled: !!startupId,
+    queryFn: async () => {
+      console.log("[platform-docs] queryFn firing for startupId:", startupId);
+      const { data, error } = await supabase
+        .from("founder_documents")
+        .select(`id, template_slug, title, status, content, completeness_score, ai_feedback, visibility, updated_at, document_templates ( name, category )`)
+        .eq("startup_id", startupId!)
+        .eq("visibility", "deal_room")
+        .in("status", ["complete", "ai_extracted", "needs_review"])
+        .order("updated_at", { ascending: false });
+      if (error) console.error("[platform-docs] error:", error);
+      console.log("[platform-docs] data:", data);
       return data ?? [];
     },
   });
@@ -1383,68 +1528,15 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: 
       const arrayBuffer = await response.arrayBuffer();
       const fileName = doc.file_name ||
         doc.storage_path?.split("/").pop()?.replace(/^\d{13}-/, "") || "";
-      const ext = fileName.split(".").pop()?.toLowerCase() ?? "";
 
-      let textContent = "";
+      // Use the unified extractor — handles PDF, DOCX, PPTX, XLSX, CSV, TXT
+      const textContent = await extractDocumentText(arrayBuffer, fileName);
+      console.log(`[generateSummary] ${fileName}: extracted ${textContent.length} chars`);
 
-      if (["pptx", "ppt"].includes(ext)) {
-        // PPTX is a ZIP archive — must unzip before regexing XML
-        try {
-          const { default: JSZip } = await import("jszip");
-          const zip = await JSZip.loadAsync(arrayBuffer);
-          const slideTexts: string[] = [];
-          const slideFiles = Object.keys(zip.files)
-            .filter((name) => /^ppt\/slides\/slide\d+\.xml$/.test(name))
-            .sort((a, b) => parseInt(a.match(/\d+/)?.[0] ?? "0") - parseInt(b.match(/\d+/)?.[0] ?? "0"));
-          for (const slideFile of slideFiles) {
-            const xml = await zip.files[slideFile].async("string");
-            const matches = [...xml.matchAll(/<a:t[^>]*?>([^<]+)<\/a:t>/g)];
-            const slideText = matches
-              .map((m) => m[1].trim())
-              .filter((t) => t.length > 1 && /[a-zA-Z]/.test(t))
-              .join(" ");
-            if (slideText) slideTexts.push(slideText);
-          }
-          textContent = slideTexts.join(" • ").slice(0, 4000);
-        } catch (zipErr) {
-          console.warn("JSZip PPTX extraction failed:", zipErr);
-          textContent = "";
-        }
-      } else if (["docx", "doc"].includes(ext)) {
-        // DOCX is also a ZIP archive
-        try {
-          const { default: JSZip } = await import("jszip");
-          const zip = await JSZip.loadAsync(arrayBuffer);
-          const wordDoc = zip.files["word/document.xml"];
-          if (wordDoc) {
-            const xml = await wordDoc.async("string");
-            textContent = [...xml.matchAll(/<w:t[^>]*?>([^<]+)<\/w:t>/g)]
-              .map((m) => m[1].trim())
-              .filter((t) => t.length > 0 && /[a-zA-Z]/.test(t))
-              .join(" ")
-              .slice(0, 4000);
-          }
-        } catch (zipErr) {
-          console.warn("JSZip DOCX extraction failed:", zipErr);
-          textContent = "";
-        }
-      } else {
-        const decoder = new TextDecoder("utf-8", { fatal: false });
-        const fullText = decoder.decode(new Uint8Array(arrayBuffer));
-        textContent = fullText
-          .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, " ")
-          .replace(/\s+/g, " ")
-          .slice(0, 4000)
-          .trim();
-      }
-
-      // Quality gate — skip OpenAI if extraction failed
-      const hasRealContent = textContent.length > 100 &&
-        /[a-zA-Z]{3,}/.test(textContent) &&
-        textContent.split(" ").filter((w) => w.length > 3).length > 10;
-
-      if (!hasRealContent) {
-        const honestMessage = `Could not extract readable text from this ${ext.toUpperCase()} file.\n\nTo review this document:\n• Click the Preview button to open it\n• Or click Download to save and open locally\n\nManual review recommended before making investment decisions.`;
+      // Quality gate — still send to AI even if content is sparse; the fallback message
+      // from the extractor already explains the situation when text couldn't be read.
+      if (!textContent || textContent.length < 30) {
+        const honestMessage = `Could not extract readable text from this file.\n\nTo review: Click Preview or Download to open locally.`;
         await supabase.from("documents").update({ ai_summary: honestMessage }).eq("id", doc.id);
         queryClient.setQueryData(["documents", dealRoomId], (old: any[]) =>
           (old ?? []).map((d: any) => d.id === doc.id ? { ...d, ai_summary: honestMessage } : d)
@@ -1464,9 +1556,13 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: 
           category: doc.category,
         }
       });
-      const summary = aiData.choices?.[0]?.message?.content || "";
+      if (aiData.error === "usage_limit") {
+        toast.error(aiData.reply || "Daily AI limit reached");
+        return;
+      }
+      const summary = aiData.reply || "";
       if (!summary) {
-        toast.error("AI returned empty response");
+        toast.error("AI returned empty response — check Cloudflare logs");
         return;
       }
 
@@ -1568,7 +1664,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: 
             onClick={() => setActiveVaultTab("documents")}
             className={cn(
               "px-4 py-1.5 rounded-lg text-sm font-medium transition-colors",
-              activeVaultTab === "documents" ? "bg-brand text-white shadow-sm" : "text-muted-foreground hover:text-foreground"
+              activeVaultTab === "documents" ? "bg-brand text-brand-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
             )}
           >
             📁 Documents
@@ -1578,7 +1674,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: 
             onClick={() => setActiveVaultTab("links")}
             className={cn(
               "px-4 py-1.5 rounded-lg text-sm font-medium transition-colors",
-              activeVaultTab === "links" ? "bg-brand text-white shadow-sm" : "text-muted-foreground hover:text-foreground"
+              activeVaultTab === "links" ? "bg-brand text-brand-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
             )}
           >
             🔗 Links
@@ -1606,6 +1702,61 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: 
       </div>
 
       {activeVaultTab === "documents" && (<>
+
+      {/* Platform documents section */}
+      {(platformDocs as any[]).length > 0 && (
+        <div className="mt-5 mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <h3 className="text-sm font-semibold text-foreground">Platform Documents</h3>
+            <span className="text-xs bg-[#7C3AED]/15 text-[#7C3AED] px-2 py-0.5 rounded-full">
+              {(platformDocs as any[]).length} structured
+            </span>
+          </div>
+          <div className="space-y-2">
+            {(platformDocs as any[]).map((doc: any) => (
+              <div key={doc.id}
+                className="flex items-center justify-between p-4 rounded-xl border border-white/8 bg-white/[0.02] hover:bg-white/5 transition-colors">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-8 h-8 rounded-lg bg-[#7C3AED]/15 flex items-center justify-center text-[#7C3AED] text-sm shrink-0">≡</div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{doc.title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {doc.document_templates?.category
+                        ? doc.document_templates.category.charAt(0).toUpperCase() + doc.document_templates.category.slice(1)
+                        : "Document"}
+                      {" · "}Updated {formatRelativeTime(doc.updated_at)}
+                      {doc.completeness_score > 0 && <> · {doc.completeness_score}% complete</>}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className={cn("text-xs px-2 py-0.5 rounded-full", doc.status === "complete" ? "bg-green-500/15 text-green-400" : "bg-amber-500/15 text-amber-400")}>
+                    {doc.status === "complete" ? "✓ Complete" : "In progress"}
+                  </span>
+                  <button
+                    onClick={() => {
+                      setViewingDoc(doc);
+                      trackDocumentView({ founderDocumentId: doc.id });
+                    }}
+                    className="text-xs px-3 py-1.5 rounded-lg bg-[#7C3AED]/15 text-[#7C3AED] hover:bg-[#7C3AED]/25 transition-colors">
+                    View
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Divider between platform docs and uploaded files */}
+      {(platformDocs as any[]).length > 0 && (docs as any[]).length > 0 && (
+        <div className="flex items-center gap-3 mb-5">
+          <div className="flex-1 h-px bg-border/40" />
+          <span className="text-xs text-muted-foreground uppercase tracking-wider">Uploaded files</span>
+          <div className="flex-1 h-px bg-border/40" />
+        </div>
+      )}
+
       {isFounder && (
         <div className="mt-5 space-y-3">
           <div className="rounded-lg bg-muted/40 border border-border/60 px-4 py-3 text-xs text-muted-foreground space-y-1">
@@ -1649,13 +1800,13 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: 
               className={cn(
                 "shrink-0 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs transition-colors",
                 activeDocTab === cat
-                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white"
+                  ? "bg-brand text-brand-foreground"
                   : "border border-border/60 hover:bg-accent"
               )}
             >
               {cat}
               {count > 0 && (
-                <span className={cn("rounded-full px-1.5 py-0.5 text-[9px] font-bold", activeDocTab === cat ? "bg-white/20" : "bg-accent text-muted-foreground")}>
+                <span className={cn("rounded-full px-1.5 py-0.5 text-[9px] font-bold", activeDocTab === cat ? "bg-background/20" : "bg-accent text-muted-foreground")}>
                   {count}
                 </span>
               )}
@@ -1785,7 +1936,10 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: 
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <button
-                      onClick={() => setPreviewDoc(doc)}
+                      onClick={() => {
+                        setPreviewDoc(doc);
+                        trackDocumentView({ documentId: doc.id });
+                      }}
                       className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
                       title="Preview"
                     >
@@ -1907,7 +2061,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: 
                         <button
                           onClick={() => generateSummary(doc)}
                           disabled={isGenerating}
-                          className="inline-flex items-center gap-1 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-2.5 py-1 text-xs font-medium shadow-sm disabled:opacity-50"
+                          className="inline-flex items-center gap-1 rounded-md bg-brand text-brand-foreground px-2.5 py-1 text-xs font-medium shadow-sm disabled:opacity-50"
                         >
                           {isGenerating
                             ? <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</>
@@ -1935,7 +2089,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: 
               : "The founder hasn't shared any documents yet."}
           </p>
           {isFounder && (
-            <label className="inline-flex items-center gap-1.5 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 text-sm cursor-pointer shadow-sm">
+            <label className="inline-flex items-center gap-1.5 rounded-md bg-brand text-brand-foreground px-4 py-2 text-sm cursor-pointer shadow-sm">
               <Upload className="h-4 w-4" /> Upload first document
               <input
                 type="file"
@@ -2083,7 +2237,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: 
                             "px-2 py-1 rounded-md text-[10px] font-medium transition-colors",
                             currentVisibility === v
                               ? v === "shared"
-                                ? "bg-success text-white shadow-sm"
+                                ? "bg-success text-success-foreground shadow-sm"
                                 : "bg-warning text-warning-foreground shadow-sm"
                               : "text-muted-foreground hover:text-foreground"
                           )}
@@ -2230,6 +2384,53 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId }: { dealRoomId: 
 
       {previewDoc && (
         <DocPreviewModal doc={previewDoc} onClose={() => setPreviewDoc(null)} />
+      )}
+
+      {/* Platform document viewer modal */}
+      {viewingDoc && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4"
+          onClick={() => setViewingDoc(null)}>
+          <div className="bg-[#111118] border border-white/10 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-6 border-b border-white/8">
+              <div>
+                <h2 className="text-lg font-bold text-white" style={{ fontFamily: "Syne, sans-serif" }}>{viewingDoc.title}</h2>
+                <p className="text-xs text-white/40 mt-1">
+                  {viewingDoc.completeness_score}% complete · Updated {formatRelativeTime(viewingDoc.updated_at)}
+                </p>
+              </div>
+              <button onClick={() => setViewingDoc(null)} className="text-white/40 hover:text-white text-xl leading-none">×</button>
+            </div>
+            <div className="overflow-y-auto p-6 space-y-4 flex-1">
+              {viewingDoc.content && Object.entries(viewingDoc.content as Record<string, string>)
+                .filter(([, v]) => v && String(v).trim())
+                .map(([key, value]) => (
+                  <div key={key}>
+                    <p className="text-xs text-white/40 uppercase tracking-wider mb-1">{key.replace(/_/g, " ")}</p>
+                    <p className="text-sm text-white/80 leading-relaxed whitespace-pre-wrap">{String(value)}</p>
+                  </div>
+                ))
+              }
+              {(!viewingDoc.content || Object.keys(viewingDoc.content).length === 0) && (
+                <p className="text-white/30 text-sm text-center py-8">No content available</p>
+              )}
+            </div>
+            {viewingDoc.ai_feedback && (viewingDoc.ai_feedback as Record<string, unknown>).overall_score && (
+              <div className="border-t border-white/8 p-4 flex items-center gap-3 bg-white/[0.02]">
+                <div className={cn(
+                  "w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold shrink-0",
+                  (viewingDoc.ai_feedback as Record<string, unknown>).signal === "strong"
+                    ? "border-green-500 text-green-400" : "border-amber-500 text-amber-400"
+                )}>
+                  {String((viewingDoc.ai_feedback as Record<string, unknown>).overall_score)}
+                </div>
+                <p className="text-xs text-white/50 flex-1">
+                  AI score: {String((viewingDoc.ai_feedback as Record<string, unknown>).summary ?? "").substring(0, 120)}...
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );
@@ -2383,7 +2584,6 @@ function InviteModal({
           supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
           supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
           appUrl: import.meta.env.VITE_APP_URL || "https://hockystick.app",
-          resendKey: (import.meta.env as any).VITE_RESEND_API_KEY || "",
           dealRoomName,
           founderName,
           startupName: companyName,
@@ -2575,9 +2775,9 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
                     "px-2.5 py-1 rounded-md text-xs font-medium transition-colors",
                     noteVisibility === v
                       ? v === "public"
-                        ? "bg-brand text-white shadow-sm"
+                        ? "bg-brand text-brand-foreground shadow-sm"
                         : v === "team"
-                        ? "bg-blue-500 text-white shadow-sm"
+                        ? "bg-blue-500 text-foreground shadow-sm"
                         : "bg-warning text-warning-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground"
                   )}
@@ -2819,6 +3019,122 @@ function MeetingCard({ m }: { m: any }) {
 // ── Investor Decision Tab ─────────────────────────────────────────
 function InvestorDecisionTab({ dealRoomId, userId }: { dealRoomId: string; userId?: string }) {
   const queryClient = useQueryClient();
+  // ── Closer state ──────────────────────────────────────────────────
+  const [selectedDecision, setSelectedDecision] = useState<"invest" | "hold" | "pass" | null>(null);
+  const [decisionReason, setDecisionReason] = useState("");
+  const [followUpDate, setFollowUpDate] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [closerError, setCloserError] = useState<string | null>(null);
+  const [showChangeDecision, setShowChangeDecision] = useState(false);
+  const [showTermSheet, setShowTermSheet] = useState(false);
+  const [termSheet, setTermSheet] = useState({
+    investment_amount: "", valuation_pre_money: "", instrument: "safe",
+    board_seat: false, pro_rata_rights: false, information_rights: true, notes: "",
+  });
+  const [savingTermSheet, setSavingTermSheet] = useState(false);
+
+  // ── Room query (for decision columns) ────────────────────────────
+  const { data: roomData, refetch: refetchRoom } = useQuery({
+    queryKey: ["closer-room", dealRoomId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("deal_rooms")
+        .select("id, status, decision, decision_reason, decision_at, follow_up_date, startup_id")
+        .eq("id", dealRoomId)
+        .single();
+      return data as any;
+    },
+  });
+
+  const existingDecision = roomData?.decision as string | null;
+
+  // Auto-calc equity
+  const equityPct = termSheet.investment_amount && termSheet.valuation_pre_money
+    ? ((Number(termSheet.investment_amount) / (Number(termSheet.valuation_pre_money) + Number(termSheet.investment_amount))) * 100).toFixed(2)
+    : "";
+
+  async function handleRecordDecision() {
+    if (!selectedDecision) { setCloserError("Select a decision."); return; }
+    if (decisionReason.trim().length < 20) { setCloserError("Please provide a specific reason (at least 20 characters)."); return; }
+    if (selectedDecision === "hold" && !followUpDate) { setCloserError("Please set a follow-up date for Hold decisions."); return; }
+    setIsSubmitting(true);
+    setCloserError(null);
+    try {
+      const { error } = await supabase.from("deal_rooms").update({
+        decision: selectedDecision,
+        decision_reason: decisionReason.trim(),
+        decision_at: new Date().toISOString(),
+        follow_up_date: followUpDate || null,
+        status: selectedDecision === "pass" ? "closed" : selectedDecision === "invest" ? "closing" : "active",
+        closed_at: selectedDecision === "pass" ? new Date().toISOString() : null,
+      }).eq("id", dealRoomId);
+      if (error) { setCloserError("Failed to record decision. Try again."); setIsSubmitting(false); return; }
+
+      // Notify founder
+      if (roomData?.startup_id) {
+        const { data: startup } = await supabase.from("startups").select("founder_id").eq("id", roomData.startup_id).maybeSingle();
+        if (startup?.founder_id) {
+          await supabase.from("notifications").insert({
+            user_id: startup.founder_id,
+            kind: "deal",
+            title: selectedDecision === "invest" ? "Investment interest recorded" : selectedDecision === "hold" ? "Investor has put your deal on hold" : "Investor decision recorded",
+            body: selectedDecision === "pass"
+              ? `The investor passed on your deal. Their reason: "${decisionReason.substring(0, 100)}"`
+              : selectedDecision === "hold"
+              ? `The investor is holding the decision until ${followUpDate}. Their note: "${decisionReason.substring(0, 100)}"`
+              : `An investor wants to proceed. Check your deal room for next steps.`,
+            read: false,
+            action_url: "/app/deal-rooms",
+          });
+        }
+      }
+
+      if (selectedDecision === "invest") setShowTermSheet(true);
+      refetchRoom();
+      queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
+      toast.success("Decision recorded");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function saveTermSheet() {
+    setSavingTermSheet(true);
+    try {
+      const { data: startup } = await supabase.from("startups").select("founder_id").eq("id", roomData?.startup_id).maybeSingle();
+      await supabase.from("term_sheets").insert({
+        deal_room_id: dealRoomId,
+        startup_id: roomData?.startup_id,
+        investor_id: userId,
+        investment_amount: Number(termSheet.investment_amount) || null,
+        valuation_pre_money: Number(termSheet.valuation_pre_money) || null,
+        equity_percentage: Number(equityPct) || null,
+        instrument: termSheet.instrument,
+        board_seat: termSheet.board_seat,
+        pro_rata_rights: termSheet.pro_rata_rights,
+        information_rights: termSheet.information_rights,
+        notes: termSheet.notes || null,
+        status: "draft",
+      });
+      if (startup?.founder_id) {
+        await supabase.from("notifications").insert({
+          user_id: startup.founder_id,
+          kind: "deal",
+          title: "Term sheet created",
+          body: "An investor has created a term sheet for your deal room. Review it now.",
+          read: false,
+          action_url: "/app/deal-rooms",
+        });
+      }
+      setShowTermSheet(false);
+      toast.success("Term sheet saved");
+    } finally {
+      setSavingTermSheet(false);
+    }
+  }
+
+  // ── Legacy assessment state ───────────────────────────────────────
   const [saving, setSaving] = useState(false);
   const [savingAssessment, setSavingAssessment] = useState(false);
   const [notes, setNotes] = useState("");
@@ -2831,11 +3147,7 @@ function InvestorDecisionTab({ dealRoomId, userId }: { dealRoomId: string; userI
     queryKey: ["investor-decision-tab", dealRoomId],
     enabled: !!userId,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("deal_rooms")
-        .select("investor_decision, investor_scores, investor_notes")
-        .eq("id", dealRoomId)
-        .single();
+      const { data } = await supabase.from("deal_rooms").select("investor_decision, investor_scores, investor_notes").eq("id", dealRoomId).single();
       return data;
     },
   });
@@ -2843,35 +3155,10 @@ function InvestorDecisionTab({ dealRoomId, userId }: { dealRoomId: string; userI
   useEffect(() => {
     if (decisionData && !loaded) {
       setNotes((decisionData as any).investor_notes ?? "");
-      if ((decisionData as any).investor_scores) {
-        setScores((s) => ({ ...s, ...((decisionData as any).investor_scores as Record<string, number>) }));
-      }
+      if ((decisionData as any).investor_scores) setScores((s) => ({ ...s, ...((decisionData as any).investor_scores as Record<string, number>) }));
       setLoaded(true);
     }
   }, [decisionData, loaded]);
-
-  const currentDecision = (decisionData as any)?.investor_decision as string | null;
-
-  const handleDecision = async (d: string) => {
-    setSaving(true);
-    try {
-      await supabase.from("deal_rooms").update({ investor_decision: d }).eq("id", dealRoomId);
-      await queryClient.invalidateQueries({ queryKey: ["investor-decision-tab", dealRoomId] });
-      await queryClient.invalidateQueries({ queryKey: ["investor-decisions-rooms"] });
-      await queryClient.invalidateQueries({ queryKey: ["investor-rooms"] });
-      toast.success(`Decision set: ${d}`);
-      if (userId && (d === "invest" || d === "hold" || d === "pass")) {
-        const decisionMap: Record<string, "Invest" | "Hold" | "Pass"> = {
-          invest: "Invest", hold: "Hold", pass: "Pass",
-        };
-        triggerDecisionEmail({
-          data: { dealRoomId, investorUserId: userId, decision: decisionMap[d], note: notes || undefined },
-        }).catch(() => {});
-      }
-    } finally {
-      setSaving(false);
-    }
-  };
 
   const handleSaveAssessment = async () => {
     setSavingAssessment(true);
@@ -2879,9 +3166,7 @@ function InvestorDecisionTab({ dealRoomId, userId }: { dealRoomId: string; userI
       await supabase.from("deal_rooms").update({ investor_notes: notes, investor_scores: scores }).eq("id", dealRoomId);
       await queryClient.invalidateQueries({ queryKey: ["investor-decision-tab", dealRoomId] });
       toast.success("Assessment saved");
-    } finally {
-      setSavingAssessment(false);
-    }
+    } finally { setSavingAssessment(false); }
   };
 
   const setScore = (key: string, val: number) => setScores((s) => ({ ...s, [key]: val }));
@@ -2895,46 +3180,203 @@ function InvestorDecisionTab({ dealRoomId, userId }: { dealRoomId: string; userI
     { key: "overall_fit", label: "Overall fit" },
   ];
 
-  const decisionConfig = {
-    invest: { label: "Invest", emoji: "✅", cls: "border-success/40 text-success hover:bg-success/10", activeCls: "bg-success/15 border-success text-success font-semibold" },
-    hold: { label: "Hold", emoji: "⏸", cls: "border-warning/40 text-warning hover:bg-warning/10", activeCls: "bg-warning/15 border-warning text-warning font-semibold" },
-    pass: { label: "Pass", emoji: "❌", cls: "border-destructive/40 text-destructive hover:bg-destructive/10", activeCls: "bg-destructive/15 border-destructive text-destructive font-semibold" },
-  } as const;
+  const inputCls = "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#7C3AED]/60";
 
   return (
-    <div className="p-8 max-w-2xl mx-auto">
-      <h2 className="text-xl font-semibold tracking-tight">Investment Decision</h2>
-      <p className="mt-1 text-sm text-muted-foreground">Your confidential assessment of this deal</p>
+    <div className="p-8 max-w-2xl mx-auto space-y-6">
 
-      {/* Decision buttons */}
-      <div className="mt-6 grid grid-cols-3 gap-3">
-        {(["invest", "hold", "pass"] as const).map((key) => {
-          const cfg = decisionConfig[key];
-          return (
-            <button
-              key={key}
-              onClick={() => handleDecision(key)}
-              disabled={saving}
-              className={cn(
-                "rounded-xl border px-4 py-5 text-sm transition-all disabled:opacity-50 flex flex-col items-center gap-2",
-                currentDecision === key ? cfg.activeCls : cfg.cls,
-              )}
-            >
-              <span className="text-2xl">{cfg.emoji}</span>
-              <span>{cfg.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {currentDecision && (
-        <div className="mt-3 text-xs text-muted-foreground">
-          Current decision: <span className="font-medium capitalize">{currentDecision}</span>
+      {/* ── Decision banner (after decision recorded) ─────────────── */}
+      {existingDecision === "invest" && !showChangeDecision && (
+        <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20">
+          <p className="text-green-400 font-semibold text-sm">✓ Investment interest recorded</p>
+          <p className="text-white/60 text-sm mt-1">Your reason: {roomData?.decision_reason}</p>
+          <button onClick={() => setShowTermSheet(true)} className="mt-3 px-4 py-2 bg-[#7C3AED] text-white text-sm rounded-lg hover:bg-[#6d28d9] transition-colors">
+            Create term sheet →
+          </button>
+          <button onClick={() => setShowChangeDecision(true)} className="mt-2 block text-xs text-white/30 hover:text-white/60">Change decision →</button>
+        </div>
+      )}
+      {existingDecision === "hold" && !showChangeDecision && (
+        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+          <p className="text-amber-400 font-semibold text-sm">⏸ On hold until {roomData?.follow_up_date}</p>
+          <p className="text-white/60 text-sm mt-1">Your reason: {roomData?.decision_reason}</p>
+          <button onClick={() => setShowChangeDecision(true)} className="mt-3 text-xs text-white/40 hover:text-white/70">Change decision →</button>
+        </div>
+      )}
+      {existingDecision === "pass" && !showChangeDecision && (
+        <div className="p-4 rounded-xl bg-white/5 border border-white/8">
+          <p className="text-white/50 font-semibold text-sm">✗ Passed</p>
+          <p className="text-white/40 text-sm mt-1">Your reason was shared with the founder: "{roomData?.decision_reason}"</p>
         </div>
       )}
 
+      {/* ── Decision panel (no decision yet, or changing) ─────────── */}
+      {(!existingDecision || showChangeDecision) && (
+        <div className="rounded-xl border border-white/10 bg-[#111118] p-6">
+          <h2 className="text-base font-bold text-white" style={{ fontFamily: "Syne, sans-serif" }}>Record your decision</h2>
+          <p className="text-xs text-white/40 mt-1">Founders receive your stated reason.</p>
+
+          <div className="mt-5 grid grid-cols-3 gap-3">
+            {(["invest", "hold", "pass"] as const).map((key) => {
+              const cfg = {
+                invest: { label: "Invest", icon: "✓", base: "bg-green-500/20 text-green-400 border-green-500/40", active: "bg-green-500/40 border-green-400" },
+                hold:   { label: "Hold",   icon: "⏸", base: "bg-amber-500/20 text-amber-400 border-amber-500/40", active: "bg-amber-500/40 border-amber-400" },
+                pass:   { label: "Pass",   icon: "✗", base: "bg-red-500/20 text-red-400 border-red-500/40",     active: "bg-red-500/40 border-red-400" },
+              }[key];
+              return (
+                <button key={key} onClick={() => setSelectedDecision(key)}
+                  className={cn("rounded-xl border px-4 py-4 text-sm font-medium transition-all flex flex-col items-center gap-1.5",
+                    selectedDecision === key ? cfg.active : cfg.base)}>
+                  <span className="text-lg">{cfg.icon}</span>
+                  <span>{cfg.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {selectedDecision === "hold" && (
+            <div className="mt-4">
+              <label className="text-xs text-white/40 uppercase tracking-wider block mb-1">Follow-up date *</label>
+              <input type="date" value={followUpDate} onChange={(e) => setFollowUpDate(e.target.value)}
+                min={new Date().toISOString().split("T")[0]}
+                className={inputCls} />
+              <p className="text-xs text-white/30 mt-1">We'll remind you on this date to revisit the deal.</p>
+            </div>
+          )}
+
+          <div className="mt-4">
+            <label className="text-xs text-white/40 uppercase tracking-wider block mb-1">Reason (required) *</label>
+            <textarea value={decisionReason} onChange={(e) => setDecisionReason(e.target.value)} rows={3}
+              placeholder="Be specific. Founders deserve to know why."
+              className={cn(inputCls, "resize-none")} />
+            <p className="text-[10px] text-white/30 mt-0.5">{decisionReason.length}/20 min characters</p>
+          </div>
+
+          {closerError && <p className="mt-2 text-xs text-red-400">{closerError}</p>}
+
+          <div className="mt-4 flex items-center gap-3">
+            <button onClick={handleRecordDecision} disabled={isSubmitting}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#7C3AED] text-white text-sm font-medium hover:bg-[#6d28d9] disabled:opacity-50 transition-colors">
+              {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              Record decision
+            </button>
+            {showChangeDecision && (
+              <button onClick={() => setShowChangeDecision(false)} className="text-sm text-white/40 hover:text-white/70">Cancel</button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Term sheet modal ──────────────────────────────────────── */}
+      {showTermSheet && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onClick={() => setShowTermSheet(false)}>
+          <div className="bg-[#111118] border border-white/10 rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-6 border-b border-white/8">
+              <div>
+                <h2 className="text-base font-bold text-white" style={{ fontFamily: "Syne, sans-serif" }}>Term Sheet</h2>
+                <p className="text-xs text-white/40 mt-0.5">A lightweight summary of proposed terms</p>
+              </div>
+              <button onClick={() => setShowTermSheet(false)} className="text-white/40 hover:text-white text-xl">×</button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="text-xs text-white/40 uppercase tracking-wider block mb-1">Investment amount (USD)</label>
+                <input type="number" value={termSheet.investment_amount}
+                  onChange={(e) => setTermSheet((t) => ({ ...t, investment_amount: e.target.value }))}
+                  placeholder="500000" className={inputCls} />
+              </div>
+              <div>
+                <label className="text-xs text-white/40 uppercase tracking-wider block mb-1">Pre-money valuation (USD)</label>
+                <input type="number" value={termSheet.valuation_pre_money}
+                  onChange={(e) => setTermSheet((t) => ({ ...t, valuation_pre_money: e.target.value }))}
+                  placeholder="5000000" className={inputCls} />
+              </div>
+              {equityPct && (
+                <div className="px-3 py-2 rounded-lg bg-[#7C3AED]/10 border border-[#7C3AED]/20">
+                  <p className="text-xs text-[#7C3AED]">Equity: <span className="font-bold">{equityPct}%</span> (auto-calculated)</p>
+                </div>
+              )}
+              <div>
+                <label className="text-xs text-white/40 uppercase tracking-wider block mb-1">Instrument</label>
+                <select value={termSheet.instrument} onChange={(e) => setTermSheet((t) => ({ ...t, instrument: e.target.value }))}
+                  className={inputCls}>
+                  <option value="safe">SAFE</option>
+                  <option value="convertible_note">Convertible Note</option>
+                  <option value="equity">Equity</option>
+                  <option value="priced">Priced Round</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs text-white/40 uppercase tracking-wider block">Rights</label>
+                {([
+                  { key: "information_rights", label: "Information rights" },
+                  { key: "board_seat", label: "Board seat" },
+                  { key: "pro_rata_rights", label: "Pro-rata rights" },
+                ] as const).map(({ key, label }) => (
+                  <label key={key} className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={termSheet[key]}
+                      onChange={(e) => setTermSheet((t) => ({ ...t, [key]: e.target.checked }))}
+                      className="accent-[#7C3AED]" />
+                    <span className="text-sm text-white/70">{label}</span>
+                  </label>
+                ))}
+              </div>
+              <div>
+                <label className="text-xs text-white/40 uppercase tracking-wider block mb-1">Notes / conditions</label>
+                <textarea value={termSheet.notes} onChange={(e) => setTermSheet((t) => ({ ...t, notes: e.target.value }))}
+                  rows={3} placeholder="Any conditions or special terms…"
+                  className={cn(inputCls, "resize-none")} />
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3 px-6 pb-2">
+              <button onClick={() => setShowTermSheet(false)} className="px-4 py-2 text-sm rounded-lg border border-white/10 text-white/60 hover:text-white hover:bg-white/5">Cancel</button>
+              <button onClick={saveTermSheet} disabled={savingTermSheet}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-[#7C3AED] text-white hover:bg-[#6d28d9] disabled:opacity-50 transition-colors">
+                {savingTermSheet && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                Save term sheet
+              </button>
+            </div>
+            <div className="px-6 pb-6">
+              <div className="flex items-center gap-3 mt-4">
+                <div className="flex-1 h-px bg-white/10" />
+                <span className="text-xs text-white/30">or</span>
+                <div className="flex-1 h-px bg-white/10" />
+              </div>
+              <input type="file" id="ts-upload" className="hidden" accept=".pdf,.docx,.doc"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file || !(room as any)?.startup_id) return;
+                  const path = `term-sheets/${dealRoomId}/${file.name}`;
+                  const { error } = await supabase.storage
+                    .from("documents").upload(path, file, { upsert: true });
+                  if (!error) {
+                    await supabase.from("term_sheets").upsert({
+                      deal_room_id: dealRoomId,
+                      startup_id: (room as any).startup_id,
+                      investor_id: user?.id,
+                      status: "draft",
+                      notes: `Uploaded: ${file.name}`,
+                    }, { onConflict: "deal_room_id" });
+                    setShowTermSheet(false);
+                    queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
+                  }
+                }}
+              />
+              <button onClick={() => document.getElementById("ts-upload")?.click()}
+                className="mt-3 w-full py-2.5 border border-white/15 rounded-lg text-sm text-white/50 hover:text-white/80 hover:border-white/30 transition-colors">
+                Upload term sheet (PDF or Word)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <h2 className="text-xl font-semibold tracking-tight">Investment Decision</h2>
+      <p className="-mt-4 text-sm text-muted-foreground">Your confidential assessment of this deal</p>
+
       {/* Scoring */}
-      <div className="mt-8 rounded-xl border border-border/60 bg-card p-5 shadow-card">
+      <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
         <div className="text-sm font-semibold mb-4">Scoring</div>
         <div className="space-y-4">
           {scoreCategories.map(({ key, label }) => (

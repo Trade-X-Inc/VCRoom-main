@@ -1,36 +1,40 @@
 import { Link } from "@tanstack/react-router";
-import { Bell, MessageSquare, Briefcase, Sparkles, UserPlus, Settings, CheckCheck } from "lucide-react";
+import { Bell, MessageSquare, Briefcase, Sparkles, UserPlus, Settings, CheckCheck, Eye } from "lucide-react";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { formatDistanceToNow } from "date-fns";
 
-type NotifType = "decision" | "message" | "invite" | "system" | string;
+type NotifKind = "decision" | "deal" | "message" | "invite" | "system" | "match" | "view" | string;
 
 interface NotifRow {
   id: string;
   title: string;
   body: string;
-  type: NotifType;
+  kind: NotifKind;
   read: boolean;
   action_url: string | null;
+  meta: Record<string, any> | null;
   created_at: string;
 }
 
-const iconFor = (type: NotifType) => {
-  if (type === "decision") return Briefcase;
-  if (type === "message") return MessageSquare;
-  if (type === "invite") return UserPlus;
-  if (type === "ai") return Sparkles;
+const iconFor = (kind: NotifKind) => {
+  if (kind === "decision" || kind === "deal") return Briefcase;
+  if (kind === "message") return MessageSquare;
+  if (kind === "invite") return UserPlus;
+  if (kind === "ai") return Sparkles;
+  if (kind === "view") return Eye;
   return Settings;
 };
 
-const tintFor = (type: NotifType) => {
-  if (type === "decision") return "bg-success/10 text-success";
-  if (type === "message") return "bg-brand/10 text-brand";
-  if (type === "invite") return "bg-warning/10 text-warning";
-  if (type === "ai") return "bg-violet/10 text-violet";
+const tintFor = (kind: NotifKind) => {
+  if (kind === "decision" || kind === "deal") return "bg-success/10 text-success";
+  if (kind === "message") return "bg-brand/10 text-brand";
+  if (kind === "invite") return "bg-warning/10 text-warning";
+  if (kind === "ai") return "bg-violet/10 text-violet";
+  if (kind === "match") return "bg-[#7C3AED]/10 text-[#7C3AED]";
+  if (kind === "view") return "bg-blue-500/10 text-blue-400";
   return "bg-muted text-muted-foreground";
 };
 
@@ -45,7 +49,7 @@ export function NotificationBell() {
     queryFn: async () => {
       const { data } = await supabase
         .from("notifications")
-        .select("id, title, body, type, read, action_url, created_at")
+        .select("id, title, body, kind, read, action_url, meta, created_at")
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false })
         .limit(20);
@@ -96,18 +100,33 @@ export function NotificationBell() {
                 <div className="py-8 text-center text-xs text-muted-foreground">No notifications yet.</div>
               )}
               {items.slice(0, 10).map((n) => {
-                const Icon = iconFor(n.type);
+                const isMatch = n.kind === "match";
+                const isView = n.kind === "view";
+                const Icon = iconFor(n.kind);
                 const content = (
                   <div className={`flex gap-3 p-3.5 hover:bg-accent/50 transition-colors cursor-pointer ${!n.read ? "bg-brand/[0.02]" : ""}`}>
-                    <div className={`grid h-8 w-8 place-items-center rounded-md shrink-0 ${tintFor(n.type)}`}>
-                      <Icon className="h-4 w-4" />
+                    <div className={`grid h-8 w-8 place-items-center rounded-md shrink-0 text-sm font-bold ${tintFor(n.kind)}`}>
+                      {isMatch ? "✦" : <Icon className="h-4 w-4" />}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
-                        <div className="text-sm font-medium leading-tight">{n.title}</div>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <div className="text-sm font-medium leading-tight">{n.title}</div>
+                          {isMatch && n.meta?.match_score && (
+                            <span className="text-xs bg-[#7C3AED]/20 text-[#7C3AED] px-1.5 py-0.5 rounded font-semibold shrink-0">
+                              {n.meta.match_score}%
+                            </span>
+                          )}
+                        </div>
                         {!n.read && <span className="h-1.5 w-1.5 rounded-full bg-brand mt-1.5 shrink-0" />}
                       </div>
-                      <div className="mt-0.5 text-xs text-muted-foreground line-clamp-2">{n.body}</div>
+                      {isView && n.meta?.viewer_name ? (
+                        <div className="mt-0.5 text-xs text-white/50">
+                          👁 {n.meta.viewer_name} opened a document
+                        </div>
+                      ) : (
+                        <div className="mt-0.5 text-xs text-muted-foreground line-clamp-2">{n.body}</div>
+                      )}
                       <div className="mt-1 text-[10px] text-muted-foreground/70">
                         {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
                       </div>

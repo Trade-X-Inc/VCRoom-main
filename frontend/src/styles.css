@@ -1,6 +1,13 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+/* ── Mobile globals ──────────────────────────────────────────────── */
+* { -webkit-tap-highlight-color: transparent; }
+img { max-width: 100%; height: auto; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
 
 @custom-variant dark (&:is(.dark *));
 

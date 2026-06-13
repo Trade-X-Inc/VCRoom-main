@@ -3,9 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 import { getEnvVar } from "@/lib/env";
 
 const systemPrompt = `You are an expert fundraising advisor helping startup founders write concise, personalized investor outreach emails.
-Return ONLY valid JSON in this exact format:
-{"subject":"...","body":"..."}
-No markdown, no explanation, just the JSON object.`;
+Respond ONLY with valid JSON. No markdown, no code fences, no explanation.
+{"subject":"...","body":"..."}`;
 
 type LeadData = {
   id: string;
@@ -28,8 +27,9 @@ export const generateOutreachEmail = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): EmailInput => data as EmailInput)
   .handler(async ({ data }: { data: EmailInput }) => {
     const supabaseUrl = getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
-    const serviceKey = getEnvVar("SUPABASE_SERVICE_ROLE_KEY") || getEnvVar("VITE_SUPABASE_SERVICE_ROLE_KEY");
-    const openAIKey = data.openAIKey || getEnvVar("OPENAI_API_KEY");
+    const serviceKey = getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
+    const cfEnv = (globalThis as any).__cf_env || {};
+    const openAIKey = cfEnv.OPENAI_API_KEY || getEnvVar("OPENAI_API_KEY");
     if (!supabaseUrl || !serviceKey) {
       return {
         subject: "Unable to generate",
@@ -99,7 +99,19 @@ Be warm but direct.`;
     // 5. Parse response
     const json = await resp.json() as { choices: Array<{ message: { content: string } }> };
     const raw = json.choices[0]?.message?.content ?? "";
-    const parsed = JSON.parse(raw) as { subject: string; body: string };
+
+    if (!raw.trim()) throw new Error("AI returned empty response");
+
+    const cleaned = raw
+      .replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+
+    let parsed: { subject: string; body: string };
+    try {
+      parsed = JSON.parse(cleaned) as { subject: string; body: string };
+    } catch {
+      console.error("[ai-fn] JSON parse failed, raw:", cleaned.slice(0, 200));
+      throw new Error("AI returned malformed JSON");
+    }
     if (!parsed.subject || !parsed.body) throw new Error("Invalid AI response");
 
     // 6. Log usage

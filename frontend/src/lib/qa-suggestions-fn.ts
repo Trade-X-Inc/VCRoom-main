@@ -11,8 +11,10 @@ type SuggestionsInput = {
 export const getQASuggestions = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): SuggestionsInput => data as SuggestionsInput)
   .handler(async ({ data }: { data: SuggestionsInput }): Promise<{ suggestions: string[] }> => {
-    const openAIKey = getEnvVar("OPENAI_API_KEY");
+    const cfEnv = (globalThis as any).__cf_env || {};
+    const openAIKey = cfEnv.OPENAI_API_KEY || getEnvVar("OPENAI_API_KEY");
     if (!openAIKey) {
+      console.error("[qa-suggestions-fn] OPENAI_API_KEY not found in __cf_env");
       throw new Error('OpenAI API key not configured on server');
     }
 

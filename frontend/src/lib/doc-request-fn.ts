@@ -2,12 +2,9 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 
 function getAdminClient(url?: string, key?: string) {
-  const resolvedUrl = url ||
-    (import.meta.env as any).VITE_SUPABASE_URL ||
-    process.env.SUPABASE_URL || "";
-  const resolvedKey = key ||
-    (import.meta.env as any).VITE_SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+  const cfEnv = (globalThis as any).__cf_env || {};
+  const resolvedUrl = url || cfEnv.SUPABASE_URL || cfEnv.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
+  const resolvedKey = key || cfEnv.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || "";
   if (!resolvedUrl || !resolvedKey)
     throw new Error(`Missing Supabase config URL:${!!resolvedUrl} KEY:${!!resolvedKey}`);
   return createClient(resolvedUrl, resolvedKey, { auth: { persistSession: false } });

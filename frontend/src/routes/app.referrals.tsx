@@ -1,22 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Copy, Check, Gift } from "lucide-react";
+import { Copy, Check, Gift, Users } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { generateReferralCode, getReferralStats } from "@/lib/referral";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/referrals")({
-  head: () => ({
-    meta: [{ title: "Referrals — Hockystick" }],
-  }),
-  beforeLoad: async ({ context }) => {
-    if (!context.user?.id || context.user?.role !== "founder") {
-      throw new Error("Unauthorized");
-    }
-  },
+  head: () => ({ meta: [{ title: "Referrals — Hockystick" }] }),
   component: Referrals,
 });
 
@@ -24,32 +16,26 @@ function Referrals() {
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
 
-  if (!user?.id) {
-    return <div>Loading...</div>;
-  }
+  const referralCode = user?.id ? generateReferralCode(user.id) : "";
+  const referralLink = user?.id
+    ? `${typeof window !== "undefined" ? window.location.origin : "https://hockystick.app"}/invite?ref=${referralCode}`
+    : "";
 
-  const referralCode = generateReferralCode(user.id);
-  const referralLink = `${window.location.origin}/invite?ref=${referralCode}`;
-
-  // Get referral stats
   const { data: stats } = useQuery({
-    queryKey: ["referral-stats", user.id],
-    enabled: !!user.id,
-    queryFn: () => getReferralStats(user.id),
+    queryKey: ["referral-stats", user?.id],
+    enabled: !!user?.id,
+    queryFn: () => getReferralStats(user!.id),
   });
 
-  // Get list of referrals
-  const { data: referrals } = useQuery({
-    queryKey: ["referrals-list", user.id],
-    enabled: !!user.id,
+  const { data: referrals = [] } = useQuery({
+    queryKey: ["referrals-list", user?.id],
+    enabled: !!user?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("referrals")
         .select("*")
-        .eq("referrer_id", user.id)
+        .eq("referrer_id", user!.id)
         .order("created_at", { ascending: false });
-
-      if (error) throw error;
       return data ?? [];
     },
   });
@@ -64,118 +50,85 @@ function Referrals() {
   const inviteBonus = Math.floor((stats?.invited ?? 0) / 3);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="p-6 lg:p-8 max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold mb-2">Referrals</h1>
-        <p className="text-muted-foreground">
-          Invite founders and investors to Hockystick and unlock benefits.
+        <h1 className="text-2xl font-semibold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
+          Referrals
+        </h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          Invite others to Hockystick and unlock extra deal rooms.
         </p>
       </div>
 
-      {/* Your Referral Link */}
-      <div className="bg-card border border-border/60 rounded-xl p-6">
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold mb-2">Your referral link</h2>
-          <p className="text-sm text-muted-foreground">
-            Share this link with others. They'll get exclusive founding member benefits.
-          </p>
-        </div>
-
+      {/* Referral link */}
+      <div className="rounded-xl border border-brand/20 bg-brand/10 p-6">
+        <h2 className="text-sm font-semibold mb-1">Your referral link</h2>
+        <p className="text-xs text-muted-foreground mb-4">
+          Share this link. Every 3 people who join = 1 extra deal room for you.
+        </p>
         <div className="flex gap-2">
-          <input
-            type="text"
-            readOnly
-            value={referralLink}
-            className="flex-1 px-3 py-2 border border-border/60 rounded-lg bg-background text-foreground text-sm font-mono"
-          />
-          <Button variant="outline" size="sm" onClick={handleCopy} className="gap-2">
-            {copied ? (
-              <>
-                <Check className="h-4 w-4" /> Copied
-              </>
-            ) : (
-              <>
-                <Copy className="h-4 w-4" /> Copy
-              </>
-            )}
-          </Button>
+          <input readOnly value={referralLink}
+            className="flex-1 px-3 py-2 rounded-lg border border-border/60 bg-background text-sm font-mono text-muted-foreground" />
+          <button onClick={handleCopy}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-brand text-brand-foreground text-sm font-semibold hover:bg-brand/90 transition-colors whitespace-nowrap">
+            {copied ? <><Check className="h-4 w-4" /> Copied</> : <><Copy className="h-4 w-4" /> Copy</>}
+          </button>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid md:grid-cols-3 gap-4">
-        <div className="bg-card border border-border/60 rounded-xl p-6">
-          <div className="text-sm text-muted-foreground mb-1">People invited</div>
-          <div className="text-3xl font-semibold">{stats?.invited ?? 0}</div>
+      <div className="grid sm:grid-cols-3 gap-4">
+        <div className="rounded-xl border border-border/60 bg-card p-5">
+          <div className="text-xs text-muted-foreground mb-1">People invited</div>
+          <div className="text-3xl font-bold text-brand">{stats?.invited ?? 0}</div>
         </div>
-
-        <div className="bg-card border border-border/60 rounded-xl p-6">
-          <div className="text-sm text-muted-foreground mb-1">Joined</div>
-          <div className="text-3xl font-semibold">{stats?.converted ?? 0}</div>
+        <div className="rounded-xl border border-border/60 bg-card p-5">
+          <div className="text-xs text-muted-foreground mb-1">Joined</div>
+          <div className="text-3xl font-bold text-brand">{stats?.converted ?? 0}</div>
         </div>
-
-        <div className="bg-gradient-to-br from-purple-600/20 to-indigo-600/20 border border-purple-500/30 rounded-xl p-6">
-          <div className="flex items-center gap-2 mb-2">
-            <Gift className="h-4 w-4 text-purple-400" />
-            <span className="text-sm font-medium text-purple-300">Bonus unlocked</span>
+        <div className="rounded-xl border border-brand/20 bg-brand/10 p-5">
+          <div className="flex items-center gap-1.5 mb-1">
+            <Gift className="h-3.5 w-3.5 text-brand" />
+            <span className="text-xs font-semibold text-brand">Bonus unlocked</span>
           </div>
-          <div className="text-2xl font-semibold">
-            +{inviteBonus} deal room{inviteBonus !== 1 ? "s" : ""}
-          </div>
-          <p className="text-xs text-muted-foreground mt-2">
-            Every 3 invites = 1 extra deal room
-          </p>
+          <div className="text-2xl font-bold">+{inviteBonus} deal room{inviteBonus !== 1 ? "s" : ""}</div>
+          <p className="text-xs text-muted-foreground mt-1">Every 3 invites = 1 extra deal room</p>
         </div>
       </div>
 
-      {/* Invited People Table */}
-      <div className="bg-card border border-border/60 rounded-xl p-6">
-        <h3 className="font-semibold mb-4">People you've invited</h3>
-
-        {referrals && referrals.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border/60">
-                  <th className="text-left py-3 px-2 font-medium text-muted-foreground">Email</th>
-                  <th className="text-left py-3 px-2 font-medium text-muted-foreground">Status</th>
-                  <th className="text-left py-3 px-2 font-medium text-muted-foreground">Invited</th>
-                </tr>
-              </thead>
-              <tbody>
-                {referrals.map((referral: any) => (
-                  <tr
-                    key={referral.id}
-                    className="border-b border-border/60 hover:bg-background/50 transition-colors"
-                  >
-                    <td className="py-3 px-2">{referral.joinee_email}</td>
-                    <td className="py-3 px-2">
-                      <span
-                        className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                          referral.status === "joined"
-                            ? "bg-green-500/20 text-green-300"
-                            : "bg-yellow-500/20 text-yellow-300"
-                        }`}
-                      >
-                        {referral.status === "joined" ? "Joined" : "Pending"}
-                      </span>
-                    </td>
-                    <td className="py-3 px-2 text-muted-foreground text-xs">
-                      {new Date(referral.created_at).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Referrals table */}
+      <div className="rounded-xl border border-border/60 bg-card p-5">
+        <h3 className="text-sm font-semibold mb-4">People you've invited</h3>
+        {(referrals as any[]).length === 0 ? (
+          <div className="text-center py-8">
+            <Users className="h-8 w-8 mx-auto mb-3 text-muted-foreground/30" />
+            <p className="text-sm text-muted-foreground">No invites sent yet.</p>
           </div>
         ) : (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">You haven't invited anyone yet.</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Share your referral link to get started.
-            </p>
-          </div>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border/60">
+                <th className="text-left py-2 px-2 text-xs font-medium text-muted-foreground">Email</th>
+                <th className="text-left py-2 px-2 text-xs font-medium text-muted-foreground">Status</th>
+                <th className="text-left py-2 px-2 text-xs font-medium text-muted-foreground">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(referrals as any[]).map((r) => (
+                <tr key={r.id} className="border-b border-border/60 last:border-0">
+                  <td className="py-2.5 px-2">{r.joinee_email}</td>
+                  <td className="py-2.5 px-2">
+                    <span className={`inline-block px-2 py-0.5 rounded-full border text-xs font-medium ${r.status === "joined" ? "bg-success/10 text-success border-success/20" : "bg-warning/10 text-warning border-warning/20"}`}>
+                      {r.status === "joined" ? "Joined" : "Pending"}
+                    </span>
+                  </td>
+                  <td className="py-2.5 px-2 text-xs text-muted-foreground">
+                    {new Date(r.created_at).toLocaleDateString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
     </div>

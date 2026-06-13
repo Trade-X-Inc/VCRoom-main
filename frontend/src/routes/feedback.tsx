@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
@@ -13,49 +12,34 @@ export const Route = createFileRoute("/feedback")({
   head: () => ({
     meta: [
       { title: "Feedback — Hockystick" },
-      { name: "description", content: "Send us your feedback to help improve Hockystick." },
+      { name: "description", content: "Help us improve Hockystick." },
     ],
   }),
   component: Feedback,
 });
 
 function Feedback() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    type: "general",
-    rating: 0,
-    message: "",
-  });
+  const [form, setForm] = useState({ name: "", email: "", type: "general", rating: 0, message: "" });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleRatingClick = (value: number) => {
-    setFormData({ ...formData, rating: value });
-  };
+  const set = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       const { error } = await supabase.from("feedback").insert({
-        name: formData.name || null,
-        email: formData.email || null,
-        type: formData.type,
-        rating: formData.rating || null,
-        message: formData.message,
+        name: form.name || null,
+        email: form.email || null,
+        type: form.type,
+        rating: form.rating || null,
+        message: form.message,
       });
-
       if (error) throw error;
-
       setSubmitted(true);
-      setFormData({ name: "", email: "", type: "general", rating: 0, message: "" });
-      toast.success("Thank you for your feedback!");
+      toast.success("Thank you for your feedback.");
     } catch (err) {
       toast.error((err as any).message || "Failed to send feedback");
     } finally {
@@ -66,102 +50,66 @@ function Feedback() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
-      <main className="mx-auto max-w-2xl px-6 py-24 md:py-32">
+
+      <div className="bg-[#0a0a0b] py-16 px-6 text-center">
+        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
+          Share your feedback.
+        </h1>
+        <p className="mt-3 text-gray-400 max-w-lg mx-auto">
+          Help us build a better product. We read every response personally.
+        </p>
+      </div>
+
+      <main className="mx-auto max-w-xl px-6 py-16">
         {submitted ? (
-          <div className="text-center">
+          <div className="text-center py-12">
             <div className="text-5xl mb-4">✓</div>
-            <h1 className="text-3xl md:text-4xl font-semibold mb-4">Thank you!</h1>
-            <p className="text-lg text-muted-foreground">
-              We appreciate your feedback. It helps us build a better product.
-            </p>
+            <h2 className="text-2xl font-bold mb-3" style={{ fontFamily: "Syne, sans-serif" }}>Thank you.</h2>
+            <p className="text-muted-foreground">We appreciate your feedback and will review it soon.</p>
           </div>
         ) : (
-          <>
-            <div className="mb-12">
-              <h1 className="text-3xl md:text-4xl font-semibold mb-4">Send us your feedback</h1>
-              <p className="text-lg text-muted-foreground">
-                Help us improve Hockystick by sharing your thoughts.
-              </p>
+          <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-gray-100 bg-white shadow-lg p-8">
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Name</label>
+              <Input name="name" value={form.name} onChange={set} placeholder="Your name (optional)" />
             </div>
-
-            <form onSubmit={handleSubmit} className="space-y-6 bg-card border border-border/60 rounded-xl p-8">
-              <div>
-                <label className="block text-sm font-medium mb-2">Name</label>
-                <Input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Your name (optional)"
-                />
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Email</label>
+              <Input type="email" name="email" value={form.email} onChange={set} placeholder="your@email.com (optional)" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Feedback type</label>
+              <select name="type" value={form.type} onChange={set}
+                className="w-full px-3 py-2 border border-border/60 rounded-lg bg-background text-foreground text-sm">
+                <option value="general">General</option>
+                <option value="bug">Bug report</option>
+                <option value="feature">Feature request</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Rating</label>
+              <div className="flex gap-1.5">
+                {[1, 2, 3, 4, 5].map((v) => (
+                  <button key={v} type="button" onClick={() => setForm((f) => ({ ...f, rating: v }))}
+                    className="transition-transform hover:scale-110">
+                    <Star className={`h-7 w-7 transition-colors ${v <= form.rating ? "fill-[#7C3AED] text-[#7C3AED]" : "text-gray-300"}`} />
+                  </button>
+                ))}
               </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Email</label>
-                <Input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="your@email.com (optional)"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Feedback type</label>
-                <select
-                  name="type"
-                  value={formData.type}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-border/60 rounded-lg bg-background text-foreground"
-                >
-                  <option value="general">General</option>
-                  <option value="bug">Bug report</option>
-                  <option value="feature">Feature request</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-3">Rating</label>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((value) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => handleRatingClick(value)}
-                      className="transition-transform hover:scale-110"
-                    >
-                      <Star
-                        className={`h-6 w-6 ${
-                          value <= formData.rating
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-muted-foreground"
-                        }`}
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Message</label>
-                <Textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                  placeholder="Tell us what you think..."
-                  className="min-h-32"
-                />
-              </div>
-
-              <Button type="submit" disabled={loading} className="w-full">
-                {loading ? "Sending..." : "Send feedback"}
-              </Button>
-            </form>
-          </>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Message</label>
+              <Textarea name="message" value={form.message} onChange={set} required
+                placeholder="Tell us what you think..." className="min-h-28" />
+            </div>
+            <button type="submit" disabled={loading}
+              className="w-full py-3 rounded-lg bg-[#7C3AED] text-white font-semibold text-sm hover:bg-[#6d28d9] transition-colors disabled:opacity-50">
+              {loading ? "Sending..." : "Send feedback"}
+            </button>
+          </form>
         )}
       </main>
+
       <SiteFooter />
     </div>
   );

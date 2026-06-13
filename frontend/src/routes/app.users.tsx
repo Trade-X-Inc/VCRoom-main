@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { triggerDealRoomInvite } from "@/lib/email/triggers";
 
 export const Route = createFileRoute("/app/users")({
   component: UsersPage,
@@ -331,6 +332,18 @@ function InviteModal({ userId, onClose, onSent }: { userId: string; onClose: () 
       setSentToken(data?.token ?? null);
       toast.success("Invite created");
       onSent();
+      // Send invite email non-blocking
+      if (data?.token) {
+        triggerDealRoomInvite({
+          data: {
+            to: email.trim().toLowerCase(),
+            investorName: "there",
+            founderName: "Your team",
+            companyName: "Hockystick",
+            inviteToken: data.token,
+          },
+        }).catch(() => {});
+      }
     } catch (e: any) {
       toast.error(e.message ?? "Failed to send invite");
     } finally {

@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { triggerWelcomeEmail } from '@/lib/email/triggers'
+import { syncContactToHubSpot } from '@/lib/hubspot'
 
 export const Route = createFileRoute('/auth/callback')({
   component: AuthCallback
@@ -77,9 +78,35 @@ function AuthCallback() {
 
         // Send welcome email only on first sign-up (no prior role = new user)
         if (!existing?.role && upsertResult) {
-          triggerWelcomeEmail({
-            data: { name: fullName, role: finalRole as "founder" | "investor", email: userEmail },
-          }).catch(() => {});
+          try {
+            await triggerWelcomeEmail({
+              data: { userId, name: fullName, role: finalRole as "founder" | "investor", email: userEmail },
+            });
+            console.log("[auth.callback] Welcome email triggered for:", userEmail);
+          } catch (e) {
+            console.error("[auth.callback] Welcome email failed:", e);
+          }
+
+          // Sync to HubSpot via server fn — awaited so it completes before redirect
+          try {
+            const nameParts = fullName.split(' ');
+            await syncContactToHubSpot({
+              data: {
+                email: userEmail,
+                properties: {
+                  firstname: nameParts[0] || "",
+                  lastname: nameParts.slice(1).join(' ') || "",
+                  lifecyclestage: "lead",
+                  hs_lead_status: "NEW",
+                  user_type: finalRole === "founder" ? "Founder" : "Investor",
+                  platform_signup_date: new Date().toISOString().split("T")[0],
+                },
+              },
+            });
+            console.log("[auth.callback] HubSpot sync complete for:", userEmail);
+          } catch (e) {
+            console.error("[auth.callback] HubSpot sync failed:", e);
+          }
         }
 
         window.location.href =

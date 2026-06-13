@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
+import { triggerDealRoomInvite } from "@/lib/email/triggers";
 
 export const Route = createFileRoute("/app/investor/team")({
   component: TeamPage,
@@ -40,15 +41,31 @@ function TeamPage() {
     if (!inviteEmail.trim() || !user?.id) return;
     setSending(true);
     try {
-      const token = crypto.randomUUID();
-      const { error } = await supabase.from("invites").insert({
-        email: inviteEmail.trim().toLowerCase(),
-        role: "investor",
-        invited_by: user.id,
-        token,
-        workspace_name: user.fullName || user.email,
-      });
+      const { data: inserted, error } = await supabase
+        .from("invites")
+        .insert({
+          email: inviteEmail.trim().toLowerCase(),
+          role: "investor",
+          invited_by: user.id,
+          expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        })
+        .select("token")
+        .single();
       if (error) throw error;
+
+      // Send invite email non-blocking
+      if (inserted?.token) {
+        triggerDealRoomInvite({
+          data: {
+            to: inviteEmail.trim().toLowerCase(),
+            investorName: "there",
+            founderName: user.fullName || "Your contact",
+            companyName: user.fullName ? `${user.fullName}'s workspace` : "Hockystick",
+            inviteToken: inserted.token,
+          },
+        }).catch(() => {});
+      }
+
       toast.success(`Invite sent to ${inviteEmail}`);
       setInviteEmail("");
       setShowInvite(false);

@@ -83,23 +83,43 @@ function Leads() {
   const queryClient = useQueryClient();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editLead, setEditLead] = useState<VCLead | null>(null);
+  const [leadsView, setLeadsView] = useState<"my" | "incoming">("my");
   const [csvOpen, setCsvOpen] = useState(false);
   const [view, setView] = useState<"list" | "table" | "kanban">("list");
 
-  const { data: leads = [], isLoading } = useQuery({
+  const { data: leads = [], isLoading: leadsLoading } = useQuery({
     queryKey: ["leads", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      if (!user?.id) return [];
       const { data, error } = await supabase
         .from("vc_leads")
         .select("*")
-        .eq("founder_id", user.id)
+        .eq("founder_id", user!.id)
         .order("updated_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as VCLead[];
     },
   });
+
+  const { data: dealRoomCount = 0 } = useQuery({
+    queryKey: ["leads-deal-room-count", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data: startup } = await supabase
+        .from("startups")
+        .select("id")
+        .eq("founder_id", user!.id)
+        .maybeSingle();
+      if (!startup?.id) return 0;
+      const { count } = await supabase
+        .from("deal_rooms")
+        .select("*", { count: "exact", head: true })
+        .eq("startup_id", startup.id);
+      return count ?? 0;
+    },
+  });
+
+  const isLoading = leadsLoading && !!user?.id;
 
   const grouped = useMemo(() => {
     const map = {} as Record<LeadStatus, VCLead[]>;
@@ -138,15 +158,120 @@ function Leads() {
   };
   const openEdit = (lead: VCLead) => { setEditLead(lead); setDrawerOpen(true); };
 
+  // Incoming connections for founders (discovery_requests pending)
+  const { data: incoming = [], isLoading: incomingLoading } = useQuery({
+    queryKey: ["incoming-connections", user?.id],
+    enabled: !!user?.id && leadsView === "incoming",
+    queryFn: async () => {
+      const { data: founderStartups } = await supabase
+        .from("startups")
+        .select("id")
+        .eq("founder_id", user!.id);
+      const startupIds = founderStartups?.map((s) => s.id) ?? [];
+      if (startupIds.length === 0) return [];
+
+      const { data, error } = await supabase
+        .from("discovery_requests")
+        .select(`
+          id,
+          status,
+          created_at,
+          investor_id,
+          startup_id,
+          vc_lead_id,
+          detail_pack_requested,
+          detail_pack_approved,
+          users!discovery_requests_investor_id_fkey ( full_name, avatar_url ),
+          startups ( company_name, sector, stage )
+        `)
+        .in("startup_id", startupIds)
+        .in("status", ["pending", "connected"])
+        .eq("stage", 1)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+
+      const investorIds = (data ?? []).map((r: any) => r.investor_id).filter(Boolean);
+      const { data: profiles } = investorIds.length
+        ? await supabase
+            .from("investor_profiles")
+            .select("user_id, fund_name, your_name, role, sectors, stages")
+            .in("user_id", investorIds)
+        : { data: [] };
+
+      const enriched = (data ?? []).map((r: any) => ({
+        ...r,
+        investor_profile: profiles?.find((p: any) => p.user_id === r.investor_id) ?? null,
+      }));
+
+      return enriched;
+    },
+  });
+
+  const [removedIds, setRemovedIds] = useState<string[]>([]);
+  const [approvedIds, setApprovedIds] = useState<string[]>([]);
+  const pendingConnections = (incoming as any[]).filter((r) => !removedIds.includes(r.id));
+
+  const handleAccept = async (requestId: string, vcLeadId: string | null) => {
+    if (!user?.id) return;
+    await supabase.from("discovery_requests").update({ status: "connected" }).eq("id", requestId);
+    if (vcLeadId) {
+      await supabase.from("vc_leads").update({ status: "Replied" }).eq("id", vcLeadId);
+    }
+    const req = (incoming as any[]).find((r) => r.id === requestId);
+    if (req) {
+      await supabase.from("notifications").insert({
+        user_id: req.investor_id,
+        kind: "deal",
+        title: "Connection accepted",
+        body: `Your connection request was accepted. Stage 2 coming soon.`,
+        read: false,
+        action_url: "/app/startups",
+      });
+    }
+    setRemovedIds((prev) => [...prev, requestId]);
+    queryClient.invalidateQueries({ queryKey: ["incoming-connections", user?.id] });
+  };
+
+  const handleDecline = async (requestId: string) => {
+    if (!user?.id) return;
+    await supabase.from("discovery_requests").update({ status: "declined" }).eq("id", requestId);
+    setRemovedIds((prev) => [...prev, requestId]);
+    queryClient.invalidateQueries({ queryKey: ["incoming-connections", user?.id] });
+  };
+
+  const handleApproveDetailPack = async (requestId: string) => {
+    if (!user?.id) return;
+    const request = (incoming as any[]).find((r) => r.id === requestId);
+    const { error } = await supabase
+      .from("discovery_requests")
+      .update({ detail_pack_approved: true })
+      .eq("id", requestId);
+
+    if (!error) {
+      if (request) {
+        await supabase.from("notifications").insert({
+          user_id: request.investor_id,
+          kind: "deal",
+          title: "Detail pack approved",
+          body: "The founder approved your detail pack request. View their full profile now.",
+          read: false,
+          action_url: "/app/directory",
+        });
+      }
+      setApprovedIds((prev) => [...prev, requestId]);
+      queryClient.invalidateQueries({ queryKey: ["incoming-connections", user?.id] });
+    }
+  };
+
   // KPI
   const total = leads.length;
   const contacted = leads.filter((l) =>
-    (["Contacted", "Replied", "Meeting Booked"] as LeadStatus[]).includes(l.status),
+    (["Contacted", "Replied"] as LeadStatus[]).includes(l.status),
   ).length;
   const hot = leads.filter((l) =>
     (["Interested", "Meeting Booked"] as LeadStatus[]).includes(l.status),
   ).length;
-  const dealRooms = leads.filter((l) => l.status === "Deal Room Created").length;
+  const dealRooms = dealRoomCount;
 
   return (
     <div className="flex flex-col" style={{ height: "calc(100vh - 4rem)" }}>
@@ -220,32 +345,119 @@ function Leads() {
         ))}
       </div>
 
-      {/* ── View content ── */}
-      {view === "list" && (
-        <div className="flex-1 overflow-y-auto px-8 pb-6 min-h-0">
-          <ListView leads={leads} isLoading={isLoading} onLeadClick={openEdit} />
+      {/* Incoming connections toggle */}
+      <div className="mt-4 px-8">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setLeadsView("my")}
+            className={`px-3 py-1 rounded-md text-sm ${leadsView === "my" ? "bg-brand text-brand-foreground" : "text-muted-foreground hover:bg-accent"}`}
+          >
+            My leads
+          </button>
+          <button
+            onClick={() => setLeadsView("incoming")}
+            className={`px-3 py-1 rounded-md text-sm ${leadsView === "incoming" ? "bg-brand text-brand-foreground" : "text-muted-foreground hover:bg-accent"}`}
+          >
+            Incoming connections
+          </button>
         </div>
-      )}
-      {view === "table" && (
-        <div className="flex-1 overflow-auto px-8 pb-6 min-h-0">
-          <TableView leads={leads} isLoading={isLoading} onLeadClick={openEdit} />
-        </div>
-      )}
-      {view === "kanban" && (
-        <div className="flex-1 overflow-x-auto px-8 pb-6 min-h-0">
-          <div className="flex gap-3 h-full" style={{ minWidth: "max-content" }}>
-            {ALL_STATUSES.map((status) => (
-              <KanbanColumn
-                key={status}
-                status={status}
-                leads={grouped[status] ?? []}
-                isLoading={isLoading}
-                onDrop={handleDrop}
-                onCardClick={openEdit}
-              />
-            ))}
+
+        {leadsView === "incoming" && (
+          <div className="mt-4">
+            {incomingLoading || pendingConnections === null ? (
+              <div className="grid gap-4 md:grid-cols-2">
+                {[1, 2].map((i) => <div key={i} className="rounded-2xl border border-border/60 bg-card h-28 animate-pulse" />)}
+              </div>
+            ) : pendingConnections.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border/60 bg-card p-8 text-center">
+                <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-muted text-muted-foreground">
+                  <Users className="h-5 w-5" />
+                </div>
+                <h3 className="mt-3 text-lg font-semibold">No incoming connections</h3>
+                <p className="mt-1 text-sm text-muted-foreground">You will see connection requests from investors here.</p>
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2">
+                {pendingConnections.map((r: any) => {
+                  const invName = r.investor_profile?.your_name ?? r.users?.full_name ?? "Investor";
+                  return (
+                    <div key={r.id} className="rounded-2xl border border-border/60 bg-card p-4 flex flex-col">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="font-semibold">{invName} <span className="text-xs text-muted-foreground">{r.investor_profile?.fund_name ? `· ${r.investor_profile.fund_name}` : ""}</span></div>
+                          <div className="text-xs text-muted-foreground mt-1">{r.investor_profile?.role ?? "Investor"}</div>
+                        </div>
+                        <div className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleString()}</div>
+                      </div>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {(r.investor_profile?.sectors || []).slice?.(0,3).map((s: string) => (
+                          <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-accent text-muted-foreground">{s}</span>
+                        ))}
+                        {(r.investor_profile?.stages || []).slice?.(0,3).map((s: string) => (
+                          <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-brand/10 text-brand">{s}</span>
+                        ))}
+                      </div>
+                      {(r.detail_pack_requested || r.detail_pack_approved) && (
+                        <div className="mt-3 inline-flex items-center gap-2 flex-wrap">
+                          {r.detail_pack_requested && !r.detail_pack_approved && (
+                            <span className="text-xs rounded-full bg-warning/10 px-2 py-1 font-semibold text-warning">Detail pack requested</span>
+                          )}
+                          {r.detail_pack_approved && (
+                            <span className="text-xs rounded-full bg-success/10 px-2 py-1 font-semibold text-success">Full access granted</span>
+                          )}
+                        </div>
+                      )}
+                      <div className="mt-4 flex gap-2">
+                        {r.status === "pending" ? (
+                          <>
+                            <button onClick={() => handleAccept(r.id, r.vc_lead_id)} className="flex-1 rounded-lg bg-success text-success-foreground px-3 py-2 text-sm">Accept</button>
+                            <button onClick={() => handleDecline(r.id)} className="flex-1 rounded-lg border border-border/60 text-muted-foreground px-3 py-2 text-sm">Decline</button>
+                          </>
+                        ) : r.status === "connected" && r.detail_pack_requested && !r.detail_pack_approved && !approvedIds.includes(r.id) ? (
+                          <button onClick={() => handleApproveDetailPack(r.id)} className="flex-1 rounded-lg bg-[#7C3AED] text-white px-3 py-2 text-sm">Approve detail pack →</button>
+                        ) : (
+                          <button disabled className="flex-1 rounded-lg border border-border/60 bg-white/5 px-3 py-2 text-muted-foreground text-sm">No actions</button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        </div>
+        )}
+      </div>
+
+      {/* ── View content ── */}
+      {leadsView !== "incoming" && (
+        <>
+          {view === "list" && (
+            <div className="flex-1 overflow-y-auto px-8 pb-6 min-h-0">
+              <ListView leads={leads} isLoading={isLoading} onLeadClick={openEdit} />
+            </div>
+          )}
+          {view === "table" && (
+            <div className="flex-1 overflow-auto px-8 pb-6 min-h-0">
+              <TableView leads={leads} isLoading={isLoading} onLeadClick={openEdit} />
+            </div>
+          )}
+          {view === "kanban" && (
+            <div className="flex-1 overflow-x-auto px-8 pb-6 min-h-0">
+              <div className="flex gap-3 h-full" style={{ minWidth: "max-content" }}>
+                {ALL_STATUSES.map((status) => (
+                  <KanbanColumn
+                    key={status}
+                    status={status}
+                    leads={grouped[status] ?? []}
+                    isLoading={isLoading}
+                    onDrop={handleDrop}
+                    onCardClick={openEdit}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* ── Lead drawer ── */}

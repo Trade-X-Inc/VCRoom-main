@@ -13,13 +13,15 @@ type MemoInput = {
 export const generateInvestorMemo = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): MemoInput => data as MemoInput)
   .handler(async ({ data }: { data: MemoInput }): Promise<{ memo: string }> => {
-    const openAIKey = getEnvVar("OPENAI_API_KEY");
+    const cfEnv = (globalThis as any).__cf_env || {};
+    const openAIKey = cfEnv.OPENAI_API_KEY || getEnvVar("OPENAI_API_KEY");
     if (!openAIKey) {
+      console.error("[investor-memo-fn] OPENAI_API_KEY not found in __cf_env");
       throw new Error('OpenAI API key not configured on server');
     }
 
     const supabaseUrl = data.supabaseUrl || getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
-    const supabaseKey = data.supabaseAnonKey || getEnvVar("SUPABASE_SERVICE_ROLE_KEY") || getEnvVar("VITE_SUPABASE_SERVICE_ROLE_KEY");
+    const supabaseKey = data.supabaseAnonKey || getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
 
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Supabase configuration missing on server');

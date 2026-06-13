@@ -1,367 +1,331 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { Check, ArrowRight, ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing — Hockystick" },
-      { name: "description", content: "Free during beta. No credit card. Early members lock in 50% off forever." },
+      { name: "description", content: "Free during beta. No credit card. Raise with confidence — pay for results." },
     ],
   }),
   component: PricingPage,
 });
 
-// ── Plan data ─────────────────────────────────────────────────────
-
-const FOUNDER_PLANS = [
+const plans = [
+  {
+    name: "Free",
+    price: 0,
+    period: "month",
+    tagline: "Test the platform before you commit",
+    borderColor: "border-white/8",
+    badge: "Beta" as string | null,
+    badgeStyle: { background: "rgba(16,185,129,0.15)", color: "#10B981" } as React.CSSProperties,
+    features: [
+      "Verified founder profile",
+      "Public profile page",
+      "1 active deal room",
+      "5 document templates",
+      "3 AI document reviews per month",
+      "Basic investor thesis matching",
+      "Profile view analytics",
+    ],
+    notIncluded: [
+      "Unlimited deal rooms",
+      "Full Document Intelligence Centre",
+      "Investor simulation",
+      "Priority matching",
+      "AI coaching",
+    ],
+    cta: "Start free",
+    ctaUrl: "/sign-up?plan=free",
+    featured: false,
+    comingSoon: false,
+  },
   {
     name: "Starter",
-    price: "Free",
-    period: "forever",
-    desc: "Get started with the basics.",
+    price: 49,
+    period: "month",
+    tagline: "For founders preparing to raise",
+    borderColor: "border-white/10",
+    badge: null as string | null,
+    badgeStyle: {} as React.CSSProperties,
     features: [
-      "1 deal room",
-      "10 VC leads",
-      "5 AI outreach messages/month",
-      "Basic Q&A",
+      "Verified founder profile",
+      "Public profile page (hockystick.app/p/you)",
+      "1 active deal room",
+      "Document Intelligence Centre (10 templates)",
+      "AI document review",
+      "Investor thesis matching",
+      "Profile view analytics",
+      "Email support",
     ],
-    missing: ["AI document summaries", "AI advisor"],
-    cta: "Get started free",
-    ctaHref: "/sign-up?role=founder",
+    notIncluded: [
+      "Unlimited deal rooms",
+      "Investor simulation",
+      "Priority matching",
+    ],
+    cta: "Start raising",
+    ctaUrl: "/sign-up?plan=starter",
     featured: false,
+    comingSoon: false,
   },
   {
     name: "Growth",
-    price: "$49",
-    period: "/month",
-    desc: "For founders running a serious raise.",
+    price: 149,
+    period: "month",
+    tagline: "For founders actively in conversations",
+    borderColor: "border-[#7C3AED]/50",
+    badge: "Most popular",
+    badgeStyle: { background: "#7C3AED", color: "#fff" } as React.CSSProperties,
     features: [
+      "Everything in Starter",
       "Unlimited deal rooms",
-      "100 VC lead imports",
-      "30 AI outreach messages/month",
-      "AI document summaries",
-      "AI advisor",
+      "Full Document Intelligence Centre (16 templates)",
+      "AI investor simulation",
+      "Deal room digital documents",
+      "Investor verification badges visible",
+      "Real-time investor view notifications",
+      "3-day nudge automation",
+      "Priority thesis matching",
       "Priority support",
     ],
-    missing: [],
-    cta: "Start free trial",
-    ctaHref: "/sign-up?role=founder",
+    notIncluded: [
+      "White-glove onboarding",
+      "Custom verification",
+    ],
+    cta: "Start raising",
+    ctaUrl: "/sign-up?plan=growth",
     featured: true,
-    badge: "Most popular",
+    comingSoon: false,
   },
   {
-    name: "Fund",
-    price: "$199",
-    period: "/month",
-    desc: "Everything, unlimited.",
+    name: "Scale",
+    price: 499,
+    period: "month",
+    tagline: "For serious raises of $2M and above",
+    borderColor: "border-white/20",
+    badge: null as string | null,
+    badgeStyle: {} as React.CSSProperties,
     features: [
       "Everything in Growth",
-      "Unlimited VC leads",
-      "Unlimited AI messages",
-      "Custom domain",
+      "Hockystick Verified badge (manual review)",
+      "White-glove profile setup",
+      "Dedicated investor matching",
+      "Deal brief generation for matched investors",
+      "Term sheet builder",
+      "Custom NDA templates",
       "API access",
-      "Dedicated support",
+      "Dedicated account manager",
+      "Priority deal room support",
     ],
-    missing: [],
-    cta: "Contact us",
-    ctaHref: "mailto:hello@hockystick.app",
+    notIncluded: [] as string[],
+    cta: "Talk to us",
+    ctaUrl: "/contact?plan=scale",
     featured: false,
-    isExternal: true,
+    comingSoon: false,
   },
-];
-
-const INVESTOR_PLANS = [
   {
-    name: "Explorer",
-    price: "Free",
-    period: "forever",
-    desc: "Dip your toes in.",
+    name: "Enterprise",
+    price: null as number | null,
+    period: null as string | null,
+    tagline: "For accelerators, funds, and platforms",
+    borderColor: "border-white/8",
+    badge: "Coming soon",
+    badgeStyle: { background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)" } as React.CSSProperties,
     features: [
-      "2 deal rooms",
-      "2 AI analyses/month",
-      "2 due diligence reports",
-      "Basic pipeline",
+      "Multi-founder cohort management",
+      "White-label deal rooms",
+      "Bulk founder onboarding",
+      "Custom verification workflows",
+      "Investor network access",
+      "Analytics dashboard for fund managers",
+      "SLA support",
+      "Custom contract",
     ],
-    missing: ["Investment memo generator", "Portfolio tracking"],
-    cta: "Get started free",
-    ctaHref: "/sign-up?role=investor",
+    notIncluded: [] as string[],
+    cta: "Join waitlist",
+    ctaUrl: "/contact?plan=enterprise",
     featured: false,
-  },
-  {
-    name: "Partner",
-    price: "$49",
-    period: "/month",
-    desc: "For active investors managing real deal flow.",
-    features: [
-      "Unlimited deal rooms",
-      "20 AI analyses/month",
-      "Unlimited DD reports",
-      "Investment memo generator",
-      "Portfolio tracking",
-    ],
-    missing: [],
-    cta: "Start free trial",
-    ctaHref: "/sign-up?role=investor",
-    featured: true,
-    badge: "Most popular",
-  },
-  {
-    name: "Fund",
-    price: "$199",
-    period: "/month",
-    desc: "Built for funds and syndicates.",
-    features: [
-      "Everything in Partner",
-      "Unlimited AI analyses",
-      "Team collaboration (5 seats)",
-      "Custom domain",
-      "API access",
-    ],
-    missing: [],
-    cta: "Contact us",
-    ctaHref: "mailto:hello@hockystick.app",
-    featured: false,
-    isExternal: true,
+    comingSoon: true,
   },
 ];
 
-const PROMISES = [
+const faqs = [
   {
-    title: "Your data is yours",
-    body: "All documents, deal rooms, and contacts can be exported anytime. No lock-in.",
+    q: "Is it really free during beta?",
+    a: "Yes. All features are free during the beta period. When paid plans launch, existing beta users get 60 days free on their chosen tier.",
   },
   {
-    title: "Founding member pricing",
-    body: "Early beta users lock in 50% off paid plans forever. No renegotiating later.",
+    q: "Does Hockystick take a success fee?",
+    a: "No. We charge subscription fees only. There is no success fee or commission on deals closed through the platform.",
   },
   {
-    title: "30-day notice",
-    body: "We'll give you 30 days notice before any feature moves behind a paywall.",
-  },
-];
-
-const FAQS = [
-  {
-    q: "What happens to my data when beta ends?",
-    a: "Nothing. All your data stays exactly where it is. We give 30 days notice before any plan changes — and founding members get locked-in pricing.",
+    q: "Can I switch plans?",
+    a: "Yes. Upgrade or downgrade at any time. Changes take effect on your next billing date.",
   },
   {
-    q: "Will free features disappear?",
-    a: "Core features stay free forever. We'll always have a free tier. Hockystick without a free plan isn't Hockystick.",
+    q: "What is the Hockystick Verified badge?",
+    a: "The Verified badge is a manual review by the Hockystick team confirming your identity and business. It signals to investors that your profile has been independently checked. Available on Scale plan and above.",
   },
   {
-    q: "Can I cancel anytime?",
-    a: "Yes. No contracts, no lock-in. Cancel with one click — no email needed, no questions asked.",
+    q: "Do you support Arabic language?",
+    a: "English-first for now. Arabic interface and Arabic-language AI analysis are on the roadmap for Q4 2026.",
   },
   {
-    q: "Is there a team plan?",
-    a: "Coming soon. Enterprise plans with custom pricing are available now — email hello@hockystick.app and we'll set you up.",
+    q: "What is the accelerator/enterprise plan?",
+    a: "The Enterprise plan lets accelerators and VC firms onboard their entire cohort or portfolio onto Hockystick, with a unified dashboard. Launching Q3 2026 — join the waitlist via the contact form.",
   },
 ];
-
-// ── Sub-components ────────────────────────────────────────────────
-
-function PlanCard({ plan }: { plan: typeof FOUNDER_PLANS[number] }) {
-  const isFree = plan.price === "Free";
-  return (
-    <div className={cn(
-      "relative rounded-2xl border p-7 flex flex-col",
-      plan.featured
-        ? "border-violet-500/60 bg-card shadow-[0_0_40px_-8px_rgba(139,92,246,0.25)]"
-        : "border-border/60 bg-card shadow-card",
-    )}>
-      {plan.featured && "badge" in plan && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-widest font-semibold bg-gradient-to-r from-violet-600 to-purple-600 text-white px-3 py-1 rounded-full whitespace-nowrap">
-          {plan.badge}
-        </div>
-      )}
-
-      <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
-        {plan.name}
-      </div>
-      <div className="flex items-baseline gap-1.5 mb-1">
-        <span className="text-4xl font-bold tracking-tight">{plan.price}</span>
-        <span className="text-sm text-muted-foreground">{plan.period}</span>
-      </div>
-      <p className="text-sm text-muted-foreground mb-6">{plan.desc}</p>
-
-      {"isExternal" in plan && plan.isExternal ? (
-        <a
-          href={plan.ctaHref}
-          className={cn(
-            "flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors mb-7",
-            plan.featured
-              ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:opacity-90"
-              : "border border-border/60 hover:bg-accent",
-          )}
-        >
-          {plan.cta} <ArrowRight className="h-4 w-4" />
-        </a>
-      ) : (
-        <Link
-          to={plan.ctaHref as any}
-          className={cn(
-            "flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors mb-7",
-            plan.featured
-              ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:opacity-90"
-              : isFree
-              ? "border border-border/60 hover:bg-accent"
-              : "border border-border/60 hover:bg-accent",
-          )}
-        >
-          {plan.cta} <ArrowRight className="h-4 w-4" />
-        </Link>
-      )}
-
-      <ul className="space-y-2.5 flex-1">
-        {plan.features.map((f) => (
-          <li key={f} className="flex items-start gap-2.5 text-sm">
-            <Check className="h-4 w-4 text-violet-500 shrink-0 mt-0.5" />
-            {f}
-          </li>
-        ))}
-        {plan.missing.map((f) => (
-          <li key={f} className="flex items-start gap-2.5 text-sm text-muted-foreground/50 line-through">
-            <Check className="h-4 w-4 text-muted-foreground/30 shrink-0 mt-0.5" />
-            {f}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function FaqItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border-b border-border/60 last:border-0">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between py-5 text-left text-sm font-semibold hover:text-brand transition-colors gap-4"
-      >
-        {q}
-        <ChevronDown className={cn("h-4 w-4 shrink-0 text-muted-foreground transition-transform", open && "rotate-180")} />
-      </button>
-      {open && (
-        <p className="pb-5 text-sm text-muted-foreground leading-relaxed">{a}</p>
-      )}
-    </div>
-  );
-}
-
-// ── Page ──────────────────────────────────────────────────────────
 
 function PricingPage() {
-  const [tab, setTab] = useState<"founders" | "investors">("founders");
-  const plans = tab === "founders" ? FOUNDER_PLANS : INVESTOR_PLANS;
-
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-[#0A0A0B]">
       <SiteHeader />
+      <main className="px-6 py-24">
 
-      {/* Beta banner */}
-      <div className="bg-gradient-to-r from-purple-950 to-indigo-950 border-b border-purple-800/40">
-        <div className="mx-auto max-w-7xl px-6 py-4 text-center">
-          <p className="text-sm text-purple-200">
-            🎉 <span className="font-semibold text-white">You're early.</span> Everything is free during beta — no credit card, no limits on core features.{" "}
-            <span className="text-purple-300">Early members get locked-in pricing forever.</span>
+        {/* Hero */}
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <p className="text-xs text-[#7C3AED] uppercase tracking-[0.2em] mb-4">Pricing</p>
+          <h1 className="font-syne font-bold text-4xl md:text-5xl text-white mb-4 leading-tight">
+            Raise with confidence.<br />Pay for results.
+          </h1>
+          <p className="text-white/60 text-lg">
+            Free during beta. Paid plans launch when you're ready.
+            No hidden fees. No success fee on deals.
+          </p>
+          <div className="mt-4 inline-flex items-center gap-2 text-sm text-[#10B981] bg-[#10B981]/10 px-4 py-2 rounded-full">
+            ✓ Free during beta · Upgrade anytime
+          </div>
+        </div>
+
+        {/* Plans grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 max-w-7xl mx-auto mb-4">
+          {plans.map((plan) => (
+            <div
+              key={plan.name}
+              className={`rounded-2xl border p-6 flex flex-col ${plan.borderColor}`}
+              style={{ background: plan.featured ? "rgba(124,58,237,0.05)" : "rgba(255,255,255,0.02)" }}
+            >
+              {/* Badge */}
+              {plan.badge && (
+                <span
+                  className="text-xs font-semibold px-2.5 py-1 rounded-full w-fit mb-4"
+                  style={plan.badgeStyle}
+                >
+                  {plan.badge}
+                </span>
+              )}
+
+              {/* Name + price */}
+              <p className="font-syne font-bold text-white text-xl mb-1">{plan.name}</p>
+              <p className="text-xs text-white/40 mb-4">{plan.tagline}</p>
+
+              {plan.price != null ? (
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-white font-syne">${plan.price}</span>
+                  <span className="text-white/40 text-sm ml-1">/{plan.period}</span>
+                </div>
+              ) : (
+                <div className="mb-6">
+                  <span className="text-2xl font-bold text-white font-syne">Custom</span>
+                </div>
+              )}
+
+              {/* CTA */}
+              <a
+                href={plan.ctaUrl}
+                className={`block text-center py-3 rounded-xl text-sm font-medium mb-6 transition-colors ${
+                  plan.comingSoon
+                    ? "cursor-not-allowed"
+                    : ""
+                }`}
+                style={
+                  plan.featured
+                    ? { background: "#7C3AED", color: "#fff" }
+                    : plan.comingSoon
+                    ? { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.3)" }
+                    : { background: "rgba(255,255,255,0.08)", color: "#fff" }
+                }
+              >
+                {plan.cta}
+              </a>
+
+              {/* Features */}
+              <div className="space-y-2.5 flex-1">
+                {plan.features.map((f, i) => (
+                  <div key={i} className="flex items-start gap-2 text-sm">
+                    <span className="text-[#10B981] mt-0.5 shrink-0">✓</span>
+                    <span className="text-white/70">{f}</span>
+                  </div>
+                ))}
+                {plan.notIncluded.map((f, i) => (
+                  <div key={i} className="flex items-start gap-2 text-sm">
+                    <span className="text-white/20 mt-0.5 shrink-0">○</span>
+                    <span className="text-white/25">{f}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <p className="text-center text-xs text-white/30 mb-16 max-w-2xl mx-auto">
+          All plans are free during beta. Paid plans launch when we're ready to scale.
+        </p>
+
+        {/* Investor pricing note */}
+        <div
+          className="max-w-3xl mx-auto text-center p-8 rounded-2xl border border-white/8 mb-16"
+          style={{ background: "rgba(255,255,255,0.02)" }}
+        >
+          <p className="font-syne font-bold text-white text-xl mb-2">Investors join free</p>
+          <p className="text-white/50 text-sm leading-relaxed">
+            Investors access Hockystick at no charge. Browse verified founder profiles, receive thesis-matched deal flow,
+            open deal rooms, and run structured due diligence — all free. Premium investor features launching Q3 2026.
           </p>
         </div>
-      </div>
 
-      {/* Header */}
-      <section className="mx-auto max-w-3xl px-6 pt-20 pb-10 text-center">
-        <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-4">Pricing</div>
-        <h1 className="text-4xl md:text-6xl font-black tracking-[-0.04em] leading-[1.0]">
-          Honest pricing.<br />No surprises.
-        </h1>
-        <p className="mt-5 text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
-          Start free. Upgrade when your deal flow demands it. Beta users lock in 50% off — forever.
-        </p>
-
-        {/* Tab switcher */}
-        <div className="mt-8 inline-flex rounded-xl border border-border/60 bg-muted/50 p-1 gap-1">
-          {(["founders", "investors"] as const).map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={cn(
-                "rounded-lg px-5 py-2 text-sm font-semibold capitalize transition-all",
-                tab === t
-                  ? "bg-background shadow-sm text-foreground"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              For {t === "founders" ? "Founders" : "Investors"}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* Plan cards */}
-      <section className="mx-auto max-w-6xl px-6 pb-20">
-        <div className="grid md:grid-cols-3 gap-6">
-          {plans.map((plan) => (
-            <PlanCard key={plan.name} plan={plan as any} />
-          ))}
+        {/* Web3 waitlist */}
+        <div
+          className="max-w-3xl mx-auto text-center p-8 rounded-2xl border border-white/5 mb-16"
+          style={{ background: "rgba(255,255,255,0.01)" }}
+        >
+          <span className="text-xs bg-amber-500/15 text-amber-400 px-2 py-0.5 rounded-full">Coming soon</span>
+          <p className="font-syne font-bold text-white text-xl mt-3 mb-2">Hockystick for Web3</p>
+          <p className="text-white/40 text-sm leading-relaxed mb-4">
+            Verified token raises. On-chain due diligence. VARA-compliant deal rooms.
+            Built for the UAE Web3 ecosystem — launching 2027.
+          </p>
+          <a
+            href="/contact?interest=web3"
+            className="text-sm text-white/50 hover:text-white underline underline-offset-2 transition-colors"
+          >
+            Join the Web3 waitlist →
+          </a>
         </div>
 
-        <p className="text-center text-xs text-muted-foreground mt-6">
-          All prices in USD. Billed monthly. Annual plans coming soon with additional savings.
-        </p>
-      </section>
-
-      {/* Beta promise */}
-      <section className="border-y border-border/60 bg-gradient-to-br from-purple-950/30 to-indigo-950/30">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <div className="text-center mb-14">
-            <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-3">Our promise</div>
-            <h2 className="text-3xl md:text-4xl font-black tracking-[-0.03em]">
-              Join now. Pay nothing.<br />Keep your data forever.
-            </h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {PROMISES.map(({ title, body }) => (
-              <div key={title} className="flex flex-col items-center text-center">
-                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-violet-600 to-purple-600 grid place-items-center mb-5 shadow-[0_0_20px_-4px_rgba(139,92,246,0.5)]">
-                  <Check className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="font-bold text-base mb-2">{title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{body}</p>
-              </div>
+        {/* FAQ */}
+        <div className="max-w-2xl mx-auto">
+          <h2 className="font-syne font-bold text-2xl text-white text-center mb-8">Common questions</h2>
+          <div className="space-y-4">
+            {faqs.map((item, i) => (
+              <details
+                key={i}
+                className="border border-white/8 rounded-xl group"
+                style={{ background: "rgba(255,255,255,0.02)" }}
+              >
+                <summary className="flex items-center justify-between p-5 cursor-pointer list-none text-sm font-medium text-white">
+                  {item.q}
+                  <span className="text-white/40 transition-transform group-open:rotate-180 ml-4 shrink-0">↓</span>
+                </summary>
+                <p className="px-5 pb-5 text-sm text-white/60 leading-relaxed">{item.a}</p>
+              </details>
             ))}
           </div>
         </div>
-      </section>
 
-      {/* FAQ */}
-      <section className="mx-auto max-w-2xl px-6 py-20">
-        <div className="text-center mb-12">
-          <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-3">FAQ</div>
-          <h2 className="text-3xl font-black tracking-[-0.03em]">Common questions</h2>
-        </div>
-        <div className="rounded-2xl border border-border/60 bg-card px-6">
-          {FAQS.map((faq) => (
-            <FaqItem key={faq.q} {...faq} />
-          ))}
-        </div>
-
-        <div className="mt-10 text-center rounded-2xl border border-brand/20 bg-brand/5 p-8">
-          <p className="text-sm font-semibold mb-1">Still have questions?</p>
-          <p className="text-sm text-muted-foreground mb-4">We're a small team and we actually reply.</p>
-          <a
-            href="mailto:hello@hockystick.app"
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold px-6 py-2.5 text-sm hover:opacity-90 transition-opacity"
-          >
-            Email us <ArrowRight className="h-4 w-4" />
-          </a>
-        </div>
-      </section>
-
+      </main>
       <SiteFooter />
     </div>
   );

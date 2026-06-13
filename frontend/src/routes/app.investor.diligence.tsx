@@ -83,6 +83,7 @@ function DiligencePage() {
   const userId = user?.id ?? "";
   const qc = useQueryClient();
   const [selectedStartupId, setSelectedStartupId] = useState<string | null>(null);
+  const [showDetail, setShowDetail] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedCat, setExpandedCat] = useState<DDCategory | null>("Financials");
 
@@ -195,9 +196,13 @@ function DiligencePage() {
   const totalProgress = selectedStartupId ? getTotalProgress() : null;
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
+    <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] overflow-hidden">
       {/* Left sidebar — company picker */}
-      <div className="w-72 shrink-0 border-r border-border/60 flex flex-col bg-card overflow-hidden">
+      <div className={cn(
+        "shrink-0 border-r border-border/60 flex flex-col bg-card overflow-hidden",
+        "w-full md:w-72",
+        showDetail ? "hidden md:flex" : "flex",
+      )}>
         <div className="px-4 py-4 border-b border-border/60">
           <div className="flex items-center gap-2 mb-3">
             <ClipboardCheck className="h-4 w-4 text-brand" />
@@ -237,7 +242,7 @@ function DiligencePage() {
             return (
               <button
                 key={s.id}
-                onClick={() => setSelectedStartupId(s.id)}
+                onClick={() => { setSelectedStartupId(s.id); setShowDetail(true); }}
                 className={cn(
                   "w-full text-left px-4 py-3 transition-colors border-b border-border/40 last:border-0",
                   isSelected ? "bg-brand/5 border-l-2 border-l-brand" : "hover:bg-accent/50"
@@ -270,7 +275,19 @@ function DiligencePage() {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className={cn(
+        "flex-1 overflow-y-auto flex flex-col",
+        showDetail ? "flex" : "hidden md:flex",
+      )}>
+        {/* Mobile back button */}
+        {showDetail && (
+          <button
+            onClick={() => setShowDetail(false)}
+            className="md:hidden flex items-center gap-1.5 px-4 py-3 text-sm text-muted-foreground hover:text-foreground border-b border-border/60 shrink-0"
+          >
+            ← Back to list
+          </button>
+        )}
         {!selectedStartup ? (
           <div className="h-full flex items-center justify-center">
             <div className="text-center max-w-sm">

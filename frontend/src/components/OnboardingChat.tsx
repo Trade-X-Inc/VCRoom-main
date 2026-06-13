@@ -23,6 +23,25 @@ interface Msg {
 
 // ── Content ────────────────────────────────────────────────────────
 
+const STARTER_QUESTIONS: Record<"founder" | "investor", string[]> = {
+  founder: [
+    "How does Hockystick help me raise funding?",
+    "What documents do I need to prepare?",
+    "How does investor matching work?",
+    "What is the Hockystick Verified badge?",
+    "How is this different from sending pitch decks?",
+  ],
+  investor: [
+    "How do I find deal flow on Hockystick?",
+    "What does Hockystick Checked mean?",
+    "How does due diligence work here?",
+    "What stages and sectors are on the platform?",
+    "How do I open a deal room?",
+  ],
+};
+
+const MAX_USER_MESSAGES = 10;
+
 const QUICK_REPLIES: Partial<Record<Phase, string[]>> = {
   role: ["I'm a Founder", "I'm an Investor"],
   "f-stage": ["Pre-seed", "Seed", "Series A+", "Just exploring"],
@@ -253,6 +272,9 @@ export function OnboardingChat({
   }
 
   const quickReplies = phase !== "freetext" ? (QUICK_REPLIES[phase] ?? []) : [];
+  const userMessageCount = msgs.filter((m) => m.role === "user").length;
+  const questionsRemaining = Math.max(0, MAX_USER_MESSAGES - userMessageCount);
+  const limitReached = userMessageCount >= MAX_USER_MESSAGES;
 
   // ── Derived dark-mode classes ─────────────────────────────────────
 
@@ -357,26 +379,66 @@ export function OnboardingChat({
         </div>
       )}
 
+      {/* Starter questions — shown when in freetext phase with no user messages yet */}
+      {phase === "freetext" && userMessageCount === 0 && convRole && (
+        <div className="px-4 pb-3 shrink-0">
+          <p className="text-[10px] text-white/30 mb-2 uppercase tracking-wider">Quick questions</p>
+          <div className="flex flex-wrap gap-2">
+            {STARTER_QUESTIONS[convRole]?.map((q, i) => (
+              <button
+                key={i}
+                onClick={() => sendMessage(q)}
+                className={cn(
+                  "text-xs px-3 py-1.5 rounded-full border text-left transition-colors",
+                  darkMode
+                    ? "border-violet-500/30 bg-violet-500/10 text-violet-300 hover:bg-violet-500/20 hover:text-white"
+                    : "border-brand/30 bg-brand/5 text-brand hover:bg-brand hover:text-brand-foreground",
+                )}
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Free text input */}
       {phase === "freetext" && (
         <div className="px-4 pb-4 shrink-0">
-          <div className={cn("flex items-center gap-2 rounded-xl border px-3 py-2 transition-colors", inputWrap)}>
-            <input
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-              placeholder="Ask me anything..."
-              className={cn("flex-1 text-sm bg-transparent outline-none", inputText)}
-            />
-            <button
-              onClick={handleSend}
-              disabled={!input.trim() || isLoading}
-              className={cn("grid h-7 w-7 place-items-center rounded-lg text-white disabled:opacity-40 transition-opacity shrink-0", sendBtn)}
-            >
-              <Send className="h-3.5 w-3.5" />
-            </button>
-          </div>
+          {questionsRemaining <= 5 && questionsRemaining > 0 && (
+            <p className="text-[11px] text-white/30 text-center mb-2">
+              {questionsRemaining} question{questionsRemaining !== 1 ? "s" : ""} remaining
+            </p>
+          )}
+          {limitReached ? (
+            <div className="text-center p-4 rounded-xl border border-white/8 bg-white/3">
+              <p className="text-sm text-white/60 mb-3">You've used all 10 questions.</p>
+              <a
+                href="/sign-up"
+                className="inline-block px-4 py-2 bg-[#7C3AED] text-white rounded-lg text-sm font-medium hover:bg-[#6d28d9] transition-colors"
+              >
+                Create your free account →
+              </a>
+            </div>
+          ) : (
+            <div className={cn("flex items-center gap-2 rounded-xl border px-3 py-2 transition-colors", inputWrap)}>
+              <input
+                ref={inputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
+                placeholder="Ask me anything..."
+                className={cn("flex-1 text-sm bg-transparent outline-none", inputText)}
+              />
+              <button
+                onClick={handleSend}
+                disabled={!input.trim() || isLoading || limitReached}
+                className={cn("grid h-7 w-7 place-items-center rounded-lg text-white disabled:opacity-40 transition-opacity shrink-0", sendBtn)}
+              >
+                <Send className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

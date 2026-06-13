@@ -16,13 +16,18 @@ type InvestorAdvisorResult = {
 export const getInvestorAdvice = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): InvestorAdvisorInput => data as InvestorAdvisorInput)
   .handler(async ({ data }: { data: InvestorAdvisorInput }): Promise<InvestorAdvisorResult> => {
-    const openAIKey = getEnvVar("OPENAI_API_KEY");
-    if (!openAIKey) {
-      throw new Error('OpenAI API key not configured on server');
+    const cfEnv = (globalThis as any).__cf_env || {};
+    const apiKey = cfEnv.OPENAI_API_KEY || cfEnv.OPEN_AI_API_KEY || cfEnv["OPEN AI API KEY"] || "";
+    if (!apiKey) {
+      console.error("[investor-advisor-fn] No OpenAI key found in __cf_env");
+      return { reply: "AI Advisor is temporarily unavailable. Please try again in a moment.", error: "no_key" };
     }
+    const baseUrl = "https://api.openai.com/v1";
+    const model = "gpt-4o-mini";
+    const extraHeaders: Record<string, string> = {};
 
     const supabaseUrl = getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
-    const supabaseKey = getEnvVar("SUPABASE_SERVICE_ROLE_KEY") || getEnvVar("VITE_SUPABASE_SERVICE_ROLE_KEY");
+    const supabaseKey = getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
 
     let profile: any = null;
     let watchlistCount = 0;
@@ -72,14 +77,15 @@ Format with markdown, bullet points, emojis.
 Max 200 words. End with clear next action.`;
 
     try {
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      const response = await fetch(`${baseUrl}/chat/completions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${openAIKey}`,
+          Authorization: `Bearer ${apiKey}`,
+          ...extraHeaders,
         },
         body: JSON.stringify({
-          model: "gpt-4o-mini",
+          model,
           max_tokens: 500,
           messages: [
             { role: "system", content: systemPrompt },

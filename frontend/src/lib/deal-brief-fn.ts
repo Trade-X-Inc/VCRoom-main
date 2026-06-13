@@ -17,7 +17,7 @@ export const generateDealBrief = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): BriefInput => data as BriefInput)
   .handler(async ({ data }: { data: BriefInput }): Promise<DealBriefResult> => {
     const supabaseUrl = getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
-    const serviceKey = getEnvVar("SUPABASE_SERVICE_ROLE_KEY") || getEnvVar("VITE_SUPABASE_SERVICE_ROLE_KEY");
+    const serviceKey = getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
     if (!supabaseUrl || !serviceKey) {
       return {
         matchScore: 72, matchLabel: "Moderate fit",
@@ -75,7 +75,8 @@ Description: ${startup?.description ?? "None provided"}
 Recent activity: ${activitySummary || "None"}`;
 
     // 5. Call OpenAI
-    const apiKey = data.openAIKey || getEnvVar("OPENAI_API_KEY");
+    const cfEnv = (globalThis as any).__cf_env || {};
+    const apiKey = cfEnv.OPENAI_API_KEY || getEnvVar("OPENAI_API_KEY");
     if (!apiKey) {
       // Graceful fallback when OpenAI is not configured
       return {
@@ -101,7 +102,7 @@ Recent activity: ${activitySummary || "None"}`;
         messages: [
           {
             role: "system",
-            content: `You are an investment analyst. Return ONLY valid JSON:
+            content: `You are an investment analyst. Respond ONLY with valid JSON. No markdown, no code fences, no explanation.
 {"matchScore":0-100,"matchLabel":"Strong fit|Moderate fit|Weak fit","strengths":["...","...","..."],"risks":["...","...","..."],"mitigants":["...","...","..."],"nextAction":"..."}`,
           },
           { role: "user", content: userPrompt },
@@ -114,7 +115,25 @@ Recent activity: ${activitySummary || "None"}`;
     const json = (await resp.json()) as { choices: Array<{ message: { content: string } }> };
     const raw = json.choices[0]?.message?.content ?? "";
 
-    const parsed = JSON.parse(raw) as DealBriefResult;
+    if (!raw.trim()) {
+      console.error("[deal-brief-fn] Empty content from OpenAI");
+      throw new Error("AI returned empty response");
+    }
+
+    const cleaned = raw
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/```\s*$/i, "")
+      .trim();
+
+    let parsed: DealBriefResult;
+    try {
+      parsed = JSON.parse(cleaned) as DealBriefResult;
+    } catch (e) {
+      console.error("[deal-brief-fn] JSON parse failed, raw:", cleaned.slice(0, 200));
+      throw new Error("AI returned malformed JSON");
+    }
+
     if (typeof parsed.matchScore !== "number" || !Array.isArray(parsed.strengths)) {
       throw new Error("Invalid AI response shape");
     }

@@ -1,10 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { Button } from "@/components/ui/button";
-import { Check, Gift, Lock } from "lucide-react";
+import { Gift, Lock, Zap, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/invite")({
   head: () => ({
@@ -22,102 +20,63 @@ function Invite() {
 
   useEffect(() => {
     if (ref) {
-      // Store referral code in localStorage for later retrieval during signup
       localStorage.setItem("referral_code", ref);
       setReferralCode(ref);
     }
   }, [ref]);
 
+  const benefits = [
+    { icon: Zap, title: "3 Extra AI Analyses", desc: "Unlock additional AI-powered deal analysis and company scoring." },
+    { icon: Gift, title: "Founding Member Badge", desc: "Show your early support with an exclusive badge on your profile." },
+    { icon: Lock, title: "Locked-In Pricing", desc: "Founding members get special pricing forever." },
+  ];
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
-      <main className="mx-auto max-w-4xl px-6 py-24 md:py-32">
-        <div className="text-center mb-16">
-          <div className="inline-block px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 mb-4">
-            <span className="text-sm font-medium text-purple-400">You're invited</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] leading-tight mb-4">
-            You're invited to Hockystick
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Join us and unlock exclusive benefits reserved for founding members.
-          </p>
+
+      <div className="bg-[#0a0a0b] py-24 px-6 text-center">
+        <div className="inline-block px-3 py-1 rounded-full border border-[#7C3AED]/30 bg-[#7C3AED]/10 mb-5">
+          <span className="text-sm text-[#7C3AED] font-medium">You're invited</span>
+        </div>
+        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight max-w-2xl mx-auto" style={{ fontFamily: "Syne, sans-serif" }}>
+          You're invited to Hockystick.
+        </h1>
+        <p className="mt-4 text-lg text-gray-400 max-w-xl mx-auto">
+          Unlock exclusive benefits reserved for founding members.
+        </p>
+      </div>
+
+      <main className="mx-auto max-w-4xl px-6 py-16">
+        <div className="grid md:grid-cols-3 gap-5 mb-10">
+          {benefits.map(({ icon: Icon, title, desc }) => (
+            <div key={title} className="rounded-xl border border-gray-100 bg-white shadow-sm p-6">
+              <div className="h-10 w-10 rounded-lg bg-[#7C3AED]/10 flex items-center justify-center mb-4">
+                <Icon className="h-5 w-5 text-[#7C3AED]" />
+              </div>
+              <h3 className="font-semibold text-sm mb-1.5">{title}</h3>
+              <p className="text-sm text-muted-foreground">{desc}</p>
+            </div>
+          ))}
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-card border border-border/60 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <Sparkles className="h-5 w-5 text-purple-400" />
-              <h3 className="font-semibold">3 Extra AI Analyses</h3>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Unlock additional AI-powered deal analysis and company scoring.
-            </p>
-          </div>
-
-          <div className="bg-card border border-border/60 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <Gift className="h-5 w-5 text-purple-400" />
-              <h3 className="font-semibold">Founding Member Badge</h3>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Show your early support with an exclusive badge on your profile.
-            </p>
-          </div>
-
-          <div className="bg-card border border-border/60 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <Lock className="h-5 w-5 text-purple-400" />
-              <h3 className="font-semibold">Locked-In Pricing</h3>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Founding members get special pricing forever—even if we raise rates later.
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-r from-purple-600/10 to-indigo-600/10 border border-purple-500/20 rounded-xl p-8 mb-8">
-          <div className="text-center">
-            <p className="text-muted-foreground mb-4">Ready to join?</p>
-            <Link to="/sign-up" search={{ role: "founder" } as any}>
-              <Button size="lg" className="gap-2">
-                Create your account
-              </Button>
-            </Link>
-            <p className="text-xs text-muted-foreground mt-4">
-              {referralCode && `Referral code: ${referralCode}`}
-            </p>
-          </div>
-        </div>
-
-        <div className="text-center text-sm text-muted-foreground">
-          <p>
+        <div className="rounded-2xl border border-[#7C3AED]/20 bg-gradient-to-r from-[#7C3AED]/5 to-indigo-600/5 p-10 text-center">
+          <p className="text-muted-foreground mb-6">Free during beta. No credit card required.</p>
+          <Link to="/sign-up" search={{ role: "founder" } as any}
+            className="inline-flex items-center gap-2 rounded-lg bg-[#7C3AED] text-white px-8 py-3 font-semibold text-sm hover:bg-[#6d28d9] transition-colors">
+            Create your account <ArrowRight className="h-4 w-4" />
+          </Link>
+          {referralCode && (
+            <p className="text-xs text-muted-foreground mt-4">Referral code: {referralCode}</p>
+          )}
+          <p className="text-sm text-muted-foreground mt-4">
             Already have an account?{" "}
-            <Link to="/sign-in" className="text-foreground hover:underline font-medium">
-              Sign in
-            </Link>
+            <Link to="/sign-in" className="text-[#7C3AED] hover:underline font-medium">Sign in</Link>
           </p>
         </div>
       </main>
+
       <SiteFooter />
     </div>
-  );
-}
-
-function Sparkles(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 3v6m0 6v6M3 12h6m6 0h6" />
-      <path d="M5.64 5.64l4.24 4.24m5.64 5.64l4.24 4.24M18.36 5.64l-4.24 4.24m-5.64 5.64l-4.24 4.24" />
-    </svg>
   );
 }

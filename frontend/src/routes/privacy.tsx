@@ -35,11 +35,11 @@ const sections = [
   },
   {
     title: "6. Your Rights",
-    body: "You have the right to access, correct, or delete your personal data at any time from your account settings. You may also request a copy of your data or object to certain processing activities. To exercise these rights, contact us at privacy@ventureroom.app.",
+    body: "You have the right to access, correct, or delete your personal data at any time from your account settings. You may also request a copy of your data or object to certain processing activities. To exercise these rights, contact us at privacy@hockystick.app.",
   },
   {
     title: "7. Contact Us",
-    body: "If you have questions about this Privacy Policy or how we handle your data, please contact our privacy team at privacy@ventureroom.app. For data deletion requests or GDPR inquiries, we aim to respond within 30 days. Our registered address is Hockystick, Inc., Delaware, United States.",
+    body: "If you have questions about this Privacy Policy or how we handle your data, please contact our privacy team at privacy@hockystick.app. For data deletion requests or GDPR inquiries, we aim to respond within 30 days. Our registered address is Hockystick, Inc., Delaware, United States.",
   },
 ];
 
@@ -48,6 +48,11 @@ function PrivacyPage() {
     <div className="min-h-screen bg-background flex flex-col">
       <SiteHeader />
       <main className="flex-1 mx-auto w-full max-w-3xl px-6 py-16">
+        <div className="mb-8">
+          <a href="/" className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors mb-8 block">
+            ← Back to Hockystick
+          </a>
+        </div>
         <div className="mb-10">
           <p className="text-xs font-semibold uppercase tracking-widest text-brand mb-3">Legal</p>
           <h1 className="text-4xl font-semibold tracking-tight">Privacy Policy</h1>
@@ -60,6 +65,11 @@ function PrivacyPage() {
               <p className="text-sm text-muted-foreground leading-relaxed">{s.body}</p>
             </section>
           ))}
+        </div>
+        <div className="mt-16 pt-8 border-t border-border/40">
+          <a href="/" className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors">
+            ← Back to Hockystick
+          </a>
         </div>
       </main>
       <SiteFooter />

@@ -48,14 +48,19 @@ export const getAIAdvice = createServerFn({ method: "POST" })
         }
       } catch { /* fail open */ }
     }
-    const openAIKey =
-      (typeof process !== "undefined" && process.env.OPENAI_API_KEY) ||
-      (import.meta.env as any).OPENAI_API_KEY ||
-      (import.meta.env as any).VITE_OPENAI_API_KEY ||
-      "";
-    if (!openAIKey) {
-      throw new Error('OpenAI API key not configured on server');
+    const cfEnv = (globalThis as any).__cf_env || {};
+    const apiKey = cfEnv.OPENAI_API_KEY || cfEnv.OPEN_AI_API_KEY || cfEnv["OPEN AI API KEY"] || "";
+    console.log('[deal-advisor] key present:', !!apiKey);
+    console.log('[deal-advisor] key prefix:', apiKey ? apiKey.substring(0, 7) : 'MISSING');
+    console.log('[deal-advisor] pageContext:', data.pageContext ?? 'none');
+    console.log('[deal-advisor] hasStartupContext:', !!data.startupContext);
+    if (!apiKey) {
+      console.error('[deal-advisor] error: OPENAI_API_KEY not found in __cf_env. Available keys:', Object.keys(cfEnv).filter(k => !k.includes('KEY') && !k.includes('SECRET') && !k.includes('TOKEN')));
+      return { reply: "AI Advisor is temporarily unavailable. Please try again in a moment.", error: "no_key" };
     }
+    const baseUrl = "https://api.openai.com/v1";
+    const model = "gpt-4o-mini";
+    const extraHeaders: Record<string, string> = {};
 
     let context = "";
     if (data.startupContext) {
@@ -128,14 +133,15 @@ export const getAIAdvice = createServerFn({ method: "POST" })
     ].filter(Boolean).join("\n");
 
     try {
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      const response = await fetch(`${baseUrl}/chat/completions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${openAIKey}`,
+          Authorization: `Bearer ${apiKey}`,
+          ...extraHeaders,
         },
         body: JSON.stringify({
-          model: "gpt-4o-mini",
+          model,
           max_tokens: 300,
           messages: [
             { role: "system", content: systemPrompt },
@@ -160,7 +166,7 @@ export const getAIAdvice = createServerFn({ method: "POST" })
         error: null,
       };
     } catch (err: any) {
-      console.error("Fetch error:", err);
+      console.error('[deal-advisor] error:', err);
       return {
         reply: "Connection error. Please try again.",
         error: "fetch_error",

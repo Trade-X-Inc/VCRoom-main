@@ -26,8 +26,7 @@ export function AIEmailComposer({ lead, onSaveToNotes }: AIEmailComposerProps) {
     setRateLimited(false);
     setResult(null);
     try {
-      const openAIKey = import.meta.env.VITE_OPENAI_API_KEY || "";
-      const res = await generateOutreachEmail({ data: { leadId: lead.id, type, userId: user.id, openAIKey } });
+      const res = await generateOutreachEmail({ data: { leadId: lead.id, type, userId: user.id } });
       setSubject(res.subject);
       setBody(res.body);
       setResult(res);

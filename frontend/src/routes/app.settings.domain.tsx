@@ -9,7 +9,7 @@ export const Route = createFileRoute("/app/settings/domain")({
 
 interface Domain { name: string; verified: boolean; primary: boolean; }
 const initial: Domain[] = [
-  { name: "ventureroom.app", verified: true, primary: true },
+  { name: "hockystick.app", verified: true, primary: true },
 ];
 
 function DomainEmail() {
@@ -55,9 +55,9 @@ function DomainEmail() {
         <div className="mt-5 rounded-lg bg-muted/40 border border-border/60 p-4 space-y-2">
           <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Required DNS records</div>
           {[
-            ["TXT", "@", "v=spf1 include:ventureroom.app ~all"],
-            ["CNAME", "vr._domainkey", "vr-dkim.ventureroom.app"],
-            ["MX", "@", "10 mx.ventureroom.app"],
+            ["TXT", "@", "v=spf1 include:hockystick.app ~all"],
+            ["CNAME", "vr._domainkey", "vr-dkim.hockystick.app"],
+            ["MX", "@", "10 mx.hockystick.app"],
           ].map(([t, host, val]) => (
             <div key={t + host} className="grid grid-cols-[60px_120px_1fr_auto] items-center gap-2 text-xs font-mono">
               <span className="font-semibold">{t}</span>

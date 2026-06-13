@@ -2,17 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://hockystick.app/</loc>
-    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
-    <loc>https://hockystick.app/sign-in</loc>
+    <loc>https://hockystick.app/pricing</loc>
+    <priority>0.9</priority>
     <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/blog</loc>
+    <priority>0.9</priority>
+    <changefreq>daily</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/blog/gcc-founders-winning-vc-deals-2026</loc>
     <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/blog/why-founders-lose-deals-before-first-meeting</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://hockystick.app/sign-up</loc>
+    <priority>0.7</priority>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://hockystick.app/sign-in</loc>
+    <priority>0.5</priority>
+    <changefreq>monthly</changefreq>
   </url>
 </urlset>
