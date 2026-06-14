@@ -129,7 +129,7 @@ export function SiteFooter() {
                 <li><Link to="/tools/valuation" className={lnk}>Valuation Calculator</Link></li>
                 <li><Link to="/tools/burn-rate" className={lnk}>Burn Rate Calculator</Link></li>
                 <li><Link to="/tools/cogs" className={lnk}>COGS Calculator</Link></li>
-                <li><span className={lnk + " opacity-40 cursor-default"}>Runway Calculator</span></li>
+                <li><Link to="/tools/runway" className={lnk}>Runway Calculator</Link></li>
                 <li><Link to="/tools/cap-table" className={lnk}>Cap Table Calculator</Link></li>
                 <li><Link to="/tools/safe-note" className={lnk}>SAFE Note Calculator</Link></li>
                 <li><Link to="/tools/dilution" className={lnk}>Dilution Calculator</Link></li>

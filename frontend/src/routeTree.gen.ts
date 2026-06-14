@@ -34,6 +34,7 @@ import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as ToolsValuationRouteImport } from './routes/tools/valuation'
 import { Route as ToolsSafeNoteRouteImport } from './routes/tools/safe-note'
+import { Route as ToolsRunwayRouteImport } from './routes/tools/runway'
 import { Route as ToolsDilutionRouteImport } from './routes/tools/dilution'
 import { Route as ToolsCogsRouteImport } from './routes/tools/cogs'
 import { Route as ToolsCapTableRouteImport } from './routes/tools/cap-table'
@@ -220,6 +221,11 @@ const ToolsValuationRoute = ToolsValuationRouteImport.update({
 const ToolsSafeNoteRoute = ToolsSafeNoteRouteImport.update({
   id: '/tools/safe-note',
   path: '/tools/safe-note',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsRunwayRoute = ToolsRunwayRouteImport.update({
+  id: '/tools/runway',
+  path: '/tools/runway',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsDilutionRoute = ToolsDilutionRouteImport.update({
@@ -597,6 +603,7 @@ export interface FileRoutesByFullPath {
   '/tools/cap-table': typeof ToolsCapTableRoute
   '/tools/cogs': typeof ToolsCogsRoute
   '/tools/dilution': typeof ToolsDilutionRoute
+  '/tools/runway': typeof ToolsRunwayRoute
   '/tools/safe-note': typeof ToolsSafeNoteRoute
   '/tools/valuation': typeof ToolsValuationRoute
   '/app/': typeof AppIndexRoute
@@ -683,6 +690,7 @@ export interface FileRoutesByTo {
   '/tools/cap-table': typeof ToolsCapTableRoute
   '/tools/cogs': typeof ToolsCogsRoute
   '/tools/dilution': typeof ToolsDilutionRoute
+  '/tools/runway': typeof ToolsRunwayRoute
   '/tools/safe-note': typeof ToolsSafeNoteRoute
   '/tools/valuation': typeof ToolsValuationRoute
   '/app': typeof AppIndexRoute
@@ -773,6 +781,7 @@ export interface FileRoutesById {
   '/tools/cap-table': typeof ToolsCapTableRoute
   '/tools/cogs': typeof ToolsCogsRoute
   '/tools/dilution': typeof ToolsDilutionRoute
+  '/tools/runway': typeof ToolsRunwayRoute
   '/tools/safe-note': typeof ToolsSafeNoteRoute
   '/tools/valuation': typeof ToolsValuationRoute
   '/app/': typeof AppIndexRoute
@@ -864,6 +873,7 @@ export interface FileRouteTypes {
     | '/tools/cap-table'
     | '/tools/cogs'
     | '/tools/dilution'
+    | '/tools/runway'
     | '/tools/safe-note'
     | '/tools/valuation'
     | '/app/'
@@ -950,6 +960,7 @@ export interface FileRouteTypes {
     | '/tools/cap-table'
     | '/tools/cogs'
     | '/tools/dilution'
+    | '/tools/runway'
     | '/tools/safe-note'
     | '/tools/valuation'
     | '/app'
@@ -1039,6 +1050,7 @@ export interface FileRouteTypes {
     | '/tools/cap-table'
     | '/tools/cogs'
     | '/tools/dilution'
+    | '/tools/runway'
     | '/tools/safe-note'
     | '/tools/valuation'
     | '/app/'
@@ -1107,6 +1119,7 @@ export interface RootRouteChildren {
   ToolsCapTableRoute: typeof ToolsCapTableRoute
   ToolsCogsRoute: typeof ToolsCogsRoute
   ToolsDilutionRoute: typeof ToolsDilutionRoute
+  ToolsRunwayRoute: typeof ToolsRunwayRoute
   ToolsSafeNoteRoute: typeof ToolsSafeNoteRoute
   ToolsValuationRoute: typeof ToolsValuationRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
@@ -1290,6 +1303,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/safe-note'
       fullPath: '/tools/safe-note'
       preLoaderRoute: typeof ToolsSafeNoteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/runway': {
+      id: '/tools/runway'
+      path: '/tools/runway'
+      fullPath: '/tools/runway'
+      preLoaderRoute: typeof ToolsRunwayRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/dilution': {
@@ -1889,6 +1909,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsCapTableRoute: ToolsCapTableRoute,
   ToolsCogsRoute: ToolsCogsRoute,
   ToolsDilutionRoute: ToolsDilutionRoute,
+  ToolsRunwayRoute: ToolsRunwayRoute,
   ToolsSafeNoteRoute: ToolsSafeNoteRoute,
   ToolsValuationRoute: ToolsValuationRoute,
   ToolsIndexRoute: ToolsIndexRoute,

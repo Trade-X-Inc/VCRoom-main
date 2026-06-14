@@ -50,12 +50,12 @@ const TOOLS: Tool[] = [
   {
     title: "Runway Calculator",
     route: "/tools/runway",
-    tag: "Coming soon",
-    tagStyle: "soon",
+    tag: "New",
+    tagStyle: "active",
     description:
-      "Model cash-out date and raise timing. Available inside the Burn Rate calculator. ↑ Included in Burn Rate tool above",
+      "Calculate your cash-out date, model three funding scenarios, and know exactly when to start your next raise.",
     cta: "Calculate runway →",
-    active: false,
+    active: true,
   },
   {
     title: "COGS Calculator",
