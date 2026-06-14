@@ -531,8 +531,56 @@ function BurnRatePage() {
 
   const pw = { maxWidth: "860px", margin: "0 auto", padding: "0 24px" };
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a good burn rate for a startup?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "There is no universal good burn rate. Most VCs want to see 18 or more months of runway post-raise at Series A. At pre-seed and seed, 12 to 18 months is acceptable. Below 9 months post-raise signals poor planning."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between gross burn and net burn?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Gross burn is all outgoing cash. Net burn is gross burn minus revenue. A startup with $60K expenses and $20K MRR has $40K net burn. That is the number investors use to calculate runway."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How much runway should I have before raising?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Raise when you have 12 to 15 months of runway. Institutional fundraising takes 3 to 6 months. You want to close with 9 or more months still in the bank. Raising on 6 months puts you in a weak negotiating position."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I extend my runway without cutting team?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Cut non-essential software subscriptions, reduce contractor hours, and negotiate vendor payment terms first. Most pre-seed startups find 15 to 25 percent savings in software and marketing without losing velocity."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "When should I be worried about my burn rate?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Worry when net burn grows faster than revenue. That pattern kills startups — not a high burn rate itself, but high burn with flat or declining revenue. Monthly burn reviews should be a standing founder ritual."
+        }
+      }
+    ]
+  };
+
   return (
     <div style={{ background: "#0A0A0B", minHeight: "100vh", color: "#fff" }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <SiteHeader />
 
       {/* S1 — Hero */}

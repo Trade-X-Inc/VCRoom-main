@@ -107,6 +107,20 @@ function JoinFlow() {
         .update({ accepted_at: new Date().toISOString() })
         .eq("token", token);
 
+      // Write deal_room_invite notification for the investor
+      const startupName = (invite.deal_rooms?.startups as any)?.company_name ?? "a startup";
+      supabase.from("notifications").insert({
+        user_id: userId,
+        kind: "deal_room_invite",
+        title: `You've joined ${startupName}'s deal room`,
+        body: "Review documents and submit your investment decision.",
+        read: false,
+        action_url: `/app/investor/deal-rooms`,
+        meta: { deal_room_id: invite.deal_room_id },
+      }).then(({ error: nErr }) => {
+        if (nErr) console.warn("[notification] deal_room_invite insert failed:", nErr.message);
+      });
+
       // Invalidate deal flow cache so new room appears immediately
       await queryClient.invalidateQueries();
 

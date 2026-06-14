@@ -542,8 +542,56 @@ function ValuationPage() {
   const s: React.CSSProperties = { background: "#0A0A0B", minHeight: "100vh", color: "#fff" };
   const maxW = { maxWidth: "860px", margin: "0 auto", padding: "0 24px" };
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a startup valuation?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A startup valuation is the agreed dollar value of your company at the time of a funding round. Pre-money valuation is the value before new investment. Post-money valuation includes the new capital."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is a good valuation for a pre-seed startup?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "In GCC and MENA markets, pre-seed valuations typically range from $1M to $3M pre-money. US pre-seed valuations run higher at $2M to $6M. What matters more is the justification — investors need to see the logic, not just the ask."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I know which valuation method to use?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Use Berkus or Scorecard if you have no revenue. Use Revenue Multiple if you have MRR or ARR. Use the VC Method if targeting institutional VCs with a specific IRR target."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why does my valuation matter before meeting investors?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Walking into an investor conversation without a defended valuation signals you have not done the financial work. Investors who suggest your valuation will suggest a number that works for them, not you."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is this valuation calculator accurate?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "This calculator uses standard venture methodology and gives a defensible starting range, not a precise number. No calculator replaces the market. Use this as preparation, not as a term sheet."
+        }
+      }
+    ]
+  };
+
   return (
     <div style={s}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <SiteHeader />
 
       {/* ── S1: Hero ──────────────────────────────────────────────── */}

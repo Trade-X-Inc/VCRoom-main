@@ -738,8 +738,56 @@ function CapTablePage() {
 
   const pw = { maxWidth: "1100px", margin: "0 auto", padding: "0 24px" };
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a cap table?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A cap table lists every person or entity owning equity in a company, the type of equity, share count, and ownership percentage. It updates with every funding round, option grant, and share transfer."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How much equity should founders give up at seed?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Standard seed rounds dilute founders 15 to 25 percent. GCC and MENA seed rounds often run at lower pre-money valuations, meaning higher dilution for the same check size compared to US deals."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is a standard option pool size?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Pre-seed: 10 to 12 percent. Seed: investors often ask for a top-up to 15 percent pre-close. Series A: 10 to 15 percent. Size the pool for the next 18 to 24 months of hiring, not indefinitely."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is a SAFE note?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A SAFE gives an investor the right to receive equity at a future priced round at a discounted price or capped valuation. Common at pre-seed in the US. In GCC and MENA, convertible notes are more common but SAFEs are gaining adoption."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "When should I hire a lawyer to manage my cap table?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "From your first priced round. Pre-seed SAFEs can be tracked in a spreadsheet. Once you have a priced round with multiple investors, pro-rata rights, and an option pool, the cap table becomes a legal document. Use Carta or equivalent from Seed onwards."
+        }
+      }
+    ]
+  };
+
   return (
     <div style={{ background: "#0A0A0B", minHeight: "100vh", color: "#fff" }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <SiteHeader />
 
       {/* S1 — Hero */}

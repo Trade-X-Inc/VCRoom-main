@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 
 const GCC_COUNTRIES = ["UAE", "Saudi Arabia", "Qatar", "Kuwait", "Bahrain", "Oman"];
@@ -79,6 +79,7 @@ const EMPTY_ADD: AddForm = {
 function StartupsPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<(typeof TAB_STATUSES)[number]>("All");
   const [showAdd, setShowAdd] = useState(false);
   const [csvOpen, setCsvOpen] = useState(false);
@@ -283,11 +284,14 @@ function StartupsPage() {
             status,
             startup_id,
             startups (
+              id,
               company_name,
               sector,
               stage,
               country,
-              funding_target
+              funding_target,
+              profile_slug,
+              tagline
             )
           )
         `)
@@ -547,16 +551,50 @@ function StartupsPage() {
                   {filteredLeads.map((l: any) => {
                     const startup = l.discovery_requests?.startups;
                     const company = startup?.company_name ?? l.investor_name;
+                    const slug = startup?.profile_slug ?? null;
                     const badge = l.status === "New" ? "Pending founder response" : l.status === "Replied" ? "Connected" : l.status === "Rejected" ? "Declined" : l.status;
                     const badgeCls = l.status === "New" ? "bg-amber-500/10 text-amber-600" : l.status === "Replied" ? "bg-success/10 text-success" : l.status === "Rejected" ? "bg-destructive/10 text-destructive" : "bg-muted/10 text-muted-foreground";
                     return (
-                      <div key={l.id} className="rounded-2xl border border-border/60 bg-card p-5">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-semibold">{company}</div>
-                            <div className="text-xs text-muted-foreground">{startup?.sector ?? l.sector} · {startup?.stage ?? l.stage}</div>
+                      <div
+                        key={l.id}
+                        onClick={() => slug && navigate({ to: "/p/$slug", params: { slug } })}
+                        title={slug ? undefined : "No Hockystick profile — add their details manually"}
+                        className="rounded-2xl bg-card p-5 group relative overflow-hidden transition-all"
+                        style={{
+                          border: "1px solid rgba(255,255,255,0.08)",
+                          cursor: slug ? "pointer" : "default",
+                          transition: "border-color 0.15s, box-shadow 0.15s",
+                        }}
+                        onMouseEnter={(e) => { if (slug) { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(124,58,237,0.4)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 0 0 1px rgba(124,58,237,0.15)"; } }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,0.08)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "none"; }}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold shrink-0 text-sm">
+                              {(company || "S")[0]}
+                            </div>
+                            <div className="min-w-0">
+                              <div className={`font-semibold truncate transition-colors ${slug ? "group-hover:text-brand" : ""}`}>{company}</div>
+                              <div className="text-xs text-muted-foreground">{startup?.sector ?? l.sector} · {startup?.stage ?? l.stage}{startup?.country ? ` · ${startup.country}` : ""}</div>
+                            </div>
                           </div>
-                          <div className={`text-xs px-2 py-1 rounded ${badgeCls}`}>{badge}</div>
+                          <div className={`text-xs px-2 py-1 rounded shrink-0 ${badgeCls}`}>{badge}</div>
+                        </div>
+                        {startup?.tagline && (
+                          <p className="mt-3 text-xs text-muted-foreground line-clamp-2">{startup.tagline}</p>
+                        )}
+                        <div className="mt-3 flex items-center justify-between">
+                          {startup?.funding_target && (
+                            <div className="text-xs text-muted-foreground">Raising <span className="text-foreground font-medium">{startup.funding_target}</span></div>
+                          )}
+                          {slug && (
+                            <span
+                              className="text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity ml-auto"
+                              style={{ color: "#7C3AED" }}
+                            >
+                              View profile →
+                            </span>
+                          )}
                         </div>
                       </div>
                     );
@@ -617,8 +655,11 @@ function StartupsPage() {
                 {filteredWatchlist.map((c: any) => (
                   <tr
                     key={c.id}
-                    onClick={() => setSelectedWatchlist(c)}
-                    className="hover:bg-accent/40 cursor-pointer transition-colors group"
+                    onClick={() => c.profile_slug ? navigate({ to: "/p/$slug", params: { slug: c.profile_slug } }) : setSelectedWatchlist(c)}
+                    className="transition-colors group"
+                    style={{ cursor: "pointer" }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLTableRowElement).style.background = c.profile_slug ? "rgba(124,58,237,0.06)" : ""; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLTableRowElement).style.background = ""; }}
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
@@ -642,6 +683,17 @@ function StartupsPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1.5 justify-end">
+                        {c.profile_slug && (
+                          <a
+                            href={`/p/${c.profile_slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-brand hover:underline text-xs flex items-center gap-0.5 mr-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            View profile <ExternalLink className="h-3 w-3" />
+                          </a>
+                        )}
                         {c.website && <a href={c.website} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-brand hover:underline text-xs flex items-center gap-0.5 mr-1">Site <ExternalLink className="h-3 w-3" /></a>}
                         <button
                           onClick={(e) => { e.stopPropagation(); openEdit(c); }}
@@ -673,7 +725,11 @@ function StartupsPage() {
                 key={c.id}
                 className="rounded-xl border border-border/60 bg-card p-4 text-left hover:shadow-card hover:border-brand/30 transition-all group flex flex-col items-center text-center gap-2"
               >
-                <button onClick={() => setSelectedWatchlist(c)} className="flex flex-col items-center gap-2 w-full">
+                <button
+                  onClick={() => c.profile_slug ? navigate({ to: "/p/$slug", params: { slug: c.profile_slug } }) : setSelectedWatchlist(c)}
+                  className="flex flex-col items-center gap-2 w-full"
+                  title={!c.profile_slug ? "No Hockystick profile — add their details manually" : undefined}
+                >
                   <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-brand text-brand-foreground text-xl font-bold group-hover:scale-105 transition-transform">
                     {(c.company_name || "S")[0]}
                   </div>
@@ -710,7 +766,14 @@ function StartupsPage() {
             {filteredWatchlist.map((c: any) => (
               <button
                 key={c.id}
-                onClick={() => setSelectedWatchlist(c)}
+                onClick={() => {
+                  if (c.profile_slug) {
+                    navigate({ to: "/p/$slug", params: { slug: c.profile_slug } });
+                  } else {
+                    setSelectedWatchlist(c);
+                  }
+                }}
+                title={c.profile_slug ? undefined : undefined}
                 className="rounded-2xl border border-border/60 bg-card p-5 text-left hover:shadow-card hover:border-brand/30 transition-all group"
               >
                 <div className="flex items-center gap-3">
@@ -724,6 +787,15 @@ function StartupsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    {c.thesisMatch && (
+                      <span style={{
+                        background: c.thesisMatch >= 80 ? "rgba(16,185,129,0.15)" : c.thesisMatch >= 60 ? "rgba(245,158,11,0.15)" : "rgba(239,68,68,0.15)",
+                        color: c.thesisMatch >= 80 ? "#10B981" : c.thesisMatch >= 60 ? "#F59E0B" : "#EF4444",
+                        padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 600,
+                      }}>
+                        {c.thesisMatch}% match
+                      </span>
+                    )}
                     <span className={cn("text-[10px] px-2 py-0.5 rounded-full border font-medium", STATUS_STYLES[c.status] || STATUS_STYLES.Sourcing)}>
                       {c.status}
                     </span>
@@ -743,7 +815,12 @@ function StartupsPage() {
                     <div className="font-medium truncate">{c.source || "—"}</div>
                   </div>
                   <div className="flex items-center justify-end gap-1">
-                    {c.website && (
+                    {c.profile_slug && (
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity text-brand mr-auto text-[11px] font-medium">
+                        View profile →
+                      </span>
+                    )}
+                    {!c.profile_slug && c.website && (
                       <a
                         href={c.website.startsWith("http") ? c.website : `https://${c.website}`}
                         target="_blank"
@@ -922,6 +999,27 @@ function StartupsPage() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-5 space-y-5">
+
+              {/* View Hockystick profile CTA */}
+              {selectedWatchlist.profile_slug && (
+                <a
+                  href={`/p/${selectedWatchlist.profile_slug}`}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    background: "#7C3AED",
+                    color: "#fff",
+                    padding: "8px 16px",
+                    borderRadius: 8,
+                    textDecoration: "none",
+                    fontSize: 13,
+                    fontWeight: 500,
+                  }}
+                >
+                  View full profile →
+                </a>
+              )}
 
               {/* Status */}
               <div>

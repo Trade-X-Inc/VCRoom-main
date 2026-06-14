@@ -349,8 +349,56 @@ Calculate yours at hockystick.app/tools/runway`;
 
   const pw: React.CSSProperties = { maxWidth: "960px", margin: "0 auto", padding: "0 24px" };
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is startup runway?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Runway is the number of months a startup can continue operating at its current spending rate before running out of cash. It is calculated by dividing current cash by net monthly burn rate."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is a good amount of runway?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "18 months post-raise is the standard target for institutional rounds. 12 months is the minimum to raise comfortably. Below 6 months, your negotiating position collapses."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between gross burn and net burn?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Gross burn is every dollar leaving the company each month. Net burn subtracts revenue. Runway is calculated on net burn because revenue is real cash reducing your consumption rate."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "When should I start raising my next round?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Start raising when you have 12 to 15 months of runway. This gives you 3 to 6 months to close and still land with 9 or more months remaining. Closing with less than 6 months signals a distressed raise."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I extend my runway quickly?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "In order of speed: cut non-essential software subscriptions, reduce contractor hours, negotiate vendor payment terms, defer non-critical hires. Team salary cuts are the last lever — they extend runway but slow growth."
+        }
+      }
+    ]
+  };
+
   return (
     <div style={{ background: "#0A0A0B", minHeight: "100vh", color: "#fff" }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <SiteHeader />
 
       {/* S1 — Hero */}

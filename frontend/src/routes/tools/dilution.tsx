@@ -431,8 +431,56 @@ function DilutionPage() {
 
   const pw: React.CSSProperties = { maxWidth: "960px", margin: "0 auto", padding: "0 24px" };
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How much dilution is normal per funding round?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Pre-seed: 10 to 20 percent. Seed: 15 to 25 percent. Series A: 20 to 30 percent. A company with strong traction raises at higher valuations and takes less dilution for the same capital."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is dilution bad?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Not inherently. Dilution with capital and a higher valuation grows the value of your remaining equity. A founder owning 30 percent of a $50M company is wealthier than one owning 90 percent of a $3M company."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I minimize equity dilution?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Raise at the highest defensible pre-money valuation. Negotiate option pool size. Raise less capital if you can hit the same milestones. Strong traction is the most effective dilution reducer."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What happens to my equity if the company is acquired?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "You receive the value of your shares at the acquisition price. Liquidation preferences held by investors can significantly reduce founder proceeds in a low-multiple acquisition. Always model this before accepting investment terms."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between dilution and a down round?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Dilution happens in every round as new shares are issued. A down round values the company lower than the previous round, triggering anti-dilution provisions for preferred investors and further diluting founders."
+        }
+      }
+    ]
+  };
+
   return (
     <div style={{ background: "#0A0A0B", minHeight: "100vh", color: "#fff" }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <SiteHeader />
 
       {/* S1 — Hero */}

@@ -292,8 +292,56 @@ Model yours at hockystick.app/tools/safe-note`;
     </div>
   );
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a SAFE note?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A SAFE gives an investor the right to receive equity at a future priced round. The investor gives money now and receives shares later at a price reflecting their early risk through a lower cap or discount rate."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is a SAFE the same as a convertible note?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. A convertible note is debt with interest. A SAFE is not debt — no interest, no maturity date, no repayment obligation if no priced round occurs. SAFEs are simpler and faster to execute."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What valuation cap should I offer?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A typical pre-seed SAFE in MENA runs at a $2M to $5M cap. US pre-seed SAFEs often carry $5M to $15M caps. The lower the cap, the better the deal for the investor. Negotiate based on traction, team, and market size."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What happens if I never raise a priced round?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The SAFE remains unconverted with no maturity date and no repayment obligation. In an acquisition, the SAFE typically converts at the cap or receives a return per the change of control clause."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Should I offer a cap or a discount or both?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Standard practice: offer both, with the cap as primary protection. A discount alone with no cap is unusual and can be meaningless at high-valuation rounds where the discount is too small to matter."
+        }
+      }
+    ]
+  };
+
   return (
     <div style={{ background: "#0A0A0B", minHeight: "100vh", color: "#fff" }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <SiteHeader />
 
       {/* S1 — Hero */}

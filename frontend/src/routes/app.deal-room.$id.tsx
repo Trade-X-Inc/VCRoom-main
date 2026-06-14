@@ -1783,6 +1783,28 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                 triggerDocumentUploadedEmail({
                   data: { dealRoomId, documentName: fileName, uploaderUserId: userId },
                 }).catch(() => {});
+                supabase
+                  .from("deal_room_members")
+                  .select("user_id")
+                  .eq("deal_room_id", dealRoomId)
+                  .then(({ data: members }) => {
+                    const investorMembers = (members ?? []).filter((m: any) => m.user_id !== userId);
+                    if (investorMembers.length > 0) {
+                      supabase.from("notifications").insert(
+                        investorMembers.map((m: any) => ({
+                          user_id: m.user_id,
+                          kind: "deal_activity",
+                          title: `New document in ${companyName} deal room`,
+                          body: `"${fileName}" has been shared with you for review.`,
+                          read: false,
+                          action_url: `/app/investor/deal-rooms`,
+                          meta: { deal_room_id: dealRoomId },
+                        }))
+                      ).then(({ error: nErr }) => {
+                        if (nErr) console.warn("[notification] deal_activity insert failed:", nErr.message);
+                      });
+                    }
+                  });
               }
             }}
           />
@@ -2112,6 +2134,26 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                   queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
                   toast.success("Uploaded!");
                   e.target.value = "";
+                  const { data: members } = await supabase
+                    .from("deal_room_members")
+                    .select("user_id")
+                    .eq("deal_room_id", dealRoomId);
+                  const investorMembers = (members ?? []).filter((m: any) => m.user_id !== userId);
+                  if (investorMembers.length > 0) {
+                    supabase.from("notifications").insert(
+                      investorMembers.map((m: any) => ({
+                        user_id: m.user_id,
+                        kind: "deal_activity",
+                        title: `New document in ${companyName} deal room`,
+                        body: `"${file.name}" has been shared with you for review.`,
+                        read: false,
+                        action_url: `/app/investor/deal-rooms`,
+                        meta: { deal_room_id: dealRoomId },
+                      }))
+                    ).then(({ error: nErr }) => {
+                      if (nErr) console.warn("[notification] deal_activity insert failed:", nErr.message);
+                    });
+                  }
                 }}
               />
             </label>
@@ -2159,6 +2201,26 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                         queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
                         toast.success(`${file.name} uploaded`);
                         e.target.value = "";
+                        const { data: members } = await supabase
+                          .from("deal_room_members")
+                          .select("user_id")
+                          .eq("deal_room_id", dealRoomId);
+                        const investorMembers = (members ?? []).filter((m: any) => m.user_id !== userId);
+                        if (investorMembers.length > 0) {
+                          supabase.from("notifications").insert(
+                            investorMembers.map((m: any) => ({
+                              user_id: m.user_id,
+                              kind: "deal_activity",
+                              title: `New document in ${companyName} deal room`,
+                              body: `"${file.name}" has been shared with you for review.`,
+                              read: false,
+                              action_url: `/app/investor/deal-rooms`,
+                              meta: { deal_room_id: dealRoomId },
+                            }))
+                          ).then(({ error: nErr }) => {
+                            if (nErr) console.warn("[notification] deal_activity insert failed:", nErr.message);
+                          });
+                        }
                       }}
                     />
                   </label>

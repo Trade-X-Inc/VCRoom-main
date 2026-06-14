@@ -538,8 +538,12 @@ function FounderPublicProfile() {
     setRequestStatuses(allPending);
     setExistingRequest({ status: "pending" });
 
-    // TODO: POST /api/notify-access-request to trigger founder email
-    // Non-blocking — don't await
+    // Fire-and-forget: notify founder via edge function (non-blocking)
+    supabase.functions.invoke("notify-access-request", {
+      body: { startup_id: startup.id, investor_id: viewerId },
+    }).catch(() => {
+      console.warn("[notify-access-request] Notification failed — request was still created");
+    });
   };
 
   const sectionLabels: Record<string, string> = {

@@ -588,8 +588,56 @@ Calculate yours at hockystick.app/tools/cogs`;
 
   const pw = { maxWidth: "900px", margin: "0 auto", padding: "0 24px" };
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is COGS for a startup?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "COGS is the direct cost of producing and delivering your product or service. For software it includes hosting, APIs, and support. For physical products it includes materials, manufacturing, and shipping. COGS does not include marketing, sales, or R&D."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is a good gross margin for a SaaS startup?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "World-class SaaS gross margins run 80 percent or higher. For early-stage SaaS, 65 to 75 percent is healthy. Below 60 percent usually means you are misclassifying operating expenses as COGS."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do GCC and MENA conditions affect COGS?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Cloud infrastructure costs run 10 to 20 percent higher in Middle East AWS regions. Import duties of 5 percent apply to most physical goods. Local payment processors like Telr and PayTabs charge 2.5 to 3.5 percent."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is gross margin vs net margin?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Gross margin is revenue minus COGS divided by revenue — it measures production efficiency. Net margin is revenue minus all expenses. Early-stage investors focus on gross margin because it shows unit economics before scaling costs."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why does gross margin matter to investors?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Gross margin determines how much of each revenue dollar remains after production costs. A SaaS company at 80 percent can spend aggressively on growth and still reach profitability. A hardware company at 20 percent has almost no room for error."
+        }
+      }
+    ]
+  };
+
   return (
     <div style={{ background: "#0A0A0B", minHeight: "100vh", color: "#fff" }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <SiteHeader />
 
       {/* S1 — Hero */}

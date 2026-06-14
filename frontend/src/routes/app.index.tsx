@@ -21,6 +21,8 @@ export const Route = createFileRoute("/app/")({
 interface Startup {
   id: string;
   name?: string | null;
+  company_name?: string | null;
+  profile_slug?: string | null;
   stage?: string | null;
   target_raise?: number | null;
   founder_id?: string;
@@ -349,30 +351,53 @@ interface AccessRequest {
   } | null;
 }
 
-function AccessRequestsPanel({ startupId }: { startupId: string }) {
+function AccessRequestsPanel({ startupId, companyName, profileSlug }: {
+  startupId: string;
+  companyName?: string | null;
+  profileSlug?: string | null;
+}) {
   const [requests, setRequests] = useState<AccessRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [actingId, setActingId] = useState<string | null>(null);
 
   const loadRequests = async () => {
     setLoading(true);
-    // Join investors table for name/firm — use investor_profiles since that's where names are stored
-    const { data } = await supabase
+    const { data: reqs } = await supabase
       .from("discovery_requests")
-      .select(`
-        id, investor_id, startup_id, status, created_at,
-        investor_profiles!investor_id ( your_name, fund_name, your_role )
-      `)
+      .select("id, investor_id, startup_id, status, created_at")
       .eq("startup_id", startupId)
       .eq("status", "pending")
       .order("created_at", { ascending: false });
-    setRequests((data ?? []) as any[]);
+
+    if (!reqs || reqs.length === 0) {
+      setRequests([]);
+      setLoading(false);
+      return;
+    }
+
+    // Fetch investor profiles separately — no FK from discovery_requests to investor_profiles
+    const investorIds = reqs.map((r: any) => r.investor_id);
+    const { data: profiles } = await supabase
+      .from("investor_profiles")
+      .select("user_id, your_name, fund_name, role")
+      .in("user_id", investorIds);
+
+    const profileMap = Object.fromEntries(
+      (profiles ?? []).map((p: any) => [p.user_id, p])
+    );
+
+    const enriched = reqs.map((r: any) => ({
+      ...r,
+      investor_profiles: profileMap[r.investor_id] ?? null,
+    }));
+
+    setRequests(enriched as any[]);
     setLoading(false);
   };
 
   useEffect(() => { loadRequests(); }, [startupId]);
 
-  const handleAction = async (requestId: string, investorId: string, action: "approved" | "rejected", investorName: string | null) => {
+  const handleAction = async (requestId: string, investorId: string, action: "approved" | "declined", investorName: string | null) => {
     setActingId(requestId);
     const { error } = await supabase
       .from("discovery_requests")
@@ -383,6 +408,19 @@ function AccessRequestsPanel({ startupId }: { startupId: string }) {
       setRequests((prev) => prev.filter((r) => r.id !== requestId));
       if (action === "approved") {
         toast.success(`Access approved. ${investorName ?? "Investor"} can now view your on-request sections.`);
+        // Write in-app notification to the investor
+        const name = companyName ?? "The founder";
+        supabase.from("notifications").insert({
+          user_id: investorId,
+          kind: "access_approved",
+          title: `${name} approved your access`,
+          body: "You can now view their business model, market, traction, and team sections.",
+          read: false,
+          action_url: profileSlug ? `/p/${profileSlug}` : null,
+          meta: { startup_id: startupId },
+        }).then(({ error: nErr }) => {
+          if (nErr) console.warn("[notification] access_approved insert failed:", nErr.message);
+        });
       } else {
         toast.success("Request declined.");
       }
@@ -429,7 +467,7 @@ function AccessRequestsPanel({ startupId }: { startupId: string }) {
               const profile = req.investor_profiles;
               const name = profile?.your_name ?? "Unknown investor";
               const firm = profile?.fund_name ?? null;
-              const role = profile?.your_role ?? null;
+              const role = profile?.role ?? null;
               const isActing = actingId === req.id;
 
               return (
@@ -456,7 +494,7 @@ function AccessRequestsPanel({ startupId }: { startupId: string }) {
                     </button>
                     <button
                       disabled={isActing}
-                      onClick={() => handleAction(req.id, req.investor_id, "rejected", name)}
+                      onClick={() => handleAction(req.id, req.investor_id, "declined", name)}
                       className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
                       style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.08)" }}
                     >
@@ -759,7 +797,13 @@ function Overview() {
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto">
       <FounderOnboarding startup={startup} docs={docs} dealRooms={dealRooms} investorMembers={investorMembers} />
-      {startup?.id && <AccessRequestsPanel startupId={startup.id} />}
+      {startup?.id && (
+        <AccessRequestsPanel
+          startupId={startup.id}
+          companyName={startup.company_name ?? startup.name}
+          profileSlug={startup.profile_slug}
+        />
+      )}
       {/* Header */}
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
