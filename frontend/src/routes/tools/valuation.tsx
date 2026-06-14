@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { ChevronDown, ChevronUp, Copy, Check } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -292,26 +292,26 @@ function VCCalculator({ onChange }: { onChange: (r: ValuationResult) => void }) 
   const [investment, setInvestment] = useState(1);
   const [dilution, setDilution] = useState(20);
 
-  const compute = useCallback((exit: number, y: number, irrPct: string, inv: number, dil: number) => {
-    const rate = Number(irrPct) / 100;
-    const postMoney = (exit * 1_000_000) / Math.pow(1 + rate, y);
-    const preMoney = postMoney - inv * 1_000_000;
-    const ownership = (inv * 1_000_000) / postMoney;
+  const { postMoney, preMoney, ownership } = useMemo(() => {
+    const rate = Number(irr) / 100;
+    const post = (exitValue * 1_000_000) / Math.pow(1 + rate, years);
+    const pre = post - investment * 1_000_000;
+    return { postMoney: post, preMoney: pre, ownership: (investment * 1_000_000) / post };
+  }, [exitValue, years, irr, investment, dilution]);
+
+  useEffect(() => {
     onChange({
       conservative: Math.max(preMoney * 0.75, 0),
       realistic: Math.max(preMoney, 0),
       optimistic: Math.max(preMoney * 1.3, 0),
       methodName: "VC Method",
     });
-    return { postMoney, preMoney, ownership };
-  }, [onChange]);
-
-  const { postMoney, preMoney, ownership } = compute(exitValue, years, irr, investment, dilution);
+  }, [preMoney, onChange]);
 
   return (
     <div>
-      <NumberInput label="Expected exit value ($M)" value={exitValue} onChange={(v) => { setExitValue(v); compute(v, years, irr, investment, dilution); }} prefix="$M" hint="Target acquisition or IPO value in millions" />
-      <Slider label="Years to exit" value={years} min={1} max={10} onChange={(v) => { setYears(v); compute(exitValue, v, irr, investment, dilution); }} unit=" yrs" />
+      <NumberInput label="Expected exit value ($M)" value={exitValue} onChange={setExitValue} prefix="$M" hint="Target acquisition or IPO value in millions" />
+      <Slider label="Years to exit" value={years} min={1} max={10} onChange={setYears} unit=" yrs" />
       <Select
         label="Target investor IRR"
         value={irr}
@@ -321,10 +321,10 @@ function VCCalculator({ onChange }: { onChange: (r: ValuationResult) => void }) 
           { label: "50% — Early-stage / angel", value: "50" },
           { label: "60% — Pre-seed / high-risk", value: "60" },
         ]}
-        onChange={(v) => { setIrr(v); compute(exitValue, years, v, investment, dilution); }}
+        onChange={setIrr}
       />
-      <NumberInput label="Investment amount ($M)" value={investment} onChange={(v) => { setInvestment(v); compute(exitValue, years, irr, v, dilution); }} prefix="$M" />
-      <Slider label="Dilution from this round" value={dilution} min={10} max={40} onChange={(v) => { setDilution(v); compute(exitValue, years, irr, investment, v); }} unit="%" />
+      <NumberInput label="Investment amount ($M)" value={investment} onChange={setInvestment} prefix="$M" />
+      <Slider label="Dilution from this round" value={dilution} min={10} max={40} onChange={setDilution} unit="%" />
       <div style={{ background: "#0d0d10", borderRadius: "8px", padding: "16px", marginTop: "8px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
         {[
           { label: "Pre-money", value: fmt(Math.max(preMoney, 0)) },
