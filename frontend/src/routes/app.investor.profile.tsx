@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   Building2, Loader2, Save, Plus, X, Pencil, Trash2,
-  Globe, Users, Linkedin, ExternalLink, UserCircle2, Mail,
+  Globe, Users, Linkedin, ExternalLink, UserCircle2, Mail, Upload,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -81,6 +81,8 @@ function InvestorProfilePage() {
   const [form, setForm] = useState<ProfileForm>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
 
   const { data: existing, isLoading } = useQuery({
     queryKey: ["investor-profile", user?.id],
@@ -128,10 +130,34 @@ function InvestorProfilePage() {
         red_flags: existing.red_flags ?? "",
         key_metrics: existing.key_metrics ?? "",
       });
+      setAvatarUrl(existing.avatar_url ?? null);
     } else if (user?.fullName) {
       setForm((f) => ({ ...f, your_name: user.fullName }));
     }
   }, [existing, user?.fullName]);
+
+  const handleAvatarUpload = async (file: File) => {
+    if (!user?.id) return;
+    if (file.size > 2 * 1024 * 1024) { toast.error("Image must be under 2MB"); return; }
+    if (!file.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
+    setAvatarUploading(true);
+    try {
+      const ext = file.name.split(".").pop() ?? "jpg";
+      const path = `investors/${user.id}/${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: false });
+      if (error) throw error;
+      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+      const url = `${data.publicUrl}?t=${Date.now()}`;
+      setAvatarUrl(url);
+      await supabase.from("investor_profiles").update({ avatar_url: url }).eq("user_id", user.id);
+      qc.invalidateQueries({ queryKey: ["investor-profile", user.id] });
+      toast.success("Profile photo updated");
+    } catch (e: any) {
+      toast.error(e.message ?? "Upload failed");
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
 
   const set = <K extends keyof ProfileForm>(k: K, v: ProfileForm[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -217,6 +243,26 @@ function InvestorProfilePage() {
 
           {/* About */}
           <Section title="About you & your fund">
+            {/* Avatar upload */}
+            <div className="flex items-center gap-4 mb-2">
+              <label className="relative cursor-pointer group shrink-0">
+                <div className="h-[72px] w-[72px] rounded-full overflow-hidden bg-gradient-brand flex items-center justify-center text-brand-foreground text-2xl font-bold">
+                  {avatarUploading
+                    ? <Loader2 className="h-5 w-5 animate-spin" />
+                    : avatarUrl
+                    ? <img src={avatarUrl} alt="avatar" className="h-full w-full object-cover" />
+                    : <span>{(form.your_name || user?.fullName || "?").split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()}</span>}
+                </div>
+                <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Upload className="h-4 w-4 text-white" />
+                </div>
+                <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])} />
+              </label>
+              <div>
+                <div className="text-sm font-medium">Profile photo</div>
+                <div className="text-xs text-muted-foreground mt-0.5">Max 2MB. JPG, PNG or WebP.</div>
+              </div>
+            </div>
             <div className="grid sm:grid-cols-2 gap-4">
               <Field label="Fund name *">
                 <input value={form.fund_name} onChange={(e) => set("fund_name", e.target.value)}

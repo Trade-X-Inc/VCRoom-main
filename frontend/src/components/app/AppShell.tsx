@@ -71,6 +71,8 @@ const workspaceNavFounder: NavItem[] = [
   { to: "/app/settings", label: "Settings", icon: Settings },
 ];
 
+const memberProfileNav: NavItem = { to: "/app/member-profile", label: "My Profile", icon: UserCircle2 };
+
 const workspaceNavInvestor: NavItem[] = [
   { to: "/app/investor/profile", label: "Profile", icon: UserCircle2 },
   { to: "/app/investor/team", label: "Team", icon: Users },
@@ -197,6 +199,21 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
     },
   });
 
+  // Team membership check (shows "My Profile" nav item)
+  const { data: isTeamMember } = useQuery({
+    queryKey: ["is-team-member", user?.id],
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("startup_team_accounts")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user!.id)
+        .eq("status", "active");
+      return (count ?? 0) > 0;
+    },
+  });
+
   // Investor deal room count (investor only)
   const { data: investorDealCount } = useQuery({
     queryKey: ["shell-investor-deal-count", user?.id],
@@ -227,8 +244,9 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       !path.startsWith("/app/news") &&
       !path.startsWith("/app/directory") &&
       !path.startsWith("/app/wall") &&
-      !path.startsWith("/app/referrals");
-    const founderOutOfBounds = !isInvestor && path.startsWith("/app/investor");
+      !path.startsWith("/app/referrals") &&
+      !path.startsWith("/app/member-profile");
+    const founderOutOfBounds = !isInvestor && path.startsWith("/app/investor") && !path.startsWith("/app/member-profile");
     if (investorOutOfBounds && lastRedirectRef.current !== "investor") {
       lastRedirectRef.current = "investor";
       navigate({ to: "/app/investor" });
@@ -418,7 +436,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                 <MessageCircle className="h-4 w-4" />
                 <span>Feedback</span>
               </button>
-              {workspaceNav.map((n) => {
+              {[...workspaceNav, ...(isTeamMember ? [memberProfileNav] : [])].map((n) => {
                 const active = path.startsWith(n.to);
                 return (
                   <Link

@@ -10,6 +10,7 @@ import {
   documentUploadedEmail,
   meetingScheduledEmail,
   feedbackRequestEmail,
+  startupTeamInviteEmail,
 } from "./templates";
 
 function getServiceClient() {
@@ -280,6 +281,32 @@ export const triggerMeetingEmail = createServerFn({ method: "POST" })
         return sendEmail({ to: m.users.email, subject, html, tags: [{ name: "type", value: "meeting-scheduled" }] });
       }));
     } catch (e) { console.error("[triggers] Meeting email failed:", e); }
+  });
+
+// ── Startup team invite ────────────────────────────────────────────────────
+
+export const triggerStartupTeamInvite = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as {
+    to: string;
+    inviterName: string;
+    companyName: string;
+    role: string;
+    token: string;
+  })
+  .handler(async ({ data }) => {
+    const inviteLink = `${APP_URL}/join?token=${data.token}`;
+    const { subject, html } = startupTeamInviteEmail({
+      inviterName: data.inviterName,
+      companyName: data.companyName,
+      role: data.role,
+      inviteLink,
+    });
+    return sendEmail({
+      to: data.to,
+      subject,
+      html,
+      tags: [{ name: "type", value: "startup-team-invite" }],
+    });
   });
 
 export const triggerDocumentUploadedEmail = createServerFn({ method: "POST" })

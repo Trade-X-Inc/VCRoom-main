@@ -186,6 +186,8 @@ function Profile() {
   const [saving, setSaving] = useState(false);
   const [logoUploading, setLogoUploading] = useState(false);
   const [deckUploading, setDeckUploading] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
   const [socialLinks, setSocialLinks] = useState<Array<{ platform: string; url: string }>>([]);
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractionResult, setExtractionResult] = useState<Record<string, unknown> | null>(null);
@@ -250,6 +252,7 @@ function Profile() {
     if (startup) {
       setForm(fromStartup(startup));
       setLogoUrl(startup.logo_url ?? null);
+      setAvatarUrl((startup as any).founder_avatar_url ?? null);
       setSocialLinks(startup.social_links ?? []);
       if (startup.pitch_deck_url) {
         const parts = startup.pitch_deck_url.split("/");
@@ -449,6 +452,31 @@ function Profile() {
       toast.error(e.message ?? "Upload failed");
     } finally {
       setLogoUploading(false);
+    }
+  };
+
+  const handleAvatarUpload = async (file: File) => {
+    if (!user?.id) return;
+    if (file.size > 2 * 1024 * 1024) { toast.error("Image must be under 2MB"); return; }
+    if (!file.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
+    setAvatarUploading(true);
+    try {
+      const ext = file.name.split(".").pop() ?? "jpg";
+      const path = `founders/${user.id}/${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: false });
+      if (error) throw error;
+      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+      const url = `${data.publicUrl}?t=${Date.now()}`;
+      setAvatarUrl(url);
+      if (startup?.id) {
+        await supabase.from("startups").update({ founder_avatar_url: url }).eq("id", startup.id);
+        queryClient.invalidateQueries({ queryKey: ["my-startup", user.id] });
+      }
+      toast.success("Profile photo updated");
+    } catch (e: any) {
+      toast.error(e.message ?? "Upload failed");
+    } finally {
+      setAvatarUploading(false);
     }
   };
 
@@ -1170,6 +1198,26 @@ function Profile() {
             </FormSection>
 
             <FormSection title="Contact">
+              {/* Founder avatar upload */}
+              <div className="mb-4 flex items-center gap-4">
+                <label className="relative cursor-pointer group shrink-0">
+                  <div className="h-[72px] w-[72px] rounded-full overflow-hidden bg-gradient-brand flex items-center justify-center text-brand-foreground text-2xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>
+                    {avatarUploading
+                      ? <Loader2 className="h-5 w-5 animate-spin" />
+                      : avatarUrl
+                      ? <img src={avatarUrl} alt="avatar" className="h-full w-full object-cover" />
+                      : <span>{(form.founder_name || user?.name || "?").split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()}</span>}
+                  </div>
+                  <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Upload className="h-4 w-4 text-white" />
+                  </div>
+                  <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])} />
+                </label>
+                <div>
+                  <div className="text-sm font-medium">Profile photo</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">Max 2MB. JPG, PNG or WebP.</div>
+                </div>
+              </div>
               <div className="grid sm:grid-cols-2 gap-3">
                 <Field label="Founder name" value={form.founder_name} onChange={field("founder_name")} placeholder="Jane Smith" />
                 <Field label="Founder email" value={form.founder_email} onChange={field("founder_email")} placeholder="jane@startup.com" />

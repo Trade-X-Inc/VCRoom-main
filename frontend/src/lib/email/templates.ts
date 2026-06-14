@@ -366,7 +366,7 @@ export function feedbackRequestEmail({ name, role }: { name: string; role: "foun
   };
 }
 
-// 12. TEAM INVITE
+// 12. TEAM INVITE (investor fund team — legacy)
 export function teamInviteEmail({
   inviteeName,
   inviterName,
@@ -389,5 +389,39 @@ export function teamInviteEmail({
   return {
     subject: `You've been added to ${fundName} on Hockystick`,
     html: baseLayout(content, `${inviterName} added you to ${fundName}.`),
+  };
+}
+
+// 13. STARTUP TEAM INVITE
+const ROLE_DESCRIPTIONS: Record<string, string> = {
+  admin: "As an Admin, you have access to all platform features including deal rooms, documents, pipeline, and team management.",
+  manager: "As a Manager, you can access deal rooms, documents, and pipeline that you are assigned to.",
+  analyst: "As an Analyst, you can review documents and run due diligence analysis on assigned deal rooms.",
+  viewer: "As a Viewer, you can read documents in deal rooms you are assigned to.",
+};
+
+export function startupTeamInviteEmail({
+  inviterName,
+  companyName,
+  role,
+  inviteLink,
+}: {
+  inviterName: string;
+  companyName: string;
+  role: string;
+  inviteLink: string;
+}) {
+  const roleDesc = ROLE_DESCRIPTIONS[role.toLowerCase()] ?? `You will have access to ${companyName}'s workspace on Hockystick.`;
+  const roleLabel = role.charAt(0).toUpperCase() + role.slice(1);
+  const content = `
+    <h2>You have been invited to join ${companyName}.</h2>
+    <p>${inviterName} has invited you to join <strong>${companyName}</strong> as a <strong>${roleLabel}</strong> on Hockystick.</p>
+    <div class="highlight"><p>${roleDesc}</p></div>
+    <div class="center"><a href="${inviteLink}" class="btn">Accept invitation →</a></div>
+    <p class="meta center">This invitation expires in 7 days. If you did not expect this invitation, you can ignore this email.</p>
+  `;
+  return {
+    subject: `You've been invited to join ${companyName} on Hockystick`,
+    html: baseLayout(content, `${inviterName} invited you to join ${companyName}.`),
   };
 }

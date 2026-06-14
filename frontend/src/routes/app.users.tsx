@@ -1,349 +1,482 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Users, UserPlus, Search, Mail, Copy, X, Check, Loader2 } from "lucide-react";
+import { Users, UserPlus, Mail, X, Loader2, ChevronDown, Clock, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { triggerDealRoomInvite } from "@/lib/email/triggers";
+import { triggerStartupTeamInvite } from "@/lib/email/triggers";
 
 export const Route = createFileRoute("/app/users")({
   component: UsersPage,
 });
 
-type Role = "Owner" | "Admin" | "Member" | "Viewer";
+type TeamRole = "admin" | "manager" | "analyst" | "viewer";
 
-const roleColor: Record<string, string> = {
-  Owner: "bg-violet/10 text-violet border-violet/20",
-  Admin: "bg-brand/10 text-brand border-brand/20",
-  Member: "bg-accent text-foreground border-border/60",
-  Viewer: "bg-muted text-muted-foreground border-border/60",
-  investor: "bg-success/10 text-success border-success/20",
-  founder: "bg-brand/10 text-brand border-brand/20",
+const ROLE_COLORS: Record<string, { bg: string; text: string }> = {
+  admin:   { bg: "rgba(124,58,237,0.15)",  text: "#7C3AED" },
+  manager: { bg: "rgba(16,185,129,0.15)",  text: "#10B981" },
+  analyst: { bg: "rgba(245,158,11,0.15)",  text: "#F59E0B" },
+  viewer:  { bg: "rgba(255,255,255,0.08)", text: "rgba(255,255,255,0.5)" },
 };
 
-interface InviteRow {
+const ROLE_DESCRIPTIONS: Record<TeamRole, string> = {
+  admin:   "Full platform access — deal rooms, documents, pipeline, team management.",
+  manager: "Access to deal rooms, documents, and pipeline they are assigned to.",
+  analyst: "Review documents and run due diligence analysis on assigned deal rooms.",
+  viewer:  "Read-only access to documents in assigned deal rooms.",
+};
+
+function RoleBadge({ role }: { role: string }) {
+  const cfg = ROLE_COLORS[role.toLowerCase()] ?? ROLE_COLORS.viewer;
+  return (
+    <span style={{
+      background: cfg.bg,
+      color: cfg.text,
+      padding: "2px 10px",
+      borderRadius: 99,
+      fontSize: 11,
+      fontWeight: 600,
+      display: "inline-block",
+    }}>
+      {role.charAt(0).toUpperCase() + role.slice(1)}
+    </span>
+  );
+}
+
+function initials(name: string) {
+  return name.split(" ").map((s) => s[0]).slice(0, 2).join("").toUpperCase() || "?";
+}
+
+interface TeamAccountRow {
+  id: string;
+  user_id: string;
+  role: string;
+  joined_at: string | null;
+  users: { full_name: string | null; email: string | null } | null;
+  team_member_profiles: { avatar_url: string | null; title: string | null } | null;
+}
+
+interface TeamInviteRow {
   id: string;
   email: string;
   role: string;
-  deal_room_id: string | null;
-  invited_by: string;
-  accepted_at: string | null;
-  expires_at: string | null;
-  created_at: string;
   token: string;
-}
-
-interface MemberRow {
-  user_id: string;
-  role: string;
   created_at: string;
-  users: { full_name: string; email?: string } | null;
+  expires_at: string | null;
+  accepted_at: string | null;
 }
 
 function UsersPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<"team" | "invites">("team");
-  const [q, setQ] = useState("");
   const [showInvite, setShowInvite] = useState(false);
 
-  // Fetch workspace members via organization_members (graceful fallback)
-  const { data: members = [], isLoading: membersLoading } = useQuery<MemberRow[]>({
-    queryKey: ["org-members", user?.id],
+  const { data: startup } = useQuery({
+    queryKey: ["users-startup", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      try {
-        const { data, error } = await supabase
-          .from("organization_members")
-          .select("user_id, role, created_at, users(full_name)")
-          .order("created_at", { ascending: true });
-        if (error) return [];
-        return (data ?? []) as MemberRow[];
-      } catch {
-        return [];
-      }
+      const { data } = await supabase
+        .from("startups")
+        .select("id, company_name, founder_name")
+        .eq("founder_id", user!.id)
+        .limit(1)
+        .maybeSingle();
+      return data;
     },
   });
 
-  // Fetch pending invites (workspace-level: deal_room_id IS NULL, or all sent by this user)
-  const { data: invites = [], isLoading: invitesLoading } = useQuery<InviteRow[]>({
-    queryKey: ["my-invites", user?.id],
-    enabled: !!user?.id,
+  const { data: teamAccounts = [], isLoading: loadingTeam } = useQuery<TeamAccountRow[]>({
+    queryKey: ["startup-team-accounts", startup?.id],
+    enabled: !!startup?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("invites")
-        .select("id, email, role, deal_room_id, invited_by, accepted_at, expires_at, created_at, token")
-        .eq("invited_by", user!.id)
-        .is("deal_room_id", null)
+      const { data } = await supabase
+        .from("startup_team_accounts")
+        .select("id, user_id, role, joined_at, users(full_name, email), team_member_profiles(avatar_url, title)")
+        .eq("startup_id", startup!.id)
+        .eq("status", "active")
+        .order("joined_at", { ascending: true });
+      return (data ?? []) as TeamAccountRow[];
+    },
+  });
+
+  const { data: pendingInvites = [], isLoading: loadingInvites } = useQuery<TeamInviteRow[]>({
+    queryKey: ["team-invites", startup?.id],
+    enabled: !!startup?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("team_invites")
+        .select("id, email, role, token, created_at, expires_at, accepted_at")
+        .eq("startup_id", startup!.id)
+        .is("accepted_at", null)
         .order("created_at", { ascending: false });
-      if (error) return [];
-      return (data ?? []) as InviteRow[];
+      return (data ?? []).filter((i) =>
+        !i.expires_at || new Date(i.expires_at) > new Date()
+      ) as TeamInviteRow[];
     },
   });
 
-  const pendingInvites = invites.filter(
-    (i) => !i.accepted_at && (!i.expires_at || new Date(i.expires_at) > new Date()),
-  );
-
-  const filteredMembers = members.filter((m) => {
-    if (!q) return true;
-    const name = m.users?.full_name ?? "";
-    return name.toLowerCase().includes(q.toLowerCase());
-  });
-
-  const filteredInvites = invites.filter((i) =>
-    !q || i.email.toLowerCase().includes(q.toLowerCase()),
-  );
-
-  const handleRevoke = async (id: string) => {
-    if (!confirm("Revoke this invite?")) return;
-    const { error } = await supabase.from("invites").delete().eq("id", id);
-    if (error) {
-      toast.error("Could not revoke invite");
-    } else {
-      toast.success("Invite revoked");
-      queryClient.invalidateQueries({ queryKey: ["my-invites", user?.id] });
-    }
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ["startup-team-accounts", startup?.id] });
+    queryClient.invalidateQueries({ queryKey: ["team-invites", startup?.id] });
   };
 
-  const copyInviteLink = (token: string) => {
-    const link = `${window.location.origin}/join/team/${token}`;
-    navigator.clipboard?.writeText(link);
-    toast.success("Link copied");
+  const handleChangeRole = async (accountId: string, newRole: string) => {
+    const { error } = await supabase
+      .from("startup_team_accounts")
+      .update({ role: newRole })
+      .eq("id", accountId);
+    if (error) toast.error("Could not update role");
+    else { toast.success("Role updated"); invalidate(); }
   };
 
-  // Build member list: always include current user as Owner
-  const selfRow: MemberRow = {
-    user_id: user?.id ?? "",
-    role: "Owner",
-    created_at: new Date().toISOString(),
-    users: { full_name: user?.name ?? "You" },
+  const handleRemoveMember = async (accountId: string, name: string) => {
+    if (!confirm(`Remove ${name} from ${startup?.company_name ?? "your team"}?`)) return;
+    const { error } = await supabase
+      .from("startup_team_accounts")
+      .delete()
+      .eq("id", accountId);
+    if (error) toast.error("Could not remove member");
+    else { toast.success(`${name} removed`); invalidate(); }
   };
-  const allMembers = [selfRow, ...filteredMembers.filter((m) => m.user_id !== user?.id)];
+
+  const handleCancelInvite = async (inviteId: string) => {
+    const { error } = await supabase
+      .from("team_invites")
+      .delete()
+      .eq("id", inviteId);
+    if (error) toast.error("Could not cancel invite");
+    else { toast.success("Invite cancelled"); invalidate(); }
+  };
+
+  const handleResendInvite = async (invite: TeamInviteRow) => {
+    const newExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    await supabase.from("team_invites").update({ expires_at: newExpiry }).eq("id", invite.id);
+    triggerStartupTeamInvite({
+      data: {
+        to: invite.email,
+        inviterName: startup?.founder_name ?? user?.name ?? "Your team",
+        companyName: startup?.company_name ?? "the company",
+        role: invite.role,
+        token: invite.token,
+      },
+    }).catch(() => {});
+    toast.success("Invite resent");
+    invalidate();
+  };
+
+  const isFounder = !!startup;
+
+  if (!isFounder && !loadingTeam) {
+    return (
+      <div style={{ padding: "48px 32px", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: 14 }}>
+        Team management is only available to founders.
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6 lg:p-8 max-w-6xl mx-auto">
-      <div className="flex items-end justify-between gap-4">
+    <div style={{ padding: "32px", maxWidth: 800, margin: "0 auto" }}>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 32 }}>
         <div>
-          <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-brand" />
-            <h1 className="text-2xl font-semibold tracking-tight">Team & users</h1>
-          </div>
-          <p className="mt-1 text-sm text-muted-foreground">Manage who can access your workspace and deal rooms.</p>
+          <h1 style={{ fontSize: 22, fontWeight: 600, color: "#fff", letterSpacing: "-0.03em", marginBottom: 4 }}>
+            Team members
+          </h1>
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
+            Manage who has access to {startup?.company_name ?? "your workspace"}.
+          </p>
         </div>
         <button
           onClick={() => setShowInvite(true)}
-          className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm font-medium shadow-glow"
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 6,
+            background: "#7C3AED", color: "#fff", border: "none",
+            borderRadius: 8, padding: "9px 16px", fontSize: 13,
+            fontWeight: 500, cursor: "pointer",
+          }}
         >
-          <UserPlus className="h-4 w-4" /> Invite people
+          <UserPlus size={14} /> Invite member
         </button>
       </div>
 
-      {/* Tabs + search */}
-      <div className="mt-6 flex items-center gap-2 border-b border-border/60">
-        {([
-          { k: "team", l: "Team", count: allMembers.length },
-          { k: "invites", l: "Invites", count: pendingInvites.length },
-        ] as const).map((t) => (
-          <button
-            key={t.k}
-            onClick={() => setTab(t.k)}
-            className={`relative px-3 py-2.5 text-sm font-medium transition-colors ${tab === t.k ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-          >
-            {t.l} <span className="ml-1 text-xs text-muted-foreground tabular-nums">{t.count}</span>
-            {tab === t.k && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand rounded-full" />}
-          </button>
-        ))}
-        <div className="ml-auto relative pb-2">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search…"
-            className="w-64 rounded-md border border-border/60 bg-background pl-8 pr-3 py-2 text-sm focus:outline-none focus:border-brand/50"
-          />
-        </div>
-      </div>
+      {/* Active members */}
+      <Section title="Active members" count={teamAccounts.length} loading={loadingTeam}>
+        {teamAccounts.length === 0 ? (
+          <EmptyState icon={<Users size={28} />} text="No team members yet" sub="Invite someone to get started." />
+        ) : (
+          teamAccounts.map((m) => {
+            const name = m.users?.full_name ?? "Unknown";
+            const email = m.users?.email ?? "";
+            const isSelf = m.user_id === user?.id;
+            const avatarUrl = (m.team_member_profiles as any)?.avatar_url;
+            return (
+              <MemberRow
+                key={m.id}
+                name={name}
+                email={email}
+                role={m.role}
+                avatarUrl={avatarUrl}
+                title={(m.team_member_profiles as any)?.title}
+                joinedAt={m.joined_at}
+                isSelf={isSelf}
+                onChangeRole={(r) => handleChangeRole(m.id, r)}
+                onRemove={() => handleRemoveMember(m.id, name)}
+              />
+            );
+          })
+        )}
+      </Section>
 
-      {/* Team tab */}
-      {tab === "team" && (
-        <>
-          {membersLoading ? (
-            <div className="mt-5 space-y-3">
-              {[1, 2, 3].map((i) => <div key={i} className="h-14 rounded-xl bg-muted animate-pulse" />)}
-            </div>
-          ) : (
-            <div className="mt-5 rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
-              <div className="grid grid-cols-[1.6fr_1fr_1fr_60px] gap-4 px-5 py-2.5 border-b border-border/60 bg-accent/30 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                <div>Member</div><div>Role</div><div>Joined</div><div></div>
-              </div>
-              <div className="divide-y divide-border/60">
-                {allMembers.map((m) => {
-                  const name = m.users?.full_name ?? "Unknown";
-                  const initials = name.split(" ").map((s) => s[0]).slice(0, 2).join("").toUpperCase() || "?";
-                  const isSelf = m.user_id === user?.id;
-                  return (
-                    <div key={m.user_id} className="grid grid-cols-[1.6fr_1fr_1fr_60px] gap-4 px-5 py-3.5 items-center hover:bg-accent/40">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-brand text-brand-foreground text-xs font-semibold shrink-0">
-                          {initials}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-sm font-medium truncate">{name}{isSelf && <span className="ml-1 text-xs text-muted-foreground">(you)</span>}</div>
-                        </div>
-                      </div>
-                      <div>
-                        <span className={`text-[10px] rounded-full px-2 py-0.5 font-medium border ${roleColor[m.role] ?? roleColor.Member}`}>
-                          {m.role}
-                        </span>
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {isSelf ? "Owner" : formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}
-                      </div>
-                      <div />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-          {allMembers.length <= 1 && !membersLoading && (
-            <div className="mt-4 rounded-xl border border-dashed border-border/60 bg-card p-8 text-center">
-              <Users className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
-              <div className="text-sm font-medium">Just you for now</div>
-              <div className="text-xs text-muted-foreground mt-1">Invite your first team member to get started.</div>
-              <button onClick={() => setShowInvite(true)} className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow">
-                <UserPlus className="h-3.5 w-3.5" /> Invite someone
-              </button>
-            </div>
-          )}
-        </>
-      )}
+      {/* Pending invites */}
+      <Section title="Pending invites" count={pendingInvites.length} loading={loadingInvites} style={{ marginTop: 24 }}>
+        {pendingInvites.length === 0 ? (
+          <EmptyState icon={<Mail size={28} />} text="No pending invites" sub="Invitations you send will appear here." />
+        ) : (
+          pendingInvites.map((inv) => (
+            <PendingInviteRow
+              key={inv.id}
+              invite={inv}
+              onCancel={() => handleCancelInvite(inv.id)}
+              onResend={() => handleResendInvite(inv)}
+            />
+          ))
+        )}
+      </Section>
 
-      {/* Invites tab */}
-      {tab === "invites" && (
-        <>
-          {invitesLoading ? (
-            <div className="mt-5 space-y-3">
-              {[1, 2].map((i) => <div key={i} className="h-14 rounded-xl bg-muted animate-pulse" />)}
-            </div>
-          ) : filteredInvites.length === 0 ? (
-            <div className="mt-5 rounded-xl border border-dashed border-border/60 bg-card p-8 text-center">
-              <Mail className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
-              <div className="text-sm font-medium">No pending invites</div>
-              <div className="text-xs text-muted-foreground mt-1">Invited people will appear here.</div>
-            </div>
-          ) : (
-            <div className="mt-5 rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
-              <div className="grid grid-cols-[1.6fr_1fr_1fr_80px] gap-4 px-5 py-2.5 border-b border-border/60 bg-accent/30 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                <div>Email</div><div>Role</div><div>Sent</div><div></div>
-              </div>
-              <div className="divide-y divide-border/60">
-                {filteredInvites.map((inv) => {
-                  const expired = inv.expires_at ? new Date(inv.expires_at) < new Date() : false;
-                  const accepted = !!inv.accepted_at;
-                  const status = accepted ? "Accepted" : expired ? "Expired" : "Pending";
-                  const statusCls = accepted
-                    ? "bg-success/10 text-success border-success/20"
-                    : expired
-                    ? "bg-muted text-muted-foreground border-border/60"
-                    : "bg-warning/10 text-warning border-warning/20";
-                  return (
-                    <div key={inv.id} className="grid grid-cols-[1.6fr_1fr_1fr_80px] gap-4 px-5 py-3.5 items-center hover:bg-accent/40">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
-                        <span className="text-sm font-medium truncate">{inv.email}</span>
-                      </div>
-                      <div>
-                        <span className={`text-[10px] rounded-full px-2 py-0.5 font-medium border ${roleColor[inv.role] ?? roleColor.Member}`}>
-                          {inv.role}
-                        </span>
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(inv.created_at), { addSuffix: true })}
-                        <div className="mt-0.5">
-                          <span className={`text-[10px] rounded-full px-1.5 py-0.5 font-medium border ${statusCls}`}>{status}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-end gap-1">
-                        {!accepted && !expired && (
-                          <>
-                            <button
-                              title="Copy invite link"
-                              onClick={() => copyInviteLink(inv.token)}
-                              className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
-                            >
-                              <Copy className="h-3.5 w-3.5" />
-                            </button>
-                            <button
-                              title="Revoke"
-                              onClick={() => handleRevoke(inv.id)}
-                              className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                            >
-                              <X className="h-3.5 w-3.5" />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </>
-      )}
-
-      {showInvite && (
+      {showInvite && startup && (
         <InviteModal
-          userId={user?.id ?? ""}
+          startup={startup}
+          inviterName={startup.founder_name ?? user?.name ?? ""}
           onClose={() => setShowInvite(false)}
-          onSent={() => queryClient.invalidateQueries({ queryKey: ["my-invites", user?.id] })}
+          onSent={invalidate}
         />
       )}
     </div>
   );
 }
 
-function InviteModal({ userId, onClose, onSent }: { userId: string; onClose: () => void; onSent: () => void }) {
+function Section({
+  title, count, loading, children, style,
+}: {
+  title: string; count: number; loading: boolean; children: React.ReactNode; style?: React.CSSProperties;
+}) {
+  return (
+    <div style={{ background: "#111114", borderRadius: 12, border: "1px solid rgba(255,255,255,0.06)", overflow: "hidden", ...style }}>
+      <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", gap: 8 }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{title}</span>
+        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.06)", borderRadius: 99, padding: "1px 7px" }}>
+          {loading ? "…" : count}
+        </span>
+      </div>
+      {loading ? (
+        <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12 }}>
+          {[1, 2].map((i) => <div key={i} style={{ height: 48, borderRadius: 8, background: "rgba(255,255,255,0.04)" }} />)}
+        </div>
+      ) : children}
+    </div>
+  );
+}
+
+function EmptyState({ icon, text, sub }: { icon: React.ReactNode; text: string; sub: string }) {
+  return (
+    <div style={{ padding: "32px 24px", textAlign: "center", color: "rgba(255,255,255,0.3)" }}>
+      <div style={{ marginBottom: 8, opacity: 0.4 }}>{icon}</div>
+      <div style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.5)", marginBottom: 4 }}>{text}</div>
+      <div style={{ fontSize: 12 }}>{sub}</div>
+    </div>
+  );
+}
+
+function MemberRow({
+  name, email, role, avatarUrl, title, joinedAt, isSelf, onChangeRole, onRemove,
+}: {
+  name: string; email: string; role: string; avatarUrl?: string | null; title?: string | null;
+  joinedAt: string | null; isSelf: boolean;
+  onChangeRole: (r: string) => void; onRemove: () => void;
+}) {
+  const [roleOpen, setRoleOpen] = useState(false);
+  const roleRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.04)", gap: 12 }}>
+      {/* Avatar */}
+      <div style={{
+        width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
+        background: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: 13, fontWeight: 700, color: "#fff", overflow: "hidden",
+      }}>
+        {avatarUrl
+          ? <img src={avatarUrl} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="" />
+          : initials(name)}
+      </div>
+
+      {/* Name + email */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 13, fontWeight: 500, color: "#fff" }}>
+          {name}{isSelf && <span style={{ color: "rgba(255,255,255,0.3)", fontWeight: 400, marginLeft: 6 }}>(you)</span>}
+        </div>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 1 }}>
+          {title ? `${title} · ${email}` : email}
+        </div>
+      </div>
+
+      {/* Role badge / dropdown */}
+      <div style={{ position: "relative" }} ref={roleRef}>
+        <button
+          onClick={() => !isSelf && setRoleOpen((o) => !o)}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 4,
+            background: "transparent", border: "none", cursor: isSelf ? "default" : "pointer", padding: 0,
+          }}
+        >
+          <RoleBadge role={role} />
+          {!isSelf && <ChevronDown size={12} style={{ color: "rgba(255,255,255,0.3)" }} />}
+        </button>
+        {roleOpen && (
+          <div style={{
+            position: "absolute", right: 0, top: "calc(100% + 4px)", zIndex: 20,
+            background: "#1a1a1f", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
+            overflow: "hidden", minWidth: 130,
+          }}>
+            {(["admin", "manager", "analyst", "viewer"] as TeamRole[]).map((r) => (
+              <button
+                key={r}
+                onClick={() => { onChangeRole(r); setRoleOpen(false); }}
+                style={{
+                  display: "block", width: "100%", textAlign: "left",
+                  padding: "9px 14px", fontSize: 12, fontWeight: 500,
+                  color: r === role ? "#7C3AED" : "rgba(255,255,255,0.7)",
+                  background: r === role ? "rgba(124,58,237,0.08)" : "transparent",
+                  border: "none", cursor: "pointer",
+                }}
+              >
+                {r.charAt(0).toUpperCase() + r.slice(1)}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Joined */}
+      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", minWidth: 80, textAlign: "right" }}>
+        {joinedAt ? formatDistanceToNow(new Date(joinedAt), { addSuffix: true }) : ""}
+      </div>
+
+      {/* Remove */}
+      {!isSelf && (
+        <button
+          onClick={onRemove}
+          title="Remove member"
+          style={{
+            background: "transparent", border: "none", cursor: "pointer",
+            color: "rgba(255,255,255,0.25)", padding: 4, borderRadius: 4,
+            display: "flex", alignItems: "center",
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#EF4444"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.25)"; }}
+        >
+          <X size={14} />
+        </button>
+      )}
+    </div>
+  );
+}
+
+function PendingInviteRow({
+  invite, onCancel, onResend,
+}: {
+  invite: TeamInviteRow; onCancel: () => void; onResend: () => void;
+}) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.04)", gap: 12 }}>
+      <div style={{
+        width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
+        background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+        <Mail size={15} style={{ color: "rgba(255,255,255,0.3)" }} />
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 13, fontWeight: 500, color: "#fff" }}>{invite.email}</div>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginTop: 1, display: "flex", alignItems: "center", gap: 4 }}>
+          <Clock size={10} />
+          Sent {formatDistanceToNow(new Date(invite.created_at), { addSuffix: true })}
+        </div>
+      </div>
+      <RoleBadge role={invite.role} />
+      <button
+        onClick={onResend}
+        title="Resend invite"
+        style={{
+          background: "transparent", border: "1px solid rgba(255,255,255,0.1)",
+          borderRadius: 6, padding: "5px 10px", fontSize: 11,
+          color: "rgba(255,255,255,0.5)", cursor: "pointer",
+          display: "flex", alignItems: "center", gap: 4,
+        }}
+      >
+        <RefreshCw size={11} /> Resend
+      </button>
+      <button
+        onClick={onCancel}
+        title="Cancel invite"
+        style={{
+          background: "transparent", border: "none", cursor: "pointer",
+          color: "rgba(255,255,255,0.25)", padding: 4, borderRadius: 4,
+          display: "flex", alignItems: "center",
+        }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#EF4444"; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.25)"; }}
+      >
+        <X size={14} />
+      </button>
+    </div>
+  );
+}
+
+function InviteModal({
+  startup, inviterName, onClose, onSent,
+}: {
+  startup: { id: string; company_name: string | null };
+  inviterName: string;
+  onClose: () => void;
+  onSent: () => void;
+}) {
+  const { user } = useAuth();
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<Role>("Member");
+  const [role, setRole] = useState<TeamRole>("analyst");
   const [sending, setSending] = useState(false);
-  const [sentToken, setSentToken] = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
 
   const handleSend = async () => {
     if (!email.trim()) { toast.error("Enter an email address"); return; }
+    if (!startup.id) return;
     setSending(true);
     try {
       const { data, error } = await supabase
-        .from("invites")
+        .from("team_invites")
         .insert({
+          startup_id: startup.id,
           email: email.trim().toLowerCase(),
-          role: role.toLowerCase(),
-          invited_by: userId,
-          deal_room_id: null,
-          expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          role,
+          invited_by: user!.id,
         })
         .select("token")
         .single();
       if (error) throw error;
-      setSentToken(data?.token ?? null);
-      toast.success("Invite created");
+      setSent(true);
       onSent();
-      // Send invite email non-blocking
       if (data?.token) {
-        triggerDealRoomInvite({
+        triggerStartupTeamInvite({
           data: {
             to: email.trim().toLowerCase(),
-            investorName: "there",
-            founderName: "Your team",
-            companyName: "Hockystick",
-            inviteToken: data.token,
+            inviterName: inviterName || "Your team",
+            companyName: startup.company_name ?? "the company",
+            role,
+            token: data.token,
           },
         }).catch(() => {});
       }
+      toast.success(`Invite sent to ${email.trim()}`);
     } catch (e: any) {
       toast.error(e.message ?? "Failed to send invite");
     } finally {
@@ -351,68 +484,102 @@ function InviteModal({ userId, onClose, onSent }: { userId: string; onClose: () 
     }
   };
 
-  const inviteLink = sentToken ? `${window.location.origin}/join/team/${sentToken}` : null;
-
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/40 backdrop-blur-sm p-4" onClick={onClose}>
-      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md rounded-2xl border border-border/60 bg-popover shadow-elev overflow-hidden">
-        <div className="px-6 py-5 border-b border-border/60">
-          <div className="text-sm font-semibold">Invite people to your workspace</div>
-          <div className="mt-0.5 text-xs text-muted-foreground">They'll receive a secure invite link.</div>
+    <div
+      style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "grid", placeItems: "center", padding: 16 }}
+      onClick={onClose}
+    >
+      <div
+        style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 28, width: "100%", maxWidth: 440 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div style={{ fontSize: 16, fontWeight: 600, color: "#fff", marginBottom: 4 }}>Invite team member</div>
+        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 24 }}>
+          They'll receive an email to join {startup.company_name} on Hockystick.
         </div>
 
-        {sentToken ? (
-          <div className="p-6">
-            <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-success/15 text-success mb-4">
-              <Check className="h-6 w-6" />
+        {sent ? (
+          <div style={{ textAlign: "center", padding: "16px 0" }}>
+            <div style={{ fontSize: 32, marginBottom: 8 }}>✉️</div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: "#fff", marginBottom: 4 }}>Invite sent</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 20 }}>
+              {email} will receive an email with a link to join.
             </div>
-            <div className="text-sm font-medium text-center">Invite created</div>
-            <div className="mt-1 text-xs text-muted-foreground text-center mb-4">Share this link with {email}</div>
-            <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-accent/30 p-2">
-              <code className="flex-1 truncate text-[11px] px-1">{inviteLink}</code>
-              <button
-                onClick={() => { navigator.clipboard?.writeText(inviteLink!); toast.success("Copied"); }}
-                className="grid h-8 w-8 place-items-center rounded-md border border-border/60 hover:bg-accent shrink-0"
-              >
-                <Copy className="h-3.5 w-3.5" />
-              </button>
-            </div>
-            <button onClick={onClose} className="mt-4 w-full rounded-md bg-foreground text-background py-2 text-sm font-medium">Done</button>
+            <button onClick={() => { setSent(false); setEmail(""); setRole("analyst"); }}
+              style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, color: "rgba(255,255,255,0.6)", cursor: "pointer", marginRight: 8 }}>
+              Invite another
+            </button>
+            <button onClick={onClose}
+              style={{ background: "#7C3AED", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, color: "#fff", cursor: "pointer" }}>
+              Done
+            </button>
           </div>
         ) : (
-          <div className="p-6 space-y-4">
-            <div>
-              <label className="text-xs font-medium">Email address</label>
+          <>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: 6 }}>
+                Email address
+              </label>
               <input
+                type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                type="email"
-                placeholder="alice@firm.com"
-                className="mt-1.5 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                placeholder="alice@company.com"
+                style={{
+                  width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: 8, padding: "10px 12px", fontSize: 13, color: "#fff",
+                  outline: "none", boxSizing: "border-box",
+                }}
+                onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
               />
             </div>
-            <div>
-              <label className="text-xs font-medium">Role</label>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value as Role)}
-                className="mt-1.5 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
-              >
-                {(["Admin", "Member", "Viewer"] as Role[]).map((r) => <option key={r}>{r}</option>)}
-              </select>
+
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: 8 }}>
+                Role
+              </label>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {(["admin", "manager", "analyst", "viewer"] as TeamRole[]).map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => setRole(r)}
+                    style={{
+                      padding: "6px 14px", borderRadius: 99, fontSize: 12, fontWeight: 500, cursor: "pointer",
+                      border: "1px solid",
+                      borderColor: role === r ? "#7C3AED" : "rgba(255,255,255,0.1)",
+                      background: role === r ? "rgba(124,58,237,0.15)" : "transparent",
+                      color: role === r ? "#7C3AED" : "rgba(255,255,255,0.5)",
+                    }}
+                  >
+                    {r.charAt(0).toUpperCase() + r.slice(1)}
+                  </button>
+                ))}
+              </div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 8, lineHeight: 1.5 }}>
+                {ROLE_DESCRIPTIONS[role]}
+              </div>
             </div>
-            <div className="flex justify-end gap-2 pt-1">
-              <button onClick={onClose} className="rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent">Cancel</button>
+
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <button onClick={onClose} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "9px 16px", fontSize: 13, color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>
+                Cancel
+              </button>
               <button
                 onClick={handleSend}
                 disabled={sending}
-                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm font-medium shadow-glow disabled:opacity-60"
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 6,
+                  background: "#7C3AED", border: "none", borderRadius: 8,
+                  padding: "9px 18px", fontSize: 13, fontWeight: 500,
+                  color: "#fff", cursor: sending ? "not-allowed" : "pointer",
+                  opacity: sending ? 0.6 : 1,
+                }}
               >
-                {sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UserPlus className="h-3.5 w-3.5" />}
+                {sending ? <Loader2 size={13} className="animate-spin" /> : <UserPlus size={13} />}
                 Send invite
               </button>
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>
