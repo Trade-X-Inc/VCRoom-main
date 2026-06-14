@@ -59,7 +59,7 @@ function InvestorAdvisor() {
       const result = await getInvestorAdvice({ data: { userId: user.id, message: t, history } });
 
       setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: result.reply }]);
-      if (result.error === "missing_key") {
+      if (result.error === "no_key" || result.error === "missing_key") {
         setErrorBanner("OpenAI API key not configured. Contact your admin.");
       }
     } catch (e: any) {

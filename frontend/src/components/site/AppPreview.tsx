@@ -12,7 +12,7 @@ export function AppPreview() {
         </div>
         <div className="ml-3 flex-1 max-w-md mx-auto">
           <div className="flex items-center gap-2 rounded-md bg-background/60 border border-border/60 px-2.5 py-1 text-xs text-muted-foreground">
-            <span className="text-success">●</span> app.ventureroom.com/app
+            <span className="text-success">●</span> hockystick.app/app
           </div>
         </div>
       </div>
