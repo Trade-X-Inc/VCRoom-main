@@ -14,10 +14,21 @@ import { NotificationBell } from "@/components/app/NotificationBell";
 import { UserMenu } from "@/components/app/UserMenu";
 import { ThemeToggle } from "@/components/app/ThemeToggle";
 import { useAuth } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
 import { useProfile } from "@/lib/store";
 
 interface NavItem { to: string; label: string; icon: any; badge?: string; }
+
+interface SearchResult {
+  id: string;
+  type: "startup" | "investor" | "document" | "deal_room";
+  title: string;
+  subtitle: string | null;
+  tag: string | null;
+  tag2: string | null;
+  slug: string | null;
+  url: string;
+  rank: number;
+}
 
 const founderNav: NavItem[] = [
   { to: "/app", label: "Overview", icon: LayoutGrid },
@@ -64,7 +75,7 @@ const workspaceNavInvestor: NavItem[] = [
   { to: "/app/investor/profile", label: "Profile", icon: UserCircle2 },
   { to: "/app/investor/team", label: "Team", icon: Users },
   { to: "/app/integrations", label: "Integrations", icon: Plug },
-  { to: "/app/settings", label: "Settings", icon: Settings },
+  { to: "/app/investor/settings", label: "Settings", icon: Settings },
 ];
 
 function FeedbackModal({ onClose }: { onClose: () => void }) {
@@ -132,6 +143,11 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searching, setSearching] = useState(false);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const profile = useProfile();
@@ -204,6 +220,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       path !== "/app/advisor" &&
       !path.startsWith("/app/profile") &&
       !path.startsWith("/app/settings") &&
+      !path.startsWith("/app/investor/settings") &&
       !path.startsWith("/app/meetings") &&
       !path.startsWith("/app/deal-room") &&
       !path.startsWith("/app/messages") &&
@@ -222,6 +239,52 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       lastRedirectRef.current = "";
     }
   }, [isInvestor, path]);  // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+      if (e.key === "Escape") {
+        setSearchOpen(false);
+        setSearchQuery("");
+        setSearchResults([]);
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  async function handleSearch(query: string) {
+    setSearchQuery(query);
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    if (!query || query.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    searchTimeoutRef.current = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (!authUser) return;
+        const { data: userRow } = await supabase
+          .from("users")
+          .select("role")
+          .eq("id", authUser.id)
+          .maybeSingle();
+        const { data, error } = await supabase.rpc("global_search", {
+          search_query: query.trim(),
+          searcher_id: authUser.id,
+          searcher_role: userRow?.role ?? "founder",
+          result_limit: 8,
+        });
+        if (!error && data) setSearchResults(data as SearchResult[]);
+      } finally {
+        setSearching(false);
+      }
+    }, 300);
+  }
 
   if (authLoading) {
     return <div className="min-h-screen bg-background grid place-items-center text-sm text-muted-foreground">Loading…</div>;
@@ -406,14 +469,14 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
 
           {/* Search — hidden on mobile, visible md+ */}
           <div className="hidden md:flex flex-1 max-w-md">
-            <div className="relative w-full">
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="relative w-full flex items-center rounded-md border border-border/60 bg-background/60 pl-9 pr-12 py-2 text-sm text-muted-foreground/70 hover:border-brand/40 hover:text-muted-foreground transition-colors text-left"
+            >
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                placeholder="Search investors, documents, deals…"
-                className="w-full rounded-md border border-border/60 bg-background/60 pl-9 pr-12 py-2 text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/10"
-              />
+              Search investors, documents, deals…
               <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground border border-border/60 rounded px-1.5 py-0.5">⌘K</kbd>
-            </div>
+            </button>
           </div>
 
           <div className="ml-auto flex items-center gap-1.5 md:gap-2">
@@ -428,6 +491,94 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
         <main className="flex-1 min-w-0 overflow-x-hidden">{children ?? <Outlet />}</main>
       </div>
       {feedbackOpen && <FeedbackModal onClose={() => setFeedbackOpen(false)} />}
+
+      {/* Global search modal */}
+      {searchOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4"
+          onClick={() => { setSearchOpen(false); setSearchQuery(""); setSearchResults([]); }}
+        >
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div
+            className="relative w-full max-w-xl rounded-2xl overflow-hidden shadow-2xl"
+            style={{ background: "#111118", border: "1px solid rgba(255,255,255,0.1)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Input */}
+            <div className="flex items-center gap-3 p-4 border-b border-white/8">
+              <Search size={18} className="text-white/30 shrink-0" />
+              <input
+                autoFocus
+                type="text"
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                placeholder="Search founders, investors, documents..."
+                className="flex-1 bg-transparent text-white placeholder:text-white/30 outline-none text-sm"
+              />
+              {searching && (
+                <div className="w-4 h-4 border-2 border-white/20 border-t-[#7C3AED] rounded-full animate-spin shrink-0" />
+              )}
+              <kbd className="text-xs text-white/25 bg-white/5 px-1.5 py-0.5 rounded shrink-0">ESC</kbd>
+            </div>
+
+            {/* Results */}
+            <div className="max-h-80 overflow-y-auto p-2">
+              {searchQuery.length >= 2 && !searching && searchResults.length === 0 && (
+                <div className="py-8 text-center">
+                  <p className="text-sm text-white/30">No results for "{searchQuery}"</p>
+                </div>
+              )}
+              {searchQuery.length < 2 && (
+                <div className="py-6 text-center">
+                  <p className="text-xs text-white/25">Search founders, investors, documents, deal rooms</p>
+                </div>
+              )}
+              {(["startup", "investor", "deal_room", "document"] as const).map((type) => {
+                const typeResults = searchResults.filter((r) => r.type === type);
+                if (typeResults.length === 0) return null;
+                const typeLabel = { startup: "Founders", investor: "Investors", deal_room: "Deal Rooms", document: "Documents" }[type];
+                const typeIcon = { startup: "◎", investor: "✦", deal_room: "🏛", document: "≡" }[type];
+                return (
+                  <div key={type} className="mb-3">
+                    <p className="text-xs text-white/25 uppercase tracking-wider px-3 mb-1">{typeIcon} {typeLabel}</p>
+                    {typeResults.map((result) => (
+                      <a
+                        key={result.id}
+                        href={result.url}
+                        onClick={() => { setSearchOpen(false); setSearchQuery(""); setSearchResults([]); }}
+                        className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors group"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-white group-hover:text-[#a78bfa] transition-colors truncate">{result.title}</p>
+                          {result.subtitle && <p className="text-xs text-white/40 truncate mt-0.5">{result.subtitle}</p>}
+                        </div>
+                        <div className="flex items-center gap-1.5 ml-3 shrink-0">
+                          {result.tag && (
+                            <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(124,58,237,0.15)", color: "#a78bfa" }}>
+                              {result.tag}
+                            </span>
+                          )}
+                          {result.tag2 && (
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-white/8 text-white/40">{result.tag2}</span>
+                          )}
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Footer */}
+            {searchResults.length > 0 && (
+              <div className="px-4 py-2 border-t border-white/5 flex items-center gap-3">
+                <span className="text-xs text-white/20">{searchResults.length} result{searchResults.length !== 1 ? "s" : ""}</span>
+                <span className="text-xs text-white/20 ml-auto">↵ to open</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

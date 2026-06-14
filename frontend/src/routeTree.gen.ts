@@ -84,6 +84,7 @@ import { Route as AppSettingsDomainRouteImport } from './routes/app.settings.dom
 import { Route as AppSettingsBillingRouteImport } from './routes/app.settings.billing'
 import { Route as AppInvestorTeamRouteImport } from './routes/app.investor.team'
 import { Route as AppInvestorStartupsRouteImport } from './routes/app.investor.startups'
+import { Route as AppInvestorSettingsRouteImport } from './routes/app.investor.settings'
 import { Route as AppInvestorProfileRouteImport } from './routes/app.investor.profile'
 import { Route as AppInvestorPortfolioRouteImport } from './routes/app.investor.portfolio'
 import { Route as AppInvestorPipelineRouteImport } from './routes/app.investor.pipeline'
@@ -475,6 +476,11 @@ const AppInvestorStartupsRoute = AppInvestorStartupsRouteImport.update({
   path: '/startups',
   getParentRoute: () => AppInvestorRoute,
 } as any)
+const AppInvestorSettingsRoute = AppInvestorSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
 const AppInvestorProfileRoute = AppInvestorProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -621,6 +627,7 @@ export interface FileRoutesByFullPath {
   '/app/investor/pipeline': typeof AppInvestorPipelineRoute
   '/app/investor/portfolio': typeof AppInvestorPortfolioRoute
   '/app/investor/profile': typeof AppInvestorProfileRoute
+  '/app/investor/settings': typeof AppInvestorSettingsRoute
   '/app/investor/startups': typeof AppInvestorStartupsRoute
   '/app/investor/team': typeof AppInvestorTeamRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
@@ -708,6 +715,7 @@ export interface FileRoutesByTo {
   '/app/investor/pipeline': typeof AppInvestorPipelineRoute
   '/app/investor/portfolio': typeof AppInvestorPortfolioRoute
   '/app/investor/profile': typeof AppInvestorProfileRoute
+  '/app/investor/settings': typeof AppInvestorSettingsRoute
   '/app/investor/startups': typeof AppInvestorStartupsRoute
   '/app/investor/team': typeof AppInvestorTeamRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
@@ -799,6 +807,7 @@ export interface FileRoutesById {
   '/app/investor/pipeline': typeof AppInvestorPipelineRoute
   '/app/investor/portfolio': typeof AppInvestorPortfolioRoute
   '/app/investor/profile': typeof AppInvestorProfileRoute
+  '/app/investor/settings': typeof AppInvestorSettingsRoute
   '/app/investor/startups': typeof AppInvestorStartupsRoute
   '/app/investor/team': typeof AppInvestorTeamRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
@@ -891,6 +900,7 @@ export interface FileRouteTypes {
     | '/app/investor/pipeline'
     | '/app/investor/portfolio'
     | '/app/investor/profile'
+    | '/app/investor/settings'
     | '/app/investor/startups'
     | '/app/investor/team'
     | '/app/settings/billing'
@@ -978,6 +988,7 @@ export interface FileRouteTypes {
     | '/app/investor/pipeline'
     | '/app/investor/portfolio'
     | '/app/investor/profile'
+    | '/app/investor/settings'
     | '/app/investor/startups'
     | '/app/investor/team'
     | '/app/settings/billing'
@@ -1068,6 +1079,7 @@ export interface FileRouteTypes {
     | '/app/investor/pipeline'
     | '/app/investor/portfolio'
     | '/app/investor/profile'
+    | '/app/investor/settings'
     | '/app/investor/startups'
     | '/app/investor/team'
     | '/app/settings/billing'
@@ -1655,6 +1667,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorStartupsRouteImport
       parentRoute: typeof AppInvestorRoute
     }
+    '/app/investor/settings': {
+      id: '/app/investor/settings'
+      path: '/settings'
+      fullPath: '/app/investor/settings'
+      preLoaderRoute: typeof AppInvestorSettingsRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
     '/app/investor/profile': {
       id: '/app/investor/profile'
       path: '/profile'
@@ -1759,6 +1778,7 @@ interface AppInvestorRouteChildren {
   AppInvestorPipelineRoute: typeof AppInvestorPipelineRoute
   AppInvestorPortfolioRoute: typeof AppInvestorPortfolioRoute
   AppInvestorProfileRoute: typeof AppInvestorProfileRoute
+  AppInvestorSettingsRoute: typeof AppInvestorSettingsRoute
   AppInvestorStartupsRoute: typeof AppInvestorStartupsRoute
   AppInvestorTeamRoute: typeof AppInvestorTeamRoute
   AppInvestorIndexRoute: typeof AppInvestorIndexRoute
@@ -1774,6 +1794,7 @@ const AppInvestorRouteChildren: AppInvestorRouteChildren = {
   AppInvestorPipelineRoute: AppInvestorPipelineRoute,
   AppInvestorPortfolioRoute: AppInvestorPortfolioRoute,
   AppInvestorProfileRoute: AppInvestorProfileRoute,
+  AppInvestorSettingsRoute: AppInvestorSettingsRoute,
   AppInvestorStartupsRoute: AppInvestorStartupsRoute,
   AppInvestorTeamRoute: AppInvestorTeamRoute,
   AppInvestorIndexRoute: AppInvestorIndexRoute,

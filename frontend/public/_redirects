@@ -1,3 +1,4 @@
-/signup    /sign-up    301
-/accelerators    /resources    301
-/grants    /resources    301
+/signup /sign-up 301
+/accelerators /resources 301
+/grants /resources 301
+/* /index.html 200

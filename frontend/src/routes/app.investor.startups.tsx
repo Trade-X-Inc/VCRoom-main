@@ -1,5 +1,28 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
+
+const GCC_COUNTRIES = ["UAE", "Saudi Arabia", "Qatar", "Kuwait", "Bahrain", "Oman"];
+const MENA_EXTRA = ["Egypt", "Jordan", "Lebanon", "Morocco", "Tunisia", "Iraq", "Palestine", "Libya"];
+const MENA_COUNTRIES = [...GCC_COUNTRIES, ...MENA_EXTRA];
+const EU_COUNTRIES = ["Germany", "France", "UK", "Netherlands", "Sweden", "Spain", "Italy", "Ireland", "Denmark", "Finland", "Norway", "Austria", "Belgium", "Portugal", "Switzerland", "Poland", "Czech Republic", "Romania", "Hungary", "Greece"];
+const NA_COUNTRIES = ["United States", "Canada"];
+const SEA_COUNTRIES = ["Singapore", "Indonesia", "Malaysia", "Thailand", "Vietnam", "Philippines"];
+const AFRICA_COUNTRIES = ["Nigeria", "Kenya", "South Africa", "Ghana", "Ethiopia", "Egypt"];
+
+function getRegion(country: string | null | undefined): string {
+  if (!country) return "";
+  const c = country.trim();
+  if (GCC_COUNTRIES.includes(c)) return "GCC";
+  if (MENA_COUNTRIES.includes(c)) return "MENA";
+  if (EU_COUNTRIES.includes(c)) return "EU";
+  if (NA_COUNTRIES.includes(c)) return "NA";
+  if (SEA_COUNTRIES.includes(c)) return "SEA";
+  if (AFRICA_COUNTRIES.includes(c)) return "Africa";
+  return "";
+}
+
+const REGION_PILLS = ["All", "GCC", "MENA", "EU", "NA", "SEA", "Africa"] as const;
+type RegionFilter = (typeof REGION_PILLS)[number];
 import { Building2, ExternalLink, Clock, Plus, X, Loader2, ChevronRight, Upload, Download, List, LayoutGrid, Grid3x3, Pencil, Trash2 } from "lucide-react";
 import Papa from "papaparse";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -62,6 +85,7 @@ function StartupsPage() {
   const [viewMode, setViewMode] = useState<"list" | "grid" | "icon">("grid");
   const [platformFilter, setPlatformFilter] = useState<"all" | "hockystick">("all");
   const [stageFilter, setStageFilter] = useState<string | null>(null);
+  const [regionFilter, setRegionFilter] = useState<RegionFilter>("All");
 
   const downloadSampleCsv = () => {
     const csv = [
@@ -450,44 +474,97 @@ function StartupsPage() {
           </button>
         </div>
 
-        {/* Platform leads view */}
-        {/* Hockystick platform leads */}
+        {/* Platform leads view — From Hockystick tab */}
         {platformFilter === "hockystick" && (
-          platformLoading ? (
-            <div className="grid md:grid-cols-2 gap-4">
-              {[1, 2].map((i) => (
-                <div key={i} className="rounded-2xl border border-border/60 bg-card h-40 animate-pulse" />
-              ))}
-            </div>
-          ) : platformLeads.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center">
-              <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
-                <Building2 className="h-6 w-6" />
-              </div>
-              <h3 className="mt-4 text-lg font-semibold">No platform leads yet</h3>
-              <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">Connect with founders from the Directory to generate platform leads.</p>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 gap-4">
-              {platformLeads.map((l: any) => {
-                const startup = l.discovery_requests?.startups;
-                const company = startup?.company_name ?? l.investor_name;
-                const badge = l.status === "New" ? "Pending founder response" : l.status === "Replied" ? "Connected" : l.status === "Rejected" ? "Declined" : l.status;
-                const badgeCls = l.status === "New" ? "bg-amber-500/10 text-amber-600" : l.status === "Replied" ? "bg-success/10 text-success" : l.status === "Rejected" ? "bg-destructive/10 text-destructive" : "bg-muted/10 text-muted-foreground";
+          <>
+            {/* Region filter pills — always render when tab is active */}
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "12px" }}>
+              {REGION_PILLS.map((r) => {
+                const active = regionFilter === r;
                 return (
-                  <div key={l.id} className="rounded-2xl border border-border/60 bg-card p-5">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-semibold">{company}</div>
-                        <div className="text-xs text-muted-foreground">{startup?.sector ?? l.sector} · {startup?.stage ?? l.stage}</div>
-                      </div>
-                      <div className={`text-xs px-2 py-1 rounded ${badgeCls}`}>{badge}</div>
-                    </div>
-                  </div>
+                  <button
+                    key={r}
+                    onClick={() => setRegionFilter(r)}
+                    style={{
+                      background: active ? "#7C3AED" : "rgba(255,255,255,0.06)",
+                      color: active ? "#ffffff" : "rgba(255,255,255,0.5)",
+                      borderRadius: "20px",
+                      padding: "6px 14px",
+                      fontSize: "13px",
+                      border: "none",
+                      cursor: "pointer",
+                      transition: "background 0.15s, color 0.15s",
+                    }}
+                  >
+                    {r}
+                  </button>
                 );
               })}
             </div>
-          )
+
+            {/* Result count — only after load */}
+            {!platformLoading && (
+              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)", marginBottom: "12px" }}>
+                {(() => {
+                  const count = platformLeads.filter((l: any) => {
+                    if (regionFilter === "All") return true;
+                    return getRegion(l.discovery_requests?.startups?.country ?? "") === regionFilter;
+                  }).length;
+                  return `Showing ${count} startup${count !== 1 ? "s" : ""}`;
+                })()}
+              </div>
+            )}
+
+            {/* Content — loading skeleton, empty state, or cards */}
+            {platformLoading ? (
+              <div className="grid md:grid-cols-2 gap-4">
+                {[1, 2].map((i) => (
+                  <div key={i} className="rounded-2xl border border-border/60 bg-card h-40 animate-pulse" />
+                ))}
+              </div>
+            ) : (() => {
+              const filteredLeads = platformLeads.filter((l: any) => {
+                if (regionFilter === "All") return true;
+                return getRegion(l.discovery_requests?.startups?.country ?? "") === regionFilter;
+              });
+              if (filteredLeads.length === 0) {
+                return (
+                  <div className="rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center">
+                    <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
+                      <Building2 className="h-6 w-6" />
+                    </div>
+                    <h3 className="mt-4 text-lg font-semibold">
+                      {regionFilter !== "All" ? `No ${regionFilter} startups on Hockystick yet.` : "No platform leads yet"}
+                    </h3>
+                    <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
+                      {regionFilter !== "All" ? "Try a different region filter." : "Connect with founders from the Directory to generate platform leads."}
+                    </p>
+                  </div>
+                );
+              }
+              return (
+                <div className="grid md:grid-cols-2 gap-4">
+                  {filteredLeads.map((l: any) => {
+                    const startup = l.discovery_requests?.startups;
+                    const company = startup?.company_name ?? l.investor_name;
+                    const badge = l.status === "New" ? "Pending founder response" : l.status === "Replied" ? "Connected" : l.status === "Rejected" ? "Declined" : l.status;
+                    const badgeCls = l.status === "New" ? "bg-amber-500/10 text-amber-600" : l.status === "Replied" ? "bg-success/10 text-success" : l.status === "Rejected" ? "bg-destructive/10 text-destructive" : "bg-muted/10 text-muted-foreground";
+                    return (
+                      <div key={l.id} className="rounded-2xl border border-border/60 bg-card p-5">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-semibold">{company}</div>
+                            <div className="text-xs text-muted-foreground">{startup?.sector ?? l.sector} · {startup?.stage ?? l.stage}</div>
+                          </div>
+                          <div className={`text-xs px-2 py-1 rounded ${badgeCls}`}>{badge}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+          </>
         )}
 
         {/* All leads / watchlist */}
