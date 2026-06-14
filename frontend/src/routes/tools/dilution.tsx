@@ -589,6 +589,42 @@ function DilutionPage() {
                 <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)", lineHeight: 1.6 }}>
                   Founders own <span style={{ color: "#fff" }}>{fmtPct(founderFinal)}</span> of the company, valued at <span style={{ color: "#fff" }}>{fmt$(latest.postMoney * founderFinal / 100)}</span> at this valuation.
                 </p>
+
+                {/* Majority threshold visual */}
+                {(() => {
+                  const breakevenSnap = snapshots.slice(1).find((s) =>
+                    s.founders.reduce((sum, f) => sum + f.pct, 0) < 50
+                  );
+                  if (!breakevenSnap) {
+                    return (
+                      <div style={{ marginTop: 16, padding: '12px 16px', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 8, color: '#10B981', fontSize: 14 }}>
+                        You maintain majority ownership through all modeled rounds.
+                      </div>
+                    );
+                  }
+                  const snapIdx = snapshots.indexOf(breakevenSnap);
+                  const bSegs = [
+                    ...breakevenSnap.founders.map((f, i) => ({ color: FOUNDER_COLORS[i] ?? "#7C3AED", pct: f.pct, label: f.name })),
+                    { color: POOL_COLOR, pct: breakevenSnap.poolPct, label: "Option pool" },
+                    ...snapshots.slice(1, snapIdx + 1).map((s, i) => ({ color: ROUND_COLORS[i] ?? "#10B981", pct: s.investorPct, label: `${s.investorName} investors` })),
+                  ];
+                  return (
+                    <div style={{ marginTop: 16 }}>
+                      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        Ownership at majority threshold
+                      </p>
+                      <div style={{ display: 'flex', height: 32, borderRadius: 4, overflow: 'hidden' }}>
+                        {bSegs.filter((s) => s.pct > 0).map((s) => (
+                          <div key={s.label} title={`${s.label}: ${fmtPct(s.pct)}`}
+                            style={{ width: `${s.pct}%`, background: s.color, transition: 'width 0.3s' }} />
+                        ))}
+                      </div>
+                      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 8 }}>
+                        Your combined founder ownership crosses below 50% at <span style={{ color: '#fff' }}>{breakevenSnap.stageName}</span>
+                      </p>
+                    </div>
+                  );
+                })()}
               </div>
             )}
 

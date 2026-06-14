@@ -39,6 +39,7 @@ function DealRooms() {
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState(false);
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
@@ -113,6 +114,15 @@ function DealRooms() {
 
   const isLoading = roomsLoading || (!!user?.id && startup === undefined);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (isLoading) {
+        setLoadError(true);
+      }
+    }, 8000);
+    return () => clearTimeout(timer);
+  }, [isLoading]);
+
   const filteredRooms = rooms.filter((r: any) => {
     const s = r.status ?? "new";
     if (filter === "active") return s === "active";
@@ -125,6 +135,19 @@ function DealRooms() {
     if (sort === "active") return new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime();
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
+
+  if (loadError) {
+    return (
+      <div style={{ textAlign: 'center', padding: '48px 24px', color: 'rgba(255,255,255,0.5)' }}>
+        <p style={{ color: '#ffffff', marginBottom: 8 }}>Failed to load</p>
+        <p style={{ fontSize: 14, marginBottom: 24 }}>There was a problem connecting. Please refresh the page.</p>
+        <button onClick={() => window.location.reload()}
+          style={{ background: '#7C3AED', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: 8, cursor: 'pointer' }}>
+          Refresh
+        </button>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

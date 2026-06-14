@@ -24,21 +24,68 @@ import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Go home
-          </Link>
-        </div>
+    <div style={{
+      minHeight: '100vh',
+      background: '#0A0A0B',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '24px',
+      fontFamily: 'DM Sans, sans-serif',
+    }}>
+      <p style={{
+        color: '#7C3AED',
+        fontSize: 12,
+        fontWeight: 600,
+        letterSpacing: '0.1em',
+        textTransform: 'uppercase',
+        marginBottom: 16,
+      }}>
+        404
+      </p>
+      <h1 style={{
+        color: '#ffffff',
+        fontSize: 32,
+        fontWeight: 800,
+        fontFamily: 'Syne, sans-serif',
+        marginBottom: 12,
+        textAlign: 'center',
+      }}>
+        This page doesn't exist
+      </h1>
+      <p style={{
+        color: 'rgba(255,255,255,0.4)',
+        fontSize: 16,
+        marginBottom: 32,
+        textAlign: 'center',
+        maxWidth: 400,
+      }}>
+        The link may be broken or the page may have moved.
+      </p>
+      <div style={{ display: 'flex', gap: 12 }}>
+        <a href="/" style={{
+          background: '#7C3AED',
+          color: '#ffffff',
+          padding: '10px 24px',
+          borderRadius: 8,
+          textDecoration: 'none',
+          fontSize: 14,
+          fontWeight: 500,
+        }}>
+          Go home
+        </a>
+        <a href="/tools" style={{
+          background: 'rgba(255,255,255,0.06)',
+          color: '#ffffff',
+          padding: '10px 24px',
+          borderRadius: 8,
+          textDecoration: 'none',
+          fontSize: 14,
+          fontWeight: 500,
+        }}>
+          View tools
+        </a>
       </div>
     </div>
   );

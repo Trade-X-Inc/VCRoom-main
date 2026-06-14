@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -123,6 +123,7 @@ function Pipeline() {
   const [dragId, setDragId] = useState<string | null>(null);
   const [overStage, setOverStage] = useState<PipelineStage | null>(null);
   const [selectedLead, setSelectedLead] = useState<VCLead | null>(null);
+  const [loadError, setLoadError] = useState(false);
 
   const { data: rawLeads = [], isLoading } = useQuery<VCLead[]>({
     queryKey: ["pipeline-leads", user?.id],
@@ -137,6 +138,15 @@ function Pipeline() {
       return (data ?? []) as VCLead[];
     },
   });
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (isLoading) {
+        setLoadError(true);
+      }
+    }, 8000);
+    return () => clearTimeout(timer);
+  }, [isLoading]);
 
   const deals = useMemo(() => rawLeads.map(leadToDeal), [rawLeads]);
 
@@ -165,6 +175,19 @@ function Pipeline() {
       .eq("id", dragId)
       .eq("founder_id", user.id);
   };
+
+  if (loadError) {
+    return (
+      <div style={{ textAlign: 'center', padding: '48px 24px', color: 'rgba(255,255,255,0.5)' }}>
+        <p style={{ color: '#ffffff', marginBottom: 8 }}>Failed to load</p>
+        <p style={{ fontSize: 14, marginBottom: 24 }}>There was a problem connecting. Please refresh the page.</p>
+        <button onClick={() => window.location.reload()}
+          style={{ background: '#7C3AED', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: 8, cursor: 'pointer' }}>
+          Refresh
+        </button>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

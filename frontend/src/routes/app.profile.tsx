@@ -75,6 +75,7 @@ type FormState = {
   revenue_model: string; pricing: string; unit_economics: string; burn_rate: string;
   runway_months: string; advisors: string; competitors: string; milestones: string;
   intro_video_url: string; product_video_url: string; moat: string;
+  legal_entity_name: string; registration_number: string;
   section_visibility: Record<string, SectionVisibility>;
 };
 
@@ -92,6 +93,7 @@ const emptyForm: FormState = {
   revenue_model: "", pricing: "", unit_economics: "", burn_rate: "",
   runway_months: "", advisors: "", competitors: "", milestones: "",
   intro_video_url: "", product_video_url: "", moat: "",
+  legal_entity_name: "", registration_number: "",
   section_visibility: defaultSectionVisibility,
 };
 
@@ -152,6 +154,8 @@ function fromStartup(s: StartupRow): FormState {
     advisors: s.advisors ?? "", competitors: s.competitors ?? "",
     milestones: s.milestones ?? "", intro_video_url: s.intro_video_url ?? "",
     product_video_url: s.product_video_url ?? "", moat: s.moat ?? "",
+    legal_entity_name: (s as any).legal_entity_name ?? "",
+    registration_number: (s as any).registration_number ?? "",
     section_visibility: completeVisibility(s.section_visibility),
   };
 }
@@ -187,6 +191,7 @@ function Profile() {
   const [extractionError, setExtractionError] = useState<string | null>(null);
   const [showExtractionPreview, setShowExtractionPreview] = useState(false);
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
+  const [runningRegistryCheck, setRunningRegistryCheck] = useState(false);
 
   const { data: startup, isLoading } = useQuery<StartupRow | null>({
     queryKey: ["my-startup", user?.id],
@@ -195,6 +200,19 @@ function Profile() {
       const { data } = await supabase
         .from("startups").select("*").eq("founder_id", user!.id).limit(1).maybeSingle();
       return data as StartupRow | null;
+    },
+  });
+
+  const { data: registryCheck, refetch: refetchRegistryCheck } = useQuery({
+    queryKey: ["registry-check", startup?.id],
+    enabled: !!startup?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("company_registry_checks")
+        .select("*")
+        .eq("startup_id", startup!.id)
+        .maybeSingle();
+      return data;
     },
   });
 
@@ -217,6 +235,10 @@ function Profile() {
   const uniqueViewers = new Set(profileViews.filter((v: any) => v.viewer_id).map((v: any) => v.viewer_id)).size;
   const anonymousViews = profileViews.filter((v: any) => !v.viewer_id).length;
   const last7Days = profileViews.filter((v: any) => new Date(v.created_at) >= new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length;
+  const viewsWithDuration = profileViews.filter((v: any) => v.duration_seconds != null);
+  const avgDuration = viewsWithDuration.length > 0
+    ? Math.round(viewsWithDuration.reduce((s: number, v: any) => s + (v.duration_seconds ?? 0), 0) / viewsWithDuration.length)
+    : 0;
   const sourceBreakdown = profileViews.reduce((acc: Record<string, number>, v: any) => {
     const src = v.source || (v.referrer?.includes("linkedin") ? "LinkedIn" : v.referrer?.includes("twitter") || v.referrer?.includes("x.com") ? "X" : v.referrer?.includes("whatsapp") ? "WhatsApp" : v.referrer ? "Other" : "Direct");
     acc[src] = (acc[src] ?? 0) + 1;
@@ -293,6 +315,30 @@ function Profile() {
     }
   };
 
+  const runRegistryCheck = async () => {
+    if (!startup?.id) return;
+    setRunningRegistryCheck(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-company-registry`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({ startup_id: startup.id }),
+        }
+      );
+      await refetchRegistryCheck();
+    } catch (e: any) {
+      toast.error("Registry check failed: " + (e.message ?? "Unknown error"));
+    } finally {
+      setRunningRegistryCheck(false);
+    }
+  };
+
   // STEP 1: Check-then-insert-or-update (no upsert with onConflict)
   const handleSave = async () => {
     if (!user?.id) return;
@@ -346,6 +392,8 @@ function Profile() {
         intro_video_url: form.intro_video_url || null,
         product_video_url: form.product_video_url || null,
         moat: form.moat || null,
+        legal_entity_name: form.legal_entity_name || null,
+        registration_number: form.registration_number || null,
         section_visibility: form.section_visibility,
         social_links: socialLinks.filter((l) => l.platform && l.url),
         profile_slug: form.company_name ? slugify(form.company_name) : null,
@@ -935,6 +983,71 @@ function Profile() {
           <div className="lg:col-span-2 space-y-4">
             <FormSection title="Company basics">
               <Field label="Company name" value={form.company_name} onChange={field("company_name")} placeholder="Atlas Robotics" />
+              <div>
+                <label className="text-xs text-white/40 uppercase tracking-wider block mb-2">Legal entity name</label>
+                <input
+                  type="text"
+                  value={form.legal_entity_name ?? ""}
+                  onChange={(e) => setForm((prev) => ({ ...prev, legal_entity_name: e.target.value }))}
+                  placeholder="Full registered legal name (if different from trading name)"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/20 focus:border-[#7C3AED]/50 outline-none transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-white/40 uppercase tracking-wider block mb-2">Company registration number</label>
+                <input
+                  type="text"
+                  value={form.registration_number ?? ""}
+                  onChange={(e) => setForm((prev) => ({ ...prev, registration_number: e.target.value }))}
+                  placeholder="e.g. 0001234 (Companies House), CL1234 (DIFC)"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/20 focus:border-[#7C3AED]/50 outline-none transition-colors"
+                />
+                <p className="text-xs text-white/25 mt-1">Optional but improves registry verification accuracy</p>
+              </div>
+
+              {/* Registry verification section */}
+              {registryCheck ? (
+                <div className="p-4 rounded-xl border mt-2" style={{
+                  background: registryCheck.verified ? "rgba(16,185,129,0.07)" : "rgba(255,255,255,0.03)",
+                  border: registryCheck.verified ? "1px solid rgba(16,185,129,0.2)" : "1px solid rgba(255,255,255,0.08)",
+                }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-white/50">Company registry check</p>
+                    <span className="text-xs font-bold" style={{ color: registryCheck.verified ? "#10B981" : "rgba(255,255,255,0.3)" }}>
+                      {registryCheck.verified ? `✓ ${registryCheck.confidence_score}% confidence` : "○ Not verified"}
+                    </span>
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>{registryCheck.verification_summary}</p>
+                  {(registryCheck.sources as Array<{ registry: string; url: string }> | null)?.length ? (
+                    <div className="mt-2 space-y-1">
+                      {(registryCheck.sources as Array<{ registry: string; url: string }>).map((source, i) => (
+                        <a key={i} href={source.url} target="_blank" rel="noopener noreferrer"
+                          className="text-xs block hover:underline" style={{ color: "#7C3AED" }}>
+                          ↗ {source.registry}
+                        </a>
+                      ))}
+                    </div>
+                  ) : null}
+                  <p className="text-xs mt-2" style={{ color: "rgba(255,255,255,0.2)" }}>
+                    Checked {new Date(registryCheck.checked_at).toLocaleDateString()} · Source-cited, not manually confirmed
+                  </p>
+                </div>
+              ) : (
+                <div className="p-4 rounded-xl border mt-2" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <p className="text-xs text-white/30">
+                    Registry check runs automatically when your profile is published. Checks OpenCorporates (140+ jurisdictions), UK Companies House, and DIFC entity register.
+                  </p>
+                </div>
+              )}
+              <button
+                onClick={runRegistryCheck}
+                disabled={runningRegistryCheck || !startup?.id}
+                className="text-xs px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.3)", color: "#a78bfa" }}
+              >
+                {runningRegistryCheck ? "⟳ Checking registries..." : "↻ Run registry check"}
+              </button>
+
               <Field label="Tagline" value={form.tagline} onChange={field("tagline")} placeholder="One line that explains your company" />
               <div className="grid sm:grid-cols-2 gap-3">
                 <Field label="Website" value={form.website} onChange={field("website")} placeholder="https://example.com" />
@@ -1090,12 +1203,12 @@ function Profile() {
                 <p className="text-sm font-semibold text-foreground mb-1">Profile Analytics</p>
                 <p className="text-xs text-muted-foreground mb-4">Tracking views of hockystick.app/p/{startup.profile_slug}</p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {([
-                    { label: "Total views", value: totalViews },
-                    { label: "Logged-in viewers", value: uniqueViewers },
-                    { label: "Anonymous views", value: anonymousViews },
-                    { label: "Last 7 days", value: last7Days },
-                  ] as const).map(({ label, value }) => (
+                  {[
+                    { label: "Total views", value: String(totalViews) },
+                    { label: "Unique visitors", value: String(uniqueViewers) },
+                    { label: "Avg duration", value: avgDuration > 0 ? `${avgDuration}s` : "0s" },
+                    { label: "Last 7 days", value: String(last7Days) },
+                  ].map(({ label, value }) => (
                     <div key={label} className="bg-white/5 border border-white/8 rounded-xl p-5">
                       <p className="text-3xl font-bold text-white" style={{ fontFamily: "Syne, sans-serif" }}>{value}</p>
                       <p className="text-xs text-white/40 uppercase tracking-wider mt-1">{label}</p>
