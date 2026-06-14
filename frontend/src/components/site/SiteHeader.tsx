@@ -41,6 +41,8 @@ export function SiteHeader() {
           <Link to="/pricing" className={NAV_LINK}>Pricing</Link>
           <Link to="/blog" className={NAV_LINK}>Blog</Link>
 
+          <Link to="/tools" className={NAV_LINK}>Tools</Link>
+
           {/* Resources dropdown */}
           <div className="relative" ref={ref}>
             <button
@@ -56,13 +58,13 @@ export function SiteHeader() {
                   className="block rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                   About
                 </Link>
-                <Link to="/accelerators" onClick={() => setResourcesOpen(false)}
+                <Link to="/resources" onClick={() => setResourcesOpen(false)}
                   className="block rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-                  Accelerators
+                  Resources Hub
                 </Link>
-                <Link to="/grants" onClick={() => setResourcesOpen(false)}
+                <Link to="/registry" onClick={() => setResourcesOpen(false)}
                   className="block rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-                  Grants
+                  Company Registry
                 </Link>
                 <Link to="/trust" onClick={() => setResourcesOpen(false)}
                   className="block rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
@@ -118,13 +120,17 @@ export function SiteHeader() {
             className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
             About
           </Link>
-          <Link to="/accelerators" onClick={close}
+          <Link to="/tools" onClick={close}
             className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
-            Accelerators
+            Tools
           </Link>
-          <Link to="/grants" onClick={close}
+          <Link to="/resources" onClick={close}
             className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
-            Grants
+            Resources Hub
+          </Link>
+          <Link to="/registry" onClick={close}
+            className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
+            Company Registry
           </Link>
           <Link to="/trust" onClick={close}
             className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">

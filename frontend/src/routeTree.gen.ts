@@ -14,11 +14,12 @@ import { Route as TrustRouteImport } from './routes/trust'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as RegistryRouteImport } from './routes/registry'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as InviteRouteImport } from './routes/invite'
 import { Route as InvestorsRouteImport } from './routes/investors'
-import { Route as GrantsRouteImport } from './routes/grants'
 import { Route as FoundersRouteImport } from './routes/founders'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeedbackRouteImport } from './routes/feedback'
@@ -26,11 +27,17 @@ import { Route as DebugRouteImport } from './routes/debug'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AppRouteImport } from './routes/app'
-import { Route as AcceleratorsRouteImport } from './routes/accelerators'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ToolsIndexRouteImport } from './routes/tools/index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as ToolsValuationRouteImport } from './routes/tools/valuation'
+import { Route as ToolsSafeNoteRouteImport } from './routes/tools/safe-note'
+import { Route as ToolsDilutionRouteImport } from './routes/tools/dilution'
+import { Route as ToolsCogsRouteImport } from './routes/tools/cogs'
+import { Route as ToolsCapTableRouteImport } from './routes/tools/cap-table'
+import { Route as ToolsBurnRateRouteImport } from './routes/tools/burn-rate'
 import { Route as SolutionsVcDealRoomRouteImport } from './routes/solutions.vc-deal-room'
 import { Route as SolutionsRaise1mRouteImport } from './routes/solutions.raise-1m'
 import { Route as SolutionsInvestorPipelineRouteImport } from './routes/solutions.investor-pipeline'
@@ -115,6 +122,16 @@ const SignInRoute = SignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegistryRoute = RegistryRouteImport.update({
+  id: '/registry',
+  path: '/registry',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -133,11 +150,6 @@ const InviteRoute = InviteRouteImport.update({
 const InvestorsRoute = InvestorsRouteImport.update({
   id: '/investors',
   path: '/investors',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GrantsRoute = GrantsRouteImport.update({
-  id: '/grants',
-  path: '/grants',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FoundersRoute = FoundersRouteImport.update({
@@ -175,11 +187,6 @@ const AppRoute = AppRouteImport.update({
   path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AcceleratorsRoute = AcceleratorsRouteImport.update({
-  id: '/accelerators',
-  path: '/accelerators',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -188,6 +195,11 @@ const AboutRoute = AboutRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsIndexRoute = ToolsIndexRouteImport.update({
+  id: '/tools/',
+  path: '/tools/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
@@ -199,6 +211,36 @@ const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
+} as any)
+const ToolsValuationRoute = ToolsValuationRouteImport.update({
+  id: '/tools/valuation',
+  path: '/tools/valuation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsSafeNoteRoute = ToolsSafeNoteRouteImport.update({
+  id: '/tools/safe-note',
+  path: '/tools/safe-note',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsDilutionRoute = ToolsDilutionRouteImport.update({
+  id: '/tools/dilution',
+  path: '/tools/dilution',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsCogsRoute = ToolsCogsRouteImport.update({
+  id: '/tools/cogs',
+  path: '/tools/cogs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsCapTableRoute = ToolsCapTableRouteImport.update({
+  id: '/tools/cap-table',
+  path: '/tools/cap-table',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsBurnRateRoute = ToolsBurnRateRouteImport.update({
+  id: '/tools/burn-rate',
+  path: '/tools/burn-rate',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SolutionsVcDealRoomRoute = SolutionsVcDealRoomRouteImport.update({
   id: '/solutions/vc-deal-room',
@@ -496,7 +538,6 @@ const AppDealRoomIdNdaRoute = AppDealRoomIdNdaRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/accelerators': typeof AcceleratorsRoute
   '/app': typeof AppRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
@@ -504,11 +545,12 @@ export interface FileRoutesByFullPath {
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
-  '/grants': typeof GrantsRoute
   '/investors': typeof InvestorsRoute
   '/invite': typeof InviteRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/registry': typeof RegistryRoute
+  '/resources': typeof ResourcesRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
@@ -551,8 +593,15 @@ export interface FileRoutesByFullPath {
   '/solutions/investor-pipeline': typeof SolutionsInvestorPipelineRoute
   '/solutions/raise-1m': typeof SolutionsRaise1mRoute
   '/solutions/vc-deal-room': typeof SolutionsVcDealRoomRoute
+  '/tools/burn-rate': typeof ToolsBurnRateRoute
+  '/tools/cap-table': typeof ToolsCapTableRoute
+  '/tools/cogs': typeof ToolsCogsRoute
+  '/tools/dilution': typeof ToolsDilutionRoute
+  '/tools/safe-note': typeof ToolsSafeNoteRoute
+  '/tools/valuation': typeof ToolsValuationRoute
   '/app/': typeof AppIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
   '/app/deal-room/$id': typeof AppDealRoomIdRoute
@@ -578,17 +627,17 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/accelerators': typeof AcceleratorsRoute
   '/contact': typeof ContactRoute
   '/debug': typeof DebugRoute
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
-  '/grants': typeof GrantsRoute
   '/investors': typeof InvestorsRoute
   '/invite': typeof InviteRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/registry': typeof RegistryRoute
+  '/resources': typeof ResourcesRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
@@ -630,8 +679,15 @@ export interface FileRoutesByTo {
   '/solutions/investor-pipeline': typeof SolutionsInvestorPipelineRoute
   '/solutions/raise-1m': typeof SolutionsRaise1mRoute
   '/solutions/vc-deal-room': typeof SolutionsVcDealRoomRoute
+  '/tools/burn-rate': typeof ToolsBurnRateRoute
+  '/tools/cap-table': typeof ToolsCapTableRoute
+  '/tools/cogs': typeof ToolsCogsRoute
+  '/tools/dilution': typeof ToolsDilutionRoute
+  '/tools/safe-note': typeof ToolsSafeNoteRoute
+  '/tools/valuation': typeof ToolsValuationRoute
   '/app': typeof AppIndexRoute
   '/blog': typeof BlogIndexRoute
+  '/tools': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
   '/app/deal-room/$id': typeof AppDealRoomIdRoute
@@ -658,7 +714,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/accelerators': typeof AcceleratorsRoute
   '/app': typeof AppRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
@@ -666,11 +721,12 @@ export interface FileRoutesById {
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
-  '/grants': typeof GrantsRoute
   '/investors': typeof InvestorsRoute
   '/invite': typeof InviteRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/registry': typeof RegistryRoute
+  '/resources': typeof ResourcesRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
@@ -713,8 +769,15 @@ export interface FileRoutesById {
   '/solutions/investor-pipeline': typeof SolutionsInvestorPipelineRoute
   '/solutions/raise-1m': typeof SolutionsRaise1mRoute
   '/solutions/vc-deal-room': typeof SolutionsVcDealRoomRoute
+  '/tools/burn-rate': typeof ToolsBurnRateRoute
+  '/tools/cap-table': typeof ToolsCapTableRoute
+  '/tools/cogs': typeof ToolsCogsRoute
+  '/tools/dilution': typeof ToolsDilutionRoute
+  '/tools/safe-note': typeof ToolsSafeNoteRoute
+  '/tools/valuation': typeof ToolsValuationRoute
   '/app/': typeof AppIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
   '/app/deal-room/$id': typeof AppDealRoomIdRoute
@@ -742,7 +805,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/accelerators'
     | '/app'
     | '/blog'
     | '/contact'
@@ -750,11 +812,12 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/forgot-password'
     | '/founders'
-    | '/grants'
     | '/investors'
     | '/invite'
     | '/pricing'
     | '/privacy'
+    | '/registry'
+    | '/resources'
     | '/sign-in'
     | '/sign-up'
     | '/terms'
@@ -797,8 +860,15 @@ export interface FileRouteTypes {
     | '/solutions/investor-pipeline'
     | '/solutions/raise-1m'
     | '/solutions/vc-deal-room'
+    | '/tools/burn-rate'
+    | '/tools/cap-table'
+    | '/tools/cogs'
+    | '/tools/dilution'
+    | '/tools/safe-note'
+    | '/tools/valuation'
     | '/app/'
     | '/blog/'
+    | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
     | '/app/deal-room/$id'
@@ -824,17 +894,17 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
-    | '/accelerators'
     | '/contact'
     | '/debug'
     | '/feedback'
     | '/forgot-password'
     | '/founders'
-    | '/grants'
     | '/investors'
     | '/invite'
     | '/pricing'
     | '/privacy'
+    | '/registry'
+    | '/resources'
     | '/sign-in'
     | '/sign-up'
     | '/terms'
@@ -876,8 +946,15 @@ export interface FileRouteTypes {
     | '/solutions/investor-pipeline'
     | '/solutions/raise-1m'
     | '/solutions/vc-deal-room'
+    | '/tools/burn-rate'
+    | '/tools/cap-table'
+    | '/tools/cogs'
+    | '/tools/dilution'
+    | '/tools/safe-note'
+    | '/tools/valuation'
     | '/app'
     | '/blog'
+    | '/tools'
     | '/api/internal/data'
     | '/api/internal/email-test'
     | '/app/deal-room/$id'
@@ -903,7 +980,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
-    | '/accelerators'
     | '/app'
     | '/blog'
     | '/contact'
@@ -911,11 +987,12 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/forgot-password'
     | '/founders'
-    | '/grants'
     | '/investors'
     | '/invite'
     | '/pricing'
     | '/privacy'
+    | '/registry'
+    | '/resources'
     | '/sign-in'
     | '/sign-up'
     | '/terms'
@@ -958,8 +1035,15 @@ export interface FileRouteTypes {
     | '/solutions/investor-pipeline'
     | '/solutions/raise-1m'
     | '/solutions/vc-deal-room'
+    | '/tools/burn-rate'
+    | '/tools/cap-table'
+    | '/tools/cogs'
+    | '/tools/dilution'
+    | '/tools/safe-note'
+    | '/tools/valuation'
     | '/app/'
     | '/blog/'
+    | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
     | '/app/deal-room/$id'
@@ -986,7 +1070,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  AcceleratorsRoute: typeof AcceleratorsRoute
   AppRoute: typeof AppRouteWithChildren
   BlogRoute: typeof BlogRouteWithChildren
   ContactRoute: typeof ContactRoute
@@ -994,11 +1077,12 @@ export interface RootRouteChildren {
   FeedbackRoute: typeof FeedbackRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   FoundersRoute: typeof FoundersRoute
-  GrantsRoute: typeof GrantsRoute
   InvestorsRoute: typeof InvestorsRoute
   InviteRoute: typeof InviteRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
+  RegistryRoute: typeof RegistryRoute
+  ResourcesRoute: typeof ResourcesRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   TermsRoute: typeof TermsRoute
@@ -1019,6 +1103,13 @@ export interface RootRouteChildren {
   SolutionsInvestorPipelineRoute: typeof SolutionsInvestorPipelineRoute
   SolutionsRaise1mRoute: typeof SolutionsRaise1mRoute
   SolutionsVcDealRoomRoute: typeof SolutionsVcDealRoomRoute
+  ToolsBurnRateRoute: typeof ToolsBurnRateRoute
+  ToolsCapTableRoute: typeof ToolsCapTableRoute
+  ToolsCogsRoute: typeof ToolsCogsRoute
+  ToolsDilutionRoute: typeof ToolsDilutionRoute
+  ToolsSafeNoteRoute: typeof ToolsSafeNoteRoute
+  ToolsValuationRoute: typeof ToolsValuationRoute
+  ToolsIndexRoute: typeof ToolsIndexRoute
   ApiInternalDataRoute: typeof ApiInternalDataRoute
   ApiInternalEmailTestRoute: typeof ApiInternalEmailTestRoute
   JoinTeamTokenRoute: typeof JoinTeamTokenRoute
@@ -1061,6 +1152,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/resources': {
+      id: '/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/registry': {
+      id: '/registry'
+      path: '/registry'
+      fullPath: '/registry'
+      preLoaderRoute: typeof RegistryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -1087,13 +1192,6 @@ declare module '@tanstack/react-router' {
       path: '/investors'
       fullPath: '/investors'
       preLoaderRoute: typeof InvestorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/grants': {
-      id: '/grants'
-      path: '/grants'
-      fullPath: '/grants'
-      preLoaderRoute: typeof GrantsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/founders': {
@@ -1145,13 +1243,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/accelerators': {
-      id: '/accelerators'
-      path: '/accelerators'
-      fullPath: '/accelerators'
-      preLoaderRoute: typeof AcceleratorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -1164,6 +1255,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/': {
+      id: '/tools/'
+      path: '/tools'
+      fullPath: '/tools/'
+      preLoaderRoute: typeof ToolsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/': {
@@ -1179,6 +1277,48 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/tools/valuation': {
+      id: '/tools/valuation'
+      path: '/tools/valuation'
+      fullPath: '/tools/valuation'
+      preLoaderRoute: typeof ToolsValuationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/safe-note': {
+      id: '/tools/safe-note'
+      path: '/tools/safe-note'
+      fullPath: '/tools/safe-note'
+      preLoaderRoute: typeof ToolsSafeNoteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/dilution': {
+      id: '/tools/dilution'
+      path: '/tools/dilution'
+      fullPath: '/tools/dilution'
+      preLoaderRoute: typeof ToolsDilutionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/cogs': {
+      id: '/tools/cogs'
+      path: '/tools/cogs'
+      fullPath: '/tools/cogs'
+      preLoaderRoute: typeof ToolsCogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/cap-table': {
+      id: '/tools/cap-table'
+      path: '/tools/cap-table'
+      fullPath: '/tools/cap-table'
+      preLoaderRoute: typeof ToolsCapTableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/burn-rate': {
+      id: '/tools/burn-rate'
+      path: '/tools/burn-rate'
+      fullPath: '/tools/burn-rate'
+      preLoaderRoute: typeof ToolsBurnRateRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/solutions/vc-deal-room': {
       id: '/solutions/vc-deal-room'
@@ -1712,7 +1852,6 @@ const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  AcceleratorsRoute: AcceleratorsRoute,
   AppRoute: AppRouteWithChildren,
   BlogRoute: BlogRouteWithChildren,
   ContactRoute: ContactRoute,
@@ -1720,11 +1859,12 @@ const rootRouteChildren: RootRouteChildren = {
   FeedbackRoute: FeedbackRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   FoundersRoute: FoundersRoute,
-  GrantsRoute: GrantsRoute,
   InvestorsRoute: InvestorsRoute,
   InviteRoute: InviteRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
+  RegistryRoute: RegistryRoute,
+  ResourcesRoute: ResourcesRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   TermsRoute: TermsRoute,
@@ -1745,6 +1885,13 @@ const rootRouteChildren: RootRouteChildren = {
   SolutionsInvestorPipelineRoute: SolutionsInvestorPipelineRoute,
   SolutionsRaise1mRoute: SolutionsRaise1mRoute,
   SolutionsVcDealRoomRoute: SolutionsVcDealRoomRoute,
+  ToolsBurnRateRoute: ToolsBurnRateRoute,
+  ToolsCapTableRoute: ToolsCapTableRoute,
+  ToolsCogsRoute: ToolsCogsRoute,
+  ToolsDilutionRoute: ToolsDilutionRoute,
+  ToolsSafeNoteRoute: ToolsSafeNoteRoute,
+  ToolsValuationRoute: ToolsValuationRoute,
+  ToolsIndexRoute: ToolsIndexRoute,
   ApiInternalDataRoute: ApiInternalDataRoute,
   ApiInternalEmailTestRoute: ApiInternalEmailTestRoute,
   JoinTeamTokenRoute: JoinTeamTokenRoute,

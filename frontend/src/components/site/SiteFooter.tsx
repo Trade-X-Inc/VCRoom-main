@@ -88,8 +88,8 @@ export function SiteFooter() {
             </div>
           </div>
 
-          {/* Cols 2-5 — Links (2×2 on sm, 4-col on md) */}
-          <div className="sm:col-span-2 md:col-span-4 grid grid-cols-2 md:grid-cols-4 gap-8">
+          {/* Cols 2-6 — Links (2×2 on sm, 5-col on md) */}
+          <div className="sm:col-span-2 md:col-span-4 grid grid-cols-2 md:grid-cols-5 gap-8">
             {/* Product */}
             <div>
               <div className={col}>Product</div>
@@ -115,10 +115,24 @@ export function SiteFooter() {
             <div>
               <div className={col}>Resources</div>
               <ul className="space-y-2.5">
-                <li><Link to="/accelerators" className={lnk}>Accelerators</Link></li>
-                <li><Link to="/grants" className={lnk}>Grants</Link></li>
+                <li><Link to="/resources" className={lnk}>Resources Hub</Link></li>
+                <li><Link to="/registry" className={lnk}>Company Registry</Link></li>
                 <li><Link to="/waitlist" className={lnk}>Waitlist</Link></li>
                 <li><Link to="/feedback" className={lnk}>Feedback</Link></li>
+              </ul>
+            </div>
+
+            {/* Tools */}
+            <div>
+              <div className={col}>Tools</div>
+              <ul className="space-y-2.5">
+                <li><Link to="/tools/valuation" className={lnk}>Valuation Calculator</Link></li>
+                <li><Link to="/tools/burn-rate" className={lnk}>Burn Rate Calculator</Link></li>
+                <li><Link to="/tools/cogs" className={lnk}>COGS Calculator</Link></li>
+                <li><span className={lnk + " opacity-40 cursor-default"}>Runway Calculator</span></li>
+                <li><Link to="/tools/cap-table" className={lnk}>Cap Table Calculator</Link></li>
+                <li><Link to="/tools/safe-note" className={lnk}>SAFE Note Calculator</Link></li>
+                <li><Link to="/tools/dilution" className={lnk}>Dilution Calculator</Link></li>
               </ul>
             </div>
 
