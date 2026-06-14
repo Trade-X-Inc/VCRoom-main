@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Building2, Globe, Users, Upload, Pencil, Trash2, Plus, X, Loader2, Check,
   Eye, Edit3, Download, Zap, AlignLeft, AlertTriangle, Copy, Sparkles, BarChart3,
+  Shield, Briefcase, TrendingUp, DollarSign,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
@@ -177,7 +178,7 @@ function Profile() {
   const queryClient = useQueryClient();
 
   const [mode, setMode] = useState<"edit" | "view">("edit");
-  const [tab, setTab] = useState<"quick" | "full" | "preview" | "analytics">("quick");
+  const [tab, setTab] = useState<"quick" | "full" | "privacy" | "preview" | "analytics">("quick");
   const [form, setForm] = useState<FormState>(emptyForm);
   const [profilePublishing, setProfilePublishing] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
@@ -881,6 +882,15 @@ function Profile() {
           <AlignLeft className="h-3.5 w-3.5" /> Full details
         </button>
         <button
+          onClick={() => setTab("privacy")}
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors",
+            tab === "privacy" ? "bg-background text-foreground font-medium shadow-xs" : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          <Shield className="h-3.5 w-3.5" /> Privacy
+        </button>
+        <button
           onClick={() => setTab("preview")}
           className={cn(
             "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors",
@@ -1187,6 +1197,21 @@ function Profile() {
             />
           </div>
         </div>
+      ) : tab === "privacy" ? (
+        <PrivacyTab
+          startupId={startup?.id ?? null}
+          sectionVisibility={form.section_visibility}
+          onSave={async (newVis) => {
+            if (!startup?.id) { toast.error("Save your profile first."); return; }
+            setForm((f) => ({ ...f, section_visibility: newVis }));
+            const { error } = await supabase
+              .from("startups")
+              .update({ section_visibility: newVis })
+              .eq("id", startup.id);
+            if (error) toast.error("Failed to save privacy settings.");
+            else toast.success("Privacy settings saved.");
+          }}
+        />
       ) : tab === "analytics" ? (
         <div className="mt-4 space-y-6">
           {!startup?.profile_slug ? (
@@ -1453,6 +1478,190 @@ function Profile() {
           Save your profile first to add team members.
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Privacy Tab ────────────────────────────────────────────────────
+
+const PRIVACY_SECTIONS: {
+  key: string;
+  label: string;
+  Icon: React.ElementType;
+  fields: string;
+  note?: string;
+  locked?: boolean;
+  defaultVal: SectionVisibility;
+}[] = [
+  {
+    key: "identity",
+    label: "Identity",
+    Icon: Building2,
+    fields: "Company name, tagline, sector, stage, website, team size, intro video",
+    note: "Identity is always public. Investors need to find you.",
+    locked: true,
+    defaultVal: "public",
+  },
+  {
+    key: "business_model",
+    label: "Business Model",
+    Icon: Briefcase,
+    fields: "Revenue model, pricing, target customer, use of funds",
+    defaultVal: "on_request",
+  },
+  {
+    key: "market",
+    label: "Market",
+    Icon: Globe,
+    fields: "Market size, TAM/SAM, competitive advantage, why now, differentiators",
+    defaultVal: "on_request",
+  },
+  {
+    key: "traction",
+    label: "Traction",
+    Icon: TrendingUp,
+    fields: "Key metrics, growth rate, customer count, milestones",
+    defaultVal: "on_request",
+  },
+  {
+    key: "team",
+    label: "Team",
+    Icon: Users,
+    fields: "Founder LinkedIn, co-founder details, advisors",
+    defaultVal: "on_request",
+  },
+  {
+    key: "financials",
+    label: "Financials",
+    Icon: DollarSign,
+    fields: "Valuation, burn rate, runway, previous funding, current investors",
+    note: "Recommended: keep financials in deal room only. This data is sensitive and should only be shared with investors you have approved.",
+    defaultVal: "deal_room",
+  },
+];
+
+const VIS_OPTIONS: { value: SectionVisibility; label: string; desc: string }[] = [
+  { value: "public",     label: "Public",          desc: "Visible to anyone who finds your profile" },
+  { value: "on_request", label: "On Request",       desc: "Visible after you approve an investor's request" },
+  { value: "deal_room",  label: "Deal Room Only",   desc: "Visible only inside an active deal room" },
+];
+
+function PrivacyTab({
+  startupId,
+  sectionVisibility,
+  onSave,
+}: {
+  startupId: string | null;
+  sectionVisibility: Record<string, SectionVisibility>;
+  onSave: (v: Record<string, SectionVisibility>) => Promise<void>;
+}) {
+  const [local, setLocal] = useState<Record<string, SectionVisibility>>(() => ({
+    identity: "public",
+    business_model: "on_request",
+    market: "on_request",
+    traction: "on_request",
+    team: "on_request",
+    financials: "deal_room",
+    ...sectionVisibility,
+  }));
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    await onSave(local);
+    setSaving(false);
+  };
+
+  return (
+    <div className="mt-4 space-y-4">
+      <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+        <div className="flex items-start gap-3 mb-6">
+          <div className="grid h-9 w-9 place-items-center rounded-lg bg-brand/10 shrink-0 mt-0.5">
+            <Shield className="h-5 w-5 text-brand" />
+          </div>
+          <div>
+            <div className="text-sm font-semibold">Profile Privacy Controls</div>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+              Control what investors see at each stage of your fundraising relationship.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-5">
+          {PRIVACY_SECTIONS.map((section) => {
+            const current = local[section.key] ?? section.defaultVal;
+            return (
+              <div
+                key={section.key}
+                className="rounded-xl border border-border/60 bg-background/40 p-5"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  {/* Left: label + fields */}
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div className="grid h-8 w-8 place-items-center rounded-md bg-accent shrink-0 mt-0.5">
+                      <section.Icon className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold">{section.label}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">{section.fields}</div>
+                      {section.note && (
+                        <div className="mt-2 text-xs text-warning leading-relaxed">{section.note}</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right: toggle */}
+                  <div className="shrink-0">
+                    {section.locked ? (
+                      <div className="inline-flex items-center gap-1.5 rounded-full border border-brand bg-brand/10 px-3 py-1.5 text-xs font-medium text-brand">
+                        🌐 Public — always on
+                      </div>
+                    ) : (
+                      <div className="flex rounded-lg border border-border/60 overflow-hidden">
+                        {VIS_OPTIONS.map((opt) => (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            title={opt.desc}
+                            onClick={() => setLocal((prev) => ({ ...prev, [section.key]: opt.value }))}
+                            className={cn(
+                              "px-3 py-1.5 text-xs font-medium transition-colors border-r last:border-r-0 border-border/60",
+                              current === opt.value
+                                ? "bg-brand text-white"
+                                : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-accent",
+                            )}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Description of current selection */}
+                {!section.locked && (
+                  <div className="mt-3 text-xs text-muted-foreground/70">
+                    {VIS_OPTIONS.find((o) => o.value === current)?.desc}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-6 flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">Changes take effect immediately on your public profile.</p>
+          <button
+            onClick={handleSave}
+            disabled={saving || !startupId}
+            className="inline-flex items-center gap-2 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-60"
+          >
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+            Save privacy settings
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

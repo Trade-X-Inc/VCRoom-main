@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { format, formatDistanceToNow } from "date-fns";
 import {
   ArrowUpRight, TrendingUp, Users, Briefcase, Mail, Sparkles,
   Calendar, FileText, CheckCircle2, Clock, Building2, X, Loader2,
-  HelpCircle, ExternalLink, AlertCircle,
+  HelpCircle, ExternalLink, AlertCircle, ShieldCheck, Check,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -330,6 +331,148 @@ function Stat({
   );
 }
 
+// ── Access Requests Panel ──────────────────────────────────────────
+
+interface AccessRequest {
+  id: string;
+  investor_id: string;
+  startup_id: string;
+  status: string;
+  created_at: string;
+  investors?: {
+    full_name: string | null;
+    firm: string | null;
+    role: string | null;
+  } | null;
+  investor_verification?: {
+    verification_status: string | null;
+  } | null;
+}
+
+function AccessRequestsPanel({ startupId }: { startupId: string }) {
+  const [requests, setRequests] = useState<AccessRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [actingId, setActingId] = useState<string | null>(null);
+
+  const loadRequests = async () => {
+    setLoading(true);
+    // Join investors table for name/firm — use investor_profiles since that's where names are stored
+    const { data } = await supabase
+      .from("discovery_requests")
+      .select(`
+        id, investor_id, startup_id, status, created_at,
+        investor_profiles!investor_id ( your_name, fund_name, your_role )
+      `)
+      .eq("startup_id", startupId)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false });
+    setRequests((data ?? []) as any[]);
+    setLoading(false);
+  };
+
+  useEffect(() => { loadRequests(); }, [startupId]);
+
+  const handleAction = async (requestId: string, investorId: string, action: "approved" | "rejected", investorName: string | null) => {
+    setActingId(requestId);
+    const { error } = await supabase
+      .from("discovery_requests")
+      .update({ status: action, updated_at: new Date().toISOString() })
+      .eq("id", requestId);
+
+    if (!error) {
+      setRequests((prev) => prev.filter((r) => r.id !== requestId));
+      if (action === "approved") {
+        toast.success(`Access approved. ${investorName ?? "Investor"} can now view your on-request sections.`);
+      } else {
+        toast.success("Request declined.");
+      }
+    } else {
+      toast.error("Could not update request.");
+    }
+    setActingId(null);
+  };
+
+  const daysAgo = (iso: string) => {
+    const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+    if (d === 0) return "today";
+    if (d === 1) return "1 day ago";
+    return `${d} days ago`;
+  };
+
+  return (
+    <div className="rounded-xl border border-border/60 bg-card shadow-card mb-6">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="h-4 w-4 text-brand" />
+          <span className="text-sm font-semibold">Investor Access Requests</span>
+          {!loading && requests.length > 0 && (
+            <span className="inline-flex items-center justify-center h-5 min-w-[20px] rounded-full bg-brand text-brand-foreground text-[10px] font-semibold px-1.5">
+              {requests.length}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="p-5">
+        {loading ? (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading requests…
+          </div>
+        ) : requests.length === 0 ? (
+          <div className="py-4 text-center">
+            <p className="text-sm text-muted-foreground">No pending access requests.</p>
+            <p className="text-xs text-muted-foreground/60 mt-1">When investors request access to your on-request sections, they will appear here.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {requests.map((req: any) => {
+              const profile = req.investor_profiles;
+              const name = profile?.your_name ?? "Unknown investor";
+              const firm = profile?.fund_name ?? null;
+              const role = profile?.your_role ?? null;
+              const isActing = actingId === req.id;
+
+              return (
+                <div key={req.id} className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-lg border border-border/60 bg-background/40 p-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">{name}</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {[firm, role].filter(Boolean).join(" · ")}
+                      {[firm, role].some(Boolean) && " · "}
+                      Requested {daysAgo(req.created_at)}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      disabled={isActing}
+                      onClick={() => handleAction(req.id, req.investor_id, "approved", name)}
+                      className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
+                      style={{ background: "rgba(16,185,129,0.15)", color: "#10B981", border: "1px solid rgba(16,185,129,0.3)" }}
+                    >
+                      {isActing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
+                      Approve
+                    </button>
+                    <button
+                      disabled={isActing}
+                      onClick={() => handleAction(req.id, req.investor_id, "rejected", name)}
+                      className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
+                      style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.08)" }}
+                    >
+                      Decline
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Main component ─────────────────────────────────────────────────
 
 function Overview() {
@@ -616,6 +759,7 @@ function Overview() {
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto">
       <FounderOnboarding startup={startup} docs={docs} dealRooms={dealRooms} investorMembers={investorMembers} />
+      {startup?.id && <AccessRequestsPanel startupId={startup.id} />}
       {/* Header */}
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
