@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { syncContactToHubSpot } from "@/lib/hubspot";
-import { Briefcase, ArrowUpRight, Plus, X, Loader2, Search, MoreHorizontal, Trash2, CheckCircle2, Copy, Check } from "lucide-react";
+import { Briefcase, ArrowUpRight, Plus, X, Loader2, Search, MoreHorizontal, Trash2, CheckCircle2, Copy, Check, Users, ChevronDown, ChevronUp } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -39,6 +39,7 @@ function DealRooms() {
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
+  const [teamPanelId, setTeamPanelId] = useState<string | null>(null);
   const [loadError, setLoadError] = useState(false);
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -85,6 +86,26 @@ function DealRooms() {
         .in("deal_room_id", roomIds)
         .order("created_at", { ascending: false });
       return data ?? [];
+    },
+  });
+
+  const { data: teamAssignments = [] } = useQuery({
+    queryKey: ["dr-team-assignments-list", user?.id, roomIds.join(",")],
+    enabled: !!user?.id && roomIds.length > 0,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("deal_room_team_assignments")
+        .select(`
+          deal_room_id,
+          team_account_id,
+          startup_team_accounts!inner(
+            role,
+            users(full_name, avatar_url),
+            team_member_profiles(first_name, last_name, avatar_url)
+          )
+        `)
+        .in("deal_room_id", roomIds);
+      return (data ?? []) as any[];
     },
   });
 
@@ -211,6 +232,8 @@ function DealRooms() {
           const initials = investorName.split(" ").map((s: string) => s[0]).join("").slice(0, 2).toUpperCase();
 
           const roomViews = (docViews as any[]).filter((v: any) => v.deal_room_id === r.id);
+          const roomTeam = (teamAssignments as any[]).filter((a: any) => a.deal_room_id === r.id);
+          const teamPanelOpen = teamPanelId === r.id;
           return (
             <div
               key={r.id}
@@ -282,6 +305,81 @@ function DealRooms() {
                   Open <ArrowUpRight className="h-3 w-3" />
                 </Link>
               </div>
+
+              {/* Team section */}
+              {roomTeam.length > 0 && (
+                <div className="border-t border-border/60 pt-3">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setTeamPanelId(teamPanelOpen ? null : r.id); }}
+                    className="flex items-center gap-2 w-full text-left"
+                  >
+                    {/* Stacked avatars */}
+                    <div className="flex items-center -space-x-2">
+                      {roomTeam.slice(0, 4).map((a: any, i: number) => {
+                        const prof = a.startup_team_accounts?.team_member_profiles;
+                        const usr = a.startup_team_accounts?.users;
+                        const avatarUrl = prof?.avatar_url ?? usr?.avatar_url ?? null;
+                        const name = prof?.first_name
+                          ? `${prof.first_name} ${prof.last_name ?? ""}`.trim()
+                          : (usr?.full_name ?? "?");
+                        const initials = name.split(" ").map((s: string) => s[0]).join("").slice(0, 2).toUpperCase();
+                        return (
+                          <div
+                            key={a.team_account_id}
+                            className="h-6 w-6 rounded-full border-2 border-card bg-accent flex items-center justify-center text-[9px] font-semibold text-foreground overflow-hidden"
+                            style={{ zIndex: 4 - i }}
+                            title={name}
+                          >
+                            {avatarUrl
+                              ? <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
+                              : initials}
+                          </div>
+                        );
+                      })}
+                      {roomTeam.length > 4 && (
+                        <div className="h-6 w-6 rounded-full border-2 border-card bg-muted/50 flex items-center justify-center text-[9px] font-semibold text-muted-foreground" style={{ zIndex: 0 }}>
+                          +{roomTeam.length - 4}
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-[11px] text-muted-foreground flex-1">
+                      {roomTeam.length} team member{roomTeam.length !== 1 ? "s" : ""} assigned
+                    </span>
+                    {teamPanelOpen
+                      ? <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
+                      : <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />}
+                  </button>
+
+                  {/* Expanded panel */}
+                  {teamPanelOpen && (
+                    <div className="mt-3 space-y-2">
+                      {roomTeam.map((a: any) => {
+                        const prof = a.startup_team_accounts?.team_member_profiles;
+                        const usr = a.startup_team_accounts?.users;
+                        const avatarUrl = prof?.avatar_url ?? usr?.avatar_url ?? null;
+                        const name = prof?.first_name
+                          ? `${prof.first_name} ${prof.last_name ?? ""}`.trim()
+                          : (usr?.full_name ?? "Unknown");
+                        const initials = name.split(" ").map((s: string) => s[0]).join("").slice(0, 2).toUpperCase();
+                        const role = a.startup_team_accounts?.role ?? "member";
+                        return (
+                          <div key={a.team_account_id} className="flex items-center gap-2.5 rounded-lg bg-accent/40 px-3 py-2">
+                            <div className="h-7 w-7 rounded-full bg-accent flex items-center justify-center text-[10px] font-semibold text-foreground overflow-hidden shrink-0">
+                              {avatarUrl
+                                ? <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
+                                : initials}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-xs font-medium truncate">{name}</div>
+                              <div className="text-[10px] text-muted-foreground capitalize">{role}</div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}

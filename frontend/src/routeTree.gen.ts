@@ -18,6 +18,7 @@ import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as RegistryRouteImport } from './routes/registry'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as JoinRouteImport } from './routes/join'
 import { Route as InviteRouteImport } from './routes/invite'
 import { Route as InvestorsRouteImport } from './routes/investors'
 import { Route as FoundersRouteImport } from './routes/founders'
@@ -46,6 +47,7 @@ import { Route as SolutionsFundraisingCrmRouteImport } from './routes/solutions.
 import { Route as SolutionsDueDiligenceRouteImport } from './routes/solutions.due-diligence'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as JoinTokenRouteImport } from './routes/join.$token'
+import { Route as CvSlugRouteImport } from './routes/cv.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AppWallRouteImport } from './routes/app.wall'
@@ -58,6 +60,7 @@ import { Route as AppPipelineRouteImport } from './routes/app.pipeline'
 import { Route as AppNotificationsRouteImport } from './routes/app.notifications'
 import { Route as AppNewsRouteImport } from './routes/app.news'
 import { Route as AppMessagesRouteImport } from './routes/app.messages'
+import { Route as AppMemberProfileRouteImport } from './routes/app.member-profile'
 import { Route as AppMeetingsRouteImport } from './routes/app.meetings'
 import { Route as AppLeadsRouteImport } from './routes/app.leads'
 import { Route as AppInvestorRouteImport } from './routes/app.investor'
@@ -142,6 +145,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinRoute = JoinRouteImport.update({
+  id: '/join',
+  path: '/join',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InviteRoute = InviteRouteImport.update({
@@ -281,8 +289,13 @@ const PSlugRoute = PSlugRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const JoinTokenRoute = JoinTokenRouteImport.update({
-  id: '/join/$token',
-  path: '/join/$token',
+  id: '/$token',
+  path: '/$token',
+  getParentRoute: () => JoinRoute,
+} as any)
+const CvSlugRoute = CvSlugRouteImport.update({
+  id: '/cv/$slug',
+  path: '/cv/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
@@ -343,6 +356,11 @@ const AppNewsRoute = AppNewsRouteImport.update({
 const AppMessagesRoute = AppMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMemberProfileRoute = AppMemberProfileRouteImport.update({
+  id: '/member-profile',
+  path: '/member-profile',
   getParentRoute: () => AppRoute,
 } as any)
 const AppMeetingsRoute = AppMeetingsRouteImport.update({
@@ -441,9 +459,9 @@ const AppInvestorIndexRoute = AppInvestorIndexRouteImport.update({
   getParentRoute: () => AppInvestorRoute,
 } as any)
 const JoinTeamTokenRoute = JoinTeamTokenRouteImport.update({
-  id: '/join/team/$token',
-  path: '/join/team/$token',
-  getParentRoute: () => rootRouteImport,
+  id: '/team/$token',
+  path: '/team/$token',
+  getParentRoute: () => JoinRoute,
 } as any)
 const AppSettingsSecurityRoute = AppSettingsSecurityRouteImport.update({
   id: '/security',
@@ -559,6 +577,7 @@ export interface FileRoutesByFullPath {
   '/founders': typeof FoundersRoute
   '/investors': typeof InvestorsRoute
   '/invite': typeof InviteRoute
+  '/join': typeof JoinRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/registry': typeof RegistryRoute
@@ -586,6 +605,7 @@ export interface FileRoutesByFullPath {
   '/app/investor': typeof AppInvestorRouteWithChildren
   '/app/leads': typeof AppLeadsRoute
   '/app/meetings': typeof AppMeetingsRoute
+  '/app/member-profile': typeof AppMemberProfileRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/news': typeof AppNewsRoute
   '/app/notifications': typeof AppNotificationsRoute
@@ -598,6 +618,7 @@ export interface FileRoutesByFullPath {
   '/app/wall': typeof AppWallRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/cv/$slug': typeof CvSlugRoute
   '/join/$token': typeof JoinTokenRoute
   '/p/$slug': typeof PSlugRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
@@ -648,6 +669,7 @@ export interface FileRoutesByTo {
   '/founders': typeof FoundersRoute
   '/investors': typeof InvestorsRoute
   '/invite': typeof InviteRoute
+  '/join': typeof JoinRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/registry': typeof RegistryRoute
@@ -674,6 +696,7 @@ export interface FileRoutesByTo {
   '/app/integrations': typeof AppIntegrationsRoute
   '/app/leads': typeof AppLeadsRoute
   '/app/meetings': typeof AppMeetingsRoute
+  '/app/member-profile': typeof AppMemberProfileRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/news': typeof AppNewsRoute
   '/app/notifications': typeof AppNotificationsRoute
@@ -686,6 +709,7 @@ export interface FileRoutesByTo {
   '/app/wall': typeof AppWallRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/cv/$slug': typeof CvSlugRoute
   '/join/$token': typeof JoinTokenRoute
   '/p/$slug': typeof PSlugRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
@@ -739,6 +763,7 @@ export interface FileRoutesById {
   '/founders': typeof FoundersRoute
   '/investors': typeof InvestorsRoute
   '/invite': typeof InviteRoute
+  '/join': typeof JoinRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/registry': typeof RegistryRoute
@@ -766,6 +791,7 @@ export interface FileRoutesById {
   '/app/investor': typeof AppInvestorRouteWithChildren
   '/app/leads': typeof AppLeadsRoute
   '/app/meetings': typeof AppMeetingsRoute
+  '/app/member-profile': typeof AppMemberProfileRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/news': typeof AppNewsRoute
   '/app/notifications': typeof AppNotificationsRoute
@@ -778,6 +804,7 @@ export interface FileRoutesById {
   '/app/wall': typeof AppWallRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/cv/$slug': typeof CvSlugRoute
   '/join/$token': typeof JoinTokenRoute
   '/p/$slug': typeof PSlugRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
@@ -832,6 +859,7 @@ export interface FileRouteTypes {
     | '/founders'
     | '/investors'
     | '/invite'
+    | '/join'
     | '/pricing'
     | '/privacy'
     | '/registry'
@@ -859,6 +887,7 @@ export interface FileRouteTypes {
     | '/app/investor'
     | '/app/leads'
     | '/app/meetings'
+    | '/app/member-profile'
     | '/app/messages'
     | '/app/news'
     | '/app/notifications'
@@ -871,6 +900,7 @@ export interface FileRouteTypes {
     | '/app/wall'
     | '/auth/callback'
     | '/blog/$slug'
+    | '/cv/$slug'
     | '/join/$token'
     | '/p/$slug'
     | '/solutions/due-diligence'
@@ -921,6 +951,7 @@ export interface FileRouteTypes {
     | '/founders'
     | '/investors'
     | '/invite'
+    | '/join'
     | '/pricing'
     | '/privacy'
     | '/registry'
@@ -947,6 +978,7 @@ export interface FileRouteTypes {
     | '/app/integrations'
     | '/app/leads'
     | '/app/meetings'
+    | '/app/member-profile'
     | '/app/messages'
     | '/app/news'
     | '/app/notifications'
@@ -959,6 +991,7 @@ export interface FileRouteTypes {
     | '/app/wall'
     | '/auth/callback'
     | '/blog/$slug'
+    | '/cv/$slug'
     | '/join/$token'
     | '/p/$slug'
     | '/solutions/due-diligence'
@@ -1011,6 +1044,7 @@ export interface FileRouteTypes {
     | '/founders'
     | '/investors'
     | '/invite'
+    | '/join'
     | '/pricing'
     | '/privacy'
     | '/registry'
@@ -1038,6 +1072,7 @@ export interface FileRouteTypes {
     | '/app/investor'
     | '/app/leads'
     | '/app/meetings'
+    | '/app/member-profile'
     | '/app/messages'
     | '/app/news'
     | '/app/notifications'
@@ -1050,6 +1085,7 @@ export interface FileRouteTypes {
     | '/app/wall'
     | '/auth/callback'
     | '/blog/$slug'
+    | '/cv/$slug'
     | '/join/$token'
     | '/p/$slug'
     | '/solutions/due-diligence'
@@ -1103,6 +1139,7 @@ export interface RootRouteChildren {
   FoundersRoute: typeof FoundersRoute
   InvestorsRoute: typeof InvestorsRoute
   InviteRoute: typeof InviteRoute
+  JoinRoute: typeof JoinRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RegistryRoute: typeof RegistryRoute
@@ -1120,7 +1157,7 @@ export interface RootRouteChildren {
   ApiHubspotSyncRoute: typeof ApiHubspotSyncRoute
   ApiTestAiRoute: typeof ApiTestAiRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
-  JoinTokenRoute: typeof JoinTokenRoute
+  CvSlugRoute: typeof CvSlugRoute
   PSlugRoute: typeof PSlugRoute
   SolutionsDueDiligenceRoute: typeof SolutionsDueDiligenceRoute
   SolutionsFundraisingCrmRoute: typeof SolutionsFundraisingCrmRoute
@@ -1137,7 +1174,6 @@ export interface RootRouteChildren {
   ToolsIndexRoute: typeof ToolsIndexRoute
   ApiInternalDataRoute: typeof ApiInternalDataRoute
   ApiInternalEmailTestRoute: typeof ApiInternalEmailTestRoute
-  JoinTeamTokenRoute: typeof JoinTeamTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1203,6 +1239,13 @@ declare module '@tanstack/react-router' {
       path: '/pricing'
       fullPath: '/pricing'
       preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join': {
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invite': {
@@ -1396,9 +1439,16 @@ declare module '@tanstack/react-router' {
     }
     '/join/$token': {
       id: '/join/$token'
-      path: '/join/$token'
+      path: '/$token'
       fullPath: '/join/$token'
       preLoaderRoute: typeof JoinTokenRouteImport
+      parentRoute: typeof JoinRoute
+    }
+    '/cv/$slug': {
+      id: '/cv/$slug'
+      path: '/cv/$slug'
+      fullPath: '/cv/$slug'
+      preLoaderRoute: typeof CvSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/$slug': {
@@ -1483,6 +1533,13 @@ declare module '@tanstack/react-router' {
       path: '/messages'
       fullPath: '/app/messages'
       preLoaderRoute: typeof AppMessagesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/member-profile': {
+      id: '/app/member-profile'
+      path: '/member-profile'
+      fullPath: '/app/member-profile'
+      preLoaderRoute: typeof AppMemberProfileRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/meetings': {
@@ -1620,10 +1677,10 @@ declare module '@tanstack/react-router' {
     }
     '/join/team/$token': {
       id: '/join/team/$token'
-      path: '/join/team/$token'
+      path: '/team/$token'
       fullPath: '/join/team/$token'
       preLoaderRoute: typeof JoinTeamTokenRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof JoinRoute
     }
     '/app/settings/security': {
       id: '/app/settings/security'
@@ -1834,6 +1891,7 @@ interface AppRouteChildren {
   AppInvestorRoute: typeof AppInvestorRouteWithChildren
   AppLeadsRoute: typeof AppLeadsRoute
   AppMeetingsRoute: typeof AppMeetingsRoute
+  AppMemberProfileRoute: typeof AppMemberProfileRoute
   AppMessagesRoute: typeof AppMessagesRoute
   AppNewsRoute: typeof AppNewsRoute
   AppNotificationsRoute: typeof AppNotificationsRoute
@@ -1861,6 +1919,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppInvestorRoute: AppInvestorRouteWithChildren,
   AppLeadsRoute: AppLeadsRoute,
   AppMeetingsRoute: AppMeetingsRoute,
+  AppMemberProfileRoute: AppMemberProfileRoute,
   AppMessagesRoute: AppMessagesRoute,
   AppNewsRoute: AppNewsRoute,
   AppNotificationsRoute: AppNotificationsRoute,
@@ -1890,6 +1949,18 @@ const BlogRouteChildren: BlogRouteChildren = {
 
 const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 
+interface JoinRouteChildren {
+  JoinTokenRoute: typeof JoinTokenRoute
+  JoinTeamTokenRoute: typeof JoinTeamTokenRoute
+}
+
+const JoinRouteChildren: JoinRouteChildren = {
+  JoinTokenRoute: JoinTokenRoute,
+  JoinTeamTokenRoute: JoinTeamTokenRoute,
+}
+
+const JoinRouteWithChildren = JoinRoute._addFileChildren(JoinRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -1902,6 +1973,7 @@ const rootRouteChildren: RootRouteChildren = {
   FoundersRoute: FoundersRoute,
   InvestorsRoute: InvestorsRoute,
   InviteRoute: InviteRoute,
+  JoinRoute: JoinRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RegistryRoute: RegistryRoute,
@@ -1919,7 +1991,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiHubspotSyncRoute: ApiHubspotSyncRoute,
   ApiTestAiRoute: ApiTestAiRoute,
   AuthCallbackRoute: AuthCallbackRoute,
-  JoinTokenRoute: JoinTokenRoute,
+  CvSlugRoute: CvSlugRoute,
   PSlugRoute: PSlugRoute,
   SolutionsDueDiligenceRoute: SolutionsDueDiligenceRoute,
   SolutionsFundraisingCrmRoute: SolutionsFundraisingCrmRoute,
@@ -1936,7 +2008,6 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsIndexRoute: ToolsIndexRoute,
   ApiInternalDataRoute: ApiInternalDataRoute,
   ApiInternalEmailTestRoute: ApiInternalEmailTestRoute,
-  JoinTeamTokenRoute: JoinTeamTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

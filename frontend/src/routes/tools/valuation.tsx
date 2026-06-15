@@ -1,8 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { ChevronDown, ChevronUp, Copy, Check } from "lucide-react";
+import { ChevronDown, ChevronUp, Copy, Check, Download } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+
+const PRINT_CSS = `
+@media print {
+  .tool-no-print { display: none !important; }
+  body { background: #fff !important; color: #111 !important; }
+  .tool-print-section { background: #fff !important; color: #111 !important; border: 1px solid #e5e7eb !important; }
+  .tool-print-section * { color: #111 !important; }
+  @page { margin: 1.5cm; }
+}
+`;
 
 export const Route = createFileRoute("/tools/valuation")({
   head: () => ({
@@ -464,7 +474,7 @@ Calculate yours at hockystick.app/tools/valuation`;
         Range based on {result.methodName}. Actual investor offers will vary based on deal terms, market conditions, and investor thesis.
       </p>
 
-      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }} className="tool-no-print">
         <button
           onClick={handleCopy}
           style={{
@@ -476,6 +486,17 @@ Calculate yours at hockystick.app/tools/valuation`;
         >
           {copied ? <Check size={14} /> : <Copy size={14} />}
           {copied ? "Copied!" : "Copy results"}
+        </button>
+        <button
+          onClick={() => { const p = document.title; document.title = "Startup Valuation — Hockystick"; window.print(); document.title = p; }}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: "6px",
+            background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
+            borderRadius: "8px", padding: "10px 16px", fontSize: "13px",
+            fontWeight: 600, color: "#a78bfa", cursor: "pointer",
+          }}
+        >
+          <Download size={14} /> Download PDF
         </button>
         <Link
           to="/sign-up"
@@ -542,6 +563,13 @@ function ValuationPage() {
   const s: React.CSSProperties = { background: "#0A0A0B", minHeight: "100vh", color: "#fff" };
   const maxW = { maxWidth: "860px", margin: "0 auto", padding: "0 24px" };
 
+  const handlePrint = () => {
+    const prev = document.title;
+    document.title = "Startup Valuation — Hockystick";
+    window.print();
+    document.title = prev;
+  };
+
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -591,8 +619,9 @@ function ValuationPage() {
 
   return (
     <div style={s}>
+      <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-      <SiteHeader />
+      <div className="tool-no-print"><SiteHeader /></div>
 
       {/* ── S1: Hero ──────────────────────────────────────────────── */}
       <section style={{ ...maxW, padding: "56px 24px 48px" }}>
@@ -698,7 +727,7 @@ function ValuationPage() {
       </section>
 
       {/* ── S3: How to use ────────────────────────────────────────── */}
-      <section style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>
             How to use this calculator
@@ -734,7 +763,7 @@ function ValuationPage() {
       </section>
 
       {/* ── S4: Methodology ───────────────────────────────────────── */}
-      <section style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>
             How each method works
@@ -769,7 +798,7 @@ function ValuationPage() {
       </section>
 
       {/* ── S5: FAQ ───────────────────────────────────────────────── */}
-      <section style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>
             Frequently asked questions
@@ -804,7 +833,7 @@ function ValuationPage() {
       </section>
 
       {/* ── S6: Related tools ─────────────────────────────────────── */}
-      <section style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "22px", marginBottom: "24px", letterSpacing: "-0.02em" }}>
             Related tools
@@ -828,7 +857,7 @@ function ValuationPage() {
       </section>
 
       {/* ── S7: Hockystick CTA ────────────────────────────────────── */}
-      <section style={{ borderTop: "1px solid rgba(255,255,255,0.06)", background: "#111114", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", background: "#111114", padding: "72px 24px" }}>
         <div style={{ maxWidth: "560px", margin: "0 auto", textAlign: "center" }}>
           <h3 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 30px)", letterSpacing: "-0.02em", marginBottom: "16px" }}>
             Knowing your valuation is step one.
@@ -865,7 +894,7 @@ function ValuationPage() {
         </div>
       </section>
 
-      <SiteFooter />
+      <div className="tool-no-print"><SiteFooter /></div>
     </div>
   );
 }

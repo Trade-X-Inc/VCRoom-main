@@ -1,8 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
-import { ChevronDown, ChevronUp, Copy, Check } from "lucide-react";
+import { ChevronDown, ChevronUp, Copy, Check, Download } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+
+const PRINT_CSS = `
+@media print {
+  .tool-no-print { display: none !important; }
+  body { background: #fff !important; color: #111 !important; }
+  .tool-print-section { background: #fff !important; color: #111 !important; border: 1px solid #e5e7eb !important; }
+  .tool-print-section * { color: #111 !important; }
+  @page { margin: 1.5cm; }
+}
+`;
 
 export const Route = createFileRoute("/tools/cogs")({
   head: () => ({
@@ -533,19 +543,32 @@ function OutputPanel({ result, model, copied, onCopy }: {
         </div>
       )}
 
-      {/* Copy button */}
-      <button
-        onClick={onCopy}
-        style={{
-          display: "inline-flex", alignItems: "center", gap: "6px", alignSelf: "flex-start",
-          background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
-          borderRadius: "8px", padding: "10px 16px", fontSize: "13px",
-          fontWeight: 600, color: "#a78bfa", cursor: "pointer",
-        }}
-      >
-        {copied ? <Check size={14} /> : <Copy size={14} />}
-        {copied ? "Copied!" : "Copy results"}
-      </button>
+      {/* Copy / Download buttons */}
+      <div className="tool-no-print" style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+        <button
+          onClick={onCopy}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: "6px", alignSelf: "flex-start",
+            background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
+            borderRadius: "8px", padding: "10px 16px", fontSize: "13px",
+            fontWeight: 600, color: "#a78bfa", cursor: "pointer",
+          }}
+        >
+          {copied ? <Check size={14} /> : <Copy size={14} />}
+          {copied ? "Copied!" : "Copy results"}
+        </button>
+        <button
+          onClick={() => { const p = document.title; document.title = "COGS Calculator — Hockystick"; window.print(); document.title = p; }}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: "6px", alignSelf: "flex-start",
+            background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
+            borderRadius: "8px", padding: "10px 16px", fontSize: "13px",
+            fontWeight: 600, color: "#a78bfa", cursor: "pointer",
+          }}
+        >
+          <Download size={14} /> Download PDF
+        </button>
+      </div>
     </div>
   );
 }
@@ -637,8 +660,9 @@ Calculate yours at hockystick.app/tools/cogs`;
 
   return (
     <div style={{ background: "#0A0A0B", minHeight: "100vh", color: "#fff" }}>
+      <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-      <SiteHeader />
+      <div className="tool-no-print"><SiteHeader /></div>
 
       {/* S1 — Hero */}
       <section style={{ ...pw, padding: "56px 24px 48px" }}>
@@ -704,7 +728,7 @@ Calculate yours at hockystick.app/tools/cogs`;
       </section>
 
       {/* S3 — How to use */}
-      <section style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>
             How to use this calculator
@@ -726,7 +750,7 @@ Calculate yours at hockystick.app/tools/cogs`;
       </section>
 
       {/* S4 — Methodology */}
-      <section style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>
             How these calculations work
@@ -759,7 +783,7 @@ Calculate yours at hockystick.app/tools/cogs`;
       </section>
 
       {/* S5 — FAQ */}
-      <section style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>
             Frequently asked questions
@@ -779,7 +803,7 @@ Calculate yours at hockystick.app/tools/cogs`;
       </section>
 
       {/* S6 — Related tools */}
-      <section style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "22px", marginBottom: "24px", letterSpacing: "-0.02em" }}>
             Related tools
@@ -803,7 +827,7 @@ Calculate yours at hockystick.app/tools/cogs`;
       </section>
 
       {/* S7 — CTA */}
-      <section style={{ borderTop: "1px solid rgba(255,255,255,0.06)", background: "#111114", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", background: "#111114", padding: "72px 24px" }}>
         <div style={{ maxWidth: "560px", margin: "0 auto", textAlign: "center" }}>
           <h3 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 30px)", letterSpacing: "-0.02em", marginBottom: "16px" }}>
             Investors will calculate your margins before you do.
@@ -824,7 +848,7 @@ Calculate yours at hockystick.app/tools/cogs`;
         </div>
       </section>
 
-      <SiteFooter />
+      <div className="tool-no-print"><SiteFooter /></div>
     </div>
   );
 }

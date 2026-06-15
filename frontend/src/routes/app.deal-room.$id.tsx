@@ -184,6 +184,39 @@ function DealRoom() {
   const isInvestor = memberRow ? (memberRow.role === "investor" || memberRow.role === "viewer") : user?.role === "investor";
   const isFounder = memberRow ? memberRow.role === "founder" : user?.role !== "investor";
 
+  // Check if current user is a startup team member (not founder/investor)
+  const { data: teamAccountRow } = useQuery({
+    queryKey: ["team-account-row", user?.id],
+    enabled: !!user?.id && !isInvestor,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("startup_team_accounts")
+        .select("id, startup_id, role")
+        .eq("user_id", user!.id)
+        .eq("status", "active")
+        .limit(1)
+        .maybeSingle();
+      return data ?? null;
+    },
+  });
+
+  const isTeamMember = !!teamAccountRow && !isInvestor;
+
+  // If team member: check if they have access to this specific deal room
+  const { data: teamAssignment, isLoading: teamAssignmentLoading } = useQuery({
+    queryKey: ["team-assignment-gate", dealRoomId, teamAccountRow?.id],
+    enabled: isTeamMember && !!teamAccountRow?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("deal_room_team_assignments")
+        .select("deal_room_id")
+        .eq("deal_room_id", dealRoomId)
+        .eq("team_account_id", teamAccountRow!.id)
+        .maybeSingle();
+      return data ?? null;
+    },
+  });
+
   const dealRoomName = (room as any)?.startups?.company_name
     ? `${(room as any).startups.company_name} — Deal Room`
     : "Deal Room";
@@ -222,6 +255,26 @@ function DealRoom() {
     return (
       <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] items-center justify-center">
         <div className="text-sm text-muted-foreground animate-pulse">Verifying access…</div>
+      </div>
+    );
+  }
+
+  // Team member access gate (A2)
+  if (isTeamMember && !teamAssignmentLoading && teamAssignment === null) {
+    return (
+      <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 p-8">
+        <div className="grid h-14 w-14 place-items-center rounded-full bg-muted/30">
+          <Lock className="h-6 w-6 text-muted-foreground" />
+        </div>
+        <div className="text-center">
+          <div className="font-semibold">Access restricted</div>
+          <div className="mt-1 text-sm text-muted-foreground max-w-sm">
+            You haven't been assigned to this deal room. Ask your team admin to give you access.
+          </div>
+        </div>
+        <Link to="/app/deal-rooms" className="mt-2 text-sm text-brand hover:underline inline-flex items-center gap-1">
+          <ArrowLeft className="h-4 w-4" /> Back to deal rooms
+        </Link>
       </div>
     );
   }
@@ -414,6 +467,8 @@ function DealRoomOverview({
   const [savingTask, setSavingTask] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showTeamAssign, setShowTeamAssign] = useState(false);
+  const [assigningMemberId, setAssigningMemberId] = useState<string | null>(null);
 
   const { data: recentActivity = [] } = useQuery({
     queryKey: ["activities-overview", dealRoomId],
@@ -573,6 +628,73 @@ function DealRoomOverview({
       return count ?? 0;
     },
   });
+
+  // Team member queries (founders only)
+  const { data: allTeamAccounts = [] } = useQuery({
+    queryKey: ["all-team-accounts-overview", room?.startup_id ?? (room as any)?.startup_id],
+    enabled: !!user?.id && isFounder && !!(room as any)?.startup_id,
+    queryFn: async () => {
+      const startupId = (room as any)?.startup_id;
+      if (!startupId) return [];
+      const { data } = await supabase
+        .from("startup_team_accounts")
+        .select("id, role, users(full_name, avatar_url), team_member_profiles(first_name, last_name, avatar_url)")
+        .eq("startup_id", startupId)
+        .eq("status", "active");
+      return (data ?? []) as any[];
+    },
+  });
+
+  const { data: assignedTeam = [], refetch: refetchAssignedTeam } = useQuery({
+    queryKey: ["dr-assigned-team", dealRoomId],
+    enabled: !!user?.id && isFounder,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("deal_room_team_assignments")
+        .select("team_account_id, startup_team_accounts(id, role, users(full_name, avatar_url), team_member_profiles(first_name, last_name, avatar_url))")
+        .eq("deal_room_id", dealRoomId);
+      return (data ?? []) as any[];
+    },
+  });
+
+  const assignedIds = new Set((assignedTeam as any[]).map((a: any) => a.team_account_id));
+
+  const handleAssignTeamMember = async (accountId: string) => {
+    if (!user?.id) return;
+    setAssigningMemberId(accountId);
+    try {
+      const { error } = await supabase.from("deal_room_team_assignments").insert({
+        deal_room_id: dealRoomId,
+        team_account_id: accountId,
+        assigned_by: user.id,
+      });
+      if (error) throw error;
+      toast.success("Team member assigned");
+      void refetchAssignedTeam();
+    } catch {
+      toast.error("Failed to assign team member");
+    } finally {
+      setAssigningMemberId(null);
+    }
+  };
+
+  const handleRemoveTeamMember = async (accountId: string) => {
+    if (!user?.id) return;
+    setAssigningMemberId(accountId);
+    try {
+      await supabase
+        .from("deal_room_team_assignments")
+        .delete()
+        .eq("deal_room_id", dealRoomId)
+        .eq("team_account_id", accountId);
+      toast.success("Team member removed");
+      void refetchAssignedTeam();
+    } catch {
+      toast.error("Failed to remove team member");
+    } finally {
+      setAssigningMemberId(null);
+    }
+  };
 
   const { data: pendingInvites = [], refetch: refetchInvites } = useQuery({
     queryKey: ["pending-invites", dealRoomId],
@@ -1178,6 +1300,84 @@ function DealRoomOverview({
               )}
             </div>
           </section>
+
+          {/* Team Access panel — founders only (A1) */}
+          {isFounder && (
+            <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+              <button
+                onClick={() => setShowTeamAssign((v) => !v)}
+                className="w-full flex items-center justify-between"
+              >
+                <div className="text-sm font-semibold inline-flex items-center gap-2">
+                  <Users className="h-4 w-4 text-brand" /> Team access
+                  {(assignedTeam as any[]).length > 0 && (
+                    <span className="text-[10px] bg-brand/10 text-brand rounded-full px-2 py-0.5 font-medium">
+                      {(assignedTeam as any[]).length}
+                    </span>
+                  )}
+                </div>
+                {showTeamAssign
+                  ? <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                  : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+              </button>
+
+              {showTeamAssign && (
+                <div className="mt-4 space-y-3">
+                  {allTeamAccounts.length === 0 ? (
+                    <div className="text-xs text-muted-foreground">
+                      No team members yet. <Link to="/app/users" className="text-brand hover:underline">Invite your team →</Link>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {(allTeamAccounts as any[]).map((acct: any) => {
+                        const prof = acct.team_member_profiles;
+                        const usr = acct.users;
+                        const avatarUrl = prof?.avatar_url ?? usr?.avatar_url ?? null;
+                        const name = prof?.first_name
+                          ? `${prof.first_name} ${prof.last_name ?? ""}`.trim()
+                          : (usr?.full_name ?? "Unknown");
+                        const initials = name.split(" ").map((s: string) => s[0]).join("").slice(0, 2).toUpperCase();
+                        const isAssigned = assignedIds.has(acct.id);
+                        const isProcessing = assigningMemberId === acct.id;
+                        return (
+                          <div key={acct.id} className="flex items-center gap-2.5 rounded-lg border border-border/40 px-3 py-2">
+                            <div className="h-7 w-7 rounded-full bg-accent flex items-center justify-center text-[10px] font-semibold text-foreground overflow-hidden shrink-0">
+                              {avatarUrl
+                                ? <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
+                                : initials}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-xs font-medium truncate">{name}</div>
+                              <div className="text-[10px] text-muted-foreground capitalize">{acct.role}</div>
+                            </div>
+                            {isAssigned ? (
+                              <button
+                                onClick={() => handleRemoveTeamMember(acct.id)}
+                                disabled={isProcessing}
+                                className="shrink-0 inline-flex items-center gap-1 text-[10px] text-destructive hover:bg-destructive/5 rounded px-2 py-1 disabled:opacity-50"
+                              >
+                                {isProcessing ? <Loader2 className="h-3 w-3 animate-spin" /> : <X className="h-3 w-3" />}
+                                Remove
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleAssignTeamMember(acct.id)}
+                                disabled={isProcessing}
+                                className="shrink-0 inline-flex items-center gap-1 text-[10px] text-brand hover:bg-brand/5 rounded px-2 py-1 disabled:opacity-50"
+                              >
+                                {isProcessing ? <Loader2 className="h-3 w-3 animate-spin" /> : <UserPlus className="h-3 w-3" />}
+                                Assign
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+            </section>
+          )}
         </div>
       </div>
 
