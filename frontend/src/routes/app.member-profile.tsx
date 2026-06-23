@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, X, Loader2, Upload, ExternalLink } from "lucide-react";
+import { Plus, X, Loader2, ExternalLink, Save } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -94,6 +94,9 @@ function MemberProfilePage() {
   const [education, setEducation] = useState<EducationEntry[]>([]);
   const [achievements, setAchievements] = useState<AchievementEntry[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [saved, setSaved] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const saveTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -131,9 +134,13 @@ function MemberProfilePage() {
     }
   }, [profile, loaded]);
 
-  // Auto-save helper — debounced 600ms
+  // Mark unsaved whenever a field changes
+  const markDirty = () => setSaved(false);
+
+  // Auto-save helper — debounced 600ms (still used for incremental field edits)
   const autoSave = (patch: Partial<MemberProfile>) => {
     if (!user?.id) return;
+    markDirty();
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(async () => {
       const slug = (patch.profile_slug ?? profileSlug ?? slugify(`${firstName} ${lastName}`.trim())) || undefined;
@@ -143,15 +150,71 @@ function MemberProfilePage() {
           .update({ ...patch, profile_slug: slug, updated_at: new Date().toISOString() })
           .eq("user_id", user!.id);
         if (error) console.warn("[member-profile] auto-save error:", error.message);
-        else qc.invalidateQueries({ queryKey: ["member-profile", user.id] });
+        else { qc.invalidateQueries({ queryKey: ["member-profile", user.id] }); setSaved(true); }
       } else {
         const { error } = await supabase
           .from("team_member_profiles")
           .upsert({ user_id: user.id, ...patch, profile_slug: slug }, { onConflict: "user_id" });
         if (error) console.warn("[member-profile] upsert error:", error.message);
-        else qc.invalidateQueries({ queryKey: ["member-profile", user.id] });
+        else { qc.invalidateQueries({ queryKey: ["member-profile", user.id] }); setSaved(true); }
       }
     }, 600);
+  };
+
+  // Explicit save button handler — saves ALL current state at once
+  const handleSave = async () => {
+    if (!user?.id || saving) return;
+    setSaving(true);
+    try {
+      const slug = slugify(`${firstName} ${lastName}`.trim()) || profileSlug || undefined;
+      const patch = {
+        first_name: firstName,
+        last_name: lastName,
+        title,
+        phone,
+        address,
+        bio,
+        avatar_url: avatarUrl,
+        is_public: isPublic,
+        profile_slug: slug ?? null,
+        skills,
+        experience,
+        education,
+        achievements,
+        updated_at: new Date().toISOString(),
+      };
+      const { error } = await supabase
+        .from("team_member_profiles")
+        .upsert({ user_id: user.id, ...patch }, { onConflict: "user_id" });
+      if (error) throw error;
+      qc.invalidateQueries({ queryKey: ["member-profile", user.id] });
+      setSaved(true);
+      toast.success("Profile saved");
+    } catch (e: any) {
+      toast.error(e.message ?? "Could not save profile");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Canvas crop to square WebP
+  const cropToSquare = (file: File, size: number): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d")!;
+        const minSide = Math.min(img.width, img.height);
+        const sx = (img.width - minSide) / 2;
+        const sy = (img.height - minSide) / 2;
+        ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+        canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Canvas toBlob failed")), "image/webp", 0.9);
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
   };
 
   const handleAvatarUpload = async (file: File) => {
@@ -160,14 +223,28 @@ function MemberProfilePage() {
     if (!file.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
     setAvatarUploading(true);
     try {
-      const ext = file.name.split(".").pop() ?? "jpg";
-      const path = `members/${user.id}/${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: false });
-      if (error) throw error;
+      const croppedBlob = await cropToSquare(file, 400);
+      const path = `members/${user.id}/${Date.now()}.webp`;
+      const { error: uploadErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, croppedBlob, { contentType: "image/webp", upsert: true });
+      if (uploadErr) throw uploadErr;
       const { data } = supabase.storage.from("avatars").getPublicUrl(path);
       const url = `${data.publicUrl}?t=${Date.now()}`;
+
+      // Save to team_member_profiles
+      await supabase
+        .from("team_member_profiles")
+        .upsert({ user_id: user.id, avatar_url: url }, { onConflict: "user_id" });
+
+      // Also update startup_team_accounts.avatar_url for quick access in lists
+      await supabase
+        .from("startup_team_accounts")
+        .update({ avatar_url: url })
+        .eq("user_id", user.id);
+
       setAvatarUrl(url);
-      autoSave({ avatar_url: url } as any);
+      qc.invalidateQueries({ queryKey: ["member-profile", user.id] });
       toast.success("Profile photo updated");
     } catch (e: any) {
       toast.error(e.message ?? "Upload failed");
@@ -258,46 +335,64 @@ function MemberProfilePage() {
   }
 
   return (
-    <div style={{ padding: "32px 32px 64px", maxWidth: 700, margin: "0 auto" }}>
+    <div style={{ padding: "32px 32px 120px", maxWidth: 700, margin: "0 auto" }}>
       <h1 style={{ fontSize: 22, fontWeight: 600, color: "#fff", letterSpacing: "-0.03em", marginBottom: 4 }}>
         My Profile
       </h1>
       <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 32 }}>
-        Build your professional CV. Fields auto-save as you type.
+        Build your professional CV. Use the Save button below when done.
       </p>
 
       {/* Section 1 — Header */}
       <Card title="Profile info">
         <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 24 }}>
-          {/* Avatar */}
-          <label style={{ position: "relative", cursor: "pointer", flexShrink: 0 }}>
-            <div style={{
-              width: 72, height: 72, borderRadius: "50%", overflow: "hidden",
-              background: "#7C3AED", display: "flex", alignItems: "center",
-              justifyContent: "center", fontSize: 26, fontWeight: 700, color: "#fff",
-              fontFamily: "Syne, sans-serif",
-            }}>
-              {avatarUploading
-                ? <Loader2 size={22} className="animate-spin" />
-                : avatarUrl
-                ? <img src={avatarUrl} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                : initials(firstName, lastName)}
-            </div>
-            <div style={{
-              position: "absolute", inset: 0, borderRadius: "50%",
-              background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center",
-              justifyContent: "center", opacity: 0, transition: "opacity 0.15s",
+          {/* Avatar — click to upload */}
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            style={{
+              width: 96, height: 96, borderRadius: "50%", flexShrink: 0,
+              background: "rgba(124,58,237,0.2)", border: "2px solid rgba(124,58,237,0.3)",
+              cursor: "pointer", overflow: "hidden", position: "relative",
+              display: "flex", alignItems: "center", justifyContent: "center",
             }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.opacity = "1"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.opacity = "0"; }}
+          >
+            {avatarUploading
+              ? <Loader2 size={22} style={{ color: "#7C3AED", animation: "spin 1s linear infinite" }} />
+              : avatarUrl
+              ? <img src={avatarUrl} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              : <span style={{ fontSize: 32, fontWeight: 800, color: "#7C3AED", fontFamily: "Syne, sans-serif" }}>
+                  {initials(firstName, lastName)}
+                </span>
+            }
+            <div
+              style={{
+                position: "absolute", inset: 0,
+                background: "rgba(0,0,0,0.55)",
+                display: "flex", flexDirection: "column",
+                alignItems: "center", justifyContent: "center",
+                opacity: 0, transition: "opacity 0.2s",
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.opacity = "1"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.opacity = "0"; }}
             >
-              <Upload size={16} style={{ color: "#fff" }} />
+              <span style={{ fontSize: 20 }}>📷</span>
+              <span style={{ fontSize: 10, color: "#fff", fontWeight: 600, marginTop: 4 }}>Upload</span>
             </div>
-            <input type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])} />
-          </label>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleAvatarUpload(file);
+              e.target.value = "";
+            }}
+          />
           <div>
             <div style={{ fontSize: 13, fontWeight: 500, color: "#fff", marginBottom: 2 }}>Profile photo</div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>Max 2MB · JPG, PNG or WebP</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>Max 2MB · Cropped to 400×400 square</div>
           </div>
         </div>
 
@@ -461,6 +556,33 @@ function MemberProfilePage() {
           </button>
         </div>
       </Card>
+
+      {/* Sticky save bar */}
+      <div style={{
+        position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 40,
+        background: "rgba(10,10,11,0.95)", backdropFilter: "blur(8px)",
+        borderTop: "1px solid rgba(255,255,255,0.08)",
+        padding: "16px 24px",
+        display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 16,
+      }}>
+        <span style={{ fontSize: 13, color: saved ? "#10B981" : "rgba(255,255,255,0.35)" }}>
+          {saved ? "✓ Saved" : "Unsaved changes"}
+        </span>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          style={{
+            background: "#7C3AED", color: "#fff", border: "none",
+            borderRadius: 8, padding: "10px 24px", fontSize: 14,
+            fontWeight: 600, cursor: saving ? "not-allowed" : "pointer",
+            opacity: saving ? 0.7 : 1,
+            display: "inline-flex", alignItems: "center", gap: 6,
+          }}
+        >
+          {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+          Save profile
+        </button>
+      </div>
     </div>
   );
 }

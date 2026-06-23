@@ -74,6 +74,7 @@ function useDirectoryData() {
             avatar_url
           )
         `)
+        .eq("publicly_discoverable", true)
         .order("created_at", { ascending: false });
       return data ?? [];
     },

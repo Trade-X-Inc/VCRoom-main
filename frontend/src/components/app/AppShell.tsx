@@ -3,8 +3,14 @@ import { Logo } from "@/components/brand/Logo";
 import {
   LayoutGrid, Users, Building2, FileText, Briefcase,
   MessageSquare, MessageCircle, Calendar, Sparkles, Search, Settings, ChevronsLeft, Plus, Inbox, Gavel,
-  PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, Kanban, BarChart3, UserCircle2, Gift, Globe, Trophy, Newspaper, Plug, Menu, X, Rocket,
+  PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, UserCircle2, Gift, Globe, Trophy, Plug, Menu, X, FileInput, Kanban, LayoutDashboard,
 } from "lucide-react";
+import {
+  getFounderCompleteness,
+  getInvestorCompleteness,
+  type ProfileBuilderSession,
+  type InvestorProfile,
+} from "@/lib/profileCompleteness";
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -31,27 +37,25 @@ interface SearchResult {
 }
 
 const founderNav: NavItem[] = [
-  { to: "/app", label: "Overview", icon: LayoutGrid },
-  { to: "/app/leads", label: "VC Leads", icon: Users },
-  { to: "/app/pipeline", label: "Pipeline", icon: Kanban },
+  { to: "/app/desk", label: "Daily Desk", icon: LayoutDashboard },
+  { to: "/app", label: "Home", icon: ShieldCheck },
+  { to: "/app/overview", label: "Overview", icon: LayoutGrid },
   { to: "/app/deal-rooms", label: "Deal Rooms", icon: Briefcase },
   { to: "/app/profile", label: "Company Profile", icon: Building2 },
   { to: "/app/documents", label: "Documents", icon: FileText },
   { to: "/app/meetings", label: "Meetings", icon: Calendar },
-  { to: "/app/reports", label: "Reports", icon: BarChart3 },
   { to: "/app/advisor", label: "AI Advisor", icon: Sparkles },
   { to: "/app/messages", label: "Team Chat", icon: MessageSquare },
   { to: "/app/directory", label: "Directory", icon: Globe },
-  { to: "/app/accelerators", label: "Accelerators", icon: Rocket },
   { to: "/app/wall", label: "The Wall", icon: Trophy },
   { to: "/app/referrals", label: "Referrals", icon: Gift },
 ];
 
 const investorNav: NavItem[] = [
-  { to: "/app/investor", label: "Overview", icon: LayoutGrid },
-  { to: "/app/investor/deal-flow", label: "Deal Flow", icon: Inbox },
-  { to: "/app/investor/pipeline", label: "My Pipeline", icon: Kanban },
-  { to: "/app/investor/startups", label: "Startups", icon: Building2 },
+  { to: "/app/investor/desk", label: "Daily Desk", icon: LayoutDashboard },
+  { to: "/app/investor/overview", label: "Overview", icon: LayoutGrid },
+  { to: "/app/investor/intake", label: "Deal Intake", icon: FileInput },
+  { to: "/app/investor/connections", label: "Connections", icon: Users },
   { to: "/app/investor/diligence", label: "Due Diligence", icon: ClipboardCheck },
   { to: "/app/investor/analysis", label: "AI Analysis", icon: Brain },
   { to: "/app/investor/advisor", label: "AI Advisor", icon: Sparkles },
@@ -65,8 +69,8 @@ const investorNav: NavItem[] = [
 ];
 
 const workspaceNavFounder: NavItem[] = [
-  { to: "/app/users", label: "Team & Users", icon: UserCog },
-  { to: "/app/audit", label: "Audit Log", icon: ShieldCheck },
+  { to: "/app/profile", label: "Profile", icon: UserCircle2 },
+  { to: "/app/users", label: "Team", icon: UserCog },
   { to: "/app/integrations", label: "Integrations", icon: Plug },
   { to: "/app/settings", label: "Settings", icon: Settings },
 ];
@@ -76,6 +80,7 @@ const memberProfileNav: NavItem = { to: "/app/member-profile", label: "My Profil
 const workspaceNavInvestor: NavItem[] = [
   { to: "/app/investor/profile", label: "Profile", icon: UserCircle2 },
   { to: "/app/investor/team", label: "Team", icon: Users },
+  // Feedback button is injected inline between Team and Integrations
   { to: "/app/integrations", label: "Integrations", icon: Plug },
   { to: "/app/investor/settings", label: "Settings", icon: Settings },
 ];
@@ -140,10 +145,26 @@ function FeedbackModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+const SIDEBAR_KEY = "hs_sidebar_expanded";
+
+function getSidebarDefault(): boolean {
+  // Collapsed by default (true = collapsed) unless user previously expanded
+  if (typeof localStorage === "undefined") return true;
+  const stored = localStorage.getItem(SIDEBAR_KEY);
+  return stored === null ? true : stored !== "1";
+}
+
 export function AppShell({ children }: { children?: React.ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsedState] = useState(getSidebarDefault);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const setCollapsed = (val: boolean) => {
+    setCollapsedState(val);
+    try {
+      localStorage.setItem(SIDEBAR_KEY, val ? "0" : "1");
+    } catch {}
+  };
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -157,19 +178,6 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   const isInvestor = user?.role === "investor";
   const nav = isInvestor ? investorNav : founderNav;
   const workspaceNav = isInvestor ? workspaceNavInvestor : workspaceNavFounder;
-
-  // Live lead count from Supabase (founder only)
-  const { data: leadCount } = useQuery({
-    queryKey: ["lead-count", user?.id],
-    enabled: !!user?.id && !isInvestor,
-    queryFn: async () => {
-      const { count } = await supabase
-        .from("vc_leads")
-        .select("*", { count: "exact", head: true })
-        .eq("founder_id", user!.id);
-      return count ?? 0;
-    },
-  });
 
   // Company name from startups table (founder only)
   const { data: startupData } = useQuery({
@@ -214,18 +222,66 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
     },
   });
 
-  // Investor deal room count (investor only)
+  // Connections badge — unseen auto-added entries (red dot priority) else active count
   const { data: investorDealCount } = useQuery({
     queryKey: ["shell-investor-deal-count", user?.id],
     enabled: !!user?.id && isInvestor,
     queryFn: async () => {
-      const { count } = await supabase
-        .from("deal_room_members")
+      // Prioritise unseen auto-added rows (founders who joined via invite link)
+      const { count: unseen } = await supabase
+        .from("investor_watchlist")
         .select("*", { count: "exact", head: true })
-        .eq("user_id", user!.id);
+        .eq("investor_id", user!.id)
+        .eq("auto_added", true)
+        .eq("seen_by_investor", false);
+      if ((unseen ?? 0) > 0) return unseen ?? 0;
+      // Fall back to total active count
+      const { count } = await supabase
+        .from("investor_watchlist")
+        .select("*", { count: "exact", head: true })
+        .eq("investor_id", user!.id)
+        .not("status", "in", '("Invested","Passed")');
       return count ?? 0;
     },
   });
+
+  // Profile completeness — founder side
+  const { data: pbSession } = useQuery({
+    queryKey: ["shell-pb-session", startupData?.id],
+    enabled: !!startupData?.id && !isInvestor,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profile_builder_sessions")
+        .select("status, path, missing_fields")
+        .eq("startup_id", startupData!.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return data as ProfileBuilderSession | null;
+    },
+  });
+
+  // Profile completeness — investor side
+  const { data: investorProfileFields } = useQuery({
+    queryKey: ["shell-investor-completeness", user?.id],
+    enabled: !!user?.id && isInvestor,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("investor_profiles")
+        .select("fund_name, your_name, thesis, sectors, stages, check_size_min, check_size_max, geography")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data as InvestorProfile | null;
+    },
+  });
+
+  const shellCompleteness = isInvestor
+    ? getInvestorCompleteness(investorProfileFields ?? null)
+    : getFounderCompleteness(pbSession ?? null);
+
+  const resumeUrl = isInvestor ? "/app/investor/profile" : "/app/profile-builder";
 
   const lastRedirectRef = useRef<string>("");
   useEffect(() => {
@@ -241,11 +297,11 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       !path.startsWith("/app/meetings") &&
       !path.startsWith("/app/deal-room") &&
       !path.startsWith("/app/messages") &&
-      !path.startsWith("/app/news") &&
       !path.startsWith("/app/directory") &&
       !path.startsWith("/app/wall") &&
       !path.startsWith("/app/referrals") &&
-      !path.startsWith("/app/member-profile");
+      !path.startsWith("/app/member-profile") &&
+      !path.startsWith("/app/audit");
     const founderOutOfBounds = !isInvestor && path.startsWith("/app/investor") && !path.startsWith("/app/member-profile");
     if (investorOutOfBounds && lastRedirectRef.current !== "investor") {
       lastRedirectRef.current = "investor";
@@ -317,7 +373,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
     : (startupData?.company_name || profile?.name || "");
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="h-screen bg-background flex overflow-hidden">
       {/* Mobile overlay backdrop */}
       {mobileOpen && (
         <div
@@ -376,6 +432,46 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
           </div>
         </div>
 
+        {/* Profile completeness banner — hidden when complete or sidebar collapsed */}
+        {!collapsed && !shellCompleteness.isComplete && (
+          <div style={{
+            background: "rgba(124,58,237,0.06)",
+            border: "1px solid rgba(124,58,237,0.2)",
+            borderRadius: 8,
+            padding: "12px 14px",
+            margin: "0 12px 8px",
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: "#fff" }}>
+                Profile {shellCompleteness.percent}% complete
+              </span>
+            </div>
+            <div style={{
+              height: 4,
+              background: "rgba(255,255,255,0.08)",
+              borderRadius: 2,
+              overflow: "hidden",
+              marginBottom: 8,
+            }}>
+              <div style={{
+                height: "100%",
+                width: `${shellCompleteness.percent}%`,
+                background: "#7C3AED",
+                borderRadius: 2,
+                transition: "width 0.3s",
+              }} />
+            </div>
+            <a href={resumeUrl} style={{
+              fontSize: 12,
+              color: "#A855F7",
+              fontWeight: 500,
+              textDecoration: "none",
+            }}>
+              Finish it →
+            </a>
+          </div>
+        )}
+
         <nav className="flex-1 px-2 space-y-0.5 overflow-y-auto">
           {!collapsed && (
             <div className="px-2 pt-3 pb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
@@ -383,11 +479,10 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
             </div>
           )}
           {nav.map((n, index) => {
-            const active = path === n.to || path === n.to + "/" || (n.to !== "/app" && n.to !== "/app/investor" && path.startsWith(n.to));
+            const active = path === n.to || path === n.to + "/" || (n.to !== "/app/overview" && n.to !== "/app/investor" && path.startsWith(n.to));
             const badge = (() => {
-              if (n.to === "/app/leads") return leadCount && leadCount > 0 ? String(leadCount) : undefined;
               if (n.to === "/app/deal-rooms") return dealRoomCount && dealRoomCount > 0 ? String(dealRoomCount) : undefined;
-              if (n.to === "/app/investor/deal-flow") return investorDealCount && investorDealCount > 0 ? String(investorDealCount) : undefined;
+              if (n.to === "/app/investor/connections") return investorDealCount && investorDealCount > 0 ? String(investorDealCount) : undefined;
               return n.badge;
             })();
             
@@ -428,30 +523,34 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
               <div className="px-2 pt-4 pb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
                 Admin
               </div>
-              {/* Feedback button — opens modal, no navigation */}
-              <button
-                onClick={() => { setFeedbackOpen(true); setMobileOpen(false); }}
-                className="w-full flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors text-muted-foreground hover:bg-accent/60 hover:text-foreground"
-              >
-                <MessageCircle className="h-4 w-4" />
-                <span>Feedback</span>
-              </button>
-              {[...workspaceNav, ...(isTeamMember ? [memberProfileNav] : [])].map((n) => {
-                const active = path.startsWith(n.to);
+              {/* Render workspace nav items, injecting Feedback button after "Team" item (index 1) */}
+              {[...workspaceNav, ...(isTeamMember ? [memberProfileNav] : [])].map((n, idx) => {
+                const active = path === n.to || path.startsWith(n.to + "/");
                 return (
-                  <Link
-                    key={n.to}
-                    to={n.to as any}
-                    preload="intent"
-                    onClick={() => setMobileOpen(false)}
-                    className={cn(
-                      "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
-                      active ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
+                  <div key={n.to}>
+                    <Link
+                      to={n.to as any}
+                      preload="intent"
+                      onClick={() => setMobileOpen(false)}
+                      className={cn(
+                        "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
+                        active ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
+                      )}
+                    >
+                      <n.icon className={cn("h-4 w-4", active && "text-brand")} />
+                      <span>{n.label}</span>
+                    </Link>
+                    {/* Inject Feedback after Team (index 1 = second item) */}
+                    {idx === 1 && (
+                      <button
+                        onClick={() => { setFeedbackOpen(true); setMobileOpen(false); }}
+                        className="w-full flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                        <span>Feedback</span>
+                      </button>
                     )}
-                  >
-                    <n.icon className={cn("h-4 w-4", active && "text-brand")} />
-                    <span>{n.label}</span>
-                  </Link>
+                  </div>
                 );
               })}
             </>
@@ -461,6 +560,26 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
         <div className="p-3 border-t border-border/60">
           {collapsed ? (
             <>
+              {/* Percent ring when sidebar collapsed + profile incomplete */}
+              {!shellCompleteness.isComplete && (
+                <a href={resumeUrl} title={`Profile ${shellCompleteness.percent}% complete — finish it`}
+                  className="mb-1 flex items-center justify-center">
+                  <svg width="32" height="32" viewBox="0 0 32 32">
+                    <circle cx="16" cy="16" r="13" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3" />
+                    <circle
+                      cx="16" cy="16" r="13" fill="none"
+                      stroke="#7C3AED" strokeWidth="3"
+                      strokeDasharray={`${2 * Math.PI * 13}`}
+                      strokeDashoffset={`${2 * Math.PI * 13 * (1 - shellCompleteness.percent / 100)}`}
+                      strokeLinecap="round"
+                      transform="rotate(-90 16 16)"
+                    />
+                    <text x="16" y="20" textAnchor="middle" fill="#A855F7" fontSize="8" fontWeight="600">
+                      {shellCompleteness.percent}%
+                    </text>
+                  </svg>
+                </a>
+              )}
               <Link
                 to={"/app/settings" as any}
                 className="flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-accent/60 hover:text-foreground"
@@ -506,7 +625,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
             <UserMenu />
           </div>
         </header>
-        <main className="flex-1 min-w-0 overflow-x-hidden">{children ?? <Outlet />}</main>
+        <main className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto flex flex-col">{children ?? <Outlet />}</main>
       </div>
       {feedbackOpen && <FeedbackModal onClose={() => setFeedbackOpen(false)} />}
 

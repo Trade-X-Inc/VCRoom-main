@@ -1,547 +1,213 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { cn } from "@/lib/utils";
+import { getDDSummaryForInvestor } from "@/lib/dd-fn";
 import {
-  ClipboardCheck, ExternalLink, Loader2, Flag, Clock, Eye, CheckCircle2,
-  ChevronDown, Building2, Users, Globe, TrendingUp, Target, ArrowRight,
-  Plus, Search, X, Briefcase,
+  CheckCircle2, ClipboardCheck, Loader2, ArrowRight, Building2, ExternalLink,
 } from "lucide-react";
-import { useState } from "react";
 
 export const Route = createFileRoute("/app/investor/diligence")({
   component: DiligencePage,
 });
 
-const CATEGORIES = ["Financials", "Team", "Legal", "Market", "Product", "References"] as const;
-type DDCategory = (typeof CATEGORIES)[number];
-const STATUSES = ["Pending", "In Review", "Complete", "Red Flag"] as const;
-type DDStatus = (typeof STATUSES)[number];
-
-const STATUS_CONFIG: Record<DDStatus, { icon: any; cls: string; label: string }> = {
-  "Pending":   { icon: Clock,        cls: "bg-muted text-muted-foreground",     label: "Pending" },
-  "In Review": { icon: Eye,          cls: "bg-brand/10 text-brand",             label: "In Review" },
-  "Complete":  { icon: CheckCircle2, cls: "bg-success/10 text-success",         label: "Complete" },
-  "Red Flag":  { icon: Flag,         cls: "bg-destructive/10 text-destructive", label: "Red Flag" },
-};
-
-// Standard DD checklist items per category
-const DD_CHECKLIST: Record<DDCategory, string[]> = {
-  Financials: [
-    "Revenue model reviewed",
-    "Last 12 months MRR/ARR verified",
-    "Burn rate & runway calculated",
-    "Cap table reviewed",
-    "Revenue projections stress-tested",
-    "Unit economics (LTV/CAC) assessed",
-  ],
-  Team: [
-    "Founders' backgrounds verified",
-    "Key team members identified",
-    "Gaps in leadership assessed",
-    "Founder-market fit evaluated",
-    "Equity split reviewed",
-    "Advisor quality checked",
-  ],
-  Legal: [
-    "Company incorporation verified",
-    "IP ownership confirmed",
-    "Outstanding litigation checked",
-    "Shareholder agreements reviewed",
-    "Employee contracts checked",
-    "Regulatory compliance assessed",
-  ],
-  Market: [
-    "TAM/SAM/SOM validated",
-    "Market growth rate confirmed",
-    "Key competitors mapped",
-    "Differentiation assessed",
-    "Go-to-market strategy reviewed",
-    "Geographic expansion potential",
-  ],
-  Product: [
-    "Product demo completed",
-    "Technical architecture reviewed",
-    "Product-market fit signals",
-    "Roadmap feasibility assessed",
-    "Tech debt evaluated",
-    "Key metrics (DAU/MAU, churn) reviewed",
-  ],
-  References: [
-    "Customer references collected",
-    "Reference calls completed",
-    "Net Promoter Score data reviewed",
-    "Case studies / testimonials reviewed",
-    "Investor reference checks done",
-    "Team reference checks done",
-  ],
-};
-
 function DiligencePage() {
   const { user } = useAuth();
-  const userId = user?.id ?? "";
-  const qc = useQueryClient();
-  const [selectedStartupId, setSelectedStartupId] = useState<string | null>(null);
-  const [showDetail, setShowDetail] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [expandedCat, setExpandedCat] = useState<DDCategory | null>("Financials");
 
-  // Fetch investor's watchlist companies
-  const { data: startups = [], isLoading: startupsLoading } = useQuery({
-    queryKey: ["investor-watchlist-dd", userId],
-    enabled: !!userId,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("investor_watchlist")
-        .select("*")
-        .eq("investor_id", userId)
-        .order("created_at", { ascending: false });
-      return data ?? [];
-    },
+  const { data: summary, isLoading: summaryLoading } = useQuery({
+    queryKey: ["dd-summary", user?.id],
+    enabled: !!user?.id,
+    queryFn: () => getDDSummaryForInvestor({ data: { userId: user!.id } }),
   });
 
-  // Separate query for deal room membership (for "Open Deal Room" button)
-  const { data: memberRooms = [] } = useQuery({
-    queryKey: ["investor-rooms", userId],
-    enabled: !!userId,
+  // Watchlist entries in Diligence status that have no deal room
+  const { data: watchlistDiligence = [], isLoading: watchlistLoading } = useQuery({
+    queryKey: ["watchlist-diligence-no-room", user?.id],
+    enabled: !!user?.id,
     queryFn: async () => {
-      const { data } = await supabase
+      // Get all deal room startup_ids so we can exclude them
+      const { data: memberships } = await supabase
         .from("deal_room_members")
         .select("deal_room_id, deal_rooms(startup_id)")
-        .eq("user_id", userId);
-      return data ?? [];
+        .eq("user_id", user!.id);
+
+      const roomStartupIds = new Set(
+        (memberships ?? []).flatMap((m: any) =>
+          m.deal_rooms ? [m.deal_rooms.startup_id] : []
+        )
+      );
+
+      // Get investor's watchlist in Diligence status
+      const { data: entries } = await supabase
+        .from("investor_watchlist")
+        .select("id, company_name, website, sector, stage, source, created_at")
+        .eq("investor_id", user!.id)
+        .eq("status", "Diligence");
+
+      // Only include ones not matched to a real deal room startup
+      // (watchlist has no FK to startups, so we can only filter by manual matching — return all for now)
+      return (entries ?? []).filter((e: any) => !roomStartupIds.has(e.id));
     },
   });
 
-  const getDealRoomId = (startupId: string) => {
-    const match = (memberRooms as any[]).find((m: any) => (m.deal_rooms as any)?.startup_id === startupId);
-    return match?.deal_room_id ?? null;
-  };
+  const isLoading = summaryLoading || watchlistLoading;
+  const dealRooms = summary?.dealRooms ?? [];
 
-  // DD checklist state for selected startup (stored in Supabase)
-  const { data: ddState = {} } = useQuery({
-    queryKey: ["lite-dd-state", userId, selectedStartupId],
-    enabled: !!userId && !!selectedStartupId,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("investor_dd_lite")
-        .select("category, item_index, checked, status")
-        .eq("investor_id", userId)
-        .eq("watchlist_id", selectedStartupId!);
-      const state: Record<string, any> = {};
-      (data ?? []).forEach((row: any) => {
-        const key = `${row.category}::${row.item_index}`;
-        state[key] = { checked: row.checked };
-        if (row.status) state[`status::${row.category}`] = row.status;
-      });
-      return state;
-    },
-  });
-
-  const toggleItem = useMutation({
-    mutationFn: async ({ category, index, checked }: { category: string; index: number; checked: boolean }) => {
-      await supabase.from("investor_dd_lite").upsert({
-        investor_id: userId,
-        watchlist_id: selectedStartupId,
-        category,
-        item_index: index,
-        checked,
-      }, { onConflict: "investor_id,watchlist_id,category,item_index" });
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["lite-dd-state", userId, selectedStartupId] }),
-  });
-
-  const setStatus = useMutation({
-    mutationFn: async ({ category, status }: { category: string; status: string }) => {
-      await supabase.from("investor_dd_lite").upsert({
-        investor_id: userId,
-        watchlist_id: selectedStartupId,
-        category,
-        item_index: -1,
-        checked: false,
-        status,
-      }, { onConflict: "investor_id,watchlist_id,category,item_index" });
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["lite-dd-state", userId, selectedStartupId] }),
-  });
-
-  const getChecked = (category: string, index: number) =>
-    ddState[`${category}::${index}`]?.checked ?? false;
-
-  const getCatStatus = (category: string): DDStatus =>
-    (ddState[`status::${category}`] as DDStatus) ?? "Pending";
-
-  const getCatProgress = (category: DDCategory) => {
-    const items = DD_CHECKLIST[category];
-    const done = items.filter((_, i) => getChecked(category, i)).length;
-    return { done, total: items.length, pct: Math.round((done / items.length) * 100) };
-  };
-
-  const getTotalProgress = () => {
-    const total = CATEGORIES.reduce((sum, c) => sum + DD_CHECKLIST[c].length, 0);
-    const done = CATEGORIES.reduce((sum, c) => {
-      return sum + DD_CHECKLIST[c].filter((_, i) => getChecked(c, i)).length;
-    }, 0);
-    return { done, total, pct: Math.round((done / total) * 100) };
-  };
-
-  const PREFERRED_STAGES = ["Seed", "Series A"];
-
-  const selectedStartup = startups.find((s: any) => s.id === selectedStartupId);
-  const filteredStartups = (startups as any[]).filter((s: any) =>
-    s.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.sector?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  const totalProgress = selectedStartupId ? getTotalProgress() : null;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] overflow-hidden">
-      {/* Left sidebar — company picker */}
-      <div className={cn(
-        "shrink-0 border-r border-border/60 flex flex-col bg-card overflow-hidden",
-        "w-full md:w-72",
-        showDetail ? "hidden md:flex" : "flex",
-      )}>
-        <div className="px-4 py-4 border-b border-border/60">
-          <div className="flex items-center gap-2 mb-3">
-            <ClipboardCheck className="h-4 w-4 text-brand" />
-            <h2 className="text-sm font-semibold">Due Diligence</h2>
-          </div>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-            <input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search companies…"
-              className="w-full rounded-lg border border-border/60 bg-background pl-8 pr-3 py-1.5 text-xs focus:outline-none focus:border-brand/50"
-            />
-            {searchQuery && (
-              <button onClick={() => setSearchQuery("")} className="absolute right-2 top-1/2 -translate-y-1/2">
-                <X className="h-3 w-3 text-muted-foreground" />
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-y-auto py-2">
-          {startupsLoading && (
-            <div className="flex items-center justify-center gap-2 py-8 text-xs text-muted-foreground">
-              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading…
-            </div>
-          )}
-          {!startupsLoading && filteredStartups.length === 0 && (
-            <div className="px-4 py-8 text-center">
-              <Building2 className="h-8 w-8 mx-auto mb-2 text-muted-foreground/30" />
-              <p className="text-xs text-muted-foreground">No companies yet. Add founders to your pipeline first.</p>
-            </div>
-          )}
-          {filteredStartups.map((s: any) => {
-            const stageMatch = PREFERRED_STAGES.includes(s.stage ?? "");
-            const isSelected = selectedStartupId === s.id;
-            return (
-              <button
-                key={s.id}
-                onClick={() => { setSelectedStartupId(s.id); setShowDetail(true); }}
-                className={cn(
-                  "w-full text-left px-4 py-3 transition-colors border-b border-border/40 last:border-0",
-                  isSelected ? "bg-brand/5 border-l-2 border-l-brand" : "hover:bg-accent/50"
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-brand/20 to-brand/10 text-[11px] font-bold text-brand shrink-0">
-                    {s.company_name?.[0] ?? "?"}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-semibold truncate">{s.company_name}</div>
-                    <div className="text-[10px] text-muted-foreground truncate">{s.stage} · {s.sector || "—"}</div>
-                  </div>
-                  {stageMatch && (
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0 bg-success/15 text-success">
-                      ✓
-                    </span>
-                  )}
-                </div>
-                {getDealRoomId(s.id) && (
-                  <div className="mt-1 ml-10 flex items-center gap-1">
-                    <Briefcase className="h-2.5 w-2.5 text-brand" />
-                    <span className="text-[9px] text-brand">In deal room</span>
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </div>
+    <div className="p-6 max-w-4xl mx-auto space-y-8">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
+          Due Diligence
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Checklist progress across all deal rooms you have access to
+        </p>
       </div>
 
-      {/* Main content */}
-      <div className={cn(
-        "flex-1 overflow-y-auto flex flex-col",
-        showDetail ? "flex" : "hidden md:flex",
-      )}>
-        {/* Mobile back button */}
-        {showDetail && (
-          <button
-            onClick={() => setShowDetail(false)}
-            className="md:hidden flex items-center gap-1.5 px-4 py-3 text-sm text-muted-foreground hover:text-foreground border-b border-border/60 shrink-0"
-          >
-            ← Back to list
-          </button>
-        )}
-        {!selectedStartup ? (
-          <div className="h-full flex items-center justify-center">
-            <div className="text-center max-w-sm">
-              <ClipboardCheck className="h-12 w-12 mx-auto mb-4 text-muted-foreground/20" />
-              <h3 className="text-base font-semibold">Select a company</h3>
-              <p className="text-sm text-muted-foreground mt-1">
-                Pick a company from the left to run due diligence — see their profile, thesis fit, and track your checklist.
-              </p>
-              {startups.length === 0 && !startupsLoading && (
-                <Link
-                  to="/app/investor/deal-flow"
-                  className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow"
-                >
-                  View Deal Flow <ArrowRight className="h-4 w-4" />
-                </Link>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="p-6 lg:p-8 max-w-4xl mx-auto space-y-6">
-
-            {/* Header */}
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-brand/20 to-brand/10 text-lg font-bold text-brand">
-                  {selectedStartup.company_name?.[0]}
-                </div>
-                <div>
-                  <h1 className="text-xl font-semibold">{selectedStartup.company_name}</h1>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-xs text-muted-foreground">{selectedStartup.stage}</span>
-                    {selectedStartup.sector && <><span className="text-muted-foreground/40">·</span><span className="text-xs text-muted-foreground">{selectedStartup.sector}</span></>}
+      {/* Deal rooms with real DD progress */}
+      {dealRooms.length > 0 ? (
+        <div className="space-y-3">
+          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Active deal rooms
+          </h2>
+          {dealRooms.map((room) => {
+            const pct = room.total > 0 ? Math.round((room.checked / room.total) * 100) : null;
+            return (
+              <div
+                key={room.id}
+                className="rounded-xl border flex flex-col sm:flex-row sm:items-center gap-4 p-5"
+                style={{ background: "#111114", borderColor: "rgba(255,255,255,0.08)" }}
+              >
+                {/* Company info */}
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.2)" }}>
+                    {room.logoUrl
+                      ? <img src={room.logoUrl} alt={room.companyName} className="h-8 w-8 rounded object-contain" />
+                      : <Building2 className="h-4 w-4" style={{ color: "#A855F7" }} />}
                   </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                {getDealRoomId(selectedStartup.id) ? (
-                  <Link
-                    to="/app/deal-room/$id"
-                    params={{ id: getDealRoomId(selectedStartup.id)! }}
-                    className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow"
-                  >
-                    <Briefcase className="h-4 w-4" /> Open Deal Room <ExternalLink className="h-3.5 w-3.5" />
-                  </Link>
-                ) : (
-                  <Link
-                    to="/app/deal-rooms"
-                    className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-sm hover:bg-brand/10"
-                  >
-                    <Plus className="h-4 w-4" /> Create Deal Room
-                  </Link>
-                )}
-              </div>
-            </div>
-
-            {/* Three cols: profile + thesis + progress */}
-            <div className="grid sm:grid-cols-3 gap-4">
-              {/* Founder profile */}
-              <div className="rounded-xl border border-border/60 bg-card p-4 space-y-3">
-                <div className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Founder</div>
-                <div className="flex items-center gap-2">
-                  {selectedStartup.users?.avatar_url ? (
-                    <img src={selectedStartup.users.avatar_url} className="h-8 w-8 rounded-full object-cover" alt="" />
-                  ) : (
-                    <div className="grid h-8 w-8 place-items-center rounded-full bg-brand/10 text-[10px] font-bold text-brand">
-                      {selectedStartup.users?.full_name?.[0] ?? "?"}
-                    </div>
-                  )}
-                  <div>
-                    <div className="text-sm font-medium">{selectedStartup.users?.full_name ?? "Unknown"}</div>
-                    <div className="text-[10px] text-muted-foreground">Founder & CEO</div>
-                  </div>
-                </div>
-                {selectedStartup.team_size && (
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Users className="h-3.5 w-3.5" />
-                    Team size: <span className="text-foreground font-medium">{selectedStartup.team_size}</span>
-                  </div>
-                )}
-                {selectedStartup.website && (
-                  <a
-                    href={selectedStartup.website.startsWith("http") ? selectedStartup.website : `https://${selectedStartup.website}`}
-                    target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-xs text-brand hover:underline"
-                  >
-                    <Globe className="h-3.5 w-3.5" /> {selectedStartup.website}
-                  </a>
-                )}
-                {selectedStartup.description && (
-                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">{selectedStartup.description}</p>
-                )}
-              </div>
-
-              {/* Quick fit indicators */}
-              <div className="rounded-xl border border-border/60 bg-card p-4 space-y-3">
-                <div className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Quick Fit</div>
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex items-center gap-1.5">
-                      <TrendingUp className="h-3 w-3" /> Stage
-                    </span>
-                    {PREFERRED_STAGES.includes(selectedStartup.stage ?? "")
-                      ? <span className="flex items-center gap-1 text-success font-medium"><CheckCircle2 className="h-3.5 w-3.5" /> {selectedStartup.stage}</span>
-                      : <span className="text-muted-foreground">{selectedStartup.stage || "—"}</span>
-                    }
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex items-center gap-1.5">
-                      <Target className="h-3 w-3" /> Sector
-                    </span>
-                    {selectedStartup.sector
-                      ? <span className="rounded-full bg-brand/10 text-brand px-2 py-0.5 text-[10px] font-medium">{selectedStartup.sector}</span>
-                      : <span className="text-muted-foreground">—</span>
-                    }
-                  </div>
-                  {selectedStartup.initial_score != null && (
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <Flag className="h-3 w-3" /> Score
-                      </span>
-                      <span className="font-semibold tabular-nums">{selectedStartup.initial_score}/10</span>
-                    </div>
-                  )}
-                  {selectedStartup.source && (
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">Source</span>
-                      <span className="font-medium truncate max-w-[120px]">{selectedStartup.source}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* DD progress */}
-              <div className="rounded-xl border border-border/60 bg-card p-4 space-y-3">
-                <div className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">DD Progress</div>
-                {totalProgress && (
-                  <>
-                    <div className="flex items-end gap-2">
-                      <div className="text-3xl font-bold">{totalProgress.pct}%</div>
-                      <div className="text-xs text-muted-foreground mb-1">{totalProgress.done}/{totalProgress.total} items</div>
-                    </div>
-                    <div className="h-2 rounded-full bg-muted overflow-hidden">
-                      <div className="h-full bg-gradient-brand rounded-full transition-all" style={{ width: `${totalProgress.pct}%` }} />
-                    </div>
-                    <div className="grid grid-cols-2 gap-1.5 mt-2">
-                      {CATEGORIES.map((cat) => {
-                        const { pct } = getCatProgress(cat);
-                        const status = getCatStatus(cat);
-                        const cfg = STATUS_CONFIG[status];
-                        return (
-                          <div key={cat} className={cn("flex items-center gap-1.5 rounded-md px-2 py-1 text-[10px]", cfg.cls)}>
-                            <cfg.icon className="h-2.5 w-2.5 shrink-0" />
-                            <span className="truncate">{cat}</span>
-                            <span className="ml-auto font-medium">{pct}%</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Checklist accordion */}
-            <div className="space-y-3">
-              <h2 className="text-base font-semibold">Due Diligence Checklist</h2>
-              <p className="text-xs text-muted-foreground -mt-2">Lite version — document analysis available in the Deal Room workstation.</p>
-              {CATEGORIES.map((cat) => {
-                const { done, total, pct } = getCatProgress(cat);
-                const status = getCatStatus(cat);
-                const cfg = STATUS_CONFIG[status];
-                const isOpen = expandedCat === cat;
-                return (
-                  <div key={cat} className="rounded-xl border border-border/60 bg-card overflow-hidden">
-                    {/* Category header */}
-                    <button
-                      onClick={() => setExpandedCat(isOpen ? null : cat)}
-                      className="w-full flex items-center gap-3 px-5 py-4 hover:bg-accent/30 transition-colors"
-                    >
-                      <span className={cn("grid h-7 w-7 place-items-center rounded-lg shrink-0", cfg.cls)}>
-                        <cfg.icon className="h-3.5 w-3.5" />
-                      </span>
-                      <div className="flex-1 text-left">
-                        <div className="text-sm font-semibold">{cat}</div>
-                        <div className="text-[10px] text-muted-foreground">{done}/{total} complete</div>
-                      </div>
-                      {/* Progress bar */}
-                      <div className="w-24 hidden sm:block">
-                        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                          <div className="h-full bg-gradient-brand transition-all" style={{ width: `${pct}%` }} />
-                        </div>
-                      </div>
-                      {/* Status selector */}
-                      <div className="relative" onClick={(e) => e.stopPropagation()}>
-                        <select
-                          value={status}
-                          onChange={(e) => setStatus.mutate({ category: cat, status: e.target.value })}
-                          className={cn(
-                            "appearance-none rounded-md px-2.5 py-1 text-[11px] font-medium pr-6 border-0 cursor-pointer focus:outline-none focus:ring-1 focus:ring-brand/50",
-                            cfg.cls
-                          )}
-                        >
-                          {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-                        </select>
-                        <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 h-3 w-3 pointer-events-none" />
-                      </div>
-                      <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform shrink-0", isOpen && "rotate-180")} />
-                    </button>
-
-                    {/* Checklist items */}
-                    {isOpen && (
-                      <div className="border-t border-border/60 divide-y divide-border/40">
-                        {DD_CHECKLIST[cat].map((item, idx) => {
-                          const checked = getChecked(cat, idx);
-                          return (
-                            <label
-                              key={idx}
-                              className="flex items-center gap-3 px-5 py-3 hover:bg-accent/20 cursor-pointer transition-colors"
-                            >
-                              <input
-                                type="checkbox"
-                                checked={checked}
-                                onChange={(e) => toggleItem.mutate({ category: cat, index: idx, checked: e.target.checked })}
-                                className="h-4 w-4 rounded border-border accent-brand cursor-pointer"
-                              />
-                              <span className={cn("text-sm flex-1", checked && "line-through text-muted-foreground")}>
-                                {item}
-                              </span>
-                              {checked && <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0" />}
-                            </label>
-                          );
-                        })}
+                  <div className="min-w-0">
+                    <div className="font-medium text-sm truncate">{room.companyName}</div>
+                    {(room.stage || room.sector) && (
+                      <div className="text-xs text-muted-foreground truncate">
+                        {[room.stage, room.sector].filter(Boolean).join(" · ")}
                       </div>
                     )}
                   </div>
-                );
-              })}
-            </div>
+                </div>
 
-            {/* Bottom note */}
-            <div className="rounded-xl border border-brand/20 bg-brand/5 p-4 flex items-start gap-3">
-              <Briefcase className="h-4 w-4 text-brand shrink-0 mt-0.5" />
-              <div className="text-xs text-muted-foreground">
-                <span className="font-semibold text-foreground">Document analysis is in the Deal Room.</span>{" "}
-                This checklist covers profile review and thesis match. For deep document analysis — pitch decks, financials, legal docs — open the Deal Room Workstation.
-                {getDealRoomId(selectedStartup.id)
-                  ? <Link to="/app/deal-room/$id" params={{ id: getDealRoomId(selectedStartup.id)! }} className="ml-1 text-brand hover:underline">Go to workstation →</Link>
-                  : <Link to="/app/deal-rooms" className="ml-1 text-brand hover:underline">Create a deal room →</Link>
-                }
+                {/* Progress */}
+                <div className="flex-1 min-w-0 max-w-xs">
+                  {pct !== null ? (
+                    <>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-xs text-muted-foreground">{room.checked}/{room.total} items</span>
+                        <span className="text-xs font-medium">{pct}%</span>
+                      </div>
+                      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
+                        <div
+                          className="h-full rounded-full transition-all"
+                          style={{
+                            width: `${pct}%`,
+                            background: pct === 100 ? "#10B981" : "#7C3AED",
+                          }}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">No checklist items yet</span>
+                  )}
+                </div>
+
+                {/* Action */}
+                <Link
+                  to="/app/deal-room/$id"
+                  params={{ id: room.id }}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium shrink-0 transition-colors"
+                  style={{ background: "rgba(124,58,237,0.1)", color: "#A855F7", border: "1px solid rgba(124,58,237,0.2)" }}
+                >
+                  Open DD <ArrowRight className="h-3 w-3" />
+                </Link>
               </div>
-            </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="rounded-xl border p-8 text-center" style={{ background: "#111114", borderColor: "rgba(255,255,255,0.08)" }}>
+          <ClipboardCheck className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
+          <p className="text-sm font-medium">No deal rooms yet</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            You are not a member of any deal rooms. Deal rooms are created when founders invite you.
+          </p>
+        </div>
+      )}
+
+      {/* Watchlist entries in Diligence with no deal room */}
+      {watchlistDiligence.length > 0 && (
+        <div className="space-y-3">
+          <div>
+            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              In diligence — not yet in a deal room
+            </h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              These companies are marked Diligence in your watchlist but have not opened a deal room with you yet.
+            </p>
           </div>
-        )}
-      </div>
+          {watchlistDiligence.map((entry: any) => (
+            <div
+              key={entry.id}
+              className="rounded-xl border flex items-center gap-4 p-5"
+              style={{ background: "#111114", borderColor: "rgba(255,255,255,0.08)" }}
+            >
+              <div className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0"
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                <Building2 className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-sm truncate">{entry.company_name}</div>
+                {(entry.sector || entry.stage) && (
+                  <div className="text-xs text-muted-foreground truncate">
+                    {[entry.stage, entry.sector].filter(Boolean).join(" · ")}
+                  </div>
+                )}
+              </div>
+              <span className="text-xs px-2 py-1 rounded-full shrink-0"
+                style={{ background: "rgba(245,158,11,0.12)", color: "#F59E0B" }}>
+                Awaiting deal room
+              </span>
+              {entry.website && (
+                <a
+                  href={entry.website.startsWith("http") ? entry.website : `https://${entry.website}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {dealRooms.length === 0 && watchlistDiligence.length === 0 && !isLoading && (
+        <div className="rounded-xl border p-8 text-center" style={{ background: "#111114", borderColor: "rgba(255,255,255,0.08)" }}>
+          <CheckCircle2 className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
+          <p className="text-sm font-medium">Nothing in diligence yet</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Move companies to Diligence in your watchlist to track them here.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

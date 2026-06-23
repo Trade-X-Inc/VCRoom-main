@@ -6,7 +6,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { OnboardingChat } from "@/components/OnboardingChat";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Users, ShieldCheck, ListChecks, CheckCircle2, Zap, Shield, Sparkles, BarChart2, Newspaper, Globe, Award, Link2, FileText, BadgeCheck, Mail, DollarSign, Wrench } from "lucide-react";
+import { ArrowRight, Users, ShieldCheck, ListChecks, CheckCircle2, Zap, Shield, Sparkles, BarChart2, Globe, Link2, FileText, BadgeCheck, Mail, DollarSign, Wrench } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -329,10 +329,9 @@ function WhatsInside() {
     { Icon: Shield,     title: "NDA-Gated Deal Rooms",    desc: "Investors sign before seeing a single document. Every file is watermarked and tracked.", tag: "Live" },
     { Icon: Sparkles,   title: "AI Document Review",      desc: "16 structured document templates reviewed by AI. VC-grade scoring, gap analysis, and investor simulation before you go live.", tag: "Live" },
     { Icon: BarChart2,  title: "Thesis Matching",         desc: "Investors receive daily alerts when a verified founder matches their sector, stage, and geography. No cold outreach needed.", tag: "Live" },
-    { Icon: Newspaper,  title: "Market News Feed",        desc: "Latest startup funding rounds and VC moves — curated for investors managing deal flow.", tag: "Live" },
     { Icon: Globe,      title: "Founder Directory",       desc: "Discover and connect with verified founders and investors in your sector.", tag: "Beta" },
-    { Icon: BadgeCheck, title: "Investor Verification",   desc: "Both founders and investors are verified. Website, LinkedIn, and public signals checked daily. Hockystick Checked badge on every profile.", tag: "Live" },
-    { Icon: Link2,      title: "CRM Integrations",        desc: "HubSpot CRM sync live. Notion, Slack and Zapier integrations coming Q3.", tag: "Live" },
+    { Icon: BadgeCheck, title: "Investor Verification",   desc: "Both founders and investors are verified. Website, LinkedIn, and public signals checked on submission. Hockystick Checked badge on every profile.", tag: "Live" },
+    { Icon: Link2,      title: "CRM Integrations",        desc: "HubSpot CRM sync live. Notion, Slack, and Zapier integrations coming soon.", tag: "Live" },
     { Icon: FileText,   title: "Deal Brief",              desc: "When an investor connects with a founder, AI generates a curated deal brief: key metrics, strengths, red flags, and DD questions — pre-done.", tag: "Live" },
   ];
 

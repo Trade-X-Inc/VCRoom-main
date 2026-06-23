@@ -25,8 +25,9 @@ import {
   CheckCircle2, Circle, ChevronDown, ChevronUp, Flag, Clock, Eye,
   StickyNote, Save, Loader2, FileText, Plus, Sparkles, Trash2, Download, RefreshCw,
   BarChart3, TrendingUp, Users, Scale, Target, Handshake, Play, Image, ExternalLink,
-  Star, Zap, DollarSign,
+  Star, Zap, DollarSign, Wand2,
 } from "lucide-react";
+import { runAutoDetection } from "@/lib/dd-fn";
 
 const CATEGORIES = ["Financials", "Team", "Legal", "Market", "Product", "References"] as const;
 type DDCategory = (typeof CATEGORIES)[number];
@@ -79,6 +80,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
   const [analyzingDoc, setAnalyzingDoc] = useState<string | null>(null);
   const [scorecard, setScorecard] = useState<Record<string, number>>({});
   const [scorecardOpen, setScorecardOpen] = useState(false);
+  const [runningAutoDetect, setRunningAutoDetect] = useState(false);
 
   useEffect(() => {
     if (!dealRoomId || !userId) return;
@@ -126,7 +128,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
           .order("category"),
         supabase
           .from("dd_checklist_items")
-          .select("id, category, label, checked")
+          .select("id, category, label, checked, auto_detected, auto_source, auto_source_label, manually_overridden")
           .eq("deal_room_id", dealRoomId)
           .order("created_at"),
       ]);
@@ -216,18 +218,44 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
     return Math.round((checklistItems.filter((i: any) => i.checked).length / checklistItems.length) * 100);
   };
 
-  const toggleItem = async (itemId: string, checked: boolean) => {
+  const toggleItem = async (itemId: string, checked: boolean, isAutoDetected?: boolean) => {
+    // Optimistic update — also set manually_overridden if this is an auto-detected item
     qc.setQueryData(["dd-workstation", dealRoomId], (old: any) => ({
       ...old,
-      items: old?.items?.map((i: any) => i.id === itemId ? { ...i, checked } : i),
+      items: old?.items?.map((i: any) =>
+        i.id === itemId
+          ? { ...i, checked, ...(isAutoDetected ? { manually_overridden: true } : {}) }
+          : i
+      ),
     }));
+    const update: Record<string, any> = { checked };
+    if (isAutoDetected) update.manually_overridden = true;
     const { error } = await supabase
       .from("dd_checklist_items")
-      .update({ checked })
+      .update(update)
       .eq("id", itemId);
     if (error) {
       toast.error("Failed to update");
       qc.invalidateQueries({ queryKey: ["dd-workstation", dealRoomId] });
+    }
+  };
+
+  const handleRunAutoDetection = async () => {
+    if (!userId) return;
+    setRunningAutoDetect(true);
+    try {
+      const result = await runAutoDetection({ data: { dealRoomId, userId } });
+      if ("error" in result && result.error) {
+        toast.error(result.error as string);
+      } else {
+        const count = (result.detected as any[]).length;
+        toast.success(count > 0 ? `Auto-detected ${count} item${count === 1 ? "" : "s"}` : "No new items auto-detected");
+        qc.invalidateQueries({ queryKey: ["dd-workstation", dealRoomId] });
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Auto-detection failed");
+    } finally {
+      setRunningAutoDetect(false);
     }
   };
 
@@ -557,6 +585,26 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
         <div className="mb-4 rounded-lg bg-muted/40 border border-border/40 px-4 py-2.5 text-xs text-muted-foreground flex items-center gap-2">
           <Eye className="h-3.5 w-3.5 shrink-0" />
           This is your investor's due diligence checklist. Items marked complete mean the investor has reviewed them.
+        </div>
+      )}
+
+      {isInvestor && (
+        <div className="mb-4 flex items-center justify-between rounded-lg px-4 py-2.5 text-xs"
+          style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)" }}>
+          <span className="text-muted-foreground flex items-center gap-1.5">
+            <Wand2 className="h-3.5 w-3.5" style={{ color: "#A855F7" }} />
+            Auto-detect items from uploaded documents and verified founder data
+          </span>
+          <button
+            onClick={handleRunAutoDetection}
+            disabled={runningAutoDetect}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors disabled:opacity-60"
+            style={{ background: "rgba(124,58,237,0.15)", color: "#A855F7", border: "1px solid rgba(124,58,237,0.3)" }}
+          >
+            {runningAutoDetect
+              ? <><Loader2 className="h-3 w-3 animate-spin" /> Running…</>
+              : <><Wand2 className="h-3 w-3" /> Run auto-detection</>}
+          </button>
         </div>
       )}
 
@@ -1121,28 +1169,46 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                         <p className="text-sm text-muted-foreground">No items yet.</p>
                       ) : (
                         <div className="space-y-1">
-                          {items.map((item: any) => (
-                            <button
-                              key={item.id}
-                              onClick={isFounder ? undefined : () => toggleItem(item.id, !item.checked)}
-                              className={cn("w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-left group transition-colors", isFounder ? "cursor-default" : "hover:bg-accent/50")}
-                            >
-                              {item.checked
-                                ? <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
-                                : <Circle className="h-4 w-4 text-muted-foreground shrink-0 group-hover:text-foreground" />}
-                              <span className={cn("text-sm flex-1", item.checked ? "line-through text-muted-foreground" : "")}>
-                                {item.label}
-                              </span>
-                              {isInvestor && (
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); void deleteItem(item.id); }}
-                                  className="opacity-0 group-hover:opacity-100 transition-opacity ml-auto text-muted-foreground hover:text-destructive shrink-0"
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </button>
-                              )}
-                            </button>
-                          ))}
+                          {items.map((item: any) => {
+                            const isAutoDetected = !!item.auto_detected && !item.manually_overridden;
+                            return (
+                              <button
+                                key={item.id}
+                                onClick={isFounder ? undefined : () => toggleItem(item.id, !item.checked, isAutoDetected)}
+                                className={cn("w-full flex items-start gap-3 rounded-lg px-3 py-2.5 text-left group transition-colors", isFounder ? "cursor-default" : "hover:bg-accent/50")}
+                              >
+                                {item.checked
+                                  ? <CheckCircle2 className={cn("h-4 w-4 shrink-0 mt-0.5", isAutoDetected ? "text-emerald-400" : "text-success")} />
+                                  : <Circle className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5 group-hover:text-foreground" />}
+                                <span className="flex-1 min-w-0">
+                                  <span className={cn("text-sm", item.checked ? "line-through text-muted-foreground" : "")}>
+                                    {item.label}
+                                  </span>
+                                  {isAutoDetected && item.auto_source_label && (
+                                    <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium"
+                                      style={{ background: "rgba(16,185,129,0.12)", color: "#10B981" }}>
+                                      <Wand2 className="h-2.5 w-2.5" />
+                                      {item.auto_source_label}
+                                    </span>
+                                  )}
+                                  {item.manually_overridden && item.auto_detected && (
+                                    <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium"
+                                      style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" }}>
+                                      overridden
+                                    </span>
+                                  )}
+                                </span>
+                                {isInvestor && (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); void deleteItem(item.id); }}
+                                    className="opacity-0 group-hover:opacity-100 transition-opacity ml-auto text-muted-foreground hover:text-destructive shrink-0 mt-0.5"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </button>
+                                )}
+                              </button>
+                            );
+                          })}
                         </div>
                       )}
                     </div>

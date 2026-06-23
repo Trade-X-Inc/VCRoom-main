@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Inbox, Search, Clock, Plus, Loader2, ArrowRight } from "lucide-react";
+import { PageGuide } from "@/components/app/PageGuide";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -26,7 +27,7 @@ function DealFlowPage() {
         investor_id: user.id,
         company_name: company,
         source: "deal_flow",
-        status: "watching",
+        status: "Watching",
       });
       if (error) throw error;
       toast.success(`${company} added to watchlist`);
@@ -93,6 +94,7 @@ function DealFlowPage() {
             Deal rooms you've been invited to appear here automatically
           </div>
         </div>
+        <PageGuide pageId="investor-deal-flow" />
       </div>
 
       <div className="mt-5 flex items-center gap-2">

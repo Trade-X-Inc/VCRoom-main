@@ -18,42 +18,56 @@ import { DDWorkstation } from "@/components/app/DDWorkstation";
 import { Dropzone } from "@/components/app/Dropzone";
 import { useAuth } from "@/lib/auth";
 import { supabase, logActivity, createNotification } from "@/lib/supabase";
-import { ReviewTab } from "@/components/app/ReviewTab";
 import { DocumentWishlist } from "@/components/app/DocumentWishlist";
 import { generateDocSummary, secureAICall } from "@/lib/ai-secure-fn";
 import { extractDocumentText } from "@/lib/document-extractor";
 import { DealTermsCard } from "@/components/app/DealTermsCard";
 import { VerificationBadge } from "@/components/shared/VerificationBadge";
+import { FieldVerificationBadge, prewarmClassificationCache } from "@/components/app/FieldVerificationBadge";
+import type { StartupClaim } from "@/lib/claims-fn";
 import {
   useParticipants, useGeneratedNdaDocs,
   participantsStore, qaStore,
   type QAQuestion, type Participant,
 } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { PageGuide } from "@/components/app/PageGuide";
 import { sendInviteEmail } from "@/lib/invite-fn";
 import { getQASuggestions } from "@/lib/qa-suggestions-fn";
 import { triggerDecisionEmail, triggerMeetingEmail, triggerDocumentUploadedEmail } from "@/lib/email/triggers";
+import { Stage2Gate } from "@/components/app/DealRoomWorkflow";
+import { generateDealBrief, type DealBriefResult } from "@/lib/deal-brief-fn";
+import {
+  advanceDealStage, skipMeeting, completeMeeting, updateMeetingNotes,
+  sendTermSheet, respondToTermSheet, createDocumentRequest, respondToDocumentRequest, passDeal,
+  DEAL_STAGES, type DealStage,
+} from "@/lib/deal-room-fn";
 
 export const Route = createFileRoute("/app/deal-room/$id")({
   component: DealRoom,
 });
 
-const tabs = [
-  { k: "overview", l: "Overview", i: LayoutGrid },
-  { k: "documents", l: "Document Vault", i: FolderOpen },
-  { k: "qa", l: "Q&A", i: MessageSquare },
-  { k: "checklist", l: "Workstation", i: LayoutGrid },
-  { k: "chat", l: "Team chat", i: MessagesSquare },
-  { k: "notes", l: "Notes", i: StickyNote },
-  { k: "timeline", l: "Activity", i: Activity },
-  { k: "meetings", l: "Meetings", i: Calendar },
-  { k: "decision", l: "Review", i: Gavel },
-];
+const STAGE_SHORT: Record<DealStage, string> = {
+  nda_signed: "NDA & Profiles",
+  initial_review: "Stage 1 Review",
+  diligence: "Diligence",
+  term_sheet: "Term Sheet",
+  closed: "Closed",
+};
+
+const STAGE_UNLOCK_HINT: Record<DealStage, string> = {
+  nda_signed: "available now",
+  initial_review: "the investor opens Stage 1 review",
+  diligence: "the investor advances to diligence",
+  term_sheet: "the investor sends a term sheet",
+  closed: "the deal closes",
+};
 
 function DealRoom() {
   const { id: dealRoomId } = Route.useParams();
-  const [tab, setTab] = useState("overview");
   const [aiOpen, setAiOpen] = useState(false);
+  const [activityOpen, setActivityOpen] = useState(false);
+  const [viewStage, setViewStage] = useState<DealStage | null>(null);
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -146,7 +160,6 @@ function DealRoom() {
   }, [ndaLoading, ndaAcceptance, user?.id, navigate, dealRoomId]);
 
   // ── Seed stores from Supabase data ────────────────────────────
-
   useEffect(() => {
     if (qaMessages.length > 0) {
       const mapped: QAQuestion[] = (qaMessages as any[]).map((m) => ({
@@ -184,10 +197,26 @@ function DealRoom() {
   const isInvestor = memberRow ? (memberRow.role === "investor" || memberRow.role === "viewer") : user?.role === "investor";
   const isFounder = memberRow ? memberRow.role === "founder" : user?.role !== "investor";
 
-  // Check if current user is a startup team member (not founder/investor)
+  // Check if current user is the actual startup owner (founder_id match)
+  const { data: ownedStartup } = useQuery({
+    queryKey: ["owned-startup-check", user?.id],
+    enabled: !!user?.id && !isInvestor,
+    staleTime: 10 * 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("startups")
+        .select("id")
+        .eq("founder_id", user!.id)
+        .maybeSingle();
+      return data ?? null;
+    },
+  });
+
+  const isStartupOwner = !!ownedStartup;
+
   const { data: teamAccountRow } = useQuery({
     queryKey: ["team-account-row", user?.id],
-    enabled: !!user?.id && !isInvestor,
+    enabled: !!user?.id && !isInvestor && !isStartupOwner,
     queryFn: async () => {
       const { data } = await supabase
         .from("startup_team_accounts")
@@ -200,9 +229,9 @@ function DealRoom() {
     },
   });
 
-  const isTeamMember = !!teamAccountRow && !isInvestor;
+  const isAdminTeamMember = teamAccountRow?.role === "admin";
+  const isTeamMember = !!teamAccountRow && !isInvestor && !isStartupOwner && !isAdminTeamMember;
 
-  // If team member: check if they have access to this specific deal room
   const { data: teamAssignment, isLoading: teamAssignmentLoading } = useQuery({
     queryKey: ["team-assignment-gate", dealRoomId, teamAccountRow?.id],
     enabled: isTeamMember && !!teamAccountRow?.id,
@@ -217,18 +246,9 @@ function DealRoom() {
     },
   });
 
-  const dealRoomName = (room as any)?.startups?.company_name
-    ? `${(room as any).startups.company_name} — Deal Room`
-    : "Deal Room";
   const companyName = (room as any)?.startups?.company_name ?? "Unknown Company";
-
-  const visibleTabs = tabs.filter((t) => {
-    if (isInvestor) return ["overview", "documents", "qa", "checklist", "notes", "timeline", "meetings", "decision"].includes(t.k);
-    return t.k !== "decision";
-  });
-  const displayTabs = visibleTabs.map((t) =>
-    t.k === "checklist" && isFounder ? { ...t, l: "Deal Report" } : t
-  );
+  const currentStage = ((room as any)?.workflow_stage ?? "nda_signed") as DealStage;
+  const currentIndex = DEAL_STAGES.indexOf(currentStage);
 
   // ── Q&A Supabase callbacks ────────────────────────────────────
   const handleAddQuestion = async (q: QAQuestion): Promise<string | undefined> => {
@@ -279,125 +299,112 @@ function DealRoom() {
     );
   }
 
+  const activeStage = viewStage ?? currentStage;
+  const viewingHistory = viewStage !== null && DEAL_STAGES.indexOf(viewStage) < currentIndex;
+
   return (
-    <div className="flex flex-col md:flex-row h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] relative">
-      {/* Sidebar — vertical on desktop, header+tabs on mobile */}
-      <aside className="md:w-[260px] border-b md:border-b-0 md:border-r border-border/60 bg-sidebar flex flex-col shrink-0">
-        {/* Company header — always visible */}
-        <div className="px-4 py-3 md:p-5 border-b border-border/60">
-          <Link to={"/app/deal-rooms" as any} className="text-xs text-muted-foreground inline-flex items-center gap-1 hover:text-foreground">
-            <ArrowLeft className="h-3 w-3" /> All deal rooms
-          </Link>
-          <div className="mt-2 md:mt-3 flex items-center gap-2.5">
-            <div className="grid h-8 w-8 md:h-9 md:w-9 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold shrink-0">
+    <div className="flex flex-col h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] relative">
+      {/* ── Top header bar ─────────────────────────────────────── */}
+      <header
+        className="shrink-0 border-b"
+        style={{ background: "#111114", borderColor: "rgba(255,255,255,0.08)" }}
+        data-testid="deal-stage-bar"
+      >
+        <div className="flex items-center gap-3 px-4 py-3">
+          {/* Left: back + company chip */}
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Link
+              to={"/app/deal-rooms" as any}
+              className="grid h-8 w-8 place-items-center rounded-lg text-white/50 hover:text-white hover:bg-white/5 shrink-0"
+              title="All deal rooms"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+            <div className="grid h-8 w-8 place-items-center rounded-lg shrink-0 font-semibold text-white"
+              style={{ background: "#7C3AED" }}>
               {companyName[0] ?? "D"}
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-sm font-semibold truncate">{companyName}</div>
-              <div className="text-[11px] text-muted-foreground">{isInvestor ? "Founder · Deal Room" : "Investor · Deal Room"}</div>
-            </div>
-            <div className="md:hidden inline-flex items-center gap-1 text-[10px] text-success shrink-0">
-              <span className="h-1.5 w-1.5 rounded-full bg-success" /> Active
+            <div className="min-w-0 hidden sm:block">
+              <div className="text-sm font-semibold text-white truncate" style={{ fontFamily: "Syne, sans-serif" }}>{companyName}</div>
+              <div className="text-[10px]" style={{ color: "rgba(255,255,255,0.5)" }}>{isInvestor ? "Founder · Deal Room" : "Investor · Deal Room"}</div>
             </div>
           </div>
-          <div className="hidden md:flex mt-3 items-center gap-1.5 text-[11px] text-success">
-            <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse-glow" /> Active · NDA signed
+
+          {/* Center: stage pills */}
+          <StageBar
+            currentIndex={currentIndex}
+            activeStage={activeStage}
+            onSelect={(stage, idx) => {
+              if (idx <= currentIndex) setViewStage(stage === currentStage ? null : stage);
+            }}
+          />
+
+          {/* Right: activity + AI */}
+          <div className="flex items-center gap-2 shrink-0 ml-auto">
+            <button
+              onClick={() => setActivityOpen(true)}
+              className="grid h-9 w-9 place-items-center rounded-lg text-white/50 hover:text-white hover:bg-white/5"
+              title="Activity"
+              data-testid="open-activity"
+            >
+              <Clock className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setAiOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-white"
+              style={{ background: "#7C3AED" }}
+              data-testid="open-ai"
+            >
+              <Sparkles className="h-4 w-4" /> <span className="hidden sm:inline">Ask AI</span>
+            </button>
           </div>
         </div>
+      </header>
 
-        {/* Mobile: horizontal scrolling tabs */}
-        <nav className="flex md:hidden overflow-x-auto scrollbar-hide gap-1 px-3 py-2 flex-shrink-0">
-          {displayTabs.map((t) => (
-            <button
-              key={t.k}
-              onClick={() => { queryClient.invalidateQueries({ predicate: (q) => (q.queryKey as string[]).includes(dealRoomId) }); setTab(t.k); }}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs whitespace-nowrap flex-shrink-0 transition-colors ${tab === t.k ? "bg-brand text-brand-foreground font-medium" : "text-muted-foreground hover:bg-accent/60"}`}
-            >
-              <t.i className="h-3.5 w-3.5" />
-              {t.l}
-            </button>
-          ))}
-        </nav>
-
-        {/* Desktop: vertical nav */}
-        <nav className="hidden md:flex flex-1 flex-col p-2 space-y-0.5 overflow-y-auto">
-          {displayTabs.map((t) => (
-            <button
-              key={t.k}
-              onClick={() => { queryClient.invalidateQueries({ predicate: (q) => (q.queryKey as string[]).includes(dealRoomId) }); setTab(t.k); }}
-              className={`w-full flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors ${tab === t.k ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60"}`}
-            >
-              <t.i className={`h-4 w-4 ${tab === t.k ? "text-brand" : ""}`} />
-              {t.l}
-            </button>
-          ))}
-        </nav>
-        <div className="hidden md:flex p-4 border-t border-border/60 text-[11px] text-muted-foreground">
-          <Lock className="h-3 w-3 inline mr-1" /> Encrypted · watermarked
-        </div>
-      </aside>
-
-      {/* Main content */}
-      <main key={tab} className="flex-1 overflow-y-auto min-h-0">
-        {tab === "overview" && (
-          <DealRoomOverview
-            dealRoomId={dealRoomId}
-            room={room}
-            memberList={memberList}
-            isInvestor={isInvestor}
-            isFounder={isFounder}
-            onTabChange={setTab}
-          />
-        )}
-        {tab === "documents" && (
-          <div className="flex flex-col h-full">
-            <div className="px-4 pt-4">
-              <DocumentWishlist
-                dealRoomId={dealRoomId}
-                isInvestor={isInvestor}
-                isFounder={isFounder}
-                userId={user?.id}
-              />
-            </div>
-            <div className="flex-1">
-              {console.log("[deal-room] room:", room?.id, (room as any)?.startup_id) as any}
-              <Documents dealRoomId={dealRoomId} isFounder={isFounder} isInvestor={isInvestor} userId={user?.id} startupId={(room as any)?.startup_id} />
-            </div>
-          </div>
-        )}
-        {tab === "chat" && <div className="h-full"><DealRoomChat dealRoomId={dealRoomId} userId={user?.id} userName={userName} /></div>}
-        {tab === "qa" && <QA dealRoomId={dealRoomId} userId={user?.id} userName={userName} isInvestor={isInvestor} isFounder={isFounder} companyName={(room as any)?.startups?.company_name ?? ""} sector={(room as any)?.startups?.sector ?? ""} />}
-        {tab === "checklist" && <DDWorkstation dealRoomId={dealRoomId} userId={user?.id} isInvestor={isInvestor} isFounder={isFounder} />}
-        {tab === "notes" && <Notes dealRoomId={dealRoomId} userId={user?.id} />}
-        {tab === "timeline" && <Timeline dealRoomId={dealRoomId} />}
-        {tab === "meetings" && <MeetingsTab dealRoomId={dealRoomId} userId={user?.id} />}
-        {tab === "decision" && isInvestor && (
-          <InvestorDecisionTab dealRoomId={dealRoomId} userId={user?.id} />
-        )}
-        {tab === "decision" && !isInvestor && (
-          <ReviewTab
-            dealRoomId={dealRoomId}
-            currentUserRole="founder"
-            startupId={(room as any)?.startup_id ?? ""}
-          />
-        )}
+      {/* ── Main content (full width) ──────────────────────────── */}
+      <main key={activeStage} className="flex-1 overflow-y-auto min-h-0" style={{ background: "#0A0A0B" }}>
+        <StagedDealRoom
+          dealRoomId={dealRoomId}
+          room={room}
+          memberList={memberList}
+          isInvestor={isInvestor}
+          isFounder={isFounder}
+          userId={user?.id}
+          userName={userName}
+          companyName={companyName}
+          currentStage={currentStage}
+          activeStage={activeStage}
+          viewingHistory={viewingHistory}
+          onAddQuestion={handleAddQuestion}
+          onSaveAnswer={handleSaveAnswer}
+        />
       </main>
 
-      {/* AI floating button */}
-      {!aiOpen && (
-        <button
-          onClick={() => setAiOpen(true)}
-          className="absolute bottom-6 right-6 inline-flex items-center gap-2 rounded-full bg-gradient-brand text-brand-foreground px-4 py-2.5 text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform"
-        >
-          <Sparkles className="h-4 w-4" /> Ask AI
-        </button>
+      {/* ── Activity drawer ─────────────────────────────────────── */}
+      {activityOpen && (
+        <>
+          <div className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm" onClick={() => setActivityOpen(false)} />
+          <aside
+            className="fixed top-0 bottom-0 right-0 z-40 w-full sm:w-[420px] border-l flex flex-col"
+            style={{ background: "#0A0A0B", borderColor: "rgba(255,255,255,0.08)" }}
+            data-testid="activity-drawer"
+          >
+            <div className="h-14 border-b flex items-center justify-between px-4" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+              <div className="text-sm font-semibold text-white" style={{ fontFamily: "Syne, sans-serif" }}>Activity</div>
+              <button onClick={() => setActivityOpen(false)} className="grid h-8 w-8 place-items-center rounded-md text-white/50 hover:bg-white/5 hover:text-white"><X className="h-4 w-4" /></button>
+            </div>
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              <Timeline dealRoomId={dealRoomId} />
+            </div>
+          </aside>
+        </>
       )}
 
-      {/* AI slide-over */}
+      {/* ── AI slide-over ───────────────────────────────────────── */}
       {aiOpen && (
         <>
           <div className="fixed inset-0 z-30 bg-foreground/20 backdrop-blur-sm" onClick={() => setAiOpen(false)} />
-          <aside className="fixed top-16 bottom-0 right-0 z-40 w-full sm:w-[440px] border-l border-border/60 bg-background shadow-elev flex flex-col">
+          <aside className="fixed top-16 bottom-0 right-0 z-40 w-full sm:w-[440px] border-l border-border/60 bg-background shadow-elev flex flex-col" data-testid="ai-panel">
             <div className="h-14 border-b border-border/60 flex items-center justify-between px-4">
               <div className="flex items-center gap-2">
                 <div className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-brand text-brand-foreground"><Sparkles className="h-3.5 w-3.5" /></div>
@@ -406,7 +413,7 @@ function DealRoom() {
                   <div className="text-[10px] text-muted-foreground">{companyName}</div>
                 </div>
               </div>
-              <button onClick={() => setAiOpen(false)} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"><X className="h-4 w-4" /></button>
+              <button onClick={() => setAiOpen(false)} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground" data-testid="close-ai"><X className="h-4 w-4" /></button>
             </div>
             <div className="flex-1 min-h-0">
               <AIChat
@@ -442,959 +449,1092 @@ function DealRoom() {
   );
 }
 
-// ── Deal Room Overview (unified for founder + investor) ───────────
-function DealRoomOverview({
-  dealRoomId,
-  room,
-  memberList,
-  isInvestor,
-  isFounder,
-  onTabChange,
+// ── Horizontal stage bar ──────────────────────────────────────────
+function StageBar({
+  currentIndex,
+  activeStage,
+  onSelect,
+}: {
+  currentIndex: number;
+  activeStage: DealStage;
+  onSelect: (stage: DealStage, index: number) => void;
+}) {
+  const [tip, setTip] = useState<DealStage | null>(null);
+  return (
+    <div className="relative" data-testid="stage-pills">
+      <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+        {DEAL_STAGES.map((stage, idx) => {
+          const isCurrent = stage === activeStage;
+          const isPast = idx < currentIndex;
+          const isFuture = idx > currentIndex;
+          const navigable = idx <= currentIndex;
+          return (
+            <div key={stage} className="shrink-0">
+              <button
+                onClick={() => {
+                  if (navigable) onSelect(stage, idx);
+                  else setTip((t) => (t === stage ? null : stage));
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs whitespace-nowrap transition-colors"
+                style={
+                  isCurrent
+                    ? { background: "#7C3AED", color: "#fff", fontWeight: 600 }
+                    : isFuture
+                      ? { color: "rgba(255,255,255,0.25)", cursor: "default" }
+                      : { color: "rgba(255,255,255,0.5)" }
+                }
+                data-testid={`stage-pill-${stage}`}
+                data-state={isCurrent ? "current" : isPast ? "past" : "future"}
+              >
+                {isPast && <Check className="h-3 w-3" style={{ color: "#10B981" }} />}
+                {isFuture && <Lock className="h-3 w-3" />}
+                {STAGE_SHORT[stage]}
+              </button>
+            </div>
+          );
+        })}
+      </nav>
+      {/* tooltip rendered outside overflow-x-auto so it isn't clipped */}
+      {tip !== null && (
+        <div
+          className="absolute left-1/2 top-full z-50 mt-1.5 -translate-x-1/2 whitespace-nowrap rounded-md px-2.5 py-1.5 text-[11px] pointer-events-none"
+          style={{ background: "#18181C", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.7)" }}
+        >
+          Unlocks when {STAGE_UNLOCK_HINT[tip]}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Reusable dark UI atoms ─────────────────────────────────────────
+const CARD: React.CSSProperties = {
+  background: "#111114",
+  border: "1px solid rgba(255,255,255,0.08)",
+  borderRadius: 12,
+};
+function DarkCard({ children, className = "", style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
+  return (
+    <div className={className} style={{ ...CARD, padding: "20px 24px", ...style }}>
+      {children}
+    </div>
+  );
+}
+function PrimaryButton({ children, onClick, disabled, testid, className = "" }: { children: React.ReactNode; onClick?: () => void; disabled?: boolean; testid?: string; className?: string }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      data-testid={testid}
+      className={cn("inline-flex items-center justify-center gap-2 rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-50", className)}
+      style={{ background: "#7C3AED" }}
+    >
+      {children}
+    </button>
+  );
+}
+function Eyebrow({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="text-[10px] uppercase tracking-[0.12em] font-semibold mb-2" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "Syne, sans-serif" }}>
+      {children}
+    </div>
+  );
+}
+
+// ── Staged deal room — renders the panel for the active stage ──────
+function StagedDealRoom({
+  dealRoomId, room, memberList, isInvestor, isFounder, userId, userName,
+  companyName, currentStage, activeStage, viewingHistory, onAddQuestion, onSaveAnswer,
 }: {
   dealRoomId: string;
   room: any;
   memberList: any[];
   isInvestor: boolean;
   isFounder: boolean;
-  onTabChange: (tab: string) => void;
+  userId?: string;
+  userName: string;
+  companyName: string;
+  currentStage: DealStage;
+  activeStage: DealStage;
+  viewingHistory: boolean;
+  onAddQuestion: (q: QAQuestion) => Promise<string | undefined>;
+  onSaveAnswer: (questionId: string, answer: string) => Promise<void>;
 }) {
   const startup = room?.startups;
+  const sector = startup?.sector ?? "";
+
+  return (
+    <div className="p-6 md:p-8 max-w-5xl mx-auto">
+      {viewingHistory && (
+        <div className="mb-5 flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs"
+          style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)", color: "rgba(255,255,255,0.7)" }}>
+          <Clock className="h-3.5 w-3.5" style={{ color: "#A855F7" }} />
+          Viewing {STAGE_SHORT[activeStage]} history. This stage is complete — current stage is {STAGE_SHORT[currentStage]}.
+        </div>
+      )}
+
+      {activeStage === "nda_signed" && (
+        <NdaStagePanel dealRoomId={dealRoomId} room={room} memberList={memberList} isInvestor={isInvestor} isFounder={isFounder} />
+      )}
+      {activeStage === "initial_review" && (
+        <InitialReviewPanel
+          dealRoomId={dealRoomId} room={room} isInvestor={isInvestor} isFounder={isFounder}
+          userId={userId} userName={userName} companyName={companyName} sector={sector}
+          readOnly={viewingHistory}
+        />
+      )}
+      {activeStage === "diligence" && (
+        <DiligencePanel
+          dealRoomId={dealRoomId} room={room} isInvestor={isInvestor} isFounder={isFounder}
+          userId={userId} readOnly={viewingHistory}
+        />
+      )}
+      {activeStage === "term_sheet" && (
+        <TermSheetPanel dealRoomId={dealRoomId} room={room} isInvestor={isInvestor} isFounder={isFounder} userId={userId} readOnly={viewingHistory} />
+      )}
+      {activeStage === "closed" && (
+        <ClosedPanel room={room} isInvestor={isInvestor} />
+      )}
+    </div>
+  );
+}
+
+// ── Pass modal (shared, confirm-first) ─────────────────────────────
+const PASS_REASONS = [
+  "Stage/traction mismatch",
+  "Sector outside thesis",
+  "Team concerns",
+  "Valuation expectations",
+  "Too early",
+  "Portfolio conflict",
+];
+
+function PassModal({ dealRoomId, userId, onClose }: { dealRoomId: string; userId?: string; onClose: () => void }) {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
-  const [taskTitle, setTaskTitle] = useState("");
-  const [taskAssignee, setTaskAssignee] = useState("");
-  const [taskDueDate, setTaskDueDate] = useState("");
-  const [savingTask, setSavingTask] = useState(false);
-  const [showInvite, setShowInvite] = useState(false);
-  const [showTutorial, setShowTutorial] = useState(false);
-  const [showTeamAssign, setShowTeamAssign] = useState(false);
-  const [assigningMemberId, setAssigningMemberId] = useState<string | null>(null);
+  const [reason, setReason] = useState(PASS_REASONS[0]);
+  const [context, setContext] = useState("");
+  const [reconsider, setReconsider] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  const { data: recentActivity = [] } = useQuery({
-    queryKey: ["activities-overview", dealRoomId],
-    enabled: !!user?.id,
-    staleTime: 2 * 60 * 1000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("activities")
-        .select("*")
-        .eq("deal_room_id", dealRoomId)
-        .order("created_at", { ascending: false })
-        .limit(5);
-      return data ?? [];
-    },
-  });
+  const confirm = async () => {
+    if (!userId) return;
+    setSaving(true);
+    try {
+      const res = await passDeal({
+        data: { deal_room_id: dealRoomId, actor_user_id: userId, reason_category: reason, context: context || undefined, reconsider_if: reconsider || undefined },
+      });
+      if (!res.ok) { toast.error("Could not pass — try again"); return; }
+      await queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
+      toast.success("Deal passed");
+      onClose();
+    } finally {
+      setSaving(false);
+    }
+  };
 
-  const { data: dealTasks = [] } = useQuery({
-    queryKey: ["deal-tasks", dealRoomId],
-    enabled: !!user?.id,
-    staleTime: 30_000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("deal_tasks")
-        .select("id, title, assignee_id, due_date, completed, created_by, created_at")
-        .eq("deal_room_id", dealRoomId)
-        .order("completed", { ascending: true })
-        .order("due_date", { ascending: true, nullsFirst: false })
-        .order("created_at", { ascending: false });
-      return data ?? [];
-    },
-  });
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
+      <div className="w-full max-w-md rounded-2xl" style={{ ...CARD, padding: 0 }} onClick={(e) => e.stopPropagation()} data-testid="pass-modal">
+        <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+          <div className="text-sm font-semibold text-white" style={{ fontFamily: "Syne, sans-serif" }}>Pass on this deal</div>
+          <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md text-white/50 hover:bg-white/5 hover:text-white"><X className="h-4 w-4" /></button>
+        </div>
+        <div className="p-5 space-y-4">
+          <div>
+            <Eyebrow>Reason</Eyebrow>
+            <select
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none"
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+              data-testid="pass-reason"
+            >
+              {PASS_REASONS.map((r) => <option key={r} value={r} style={{ background: "#18181C" }}>{r}</option>)}
+            </select>
+          </div>
+          <div>
+            <Eyebrow>Context for founder (optional)</Eyebrow>
+            <textarea
+              value={context}
+              onChange={(e) => setContext(e.target.value)}
+              rows={2}
+              placeholder="One or two sentences the founder will see."
+              className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none resize-none placeholder:text-white/25"
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+            />
+          </div>
+          <div>
+            <Eyebrow>Reconsider if (optional)</Eyebrow>
+            <input
+              value={reconsider}
+              onChange={(e) => setReconsider(e.target.value)}
+              placeholder="e.g. you reach $50K MRR"
+              className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/25"
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+            />
+          </div>
+        </div>
+        <div className="flex justify-end gap-2 px-5 pb-5">
+          <button onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-white/60 hover:text-white" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>Cancel</button>
+          <button
+            onClick={confirm}
+            disabled={saving}
+            data-testid="pass-confirm"
+            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+            style={{ background: "#EF4444" }}
+          >
+            {saving && <Loader2 className="h-4 w-4 animate-spin" />} Confirm pass
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-  const { data: investorMembers = [] } = useQuery({
-    queryKey: ["investor-members", dealRoomId],
+// ── Confirm-first generic modal ────────────────────────────────────
+function ConfirmModal({ title, body, confirmLabel, onConfirm, onClose, testid, busy }: { title: string; body: string; confirmLabel: string; onConfirm: () => void; onClose: () => void; testid?: string; busy?: boolean }) {
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
+      <div className="w-full max-w-sm rounded-2xl" style={{ ...CARD, padding: 0 }} onClick={(e) => e.stopPropagation()} data-testid={testid}>
+        <div className="px-5 py-4 border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+          <div className="text-sm font-semibold text-white" style={{ fontFamily: "Syne, sans-serif" }}>{title}</div>
+        </div>
+        <div className="p-5 text-sm" style={{ color: "rgba(255,255,255,0.7)" }}>{body}</div>
+        <div className="flex justify-end gap-2 px-5 pb-5">
+          <button onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-white/60 hover:text-white" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>Cancel</button>
+          <PrimaryButton onClick={onConfirm} disabled={busy} testid={testid ? `${testid}-confirm` : undefined} className="!px-4 !py-2">
+            {busy && <Loader2 className="h-4 w-4 animate-spin" />} {confirmLabel}
+          </PrimaryButton>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── NDA stage panel ────────────────────────────────────────────────
+function NdaStagePanel({ dealRoomId, room, memberList, isInvestor, isFounder }: { dealRoomId: string; room: any; memberList: any[]; isInvestor: boolean; isFounder: boolean }) {
+  const startup = room?.startups;
+  const { data: ndaRows = [] } = useQuery({
+    queryKey: ["nda-stage-acceptances", dealRoomId],
     enabled: !!dealRoomId,
     queryFn: async () => {
       const { data } = await supabase
-        .from("deal_room_members")
-        .select("id, user_id, role, users(full_name, avatar_url)")
+        .from("nda_acceptances")
+        .select("user_id, role, accepted_at")
         .eq("deal_room_id", dealRoomId)
-        .eq("role", "investor");
+        .order("accepted_at", { ascending: true });
+      return data ?? [];
+    },
+  });
+  const founderRow = (memberList as any[]).find((m) => m.role === "founder");
+  const investorRow = (memberList as any[]).find((m) => m.role === "investor");
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <Eyebrow>NDA & Profiles</Eyebrow>
+        <h2 className="text-2xl font-semibold tracking-tight text-white" style={{ fontFamily: "Syne, sans-serif" }}>{companyNameOf(room)}</h2>
+        <p className="mt-1 text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>Both parties signed the NDA. Profiles are shared.</p>
+      </div>
+
+      <DarkCard>
+        <div className="flex items-center gap-3">
+          <div className="grid h-10 w-10 place-items-center rounded-lg" style={{ background: "rgba(16,185,129,0.12)" }}>
+            <Shield className="h-5 w-5" style={{ color: "#10B981" }} />
+          </div>
+          <div className="flex-1">
+            <div className="text-sm font-semibold text-white">NDA signed by all parties</div>
+            <div className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
+              {(ndaRows as any[]).length > 0 && (ndaRows as any[])[0].accepted_at
+                ? `First accepted ${new Date((ndaRows as any[])[0].accepted_at).toLocaleDateString()}`
+                : "Confidentiality terms in effect"}
+            </div>
+          </div>
+          <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium"
+            style={{ background: "rgba(16,185,129,0.12)", color: "#10B981" }}>
+            <CheckCircle2 className="h-3.5 w-3.5" /> Active
+          </span>
+        </div>
+      </DarkCard>
+
+      <div className="grid sm:grid-cols-2 gap-4">
+        <DarkCard>
+          <Eyebrow>Startup</Eyebrow>
+          <div className="flex items-center gap-3">
+            <div className="grid h-11 w-11 place-items-center rounded-xl overflow-hidden text-white font-bold" style={{ background: "#7C3AED" }}>
+              {startup?.logo_url ? <img src={startup.logo_url} alt="" className="h-full w-full object-cover" /> : (startup?.company_name?.[0] ?? "S")}
+            </div>
+            <div className="min-w-0">
+              <div className="text-sm font-semibold text-white truncate">{startup?.company_name ?? "Company"}</div>
+              <div className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>{[startup?.stage, startup?.sector].filter(Boolean).join(" · ") || "—"}</div>
+            </div>
+          </div>
+          {founderRow?.users?.full_name && (
+            <div className="mt-3 text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>Founder: {founderRow.users.full_name}</div>
+          )}
+        </DarkCard>
+        <DarkCard>
+          <Eyebrow>Investor</Eyebrow>
+          <div className="flex items-center gap-3">
+            <div className="grid h-11 w-11 place-items-center rounded-xl text-white font-bold" style={{ background: "rgba(16,185,129,0.18)", color: "#10B981" }}>
+              {((room as any)?.investor_company || (room as any)?.investor_name || investorRow?.users?.full_name || "V")[0]}
+            </div>
+            <div className="min-w-0">
+              <div className="text-sm font-semibold text-white truncate">{(room as any)?.investor_company || (room as any)?.investor_name || investorRow?.users?.full_name || "Investor"}</div>
+              <div className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>{investorRow?.users?.full_name || (room as any)?.investor_name || "—"}</div>
+            </div>
+          </div>
+          {isInvestor && (
+            <div className="mt-3 flex items-center gap-1.5 text-xs" style={{ color: "#10B981" }}>
+              <CheckCircle2 className="h-3.5 w-3.5" /> Verification details visible to founder
+            </div>
+          )}
+        </DarkCard>
+      </div>
+
+      <div className="rounded-lg px-4 py-4" style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)" }}>
+        {isFounder ? (
+          <div className="text-sm" style={{ color: "rgba(255,255,255,0.8)" }}>
+            <div className="font-semibold text-white">Upload your Stage 1 documents</div>
+            <p className="mt-1 text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>Add your deck and key materials. They appear in the investor's Stage 1 review when the investor opens it.</p>
+          </div>
+        ) : (
+          <div className="text-sm" style={{ color: "rgba(255,255,255,0.8)" }}>
+            <div className="font-semibold text-white">Waiting on the founder</div>
+            <p className="mt-1 text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>Stage 1 review opens once the founder shares their documents.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function companyNameOf(room: any) {
+  return room?.startups?.company_name ?? (room as any)?.investor_company ?? "Deal Room";
+}
+
+// ── Initial review panel ───────────────────────────────────────────
+function InitialReviewPanel({
+  dealRoomId, room, isInvestor, isFounder, userId, userName, companyName, sector, readOnly,
+}: {
+  dealRoomId: string; room: any; isInvestor: boolean; isFounder: boolean;
+  userId?: string; userName: string; companyName: string; sector: string; readOnly: boolean;
+}) {
+  const queryClient = useQueryClient();
+  const [brief, setBrief] = useState<DealBriefResult | null>(null);
+  const [briefLoading, setBriefLoading] = useState(false);
+  const [advancing, setAdvancing] = useState(false);
+  const [showAdvance, setShowAdvance] = useState(false);
+  const [showPass, setShowPass] = useState(false);
+
+  const startupId = (room as any)?.startup_id ?? null;
+
+  const loadBrief = async () => {
+    if (!userId) return;
+    setBriefLoading(true);
+    try {
+      const result = await generateDealBrief({ data: { dealRoomId, userId } });
+      setBrief(result);
+    } catch {
+      toast.error("Could not generate brief");
+    } finally {
+      setBriefLoading(false);
+    }
+  };
+
+  const doAdvance = async () => {
+    if (!userId) return;
+    setAdvancing(true);
+    try {
+      const res = await advanceDealStage({ data: { deal_room_id: dealRoomId, to_stage: "diligence", actor_user_id: userId } });
+      if (!res.ok) { toast.error("Could not advance"); return; }
+      await queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
+      toast.success("Advanced to Diligence");
+      setShowAdvance(false);
+    } finally {
+      setAdvancing(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <Eyebrow>Stage 1 Review</Eyebrow>
+        <h2 className="text-2xl font-semibold tracking-tight text-white" style={{ fontFamily: "Syne, sans-serif" }}>Initial review</h2>
+        <p className="mt-1 text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
+          {isInvestor ? "Review the deal brief and Stage 1 documents, then decide." : "The investor is reviewing your Stage 1 materials."}
+        </p>
+      </div>
+
+      {isInvestor && (
+        <DarkCard>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-white">
+              <Sparkles className="h-4 w-4" style={{ color: "#A855F7" }} /> AI deal brief
+            </div>
+            {!brief && (
+              <button onClick={loadBrief} disabled={briefLoading} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50" style={{ background: "#7C3AED" }} data-testid="generate-brief">
+                {briefLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />} Generate
+              </button>
+            )}
+          </div>
+          {brief ? (
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="rounded-full px-2.5 py-1 text-xs font-semibold" style={{ background: "rgba(124,58,237,0.12)", color: "#A855F7" }}>{brief.matchScore}/100 · {brief.matchLabel}</span>
+              </div>
+              <BriefList label="Strengths" items={brief.strengths} color="#10B981" />
+              <BriefList label="Risks" items={brief.risks} color="#F59E0B" />
+              <div>
+                <Eyebrow>Suggested next action</Eyebrow>
+                <p style={{ color: "rgba(255,255,255,0.7)" }}>{brief.nextAction}</p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>Generate an AI brief summarizing fit, strengths, and risks for this deal.</p>
+          )}
+        </DarkCard>
+      )}
+
+      <DarkCard style={{ padding: 0 }}>
+        <div className="px-6 pt-5">
+          <Eyebrow>Stage 1 documents</Eyebrow>
+        </div>
+        <div className="-mt-2">
+          <Documents dealRoomId={dealRoomId} isFounder={isFounder} isInvestor={isInvestor} userId={userId} startupId={startupId} />
+        </div>
+      </DarkCard>
+
+      <DarkCard style={{ padding: 0 }}>
+        <QA dealRoomId={dealRoomId} userId={userId} userName={userName} isInvestor={isInvestor} isFounder={isFounder} companyName={companyName} sector={sector} />
+      </DarkCard>
+
+      {isInvestor && !readOnly && (
+        <div className="flex flex-wrap items-center gap-3">
+          <PrimaryButton onClick={() => setShowAdvance(true)} testid="advance-to-diligence">Advance to Diligence</PrimaryButton>
+          <button
+            onClick={() => setShowPass(true)}
+            data-testid="pass-deal"
+            className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold"
+            style={{ background: "rgba(239,68,68,0.12)", color: "#EF4444" }}
+          >
+            <ThumbsDown className="h-4 w-4" /> Pass
+          </button>
+        </div>
+      )}
+
+      {showAdvance && (
+        <ConfirmModal
+          title="Advance to Diligence"
+          body="This opens the diligence stage for both parties — meetings, document requests, and the DD checklist. The founder will see the change."
+          confirmLabel="Advance"
+          busy={advancing}
+          testid="advance-confirm-modal"
+          onConfirm={doAdvance}
+          onClose={() => setShowAdvance(false)}
+        />
+      )}
+      {showPass && <PassModal dealRoomId={dealRoomId} userId={userId} onClose={() => setShowPass(false)} />}
+    </div>
+  );
+}
+
+function BriefList({ label, items, color }: { label: string; items: string[]; color: string }) {
+  if (!items?.length) return null;
+  return (
+    <div>
+      <Eyebrow>{label}</Eyebrow>
+      <ul className="space-y-1">
+        {items.map((it, i) => (
+          <li key={i} className="flex gap-2 text-xs" style={{ color: "rgba(255,255,255,0.7)" }}>
+            <span className="mt-1.5 h-1 w-1 rounded-full shrink-0" style={{ background: color }} /> {it}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+// ── Diligence panel (3 sub-tabs) ───────────────────────────────────
+function DiligencePanel({ dealRoomId, room, isInvestor, isFounder, userId, readOnly }: { dealRoomId: string; room: any; isInvestor: boolean; isFounder: boolean; userId?: string; readOnly: boolean }) {
+  const [sub, setSub] = useState<"meetings" | "requests" | "checklist">("meetings");
+  const subs = [
+    { k: "meetings" as const, l: "Meetings", i: Calendar },
+    { k: "requests" as const, l: "Document Requests", i: FolderOpen },
+    { k: "checklist" as const, l: "DD Checklist", i: ClipboardList },
+  ];
+  return (
+    <div className="space-y-6">
+      <div>
+        <Eyebrow>Diligence</Eyebrow>
+        <h2 className="text-2xl font-semibold tracking-tight text-white" style={{ fontFamily: "Syne, sans-serif" }}>Due diligence</h2>
+      </div>
+
+      <div className="flex items-center gap-1 rounded-xl p-1" style={{ background: "rgba(255,255,255,0.04)" }} data-testid="diligence-subtabs">
+        {subs.map((s) => (
+          <button
+            key={s.k}
+            onClick={() => setSub(s.k)}
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
+            style={sub === s.k ? { background: "#7C3AED", color: "#fff" } : { color: "rgba(255,255,255,0.5)" }}
+            data-testid={`diligence-sub-${s.k}`}
+          >
+            <s.i className="h-3.5 w-3.5" /> {s.l}
+          </button>
+        ))}
+      </div>
+
+      {sub === "meetings" && <MeetingsSubTab dealRoomId={dealRoomId} room={room} isInvestor={isInvestor} isFounder={isFounder} userId={userId} readOnly={readOnly} />}
+      {sub === "requests" && <DocumentRequestsSubTab dealRoomId={dealRoomId} isInvestor={isInvestor} isFounder={isFounder} userId={userId} readOnly={readOnly} />}
+      {sub === "checklist" && (
+        <DarkCard style={{ padding: 0 }}>
+          <DDWorkstation dealRoomId={dealRoomId} userId={userId} isInvestor={isInvestor} isFounder={isFounder} />
+        </DarkCard>
+      )}
+    </div>
+  );
+}
+
+// ── Meetings sub-tab ───────────────────────────────────────────────
+function MeetingsSubTab({ dealRoomId, room, isInvestor, isFounder, userId, readOnly }: { dealRoomId: string; room: any; isInvestor: boolean; isFounder: boolean; userId?: string; readOnly: boolean }) {
+  const queryClient = useQueryClient();
+  const [busyNum, setBusyNum] = useState<number | null>(null);
+  const [showAdvance, setShowAdvance] = useState(false);
+  const [advancing, setAdvancing] = useState(false);
+  const [drafts, setDrafts] = useState<Record<number, { type: string; scheduled: string }>>({});
+
+  const { data: meetings = [], refetch } = useQuery({
+    queryKey: ["dr-stage-meetings", dealRoomId],
+    enabled: !!dealRoomId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("deal_room_meetings")
+        .select("*")
+        .eq("deal_room_id", dealRoomId)
+        .order("meeting_number", { ascending: true });
       return data ?? [];
     },
   });
 
-  const investorUserIds = (investorMembers as any[]).map((m) => m.user_id);
+  const byNumber = (n: number) => (meetings as any[]).find((m) => m.meeting_number === n);
+  const anyDone = (meetings as any[]).some((m) => m.completed_at);
 
-  const { data: investorProfilesInRoom = [] } = useQuery({
-    queryKey: ["room-investor-profiles", dealRoomId, investorUserIds.join(",")],
-    enabled: !!user?.id && (investorMembers as any[]).length > 0,
-    queryFn: async () => {
-      if (investorUserIds.length === 0) return [];
-      const { data } = await supabase
-        .from("investor_profiles")
-        .select("user_id, fund_name, your_name, role, fund_size, sectors, stages, check_size_min, check_size_max, geography, linkedin_url, thesis")
-        .in("user_id", investorUserIds);
-      return data ?? [];
-    },
-  });
-
-  // Fallback: fetch investor profile by email then name — runs for both founder and investor views
-  const roomInvestorName = (room as any)?.investor_name ?? "";
-  const roomInvestorEmail = (room as any)?.investor_email ?? "";
-  const profileSelect = "user_id, your_name, fund_name, role, sectors, stages, geography, check_size_min, check_size_max, linkedin_url, website, thesis, verification_tier, email";
-  const { data: fallbackInvestorProfile } = useQuery({
-    queryKey: ["fallback-investor", roomInvestorEmail || roomInvestorName],
-    enabled: !!(roomInvestorEmail || roomInvestorName),
-    queryFn: async () => {
-      console.log("[fallback-investor] searching — email:", roomInvestorEmail, "name:", roomInvestorName);
-      // Email is authoritative — try first
-      if (roomInvestorEmail) {
-        const { data: byEmail, error: emailErr } = await supabase
-          .from("investor_profiles")
-          .select(profileSelect)
-          .eq("email", roomInvestorEmail)
-          .maybeSingle();
-        console.log("[fallback-investor] email query result:", byEmail, "error:", emailErr?.message);
-        if (byEmail) return byEmail;
-      }
-      // Fallback: match by display name
-      if (roomInvestorName) {
-        const { data: byName, error: nameErr } = await supabase
-          .from("investor_profiles")
-          .select(profileSelect)
-          .eq("your_name", roomInvestorName)
-          .maybeSingle();
-        console.log("[fallback-investor] name query result:", byName, "error:", nameErr?.message);
-        return byName ?? null;
-      }
-      return null;
-    },
-  });
-
-  const investorUserId = (investorProfilesInRoom as any[])[0]?.user_id ?? fallbackInvestorProfile?.user_id;
-  const { data: investorVerification } = useQuery({
-    queryKey: ["investor-verification", investorUserId],
-    enabled: !!investorUserId,
-    staleTime: 10 * 60 * 1000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("investor_verifications")
-        .select("verification_tier, overall_score, website_resolves, linkedin_valid, email_domain_matches, notes")
-        .eq("investor_id", investorUserId)
-        .maybeSingle();
-      return data ?? null;
-    },
-  });
-
-  const { data: latestDecision } = useQuery({
-    queryKey: ["overview-decision", dealRoomId],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("decisions")
-        .select("status, created_at, users(full_name)")
-        .eq("deal_room_id", dealRoomId)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      return data ?? null;
-    },
-  });
-
-  const docsShared = useQuery({
-    queryKey: ["overview-doc-count", dealRoomId],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const { count } = await supabase
-        .from("documents")
-        .select("id", { count: "exact", head: true })
-        .eq("deal_room_id", dealRoomId);
-      return count ?? 0;
-    },
-  });
-
-  const qaCount = useQuery({
-    queryKey: ["overview-qa-count", dealRoomId],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const { count } = await supabase
-        .from("messages")
-        .select("id", { count: "exact", head: true })
-        .eq("deal_room_id", dealRoomId)
-        .eq("is_qa", true);
-      return count ?? 0;
-    },
-  });
-
-  const meetingsCount = useQuery({
-    queryKey: ["overview-meetings-count", dealRoomId],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const { count } = await supabase
-        .from("meetings")
-        .select("id", { count: "exact", head: true })
-        .eq("deal_room_id", dealRoomId);
-      return count ?? 0;
-    },
-  });
-
-  // Team member queries (founders only)
-  const { data: allTeamAccounts = [] } = useQuery({
-    queryKey: ["all-team-accounts-overview", room?.startup_id ?? (room as any)?.startup_id],
-    enabled: !!user?.id && isFounder && !!(room as any)?.startup_id,
-    queryFn: async () => {
-      const startupId = (room as any)?.startup_id;
-      if (!startupId) return [];
-      const { data } = await supabase
-        .from("startup_team_accounts")
-        .select("id, role, users(full_name, avatar_url), team_member_profiles(first_name, last_name, avatar_url)")
-        .eq("startup_id", startupId)
-        .eq("status", "active");
-      return (data ?? []) as any[];
-    },
-  });
-
-  const { data: assignedTeam = [], refetch: refetchAssignedTeam } = useQuery({
-    queryKey: ["dr-assigned-team", dealRoomId],
-    enabled: !!user?.id && isFounder,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("deal_room_team_assignments")
-        .select("team_account_id, startup_team_accounts(id, role, users(full_name, avatar_url), team_member_profiles(first_name, last_name, avatar_url))")
-        .eq("deal_room_id", dealRoomId);
-      return (data ?? []) as any[];
-    },
-  });
-
-  const assignedIds = new Set((assignedTeam as any[]).map((a: any) => a.team_account_id));
-
-  const handleAssignTeamMember = async (accountId: string) => {
-    if (!user?.id) return;
-    setAssigningMemberId(accountId);
+  const markDone = async (n: number) => {
+    if (!userId) return;
+    setBusyNum(n);
     try {
-      const { error } = await supabase.from("deal_room_team_assignments").insert({
-        deal_room_id: dealRoomId,
-        team_account_id: accountId,
-        assigned_by: user.id,
-      });
-      if (error) throw error;
-      toast.success("Team member assigned");
-      void refetchAssignedTeam();
-    } catch {
-      toast.error("Failed to assign team member");
-    } finally {
-      setAssigningMemberId(null);
-    }
+      const d = drafts[n];
+      await completeMeeting({ data: { deal_room_id: dealRoomId, meeting_number: n, actor_user_id: userId, meeting_type: d?.type === "in_person" ? "in_person" : "video", scheduled_at: d?.scheduled ? new Date(d.scheduled).toISOString() : undefined } });
+      await refetch();
+      toast.success(`Meeting ${n} marked done`);
+    } finally { setBusyNum(null); }
   };
 
-  const handleRemoveTeamMember = async (accountId: string) => {
-    if (!user?.id) return;
-    setAssigningMemberId(accountId);
+  const doSkip = async (n: number) => {
+    if (!userId) return;
+    setBusyNum(n);
     try {
-      await supabase
-        .from("deal_room_team_assignments")
-        .delete()
-        .eq("deal_room_id", dealRoomId)
-        .eq("team_account_id", accountId);
-      toast.success("Team member removed");
-      void refetchAssignedTeam();
-    } catch {
-      toast.error("Failed to remove team member");
-    } finally {
-      setAssigningMemberId(null);
-    }
+      await skipMeeting({ data: { deal_room_id: dealRoomId, meeting_number: n, actor_user_id: userId } });
+      await refetch();
+      toast.success(`Meeting ${n} skipped`);
+    } finally { setBusyNum(null); }
   };
 
-  const { data: pendingInvites = [], refetch: refetchInvites } = useQuery({
-    queryKey: ["pending-invites", dealRoomId],
-    enabled: !!user?.id && isFounder,
+  const saveNotes = async (n: number, notes_shared?: string, notes_investor?: string) => {
+    await updateMeetingNotes({ data: { deal_room_id: dealRoomId, meeting_number: n, notes_shared, notes_investor } });
+    await refetch();
+    toast.success("Notes saved");
+  };
+
+  const doAdvance = async () => {
+    if (!userId) return;
+    setAdvancing(true);
+    try {
+      const res = await advanceDealStage({ data: { deal_room_id: dealRoomId, to_stage: "term_sheet", actor_user_id: userId } });
+      if (!res.ok) { toast.error("Could not advance"); return; }
+      await queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
+      toast.success("Advanced to Term Sheet");
+      setShowAdvance(false);
+    } finally { setAdvancing(false); }
+  };
+
+  return (
+    <div className="space-y-4">
+      {[1, 2, 3].map((n) => {
+        const m = byNumber(n);
+        const skipped = m?.meeting_type === "skipped";
+        const done = !!m?.completed_at;
+        const status = skipped ? "Skipped" : done ? "Done" : "Scheduled";
+        const draft = drafts[n] ?? { type: m?.meeting_type === "in_person" ? "in_person" : "video", scheduled: "" };
+        return (
+          <DarkCard key={n}>
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-sm font-semibold text-white">Meeting {n}</div>
+              <span className="rounded-full px-2.5 py-1 text-xs font-medium"
+                style={skipped
+                  ? { background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" }
+                  : done
+                    ? { background: "rgba(16,185,129,0.12)", color: "#10B981" }
+                    : { background: "rgba(245,158,11,0.12)", color: "#F59E0B" }}
+                data-testid={`meeting-status-${n}`}>
+                {status}
+              </span>
+            </div>
+
+            {!done && !skipped && !readOnly && (
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-1 rounded-lg p-0.5" style={{ background: "rgba(255,255,255,0.04)" }}>
+                  {(["video", "in_person"] as const).map((t) => (
+                    <button key={t} onClick={() => setDrafts((s) => ({ ...s, [n]: { ...draft, type: t } }))}
+                      className="rounded-md px-2.5 py-1 text-xs font-medium"
+                      style={draft.type === t ? { background: "#7C3AED", color: "#fff" } : { color: "rgba(255,255,255,0.5)" }}>
+                      {t === "video" ? "Online" : "In-person"}
+                    </button>
+                  ))}
+                </div>
+                <input type="datetime-local" value={draft.scheduled}
+                  onChange={(e) => setDrafts((s) => ({ ...s, [n]: { ...draft, scheduled: e.target.value } }))}
+                  className="rounded-lg px-3 py-1.5 text-xs text-white outline-none"
+                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }} />
+              </div>
+            )}
+
+            {m?.scheduled_at && (
+              <div className="mt-2 text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>{format(new Date(m.scheduled_at), "EEE, d MMM · h:mm a")}</div>
+            )}
+
+            {isInvestor && !done && !skipped && !readOnly && (
+              <div className="mt-3 flex items-center gap-2">
+                <button onClick={() => markDone(n)} disabled={busyNum === n} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50" style={{ background: "#7C3AED" }} data-testid={`meeting-done-${n}`}>
+                  {busyNum === n ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />} Mark as done
+                </button>
+                <button onClick={() => doSkip(n)} disabled={busyNum === n} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium" style={{ color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.08)" }} data-testid={`meeting-skip-${n}`}>
+                  Skip this meeting
+                </button>
+              </div>
+            )}
+
+            {/* Notes */}
+            <div className="mt-3 space-y-2">
+              <div>
+                <Eyebrow>Shared notes</Eyebrow>
+                <NotesEditor initial={m?.notes_shared ?? ""} readOnly={readOnly} onSave={(v) => saveNotes(n, v, undefined)} placeholder="Visible to both parties" />
+              </div>
+              {isInvestor && (
+                <div>
+                  <Eyebrow>Investor-only notes</Eyebrow>
+                  <NotesEditor initial={m?.notes_investor ?? ""} readOnly={readOnly} onSave={(v) => saveNotes(n, undefined, v)} placeholder="Private to your team" />
+                </div>
+              )}
+            </div>
+          </DarkCard>
+        );
+      })}
+
+      {isInvestor && anyDone && !readOnly && (
+        <div>
+          <PrimaryButton onClick={() => setShowAdvance(true)} testid="advance-to-term-sheet">Advance to Term Sheet</PrimaryButton>
+        </div>
+      )}
+      {showAdvance && (
+        <ConfirmModal
+          title="Advance to Term Sheet"
+          body="This moves the deal to the term sheet stage. The founder will see the change."
+          confirmLabel="Advance"
+          busy={advancing}
+          testid="advance-ts-confirm-modal"
+          onConfirm={doAdvance}
+          onClose={() => setShowAdvance(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+function NotesEditor({ initial, onSave, readOnly, placeholder }: { initial: string; onSave: (v: string) => void; readOnly: boolean; placeholder?: string }) {
+  const [val, setVal] = useState(initial);
+  const [dirty, setDirty] = useState(false);
+  useEffect(() => { setVal(initial); setDirty(false); }, [initial]);
+  if (readOnly) {
+    return <p className="text-xs" style={{ color: "rgba(255,255,255,0.7)" }}>{initial || "—"}</p>;
+  }
+  return (
+    <div className="flex items-start gap-2">
+      <textarea
+        value={val}
+        onChange={(e) => { setVal(e.target.value); setDirty(true); }}
+        rows={2}
+        placeholder={placeholder}
+        className="flex-1 rounded-lg px-3 py-2 text-xs text-white outline-none resize-none placeholder:text-white/25"
+        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+      />
+      {dirty && (
+        <button onClick={() => { onSave(val); setDirty(false); }} className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-white shrink-0" style={{ background: "#7C3AED" }}>Save</button>
+      )}
+    </div>
+  );
+}
+
+// ── Document requests sub-tab ──────────────────────────────────────
+const DOC_REQ_CATEGORIES: { value: string; label: string }[] = [
+  { value: "general",    label: "General documents" },
+  { value: "financial",  label: "Financial documents" },
+  { value: "legal",      label: "Legal documents" },
+  { value: "commercial", label: "Commercial / contracts" },
+  { value: "team",       label: "Team & HR documents" },
+];
+
+function DocumentRequestsSubTab({ dealRoomId, isInvestor, isFounder, userId, readOnly }: { dealRoomId: string; isInvestor: boolean; isFounder: boolean; userId?: string; readOnly: boolean }) {
+  const queryClient = useQueryClient();
+  const [name, setName] = useState("");
+  const [desc, setDesc] = useState("");
+  const [category, setCategory] = useState("general");
+  const [creating, setCreating] = useState(false);
+  const [blockedMsg, setBlockedMsg] = useState<string | null>(null);
+  const [respondingId, setRespondingId] = useState<string | null>(null);
+
+  const { data: requests = [], refetch } = useQuery({
+    queryKey: ["doc-requests", dealRoomId],
+    enabled: !!dealRoomId,
     queryFn: async () => {
       const { data } = await supabase
-        .from("invites")
-        .select("token, email, role, created_at, accepted_at")
+        .from("deal_room_document_requests")
+        .select("*")
         .eq("deal_room_id", dealRoomId)
-        .is("accepted_at", null)
+        .eq("is_blocked", false)
         .order("created_at", { ascending: false });
       return data ?? [];
     },
   });
 
-  // Deal health score (0–80, -10 if stale)
-  const docsCount = docsShared.data ?? 0;
-  const qCount = qaCount.data ?? 0;
-  const meetCount = meetingsCount.data ?? 0;
-  const tasks = dealTasks as any[];
-  const completedTasks = tasks.filter((t) => t.completed).length;
-  const lastActivityAt = (recentActivity as any[])[0]?.created_at ?? null;
-  const daysSinceActivity = lastActivityAt
-    ? (Date.now() - new Date(lastActivityAt).getTime()) / (1000 * 60 * 60 * 24)
-    : null;
-  let healthScore = 0;
-  if (docsCount > 0) healthScore += 20;
-  if (tasks.length > 0 && completedTasks / tasks.length > 0.5) healthScore += 20;
-  if (qCount > 0) healthScore += 20;
-  if (meetCount > 0) healthScore += 20;
-  if (daysSinceActivity !== null && daysSinceActivity > 7) healthScore -= 10;
-  healthScore = Math.max(0, healthScore);
-  const healthFill = Math.round((healthScore / 80) * 100);
-  const healthColor = healthScore >= 57 ? "bg-success" : healthScore >= 33 ? "bg-warning" : "bg-destructive";
-  const healthLabel = healthScore >= 57 ? "On track" : healthScore >= 33 ? "In progress" : "Early stage";
-  const healthTextColor = healthScore >= 57 ? "text-success" : healthScore >= 33 ? "text-warning" : "text-destructive";
+  const otherPartyId = async () => {
+    const { data } = await supabase
+      .from("deal_room_members")
+      .select("user_id, role")
+      .eq("deal_room_id", dealRoomId);
+    const target = (data ?? []).find((m: any) => m.user_id !== userId);
+    return target?.user_id ?? userId;
+  };
 
-  const decisionLabel = getDecisionLabel((latestDecision as any)?.status);
-  const progressSteps = [
-    { label: "NDA Signed", complete: true },
-    { label: "Documents Shared", complete: (docsShared.data ?? 0) > 0 },
-    { label: "Q&A Complete", complete: (qaCount.data ?? 0) > 0 && (qaMessagesAnswered(recentActivity as any[]) || decisionLabel !== "Under Review") },
-    { label: "Review Done", complete: decisionLabel === "Term Sheet" || decisionLabel === "Passed" },
-    { label: "Decision", complete: decisionLabel === "Term Sheet" || decisionLabel === "Passed" },
-  ];
-  const currentStepIndex = Math.min(
-    progressSteps.findIndex((step) => !step.complete) === -1 ? progressSteps.length - 1 : progressSteps.findIndex((step) => !step.complete),
-    progressSteps.length - 1,
-  );
-
-  const addTask = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!taskTitle.trim() || !user?.id) return;
-    setSavingTask(true);
+  const submit = async () => {
+    if (!name.trim() || !desc.trim() || !userId) return;
+    setBlockedMsg(null);
+    setCreating(true);
     try {
-      await supabase.from("deal_tasks").insert({
-        deal_room_id: dealRoomId,
-        title: taskTitle.trim(),
-        assignee_id: taskAssignee || null,
-        due_date: taskDueDate || null,
-        created_by: user.id,
-      });
-      await logActivity(dealRoomId, user.id, "Added a deal task", { title: taskTitle.trim() });
-      await queryClient.invalidateQueries({ queryKey: ["deal-tasks", dealRoomId] });
-      await queryClient.invalidateQueries({ queryKey: ["activities-overview", dealRoomId] });
-      setTaskTitle("");
-      setTaskAssignee("");
-      setTaskDueDate("");
-      toast.success("Task added");
-    } finally {
-      setSavingTask(false);
-    }
-  };
-
-  const toggleTask = async (task: any) => {
-    if (!user?.id) return;
-    await supabase.from("deal_tasks").update({ completed: !task.completed }).eq("id", task.id);
-    await logActivity(dealRoomId, user.id, `${task.completed ? "Reopened" : "Completed"} a deal task`, { title: task.title });
-    queryClient.invalidateQueries({ queryKey: ["deal-tasks", dealRoomId] });
-    queryClient.invalidateQueries({ queryKey: ["activities-overview", dealRoomId] });
-  };
-
-  const founderMembers = (memberList as any[]).filter((m) => m.role === "founder");
-  const baseOrigin = typeof window !== "undefined" ? window.location.origin : "https://hockystick.app";
-
-  const handleCopyInviteLink = (token: string) => {
-    navigator.clipboard.writeText(`${baseOrigin}/join/${token}`);
-    toast.success("Invite link copied");
-  };
-
-  const handleCancelInvite = async (token: string) => {
-    await supabase.from("invites").delete().eq("token", token);
-    void refetchInvites();
-    queryClient.invalidateQueries({ queryKey: ["deal-room-members", dealRoomId] });
-    toast.success("Invite cancelled");
-  };
-
-  const handleResendInvite = async (inv: any) => {
-    if (!user?.id) return;
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const result = await sendInviteEmail({
+      const requestedFrom = await otherPartyId();
+      const res = await createDocumentRequest({
         data: {
-          dealRoomId,
-          email: inv.email,
-          role: "investor",
-          invitedBy: user.id,
-          userAccessToken: session?.access_token ?? "",
-          supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
-          supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-          appUrl: import.meta.env.VITE_APP_URL || "https://hockystick.app",
-          founderName: (user as any)?.fullName ?? user?.email ?? "The founder",
-          startupName: startup?.company_name ?? "Unknown",
+          deal_room_id: dealRoomId,
+          requested_by: userId,
+          requested_from: requestedFrom,
+          document_name: name.trim(),
+          document_description: desc.trim(),
+          category,
         },
       });
-      if (result.success) {
-        toast.success("Invite resent");
-        void refetchInvites();
-        queryClient.invalidateQueries({ queryKey: ["deal-room-members", dealRoomId] });
+      if (res.blocked) {
+        setBlockedMsg(res.blocked_reason ?? "This category cannot be requested.");
+        return;
       }
-      else toast.error("Failed to resend");
-    } catch {
-      toast.error("Failed to resend");
+      setName(""); setDesc(""); setCategory("general");
+      await refetch();
+      toast.success("Document requested");
+    } finally {
+      setCreating(false);
     }
   };
 
-  const summary = startup?.tagline || startup?.description || startup?.traction || "Shared diligence workspace for this investment opportunity.";
-  const profileLink = isInvestor ? "/app/investor/startups" : "/app/profile";
-  const decisionMeta = DECISION_BADGES[decisionLabel];
+  const respond = async (req: any, response: "provided" | "declined" | "partial", extra: { decline_reason?: string; partial_explanation?: string; document_path?: string }) => {
+    if (!userId) return;
+    setRespondingId(req.id);
+    try {
+      await respondToDocumentRequest({ data: { request_id: req.id, deal_room_id: dealRoomId, actor_user_id: userId, response, ...extra } });
+      await refetch();
+      toast.success("Response sent");
+    } finally { setRespondingId(null); }
+  };
 
-  const founderSteps = [
-    { title: "Complete your profile", body: "Fill in your startup's profile — stage, sector, funding target, revenue, and team size. Investors read this first." },
-    { title: "Upload your pitch deck", body: "Go to the Documents tab and upload your deck. The AI will auto-summarise it for investors." },
-    { title: "Answer investor questions", body: "Check the Q&A tab — investors may post questions. Prompt, thorough answers build trust." },
-    { title: "Track due diligence", body: "Open the Workstation tab to see which documents the investor needs. Upload them and mark each as fulfilled." },
-    { title: "Watch for the decision", body: "The investor will post their decision (Pass / Term Sheet / Investing) in the Decisions tab. You'll be notified." },
-  ];
-  const investorSteps = [
-    { title: "Review the pitch", body: "Start with the Overview tab — company card, funding target, and key metrics at a glance." },
-    { title: "Dig into documents", body: "Open the Documents tab to read the deck, financials, and any uploaded files. Use the AI Summary button for a quick brief." },
-    { title: "Run due diligence", body: "The Workstation tab has 6 DD categories pre-loaded. Check off items as you review them, set statuses, and add private notes." },
-    { title: "Request missing docs", body: "In the Documents tab use 'Documents needed' to tell the founder what you still require. They can mark items as uploaded." },
-    { title: "Post your decision", body: "When you're ready, go to the Decisions tab and post a formal decision — Pass, Term Sheet, or Investing." },
-  ];
-  const tutorialSteps = isFounder ? founderSteps : investorSteps;
+  const statusPill = (status: string) => {
+    if (status === "provided") return { label: "Provided", style: { background: "rgba(16,185,129,0.12)", color: "#10B981" } };
+    if (status === "declined") return { label: "Declined", style: { background: "rgba(239,68,68,0.12)", color: "#EF4444" } };
+    if (status === "partial") return { label: "Partial", style: { background: "rgba(245,158,11,0.12)", color: "#F59E0B" } };
+    return { label: "Pending", style: { background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" } };
+  };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
-      {/* How it works tutorial */}
-      <div className="mb-5 rounded-xl border border-brand/20 bg-brand/5 overflow-hidden">
-        <button
-          onClick={() => setShowTutorial((v) => !v)}
-          className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-brand/10 transition-colors"
-        >
-          <div className="flex items-center gap-2">
-            <Lightbulb className="h-4 w-4 text-brand shrink-0" />
-            <span className="text-sm font-semibold">How it works</span>
-            <span className="text-[10px] text-muted-foreground">{isFounder ? "Founder guide" : "Investor guide"}</span>
+    <div className="space-y-4">
+      {isInvestor && !readOnly && (
+        <DarkCard>
+          <Eyebrow>Request a document</Eyebrow>
+          <div className="space-y-3">
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Document name (required)" className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/25" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }} data-testid="doc-req-name" />
+            <textarea value={desc} onChange={(e) => setDesc(e.target.value)} rows={2} placeholder="What you need and why (required)" className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none resize-none placeholder:text-white/25" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }} data-testid="doc-req-desc" />
+            <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }} data-testid="doc-req-category">
+              {DOC_REQ_CATEGORIES.map((c) => <option key={c.value} value={c.value} style={{ background: "#18181C" }}>{c.label}</option>)}
+            </select>
+            <div className="rounded-lg px-3 py-2.5 text-xs leading-relaxed" style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.18)", color: "rgba(255,255,255,0.5)" }} data-testid="doc-req-boundary-callout">
+              <span className="font-semibold" style={{ color: "rgba(255,255,255,0.7)" }}>What we don't facilitate:</span> Hockystick does not support requests for source code, technical IP, personal employee data, or customer PII. These protect both parties.
+            </div>
+            <div className="flex justify-end">
+              <PrimaryButton onClick={submit} disabled={!name.trim() || !desc.trim() || creating} testid="doc-req-submit" className="!px-4 !py-2">
+                {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Request
+              </PrimaryButton>
+            </div>
           </div>
-          {showTutorial
-            ? <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
-            : <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />}
-        </button>
-        {showTutorial && (
-          <div className="px-4 pb-4 pt-1 border-t border-brand/10">
-            <ol className="space-y-3 mt-2">
-              {tutorialSteps.map(({ title, body }, i) => (
-                <li key={title} className="flex gap-3">
-                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/15 text-[10px] font-bold text-brand">{i + 1}</span>
-                  <div>
-                    <div className="text-xs font-semibold">{title}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">{body}</div>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-        )}
-      </div>
+        </DarkCard>
+      )}
 
-      <div className="flex items-start justify-between gap-6 mb-6">
-        <div>
-          <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
-            {isInvestor ? "Investor Deal Room" : "Founder Deal Room"}
-          </div>
-          <h2 className="mt-1 text-2xl font-semibold tracking-tight">
-            {startup?.company_name ?? (room as any)?.investor_company ?? "Deal Room"}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {isInvestor
-              ? `Investor Deal Room · ${(room as any)?.status ?? "Due Diligence"}`
-              : "Diligence, tasks, decisions, and activity in one place."}
-          </p>
+      {(requests as any[]).length === 0 ? (
+        <DarkCard><p className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>No document requests yet.</p></DarkCard>
+      ) : (
+        (requests as any[]).map((req) => {
+          const pill = statusPill(req.status);
+          const canRespond = isFounder && req.requested_from === userId && req.status === "pending" && !readOnly;
+          return (
+            <DarkCard key={req.id} className="space-y-2">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-white">{req.document_name}</div>
+                  <div className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.5)" }}>{req.document_description}</div>
+                  <div className="text-[10px] mt-1 uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.25)" }}>{DOC_REQ_CATEGORIES.find((c) => c.value === req.category)?.label ?? req.category}</div>
+                </div>
+                <span className="rounded-full px-2.5 py-1 text-xs font-medium shrink-0" style={pill.style}>{pill.label}</span>
+              </div>
+              {req.decline_reason && <p className="text-xs" style={{ color: "#EF4444" }}>Declined: {req.decline_reason}</p>}
+              {req.partial_explanation && <p className="text-xs" style={{ color: "#F59E0B" }}>Partial: {req.partial_explanation}</p>}
+              {canRespond && (
+                <DocRequestActions req={req} busy={respondingId === req.id} onRespond={respond} />
+              )}
+            </DarkCard>
+          );
+        })
+      )}
+    </div>
+  );
+}
+
+function DocRequestActions({ req, busy, onRespond }: { req: any; busy: boolean; onRespond: (req: any, r: "provided" | "declined" | "partial", extra: any) => void }) {
+  const [mode, setMode] = useState<"none" | "decline" | "partial">("none");
+  const [text, setText] = useState("");
+  return (
+    <div className="pt-1">
+      {mode === "none" && (
+        <div className="flex flex-wrap gap-2">
+          <button onClick={() => onRespond(req, "provided", { document_path: `requests/${req.id}` })} disabled={busy} className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50" style={{ background: "#7C3AED" }} data-testid="doc-provide">
+            {busy ? <Loader2 className="inline h-3.5 w-3.5 animate-spin" /> : "Provide"}
+          </button>
+          <button onClick={() => setMode("partial")} className="rounded-lg px-3 py-1.5 text-xs font-medium" style={{ color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.08)" }}>Partial</button>
+          <button onClick={() => setMode("decline")} className="rounded-lg px-3 py-1.5 text-xs font-medium" style={{ color: "#EF4444", border: "1px solid rgba(239,68,68,0.2)" }}>Decline</button>
         </div>
-        <span className="inline-flex items-center gap-1.5 rounded-md border border-success/30 bg-success/10 px-2.5 py-1 text-xs font-medium text-success">
-          <CheckCircle2 className="h-3.5 w-3.5" /> NDA signed
-        </span>
+      )}
+      {mode !== "none" && (
+        <div className="space-y-2">
+          <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2} placeholder={mode === "decline" ? "Reason for declining" : "What you can share, and what's missing"} className="w-full rounded-lg px-3 py-2 text-xs text-white outline-none resize-none placeholder:text-white/25" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }} />
+          <div className="flex gap-2">
+            <button onClick={() => setMode("none")} className="rounded-lg px-3 py-1.5 text-xs" style={{ color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.08)" }}>Cancel</button>
+            <button
+              onClick={() => onRespond(req, mode === "decline" ? "declined" : "partial", mode === "decline" ? { decline_reason: text } : { partial_explanation: text, document_path: `requests/${req.id}` })}
+              disabled={busy || !text.trim()}
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+              style={{ background: "#7C3AED" }}
+            >
+              Submit
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Term sheet panel ───────────────────────────────────────────────
+const TERM_EXPLAIN: Record<string, string> = {
+  valuation: "The agreed worth of your company before this investment.",
+  investment_amount: "How much the investor will put in.",
+  equity_pct: "The share of the company the investor receives.",
+  instrument_type: "The legal form of the investment (SAFE, equity, note).",
+  pro_rata: "The investor's right to keep their ownership % in future rounds.",
+  board_seat: "Whether the investor takes a seat on your board.",
+};
+
+function TermSheetPanel({ dealRoomId, room, isInvestor, isFounder, userId, readOnly }: { dealRoomId: string; room: any; isInvestor: boolean; isFounder: boolean; userId?: string; readOnly: boolean }) {
+  const queryClient = useQueryClient();
+  const [form, setForm] = useState({ valuation: "", investment_amount: "", equity_pct: "", instrument_type: "safe", pro_rata: false, board_seat: false });
+  const [showSend, setShowSend] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [responding, setResponding] = useState(false);
+
+  const sent = !!(room as any)?.term_sheet_sent_at;
+  const status = (room as any)?.term_sheet_status as string | null;
+
+  const doSend = async () => {
+    if (!userId) return;
+    setSending(true);
+    try {
+      const res = await sendTermSheet({
+        data: {
+          deal_room_id: dealRoomId, actor_user_id: userId,
+          valuation: form.valuation ? Number(form.valuation) : null,
+          investment_amount: form.investment_amount ? Number(form.investment_amount) : null,
+          equity_pct: form.equity_pct ? Number(form.equity_pct) : null,
+          instrument_type: form.instrument_type,
+          pro_rata: form.pro_rata, board_seat: form.board_seat,
+        },
+      });
+      if (!res.ok) { toast.error("Could not send"); return; }
+      await queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
+      toast.success("Term sheet sent");
+      setShowSend(false);
+    } finally { setSending(false); }
+  };
+
+  const respond = async (response: "accepted" | "countered" | "rejected") => {
+    if (!userId) return;
+    setResponding(true);
+    try {
+      const res = await respondToTermSheet({ data: { deal_room_id: dealRoomId, actor_user_id: userId, response } });
+      if (!res.ok) { toast.error("Could not respond"); return; }
+      await queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
+      toast.success(response === "accepted" ? "Term sheet accepted" : response === "countered" ? "Counter requested" : "Term sheet flagged");
+    } finally { setResponding(false); }
+  };
+
+  const inputStyle: React.CSSProperties = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <Eyebrow>Term Sheet</Eyebrow>
+        <h2 className="text-2xl font-semibold tracking-tight text-white" style={{ fontFamily: "Syne, sans-serif" }}>Term sheet</h2>
       </div>
 
-      <div className="grid md:grid-cols-5 gap-5">
-        <div className="md:col-span-3 space-y-4">
-          <div className="grid sm:grid-cols-2 gap-4">
-            {/* STARTUP CARD */}
-            <section className="rounded-xl border border-brand/25 bg-card p-5 shadow-card">
-              <div className="mb-3"><span className="text-[9px] uppercase tracking-widest font-bold text-brand bg-brand/10 px-2 py-0.5 rounded-full">Startup</span></div>
-              <div className="flex items-start gap-3">
-                <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl border border-border/60 bg-gradient-brand text-base font-bold text-brand-foreground">
-                  {startup?.logo_url ? <img src={startup.logo_url} alt={startup?.company_name ?? "Co"} className="h-full w-full object-cover rounded-xl" /> : (startup?.company_name?.[0] ?? "S")}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-sm leading-tight truncate">{startup?.company_name ?? "Company"}</h3>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {startup?.stage && <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[9px] font-medium text-brand">{startup.stage}</span>}
-                    {startup?.sector && <span className="rounded-full bg-accent px-2 py-0.5 text-[9px] text-muted-foreground">{startup.sector}</span>}
-                  </div>
-                </div>
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-1.5">
-                <div className="rounded-lg bg-background border border-border/50 p-2">
-                  <div className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Raise</div>
-                  <div className="text-xs font-bold mt-0.5">{formatMoney(startup?.funding_target)}</div>
-                </div>
-                <div className="rounded-lg bg-background border border-border/50 p-2">
-                  <div className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">ARR</div>
-                  <div className="text-xs font-bold mt-0.5">{formatMoney(startup?.revenue)}</div>
-                </div>
-              </div>
-              {startup?.traction && <p className="mt-2 text-[10px] text-muted-foreground line-clamp-2"><span className="font-semibold text-foreground">Traction: </span>{startup.traction}</p>}
-              {founderMembers.length > 0 && (
-                <div className="mt-3 pt-2.5 border-t border-border/40 space-y-1.5">
-                  <div className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Team</div>
-                  {founderMembers.map((m: any) => (
-                    <div key={m.id} className="flex items-center gap-2">
-                      {m.users?.avatar_url ? <img src={m.users.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover border-2 border-brand/20 shrink-0" /> : <div className="grid h-7 w-7 place-items-center rounded-full bg-brand/15 text-brand text-[9px] font-bold border-2 border-brand/20 shrink-0">{(m.users?.full_name || "F").split(" ").map((s: string) => s[0]).join("").slice(0,2).toUpperCase()}</div>}
-                      <div className="min-w-0"><div className="text-[10px] font-semibold truncate">{m.users?.full_name ?? m.users?.email ?? "Founder"}</div><div className="text-[9px] text-muted-foreground">{m.designation || "Founder"}</div></div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <Link to="/app/profile" className="mt-3 inline-flex items-center gap-1 text-[10px] text-brand hover:underline">View profile <ExternalLink className="h-3 w-3" /></Link>
-            </section>
-            {/* INVESTOR CARD */}
-            {(() => {
-              const invP = (investorProfilesInRoom as any[])[0] ?? fallbackInvestorProfile;
-              const hasInvestor = invP || investorMembers.length > 0 || !!roomInvestorName;
-              return (
-                <section className="rounded-xl border border-success/25 bg-card p-5 shadow-card">
-                  <div className="mb-3"><span className="text-[9px] uppercase tracking-widest font-bold text-success bg-success/10 px-2 py-0.5 rounded-full">Investor</span></div>
-                  {hasInvestor ? (<>
-                    <div className="flex items-start gap-3">
-                      <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl border border-border/60 bg-success/10 text-base font-bold text-success">{(invP?.fund_name || roomInvestorName || "V")[0].toUpperCase()}</div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-sm leading-tight truncate">{invP?.fund_name ?? roomInvestorName ?? "Investor"}</h3>
-                        <div className="text-[10px] text-muted-foreground truncate">
-                          {invP?.your_name ?? roomInvestorName ?? ""}
-                          {invP?.role ? ` · ${invP.role}` : ""}
-                        </div>
-                        <div className="mt-1">
-                          <VerificationBadge tier={investorVerification?.verification_tier ?? invP?.verification_tier} size="sm" />
-                        </div>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {invP?.sectors && <span className="rounded-full bg-success/10 px-2 py-0.5 text-[9px] font-medium text-success truncate max-w-[100px]">{String(invP.sectors).split(",")[0].trim()}</span>}
-                          {invP?.stages && <span className="rounded-full bg-accent px-2 py-0.5 text-[9px] text-muted-foreground">{String(invP.stages).split(",")[0].trim()}</span>}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mt-3 grid grid-cols-2 gap-1.5">
-                      <div className="rounded-lg bg-background border border-border/50 p-2">
-                        <div className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Check size</div>
-                        <div className="text-[10px] font-bold mt-0.5">
-                          {invP?.check_size_min && invP?.check_size_max
-                            ? `${invP.check_size_min} – ${invP.check_size_max}`
-                            : invP?.check_size_min ?? invP?.check_size_max ?? (roomInvestorName && !invP ? "…" : "—")}
-                        </div>
-                      </div>
-                      <div className="rounded-lg bg-background border border-border/50 p-2">
-                        <div className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Geography</div>
-                        <div className="text-[10px] font-bold mt-0.5 truncate">{invP?.geography ?? (roomInvestorName && !invP ? "…" : "—")}</div>
-                      </div>
-                    </div>
-                    {invP?.thesis && <p className="mt-2 text-[10px] text-muted-foreground line-clamp-2"><span className="font-semibold text-foreground">Thesis: </span>{invP.thesis}</p>}
-                    {investorMembers.length > 0 && (
-                      <div className="mt-3 pt-2.5 border-t border-border/40 space-y-1.5">
-                        <div className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Team</div>
-                        {(investorMembers as any[]).map((m: any) => {
-                          const mp = (investorProfilesInRoom as any[]).find((p: any) => p.user_id === m.user_id);
-                          return (<div key={m.id} className="flex items-center gap-2">
-                            {m.users?.avatar_url ? <img src={m.users.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover border-2 border-success/20 shrink-0" /> : <div className="grid h-7 w-7 place-items-center rounded-full bg-success/15 text-success text-[9px] font-bold border-2 border-success/20 shrink-0">{(m.users?.full_name || "I").split(" ").map((s: string) => s[0]).join("").slice(0,2).toUpperCase()}</div>}
-                            <div className="min-w-0"><div className="text-[10px] font-semibold truncate">{m.users?.full_name ?? m.users?.email ?? "Investor"}</div><div className="text-[9px] text-muted-foreground">{mp?.role || "Investor"}{mp?.fund_name ? ` · ${mp.fund_name}` : ""}</div></div>
-                          </div>);
-                        })}
-                      </div>
-                    )}
-                    {invP?.linkedin_url && <a href={invP.linkedin_url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-[10px] text-brand hover:underline">LinkedIn <ExternalLink className="h-3 w-3" /></a>}
-                  </>) : (<div className="py-6 text-center"><div className="text-xs text-muted-foreground">No investor joined yet.</div></div>)}
-                </section>
-              );
-            })()}
-          </div>
-
-          <DealTermsCard dealRoomId={dealRoomId} isFounder={isFounder} isInvestor={isInvestor} />
-
-          <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-            <div className="mb-5 flex items-center justify-between">
-              <div className="text-sm font-semibold inline-flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-brand" /> Deal progress
-              </div>
-              <span className="text-xs text-muted-foreground">Current: {progressSteps[currentStepIndex].label}</span>
+      {isInvestor && !sent && !readOnly && (
+        <DarkCard className="space-y-3">
+          <div className="grid sm:grid-cols-2 gap-3">
+            <div>
+              <Eyebrow>Pre-money valuation (USD)</Eyebrow>
+              <input type="number" value={form.valuation} onChange={(e) => setForm((f) => ({ ...f, valuation: e.target.value }))} className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none" style={inputStyle} data-testid="ts-valuation" />
             </div>
-            <div className="grid grid-cols-5 gap-2">
-              {progressSteps.map((step, index) => {
-                const current = index === currentStepIndex;
-                const completed = step.complete && index < currentStepIndex;
-                return (
-                  <div key={step.label} className="relative min-w-0">
-                    {index < progressSteps.length - 1 && (
-                      <div className={cn("absolute left-[calc(50%+1rem)] right-[calc(-50%+1rem)] top-4 h-0.5", completed ? "bg-success" : "bg-border")} />
-                    )}
-                    <div className="relative z-10 flex flex-col items-center gap-2 text-center">
-                      <div className={cn(
-                        "grid h-8 w-8 place-items-center rounded-full border text-xs font-semibold",
-                        completed && "border-success bg-success text-success-foreground",
-                        current && "border-brand bg-brand text-brand-foreground shadow-glow",
-                        !completed && !current && "border-border bg-background text-muted-foreground",
-                      )}>
-                        {completed ? <Check className="h-4 w-4" /> : index + 1}
-                      </div>
-                      <div className={cn("text-[11px] leading-tight", current ? "font-semibold text-foreground" : "text-muted-foreground")}>{step.label}</div>
-                    </div>
-                  </div>
-                );
-              })}
+            <div>
+              <Eyebrow>Investment amount (USD)</Eyebrow>
+              <input type="number" value={form.investment_amount} onChange={(e) => setForm((f) => ({ ...f, investment_amount: e.target.value }))} className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none" style={inputStyle} data-testid="ts-amount" />
             </div>
-          </section>
-
-          <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <div>
-                <div className="text-sm font-semibold inline-flex items-center gap-2">
-                  <ClipboardList className="h-4 w-4 text-brand" /> Deal tasks
-                </div>
-                <p className="mt-0.5 text-xs text-muted-foreground">Shared next steps visible to both parties.</p>
-              </div>
-              <span className="text-xs text-muted-foreground">{(dealTasks as any[]).filter((t) => t.completed).length}/{(dealTasks as any[]).length} complete</span>
+            <div>
+              <Eyebrow>Equity %</Eyebrow>
+              <input type="number" value={form.equity_pct} onChange={(e) => setForm((f) => ({ ...f, equity_pct: e.target.value }))} className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none" style={inputStyle} data-testid="ts-equity" />
             </div>
-
-            <div className="divide-y divide-border/60 rounded-lg border border-border/60">
-              {(dealTasks as any[]).length === 0 && (
-                <div className="p-4 text-sm text-muted-foreground">No shared tasks yet.</div>
-              )}
-              {(dealTasks as any[]).map((task) => (
-                <div key={task.id} className="flex items-center gap-3 px-4 py-3">
-                  <input
-                    type="checkbox"
-                    checked={!!task.completed}
-                    onChange={() => toggleTask(task)}
-                    className="h-4 w-4 rounded border-border accent-[var(--brand)]"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className={cn("text-sm font-medium truncate", task.completed && "text-muted-foreground line-through")}>{task.title}</div>
-                    <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      <span>{"Unassigned"}</span>
-                      <span>•</span>
-                      <span>{task.due_date ? format(new Date(`${task.due_date}T00:00:00`), "MMM d") : "No due date"}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <form onSubmit={addTask} className="mt-4 flex flex-wrap items-center gap-2 w-full">
-              <input
-                value={taskTitle}
-                onChange={(e) => setTaskTitle(e.target.value)}
-                placeholder="Add a shared task"
-                className="flex-1 min-w-0 rounded-md border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
-              />
-              <select
-                value={taskAssignee}
-                onChange={(e) => setTaskAssignee(e.target.value)}
-                className="w-32 shrink-0 rounded-md border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
-              >
-                <option value="">Unassigned</option>
-                {(memberList as any[]).map((member) => (
-                  <option key={member.user_id} value={member.user_id}>
-                    {member.users?.full_name || member.users?.email || member.role}
-                  </option>
-                ))}
+            <div>
+              <Eyebrow>Instrument</Eyebrow>
+              <select value={form.instrument_type} onChange={(e) => setForm((f) => ({ ...f, instrument_type: e.target.value }))} className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none" style={inputStyle} data-testid="ts-instrument">
+                <option value="safe" style={{ background: "#18181C" }}>SAFE</option>
+                <option value="convertible_note" style={{ background: "#18181C" }}>Convertible Note</option>
+                <option value="equity" style={{ background: "#18181C" }}>Equity</option>
+                <option value="priced" style={{ background: "#18181C" }}>Priced Round</option>
               </select>
-              <input
-                type="date"
-                value={taskDueDate}
-                onChange={(e) => setTaskDueDate(e.target.value)}
-                className="w-36 shrink-0 rounded-md border border-border/60 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
-              />
-              <button
-                type="submit"
-                disabled={!taskTitle.trim() || savingTask}
-                className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-md bg-gradient-brand px-3 py-2 text-sm font-medium text-brand-foreground shadow-glow disabled:opacity-50"
-              >
-                {savingTask ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                Add task
-              </button>
-            </form>
-          </section>
-        </div>
-
-        <div className="md:col-span-2 space-y-4">
-          <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-            <div className="text-sm font-semibold">Decision status</div>
-            <div className={cn("mt-4 inline-flex w-full items-center justify-center rounded-xl px-4 py-5 text-xl font-semibold", decisionMeta.className)}>
-              {decisionLabel}
             </div>
-            <div className="mt-3 text-xs text-muted-foreground">
-              {(latestDecision as any)?.created_at
-                ? `Updated ${formatDistanceToNow(new Date((latestDecision as any).created_at), { addSuffix: true })}`
-                : "No investor decision submitted yet."}
+          </div>
+          <div className="flex flex-wrap gap-4">
+            <label className="flex items-center gap-2 cursor-pointer text-sm" style={{ color: "rgba(255,255,255,0.7)" }}>
+              <input type="checkbox" checked={form.pro_rata} onChange={(e) => setForm((f) => ({ ...f, pro_rata: e.target.checked }))} style={{ accentColor: "#7C3AED" }} /> Pro-rata rights
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer text-sm" style={{ color: "rgba(255,255,255,0.7)" }}>
+              <input type="checkbox" checked={form.board_seat} onChange={(e) => setForm((f) => ({ ...f, board_seat: e.target.checked }))} style={{ accentColor: "#7C3AED" }} /> Board seat
+            </label>
+          </div>
+          <div className="flex justify-end">
+            <PrimaryButton onClick={() => setShowSend(true)} testid="send-term-sheet">Send term sheet</PrimaryButton>
+          </div>
+        </DarkCard>
+      )}
+
+      {sent && (
+        <DarkCard className="space-y-3" data-testid="term-sheet-display">
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-semibold text-white">Proposed terms</div>
+            <span className="rounded-full px-2.5 py-1 text-xs font-medium" style={{ background: "rgba(16,185,129,0.12)", color: "#10B981" }}>{status ?? "sent"}</span>
+          </div>
+          {([
+            ["valuation", "Pre-money valuation", (room as any)?.term_sheet_valuation],
+            ["investment_amount", "Investment amount", (room as any)?.term_sheet_investment_amount],
+            ["equity_pct", "Equity %", (room as any)?.term_sheet_equity_pct],
+            ["instrument_type", "Instrument", (room as any)?.term_sheet_type],
+            ["pro_rata", "Pro-rata rights", (room as any)?.term_sheet_pro_rata ? "Yes" : "No"],
+            ["board_seat", "Board seat", (room as any)?.term_sheet_board_seat ? "Yes" : "No"],
+          ] as const).map(([k, label, value]) => (
+            <div key={k} className="flex items-center justify-between gap-3 group" title={TERM_EXPLAIN[k]}>
+              <span className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>{label}</span>
+              <span className="text-sm text-white">{value === null || value === undefined || value === "" ? "—" : String(value)}</span>
             </div>
-          </section>
+          ))}
 
-          <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-            <div className="text-sm font-semibold mb-3">Key metrics</div>
-            <div className="grid grid-cols-2 gap-3">
-              <Metric icon={DollarSign} label="ARR" value={formatMoney(startup?.revenue)} />
-              <Metric icon={Users} label="Team size" value={startup?.team_size ?? "—"} />
-              <Metric icon={Building2} label="Stage" value={startup?.stage ?? "—"} />
-              <Metric icon={Target} label="Raise amount" value={formatMoney(startup?.funding_target)} />
+          {isFounder && status === "sent" && !readOnly && (
+            <div className="flex flex-wrap gap-2 pt-2">
+              <PrimaryButton onClick={() => respond("accepted")} disabled={responding} testid="ts-accept" className="!px-4 !py-2">Accept</PrimaryButton>
+              <button onClick={() => respond("countered")} disabled={responding} className="rounded-lg px-4 py-2 text-sm font-medium" style={{ color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.08)" }} data-testid="ts-counter">Counter</button>
+              <button onClick={() => respond("rejected")} disabled={responding} className="rounded-lg px-4 py-2 text-sm font-medium" style={{ color: "#EF4444", border: "1px solid rgba(239,68,68,0.2)" }} data-testid="ts-flag">Flag</button>
             </div>
-          </section>
-
-          <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-            <div className="flex items-center justify-between mb-3">
-              <div className="text-sm font-semibold">Deal health</div>
-              <span className={cn("text-xs font-medium", healthTextColor)}>{healthLabel}</span>
-            </div>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
-                <div
-                  className={cn("h-full rounded-full transition-all duration-500", healthColor)}
-                  style={{ width: `${healthFill}%` }}
-                />
-              </div>
-              <span className="text-sm font-semibold tabular-nums shrink-0">{healthScore}<span className="text-xs font-normal text-muted-foreground">/80</span></span>
-            </div>
-            <div className="grid grid-cols-2 gap-1.5 text-xs">
-              {[
-                { label: "Documents", done: docsCount > 0, value: `${docsCount} file${docsCount !== 1 ? "s" : ""}` },
-                { label: "Q&A", done: qCount > 0, value: `${qCount} message${qCount !== 1 ? "s" : ""}` },
-                { label: "Tasks", done: tasks.length > 0 && completedTasks / Math.max(tasks.length, 1) > 0.5, value: `${completedTasks}/${tasks.length} done` },
-                { label: "Meetings", done: meetCount > 0, value: `${meetCount} held` },
-              ].map(({ label, done, value }) => (
-                <div key={label} className={cn("flex items-center gap-1.5 rounded-md px-2 py-1.5", done ? "bg-success/5 text-success" : "bg-muted/40 text-muted-foreground")}>
-                  <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", done ? "bg-success" : "bg-muted-foreground/40")} />
-                  <span className="font-medium">{label}</span>
-                  <span className="ml-auto tabular-nums">{value}</span>
-                </div>
-              ))}
-            </div>
-            {daysSinceActivity !== null && daysSinceActivity > 7 && (
-              <div className="mt-2 text-[10px] text-warning flex items-center gap-1">
-                <AlertTriangle className="h-3 w-3" /> No activity in {Math.floor(daysSinceActivity)} days (−10 pts)
-              </div>
-            )}
-          </section>
-
-          <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-            <div className="text-sm font-semibold mb-3">Recent activity</div>
-            {(recentActivity as any[]).length === 0 ? (
-              <div className="text-xs text-muted-foreground">No activity yet.</div>
-            ) : (
-              <div className="space-y-3">
-                {(recentActivity as any[]).slice(0, 5).map((e) => (
-                  <div key={e.id} className="flex items-start gap-2.5">
-                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-brand" />
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm">{e.action}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(e.created_at), { addSuffix: true })}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-
-          <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-            <div className="flex items-center justify-between mb-4">
-              <div className="text-sm font-semibold inline-flex items-center gap-2">
-                <Users className="h-4 w-4 text-brand" /> Participants
-              </div>
-              {isFounder && (
-                <button onClick={() => setShowInvite(true)} className="inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-2.5 py-1 text-xs shadow-glow">
-                  <UserPlus className="h-3 w-3" /> Invite
-                </button>
-              )}
-            </div>
-            {founderMembers.length > 0 && (
-              <div className="mb-4">
-                <div className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold mb-2 flex items-center gap-1.5"><div className="h-1.5 w-1.5 rounded-full bg-brand" /> Startup team</div>
-                <div className="space-y-2.5">
-                  {founderMembers.map((m: any) => (
-                    <div key={m.id} className="flex items-center gap-2.5">
-                      {m.users?.avatar_url ? <img src={m.users.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover border-2 border-brand/20 shrink-0" /> : <div className="grid h-8 w-8 place-items-center rounded-full bg-brand/15 text-brand text-[10px] font-bold border-2 border-brand/20 shrink-0">{(m.users?.full_name || "F").split(" ").map((s: string) => s[0]).join("").slice(0,2).toUpperCase()}</div>}
-                      <div className="flex-1 min-w-0"><div className="text-xs font-semibold truncate">{m.users?.full_name ?? m.users?.email ?? "Founder"}</div><div className="text-[9px] text-muted-foreground">{m.designation || "Founder"}</div></div>
-                      <span className="text-[9px] bg-brand/10 text-brand rounded-full px-2 py-0.5 shrink-0">Founder</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {investorMembers.length > 0 && (
-              <div className="mb-3">
-                <div className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold mb-2 flex items-center gap-1.5"><div className="h-1.5 w-1.5 rounded-full bg-success" /> Investor team</div>
-                <div className="space-y-2.5">
-                  {investorMembers.map((m: any) => {
-                    const mp = investorProfilesInRoom.find((p: any) => p.user_id === m.user_id);
-                    return (<div key={m.id} className="flex items-center gap-2.5">
-                      {m.users?.avatar_url ? <img src={m.users.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover border-2 border-success/20 shrink-0" /> : <div className="grid h-8 w-8 place-items-center rounded-full bg-success/15 text-success text-[10px] font-bold border-2 border-success/20 shrink-0">{(m.users?.full_name || "I").split(" ").map((s: string) => s[0]).join("").slice(0,2).toUpperCase()}</div>}
-                      <div className="flex-1 min-w-0"><div className="text-xs font-semibold truncate">{m.users?.full_name ?? m.users?.email ?? "Investor"}</div><div className="text-[9px] text-muted-foreground">{mp?.role || "Investor"}{mp?.fund_name ? ` · ${mp.fund_name}` : ""}</div></div>
-                      <span className="text-[9px] bg-success/10 text-success rounded-full px-2 py-0.5 shrink-0">Investor</span>
-                    </div>);
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Pending invites (founders only) */}
-            {isFounder && (pendingInvites as any[]).length > 0 && (
-              <div>
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Pending invites</div>
-                <div className="space-y-1.5">
-                  {(pendingInvites as any[]).map((inv) => (
-                    <div key={inv.token} className="flex items-center gap-1.5 text-xs">
-                      <span className="truncate text-muted-foreground flex-1 min-w-0">{inv.email}</span>
-                      <span className="shrink-0 text-[9px] bg-warning/10 text-warning rounded px-1.5 py-0.5">Pending</span>
-                      <button
-                        onClick={() => handleCopyInviteLink(inv.token)}
-                        className="shrink-0 grid h-5 w-5 place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-accent"
-                        title="Copy invite link"
-                      >
-                        <Copy className="h-3 w-3" />
-                      </button>
-                      <button
-                        onClick={() => handleResendInvite(inv)}
-                        className="shrink-0 grid h-5 w-5 place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-accent"
-                        title="Resend invite"
-                      >
-                        <Send className="h-3 w-3" />
-                      </button>
-                      <button
-                        onClick={() => handleCancelInvite(inv.token)}
-                        className="shrink-0 grid h-5 w-5 place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/5"
-                        title="Cancel invite"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Empty state */}
-            {founderMembers.length === 0 && investorMembers.length === 0 && (pendingInvites as any[]).length === 0 && (
-              <div className="text-xs text-muted-foreground">No participants yet.</div>
-            )}
-          </section>
-
-          <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-            <div className="text-sm font-semibold mb-3">Quick actions</div>
-            <div className="space-y-2">
-              {isFounder ? (
-                <>
-                  <button
-                    onClick={() => onTabChange("documents")}
-                    className="w-full rounded-md border border-border/60 px-3 py-2 text-left text-sm hover:bg-accent"
-                  >
-                    <FileText className="mr-2 inline h-4 w-4 text-brand" /> Upload doc
-                  </button>
-                  <button
-                    onClick={() => onTabChange("meetings")}
-                    className="w-full rounded-md border border-border/60 px-3 py-2 text-left text-sm hover:bg-accent"
-                  >
-                    <Calendar className="mr-2 inline h-4 w-4 text-brand" /> Schedule meeting
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => onTabChange("documents")}
-                    className="w-full rounded-md border border-border/60 px-3 py-2 text-left text-sm hover:bg-accent"
-                  >
-                    <FileText className="mr-2 inline h-4 w-4 text-brand" /> Request doc
-                  </button>
-                  <button
-                    onClick={() => onTabChange("decision")}
-                    className="w-full rounded-md border border-success/40 bg-success/10 px-3 py-2 text-left text-sm text-success hover:bg-success/15"
-                  >
-                    <ThumbsUp className="mr-2 inline h-4 w-4" /> Submit decision
-                  </button>
-                </>
-              )}
-            </div>
-          </section>
-
-          {/* Team Access panel — founders only (A1) */}
-          {isFounder && (
-            <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-              <button
-                onClick={() => setShowTeamAssign((v) => !v)}
-                className="w-full flex items-center justify-between"
-              >
-                <div className="text-sm font-semibold inline-flex items-center gap-2">
-                  <Users className="h-4 w-4 text-brand" /> Team access
-                  {(assignedTeam as any[]).length > 0 && (
-                    <span className="text-[10px] bg-brand/10 text-brand rounded-full px-2 py-0.5 font-medium">
-                      {(assignedTeam as any[]).length}
-                    </span>
-                  )}
-                </div>
-                {showTeamAssign
-                  ? <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                  : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
-              </button>
-
-              {showTeamAssign && (
-                <div className="mt-4 space-y-3">
-                  {allTeamAccounts.length === 0 ? (
-                    <div className="text-xs text-muted-foreground">
-                      No team members yet. <Link to="/app/users" className="text-brand hover:underline">Invite your team →</Link>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {(allTeamAccounts as any[]).map((acct: any) => {
-                        const prof = acct.team_member_profiles;
-                        const usr = acct.users;
-                        const avatarUrl = prof?.avatar_url ?? usr?.avatar_url ?? null;
-                        const name = prof?.first_name
-                          ? `${prof.first_name} ${prof.last_name ?? ""}`.trim()
-                          : (usr?.full_name ?? "Unknown");
-                        const initials = name.split(" ").map((s: string) => s[0]).join("").slice(0, 2).toUpperCase();
-                        const isAssigned = assignedIds.has(acct.id);
-                        const isProcessing = assigningMemberId === acct.id;
-                        return (
-                          <div key={acct.id} className="flex items-center gap-2.5 rounded-lg border border-border/40 px-3 py-2">
-                            <div className="h-7 w-7 rounded-full bg-accent flex items-center justify-center text-[10px] font-semibold text-foreground overflow-hidden shrink-0">
-                              {avatarUrl
-                                ? <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
-                                : initials}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="text-xs font-medium truncate">{name}</div>
-                              <div className="text-[10px] text-muted-foreground capitalize">{acct.role}</div>
-                            </div>
-                            {isAssigned ? (
-                              <button
-                                onClick={() => handleRemoveTeamMember(acct.id)}
-                                disabled={isProcessing}
-                                className="shrink-0 inline-flex items-center gap-1 text-[10px] text-destructive hover:bg-destructive/5 rounded px-2 py-1 disabled:opacity-50"
-                              >
-                                {isProcessing ? <Loader2 className="h-3 w-3 animate-spin" /> : <X className="h-3 w-3" />}
-                                Remove
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => handleAssignTeamMember(acct.id)}
-                                disabled={isProcessing}
-                                className="shrink-0 inline-flex items-center gap-1 text-[10px] text-brand hover:bg-brand/5 rounded px-2 py-1 disabled:opacity-50"
-                              >
-                                {isProcessing ? <Loader2 className="h-3 w-3 animate-spin" /> : <UserPlus className="h-3 w-3" />}
-                                Assign
-                              </button>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
-            </section>
           )}
-        </div>
-      </div>
 
-      {showInvite && (
-        <InviteModal
-          dealRoomId={dealRoomId}
-          dealRoomName={startup?.company_name ? `${startup.company_name} — Deal Room` : "Deal Room"}
-          companyName={startup?.company_name ?? "Unknown"}
-          founderName={user?.fullName ?? user?.email ?? "The founder"}
-          invitedBy={user?.id ?? ""}
-          onClose={() => setShowInvite(false)}
-          onSent={() => {
-            void refetchInvites();
-            queryClient.invalidateQueries({ queryKey: ["deal-room-members", dealRoomId] });
-          }}
+          {isFounder && (
+            <p className="pt-2 text-[11px]" style={{ color: "rgba(255,255,255,0.25)" }}>
+              This summary is not legal advice. Review the full term sheet with a lawyer before signing.
+            </p>
+          )}
+        </DarkCard>
+      )}
+
+      {!isInvestor && !sent && (
+        <DarkCard><p className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>The investor is preparing a term sheet.</p></DarkCard>
+      )}
+
+      {showSend && (
+        <ConfirmModal
+          title="Send term sheet"
+          body="The founder will see these terms immediately and can accept, counter, or flag them."
+          confirmLabel="Send"
+          busy={sending}
+          testid="send-ts-confirm-modal"
+          onConfirm={doSend}
+          onClose={() => setShowSend(false)}
         />
       )}
+    </div>
+  );
+}
+
+// ── Closed panel ───────────────────────────────────────────────────
+function ClosedPanel({ room, isInvestor }: { room: any; isInvestor: boolean }) {
+  const accepted = (room as any)?.term_sheet_status === "accepted";
+  const amount = (room as any)?.term_sheet_investment_amount;
+  const closedAt = (room as any)?.closed_at_workflow;
+  return (
+    <div className="space-y-6">
+      <div>
+        <Eyebrow>Closed</Eyebrow>
+        <h2 className="text-2xl font-semibold tracking-tight text-white" style={{ fontFamily: "Syne, sans-serif" }}>Deal closed</h2>
+      </div>
+      <DarkCard>
+        <div className="flex items-center gap-3">
+          <div className="grid h-10 w-10 place-items-center rounded-lg" style={{ background: accepted ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.06)" }}>
+            {accepted ? <CheckCircle2 className="h-5 w-5" style={{ color: "#10B981" }} /> : <X className="h-5 w-5" style={{ color: "rgba(255,255,255,0.4)" }} />}
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-white">{accepted ? "Deal closed — term sheet accepted" : "Deal closed"}</div>
+            <div className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>{closedAt ? new Date(closedAt).toLocaleDateString() : "This deal room is now read-only."}</div>
+          </div>
+        </div>
+        {isInvestor && accepted && amount != null && (
+          <div className="mt-4 rounded-lg px-4 py-3" style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)" }}>
+            <Eyebrow>Investment recorded</Eyebrow>
+            <div className="text-lg font-semibold text-white">{formatMoney(amount)}</div>
+          </div>
+        )}
+        {!isInvestor && (
+          <p className="mt-4 text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
+            {accepted ? "Congratulations — the investment is confirmed." : "This deal has closed. Reach out to your investor for next steps."}
+          </p>
+        )}
+      </DarkCard>
     </div>
   );
 }
@@ -1625,6 +1765,31 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
       return data ?? [];
     },
   });
+
+  // Stage 2 gate — fetch directly from deal_rooms
+  const { data: drStageData } = useQuery({
+    queryKey: ["dr-stage-gate", dealRoomId],
+    enabled: !!dealRoomId,
+    staleTime: 15_000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("deal_rooms")
+        .select("workflow_stage, stage2_unlocked")
+        .eq("id", dealRoomId)
+        .maybeSingle();
+      return data ?? null;
+    },
+  });
+  const stage2Unlocked = drStageData?.stage2_unlocked ?? false;
+  const workflowStage = drStageData?.workflow_stage ?? "nda_signed";
+
+  // For investor: split platform docs into stage 1 and stage 2
+  const platformDocsSplit = isInvestor
+    ? {
+        stage1: (platformDocs as any[]).filter((d) => !d.deal_room_stage || d.deal_room_stage === 1),
+        stage2: (platformDocs as any[]).filter((d) => d.deal_room_stage === 2),
+      }
+    : { stage1: platformDocs as any[], stage2: [] };
 
   // Founder sees investor docs marked shared; investor sees all their own
   const visibleInvestorDocs = isFounder
@@ -1912,6 +2077,88 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
               {(platformDocs as any[]).length} structured
             </span>
           </div>
+          {/* Stage 2 gate — investor only */}
+          {isInvestor && <Stage2Gate stage2Unlocked={stage2Unlocked} />}
+          {/* Stage 1 docs */}
+          {isInvestor && platformDocsSplit.stage1.length > 0 && (
+            <div className="mb-2">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 font-semibold">Stage 1 — Initial review</div>
+              <div className="space-y-2">
+                {platformDocsSplit.stage1.map((doc: any) => (
+                  <div key={doc.id}
+                    className="flex items-center justify-between p-4 rounded-xl border border-white/8 bg-white/[0.02] hover:bg-white/5 transition-colors">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 rounded-lg bg-[#7C3AED]/15 flex items-center justify-center text-[#7C3AED] text-sm shrink-0">≡</div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{doc.title}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {doc.document_templates?.category
+                            ? doc.document_templates.category.charAt(0).toUpperCase() + doc.document_templates.category.slice(1)
+                            : "Document"}
+                          {" · "}Updated {formatRelativeTime(doc.updated_at)}
+                          {doc.completeness_score > 0 && <> · {doc.completeness_score}% complete</>}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <span className={cn("text-xs px-2 py-0.5 rounded-full", doc.status === "complete" ? "bg-green-500/15 text-green-400" : "bg-amber-500/15 text-amber-400")}>
+                        {doc.status === "complete" ? "✓ Complete" : "In progress"}
+                      </span>
+                      <button
+                        onClick={() => {
+                          setViewingDoc(doc);
+                          trackDocumentView({ founderDocumentId: doc.id });
+                        }}
+                        className="text-xs px-3 py-1.5 rounded-lg bg-[#7C3AED]/15 text-[#7C3AED] hover:bg-[#7C3AED]/25 transition-colors">
+                        View
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {/* Stage 2 docs — gated */}
+          {isInvestor && platformDocsSplit.stage2.length > 0 && stage2Unlocked && (
+            <div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 font-semibold">Stage 2 — Full diligence</div>
+              <div className="space-y-2">
+                {platformDocsSplit.stage2.map((doc: any) => (
+                  <div key={doc.id}
+                    className="flex items-center justify-between p-4 rounded-xl border border-white/8 bg-white/[0.02] hover:bg-white/5 transition-colors">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 rounded-lg bg-[#7C3AED]/15 flex items-center justify-center text-[#7C3AED] text-sm shrink-0">≡</div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{doc.title}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {doc.document_templates?.category
+                            ? doc.document_templates.category.charAt(0).toUpperCase() + doc.document_templates.category.slice(1)
+                            : "Document"}
+                          {" · "}Updated {formatRelativeTime(doc.updated_at)}
+                          {doc.completeness_score > 0 && <> · {doc.completeness_score}% complete</>}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <span className={cn("text-xs px-2 py-0.5 rounded-full", doc.status === "complete" ? "bg-green-500/15 text-green-400" : "bg-amber-500/15 text-amber-400")}>
+                        {doc.status === "complete" ? "✓ Complete" : "In progress"}
+                      </span>
+                      <button
+                        onClick={() => {
+                          setViewingDoc(doc);
+                          trackDocumentView({ founderDocumentId: doc.id });
+                        }}
+                        className="text-xs px-3 py-1.5 rounded-lg bg-[#7C3AED]/15 text-[#7C3AED] hover:bg-[#7C3AED]/25 transition-colors">
+                        View
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {/* Founder view (not split, no gate) */}
+          {!isInvestor && (
           <div className="space-y-2">
             {(platformDocs as any[]).map((doc: any) => (
               <div key={doc.id}
@@ -1926,6 +2173,10 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                         : "Document"}
                       {" · "}Updated {formatRelativeTime(doc.updated_at)}
                       {doc.completeness_score > 0 && <> · {doc.completeness_score}% complete</>}
+                      {" · "}
+                      <span className="font-medium text-[#7C3AED]">
+                        Stage {(doc.deal_room_stage ?? 1) === 2 ? "2 — Full diligence" : "1 — Initial review"}
+                      </span>
                     </p>
                   </div>
                 </div>
@@ -1945,6 +2196,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
               </div>
             ))}
           </div>
+          )}
         </div>
       )}
 
@@ -1977,6 +2229,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
           </div>
           <Dropzone
             dealRoomId={dealRoomId}
+            activeDocTab={activeDocTab !== "All" ? activeDocTab : undefined}
             onUploadComplete={(fileName) => {
               queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
               if (fileName && userId) {
@@ -3136,723 +3389,6 @@ function Timeline({ dealRoomId }: { dealRoomId: string }) {
   );
 }
 
-function MeetingsTab({ dealRoomId, userId }: { dealRoomId: string; userId: string | undefined }) {
-  const queryClient = useQueryClient();
-  const [showForm, setShowForm] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [f, setF] = useState({ title: "", scheduledAt: "", meetingLink: "", notes: "" });
-  const set = (k: keyof typeof f, v: string) => setF((s) => ({ ...s, [k]: v }));
-
-  const { data: meetings = [], isLoading, isError } = useQuery({
-    queryKey: ["meetings", dealRoomId],
-    enabled: !!userId,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("meetings")
-        .select("*")
-        .eq("deal_room_id", dealRoomId)
-        .order("scheduled_at", { ascending: true });
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!f.title || !f.scheduledAt || !userId) return;
-    setSaving(true);
-    try {
-      const { error } = await supabase.from("meetings").insert({
-        deal_room_id: dealRoomId,
-        title: f.title,
-        scheduled_at: new Date(f.scheduledAt).toISOString(),
-        meeting_link: f.meetingLink || null,
-        notes: f.notes || null,
-        created_by: userId,
-      });
-      if (error) throw error;
-      await logActivity(dealRoomId, userId, "Scheduled a meeting", { title: f.title });
-      queryClient.invalidateQueries({ queryKey: ["meetings", dealRoomId] });
-      queryClient.invalidateQueries({ queryKey: ["activities-overview", dealRoomId] });
-      setF({ title: "", scheduledAt: "", meetingLink: "", notes: "" });
-      setShowForm(false);
-      toast.success("Meeting scheduled");
-      if (userId) {
-        triggerMeetingEmail({
-          data: {
-            dealRoomId,
-            organizerUserId: userId,
-            meetingTitle: f.title,
-            meetingDate: new Date(f.scheduledAt).toLocaleString("en-US", { dateStyle: "full", timeStyle: "short" }),
-            meetingLink: f.meetingLink || undefined,
-          },
-        }).catch(() => {});
-      }
-    } catch (err) {
-      console.error("Failed to schedule meeting:", err);
-      toast.error("Failed to schedule meeting — check console for details");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const now = new Date();
-  const upcoming = (meetings as any[]).filter((m) => new Date(m.scheduled_at) >= now);
-  const past = (meetings as any[]).filter((m) => new Date(m.scheduled_at) < now);
-
-  return (
-    <div className="p-8 max-w-3xl mx-auto">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold tracking-tight">Meetings</h2>
-        <button onClick={() => setShowForm((v) => !v)} className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow">
-          <Plus className="h-4 w-4" /> Schedule meeting
-        </button>
-      </div>
-
-      {showForm && (
-        <form onSubmit={submit} className="mt-5 rounded-xl border border-border/60 bg-card p-5 shadow-card space-y-3">
-          <div>
-            <label className="text-xs text-muted-foreground">Title *</label>
-            <input required value={f.title} onChange={(e) => set("title", e.target.value)} className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm" />
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground">Date &amp; Time *</label>
-            <input type="datetime-local" required value={f.scheduledAt} onChange={(e) => set("scheduledAt", e.target.value)} className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm" />
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground">Meeting link</label>
-            <input type="url" value={f.meetingLink} onChange={(e) => set("meetingLink", e.target.value)} placeholder="Zoom / Google Meet / Teams link" className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm" />
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground">Notes</label>
-            <textarea value={f.notes} onChange={(e) => set("notes", e.target.value)} rows={2} className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm" />
-          </div>
-          <div className="flex justify-end gap-2 pt-1">
-            <button type="button" onClick={() => setShowForm(false)} className="rounded-md border border-border/60 px-3 py-1.5 text-sm">Cancel</button>
-            <button type="submit" disabled={!f.title || !f.scheduledAt || saving} className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm disabled:opacity-50">
-              {saving && <Loader2 className="h-3 w-3 animate-spin" />}
-              Add meeting
-            </button>
-          </div>
-        </form>
-      )}
-
-      {isError && <p className="mt-4 text-sm text-destructive">Could not load data. Please refresh.</p>}
-      {isLoading && <div className="mt-4 text-sm text-muted-foreground animate-pulse">Loading…</div>}
-
-      {upcoming.length > 0 && (
-        <>
-          <div className="mt-6 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Upcoming</div>
-          <div className="mt-2 space-y-3">{upcoming.map((m: any) => <MeetingCard key={m.id} m={m} />)}</div>
-        </>
-      )}
-      {past.length > 0 && (
-        <>
-          <div className="mt-6 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Past</div>
-          <div className="mt-2 space-y-3 opacity-60">{past.map((m: any) => <MeetingCard key={m.id} m={m} />)}</div>
-        </>
-      )}
-      {!isLoading && meetings.length === 0 && !showForm && (
-        <p className="mt-6 text-sm text-muted-foreground">No meetings scheduled yet.</p>
-      )}
-    </div>
-  );
-}
-
-function MeetingCard({ m }: { m: any }) {
-  return (
-    <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-      <div className="flex items-center justify-between gap-4">
-        <div className="text-sm font-semibold">{m.title}</div>
-        <span className="text-xs text-muted-foreground shrink-0">{format(new Date(m.scheduled_at), "EEE, d MMM · h:mm a")}</span>
-      </div>
-      {m.notes && <div className="mt-1 text-sm text-muted-foreground">{m.notes}</div>}
-      {m.meeting_link && (
-        <a href={m.meeting_link} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-xs hover:bg-brand/10">
-          <ExternalLink className="h-3 w-3" /> Join meeting
-        </a>
-      )}
-    </div>
-  );
-}
-
-// ── Investor Decision Tab ─────────────────────────────────────────
-function InvestorDecisionTab({ dealRoomId, userId }: { dealRoomId: string; userId?: string }) {
-  const queryClient = useQueryClient();
-  // ── Closer state ──────────────────────────────────────────────────
-  const [selectedDecision, setSelectedDecision] = useState<"invest" | "hold" | "pass" | null>(null);
-  const [decisionReason, setDecisionReason] = useState("");
-  const [followUpDate, setFollowUpDate] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [closerError, setCloserError] = useState<string | null>(null);
-  const [showChangeDecision, setShowChangeDecision] = useState(false);
-  const [showTermSheet, setShowTermSheet] = useState(false);
-  const [termSheet, setTermSheet] = useState({
-    investment_amount: "", valuation_pre_money: "", instrument: "safe",
-    board_seat: false, pro_rata_rights: false, information_rights: true, notes: "",
-  });
-  const [savingTermSheet, setSavingTermSheet] = useState(false);
-
-  // ── Room query (for decision columns) ────────────────────────────
-  const { data: roomData, refetch: refetchRoom } = useQuery({
-    queryKey: ["closer-room", dealRoomId],
-    enabled: !!userId,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("deal_rooms")
-        .select("id, status, decision, decision_reason, decision_at, follow_up_date, startup_id")
-        .eq("id", dealRoomId)
-        .single();
-      return data as any;
-    },
-  });
-
-  const existingDecision = roomData?.decision as string | null;
-
-  // Auto-calc equity
-  const equityPct = termSheet.investment_amount && termSheet.valuation_pre_money
-    ? ((Number(termSheet.investment_amount) / (Number(termSheet.valuation_pre_money) + Number(termSheet.investment_amount))) * 100).toFixed(2)
-    : "";
-
-  async function handleRecordDecision() {
-    if (!selectedDecision) { setCloserError("Select a decision."); return; }
-    if (decisionReason.trim().length < 20) { setCloserError("Please provide a specific reason (at least 20 characters)."); return; }
-    if (selectedDecision === "hold" && !followUpDate) { setCloserError("Please set a follow-up date for Hold decisions."); return; }
-    setIsSubmitting(true);
-    setCloserError(null);
-    try {
-      const { error } = await supabase.from("deal_rooms").update({
-        decision: selectedDecision,
-        decision_reason: decisionReason.trim(),
-        decision_at: new Date().toISOString(),
-        follow_up_date: followUpDate || null,
-        status: selectedDecision === "pass" ? "closed" : selectedDecision === "invest" ? "closing" : "active",
-        closed_at: selectedDecision === "pass" ? new Date().toISOString() : null,
-      }).eq("id", dealRoomId);
-      if (error) { setCloserError("Failed to record decision. Try again."); setIsSubmitting(false); return; }
-
-      // Notify founder
-      if (roomData?.startup_id) {
-        const { data: startup } = await supabase.from("startups").select("founder_id").eq("id", roomData.startup_id).maybeSingle();
-        if (startup?.founder_id) {
-          await supabase.from("notifications").insert({
-            user_id: startup.founder_id,
-            kind: "deal",
-            title: selectedDecision === "invest" ? "Investment interest recorded" : selectedDecision === "hold" ? "Investor has put your deal on hold" : "Investor decision recorded",
-            body: selectedDecision === "pass"
-              ? `The investor passed on your deal. Their reason: "${decisionReason.substring(0, 100)}"`
-              : selectedDecision === "hold"
-              ? `The investor is holding the decision until ${followUpDate}. Their note: "${decisionReason.substring(0, 100)}"`
-              : `An investor wants to proceed. Check your deal room for next steps.`,
-            read: false,
-            action_url: "/app/deal-rooms",
-          });
-        }
-      }
-
-      if (selectedDecision === "invest") setShowTermSheet(true);
-      refetchRoom();
-      queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
-      toast.success("Decision recorded");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
-  async function saveTermSheet() {
-    setSavingTermSheet(true);
-    try {
-      const { data: startup } = await supabase.from("startups").select("founder_id").eq("id", roomData?.startup_id).maybeSingle();
-      await supabase.from("term_sheets").insert({
-        deal_room_id: dealRoomId,
-        startup_id: roomData?.startup_id,
-        investor_id: userId,
-        investment_amount: Number(termSheet.investment_amount) || null,
-        valuation_pre_money: Number(termSheet.valuation_pre_money) || null,
-        equity_percentage: Number(equityPct) || null,
-        instrument: termSheet.instrument,
-        board_seat: termSheet.board_seat,
-        pro_rata_rights: termSheet.pro_rata_rights,
-        information_rights: termSheet.information_rights,
-        notes: termSheet.notes || null,
-        status: "draft",
-      });
-      if (startup?.founder_id) {
-        await supabase.from("notifications").insert({
-          user_id: startup.founder_id,
-          kind: "deal",
-          title: "Term sheet created",
-          body: "An investor has created a term sheet for your deal room. Review it now.",
-          read: false,
-          action_url: "/app/deal-rooms",
-        });
-      }
-      setShowTermSheet(false);
-      toast.success("Term sheet saved");
-    } finally {
-      setSavingTermSheet(false);
-    }
-  }
-
-  // ── Legacy assessment state ───────────────────────────────────────
-  const [saving, setSaving] = useState(false);
-  const [savingAssessment, setSavingAssessment] = useState(false);
-  const [notes, setNotes] = useState("");
-  const [scores, setScores] = useState<Record<string, number>>({
-    team: 0, market: 0, product: 0, traction: 0, deal_terms: 0, overall_fit: 0,
-  });
-  const [loaded, setLoaded] = useState(false);
-
-  const { data: decisionData } = useQuery({
-    queryKey: ["investor-decision-tab", dealRoomId],
-    enabled: !!userId,
-    queryFn: async () => {
-      const { data } = await supabase.from("deal_rooms").select("investor_decision, investor_scores, investor_notes").eq("id", dealRoomId).single();
-      return data;
-    },
-  });
-
-  useEffect(() => {
-    if (decisionData && !loaded) {
-      setNotes((decisionData as any).investor_notes ?? "");
-      if ((decisionData as any).investor_scores) setScores((s) => ({ ...s, ...((decisionData as any).investor_scores as Record<string, number>) }));
-      setLoaded(true);
-    }
-  }, [decisionData, loaded]);
-
-  const handleSaveAssessment = async () => {
-    setSavingAssessment(true);
-    try {
-      await supabase.from("deal_rooms").update({ investor_notes: notes, investor_scores: scores }).eq("id", dealRoomId);
-      await queryClient.invalidateQueries({ queryKey: ["investor-decision-tab", dealRoomId] });
-      toast.success("Assessment saved");
-    } finally { setSavingAssessment(false); }
-  };
-
-  const setScore = (key: string, val: number) => setScores((s) => ({ ...s, [key]: val }));
-
-  const scoreCategories = [
-    { key: "team", label: "Team" },
-    { key: "market", label: "Market" },
-    { key: "product", label: "Product" },
-    { key: "traction", label: "Traction" },
-    { key: "deal_terms", label: "Deal terms" },
-    { key: "overall_fit", label: "Overall fit" },
-  ];
-
-  const inputCls = "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#7C3AED]/60";
-
-  return (
-    <div className="p-8 max-w-2xl mx-auto space-y-6">
-
-      {/* ── Decision banner (after decision recorded) ─────────────── */}
-      {existingDecision === "invest" && !showChangeDecision && (
-        <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20">
-          <p className="text-green-400 font-semibold text-sm">✓ Investment interest recorded</p>
-          <p className="text-white/60 text-sm mt-1">Your reason: {roomData?.decision_reason}</p>
-          <button onClick={() => setShowTermSheet(true)} className="mt-3 px-4 py-2 bg-[#7C3AED] text-white text-sm rounded-lg hover:bg-[#6d28d9] transition-colors">
-            Create term sheet →
-          </button>
-          <button onClick={() => setShowChangeDecision(true)} className="mt-2 block text-xs text-white/30 hover:text-white/60">Change decision →</button>
-        </div>
-      )}
-      {existingDecision === "hold" && !showChangeDecision && (
-        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
-          <p className="text-amber-400 font-semibold text-sm">⏸ On hold until {roomData?.follow_up_date}</p>
-          <p className="text-white/60 text-sm mt-1">Your reason: {roomData?.decision_reason}</p>
-          <button onClick={() => setShowChangeDecision(true)} className="mt-3 text-xs text-white/40 hover:text-white/70">Change decision →</button>
-        </div>
-      )}
-      {existingDecision === "pass" && !showChangeDecision && (
-        <div className="p-4 rounded-xl bg-white/5 border border-white/8">
-          <p className="text-white/50 font-semibold text-sm">✗ Passed</p>
-          <p className="text-white/40 text-sm mt-1">Your reason was shared with the founder: "{roomData?.decision_reason}"</p>
-        </div>
-      )}
-
-      {/* ── Decision panel (no decision yet, or changing) ─────────── */}
-      {(!existingDecision || showChangeDecision) && (
-        <div className="rounded-xl border border-white/10 bg-[#111118] p-6">
-          <h2 className="text-base font-bold text-white" style={{ fontFamily: "Syne, sans-serif" }}>Record your decision</h2>
-          <p className="text-xs text-white/40 mt-1">Founders receive your stated reason.</p>
-
-          <div className="mt-5 grid grid-cols-3 gap-3">
-            {(["invest", "hold", "pass"] as const).map((key) => {
-              const cfg = {
-                invest: { label: "Invest", icon: "✓", base: "bg-green-500/20 text-green-400 border-green-500/40", active: "bg-green-500/40 border-green-400" },
-                hold:   { label: "Hold",   icon: "⏸", base: "bg-amber-500/20 text-amber-400 border-amber-500/40", active: "bg-amber-500/40 border-amber-400" },
-                pass:   { label: "Pass",   icon: "✗", base: "bg-red-500/20 text-red-400 border-red-500/40",     active: "bg-red-500/40 border-red-400" },
-              }[key];
-              return (
-                <button key={key} onClick={() => setSelectedDecision(key)}
-                  className={cn("rounded-xl border px-4 py-4 text-sm font-medium transition-all flex flex-col items-center gap-1.5",
-                    selectedDecision === key ? cfg.active : cfg.base)}>
-                  <span className="text-lg">{cfg.icon}</span>
-                  <span>{cfg.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {selectedDecision === "hold" && (
-            <div className="mt-4">
-              <label className="text-xs text-white/40 uppercase tracking-wider block mb-1">Follow-up date *</label>
-              <input type="date" value={followUpDate} onChange={(e) => setFollowUpDate(e.target.value)}
-                min={new Date().toISOString().split("T")[0]}
-                className={inputCls} />
-              <p className="text-xs text-white/30 mt-1">We'll remind you on this date to revisit the deal.</p>
-            </div>
-          )}
-
-          <div className="mt-4">
-            <label className="text-xs text-white/40 uppercase tracking-wider block mb-1">Reason (required) *</label>
-            <textarea value={decisionReason} onChange={(e) => setDecisionReason(e.target.value)} rows={3}
-              placeholder="Be specific. Founders deserve to know why."
-              className={cn(inputCls, "resize-none")} />
-            <p className="text-[10px] text-white/30 mt-0.5">{decisionReason.length}/20 min characters</p>
-          </div>
-
-          {closerError && <p className="mt-2 text-xs text-red-400">{closerError}</p>}
-
-          <div className="mt-4 flex items-center gap-3">
-            <button onClick={handleRecordDecision} disabled={isSubmitting}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#7C3AED] text-white text-sm font-medium hover:bg-[#6d28d9] disabled:opacity-50 transition-colors">
-              {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-              Record decision
-            </button>
-            {showChangeDecision && (
-              <button onClick={() => setShowChangeDecision(false)} className="text-sm text-white/40 hover:text-white/70">Cancel</button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── Term sheet modal ──────────────────────────────────────── */}
-      {showTermSheet && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onClick={() => setShowTermSheet(false)}>
-          <div className="bg-[#111118] border border-white/10 rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-6 border-b border-white/8">
-              <div>
-                <h2 className="text-base font-bold text-white" style={{ fontFamily: "Syne, sans-serif" }}>Term Sheet</h2>
-                <p className="text-xs text-white/40 mt-0.5">A lightweight summary of proposed terms</p>
-              </div>
-              <button onClick={() => setShowTermSheet(false)} className="text-white/40 hover:text-white text-xl">×</button>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="text-xs text-white/40 uppercase tracking-wider block mb-1">Investment amount (USD)</label>
-                <input type="number" value={termSheet.investment_amount}
-                  onChange={(e) => setTermSheet((t) => ({ ...t, investment_amount: e.target.value }))}
-                  placeholder="500000" className={inputCls} />
-              </div>
-              <div>
-                <label className="text-xs text-white/40 uppercase tracking-wider block mb-1">Pre-money valuation (USD)</label>
-                <input type="number" value={termSheet.valuation_pre_money}
-                  onChange={(e) => setTermSheet((t) => ({ ...t, valuation_pre_money: e.target.value }))}
-                  placeholder="5000000" className={inputCls} />
-              </div>
-              {equityPct && (
-                <div className="px-3 py-2 rounded-lg bg-[#7C3AED]/10 border border-[#7C3AED]/20">
-                  <p className="text-xs text-[#7C3AED]">Equity: <span className="font-bold">{equityPct}%</span> (auto-calculated)</p>
-                </div>
-              )}
-              <div>
-                <label className="text-xs text-white/40 uppercase tracking-wider block mb-1">Instrument</label>
-                <select value={termSheet.instrument} onChange={(e) => setTermSheet((t) => ({ ...t, instrument: e.target.value }))}
-                  className={inputCls}>
-                  <option value="safe">SAFE</option>
-                  <option value="convertible_note">Convertible Note</option>
-                  <option value="equity">Equity</option>
-                  <option value="priced">Priced Round</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs text-white/40 uppercase tracking-wider block">Rights</label>
-                {([
-                  { key: "information_rights", label: "Information rights" },
-                  { key: "board_seat", label: "Board seat" },
-                  { key: "pro_rata_rights", label: "Pro-rata rights" },
-                ] as const).map(({ key, label }) => (
-                  <label key={key} className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={termSheet[key]}
-                      onChange={(e) => setTermSheet((t) => ({ ...t, [key]: e.target.checked }))}
-                      className="accent-[#7C3AED]" />
-                    <span className="text-sm text-white/70">{label}</span>
-                  </label>
-                ))}
-              </div>
-              <div>
-                <label className="text-xs text-white/40 uppercase tracking-wider block mb-1">Notes / conditions</label>
-                <textarea value={termSheet.notes} onChange={(e) => setTermSheet((t) => ({ ...t, notes: e.target.value }))}
-                  rows={3} placeholder="Any conditions or special terms…"
-                  className={cn(inputCls, "resize-none")} />
-              </div>
-            </div>
-            <div className="flex items-center justify-end gap-3 px-6 pb-2">
-              <button onClick={() => setShowTermSheet(false)} className="px-4 py-2 text-sm rounded-lg border border-white/10 text-white/60 hover:text-white hover:bg-white/5">Cancel</button>
-              <button onClick={saveTermSheet} disabled={savingTermSheet}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-[#7C3AED] text-white hover:bg-[#6d28d9] disabled:opacity-50 transition-colors">
-                {savingTermSheet && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                Save term sheet
-              </button>
-            </div>
-            <div className="px-6 pb-6">
-              <div className="flex items-center gap-3 mt-4">
-                <div className="flex-1 h-px bg-white/10" />
-                <span className="text-xs text-white/30">or</span>
-                <div className="flex-1 h-px bg-white/10" />
-              </div>
-              <input type="file" id="ts-upload" className="hidden" accept=".pdf,.docx,.doc"
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (!file || !(room as any)?.startup_id) return;
-                  const path = `term-sheets/${dealRoomId}/${file.name}`;
-                  const { error } = await supabase.storage
-                    .from("documents").upload(path, file, { upsert: true });
-                  if (!error) {
-                    await supabase.from("term_sheets").upsert({
-                      deal_room_id: dealRoomId,
-                      startup_id: (room as any).startup_id,
-                      investor_id: user?.id,
-                      status: "draft",
-                      notes: `Uploaded: ${file.name}`,
-                    }, { onConflict: "deal_room_id" });
-                    setShowTermSheet(false);
-                    queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
-                  }
-                }}
-              />
-              <button onClick={() => document.getElementById("ts-upload")?.click()}
-                className="mt-3 w-full py-2.5 border border-white/15 rounded-lg text-sm text-white/50 hover:text-white/80 hover:border-white/30 transition-colors">
-                Upload term sheet (PDF or Word)
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <h2 className="text-xl font-semibold tracking-tight">Investment Decision</h2>
-      <p className="-mt-4 text-sm text-muted-foreground">Your confidential assessment of this deal</p>
-
-      {/* Scoring */}
-      <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-        <div className="text-sm font-semibold mb-4">Scoring</div>
-        <div className="space-y-4">
-          {scoreCategories.map(({ key, label }) => (
-            <div key={key} className="flex items-center gap-4">
-              <div className="w-24 text-sm text-muted-foreground shrink-0">{label}</div>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    onClick={() => setScore(key, star)}
-                    className={cn(
-                      "text-xl leading-none transition-colors hover:text-warning",
-                      star <= (scores[key] ?? 0) ? "text-warning" : "text-muted-foreground/25",
-                    )}
-                  >
-                    ★
-                  </button>
-                ))}
-              </div>
-              <span className="ml-auto text-xs text-muted-foreground shrink-0">
-                {scores[key] ? `${scores[key]}/5` : "—"}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Notes */}
-      <div className="mt-5">
-        <div className="text-sm font-semibold mb-2">Decision notes</div>
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="Your private notes about this investment decision…"
-          rows={5}
-          className="w-full rounded-xl border border-border/60 bg-background px-4 py-3 text-sm resize-none focus:outline-none focus:border-brand/50"
-        />
-      </div>
-
-      <button
-        onClick={handleSaveAssessment}
-        disabled={savingAssessment}
-        className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-50"
-      >
-        {savingAssessment && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-        Save assessment
-      </button>
-    </div>
-  );
-}
-
-function Decision({ isInvestor, dealRoomId, userId, queryClient }: { isInvestor: boolean; dealRoomId: string; userId?: string; queryClient: ReturnType<typeof useQueryClient> }) {
-  const { data: existingDecision, isLoading: decisionLoading } = useQuery({
-    queryKey: ["decision", dealRoomId],
-    enabled: !!userId,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("decisions")
-        .select("*, users(full_name)")
-        .eq("deal_room_id", dealRoomId)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      return data ?? null;
-    },
-  });
-
-  const [editing, setEditing] = useState(false);
-  const [status, setStatus] = useState<"accepted" | "hold" | "pass" | null>(null);
-  const [risk, setRisk] = useState<"low" | "medium" | "high">("low");
-  const [notes, setNotes] = useState("");
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    if (existingDecision) {
-      setStatus(existingDecision.status as "accepted" | "hold" | "pass");
-      setRisk((existingDecision.risk_level as "low" | "medium" | "high") ?? "low");
-      setNotes(existingDecision.notes ?? "");
-    }
-  }, [existingDecision]);
-
-  const showForm = editing || (!decisionLoading && !existingDecision);
-
-  const save = async (submit = false) => {
-    if (!userId || !status) return;
-    setSaving(true);
-    await supabase.from("decisions").insert({
-      deal_room_id: dealRoomId,
-      decided_by: userId,
-      status,
-      risk_level: risk,
-      notes,
-    });
-    if (submit) {
-      await logActivity(dealRoomId, userId, `Submitted a decision: ${status}`);
-      toast.success("Decision saved");
-    }
-    queryClient.invalidateQueries({ queryKey: ["decision", dealRoomId] });
-    queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
-    setEditing(false);
-    setSaving(false);
-  };
-
-  if (!isInvestor) {
-    return (
-      <div className="p-8 max-w-3xl mx-auto">
-        <h2 className="text-xl font-semibold tracking-tight">Investor decisions</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Real-time view of where each investor stands.</p>
-        <div className="mt-6 rounded-xl border border-border/60 bg-card shadow-card divide-y divide-border/60">
-          {[
-            ["Investor A", "Reviewing", "warning", "Awaiting partner meeting"],
-            ["Investor B", "Requested info", "brand", "Asked for Q4 cohort details"],
-            ["Investor C", "Accepted", "success", "Ready to sign term sheet"],
-          ].map(([n, s, c, note]: any) => (
-            <div key={n} className="flex items-center gap-4 px-5 py-4">
-              <div className="grid h-9 w-9 place-items-center rounded-full bg-accent text-xs font-semibold">{n.split(" ").map((x: string) => x[0]).join("")}</div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium">{n}</div>
-                <div className="text-xs text-muted-foreground">{note}</div>
-              </div>
-              <span className={`text-xs px-2 py-1 rounded-md bg-${c}/10 text-${c}`}>{s}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  const statusMeta: Record<string, { label: string; color: string }> = {
-    accepted: { label: "Accept", color: "success" },
-    hold: { label: "Request info", color: "warning" },
-    pass: { label: "Pass", color: "destructive" },
-  };
-
-  return (
-    <div className="p-8 max-w-3xl mx-auto">
-      <h2 className="text-xl font-semibold tracking-tight">Your decision</h2>
-      <p className="mt-1 text-sm text-muted-foreground">One-click. Founder is notified immediately.</p>
-
-      {existingDecision && !editing && (
-        <div className="mt-6 rounded-2xl border border-border/60 bg-card p-6 shadow-card">
-          <div className="flex items-center justify-between">
-            <div className="text-sm font-semibold">Current decision</div>
-            <button onClick={() => setEditing(true)} className="text-xs text-brand hover:underline">Update decision</button>
-          </div>
-          <div className="mt-3 flex items-center gap-3 flex-wrap">
-            {existingDecision.status && (
-              <span className={`text-xs px-2 py-1 rounded-md bg-${statusMeta[existingDecision.status]?.color}/10 text-${statusMeta[existingDecision.status]?.color}`}>
-                {statusMeta[existingDecision.status]?.label}
-              </span>
-            )}
-            <span className="text-xs text-muted-foreground capitalize">Risk: {existingDecision.risk_level}</span>
-            <span className="text-xs text-muted-foreground">
-              {existingDecision.users?.full_name ?? "You"} · {formatDistanceToNow(new Date(existingDecision.created_at), { addSuffix: true })}
-            </span>
-          </div>
-          {existingDecision.notes && <p className="mt-3 text-sm text-muted-foreground">{existingDecision.notes}</p>}
-        </div>
-      )}
-
-      {showForm && (
-        <>
-          <div className="mt-6 grid grid-cols-3 gap-3">
-            {([
-              ["accept", "Accept", "Move to term sheet", ThumbsUp, "success"],
-              ["hold", "Request info", "Ask for more diligence", HelpCircle, "warning"],
-              ["pass", "Pass", "Decline this round", ThumbsDown, "destructive"],
-            ] as const).map(([k, l, sub, I, c]) => (
-              <button
-                key={k}
-                onClick={() => setStatus(k)}
-                className={cn("rounded-xl border-2 p-5 text-left transition-colors", status === k ? `border-${c} bg-${c}/5` : "border-border/60 hover:border-border")}
-              >
-                <I className={`h-5 w-5 text-${c}`} />
-                <div className="mt-3 text-sm font-semibold">{l}</div>
-                <div className="text-xs text-muted-foreground">{sub}</div>
-              </button>
-            ))}
-          </div>
-
-          <div className="mt-6 rounded-2xl border border-border/60 bg-card p-6 shadow-card">
-            <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Risk level</div>
-            <div className="mt-3 flex gap-2">
-              {(["low", "medium", "high"] as const).map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setRisk(r)}
-                  className={cn("flex-1 rounded-md border px-3 py-2 text-sm capitalize", risk === r ? "border-success bg-success/10 text-success" : "border-border/60 hover:bg-accent")}
-                >{r}</button>
-              ))}
-            </div>
-            <div className="mt-6 text-xs uppercase tracking-wider text-muted-foreground font-semibold">Partner notes (private)</div>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Add your investment thesis notes…"
-              className="mt-3 w-full min-h-[120px] rounded-md border border-border/60 bg-background p-3 text-sm focus:outline-none focus:border-brand/50"
-            />
-            <div className="mt-5 flex justify-end gap-2">
-              {editing && <button onClick={() => setEditing(false)} className="rounded-md border border-border/60 px-4 py-2 text-sm hover:bg-accent">Cancel</button>}
-              <button onClick={() => save(false)} disabled={saving} className="rounded-md border border-border/60 px-4 py-2 text-sm hover:bg-accent disabled:opacity-50">Save draft</button>
-              <button onClick={() => save(true)} disabled={!status || saving} className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-50">
-                {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                Submit decision
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
-// ── Structured Q&A + live discussion ──────────────────────────────
 function QA({
   dealRoomId,
   userId,

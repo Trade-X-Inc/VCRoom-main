@@ -4,8 +4,15 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Building2, Globe, Users, Upload, Pencil, Trash2, Plus, X, Loader2, Check,
   Eye, Edit3, Download, Zap, AlignLeft, AlertTriangle, Copy, Sparkles, BarChart3,
-  Shield, Briefcase, TrendingUp, DollarSign,
+  Shield, Briefcase, TrendingUp, DollarSign, CheckCircle2, XCircle,
+  Clock, Linkedin, Twitter, Instagram, Target, Save, RefreshCw,
 } from "lucide-react";
+import type { StartupClaim, ClaimStatus } from "@/lib/claims-fn";
+import type { FounderThesis } from "@/lib/founder-thesis-fn";
+import { AttachProofModal } from "@/components/app/AttachProofModal";
+import { OperationalVerificationSection } from "./app.profile.operational";
+import { PageGuide } from "@/components/app/PageGuide";
+import { FieldVerificationBadge, prewarmClassificationCache } from "@/components/app/FieldVerificationBadge";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -195,6 +202,26 @@ function Profile() {
   const [showExtractionPreview, setShowExtractionPreview] = useState(false);
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
   const [runningRegistryCheck, setRunningRegistryCheck] = useState(false);
+  // Attach-proof modal state
+  const [attachingClaim, setAttachingClaim] = useState<{ type: string; label: string; value: string } | null>(null);
+  const [attachingFile, setAttachingFile] = useState<File | null>(null);
+  const [attachingRunning, setAttachingRunning] = useState(false);
+
+  // Founder thesis state
+  const [thesisForm, setThesisForm] = useState({
+    preferred_check_size_min: "",
+    preferred_check_size_max: "",
+    preferred_investor_type: "",
+    board_preference: "",
+    sector_expertise_wanted: "",
+    geography_preference: "",
+    exclusions: "",
+    what_good_fit_looks_like: "",
+  });
+  const [thesisInitialized, setThesisInitialized] = useState(false);
+  const [thesisSaving, setThesisSaving] = useState(false);
+  const [thesisSaved, setThesisSaved] = useState(false);
+  const [thesisProposing, setThesisProposing] = useState(false);
 
   const { data: startup, isLoading } = useQuery<StartupRow | null>({
     queryKey: ["my-startup", user?.id],
@@ -205,6 +232,128 @@ function Profile() {
       return data as StartupRow | null;
     },
   });
+
+  // Prewarm classification cache once per mount
+  useEffect(() => { prewarmClassificationCache(); }, []);
+
+  // ── Founder Tier 1 verification result ───────────────────────────────────
+  const { data: founderVerification } = useQuery({
+    queryKey: ["founder-verification", user?.id],
+    enabled: !!user?.id,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("founder_verifications")
+        .select("tier1_passed, tier1_score, verification_tier")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  const founderTier1Passed = founderVerification?.tier1_passed === true;
+
+  // ── Claims (quantitative field verification) ──────────────────────────────
+  const { data: claims = [], refetch: refetchClaims } = useQuery<StartupClaim[]>({
+    queryKey: ["startup-claims", startup?.id],
+    enabled: !!startup?.id,
+    staleTime: 30_000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("startup_claims")
+        .select("*")
+        .eq("startup_id", startup!.id);
+      return (data ?? []) as StartupClaim[];
+    },
+  });
+
+  const claimByType = (type: string): StartupClaim | undefined =>
+    claims.find((c) => c.claim_type === type);
+
+  // ── Founder thesis ────────────────────────────────────────────────────────
+  const { data: existingThesis } = useQuery<FounderThesis | null>({
+    queryKey: ["founder-thesis", startup?.id],
+    enabled: !!startup?.id,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { getFounderThesis } = await import("@/lib/founder-thesis-fn");
+      return getFounderThesis({ data: { startupId: startup!.id } });
+    },
+  });
+
+  // Populate thesis form once data arrives
+  if (existingThesis !== undefined && !thesisInitialized) {
+    setThesisInitialized(true);
+    if (existingThesis) {
+      setThesisForm({
+        preferred_check_size_min: existingThesis.preferred_check_size_min ?? "",
+        preferred_check_size_max: existingThesis.preferred_check_size_max ?? "",
+        preferred_investor_type: existingThesis.preferred_investor_type ?? "",
+        board_preference: existingThesis.board_preference ?? "",
+        sector_expertise_wanted: existingThesis.sector_expertise_wanted ?? "",
+        geography_preference: existingThesis.geography_preference ?? "",
+        exclusions: existingThesis.exclusions ?? "",
+        what_good_fit_looks_like: existingThesis.what_good_fit_looks_like ?? "",
+      });
+    }
+  }
+
+  const thesisField = (key: keyof typeof thesisForm) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setThesisForm((prev) => ({ ...prev, [key]: e.target.value }));
+
+  const handleThesisSave = async (status: "draft" | "complete") => {
+    if (!startup?.id) return;
+    setThesisSaving(true);
+    try {
+      const { upsertFounderThesis } = await import("@/lib/founder-thesis-fn");
+      const result = await upsertFounderThesis({ data: { startupId: startup.id, ...thesisForm, status } });
+      if (!result.ok) throw new Error(result.error ?? "Save failed");
+      setThesisSaved(true);
+      setTimeout(() => setThesisSaved(false), 3000);
+      toast.success(status === "complete" ? "Investor criteria saved" : "Draft saved");
+    } catch (err: any) {
+      toast.error(err.message || "Save failed");
+    } finally {
+      setThesisSaving(false);
+    }
+  };
+
+  const handleThesisAIPropose = async () => {
+    if (!startup?.id || thesisProposing) return;
+    setThesisProposing(true);
+    try {
+      const { proposeFounderThesis } = await import("@/lib/founder-thesis-fn");
+      const proposed = await proposeFounderThesis({
+        data: {
+          company_name: (form as any).company_name || startup.company_name || "",
+          sector: (form as any).sector || "",
+          stage: (form as any).stage || "",
+          problem: (form as any).problem || "",
+          solution: (form as any).solution || "",
+          revenue: (form as any).revenue || "",
+          traction: (form as any).traction || "",
+          country: (form as any).country || "",
+        },
+      });
+      if (!proposed.ok) { toast.error(proposed.error || "AI proposal failed"); return; }
+      setThesisForm((prev) => ({
+        preferred_check_size_min: proposed.preferred_check_size_min || prev.preferred_check_size_min,
+        preferred_check_size_max: proposed.preferred_check_size_max || prev.preferred_check_size_max,
+        preferred_investor_type: proposed.preferred_investor_type || prev.preferred_investor_type,
+        board_preference: proposed.board_preference || prev.board_preference,
+        sector_expertise_wanted: proposed.sector_expertise_wanted || prev.sector_expertise_wanted,
+        geography_preference: proposed.geography_preference || prev.geography_preference,
+        exclusions: proposed.exclusions || prev.exclusions,
+        what_good_fit_looks_like: proposed.what_good_fit_looks_like || prev.what_good_fit_looks_like,
+      }));
+      toast.success("AI suggestions applied — edit anything that's wrong before saving.");
+    } catch {
+      toast.error("AI proposal failed. Fill in the form manually.");
+    } finally {
+      setThesisProposing(false);
+    }
+  };
 
   const { data: registryCheck, refetch: refetchRegistryCheck } = useQuery({
     queryKey: ["registry-check", startup?.id],
@@ -409,14 +558,19 @@ function Profile() {
         .from("startups").select("id").eq("founder_id", user.id).maybeSingle();
 
       let error;
+      let newStartupId: string | null = null;
       if (existing?.id) {
         const { error: updateError } = await supabase
           .from("startups").update(payload).eq("id", existing.id);
         error = updateError;
       } else {
-        const { error: insertError } = await supabase
-          .from("startups").insert({ ...payload, founder_id: user.id, created_at: new Date().toISOString() });
+        const { data: inserted, error: insertError } = await supabase
+          .from("startups")
+          .insert({ ...payload, founder_id: user.id, created_at: new Date().toISOString() })
+          .select("id")
+          .single();
         error = insertError;
+        newStartupId = inserted?.id ?? null;
       }
 
       if (error) {
@@ -427,6 +581,59 @@ function Profile() {
         queryClient.invalidateQueries({ queryKey: ["my-startup-overview"] });
         queryClient.invalidateQueries({ queryKey: ["shell-startup", user.id] });
         setMode("view");
+
+        // Migrate localStorage skip flag to DB now that a startup row exists
+        if (newStartupId && typeof window !== "undefined" && localStorage.getItem("pb_skipped") === "1") {
+          supabase
+            .from("profile_builder_sessions")
+            .insert({ startup_id: newStartupId, status: "skipped", path: null })
+            .then(() => { localStorage.removeItem("pb_skipped"); })
+            .catch(() => null); // non-blocking, localStorage flag remains as fallback
+        }
+
+        // If founder arrived via an investor invite link, wire up the auto-add flow
+        if (newStartupId && typeof window !== "undefined") {
+          const pendingToken = sessionStorage.getItem("pending_investor_invite_token");
+          const pendingLinkId = sessionStorage.getItem("pending_investor_invite_link_id");
+          const pendingInvestorId = sessionStorage.getItem("pending_investor_id");
+          if (pendingToken && pendingLinkId && pendingInvestorId) {
+            import("@/lib/connections-fn").then(({ processInviteLinkJoin }) => {
+              processInviteLinkJoin({
+                data: {
+                  token: pendingToken,
+                  companyName: form.company_name || "Unknown company",
+                  investorId: pendingInvestorId,
+                  inviteLinkId: pendingLinkId,
+                },
+              }).then(() => {
+                sessionStorage.removeItem("pending_investor_invite_token");
+                sessionStorage.removeItem("pending_investor_invite_link_id");
+                sessionStorage.removeItem("pending_investor_id");
+              }).catch(() => null);
+            }).catch(() => null);
+          }
+        }
+
+        // Upsert claims for every quantitative field that has a value — fire-and-forget
+        const savedStartupId = existing?.id ?? newStartupId;
+        if (savedStartupId) {
+          const { upsertClaim } = await import("@/lib/claims-fn");
+          const quantFields: Array<{ type: string; label: string; value: string | null }> = [
+            { type: "revenue",        label: "Revenue / ARR",   value: form.revenue || null },
+            { type: "growth_rate",    label: "Growth Rate",     value: form.growth_rate || null },
+            { type: "customer_count", label: "Customers",       value: form.customer_count || null },
+            { type: "key_metric",     label: "Key Metric",      value: form.key_metric || null },
+            { type: "traction",       label: "Traction",        value: form.traction || null },
+          ];
+          for (const qf of quantFields) {
+            if (qf.value) {
+              upsertClaim({ data: { startup_id: savedStartupId, claim_type: qf.type, claim_label: qf.label, claim_value: qf.value } })
+                .catch(() => null);
+            }
+          }
+          // Refresh claims after a brief delay to let upserts settle
+          setTimeout(() => refetchClaims(), 1200);
+        }
       }
     } finally {
       setSaving(false);
@@ -642,6 +849,27 @@ function Profile() {
             <div>
               <h1 className="text-2xl font-semibold tracking-tight">Company Profile</h1>
               <p className="text-sm text-muted-foreground mt-0.5">How investors see your startup.</p>
+              {/* Part 3 — claims + cap table summary */}
+              {claims.length > 0 && (() => {
+                const confirmed = claims.filter((c) => c.proof_status === "ai_confirmed").length;
+                const mismatched = claims.filter((c) => c.proof_status === "ai_mismatch").length;
+                return (
+                  <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    <span
+                      className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full"
+                      style={mismatched > 0
+                        ? { background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", color: "#EF4444" }
+                        : confirmed === claims.length
+                        ? { background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }
+                        : { background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", color: "#F59E0B" }}
+                    >
+                      {mismatched > 0 ? <XCircle className="h-3 w-3" /> : confirmed === claims.length ? <CheckCircle2 className="h-3 w-3" /> : <AlertTriangle className="h-3 w-3" />}
+                      {confirmed}/{claims.length} claims verified
+                      {mismatched > 0 && ` · ${mismatched} mismatch${mismatched > 1 ? "es" : ""}`}
+                    </span>
+                  </div>
+                );
+              })()}
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -697,12 +925,35 @@ function Profile() {
             <div className="mt-4 rounded-xl border border-border/60 bg-card p-5 shadow-card print-card">
               <div className="text-sm font-semibold mb-3">Key details</div>
               <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2.5">
-                {pairs.map(([label, val]) => (
-                  <div key={label} className="flex items-center justify-between border-b border-border/40 pb-2">
-                    <span className="text-xs text-muted-foreground">{label}</span>
-                    <span className="text-sm font-medium">{val}</span>
-                  </div>
-                ))}
+                {pairs.map(([label, val]) => {
+                  // Map display label to claim_type
+                  const claimTypeMap: Record<string, string> = {
+                    "Revenue / ARR": "revenue",
+                    "Growth rate": "growth_rate",
+                    "Customers": "customer_count",
+                    "Key metric": "key_metric",
+                  };
+                  const claimType = claimTypeMap[label];
+                  const claim = claimType ? claimByType(claimType) : undefined;
+                  const cfg = claim ? STATUS_CONFIG[claim.proof_status as ClaimStatus] : undefined;
+                  return (
+                    <div key={label} className="flex items-center justify-between border-b border-border/40 pb-2 gap-2">
+                      <span className="text-xs text-muted-foreground shrink-0">{label}</span>
+                      <div className="flex items-center gap-2 min-w-0">
+                        {cfg && (
+                          <span
+                            className="inline-flex items-center gap-1 rounded-full text-[10px] font-medium px-1.5 py-0.5 shrink-0"
+                            style={cfg.style}
+                            title={claim?.proof_status}
+                          >
+                            {cfg.icon}
+                          </span>
+                        )}
+                        <span className="text-sm font-medium truncate">{val}</span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -797,6 +1048,7 @@ function Profile() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <PageGuide pageId="profile" />
           {startup && (
             <button
               onClick={() => setMode("view")}
@@ -833,6 +1085,17 @@ function Profile() {
             <span className="font-semibold">Your profile is not yet visible in the directory.</span> Complete at least 80% to go live.
           </div>
         )}
+        <div className="mt-3">
+          <a
+            href="/trust"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs transition-colors"
+            style={{ color: "rgba(124,58,237,0.65)" }}
+          >
+            See how verification works →
+          </a>
+        </div>
       </div>
 
       {startup && !form.company_name.trim() && (
@@ -1019,10 +1282,16 @@ function Profile() {
         // FULL DETAILS: all sections
         <div className="mt-4 grid lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2 space-y-4">
-            <FormSection title="Company basics">
+            <FormSection
+              title="Company identity"
+              badge={<FieldVerificationBadge profileType="startup" fieldName="legal_entity_name" tier1Passed={founderTier1Passed} compact />}
+            >
               <Field label="Company name" value={form.company_name} onChange={field("company_name")} placeholder="Atlas Robotics" />
               <div>
-                <label className="text-xs text-white/40 uppercase tracking-wider block mb-2">Legal entity name</label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs text-white/40 uppercase tracking-wider">Legal entity name</label>
+                  <FieldVerificationBadge profileType="startup" fieldName="legal_entity_name" tier1Passed={founderTier1Passed} />
+                </div>
                 <input
                   type="text"
                   value={form.legal_entity_name ?? ""}
@@ -1032,7 +1301,10 @@ function Profile() {
                 />
               </div>
               <div>
-                <label className="text-xs text-white/40 uppercase tracking-wider block mb-2">Company registration number</label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs text-white/40 uppercase tracking-wider">Company registration number</label>
+                  <FieldVerificationBadge profileType="startup" fieldName="registration_number" tier1Passed={founderTier1Passed} />
+                </div>
                 <input
                   type="text"
                   value={form.registration_number ?? ""}
@@ -1056,16 +1328,48 @@ function Profile() {
                     </span>
                   </div>
                   <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>{registryCheck.verification_summary}</p>
-                  {(registryCheck.sources as Array<{ registry: string; url: string }> | null)?.length ? (
+
+                  {/* Structured registry sources (OpenCorporates / Companies House) */}
+                  {(registryCheck.sources as Array<{ registry: string; url: string; confidence?: string }> | null)
+                    ?.filter((s) => !s.registry?.includes("DIFC"))
+                    .length ? (
                     <div className="mt-2 space-y-1">
-                      {(registryCheck.sources as Array<{ registry: string; url: string }>).map((source, i) => (
-                        <a key={i} href={source.url} target="_blank" rel="noopener noreferrer"
-                          className="text-xs block hover:underline" style={{ color: "#7C3AED" }}>
-                          ↗ {source.registry}
-                        </a>
-                      ))}
+                      {(registryCheck.sources as Array<{ registry: string; url: string }>)
+                        .filter((s) => !s.registry?.includes("DIFC"))
+                        .map((source, i) => (
+                          <a key={i} href={source.url} target="_blank" rel="noopener noreferrer"
+                            className="text-xs block hover:underline" style={{ color: "#7C3AED" }}>
+                            ↗ {source.registry}
+                          </a>
+                        ))}
                     </div>
                   ) : null}
+
+                  {/* DIFC result — visually secondary, clearly labeled as best-effort */}
+                  {registryCheck.difc_check_method === "ai_web_search" && (
+                    <div className="mt-3 rounded-lg px-3 py-2.5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[11px] font-medium" style={{ color: "rgba(255,255,255,0.4)" }}>DIFC (UAE): best-effort web search</span>
+                        <span className="text-[11px]" style={{ color: registryCheck.difc_found ? "#10B981" : "rgba(255,255,255,0.25)" }}>
+                          {registryCheck.difc_found ? "✓ Match found" : "○ No match"}
+                          {registryCheck.difc_confidence ? ` · ${registryCheck.difc_confidence} confidence` : ""}
+                        </span>
+                      </div>
+                      <p className="text-[11px] leading-snug" style={{ color: "rgba(255,255,255,0.3)" }}>
+                        Not a direct registry API — AI-assisted search of the DIFC public register page.
+                        {registryCheck.difc_source_url && (
+                          <>
+                            {" "}
+                            <a href={registryCheck.difc_source_url} target="_blank" rel="noopener noreferrer"
+                              className="hover:underline" style={{ color: "#7C3AED" }}>
+                              Verify on difc.ae ↗
+                            </a>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  )}
+
                   <p className="text-xs mt-2" style={{ color: "rgba(255,255,255,0.2)" }}>
                     Checked {new Date(registryCheck.checked_at).toLocaleDateString()} · Source-cited, not manually confirmed
                   </p>
@@ -1073,7 +1377,7 @@ function Profile() {
               ) : (
                 <div className="p-4 rounded-xl border mt-2" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
                   <p className="text-xs text-white/30">
-                    Registry check runs automatically when your profile is published. Checks OpenCorporates (140+ jurisdictions), UK Companies House, and DIFC entity register.
+                    Registry check runs automatically when your profile is published. Checks OpenCorporates (140+ jurisdictions), UK Companies House, and DIFC (best-effort web search).
                   </p>
                 </div>
               )}
@@ -1088,10 +1392,13 @@ function Profile() {
 
               <Field label="Tagline" value={form.tagline} onChange={field("tagline")} placeholder="One line that explains your company" />
               <div className="grid sm:grid-cols-2 gap-3">
-                <Field label="Website" value={form.website} onChange={field("website")} placeholder="https://example.com" />
+                <Field label="Website" value={form.website} onChange={field("website")} placeholder="https://example.com"
+                  badge={<FieldVerificationBadge profileType="startup" fieldName="website" tier1Passed={founderTier1Passed} compact />} />
                 <Field label="Founded year" value={form.founded_year} onChange={field("founded_year")} placeholder="2022" />
                 <Field label="Country / HQ" value={form.country} onChange={field("country")} placeholder="San Francisco, USA" />
-                <Field label="Team size" value={form.team_size} onChange={field("team_size")} placeholder="e.g. 12" title="Number of full-time team members" />
+                <Field label="Team size" value={form.team_size} onChange={field("team_size")} placeholder="e.g. 12" title="Number of full-time team members"
+                  badge={<FieldVerificationBadge profileType="startup" fieldName="team_size" claimStatus={claimByType("team_size")?.proof_status}
+                    onAttachProof={startup?.id ? () => setAttachingClaim({ type: "team_size", label: "Team Size", value: form.team_size }) : undefined} compact />} />
                 <Field label="Sector" value={form.sector} onChange={field("sector")} placeholder="B2B SaaS, Fintech, AI..." />
                 <div>
                   <label className="text-xs text-muted-foreground">Stage</label>
@@ -1108,53 +1415,119 @@ function Profile() {
               <div className="grid sm:grid-cols-2 gap-3">
                 <Field label="Funding target" value={form.funding_target} onChange={field("funding_target")} placeholder="e.g. 2,000,000" title="Enter amount in USD, use commas for thousands (e.g. 2,000,000)" onBlur={(e) => setForm((f) => ({ ...f, funding_target: formatNumber(e.target.value) }))} />
                 <Field label="Pre-money valuation" value={form.valuation} onChange={field("valuation")} placeholder="e.g. 20,000,000" title="Pre-money valuation in USD" onBlur={(e) => setForm((f) => ({ ...f, valuation: formatNumber(e.target.value) }))} />
-                <Field label="Previous funding raised" value={form.previous_funding} onChange={field("previous_funding")} placeholder="$500K pre-seed" />
-                <Field label="Current investors" value={form.current_investors} onChange={field("current_investors")} placeholder="Y Combinator, Sequoia" />
+                <Field label="Previous funding raised" value={form.previous_funding} onChange={field("previous_funding")} placeholder="$500K pre-seed"
+                  badge={<FieldVerificationBadge profileType="startup" fieldName="previous_funding" claimStatus={claimByType("previous_funding")?.proof_status}
+                    onAttachProof={startup?.id ? () => setAttachingClaim({ type: "previous_funding", label: "Previous Funding", value: form.previous_funding }) : undefined} compact />} />
+                <Field label="Current investors" value={form.current_investors} onChange={field("current_investors")} placeholder="Y Combinator, Sequoia"
+                  badge={<FieldVerificationBadge profileType="startup" fieldName="current_investors" compact />} />
               </div>
               <TextArea label="Use of funds" value={form.use_of_funds} onChange={field("use_of_funds")} placeholder="40% engineering, 30% sales, 30% ops" rows={2} />
             </FormSection>
 
-            <FormSection title="Traction & metrics">
+            <FormSection
+              title="Traction & metrics"
+              badge={<FieldVerificationBadge profileType="startup" fieldName="revenue" claimStatus={claimByType("revenue")?.proof_status} compact />}
+            >
               <div className="grid sm:grid-cols-2 gap-3">
-                <Field label="Revenue / ARR" value={form.revenue} onChange={field("revenue")} placeholder="e.g. 500,000" title="Annual revenue in USD" onBlur={(e) => setForm((f) => ({ ...f, revenue: formatNumber(e.target.value) }))} />
-                <Field label="Growth rate" value={form.growth_rate} onChange={field("growth_rate")} placeholder="+15% MoM" />
-                <Field label="Customer count" value={form.customer_count} onChange={field("customer_count")} placeholder="500 paying customers" />
-                <Field label="Key metric" value={form.key_metric} onChange={field("key_metric")} placeholder="Your most important metric" />
+                {/* Revenue */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs text-muted-foreground">Revenue / ARR</label>
+                    <ClaimBadge claim={claimByType("revenue")} onAttach={startup?.id ? () => setAttachingClaim({ type: "revenue", label: "Revenue / ARR", value: form.revenue }) : undefined} />
+                  </div>
+                  <input value={form.revenue} onChange={field("revenue")} onBlur={(e) => setForm((f) => ({ ...f, revenue: formatNumber(e.target.value) }))} placeholder="e.g. 500,000" className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
+                </div>
+                {/* Growth rate */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs text-muted-foreground">Growth rate</label>
+                    <ClaimBadge claim={claimByType("growth_rate")} onAttach={startup?.id ? () => setAttachingClaim({ type: "growth_rate", label: "Growth Rate", value: form.growth_rate }) : undefined} />
+                  </div>
+                  <input value={form.growth_rate} onChange={field("growth_rate")} placeholder="+15% MoM" className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
+                </div>
+                {/* Customer count */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs text-muted-foreground">Customer count</label>
+                    <ClaimBadge claim={claimByType("customer_count")} onAttach={startup?.id ? () => setAttachingClaim({ type: "customer_count", label: "Customers", value: form.customer_count }) : undefined} />
+                  </div>
+                  <input value={form.customer_count} onChange={field("customer_count")} placeholder="500 paying customers" className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
+                </div>
+                {/* Key metric */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs text-muted-foreground">Key metric</label>
+                    <ClaimBadge claim={claimByType("key_metric")} onAttach={startup?.id ? () => setAttachingClaim({ type: "key_metric", label: "Key Metric", value: form.key_metric }) : undefined} />
+                  </div>
+                  <input value={form.key_metric} onChange={field("key_metric")} placeholder="Your most important metric" className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
+                </div>
               </div>
-              <TextArea label="Traction highlights" value={form.traction} onChange={field("traction")} placeholder="Key traction highlights..." rows={3} />
+              {/* Traction textarea */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs text-muted-foreground">Traction highlights</label>
+                  <ClaimBadge claim={claimByType("traction")} onAttach={startup?.id ? () => setAttachingClaim({ type: "traction", label: "Traction", value: form.traction }) : undefined} />
+                </div>
+                <textarea value={form.traction} onChange={field("traction")} placeholder="Key traction highlights..." rows={3} className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none" />
+              </div>
             </FormSection>
 
-            <FormSection title="Pitch content">
-              <TextArea label="Problem" value={form.problem} onChange={field("problem")} placeholder="What problem are you solving?" rows={4} />
-              <TextArea label="Solution" value={form.solution} onChange={field("solution")} placeholder="How does your product solve it?" rows={4} />
-              <TextArea label="Business model" value={form.business_model} onChange={field("business_model")} placeholder="How do you make money?" rows={3} />
+            {/* Cap Table — founder-only, not visible to investors by default */}
+            {startup?.id && <CapTableSection startupId={startup.id} />}
+
+            <FormSection
+              title="Vision & strategy"
+              badge={<FieldVerificationBadge profileType="startup" fieldName="problem" compact />}
+            >
+              <TextArea label="Problem" value={form.problem} onChange={field("problem")} placeholder="What problem are you solving?" rows={4}
+                badge={<FieldVerificationBadge profileType="startup" fieldName="problem" />} />
+              <TextArea label="Solution" value={form.solution} onChange={field("solution")} placeholder="How does your product solve it?" rows={4}
+                badge={<FieldVerificationBadge profileType="startup" fieldName="solution" />} />
+              <TextArea label="Business model" value={form.business_model} onChange={field("business_model")} placeholder="How do you make money?" rows={3}
+                badge={<FieldVerificationBadge profileType="startup" fieldName="business_model" />} />
               <Field label="Market size" value={form.market_size} onChange={field("market_size") as any} placeholder="$50B TAM, $5B SAM…" />
-              <TextArea label="Why us" value={form.why_us} onChange={field("why_us")} placeholder="Why is your team uniquely positioned?" rows={3} />
-              <TextArea label="Why now?" value={form.why_now} onChange={field("why_now")} placeholder="What tailwind or market shift makes this the right time?" rows={2} />
+              <TextArea label="Why us" value={form.why_us} onChange={field("why_us")} placeholder="Why is your team uniquely positioned?" rows={3}
+                badge={<FieldVerificationBadge profileType="startup" fieldName="why_us" />} />
+              <TextArea label="Why now?" value={form.why_now} onChange={field("why_now")} placeholder="What tailwind or market shift makes this the right time?" rows={2}
+                badge={<FieldVerificationBadge profileType="startup" fieldName="why_now" />} />
             </FormSection>
 
             <FormSection title="Market & opportunity">
               <div className="grid sm:grid-cols-2 gap-3">
                 <Field label="TAM" value={form.tam} onChange={field("tam")} placeholder="Total addressable market" />
                 <Field label="SAM" value={form.sam} onChange={field("sam")} placeholder="Serviceable addressable market" />
-                <Field label="Target customer" value={form.target_customer} onChange={field("target_customer")} placeholder="Who will buy from you?" />
+                <Field label="Target customer" value={form.target_customer} onChange={field("target_customer")} placeholder="Who will buy from you?"
+                  badge={<FieldVerificationBadge profileType="startup" fieldName="target_customer" compact />} />
               </div>
             </FormSection>
 
             <FormSection title="Business model details">
               <TextArea label="Revenue model" value={form.revenue_model} onChange={field("revenue_model")} placeholder="How do you generate revenue?" rows={3} />
               <Field label="Pricing" value={form.pricing} onChange={field("pricing")} placeholder="Pricing model or range" />
-              <TextArea label="Unit economics" value={form.unit_economics} onChange={field("unit_economics")} placeholder="CAC, LTV or contribution margin" rows={3} />
+              <TextArea label="Unit economics" value={form.unit_economics} onChange={field("unit_economics")} placeholder="CAC, LTV or contribution margin" rows={3}
+                badge={<FieldVerificationBadge profileType="startup" fieldName="unit_economics" />} />
               <div className="grid sm:grid-cols-2 gap-3">
-                <Field label="Burn rate" value={form.burn_rate} onChange={field("burn_rate")} placeholder="$ / month" />
-                <Field label="Runway (months)" value={form.runway_months} onChange={field("runway_months")} placeholder="e.g. 12" />
+                <Field label="Burn rate" value={form.burn_rate} onChange={field("burn_rate")} placeholder="$ / month"
+                  badge={<FieldVerificationBadge profileType="startup" fieldName="burn_rate" claimStatus={claimByType("burn_rate")?.proof_status}
+                    onAttachProof={startup?.id ? () => setAttachingClaim({ type: "burn_rate", label: "Burn Rate", value: form.burn_rate }) : undefined} compact />} />
+                <Field label="Runway (months)" value={form.runway_months} onChange={field("runway_months")} placeholder="e.g. 12"
+                  badge={<FieldVerificationBadge profileType="startup" fieldName="runway_months" claimStatus={claimByType("runway_months")?.proof_status}
+                    onAttachProof={startup?.id ? () => setAttachingClaim({ type: "runway_months", label: "Runway (months)", value: form.runway_months }) : undefined} compact />} />
               </div>
             </FormSection>
 
-            <FormSection title="Differentiation">
-              <TextArea label="Moat" value={form.moat} onChange={field("moat")} placeholder="What protects your business?" rows={3} />
-              <TextArea label="Competitors" value={form.competitors} onChange={field("competitors")} placeholder="Key competitors and alternatives" rows={3} />
-              <TextArea label="Milestones" value={form.milestones} onChange={field("milestones")} placeholder="Key traction, launches, and milestones" rows={3} />
+            <FormSection
+              title="Cap & relationships"
+              badge={<FieldVerificationBadge profileType="startup" fieldName="advisors" compact />}
+            >
+              <TextArea label="Moat" value={form.moat} onChange={field("moat")} placeholder="What protects your business?" rows={3}
+                badge={<FieldVerificationBadge profileType="startup" fieldName="moat" />} />
+              <TextArea label="Competitors" value={form.competitors} onChange={field("competitors")} placeholder="Key competitors and alternatives" rows={3}
+                badge={<FieldVerificationBadge profileType="startup" fieldName="competitors" />} />
+              <TextArea label="Milestones" value={form.milestones} onChange={field("milestones")} placeholder="Key traction, launches, and milestones" rows={3}
+                badge={<FieldVerificationBadge profileType="startup" fieldName="milestones" />} />
+              <TextArea label="Advisors" value={form.advisors} onChange={field("advisors")} placeholder="Notable advisors" rows={2}
+                badge={<FieldVerificationBadge profileType="startup" fieldName="advisors" />} />
             </FormSection>
 
             <FormSection title="Media">
@@ -1221,9 +1594,11 @@ function Profile() {
               <div className="grid sm:grid-cols-2 gap-3">
                 <Field label="Founder name" value={form.founder_name} onChange={field("founder_name")} placeholder="Jane Smith" />
                 <Field label="Founder email" value={form.founder_email} onChange={field("founder_email")} placeholder="jane@startup.com" />
-                <Field label="Founder LinkedIn" value={form.founder_linkedin} onChange={field("founder_linkedin")} placeholder="linkedin.com/in/janesmith" />
+                <Field label="Founder LinkedIn" value={form.founder_linkedin} onChange={field("founder_linkedin")} placeholder="linkedin.com/in/janesmith"
+                  badge={<FieldVerificationBadge profileType="startup" fieldName="founder_linkedin" tier1Passed={founderTier1Passed} compact />} />
                 <Field label="Co-founder name" value={form.cofounder_name} onChange={field("cofounder_name")} placeholder="Alex Lee" />
-                <Field label="Co-founder LinkedIn" value={form.cofounder_linkedin} onChange={field("cofounder_linkedin")} placeholder="linkedin.com/in/alexlee" />
+                <Field label="Co-founder LinkedIn" value={form.cofounder_linkedin} onChange={field("cofounder_linkedin")} placeholder="linkedin.com/in/alexlee"
+                  badge={<FieldVerificationBadge profileType="startup" fieldName="cofounder_linkedin" compact />} />
               </div>
             </FormSection>
 
@@ -1526,6 +1901,236 @@ function Profile() {
           Save your profile first to add team members.
         </div>
       )}
+
+      {/* ── Investor criteria / Founder thesis ───────────────────────── */}
+      {startup?.id && tab !== "analytics" && (
+        <div className="mt-8 rounded-xl border border-border/60 bg-card p-5 shadow-card space-y-5">
+          {/* Section header */}
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+              style={{ background: "rgba(124,58,237,0.1)" }}>
+              <Target className="h-4 w-4" style={{ color: "#A855F7" }} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
+                  What kind of investor are you looking for
+                </h2>
+                {existingThesis?.status === "complete" && (
+                  <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full"
+                    style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }}>
+                    <CheckCircle2 className="h-3 w-3" /> Complete
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                The last step. This helps us match you with investors who are actually right for you, not just anyone who's interested.
+              </p>
+            </div>
+          </div>
+
+          {/* AI propose banner — only if thesis not yet complete */}
+          {existingThesis?.status !== "complete" && (
+            <div className="rounded-lg px-4 py-3 flex items-center justify-between gap-3 flex-wrap"
+              style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.15)" }}>
+              <p className="text-xs text-white/50 leading-relaxed flex-1">
+                Based on your profile and documents, we can suggest a starting point — edit anything that's wrong.
+              </p>
+              <button
+                onClick={handleThesisAIPropose}
+                disabled={thesisProposing}
+                className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium shrink-0 transition-colors"
+                style={{
+                  background: thesisProposing ? "rgba(124,58,237,0.3)" : "rgba(124,58,237,0.15)",
+                  border: "1px solid rgba(124,58,237,0.3)",
+                  color: thesisProposing ? "rgba(255,255,255,0.4)" : "#A855F7",
+                  cursor: thesisProposing ? "not-allowed" : "pointer",
+                }}
+              >
+                {thesisProposing
+                  ? <><Loader2 className="h-3 w-3 animate-spin" /> Proposing…</>
+                  : <><Sparkles className="h-3 w-3" /> Suggest defaults</>}
+              </button>
+            </div>
+          )}
+
+          {/* Regenerate button for complete thesis */}
+          {existingThesis?.status === "complete" && (
+            <button
+              onClick={handleThesisAIPropose}
+              disabled={thesisProposing}
+              className="inline-flex items-center gap-1.5 text-xs transition-colors"
+              style={{ color: "rgba(255,255,255,0.3)", background: "none", border: "none", cursor: thesisProposing ? "not-allowed" : "pointer", padding: 0 }}
+            >
+              {thesisProposing
+                ? <><Loader2 className="h-3 w-3 animate-spin" /> Regenerating…</>
+                : <><RefreshCw className="h-3 w-3" /> Regenerate AI suggestions</>}
+            </button>
+          )}
+
+          {/* Form fields */}
+          <div className="space-y-4">
+            {/* Check size */}
+            <div>
+              <label className="text-xs font-medium text-muted-foreground block mb-1">
+                Check size range
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  value={thesisForm.preferred_check_size_min}
+                  onChange={thesisField("preferred_check_size_min")}
+                  placeholder="Min e.g. $250k"
+                  className="flex-1 rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                />
+                <span className="text-xs text-muted-foreground shrink-0">to</span>
+                <input
+                  value={thesisForm.preferred_check_size_max}
+                  onChange={thesisField("preferred_check_size_max")}
+                  placeholder="Max e.g. $3M"
+                  className="flex-1 rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                />
+              </div>
+            </div>
+
+            {/* Investor type */}
+            <div>
+              <label className="text-xs font-medium text-muted-foreground block mb-1">Investor type</label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {["Capital only", "Capital + sector expertise", "Capital + network access"].map((val) => (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => setThesisForm((p) => ({ ...p, preferred_investor_type: val }))}
+                    className={`rounded-lg border px-3 py-2.5 text-left text-sm transition-colors ${
+                      thesisForm.preferred_investor_type === val
+                        ? "border-brand/60 bg-brand/10 text-foreground"
+                        : "border-border/60 bg-background text-muted-foreground hover:border-border"
+                    }`}
+                  >
+                    {val}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Board preference */}
+            <div>
+              <label className="text-xs font-medium text-muted-foreground block mb-1">Involvement preference</label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {[
+                  { val: "Hands-on (board seat, regular check-ins)", short: "Hands-on" },
+                  { val: "Collaborative (available but not directive)", short: "Collaborative" },
+                  { val: "Hands-off (capital only, minimal involvement)", short: "Hands-off" },
+                ].map(({ val, short }) => (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => setThesisForm((p) => ({ ...p, board_preference: val }))}
+                    className={`rounded-lg border px-3 py-2.5 text-left text-sm transition-colors ${
+                      thesisForm.board_preference === val
+                        ? "border-brand/60 bg-brand/10 text-foreground"
+                        : "border-border/60 bg-background text-muted-foreground hover:border-border"
+                    }`}
+                  >
+                    {short}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Sector expertise */}
+            <div>
+              <label className="text-xs font-medium text-muted-foreground block mb-1">Sector expertise wanted</label>
+              <input
+                value={thesisForm.sector_expertise_wanted}
+                onChange={thesisField("sector_expertise_wanted")}
+                placeholder="e.g. Defence, robotics, GCC enterprise sales"
+                className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+              />
+            </div>
+
+            {/* Geography */}
+            <div>
+              <label className="text-xs font-medium text-muted-foreground block mb-1">Geography preference</label>
+              <input
+                value={thesisForm.geography_preference}
+                onChange={thesisField("geography_preference")}
+                placeholder="e.g. GCC-based or UK/Europe, or 'No preference'"
+                className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+              />
+            </div>
+
+            {/* Exclusions */}
+            <div>
+              <label className="text-xs font-medium text-muted-foreground block mb-1">Exclusions / red lines</label>
+              <textarea
+                rows={2}
+                value={thesisForm.exclusions}
+                onChange={thesisField("exclusions")}
+                placeholder="e.g. No investors with portfolio conflicts in defence or surveillance tech"
+                className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
+              />
+            </div>
+
+            {/* What good fit looks like */}
+            <div>
+              <label className="text-xs font-medium text-muted-foreground block mb-1">What a great-fit investor looks like</label>
+              <textarea
+                rows={3}
+                value={thesisForm.what_good_fit_looks_like}
+                onChange={thesisField("what_good_fit_looks_like")}
+                placeholder="In your own words — what would make you say yes immediately?"
+                className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
+              />
+            </div>
+
+            {/* Save actions */}
+            <div className="flex items-center gap-3 pt-1">
+              <button
+                type="button"
+                onClick={() => handleThesisSave("complete")}
+                disabled={thesisSaving || !startup?.id}
+                className="inline-flex items-center gap-2 rounded-lg bg-brand text-brand-foreground px-5 py-2.5 text-sm font-medium disabled:opacity-60 transition-colors"
+              >
+                {thesisSaving ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : thesisSaved ? <CheckCircle2 className="h-4 w-4" />
+                  : <Save className="h-4 w-4" />}
+                {thesisSaved ? "Saved" : "Save investor criteria"}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleThesisSave("draft")}
+                disabled={thesisSaving || !startup?.id}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-2"
+              >
+                Save as draft
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Operational Verified — Tier 3 */}
+      {startup?.id && tab !== "analytics" && (
+        <div className="mt-8">
+          <OperationalVerificationSection
+            startupId={startup.id}
+            companyName={form.company_name}
+            userEmail={user?.email ?? ""}
+            displayName={form.company_name || "Founder"}
+          />
+        </div>
+      )}
+
+      {/* Attach-proof modal — rendered outside the form to avoid nesting */}
+      {attachingClaim && startup?.id && (
+        <AttachProofModal
+          claim={attachingClaim}
+          startupId={startup.id}
+          onClose={() => { setAttachingClaim(null); setAttachingFile(null); }}
+          onDone={() => { refetchClaims(); setAttachingClaim(null); setAttachingFile(null); }}
+        />
+      )}
     </div>
   );
 }
@@ -1816,27 +2421,338 @@ function RightCol({ form, deckName, deckUploading, isExtracting, onDeckUpload, s
   );
 }
 
-// ── Reusable field components ──────────────────────────────────────
+// ── Claim verification components ─────────────────────────────────
 
-function FormSection({ title, children }: { title: string; children: React.ReactNode }) {
+const STATUS_CONFIG: Record<ClaimStatus, { label: string; icon: React.ReactNode; style: React.CSSProperties }> = {
+  unverified: {
+    label: "Unverified",
+    icon: <AlertTriangle className="h-3 w-3" />,
+    style: { background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.25)", color: "#F59E0B" },
+  },
+  pending_review: {
+    label: "Proof attached",
+    icon: <Clock className="h-3 w-3" />,
+    style: { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.5)" },
+  },
+  ai_confirmed: {
+    label: "AI confirmed",
+    icon: <CheckCircle2 className="h-3 w-3" />,
+    style: { background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" },
+  },
+  ai_mismatch: {
+    label: "Claim mismatch",
+    icon: <XCircle className="h-3 w-3" />,
+    style: { background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", color: "#EF4444" },
+  },
+};
+
+function ClaimBadge({ claim, onAttach }: { claim: StartupClaim | undefined; onAttach?: () => void }) {
+  if (!claim) return null;
+  const cfg = STATUS_CONFIG[claim.proof_status as ClaimStatus] ?? STATUS_CONFIG.unverified;
+  return (
+    <span
+      className="inline-flex items-center gap-1 rounded-full text-[11px] font-medium px-2 py-0.5 cursor-default"
+      style={cfg.style}
+      title={claim.proof_status === "ai_mismatch"
+        ? `Document does not match this claim. ${claim.ai_check_result?.explanation ?? ""}`
+        : claim.proof_status === "ai_confirmed"
+        ? `AI confirmed: ${claim.ai_check_result?.found_value ?? "value found in document"}`
+        : undefined}
+    >
+      {cfg.icon}
+      {cfg.label}
+      {(claim.proof_status === "unverified" || claim.proof_status === "ai_mismatch") && onAttach && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onAttach(); }}
+          className="ml-1 underline underline-offset-2 hover:opacity-70"
+          style={{ color: "inherit", background: "none", border: "none", padding: 0, cursor: "pointer", fontSize: "inherit" }}
+        >
+          Attach proof
+        </button>
+      )}
+    </span>
+  );
+}
+
+// ── Cap table section ─────────────────────────────────────────────
+
+interface CapRow {
+  id: string;
+  startup_id: string;
+  shareholder_name: string;
+  shareholder_role: string | null;
+  ownership_percent: number;
+  signed_agreement_doc_id: string | null;
+  agreement_status: string | null;
+  linkedin_url: string | null;
+  x_url: string | null;
+  instagram_url: string | null;
+  social_verified: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+const CAP_ROLES = ["Founder", "Co-Founder", "Angel Investor", "VC", "Employee (ESOP)", "Advisor", "Other"];
+
+function CapTableSection({ startupId }: { startupId: string }) {
+  const qc = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
+  const blank = { shareholder_name: "", shareholder_role: "Founder", ownership_percent: "", linkedin_url: "", x_url: "", instagram_url: "" };
+  const [form, setForm] = useState(blank);
+
+  const { data: rows = [] } = useQuery<CapRow[]>({
+    queryKey: ["cap-table", startupId],
+    enabled: !!startupId,
+    queryFn: async () => {
+      const { data } = await supabase.from("startup_cap_table").select("*").eq("startup_id", startupId).order("created_at");
+      return (data ?? []) as CapRow[];
+    },
+  });
+
+  const totalOwnership = rows.reduce((s, r) => s + Number(r.ownership_percent), 0);
+  const overLimit = totalOwnership > 100;
+
+  const handleSave = async () => {
+    if (!form.shareholder_name.trim() || !form.ownership_percent) return;
+    const pct = parseFloat(String(form.ownership_percent));
+    if (isNaN(pct) || pct <= 0) { toast.error("Enter a valid ownership percentage."); return; }
+    setSaving(true);
+    try {
+      const payload = {
+        startup_id: startupId,
+        shareholder_name: form.shareholder_name.trim(),
+        shareholder_role: form.shareholder_role || null,
+        ownership_percent: pct,
+        linkedin_url: form.linkedin_url.trim() || null,
+        x_url: form.x_url.trim() || null,
+        instagram_url: form.instagram_url.trim() || null,
+        updated_at: new Date().toISOString(),
+      };
+      if (editingId) {
+        await supabase.from("startup_cap_table").update(payload).eq("id", editingId);
+      } else {
+        await supabase.from("startup_cap_table").insert({ ...payload, social_verified: false });
+      }
+      qc.invalidateQueries({ queryKey: ["cap-table", startupId] });
+      setForm(blank); setShowForm(false); setEditingId(null);
+      toast.success("Shareholder saved");
+    } catch (e: any) {
+      toast.error(e.message ?? "Save failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleVerify = async (row: CapRow) => {
+    setVerifyingId(row.id);
+    try {
+      const { verifySocialUrls } = await import("@/lib/claims-fn");
+      const r = await verifySocialUrls({
+        data: { startup_id: startupId, cap_table_row_id: row.id, linkedin_url: row.linkedin_url, x_url: row.x_url, instagram_url: row.instagram_url },
+      });
+      qc.invalidateQueries({ queryKey: ["cap-table", startupId] });
+      toast.success(r.social_verified ? "Social links verified" : "Links could not be reached — social_verified set to false");
+    } catch {
+      toast.error("Verification failed");
+    } finally {
+      setVerifyingId(null);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    await supabase.from("startup_cap_table").delete().eq("id", id);
+    qc.invalidateQueries({ queryKey: ["cap-table", startupId] });
+  };
+
+  const startEdit = (row: CapRow) => {
+    setEditingId(row.id);
+    setForm({
+      shareholder_name: row.shareholder_name,
+      shareholder_role: row.shareholder_role ?? "Founder",
+      ownership_percent: String(row.ownership_percent),
+      linkedin_url: row.linkedin_url ?? "",
+      x_url: row.x_url ?? "",
+      instagram_url: row.instagram_url ?? "",
+    });
+    setShowForm(true);
+  };
+
+  const f = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    setForm((prev) => ({ ...prev, [k]: e.target.value }));
+
+  const inputCls = "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50";
+
   return (
     <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
-      <div className="text-sm font-semibold mb-4">{title}</div>
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <div className="text-sm font-semibold">Cap Table</div>
+          <div className="text-xs text-muted-foreground mt-0.5">Visible only to you — not shared with investors by default.</div>
+        </div>
+        <button
+          onClick={() => { setShowForm((v) => !v); setEditingId(null); setForm(blank); }}
+          className="inline-flex items-center gap-1.5 text-xs rounded-md border border-border/60 px-3 py-1.5 hover:bg-accent transition-colors"
+        >
+          <Plus className="h-3.5 w-3.5" /> Add shareholder
+        </button>
+      </div>
+
+      {overLimit && (
+        <div className="mb-3 flex items-center gap-2 rounded-lg px-3 py-2 text-xs"
+          style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", color: "#F59E0B" }}>
+          <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+          Total ownership is {totalOwnership.toFixed(1)}% — exceeds 100%. This may be intentional if data is incomplete.
+        </div>
+      )}
+
+      {rows.length > 0 && (
+        <div className="space-y-2 mb-4">
+          {rows.map((row) => (
+            <div key={row.id}
+              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10 }}
+              className="px-4 py-3"
+            >
+              <div className="flex items-start justify-between gap-2 flex-wrap">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-medium text-white">{row.shareholder_name}</span>
+                    {row.shareholder_role && (
+                      <span className="text-xs px-1.5 py-0.5 rounded-full"
+                        style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.2)", color: "#A855F7" }}>
+                        {row.shareholder_role}
+                      </span>
+                    )}
+                    <span className="text-sm font-semibold text-white/70">{row.ownership_percent}%</span>
+                    {row.social_verified ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-full"
+                        style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }}>
+                        <CheckCircle2 className="h-3 w-3" /> Social verified
+                      </span>
+                    ) : (row.linkedin_url || row.x_url || row.instagram_url) ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-full"
+                        style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", color: "#F59E0B" }}>
+                        <AlertTriangle className="h-3 w-3" /> Unverified links
+                      </span>
+                    ) : (
+                      <span className="text-[11px] text-white/25">No social links</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 mt-1.5">
+                    {row.linkedin_url && <a href={row.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white/60 transition-colors"><Linkedin className="h-3.5 w-3.5" /></a>}
+                    {row.x_url && <a href={row.x_url} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white/60 transition-colors"><Twitter className="h-3.5 w-3.5" /></a>}
+                    {row.instagram_url && <a href={row.instagram_url} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white/60 transition-colors"><Instagram className="h-3.5 w-3.5" /></a>}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {(row.linkedin_url || row.x_url || row.instagram_url) && (
+                    <button
+                      onClick={() => handleVerify(row)}
+                      disabled={verifyingId === row.id}
+                      className="text-xs text-white/30 hover:text-white/60 transition-colors flex items-center gap-1"
+                      title="Re-run social link verification"
+                    >
+                      {verifyingId === row.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
+                      Verify
+                    </button>
+                  )}
+                  <button onClick={() => startEdit(row)} className="text-white/30 hover:text-white/60 p-1"><Pencil className="h-3.5 w-3.5" /></button>
+                  <button onClick={() => handleDelete(row.id)} className="text-white/30 hover:text-red-400 p-1"><Trash2 className="h-3.5 w-3.5" /></button>
+                </div>
+              </div>
+            </div>
+          ))}
+          <div className="pt-1 text-xs text-muted-foreground text-right">
+            Total documented: <span className={overLimit ? "text-[#F59E0B] font-semibold" : "font-medium"}>{totalOwnership.toFixed(1)}%</span>
+          </div>
+        </div>
+      )}
+
+      {rows.length === 0 && !showForm && (
+        <p className="text-xs text-muted-foreground">No shareholders added yet. Add shareholders to document your cap table.</p>
+      )}
+
+      {showForm && (
+        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10 }} className="p-4 space-y-3">
+          <div className="grid sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs text-muted-foreground">Shareholder name *</label>
+              <input value={form.shareholder_name} onChange={f("shareholder_name")} placeholder="Jane Smith" className={inputCls} />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">Role</label>
+              <select value={form.shareholder_role} onChange={f("shareholder_role")} className={inputCls}>
+                {CAP_ROLES.map((r) => <option key={r}>{r}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">Ownership % *</label>
+              <input type="number" min="0" max="100" step="0.01" value={form.ownership_percent} onChange={f("ownership_percent")} placeholder="25.0" className={inputCls} />
+            </div>
+          </div>
+          <div className="text-xs text-muted-foreground font-medium pt-1">Social links (at least one required for verification)</div>
+          <div className="grid sm:grid-cols-3 gap-3">
+            <div>
+              <label className="text-xs text-muted-foreground flex items-center gap-1"><Linkedin className="h-3 w-3" /> LinkedIn URL</label>
+              <input value={form.linkedin_url} onChange={f("linkedin_url")} placeholder="https://linkedin.com/in/..." className={inputCls} />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground flex items-center gap-1"><Twitter className="h-3 w-3" /> X (Twitter) URL</label>
+              <input value={form.x_url} onChange={f("x_url")} placeholder="https://x.com/..." className={inputCls} />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground flex items-center gap-1"><Instagram className="h-3 w-3" /> Instagram URL</label>
+              <input value={form.instagram_url} onChange={f("instagram_url")} placeholder="https://instagram.com/..." className={inputCls} />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 pt-1">
+            <button onClick={() => { setShowForm(false); setEditingId(null); setForm(blank); }} className="px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">Cancel</button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="inline-flex items-center gap-1.5 rounded-md bg-brand text-brand-foreground px-4 py-1.5 text-xs font-medium disabled:opacity-60"
+            >
+              {saving && <Loader2 className="h-3 w-3 animate-spin" />}
+              {editingId ? "Update" : "Add shareholder"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Reusable field components ──────────────────────────────────────
+
+function FormSection({ title, badge, children }: { title: string; badge?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="text-sm font-semibold">{title}</div>
+        {badge}
+      </div>
       <div className="space-y-3">{children}</div>
     </div>
   );
 }
 
-function Field({ label, value, onChange, placeholder, type = "text", onBlur, title }: {
+function Field({ label, value, onChange, placeholder, type = "text", onBlur, title, badge }: {
   label: string; value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string; type?: string;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   title?: string;
+  badge?: React.ReactNode;
 }) {
   return (
     <div>
-      <label className="text-xs text-muted-foreground">{label}</label>
+      <div className="flex items-center justify-between mb-1">
+        <label className="text-xs text-muted-foreground">{label}</label>
+        {badge}
+      </div>
       <input
         type={type}
         value={value}
@@ -1844,26 +2760,30 @@ function Field({ label, value, onChange, placeholder, type = "text", onBlur, tit
         onBlur={onBlur}
         placeholder={placeholder}
         title={title}
-        className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+        className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
       />
     </div>
   );
 }
 
-function TextArea({ label, value, onChange, placeholder, rows = 3 }: {
+function TextArea({ label, value, onChange, placeholder, rows = 3, badge }: {
   label: string; value: string;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   placeholder?: string; rows?: number;
+  badge?: React.ReactNode;
 }) {
   return (
     <div>
-      <label className="text-xs text-muted-foreground">{label}</label>
+      <div className="flex items-center justify-between mb-1">
+        <label className="text-xs text-muted-foreground">{label}</label>
+        {badge}
+      </div>
       <textarea
         value={value}
         onChange={onChange}
         placeholder={placeholder}
         rows={rows}
-        className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
+        className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
       />
     </div>
   );

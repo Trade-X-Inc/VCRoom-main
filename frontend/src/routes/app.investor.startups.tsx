@@ -24,9 +24,11 @@ function getRegion(country: string | null | undefined): string {
 const REGION_PILLS = ["All", "GCC", "MENA", "EU", "NA", "SEA", "Africa"] as const;
 type RegionFilter = (typeof REGION_PILLS)[number];
 import { Building2, ExternalLink, Clock, Plus, X, Loader2, ChevronRight, Upload, Download, List, LayoutGrid, Grid3x3, Pencil, Trash2 } from "lucide-react";
+import { PageGuide } from "@/components/app/PageGuide";
 import Papa from "papaparse";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
+import { logActivity } from "@/lib/activity-log-fn";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
@@ -317,6 +319,7 @@ function StartupsPage() {
           </div>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
+          <PageGuide pageId="investor-startups" />
           {/* View mode toggle */}
           <div className="flex items-center rounded-lg border border-border/60 bg-muted/40 p-0.5 gap-0.5">
             <button
@@ -1028,6 +1031,7 @@ function StartupsPage() {
                   value={selectedWatchlist.status}
                   onChange={async (e) => {
                     if (!user?.id) return;
+                    const oldStatus = selectedWatchlist.status;
                     const newStatus = e.target.value;
                     setUpdatingStatus(true);
                     try {
@@ -1038,6 +1042,15 @@ function StartupsPage() {
                       if (error) throw error;
                       setSelectedWatchlist({ ...selectedWatchlist, status: newStatus });
                       qc.invalidateQueries({ queryKey: ["investor-watchlist", user.id] });
+                      logActivity({
+                        account_type: "investor",
+                        account_id: user.id,
+                        actor_user_id: user.id,
+                        actor_name: user.fullName || user.email || "Investor",
+                        action_type: "pipeline_status_changed",
+                        target_label: selectedWatchlist.company_name || "Company",
+                        detail: `Moved from ${oldStatus} to ${newStatus}`,
+                      });
                       toast.success("Status updated");
                     } catch (err: any) {
                       toast.error(err?.message || "Could not update status");

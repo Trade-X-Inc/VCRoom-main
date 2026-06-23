@@ -2,6 +2,7 @@ import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-r
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Settings, Bell, Shield, Building2, User, Loader2, Camera } from "lucide-react";
+import { VerificationSection } from "@/components/app/VerificationSection";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
@@ -127,12 +128,21 @@ function ProfileSettings() {
     queryFn: async () => {
       const { data } = await supabase
         .from("startups")
-        .select("id, company_name, website, description, stage, country")
+        .select("id, company_name, website, description, stage, country, profile_slug, founder_email, publicly_discoverable")
         .eq("founder_id", user!.id)
         .maybeSingle();
       return data;
     },
   });
+
+  // Discoverable toggle state (founders only)
+  const [discoverable, setDiscoverable] = useState<boolean>(false);
+  const [savingDiscoverable, setSavingDiscoverable] = useState(false);
+  useEffect(() => {
+    if (!isInvestor && startup) {
+      setDiscoverable(startup.publicly_discoverable ?? false);
+    }
+  }, [startup, isInvestor]);
 
   // Load investor profile
   const { data: investorProfile } = useQuery({
@@ -336,6 +346,71 @@ function ProfileSettings() {
           </button>
         </div>
       </Card>
+
+      {/* Publicly discoverable toggle — founders only */}
+      {!isInvestor && startup?.id && (
+        <Card title="Profile visibility">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <div className="text-sm font-medium text-foreground">Publicly discoverable</div>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                When off, only investors you've connected with directly can see your full profile. Your company won't appear in general search or the directory. When on, investors browsing the platform can find you.
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={discoverable}
+              disabled={savingDiscoverable}
+              onClick={async () => {
+                if (!startup?.id) return;
+                const next = !discoverable;
+                setSavingDiscoverable(true);
+                try {
+                  const { error } = await supabase
+                    .from("startups")
+                    .update({ publicly_discoverable: next, updated_at: new Date().toISOString() })
+                    .eq("id", startup.id);
+                  if (error) throw error;
+                  setDiscoverable(next);
+                  qc.invalidateQueries({ queryKey: ["settings-startup", user?.id] });
+                  toast.success(next ? "Profile is now discoverable" : "Profile hidden from general search");
+                } catch (err: any) {
+                  toast.error(err.message || "Failed to update");
+                } finally {
+                  setSavingDiscoverable(false);
+                }
+              }}
+              className={cn(
+                "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 focus:ring-offset-background disabled:opacity-60",
+                discoverable ? "bg-brand" : "bg-muted"
+              )}
+            >
+              <span className={cn(
+                "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200",
+                discoverable ? "translate-x-5" : "translate-x-0"
+              )} />
+            </button>
+          </div>
+          <div className={cn("text-xs px-2 py-1 rounded-md w-fit font-medium", discoverable ? "bg-green-500/10 text-green-400" : "bg-muted/60 text-muted-foreground")}>
+            {savingDiscoverable ? "Saving…" : discoverable ? "Discoverable — appears in directory and search" : "Hidden — reachable only via direct connection"}
+          </div>
+        </Card>
+      )}
+
+      {/* Verification section — founders and investors */}
+      {user?.id && (isInvestor ? true : !!startup?.id) && (
+        <section className="rounded-xl border border-border/60 bg-card p-5 space-y-4">
+          <VerificationSection
+            entityType={isInvestor ? "investor" : "founder"}
+            entityId={isInvestor ? user.id : startup!.id}
+            userId={user.id}
+            userEmail={user?.email ?? ""}
+            displayName={fullName || (isInvestor ? "Investor" : startup?.company_name ?? "Founder")}
+            verifySlug={isInvestor ? undefined : (startup?.profile_slug ?? undefined)}
+          />
+        </section>
+      )}
     </div>
   );
 }

@@ -109,10 +109,24 @@ function AuthCallback() {
           }
         }
 
-        window.location.href =
-          finalRole === 'investor'
-            ? '/app/investor/'
-            : '/app'
+        // Route to the correct landing page after sign-in
+        if (finalRole === 'investor') {
+          // Investor default landing: Overview page (not the AI Advisor index)
+          window.location.href = '/app/investor/overview';
+        } else if (!existing?.role) {
+          // Brand new founder — go to profile builder unless they already dismissed it
+          const alreadySkipped = localStorage.getItem('pb_skipped') === '1';
+          window.location.href = alreadySkipped ? '/app' : '/app/profile-builder';
+        } else {
+          // Returning founder — if they have a startup already, go straight to /app.
+          // Only send to profile-builder if they have no startup row yet.
+          const { data: startup } = await supabase
+            .from('startups')
+            .select('id')
+            .eq('founder_id', userId)
+            .maybeSingle();
+          window.location.href = startup?.id ? '/app' : '/app/profile-builder';
+        }
       } catch (err) {
         console.error('Callback error:', err)
         window.location.href = '/sign-in'

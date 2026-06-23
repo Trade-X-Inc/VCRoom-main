@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Sparkles, Send, Loader2, User } from "lucide-react";
@@ -7,8 +7,15 @@ import ReactMarkdown from "react-markdown";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { getAIAdvice } from "@/lib/advisor-fn";
+import {
+  getFounderCompleteness,
+  getResumeMessage,
+  isToolRequest,
+  type ProfileBuilderSession,
+} from "@/lib/profileCompleteness";
 
 export const Route = createFileRoute("/app/advisor")({
+  beforeLoad: () => { throw redirect({ to: "/app" }); },
   component: Advisor,
 });
 
@@ -16,6 +23,7 @@ interface ChatMsg {
   id: string;
   role: "user" | "assistant";
   content: string;
+  isGateBlock?: boolean;
 }
 
 const STARTERS = [
@@ -28,8 +36,10 @@ const STARTERS = [
 
 function Advisor() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const endRef = useRef<HTMLDivElement>(null);
 
+  // ── Startup context ───────────────────────────────────────────────────────
   const { data: startupCtx } = useQuery({
     queryKey: ["advisor-ctx", user?.id],
     enabled: !!user?.id,
@@ -68,6 +78,34 @@ function Advisor() {
     },
   });
 
+  // ── Profile builder session (for completeness gate) ───────────────────────
+  const { data: pbSession } = useQuery({
+    queryKey: ["advisor-pb-session", user?.id],
+    enabled: !!user?.id,
+    staleTime: 60_000,
+    queryFn: async () => {
+      // Need startup id first
+      const { data: startup } = await supabase
+        .from("startups")
+        .select("id")
+        .eq("founder_id", user!.id)
+        .maybeSingle();
+      if (!startup?.id) return null;
+
+      const { data: session } = await supabase
+        .from("profile_builder_sessions")
+        .select("id, status, path, missing_fields")
+        .eq("startup_id", startup.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return session as ProfileBuilderSession | null;
+    },
+  });
+
+  const completeness = getFounderCompleteness(pbSession ?? null);
+
+  // ── Chat state ────────────────────────────────────────────────────────────
   const WELCOME: ChatMsg = {
     id: "m0",
     role: "assistant",
@@ -94,11 +132,9 @@ function Advisor() {
     },
   });
 
-  // Prepend persisted history once, keeping welcome message first
   useEffect(() => {
     if (historyApplied.current || !savedHistory) return;
     historyApplied.current = true;
-    console.log("Advisor history loaded:", savedHistory.length);
     if (savedHistory.length > 0) {
       setMsgs([
         WELCOME,
@@ -115,6 +151,7 @@ function Advisor() {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [msgs, thinking]);
 
+  // ── Send ──────────────────────────────────────────────────────────────────
   const send = async (text: string) => {
     const t = text.trim();
     if (!t || thinking || !user?.id) return;
@@ -126,6 +163,18 @@ function Advisor() {
     setThinking(true);
 
     try {
+      // ── Completeness gate ──
+      if (!completeness.isComplete && isToolRequest(t)) {
+        const resumeMsg = getResumeMessage(completeness, "founder", pbSession ?? null);
+        setMsgs((xs) => [...xs, {
+          id: `gate${Date.now()}`,
+          role: "assistant",
+          content: resumeMsg,
+          isGateBlock: true,
+        }]);
+        return;
+      }
+
       const history = msgs.slice(1).map((m) => ({ role: m.role as string, content: m.content }));
       const result = await getAIAdvice({
         data: { userId: user.id, message: t, history, startupContext: startupCtx ?? undefined },
@@ -135,18 +184,10 @@ function Advisor() {
       if (result.error === "missing_key") {
         setErrorBanner("OpenAI API key not configured. Contact your admin.");
       } else if (user?.id && !result.error) {
-        void supabase.from("advisor_messages").insert({ user_id: user.id, role: "user", content: t })
-          .then(({ error }) => {
-            if (error) console.error("Advisor save error (user):", error);
-            else console.log("Advisor message saved: user");
-          });
-        void supabase.from("advisor_messages").insert({ user_id: user.id, role: "assistant", content: result.reply })
-          .then(({ error }) => {
-            if (error) console.error("Advisor save error (assistant):", error);
-            else console.log("Advisor message saved: assistant");
-          });
+        void supabase.from("advisor_messages").insert({ user_id: user.id, role: "user", content: t });
+        void supabase.from("advisor_messages").insert({ user_id: user.id, role: "assistant", content: result.reply });
       }
-    } catch (e: any) {
+    } catch {
       toast.error("Request failed. Please try again.");
       setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: "Sorry, I couldn't process that. Please try again." }]);
     } finally {
@@ -157,7 +198,7 @@ function Advisor() {
   const showStarters = msgs.length <= 1;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)]">
+    <div className="flex flex-col flex-1 min-h-0">
       {/* Header */}
       <div className="border-b border-border/60 bg-background/80 backdrop-blur-xl px-6 lg:px-8 py-4 shrink-0">
         <div className="max-w-3xl mx-auto flex items-center justify-between gap-3">
@@ -186,11 +227,31 @@ function Advisor() {
               <div className={`grid h-8 w-8 place-items-center rounded-full shrink-0 ${m.role === "user" ? "bg-gradient-brand text-brand-foreground" : "bg-accent text-foreground border border-border/60"}`}>
                 {m.role === "user" ? <User className="h-4 w-4" /> : <Sparkles className="h-4 w-4 text-brand" />}
               </div>
-              <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.role === "user" ? "bg-gradient-brand text-brand-foreground" : "bg-card border border-border/60 shadow-card"}`}>
-                {m.role === "user" ? m.content : (
-                  <div className="[&_p]:mb-1.5 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:space-y-0.5 [&_ol]:list-decimal [&_ol]:pl-4 [&_strong]:font-semibold">
-                    <ReactMarkdown>{m.content}</ReactMarkdown>
-                  </div>
+              <div className="flex flex-col gap-2 max-w-[80%]">
+                <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.role === "user" ? "bg-gradient-brand text-brand-foreground" : "bg-card border border-border/60 shadow-card"}`}>
+                  {m.role === "user" ? m.content : (
+                    <div className="[&_p]:mb-1.5 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:space-y-0.5 [&_ol]:list-decimal [&_ol]:pl-4 [&_strong]:font-semibold">
+                      <ReactMarkdown>{m.content}</ReactMarkdown>
+                    </div>
+                  )}
+                </div>
+                {m.isGateBlock && (
+                  <button
+                    onClick={() => navigate({ to: "/app/profile-builder" as any })}
+                    style={{
+                      alignSelf: "flex-start",
+                      background: "#7C3AED",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: 8,
+                      padding: "8px 16px",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Resume profile builder →
+                  </button>
                 )}
               </div>
             </div>

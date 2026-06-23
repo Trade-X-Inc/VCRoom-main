@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { syncContactToHubSpot } from "@/lib/hubspot";
 import { Briefcase, ArrowUpRight, Plus, X, Loader2, Search, MoreHorizontal, Trash2, CheckCircle2, Copy, Check, Users, ChevronDown, ChevronUp } from "lucide-react";
+import { PageGuide } from "@/components/app/PageGuide";
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -185,12 +186,15 @@ function DealRooms() {
           <h1 className="text-2xl font-semibold tracking-tight">Deal Rooms</h1>
           <div className="text-sm text-muted-foreground">{rooms.length} room{rooms.length !== 1 ? "s" : ""}</div>
         </div>
-        <button
-          onClick={() => setOpen(true)}
-          className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"
-        >
-          <Plus className="h-4 w-4" /> Create new deal room
-        </button>
+        <div className="flex items-center gap-2">
+          <PageGuide pageId="deal-rooms" />
+          <button
+            onClick={() => setOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"
+          >
+            <Plus className="h-4 w-4" /> Create new deal room
+          </button>
+        </div>
       </div>
 
       {/* Filter + Sort bar */}

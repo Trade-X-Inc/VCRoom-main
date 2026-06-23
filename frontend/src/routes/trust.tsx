@@ -1,290 +1,237 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
+import { useQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { CheckCircle2, ChevronRight } from "lucide-react";
+
+// ── Server fn — fetches real verification_tiers rows ─────────────────────────
+const getVerificationTiers = createServerFn({ method: "GET" }).handler(async () => {
+  const cfEnv = (globalThis as any).__cf_env || {};
+  const url = cfEnv.SUPABASE_URL || cfEnv.VITE_SUPABASE_URL || "";
+  const key = cfEnv.SUPABASE_SERVICE_ROLE_KEY || "";
+  if (!url || !key) return { tiers: [] };
+  const sb = createClient(url, key, { auth: { persistSession: false } });
+  const { data } = await sb.from("verification_tiers").select("id, tier_name, applies_to, description, requirements").order("id");
+  return { tiers: data ?? [] };
+});
 
 export const Route = createFileRoute("/trust")({
   head: () => ({
     meta: [
-      { title: "Trust & Verification — Hockystick" },
-      {
-        name: "description",
-        content:
-          "How Hockystick verifies founders and investors. Two-way trust infrastructure for MENA fundraising.",
-      },
+      { title: "How Verification Works — Hockystick" },
+      { name: "description", content: "Every Hockystick verification tier explained. What each badge means, what we actually check, and what we never claim." },
     ],
   }),
   component: TrustPage,
 });
 
-// ── BadgeCard ─────────────────────────────────────────────────────
+// ── Tier display config ───────────────────────────────────────────────────────
+const TIER_CONFIG: Record<number, { color: string; borderColor: string; badgeBg: string; badgeText: string }> = {
+  0: { color: "rgba(255,255,255,0.25)",  borderColor: "rgba(255,255,255,0.08)", badgeBg: "rgba(255,255,255,0.06)",  badgeText: "rgba(255,255,255,0.4)" },
+  1: { color: "#3B82F6",                 borderColor: "rgba(59,130,246,0.2)",   badgeBg: "rgba(59,130,246,0.1)",   badgeText: "#3B82F6" },
+  2: { color: "#10B981",                 borderColor: "rgba(16,185,129,0.2)",   badgeBg: "rgba(16,185,129,0.1)",   badgeText: "#10B981" },
+  3: { color: "#F59E0B",                 borderColor: "rgba(245,158,11,0.2)",   badgeBg: "rgba(245,158,11,0.1)",   badgeText: "#F59E0B" },
+  4: { color: "#7C3AED",                 borderColor: "rgba(124,58,237,0.2)",   badgeBg: "rgba(124,58,237,0.1)",   badgeText: "#A855F7" },
+};
 
-interface BadgeCardProps {
-  icon: string;
-  iconColor: string;
-  badgeClass?: string;
-  name: string;
-  tagline: string;
-  how: string;
-  checks: string[];
-  notClaimed: string[];
-  status: "automatic" | "coming_soon";
-  availableText?: string;
-}
-
-function BadgeCard({
-  icon,
-  iconColor,
-  badgeClass,
-  name,
-  tagline,
-  how,
-  checks,
-  notClaimed,
-  status,
-  availableText,
-}: BadgeCardProps) {
-  return (
-    <div
-      className={`rounded-xl border p-5 mb-4 ${
-        status === "coming_soon"
-          ? "border-white/5 bg-white/[0.02] opacity-70"
-          : "border-white/8 bg-white/[0.03]"
-      }`}
-    >
-      <div className="flex items-start gap-3 mb-3">
-        <span className={`text-lg leading-none mt-0.5 shrink-0 ${iconColor}`}>{icon}</span>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 flex-wrap mb-0.5">
-            <p className="text-sm font-semibold text-white" style={{ fontFamily: "Syne, sans-serif" }}>
-              {name}
-            </p>
-            {status === "coming_soon" && (
-              <span className="text-xs bg-white/8 text-white/40 px-2 py-0.5 rounded-full border border-white/10">
-                {availableText ?? "Coming soon"}
-              </span>
-            )}
-            {status === "automatic" && badgeClass && (
-              <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${badgeClass}`}>
-                {icon} {name}
-              </span>
-            )}
-          </div>
-          <p className="text-xs text-white/40">{tagline}</p>
-        </div>
-      </div>
-
-      <p className="text-xs text-white/50 mb-3 leading-relaxed">
-        <span className="text-white/30">How: </span>
-        {how}
-      </p>
-
-      {checks.length > 0 && (
-        <div className="space-y-1.5 mb-3">
-          {checks.map((check, i) => (
-            <div key={i} className="flex items-center gap-2 text-xs">
-              <span className="text-green-400 shrink-0">✓</span>
-              <span className="text-white/60">{check}</span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {notClaimed.length > 0 && (
-        <div className="border-t border-white/5 pt-3 space-y-1.5">
-          <p className="text-xs text-white/25 mb-1.5">What this badge does NOT claim:</p>
-          {notClaimed.map((item, i) => (
-            <div key={i} className="flex items-center gap-2 text-xs">
-              <span className="text-white/20 shrink-0">○</span>
-              <span className="text-white/30">{item}</span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Page ──────────────────────────────────────────────────────────
+const APPLIES_TO_LABEL: Record<string, string> = {
+  both: "Founders & Investors",
+  founder: "Founders only",
+  investor: "Investors only",
+};
 
 function TrustPage() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["verification-tiers"],
+    queryFn: () => getVerificationTiers(),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const tiers = data?.tiers ?? [];
+
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-white">
       <SiteHeader />
 
       {/* Hero */}
-      <section className="pt-12 sm:pt-24 pb-12 sm:pb-16 text-center px-4 sm:px-6">
-        <p className="text-xs text-[#7C3AED] uppercase tracking-[0.2em] mb-4">
-          Trust Infrastructure
+      <section className="pt-16 sm:pt-24 pb-12 text-center px-4 sm:px-6">
+        <p className="text-xs uppercase tracking-[0.2em] mb-4" style={{ color: "#7C3AED" }}>
+          Verification system
         </p>
         <h1
           className="font-bold text-3xl md:text-4xl lg:text-5xl text-white leading-tight mb-6 max-w-3xl mx-auto"
           style={{ fontFamily: "Syne, sans-serif" }}
         >
-          Two-way verified trust.<br />
-          Not just founder checks.
+          How verification works
         </h1>
-        <p className="text-white/60 text-lg max-w-2xl mx-auto leading-relaxed">
-          Every platform verifies founders. None verify investors.
-          Hockystick is the first to build trust infrastructure for both sides of the table — so
-          deals are based on merit, not connections.
+        <p className="text-white/60 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mb-6">
+          Five tiers. Each badge means something specific and verifiable. This page shows exactly
+          what we check and what we never claim.
         </p>
+
+        {/* The principle — in a callout box, not buried */}
+        <div
+          className="inline-block max-w-xl mx-auto rounded-xl px-6 py-4 text-left"
+          style={{ background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)" }}
+        >
+          <p className="text-sm text-white/80 leading-relaxed">
+            <span className="text-white font-medium">Every account is fully accepted from day one.</span>{" "}
+            Badges show how much has been independently verified — they never gate access.
+            You can use every feature on the platform regardless of your verification tier.
+          </p>
+        </div>
       </section>
 
-      {/* Badge columns */}
-      <section className="py-8 px-4 sm:px-6 max-w-5xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-          {/* FOUNDER BADGES */}
-          <div>
-            <p className="text-xs text-white/40 uppercase tracking-[0.2em] mb-6">For Founders</p>
-
-            <BadgeCard
-              icon="○"
-              iconColor="text-white/40"
-              name="Profile Active"
-              tagline="Your profile is live on Hockystick"
-              how="Automatic when you publish your founder profile with 80%+ completeness."
-              checks={[
-                "Company details complete",
-                "Problem & solution filled",
-                "Funding target set",
-                "Profile published",
-              ]}
-              notClaimed={[]}
-              status="automatic"
-            />
-
-            <BadgeCard
-              icon="✓"
-              iconColor="text-blue-400"
-              badgeClass="bg-blue-500/15 text-blue-400 border-blue-500/20"
-              name="Hockystick Reviewed"
-              tagline="Your documents have been AI-reviewed"
-              how="Automatic when you complete 3+ documents in the Document Intelligence Centre with AI review scores."
-              checks={[
-                "Pitch deck uploaded or profile complete",
-                "At least 3 key documents completed",
-                "AI document review run",
-                "No critical gaps flagged",
-              ]}
-              notClaimed={[
-                "Does not verify revenue figures",
-                "Does not verify customer claims",
-                "Does not verify team backgrounds",
-              ]}
-              status="automatic"
-            />
-
-            <BadgeCard
-              icon="✦"
-              iconColor="text-[#7C3AED]"
-              badgeClass="bg-[#7C3AED]/15 text-[#7C3AED] border-[#7C3AED]/20"
-              name="Hockystick Verified"
-              tagline="Identity and business independently confirmed"
-              how="Manual review by the Hockystick team. Includes identity confirmation, company registration check, and structured challenge session with verified investors."
-              checks={[
-                "Government-issued ID verified",
-                "Company registration confirmed",
-                "Business model challenged by investors",
-                "Key claims independently checked",
-              ]}
-              notClaimed={[]}
-              status="coming_soon"
-              availableText="Available Q3 2026"
-            />
+      {/* Tiers */}
+      <section className="py-8 px-4 sm:px-6 max-w-3xl mx-auto">
+        {isLoading ? (
+          <div className="space-y-4">
+            {[0,1,2,3,4].map((i) => (
+              <div key={i} className="h-32 rounded-xl animate-pulse" style={{ background: "rgba(255,255,255,0.04)" }} />
+            ))}
           </div>
+        ) : (
+          <div className="space-y-4">
+            {tiers.map((tier: any) => {
+              const cfg = TIER_CONFIG[tier.id] ?? TIER_CONFIG[0];
+              const requirements: Array<{ label: string; detail?: string }> = tier.requirements ?? [];
+              const appliesToLabel = APPLIES_TO_LABEL[tier.applies_to] ?? tier.applies_to;
 
-          {/* INVESTOR BADGES */}
-          <div>
-            <p className="text-xs text-white/40 uppercase tracking-[0.2em] mb-6">For Investors</p>
+              return (
+                <div
+                  key={tier.id}
+                  className="rounded-xl p-6"
+                  style={{ background: "#111114", border: `1px solid ${cfg.borderColor}` }}
+                >
+                  {/* Header row */}
+                  <div className="flex items-start gap-4 mb-4">
+                    <div
+                      className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0 text-sm font-bold"
+                      style={{ background: cfg.badgeBg, color: cfg.color, border: `1px solid ${cfg.borderColor}` }}
+                    >
+                      {tier.id}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                        <h2 className="text-base font-semibold text-white" style={{ fontFamily: "Syne, sans-serif" }}>
+                          {tier.tier_name}
+                        </h2>
+                        <span
+                          className="text-[10px] font-medium px-2 py-0.5 rounded-full"
+                          style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" }}
+                        >
+                          {appliesToLabel}
+                        </span>
+                      </div>
+                      <p className="text-sm text-white/50 leading-relaxed">{tier.description}</p>
+                    </div>
+                  </div>
 
-            <BadgeCard
-              icon="○"
-              iconColor="text-white/40"
-              name="Thesis Active"
-              tagline="Your investment thesis is on the platform"
-              how="Automatic when your investor profile is complete with sectors, stages, and geography."
-              checks={[
-                "Investment thesis filled",
-                "Sectors and stages defined",
-                "Geography preference set",
-                "Check size range provided",
-              ]}
-              notClaimed={[]}
-              status="automatic"
-            />
+                  {/* Requirements */}
+                  {requirements.length > 0 && (
+                    <div className="space-y-2 ml-14">
+                      {requirements.map((req, i) => (
+                        <div key={i} className="flex items-start gap-2">
+                          <CheckCircle2 className="h-3.5 w-3.5 shrink-0 mt-0.5" style={{ color: cfg.color }} />
+                          <div className="min-w-0">
+                            <span className="text-xs text-white/70">{req.label}</span>
+                            {req.detail && (
+                              <p className="text-xs text-white/35 mt-0.5 leading-relaxed">{req.detail}</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
-            <BadgeCard
-              icon="✓"
-              iconColor="text-blue-400"
-              badgeClass="bg-blue-500/15 text-blue-400 border-blue-500/20"
-              name="Hockystick Checked"
-              tagline="Digital presence independently verified"
-              how="Automatic daily check. No action needed from the investor."
-              checks={[
-                "Fund or firm website resolves",
-                "LinkedIn profile URL is valid",
-                "Email domain matches fund website",
-                "Public signals found in AI research",
-              ]}
-              notClaimed={[
-                "Does not verify fund size",
-                "Does not verify portfolio companies",
-                "Does not verify investment history",
-                "Self-reported claims are not confirmed",
-              ]}
-              status="automatic"
-            />
+                  {requirements.length === 0 && (
+                    <p className="text-xs text-white/30 ml-14 italic">No requirements — automatic on account creation.</p>
+                  )}
 
-            <BadgeCard
-              icon="✦"
-              iconColor="text-[#7C3AED]"
-              badgeClass="bg-[#7C3AED]/15 text-[#7C3AED] border-[#7C3AED]/20"
-              name="Hockystick Verified"
-              tagline="Track record and identity independently confirmed"
-              how="Manual review by the Hockystick team. Reserved for active investors who have completed at least one deal on the platform."
-              checks={[
-                "Government-issued ID verified",
-                "Fund or entity registration confirmed",
-                "At least one completed deal on Hockystick",
-                "Reference check from portfolio founder",
-              ]}
-              notClaimed={[]}
-              status="coming_soon"
-              availableText="Available Q3 2026"
-            />
+                  {/* Inline notes for Tier 3 — dual paths: Capital Verified (investors) + Operationally Verified (founders) */}
+                  {tier.id === 3 && (
+                    <div className="ml-14 mt-3 space-y-3">
+                      <div
+                        className="rounded-lg px-4 py-3"
+                        style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)" }}
+                      >
+                        <p className="text-xs text-white/60 font-medium mb-1.5">Capital Verified — for investors</p>
+                        <p className="text-xs text-white/40 leading-relaxed">
+                          Three independent documents: fund formation instrument, capital commitment letter or board resolution, AUM confirmation.
+                          Accepted: Limited Partnership Agreement, Articles of Association, Board Resolution with capital commitment,
+                          Bank statement or custodian letter (dated within 12 months).
+                          Each slot requires distinct content — one document cannot satisfy more than one slot.
+                        </p>
+                      </div>
+                      <div
+                        className="rounded-lg px-4 py-3"
+                        style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.15)" }}
+                      >
+                        <p className="text-xs text-white/60 font-medium mb-1.5">Operationally Verified — for founders</p>
+                        <p className="text-xs text-white/40 leading-relaxed">
+                          Three independent documents: financial activity record, customer or contract evidence, team employment record.
+                          Accepted: bank statements or revenue records (dated within 6 months), signed contracts or purchase orders naming an external party,
+                          payroll records, employment contracts, offer letters, or org charts naming individuals with titles.
+                          Each slot requires distinct content — one document cannot satisfy more than one slot.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* Key guarantees */}
+      <section className="py-8 px-4 sm:px-6 max-w-3xl mx-auto">
+        <div
+          className="rounded-xl p-6"
+          style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)" }}
+        >
+          <h3 className="text-sm font-semibold text-white mb-4" style={{ fontFamily: "Syne, sans-serif" }}>
+            What we never do
+          </h3>
+          <div className="space-y-3">
+            {[
+              "Use one document to satisfy multiple unrelated claims. A pitch deck does not verify a financial statement. A financial document does not verify legal standing.",
+              "Infer content from a filename or category label. A file named 'financials.csv' is only verified for a specific claim if the actual content confirms that claim.",
+              "Gate platform access on verification tier. Every account has full access from sign-up.",
+              "Let a verified badge drift from what was actually checked. The requirements on this page are the exact same requirements enforced by the system.",
+            ].map((text, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <span className="text-xs text-white/25 shrink-0 mt-0.5">○</span>
+                <p className="text-xs text-white/50 leading-relaxed">{text}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Bottom CTA */}
-      <section className="py-12 sm:py-16 px-4 sm:px-6 text-center border-t border-white/8 max-w-5xl mx-auto">
-        <p className="text-xs text-white/40 uppercase tracking-[0.2em] mb-4">
-          Built on honest verification
-        </p>
-        <h2
-          className="font-bold text-2xl text-white mb-4"
-          style={{ fontFamily: "Syne, sans-serif" }}
-        >
-          We only claim what we can prove.
-        </h2>
-        <p className="text-white/50 max-w-xl mx-auto text-sm leading-relaxed mb-8">
-          Wrong information in an investment context is worse than no information. Every badge on
-          Hockystick is backed by a specific, documented check — never an assumption.
-        </p>
-        <div className="flex gap-4 justify-center flex-wrap">
-          <a
-            href="/sign-up"
-            className="px-6 py-3 bg-[#7C3AED] text-white rounded-lg text-sm font-medium hover:bg-[#6d28d9] transition-colors"
+      {/* Links back to profiles */}
+      <section className="py-8 px-4 sm:px-6 max-w-3xl mx-auto">
+        <div className="flex flex-wrap gap-3">
+          <Link
+            to="/sign-up"
+            search={{ role: "founder" } as any}
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-colors"
+            style={{ background: "#7C3AED" }}
           >
-            Start raising →
-          </a>
-          <a
-            href="/sign-up?role=investor"
-            className="px-6 py-3 border border-white/15 text-white/70 rounded-lg text-sm font-medium hover:border-white/30 hover:text-white transition-colors"
+            Start as a founder
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Link>
+          <Link
+            to="/sign-up"
+            search={{ role: "investor" } as any}
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors"
+            style={{ border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}
           >
-            Invest on Hockystick →
-          </a>
+            Invest on Hockystick
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
       </section>
 

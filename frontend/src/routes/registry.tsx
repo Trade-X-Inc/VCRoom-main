@@ -38,6 +38,9 @@ interface RegistryResult {
     found: boolean;
     status: string;
     confidence: number;
+    confidenceLabel: string | null;
+    sourceUrl: string | null;
+    method: string;
   };
   verified: boolean;
   confidence: number;
@@ -115,8 +118,8 @@ function Registry() {
         </h1>
         <p className="text-white/50 text-sm leading-relaxed mb-10">
           Search across OpenCorporates (140+ jurisdictions including UAE, UK, US, Saudi Arabia,
-          Bahrain, Qatar), UK Companies House, and DIFC entity register — simultaneously.
-          Free. No account required.
+          Bahrain, Qatar) and UK Companies House via direct API, plus a best-effort DIFC
+          web search — simultaneously. Free. No account required.
         </p>
 
         {/* Search input */}
@@ -140,7 +143,7 @@ function Registry() {
 
         {/* Registries being checked */}
         <div className="flex flex-wrap gap-2 mb-10">
-          {["OpenCorporates (140+ jurisdictions)", "UK Companies House", "DIFC Entity Register"].map((r) => (
+          {["OpenCorporates (140+ jurisdictions)", "UK Companies House", "DIFC (best-effort web search)"].map((r) => (
             <span
               key={r}
               className="text-xs text-white/30 border border-white/8 px-3 py-1 rounded-full"
@@ -292,36 +295,62 @@ function Registry() {
               )}
             </div>
 
-            {/* DIFC */}
+            {/* DIFC — always shown as best-effort, never equal to structured checks */}
             <div
               className="p-4 rounded-xl"
               style={{
-                background: results.difc.found ? "rgba(124,58,237,0.07)" : "rgba(255,255,255,0.02)",
-                border: results.difc.found ? "1px solid rgba(124,58,237,0.2)" : "1px solid rgba(255,255,255,0.06)",
+                background: "rgba(255,255,255,0.02)",
+                border: "1px solid rgba(255,255,255,0.07)",
               }}
             >
               <div className="flex items-center justify-between mb-1">
-                <p className="text-sm font-medium text-white">DIFC Entity Register</p>
+                <div>
+                  <p className="text-sm font-medium text-white">DIFC (UAE)</p>
+                  <p className="text-[11px] mt-0.5" style={{ color: "rgba(245,158,11,0.7)" }}>
+                    Best-effort match — not a direct registry connection
+                  </p>
+                </div>
                 <span
                   className="text-xs font-semibold"
                   style={{
-                    color: results.difc.found
-                      ? "#a78bfa"
-                      : results.difc.status === "unavailable"
-                      ? "rgba(255,255,255,0.15)"
-                      : "rgba(255,255,255,0.2)",
+                    color: results.difc.found ? "#10B981" : "rgba(255,255,255,0.2)",
                   }}
                 >
                   {results.difc.found
-                    ? "✓ Found"
-                    : results.difc.status === "unavailable"
-                    ? "— Unavailable"
-                    : "○ Not found"}
+                    ? `✓ Match found`
+                    : results.difc.status === "no_data_returned" || results.difc.status === "ai_unavailable"
+                    ? "— Check attempted"
+                    : "○ No match found"}
                 </span>
               </div>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
-                Dubai International Financial Centre entity register
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.3)" }}>
+                AI-assisted search of the DIFC public register page. No direct API access exists.
+                {results.difc.confidenceLabel && results.difc.found && (
+                  <> Confidence: <strong className="text-white/50">{results.difc.confidenceLabel}</strong>.</>
+                )}
               </p>
+              {results.difc.found && results.difc.sourceUrl && (
+                <a
+                  href={results.difc.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs hover:underline block mt-2"
+                  style={{ color: "#7C3AED" }}
+                >
+                  ↗ Verify on difc.ae (check the AI's work)
+                </a>
+              )}
+              {!results.difc.found && (
+                <a
+                  href="https://www.difc.ae/business/public-register/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs hover:underline block mt-2"
+                  style={{ color: "rgba(124,58,237,0.6)" }}
+                >
+                  ↗ Search manually on difc.ae
+                </a>
+              )}
             </div>
 
             {/* Disclaimer */}

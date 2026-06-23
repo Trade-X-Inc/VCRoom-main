@@ -1,0 +1,10 @@
+[
+  { "key": "fund_name", "label": "Fund or firm name" },
+  { "key": "your_name", "label": "Your name" },
+  { "key": "thesis", "label": "Investment thesis" },
+  { "key": "sectors", "label": "Sectors of interest" },
+  { "key": "stages", "label": "Investment stages" },
+  { "key": "check_size_min", "label": "Minimum check size" },
+  { "key": "check_size_max", "label": "Maximum check size" },
+  { "key": "geography", "label": "Geography focus" }
+]

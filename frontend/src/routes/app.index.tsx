@@ -1,404 +1,926 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { format, formatDistanceToNow } from "date-fns";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ArrowUpRight, TrendingUp, Users, Briefcase, Mail, Sparkles,
-  Calendar, FileText, CheckCircle2, Clock, Building2, X, Loader2,
-  HelpCircle, ExternalLink, AlertCircle, ShieldCheck, Check,
+  ShieldCheck, CheckCircle2, XCircle,
+  Loader2, ChevronRight, Users, Globe, Linkedin, Mail,
+  Building2, Briefcase, Clock, Eye, Check, X,
+  Zap, TrendingUp, TrendingDown, AlertTriangle, ArrowRight,
 } from "lucide-react";
+import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { cn } from "@/lib/utils";
+import { AttachProofModal } from "@/components/app/AttachProofModal";
+import { PageGuide } from "@/components/app/PageGuide";
+import type { StartupClaim, ClaimStatus } from "@/lib/claims-fn";
+import type { ReadinessResult } from "@/lib/readiness-fn";
 
 export const Route = createFileRoute("/app/")({
-  component: Overview,
+  component: FounderHome,
 });
 
-// ── Types ──────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Types
+// ─────────────────────────────────────────────────────────────────────────────
 
-interface Startup {
-  id: string;
-  name?: string | null;
-  company_name?: string | null;
-  profile_slug?: string | null;
-  stage?: string | null;
-  target_raise?: number | null;
-  founder_id?: string;
+interface FounderVerif {
+  current_tier: number;
+  tier1_passed: boolean;
+  tier1_score: number;
+  tier1_checked_at: string | null;
+  website_resolves: boolean | null;
+  website_matches_pitch: boolean | null;
+  linkedin_valid: boolean | null;
+  email_domain_matches: boolean | null;
+  registry_confirmed: boolean | null;
+  website_content_summary: string | null;
+  tier2_passed: boolean;
+  tier3_passed: boolean;
 }
 
-interface Activity {
+interface CapRow {
   id: string;
-  action: string;
-  created_at: string;
-  deal_room_id?: string | null;
-  actor_id?: string | null;
-  metadata?: Record<string, unknown> | null;
+  social_verified: boolean;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Small shared helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+const CLAIM_STATUS_STYLE: Record<ClaimStatus, { style: React.CSSProperties; label: string }> = {
+  unverified: {
+    style: { background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.25)", color: "#F59E0B" },
+    label: "Unverified",
+  },
+  pending_review: {
+    style: { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.5)" },
+    label: "Proof attached",
+  },
+  ai_confirmed: {
+    style: { background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" },
+    label: "Confirmed",
+  },
+  ai_mismatch: {
+    style: { background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", color: "#EF4444" },
+    label: "Mismatch",
+  },
+};
+
+function CheckRow({
+  label,
+  passed,
+  icon,
+  note,
+}: {
+  label: string;
+  passed: boolean | null;
+  icon: React.ReactNode;
+  note?: string | null;
+}) {
+  return (
+    <div className="flex items-start gap-3 py-3 border-b last:border-0" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+      <span className="mt-0.5 text-white/30 shrink-0">{icon}</span>
+      <div className="flex-1 min-w-0">
+        <span className="text-sm text-white/70">{label}</span>
+        {note && <p className="text-xs text-white/35 mt-0.5 leading-relaxed truncate" title={note}>{note}</p>}
+      </div>
+      <div className="shrink-0">
+        {passed === null ? (
+          <span className="text-xs text-white/25">Not checked</span>
+        ) : passed ? (
+          <span className="flex items-center gap-1 text-xs" style={{ color: "#10B981" }}>
+            <CheckCircle2 className="h-3.5 w-3.5" /> Pass
+          </span>
+        ) : (
+          <span className="flex items-center gap-1 text-xs" style={{ color: "#EF4444" }}>
+            <XCircle className="h-3.5 w-3.5" /> Fail
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Verification card
+// ─────────────────────────────────────────────────────────────────────────────
+
+function VerificationCard({
+  startupId,
+  userId,
+  profileSlug,
+}: {
+  startupId: string;
+  userId: string;
+  profileSlug: string | null;
+}) {
+  const qc = useQueryClient();
+  const [running, setRunning] = useState(false);
+  const [attachingClaim, setAttachingClaim] = useState<{ type: string; label: string; value: string } | null>(null);
+
+  const { data: verif, isLoading: verifLoading } = useQuery<FounderVerif | null>({
+    queryKey: ["home-verif", startupId],
+    enabled: !!startupId && typeof window !== "undefined",
+    staleTime: 0,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("founder_verifications")
+        .select("current_tier,tier1_passed,tier1_score,tier1_checked_at,website_resolves,website_matches_pitch,linkedin_valid,email_domain_matches,registry_confirmed,website_content_summary,tier2_passed,tier3_passed")
+        .eq("startup_id", startupId)
+        .maybeSingle();
+      return (data as FounderVerif | null) ?? null;
+    },
+  });
+
+  const { data: claims = [], refetch: refetchClaims } = useQuery<StartupClaim[]>({
+    queryKey: ["home-claims", startupId],
+    enabled: !!startupId && typeof window !== "undefined",
+    staleTime: 0,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("startup_claims")
+        .select("*")
+        .eq("startup_id", startupId)
+        .order("claim_type");
+      return (data ?? []) as StartupClaim[];
+    },
+  });
+
+  const { data: capRows = [] } = useQuery<CapRow[]>({
+    queryKey: ["home-cap", startupId],
+    enabled: !!startupId && typeof window !== "undefined",
+    staleTime: 0,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("startup_cap_table")
+        .select("id, social_verified")
+        .eq("startup_id", startupId);
+      return (data ?? []) as CapRow[];
+    },
+  });
+
+  const neverRun = !verif || !verif.tier1_checked_at;
+  const tier1Passed = verif?.tier1_passed ?? false;
+  const tier1Score = verif?.tier1_score ?? 0;
+  const currentTier = verif?.current_tier ?? 0;
+
+  const confirmedClaims = claims.filter((c) => c.proof_status === "ai_confirmed").length;
+  const mismatchedClaims = claims.filter((c) => c.proof_status === "ai_mismatch");
+  const unverifiedClaims = claims.filter(
+    (c) => c.proof_status === "unverified" || c.proof_status === "ai_mismatch"
+  );
+  const capVerifiedCount = capRows.filter((r) => r.social_verified).length;
+
+  let subtext: string;
+  if (neverRun) {
+    subtext = "Not yet verified — run your first check";
+  } else if (tier1Passed) {
+    subtext = `Hockystick Checked · ${tier1Score}/100`;
+  } else {
+    subtext = `Verification check found gaps · ${tier1Score}/100`;
+  }
+
+  const headerBadgeStyle: React.CSSProperties = neverRun
+    ? { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.3)" }
+    : tier1Passed
+    ? { background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }
+    : { background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", color: "#F59E0B" };
+
+  const handleRunTier1 = async () => {
+    if (running) return;
+    setRunning(true);
+    toast.info("Running automated checks — this takes up to 20 seconds…");
+    try {
+      const { runTier1Check } = await import("@/lib/verification-fn");
+      const result = await runTier1Check({ data: { startup_id: startupId, caller_user_id: userId } });
+      await qc.invalidateQueries({ queryKey: ["home-verif", startupId] });
+      if (result.tier1_passed) {
+        toast.success(`Verification passed — score ${result.tier1_score}/100`);
+      } else {
+        toast.error(`Score ${result.tier1_score}/100 — 60 needed to pass. See which checks failed below.`);
+      }
+      // Auto-recompute readiness after verification reruns
+      try {
+        const { computeReadiness } = await import("@/lib/readiness-fn");
+        await computeReadiness({ data: { startup_id: startupId, founder_user_id: userId } });
+        qc.invalidateQueries({ queryKey: ["readiness", startupId] });
+      } catch { /* non-blocking */ }
+    } catch {
+      toast.error("Verification check failed. Please try again.");
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  return (
+    <>
+      <div
+        style={{
+          background: "#111114",
+          border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: 16,
+          overflow: "hidden",
+        }}
+      >
+        {/* Card header */}
+        <div
+          style={{ padding: "20px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+          className="flex items-start justify-between gap-4 flex-wrap"
+        >
+          <div className="flex items-start gap-3">
+            <div
+              className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+              style={{
+                background: neverRun
+                  ? "rgba(255,255,255,0.05)"
+                  : tier1Passed
+                  ? "rgba(16,185,129,0.12)"
+                  : "rgba(245,158,11,0.1)",
+              }}
+            >
+              <ShieldCheck
+                className="h-4.5 w-4.5"
+                style={{
+                  color: neverRun ? "rgba(255,255,255,0.25)" : tier1Passed ? "#10B981" : "#F59E0B",
+                }}
+              />
+            </div>
+            <div>
+              <h2
+                className="text-sm font-semibold text-white"
+                style={{ fontFamily: "Syne, sans-serif" }}
+              >
+                Verification
+              </h2>
+              <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{subtext}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <span
+              className="text-[11px] px-2.5 py-1 rounded-full font-medium"
+              style={headerBadgeStyle}
+            >
+              {neverRun ? "Not verified" : currentTier === 1 ? "✓ Hockystick Checked" : currentTier >= 2 ? "✦ Verified" : "Check ran, not passed"}
+            </span>
+            {!neverRun && profileSlug && (
+              <a
+                href={`/verify/${profileSlug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] flex items-center gap-1 transition-colors"
+                style={{ color: "rgba(255,255,255,0.3)" }}
+              >
+                Public report <ChevronRight className="h-3 w-3" />
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* Body */}
+        <div style={{ padding: "20px 24px" }}>
+          {/* Never-run state */}
+          {neverRun && (
+            <div className="space-y-4">
+              <div
+                className="rounded-lg text-xs leading-relaxed"
+                style={{
+                  background: "rgba(124,58,237,0.06)",
+                  border: "1px solid rgba(124,58,237,0.15)",
+                  padding: "12px 16px",
+                  color: "rgba(255,255,255,0.45)",
+                }}
+              >
+                Automated checks confirm your website resolves, your LinkedIn URL exists, your email domain
+                matches your website, and your company appears in a public registry. No login required on
+                the investor side — the badge is visible on your public profile.
+              </div>
+              <button
+                onClick={handleRunTier1}
+                disabled={running}
+                className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-white transition-colors"
+                style={{
+                  background: running ? "rgba(124,58,237,0.4)" : "#7C3AED",
+                  cursor: running ? "not-allowed" : "pointer",
+                  opacity: running ? 0.8 : 1,
+                }}
+              >
+                {running
+                  ? <><Loader2 className="h-4 w-4 animate-spin" /> Running checks…</>
+                  : <><ShieldCheck className="h-4 w-4" /> Run verification check</>
+                }
+              </button>
+            </div>
+          )}
+
+          {/* Has-run state */}
+          {!neverRun && (
+            <div>
+              {verifLoading ? (
+                <div className="flex items-center gap-2 py-4 text-sm text-white/30">
+                  <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+                </div>
+              ) : (
+                <div
+                  className="rounded-lg overflow-hidden mb-4"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+                >
+                  <div style={{ padding: "0 16px" }}>
+                    <CheckRow
+                      label="Website resolves"
+                      icon={<Globe className="h-3.5 w-3.5" />}
+                      passed={verif?.website_resolves ?? null}
+                      note={verif?.website_resolves === false ? "No valid HTTP response from listed website" : null}
+                    />
+                    <CheckRow
+                      label="Website content matches profile"
+                      icon={<Building2 className="h-3.5 w-3.5" />}
+                      passed={verif?.website_matches_pitch ?? null}
+                      note={verif?.website_content_summary ?? null}
+                    />
+                    <CheckRow
+                      label="LinkedIn URL reachable"
+                      icon={<Linkedin className="h-3.5 w-3.5" />}
+                      passed={verif?.linkedin_valid ?? null}
+                    />
+                    <CheckRow
+                      label="Email domain matches website"
+                      icon={<Mail className="h-3.5 w-3.5" />}
+                      passed={verif?.email_domain_matches ?? null}
+                      note={verif?.email_domain_matches === false ? "Free email providers excluded" : null}
+                    />
+                    <CheckRow
+                      label="Company registry confirmed"
+                      icon={<Building2 className="h-3.5 w-3.5" />}
+                      passed={verif?.registry_confirmed ?? null}
+                    />
+                  </div>
+                  <div
+                    style={{ padding: "10px 16px", borderTop: "1px solid rgba(255,255,255,0.05)" }}
+                    className="flex items-center justify-between"
+                  >
+                    <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
+                      Score: {tier1Score}/100 — {tier1Passed ? "passed (60 required)" : "60 needed to pass"}
+                    </span>
+                    <button
+                      onClick={handleRunTier1}
+                      disabled={running}
+                      className="text-xs flex items-center gap-1 transition-colors"
+                      style={{ color: "rgba(255,255,255,0.3)", cursor: running ? "not-allowed" : "pointer" }}
+                    >
+                      {running ? <><Loader2 className="h-3 w-3 animate-spin" /> Re-running…</> : "Re-run checks"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Claims subsection */}
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 16, marginTop: neverRun ? 16 : 0 }}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-semibold text-white/60 uppercase tracking-wider" style={{ letterSpacing: "0.1em" }}>
+                Claims
+              </span>
+              <span
+                className="text-[11px] px-2 py-0.5 rounded-full"
+                style={
+                  mismatchedClaims.length > 0
+                    ? { background: "rgba(239,68,68,0.1)", color: "#EF4444", border: "1px solid rgba(239,68,68,0.2)" }
+                    : confirmedClaims === claims.length && claims.length > 0
+                    ? { background: "rgba(16,185,129,0.12)", color: "#10B981", border: "1px solid rgba(16,185,129,0.2)" }
+                    : { background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1px solid rgba(245,158,11,0.2)" }
+                }
+              >
+                {claims.length === 0
+                  ? "No claims yet"
+                  : `${confirmedClaims}/${claims.length} verified`}
+              </span>
+            </div>
+
+            {claims.length === 0 && (
+              <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+                Save traction data (revenue, growth rate, customer count) on your{" "}
+                <Link to="/app/profile" className="underline underline-offset-2 hover:opacity-70" style={{ color: "rgba(124,58,237,0.8)" }}>
+                  Company Profile
+                </Link>{" "}
+                and claims will appear here.
+              </p>
+            )}
+
+            {claims.length > 0 && (
+              <div className="space-y-2">
+                {claims.map((claim) => {
+                  const cfg = CLAIM_STATUS_STYLE[claim.proof_status as ClaimStatus] ?? CLAIM_STATUS_STYLE.unverified;
+                  const needsAction = claim.proof_status === "unverified" || claim.proof_status === "ai_mismatch";
+                  return (
+                    <div
+                      key={claim.id}
+                      className="flex items-center justify-between gap-3 rounded-lg px-3 py-2.5"
+                      style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.06)" }}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm text-white/70 truncate block">{claim.claim_label}</span>
+                        <span className="text-xs text-white/35 truncate block">{claim.claim_value}</span>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span
+                          className="text-[11px] px-1.5 py-0.5 rounded-full font-medium"
+                          style={cfg.style}
+                        >
+                          {cfg.label}
+                        </span>
+                        {needsAction && (
+                          <button
+                            onClick={() =>
+                              setAttachingClaim({
+                                type: claim.claim_type,
+                                label: claim.claim_label,
+                                value: claim.claim_value,
+                              })
+                            }
+                            className="text-[11px] underline underline-offset-2 transition-colors"
+                            style={{ color: "rgba(124,58,237,0.8)", background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                          >
+                            Attach proof
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Cap table subsection */}
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 16, marginTop: 16 }}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-semibold text-white/60 uppercase tracking-wider" style={{ letterSpacing: "0.1em" }}>
+                Cap Table
+              </span>
+              <span
+                className="text-[11px] px-2 py-0.5 rounded-full"
+                style={
+                  capRows.length === 0
+                    ? { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.3)", border: "1px solid rgba(255,255,255,0.08)" }
+                    : capVerifiedCount === capRows.length
+                    ? { background: "rgba(16,185,129,0.12)", color: "#10B981", border: "1px solid rgba(16,185,129,0.2)" }
+                    : { background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1px solid rgba(245,158,11,0.2)" }
+                }
+              >
+                {capRows.length === 0
+                  ? "No entries"
+                  : `${capRows.length} shareholder${capRows.length !== 1 ? "s" : ""} · ${capVerifiedCount} verified`}
+              </span>
+            </div>
+
+            {capRows.length === 0 ? (
+              <div className="flex items-center gap-2">
+                <Users className="h-3.5 w-3.5 shrink-0" style={{ color: "rgba(255,255,255,0.2)" }} />
+                <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+                  No cap table entries yet.{" "}
+                  <Link
+                    to="/app/profile"
+                    className="underline underline-offset-2 hover:opacity-70"
+                    style={{ color: "rgba(124,58,237,0.8)" }}
+                  >
+                    Add shareholders on Company Profile
+                  </Link>
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between">
+                <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
+                  Visible only to you — not shared with investors by default.
+                </span>
+                <Link
+                  to="/app/profile"
+                  className="text-[11px] flex items-center gap-1 transition-colors"
+                  style={{ color: "rgba(124,58,237,0.7)" }}
+                >
+                  Manage <ChevronRight className="h-3 w-3" />
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {attachingClaim && (
+        <AttachProofModal
+          claim={attachingClaim}
+          startupId={startupId}
+          onClose={() => setAttachingClaim(null)}
+          onDone={async () => {
+            refetchClaims();
+            setAttachingClaim(null);
+            // Recompute readiness when a claim proof status changes
+            try {
+              const { computeReadiness } = await import("@/lib/readiness-fn");
+              await computeReadiness({ data: { startup_id: startupId, founder_user_id: userId } });
+              qc.invalidateQueries({ queryKey: ["readiness", startupId] });
+            } catch { /* non-blocking */ }
+          }}
+        />
+      )}
+    </>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Deal Activity card
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface DealRoom {
   id: string;
-  name?: string | null;
-  status?: string | null;
-  updated_at: string;
+  status: string;
+  created_at: string;
+  investor_name: string | null;
+  investor_company: string | null;
 }
-
-// ── Helpers ────────────────────────────────────────────────────────
-
-function timeAgo(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 2) return "just now";
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  return `${Math.floor(hrs / 24)}d ago`;
-}
-
-function activityIcon(action: string): { Icon: React.ElementType; cls: string } {
-  const a = action.toLowerCase();
-  if (a.includes("sign") || a.includes("nda")) return { Icon: CheckCircle2, cls: "text-success" };
-  if (a.includes("document") || a.includes("view") || a.includes("file")) return { Icon: FileText, cls: "text-brand" };
-  if (a.includes("email") || a.includes("reply") || a.includes("message")) return { Icon: Mail, cls: "text-violet" };
-  if (a.includes("meeting") || a.includes("calendar") || a.includes("schedule")) return { Icon: Calendar, cls: "text-warning" };
-  if (a.includes("deal") || a.includes("room")) return { Icon: Briefcase, cls: "text-success" };
-  return { Icon: Clock, cls: "text-muted-foreground" };
-}
-
-const DEAL_ROOM_PROGRESS: Record<string, { p: number; bar: string }> = {
-  decision: { p: 90, bar: "bg-success" },
-  diligence: { p: 75, bar: "bg-success" },
-  qa: { p: 52, bar: "bg-warning" },
-  "q&a": { p: 52, bar: "bg-warning" },
-  review: { p: 40, bar: "bg-brand" },
-  onboard: { p: 20, bar: "bg-brand" },
-};
-
-function dealRoomProgress(status: string | null | undefined): { p: number; bar: string } {
-  const s = (status ?? "").toLowerCase();
-  for (const [key, val] of Object.entries(DEAL_ROOM_PROGRESS)) {
-    if (s.includes(key)) return val;
-  }
-  return { p: 10, bar: "bg-brand" };
-}
-
-// ── How it works modal ─────────────────────────────────────────────
-
-function HowItWorksModal({ onClose }: { onClose: () => void }) {
-  const steps = [
-    { n: "1", title: "Add VC leads", body: "Build your target list of investors manually or via CSV import." },
-    { n: "2", title: "Generate AI emails", body: "Use AI to write personalised cold outreach and follow-ups for each investor." },
-    { n: "3", title: "Create deal rooms", body: "When VCs show interest, open a secure deal room to share documents." },
-    { n: "4", title: "Close your round", body: "Manage diligence, Q&A, and investor decisions all in one place." },
-  ];
-
-  return (
-    <div
-      className="fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm grid place-items-center p-4"
-      onClick={onClose}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg rounded-2xl border border-border/60 bg-card shadow-elev p-8"
-      >
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold">How Hockystick works</h2>
-          <button
-            onClick={onClose}
-            className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-        <div className="space-y-5">
-          {steps.map((s) => (
-            <div key={s.n} className="flex items-start gap-4">
-              <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-brand text-brand-foreground text-sm font-semibold">
-                {s.n}
-              </div>
-              <div>
-                <div className="text-sm font-semibold">{s.title}</div>
-                <div className="text-sm text-muted-foreground mt-0.5 leading-relaxed">{s.body}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Onboarding step card ───────────────────────────────────────────
-
-function OnboardingStep({
-  icon: Icon,
-  title,
-  description,
-  buttonLabel,
-  to,
-  done,
-  disabled,
-}: {
-  icon: React.ElementType;
-  title: string;
-  description: string;
-  buttonLabel: string;
-  to: string;
-  done: boolean;
-  disabled?: boolean;
-}) {
-  const navigate = useNavigate();
-  return (
-    <div
-      className={cn(
-        "rounded-xl border border-border/60 bg-card p-6 shadow-card flex flex-col gap-3",
-        disabled && "opacity-50",
-      )}
-    >
-      <div className="flex items-start justify-between">
-        <div className={cn("grid h-10 w-10 place-items-center rounded-lg", disabled ? "bg-muted" : "bg-brand/10")}>
-          <Icon className={cn("h-5 w-5", disabled ? "text-muted-foreground" : "text-brand")} />
-        </div>
-        {done && <CheckCircle2 className="h-5 w-5 text-success shrink-0" />}
-      </div>
-      <div>
-        <div className="text-sm font-semibold">{title}</div>
-        <div className="text-xs text-muted-foreground mt-1 leading-relaxed">{description}</div>
-      </div>
-      <button
-        disabled={disabled}
-        onClick={() => !disabled && navigate({ to: to as any })}
-        className={cn(
-          "mt-auto rounded-md px-3 py-2 text-sm font-medium transition-colors text-center",
-          done
-            ? "border border-border/60 text-muted-foreground hover:bg-accent"
-            : disabled
-            ? "border border-border/60 text-muted-foreground cursor-not-allowed"
-            : "bg-gradient-brand text-brand-foreground shadow-glow hover:opacity-90",
-        )}
-      >
-        {done ? "✓ " : ""}{buttonLabel}
-      </button>
-    </div>
-  );
-}
-
-// ── Founder onboarding checklist ───────────────────────────────────
-
-function FounderOnboarding({
-  startup,
-  docs,
-  dealRooms,
-  investorMembers,
-}: {
-  startup: any;
-  docs: any[];
-  dealRooms: any[];
-  investorMembers: any[];
-}) {
-  const [dismissed, setDismissed] = useState(
-    () => typeof localStorage !== "undefined" && !!localStorage.getItem("hs_onboarding_founder_dismissed"),
-  );
-
-  const steps = [
-    {
-      id: "profile",
-      label: "Complete your company profile",
-      description: "Add your pitch, team, and financials",
-      done: !!(startup?.name),
-      href: "/app/profile",
-    },
-    {
-      id: "docs",
-      label: "Upload your pitch deck",
-      description: "Share documents with investors securely",
-      done: docs.length > 0,
-      href: "/app/documents",
-    },
-    {
-      id: "dealroom",
-      label: "Create your first deal room",
-      description: "Your private space to close deals",
-      done: dealRooms.length > 0,
-      href: "/app/deal-rooms",
-    },
-    {
-      id: "investor",
-      label: "Invite your first investor",
-      description: "Send a secure deal room invitation",
-      done: investorMembers.length > 0,
-      href: "/app/deal-rooms",
-    },
-  ];
-
-  const completed = steps.filter((s) => s.done).length;
-  if (dismissed || completed === steps.length) return null;
-
-  const pct = Math.round((completed / steps.length) * 100);
-
-  return (
-    <div className="rounded-xl border border-border/60 bg-card shadow-card p-5 mb-6">
-      <div className="flex items-center justify-between mb-3">
-        <div>
-          <div className="text-sm font-semibold">Get started with Hockystick</div>
-          <div className="text-xs text-muted-foreground">{completed} of {steps.length} steps complete</div>
-        </div>
-        <button
-          onClick={() => {
-            localStorage.setItem("hs_onboarding_founder_dismissed", "1");
-            setDismissed(true);
-          }}
-          className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
-          title="Dismiss"
-        >
-          <X className="h-3.5 w-3.5" />
-        </button>
-      </div>
-      <div className="h-1.5 rounded-full bg-muted overflow-hidden mb-4">
-        <div
-          className="h-full bg-gradient-brand rounded-full transition-all duration-500"
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {steps.map((step) => (
-          <Link
-            key={step.id}
-            to={step.href as any}
-            className={cn(
-              "rounded-lg border px-3 py-2.5 flex items-start gap-2.5 transition-colors",
-              step.done
-                ? "border-success/30 bg-success/5 opacity-70 pointer-events-none"
-                : "border-border/60 bg-background/60 hover:bg-accent",
-            )}
-          >
-            <div className="mt-0.5 shrink-0">
-              {step.done ? (
-                <CheckCircle2 className="h-4 w-4 text-success" />
-              ) : (
-                <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/30" />
-              )}
-            </div>
-            <div>
-              <div className={cn("text-xs font-medium leading-tight", step.done && "text-muted-foreground")}>
-                {step.label}
-              </div>
-              <div className="text-[11px] text-muted-foreground mt-0.5 leading-tight">{step.description}</div>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ── Stat card ──────────────────────────────────────────────────────
-
-function Stat({
-  label,
-  value,
-  sub,
-  trend,
-  comingSoon,
-}: {
-  label: string;
-  value: string | number;
-  sub: string;
-  trend?: string;
-  comingSoon?: boolean;
-}) {
-  return (
-    <div className="relative overflow-hidden rounded-xl border border-border/60 bg-card p-5 shadow-card">
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="mt-1.5 flex items-baseline gap-2">
-        <span
-          className={cn("text-2xl font-semibold tracking-tight", comingSoon && "text-muted-foreground")}
-        >
-          {value}
-        </span>
-        {trend && (
-          <span className="text-xs text-success inline-flex items-center gap-0.5">
-            <TrendingUp className="h-3 w-3" /> {trend}
-          </span>
-        )}
-        {comingSoon && (
-          <span title="Coming soon" className="cursor-help inline-flex items-center">
-            <HelpCircle className="h-3.5 w-3.5 text-muted-foreground/60" />
-          </span>
-        )}
-      </div>
-      <div className="text-xs text-muted-foreground mt-0.5">{sub}</div>
-    </div>
-  );
-}
-
-// ── Access Requests Panel ──────────────────────────────────────────
 
 interface AccessRequest {
   id: string;
   investor_id: string;
-  startup_id: string;
-  status: string;
   created_at: string;
-  investors?: {
-    full_name: string | null;
-    firm: string | null;
-    role: string | null;
-  } | null;
-  investor_verification?: {
-    verification_status: string | null;
-  } | null;
+  investor_profiles: { your_name: string | null; fund_name: string | null } | null;
 }
 
-function AccessRequestsPanel({ startupId, companyName, profileSlug }: {
-  startupId: string;
-  companyName?: string | null;
-  profileSlug?: string | null;
+interface DocViewSummary {
+  deal_room_id: string;
+  count: number;
+  most_recent: string;
+  viewer_name: string | null;
+}
+
+function daysAgo(iso: string): string {
+  const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  if (d === 0) return "today";
+  if (d === 1) return "1 day ago";
+  return `${d} days ago`;
+}
+
+function ConfirmDialog({
+  message,
+  onConfirm,
+  onCancel,
+  confirmLabel,
+  confirmDanger,
+}: {
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+  confirmLabel: string;
+  confirmDanger?: boolean;
 }) {
-  const [requests, setRequests] = useState<AccessRequest[]>([]);
-  const [loading, setLoading] = useState(true);
+  return (
+    <div
+      style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
+      onClick={onCancel}
+    >
+      <div
+        style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: "24px 28px", maxWidth: 380, width: "100%" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <p className="text-sm text-white/80 leading-relaxed mb-5">{message}</p>
+        <div className="flex justify-end gap-2">
+          <button onClick={onCancel} className="px-4 py-2 text-xs text-white/40 hover:text-white/70 transition-colors">
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 text-xs font-medium rounded-lg text-white transition-colors"
+            style={{ background: confirmDanger ? "#EF4444" : "#7C3AED" }}
+          >
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Readiness card
+// ─────────────────────────────────────────────────────────────────────────────
+
+function ReadinessCard({
+  startupId,
+  userId,
+}: {
+  startupId: string;
+  userId: string;
+}) {
+  const qc = useQueryClient();
+
+  const { data: readiness, isLoading } = useQuery({
+    queryKey: ["readiness", startupId],
+    enabled: !!startupId && typeof window !== "undefined",
+    staleTime: 0,
+    queryFn: async () => {
+      const { computeReadiness } = await import("@/lib/readiness-fn");
+      return computeReadiness({ data: { startup_id: startupId, founder_user_id: userId } });
+    },
+  });
+
+  const score = readiness?.readiness_score ?? 0;
+  const passed = readiness?.gate_passed ?? false;
+  const blockers = readiness?.gate_blockers ?? [];
+  const prev = readiness?.prev_readiness_score ?? null;
+  const delta = prev !== null ? score - prev : null;
+
+  const scoreColor = passed ? "#10B981" : score >= 50 ? "#F59E0B" : "#EF4444";
+  const scoreBg = passed
+    ? "rgba(16,185,129,0.08)"
+    : score >= 50
+    ? "rgba(245,158,11,0.06)"
+    : "rgba(239,68,68,0.06)";
+  const scoreBorder = passed
+    ? "1px solid rgba(16,185,129,0.2)"
+    : score >= 50
+    ? "1px solid rgba(245,158,11,0.2)"
+    : "1px solid rgba(239,68,68,0.15)";
+
+  const BLOCKER_ICON: Record<string, React.ReactNode> = {
+    verification: <ShieldCheck className="h-3.5 w-3.5" />,
+    claims: <CheckCircle2 className="h-3.5 w-3.5" />,
+    simulation: <Zap className="h-3.5 w-3.5" />,
+  };
+
+  return (
+    <div
+      className="mt-4"
+      style={{
+        background: "#111114",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: 16,
+        overflow: "hidden",
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{ padding: "20px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+        className="flex items-start justify-between gap-4 flex-wrap"
+      >
+        <div className="flex items-start gap-3">
+          <div
+            className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+            style={{ background: passed ? "rgba(16,185,129,0.12)" : "rgba(245,158,11,0.1)" }}
+          >
+            <Zap className="h-4 w-4" style={{ color: passed ? "#10B981" : "#F59E0B" }} />
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold text-white" style={{ fontFamily: "Syne, sans-serif" }}>
+              Investor Readiness
+            </h2>
+            <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
+              Composite signal from verification, claims, and simulation
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          {/* Delta indicator */}
+          {delta !== null && delta !== 0 && (
+            <span
+              className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full"
+              style={
+                delta > 0
+                  ? { background: "rgba(16,185,129,0.12)", color: "#10B981" }
+                  : { background: "rgba(245,158,11,0.12)", color: "#F59E0B" }
+              }
+            >
+              {delta > 0
+                ? <TrendingUp className="h-3 w-3" />
+                : <TrendingDown className="h-3 w-3" />}
+              {delta > 0 ? "+" : ""}{delta}
+            </span>
+          )}
+          {/* Score badge */}
+          <span
+            className="text-xs font-bold px-3 py-1 rounded-full"
+            style={{ background: scoreBg, border: scoreBorder, color: scoreColor }}
+          >
+            {isLoading ? "…" : passed ? "✓ Ready" : "Not ready yet"}
+          </span>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div style={{ padding: "20px 24px" }}>
+        {isLoading ? (
+          <div className="flex items-center gap-2 text-white/30">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span className="text-sm">Computing readiness…</span>
+          </div>
+        ) : (
+          <>
+            {/* Big score */}
+            <div className="flex items-end gap-3 mb-5">
+              <span
+                className="font-bold leading-none"
+                style={{ fontSize: 52, color: scoreColor, fontFamily: "Syne, sans-serif" }}
+              >
+                {score}
+              </span>
+              <span className="text-lg text-white/30 mb-1">/100</span>
+              {passed && (
+                <span className="mb-2 text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(16,185,129,0.15)", color: "#10B981" }}>
+                  Ready for outreach
+                </span>
+              )}
+            </div>
+
+            {/* Score breakdown pills */}
+            <div className="flex flex-wrap gap-2 mb-5">
+              {[
+                { label: "Verification", value: readiness?.verification_score ?? 0, max: 100, weight: "40%" },
+                {
+                  label: "Claims",
+                  value: readiness && readiness.claims_total_count > 0
+                    ? Math.round((readiness.claims_verified_count / readiness.claims_total_count) * 100)
+                    : 0,
+                  max: 100,
+                  weight: "30%",
+                },
+                {
+                  label: "Simulation",
+                  value: readiness?.latest_sim_score != null
+                    ? Math.round((readiness.latest_sim_score / 10) * 100)
+                    : 0,
+                  max: 100,
+                  weight: "30%",
+                  na: readiness?.latest_sim_score == null,
+                },
+              ].map(({ label, value, weight, na }) => (
+                <div
+                  key={label}
+                  className="rounded-lg px-3 py-2 text-xs"
+                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
+                >
+                  <div className="font-medium text-white/60">{label} <span className="text-white/25">({weight})</span></div>
+                  <div className="font-semibold mt-0.5" style={{ color: na ? "rgba(255,255,255,0.25)" : value >= 60 ? "#10B981" : value >= 30 ? "#F59E0B" : "#EF4444" }}>
+                    {na ? "Not run" : `${value}/100`}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Passed state */}
+            {passed && (
+              <div
+                className="rounded-xl px-4 py-3.5"
+                style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)" }}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "#10B981" }} />
+                  <span className="text-sm font-semibold" style={{ color: "#10B981" }}>
+                    All three signals are strong
+                  </span>
+                </div>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
+                  Your verification, claims, and simulation are in good shape. Start warm outreach with confidence.
+                </p>
+              </div>
+            )}
+
+            {/* Blockers — only real, true blockers */}
+            {!passed && blockers.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs font-medium uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.3)" }}>
+                  What's blocking you
+                </p>
+                {blockers.map((b, i) => (
+                  <a
+                    key={i}
+                    href={b.action_url}
+                    className="flex items-start gap-3 rounded-xl px-4 py-3 transition-colors group"
+                    style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)", textDecoration: "none" }}
+                  >
+                    <span className="mt-0.5 shrink-0" style={{ color: "#F59E0B" }}>
+                      {BLOCKER_ICON[b.type] ?? <AlertTriangle className="h-3.5 w-3.5" />}
+                    </span>
+                    <span className="text-xs leading-relaxed flex-1" style={{ color: "rgba(255,255,255,0.6)" }}>
+                      {b.message}
+                    </span>
+                    <ArrowRight className="h-3.5 w-3.5 shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: "#F59E0B" }} />
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {!passed && blockers.length === 0 && (
+              <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+                Score is below 70 — continue improving your profile to unlock outreach readiness.
+              </p>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DealActivityCard({
+  startupId,
+  profileSlug,
+  companyName,
+}: {
+  startupId: string;
+  profileSlug: string | null;
+  companyName: string | null;
+}) {
+  const [confirmAction, setConfirmAction] = useState<{
+    requestId: string;
+    investorId: string;
+    action: "approved" | "declined";
+    investorName: string | null;
+  } | null>(null);
   const [actingId, setActingId] = useState<string | null>(null);
 
+  const { data: dealRooms = [] } = useQuery<DealRoom[]>({
+    queryKey: ["home-deal-rooms", startupId],
+    enabled: !!startupId && typeof window !== "undefined",
+    staleTime: 0,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("deal_rooms")
+        .select("id, status, created_at, investor_name, investor_company")
+        .eq("startup_id", startupId)
+        .order("created_at", { ascending: false });
+      return (data ?? []) as DealRoom[];
+    },
+  });
+
+  const [requests, setRequests] = useState<AccessRequest[]>([]);
+  const [reqLoading, setReqLoading] = useState(true);
+
   const loadRequests = async () => {
-    setLoading(true);
+    setReqLoading(true);
     const { data: reqs } = await supabase
       .from("discovery_requests")
-      .select("id, investor_id, startup_id, status, created_at")
+      .select("id, investor_id, created_at")
       .eq("startup_id", startupId)
       .eq("status", "pending")
       .order("created_at", { ascending: false });
 
-    if (!reqs || reqs.length === 0) {
-      setRequests([]);
-      setLoading(false);
-      return;
-    }
+    if (!reqs || reqs.length === 0) { setRequests([]); setReqLoading(false); return; }
 
-    // Fetch investor profiles separately — no FK from discovery_requests to investor_profiles
     const investorIds = reqs.map((r: any) => r.investor_id);
     const { data: profiles } = await supabase
       .from("investor_profiles")
-      .select("user_id, your_name, fund_name, role")
+      .select("user_id, your_name, fund_name")
       .in("user_id", investorIds);
 
-    const profileMap = Object.fromEntries(
-      (profiles ?? []).map((p: any) => [p.user_id, p])
-    );
-
-    const enriched = reqs.map((r: any) => ({
-      ...r,
-      investor_profiles: profileMap[r.investor_id] ?? null,
-    }));
-
-    setRequests(enriched as any[]);
-    setLoading(false);
+    const pm = Object.fromEntries((profiles ?? []).map((p: any) => [p.user_id, p]));
+    setRequests(reqs.map((r: any) => ({ ...r, investor_profiles: pm[r.investor_id] ?? null })));
+    setReqLoading(false);
   };
 
   useEffect(() => { loadRequests(); }, [startupId]);
 
-  const handleAction = async (requestId: string, investorId: string, action: "approved" | "declined", investorName: string | null) => {
+  const { data: docViewsByRoom = [] } = useQuery<DocViewSummary[]>({
+    queryKey: ["home-doc-views", startupId],
+    enabled: dealRooms.length > 0 && typeof window !== "undefined",
+    staleTime: 0,
+    queryFn: async () => {
+      const roomIds = dealRooms.map((r) => r.id);
+      const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const { data } = await supabase
+        .from("document_views")
+        .select("deal_room_id, created_at, viewer_name")
+        .in("deal_room_id", roomIds)
+        .gte("created_at", cutoff)
+        .order("created_at", { ascending: false });
+
+      if (!data || data.length === 0) return [];
+
+      const grouped: Record<string, DocViewSummary> = {};
+      for (const row of data as any[]) {
+        if (!grouped[row.deal_room_id]) {
+          grouped[row.deal_room_id] = {
+            deal_room_id: row.deal_room_id,
+            count: 0,
+            most_recent: row.created_at,
+            viewer_name: row.viewer_name,
+          };
+        }
+        grouped[row.deal_room_id].count++;
+        if (row.created_at > grouped[row.deal_room_id].most_recent) {
+          grouped[row.deal_room_id].most_recent = row.created_at;
+          grouped[row.deal_room_id].viewer_name = row.viewer_name;
+        }
+      }
+      return Object.values(grouped);
+    },
+  });
+
+  const executeAction = async () => {
+    if (!confirmAction) return;
+    const { requestId, investorId, action, investorName } = confirmAction;
+    setConfirmAction(null);
     setActingId(requestId);
+
     const { error } = await supabase
       .from("discovery_requests")
       .update({ status: action, updated_at: new Date().toISOString() })
@@ -408,7 +930,6 @@ function AccessRequestsPanel({ startupId, companyName, profileSlug }: {
       setRequests((prev) => prev.filter((r) => r.id !== requestId));
       if (action === "approved") {
         toast.success(`Access approved. ${investorName ?? "Investor"} can now view your on-request sections.`);
-        // Write in-app notification to the investor
         const name = companyName ?? "The founder";
         supabase.from("notifications").insert({
           user_id: investorId,
@@ -419,7 +940,7 @@ function AccessRequestsPanel({ startupId, companyName, profileSlug }: {
           action_url: profileSlug ? `/p/${profileSlug}` : null,
           meta: { startup_id: startupId },
         }).then(({ error: nErr }) => {
-          if (nErr) console.warn("[notification] access_approved insert failed:", nErr.message);
+          if (nErr) console.warn("[notification] access_approved failed:", nErr.message);
         });
       } else {
         toast.success("Request declined.");
@@ -430,729 +951,322 @@ function AccessRequestsPanel({ startupId, companyName, profileSlug }: {
     setActingId(null);
   };
 
-  const daysAgo = (iso: string) => {
-    const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
-    if (d === 0) return "today";
-    if (d === 1) return "1 day ago";
-    return `${d} days ago`;
-  };
+  const pendingCount = requests.length;
+  const activeRoomCount = dealRooms.filter((r) => r.status === "active").length;
+  let subtext: string;
+  if (pendingCount > 0) {
+    subtext = `${pendingCount} investor${pendingCount > 1 ? "s" : ""} waiting on you`;
+  } else if (activeRoomCount > 0) {
+    subtext = `${activeRoomCount} active deal room${activeRoomCount > 1 ? "s" : ""}`;
+  } else {
+    subtext = "No active investor activity yet";
+  }
 
   return (
-    <div className="rounded-xl border border-border/60 bg-card shadow-card mb-6">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="h-4 w-4 text-brand" />
-          <span className="text-sm font-semibold">Investor Access Requests</span>
-          {!loading && requests.length > 0 && (
-            <span className="inline-flex items-center justify-center h-5 min-w-[20px] rounded-full bg-brand text-brand-foreground text-[10px] font-semibold px-1.5">
-              {requests.length}
-            </span>
+    <>
+      <div
+        style={{
+          background: "#111114",
+          border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: 16,
+          overflow: "hidden",
+          marginTop: 16,
+        }}
+      >
+        <div
+          style={{ padding: "20px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+          className="flex items-start gap-3"
+        >
+          <div
+            className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+            style={{ background: pendingCount > 0 ? "rgba(245,158,11,0.1)" : "rgba(124,58,237,0.1)" }}
+          >
+            <Briefcase
+              className="h-4 w-4"
+              style={{ color: pendingCount > 0 ? "#F59E0B" : "#A855F7" }}
+            />
+          </div>
+          <div>
+            <h2
+              className="text-sm font-semibold text-white"
+              style={{ fontFamily: "Syne, sans-serif" }}
+            >
+              Deal Activity
+            </h2>
+            <p className="text-xs mt-0.5" style={{ color: pendingCount > 0 ? "#F59E0B" : "rgba(255,255,255,0.4)" }}>
+              {subtext}
+            </p>
+          </div>
+        </div>
+
+        <div style={{ padding: "20px 24px" }} className="space-y-4">
+          {reqLoading && (
+            <div className="flex items-center gap-2 text-xs text-white/30">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading requests…
+            </div>
+          )}
+
+          {!reqLoading && requests.length > 0 && (
+            <div>
+              <div className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-2" style={{ letterSpacing: "0.1em" }}>
+                Pending access requests
+              </div>
+              <div className="space-y-2">
+                {requests.map((req) => {
+                  const name = req.investor_profiles?.your_name ?? "Unknown investor";
+                  const firm = req.investor_profiles?.fund_name;
+                  const isActing = actingId === req.id;
+                  return (
+                    <div
+                      key={req.id}
+                      className="flex items-center justify-between gap-3 rounded-lg px-3 py-3 flex-wrap"
+                      style={{ background: "rgba(245,158,11,0.05)", border: "1px solid rgba(245,158,11,0.15)" }}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-white truncate">{name}</div>
+                        <div className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>
+                          {firm && <span>{firm} · </span>}
+                          Requested {daysAgo(req.created_at)}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {isActing ? (
+                          <Loader2 className="h-4 w-4 animate-spin text-white/30" />
+                        ) : (
+                          <>
+                            <button
+                              onClick={() =>
+                                setConfirmAction({ requestId: req.id, investorId: req.investor_id, action: "approved", investorName: name })
+                              }
+                              className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors"
+                              style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.25)", color: "#10B981" }}
+                            >
+                              <Check className="h-3 w-3" /> Approve
+                            </button>
+                            <button
+                              onClick={() =>
+                                setConfirmAction({ requestId: req.id, investorId: req.investor_id, action: "declined", investorName: name })
+                              }
+                              className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors"
+                              style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#EF4444" }}
+                            >
+                              <X className="h-3 w-3" /> Decline
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {dealRooms.length === 0 && requests.length === 0 && !reqLoading ? (
+            <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+              No active investor activity yet. Once an investor requests access to your profile, it'll show up here.
+            </p>
+          ) : (
+            dealRooms.length > 0 && (
+              <div>
+                {requests.length > 0 && (
+                  <div className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-2" style={{ letterSpacing: "0.1em" }}>
+                    Deal rooms
+                  </div>
+                )}
+                <div className="space-y-2">
+                  {dealRooms.map((room) => {
+                    const viewSummary = docViewsByRoom.find((v) => v.deal_room_id === room.id);
+                    return (
+                      <div
+                        key={room.id}
+                        className="flex items-center justify-between gap-3 rounded-lg px-4 py-3 flex-wrap"
+                        style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)" }}
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm font-medium text-white truncate">
+                              {room.investor_name ?? "Investor"}
+                              {room.investor_company ? ` · ${room.investor_company}` : ""}
+                            </span>
+                            <span
+                              className="text-[11px] px-1.5 py-0.5 rounded-full capitalize shrink-0"
+                              style={
+                                room.status === "active"
+                                  ? { background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }
+                                  : { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)" }
+                              }
+                            >
+                              {room.status}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3 mt-1 flex-wrap">
+                            <span className="text-xs flex items-center gap-1" style={{ color: "rgba(255,255,255,0.3)" }}>
+                              <Clock className="h-3 w-3" /> Opened {daysAgo(room.created_at)}
+                            </span>
+                            {viewSummary ? (
+                              <span className="text-xs flex items-center gap-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+                                <Eye className="h-3 w-3" />
+                                {viewSummary.viewer_name ?? "Investor"} viewed {viewSummary.count} document{viewSummary.count !== 1 ? "s" : ""} {daysAgo(viewSummary.most_recent)}
+                              </span>
+                            ) : (
+                              <span className="text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
+                                No document views in the last 7 days
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <Link
+                          to="/app/deal-room/$id"
+                          params={{ id: room.id }}
+                          className="inline-flex items-center gap-1 text-xs font-medium shrink-0 transition-colors"
+                          style={{ color: "rgba(124,58,237,0.8)" }}
+                        >
+                          Open deal room <ChevronRight className="h-3.5 w-3.5" />
+                        </Link>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )
           )}
         </div>
       </div>
 
-      <div className="p-5">
-        {loading ? (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
-            <Loader2 className="h-4 w-4 animate-spin" /> Loading requests…
-          </div>
-        ) : requests.length === 0 ? (
-          <div className="py-4 text-center">
-            <p className="text-sm text-muted-foreground">No pending access requests.</p>
-            <p className="text-xs text-muted-foreground/60 mt-1">When investors request access to your on-request sections, they will appear here.</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {requests.map((req: any) => {
-              const profile = req.investor_profiles;
-              const name = profile?.your_name ?? "Unknown investor";
-              const firm = profile?.fund_name ?? null;
-              const role = profile?.role ?? null;
-              const isActing = actingId === req.id;
-
-              return (
-                <div key={req.id} className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-lg border border-border/60 bg-background/40 p-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">{name}</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-0.5">
-                      {[firm, role].filter(Boolean).join(" · ")}
-                      {[firm, role].some(Boolean) && " · "}
-                      Requested {daysAgo(req.created_at)}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      disabled={isActing}
-                      onClick={() => handleAction(req.id, req.investor_id, "approved", name)}
-                      className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
-                      style={{ background: "rgba(16,185,129,0.15)", color: "#10B981", border: "1px solid rgba(16,185,129,0.3)" }}
-                    >
-                      {isActing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
-                      Approve
-                    </button>
-                    <button
-                      disabled={isActing}
-                      onClick={() => handleAction(req.id, req.investor_id, "declined", name)}
-                      className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
-                      style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.08)" }}
-                    >
-                      Decline
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </div>
+      {confirmAction && (
+        <ConfirmDialog
+          message={
+            confirmAction.action === "approved"
+              ? `Approve access for ${confirmAction.investorName ?? "this investor"}? They will be able to view your on-request profile sections.`
+              : `Decline access for ${confirmAction.investorName ?? "this investor"}?`
+          }
+          onConfirm={executeAction}
+          onCancel={() => setConfirmAction(null)}
+          confirmLabel={confirmAction.action === "approved" ? "Approve access" : "Decline"}
+          confirmDanger={confirmAction.action === "declined"}
+        />
+      )}
+    </>
   );
 }
 
-// ── Main component ─────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Page
+// ─────────────────────────────────────────────────────────────────────────────
 
-function Overview() {
+function FounderHome() {
   const { user } = useAuth();
-  const [howItWorksOpen, setHowItWorksOpen] = useState(false);
 
-  // FIX 1 — detect new vs returning user (parallel queries)
-  const { data: startup = null, isLoading: startupLoading } = useQuery<Startup | null>({
-    queryKey: ["my-startup", user?.id],
-    enabled: !!user?.id,
+  const { data: startup, isLoading } = useQuery({
+    queryKey: ["home-startup", user?.id],
+    enabled: !!user?.id && typeof window !== "undefined",
+    staleTime: 0,
     queryFn: async () => {
       const { data } = await supabase
         .from("startups")
-        .select("*")
+        .select("id, company_name, profile_slug, stage, sector")
         .eq("founder_id", user!.id)
-        .limit(1);
-      return (data?.[0] as Startup) ?? null;
+        .maybeSingle();
+      return data ?? null;
     },
   });
 
-  const { data: leadCount = 0, isLoading: leadLoading } = useQuery<number>({
-    queryKey: ["lead-count", user?.id],
-    enabled: !!user?.id,
+  // Fetch latest readiness snapshot for PageGuide live context
+  const { data: readinessSnap } = useQuery<ReadinessResult | null>({
+    queryKey: ["readiness-snap-home", startup?.id],
+    enabled: !!startup?.id && typeof window !== "undefined",
+    staleTime: 0,
     queryFn: async () => {
-      const { count } = await supabase
-        .from("vc_leads")
-        .select("*", { count: "exact", head: true })
-        .eq("founder_id", user!.id);
-      return count ?? 0;
+      const { computeReadiness } = await import("@/lib/readiness-fn");
+      return computeReadiness({ data: { startup_id: startup!.id, founder_user_id: user!.id } });
     },
   });
 
-  const { data: dealRoomCount = 0 } = useQuery<number>({
-    queryKey: ["deal-room-count", user?.id],
-    enabled: !!startup?.id,
-    queryFn: async () => {
-      const { count } = await supabase
-        .from("deal_rooms")
-        .select("*", { count: "exact", head: true })
-        .eq("startup_id", startup!.id);
-      return count ?? 0;
-    },
-  });
-
-  // Returning-user queries
-  const { data: meetingCount = 0 } = useQuery<number>({
-    queryKey: ["meeting-count", startup?.id],
-    enabled: !!startup?.id,
-    queryFn: async () => {
-      const { data: rooms } = await supabase
-        .from("deal_rooms")
-        .select("id")
-        .eq("startup_id", startup!.id);
-      const ids = (rooms ?? []).map((r: { id: string }) => r.id);
-      if (ids.length === 0) return 0;
-      const { count } = await supabase
-        .from("meetings")
-        .select("*", { count: "exact", head: true })
-        .in("deal_room_id", ids)
-        .gt("scheduled_at", new Date().toISOString());
-      return count ?? 0;
-    },
-  });
-
-  const { data: activities = [] } = useQuery<Activity[]>({
-    queryKey: ["recent-activity", startup?.id],
-    enabled: !!startup?.id,
-    queryFn: async () => {
-      const { data: rooms } = await supabase
-        .from("deal_rooms")
-        .select("id")
-        .eq("startup_id", startup!.id);
-      const ids = (rooms ?? []).map((r: { id: string }) => r.id);
-      if (ids.length === 0) return [];
-      const { data } = await supabase
-        .from("activities")
-        .select("*")
-        .in("deal_room_id", ids)
-        .order("created_at", { ascending: false })
-        .limit(5);
-      return (data ?? []) as Activity[];
-    },
-  });
-
-  const { data: dealRooms = [] } = useQuery<DealRoom[]>({
-    queryKey: ["hot-deal-rooms", startup?.id],
-    enabled: !!startup?.id,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("deal_rooms")
-        .select("*")
-        .eq("startup_id", startup!.id)
-        .order("updated_at", { ascending: false })
-        .limit(3);
-      return (data ?? []) as DealRoom[];
-    },
-  });
-
-  const { data: docs = [] } = useQuery({
-    queryKey: ["my-docs-any", startup?.id],
-    enabled: !!startup?.id,
-    queryFn: async () => {
-      const { data: rooms } = await supabase
-        .from("deal_rooms").select("id").eq("startup_id", startup!.id);
-      const ids = (rooms ?? []).map((r: any) => r.id);
-      if (ids.length === 0) return [];
-      const { data } = await supabase
-        .from("documents").select("id").in("deal_room_id", ids).limit(1);
-      return data ?? [];
-    },
-  });
-
-  const { data: investorMembers = [] } = useQuery({
-    queryKey: ["investor-members-any", startup?.id],
-    enabled: !!startup?.id,
-    queryFn: async () => {
-      const { data: rooms } = await supabase
-        .from("deal_rooms").select("id").eq("startup_id", startup!.id);
-      const ids = (rooms ?? []).map((r: any) => r.id);
-      if (ids.length === 0) return [];
-      const { data } = await supabase
-        .from("deal_room_members").select("role").in("deal_room_id", ids).eq("role", "investor").limit(1);
-      return data ?? [];
-    },
-  });
-
-  const { data: pipelineLeads = [] } = useQuery<{ status: string }[]>({
-    queryKey: ["pipeline-status", user?.id],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("vc_leads")
-        .select("status")
-        .eq("founder_id", user!.id);
-      return (data ?? []) as { status: string }[];
-    },
-  });
-
-  const { data: overdueLeads = [] } = useQuery<
-    { id: string; investor_name: string; firm_name: string | null; follow_up_date: string }[]
-  >({
-    queryKey: ["overdue-leads", user?.id],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const today = new Date();
-      today.setHours(23, 59, 59, 999);
-      const { data } = await supabase
-        .from("vc_leads")
-        .select("id, investor_name, firm_name, follow_up_date")
-        .eq("founder_id", user!.id)
-        .lte("follow_up_date", today.toISOString())
-        .order("follow_up_date", { ascending: true })
-        .limit(5);
-      return (data ?? []) as any[];
-    },
-  });
-
-  const { data: todayMeetings = [] } = useQuery<any[]>({
-    queryKey: ["today-meetings", user?.id],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const start = new Date();
-      start.setHours(0, 0, 0, 0);
-      const end = new Date();
-      end.setHours(23, 59, 59, 999);
-      const { data } = await supabase
-        .from("meetings")
-        .select("id, title, scheduled_at, meeting_link, vc_leads(investor_name)")
-        .eq("created_by", user!.id)
-        .gte("scheduled_at", start.toISOString())
-        .lte("scheduled_at", end.toISOString())
-        .order("scheduled_at", { ascending: true });
-      return (data ?? []) as any[];
-    },
-  });
-
-  const isQueriesLoading = !user?.id || startupLoading || leadLoading;
-  const isNewUser = !isQueriesLoading && !startup && leadCount === 0;
-
-  // ── Loading state ────────────────────────────────────────────────
-  if (isQueriesLoading) {
+  if (isLoading) {
     return (
-      <div className="p-8 flex items-center justify-center min-h-64">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <div className="p-8 flex items-center justify-center">
+        <Loader2 className="h-5 w-5 animate-spin text-white/30" />
       </div>
     );
   }
 
-  // ── FIX 2 — New user onboarding view ────────────────────────────
-  if (isNewUser) {
-    const completedSteps =
-      (startup ? 1 : 0) + (leadCount > 0 ? 1 : 0) + (dealRoomCount > 0 ? 1 : 0);
-    const progressPct = Math.round((completedSteps / 4) * 100);
-
+  if (!startup) {
     return (
-      <div className="p-6 lg:p-8 max-w-4xl mx-auto">
-        <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Welcome to Hockystick 👋</h1>
-            <p className="mt-1.5 text-sm text-muted-foreground">
-              Let's get your fundraise set up. Complete these steps to get started.
-            </p>
+      <div className="p-6 lg:p-8 max-w-3xl mx-auto">
+        <div className="rounded-xl border border-dashed border-border/60 bg-card p-8 text-center">
+          <Building2 className="h-8 w-8 text-white/20 mx-auto mb-3" />
+          <div className="text-sm font-medium mb-1">No company profile yet</div>
+          <div className="text-xs text-muted-foreground mb-4">
+            Build your profile to start verification, claim proof, and track investor activity.
           </div>
-          <button
-            onClick={() => setHowItWorksOpen(true)}
-            className="rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent inline-flex items-center gap-1.5"
+          <Link
+            to="/app/profile-builder"
+            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
+            style={{ background: "#7C3AED" }}
           >
-            <HelpCircle className="h-4 w-4" /> How it works
-          </button>
+            Build my profile
+          </Link>
         </div>
-
-        {/* Progress bar */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium">{completedSteps} of 4 steps complete</span>
-            <span className="text-xs text-muted-foreground">{progressPct}%</span>
-          </div>
-          <div className="h-2 rounded-full bg-muted overflow-hidden">
-            <div
-              className="h-full bg-gradient-brand rounded-full transition-all duration-500"
-              style={{ width: `${progressPct}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Step cards 2×2 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <OnboardingStep
-            icon={Building2}
-            title="Set up your company profile"
-            description="Add your startup details, team, and pitch so investors know who you are."
-            buttonLabel="Set up profile"
-            to="/app/profile"
-            done={!!startup}
-          />
-          <OnboardingStep
-            icon={Users}
-            title="Build your investor list"
-            description="Add VCs manually or import a CSV of investor contacts to target."
-            buttonLabel="Add leads"
-            to="/app/leads"
-            done={leadCount > 0}
-          />
-          <OnboardingStep
-            icon={Briefcase}
-            title="Create your first deal room"
-            description="A secure space to share documents and collaborate with investors."
-            buttonLabel="Create deal room"
-            to="/app/deal-rooms"
-            done={dealRoomCount > 0}
-          />
-          <OnboardingStep
-            icon={Mail}
-            title="Invite your first investor"
-            description="Send a deal room invite with NDA to a VC you're in conversation with."
-            buttonLabel="Go to deal rooms"
-            to="/app/deal-rooms"
-            done={false}
-            disabled={dealRoomCount === 0}
-          />
-        </div>
-
-        {howItWorksOpen && <HowItWorksModal onClose={() => setHowItWorksOpen(false)} />}
       </div>
     );
   }
 
-  // ── FIX 3 — Returning user dashboard ────────────────────────────
-
-  const statusMap: Record<string, number> = {};
-  pipelineLeads.forEach(({ status }) => {
-    statusMap[status] = (statusMap[status] ?? 0) + 1;
-  });
-
-  const greeting = (() => {
-    const h = new Date().getHours();
-    if (h < 12) return "Good morning";
-    if (h < 18) return "Good afternoon";
-    return "Good evening";
-  })();
-
-  const firstName = user?.name?.split(" ")[0] ?? "Founder";
+  // Build live data string for PageGuide AI context
+  const homeLiveData = readinessSnap
+    ? [
+        `Company: ${startup.company_name ?? "Not set"} | Stage: ${(startup as any).stage ?? "Not set"} | Sector: ${(startup as any).sector ?? "Not set"}`,
+        `Readiness score: ${readinessSnap.readiness_score}/100 | Gate passed: ${readinessSnap.gate_passed}`,
+        `Verification score: ${readinessSnap.verification_score}/100`,
+        `Claims: ${readinessSnap.claims_verified_count} verified of ${readinessSnap.claims_total_count} total`,
+        `Last simulation score: ${readinessSnap.latest_sim_score != null ? `${readinessSnap.latest_sim_score}/10` : "not run"}`,
+        readinessSnap.gate_blockers.length > 0
+          ? `Blockers:\n${readinessSnap.gate_blockers.map((b) => `  - [${b.type}] ${b.message}`).join("\n")}`
+          : "No blockers — gate is passing.",
+      ].join("\n")
+    : "Readiness data not yet loaded.";
 
   return (
-    <div className="p-6 lg:p-8 max-w-7xl mx-auto">
-      <FounderOnboarding startup={startup} docs={docs} dealRooms={dealRooms} investorMembers={investorMembers} />
-      {startup?.id && (
-        <AccessRequestsPanel
-          startupId={startup.id}
-          companyName={startup.company_name ?? startup.name}
-          profileSlug={startup.profile_slug}
-        />
-      )}
-      {/* Header */}
-      <div className="flex items-end justify-between flex-wrap gap-4">
+    <div className="p-6 lg:p-8 max-w-3xl mx-auto">
+      <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <div className="text-xs text-muted-foreground">{greeting}, {firstName}</div>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-            {startup?.name ?? "Your Startup"}{startup?.stage ? ` — ${startup.stage}` : ""}
+          <h1
+            className="text-2xl font-semibold tracking-tight text-white"
+            style={{ fontFamily: "Syne, sans-serif" }}
+          >
+            {startup.company_name ?? "Home"}
           </h1>
+          <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+            Your verification status and investor activity at a glance.
+          </p>
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setHowItWorksOpen(true)}
-            className="rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent inline-flex items-center gap-1.5"
-          >
-            <HelpCircle className="h-4 w-4" /> How it works
-          </button>
-          <Link
-            to="/app/email"
-            className="rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent inline-flex items-center gap-1.5"
-          >
-            <Mail className="h-4 w-4" /> Compose
-          </Link>
-          <Link
-            to="/app/leads"
-            className="rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow inline-flex items-center gap-1.5"
-          >
-            Add lead <ArrowUpRight className="h-3.5 w-3.5" />
-          </Link>
+        <div className="shrink-0 mt-1">
+          <PageGuide
+            pageId="home"
+            liveData={homeLiveData}
+            startupContext={{
+              companyName: startup.company_name ?? undefined,
+              stage: (startup as any).stage ?? undefined,
+              sector: (startup as any).sector ?? undefined,
+            }}
+          />
         </div>
       </div>
 
-      {/* Today's actions */}
-      {(() => {
-        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-        const staleDealRooms = dealRooms.filter((r) => new Date(r.updated_at) < sevenDaysAgo);
-        const noProfile = !startup?.name;
-
-        type Action = {
-          key: string;
-          label: string;
-          sub: string;
-          border: string;
-          link?: string | null;
-          to?: string;
-        };
-
-        const actions: Action[] = [
-          ...overdueLeads.map((l) => ({
-            key: l.id,
-            label: `Follow up with ${l.investor_name}${l.firm_name ? ` at ${l.firm_name}` : ""}`,
-            sub: `Due ${new Date(l.follow_up_date).toLocaleDateString()}`,
-            border: "border-l-destructive",
-            to: "/app/leads",
-          })),
-          ...todayMeetings.map((m) => ({
-            key: m.id,
-            label: m.title,
-            sub: `Today at ${format(new Date(m.scheduled_at), "h:mm a")}`,
-            border: "border-l-warning",
-            link: m.meeting_link,
-            to: "/app/meetings",
-          })),
-          ...staleDealRooms.map((r) => ({
-            key: r.id,
-            label: `Deal room with ${r.name ?? "investor"} is stale`,
-            sub: `No activity for ${formatDistanceToNow(new Date(r.updated_at))}`,
-            border: "border-l-warning",
-          })),
-          ...(noProfile
-            ? [{
-                key: "profile",
-                label: "Complete your company profile",
-                sub: "Add your startup details to attract investors",
-                border: "border-l-brand",
-                to: "/app/profile",
-              }]
-            : []),
-        ];
-
-        if (actions.length === 0) {
-          return (
-            <div className="mt-6 rounded-xl border border-success/30 bg-success/5 px-5 py-3.5 flex items-center gap-3">
-              <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
-              <span className="text-sm font-medium text-success">You're all caught up</span>
-            </div>
-          );
-        }
-
-        return (
-          <div className="mt-6">
-            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
-              <AlertCircle className="h-3.5 w-3.5 text-warning" /> Today's actions
-            </div>
-            <div className="space-y-2">
-              {actions.map((a) => (
-                <div
-                  key={a.key}
-                  className={cn(
-                    "rounded-xl border border-border/60 bg-card px-4 py-3 border-l-4 shadow-card flex items-center justify-between gap-4",
-                    a.border,
-                  )}
-                >
-                  <div className="min-w-0">
-                    <div className="text-sm font-medium truncate">{a.label}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">{a.sub}</div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    {a.link && (
-                      <a
-                        href={a.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-xs hover:bg-brand/10"
-                      >
-                        <ExternalLink className="h-3 w-3" /> Join
-                      </a>
-                    )}
-                    {a.to && (
-                      <Link
-                        to={a.to as any}
-                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                      >
-                        View <ArrowUpRight className="h-3 w-3" />
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      })()}
-
-      {/* Raise progress */}
-      <div className="mt-6 rounded-2xl border border-border/60 bg-card p-6 shadow-card relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-mesh opacity-[0.05]" />
-        <div className="relative flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <div className="text-xs text-muted-foreground">Round progress</div>
-            <div className="mt-1 flex items-baseline gap-2">
-              <span
-                className="text-3xl font-semibold tracking-tight text-muted-foreground"
-                title="Coming soon"
-              >
-                --
-              </span>
-              <span className="text-sm text-muted-foreground">
-                {startup?.target_raise
-                  ? `of $${(startup.target_raise / 1_000_000).toFixed(0)}M target`
-                  : "target not set"}
-              </span>
-            </div>
-          </div>
-          <div className="flex gap-6 text-sm">
-            <div>
-              <div className="text-xs text-muted-foreground">Soft circled</div>
-              <div className="font-medium text-muted-foreground" title="Coming soon">--</div>
-            </div>
-            <div>
-              <div className="text-xs text-muted-foreground">Lead</div>
-              <div className="font-medium text-muted-foreground" title="Coming soon">--</div>
-            </div>
-            <div>
-              <div className="text-xs text-muted-foreground">Close</div>
-              <div className="font-medium text-muted-foreground" title="Coming soon">--</div>
-            </div>
-          </div>
-        </div>
-        <div className="relative mt-5 h-2.5 rounded-full bg-muted overflow-hidden">
-          <div className="absolute inset-y-0 left-0 w-0 bg-gradient-brand rounded-full" />
-        </div>
-        <div className="relative mt-2 flex justify-between text-[11px] text-muted-foreground">
-          {startup?.target_raise ? (
-            <>
-              <span>$0</span>
-              <span>${((startup.target_raise / 1_000_000) * 0.25).toFixed(1)}M</span>
-              <span>${((startup.target_raise / 1_000_000) * 0.5).toFixed(1)}M</span>
-              <span>${((startup.target_raise / 1_000_000) * 0.75).toFixed(1)}M</span>
-              <span>${(startup.target_raise / 1_000_000).toFixed(0)}M</span>
-            </>
-          ) : (
-            <><span>$0</span><span>$2M</span><span>$4M</span><span>$6M</span><span>$8M</span></>
-          )}
-        </div>
-      </div>
-
-      {/* Stat cards */}
-      <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Stat
-          label="Active VCs"
-          value={leadCount}
-          sub="in pipeline"
-          trend={leadCount > 0 ? `+${leadCount} total` : undefined}
-        />
-        <Stat label="Reply rate" value="--" sub="vs benchmark" comingSoon />
-        <Stat label="Meetings" value={meetingCount} sub="upcoming" />
-        <Stat label="Deal rooms" value={dealRoomCount} sub={dealRoomCount === 1 ? "1 active" : `${dealRoomCount} active`} />
-      </div>
-
-      <div className="mt-6 grid lg:grid-cols-3 gap-4">
-        {/* Pipeline at a glance */}
-        <div className="lg:col-span-2 rounded-xl border border-border/60 bg-card shadow-card">
-          <div className="flex items-center justify-between p-5 border-b border-border/60">
-            <div>
-              <div className="text-sm font-semibold">Pipeline at a glance</div>
-              <div className="text-xs text-muted-foreground">{leadCount} leads total</div>
-            </div>
-            <Link to="/app/leads" className="text-xs text-brand inline-flex items-center gap-1">
-              Open pipeline <ArrowUpRight className="h-3 w-3" />
-            </Link>
-          </div>
-          <div className="p-5 grid grid-cols-7 gap-2">
-            {(
-              [
-                ["New", statusMap["New"] ?? 0, "bg-muted-foreground/40"],
-                ["Contact", statusMap["Contacted"] ?? 0, "bg-foreground/40"],
-                ["Replied", statusMap["Replied"] ?? 0, "bg-brand"],
-                ["Meeting", statusMap["Meeting Booked"] ?? 0, "bg-violet"],
-                ["Interest", statusMap["Interested"] ?? 0, "bg-warning"],
-                ["DR", statusMap["Deal Room Created"] ?? 0, "bg-success"],
-                ["Pass", statusMap["Rejected"] ?? 0, "bg-destructive/60"],
-              ] as [string, number, string][]
-            ).map(([l, n, c]) => (
-              <div key={l} className="rounded-lg border border-border/60 bg-background/40 p-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-muted-foreground truncate">{l}</span>
-                  <span className={cn("h-1.5 w-1.5 rounded-full", c)} />
-                </div>
-                <div className="mt-1 text-lg font-semibold">{n}</div>
-                <div
-                  className={cn("mt-2 h-1 rounded-full opacity-50", c)}
-                  style={{ width: `${Math.min(100, n * 8)}%` }}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* AI Advisor */}
-        <div className="rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
-          <div className="p-5 border-b border-border/60 flex items-center gap-2">
-            <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-brand text-brand-foreground">
-              <Sparkles className="h-3.5 w-3.5" />
-            </div>
-            <div>
-              <div className="text-sm font-semibold">AI Advisor</div>
-              <div className="text-xs text-muted-foreground">Suggested actions</div>
-            </div>
-          </div>
-          <div className="p-3 space-y-2">
-            {[
-              { t: "Complete your startup profile", d: "Add pitch deck and team details to attract investors" },
-              { t: "Import your VC target list", d: "Upload a CSV or add leads manually" },
-              { t: "Create your first deal room", d: "Set up a secure space to share documents" },
-            ].map((a) => (
-              <div
-                key={a.t}
-                className="rounded-lg border border-border/60 bg-background/40 p-3 hover:bg-accent transition-colors cursor-pointer"
-              >
-                <div className="text-sm font-medium">{a.t}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">{a.d}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-6 grid lg:grid-cols-2 gap-4">
-        {/* Recent activity */}
-        <div className="rounded-xl border border-border/60 bg-card shadow-card">
-          <div className="p-5 border-b border-border/60 flex items-center justify-between">
-            <div className="text-sm font-semibold">Recent activity</div>
-            <span className="text-xs text-muted-foreground">Live</span>
-          </div>
-          {activities.length === 0 ? (
-            <div className="px-5 py-8 text-center text-sm text-muted-foreground">
-              No activity yet — invite an investor to get started.
-            </div>
-          ) : (
-            <div className="divide-y divide-border/60">
-              {activities.map((a) => {
-                const { Icon, cls } = activityIcon(a.action);
-                return (
-                  <div key={a.id} className="flex items-center gap-3 px-5 py-3">
-                    <Icon className={cn("h-4 w-4 shrink-0", cls)} />
-                    <div className="flex-1 text-sm truncate capitalize">
-                      {a.action.replace(/_/g, " ")}
-                    </div>
-                    <div className="text-xs text-muted-foreground inline-flex items-center gap-1 shrink-0">
-                      <Clock className="h-3 w-3" /> {timeAgo(a.created_at)}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Hot deal rooms */}
-        <div className="rounded-xl border border-border/60 bg-card shadow-card">
-          <div className="p-5 border-b border-border/60 flex items-center justify-between">
-            <div className="text-sm font-semibold">Hot deal rooms</div>
-            <Link to={"/app/deal-rooms" as any} className="text-xs text-brand">
-              View all
-            </Link>
-          </div>
-          {dealRooms.length === 0 ? (
-            <div className="px-5 py-8 text-center text-sm text-muted-foreground">
-              No deal rooms yet.
-            </div>
-          ) : (
-            <div className="divide-y divide-border/60">
-              {dealRooms.map((r) => {
-                const { p, bar } = dealRoomProgress(r.status);
-                const initials = (r.name ?? "?")
-                  .split(" ")
-                  .map((s: string) => s[0] ?? "")
-                  .join("")
-                  .slice(0, 2)
-                  .toUpperCase();
-                return (
-                  <Link
-                    to={"/app/deal-rooms" as any}
-                    key={r.id}
-                    className="flex items-center gap-3 px-5 py-3 hover:bg-accent/40"
-                  >
-                    <div className="grid h-9 w-9 place-items-center rounded-md bg-gradient-soft text-xs font-semibold border border-border/60">
-                      {initials}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium truncate">{r.name ?? "Deal Room"}</div>
-                      <div className="text-xs text-muted-foreground capitalize">
-                        {r.status ?? "Active"}
-                      </div>
-                    </div>
-                    <div className="w-20">
-                      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                        <div className={cn("h-full", bar)} style={{ width: `${p}%` }} />
-                      </div>
-                      <div className="text-[10px] text-muted-foreground text-right mt-0.5">{p}%</div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {howItWorksOpen && <HowItWorksModal onClose={() => setHowItWorksOpen(false)} />}
+      <VerificationCard
+        startupId={startup.id}
+        userId={user!.id}
+        profileSlug={startup.profile_slug}
+      />
+      <ReadinessCard
+        startupId={startup.id}
+        userId={user!.id}
+      />
+      <DealActivityCard
+        startupId={startup.id}
+        profileSlug={startup.profile_slug ?? null}
+        companyName={startup.company_name ?? null}
+      />
     </div>
   );
 }

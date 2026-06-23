@@ -1,9 +1,10 @@
 {
-  // Force redeploy: 2026-05-27
+  // Force redeploy: 2026-06-18
   "name": "vcroom-main",
   "compatibility_date": "2024-09-23",
   "compatibility_flags": ["nodejs_compat"],
   "pages_build_output_dir": "./dist/client",
+  "placement": { "mode": "smart" },
   "vars": {
     "VITE_SUPABASE_URL": "https://ldimninnjlvxozubheib.supabase.co",
     "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI",

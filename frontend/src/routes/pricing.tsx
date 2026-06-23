@@ -6,7 +6,7 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing — Hockystick" },
-      { name: "description", content: "Free during beta. No credit card. Raise with confidence — pay for results." },
+      { name: "description", content: "Free during beta. Team collaboration, role-based access, and AI-powered deal flow — built for founders and investors." },
     ],
   }),
   component: PricingPage,
@@ -16,26 +16,23 @@ const plans = [
   {
     name: "Free",
     price: 0,
-    period: "month",
-    tagline: "Test the platform before you commit",
+    tagline: "For solo founders and investors getting started",
     borderColor: "border-white/8",
     badge: "Beta" as string | null,
     badgeStyle: { background: "rgba(16,185,129,0.15)", color: "#10B981" } as React.CSSProperties,
+    teamCallout: { emoji: "👤", text: "Solo only — upgrade for team access" },
+    teamCalloutStyle: {} as React.CSSProperties,
     features: [
-      "Verified founder profile",
-      "Public profile page",
-      "1 active deal room",
-      "5 document templates",
-      "3 AI document reviews per month",
-      "Basic investor thesis matching",
-      "Profile view analytics",
+      "1 founder or investor profile",
+      "Verified public profile",
+      "3 active deal rooms",
+      "20 AI advisor calls / day",
+      "Basic profile analytics",
     ],
     notIncluded: [
-      "Unlimited deal rooms",
-      "Full Document Intelligence Centre",
-      "Investor simulation",
-      "Priority matching",
-      "AI coaching",
+      "No team members",
+      "No document analytics",
+      "No priority matching",
     ],
     cta: "Start free",
     ctaUrl: "/sign-up?plan=free",
@@ -45,70 +42,67 @@ const plans = [
   {
     name: "Starter",
     price: 49,
-    period: "month",
-    tagline: "For founders preparing to raise",
+    tagline: "For founders and investors with a small team",
     borderColor: "border-white/10",
-    badge: null as string | null,
-    badgeStyle: {} as React.CSSProperties,
+    badge: "Most popular" as string | null,
+    badgeStyle: { background: "#7C3AED", color: "#fff" } as React.CSSProperties,
+    teamCallout: { emoji: "👥", text: "Add 1 team member · Assign them to specific deal rooms · They only see what you allow" },
+    teamCalloutStyle: { border: "1px solid rgba(124,58,237,0.3)", background: "rgba(124,58,237,0.06)" } as React.CSSProperties,
     features: [
-      "Verified founder profile",
-      "Public profile page (hockystick.app/p/you)",
-      "1 active deal room",
-      "Document Intelligence Centre (10 templates)",
-      "AI document review",
-      "Investor thesis matching",
-      "Profile view analytics",
-      "Email support",
+      "Everything in Free",
+      "1 additional team member (2 users total)",
+      "Role-based access (Admin / Manager / Analyst / Viewer)",
+      "5 active deal rooms",
+      "50 AI advisor calls / day",
+      "Document view analytics",
+      "Priority thesis matching",
     ],
     notIncluded: [
-      "Unlimited deal rooms",
-      "Investor simulation",
-      "Priority matching",
+      "No external analyst access",
+      "No advanced deal room controls",
     ],
     cta: "Start raising",
     ctaUrl: "/sign-up?plan=starter",
-    featured: false,
+    featured: true,
     comingSoon: false,
   },
   {
-    name: "Growth",
-    price: 149,
-    period: "month",
-    tagline: "For founders actively in conversations",
-    borderColor: "border-[#7C3AED]/50",
-    badge: "Most popular",
-    badgeStyle: { background: "#7C3AED", color: "#fff" } as React.CSSProperties,
+    name: "Pro",
+    price: 99,
+    tagline: "For serious fundraisers and active investors",
+    borderColor: "border-white/10",
+    badge: null as string | null,
+    badgeStyle: {} as React.CSSProperties,
+    teamCallout: { emoji: "👥", text: "Up to 5 users total · Your CFO in the data room · Your legal counsel reviewing documents · Your analyst running DD — without seeing everything · Each person sees only what you assign them" },
+    teamCalloutStyle: { border: "1px solid rgba(124,58,237,0.4)", background: "rgba(124,58,237,0.08)" } as React.CSSProperties,
     features: [
       "Everything in Starter",
-      "Unlimited deal rooms",
-      "Full Document Intelligence Centre (16 templates)",
-      "AI investor simulation",
-      "Deal room digital documents",
-      "Investor verification badges visible",
-      "Real-time investor view notifications",
-      "3-day nudge automation",
-      "Priority thesis matching",
-      "Priority support",
+      "Up to 4 additional team members (5 users total)",
+      "External analyst / agency access",
+      "Per-deal-room team assignment",
+      "15 active deal rooms",
+      "200 AI advisor calls / day",
+      "Advanced profile analytics",
+      "Priority deal matching + notifications",
+      "Custom team roles per deal room",
     ],
-    notIncluded: [
-      "White-glove onboarding",
-      "Custom verification",
-    ],
+    notIncluded: [] as string[],
     cta: "Start raising",
-    ctaUrl: "/sign-up?plan=growth",
-    featured: true,
+    ctaUrl: "/sign-up?plan=pro",
+    featured: false,
     comingSoon: false,
   },
   {
     name: "Scale",
     price: 499,
-    period: "month",
     tagline: "For serious raises of $2M and above",
     borderColor: "border-white/20",
     badge: null as string | null,
     badgeStyle: {} as React.CSSProperties,
+    teamCallout: null,
+    teamCalloutStyle: {} as React.CSSProperties,
     features: [
-      "Everything in Growth",
+      "Everything in Pro",
       "Hockystick Verified badge (manual review)",
       "White-glove profile setup",
       "Dedicated investor matching",
@@ -117,7 +111,6 @@ const plans = [
       "Custom NDA templates",
       "API access",
       "Dedicated account manager",
-      "Priority deal room support",
     ],
     notIncluded: [] as string[],
     cta: "Talk to us",
@@ -128,11 +121,12 @@ const plans = [
   {
     name: "Enterprise",
     price: null as number | null,
-    period: null as string | null,
     tagline: "For accelerators, funds, and platforms",
     borderColor: "border-white/8",
-    badge: "Coming soon",
+    badge: "Coming soon" as string | null,
     badgeStyle: { background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)" } as React.CSSProperties,
+    teamCallout: null,
+    teamCalloutStyle: {} as React.CSSProperties,
     features: [
       "Multi-founder cohort management",
       "White-label deal rooms",
@@ -169,6 +163,14 @@ const faqs = [
     a: "The Verified badge is a manual review by the Hockystick team confirming your identity and business. It signals to investors that your profile has been independently checked. Available on Scale plan and above.",
   },
   {
+    q: "Can team members have different access levels?",
+    a: "Yes. Each team member gets a role: Admin (full access), Manager (operations), Analyst (documents & DD), or Viewer (read-only). For investor teams: Admin, Associate, Analyst, or External. Roles can be changed at any time.",
+  },
+  {
+    q: "What is External Analyst access?",
+    a: "External Analysts can only access deal rooms you explicitly assign them to — they cannot see your discovery feed, pipeline, or investment thesis. Designed for third-party DD firms, legal advisors, and agencies.",
+  },
+  {
     q: "Do you support Arabic language?",
     a: "English-first for now. Arabic interface and Arabic-language AI analysis are on the roadmap for Q4 2026.",
   },
@@ -177,6 +179,80 @@ const faqs = [
     a: "The Enterprise plan lets accelerators and VC firms onboard their entire cohort or portfolio onto Hockystick, with a unified dashboard. Launching Q3 2026 — join the waitlist via the contact form.",
   },
 ];
+
+const founderRolesTable = {
+  headers: ["Feature", "Owner", "Admin", "Manager", "Analyst", "Viewer"],
+  rows: [
+    ["Edit profile",            true,  true,  true,  false, false],
+    ["Create deal rooms",       true,  true,  true,  false, false],
+    ["Upload documents",        true,  true,  true,  true,  false],
+    ["AI Advisor",              true,  true,  true,  true,  false],
+    ["Pipeline management",     true,  true,  true,  false, false],
+    ["Analytics",               true,  true,  true,  false, false],
+    ["Manage team",             true,  true,  false, false, false],
+    ["View assigned deal rooms",true,  true,  true,  true,  true ],
+  ],
+};
+
+const investorRolesTable = {
+  headers: ["Feature", "Owner", "Admin", "Associate", "Analyst", "External"],
+  rows: [
+    ["Browse startups",         true,  true,  true,  true,  false],
+    ["Request access",          true,  true,  true,  false, false],
+    ["Submit decisions",        true,  true,  false, false, false],
+    ["Run AI analysis",         true,  true,  true,  true,  true ],
+    ["Manage team",             true,  true,  false, false, false],
+    ["View assigned deal rooms",true,  true,  true,  true,  true ],
+  ],
+};
+
+function CheckOrDash({ value }: { value: boolean }) {
+  return (
+    <span style={{ color: value ? "#10B981" : "rgba(255,255,255,0.2)", fontWeight: 600, fontSize: 15 }}>
+      {value ? "✓" : "—"}
+    </span>
+  );
+}
+
+function RoleTable({ title, table }: { title: string; table: typeof founderRolesTable }) {
+  return (
+    <div style={{ marginBottom: 32 }}>
+      <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
+        {title}
+      </div>
+      <div style={{ background: "#111114", borderRadius: 12, border: "1px solid rgba(255,255,255,0.06)", overflow: "hidden" }}>
+        {/* Header */}
+        <div style={{ display: "grid", gridTemplateColumns: `2fr ${table.headers.slice(1).map(() => "1fr").join(" ")}`, padding: "12px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+          {table.headers.map((h, i) => (
+            <div key={i} style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.06em", textAlign: i === 0 ? "left" : "center" }}>
+              {h}
+            </div>
+          ))}
+        </div>
+        {/* Rows */}
+        {table.rows.map((row, ri) => (
+          <div
+            key={ri}
+            style={{
+              display: "grid",
+              gridTemplateColumns: `2fr ${table.headers.slice(1).map(() => "1fr").join(" ")}`,
+              padding: "11px 20px",
+              borderBottom: ri < table.rows.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
+              background: ri % 2 === 1 ? "rgba(255,255,255,0.02)" : "transparent",
+            }}
+          >
+            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{row[0] as string}</div>
+            {(row.slice(1) as boolean[]).map((val, ci) => (
+              <div key={ci} style={{ textAlign: "center" }}>
+                <CheckOrDash value={val} />
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function PricingPage() {
   return (
@@ -207,39 +283,44 @@ function PricingPage() {
               className={`rounded-2xl border p-6 flex flex-col ${plan.borderColor}`}
               style={{ background: plan.featured ? "rgba(124,58,237,0.05)" : "rgba(255,255,255,0.02)" }}
             >
-              {/* Badge */}
               {plan.badge && (
-                <span
-                  className="text-xs font-semibold px-2.5 py-1 rounded-full w-fit mb-4"
-                  style={plan.badgeStyle}
-                >
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full w-fit mb-4" style={plan.badgeStyle}>
                   {plan.badge}
                 </span>
               )}
 
-              {/* Name + price */}
               <p className="font-syne font-bold text-white text-xl mb-1">{plan.name}</p>
               <p className="text-xs text-white/40 mb-4">{plan.tagline}</p>
 
               {plan.price != null ? (
-                <div className="mb-6">
+                <div className="mb-4">
                   <span className="text-4xl font-bold text-white font-syne">${plan.price}</span>
-                  <span className="text-white/40 text-sm ml-1">/{plan.period}</span>
+                  <span className="text-white/40 text-sm ml-1">/month</span>
                 </div>
               ) : (
-                <div className="mb-6">
+                <div className="mb-4">
                   <span className="text-2xl font-bold text-white font-syne">Custom</span>
                 </div>
               )}
 
-              {/* CTA */}
+              {/* Team callout */}
+              {plan.teamCallout && (
+                <div
+                  className="rounded-lg p-3 mb-4 text-xs leading-relaxed"
+                  style={{
+                    background: Object.keys(plan.teamCalloutStyle).length ? undefined : "rgba(255,255,255,0.04)",
+                    border: Object.keys(plan.teamCalloutStyle).length ? undefined : "1px solid rgba(255,255,255,0.06)",
+                    color: "rgba(255,255,255,0.6)",
+                    ...plan.teamCalloutStyle,
+                  }}
+                >
+                  {plan.teamCallout.emoji} {plan.teamCallout.text}
+                </div>
+              )}
+
               <a
                 href={plan.ctaUrl}
-                className={`block text-center py-3 rounded-xl text-sm font-medium mb-6 transition-colors ${
-                  plan.comingSoon
-                    ? "cursor-not-allowed"
-                    : ""
-                }`}
+                className={`block text-center py-3 rounded-xl text-sm font-medium mb-6 transition-colors ${plan.comingSoon ? "cursor-not-allowed" : ""}`}
                 style={
                   plan.featured
                     ? { background: "#7C3AED", color: "#fff" }
@@ -251,7 +332,6 @@ function PricingPage() {
                 {plan.cta}
               </a>
 
-              {/* Features */}
               <div className="space-y-2.5 flex-1">
                 {plan.features.map((f, i) => (
                   <div key={i} className="flex items-start gap-2 text-sm">
@@ -270,15 +350,66 @@ function PricingPage() {
           ))}
         </div>
 
-        <p className="text-center text-xs text-white/30 mb-16 max-w-2xl mx-auto">
+        <p className="text-center text-xs text-white/30 mb-20 max-w-2xl mx-auto">
           All plans are free during beta. Paid plans launch when we're ready to scale.
         </p>
 
+        {/* Team benefit section */}
+        <div className="max-w-5xl mx-auto mb-20">
+          <h2 className="font-syne font-bold text-3xl text-white text-center mb-3">
+            Why your team needs Hockystick access
+          </h2>
+          <p className="text-white/50 text-center text-sm mb-10 max-w-xl mx-auto">
+            The best deals are a team effort. Give everyone the right level of access.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Card 1 */}
+            <div className="rounded-2xl border border-white/8 p-6" style={{ background: "rgba(255,255,255,0.02)" }}>
+              <div className="text-2xl mb-3">🏗️</div>
+              <div className="font-syne font-bold text-white text-base mb-2">Your deal room is a team effort</div>
+              <p className="text-white/50 text-sm leading-relaxed">
+                Your CFO needs to review financial documents. Your legal counsel needs to see term sheets. Your co-founder needs full visibility.
+                On the free plan, you share one login. On Pro, everyone has their own account with the right level of access.
+              </p>
+            </div>
+            {/* Card 2 */}
+            <div className="rounded-2xl border border-white/8 p-6" style={{ background: "rgba(255,255,255,0.02)" }}>
+              <div className="text-2xl mb-3">📊</div>
+              <div className="font-syne font-bold text-white text-base mb-2">Your associates handle screening. You handle decisions.</div>
+              <p className="text-white/50 text-sm leading-relaxed">
+                Associates browse and request access. Analysts run due diligence reports. External DD firms get deal-room-only access —
+                they see documents, not your pipeline. You get a clean summary and submit the final call.
+              </p>
+            </div>
+            {/* Card 3 */}
+            <div className="rounded-2xl border border-white/8 p-6 relative" style={{ background: "rgba(255,255,255,0.02)" }}>
+              <div className="text-2xl mb-3">🏢</div>
+              <div className="font-syne font-bold text-white text-base mb-2">Built for teams, not just individuals</div>
+              <p className="text-white/50 text-sm leading-relaxed">
+                Running a cohort program or accelerator? Assign analysts to specific portfolio companies. External agencies can review
+                specific deal rooms. Team-level visibility into every active deal.
+              </p>
+              <div className="mt-4">
+                <span className="text-xs bg-amber-500/15 text-amber-400 px-2 py-0.5 rounded-full">VC program features coming 2026</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Role comparison tables */}
+        <div className="max-w-4xl mx-auto mb-20">
+          <h2 className="font-syne font-bold text-2xl text-white text-center mb-2">
+            What each team role can do
+          </h2>
+          <p className="text-white/40 text-sm text-center mb-10">
+            Role permissions apply across both founder and investor accounts.
+          </p>
+          <RoleTable title="Founder roles" table={founderRolesTable} />
+          <RoleTable title="Investor roles" table={investorRolesTable} />
+        </div>
+
         {/* Investor pricing note */}
-        <div
-          className="max-w-3xl mx-auto text-center p-8 rounded-2xl border border-white/8 mb-16"
-          style={{ background: "rgba(255,255,255,0.02)" }}
-        >
+        <div className="max-w-3xl mx-auto text-center p-8 rounded-2xl border border-white/8 mb-16" style={{ background: "rgba(255,255,255,0.02)" }}>
           <p className="font-syne font-bold text-white text-xl mb-2">Investors join free</p>
           <p className="text-white/50 text-sm leading-relaxed">
             Investors access Hockystick at no charge. Browse verified founder profiles, receive thesis-matched deal flow,
@@ -287,20 +418,14 @@ function PricingPage() {
         </div>
 
         {/* Web3 waitlist */}
-        <div
-          className="max-w-3xl mx-auto text-center p-8 rounded-2xl border border-white/5 mb-16"
-          style={{ background: "rgba(255,255,255,0.01)" }}
-        >
+        <div className="max-w-3xl mx-auto text-center p-8 rounded-2xl border border-white/5 mb-16" style={{ background: "rgba(255,255,255,0.01)" }}>
           <span className="text-xs bg-amber-500/15 text-amber-400 px-2 py-0.5 rounded-full">Coming soon</span>
           <p className="font-syne font-bold text-white text-xl mt-3 mb-2">Hockystick for Web3</p>
           <p className="text-white/40 text-sm leading-relaxed mb-4">
             Verified token raises. On-chain due diligence. VARA-compliant deal rooms.
             Built for the UAE Web3 ecosystem — launching 2027.
           </p>
-          <a
-            href="/contact?interest=web3"
-            className="text-sm text-white/50 hover:text-white underline underline-offset-2 transition-colors"
-          >
+          <a href="/contact?interest=web3" className="text-sm text-white/50 hover:text-white underline underline-offset-2 transition-colors">
             Join the Web3 waitlist →
           </a>
         </div>
@@ -310,11 +435,7 @@ function PricingPage() {
           <h2 className="font-syne font-bold text-2xl text-white text-center mb-8">Common questions</h2>
           <div className="space-y-4">
             {faqs.map((item, i) => (
-              <details
-                key={i}
-                className="border border-white/8 rounded-xl group"
-                style={{ background: "rgba(255,255,255,0.02)" }}
-              >
+              <details key={i} className="border border-white/8 rounded-xl group" style={{ background: "rgba(255,255,255,0.02)" }}>
                 <summary className="flex items-center justify-between p-5 cursor-pointer list-none text-sm font-medium text-white">
                   {item.q}
                   <span className="text-white/40 transition-transform group-open:rotate-180 ml-4 shrink-0">↓</span>

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Globe, Users, Video, Sparkles, Lock } from "lucide-react";
+import { ArrowLeft, Globe, Users, Video, Sparkles, Lock, EyeOff } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { VerificationBadge } from "@/components/shared/VerificationBadge";
 
 interface PublicStartup {
   id: string;
@@ -76,7 +77,8 @@ const SECTION_DEFAULTS: Record<string, string> = {
 
 export const Route = createFileRoute("/p/$slug")({
   head: ({ loaderData }) => {
-    const startup = loaderData as PublicStartup | null;
+    const d = loaderData as { startup: PublicStartup | null; slug: string };
+    const startup = d?.startup;
     if (!startup) {
       return { meta: [{ title: "Founder profile not found — Hockystick" }] };
     }
@@ -90,20 +92,21 @@ export const Route = createFileRoute("/p/$slug")({
     };
   },
   loader: async ({ params }) => {
-    if (!params.slug) return null;
+    if (!params.slug) return { startup: null, slug: "" };
     const cfEnv = (globalThis as any).__cf_env || {};
     const supabaseUrl = cfEnv.SUPABASE_URL || cfEnv.VITE_SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
     const serviceKey = cfEnv.SUPABASE_SERVICE_ROLE_KEY || "";
     const client = serviceKey ? createClient(supabaseUrl, serviceKey) : supabase;
+    // Only return the profile if publicly published — owner preview is handled client-side
     const { data } = await client
       .from("startups")
       .select("*")
       .eq("profile_slug", params.slug)
       .eq("profile_published", true)
       .maybeSingle();
-    return data as PublicStartup | null;
+    return { startup: data as PublicStartup | null, slug: params.slug };
   },
-  component: FounderPublicProfile,
+  component: FounderPublicProfileWrapper,
 });
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -340,12 +343,110 @@ function LockedSectionCard({
   );
 }
 
+// ─── Owner-preview wrapper ────────────────────────────────────────────────────
+// Mirrors the same pattern used on /i/$slug. The server loader has no session
+// context (service-role client, no user JWT), so owner detection happens here
+// on the client after auth is available.
+
+function FounderPublicProfileWrapper() {
+  const { startup: publicStartup, slug } = Route.useLoaderData() as { startup: PublicStartup | null; slug: string };
+
+  const [ownerState, setOwnerState] = useState<
+    | { loading: true }
+    | { loading: false; isOwner: false }
+    | { loading: false; isOwner: true; startup: PublicStartup }
+  >({ loading: !publicStartup });
+
+  useEffect(() => {
+    if (publicStartup) return; // already public — no owner check needed
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user?.id || cancelled) {
+          if (!cancelled) setOwnerState({ loading: false, isOwner: false });
+          return;
+        }
+        const { data: ownedStartup } = await supabase
+          .from("startups")
+          .select("*")
+          .eq("profile_slug", slug)
+          .eq("founder_id", session.user.id)
+          .maybeSingle();
+        if (cancelled) return;
+        if (!ownedStartup) {
+          setOwnerState({ loading: false, isOwner: false });
+          return;
+        }
+        setOwnerState({ loading: false, isOwner: true, startup: ownedStartup as PublicStartup });
+      } catch {
+        if (!cancelled) setOwnerState({ loading: false, isOwner: false });
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [publicStartup, slug]);
+
+  // Public profile found — render normally, no banner
+  if (publicStartup) {
+    return <FounderPublicProfile startup={publicStartup} isOwnerPreview={false} />;
+  }
+
+  // Still resolving session
+  if (ownerState.loading) {
+    return (
+      <div style={{ background: "#0A0A0B", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ width: 32, height: 32, border: "2px solid rgba(124,58,237,0.3)", borderTopColor: "#7C3AED", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  // Logged-in owner viewing their own unpublished profile — show with preview banner
+  if (ownerState.isOwner) {
+    return <FounderPublicProfile startup={ownerState.startup} isOwnerPreview={true} />;
+  }
+
+  // Not published / not owner
+  return (
+    <div style={{ background: "#0A0A0B", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ textAlign: "center", color: "#FAFAFA" }}>
+        <h1 style={{ fontSize: 32, fontFamily: "Syne, sans-serif", fontWeight: 800, marginBottom: 12 }}>Profile private</h1>
+        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 15 }}>This founder profile hasn't been published yet.</p>
+        <a href="/" style={{ display: "inline-block", marginTop: 24, color: "#7C3AED", textDecoration: "underline", fontSize: 14 }}>Back to Hockystick</a>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-function FounderPublicProfile() {
-  const startup = Route.useLoaderData() as PublicStartup | null;
+function ClaimStatusPill({ status }: { status: string }) {
+  if (status === "ai_confirmed") {
+    return (
+      <span className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full font-medium shrink-0"
+        style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }}>
+        ✓ Verified
+      </span>
+    );
+  }
+  if (status === "ai_mismatch") {
+    return (
+      <span className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full font-medium shrink-0"
+        style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#EF4444" }}>
+        ⚠ Mismatch
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full font-medium shrink-0"
+      style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", color: "#F59E0B" }}>
+      Unverified
+    </span>
+  );
+}
 
-  const [accessLevel, setAccessLevel] = useState<AccessLevel>("public");
+function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStartup; isOwnerPreview: boolean }) {
+  const [accessLevel, setAccessLevel] = useState<AccessLevel>(isOwnerPreview ? "founder" : "public");
   const [viewerId, setViewerId] = useState<string | null>(null);
   const [viewerRole, setViewerRole] = useState<string | null>(null);
   const [accessLoaded, setAccessLoaded] = useState(false);
@@ -356,14 +457,22 @@ function FounderPublicProfile() {
   const [existingRequest, setExistingRequest] = useState<{ status: string } | null>(null);
 
   useEffect(() => {
-    if (!startup) return;
+    if (isOwnerPreview) {
+      // Owner is already confirmed — full access, no need to call getAccessLevel
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setViewerId(session?.user?.id ?? null);
+        setViewerRole("founder");
+        setAccessLoaded(true);
+      });
+      return;
+    }
     getAccessLevel(startup).then(({ level, userId, userRole }) => {
       setAccessLevel(level);
       setViewerId(userId);
       setViewerRole(userRole);
       setAccessLoaded(true);
     });
-  }, [startup?.id]);
+  }, [startup?.id, isOwnerPreview]);
 
   // Pre-load existing discovery request for this investor
   useEffect(() => {
@@ -403,6 +512,37 @@ function FounderPublicProfile() {
       return data;
     },
   });
+
+  const { data: founderVerification } = useQuery({
+    queryKey: ["founder-verification-public", startup?.id],
+    enabled: !!startup?.id,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("founder_verifications")
+        .select("current_tier, tier1_passed, tier1_score, tier2_passed, tier3_passed")
+        .eq("startup_id", startup!.id)
+        .maybeSingle();
+      return data ?? null;
+    },
+  });
+
+  // Claims: only ai_confirmed ones are shown publicly (unverified/mismatch are
+  // shown as "Unverified" to investors — they need to see what's not backed up)
+  const { data: publicClaims = [] } = useQuery({
+    queryKey: ["public-claims", startup?.id],
+    enabled: !!startup?.id,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("startup_claims")
+        .select("claim_type, claim_label, claim_value, proof_status")
+        .eq("startup_id", startup!.id);
+      return (data ?? []) as Array<{ claim_type: string; claim_label: string; claim_value: string; proof_status: string }>;
+    },
+  });
+
+  const publicClaimByType = (type: string) => publicClaims.find((c) => c.claim_type === type);
 
   // Profile view tracking
   useEffect(() => {
@@ -466,20 +606,6 @@ function FounderPublicProfile() {
       document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [startup?.id]);
-
-  if (!startup) {
-    return (
-      <div className="min-h-screen bg-background text-foreground">
-        <SiteHeader />
-        <main className="mx-auto max-w-3xl px-4 sm:px-6 py-32 text-center">
-          <h1 className="text-3xl font-bold mb-4">Profile not found</h1>
-          <p className="text-muted-foreground mb-8">This founder profile either does not exist or has not been published yet.</p>
-          <Link to="/"><Button className="gap-2"><ArrowLeft className="h-4 w-4" /> Back to Hockystick</Button></Link>
-        </main>
-        <SiteFooter />
-      </div>
-    );
-  }
 
   const vis = getVisibility(startup);
 
@@ -574,6 +700,29 @@ function FounderPublicProfile() {
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <SiteHeader />
+      {/* Owner preview banner — amber, same style as /i/$slug */}
+      {isOwnerPreview && (
+        <div style={{
+          background: "rgba(245,158,11,0.12)",
+          borderBottom: "1px solid rgba(245,158,11,0.25)",
+          padding: "10px 24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          flexWrap: "wrap",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <EyeOff style={{ height: 14, width: 14, color: "#F59E0B", flexShrink: 0 }} />
+            <span style={{ fontSize: 13, color: "#F59E0B", fontWeight: 500 }}>
+              Preview mode — this is how your profile will look to others. Not published yet.
+            </span>
+          </div>
+          <a href="/app/profile" style={{ fontSize: 12, color: "#F59E0B", textDecoration: "underline", whiteSpace: "nowrap" }}>
+            Back to profile settings
+          </a>
+        </div>
+      )}
       <main className="mx-auto max-w-6xl px-4 sm:px-6 py-16" style={{ paddingBottom: 80 }}>
         {/* Header — always public */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -583,15 +732,25 @@ function FounderPublicProfile() {
               {startup.company_name || "Unnamed startup"}
             </h1>
             {startup.tagline && <p className="mt-4 max-w-3xl text-lg text-muted-foreground">{startup.tagline}</p>}
-            {startup?.registry_verified && registryCheck && (
-              <div className="flex items-center gap-2 mt-3">
-                <span
-                  className="text-xs px-2.5 py-1 rounded-full font-medium inline-flex items-center gap-1"
-                  style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.25)", color: "#10B981" }}
-                  title={`Company registration verified with ${registryCheck.confidence_score}% confidence.`}
-                >
-                  ✓ Registered company
-                </span>
+            {(startup?.registry_verified && registryCheck || (founderVerification?.current_tier ?? 0) > 0) && (
+              <div className="flex items-center gap-2 mt-3 flex-wrap">
+                {startup?.registry_verified && registryCheck && (
+                  <span
+                    className="text-xs px-2.5 py-1 rounded-full font-medium inline-flex items-center gap-1"
+                    style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.25)", color: "#10B981" }}
+                    title={`Company registration verified with ${registryCheck.confidence_score}% confidence.`}
+                  >
+                    ✓ Registered company
+                  </span>
+                )}
+                {(founderVerification?.current_tier ?? 0) > 0 && (
+                  <VerificationBadge
+                    tier={founderVerification!.current_tier}
+                    size="md"
+                    verifySlug={startup.profile_slug ?? undefined}
+                    entityType="founder"
+                  />
+                )}
               </div>
             )}
             {(startup.social_links ?? []).length > 0 && (
@@ -681,12 +840,30 @@ function FounderPublicProfile() {
                   </div>
                 </div>
               )}
-              {startup.revenue && (
-                <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
-                  <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Revenue</div>
-                  <div className="mt-2 text-lg font-semibold text-foreground">{formatCurrency(startup.revenue)}</div>
-                </div>
-              )}
+              {startup.revenue && (() => {
+                const revClaim = publicClaimByType("revenue");
+                const isUnverified = !revClaim || revClaim.proof_status === "unverified" || revClaim.proof_status === "ai_mismatch";
+                return (
+                  <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Revenue</div>
+                      {revClaim && (
+                        <span
+                          className="text-[10px] px-1.5 py-0.5 rounded-full font-medium inline-flex items-center gap-1"
+                          style={isUnverified
+                            ? { background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", color: "#F59E0B" }
+                            : revClaim.proof_status === "ai_mismatch"
+                            ? { background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", color: "#EF4444" }
+                            : { background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }}
+                        >
+                          {revClaim.proof_status === "ai_confirmed" ? "✓ Verified" : revClaim.proof_status === "ai_mismatch" ? "⚠ Mismatch" : "Unverified"}
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-2 text-lg font-semibold text-foreground">{formatCurrency(startup.revenue)}</div>
+                  </div>
+                );
+              })()}
             </SectionGate>
 
             {/* Market section */}
@@ -717,9 +894,24 @@ function FounderPublicProfile() {
                 <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
                   <div className="text-sm uppercase tracking-[0.24em] text-muted-foreground mb-3">Key metrics</div>
                   <div className="space-y-2 text-sm text-muted-foreground">
-                    {startup.key_metric && <div><span className="font-semibold text-foreground">Key metric:</span> {startup.key_metric}</div>}
-                    {startup.growth_rate && <div><span className="font-semibold text-foreground">Growth:</span> {startup.growth_rate}</div>}
-                    {startup.customer_count && <div><span className="font-semibold text-foreground">Customers:</span> {startup.customer_count}</div>}
+                    {startup.key_metric && (
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span><span className="font-semibold text-foreground">Key metric:</span> {startup.key_metric}</span>
+                        {publicClaimByType("key_metric") && <ClaimStatusPill status={publicClaimByType("key_metric")!.proof_status} />}
+                      </div>
+                    )}
+                    {startup.growth_rate && (
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span><span className="font-semibold text-foreground">Growth:</span> {startup.growth_rate}</span>
+                        {publicClaimByType("growth_rate") && <ClaimStatusPill status={publicClaimByType("growth_rate")!.proof_status} />}
+                      </div>
+                    )}
+                    {startup.customer_count && (
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span><span className="font-semibold text-foreground">Customers:</span> {startup.customer_count}</span>
+                        {publicClaimByType("customer_count") && <ClaimStatusPill status={publicClaimByType("customer_count")!.proof_status} />}
+                      </div>
+                    )}
                     {startup.milestones && <div><span className="font-semibold text-foreground">Milestones:</span> {startup.milestones}</div>}
                   </div>
                 </div>

@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
 import { useState } from "react";
-import { LogOut, Settings, User, Users, ShieldCheck } from "lucide-react";
+import { LogOut, Settings, User, Users, Activity } from "lucide-react";
 
 export function UserMenu() {
   const { user, signOut } = useAuth();
@@ -9,9 +9,23 @@ export function UserMenu() {
 
   if (!user) return null;
 
+  const isInvestor = user.role === "investor";
+
   const initials = user.fullName
     ? user.fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
     : user.email.slice(0, 2).toUpperCase();
+
+  const menuItems = isInvestor
+    ? [
+        { icon: User, label: "Account", to: "/app/investor/profile" as const },
+        { icon: Users, label: "Team", to: "/app/investor/team" as const },
+        { icon: Settings, label: "Settings", to: "/app/investor/settings" as const },
+      ]
+    : [
+        { icon: User, label: "Account", to: "/app/profile" as const },
+        { icon: Users, label: "Team & users", to: "/app/users" as const },
+        { icon: Settings, label: "Settings", to: "/app/settings" as const },
+      ];
 
   return (
     <div className="relative">
@@ -41,12 +55,7 @@ export function UserMenu() {
             </div>
 
             <div className="p-1">
-              {[
-                { icon: User, label: "Account", to: "/app/profile" as const },
-                { icon: Users, label: "Team & users", to: "/app/users" as const },
-                { icon: ShieldCheck, label: "Audit log", to: "/app/audit" as const },
-                { icon: Settings, label: "Settings", to: "/app/profile" as const },
-              ].map((m) => (
+              {menuItems.map((m) => (
                 <Link
                   key={m.label}
                   to={m.to}
@@ -56,6 +65,16 @@ export function UserMenu() {
                   <m.icon className="h-4 w-4 text-muted-foreground" /> {m.label}
                 </Link>
               ))}
+              {/* Audit log — page exists, data is placeholder (activity tracking coming soon) */}
+              <Link
+                to="/app/audit"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-foreground/80 hover:bg-accent hover:text-foreground"
+              >
+                <Activity className="h-4 w-4 text-muted-foreground" />
+                <span>Activity log</span>
+                <span className="ml-auto text-[9px] text-muted-foreground border border-border/60 rounded px-1 py-0.5">soon</span>
+              </Link>
             </div>
 
             <div className="p-1 border-t border-border/60">

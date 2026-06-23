@@ -3,6 +3,7 @@ import {
   FileText, CheckCircle2, AlertCircle, Zap,
   ArrowRight, ChevronDown, Loader2, X, Upload,
 } from "lucide-react";
+import { PageGuide } from "@/components/app/PageGuide";
 import { useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
@@ -346,7 +347,7 @@ function Documents() {
     return filtered;
   }, [documentsWithStatus, stageKey, selectedCategory]);
 
-  // Calculate readiness score
+  // Calculate readiness score (required-docs completion only — for guidance message)
   const { readinessScore, completedRequired, requiredCount } = useMemo(() => {
     const requiredTemplates = documentsWithStatus.filter(t => t.is_required);
     const completed = requiredTemplates.filter(t => {
@@ -378,31 +379,21 @@ function Documents() {
     return `You've completed ${completedRequired} of ${requiredCount} required documents.`;
   }, [founderDocs, readinessScore, completedRequired, requiredCount]);
 
-  // Overall investor-readiness score (60% required completion + 40% AI scores)
-  const overallScore = useMemo(() => {
-    if (!founderDocs?.length) return 0;
-    const completed = founderDocs.filter(d =>
-      d.status === "complete" || d.status === "ai_extracted"
-    );
-    const required = founderDocs.filter(d => {
-      const t = documentsWithStatus.find(t => t.slug === d.template_slug);
-      return t?.is_required;
-    });
-    const requiredComplete = required.filter(d =>
-      d.status === "complete" || d.status === "ai_extracted"
-    );
-    const completionScore = required.length > 0
-      ? (requiredComplete.length / required.length) * 60
-      : 0;
-    const avgAIScore = completed.length > 0
-      ? completed.reduce((sum, d) => {
-          const score = (d.ai_feedback as Record<string, unknown>)?.overall_score as number ?? 0;
-          return sum + score;
-        }, 0) / completed.length
-      : 0;
-    const aiScore = (avgAIScore / 10) * 40;
-    return Math.round(completionScore + aiScore);
-  }, [founderDocs, documentsWithStatus]);
+  // Overall investor-readiness score — single source of truth: readiness_snapshots
+  const { data: readinessSnapshot } = useQuery({
+    queryKey: ["readiness-snapshot-docs", startup?.id],
+    enabled: !!startup?.id,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("readiness_snapshots")
+        .select("readiness_score, gate_passed")
+        .eq("startup_id", startup!.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+  const overallScore = readinessSnapshot?.readiness_score ?? 0;
 
   const readinessLabel = overallScore >= 80
     ? "Investor ready"
@@ -463,6 +454,11 @@ function Documents() {
       const data = await res.json();
       if (data.simulation) {
         setSimulation(data.simulation);
+        // Recompute readiness now that we have a fresh simulation score
+        if (startup?.id && user?.id) {
+          const { computeReadiness } = await import("@/lib/readiness-fn");
+          computeReadiness({ data: { startup_id: startup.id, founder_user_id: user.id } }).catch(() => null);
+        }
       }
     } catch (e) {
       console.error("[simulate-investor]", e);
@@ -496,6 +492,16 @@ function Documents() {
       if (upsertError) throw upsertError;
       toast.success(`${templateName} uploaded`);
       refetchFounderDocs();
+      const { logActivity } = await import("@/lib/activity-log-fn");
+      logActivity({
+        account_type: "founder",
+        account_id: startup.id,
+        actor_user_id: user!.id,
+        actor_name: user!.fullName || user!.email || "Founder",
+        action_type: "document_uploaded",
+        target_label: templateName,
+        detail: `Uploaded ${file.name}`,
+      });
     } catch (e: any) {
       toast.error(e.message || "Upload failed");
     } finally {
@@ -522,6 +528,7 @@ function Documents() {
           <p className="text-sm text-muted-foreground">Your document workspace — guided by AI</p>
         </div>
         <div className="flex items-center gap-2">
+          <PageGuide pageId="documents" />
           <span className="text-sm text-muted-foreground">Stage:</span>
           <div className="relative inline-flex">
             <select

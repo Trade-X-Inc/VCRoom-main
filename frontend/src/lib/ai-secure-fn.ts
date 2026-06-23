@@ -176,3 +176,55 @@ export const secureAICall = createServerFn({ method: "POST" })
       return { reply: `Request failed: ${err.message}`, error: err.message };
     }
   });
+
+// Classify a document into one of the deal room categories
+// Returns one of: Pitch Deck | Financials | Legal | Market Research | Team | Product | Other
+type ClassifyInput = { fileName: string; textSample: string };
+type ClassifyResult = { category: string; confidence: "high" | "low" };
+
+export const classifyDocument = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown): ClassifyInput => data as ClassifyInput)
+  .handler(async ({ data }): Promise<ClassifyResult> => {
+    const cfEnv = (globalThis as any).__cf_env || {};
+    const apiKey =
+      cfEnv.OPENAI_API_KEY ||
+      cfEnv.OPEN_AI_API_KEY ||
+      cfEnv["OPEN AI API KEY"] ||
+      getEnvVar("OPENAI_API_KEY") ||
+      "";
+
+    if (!apiKey) return { category: "Other", confidence: "low" };
+
+    const CATEGORIES = ["Pitch Deck", "Financials", "Legal", "Market Research", "Team", "Product", "Other"];
+
+    try {
+      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          max_tokens: 30,
+          temperature: 0,
+          messages: [
+            {
+              role: "system",
+              content: `You classify startup documents into exactly one of these categories: ${CATEGORIES.join(", ")}.\nRespond with ONLY the category name, nothing else.`,
+            },
+            {
+              role: "user",
+              content: `File name: ${data.fileName}\n\nDocument excerpt (first 800 chars):\n${data.textSample.slice(0, 800)}`,
+            },
+          ],
+        }),
+        signal: AbortSignal.timeout(10000),
+      });
+
+      if (!resp.ok) return { category: "Other", confidence: "low" };
+      const json: any = await resp.json();
+      const raw = (json.choices?.[0]?.message?.content ?? "").trim();
+      const matched = CATEGORIES.find((c) => c.toLowerCase() === raw.toLowerCase());
+      return { category: matched ?? "Other", confidence: matched ? "high" : "low" };
+    } catch {
+      return { category: "Other", confidence: "low" };
+    }
+  });
