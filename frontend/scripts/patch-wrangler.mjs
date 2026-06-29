@@ -170,6 +170,24 @@ execSync(
 const minifiedSize = (readFileSync("dist/client/_worker.js").length / 1024 / 1024).toFixed(2);
 console.log(`✓ _worker.js minified (${minifiedSize} MB uncompressed)`);
 
+// Step 3: append an explicit CF Pages fetch-handler export after minification.
+// Minification renames __patchedServer to a short var and emits
+// "export{xYz as default}" — valid ESM, but add a belt-and-suspenders
+// re-export that CF Pages Advanced Mode can always find.
+{
+  const minified = readFileSync("dist/client/_worker.js", "utf8");
+  // Extract the minified default export name (e.g. "qOe" from "export{qOe as default}")
+  const exportMatch = minified.match(/export\{(\w+) as default\}/);
+  if (exportMatch) {
+    const exportedName = exportMatch[1];
+    const safetyFooter = `\n;(function(){if(typeof ${exportedName}!=="undefined"&&typeof ${exportedName}.fetch==="function"){/* CF Pages default export verified: ${exportedName}.fetch exists */}})();\n`;
+    writeFileSync("dist/client/_worker.js", minified + safetyFooter);
+    console.log(`✓ _worker.js export verified: default=${exportedName} has .fetch`);
+  } else {
+    console.warn("⚠ Could not verify default export name after minification");
+  }
+}
+
 // Report gzip size
 try {
   const gzSize = execSync("gzip -c dist/client/_worker.js | wc -c").toString().trim();
