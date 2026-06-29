@@ -4,12 +4,16 @@ import {
   ArrowRight, ChevronDown, Loader2, X, Upload,
 } from "lucide-react";
 import { PageGuide } from "@/components/app/PageGuide";
+import { ProfileBuilder } from "@/components/founder/ProfileBuilder";
 import { useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
+const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","xlsx","xls","docx","doc","csv","png","jpg","jpeg"]);
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
 export const Route = createFileRoute("/app/documents")({
   component: Documents,
@@ -244,36 +248,6 @@ function getStatusIcon(status: string): { Icon: any; color: string; label: strin
 const STAGE2_SLUGS = new Set(["competitive-landscape", "product-roadmap", "tech-stack-overview", "traction-summary"]);
 const STAGE3_SLUGS = new Set(["financial-model", "cap-table", "incorporation-docs", "shareholder-agreements", "bank-statements", "customer-references"]);
 
-const simulationToDoc: Record<string, string> = {
-  competitive: "competitive-landscape",
-  competition: "competitive-landscape",
-  market: "market-sizing",
-  revenue: "financial-model",
-  financial: "financial-model",
-  traction: "traction-summary",
-  customer: "traction-summary",
-  team: "team-bios",
-  technology: "tech-stack-overview",
-  product: "product-roadmap",
-  business: "business-model",
-};
-
-function getRelevantDoc(text: string): string | null {
-  const lower = text.toLowerCase();
-  for (const [keyword, slug] of Object.entries(simulationToDoc)) {
-    if (lower.includes(keyword)) return slug;
-  }
-  return null;
-}
-
-interface SimulationResult {
-  first_question: string;
-  red_flag: string;
-  strongest_point: string;
-  deal_killer: string | null;
-  overall_verdict: string;
-  score: number;
-}
 
 function Documents() {
   const { user } = useAuth();
@@ -282,8 +256,6 @@ function Documents() {
   const [editingDoc, setEditingDoc] = useState<FounderDocument | null>(null);
   const [showInstructions, setShowInstructions] = useState(true);
   const [uploading, setUploading] = useState<string | null>(null);
-  const [isSimulating, setIsSimulating] = useState(false);
-  const [simulation, setSimulation] = useState<SimulationResult | null>(null);
   const queryClient = useQueryClient();
 
   // Fetch startup
@@ -347,128 +319,11 @@ function Documents() {
     return filtered;
   }, [documentsWithStatus, stageKey, selectedCategory]);
 
-  // Calculate readiness score (required-docs completion only — for guidance message)
-  const { readinessScore, completedRequired, requiredCount } = useMemo(() => {
-    const requiredTemplates = documentsWithStatus.filter(t => t.is_required);
-    const completed = requiredTemplates.filter(t => {
-      const doc = founderDocs.find(d => d.template_slug === t.slug);
-      return doc?.status === "complete";
-    }).length;
-    return {
-      readinessScore: requiredTemplates.length > 0
-        ? Math.round((completed / requiredTemplates.length) * 100)
-        : 0,
-      completedRequired: completed,
-      requiredCount: requiredTemplates.length,
-    };
-  }, [documentsWithStatus, founderDocs]);
-
-  // Get guidance message
-  const guidanceMessage = useMemo(() => {
-    const financialModel = founderDocs.find(d => d.template_slug === "financial-model");
-    const capTable = founderDocs.find(d => d.template_slug === "cap-table");
-    if (!financialModel || financialModel.status === "empty") {
-      return "Investors always ask for your financial model first. Complete it before opening deal rooms.";
-    }
-    if (!capTable || capTable.status === "empty") {
-      return "Your cap table is required before any term sheet can be discussed.";
-    }
-    if (readinessScore === 100) {
-      return "Your document pack is investor-ready. You can now request deal rooms with confidence.";
-    }
-    return `You've completed ${completedRequired} of ${requiredCount} required documents.`;
-  }, [founderDocs, readinessScore, completedRequired, requiredCount]);
-
-  // Overall investor-readiness score — single source of truth: readiness_snapshots
-  const { data: readinessSnapshot } = useQuery({
-    queryKey: ["readiness-snapshot-docs", startup?.id],
-    enabled: !!startup?.id,
-    staleTime: 60_000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("readiness_snapshots")
-        .select("readiness_score, gate_passed")
-        .eq("startup_id", startup!.id)
-        .maybeSingle();
-      return data;
-    },
-  });
-  const overallScore = readinessSnapshot?.readiness_score ?? 0;
-
-  const readinessLabel = overallScore >= 80
-    ? "Investor ready"
-    : overallScore >= 60
-    ? "Getting there"
-    : overallScore >= 40
-    ? "Needs work"
-    : "Early stage";
-
-  const readinessColor = overallScore >= 80
-    ? "text-green-400"
-    : overallScore >= 60
-    ? "text-[#7C3AED]"
-    : overallScore >= 40
-    ? "text-amber-400"
-    : "text-red-400";
-
-  const readinessBarColor = overallScore >= 80
-    ? "bg-green-500"
-    : overallScore >= 60
-    ? "bg-[#7C3AED]"
-    : overallScore >= 40
-    ? "bg-amber-500"
-    : "bg-red-500";
-
-  async function runReadinessSimulation() {
-    if (!startup?.id) return;
-    setIsSimulating(true);
-    try {
-      const docSummary = founderDocs
-        ?.filter(d => d.status === "complete" || d.status === "ai_extracted")
-        .map(d => {
-          const content = d.content as Record<string, string>;
-          const fields = Object.entries(content ?? {})
-            .filter(([, v]) => v?.trim())
-            .map(([k, v]) => `${k}: ${v}`)
-            .join(". ");
-          return `[${d.template_slug}]: ${fields}`;
-        })
-        .join("\n\n");
-
-      const { data: { session } } = await supabase.auth.getSession();
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/simulate-investor`,
-        {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${session?.access_token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            docSummary,
-            stage: startup?.stage ?? "seed",
-            sector: (startup as any)?.sector ?? "",
-          }),
-        }
-      );
-      const data = await res.json();
-      if (data.simulation) {
-        setSimulation(data.simulation);
-        // Recompute readiness now that we have a fresh simulation score
-        if (startup?.id && user?.id) {
-          const { computeReadiness } = await import("@/lib/readiness-fn");
-          computeReadiness({ data: { startup_id: startup.id, founder_user_id: user.id } }).catch(() => null);
-        }
-      }
-    } catch (e) {
-      console.error("[simulate-investor]", e);
-    } finally {
-      setIsSimulating(false);
-    }
-  }
-
   async function handleFileUpload(templateSlug: string, templateName: string, templateId: string, file: File) {
     if (!startup?.id) return;
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+    if (!ALLOWED_EXTENSIONS.has(ext)) { toast.error(`${file.name}: file type not allowed`); return; }
+    if (file.size > MAX_FILE_SIZE) { toast.error(`${file.name}: exceeds 50 MB limit`); return; }
     setUploading(templateSlug);
     try {
       const filePath = `founder-docs/${startup.id}/${templateSlug}/${file.name}`;
@@ -520,7 +375,8 @@ function Documents() {
   }
 
   return (
-    <div className="p-6 lg:p-8 max-w-7xl mx-auto">
+    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex-1 overflow-y-auto p-6 lg:p-8">
       {/* Header */}
       <div className="flex items-start justify-between gap-6 mb-8">
         <div>
@@ -545,161 +401,9 @@ function Documents() {
         </div>
       </div>
 
-      {/* Readiness panel */}
-      <div className="mb-6 p-6 rounded-2xl" style={{ background: '#0d0d1a', border: '1px solid #1e1e3a' }}>
-        <div className="flex items-start justify-between mb-4 gap-4 flex-wrap">
-          <div>
-            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: '#7c6baa' }}>Investor readiness</p>
-            <div className="flex items-baseline gap-3 flex-wrap">
-              <span className="text-4xl font-bold" style={{ fontFamily: "Syne, sans-serif", color: '#ffffff' }}>
-                {overallScore}
-              </span>
-              <span className="text-sm" style={{ color: '#7c6baa' }}>/100</span>
-              <span className={`text-sm font-medium ${readinessColor}`}>{readinessLabel}</span>
-            </div>
-          </div>
-          <button
-            onClick={runReadinessSimulation}
-            disabled={isSimulating || overallScore < 30}
-            className="px-4 py-2 rounded-lg text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 shrink-0"
-            style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.3)', color: '#a78bfa' }}
-          >
-            {isSimulating ? (
-              <><Loader2 className="h-3.5 w-3.5 animate-spin" />Simulating…</>
-            ) : (
-              <>✦ Simulate investor review</>
-            )}
-          </button>
-        </div>
-
-        {/* Progress bar */}
-        <div className="h-2 rounded-full mb-4" style={{ background: '#1e1e3a' }}>
-          <div
-            className={`h-full rounded-full transition-all duration-500 ${readinessBarColor}`}
-            style={{ width: `${overallScore}%` }}
-          />
-        </div>
-
-        {/* Quick gap indicators */}
-        <div className="flex flex-wrap gap-2">
-          {documentsWithStatus
-            .filter(d => d.is_required &&
-              d.founderDoc?.status !== "complete" &&
-              d.founderDoc?.status !== "ai_extracted")
-            .slice(0, 4)
-            .map(d => (
-              <span key={d.id} className="text-xs px-2 py-1 rounded-full" style={{ background: '#2d0a0a', border: '1px solid #7f1d1d', color: '#fca5a5' }}>
-                Missing: {d.name}
-              </span>
-            ))
-          }
-          {founderDocs
-            .filter(d => {
-              const score = (d.ai_feedback as Record<string, unknown>)?.overall_score as number;
-              return score && score < 5 && (d.status === "complete" || d.status === "ai_extracted");
-            })
-            .slice(0, 2)
-            .map(d => {
-              const t = documentsWithStatus.find(t => t.slug === d.template_slug);
-              return (
-                <span key={d.id} className="text-xs px-2 py-1 rounded-full" style={{ background: '#1c1200', border: '1px solid #78350f', color: '#fcd34d' }}>
-                  Weak: {t?.name ?? d.template_slug}
-                </span>
-              );
-            })
-          }
-          {documentsWithStatus.filter(d =>
-            d.is_required &&
-            d.founderDoc?.status !== "complete" &&
-            d.founderDoc?.status !== "ai_extracted"
-          ).length === 0 && founderDocs.length > 0 && (
-            <span className="text-xs" style={{ color: '#4a4a6a' }}>All required documents complete</span>
-          )}
-        </div>
-      </div>
-
-      {/* Investor simulation results */}
-      {simulation && (
-        <div className="mb-6 p-6 rounded-2xl" style={{ background: '#1a1035', border: '1px solid #4c1d95' }}>
-          <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
-            <div>
-              <p className="text-xs uppercase tracking-wider mb-1" style={{ color: '#a78bfa' }}>✦ Investor simulation</p>
-              <p className="text-sm" style={{ color: '#7c6baa' }}>How a VC analyst would read your profile right now</p>
-            </div>
-            <div className="text-right shrink-0">
-              <p className="text-2xl font-bold" style={{ fontFamily: "Syne, sans-serif", color: '#ffffff' }}>
-                {simulation.score}/10
-              </p>
-              <p className="text-xs" style={{ color: '#7c6baa' }}>investment interest score</p>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="p-4 rounded-xl" style={{ background: '#0f0f1a', border: '1px solid #2d2d4a' }}>
-              <p className="text-xs uppercase tracking-wider mb-2" style={{ color: '#7c6baa' }}>Overall verdict</p>
-              <p className="text-sm leading-relaxed" style={{ color: '#e2e0f0' }}>{simulation.overall_verdict}</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="p-4 rounded-xl" style={{ background: '#1c1200', border: '1px solid #78350f' }}>
-                <p className="text-xs uppercase tracking-wider mb-2" style={{ color: '#f59e0b' }}>First question they'll ask</p>
-                <p className="text-sm leading-relaxed" style={{ color: '#c4b5fd' }}>"{simulation.first_question}"</p>
-                {(() => {
-                  const slug = getRelevantDoc(simulation.first_question);
-                  if (!slug) return null;
-                  return (
-                    <a href={`/app/documents?open=${slug}`} className="mt-2 inline-block text-xs text-amber-400/70 hover:text-amber-400 underline underline-offset-2">
-                      Fix this document →
-                    </a>
-                  );
-                })()}
-              </div>
-
-              <div className="p-4 rounded-xl" style={{ background: '#001a0f', border: '1px solid #14532d' }}>
-                <p className="text-xs uppercase tracking-wider mb-2" style={{ color: '#22c55e' }}>Strongest point</p>
-                <p className="text-sm leading-relaxed" style={{ color: '#e2e0f0' }}>{simulation.strongest_point}</p>
-              </div>
-
-              <div className="p-4 rounded-xl" style={{ background: '#1a0505', border: '1px solid #7f1d1d' }}>
-                <p className="text-xs uppercase tracking-wider mb-2" style={{ color: '#ef4444' }}>⚠ Red flag they'll spot</p>
-                <p className="text-sm leading-relaxed" style={{ color: '#e2e0f0' }}>{simulation.red_flag}</p>
-                {(() => {
-                  const slug = getRelevantDoc(simulation.red_flag);
-                  if (!slug) return null;
-                  return (
-                    <a href={`/app/documents?open=${slug}`} className="mt-2 inline-block text-xs text-red-400/70 hover:text-red-400 underline underline-offset-2">
-                      Fix this document →
-                    </a>
-                  );
-                })()}
-              </div>
-
-              {simulation.deal_killer && (
-                <div className="p-4 rounded-xl" style={{ background: '#1a0000', border: '1px solid #991b1b' }}>
-                  <p className="text-xs uppercase tracking-wider mb-2" style={{ color: '#f87171' }}>✗ Potential deal killer</p>
-                  <p className="text-sm leading-relaxed" style={{ color: '#e2e0f0' }}>{simulation.deal_killer}</p>
-                  {(() => {
-                    const slug = getRelevantDoc(simulation.deal_killer!);
-                    if (!slug) return null;
-                    return (
-                      <a href={`/app/documents?open=${slug}`} className="mt-2 inline-block text-xs text-red-400/70 hover:text-red-400 underline underline-offset-2">
-                        Fix this document →
-                      </a>
-                    );
-                  })()}
-                </div>
-              )}
-            </div>
-          </div>
-
-          <button
-            onClick={() => setSimulation(null)}
-            className="mt-4 text-xs transition-colors"
-            style={{ color: '#4a4a6a' }}
-          >
-            Dismiss
-          </button>
-        </div>
+      {/* Digital Profile — ProfileBuilder */}
+      {startup?.id && user?.id && (
+        <ProfileBuilder startupId={startup.id} userId={user.id} />
       )}
 
       {/* How it works — collapsible */}
@@ -738,7 +442,7 @@ function Documents() {
       </div>
 
       {/* Main content: sidebar + documents */}
-      <div className="grid grid-cols-12 gap-6">
+      <div className="grid grid-cols-12 gap-6 items-start">
         {/* Sidebar categories */}
         <div className="col-span-3">
           <div className="space-y-1">
@@ -938,6 +642,7 @@ function Documents() {
         />
       )}
     </div>
+    </div>
   );
 }
 
@@ -1037,10 +742,10 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-3xl rounded-2xl border border-white/10 bg-[#111118] shadow-2xl overflow-hidden my-auto"
+        className="w-full max-w-3xl rounded-2xl border border-border/60 bg-card shadow-2xl overflow-hidden my-auto"
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#111118] z-10">
+        <div className="px-6 py-4 border-b border-border/60 flex items-center justify-between sticky top-0 bg-card z-10">
           <div className="flex-1 min-w-0 pr-4">
             <h2 className="text-base font-semibold text-white" style={{ fontFamily: "Syne, sans-serif" }}>{template?.name ?? "Document"}</h2>
             <div className="flex items-center gap-2 mt-1.5">
@@ -1188,7 +893,7 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
         )}
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-white/10 flex items-center justify-between sticky bottom-0 bg-[#111118]">
+        <div className="px-6 py-4 border-t border-border/60 flex items-center justify-between sticky bottom-0 bg-card">
           <button
             onClick={onClose}
             className="rounded-lg border border-white/10 px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"

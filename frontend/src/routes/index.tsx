@@ -1,652 +1,1166 @@
-// Landing page v2 — rebuilt 2026-05-27
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { OnboardingChat } from "@/components/OnboardingChat";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { ArrowRight, Users, ShieldCheck, ListChecks, CheckCircle2, Zap, Shield, Sparkles, BarChart2, Globe, Link2, FileText, BadgeCheck, Mail, DollarSign, Wrench } from "lucide-react";
+import { CheckCircle2, ArrowRight, Shield, Lock } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Hockystick — Verified Fundraising for MENA Founders" },
-      { name: "description", content: "Replace your pitch deck with a verified founder profile. Connect with investors through structured, staged access. Built for GCC and MENA founders." },
-      { name: "keywords", content: "deal room software, VC deal flow, startup fundraising platform, investor due diligence, AI investment analysis, deal flow management, startup investor platform" },
-      { property: "og:title", content: "Hockystick — Verified Fundraising for MENA Founders" },
-      { property: "og:description", content: "The private platform for founders raising capital and VCs managing deal flow. Secure, AI-powered, built for closing deals." },
+      { title: "Hockystick — Where deals get done" },
+      { name: "description", content: "Hockystick is the private fundraising platform for founders and investors. Verified deal rooms. AI-powered matching. No warm intro required." },
+      { name: "keywords", content: "startup fundraising platform, verified investor platform, founder due diligence, VC deal flow management, deal rooms" },
+      { name: "robots", content: "index, follow" },
+      { property: "og:title", content: "Hockystick — Where deals get done" },
+      { property: "og:description", content: "Private deal rooms for early-stage fundraising. Verified profiles. AI matching." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://hockystick.app" },
+      { property: "og:image", content: "https://hockystick.app/og-image.png" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Hockystick — Where deals get done" },
-      { name: "twitter:description", content: "AI-powered deal rooms for founders and investors." },
+      { name: "twitter:description", content: "Private deal rooms. Verified founders. Serious investors. Deals that close." },
     ],
     links: [
       { rel: "canonical", href: "https://hockystick.app" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" as const },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" },
     ],
   }),
   component: Landing,
 });
 
-const STYLES = `
-  .hs { font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif; }
-  @keyframes hs-up { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
-  .hs-a  { animation: hs-up 0.65s cubic-bezier(0.16,1,0.3,1) both; }
-  .hs-a1 { animation-delay: 0.08s; }
-  .hs-a2 { animation-delay: 0.18s; }
-  .hs-a3 { animation-delay: 0.30s; }
-  .hs-a4 { animation-delay: 0.44s; }
-  .hs-a5 { animation-delay: 0.58s; }
-  .hs-step-line { background: linear-gradient(90deg, var(--color-brand), var(--color-violet)); }
-`;
+/* ─── SHARED TOKENS ─────────────────────────────────────────────────────── */
+const PURPLE = "#7C3AED";
+const PURPLE_DARK = "#6d28d9";
+const SYNE = "Syne, sans-serif";
+const DM = "DM Sans, sans-serif";
+const W60 = "rgba(255,255,255,0.6)";
+const W70 = "rgba(255,255,255,0.7)";
+const W40 = "rgba(255,255,255,0.4)";
+const W08 = "rgba(255,255,255,0.08)";
 
-function Landing() {
+/* ─── ROOT ───────────────────────────────────────────────────────────────── */
+function useDark(): boolean {
+  const [dark, setDark] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("vr.theme") === "dark";
+  });
+
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const handler = () => {
+      setDark(localStorage.getItem("vr.theme") === "dark");
+    };
+    window.addEventListener("storage", handler);
+    return () => window.removeEventListener("storage", handler);
   }, []);
 
+  return dark;
+}
+
+function Landing() {
+  const dark = useDark();
+  useEffect(() => { window.scrollTo(0, 0); }, []);
   return (
-    <>
-      <style>{STYLES}</style>
-      <div className="min-h-screen bg-background text-foreground">
-        <SiteHeader />
-        <Hero />
-        <ChatSection />
-        <Pain />
-        <SolutionStatement />
-        <HowItWorks />
-        <ProofNumbers />
-        <WhatsInside />
-        <ForFoundersInvestors />
-        <RegistryTeaser />
-        <FinalCTA />
-        <SiteFooter />
-        <OnboardingChat variant="floating" />
-      </div>
-    </>
+    <div style={{ background: "#0A0A0B" }}>
+      <SiteHeader />
+      <Hero />
+      <SocialProofBar />
+      <ProblemSection dark={dark} />
+      <HowItWorks dark={dark} />
+      <ForFounders dark={dark} />
+      <ForInvestors dark={dark} />
+      <TrustSection />
+      <PricingSection dark={dark} />
+      <FinalCTA />
+      <SiteFooter />
+    </div>
   );
 }
 
-// ── 1. HERO ───────────────────────────────────────────────────────
-function Hero() {
-  return (
-    <section className="relative overflow-hidden flex items-center min-h-[calc(100vh-64px)]">
-      <div className="absolute inset-0 -z-10 bg-gradient-hero" />
-      <div className="absolute inset-0 -z-10 grid-bg opacity-30 [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,black,transparent_80%)]" />
-      <div className="absolute inset-0 -z-10 noise opacity-40" />
-
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 py-24 text-center w-full">
-        <div className="hs-a hs-a1 inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/8 px-3 py-1 text-[11px] font-medium text-brand">
-          <span className="h-1.5 w-1.5 rounded-full bg-brand animate-pulse-glow" />
-          Early access — free during beta
-          <ArrowRight className="h-3 w-3" />
-        </div>
-
-        <h1 className="hs hs-a hs-a2 mt-6 text-[clamp(2.5rem,7vw,5rem)] font-black leading-[1.0] tracking-[-0.04em]">
-          <span className="text-gradient-brand">Verified founders. Serious investors. Deals that close.</span>
-        </h1>
-
-        <p className="hs-a hs-a3 mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Hockystick replaces the pitch deck with a verified founder profile — and gives investors a structured path from discovery to deal room. Built for GCC and MENA, open globally.
-        </p>
-
-        <div className="hs-a hs-a4 mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-          <Link to="/sign-up" search={{ role: "founder" } as any}>
-            <Button variant="brand" size="lg" className="gap-2 shadow-glow w-full sm:w-auto">
-              I'm raising capital <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
-          <Link to="/sign-up" search={{ role: "investor" } as any}>
-            <Button variant="outline" size="lg" className="gap-2 w-full sm:w-auto">
-              I invest in startups <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
-
-        <p className="hs-a hs-a5 mt-4 text-sm text-muted-foreground">
-          Used by founders across GCC, USA and Europe · Verified deal rooms · Free during beta
-        </p>
-        <div className="hs-a hs-a5 mt-5 flex items-center justify-center gap-3">
-          <a href="https://x.com/hockystickapp" target="_blank" rel="noopener noreferrer" title="@hockystickapp on X"
-            className="grid h-8 w-8 place-items-center rounded-lg bg-white/10 text-muted-foreground hover:bg-[#7C3AED] hover:text-white transition-all">
-            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.735-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-            </svg>
-          </a>
-          <a href="https://linkedin.com/company/hockystick" target="_blank" rel="noopener noreferrer" title="Hockystick on LinkedIn"
-            className="grid h-8 w-8 place-items-center rounded-lg bg-white/10 text-muted-foreground hover:bg-[#7C3AED] hover:text-white transition-all">
-            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-            </svg>
-          </a>
-        </div>
-      </div>
-    </section>
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 1 — HERO
+═══════════════════════════════════════════════════════════════════════════ */
+function DealRoomCard() {
+  const badge = (label: string, color: string, bg: string) => (
+    <span
+      className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full"
+      style={{ color, background: bg, fontFamily: SYNE }}
+    >
+      {label}
+    </span>
   );
-}
 
-// ── 2. PAIN ───────────────────────────────────────────────────────
-function Pain() {
-  const cards: { Icon: React.ElementType; stat: string; who: string; body: string }[] = [
-    {
-      Icon: Mail,
-      stat: "200 emails sent",
-      who: "The Founder",
-      body: "You spend 3 months crafting the perfect pitch. You send it to 200 investors. 12 open it. 3 reply. 1 ghosts you after 4 meetings. You never know why.",
-    },
-    {
-      Icon: DollarSign,
-      stat: "50 decks this week",
-      who: "The Investor",
-      body: "Deals flood your inbox with no structure, no context, no thesis match. Your analyst spends 20 hours on a company you'd pass in 5 minutes if you had the right data.",
-    },
-    {
-      Icon: Wrench,
-      stat: "12 tools, 0 clarity",
-      who: "The Process",
-      body: "Google Drive, Notion, DocuSign, email, Slack — the deal lives across 12 tools and 2 inboxes. Every update is manual. Every handoff breaks.",
-    },
-  ];
+  const docRow = (
+    icon: string,
+    name: string,
+    sub: string,
+    badgeLabel: string,
+    badgeColor: string,
+    badgeBg: string,
+  ) => (
+    <div
+      className="flex items-center gap-3 px-4 py-2.5"
+      style={{ borderBottom: `1px solid ${W08}` }}
+    >
+      <span className="text-base shrink-0">{icon}</span>
+      <div className="flex-1 min-w-0">
+        <div className="text-white text-xs font-medium truncate" style={{ fontFamily: SYNE }}>{name}</div>
+        <div className="text-[10px] truncate" style={{ color: W40, fontFamily: DM }}>{sub}</div>
+      </div>
+      {badge(badgeLabel, badgeColor, badgeBg)}
+    </div>
+  );
 
   return (
-    <section className="bg-gray-950 text-white py-24 md:py-32">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="text-[10px] uppercase tracking-widest font-semibold text-purple-400 mb-5">
-          The Reality
-        </div>
-        <h2 className="hs text-3xl md:text-4xl font-bold text-white mb-14 max-w-xl leading-[1.1]">
-          Fundraising is broken on both sides.
-        </h2>
-
-        <div className="grid md:grid-cols-3 gap-5">
-          {cards.map(({ Icon, stat, who, body }) => (
-            <div key={who} className="rounded-xl border border-white/10 bg-white/5 p-6">
-              <div className="mb-4 h-10 w-10 rounded-lg bg-white/8 flex items-center justify-center text-purple-400">
-                <Icon size={20} />
-              </div>
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-purple-400 mb-2">
-                {who}
-              </div>
-              <div className="text-xl font-bold text-white mb-3">{stat}</div>
-              <p className="text-sm text-gray-400 leading-relaxed">{body}</p>
+    <div className="relative w-full" style={{ perspective: "800px" }}>
+      {/* Shadow card (depth) */}
+      <div
+        className="absolute inset-0 rounded-2xl"
+        style={{
+          background: "#111113",
+          border: `1px solid ${W08}`,
+          transform: "rotate(1.5deg) translateY(8px) scale(0.97)",
+          opacity: 0.5,
+        }}
+      />
+      {/* Glow */}
+      <div
+        className="absolute -inset-8 rounded-3xl pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(124,58,237,0.22), transparent 70%)",
+        }}
+      />
+      {/* Main card */}
+      <div
+        className="relative rounded-2xl overflow-hidden shadow-2xl"
+        style={{
+          background: "#111113",
+          border: `1px solid rgba(124,58,237,0.35)`,
+          transform: "rotate(-1deg)",
+        }}
+      >
+        {/* Top bar */}
+        <div
+          className="flex items-center justify-between px-4 py-3"
+          style={{ background: "#0A0A0B", borderBottom: `1px solid ${W08}` }}
+        >
+          <div className="flex items-center gap-2.5">
+            <div
+              className="h-7 w-7 rounded-md flex items-center justify-center text-white text-[10px] font-bold"
+              style={{ background: PURPLE, fontFamily: SYNE }}
+            >
+              AR
             </div>
+            <div>
+              <div className="text-white text-xs font-bold tracking-wide" style={{ fontFamily: SYNE }}>
+                ATLAS ROBOTICS
+              </div>
+              <div className="text-[10px]" style={{ color: W40, fontFamily: DM }}>
+                Seed · Robotics
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {badge("Active", "#10B981", "rgba(16,185,129,0.12)")}
+          </div>
+        </div>
+
+        {/* Stats row */}
+        <div
+          className="flex items-center gap-4 px-4 py-2"
+          style={{ background: "rgba(124,58,237,0.06)", borderBottom: `1px solid ${W08}` }}
+        >
+          {[
+            { label: "37 days open" },
+            { label: "14 doc views" },
+            { label: "Match score 85/100" },
+          ].map(({ label }) => (
+            <span key={label} className="text-[10px]" style={{ color: W60, fontFamily: DM }}>
+              {label}
+            </span>
           ))}
         </div>
 
-        <div className="mt-14 text-center">
-          <p className="text-2xl font-semibold text-white mb-6">
-            There's no shared space. No trust layer. No single source of truth.
-          </p>
-          <a href="#how-it-works">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 px-6 py-3 text-sm font-medium text-white transition-colors cursor-pointer">
-              See how Hockystick fixes this <ArrowRight className="h-4 w-4" />
+        {/* Document rows */}
+        {docRow("📄", "Pitch Deck", "Opened 3× by Dr Henry", "↓ Viewed", "#A855F7", "rgba(168,85,247,0.12)")}
+        {docRow("📊", "Financial Model", "First opened 2 days ago", "⟳ Reviewing", "#F59E0B", "rgba(245,158,11,0.12)")}
+        {docRow("📋", "Cap Table", "Awaiting access request", "🔒 Locked", "rgba(255,255,255,0.35)", "rgba(255,255,255,0.06)")}
+
+        {/* Investor row */}
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-2">
+            <div
+              className="h-6 w-6 rounded-full flex items-center justify-center text-white text-[9px] font-bold shrink-0"
+              style={{ background: "rgba(124,58,237,0.3)", fontFamily: SYNE }}
+            >
+              DH
+            </div>
+            <span className="text-xs" style={{ color: W60, fontFamily: DM }}>
+              Dr Henry · ACME Ventures
             </span>
-          </a>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── 3. SOLUTION STATEMENT ─────────────────────────────────────────
-function SolutionStatement() {
-  return (
-    <section className="bg-background py-24 md:py-32">
-      <div className="mx-auto max-w-3xl px-6 text-center">
-        <h2 className="hs text-[clamp(2.5rem,6vw,4rem)] font-black leading-tight tracking-[-0.04em]">
-          One room.<br />
-          Both sides.<br />
-          Every deal.
-        </h2>
-        <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Hockystick gives founders and investors a private, encrypted space to share documents, run due
-          diligence, ask questions, and make decisions — without the friction, the chaos, or the email
-          thread from hell.
-        </p>
-      </div>
-    </section>
-  );
-}
-
-// ── 4. HOW IT WORKS ───────────────────────────────────────────────
-function HowItWorks() {
-  const steps = [
-    {
-      n: "01",
-      t: "Build your profile",
-      d: "Complete your verified founder profile. Upload your pitch deck — AI extracts key data automatically. Build your Document Intelligence Centre with 16 templates.",
-      icon: Users,
-    },
-    {
-      n: "02",
-      t: "Open a deal room",
-      d: "Invite your investor (or founder). They sign an NDA. Documents are shared, watermarked, and audited automatically.",
-      icon: ShieldCheck,
-    },
-    {
-      n: "03",
-      t: "Run due diligence",
-      d: "AI-reviewed documents, investor simulation, thesis matching, and structured Q&A — all before your first investor meeting.",
-      icon: ListChecks,
-    },
-    {
-      n: "04",
-      t: "Make the decision",
-      d: "Investor records Invest, Hold, or Pass with mandatory reasoning. Term sheet builder included. Founder notified at every step.",
-      icon: Zap,
-    },
-  ];
-
-  return (
-    <section id="how-it-works" className="relative border-y border-border/60">
-      <div className="absolute inset-0 -z-10 bg-gradient-soft" />
-      <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
-        <div className="mb-14 max-w-xl">
-          <div className="text-[10px] uppercase tracking-widest font-semibold text-brand mb-3">
-            How it works
           </div>
-          <h2 className="hs text-3xl md:text-5xl font-bold tracking-[-0.04em] leading-[1.08]">
-            From first contact to closed deal — structured.
-          </h2>
-        </div>
-
-        {/* Desktop timeline */}
-        <div className="hidden md:block relative">
-          <div className="absolute top-[2.25rem] left-[calc(12.5%+1.5rem)] right-[calc(12.5%+1.5rem)] h-px hs-step-line opacity-30" />
-          <div className="grid grid-cols-4 gap-5">
-            {steps.map(({ n, t, d, icon: Icon }) => (
-              <div key={n} className="relative group">
-                <div className="relative z-10 flex flex-col">
-                  <div className="mb-5 grid h-11 w-11 place-items-center rounded-xl bg-gradient-brand text-brand-foreground shadow-glow group-hover:scale-105 transition-transform duration-200">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <div className="font-mono text-[10px] text-brand font-semibold mb-1.5">{n}</div>
-                  <div className="hs text-base font-bold tracking-tight mb-2">{t}</div>
-                  <div className="text-sm text-muted-foreground leading-relaxed">{d}</div>
-                </div>
-              </div>
+          <div className="flex items-center gap-1">
+            {["Invest", "Hold", "Pass"].map((v, i) => (
+              <button
+                key={v}
+                className="text-[10px] px-2 py-0.5 rounded border transition-colors"
+                style={{
+                  color: W40,
+                  borderColor: W08,
+                  background: "transparent",
+                  fontFamily: SYNE,
+                  opacity: i === 0 ? 0.8 : 0.4,
+                }}
+              >
+                {v}
+              </button>
             ))}
           </div>
         </div>
-
-        {/* Mobile vertical */}
-        <div className="md:hidden space-y-8">
-          {steps.map(({ n, t, d, icon: Icon }, i) => (
-            <div key={n} className="flex gap-5">
-              <div className="flex flex-col items-center">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-brand text-brand-foreground shadow-glow shrink-0">
-                  <Icon className="h-4 w-4" />
-                </div>
-                {i < steps.length - 1 && <div className="flex-1 w-px bg-border/60 my-2" />}
-              </div>
-              <div className="pb-2 pt-1">
-                <div className="font-mono text-[10px] text-brand font-semibold mb-1">{n}</div>
-                <div className="hs text-base font-bold tracking-tight mb-1.5">{t}</div>
-                <div className="text-sm text-muted-foreground leading-relaxed">{d}</div>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
-    </section>
+    </div>
   );
 }
 
-// ── 5. PROOF NUMBERS ─────────────────────────────────────────────
-function ProofNumbers() {
-  const stats = [
-    { n: "< 5 min",      label: "to build a complete investor profile" },
-    { n: "16 templates", label: "in the Document Intelligence Centre" },
-    { n: "100%",         label: "encrypted & watermarked documents" },
-    { n: "3 stages",     label: "of verified access from public to deal room" },
-  ];
-
-  return (
-    <section className="bg-gradient-to-r from-purple-600 to-indigo-600 py-20">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:divide-x divide-white/20">
-          {stats.map(({ n, label }) => (
-            <div key={n} className="md:px-8 first:pl-0 last:pr-0 text-center md:text-left">
-              <div className="hs text-[clamp(2rem,5vw,3rem)] font-bold text-white leading-none mb-2">
-                {n}
-              </div>
-              <div className="text-sm text-white/70 leading-snug">{label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── 5b. WHAT'S INSIDE ────────────────────────────────────────────
-function WhatsInside() {
-  const features: { Icon: React.ElementType; title: string; desc: string; tag: string }[] = [
-    { Icon: Shield,     title: "NDA-Gated Deal Rooms",    desc: "Investors sign before seeing a single document. Every file is watermarked and tracked.", tag: "Live" },
-    { Icon: Sparkles,   title: "AI Document Review",      desc: "16 structured document templates reviewed by AI. VC-grade scoring, gap analysis, and investor simulation before you go live.", tag: "Live" },
-    { Icon: BarChart2,  title: "Thesis Matching",         desc: "Investors receive daily alerts when a verified founder matches their sector, stage, and geography. No cold outreach needed.", tag: "Live" },
-    { Icon: Globe,      title: "Founder Directory",       desc: "Discover and connect with verified founders and investors in your sector.", tag: "Beta" },
-    { Icon: BadgeCheck, title: "Investor Verification",   desc: "Both founders and investors are verified. Website, LinkedIn, and public signals checked on submission. Hockystick Checked badge on every profile.", tag: "Live" },
-    { Icon: Link2,      title: "CRM Integrations",        desc: "HubSpot CRM sync live. Notion, Slack, and Zapier integrations coming soon.", tag: "Live" },
-    { Icon: FileText,   title: "Deal Brief",              desc: "When an investor connects with a founder, AI generates a curated deal brief: key metrics, strengths, red flags, and DD questions — pre-done.", tag: "Live" },
-  ];
-
-  return (
-    <section className="py-20 bg-white dark:bg-background">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="text-center mb-12">
-          <span className="text-[11px] uppercase tracking-widest font-semibold text-[#7C3AED]">EVERYTHING INCLUDED</span>
-          <h2 className="text-4xl font-black mt-3 tracking-tight text-gray-900 dark:text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
-            One platform. Every tool you need.
-          </h2>
-          <p className="text-gray-500 dark:text-muted-foreground mt-3 max-w-xl mx-auto">
-            From first investor contact to closed round — Hockystick covers every step.
-          </p>
-        </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {features.map((f) => (
-            <div key={f.title} className="rounded-xl border border-gray-100 dark:border-border/60 bg-white dark:bg-card p-5 shadow-sm hover:shadow-md hover:border-[#7C3AED]/30 transition-all">
-              <div className="mb-3 h-9 w-9 rounded-lg bg-[#7C3AED]/10 flex items-center justify-center text-[#7C3AED]">
-                <f.Icon size={18} />
-              </div>
-              <div className="flex items-center gap-2 mb-1.5">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-foreground">{f.title}</h3>
-                <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded-full", {
-                  "bg-green-100 text-green-700": f.tag === "Live",
-                  "bg-purple-100 text-purple-700": f.tag === "Beta",
-                  "bg-gray-100 text-gray-500": f.tag === "Coming Q3",
-                })}>{f.tag}</span>
-              </div>
-              <p className="text-xs text-gray-500 dark:text-muted-foreground leading-relaxed">{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── 6. FOR FOUNDERS / FOR INVESTORS ──────────────────────────────
-function ForFoundersInvestors() {
-  const founderFeatures = [
-    "NDA-gated investor access",
-    "Document Intelligence Centre (16 templates)",
-    "Real-time investor activity tracking",
-    "Q&A thread per investor",
-    "Due diligence workstation",
-  ];
-  const investorFeatures = [
-    "Thesis-match AI scoring (0–100)",
-    "Daily thesis match alerts",
-    "AI-generated deal brief per founder",
-    "Hockystick Verified investor badge",
-    "Portfolio management",
-  ];
-
-  return (
-    <section className="grid md:grid-cols-2">
-      {/* Left — dark purple */}
-      <div className="bg-gradient-to-br from-purple-950 to-purple-900 p-12 md:p-16 flex flex-col">
-        <div className="text-[10px] uppercase tracking-widest font-semibold text-purple-400 mb-5">
-          For Founders
-        </div>
-        <h2 className="hs text-3xl md:text-4xl font-bold text-white leading-[1.1] tracking-[-0.03em] mb-5">
-          Your raise deserves a war room.
-        </h2>
-        <p className="text-purple-200/80 text-base leading-relaxed mb-8 max-w-sm">
-          Stop managing 200 investor relationships in a spreadsheet. Get a structured deal room that keeps
-          investors engaged, documents organized, and your round moving — without the chaos.
-        </p>
-        <ul className="space-y-3 mb-10">
-          {founderFeatures.map((f) => (
-            <li key={f} className="flex items-center gap-3 text-sm text-purple-100">
-              <CheckCircle2 className="h-4 w-4 text-purple-400 shrink-0" />
-              {f}
-            </li>
-          ))}
-        </ul>
-        <div className="mt-auto">
-          <Link to="/sign-up" search={{ role: "founder" } as any}>
-            <span className="inline-flex items-center gap-2 rounded-full bg-white text-purple-900 font-semibold px-6 py-3 text-sm hover:bg-purple-50 transition-colors shadow-lg cursor-pointer">
-              Start raising free <ArrowRight className="h-4 w-4" />
-            </span>
-          </Link>
-        </div>
-      </div>
-
-      {/* Right — dark indigo */}
-      <div className="bg-gradient-to-br from-indigo-950 to-indigo-900 p-12 md:p-16 flex flex-col">
-        <div className="text-[10px] uppercase tracking-widest font-semibold text-indigo-400 mb-5">
-          For Investors
-        </div>
-        <h2 className="hs text-3xl md:text-4xl font-bold text-white leading-[1.1] tracking-[-0.03em] mb-5">
-          Find signal. Skip the noise.
-        </h2>
-        <p className="text-indigo-200/80 text-base leading-relaxed mb-8 max-w-sm">
-          AI thesis-match scoring, a live DD workstation, and structured document review — so you can move
-          from deck to decision without drowning in unstructured deal flow.
-        </p>
-        <ul className="space-y-3 mb-10">
-          {investorFeatures.map((f) => (
-            <li key={f} className="flex items-center gap-3 text-sm text-indigo-100">
-              <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
-              {f}
-            </li>
-          ))}
-        </ul>
-        <div className="mt-auto">
-          <Link to="/sign-up" search={{ role: "investor" } as any}>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/30 text-white font-semibold px-6 py-3 text-sm hover:bg-white/10 transition-colors cursor-pointer">
-              Explore deal flow <ArrowRight className="h-4 w-4" />
-            </span>
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── 7. AI CHAT SECTION ────────────────────────────────────────────
-function ChatSection() {
-  return (
-    <section id="talk-to-ai" className="bg-gray-950 py-0">
-      {/* Hero banner above chat */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 pb-8 sm:pb-12">
-        <div className="flex items-center gap-2 mb-6">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-green-500/15 px-3 py-1 text-[11px] font-semibold text-green-400 uppercase tracking-wider">
-            <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
-            AI Agent · Online 24/7
-          </span>
-        </div>
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          <div>
-            <h3 className="text-3xl sm:text-4xl lg:text-6xl font-black text-white leading-tight tracking-tight">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-purple-300">
-                Ask our AI anything about Hockystick
-              </span>
-            </h3>
-            <p className="mt-5 text-lg text-gray-400 max-w-lg leading-relaxed">
-              Our AI knows Hockystick inside out — features, pricing, how it works for your specific situation. Ask anything. Get real answers. No sales calls.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-4">
-              {["Smart Answers", "Personalized Guidance", "Instant Setup Help"].map((badge) => (
-                <span key={badge} className="inline-flex items-center gap-1.5 text-sm text-gray-300">
-                  <svg className="h-4 w-4 text-green-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  {badge}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div className="text-gray-400 text-sm space-y-2 lg:text-right">
-            <div className="text-2xl font-bold text-white">Free during beta</div>
-            <div>No credit card · 2-minute setup · Cancel anytime</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Wide chat widget */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-12 sm:pb-20">
-        <div className="rounded-2xl border border-white/10 bg-gray-900 overflow-hidden shadow-2xl">
-          {/* Chat header */}
-          <div className="flex items-center gap-3 px-6 py-4 border-b border-white/10 bg-gray-900/80">
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-violet-600 to-purple-600">
-              <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-              </svg>
-            </div>
-            <div>
-              <div className="text-sm font-semibold text-white">Talk to Hockystick AI</div>
-              <div className="text-[11px] text-green-400 flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
-                Usually replies instantly
-              </div>
-            </div>
-          </div>
-
-          {/* Quick questions grid */}
-          <div className="px-6 py-5 border-b border-white/10">
-            <p className="text-[11px] uppercase tracking-wider text-gray-500 mb-3 font-semibold">Quick questions</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {[
-                { Icon: Shield,     text: "How do deal rooms work?" },
-                { Icon: Sparkles,   text: "What does AI due diligence check?" },
-                { Icon: DollarSign, text: "Is it free to use?" },
-                { Icon: CheckCircle2, text: "How does thesis matching work?" },
-                { Icon: ShieldCheck,  text: "How secure is my data?" },
-                { Icon: Mail,         text: "How do I invite investors?" },
-              ].map((q) => (
-                <button
-                  key={q.text}
-                  onClick={() => window.dispatchEvent(new CustomEvent("hs-chat-send", { detail: q.text }))}
-                  className="flex items-start gap-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-violet-500/50 p-3 text-left transition-all"
-                >
-                  <q.Icon size={14} className="shrink-0 mt-0.5 text-purple-400" />
-                  <span className="text-xs text-gray-300 leading-relaxed">{q.text}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Chat messages area */}
-          <div>
-            <div className="text-center py-4 px-6 border-b border-white/10">
-              <div className="inline-flex items-center gap-2 bg-[#7C3AED]/15 border border-[#7C3AED]/30 rounded-full px-4 py-2 mb-2">
-                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-sm font-medium text-white">Live AI Chat</span>
-              </div>
-              <p className="text-white/50 text-xs">
-                Select your role and ask our AI anything about Hockystick. It can answer 10 questions.
-              </p>
-            </div>
-            <OnboardingChat variant="embedded" darkMode={true} />
-          </div>
-
-          {/* Bottom trust strip */}
-          <div className="px-6 py-3 border-t border-white/10 bg-gray-900/50">
-            <div className="flex flex-wrap gap-6 justify-center text-[11px] text-gray-500">
-              {[
-                { Icon: Zap,        label: "Instant answers" },
-                { Icon: ListChecks, label: "Personalized for your stage" },
-                { Icon: ShieldCheck, label: "Private & secure" },
-                { Icon: Globe,      label: "Real platform insights" },
-              ].map(({ Icon, label }) => (
-                <span key={label} className="flex items-center gap-1.5">
-                  <Icon size={11} className="text-gray-500" />
-                  {label}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── 8. REGISTRY TEASER ───────────────────────────────────────────
-function RegistryTeaser() {
+function Hero() {
   return (
     <section
-      className="py-16 px-4 sm:px-6"
-      style={{
-        background: "#0d0d1a",
-        borderTop: "1px solid rgba(255,255,255,0.06)",
-        borderBottom: "1px solid rgba(255,255,255,0.06)",
-      }}
+      data-testid="hero-section"
+      className="relative w-full overflow-hidden"
+      style={{ minHeight: "88vh", background: "#0A0A0B" }}
     >
-      <div className="max-w-3xl mx-auto text-center">
-        <p
-          className="text-xs uppercase tracking-[0.2em] mb-4"
-          style={{ color: "#7C3AED" }}
-        >
-          Free tool
-        </p>
-        <h2
-          className="font-bold text-2xl sm:text-3xl mb-3"
-          style={{ fontFamily: "Syne, sans-serif", color: "#ffffff" }}
-        >
-          Check if a company is legally registered
-        </h2>
-        <p
-          className="text-sm leading-relaxed mb-8 max-w-xl mx-auto"
-          style={{ color: "rgba(255,255,255,0.5)" }}
-        >
-          Search OpenCorporates (140+ jurisdictions), UK Companies House, and DIFC entity
-          register simultaneously. Free. No account required.
-        </p>
-        <a
-          href="/registry"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-colors"
+      {/* Purple radial glow — behind content */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse 70% 55% at 50% 0%, rgba(124,58,237,0.25), transparent 65%)",
+        }}
+      />
+
+      <div className="relative max-w-[1100px] mx-auto px-6 pt-24 pb-16 lg:pt-32 lg:pb-20">
+        {/* Eyebrow */}
+        <div className="flex justify-center mb-8">
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold"
+            style={{
+              background: "rgba(124,58,237,0.12)",
+              border: "1px solid rgba(124,58,237,0.3)",
+              color: "#A855F7",
+              fontFamily: SYNE,
+              letterSpacing: "0.06em",
+            }}
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-[#A855F7] animate-pulse" />
+            Private deal rooms for GCC &amp; MENA
+          </div>
+        </div>
+
+        {/* H1 */}
+        <h1
+          className="text-center mb-6 leading-none"
           style={{
-            background: "rgba(124,58,237,0.15)",
-            border: "1px solid rgba(124,58,237,0.3)",
-            color: "#a78bfa",
+            fontFamily: SYNE,
+            fontWeight: 800,
+            fontSize: "clamp(48px, 8vw, 80px)",
+            letterSpacing: "-2px",
+            color: "#FFFFFF",
           }}
         >
-          Search company registries →
-        </a>
-        <p className="text-xs mt-4" style={{ color: "rgba(255,255,255,0.2)" }}>
-          UAE · UK · US · Saudi Arabia · Bahrain · Qatar · 140+ jurisdictions
+          Where deals
+          <br />
+          <span style={{ color: PURPLE }}>get done.</span>
+        </h1>
+
+        {/* Subhead */}
+        <p
+          className="text-center mx-auto mb-10 leading-relaxed"
+          style={{
+            fontFamily: DM,
+            fontWeight: 300,
+            fontSize: "clamp(16px, 2.5vw, 22px)",
+            color: "rgba(250,250,250,0.65)",
+            maxWidth: "580px",
+          }}
+        >
+          Founders build secure, verified deal rooms.
+          <br />
+          Investors discover and close deals — without the cold email.
+        </p>
+
+        {/* CTAs */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
+          <Link
+            to="/sign-up"
+            search={{ role: "founder" } as any}
+            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold text-white transition-colors"
+            style={{ background: PURPLE, padding: "14px 32px", fontSize: "16px", fontFamily: SYNE }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = PURPLE_DARK; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = PURPLE; }}
+          >
+            Start raising <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            to="/sign-up"
+            search={{ role: "investor" } as any}
+            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold text-white transition-colors"
+            style={{ border: "1px solid rgba(255,255,255,0.3)", padding: "14px 32px", fontSize: "16px", fontFamily: SYNE }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+          >
+            Explore deals as an investor
+          </Link>
+        </div>
+
+        {/* Social proof line */}
+        <div className="flex justify-center mb-16">
+          <p
+            className="text-xs"
+            style={{ color: W40, fontFamily: DM }}
+          >
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-400 mr-1.5 align-middle" />
+            LIVE &nbsp;·&nbsp; GCC &amp; MENA &nbsp;·&nbsp; NDA-gated deal rooms &nbsp;·&nbsp; Free to start
+          </p>
+        </div>
+
+        {/* Hero visual */}
+        <div className="max-w-lg mx-auto">
+          <DealRoomCard />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 2 — SOCIAL PROOF BAR
+═══════════════════════════════════════════════════════════════════════════ */
+function SocialProofBar() {
+  const countries = [
+    { flag: "🇦🇪", label: "UAE" },
+    { flag: "🇸🇦", label: "KSA" },
+    { flag: "🇶🇦", label: "Qatar" },
+    { flag: "🇪🇬", label: "Egypt" },
+    { flag: "🇯🇴", label: "Jordan" },
+  ];
+  return (
+    <section className="w-full py-4" style={{ background: "#111113" }}>
+      <div className="max-w-[1100px] mx-auto px-6">
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          <span className="text-xs" style={{ color: W40, fontFamily: DM }}>
+            Founders raising across
+          </span>
+          {countries.map(({ flag, label }, i) => (
+            <span key={label} className="flex items-center gap-3">
+              <span className="text-sm font-medium text-white" style={{ fontFamily: DM }}>
+                {flag} {label}
+              </span>
+              {i < countries.length - 1 && (
+                <span style={{ color: "rgba(255,255,255,0.15)", fontSize: "10px" }}>|</span>
+              )}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 3 — PROBLEM
+═══════════════════════════════════════════════════════════════════════════ */
+function ProblemSection({ dark }: { dark: boolean }) {
+  const bg = dark ? "#0A0A0B" : "#F9FAFB";
+  const cardBg = dark ? "#111113" : "#FFFFFF";
+  const headingColor = dark ? "#FFFFFF" : "#111827";
+  const bodyColor = dark ? W60 : "#4B5563";
+  const statColor = dark ? "#FFFFFF" : "#111827";
+
+  const stats = [
+    {
+      n: "73%",
+      label: "of GCC founders say no warm intro is their biggest barrier",
+    },
+    {
+      n: "6 weeks",
+      label: "average time wasted pitching investors who were never a fit",
+    },
+    {
+      n: "1 platform",
+      label: "to manage verified profiles, deal rooms, and decisions",
+    },
+  ];
+  return (
+    <section className="w-full py-24" style={{ background: bg }}>
+      <div className="max-w-[1100px] mx-auto px-6">
+        <div className="max-w-xl mb-14">
+          <h2
+            className="mb-6 leading-tight"
+            style={{
+              fontFamily: SYNE,
+              fontWeight: 700,
+              fontSize: "clamp(32px, 5vw, 48px)",
+              color: headingColor,
+            }}
+          >
+            The warm intro is the bottleneck.
+          </h2>
+          <p
+            className="leading-relaxed"
+            style={{ fontFamily: DM, fontWeight: 300, fontSize: "18px", color: bodyColor }}
+          >
+            Investors read 200 cold decks a week. They read the ones from founders someone they
+            trust introduced. If you&rsquo;re not in the network, you&rsquo;re invisible.
+            Hockystick is the network you didn&rsquo;t have to be born into.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-4">
+          {stats.map(({ n, label }) => (
+            <div
+              key={n}
+              className="rounded-lg px-6 py-5"
+              style={{
+                background: cardBg,
+                borderLeft: `3px solid ${PURPLE}`,
+                boxShadow: dark ? "none" : "0 1px 4px rgba(0,0,0,0.06)",
+              }}
+            >
+              <div
+                className="mb-2"
+                style={{
+                  fontFamily: SYNE,
+                  fontWeight: 700,
+                  fontSize: "36px",
+                  color: statColor,
+                }}
+              >
+                {n}
+              </div>
+              <p
+                className="leading-snug"
+                style={{ fontFamily: DM, fontSize: "14px", color: bodyColor }}
+              >
+                {label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 4 — HOW IT WORKS
+═══════════════════════════════════════════════════════════════════════════ */
+const HOW_STEPS = [
+  {
+    n: "01",
+    title: "Build your verified profile",
+    body: "Upload documents, complete company details, pass our verification checks. Investors see what was confirmed — and what wasn’t. No inflated claims.",
+  },
+  {
+    n: "02",
+    title: "Get discovered by matched investors",
+    body: "Investors filter by stage, sector, and geography. Your verified profile appears in their feed when you match their thesis. They request access — you approve.",
+  },
+  {
+    n: "03",
+    title: "Open a deal room",
+    body: "NDA-gated. Encrypted. Three access tiers — public profile, initial data pack, full deal room. You decide what each investor sees.",
+  },
+  {
+    n: "04",
+    title: "Get a decision, not a ghost",
+    body: "Investors submit Invest, Hold, or Pass in the room. Pass decisions include a reason. No more waiting for a reply that never comes.",
+  },
+];
+
+function HowItWorks({ dark }: { dark: boolean }) {
+  const bg = dark ? "#0A0A0B" : "#FFFFFF";
+  const headingColor = dark ? "#FFFFFF" : "#111827";
+  const bodyColor = dark ? W60 : "#4B5563";
+  const gridDivider = dark ? "rgba(255,255,255,0.06)" : "#E5E7EB";
+
+  return (
+    <section id="how-it-works" className="w-full py-24" style={{ background: bg }}>
+      <div className="max-w-[1100px] mx-auto px-6">
+        {/* Label + heading */}
+        <div className="mb-16">
+          <div
+            className="mb-3 text-xs font-semibold uppercase tracking-[0.14em]"
+            style={{ color: PURPLE, fontFamily: SYNE }}
+          >
+            HOW IT WORKS
+          </div>
+          <h2
+            style={{
+              fontFamily: SYNE,
+              fontWeight: 700,
+              fontSize: "clamp(32px, 5vw, 48px)",
+              color: headingColor,
+            }}
+          >
+            From profile to closed — in one place.
+          </h2>
+        </div>
+
+        {/* 2×2 grid desktop, stack mobile */}
+        <div className="grid md:grid-cols-2 gap-px" style={{ background: gridDivider }}>
+          {HOW_STEPS.map((step, i) => (
+            <div
+              key={step.n}
+              className="p-8"
+              style={{
+                background: dark
+                  ? (i % 2 === 0 ? "#111113" : "#0D0D0F")
+                  : (i % 2 === 0 ? "#F9FAFB" : "#FFFFFF"),
+              }}
+            >
+              <div
+                className="mb-4 text-sm font-bold"
+                style={{ color: PURPLE, fontFamily: SYNE }}
+              >
+                {step.n}
+              </div>
+              <h3
+                className="mb-3"
+                style={{ fontFamily: SYNE, fontWeight: 600, fontSize: "20px", color: headingColor }}
+              >
+                {step.title}
+              </h3>
+              <p
+                className="leading-relaxed"
+                style={{ fontFamily: DM, fontWeight: 300, fontSize: "15px", color: bodyColor }}
+              >
+                {step.body}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 5 — FOR FOUNDERS
+═══════════════════════════════════════════════════════════════════════════ */
+function ReadinessMockup() {
+  const gaps = [
+    { label: "LinkedIn URL", ok: false, pts: "-8 pts" },
+    { label: "Financial model", ok: false, pts: "-15 pts" },
+    { label: "Pitch deck", ok: true, pts: "+12 pts" },
+  ];
+  return (
+    <div
+      className="rounded-xl overflow-hidden"
+      style={{ background: "#111113", border: `1px solid ${W08}` }}
+    >
+      {/* Header */}
+      <div
+        className="px-5 py-4"
+        style={{ borderBottom: `1px solid ${W08}`, background: "#0A0A0B" }}
+      >
+        <div className="text-xs font-semibold text-white" style={{ fontFamily: SYNE }}>
+          Readiness Score
+        </div>
+      </div>
+      {/* Score */}
+      <div className="px-5 pt-5 pb-4">
+        <div
+          className="mb-1"
+          style={{ fontFamily: SYNE, fontWeight: 800, fontSize: "48px", color: "#FFFFFF" }}
+        >
+          74 <span style={{ fontSize: "20px", color: W40, fontWeight: 400 }}>/ 100</span>
+        </div>
+        {/* Progress bar */}
+        <div className="h-2 rounded-full mb-5" style={{ background: "rgba(255,255,255,0.08)" }}>
+          <div className="h-2 rounded-full" style={{ width: "74%", background: PURPLE }} />
+        </div>
+        {/* Gap items */}
+        <div className="space-y-2">
+          {gaps.map(({ label, ok, pts }) => (
+            <div key={label} className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span
+                  className="h-4 w-4 rounded-full flex items-center justify-center text-[9px] shrink-0"
+                  style={{
+                    background: ok ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.12)",
+                    color: ok ? "#10B981" : "#EF4444",
+                  }}
+                >
+                  {ok ? "✓" : "✗"}
+                </span>
+                <span className="text-xs" style={{ color: ok ? W70 : W60, fontFamily: DM }}>
+                  {label}
+                </span>
+              </div>
+              <span
+                className="text-[10px] font-semibold"
+                style={{ color: ok ? "#10B981" : "#EF4444", fontFamily: SYNE }}
+              >
+                {pts}
+              </span>
+            </div>
+          ))}
+        </div>
+        {/* Action */}
+        <div
+          className="mt-4 rounded-lg px-3 py-2.5 text-xs leading-snug"
+          style={{
+            background: "rgba(124,58,237,0.08)",
+            border: "1px solid rgba(124,58,237,0.2)",
+            color: W60,
+            fontFamily: DM,
+          }}
+        >
+          <span style={{ color: "#A855F7", fontFamily: SYNE, fontWeight: 600 }}>Top action: </span>
+          Upload your financial model before your next investor call.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const FOUNDER_FEATS = [
+  "Build a secure deal room in minutes",
+  "Control exactly what each investor sees — public, NDA, or full access",
+  "Get a readiness score before your first investor call",
+  "Know which investors match your stage, sector, and raise size",
+  "Track every investor: views, time spent, documents opened",
+  "Get structured feedback when investors pass — not silence",
+];
+
+function ForFounders({ dark }: { dark: boolean }) {
+  const bg = dark ? "#111113" : "#F9FAFB";
+  const headingColor = dark ? "#FFFFFF" : "#111827";
+  const featureColor = dark ? W70 : "#374151";
+  const captionColor = dark ? W40 : "#6B7280";
+
+  return (
+    <section
+      id="for-founders"
+      className="w-full py-24"
+      style={{ background: bg }}
+    >
+      <div className="max-w-[1100px] mx-auto px-6">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+          {/* Content */}
+          <div>
+            <div
+              className="mb-3 text-xs font-semibold uppercase tracking-[0.14em]"
+              style={{ color: PURPLE, fontFamily: SYNE }}
+            >
+              FOR FOUNDERS
+            </div>
+            <h2
+              className="mb-5 leading-tight"
+              style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: headingColor }}
+            >
+              Stop chasing investors.
+              <br />
+              Start closing rounds.
+            </h2>
+            <ul className="space-y-3 mb-8">
+              {FOUNDER_FEATS.map((f) => (
+                <li key={f} className="flex gap-3">
+                  <ArrowRight
+                    className="h-4 w-4 shrink-0 mt-0.5"
+                    style={{ color: PURPLE }}
+                  />
+                  <span
+                    className="text-sm leading-relaxed"
+                    style={{ color: featureColor, fontFamily: DM }}
+                  >
+                    {f}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <Link
+              to="/sign-up"
+              search={{ role: "founder" } as any}
+              className="inline-flex items-center gap-2 rounded-lg font-semibold text-white transition-colors"
+              style={{ background: PURPLE, padding: "12px 24px", fontSize: "14px", fontFamily: SYNE }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = PURPLE_DARK; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = PURPLE; }}
+            >
+              Start raising <ArrowRight className="h-4 w-4" />
+            </Link>
+            <p className="mt-3 text-xs" style={{ color: captionColor, fontFamily: DM }}>
+              8 founders currently fundraising on Hockystick
+            </p>
+          </div>
+
+          {/* Mockup */}
+          <ReadinessMockup />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 6 — FOR INVESTORS
+═══════════════════════════════════════════════════════════════════════════ */
+function InvestorCardMockup() {
+  return (
+    <div
+      className="rounded-xl overflow-hidden"
+      style={{ background: "#111113", border: `1px solid ${W08}` }}
+    >
+      {/* Header */}
+      <div
+        className="px-5 py-4 flex items-center justify-between"
+        style={{ borderBottom: `1px solid ${W08}`, background: "#0A0A0B" }}
+      >
+        <div className="flex items-center gap-2.5">
+          <div
+            className="h-8 w-8 rounded-md flex items-center justify-center text-white text-[10px] font-bold"
+            style={{ background: PURPLE, fontFamily: SYNE }}
+          >
+            AR
+          </div>
+          <div>
+            <div className="text-white text-xs font-bold tracking-wide" style={{ fontFamily: SYNE }}>
+              ATLAS ROBOTICS
+            </div>
+            <div className="text-[10px]" style={{ color: W40, fontFamily: DM }}>Seed · Robotics</div>
+          </div>
+        </div>
+        <span
+          className="text-[10px] font-bold px-2 py-1 rounded-full"
+          style={{ background: "rgba(16,185,129,0.12)", color: "#10B981", fontFamily: SYNE }}
+        >
+          Match: 85/100
+        </span>
+      </div>
+      {/* Body rows */}
+      <div className="px-5 py-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <CheckCircle2 className="h-3.5 w-3.5 shrink-0" style={{ color: "#10B981" }} />
+          <span className="text-xs" style={{ color: W70, fontFamily: DM }}>
+            Verification: Tier 1 · Company registered · Website live
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <CheckCircle2 className="h-3.5 w-3.5 shrink-0" style={{ color: "#10B981" }} />
+          <span className="text-xs" style={{ color: W70, fontFamily: DM }}>
+            Stage: Seed · Sector: Robotics · Raise: $2M
+          </span>
+        </div>
+        <div className="flex items-center justify-between pt-1">
+          <span
+            className="text-[10px] font-semibold px-2 py-1 rounded-full"
+            style={{ background: "rgba(245,158,11,0.12)", color: "#F59E0B", fontFamily: SYNE }}
+          >
+            IN DILIGENCE
+          </span>
+          <div className="flex items-center gap-1.5">
+            {(["Invest", "Hold", "Pass"] as const).map((v, i) => (
+              <button
+                key={v}
+                className="text-[10px] px-2.5 py-1 rounded border"
+                style={{
+                  color: i === 0 ? "#10B981" : i === 1 ? "#F59E0B" : "#EF4444",
+                  borderColor:
+                    i === 0
+                      ? "rgba(16,185,129,0.3)"
+                      : i === 1
+                      ? "rgba(245,158,11,0.3)"
+                      : "rgba(239,68,68,0.3)",
+                  background: "transparent",
+                  fontFamily: SYNE,
+                  fontWeight: 600,
+                }}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const INVESTOR_FEATS = [
+  "Set your thesis once — get matched deals every day",
+  "See what’s verified before you open a single document",
+  "Deal rooms with NDA, document vault, and DD checklist built in",
+  "Match score tells you thesis fit before you spend 10 minutes reading",
+  "Submit Invest/Hold/Pass in the room — your decisions, tracked",
+  "Pipeline kanban from sourcing to signed term sheet",
+];
+
+function ForInvestors({ dark }: { dark: boolean }) {
+  const bg = dark ? "#0A0A0B" : "#FFFFFF";
+  const headingColor = dark ? "#FFFFFF" : "#111827";
+  const featureColor = dark ? W70 : "#374151";
+  const btnBorder = dark ? "1px solid rgba(255,255,255,0.3)" : "1px solid #7C3AED";
+  const btnColor = dark ? "#FFFFFF" : PURPLE;
+  const btnHoverBg = dark ? "rgba(255,255,255,0.05)" : "rgba(124,58,237,0.06)";
+
+  return (
+    <section
+      id="for-investors"
+      className="w-full py-24"
+      style={{ background: bg }}
+    >
+      <div className="max-w-[1100px] mx-auto px-6">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+          {/* Mockup — left */}
+          <div className="order-2 lg:order-1">
+            <InvestorCardMockup />
+          </div>
+
+          {/* Content — right */}
+          <div className="order-1 lg:order-2">
+            <div
+              className="mb-3 text-xs font-semibold uppercase tracking-[0.14em]"
+              style={{ color: PURPLE, fontFamily: SYNE }}
+            >
+              FOR INVESTORS
+            </div>
+            <h2
+              className="mb-5 leading-tight"
+              style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: headingColor }}
+            >
+              Every deal. One place.
+              <br />
+              Zero noise.
+            </h2>
+            <ul className="space-y-3 mb-8">
+              {INVESTOR_FEATS.map((f) => (
+                <li key={f} className="flex gap-3">
+                  <ArrowRight
+                    className="h-4 w-4 shrink-0 mt-0.5"
+                    style={{ color: PURPLE }}
+                  />
+                  <span
+                    className="text-sm leading-relaxed"
+                    style={{ color: featureColor, fontFamily: DM }}
+                  >
+                    {f}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <Link
+              to="/sign-up"
+              search={{ role: "investor" } as any}
+              className="inline-flex items-center gap-2 rounded-lg font-semibold transition-colors"
+              style={{ border: btnBorder, padding: "12px 24px", fontSize: "14px", fontFamily: SYNE, color: btnColor }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = btnHoverBg; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+            >
+              Join as an investor <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 7 — TRUST — always purple
+═══════════════════════════════════════════════════════════════════════════ */
+const FOUNDER_CHECKS = [
+  "Company registration (live registry check)",
+  "Business email domain (MX records)",
+  "Website existence (live HTTP check)",
+  "LinkedIn URL format (no scraping — validated only)",
+];
+const INVESTOR_CHECKS = [
+  "Investment thesis (stage, sector, geography)",
+  "Stated check size range",
+  "Geographic mandate match",
+  "Active vs inactive status",
+];
+
+function TrustSection() {
+  const check = (text: string) => (
+    <li key={text} className="flex gap-3">
+      <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5 text-white" />
+      <span className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.82)", fontFamily: DM }}>
+        {text}
+      </span>
+    </li>
+  );
+
+  return (
+    <section className="w-full py-20" style={{ background: PURPLE }}>
+      <div className="max-w-[1100px] mx-auto px-6">
+        {/* Header */}
+        <div className="text-center mb-14">
+          <h2
+            className="mb-4"
+            style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: "#FFFFFF" }}
+          >
+            The only platform that verifies both sides.
+          </h2>
+          <p
+            className="mx-auto leading-relaxed"
+            style={{ fontFamily: DM, fontWeight: 300, fontSize: "18px", color: "rgba(255,255,255,0.8)", maxWidth: "560px" }}
+          >
+            Most platforms check whether founders exist.
+            We check whether they&rsquo;re ready — and whether investors are serious.
+          </p>
+        </div>
+
+        {/* 2-col */}
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12">
+          <div>
+            <h3
+              className="mb-5 text-xs font-bold uppercase tracking-[0.14em]"
+              style={{ color: "rgba(255,255,255,0.55)", fontFamily: SYNE }}
+            >
+              Founders get verified for:
+            </h3>
+            <ul className="space-y-3">
+              {FOUNDER_CHECKS.map(check)}
+            </ul>
+            <p className="mt-5 text-xs" style={{ color: "rgba(255,255,255,0.5)", fontFamily: DM }}>
+              Verification score 0–100. Tier 1–4 badges shown on profile.
+            </p>
+          </div>
+
+          {/* Divider (desktop only) */}
+          <div className="relative">
+            <div
+              className="hidden md:block absolute left-0 top-0 bottom-0 w-px"
+              style={{ background: "rgba(255,255,255,0.2)" }}
+            />
+            <div className="md:pl-12">
+              <h3
+                className="mb-5 text-xs font-bold uppercase tracking-[0.14em]"
+                style={{ color: "rgba(255,255,255,0.55)", fontFamily: SYNE }}
+              >
+                Investors are screened for:
+              </h3>
+              <ul className="space-y-3">
+                {INVESTOR_CHECKS.map(check)}
+              </ul>
+              <p className="mt-5 text-xs" style={{ color: "rgba(255,255,255,0.5)", fontFamily: DM }}>
+                Investors set their thesis. Founders only appear in matched feeds.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom line */}
+        <p
+          className="text-center mt-10 text-base"
+          style={{ color: "rgba(255,255,255,0.85)", fontFamily: DM, fontWeight: 400 }}
+        >
+          Competitors verify founders only.&nbsp;&nbsp;Hockystick verifies both.
         </p>
       </div>
     </section>
   );
 }
 
-// ── 10. FINAL CTA ─────────────────────────────────────────────────
-function FinalCTA() {
-  return (
-    <section className="bg-gradient-to-r from-purple-600 to-indigo-600 py-20">
-      <div className="mx-auto max-w-4xl px-6 text-center">
-        <h2 className="hs text-4xl md:text-5xl font-black text-white leading-tight tracking-[-0.03em]">
-          Your verified profile is one step away.
-        </h2>
-        <p className="mt-4 text-lg text-white/70 max-w-xl mx-auto">
-          Build your structured founder profile, connect with verified investors, and run due diligence — all in one place.
-        </p>
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 8 — PRICING
+═══════════════════════════════════════════════════════════════════════════ */
+const FOUNDER_PLAN = [
+  "Verified profile + verification badge",
+  "Unlimited deal rooms",
+  "Investor pipeline tracking",
+  "NDA-gated document vault",
+  "Readiness score + coaching",
+  "Investor simulation (how a VC sees you)",
+  "Deal room analytics (views, time spent)",
+];
 
-        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-          <Link to="/sign-up" search={{ role: "founder" } as any}>
-            <span className="inline-flex items-center justify-center gap-2 rounded-full bg-white text-purple-900 font-semibold px-8 py-4 text-base hover:bg-purple-50 transition-colors shadow-lg w-full sm:w-auto cursor-pointer">
-              Start raising <ArrowRight className="h-5 w-5" />
-            </span>
-          </Link>
-          <Link to="/sign-up" search={{ role: "investor" } as any}>
-            <span className="inline-flex items-center justify-center gap-2 rounded-full border border-white/40 text-white font-semibold px-8 py-4 text-base hover:bg-white/10 transition-colors w-full sm:w-auto cursor-pointer">
-              Start investing <ArrowRight className="h-5 w-5" />
-            </span>
-          </Link>
+const INVESTOR_PLAN = [
+  "Set investment thesis",
+  "Browse verified founder directory",
+  "Thesis matching (daily updates)",
+  "Deal rooms + DD workstation",
+  "Decision board (kanban pipeline)",
+  "Deal intake (paste any founder data)",
+];
+
+function PricingSection({ dark }: { dark: boolean }) {
+  const bg = dark ? "#111113" : "#F9FAFB";
+  const cardBgPrimary = dark ? "#0A0A0B" : "#FFFFFF";
+  const cardBgSecondary = dark ? "#0A0A0B" : "#FFFFFF";
+  const headingColor = dark ? "#FFFFFF" : "#111827";
+  const subColor = dark ? W60 : "#4B5563";
+  const labelColor = dark ? W40 : "#6B7280";
+  const priceColor = dark ? "#FFFFFF" : "#111827";
+  const cardSecondaryBorder = dark ? "1px solid rgba(255,255,255,0.1)" : "1px solid #E5E7EB";
+  const investorBtnBorder = dark ? "1px solid rgba(255,255,255,0.25)" : "1px solid #7C3AED";
+  const investorBtnColor = dark ? "#FFFFFF" : PURPLE;
+  const investorBtnHover = dark ? "rgba(255,255,255,0.05)" : "rgba(124,58,237,0.06)";
+
+  const tick = (text: string) => (
+    <li key={text} className="flex gap-2.5">
+      <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" style={{ color: "#10B981" }} />
+      <span className="text-sm" style={{ color: dark ? W70 : "#374151", fontFamily: DM }}>
+        {text}
+      </span>
+    </li>
+  );
+
+  return (
+    <section className="w-full py-24" style={{ background: bg }}>
+      <div className="max-w-[1100px] mx-auto px-6">
+        <div className="text-center mb-12">
+          <h2
+            className="mb-3"
+            style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: headingColor }}
+          >
+            Simple pricing.
+            <br />
+            No surprises.
+          </h2>
+          <p style={{ fontFamily: DM, fontWeight: 300, fontSize: "16px", color: subColor }}>
+            Start free. Upgrade when you&rsquo;re ready to get serious.
+          </p>
         </div>
 
-        <p className="mt-6 text-sm text-white/50">
-          Free during beta · No credit card · 2-minute setup
+        <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+          {/* Founder card */}
+          <div
+            className="rounded-2xl p-8 relative"
+            style={{ background: cardBgPrimary, border: `2px solid ${PURPLE}`, boxShadow: dark ? "none" : "0 2px 12px rgba(124,58,237,0.1)" }}
+          >
+            <div
+              className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-semibold text-white"
+              style={{ background: PURPLE, fontFamily: SYNE }}
+            >
+              Most popular
+            </div>
+            <div
+              className="text-xs font-semibold uppercase tracking-widest mb-4"
+              style={{ color: labelColor, fontFamily: SYNE }}
+            >
+              Founder Pro
+            </div>
+            <div
+              className="mb-1"
+              style={{ fontFamily: SYNE, fontWeight: 800, fontSize: "40px", color: priceColor }}
+            >
+              $49
+              <span style={{ fontSize: "18px", fontWeight: 400, color: labelColor }}> /month</span>
+            </div>
+            <p className="text-xs mb-6" style={{ color: labelColor, fontFamily: DM }}>
+              7-day free trial. No credit card required.
+            </p>
+            <ul className="space-y-3 mb-8">
+              {FOUNDER_PLAN.map(tick)}
+            </ul>
+            <Link
+              to="/sign-up"
+              search={{ role: "founder" } as any}
+              className="block w-full text-center rounded-lg font-semibold text-white transition-colors"
+              style={{ background: PURPLE, padding: "12px 0", fontFamily: SYNE }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = PURPLE_DARK; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = PURPLE; }}
+            >
+              Start for free — upgrade anytime
+            </Link>
+          </div>
+
+          {/* Investor card */}
+          <div
+            className="rounded-2xl p-8"
+            style={{ background: cardBgSecondary, border: cardSecondaryBorder, boxShadow: dark ? "none" : "0 1px 4px rgba(0,0,0,0.06)" }}
+          >
+            <div
+              className="text-xs font-semibold uppercase tracking-widest mb-4"
+              style={{ color: labelColor, fontFamily: SYNE }}
+            >
+              Investor Access
+            </div>
+            <div
+              className="mb-1"
+              style={{ fontFamily: SYNE, fontWeight: 800, fontSize: "40px", color: priceColor }}
+            >
+              Free
+            </div>
+            <p className="text-xs mb-6" style={{ color: labelColor, fontFamily: DM }}>
+              Always free for verified investors.
+            </p>
+            <ul className="space-y-3 mb-8">
+              {INVESTOR_PLAN.map(tick)}
+            </ul>
+            <Link
+              to="/sign-up"
+              search={{ role: "investor" } as any}
+              className="block w-full text-center rounded-lg font-semibold transition-colors"
+              style={{ border: investorBtnBorder, padding: "12px 0", fontFamily: SYNE, color: investorBtnColor }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = investorBtnHover; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+            >
+              Join as an investor →
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 9 — FINAL CTA — always purple
+═══════════════════════════════════════════════════════════════════════════ */
+function FinalCTA() {
+  return (
+    <section className="w-full py-24 text-center" style={{ background: PURPLE }}>
+      <div className="max-w-[1100px] mx-auto px-6">
+        <h2
+          className="mb-4"
+          style={{
+            fontFamily: SYNE,
+            fontWeight: 700,
+            fontSize: "clamp(32px, 5vw, 48px)",
+            color: "#FFFFFF",
+          }}
+        >
+          Ready to raise differently?
+        </h2>
+        <p
+          className="mb-10 mx-auto"
+          style={{
+            fontFamily: DM,
+            fontWeight: 300,
+            fontSize: "18px",
+            color: "rgba(255,255,255,0.8)",
+            maxWidth: "480px",
+          }}
+        >
+          GCC &amp; MENA focused. Free to start.
+          <br />
+          Your next investor is already on Hockystick.
         </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            to="/sign-up"
+            search={{ role: "founder" } as any}
+            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors"
+            style={{ background: "#FFFFFF", color: PURPLE, padding: "14px 32px", fontSize: "15px", fontFamily: SYNE }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "#f0ecff"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "#FFFFFF"; }}
+          >
+            Start as a founder <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            to="/sign-up"
+            search={{ role: "investor" } as any}
+            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold text-white transition-colors"
+            style={{ border: "1px solid rgba(255,255,255,0.45)", padding: "14px 32px", fontSize: "15px", fontFamily: SYNE }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+          >
+            I&rsquo;m an investor
+          </Link>
+        </div>
       </div>
     </section>
   );

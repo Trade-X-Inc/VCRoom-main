@@ -6,6 +6,11 @@ import { useAccountContext } from "@/hooks/useAccountContext";
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/app")({
+  head: () => ({
+    meta: [
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
   beforeLoad: () => {
     if (typeof window === "undefined") return;
     const { user, initialized } = useAuthStore.getState();

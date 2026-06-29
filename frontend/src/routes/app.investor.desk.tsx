@@ -1,17 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   CheckCircle2, AlertTriangle, ChevronDown, ChevronUp,
-  Send, Loader2, X, Sparkles, MoreHorizontal,
+  Loader2, X, MoreHorizontal,
   BellOff, Check, ExternalLink, TrendingUp, BarChart3,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { getInvestorAdvice } from "@/lib/investor-advisor-fn";
-import { getInvestorContext, buildInvestorContextBlock } from "@/lib/investor-context-fn";
 import {
   getDeskTasks, updateDeskTask, type DeskTask, type ChainPhase,
 } from "@/lib/desk-fn";
@@ -19,6 +17,7 @@ import { ChatResultCard } from "@/components/app/ChatResultCard";
 import { generateInvestorDealBrief, type InvestorDealBrief } from "@/lib/investor-deal-brief-fn";
 
 export const Route = createFileRoute("/app/investor/desk")({
+  beforeLoad: () => { throw redirect({ to: "/app/investor/overview" }); },
   component: InvestorDesk,
 });
 
@@ -256,98 +255,11 @@ const menuItemStyle: React.CSSProperties = {
   color: "rgba(255,255,255,0.7)", fontSize: 12, fontWeight: 500, cursor: "pointer", textAlign: "left",
 };
 
-// ── Sidebar advisor ────────────────────────────────────────────────────────────
-
-function SidebarAdvisor({ userId, contextBlock }: { userId: string; contextBlock: string }) {
-  const [input, setInput] = useState("");
-  const [thinking, setThinking] = useState(false);
-  const [msgs, setMsgs] = useState<Array<{ role: "user" | "assistant"; content: string; id: string }>>([
-    { id: "m0", role: "assistant", content: "Ask me about your pipeline, thesis matches, or any deal in your watchlist." },
-  ]);
-  const endRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs, thinking]);
-
-  const send = async (text: string) => {
-    const t = text.trim();
-    if (!t || thinking) return;
-    setInput("");
-    setMsgs((xs) => [...xs, { id: `u${Date.now()}`, role: "user", content: t }]);
-    setThinking(true);
-    try {
-      const history = msgs.slice(-6).map((m) => ({ role: m.role as string, content: m.content }));
-      const result = await getInvestorAdvice({ data: { userId, message: t, history, liveContextBlock: contextBlock } });
-      setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: result.reply }]);
-    } catch {
-      setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: "Request failed. Try again." }]);
-    } finally {
-      setThinking(false);
-    }
-  };
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "#0D0D10", borderLeft: "1px solid rgba(255,255,255,0.08)" }}>
-      <div style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", gap: 8 }}>
-        <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg, #7C3AED, #A855F7)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Sparkles size={13} color="#fff" />
-        </div>
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>AI Advisor</div>
-          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>Context-aware</div>
-        </div>
-      </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "12px 14px" }}>
-        {msgs.map((m) => (
-          <div key={m.id} style={{ marginBottom: 10, display: "flex", flexDirection: m.role === "user" ? "row-reverse" : "row", gap: 6 }}>
-            <div style={{ maxWidth: "85%", borderRadius: m.role === "user" ? "14px 4px 14px 14px" : "4px 14px 14px 14px", padding: "8px 11px", background: m.role === "user" ? "linear-gradient(135deg,#7C3AED,#A855F7)" : "#18181C", fontSize: 12, color: "#FAFAFA", lineHeight: 1.55 }}>
-              <div className="[&_p]:mb-1 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-3">
-                <ReactMarkdown>{m.content}</ReactMarkdown>
-              </div>
-            </div>
-          </div>
-        ))}
-        {thinking && (
-          <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
-            <div style={{ padding: "8px 11px", background: "#18181C", borderRadius: "4px 14px 14px 14px", fontSize: 11, color: "rgba(255,255,255,0.4)", display: "flex", alignItems: "center", gap: 6 }}>
-              <Loader2 size={11} style={{ animation: "spin 1s linear infinite" }} /> Thinking…
-            </div>
-          </div>
-        )}
-        <div ref={endRef} />
-      </div>
-      <div style={{ padding: "10px 12px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-        <form onSubmit={(e) => { e.preventDefault(); send(input); }} style={{ display: "flex", gap: 6, background: "#111114", border: "1px solid rgba(255,255,255,0.10)", borderRadius: 10, padding: "6px 8px 6px 12px" }}>
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }}
-            rows={1}
-            placeholder="Ask a question…"
-            style={{ flex: 1, background: "transparent", border: "none", outline: "none", resize: "none", fontSize: 12, color: "#FAFAFA", lineHeight: 1.5, maxHeight: 80 }}
-          />
-          <button type="submit" disabled={!input.trim() || thinking} style={{ width: 28, height: 28, borderRadius: 7, background: input.trim() && !thinking ? "#7C3AED" : "rgba(255,255,255,0.06)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <Send size={12} color={input.trim() && !thinking ? "#fff" : "rgba(255,255,255,0.3)"} />
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
 // ── Main ───────────────────────────────────────────────────────────────────────
 
 function InvestorDesk() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [contextBlock, setContextBlock] = useState("");
-
-  useEffect(() => {
-    if (!user?.id) return;
-    getInvestorContext({ data: { investorId: user.id } }).then((ctx) => {
-      setContextBlock(buildInvestorContextBlock(ctx));
-    }).catch(() => {});
-  }, [user?.id]);
 
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: ["desk-tasks", user?.id, "investor"],
@@ -447,19 +359,6 @@ function InvestorDesk() {
         )}
       </div>
 
-      {/* Sidebar toggle */}
-      <button
-        onClick={() => setSidebarOpen((v) => !v)}
-        style={{ position: "absolute", top: "50%", right: sidebarOpen ? 320 : 0, transform: "translateY(-50%)", zIndex: 10, background: "#18181C", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px 0 0 8px", padding: "8px 4px", cursor: "pointer", color: "rgba(255,255,255,0.4)" }}
-      >
-        <Sparkles size={14} />
-      </button>
-
-      {sidebarOpen && (
-        <div style={{ width: 320, flexShrink: 0, height: "100%", overflow: "hidden" }}>
-          <SidebarAdvisor userId={user?.id ?? ""} contextBlock={contextBlock} />
-        </div>
-      )}
     </div>
   );
 }

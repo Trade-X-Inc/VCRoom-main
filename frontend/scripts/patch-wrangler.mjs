@@ -1,63 +1,18 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { execSync } from "child_process";
 
-// 1. Clean dist/client/wrangler.json for Cloudflare Pages compatibility.
-// The @cloudflare/vite-plugin generates fields that are only valid for
-// Workers, not Pages. Remove them all before deployment.
+// 1. Replace dist/client/wrangler.json with a clean minimal file.
+// The @cloudflare/vite-plugin generates this with absolute local Mac paths
+// (configPath, userConfigPath, pages_build_output_dir) which break CF runtime.
+// We overwrite it with only the fields CF Pages actually needs.
 const pagesWranglerPath = "dist/client/wrangler.json";
-if (existsSync(pagesWranglerPath)) {
-  const cfg = JSON.parse(readFileSync(pagesWranglerPath, "utf8"));
-
-  const invalidTopLevel = [
-    "assets",
-    "triggers",
-    "definedEnvironments",
-    "ai_search_namespaces",
-    "ai_search",
-    "secrets_store_secrets",
-    "unsafe_hello_world",
-    "flagship",
-    "worker_loaders",
-    "ratelimits",
-    "vpc_services",
-    "vpc_networks",
-    "python_modules",
-  ];
-  const removed = [];
-  for (const field of invalidTopLevel) {
-    if (cfg[field] !== undefined) {
-      delete cfg[field];
-      removed.push(field);
-    }
-  }
-
-  // Strip non-standard sub-fields from "dev" block
-  if (cfg.dev && typeof cfg.dev === "object") {
-    const validDevFields = new Set(["ip", "port", "inspector_port", "local_protocol", "upstream_protocol", "host"]);
-    for (const key of Object.keys(cfg.dev)) {
-      if (!validDevFields.has(key)) {
-        delete cfg.dev[key];
-        removed.push(`dev.${key}`);
-      }
-    }
-    if (Object.keys(cfg.dev).length === 0) {
-      delete cfg.dev;
-      removed.push("dev (emptied)");
-    }
-  }
-
-  // Add nodejs_compat so process.env works in Cloudflare Workers at runtime
-  if (!cfg.compatibility_flags) cfg.compatibility_flags = [];
-  if (!cfg.compatibility_flags.includes("nodejs_compat")) {
-    cfg.compatibility_flags.push("nodejs_compat");
-  }
-  writeFileSync(pagesWranglerPath, JSON.stringify(cfg, null, 2));
-  if (removed.length > 0) {
-    console.log(`✓ Cleaned dist/client/wrangler.json (removed: ${removed.join(", ")})`);
-  } else {
-    console.log("✓ dist/client/wrangler.json already clean");
-  }
-}
+const cleanWrangler = {
+  name: "vcroom-main",
+  compatibility_date: "2026-01-01",
+  compatibility_flags: ["nodejs_compat"],
+};
+writeFileSync(pagesWranglerPath, JSON.stringify(cleanWrangler, null, 2));
+console.log("✓ dist/client/wrangler.json rewritten (clean, no local paths)");
 
 // 2. Bundle dist/server/server.js → dist/client/_worker.js
 // Pages Advanced Mode: _worker.js handles SSR, Pages CDN serves static assets.
@@ -67,6 +22,11 @@ if (!existsSync("dist/server/server.js")) {
 }
 
 console.log("Bundling server.js → _worker.js ...");
+// External libraries that are client-side only and must not be bundled into the
+// CF Worker. They are only called from browser event handlers (file upload/parse)
+// and are loaded via dynamic import on the client. Including them in the server
+// bundle pushes the compressed worker past CF's 1MB script limit.
+// Step 1: bundle unminified (so the regex patch below can find the export marker)
 execSync(
   [
     "node_modules/.bin/esbuild",
@@ -75,6 +35,13 @@ execSync(
     "--format=esm",
     "--platform=browser",
     "--external:node:*",
+    "--external:ws",
+    "--external:pdfjs-dist",
+    "--external:xlsx",
+    "--external:papaparse",
+    "--external:jszip",
+    "--define:process.env.NODE_ENV='\"production\"'",
+    "--define:global.process.env.NODE_ENV='\"production\"'",
     "--conditions=worker,browser",
     "--outfile=dist/client/_worker.js",
     "--log-level=warning",
@@ -148,9 +115,21 @@ const __patchedServer = {
     return __origServer.fetch(request, env, ctx);
   }
 };
-export {`;
+// IMPORTANT: Only export default — CF Workers runtime rejects named exports that
+// are not ExportedHandler functions (e.g. TSS_SERVER_FUNCTION is a string/object,
+// not a function, which causes "Incorrect type for map entry" startup crash).
+export default __patchedServer;
+// REMOVE_NAMED_EXPORTS_MARKER`;
+  // Replace the entire export { ... } block with just the default export above.
+  // The block ends at the first }; after "export {" — use a targeted replacement.
   workerCode = workerCode.replace(initCallMatch[0], injection);
-  workerCode = workerCode.replace(/\bserver as default\b/, "__patchedServer as default");
+  // Remove the old named export block that esbuild generated (everything from
+  // "// REMOVE_NAMED_EXPORTS_MARKER" up to and including the closing "};" of export{}).
+  // The named exports block looks like: \n  TSS_SERVER_FUNCTION as T,\n  ...\n  __patchedServer as default,\n  ...\n};
+  workerCode = workerCode.replace(
+    /\/\/ REMOVE_NAMED_EXPORTS_MARKER\n[\s\S]*?^};/m,
+    '// named exports removed — CF Workers only needs default'
+  );
   console.log("✓ dist/client/_worker.js patched (CF env injection)");
 } else {
   console.warn("⚠ Could not find export marker in _worker.js — CF env patch skipped");
@@ -158,3 +137,31 @@ export {`;
 
 writeFileSync("dist/client/_worker.js", polyfill + workerCode);
 console.log("✓ dist/client/_worker.js ready (with MessageChannel polyfill)");
+
+// Step 2: minify the patched worker in-place to get under CF Pages' 1MB gzip limit
+console.log("Minifying _worker.js ...");
+execSync(
+  [
+    "node_modules/.bin/esbuild",
+    "dist/client/_worker.js",
+    "--minify",
+    "--format=esm",
+    "--platform=browser",
+    "--outfile=dist/client/_worker.js",
+    "--allow-overwrite",
+    "--log-level=warning",
+  ].join(" "),
+  { stdio: "inherit" }
+);
+const minifiedSize = (readFileSync("dist/client/_worker.js").length / 1024 / 1024).toFixed(2);
+console.log(`✓ _worker.js minified (${minifiedSize} MB uncompressed)`);
+
+// Report gzip size
+try {
+  const gzSize = execSync("gzip -c dist/client/_worker.js | wc -c").toString().trim();
+  const gzMB = (parseInt(gzSize) / 1024 / 1024).toFixed(2);
+  console.log(`✓ _worker.js gzip size: ${gzMB} MB (CF Pages limit: 1 MB)`);
+  if (parseFloat(gzMB) > 1.0) {
+    console.error(`✘ WARNING: worker is ${gzMB} MB gzipped — exceeds CF Pages 1 MB limit`);
+  }
+} catch (_) {}

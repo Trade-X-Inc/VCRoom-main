@@ -29,14 +29,14 @@ const STAGE_ORDER: Record<string, number> = {
 };
 
 const STAGE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  Sourcing:    { bg: "rgba(255,255,255,0.06)", text: "rgba(255,255,255,0.5)", border: "rgba(255,255,255,0.1)" },
+  Sourcing:    { bg: "rgba(107,114,128,0.12)", text: "#6B7280", border: "rgba(107,114,128,0.25)" },
   Reviewing:   { bg: "rgba(59,130,246,0.12)",  text: "#3B82F6",              border: "rgba(59,130,246,0.25)" },
   Meeting:     { bg: "rgba(168,85,247,0.12)",  text: "#A855F7",              border: "rgba(168,85,247,0.25)" },
   Diligence:   { bg: "rgba(245,158,11,0.12)",  text: "#F59E0B",              border: "rgba(245,158,11,0.25)" },
   "Term Sheet":{ bg: "rgba(251,146,60,0.12)",  text: "#FB923C",              border: "rgba(251,146,60,0.25)" },
   Decision:    { bg: "rgba(239,68,68,0.12)",   text: "#EF4444",              border: "rgba(239,68,68,0.25)" },
   Invested:    { bg: "rgba(16,185,129,0.12)",  text: "#10B981",              border: "rgba(16,185,129,0.25)" },
-  Passed:      { bg: "rgba(255,255,255,0.04)", text: "rgba(255,255,255,0.25)", border: "rgba(255,255,255,0.06)" },
+  Passed:      { bg: "rgba(107,114,128,0.08)", text: "#9CA3AF", border: "rgba(107,114,128,0.15)" },
 };
 
 const PASS_CATEGORIES = [
@@ -255,6 +255,26 @@ function DecisionsPage() {
       await supabase.from("decisions").insert({ deal_room_id: entry.deal_room_id ?? null, decided_by: user!.id, status: "passed", decision_type: "pass", pass_reason_category: modal.passCategory ?? null, pass_reason_detail: modal.passDetail ?? null });
       await supabase.from("activity_log").insert({ account_type: "investor", account_id: user!.id, actor_user_id: user!.id, actor_name: user!.user_metadata?.full_name ?? user!.email ?? "Investor", action_type: "pipeline_status_changed", target_type: "watchlist", target_id: entry.id, target_label: entry.company_name, detail: `Decision: Pass — ${modal.passCategory ?? "no reason"}`, metadata: { type: "pass", category: modal.passCategory } });
       toast.success(`${entry.company_name} — passed`);
+      // Auto-trigger founder coaching for rejection (fire and forget)
+      if (entry.startup_id) {
+        const startupId = entry.startup_id;
+        const rejectionReason = [modal.passCategory, modal.passDetail].filter(Boolean).join(" — ") || "No specific reason provided";
+        supabase.from("startups").select("founder_id").eq("id", startupId).maybeSingle().then(({ data: startupRow }) => {
+          if (!startupRow?.founder_id) return;
+          supabase.auth.getSession().then(({ data: authData }) => {
+            const jwt = authData?.session?.access_token ?? "";
+            import("@/lib/coaching-fn").then(({ runFounderCoaching }) => {
+              runFounderCoaching({
+                startupId,
+                userId: startupRow.founder_id,
+                triggerType: "rejection",
+                triggerData: { rejection_reason: rejectionReason },
+                jwt,
+              }).catch(() => {});
+            });
+          });
+        });
+      }
     }
 
     qc.invalidateQueries({ queryKey: ["investor-pipeline", user?.id] });
@@ -280,19 +300,19 @@ function DecisionsPage() {
   const staleCount = rawEntries.filter(isStale).length;
 
   return (
-    <div style={{ paddingBottom: 40 }}>
+    <div style={{ paddingBottom: 40, paddingLeft: 24, paddingRight: 24 }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 20 }}>
         <div>
-          <h1 style={{ fontFamily: "Syne, sans-serif", fontSize: 24, fontWeight: 700, color: "#fff", margin: 0 }}>Decision Board</h1>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 4 }}>
+          <h1 style={{ fontFamily: "Syne, sans-serif", fontSize: 24, fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>Decision Board</h1>
+          <p style={{ color: "var(--color-muted-foreground)", fontSize: 13, marginTop: 4 }}>
             {activeCount} active
             {staleCount > 0 && <> · <span style={{ color: "#F59E0B" }}>{staleCount} stale</span></>}
           </p>
         </div>
 
         {/* View toggle */}
-        <div style={{ display: "flex", gap: 2, background: "rgba(255,255,255,0.06)", padding: 3, borderRadius: 8 }}>
+        <div style={{ display: "flex", gap: 2, background: "var(--hs-bg-secondary)", padding: 3, borderRadius: 8, border: "1px solid var(--hs-border)" }}>
           {([["kanban", Columns3, "Kanban"], ["list", List, "List"], ["grid", LayoutGrid, "Grid"]] as const).map(([mode, Icon, label]) => (
             <button
               key={mode}
@@ -302,7 +322,7 @@ function DecisionsPage() {
                 display: "flex", alignItems: "center", gap: 5, padding: "6px 12px",
                 borderRadius: 6, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600,
                 background: view === mode ? "rgba(124,58,237,0.8)" : "transparent",
-                color: view === mode ? "#fff" : "rgba(255,255,255,0.4)",
+                color: "var(--hs-text-primary)",
               }}
             >
               <Icon size={13} />{label}
@@ -323,8 +343,8 @@ function DecisionsPage() {
       {/* Empty state */}
       {entries.length === 0 && (
         <div style={{ textAlign: "center", padding: "64px 24px" }}>
-          <Gavel size={32} style={{ color: "rgba(255,255,255,0.15)", margin: "0 auto 12px" }} />
-          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>
+          <Gavel size={32} style={{ color: "var(--color-muted-foreground)", margin: "0 auto 12px" }} />
+          <p style={{ color: "var(--color-muted-foreground)", fontSize: 14 }}>
             {rawEntries.length === 0 ? "No companies in your pipeline yet. Add from your watchlist." : "No companies match the current filters."}
           </p>
         </div>
@@ -398,12 +418,12 @@ function FilterBar({ search, onSearch, stageFilter, onStageFilter, sectors, sect
     <div style={{ marginBottom: 16, display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
       {/* Search */}
       <div style={{ position: "relative", flex: "0 1 200px" }}>
-        <Search size={12} style={{ position: "absolute", left: 9, top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.3)" }} />
+        <Search size={12} style={{ position: "absolute", left: 9, top: "50%", transform: "translateY(-50%)", color: "var(--color-muted-foreground)" }} />
         <input
           data-testid="pipeline-search"
           value={search} onChange={(e) => onSearch(e.target.value)}
           placeholder="Search…"
-          style={{ width: "100%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "7px 12px 7px 28px", color: "#fff", fontSize: 12, outline: "none", boxSizing: "border-box" as const }}
+          style={{ width: "100%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "7px 12px 7px 28px", color: "var(--color-foreground)", fontSize: 12, outline: "none", boxSizing: "border-box" as const }}
         />
       </div>
 
@@ -414,7 +434,7 @@ function FilterBar({ search, onSearch, stageFilter, onStageFilter, sectors, sect
         return (
           <button key={s} data-testid={`filter-stage-${s.toLowerCase().replace(" ", "-")}`}
             onClick={() => s === "Passed" ? onShowPassed(!showPassed) : toggleStage(s)}
-            style={{ fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 20, border: "none", cursor: "pointer", letterSpacing: "0.04em", background: active ? c.bg : "rgba(255,255,255,0.05)", color: active ? c.text : "rgba(255,255,255,0.35)", outline: active ? `1px solid ${c.border}` : "1px solid transparent" }}
+            style={{ fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 20, border: "none", cursor: "pointer", letterSpacing: "0.04em", background: active ? c.bg : "var(--color-muted)", color: active ? c.text : "var(--color-muted-foreground)", outline: active ? `1px solid ${c.border}` : "1px solid transparent" }}
           >
             {s}
           </button>
@@ -425,19 +445,19 @@ function FilterBar({ search, onSearch, stageFilter, onStageFilter, sectors, sect
       {sectors.map((s) => {
         const active = sectorFilter.includes(s);
         return (
-          <button key={s} onClick={() => toggleSector(s)} style={{ fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 20, border: "none", cursor: "pointer", background: active ? "rgba(124,58,237,0.2)" : "rgba(255,255,255,0.05)", color: active ? "#A855F7" : "rgba(255,255,255,0.35)", outline: active ? "1px solid rgba(124,58,237,0.3)" : "1px solid transparent" }}>
+          <button key={s} onClick={() => toggleSector(s)} style={{ fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 20, border: "none", cursor: "pointer", background: active ? "rgba(124,58,237,0.2)" : "var(--color-muted)", color: active ? "#A855F7" : "var(--color-muted-foreground)", outline: active ? "1px solid rgba(124,58,237,0.3)" : "1px solid transparent" }}>
             {s}
           </button>
         );
       })}
 
       {/* Stale toggle */}
-      <button data-testid="filter-stale" onClick={() => onStaleOnly(!staleOnly)} style={{ fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 20, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, background: staleOnly ? "rgba(245,158,11,0.15)" : "rgba(255,255,255,0.05)", color: staleOnly ? "#F59E0B" : "rgba(255,255,255,0.35)", outline: staleOnly ? "1px solid rgba(245,158,11,0.3)" : "1px solid transparent" }}>
+      <button data-testid="filter-stale" onClick={() => onStaleOnly(!staleOnly)} style={{ fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 20, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, background: staleOnly ? "rgba(245,158,11,0.15)" : "var(--color-muted)", color: staleOnly ? "#F59E0B" : "var(--color-muted-foreground)", outline: staleOnly ? "1px solid rgba(245,158,11,0.3)" : "1px solid transparent" }}>
         <AlertTriangle size={10} />Stale only
       </button>
 
       {hasFilters && (
-        <button onClick={() => { onSearch(""); onStageFilter([]); onSectorFilter([]); onStaleOnly(false); }} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 20, border: "none", cursor: "pointer", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.3)" }}>
+        <button onClick={() => { onSearch(""); onStageFilter([]); onSectorFilter([]); onStaleOnly(false); }} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 20, border: "none", cursor: "pointer", background: "var(--color-muted)", color: "var(--color-muted-foreground)" }}>
           <X size={10} style={{ display: "inline", marginRight: 2 }} />Clear
         </button>
       )}
@@ -461,32 +481,34 @@ function CompanyCard({ entry, compact = false, onAdvance, onDecision, advancing 
   const isAdvancing = advancing === entry.id;
 
   return (
-    <div data-testid={`company-card-${entry.id}`} style={{
-      background: "#111114",
-      border: `1px solid ${stale ? "rgba(245,158,11,0.3)" : "rgba(255,255,255,0.08)"}`,
-      borderLeft: stale ? "3px solid #F59E0B" : "1px solid rgba(255,255,255,0.08)",
-      borderRadius: 10, padding: compact ? "12px 14px" : "16px",
-      display: "flex", flexDirection: "column" as const, gap: 10,
-    }}>
+    <div
+      data-testid={`company-card-${entry.id}`}
+      className="bg-card rounded-xl flex flex-col gap-2.5"
+      style={{
+        border: `1px solid ${stale ? "rgba(245,158,11,0.4)" : "var(--hs-border)"}`,
+        borderLeft: stale ? "3px solid #F59E0B" : undefined,
+        padding: compact ? "12px 14px" : "16px",
+      }}
+    >
       <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
         <div style={{ width: 32, height: 32, borderRadius: 8, flexShrink: 0, background: "rgba(124,58,237,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#A855F7" }}>
           {(entry.company_name ?? "?")[0].toUpperCase()}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 600, fontSize: 13, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>
+          <div className="font-semibold text-sm text-foreground truncate">
             {entry.company_name}
           </div>
           <div style={{ display: "flex", gap: 4, marginTop: 4, flexWrap: "wrap" as const, alignItems: "center" }}>
             <StageBadge status={entry.status} />
-            {entry.sector && <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>{entry.sector}</span>}
-            {entry.stage && <span style={{ fontSize: 10, color: "rgba(255,255,255,0.25)" }}>{entry.stage}</span>}
+            {entry.sector && <span className="text-xs text-muted-foreground">{entry.sector}</span>}
+            {entry.stage && <span className="text-xs text-muted-foreground/60">{entry.stage}</span>}
           </div>
         </div>
         <ScorePill score={entry.initial_score} />
       </div>
 
       <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" as const }}>
-        <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: stale ? "#F59E0B" : "rgba(255,255,255,0.3)" }}>
+        <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: stale ? "#F59E0B" : "var(--color-muted-foreground)" }}>
           {stale ? <AlertTriangle size={11} /> : <Clock size={11} />}
           {stale ? `Stale ${days}d` : `${days}d in stage`}
         </span>
@@ -530,19 +552,19 @@ function KanbanView({ entries, advancing, onAdvance, onDecision }: {
 
   return (
     <div style={{ overflowX: "auto", paddingBottom: 8 }}>
-      <div style={{ display: "flex", gap: 12, minWidth: `${Math.max(visibleStages.length, 1) * 228}px` }}>
+      <div style={{ display: "flex", gap: 12 }}>
         {visibleStages.map((stage) => {
           const cols = entries.filter((e) => e.status === stage);
           const c = STAGE_COLORS[stage] ?? STAGE_COLORS.Sourcing;
           return (
-            <div key={stage} data-testid={`kanban-col-${stage.toLowerCase().replace(" ", "-")}`} style={{ width: 220, flexShrink: 0 }}>
+            <div key={stage} data-testid={`kanban-col-${stage.toLowerCase().replace(" ", "-")}`} style={{ flex: "1 1 0", minWidth: 240, maxWidth: 340, background: "var(--color-muted)", borderRadius: 10, padding: 8 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8, padding: "5px 8px", borderRadius: 6, background: c.bg }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: c.text, textTransform: "uppercase" as const, letterSpacing: "0.08em" }}>{stage}</span>
                 <span style={{ fontSize: 11, fontWeight: 600, color: c.text, opacity: 0.7 }}>{cols.length}</span>
               </div>
               <div style={{ display: "flex", flexDirection: "column" as const, gap: 8 }}>
                 {cols.map((e) => <CompanyCard key={e.id} entry={e} compact advancing={advancing} onAdvance={onAdvance} onDecision={onDecision} />)}
-                {cols.length === 0 && <div style={{ textAlign: "center" as const, padding: "20px 8px", color: "rgba(255,255,255,0.12)", fontSize: 12 }}>Empty</div>}
+                {cols.length === 0 && <div style={{ textAlign: "center" as const, padding: "20px 8px", color: "var(--color-muted-foreground)", fontSize: 12 }}>Empty</div>}
               </div>
             </div>
           );
@@ -573,7 +595,7 @@ function ListView({ entries, advancing, onAdvance, onDecision }: {
   const toggleSort = (col: typeof sortCol) => { if (sortCol === col) setSortDir((d) => (d === 1 ? -1 : 1)); else { setSortCol(col); setSortDir(1); } };
 
   const th = (col: typeof sortCol, label: string) => (
-    <th onClick={() => toggleSort(col)} style={{ padding: "8px 12px", textAlign: "left" as const, fontSize: 11, fontWeight: 700, color: sortCol === col ? "#A855F7" : "rgba(255,255,255,0.35)", textTransform: "uppercase" as const, letterSpacing: "0.08em", cursor: "pointer", whiteSpace: "nowrap" as const, borderBottom: "1px solid rgba(255,255,255,0.06)", background: "#0d0d10" }}>
+    <th onClick={() => toggleSort(col)} style={{ padding: "8px 12px", textAlign: "left" as const, fontSize: 11, fontWeight: 700, color: sortCol === col ? "#A855F7" : "var(--color-muted-foreground)", textTransform: "uppercase" as const, letterSpacing: "0.08em", cursor: "pointer", whiteSpace: "nowrap" as const, borderBottom: "1px solid var(--color-border)", background: "var(--color-card)" }}>
       {label}{sortCol === col ? (sortDir === 1 ? " ↑" : " ↓") : ""}
     </th>
   );
@@ -581,7 +603,7 @@ function ListView({ entries, advancing, onAdvance, onDecision }: {
   return (
     <div style={{ overflowX: "auto", borderRadius: 10, border: "1px solid rgba(255,255,255,0.08)" }}>
       <table data-testid="list-view-table" style={{ width: "100%", borderCollapse: "collapse" as const }}>
-        <thead><tr>{th("company_name", "Company")}{th("status", "Stage")}{th("days", "Days")}{th("initial_score", "Score")}<th style={{ padding: "8px 12px", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase" as const, letterSpacing: "0.08em", borderBottom: "1px solid rgba(255,255,255,0.06)", background: "#0d0d10" }}>Sector</th><th style={{ padding: "8px 12px", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase" as const, letterSpacing: "0.08em", borderBottom: "1px solid rgba(255,255,255,0.06)", background: "#0d0d10" }}>Actions</th></tr></thead>
+        <thead><tr>{th("company_name", "Company")}{th("status", "Stage")}{th("days", "Days")}{th("initial_score", "Score")}<th style={{ padding: "8px 12px", fontSize: 11, fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase" as const, letterSpacing: "0.08em", borderBottom: "1px solid var(--color-border)", background: "var(--color-card)" }}>Sector</th><th style={{ padding: "8px 12px", fontSize: 11, fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase" as const, letterSpacing: "0.08em", borderBottom: "1px solid var(--color-border)", background: "var(--color-card)" }}>Actions</th></tr></thead>
         <tbody>
           {sorted.map((e) => {
             const days = daysInStage(e);
@@ -593,15 +615,15 @@ function ListView({ entries, advancing, onAdvance, onDecision }: {
             return (
               <tr key={e.id} style={{ borderLeft: stale ? "3px solid #F59E0B" : "3px solid transparent", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
                 <td style={{ padding: "10px 12px" }}>
-                  <div style={{ fontWeight: 600, fontSize: 13, color: "#fff" }}>{e.company_name}</div>
+                  <div style={{ fontWeight: 600, fontSize: 13, color: "var(--color-foreground)" }}>{e.company_name}</div>
                   {e.deal_room_id && <a href={`/app/deal-room/${e.deal_room_id}`} style={{ fontSize: 10, color: "#7C3AED", display: "flex", alignItems: "center", gap: 3, marginTop: 2 }}><ExternalLink size={9} />Open DD</a>}
                 </td>
                 <td style={{ padding: "10px 12px" }}><StageBadge status={e.status} /></td>
-                <td style={{ padding: "10px 12px", fontSize: 12, color: stale ? "#F59E0B" : "rgba(255,255,255,0.4)", whiteSpace: "nowrap" as const }}>
+                <td style={{ padding: "10px 12px", fontSize: 12, color: stale ? "#F59E0B" : "var(--color-muted-foreground)", whiteSpace: "nowrap" as const }}>
                   {stale && <AlertTriangle size={10} style={{ display: "inline", marginRight: 3 }} />}{days}d
                 </td>
                 <td style={{ padding: "10px 12px" }}><ScorePill score={e.initial_score} /></td>
-                <td style={{ padding: "10px 12px", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{e.sector ?? "—"}</td>
+                <td style={{ padding: "10px 12px", fontSize: 12, color: "var(--color-muted-foreground)" }}>{e.sector ?? "—"}</td>
                 <td style={{ padding: "10px 12px" }}>
                   {!isPassed && (
                     <div style={{ display: "flex", gap: 4 }}>
@@ -641,19 +663,19 @@ function GridView({ entries, advancing, onAdvance, onDecision }: {
 function ModalOverlay({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <div style={{ background: "#18181C", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 24, width: "100%", maxWidth: 440, boxShadow: "0 24px 64px rgba(0,0,0,0.6)" }}>
+      <div style={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 14, padding: 24, width: "100%", maxWidth: 440, boxShadow: "0 24px 64px rgba(0,0,0,0.6)" }}>
         {children}
       </div>
     </div>
   );
 }
 
-const inputStyle: React.CSSProperties = { width: "100%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "8px 12px", color: "#fff", fontSize: 13, outline: "none", boxSizing: "border-box" };
+const inputStyle: React.CSSProperties = { width: "100%", background: "var(--color-input)", border: "1px solid var(--color-border)", borderRadius: 8, padding: "8px 12px", color: "var(--color-foreground)", fontSize: 13, outline: "none", boxSizing: "border-box" };
 
 function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: 12 }}>
-      <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)", textTransform: "uppercase" as const, letterSpacing: "0.08em", marginBottom: 4 }}>{label}</label>
+      <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase" as const, letterSpacing: "0.08em", marginBottom: 4 }}>{label}</label>
       {children}
     </div>
   );
@@ -662,7 +684,7 @@ function FieldRow({ label, children }: { label: string; children: React.ReactNod
 function ModalBtns({ onConfirm, onCancel, label, color = "#7C3AED", disabled = false }: { onConfirm: () => void; onCancel: () => void; label: string; color?: string; disabled?: boolean }) {
   return (
     <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 20 }}>
-      <button onClick={onCancel} style={{ padding: "8px 18px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)", background: "transparent", color: "rgba(255,255,255,0.5)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+      <button onClick={onCancel} style={{ padding: "8px 18px", borderRadius: 8, border: "1px solid var(--color-border)", background: "transparent", color: "var(--color-muted-foreground)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
       <button onClick={onConfirm} disabled={disabled} style={{ padding: "8px 20px", borderRadius: 8, border: "none", background: color, color: "#fff", fontSize: 13, fontWeight: 600, cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.5 : 1 }}>{label}</button>
     </div>
   );
@@ -672,7 +694,7 @@ function ConfirmModal({ title, body, confirmLabel, onConfirm, onCancel }: { titl
   return (
     <ModalOverlay>
       <h2 style={{ fontFamily: "Syne, sans-serif", fontSize: 18, fontWeight: 700, color: "#fff", margin: "0 0 6px" }}>{title}</h2>
-      <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: "0 0 4px" }}>{body}</p>
+      <p style={{ fontSize: 13, color: "var(--color-muted-foreground)", margin: "0 0 4px" }}>{body}</p>
       <ModalBtns onConfirm={onConfirm} onCancel={onCancel} label={confirmLabel} />
     </ModalOverlay>
   );
@@ -682,7 +704,7 @@ function InvestModal({ entry, amount, notes, onChange, onConfirm, onCancel }: { 
   return (
     <ModalOverlay>
       <h2 style={{ fontFamily: "Syne, sans-serif", fontSize: 18, fontWeight: 700, color: "#fff", margin: "0 0 4px" }}>Record investment — {entry.company_name}</h2>
-      <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: "0 0 16px" }}>This will move the company to Invested and record the decision.</p>
+      <p style={{ fontSize: 13, color: "var(--color-muted-foreground)", margin: "0 0 16px" }}>This will move the company to Invested and record the decision.</p>
       <FieldRow label="Investment amount (optional)"><input value={amount} onChange={(e) => onChange("investAmount", e.target.value)} placeholder="e.g. $250,000" style={inputStyle} /></FieldRow>
       <FieldRow label="Notes (optional)"><textarea value={notes} onChange={(e) => onChange("investNotes", e.target.value)} rows={3} placeholder="Board seat, pro-rata, terms…" style={{ ...inputStyle, resize: "vertical" as const }} /></FieldRow>
       <ModalBtns onConfirm={onConfirm} onCancel={onCancel} label="Record investment" color="#10B981" />
@@ -694,7 +716,7 @@ function HoldModal({ entry, date, notes, onChange, onConfirm, onCancel }: { entr
   return (
     <ModalOverlay>
       <h2 style={{ fontFamily: "Syne, sans-serif", fontSize: 18, fontWeight: 700, color: "#fff", margin: "0 0 4px" }}>Hold — {entry.company_name}</h2>
-      <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: "0 0 16px" }}>Set a follow-up date. Company stays in Decision stage.</p>
+      <p style={{ fontSize: 13, color: "var(--color-muted-foreground)", margin: "0 0 16px" }}>Set a follow-up date. Company stays in Decision stage.</p>
       <FieldRow label="Follow-up date (required)"><input type="date" value={date} onChange={(e) => onChange("holdDate", e.target.value)} style={inputStyle} /></FieldRow>
       <FieldRow label="Notes (optional)"><textarea value={notes} onChange={(e) => onChange("holdNotes", e.target.value)} rows={2} placeholder="What needs to change before you invest?" style={{ ...inputStyle, resize: "vertical" as const }} /></FieldRow>
       <ModalBtns onConfirm={onConfirm} onCancel={onCancel} label="Confirm hold" color="#F59E0B" disabled={!date} />
@@ -706,13 +728,13 @@ function PassModal({ entry, category, detail, onChange, onConfirm, onCancel }: {
   return (
     <ModalOverlay>
       <h2 style={{ fontFamily: "Syne, sans-serif", fontSize: 18, fontWeight: 700, color: "#fff", margin: "0 0 4px" }}>Pass — {entry.company_name}</h2>
-      <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: "0 0 16px" }}>Select the primary reason. Not shared with the founder.</p>
+      <p style={{ fontSize: 13, color: "var(--color-muted-foreground)", margin: "0 0 16px" }}>Select the primary reason. Not shared with the founder.</p>
       <FieldRow label="Primary reason">
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
           {PASS_CATEGORIES.map((cat) => (
             <button key={cat} data-testid={`pass-cat-${cat.toLowerCase().replace(" ", "-")}`}
               onClick={() => onChange("passCategory", category === cat ? "" : cat)}
-              style={{ padding: "8px 12px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600, textAlign: "left" as const, display: "flex", alignItems: "center", gap: 6, background: category === cat ? "rgba(239,68,68,0.15)" : "rgba(255,255,255,0.05)", color: category === cat ? "#EF4444" : "rgba(255,255,255,0.5)", outline: category === cat ? "1px solid rgba(239,68,68,0.3)" : "1px solid rgba(255,255,255,0.06)" }}
+              style={{ padding: "8px 12px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600, textAlign: "left" as const, display: "flex", alignItems: "center", gap: 6, background: category === cat ? "rgba(239,68,68,0.15)" : "var(--color-muted)", color: category === cat ? "#EF4444" : "var(--color-muted-foreground)", outline: category === cat ? "1px solid rgba(239,68,68,0.3)" : "1px solid var(--color-border)" }}
             >
               {category === cat && <CheckCircle2 size={11} />}{cat}
             </button>

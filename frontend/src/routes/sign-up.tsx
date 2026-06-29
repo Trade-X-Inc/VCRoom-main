@@ -4,6 +4,12 @@ import { supabase } from '@/lib/supabase'
 import { Turnstile } from '@marsidev/react-turnstile'
 
 export const Route = createFileRoute('/sign-up')({
+  head: () => ({
+    meta: [
+      { title: "Sign up | Hockystick" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
   component: SignUp
 })
 

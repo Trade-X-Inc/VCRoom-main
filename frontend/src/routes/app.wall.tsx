@@ -45,7 +45,7 @@ function Wall() {
   ];
 
   return (
-    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-8">
+    <div className="p-6 lg:p-8 space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
           The Wall

@@ -1,8 +1,9 @@
-import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState, useSearch } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Settings, Bell, Shield, Building2, User, Loader2, Camera } from "lucide-react";
+import { Settings, Bell, Shield, User, Loader2, Camera, HelpCircle, Info } from "lucide-react";
 import { VerificationSection } from "@/components/app/VerificationSection";
+import { FounderHelpGuide, AboutSection } from "@/components/app/HelpGuide";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
@@ -12,31 +13,41 @@ export const Route = createFileRoute("/app/settings")({
   component: SettingsLayout,
 });
 
-const tabs = [
+const routeTabs = [
   { to: "/app/settings", label: "Profile", icon: User, exact: true },
   { to: "/app/settings/notifications", label: "Notifications", icon: Bell },
   { to: "/app/settings/security", label: "Security", icon: Shield },
 ];
 
+const inlineTabs = [
+  { id: "help", label: "How to use", icon: HelpCircle },
+  { id: "about", label: "About", icon: Info },
+];
+
 function SettingsLayout() {
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const isIndex = path === "/app/settings";
+  const search = useSearch({ strict: false }) as { tab?: string };
+  const [inlineTab, setInlineTab] = useState<"help" | "about" | null>(
+    search?.tab === "help" ? "help" : search?.tab === "about" ? "about" : null
+  );
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
+    <div className="px-4 py-6 sm:px-6 lg:px-8">
       <div className="flex items-center gap-2 mb-6">
         <Settings className="h-5 w-5 text-brand" />
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
       </div>
 
-      <div className="grid lg:grid-cols-[200px_1fr] gap-6">
-        <nav className="space-y-1">
-          {tabs.map((t) => {
-            const active = t.exact ? path === t.to : path.startsWith(t.to);
+      <div className="flex gap-6 lg:gap-8">
+        {/* Left sidebar — 200px fixed */}
+        <nav className="w-[200px] shrink-0 space-y-1">
+          {routeTabs.map((t) => {
+            const active = inlineTab === null && (t.exact ? path === t.to : path.startsWith(t.to));
             return (
               <Link
                 key={t.to}
                 to={t.to as any}
+                onClick={() => setInlineTab(null)}
                 className={cn(
                   "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors",
                   active ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
@@ -47,10 +58,35 @@ function SettingsLayout() {
               </Link>
             );
           })}
+
+          <div className="my-2 border-t border-border/40" />
+
+          {inlineTabs.map((t) => {
+            const active = inlineTab === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => setInlineTab(t.id as "help" | "about")}
+                data-testid={`settings-tab-${t.id}`}
+                className={cn(
+                  "w-full flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors text-left",
+                  active ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+                )}
+              >
+                <t.icon className={cn("h-4 w-4", active && "text-brand")} />
+                {t.label}
+              </button>
+            );
+          })}
         </nav>
 
-        <div className="min-w-0">
-          {isIndex ? <ProfileSettings /> : <Outlet />}
+        {/* Content panel */}
+        <div className="flex-1 min-w-0">
+          {inlineTab === "help" && <FounderHelpGuide />}
+          {inlineTab === "about" && <AboutSection />}
+          {inlineTab === null && (
+            path === "/app/settings" ? <ProfileSettings /> : <Outlet />
+          )}
         </div>
       </div>
     </div>
@@ -229,11 +265,27 @@ function ProfileSettings() {
         if (error) throw error;
       } else {
         if (!startup?.id) throw new Error("No startup found. Create a company profile first.");
+        const prevStage = startup.stage;
         const { error } = await supabase
           .from("startups")
           .update({ company_name: companyName.trim(), website: website.trim(), description: description.trim(), stage: stage || null, country: country.trim(), updated_at: new Date().toISOString() })
           .eq("id", startup.id);
         if (error) throw error;
+        // Auto-trigger coaching when stage changes (fire and forget)
+        if (stage && stage !== prevStage && user?.id) {
+          supabase.auth.getSession().then(({ data: authData }) => {
+            const jwt = authData?.session?.access_token ?? "";
+            import("@/lib/coaching-fn").then(({ runFounderCoaching }) => {
+              runFounderCoaching({
+                startupId: startup.id,
+                userId: user.id,
+                triggerType: "stage_change",
+                triggerData: { new_stage: stage },
+                jwt,
+              }).catch(() => {});
+            });
+          });
+        }
       }
       qc.invalidateQueries({ queryKey: ["settings-startup", "settings-investor-profile"] });
       toast.success("Saved");

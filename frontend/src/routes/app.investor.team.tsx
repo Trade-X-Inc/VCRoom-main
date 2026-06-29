@@ -19,7 +19,7 @@ const ROLE_COLORS: Record<string, { bg: string; text: string }> = {
   admin:     { bg: "rgba(124,58,237,0.15)",  text: "#7C3AED" },
   associate: { bg: "rgba(16,185,129,0.15)",  text: "#10B981" },
   analyst:   { bg: "rgba(245,158,11,0.15)",  text: "#F59E0B" },
-  external:  { bg: "rgba(255,255,255,0.08)", text: "rgba(255,255,255,0.5)" },
+  external:  { bg: "rgba(107,114,128,0.12)", text: "#6B7280" },
 };
 
 function RoleBadge({ role }: { role: string }) {
@@ -190,12 +190,12 @@ function InvestorTeamPage() {
   };
 
   return (
-    <div style={{ padding: "32px", maxWidth: 800, margin: "0 auto" }}>
+    <div className="p-6 lg:p-8">
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 32 }}>
+      <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 600, color: "#fff", letterSpacing: "-0.03em", marginBottom: 4 }}>Team</h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>Team</h1>
+          <p className="text-sm text-muted-foreground">
             Invite analysts and partners to collaborate on deals.
           </p>
         </div>
@@ -204,7 +204,7 @@ function InvestorTeamPage() {
           disabled={isFreePlan || atLimit}
           style={{
             display: "inline-flex", alignItems: "center", gap: 6,
-            background: isFreePlan || atLimit ? "rgba(255,255,255,0.06)" : "#7C3AED",
+            background: isFreePlan || atLimit ? "var(--color-muted)" : "#7C3AED",
             color: isFreePlan || atLimit ? "rgba(255,255,255,0.3)" : "#fff",
             border: "none", borderRadius: 8, padding: "9px 16px",
             fontSize: 13, fontWeight: 500,
@@ -217,13 +217,13 @@ function InvestorTeamPage() {
 
       {/* Free plan paywall */}
       {isFreePlan && (
-        <div style={{ background: "#111114", border: "1px solid rgba(124,58,237,0.3)", borderRadius: 12, padding: 24, textAlign: "center", marginBottom: 24 }}>
-          <p style={{ color: "#fff", fontSize: 15, fontWeight: 600, marginBottom: 8 }}>Team collaboration is a paid feature</p>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginBottom: 20, maxWidth: 480, margin: "0 auto 20px", lineHeight: 1.6 }}>
+        <div className="bg-card border border-brand/30 rounded-xl p-6 text-center mb-6">
+          <p className="text-base font-semibold text-foreground mb-2">Team collaboration is a paid feature</p>
+          <p className="text-sm text-muted-foreground mb-5 max-w-md mx-auto leading-relaxed">
             Upgrade to Starter to invite 1 team member, or Pro to invite up to 4.
             Your analysts get role-based access to deal rooms and documents.
           </p>
-          <a href="/pricing" style={{ display: "inline-block", background: "#7C3AED", color: "#fff", padding: "10px 24px", borderRadius: 8, textDecoration: "none", fontSize: 14, fontWeight: 600 }}>
+          <a href="/pricing" className="inline-block bg-brand text-white px-6 py-2.5 rounded-lg text-sm font-semibold no-underline hover:bg-brand/90 transition-colors">
             View plans →
           </a>
         </div>
@@ -233,7 +233,7 @@ function InvestorTeamPage() {
       {atLimit && !isFreePlan && (
         <div style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 10, padding: "14px 16px", marginBottom: 24, display: "flex", alignItems: "center", gap: 10 }}>
           <AlertTriangle size={14} style={{ color: "#F59E0B", flexShrink: 0 }} />
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.6)" }}>
+          <span style={{ fontSize: 13, color: "var(--color-foreground)" }}>
             You've used all {teamLimit} seat(s) on the {userPlan?.plan_name ?? ""} plan.{" "}
             <a href="/pricing" style={{ color: "#7C3AED" }}>Upgrade plan →</a>
           </span>
@@ -241,19 +241,19 @@ function InvestorTeamPage() {
       )}
 
       {/* Members section */}
-      <div style={{ background: "#111114", borderRadius: 12, border: "1px solid rgba(255,255,255,0.06)", overflow: "hidden" }}>
-        <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>Members</span>
-            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.06)", borderRadius: 99, padding: "1px 7px" }}>
+      <div className="bg-card border border-border/60 rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-border/60 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-foreground">Members</span>
+            <span className="text-xs text-muted-foreground bg-accent rounded-full px-2 py-px">
               {loadingMembers ? "…" : currentMemberCount + 1}
             </span>
           </div>
           {!isFreePlan && (
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.3)" }}>
+            <span className="text-xs text-muted-foreground">
               {currentMemberCount} of {teamLimit} seats used
               {atLimit && (
-                <span style={{ marginLeft: 8, fontSize: 11, background: "rgba(245,158,11,0.12)", color: "#F59E0B", padding: "2px 8px", borderRadius: 4, fontWeight: 600 }}>
+                <span className="ml-2 text-xs bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-semibold">
                   Limit reached
                 </span>
               )}
@@ -262,25 +262,25 @@ function InvestorTeamPage() {
         </div>
 
         {/* Owner row */}
-        <div style={{ display: "flex", alignItems: "center", padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.04)", gap: 12 }}>
-          <div style={{ width: 36, height: 36, borderRadius: "50%", flexShrink: 0, background: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff" }}>
+        <div className="flex items-center px-5 py-3.5 border-b border-border/40 gap-3">
+          <div style={{ width: 36, height: 36, borderRadius: "50%", flexShrink: 0, background: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "var(--color-foreground)" }}>
             {initials(user?.name ?? user?.email ?? "?")}
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 500, color: "#fff" }}>
-              {user?.name || "You"} <span style={{ color: "rgba(255,255,255,0.3)", fontWeight: 400 }}>(you)</span>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-medium text-foreground">
+              {user?.name || "You"} <span className="text-muted-foreground font-normal">(you)</span>
             </div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 1 }}>{user?.email}</div>
+            <div className="text-xs text-muted-foreground mt-px">{user?.email}</div>
           </div>
-          <span style={{ background: "rgba(124,58,237,0.15)", color: "#7C3AED", padding: "2px 10px", borderRadius: 99, fontSize: 11, fontWeight: 600 }}>Owner</span>
+          <span className="text-xs font-semibold bg-brand/15 text-brand px-2.5 py-0.5 rounded-full">Owner</span>
         </div>
 
         {loadingMembers ? (
           <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12 }}>
-            {[1, 2].map((i) => <div key={i} style={{ height: 48, borderRadius: 8, background: "rgba(255,255,255,0.04)" }} />)}
+            {[1, 2].map((i) => <div key={i} style={{ height: 48, borderRadius: 8, background: "var(--color-muted)" }} />)}
           </div>
         ) : members.length === 0 ? (
-          <div style={{ padding: "24px 20px", textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 13 }}>
+          <div style={{ padding: "24px 20px", textAlign: "center", color: "var(--color-muted-foreground)", fontSize: 13 }}>
             No team members yet — invite someone to collaborate.
           </div>
         ) : (
@@ -308,17 +308,17 @@ function InvestorTeamPage() {
       </div>
 
       {/* Pending invites */}
-      <div style={{ background: "#111114", borderRadius: 12, border: "1px solid rgba(255,255,255,0.06)", overflow: "hidden", marginTop: 24 }}>
-        <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>Pending invites</span>
-          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.06)", borderRadius: 99, padding: "1px 7px" }}>
+      <div className="bg-card border border-border/60 rounded-xl overflow-hidden mt-6">
+        <div className="px-5 py-4 border-b border-border/60 flex items-center gap-2">
+          <span className="text-sm font-semibold text-foreground">Pending invites</span>
+          <span className="text-xs text-muted-foreground bg-accent rounded-full px-2 py-px">
             {loadingInvites ? "…" : pending.length}
           </span>
         </div>
         {loadingInvites ? (
-          <div style={{ padding: 24 }}><div style={{ height: 48, borderRadius: 8, background: "rgba(255,255,255,0.04)" }} /></div>
+          <div className="p-6"><div className="h-12 rounded-lg bg-accent/40" /></div>
         ) : pending.length === 0 ? (
-          <div style={{ padding: "24px 20px", textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 13 }}>No pending invites.</div>
+          <div className="px-5 py-6 text-center text-sm text-muted-foreground">No pending invites.</div>
         ) : (
           pending.map((inv) => (
             <PendingRow key={inv.id} invite={inv} onCancel={() => handleCancelInvite(inv.id)} onResend={() => handleResendInvite(inv)} />
@@ -344,21 +344,21 @@ function InvestorTeamPage() {
           onClick={() => setAppointConfirm(null)}
         >
           <div
-            style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 28, width: "100%", maxWidth: 420 }}
+            className="bg-card border border-border/60 rounded-2xl p-7 w-full max-w-sm"
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ fontSize: 20, textAlign: "center", marginBottom: 12 }}>⚠️</div>
-            <div style={{ fontSize: 15, fontWeight: 600, color: "#fff", textAlign: "center", marginBottom: 8 }}>
+            <div className="text-xl text-center mb-3">⚠️</div>
+            <div className="text-base font-semibold text-foreground text-center mb-2">
               Appoint {appointConfirm.name} as Admin?
             </div>
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", textAlign: "center", lineHeight: 1.6, marginBottom: 24 }}>
+            <p className="text-sm text-muted-foreground text-center leading-relaxed mb-6">
               Admins have full platform access and can manage other team members. Only assign this role to trusted colleagues.
             </p>
-            <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={() => setAppointConfirm(null)} style={{ flex: 1, background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, padding: "10px", fontSize: 13, color: "rgba(255,255,255,0.6)", cursor: "pointer" }}>
+            <div className="flex gap-2.5">
+              <button onClick={() => setAppointConfirm(null)} className="flex-1 bg-accent text-muted-foreground hover:text-foreground border-0 rounded-lg py-2.5 text-sm cursor-pointer transition-colors">
                 Cancel
               </button>
-              <button onClick={confirmAppoint} style={{ flex: 1, background: "#7C3AED", border: "none", borderRadius: 8, padding: "10px", fontSize: 13, color: "#fff", fontWeight: 600, cursor: "pointer" }}>
+              <button onClick={confirmAppoint} className="flex-1 bg-brand text-white border-0 rounded-lg py-2.5 text-sm font-semibold cursor-pointer hover:bg-brand/90 transition-colors">
                 Appoint as Admin
               </button>
             </div>
@@ -381,13 +381,13 @@ function MemberRow({
   const roleRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div style={{ display: "flex", alignItems: "center", padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.04)", gap: 12 }}>
-      <div style={{ width: 36, height: 36, borderRadius: "50%", flexShrink: 0, background: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff", overflow: "hidden" }}>
+    <div style={{ display: "flex", alignItems: "center", padding: "14px 20px", borderBottom: "1px solid var(--color-border)", gap: 12 }}>
+      <div style={{ width: 36, height: 36, borderRadius: "50%", flexShrink: 0, background: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "var(--color-foreground)", overflow: "hidden" }}>
         {avatarUrl ? <img src={avatarUrl} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="" /> : initials(name)}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 13, fontWeight: 500, color: "#fff" }}>{name}</div>
-        {title && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 1 }}>{title}</div>}
+        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--color-foreground)" }}>{name}</div>
+        {title && <div style={{ fontSize: 11, color: "var(--color-muted-foreground)", marginTop: 1 }}>{title}</div>}
       </div>
       <div style={{ position: "relative" }} ref={roleRef}>
         <button
@@ -395,10 +395,10 @@ function MemberRow({
           style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "transparent", border: "none", cursor: "pointer", padding: 0 }}
         >
           <RoleBadge role={role} />
-          <ChevronDown size={12} style={{ color: "rgba(255,255,255,0.3)" }} />
+          <ChevronDown size={12} style={{ color: "var(--color-muted-foreground)" }} />
         </button>
         {roleOpen && (
-          <div style={{ position: "absolute", right: 0, top: "calc(100% + 4px)", zIndex: 20, background: "#1a1a1f", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, overflow: "hidden", minWidth: 200 }}>
+          <div className="absolute right-0 top-[calc(100%+4px)] z-20 bg-card border border-border/60 rounded-lg overflow-hidden min-w-[200px]">
             {roles.map((r) => (
               <button
                 key={r.value}
@@ -411,12 +411,12 @@ function MemberRow({
           </div>
         )}
       </div>
-      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", minWidth: 80, textAlign: "right" }}>
+      <div style={{ fontSize: 11, color: "var(--color-muted-foreground)", minWidth: 80, textAlign: "right" }}>
         {joinedAt ? formatDistanceToNow(new Date(joinedAt), { addSuffix: true }) : ""}
       </div>
       <button
         onClick={onRemove}
-        style={{ background: "transparent", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.25)", padding: 4, borderRadius: 4, display: "flex", alignItems: "center" }}
+        style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--color-muted-foreground)", padding: 4, borderRadius: 4, display: "flex", alignItems: "center" }}
         onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#EF4444"; }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.25)"; }}
       >
@@ -428,22 +428,22 @@ function MemberRow({
 
 function PendingRow({ invite, onCancel, onResend }: { invite: InviteRow; onCancel: () => void; onResend: () => void }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.04)", gap: 12 }}>
-      <div style={{ width: 36, height: 36, borderRadius: "50%", flexShrink: 0, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <Mail size={15} style={{ color: "rgba(255,255,255,0.3)" }} />
+    <div style={{ display: "flex", alignItems: "center", padding: "14px 20px", borderBottom: "1px solid var(--color-border)", gap: 12 }}>
+      <div style={{ width: 36, height: 36, borderRadius: "50%", flexShrink: 0, background: "var(--color-muted)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Mail size={15} style={{ color: "var(--color-muted-foreground)" }} />
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 13, fontWeight: 500, color: "#fff" }}>{invite.email}</div>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginTop: 1, display: "flex", alignItems: "center", gap: 4 }}>
+        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--color-foreground)" }}>{invite.email}</div>
+        <div style={{ fontSize: 11, color: "var(--color-muted-foreground)", marginTop: 1, display: "flex", alignItems: "center", gap: 4 }}>
           <Clock size={10} />
           Sent {formatDistanceToNow(new Date(invite.created_at), { addSuffix: true })}
         </div>
       </div>
       <RoleBadge role={invite.role} />
-      <button onClick={onResend} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, padding: "5px 10px", fontSize: 11, color: "rgba(255,255,255,0.5)", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+      <button onClick={onResend} style={{ background: "transparent", border: "1px solid var(--color-border)", borderRadius: 6, padding: "5px 10px", fontSize: 11, color: "var(--color-foreground)", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
         <RefreshCw size={11} /> Resend
       </button>
-      <button onClick={onCancel} style={{ background: "transparent", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.25)", padding: 4, borderRadius: 4, display: "flex", alignItems: "center" }}
+      <button onClick={onCancel} style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--color-muted-foreground)", padding: 4, borderRadius: 4, display: "flex", alignItems: "center" }}
         onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#EF4444"; }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.25)"; }}>
         <X size={14} />
@@ -508,11 +508,11 @@ function InviteModal({
       onClick={onClose}
     >
       <div
-        style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 28, width: "100%", maxWidth: 440 }}
+        style={{ background: "#111114", border: "1px solid var(--color-border)", borderRadius: 16, padding: 28, width: "100%", maxWidth: 440 }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div style={{ fontSize: 16, fontWeight: 600, color: "#fff", marginBottom: 4 }}>Invite team member</div>
-        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 24 }}>
+        <div style={{ fontSize: 16, fontWeight: 600, color: "var(--color-foreground)", marginBottom: 4 }}>Invite team member</div>
+        <div style={{ fontSize: 12, color: "var(--color-muted-foreground)", marginBottom: 24 }}>
           They'll receive an email to join your investment team on Hockystick.
         </div>
         <div style={{ marginBottom: 16 }}>
@@ -546,7 +546,7 @@ function InviteModal({
                   Admins have full platform access and can manage other team members. Only invite trusted colleagues as Admin.
                 </p>
               )}
-              <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.4)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-muted-foreground)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 What a {role.charAt(0).toUpperCase() + role.slice(1)} can do
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
@@ -565,12 +565,12 @@ function InviteModal({
           )}
         </div>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, padding: "9px 16px", fontSize: 13, color: "rgba(255,255,255,0.6)", cursor: "pointer" }}>
+          <button onClick={onClose} style={{ background: "var(--color-muted)", border: "none", borderRadius: 8, padding: "9px 16px", fontSize: 13, color: "var(--color-foreground)", cursor: "pointer" }}>
             Cancel
           </button>
           <button
             onClick={handleSend} disabled={sending || !email.trim()}
-            style={{ background: "#7C3AED", border: "none", borderRadius: 8, padding: "9px 18px", fontSize: 13, color: "#fff", fontWeight: 500, cursor: "pointer", opacity: sending || !email.trim() ? 0.6 : 1, display: "inline-flex", alignItems: "center", gap: 6 }}
+            style={{ background: "#7C3AED", border: "none", borderRadius: 8, padding: "9px 18px", fontSize: 13, color: "var(--color-foreground)", fontWeight: 500, cursor: "pointer", opacity: sending || !email.trim() ? 0.6 : 1, display: "inline-flex", alignItems: "center", gap: 6 }}
           >
             {sending && <Loader2 size={13} className="animate-spin" />}
             Send invite
@@ -582,13 +582,13 @@ function InviteModal({
 }
 
 const labelStyle: React.CSSProperties = {
-  fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.4)",
+  fontSize: 11, fontWeight: 600, color: "var(--color-muted-foreground)",
   textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: 6,
 };
 
 const inputStyle: React.CSSProperties = {
-  width: "100%", background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
-  padding: "10px 12px", fontSize: 13, color: "#fff",
+  width: "100%", background: "var(--color-muted)",
+  border: "1px solid var(--color-border)", borderRadius: 8,
+  padding: "10px 12px", fontSize: 13, color: "var(--color-foreground)",
   outline: "none", boxSizing: "border-box",
 };

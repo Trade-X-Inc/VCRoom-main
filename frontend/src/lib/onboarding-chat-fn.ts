@@ -75,7 +75,6 @@ export const askOnboardingAI = createServerFn({ method: "POST" })
       cfEnv.OPENAI_API_KEY ||
       cfEnv.OPEN_AI_API_KEY ||
       cfEnv["OPEN AI API KEY"] ||
-      cfEnv.VITE_OPENAI_API_KEY ||
       getEnvVar("OPENAI_API_KEY") ||
       "";
     console.log("[OnboardingChat] Key exists:", !!apiKey, "prefix:", apiKey ? apiKey.slice(0, 8) : "MISSING");

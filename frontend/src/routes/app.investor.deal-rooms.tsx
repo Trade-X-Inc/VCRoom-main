@@ -19,6 +19,14 @@ const STATUS_TO_LABEL: Record<string, { label: string; cls: string }> = {
   exited:         { label: "Exited",      cls: "bg-muted text-muted-foreground" },
 };
 
+const STAGE_TO_LABEL: Record<string, { label: string; cls: string }> = {
+  information_vault: { label: "Info Vault",  cls: "bg-muted text-muted-foreground" },
+  qa:                { label: "Q&A",         cls: "bg-brand/10 text-brand" },
+  due_diligence:     { label: "Diligence",   cls: "bg-warning/10 text-warning" },
+  term_sheet:        { label: "Term Sheet",  cls: "bg-success/10 text-success" },
+  closing:           { label: "Closing",     cls: "bg-success/10 text-success" },
+};
+
 function DealRoomsPage() {
   const { user } = useAuth();
 
@@ -26,31 +34,36 @@ function DealRoomsPage() {
     queryKey: ["investor-deal-rooms-list", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("deal_room_members")
-        .select(`
-          deal_room_id,
-          deal_rooms(
-            id, updated_at, created_at, status,
-            startups(company_name, sector, stage, funding_target, tagline)
-          )
-        `)
-        .eq("user_id", user!.id);
-      if (error) throw error;
-      return (data ?? [])
-        .map((r: any) => ({
-          id: r.deal_room_id,
-          updatedAt: r.deal_rooms?.updated_at,
-          createdAt: r.deal_rooms?.created_at,
-          status: r.deal_rooms?.status,
-          company: r.deal_rooms?.startups?.company_name ?? "Unnamed",
-          sector: r.deal_rooms?.startups?.sector,
-          stage: r.deal_rooms?.startups?.stage,
-          fundingTarget: r.deal_rooms?.startups?.funding_target,
-          tagline: r.deal_rooms?.startups?.tagline,
-        }))
-        .filter((r) => !!r.id)
-        .sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
+      // Pull via deal_room_members membership
+      const [membersRes, directRes] = await Promise.all([
+        supabase
+          .from("deal_room_members")
+          .select(`deal_room_id, deal_rooms(id, updated_at, created_at, status, workflow_stage, investor_email, startups(company_name, sector, stage, funding_target, tagline))`)
+          .eq("user_id", user!.id),
+        // Also pull deal rooms where investor_user_id = current user
+        supabase
+          .from("deal_rooms")
+          .select("id, updated_at, created_at, status, workflow_stage, investor_email, startups(company_name, sector, stage, funding_target, tagline)")
+          .eq("investor_user_id", user!.id),
+      ]);
+
+      const seen = new Set<string>();
+      const rows: any[] = [];
+
+      for (const r of membersRes.data ?? []) {
+        const dr = r.deal_rooms as any;
+        if (!dr?.id || seen.has(dr.id)) continue;
+        seen.add(dr.id);
+        rows.push({ id: dr.id, updatedAt: dr.updated_at, createdAt: dr.created_at, status: dr.status, workflowStage: dr.workflow_stage, company: dr.startups?.company_name ?? "Unnamed", sector: dr.startups?.sector, stage: dr.startups?.stage, fundingTarget: dr.startups?.funding_target, tagline: dr.startups?.tagline });
+      }
+
+      for (const dr of directRes.data ?? []) {
+        if (!dr.id || seen.has(dr.id)) continue;
+        seen.add(dr.id);
+        rows.push({ id: dr.id, updatedAt: dr.updated_at, createdAt: dr.created_at, status: dr.status, workflowStage: (dr as any).workflow_stage, company: (dr as any).startups?.company_name ?? "Unnamed", sector: (dr as any).startups?.sector, stage: (dr as any).startups?.stage, fundingTarget: (dr as any).startups?.funding_target, tagline: (dr as any).startups?.tagline });
+      }
+
+      return rows.sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
     },
   });
 
@@ -93,7 +106,7 @@ function DealRoomsPage() {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {rooms.map((room) => {
-              const statusInfo = STATUS_TO_LABEL[room.status ?? ""] ?? { label: "New", cls: "bg-muted text-muted-foreground" };
+              const stageInfo = STAGE_TO_LABEL[(room as any).workflowStage ?? ""] ?? { label: "Open", cls: "bg-muted text-muted-foreground" };
               const daysSinceActivity = room.updatedAt
                 ? Math.floor((Date.now() - new Date(room.updatedAt).getTime()) / (1000 * 60 * 60 * 24))
                 : null;
@@ -105,6 +118,7 @@ function DealRoomsPage() {
                   to="/app/deal-room/$id"
                   params={{ id: room.id }}
                   className="block rounded-2xl border border-border/60 bg-card p-5 hover:shadow-card transition-shadow group"
+                  data-testid={`deal-room-card-${room.id}`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3 min-w-0">
@@ -116,8 +130,8 @@ function DealRoomsPage() {
                         <div className="text-xs text-muted-foreground">{room.sector || "—"} · {room.stage || "Stage TBD"}</div>
                       </div>
                     </div>
-                    <span className={cn("shrink-0 text-[10px] font-medium rounded-full px-2 py-0.5", statusInfo.cls)}>
-                      {statusInfo.label}
+                    <span className={cn("shrink-0 text-[10px] font-semibold rounded-full px-2.5 py-0.5", stageInfo.cls)}>
+                      {stageInfo.label}
                     </span>
                   </div>
 

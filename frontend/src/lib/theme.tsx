@@ -15,15 +15,17 @@ function apply(resolved: "light" | "dark") {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
   root.classList.toggle("dark", resolved === "dark");
+  root.setAttribute("data-theme", resolved);
   root.style.colorScheme = resolved;
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("system");
+  const [theme, setThemeState] = useState<Theme>("light");
   const [resolved, setResolved] = useState<"light" | "dark">("light");
 
   useEffect(() => {
-    const stored = (typeof window !== "undefined" && (localStorage.getItem(STORAGE_KEY) as Theme | null)) || "system";
+    // Default to "light" for new users; existing users keep their stored preference
+    const stored = (typeof window !== "undefined" && (localStorage.getItem(STORAGE_KEY) as Theme | null)) || "light";
     setThemeState(stored);
   }, []);
 

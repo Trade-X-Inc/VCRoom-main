@@ -1,6 +1,16 @@
 import { useState, useRef, type DragEvent } from "react";
 import { Upload, FileText, X, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+
+const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","xlsx","xls","docx","doc","csv","png","jpg","jpeg","mp4","txt"]);
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
+
+function validateFile(file: File): string | null {
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+  if (!ALLOWED_EXTENSIONS.has(ext)) return `${file.name}: file type not allowed`;
+  if (file.size > MAX_FILE_SIZE) return `${file.name}: exceeds 50 MB limit`;
+  return null;
+}
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 import { uploadDocument, supabase, logActivity } from "@/lib/supabase";
@@ -127,7 +137,14 @@ export function Dropzone({
 
   const handleFiles = (list: FileList | null) => {
     if (!list || list.length === 0) return;
-    const next: UploadedFile[] = Array.from(list).map((f) => ({
+    const validFiles: File[] = [];
+    for (const f of Array.from(list)) {
+      const err = validateFile(f);
+      if (err) { toast.error(err); continue; }
+      validFiles.push(f);
+    }
+    if (validFiles.length === 0) return;
+    const next: UploadedFile[] = validFiles.map((f) => ({
       id: crypto.randomUUID(),
       name: f.name,
       size: f.size,

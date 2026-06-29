@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  Users, Plus, Copy, Check, Loader2, ChevronRight,
+  Plus, Copy, Check, Loader2, ChevronRight,
   Circle, Send, Link as LinkIcon, Building2, AlertCircle,
+  LayoutList, LayoutGrid, Table2, Columns3, Search,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -58,6 +59,8 @@ interface InviteLink {
   created_at: string;
 }
 
+type ViewMode = "pipeline" | "list" | "card" | "kanban";
+
 // Stage tab definitions
 type TabKey = "all" | "new_intake" | "sourcing" | "reviewing" | "diligence" | "invested";
 const TABS: { key: TabKey; label: string }[] = [
@@ -89,14 +92,14 @@ function ConfirmModal({ count, onConfirm, onCancel, confirming }: {
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
       onClick={onCancel}>
-      <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 28, maxWidth: 420, width: "100%" }}
+      <div style={{ background: "var(--hs-bg-secondary)", border: "1px solid var(--hs-border)", borderRadius: 16, padding: 28, maxWidth: 420, width: "100%" }}
         onClick={(e) => e.stopPropagation()}>
-        <div className="text-sm font-semibold text-white mb-2" style={{ fontFamily: "Syne, sans-serif" }}>Send Hockystick invites</div>
-        <p className="text-xs text-white/50 leading-relaxed mb-5">
-          This will send a real email invite to <strong className="text-white/70">{count} {count === 1 ? "founder" : "founders"}</strong> and add them to your pipeline as Sourcing leads. This action cannot be undone.
+        <div className="text-sm font-semibold mb-2" style={{ fontFamily: "Syne, sans-serif", color: "var(--hs-text-primary)" }}>Send Hockystick invites</div>
+        <p className="text-xs leading-relaxed mb-5" style={{ color: "var(--hs-text-muted)" }}>
+          This will send a real email invite to <strong style={{ color: "var(--hs-text-secondary)" }}>{count} {count === 1 ? "founder" : "founders"}</strong> and add them to your pipeline as Sourcing leads. This action cannot be undone.
         </p>
         <div className="flex gap-2 justify-end">
-          <button onClick={onCancel} className="px-4 py-2 text-xs text-white/40 hover:text-white/70 transition-colors">Cancel</button>
+          <button onClick={onCancel} className="px-4 py-2 text-xs transition-colors" style={{ color: "var(--hs-text-muted)" }}>Cancel</button>
           <button onClick={onConfirm} disabled={confirming}
             style={{ background: confirming ? "rgba(124,58,237,0.4)" : "#7C3AED", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 12, fontWeight: 600, cursor: confirming ? "not-allowed" : "pointer" }}>
             {confirming ? <span className="flex items-center gap-1.5"><Loader2 className="h-3 w-3 animate-spin" /> Sending…</span> : `Send ${count} invite${count !== 1 ? "s" : ""}`}
@@ -119,9 +122,9 @@ function PipelineRow({ row, onMarkSeen, onDecide }: {
 
   return (
     <div
-      style={{ background: "#111114", border: `1px solid ${isNew ? "rgba(124,58,237,0.35)" : "rgba(255,255,255,0.08)"}`, borderRadius: 10, padding: "12px 16px", cursor: isNew ? "pointer" : "default" }}
+      style={{ background: "var(--hs-bg-secondary)", border: `1px solid ${isNew ? "rgba(124,58,237,0.35)" : "var(--hs-border)"}`, borderRadius: 10, padding: "12px 16px", cursor: isNew ? "pointer" : "default" }}
       onClick={() => { if (isNew) onMarkSeen(row.id); }}
-      className="flex items-center gap-3 transition-colors hover:border-white/15"
+      className="flex items-center gap-3 transition-colors"
     >
       {/* New dot */}
       {isNew && <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#7C3AED", flexShrink: 0 }} title="New — auto-added via invite link" />}
@@ -133,13 +136,13 @@ function PipelineRow({ row, onMarkSeen, onDecide }: {
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-white truncate">{row.company_name}</span>
+          <span className="text-sm font-semibold truncate" style={{ color: "var(--hs-text-primary)" }}>{row.company_name}</span>
           {isNew && <span style={{ background: "rgba(124,58,237,0.12)", color: "#A855F7", borderRadius: 99, padding: "1px 8px", fontSize: 10, fontWeight: 600, flexShrink: 0 }}>Via invite link</span>}
         </div>
         <div className="flex items-center gap-2 mt-0.5">
-          {row.sector && <span className="text-[11px] text-white/30">{row.sector}</span>}
-          {row.stage && <span className="text-[11px] text-white/30">{row.stage}</span>}
-          {row.source && <span className="text-[11px] text-white/20">· {row.source}</span>}
+          {row.sector && <span className="text-[11px]" style={{ color: "var(--hs-text-muted)" }}>{row.sector}</span>}
+          {row.stage && <span className="text-[11px]" style={{ color: "var(--hs-text-muted)" }}>{row.stage}</span>}
+          {row.source && <span className="text-[11px]" style={{ color: "var(--hs-text-muted)" }}>· {row.source}</span>}
         </div>
       </div>
 
@@ -290,6 +293,142 @@ function InviteLinkPanel({ investorId }: { investorId: string }) {
   );
 }
 
+// ── List view ─────────────────────────────────────────────────────────────
+
+function ListView({ rows, search }: { rows: WatchlistRow[]; search: string }) {
+  const filtered = rows.filter((r) =>
+    !search || r.company_name.toLowerCase().includes(search.toLowerCase()) ||
+    (r.sector ?? "").toLowerCase().includes(search.toLowerCase())
+  );
+
+  if (filtered.length === 0) return (
+    <div style={{ padding: "40px 16px", textAlign: "center", border: "1px dashed rgba(255,255,255,0.08)", borderRadius: 12 }}>
+      <p className="text-sm text-muted-foreground">{search ? "No results matching your search." : "No companies in pipeline yet."}</p>
+    </div>
+  );
+
+  return (
+    <div className="space-y-2" data-testid="list-view">
+      {filtered.map((r) => {
+        const statusStyle = STATUS_COLORS[r.status] ?? STATUS_COLORS.Watching;
+        return (
+          <div key={r.id} className="flex items-center gap-3 rounded-xl px-4 py-3 transition-colors"
+            style={{ background: "var(--hs-bg-secondary)", border: "1px solid var(--hs-border)" }}>
+            <div style={{ width: 36, height: 36, borderRadius: 8, background: "rgba(124,58,237,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span className="text-sm font-bold" style={{ color: "#A855F7" }}>{r.company_name[0]?.toUpperCase()}</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold" style={{ color: "var(--hs-text-primary)" }}>{r.company_name}</span>
+                {r.stage && <span className="text-[11px] rounded-full px-2 py-0.5" style={{ background: "rgba(124,58,237,0.1)", color: "#A855F7" }}>{r.stage}</span>}
+              </div>
+              <div className="flex items-center gap-2 mt-0.5">
+                {r.sector && <span className="text-[11px]" style={{ color: "var(--hs-text-muted)" }}>{r.sector}</span>}
+                {r.source && <span className="text-[11px]" style={{ color: "var(--hs-text-muted)" }}>· {r.source}</span>}
+              </div>
+            </div>
+            <span style={{ background: statusStyle.bg, color: statusStyle.text, borderRadius: 99, padding: "3px 10px", fontSize: 11, fontWeight: 600, flexShrink: 0 }}>
+              {r.status}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Card view ─────────────────────────────────────────────────────────────
+
+function CardView({ rows, search }: { rows: WatchlistRow[]; search: string }) {
+  const filtered = rows.filter((r) =>
+    !search || r.company_name.toLowerCase().includes(search.toLowerCase()) ||
+    (r.sector ?? "").toLowerCase().includes(search.toLowerCase())
+  );
+
+  if (filtered.length === 0) return (
+    <div style={{ padding: "40px 16px", textAlign: "center", border: "1px dashed rgba(255,255,255,0.08)", borderRadius: 12 }}>
+      <p className="text-sm text-muted-foreground">{search ? "No results." : "No companies yet."}</p>
+    </div>
+  );
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="card-view">
+      {filtered.map((r) => {
+        const statusStyle = STATUS_COLORS[r.status] ?? STATUS_COLORS.Watching;
+        return (
+          <div key={r.id} className="rounded-xl p-5 flex flex-col gap-3"
+            style={{ background: "var(--hs-bg-secondary)", border: "1px solid var(--hs-border)" }}>
+            <div className="flex items-start justify-between">
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(124,58,237,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span className="text-base font-bold" style={{ color: "#A855F7" }}>{r.company_name[0]?.toUpperCase()}</span>
+              </div>
+              <span style={{ background: statusStyle.bg, color: statusStyle.text, borderRadius: 99, padding: "3px 10px", fontSize: 11, fontWeight: 600 }}>
+                {r.status}
+              </span>
+            </div>
+            <div>
+              <div className="font-semibold text-sm" style={{ color: "var(--hs-text-primary)" }}>{r.company_name}</div>
+              {r.sector && <div className="text-xs mt-0.5" style={{ color: "var(--hs-text-muted)" }}>{r.sector}</div>}
+            </div>
+            <div className="flex items-center gap-2 flex-wrap mt-auto">
+              {r.stage && <span className="text-[11px] rounded-full px-2 py-0.5" style={{ background: "rgba(124,58,237,0.1)", color: "#A855F7" }}>{r.stage}</span>}
+              {r.source && <span className="text-[11px] rounded-full px-2 py-0.5" style={{ background: "rgba(255,255,255,0.06)", color: "var(--hs-text-muted)" }}>{r.source}</span>}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Kanban view ───────────────────────────────────────────────────────────
+
+const KANBAN_COLUMNS: { label: string; statuses: string[] }[] = [
+  { label: "Sourcing",  statuses: ["Sourcing", "Watching"] },
+  { label: "Reviewing", statuses: ["Reviewing"] },
+  { label: "Diligence", statuses: ["Diligence"] },
+  { label: "Decision",  statuses: [] },
+  { label: "Invested/Passed", statuses: ["Invested", "Passed"] },
+];
+
+function KanbanView({ rows }: { rows: WatchlistRow[] }) {
+  return (
+    <div className="flex gap-4 overflow-x-auto pb-4" data-testid="kanban-view">
+      {KANBAN_COLUMNS.map((col) => {
+        const cards = rows.filter((r) => col.statuses.includes(r.status));
+        return (
+          <div key={col.label} style={{ minWidth: 220, flex: "0 0 220px" }}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--hs-text-muted)" }}>{col.label}</span>
+              <span className="text-[10px] rounded-full px-2 py-0.5 font-semibold" style={{ background: "rgba(255,255,255,0.06)", color: "var(--hs-text-muted)" }}>{cards.length}</span>
+            </div>
+            <div className="space-y-2">
+              {cards.map((r) => {
+                const statusStyle = STATUS_COLORS[r.status] ?? STATUS_COLORS.Watching;
+                return (
+                  <div key={r.id} className="rounded-xl p-3 space-y-2"
+                    style={{ background: "var(--hs-bg-secondary)", border: "1px solid var(--hs-border)" }}>
+                    <div className="text-sm font-semibold" style={{ color: "var(--hs-text-primary)" }}>{r.company_name}</div>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {r.stage && <span className="text-[10px] rounded-full px-1.5 py-0.5" style={{ background: "rgba(124,58,237,0.1)", color: "#A855F7" }}>{r.stage}</span>}
+                      <span style={{ background: statusStyle.bg, color: statusStyle.text, borderRadius: 99, padding: "1px 8px", fontSize: 10, fontWeight: 600 }}>{r.status}</span>
+                    </div>
+                  </div>
+                );
+              })}
+              {cards.length === 0 && (
+                <div style={{ border: "1px dashed rgba(255,255,255,0.08)", borderRadius: 10, padding: "16px 12px", textAlign: "center" }}>
+                  <p className="text-xs" style={{ color: "var(--hs-text-muted)" }}>No connections yet</p>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── Main page ──────────────────────────────────────────────────────────────
 
 function ConnectionsPage() {
@@ -300,6 +439,8 @@ function ConnectionsPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [decidingId, setDecidingId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>("pipeline");
+  const [search, setSearch] = useState("");
 
   const THESIS_THRESHOLD = 60;
 
@@ -318,18 +459,50 @@ function ConnectionsPage() {
     },
   });
 
-  // ── Watchlist rows
+  // ── Watchlist rows (includes discovery_requests with status='connected' merged in)
   const { data: watchlist = [], refetch: refetchWatchlist } = useQuery<WatchlistRow[]>({
     queryKey: ["connections-watchlist", user?.id],
     enabled: !!user?.id,
     staleTime: 30_000,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("investor_watchlist")
-        .select("id,company_name,status,source,sector,stage,auto_added,seen_by_investor,source_invite_link_id,startup_id,created_at,updated_at")
-        .eq("investor_id", user!.id)
-        .order("created_at", { ascending: false });
-      return (data ?? []) as WatchlistRow[];
+      const [watchlistRes, discoveryRes] = await Promise.all([
+        supabase
+          .from("investor_watchlist")
+          .select("id,company_name,status,source,sector,stage,auto_added,seen_by_investor,source_invite_link_id,startup_id,created_at,updated_at")
+          .eq("investor_id", user!.id)
+          .order("created_at", { ascending: false }),
+        // Pull connected discovery_requests — investor_id column stores auth.uid()
+        supabase
+          .from("discovery_requests")
+          .select("id,startup_id,status,created_at,startups(company_name,sector,stage)")
+          .eq("investor_id", user!.id)
+          .eq("status", "connected"),
+      ]);
+
+      const rows: WatchlistRow[] = (watchlistRes.data ?? []) as WatchlistRow[];
+      const existingStartupIds = new Set(rows.map((r) => r.startup_id).filter(Boolean));
+
+      // Merge discovery_requests entries not already in watchlist
+      for (const dr of discoveryRes.data ?? []) {
+        if (existingStartupIds.has(dr.startup_id)) continue;
+        const s = (dr as any).startups;
+        rows.push({
+          id: `dr-${dr.id}`,
+          company_name: s?.company_name ?? "Unknown",
+          status: "Reviewing" as any,
+          source: "connected",
+          sector: s?.sector ?? null,
+          stage: s?.stage ?? null,
+          auto_added: true,
+          seen_by_investor: true,
+          source_invite_link_id: null,
+          startup_id: dr.startup_id,
+          created_at: dr.created_at,
+          updated_at: dr.created_at,
+        });
+      }
+
+      return rows;
     },
   });
 
@@ -465,16 +638,71 @@ function ConnectionsPage() {
 
   const card = "bg-card border border-border/60 rounded-xl p-5";
 
+  const VIEW_BUTTONS: { mode: ViewMode; icon: (props: any) => JSX.Element; label: string; testid: string }[] = [
+    { mode: "pipeline", icon: Table2,   label: "Table",   testid: "view-pipeline" },
+    { mode: "list",     icon: LayoutList, label: "List",  testid: "view-list" },
+    { mode: "card",     icon: LayoutGrid, label: "Card",  testid: "view-card" },
+    { mode: "kanban",   icon: Columns3,   label: "Kanban", testid: "view-kanban" },
+  ];
+
   return (
-    <div className="p-5 lg:p-8 max-w-[1200px] mx-auto">
+    <div className="p-5 lg:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>Connections</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Your pipeline, intake matches, and invite management in one place</p>
+          <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: "Syne, sans-serif", color: "var(--hs-text-primary)" }}>Connections</h1>
+          <p className="text-sm mt-0.5" style={{ color: "var(--hs-text-muted)" }}>
+            Your pipeline — {watchlist.length} active {watchlist.length === 1 ? "company" : "companies"}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5" style={{ color: "var(--hs-text-muted)" }} />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search companies…"
+              className="text-sm rounded-lg pl-8 pr-3 py-1.5 outline-none"
+              style={{ background: "var(--hs-bg-secondary)", border: "1px solid var(--hs-border)", color: "var(--hs-text-primary)", width: 180 }}
+            />
+          </div>
+          {/* View toggle */}
+          <div className="flex items-center rounded-lg overflow-hidden" style={{ border: "1px solid var(--hs-border)" }}>
+            {VIEW_BUTTONS.map(({ mode, icon: Icon, label, testid }) => (
+              <button
+                key={mode}
+                onClick={() => setViewMode(mode)}
+                data-testid={testid}
+                title={label}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors"
+                style={{
+                  background: viewMode === mode ? "#7C3AED" : "var(--hs-bg-secondary)",
+                  color: viewMode === mode ? "#fff" : "var(--hs-text-muted)",
+                  borderRight: "1px solid var(--hs-border)",
+                }}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">{label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
+      {/* Alternate views: list, card, kanban */}
+      {viewMode === "list" && (
+        <ListView rows={watchlist} search={search} />
+      )}
+      {viewMode === "card" && (
+        <CardView rows={watchlist} search={search} />
+      )}
+      {viewMode === "kanban" && (
+        <KanbanView rows={watchlist} />
+      )}
+
+      {/* Default pipeline view (tabs + intake + pipeline + right sidebar) */}
+      {viewMode === "pipeline" && (
       <div className="grid lg:grid-cols-[1fr_300px] gap-6">
         {/* LEFT — main pipeline area */}
         <div className="space-y-6 min-w-0">
@@ -676,6 +904,7 @@ function ConnectionsPage() {
           )}
         </div>
       </div>
+      )} {/* end pipeline view */}
 
       {/* Confirm modal */}
       {showConfirm && (

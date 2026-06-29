@@ -4,6 +4,12 @@ import { supabase } from '@/lib/supabase'
 import { ChevronLeft } from 'lucide-react'
 
 export const Route = createFileRoute('/sign-in')({
+  head: () => ({
+    meta: [
+      { title: "Sign in | Hockystick" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
   component: SignIn
 })
 

@@ -73,6 +73,7 @@ export function VerificationBadge({
       <Link
         to={`/verify/${verifySlug}` as any}
         title={c.tooltip}
+        data-testid="verification-badge"
         className={`${className} cursor-pointer hover:opacity-80 transition-opacity`}
       >
         {inner}
@@ -81,7 +82,7 @@ export function VerificationBadge({
   }
 
   return (
-    <span title={c.tooltip} className={`${className} cursor-help`}>
+    <span title={c.tooltip} data-testid="verification-badge" className={`${className} cursor-help`}>
       {inner}
     </span>
   );

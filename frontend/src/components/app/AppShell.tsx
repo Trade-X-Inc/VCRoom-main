@@ -2,9 +2,10 @@ import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-route
 import { Logo } from "@/components/brand/Logo";
 import {
   LayoutGrid, Users, Building2, FileText, Briefcase,
-  MessageSquare, MessageCircle, Calendar, Sparkles, Search, Settings, ChevronsLeft, Plus, Inbox, Gavel,
-  PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, UserCircle2, Gift, Globe, Trophy, Plug, Menu, X, FileInput, Kanban, LayoutDashboard,
+  MessageSquare, MessageCircle, Calendar, Search, Settings, ChevronsLeft, Plus, Gavel,
+  PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, UserCircle2, Gift, Globe, Trophy, Menu, X, FileInput, LayoutDashboard,
 } from "lucide-react";
+import { AIOperatorPanel } from "@/components/ai/AIOperatorPanel";
 import {
   getFounderCompleteness,
   getInvestorCompleteness,
@@ -37,14 +38,12 @@ interface SearchResult {
 }
 
 const founderNav: NavItem[] = [
-  { to: "/app/desk", label: "Daily Desk", icon: LayoutDashboard },
-  { to: "/app", label: "Home", icon: ShieldCheck },
   { to: "/app/overview", label: "Overview", icon: LayoutGrid },
+  { to: "/app", label: "Workstation", icon: LayoutDashboard },
   { to: "/app/deal-rooms", label: "Deal Rooms", icon: Briefcase },
-  { to: "/app/profile", label: "Company Profile", icon: Building2 },
   { to: "/app/documents", label: "Documents", icon: FileText },
   { to: "/app/meetings", label: "Meetings", icon: Calendar },
-  { to: "/app/advisor", label: "AI Advisor", icon: Sparkles },
+  { to: "/app/connections", label: "Connections", icon: Users },
   { to: "/app/messages", label: "Team Chat", icon: MessageSquare },
   { to: "/app/directory", label: "Directory", icon: Globe },
   { to: "/app/wall", label: "The Wall", icon: Trophy },
@@ -52,13 +51,12 @@ const founderNav: NavItem[] = [
 ];
 
 const investorNav: NavItem[] = [
-  { to: "/app/investor/desk", label: "Daily Desk", icon: LayoutDashboard },
   { to: "/app/investor/overview", label: "Overview", icon: LayoutGrid },
   { to: "/app/investor/intake", label: "Deal Intake", icon: FileInput },
   { to: "/app/investor/connections", label: "Connections", icon: Users },
+  { to: "/app/investor/deal-rooms", label: "Deal Rooms", icon: Briefcase },
   { to: "/app/investor/diligence", label: "Due Diligence", icon: ClipboardCheck },
   { to: "/app/investor/analysis", label: "AI Analysis", icon: Brain },
-  { to: "/app/investor/advisor", label: "AI Advisor", icon: Sparkles },
   { to: "/app/investor/decisions", label: "Decisions", icon: Gavel },
   { to: "/app/investor/portfolio", label: "Portfolio", icon: PieChart },
   { to: "/app/meetings", label: "Meetings", icon: Calendar },
@@ -71,7 +69,6 @@ const investorNav: NavItem[] = [
 const workspaceNavFounder: NavItem[] = [
   { to: "/app/profile", label: "Profile", icon: UserCircle2 },
   { to: "/app/users", label: "Team", icon: UserCog },
-  { to: "/app/integrations", label: "Integrations", icon: Plug },
   { to: "/app/settings", label: "Settings", icon: Settings },
 ];
 
@@ -80,70 +77,9 @@ const memberProfileNav: NavItem = { to: "/app/member-profile", label: "My Profil
 const workspaceNavInvestor: NavItem[] = [
   { to: "/app/investor/profile", label: "Profile", icon: UserCircle2 },
   { to: "/app/investor/team", label: "Team", icon: Users },
-  // Feedback button is injected inline between Team and Integrations
-  { to: "/app/integrations", label: "Integrations", icon: Plug },
+  // Feedback button is injected inline after Team (index 1)
   { to: "/app/investor/settings", label: "Settings", icon: Settings },
 ];
-
-function FeedbackModal({ onClose }: { onClose: () => void }) {
-  const { user } = useAuth();
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState("");
-  const [saving, setSaving] = useState(false);
-
-  const submit = async () => {
-    if (!rating) { toast.error("Please select a rating"); return; }
-    setSaving(true);
-    try {
-      await supabase.from("feedback").insert({
-        user_id: user?.id,
-        email: user?.email,
-        rating,
-        message: comment.trim(),
-        created_at: new Date().toISOString(),
-      });
-      toast.success("Thank you for your feedback!");
-      onClose();
-    } catch (e: any) {
-      toast.error(e.message || "Failed to submit");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-      <div className="bg-card border border-border/60 rounded-2xl p-6 w-full max-w-sm shadow-xl space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-sm">How is your experience?</h3>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
-        </div>
-        <div className="flex gap-2 justify-center">
-          {[1,2,3,4,5].map((s) => (
-            <button key={s} onClick={() => setRating(s)}
-              className={`text-2xl transition-transform hover:scale-110 ${s <= rating ? "opacity-100" : "opacity-30"}`}>
-              ⭐
-            </button>
-          ))}
-        </div>
-        <textarea
-          rows={3}
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="Any comments? (optional)"
-          className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:border-brand/50"
-        />
-        <div className="flex gap-2">
-          <button onClick={onClose} className="flex-1 rounded-lg border border-border/60 py-2 text-sm hover:bg-accent transition-colors">Cancel</button>
-          <button onClick={submit} disabled={saving || !rating}
-            className="flex-1 rounded-lg bg-brand text-brand-foreground py-2 text-sm font-medium hover:bg-brand/90 disabled:opacity-50 transition-colors">
-            {saving ? "Sending…" : "Submit"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 const SIDEBAR_KEY = "hs_sidebar_expanded";
 
@@ -165,7 +101,6 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       localStorage.setItem(SIDEBAR_KEY, val ? "0" : "1");
     } catch {}
   };
-  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -301,7 +236,8 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       !path.startsWith("/app/wall") &&
       !path.startsWith("/app/referrals") &&
       !path.startsWith("/app/member-profile") &&
-      !path.startsWith("/app/audit");
+      !path.startsWith("/app/audit") &&
+      !path.startsWith("/app/feedback");
     const founderOutOfBounds = !isInvestor && path.startsWith("/app/investor") && !path.startsWith("/app/member-profile");
     if (investorOutOfBounds && lastRedirectRef.current !== "investor") {
       lastRedirectRef.current = "investor";
@@ -446,13 +382,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                 Profile {shellCompleteness.percent}% complete
               </span>
             </div>
-            <div style={{
-              height: 4,
-              background: "rgba(255,255,255,0.08)",
-              borderRadius: 2,
-              overflow: "hidden",
-              marginBottom: 8,
-            }}>
+            <div className="h-1 rounded-sm overflow-hidden mb-2 bg-muted">
               <div style={{
                 height: "100%",
                 width: `${shellCompleteness.percent}%`,
@@ -479,7 +409,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
             </div>
           )}
           {nav.map((n, index) => {
-            const active = path === n.to || path === n.to + "/" || (n.to !== "/app/overview" && n.to !== "/app/investor" && path.startsWith(n.to));
+            const active = path === n.to || path === n.to + "/" || (n.to !== "/app" && n.to !== "/app/overview" && n.to !== "/app/investor" && path.startsWith(n.to));
             const badge = (() => {
               if (n.to === "/app/deal-rooms") return dealRoomCount && dealRoomCount > 0 ? String(dealRoomCount) : undefined;
               if (n.to === "/app/investor/connections") return investorDealCount && investorDealCount > 0 ? String(investorDealCount) : undefined;
@@ -542,13 +472,14 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                     </Link>
                     {/* Inject Feedback after Team (index 1 = second item) */}
                     {idx === 1 && (
-                      <button
-                        onClick={() => { setFeedbackOpen(true); setMobileOpen(false); }}
+                      <Link
+                        to={"/app/feedback" as any}
+                        onClick={() => setMobileOpen(false)}
                         className="w-full flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors text-muted-foreground hover:bg-accent/60 hover:text-foreground"
                       >
                         <MessageCircle className="h-4 w-4" />
                         <span>Feedback</span>
-                      </button>
+                      </Link>
                     )}
                   </div>
                 );
@@ -565,7 +496,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                 <a href={resumeUrl} title={`Profile ${shellCompleteness.percent}% complete — finish it`}
                   className="mb-1 flex items-center justify-center">
                   <svg width="32" height="32" viewBox="0 0 32 32">
-                    <circle cx="16" cy="16" r="13" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3" />
+                    <circle cx="16" cy="16" r="13" fill="none" stroke="var(--color-muted)" strokeWidth="3" />
                     <circle
                       cx="16" cy="16" r="13" fill="none"
                       stroke="#7C3AED" strokeWidth="3"
@@ -594,41 +525,55 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-14 md:h-16 border-b border-border/60 bg-background/80 backdrop-blur-xl sticky top-0 z-20 flex items-center px-3 md:px-6 gap-2 md:gap-3">
-          {/* Mobile hamburger */}
-          <button
-            onClick={() => setMobileOpen(true)}
-            className="md:hidden grid h-9 w-9 place-items-center rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground shrink-0"
-          >
-            <Menu className="h-4 w-4" />
-          </button>
-
-          {/* Search — hidden on mobile, visible md+ */}
-          <div className="hidden md:flex flex-1 max-w-md">
+      {/* Main content + AI panel */}
+      <div className="flex-1 flex min-w-0 overflow-hidden">
+        {/* Content column */}
+        <div className="flex-1 flex flex-col min-w-0">
+          <header className="h-14 md:h-16 border-b border-border/60 bg-background/80 backdrop-blur-xl sticky top-0 z-20 flex items-center px-3 md:px-6 gap-2 md:gap-3">
+            {/* Mobile hamburger */}
             <button
-              onClick={() => setSearchOpen(true)}
-              className="relative w-full flex items-center rounded-md border border-border/60 bg-background/60 pl-9 pr-12 py-2 text-sm text-muted-foreground/70 hover:border-brand/40 hover:text-muted-foreground transition-colors text-left"
+              onClick={() => setMobileOpen(true)}
+              className="md:hidden grid h-9 w-9 place-items-center rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground shrink-0"
             >
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              Search investors, documents, deals…
-              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground border border-border/60 rounded px-1.5 py-0.5">⌘K</kbd>
+              <Menu className="h-4 w-4" />
             </button>
-          </div>
 
-          <div className="ml-auto flex items-center gap-1.5 md:gap-2">
-            <button className="hidden md:grid h-9 w-9 place-items-center rounded-md border border-border/60 hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
-              <Plus className="h-4 w-4" />
-            </button>
-            <ThemeToggle />
-            <NotificationBell />
-            <UserMenu />
-          </div>
-        </header>
-        <main className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto flex flex-col">{children ?? <Outlet />}</main>
+            {/* Search — hidden on mobile, visible md+ */}
+            <div className="hidden md:flex flex-1 max-w-md">
+              <button
+                onClick={() => setSearchOpen(true)}
+                className="relative w-full flex items-center rounded-md border border-border/60 bg-background/60 pl-9 pr-12 py-2 text-sm text-muted-foreground/70 hover:border-brand/40 hover:text-muted-foreground transition-colors text-left"
+              >
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                Search investors, documents, deals…
+                <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground border border-border/60 rounded px-1.5 py-0.5">⌘K</kbd>
+              </button>
+            </div>
+
+            <div className="ml-auto flex items-center gap-1.5 md:gap-2">
+              <button className="hidden md:grid h-9 w-9 place-items-center rounded-md border border-border/60 hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
+                <Plus className="h-4 w-4" />
+              </button>
+              <ThemeToggle />
+              <NotificationBell />
+              <UserMenu />
+            </div>
+          </header>
+          <main className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto flex flex-col">
+            <div className="flex flex-col flex-1 w-full max-w-[1600px] mx-auto">
+              {children ?? <Outlet />}
+            </div>
+          </main>
+        </div>
+
+        {/* AI Operator Panel — right side, full height, part of shell layout */}
+        {user && (
+          <AIOperatorPanel
+            userRole={isInvestor ? "investor" : "founder"}
+            userId={user.id}
+          />
+        )}
       </div>
-      {feedbackOpen && <FeedbackModal onClose={() => setFeedbackOpen(false)} />}
-
       {/* Global search modal */}
       {searchOpen && (
         <div
@@ -637,37 +582,36 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
         >
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <div
-            className="relative w-full max-w-xl rounded-2xl overflow-hidden shadow-2xl"
-            style={{ background: "#111118", border: "1px solid rgba(255,255,255,0.1)" }}
+            className="relative w-full max-w-xl rounded-2xl overflow-hidden shadow-2xl bg-card border border-border/60"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Input */}
-            <div className="flex items-center gap-3 p-4 border-b border-white/8">
-              <Search size={18} className="text-white/30 shrink-0" />
+            <div className="flex items-center gap-3 p-4 border-b border-border/60">
+              <Search size={18} className="text-muted-foreground shrink-0" />
               <input
                 autoFocus
                 type="text"
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 placeholder="Search founders, investors, documents..."
-                className="flex-1 bg-transparent text-white placeholder:text-white/30 outline-none text-sm"
+                className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-sm"
               />
               {searching && (
-                <div className="w-4 h-4 border-2 border-white/20 border-t-[#7C3AED] rounded-full animate-spin shrink-0" />
+                <div className="w-4 h-4 border-2 border-muted border-t-[#7C3AED] rounded-full animate-spin shrink-0" />
               )}
-              <kbd className="text-xs text-white/25 bg-white/5 px-1.5 py-0.5 rounded shrink-0">ESC</kbd>
+              <kbd className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded shrink-0">ESC</kbd>
             </div>
 
             {/* Results */}
             <div className="max-h-80 overflow-y-auto p-2">
               {searchQuery.length >= 2 && !searching && searchResults.length === 0 && (
                 <div className="py-8 text-center">
-                  <p className="text-sm text-white/30">No results for "{searchQuery}"</p>
+                  <p className="text-sm text-muted-foreground">No results for "{searchQuery}"</p>
                 </div>
               )}
               {searchQuery.length < 2 && (
                 <div className="py-6 text-center">
-                  <p className="text-xs text-white/25">Search founders, investors, documents, deal rooms</p>
+                  <p className="text-xs text-muted-foreground">Search founders, investors, documents, deal rooms</p>
                 </div>
               )}
               {(["startup", "investor", "deal_room", "document"] as const).map((type) => {
@@ -677,17 +621,17 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                 const typeIcon = { startup: "◎", investor: "✦", deal_room: "🏛", document: "≡" }[type];
                 return (
                   <div key={type} className="mb-3">
-                    <p className="text-xs text-white/25 uppercase tracking-wider px-3 mb-1">{typeIcon} {typeLabel}</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider px-3 mb-1">{typeIcon} {typeLabel}</p>
                     {typeResults.map((result) => (
                       <a
                         key={result.id}
                         href={result.url}
                         onClick={() => { setSearchOpen(false); setSearchQuery(""); setSearchResults([]); }}
-                        className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors group"
+                        className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-accent transition-colors group"
                       >
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-white group-hover:text-[#a78bfa] transition-colors truncate">{result.title}</p>
-                          {result.subtitle && <p className="text-xs text-white/40 truncate mt-0.5">{result.subtitle}</p>}
+                          <p className="text-sm font-medium text-foreground group-hover:text-[#a78bfa] transition-colors truncate">{result.title}</p>
+                          {result.subtitle && <p className="text-xs text-muted-foreground truncate mt-0.5">{result.subtitle}</p>}
                         </div>
                         <div className="flex items-center gap-1.5 ml-3 shrink-0">
                           {result.tag && (
@@ -696,7 +640,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                             </span>
                           )}
                           {result.tag2 && (
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-white/8 text-white/40">{result.tag2}</span>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{result.tag2}</span>
                           )}
                         </div>
                       </a>
@@ -709,8 +653,8 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
             {/* Footer */}
             {searchResults.length > 0 && (
               <div className="px-4 py-2 border-t border-white/5 flex items-center gap-3">
-                <span className="text-xs text-white/20">{searchResults.length} result{searchResults.length !== 1 ? "s" : ""}</span>
-                <span className="text-xs text-white/20 ml-auto">↵ to open</span>
+                <span className="text-xs text-muted-foreground">{searchResults.length} result{searchResults.length !== 1 ? "s" : ""}</span>
+                <span className="text-xs text-muted-foreground ml-auto">↵ to open</span>
               </div>
             )}
           </div>

@@ -1,4 +1,7 @@
 import { useState, useRef } from "react";
+
+const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","xlsx","xls","docx","doc","csv","png","jpg","jpeg"]);
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import {
@@ -111,6 +114,9 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
 
   const handleUploadForRequest = async (id: string, file: File) => {
     if (!userId) return;
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+    if (!ALLOWED_EXTENSIONS.has(ext)) { toast.error(`${file.name}: file type not allowed`); return; }
+    if (file.size > MAX_FILE_SIZE) { toast.error(`${file.name}: exceeds 50 MB limit`); return; }
     setUploadingId(id);
     try {
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");

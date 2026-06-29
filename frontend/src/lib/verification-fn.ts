@@ -1,8 +1,24 @@
 import { createServerFn } from "@tanstack/react-start";
+import { supabase } from "@/lib/supabase";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
+
+export type VerificationRun = {
+  startup_id: string;
+  website_resolves: boolean;
+  website_matches_pitch: boolean;
+  website_content_summary: string;
+  linkedin_valid: boolean;
+  email_domain_matches: boolean;
+  registry_confirmed: boolean;
+  tier1_score: number;
+  tier1_passed: boolean;
+  current_tier: number;
+  tier1_checked_at: string;
+  error?: string;
+};
 
 export type Tier1Result = {
   startup_id: string;
@@ -479,3 +495,48 @@ export const getPublicVerification = createServerFn({ method: "POST" })
       tier3_passed: v?.tier3_passed ?? false,
     };
   });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Edge-function wrapper — calls run-verification via HTTP (client-callable)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const EDGE_URL =
+  "https://ldimninnjlvxozubheib.supabase.co/functions/v1/run-verification";
+const ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM3MTA2MTYsImV4cCI6MjAyOTI4NjYxNn0.wLFUJmHMy0_5f5CZxE5P5CflK0v8Mop0iHLrj73uqFY";
+
+export async function runVerification({
+  startupId,
+  userId,
+  jwt,
+}: {
+  startupId: string;
+  userId: string;
+  jwt: string;
+}): Promise<VerificationRun> {
+  const res = await fetch(EDGE_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwt}`,
+      apikey: ANON_KEY,
+    },
+    body: JSON.stringify({ startup_id: startupId, user_id: userId }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error ?? `HTTP ${res.status}`);
+  return json as VerificationRun;
+}
+
+export async function fetchVerificationStatus(
+  startupId: string,
+): Promise<VerificationRun | null> {
+  const { data } = await supabase
+    .from("founder_verifications")
+    .select(
+      "startup_id, website_resolves, website_matches_pitch, website_content_summary, linkedin_valid, email_domain_matches, registry_confirmed, tier1_score, tier1_passed, current_tier, tier1_checked_at"
+    )
+    .eq("startup_id", startupId)
+    .maybeSingle();
+  return data ?? null;
+}

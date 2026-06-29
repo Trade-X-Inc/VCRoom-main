@@ -44,9 +44,8 @@ type CandidateRow = IntakeCandidate & { id: string; status: string };
 
 // ── Styles ─────────────────────────────────────────────────────────────────────
 
-const card = {
-  background: "#111114",
-  border: "1px solid rgba(255,255,255,0.07)",
+// card style is now applied via className for theme support
+const cardStyle = {
   borderRadius: 16,
   padding: "24px",
 } as React.CSSProperties;
@@ -71,8 +70,8 @@ const badge = (color: "green" | "amber" | "muted") => ({
   }),
   ...(color === "muted" && {
     background: "rgba(255,255,255,0.05)",
-    color: "rgba(255,255,255,0.4)",
-    border: "1px solid rgba(255,255,255,0.08)",
+    color: "var(--color-muted-foreground)",
+    border: "1px solid var(--color-border)",
   }),
 } as React.CSSProperties);
 
@@ -400,40 +399,37 @@ function IntakePage() {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div style={{ padding: "32px 24px", maxWidth: 860, margin: "0 auto" }}>
+    <div className="p-6 lg:p-8">
 
       {/* Header */}
-      <div style={{ marginBottom: 28 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(124,58,237,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <FileInput size={16} style={{ color: "#a78bfa" }} />
-          </div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, color: "#fff", letterSpacing: "-0.02em", margin: 0, fontFamily: "Syne, sans-serif" }}>
-            Deal Intake
-          </h1>
-          <div style={{ marginLeft: "auto" }}>
+      <div className="mb-7 flex items-start gap-3">
+        <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(124,58,237,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <FileInput size={16} style={{ color: "#a78bfa" }} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-foreground m-0" style={{ fontFamily: "Syne, sans-serif" }}>
+              Deal Intake
+            </h1>
             <PageGuide pageId="investor-intake" />
           </div>
+          <p className="text-sm text-muted-foreground mt-1 leading-relaxed max-w-xl">
+            Paste, upload, or link any founder data. We extract contacts, score against your thesis, and surface the strongest matches.
+          </p>
         </div>
-        <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", lineHeight: 1.6, margin: 0, maxWidth: 600 }}>
-          Paste, upload, or link any founder data. We extract contacts, score against your thesis, and surface the strongest matches.
-        </p>
       </div>
 
       {/* ── Past intake runs (ABOVE the inputs) ────────────────────────── */}
       {batches.length === 0 && !investorProfile?.id ? null : (
         <div style={{ marginBottom: 28 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-            <History size={13} style={{ color: "rgba(255,255,255,0.3)" }} />
-            <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            <History size={13} style={{ color: "var(--color-muted-foreground)" }} />
+            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
               Past intake runs
             </span>
           </div>
           {batches.length === 0 ? (
-            <div style={{
-              background: "#111114", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10,
-              padding: "16px 20px", fontSize: 13, color: "rgba(255,255,255,0.25)",
-            }}>
+            <div className="rounded-xl border border-border/60 bg-card px-5 py-4 text-sm text-muted-foreground">
               No intake runs yet — parse your first batch below.
             </div>
           ) : (
@@ -452,7 +448,7 @@ function IntakePage() {
                   const strongCount = batchStrongCounts[b.id];
 
                   return (
-                    <div key={b.id} style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, overflow: "hidden" }}>
+                    <div key={b.id} className="bg-card border border-border/60 rounded-xl overflow-hidden">
                       <button
                         onClick={() => {
                           prefetchBatchStrongCount(b.id);
@@ -472,10 +468,10 @@ function IntakePage() {
                         </div>
                         {/* Label */}
                         <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: b.status === "processing" ? "rgba(255,255,255,0.4)" : "#fff" }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)" }}>
                             {typeLabel} — {dateLabel}
                           </div>
-                          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginTop: 2 }}>
+                          <div style={{ fontSize: 11, color: "var(--color-muted-foreground)", marginTop: 2 }}>
                             {b.status === "processing" ? "Processing…" : b.status === "failed" ? "Parse failed" : b.parsed_count != null ? `${b.parsed_count} lead${b.parsed_count !== 1 ? "s" : ""}` : "No leads found"}
                           </div>
                         </div>
@@ -489,17 +485,17 @@ function IntakePage() {
                           <span style={{ fontSize: 11, color: "#ef4444", flexShrink: 0 }}>Failed</span>
                         )}
                         {b.status === "processing" ? null : loadingBatch === b.id
-                          ? <Loader2 size={13} style={{ color: "rgba(255,255,255,0.3)", flexShrink: 0 }} className="animate-spin" />
+                          ? <Loader2 size={13} style={{ color: "var(--color-muted-foreground)", flexShrink: 0 }} className="animate-spin" />
                           : expandedBatchId === b.id
-                          ? <ChevronUp size={13} style={{ color: "rgba(255,255,255,0.3)", flexShrink: 0 }} />
-                          : <ChevronDown size={13} style={{ color: "rgba(255,255,255,0.3)", flexShrink: 0 }} />
+                          ? <ChevronUp size={13} style={{ color: "var(--color-muted-foreground)", flexShrink: 0 }} />
+                          : <ChevronDown size={13} style={{ color: "var(--color-muted-foreground)", flexShrink: 0 }} />
                         }
                       </button>
 
                       {expandedBatchId === b.id && batchCandidates[b.id] && (
-                        <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "12px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
+                        <div style={{ borderTop: "1px solid var(--hs-border)", padding: "12px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
                           {batchCandidates[b.id].length === 0 ? (
-                            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.3)", margin: 0 }}>No candidates extracted from this batch.</p>
+                            <p style={{ fontSize: 13, color: "var(--color-muted-foreground)", margin: 0 }}>No candidates extracted from this batch.</p>
                           ) : (
                             batchCandidates[b.id].map((c) => (
                               <CandidateCard key={c.id} candidate={c} watchlistNames={watchlistNames} compact />
@@ -519,17 +515,17 @@ function IntakePage() {
       <div style={{ marginBottom: 24, padding: "12px 16px", background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" as const }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" as const }}>
           <Target size={13} style={{ color: "#A855F7", flexShrink: 0 }} />
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>Your current thesis:</span>
+          <span style={{ fontSize: 12, color: "var(--color-foreground)" }}>Your current thesis:</span>
           {investorProfile?.sectors?.length ? (
             <span style={{ fontSize: 12, color: "#A855F7", fontWeight: 600 }}>{investorProfile.sectors.slice(0, 2).join(", ")}</span>
-          ) : <span style={{ fontSize: 12, color: "rgba(255,255,255,0.25)" }}>No sectors set</span>}
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.2)" }}>·</span>
+          ) : <span style={{ fontSize: 12, color: "var(--color-muted-foreground)" }}>No sectors set</span>}
+          <span style={{ fontSize: 12, color: "var(--color-muted-foreground)" }}>·</span>
           {investorProfile?.stages?.length ? (
             <span style={{ fontSize: 12, color: "#A855F7", fontWeight: 600 }}>{investorProfile.stages.slice(0, 2).join(", ")}</span>
-          ) : <span style={{ fontSize: 12, color: "rgba(255,255,255,0.25)" }}>No stages set</span>}
+          ) : <span style={{ fontSize: 12, color: "var(--color-muted-foreground)" }}>No stages set</span>}
           {investorProfile?.geography && (
             <>
-              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.2)" }}>·</span>
+              <span style={{ fontSize: 12, color: "var(--color-muted-foreground)" }}>·</span>
               <span style={{ fontSize: 12, color: "#A855F7", fontWeight: 600 }}>{investorProfile.geography}</span>
             </>
           )}
@@ -545,12 +541,12 @@ function IntakePage() {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
 
         {/* Section 1 — Paste */}
-        <div style={{ ...card, display: "flex", flexDirection: "column" as const, gap: 12 }}>
+        <div style={{ ...cardStyle, display: "flex", flexDirection: "column" as const, gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <FileInput size={14} style={{ color: "#A855F7" }} />
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>Paste raw data</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)" }}>Paste raw data</span>
           </div>
-          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", margin: 0, lineHeight: 1.5 }}>
+          <p style={{ fontSize: 12, color: "var(--color-muted-foreground)", margin: 0, lineHeight: 1.5 }}>
             Forwarded emails, LinkedIn exports, event attendee lists, CRM exports — paste anything.
           </p>
           <textarea
@@ -561,12 +557,12 @@ function IntakePage() {
             style={{
               flex: 1,
               minHeight: 180,
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.08)",
+              background: "var(--color-muted)",
+              border: "1px solid var(--color-border)",
               borderRadius: 8,
               padding: "12px 14px",
               fontSize: 13,
-              color: "#fff",
+              color: "var(--color-foreground)",
               resize: "vertical" as const,
               outline: "none",
               fontFamily: "inherit",
@@ -575,7 +571,7 @@ function IntakePage() {
               opacity: parsing ? 0.5 : 1,
             }}
           />
-          <p style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", margin: 0 }}>
+          <p style={{ fontSize: 11, color: "var(--color-muted-foreground)", margin: 0 }}>
             Plain text, CSV, or JSON supported
           </p>
         </div>
@@ -583,11 +579,11 @@ function IntakePage() {
         <div style={{ display: "flex", flexDirection: "column" as const, gap: 16 }}>
 
           {/* Section 2 — Upload files */}
-          <div style={{ ...card }}>
+          <div style={{ ...cardStyle }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <Upload size={14} style={{ color: "#A855F7" }} />
-                <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>Upload files</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)" }}>Upload files</span>
               </div>
               <button
                 onClick={downloadTemplate}
@@ -596,7 +592,7 @@ function IntakePage() {
                 <Download size={10} /> Sample template
               </button>
             </div>
-            <p style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", margin: "0 0 10px", lineHeight: 1.5 }}>
+            <p style={{ fontSize: 11, color: "var(--color-muted-foreground)", margin: "0 0 10px", lineHeight: 1.5 }}>
               Excel (.xlsx), CSV, or PDF pitch decks — up to 20 files
             </p>
             <input
@@ -611,8 +607,8 @@ function IntakePage() {
               <div style={{ display: "flex", flexDirection: "column" as const, gap: 6, marginBottom: 10 }}>
                 {uploadedFiles.map((f, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)", borderRadius: 6, padding: "5px 10px" }}>
-                    <span style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const, maxWidth: "85%" }}>{f.name}</span>
-                    <button onClick={() => removeFile(i)} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.3)", padding: 0, flexShrink: 0 }}>
+                    <span style={{ fontSize: 12, color: "var(--color-foreground)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const, maxWidth: "85%" }}>{f.name}</span>
+                    <button onClick={() => removeFile(i)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-muted-foreground)", padding: 0, flexShrink: 0 }}>
                       <X size={12} />
                     </button>
                   </div>
@@ -622,7 +618,7 @@ function IntakePage() {
             {uploadedFiles.length < 20 && (
               <button
                 onClick={() => fileInputRef.current?.click()}
-                style={{ width: "100%", background: "rgba(255,255,255,0.03)", border: "1px dashed rgba(255,255,255,0.15)", borderRadius: 8, padding: "10px", fontSize: 12, color: "rgba(255,255,255,0.4)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+                style={{ width: "100%", background: "var(--color-muted)", border: "1px dashed rgba(255,255,255,0.15)", borderRadius: 8, padding: "10px", fontSize: 12, color: "var(--color-muted-foreground)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
               >
                 <Plus size={13} /> Add files
               </button>
@@ -630,12 +626,12 @@ function IntakePage() {
           </div>
 
           {/* Section 3 — Add links */}
-          <div style={{ ...card }}>
+          <div style={{ ...cardStyle }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
               <Link2 size={14} style={{ color: "#A855F7" }} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>Add links</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)" }}>Add links</span>
             </div>
-            <p style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", margin: "0 0 10px", lineHeight: 1.5 }}>
+            <p style={{ fontSize: 11, color: "var(--color-muted-foreground)", margin: "0 0 10px", lineHeight: 1.5 }}>
               Pitch deck links, LinkedIn profiles, websites — up to 20
             </p>
             <div style={{ display: "flex", flexDirection: "column" as const, gap: 6 }}>
@@ -646,10 +642,10 @@ function IntakePage() {
                     value={l}
                     onChange={(e) => updateLink(i, e.target.value)}
                     placeholder="https://…"
-                    style={{ flex: 1, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px 10px", fontSize: 12, color: "#fff", outline: "none" }}
+                    style={{ flex: 1, background: "var(--color-muted)", border: "1px solid var(--color-border)", borderRadius: 7, padding: "7px 10px", fontSize: 12, color: "var(--color-foreground)", outline: "none" }}
                   />
                   {links.length > 1 && (
-                    <button onClick={() => removeLink(i)} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.3)", padding: 2, flexShrink: 0 }}>
+                    <button onClick={() => removeLink(i)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-muted-foreground)", padding: 2, flexShrink: 0 }}>
                       <X size={12} />
                     </button>
                   )}
@@ -669,8 +665,8 @@ function IntakePage() {
       </div>
 
       {/* Section 4 — What we evaluate */}
-      <div style={{ marginBottom: 16, padding: "14px 18px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10 }}>
-        <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.3)", textTransform: "uppercase" as const, letterSpacing: "0.1em", marginBottom: 10 }}>
+      <div style={{ marginBottom: 16, padding: "14px 18px", background: "rgba(255,255,255,0.02)", border: "1px solid var(--color-border)", borderRadius: 10 }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: "var(--color-muted-foreground)", textTransform: "uppercase" as const, letterSpacing: "0.1em", marginBottom: 10 }}>
           What we evaluate
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 24px" }}>
@@ -681,7 +677,7 @@ function IntakePage() {
             "Red flags against your exclusion criteria",
             "Overall match score (0–100)",
           ].map((item) => (
-            <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: 7, fontSize: 12, color: "rgba(255,255,255,0.5)", lineHeight: 1.5 }}>
+            <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: 7, fontSize: 12, color: "var(--color-foreground)", lineHeight: 1.5 }}>
               <CheckCircle2 size={12} style={{ color: "#10B981", flexShrink: 0, marginTop: 2 }} />
               {item}
             </div>
@@ -701,8 +697,8 @@ function IntakePage() {
         onClick={handleSubmit}
         disabled={parsing || !hasInput}
         style={{
-          background: parsing || !hasInput ? "rgba(255,255,255,0.06)" : "#7C3AED",
-          color: parsing || !hasInput ? "rgba(255,255,255,0.3)" : "#fff",
+          background: parsing || !hasInput ? "var(--hs-bg-secondary)" : "#7C3AED",
+          color: parsing || !hasInput ? "var(--hs-text-muted)" : "#fff",
           border: "none",
           borderRadius: 10,
           padding: "13px 24px",
@@ -735,7 +731,7 @@ function IntakePage() {
         <div style={{ marginTop: 32 }}>
           {/* Summary bar */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 20 }}>
-            <div style={{ fontSize: 15, fontWeight: 600, color: "#fff" }}>
+            <div style={{ fontSize: 15, fontWeight: 600, color: "var(--color-foreground)" }}>
               Found <span style={{ color: "#a78bfa" }}>{currentCandidates.length}</span> potential lead{currentCandidates.length !== 1 ? "s" : ""} from this batch
             </div>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -770,7 +766,7 @@ function IntakePage() {
           </div>
 
           {filtered.length === 0 && (
-            <div style={{ textAlign: "center", padding: "40px 24px", color: "rgba(255,255,255,0.3)", fontSize: 14 }}>
+            <div style={{ textAlign: "center", padding: "40px 24px", color: "var(--color-muted-foreground)", fontSize: 14 }}>
               No results match this filter.
             </div>
           )}
@@ -900,22 +896,19 @@ function CandidateCard({
   }
 
   return (
-    <div style={{
-      background: "#111114",
-      border: "1px solid rgba(255,255,255,0.07)",
-      borderRadius: 12,
-      padding: compact ? "14px 16px" : "20px",
-      opacity: c.status === "reviewed" ? 0.6 : 1,
-    }}>
+    <div
+      className="bg-card border border-border/60 rounded-xl"
+      style={{ padding: compact ? "14px 16px" : "20px", opacity: c.status === "reviewed" ? 0.6 : 1 }}
+    >
       {/* Top row */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
-            <span style={{ fontSize: 15, fontWeight: 600, color: "#fff" }}>
+            <span className="text-base font-semibold text-foreground">
               {c.company_name || "Unknown company"}
             </span>
             {c.founder_name && (
-              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.35)" }}>
+              <span style={{ fontSize: 12, color: "var(--color-muted-foreground)" }}>
                 · {c.founder_name}
               </span>
             )}
@@ -966,7 +959,7 @@ function CandidateCard({
       {!compact && c.thesis_fit_reasons && c.thesis_fit_reasons.length > 1 && (
         <ul style={{ margin: "6px 0 0", padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 3 }}>
           {c.thesis_fit_reasons.slice(1).map((r, i) => (
-            <li key={i} style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", display: "flex", gap: 6 }}>
+            <li key={i} style={{ fontSize: 12, color: "var(--color-muted-foreground)", display: "flex", gap: 6 }}>
               <span style={{ color: "rgba(255,255,255,0.15)", flexShrink: 0 }}>·</span>
               {r}
             </li>
@@ -1016,7 +1009,7 @@ function CandidateCard({
               target="_blank"
               rel="noopener noreferrer"
               style={{
-                fontSize: 12, fontWeight: 600, color: "#fff",
+                fontSize: 12, fontWeight: 600, color: "var(--color-foreground)",
                 background: "#7C3AED", border: "none", borderRadius: 7,
                 padding: "6px 14px", cursor: "pointer", textDecoration: "none",
                 display: "inline-flex", alignItems: "center", gap: 5,
@@ -1067,7 +1060,7 @@ function CandidateCard({
               style={{
                 fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.6)",
                 background: "transparent",
-                border: "1px solid rgba(255,255,255,0.1)",
+                border: "1px solid var(--color-border)",
                 borderRadius: 7,
                 padding: "6px 14px", cursor: "pointer",
               }}
@@ -1076,7 +1069,7 @@ function CandidateCard({
             </button>
           )}
           {c.status === "reviewed" && (
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", display: "flex", alignItems: "center", gap: 4 }}>
+            <span style={{ fontSize: 12, color: "var(--color-muted-foreground)", display: "flex", alignItems: "center", gap: 4 }}>
               <CheckCircle2 size={11} /> Tracked
             </span>
           )}
@@ -1084,7 +1077,7 @@ function CandidateCard({
             <button
               onClick={() => setSnippetOpen((v) => !v)}
               style={{
-                fontSize: 12, color: "rgba(255,255,255,0.3)",
+                fontSize: 12, color: "var(--color-muted-foreground)",
                 background: "transparent", border: "none",
                 cursor: "pointer", display: "flex", alignItems: "center", gap: 4, padding: 0,
               }}
@@ -1113,10 +1106,10 @@ function CandidateCard({
             )}
           </div>
           {briefResult.headline && (
-            <p style={{ fontSize: 13, fontWeight: 600, color: "#fff", margin: "0 0 6px", lineHeight: 1.4 }}>{briefResult.headline}</p>
+            <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)", margin: "0 0 6px", lineHeight: 1.4 }}>{briefResult.headline}</p>
           )}
           {briefResult.investment_thesis && (
-            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", lineHeight: 1.5 }}>{briefResult.investment_thesis.slice(0, 200)}{briefResult.investment_thesis.length > 200 ? "…" : ""}</p>
+            <p style={{ fontSize: 12, color: "var(--color-foreground)", margin: "0 0 8px", lineHeight: 1.5 }}>{briefResult.investment_thesis.slice(0, 200)}{briefResult.investment_thesis.length > 200 ? "…" : ""}</p>
           )}
           {briefResult.strengths?.length > 0 && (
             <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 3 }}>
@@ -1135,11 +1128,11 @@ function CandidateCard({
         <div style={{
           marginTop: 12,
           padding: "10px 14px",
-          background: "rgba(255,255,255,0.03)",
+          background: "var(--color-muted)",
           border: "1px solid rgba(255,255,255,0.06)",
           borderRadius: 8,
           fontSize: 12,
-          color: "rgba(255,255,255,0.4)",
+          color: "var(--color-muted-foreground)",
           fontFamily: "monospace",
           lineHeight: 1.7,
           whiteSpace: "pre-wrap" as const,

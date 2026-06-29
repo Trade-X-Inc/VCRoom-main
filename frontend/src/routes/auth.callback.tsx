@@ -116,16 +116,16 @@ function AuthCallback() {
         } else if (!existing?.role) {
           // Brand new founder — go to profile builder unless they already dismissed it
           const alreadySkipped = localStorage.getItem('pb_skipped') === '1';
-          window.location.href = alreadySkipped ? '/app' : '/app/profile-builder';
+          window.location.href = alreadySkipped ? '/app/overview' : '/app/profile-builder';
         } else {
-          // Returning founder — if they have a startup already, go straight to /app.
+          // Returning founder — if they have a startup, go straight to /app/overview.
           // Only send to profile-builder if they have no startup row yet.
           const { data: startup } = await supabase
             .from('startups')
             .select('id')
             .eq('founder_id', userId)
             .maybeSingle();
-          window.location.href = startup?.id ? '/app' : '/app/profile-builder';
+          window.location.href = startup?.id ? '/app/overview' : '/app/profile-builder';
         }
       } catch (err) {
         console.error('Callback error:', err)

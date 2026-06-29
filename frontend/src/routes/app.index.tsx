@@ -6,6 +6,7 @@ import {
   Loader2, ChevronRight, Users, Globe, Linkedin, Mail,
   Building2, Briefcase, Clock, Eye, Check, X,
   Zap, TrendingUp, TrendingDown, AlertTriangle, ArrowRight,
+  ScanLine,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
@@ -13,7 +14,7 @@ import { supabase } from "@/lib/supabase";
 import { AttachProofModal } from "@/components/app/AttachProofModal";
 import { PageGuide } from "@/components/app/PageGuide";
 import type { StartupClaim, ClaimStatus } from "@/lib/claims-fn";
-import type { ReadinessResult } from "@/lib/readiness-fn";
+import type { ReadinessResult, ScoreRun, ScoreRunFactor, ScoreRunGap } from "@/lib/readiness-fn";
 
 export const Route = createFileRoute("/app/")({
   component: FounderHome,
@@ -53,7 +54,7 @@ const CLAIM_STATUS_STYLE: Record<ClaimStatus, { style: React.CSSProperties; labe
     label: "Unverified",
   },
   pending_review: {
-    style: { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.5)" },
+    style: { background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)", color: "#7C3AED" },
     label: "Proof attached",
   },
   ai_confirmed: {
@@ -78,15 +79,15 @@ function CheckRow({
   note?: string | null;
 }) {
   return (
-    <div className="flex items-start gap-3 py-3 border-b last:border-0" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-      <span className="mt-0.5 text-white/30 shrink-0">{icon}</span>
+    <div className="flex items-start gap-3 py-3 border-b border-border/60 last:border-0">
+      <span className="mt-0.5 text-muted-foreground dark:text-white/30 shrink-0">{icon}</span>
       <div className="flex-1 min-w-0">
-        <span className="text-sm text-white/70">{label}</span>
-        {note && <p className="text-xs text-white/35 mt-0.5 leading-relaxed truncate" title={note}>{note}</p>}
+        <span className="text-sm text-foreground/70 dark:text-white/70">{label}</span>
+        {note && <p className="text-xs text-muted-foreground dark:text-white/35 mt-0.5 leading-relaxed truncate" title={note}>{note}</p>}
       </div>
       <div className="shrink-0">
         {passed === null ? (
-          <span className="text-xs text-white/25">Not checked</span>
+          <span className="text-xs text-muted-foreground dark:text-white/25">Not checked</span>
         ) : passed ? (
           <span className="flex items-center gap-1 text-xs" style={{ color: "#10B981" }}>
             <CheckCircle2 className="h-3.5 w-3.5" /> Pass
@@ -181,7 +182,7 @@ function VerificationCard({
   }
 
   const headerBadgeStyle: React.CSSProperties = neverRun
-    ? { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.3)" }
+    ? { background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.15)", color: "rgba(124,58,237,0.7)" }
     : tier1Passed
     ? { background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }
     : { background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", color: "#F59E0B" };
@@ -214,25 +215,18 @@ function VerificationCard({
 
   return (
     <>
-      <div
-        style={{
-          background: "#111114",
-          border: "1px solid rgba(255,255,255,0.08)",
-          borderRadius: 16,
-          overflow: "hidden",
-        }}
-      >
+      <div className="rounded-2xl border border-border/60 bg-card overflow-hidden">
         {/* Card header */}
         <div
-          style={{ padding: "20px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-          className="flex items-start justify-between gap-4 flex-wrap"
+          className="flex items-start justify-between gap-4 flex-wrap border-b border-border/60"
+          style={{ padding: "20px 24px" }}
         >
           <div className="flex items-start gap-3">
             <div
               className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
               style={{
                 background: neverRun
-                  ? "rgba(255,255,255,0.05)"
+                  ? "var(--color-muted)"
                   : tier1Passed
                   ? "rgba(16,185,129,0.12)"
                   : "rgba(245,158,11,0.1)",
@@ -241,18 +235,18 @@ function VerificationCard({
               <ShieldCheck
                 className="h-4.5 w-4.5"
                 style={{
-                  color: neverRun ? "rgba(255,255,255,0.25)" : tier1Passed ? "#10B981" : "#F59E0B",
+                  color: neverRun ? "var(--color-muted-foreground)" : tier1Passed ? "#10B981" : "#F59E0B",
                 }}
               />
             </div>
             <div>
               <h2
-                className="text-sm font-semibold text-white"
+                className="text-sm font-semibold text-foreground"
                 style={{ fontFamily: "Syne, sans-serif" }}
               >
                 Verification
               </h2>
-              <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{subtext}</p>
+              <p className="text-xs mt-0.5 text-muted-foreground">{subtext}</p>
             </div>
           </div>
 
@@ -268,8 +262,7 @@ function VerificationCard({
                 href={`/verify/${profileSlug}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[11px] flex items-center gap-1 transition-colors"
-                style={{ color: "rgba(255,255,255,0.3)" }}
+                className="text-[11px] flex items-center gap-1 transition-colors text-muted-foreground"
               >
                 Public report <ChevronRight className="h-3 w-3" />
               </a>
@@ -288,7 +281,7 @@ function VerificationCard({
                   background: "rgba(124,58,237,0.06)",
                   border: "1px solid rgba(124,58,237,0.15)",
                   padding: "12px 16px",
-                  color: "rgba(255,255,255,0.45)",
+                  color: "var(--color-muted-foreground)",
                 }}
               >
                 Automated checks confirm your website resolves, your LinkedIn URL exists, your email domain
@@ -296,6 +289,7 @@ function VerificationCard({
                 the investor side — the badge is visible on your public profile.
               </div>
               <button
+                data-testid="run-verification-btn"
                 onClick={handleRunTier1}
                 disabled={running}
                 className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-white transition-colors"
@@ -317,13 +311,14 @@ function VerificationCard({
           {!neverRun && (
             <div>
               {verifLoading ? (
-                <div className="flex items-center gap-2 py-4 text-sm text-white/30">
+                <div className="flex items-center gap-2 py-4 text-sm text-muted-foreground dark:text-white/30">
                   <Loader2 className="h-4 w-4 animate-spin" /> Loading…
                 </div>
               ) : (
                 <div
+                  data-testid="verification-result"
                   className="rounded-lg overflow-hidden mb-4"
-                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+                  style={{ background: "var(--color-muted)", border: "var(--color-border)" }}
                 >
                   <div style={{ padding: "0 16px" }}>
                     <CheckRow
@@ -356,17 +351,18 @@ function VerificationCard({
                     />
                   </div>
                   <div
-                    style={{ padding: "10px 16px", borderTop: "1px solid rgba(255,255,255,0.05)" }}
+                    style={{ padding: "10px 16px", borderTop: "1px solid var(--color-border)" }}
                     className="flex items-center justify-between"
                   >
-                    <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
+                    <span className="text-xs text-muted-foreground">
                       Score: {tier1Score}/100 — {tier1Passed ? "passed (60 required)" : "60 needed to pass"}
                     </span>
                     <button
+                      data-testid="run-verification-btn"
                       onClick={handleRunTier1}
                       disabled={running}
                       className="text-xs flex items-center gap-1 transition-colors"
-                      style={{ color: "rgba(255,255,255,0.3)", cursor: running ? "not-allowed" : "pointer" }}
+                      style={{ color: "var(--color-muted-foreground)", cursor: running ? "not-allowed" : "pointer" }}
                     >
                       {running ? <><Loader2 className="h-3 w-3 animate-spin" /> Re-running…</> : "Re-run checks"}
                     </button>
@@ -377,9 +373,9 @@ function VerificationCard({
           )}
 
           {/* Claims subsection */}
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 16, marginTop: neverRun ? 16 : 0 }}>
+          <div className="border-t border-border/40 pt-4" style={{ marginTop: neverRun ? 16 : 0 }}>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-white/60 uppercase tracking-wider" style={{ letterSpacing: "0.1em" }}>
+              <span className="text-xs font-semibold text-foreground/60 dark:text-white/60 uppercase tracking-wider" style={{ letterSpacing: "0.1em" }}>
                 Claims
               </span>
               <span
@@ -394,12 +390,17 @@ function VerificationCard({
               >
                 {claims.length === 0
                   ? "No claims yet"
-                  : `${confirmedClaims}/${claims.length} verified`}
+                  : `${confirmedClaims}/${claims.length} with evidence`}
               </span>
             </div>
+            {claims.length > 0 && (
+              <div className="mb-3 rounded-lg px-3 py-2.5 text-xs leading-relaxed" style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", color: "#F59E0B" }}>
+                These are self-reported claims. Upload supporting documents to allow AI verification. Verified claims are shown to investors with source evidence.
+              </div>
+            )}
 
             {claims.length === 0 && (
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+              <p className="text-xs text-muted-foreground">
                 Save traction data (revenue, growth rate, customer count) on your{" "}
                 <Link to="/app/profile" className="underline underline-offset-2 hover:opacity-70" style={{ color: "rgba(124,58,237,0.8)" }}>
                   Company Profile
@@ -417,11 +418,11 @@ function VerificationCard({
                     <div
                       key={claim.id}
                       className="flex items-center justify-between gap-3 rounded-lg px-3 py-2.5"
-                      style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.06)" }}
+                      style={{ background: "rgba(255,255,255,0.025)", border: "var(--color-border)" }}
                     >
                       <div className="flex-1 min-w-0">
-                        <span className="text-sm text-white/70 truncate block">{claim.claim_label}</span>
-                        <span className="text-xs text-white/35 truncate block">{claim.claim_value}</span>
+                        <span className="text-sm text-foreground/70 dark:text-white/70 truncate block">{claim.claim_label}</span>
+                        <span className="text-xs text-muted-foreground dark:text-white/35 truncate block">{claim.claim_value}</span>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <span
@@ -442,7 +443,7 @@ function VerificationCard({
                             className="text-[11px] underline underline-offset-2 transition-colors"
                             style={{ color: "rgba(124,58,237,0.8)", background: "none", border: "none", cursor: "pointer", padding: 0 }}
                           >
-                            Attach proof
+                            Upload evidence
                           </button>
                         )}
                       </div>
@@ -454,16 +455,16 @@ function VerificationCard({
           </div>
 
           {/* Cap table subsection */}
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 16, marginTop: 16 }}>
+          <div className="border-t border-border/40 pt-4 mt-4">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-white/60 uppercase tracking-wider" style={{ letterSpacing: "0.1em" }}>
+              <span className="text-xs font-semibold text-foreground/60 dark:text-white/60 uppercase tracking-wider" style={{ letterSpacing: "0.1em" }}>
                 Cap Table
               </span>
               <span
                 className="text-[11px] px-2 py-0.5 rounded-full"
                 style={
                   capRows.length === 0
-                    ? { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.3)", border: "1px solid rgba(255,255,255,0.08)" }
+                    ? { background: "var(--color-muted)", color: "var(--color-muted-foreground)", border: "1px solid var(--color-border)" }
                     : capVerifiedCount === capRows.length
                     ? { background: "rgba(16,185,129,0.12)", color: "#10B981", border: "1px solid rgba(16,185,129,0.2)" }
                     : { background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1px solid rgba(245,158,11,0.2)" }
@@ -477,8 +478,8 @@ function VerificationCard({
 
             {capRows.length === 0 ? (
               <div className="flex items-center gap-2">
-                <Users className="h-3.5 w-3.5 shrink-0" style={{ color: "rgba(255,255,255,0.2)" }} />
-                <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+                <Users className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--color-muted-foreground)" }} />
+                <span className="text-xs text-muted-foreground">
                   No cap table entries yet.{" "}
                   <Link
                     to="/app/profile"
@@ -491,7 +492,7 @@ function VerificationCard({
               </div>
             ) : (
               <div className="flex items-center justify-between">
-                <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
+                <span className="text-xs text-muted-foreground">
                   Visible only to you — not shared with investors by default.
                 </span>
                 <Link
@@ -580,17 +581,17 @@ function ConfirmDialog({
       onClick={onCancel}
     >
       <div
-        style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: "24px 28px", maxWidth: 380, width: "100%" }}
+        className="bg-card border border-border/60 rounded-xl p-7 w-full max-w-sm"
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="text-sm text-white/80 leading-relaxed mb-5">{message}</p>
+        <p className="text-sm text-foreground leading-relaxed mb-5">{message}</p>
         <div className="flex justify-end gap-2">
-          <button onClick={onCancel} className="px-4 py-2 text-xs text-white/40 hover:text-white/70 transition-colors">
+          <button onClick={onCancel} className="px-4 py-2 text-xs text-white/40 hover:text-foreground/70 dark:text-white/70 transition-colors">
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 text-xs font-medium rounded-lg text-white transition-colors"
+            className="px-4 py-2 text-xs font-medium rounded-lg text-white dark:text-white transition-colors"
             style={{ background: confirmDanger ? "#EF4444" : "#7C3AED" }}
           >
             {confirmLabel}
@@ -649,19 +650,11 @@ function ReadinessCard({
   };
 
   return (
-    <div
-      className="mt-4"
-      style={{
-        background: "#111114",
-        border: "1px solid rgba(255,255,255,0.08)",
-        borderRadius: 16,
-        overflow: "hidden",
-      }}
-    >
+    <div className="mt-4 rounded-2xl border border-border/60 bg-card overflow-hidden">
       {/* Header */}
       <div
-        style={{ padding: "20px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-        className="flex items-start justify-between gap-4 flex-wrap"
+        className="flex items-start justify-between gap-4 flex-wrap border-b border-border/60"
+        style={{ padding: "20px 24px" }}
       >
         <div className="flex items-start gap-3">
           <div
@@ -671,10 +664,10 @@ function ReadinessCard({
             <Zap className="h-4 w-4" style={{ color: passed ? "#10B981" : "#F59E0B" }} />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-white" style={{ fontFamily: "Syne, sans-serif" }}>
+            <h2 className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
               Investor Readiness
             </h2>
-            <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
+            <p className="text-xs mt-0.5 text-muted-foreground">
               Composite signal from verification, claims, and simulation
             </p>
           </div>
@@ -709,7 +702,7 @@ function ReadinessCard({
       {/* Body */}
       <div style={{ padding: "20px 24px" }}>
         {isLoading ? (
-          <div className="flex items-center gap-2 text-white/30">
+          <div className="flex items-center gap-2 text-muted-foreground dark:text-white/30">
             <Loader2 className="h-4 w-4 animate-spin" />
             <span className="text-sm">Computing readiness…</span>
           </div>
@@ -723,7 +716,7 @@ function ReadinessCard({
               >
                 {score}
               </span>
-              <span className="text-lg text-white/30 mb-1">/100</span>
+              <span className="text-lg text-muted-foreground dark:text-white/30 mb-1">/100</span>
               {passed && (
                 <span className="mb-2 text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(16,185,129,0.15)", color: "#10B981" }}>
                   Ready for outreach
@@ -758,8 +751,8 @@ function ReadinessCard({
                   className="rounded-lg px-3 py-2 text-xs"
                   style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
                 >
-                  <div className="font-medium text-white/60">{label} <span className="text-white/25">({weight})</span></div>
-                  <div className="font-semibold mt-0.5" style={{ color: na ? "rgba(255,255,255,0.25)" : value >= 60 ? "#10B981" : value >= 30 ? "#F59E0B" : "#EF4444" }}>
+                  <div className="font-medium text-foreground/60 dark:text-white/60">{label} <span className="text-muted-foreground dark:text-white/25">({weight})</span></div>
+                  <div className="font-semibold mt-0.5" style={{ color: na ? "var(--color-muted-foreground)" : value >= 60 ? "#10B981" : value >= 30 ? "#F59E0B" : "#EF4444" }}>
                     {na ? "Not run" : `${value}/100`}
                   </div>
                 </div>
@@ -778,7 +771,7 @@ function ReadinessCard({
                     All three signals are strong
                   </span>
                 </div>
-                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
+                <p className="text-xs leading-relaxed text-muted-foreground">
                   Your verification, claims, and simulation are in good shape. Start warm outreach with confidence.
                 </p>
               </div>
@@ -787,7 +780,7 @@ function ReadinessCard({
             {/* Blockers — only real, true blockers */}
             {!passed && blockers.length > 0 && (
               <div className="space-y-2">
-                <p className="text-xs font-medium uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.3)" }}>
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   What's blocking you
                 </p>
                 {blockers.map((b, i) => (
@@ -800,7 +793,7 @@ function ReadinessCard({
                     <span className="mt-0.5 shrink-0" style={{ color: "#F59E0B" }}>
                       {BLOCKER_ICON[b.type] ?? <AlertTriangle className="h-3.5 w-3.5" />}
                     </span>
-                    <span className="text-xs leading-relaxed flex-1" style={{ color: "rgba(255,255,255,0.6)" }}>
+                    <span className="text-xs leading-relaxed flex-1 text-foreground/70">
                       {b.message}
                     </span>
                     <ArrowRight className="h-3.5 w-3.5 shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: "#F59E0B" }} />
@@ -810,7 +803,7 @@ function ReadinessCard({
             )}
 
             {!passed && blockers.length === 0 && (
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+              <p className="text-xs text-muted-foreground">
                 Score is below 70 — continue improving your profile to unlock outreach readiness.
               </p>
             )}
@@ -964,17 +957,9 @@ function DealActivityCard({
 
   return (
     <>
-      <div
-        style={{
-          background: "#111114",
-          border: "1px solid rgba(255,255,255,0.08)",
-          borderRadius: 16,
-          overflow: "hidden",
-          marginTop: 16,
-        }}
-      >
+      <div className="rounded-2xl border border-border/60 bg-card overflow-hidden mt-4">
         <div
-          style={{ padding: "20px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+          style={{ padding: "20px 24px", borderBottom: "var(--color-border)" }}
           className="flex items-start gap-3"
         >
           <div
@@ -993,7 +978,7 @@ function DealActivityCard({
             >
               Deal Activity
             </h2>
-            <p className="text-xs mt-0.5" style={{ color: pendingCount > 0 ? "#F59E0B" : "rgba(255,255,255,0.4)" }}>
+            <p className="text-xs mt-0.5" style={{ color: pendingCount > 0 ? "#F59E0B" : "var(--color-muted-foreground)" }}>
               {subtext}
             </p>
           </div>
@@ -1001,14 +986,14 @@ function DealActivityCard({
 
         <div style={{ padding: "20px 24px" }} className="space-y-4">
           {reqLoading && (
-            <div className="flex items-center gap-2 text-xs text-white/30">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground dark:text-white/30">
               <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading requests…
             </div>
           )}
 
           {!reqLoading && requests.length > 0 && (
             <div>
-              <div className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-2" style={{ letterSpacing: "0.1em" }}>
+              <div className="text-xs font-semibold text-foreground/60 dark:text-white/60 uppercase tracking-wider mb-2" style={{ letterSpacing: "0.1em" }}>
                 Pending access requests
               </div>
               <div className="space-y-2">
@@ -1024,14 +1009,14 @@ function DealActivityCard({
                     >
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium text-white truncate">{name}</div>
-                        <div className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>
+                        <div className="text-xs mt-0.5 text-muted-foreground">
                           {firm && <span>{firm} · </span>}
                           Requested {daysAgo(req.created_at)}
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
                         {isActing ? (
-                          <Loader2 className="h-4 w-4 animate-spin text-white/30" />
+                          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground dark:text-white/30" />
                         ) : (
                           <>
                             <button
@@ -1063,14 +1048,14 @@ function DealActivityCard({
           )}
 
           {dealRooms.length === 0 && requests.length === 0 && !reqLoading ? (
-            <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+            <p className="text-xs text-muted-foreground">
               No active investor activity yet. Once an investor requests access to your profile, it'll show up here.
             </p>
           ) : (
             dealRooms.length > 0 && (
               <div>
                 {requests.length > 0 && (
-                  <div className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-2" style={{ letterSpacing: "0.1em" }}>
+                  <div className="text-xs font-semibold text-foreground/60 dark:text-white/60 uppercase tracking-wider mb-2" style={{ letterSpacing: "0.1em" }}>
                     Deal rooms
                   </div>
                 )}
@@ -1094,23 +1079,23 @@ function DealActivityCard({
                               style={
                                 room.status === "active"
                                   ? { background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }
-                                  : { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)" }
+                                  : { background: "var(--color-muted)", border: "1px solid var(--color-border)", color: "var(--color-muted-foreground)" }
                               }
                             >
                               {room.status}
                             </span>
                           </div>
                           <div className="flex items-center gap-3 mt-1 flex-wrap">
-                            <span className="text-xs flex items-center gap-1" style={{ color: "rgba(255,255,255,0.3)" }}>
+                            <span className="text-xs flex items-center gap-1 text-muted-foreground">
                               <Clock className="h-3 w-3" /> Opened {daysAgo(room.created_at)}
                             </span>
                             {viewSummary ? (
-                              <span className="text-xs flex items-center gap-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+                              <span className="text-xs flex items-center gap-1 text-muted-foreground">
                                 <Eye className="h-3 w-3" />
                                 {viewSummary.viewer_name ?? "Investor"} viewed {viewSummary.count} document{viewSummary.count !== 1 ? "s" : ""} {daysAgo(viewSummary.most_recent)}
                               </span>
                             ) : (
-                              <span className="text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
+                              <span className="text-xs" style={{ color: "var(--color-muted-foreground)" }}>
                                 No document views in the last 7 days
                               </span>
                             )}
@@ -1152,11 +1137,641 @@ function DealActivityCard({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Score Audit Card
+// ─────────────────────────────────────────────────────────────────────────────
+
+const FACTOR_ORDER = ["team", "market", "traction", "financials", "product", "legal"] as const;
+const FACTOR_LABELS: Record<string, string> = {
+  team: "Team", market: "Market", traction: "Traction",
+  financials: "Financials", product: "Product", legal: "Legal",
+};
+
+function ScoreAuditCard({
+  startupId,
+  userId,
+  onScoreRun,
+}: {
+  startupId: string;
+  userId: string;
+  onScoreRun?: (run: ScoreRun) => void;
+}) {
+  const qc = useQueryClient();
+  const [running, setRunning] = useState(false);
+
+  const { data: latestRun } = useQuery<ScoreRun | null>({
+    queryKey: ["score-audit", startupId],
+    enabled: !!startupId && typeof window !== "undefined",
+    staleTime: 0,
+    queryFn: async () => {
+      const { fetchLatestScoreRun } = await import("@/lib/readiness-fn");
+      return fetchLatestScoreRun(startupId, supabase);
+    },
+  });
+
+  const handleRun = async () => {
+    setRunning(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const jwt = sessionData?.session?.access_token ?? "";
+      const { runReadinessScore } = await import("@/lib/readiness-fn");
+      const result = await runReadinessScore(startupId, userId, jwt);
+      qc.setQueryData(["score-audit", startupId], result);
+      onScoreRun?.(result);
+    } catch (err: any) {
+      toast.error(err?.message ?? "Score audit failed");
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  return (
+    <div className="rounded-xl border border-border/60 bg-card p-5 mt-4" data-testid="score-audit-card">
+      {/* Header row */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div
+            className="grid h-8 w-8 place-items-center rounded-lg"
+            style={{ background: "rgba(124,58,237,0.12)" }}
+          >
+            <ScanLine className="h-4 w-4" style={{ color: "#7C3AED" }} />
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
+              Score Audit
+            </div>
+            {latestRun && (
+              <div className="text-xs text-muted-foreground">
+                Last run: {new Date(latestRun.created_at).toLocaleDateString()}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {latestRun && (
+            <div className="flex items-center gap-1.5">
+              <span
+                className="text-2xl font-bold"
+                style={{ fontFamily: "Syne, sans-serif", color: "#7C3AED" }}
+              >
+                {latestRun.score}
+              </span>
+              <span className="text-xs text-muted-foreground">/100</span>
+              {latestRun.prev_score != null && (
+                <span
+                  className="text-xs font-semibold ml-1"
+                  style={{
+                    color: latestRun.score >= latestRun.prev_score ? "#10B981" : "#EF4444",
+                  }}
+                >
+                  {latestRun.score >= latestRun.prev_score ? "↑" : "↓"}
+                  {Math.abs(latestRun.score - latestRun.prev_score)} pts
+                </span>
+              )}
+            </div>
+          )}
+          <button
+            onClick={handleRun}
+            disabled={running}
+            data-testid="run-score-audit-btn"
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
+            style={{ background: "#7C3AED" }}
+          >
+            {running ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                Running…
+              </>
+            ) : (
+              "Run Score Audit"
+            )}
+          </button>
+        </div>
+      </div>
+
+      {!latestRun && !running && (
+        <div className="text-sm text-muted-foreground">
+          Run a score audit to get AI-powered investor readiness analysis.
+        </div>
+      )}
+
+      {latestRun && (
+        <div className="space-y-5">
+          {/* Section A — Data gaps */}
+          <div data-testid="score-audit-gaps-section">
+            <div className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--color-muted-foreground)", letterSpacing: "0.1em" }}>
+              What the AI couldn't evaluate
+            </div>
+            <div
+              className="rounded-lg px-3 py-2 mb-2 text-xs"
+              style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.15)", color: "var(--color-foreground)" }}
+            >
+              Score confidence: {latestRun.confidence_lo}–{latestRun.confidence_hi} / 100
+            </div>
+            {latestRun.data_gaps.length === 0 ? (
+              <div className="text-sm" style={{ color: "#10B981" }}>All key data points present ✓</div>
+            ) : (
+              <div className="space-y-2">
+                {latestRun.data_gaps.map((gap: ScoreRunGap, i: number) => (
+                  <div key={i} className="flex items-start gap-2" data-testid="score-audit-gap-item">
+                    <span className="font-semibold text-sm text-white capitalize">{gap.field.replace(/_/g, " ")}</span>
+                    <span
+                      className="text-xs font-semibold rounded px-1.5 py-0.5 shrink-0"
+                      style={{ background: "rgba(245,158,11,0.12)", color: "#F59E0B" }}
+                    >
+                      –{gap.impact_points} pts
+                    </span>
+                    <span className="text-xs text-muted-foreground">{gap.message}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Section B — Factor breakdown */}
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "var(--color-muted-foreground)", letterSpacing: "0.1em" }}>
+              Score breakdown
+            </div>
+            <div className="space-y-3">
+              {FACTOR_ORDER.map((key) => {
+                const factor = (latestRun.factor_breakdown as Record<string, ScoreRunFactor>)[key];
+                if (!factor) return null;
+                const pct = Math.round((factor.score / factor.max) * 100);
+                return (
+                  <div key={key}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-medium text-white">{FACTOR_LABELS[key]}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {factor.score}/{factor.max}
+                      </span>
+                    </div>
+                    <div className="h-1.5 rounded-full w-full" style={{ background: "rgba(255,255,255,0.08)" }}>
+                      <div
+                        className="h-1.5 rounded-full transition-all"
+                        style={{ width: `${pct}%`, background: "#7C3AED" }}
+                      />
+                    </div>
+                    <div className="text-xs mt-1 text-muted-foreground">
+                      {factor.reasoning}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Section C — Top action */}
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--color-muted-foreground)", letterSpacing: "0.1em" }}>
+              Your highest-impact next action
+            </div>
+            <div
+              className="pl-3 py-2 text-sm text-white"
+              style={{ borderLeft: "3px solid #7C3AED" }}
+            >
+              {latestRun.top_action}
+            </div>
+          </div>
+
+          {/* Section D — Investor preview */}
+          {latestRun.sim_preview && (
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--color-muted-foreground)", letterSpacing: "0.1em" }}>
+                Investor preview
+              </div>
+              <div className="text-sm italic text-muted-foreground">
+                {latestRun.sim_preview}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Investor Simulation Card
+// ─────────────────────────────────────────────────────────────────────────────
+
+type SimBlock = {
+  label: string;
+  content: string;
+  bg: string;
+  border: string;
+  iconBg: string;
+  iconColor: string;
+  icon: string;
+  testId: string;
+};
+
+function InvestorSimCard({
+  startupId,
+  userId,
+  onSimRun,
+}: {
+  startupId: string;
+  userId: string;
+  onSimRun?: (run: import("@/lib/investor-sim-fn").SimRun) => void;
+}) {
+  const qc = useQueryClient();
+  const [running, setRunning] = useState(false);
+
+  const { data: latestSim } = useQuery<import("@/lib/investor-sim-fn").SimRun | null>({
+    queryKey: ["investor-sim", startupId],
+    enabled: !!startupId && typeof window !== "undefined",
+    staleTime: 0,
+    queryFn: async () => {
+      const { fetchLatestSimRun } = await import("@/lib/investor-sim-fn");
+      return fetchLatestSimRun(startupId);
+    },
+  });
+
+  const handleRun = async () => {
+    setRunning(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const jwt = sessionData?.session?.access_token ?? "";
+      const { runInvestorSim } = await import("@/lib/investor-sim-fn");
+      const result = await runInvestorSim(startupId, userId, jwt);
+      qc.setQueryData(["investor-sim", startupId], result);
+      onSimRun?.(result);
+    } catch (err: any) {
+      toast.error(err?.message ?? "Simulation failed");
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  const blocks: SimBlock[] = latestSim
+    ? [
+        {
+          label: "First question they'll ask",
+          content: latestSim.first_question,
+          bg: "rgba(245,158,11,0.06)",
+          border: "rgba(245,158,11,0.18)",
+          iconBg: "rgba(245,158,11,0.15)",
+          iconColor: "#F59E0B",
+          icon: "?",
+          testId: "sim-block-first-question",
+        },
+        {
+          label: "Red flag they'll spot",
+          content: latestSim.red_flag,
+          bg: "rgba(239,68,68,0.06)",
+          border: "rgba(239,68,68,0.18)",
+          iconBg: "rgba(239,68,68,0.15)",
+          iconColor: "#EF4444",
+          icon: "⚠",
+          testId: "sim-block-red-flag",
+        },
+        {
+          label: "Strongest point in your profile",
+          content: latestSim.strongest_point,
+          bg: "rgba(16,185,129,0.06)",
+          border: "rgba(16,185,129,0.18)",
+          iconBg: "rgba(16,185,129,0.15)",
+          iconColor: "#10B981",
+          icon: "↑",
+          testId: "sim-block-strongest",
+        },
+        {
+          label: "Kill risk",
+          content: latestSim.kill_risk,
+          bg: "rgba(127,29,29,0.18)",
+          border: "rgba(239,68,68,0.30)",
+          iconBg: "rgba(239,68,68,0.20)",
+          iconColor: "#FCA5A5",
+          icon: "✕",
+          testId: "sim-block-kill-risk",
+        },
+      ]
+    : [];
+
+  return (
+    <div className="rounded-xl border border-border/60 bg-card p-5 mt-4" data-testid="investor-sim-card">
+      {/* Header row */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div
+            className="grid h-8 w-8 place-items-center rounded-lg"
+            style={{ background: "rgba(124,58,237,0.12)" }}
+          >
+            <Users className="h-4 w-4" style={{ color: "#7C3AED" }} />
+          </div>
+          <div>
+            <div
+              className="text-sm font-semibold text-white"
+              style={{ fontFamily: "Syne, sans-serif" }}
+            >
+              Investor Simulation
+            </div>
+            {latestSim && (
+              <div className="text-xs text-muted-foreground">
+                Last run: {new Date(latestSim.created_at).toLocaleDateString()}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <button
+          onClick={handleRun}
+          disabled={running}
+          data-testid="run-investor-sim-btn"
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
+          style={{ background: "#7C3AED" }}
+        >
+          {running ? (
+            <>
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              Running…
+            </>
+          ) : latestSim ? (
+            "Re-run"
+          ) : (
+            "Run Simulation"
+          )}
+        </button>
+      </div>
+
+      {!latestSim && !running && (
+        <div className="text-sm text-muted-foreground">
+          Simulate a first-pass investor review — get the opening question, red flag,
+          strongest point, and kill risk specific to your profile.
+        </div>
+      )}
+
+      {latestSim && (
+        <div className="space-y-3" data-testid="investor-sim-blocks">
+          {blocks.map((b) => (
+            <div
+              key={b.testId}
+              data-testid={b.testId}
+              className="rounded-lg px-4 py-3 flex items-start gap-3"
+              style={{ background: b.bg, border: `1px solid ${b.border}` }}
+            >
+              <div
+                className="shrink-0 grid h-7 w-7 place-items-center rounded-full text-sm font-bold"
+                style={{ background: b.iconBg, color: b.iconColor }}
+              >
+                {b.icon}
+              </div>
+              <div>
+                <div
+                  className="text-xs font-semibold uppercase tracking-wider mb-1"
+                  style={{ color: b.iconColor, letterSpacing: "0.08em" }}
+                >
+                  {b.label}
+                </div>
+                <div className="text-sm text-white leading-relaxed">{b.content}</div>
+              </div>
+            </div>
+          ))}
+
+          {/* Footer: persona + timestamp */}
+          <div className="pt-1 text-xs" style={{ color: "var(--color-muted-foreground)" }}>
+            {latestSim.investor_persona_used && (
+              <span>{latestSim.investor_persona_used} · </span>
+            )}
+            {new Date(latestSim.created_at).toLocaleString()}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Coaching Card
+// ─────────────────────────────────────────────────────────────────────────────
+
+const EFFORT_STYLES: Record<string, { bg: string; color: string }> = {
+  low: { bg: "rgba(16,185,129,0.12)", color: "#10B981" },
+  medium: { bg: "rgba(245,158,11,0.12)", color: "#F59E0B" },
+  high: { bg: "rgba(239,68,68,0.12)", color: "#EF4444" },
+};
+
+function CoachingCard({
+  startupId,
+  userId,
+  stage,
+}: {
+  startupId: string;
+  userId: string;
+  stage: string | null;
+}) {
+  const qc = useQueryClient();
+  const [running, setRunning] = useState(false);
+
+  const { data: session } = useQuery<import("@/lib/coaching-fn").CoachingSession | null>({
+    queryKey: ["coaching-session", startupId],
+    enabled: !!startupId && typeof window !== "undefined",
+    staleTime: 0,
+    queryFn: async () => {
+      const { fetchLatestCoachingSession } = await import("@/lib/coaching-fn");
+      return fetchLatestCoachingSession(startupId);
+    },
+  });
+
+  const handleRun = async () => {
+    setRunning(true);
+    try {
+      const { data: authData } = await supabase.auth.getSession();
+      const jwt = authData?.session?.access_token ?? "";
+      const { runFounderCoaching } = await import("@/lib/coaching-fn");
+      const result = await runFounderCoaching({
+        startupId,
+        userId,
+        triggerType: "manual",
+        jwt,
+      });
+      qc.setQueryData(["coaching-session", startupId], result);
+    } catch (err: any) {
+      toast.error(err?.message ?? "Coaching session failed");
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  const SECTION: React.CSSProperties = {
+    borderLeft: "3px solid #7C3AED",
+    paddingLeft: 12,
+    marginBottom: 16,
+  };
+
+  return (
+    <div className="rounded-xl border border-border/60 bg-card p-5 mt-4" data-testid="coaching-card">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div
+            className="grid h-8 w-8 place-items-center rounded-lg"
+            style={{ background: "rgba(124,58,237,0.12)" }}
+          >
+            <TrendingUp className="h-4 w-4" style={{ color: "#7C3AED" }} />
+          </div>
+          <div>
+            <div
+              className="text-sm font-semibold text-white"
+              style={{ fontFamily: "Syne, sans-serif" }}
+            >
+              Founder Coaching
+            </div>
+            {session && (
+              <div className="text-xs text-muted-foreground">
+                {session.trigger_type} · {new Date(session.created_at).toLocaleDateString()}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <button
+          onClick={handleRun}
+          disabled={running}
+          data-testid="run-coaching-btn"
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
+          style={{ background: "#7C3AED" }}
+        >
+          {running ? (
+            <>
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              Running…
+            </>
+          ) : session ? (
+            "Refresh"
+          ) : (
+            "Get Coaching"
+          )}
+        </button>
+      </div>
+
+      {!session && !running && (
+        <div className="text-sm text-muted-foreground">
+          Get a personalized coaching session — stage-specific guidance, financial
+          and legal readiness, and a prioritized action plan.
+        </div>
+      )}
+
+      {session && (
+        <div className="space-y-4" data-testid="coaching-sections">
+
+          {/* Section 1 — Stage guide */}
+          <div data-testid="coaching-stage-guide">
+            <div
+              className="text-xs font-semibold uppercase tracking-wider mb-2"
+              style={{ color: "#A855F7", letterSpacing: "0.1em" }}
+            >
+              What investors at {session.stage ?? stage ?? "this stage"} expect
+            </div>
+            <div style={SECTION}>
+              <div className="text-sm text-white leading-relaxed">{session.stage_guide}</div>
+            </div>
+          </div>
+
+          {/* Section 2 — Financial & Legal */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div
+              className="rounded-lg px-3 py-3"
+              style={{ background: "var(--color-muted)", border: "var(--color-border)" }}
+              data-testid="coaching-financial"
+            >
+              <div
+                className="text-xs font-semibold uppercase tracking-wider mb-2"
+                style={{ color: "var(--color-muted-foreground)", letterSpacing: "0.08em" }}
+              >
+                Financial readiness
+              </div>
+              <div className="text-sm text-white leading-relaxed">{session.financial}</div>
+            </div>
+            <div
+              className="rounded-lg px-3 py-3"
+              style={{ background: "var(--color-muted)", border: "var(--color-border)" }}
+              data-testid="coaching-legal"
+            >
+              <div
+                className="text-xs font-semibold uppercase tracking-wider mb-2"
+                style={{ color: "var(--color-muted-foreground)", letterSpacing: "0.08em" }}
+              >
+                Legal readiness
+              </div>
+              <div className="text-sm text-white leading-relaxed">{session.legal}</div>
+            </div>
+          </div>
+
+          {/* Section 3 — Rejection debrief (conditional) */}
+          {session.rejection_debrief && (
+            <div
+              className="rounded-lg px-4 py-3"
+              style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.18)" }}
+              data-testid="coaching-rejection"
+            >
+              <div
+                className="text-xs font-semibold uppercase tracking-wider mb-2"
+                style={{ color: "#EF4444", letterSpacing: "0.08em" }}
+              >
+                Why this investor passed
+              </div>
+              <div className="text-sm text-white leading-relaxed">{session.rejection_debrief}</div>
+            </div>
+          )}
+
+          {/* Section 4 — Action plan */}
+          <div data-testid="coaching-action-plan">
+            <div
+              className="text-xs font-semibold uppercase tracking-wider mb-3"
+              style={{ color: "var(--color-muted-foreground)", letterSpacing: "0.1em" }}
+            >
+              Action plan
+            </div>
+            <div className="space-y-2">
+              {(session.action_plan ?? []).map((item: import("@/lib/coaching-fn").CoachingActionItem) => {
+                const effortStyle = EFFORT_STYLES[item.effort] ?? EFFORT_STYLES.medium;
+                return (
+                  <div
+                    key={item.priority}
+                    className="flex items-start gap-3 rounded-lg px-3 py-3"
+                    style={{ background: "var(--color-muted)", border: "var(--color-border)" }}
+                    data-testid="coaching-action-item"
+                  >
+                    <div
+                      className="shrink-0 grid h-6 w-6 place-items-center rounded-full text-xs font-bold"
+                      style={{ background: "rgba(124,58,237,0.2)", color: "#A855F7" }}
+                    >
+                      {item.priority}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold text-white">{item.action}</div>
+                      <div className="text-xs mt-1 text-muted-foreground">
+                        {item.why}
+                      </div>
+                    </div>
+                    <span
+                      className="shrink-0 text-xs font-semibold rounded px-2 py-0.5 capitalize"
+                      style={{ background: effortStyle.bg, color: effortStyle.color }}
+                      data-testid="coaching-effort-badge"
+                    >
+                      {item.effort}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Page
 // ─────────────────────────────────────────────────────────────────────────────
 
 function FounderHome() {
   const { user } = useAuth();
+  const [latestScoreRun, setLatestScoreRun] = useState<ScoreRun | null>(null);
+  const [latestSimRun, setLatestSimRun] = useState<import("@/lib/investor-sim-fn").SimRun | null>(null);
 
   const { data: startup, isLoading } = useQuery({
     queryKey: ["home-startup", user?.id],
@@ -1165,12 +1780,32 @@ function FounderHome() {
     queryFn: async () => {
       const { data } = await supabase
         .from("startups")
-        .select("id, company_name, profile_slug, stage, sector")
+        .select("id, company_name, profile_slug, stage, sector, completeness_score")
         .eq("founder_id", user!.id)
         .maybeSingle();
       return data ?? null;
     },
   });
+
+  // Load latest score run on mount for AI panel context
+  useEffect(() => {
+    if (!startup?.id) return;
+    import("@/lib/readiness-fn").then(({ fetchLatestScoreRun }) => {
+      fetchLatestScoreRun(startup.id, supabase).then((run) => {
+        if (run) setLatestScoreRun(run);
+      });
+    });
+  }, [startup?.id]);
+
+  // Load latest sim run on mount for AI panel context
+  useEffect(() => {
+    if (!startup?.id) return;
+    import("@/lib/investor-sim-fn").then(({ fetchLatestSimRun }) => {
+      fetchLatestSimRun(startup.id).then((run) => {
+        if (run) setLatestSimRun(run);
+      });
+    });
+  }, [startup?.id]);
 
   // Fetch latest readiness snapshot for PageGuide live context
   const { data: readinessSnap } = useQuery<ReadinessResult | null>({
@@ -1186,7 +1821,7 @@ function FounderHome() {
   if (isLoading) {
     return (
       <div className="p-8 flex items-center justify-center">
-        <Loader2 className="h-5 w-5 animate-spin text-white/30" />
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground dark:text-white/30" />
       </div>
     );
   }
@@ -1195,7 +1830,7 @@ function FounderHome() {
     return (
       <div className="p-6 lg:p-8 max-w-3xl mx-auto">
         <div className="rounded-xl border border-dashed border-border/60 bg-card p-8 text-center">
-          <Building2 className="h-8 w-8 text-white/20 mx-auto mb-3" />
+          <Building2 className="h-8 w-8 text-muted-foreground dark:text-white/20 mx-auto mb-3" />
           <div className="text-sm font-medium mb-1">No company profile yet</div>
           <div className="text-xs text-muted-foreground mb-4">
             Build your profile to start verification, claim proof, and track investor activity.
@@ -1227,17 +1862,17 @@ function FounderHome() {
     : "Readiness data not yet loaded.";
 
   return (
-    <div className="p-6 lg:p-8 max-w-3xl mx-auto">
+    <div className="p-6 lg:p-8">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <h1
-            className="text-2xl font-semibold tracking-tight text-white"
+            className="text-2xl font-semibold tracking-tight text-foreground"
             style={{ fontFamily: "Syne, sans-serif" }}
           >
-            {startup.company_name ?? "Home"}
+            Workstation
           </h1>
-          <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>
-            Your verification status and investor activity at a glance.
+          <p className="text-sm mt-1 text-muted-foreground">
+            Build your profile. Prepare for investors.
           </p>
         </div>
         <div className="shrink-0 mt-1">
@@ -1267,6 +1902,25 @@ function FounderHome() {
         profileSlug={startup.profile_slug ?? null}
         companyName={startup.company_name ?? null}
       />
+
+      <ScoreAuditCard
+        startupId={startup.id}
+        userId={user!.id}
+        onScoreRun={(run) => setLatestScoreRun(run)}
+      />
+
+      <InvestorSimCard
+        startupId={startup.id}
+        userId={user!.id}
+        onSimRun={(run) => setLatestSimRun(run)}
+      />
+
+      <CoachingCard
+        startupId={startup.id}
+        userId={user!.id}
+        stage={(startup as any).stage ?? null}
+      />
+
     </div>
   );
 }

@@ -222,3 +222,70 @@ function emptyResult(startup_id: string, _reason: string): ReadinessResult {
     prev_readiness_score: null,
   };
 }
+
+// ─── AI Score Audit types + functions ─────────────────────────────────────────
+
+export type ScoreRunFactor = {
+  score: number;
+  max: number;
+  reasoning: string;
+};
+
+export type ScoreRunGap = {
+  field: string;
+  impact_points: number;
+  message: string;
+};
+
+export type ScoreRun = {
+  id: string;
+  startup_id: string;
+  score: number;
+  confidence_lo: number;
+  confidence_hi: number;
+  factor_breakdown: Record<string, ScoreRunFactor>;
+  data_gaps: ScoreRunGap[];
+  top_action: string;
+  sim_preview: string | null;
+  prev_score: number | null;
+  created_at: string;
+};
+
+const EDGE_URL = "https://ldimninnjlvxozubheib.supabase.co/functions/v1/run-readiness-score";
+const ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM3MTA2MTYsImV4cCI6MjAyOTI4NjYxNn0.wLFUJmHMy0_5f5CZxE5P5CflK0v8Mop0iHLrj73uqFY";
+
+// Client-side function — called from browser, not a server fn.
+// We keep it here alongside the types so callers import from one place.
+export async function runReadinessScore(
+  startupId: string,
+  userId: string,
+  jwt: string,
+): Promise<ScoreRun> {
+  const res = await fetch(EDGE_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwt}`,
+      apikey: ANON_KEY,
+    },
+    body: JSON.stringify({ startup_id: startupId, user_id: userId }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error ?? `HTTP ${res.status}`);
+  return json as ScoreRun;
+}
+
+export async function fetchLatestScoreRun(
+  startupId: string,
+  supabaseClient: any,
+): Promise<ScoreRun | null> {
+  const { data } = await supabaseClient
+    .from("readiness_score_runs")
+    .select("*")
+    .eq("startup_id", startupId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return data ?? null;
+}

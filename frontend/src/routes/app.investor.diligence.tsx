@@ -62,7 +62,7 @@ function DiligencePage() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-8">
+    <div className="p-6 lg:p-8 space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
@@ -84,8 +84,7 @@ function DiligencePage() {
             return (
               <div
                 key={room.id}
-                className="rounded-xl border flex flex-col sm:flex-row sm:items-center gap-4 p-5"
-                style={{ background: "#111114", borderColor: "rgba(255,255,255,0.08)" }}
+                className="rounded-xl border border-border/60 bg-card flex flex-col sm:flex-row sm:items-center gap-4 p-5"
               >
                 {/* Company info */}
                 <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -113,7 +112,7 @@ function DiligencePage() {
                         <span className="text-xs text-muted-foreground">{room.checked}/{room.total} items</span>
                         <span className="text-xs font-medium">{pct}%</span>
                       </div>
-                      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
+                      <div className="h-1.5 rounded-full overflow-hidden bg-muted">
                         <div
                           className="h-full rounded-full transition-all"
                           style={{
@@ -142,7 +141,7 @@ function DiligencePage() {
           })}
         </div>
       ) : (
-        <div className="rounded-xl border p-8 text-center" style={{ background: "#111114", borderColor: "rgba(255,255,255,0.08)" }}>
+        <div className="rounded-xl border border-border/60 bg-card p-8 text-center">
           <ClipboardCheck className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
           <p className="text-sm font-medium">No deal rooms yet</p>
           <p className="text-xs text-muted-foreground mt-1">
@@ -165,11 +164,10 @@ function DiligencePage() {
           {watchlistDiligence.map((entry: any) => (
             <div
               key={entry.id}
-              className="rounded-xl border flex items-center gap-4 p-5"
-              style={{ background: "#111114", borderColor: "rgba(255,255,255,0.08)" }}
+              className="rounded-xl border border-border/60 bg-card flex items-center gap-4 p-5"
             >
               <div className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0"
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                style={{ background: "var(--color-muted)", border: "1px solid var(--color-border)" }}>
                 <Building2 className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="flex-1 min-w-0">
@@ -200,7 +198,7 @@ function DiligencePage() {
       )}
 
       {dealRooms.length === 0 && watchlistDiligence.length === 0 && !isLoading && (
-        <div className="rounded-xl border p-8 text-center" style={{ background: "#111114", borderColor: "rgba(255,255,255,0.08)" }}>
+        <div className="rounded-xl border border-border/60 bg-card p-8 text-center">
           <CheckCircle2 className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
           <p className="text-sm font-medium">Nothing in diligence yet</p>
           <p className="text-xs text-muted-foreground mt-1">

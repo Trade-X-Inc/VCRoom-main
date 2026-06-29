@@ -68,11 +68,13 @@ import { Route as AppInvestorThesisRouteImport } from './routes/app.investor-the
 import { Route as AppInvestorRouteImport } from './routes/app.investor'
 import { Route as AppIntegrationsRouteImport } from './routes/app.integrations'
 import { Route as AppHomeRouteImport } from './routes/app.home'
+import { Route as AppFeedbackRouteImport } from './routes/app.feedback'
 import { Route as AppEmailRouteImport } from './routes/app.email'
 import { Route as AppDocumentsRouteImport } from './routes/app.documents'
 import { Route as AppDirectoryRouteImport } from './routes/app.directory'
 import { Route as AppDeskRouteImport } from './routes/app.desk'
 import { Route as AppDealRoomsRouteImport } from './routes/app.deal-rooms'
+import { Route as AppConnectionsRouteImport } from './routes/app.connections'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
 import { Route as AppAdvisorRouteImport } from './routes/app.advisor'
 import { Route as ApiTestAiRouteImport } from './routes/api.test-ai'
@@ -406,6 +408,11 @@ const AppHomeRoute = AppHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AppRoute,
 } as any)
+const AppFeedbackRoute = AppFeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppEmailRoute = AppEmailRouteImport.update({
   id: '/email',
   path: '/email',
@@ -429,6 +436,11 @@ const AppDeskRoute = AppDeskRouteImport.update({
 const AppDealRoomsRoute = AppDealRoomsRouteImport.update({
   id: '/deal-rooms',
   path: '/deal-rooms',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppConnectionsRoute = AppConnectionsRouteImport.update({
+  id: '/connections',
+  path: '/connections',
   getParentRoute: () => AppRoute,
 } as any)
 const AppAuditRoute = AppAuditRouteImport.update({
@@ -644,11 +656,13 @@ export interface FileRoutesByFullPath {
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/connections': typeof AppConnectionsRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
   '/app/desk': typeof AppDeskRoute
   '/app/directory': typeof AppDirectoryRoute
   '/app/documents': typeof AppDocumentsRoute
   '/app/email': typeof AppEmailRoute
+  '/app/feedback': typeof AppFeedbackRoute
   '/app/home': typeof AppHomeRoute
   '/app/integrations': typeof AppIntegrationsRoute
   '/app/investor': typeof AppInvestorRouteWithChildren
@@ -744,11 +758,13 @@ export interface FileRoutesByTo {
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/connections': typeof AppConnectionsRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
   '/app/desk': typeof AppDeskRoute
   '/app/directory': typeof AppDirectoryRoute
   '/app/documents': typeof AppDocumentsRoute
   '/app/email': typeof AppEmailRoute
+  '/app/feedback': typeof AppFeedbackRoute
   '/app/home': typeof AppHomeRoute
   '/app/integrations': typeof AppIntegrationsRoute
   '/app/investor-thesis': typeof AppInvestorThesisRoute
@@ -846,11 +862,13 @@ export interface FileRoutesById {
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/connections': typeof AppConnectionsRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
   '/app/desk': typeof AppDeskRoute
   '/app/directory': typeof AppDirectoryRoute
   '/app/documents': typeof AppDocumentsRoute
   '/app/email': typeof AppEmailRoute
+  '/app/feedback': typeof AppFeedbackRoute
   '/app/home': typeof AppHomeRoute
   '/app/integrations': typeof AppIntegrationsRoute
   '/app/investor': typeof AppInvestorRouteWithChildren
@@ -950,11 +968,13 @@ export interface FileRouteTypes {
     | '/api/test-ai'
     | '/app/advisor'
     | '/app/audit'
+    | '/app/connections'
     | '/app/deal-rooms'
     | '/app/desk'
     | '/app/directory'
     | '/app/documents'
     | '/app/email'
+    | '/app/feedback'
     | '/app/home'
     | '/app/integrations'
     | '/app/investor'
@@ -1050,11 +1070,13 @@ export interface FileRouteTypes {
     | '/api/test-ai'
     | '/app/advisor'
     | '/app/audit'
+    | '/app/connections'
     | '/app/deal-rooms'
     | '/app/desk'
     | '/app/directory'
     | '/app/documents'
     | '/app/email'
+    | '/app/feedback'
     | '/app/home'
     | '/app/integrations'
     | '/app/investor-thesis'
@@ -1151,11 +1173,13 @@ export interface FileRouteTypes {
     | '/api/test-ai'
     | '/app/advisor'
     | '/app/audit'
+    | '/app/connections'
     | '/app/deal-rooms'
     | '/app/desk'
     | '/app/directory'
     | '/app/documents'
     | '/app/email'
+    | '/app/feedback'
     | '/app/home'
     | '/app/integrations'
     | '/app/investor'
@@ -1690,6 +1714,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHomeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/feedback': {
+      id: '/app/feedback'
+      path: '/feedback'
+      fullPath: '/app/feedback'
+      preLoaderRoute: typeof AppFeedbackRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/email': {
       id: '/app/email'
       path: '/email'
@@ -1723,6 +1754,13 @@ declare module '@tanstack/react-router' {
       path: '/deal-rooms'
       fullPath: '/app/deal-rooms'
       preLoaderRoute: typeof AppDealRoomsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/connections': {
+      id: '/app/connections'
+      path: '/connections'
+      fullPath: '/app/connections'
+      preLoaderRoute: typeof AppConnectionsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/audit': {
@@ -2045,11 +2083,13 @@ const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(
 interface AppRouteChildren {
   AppAdvisorRoute: typeof AppAdvisorRoute
   AppAuditRoute: typeof AppAuditRoute
+  AppConnectionsRoute: typeof AppConnectionsRoute
   AppDealRoomsRoute: typeof AppDealRoomsRoute
   AppDeskRoute: typeof AppDeskRoute
   AppDirectoryRoute: typeof AppDirectoryRoute
   AppDocumentsRoute: typeof AppDocumentsRoute
   AppEmailRoute: typeof AppEmailRoute
+  AppFeedbackRoute: typeof AppFeedbackRoute
   AppHomeRoute: typeof AppHomeRoute
   AppIntegrationsRoute: typeof AppIntegrationsRoute
   AppInvestorRoute: typeof AppInvestorRouteWithChildren
@@ -2074,11 +2114,13 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAdvisorRoute: AppAdvisorRoute,
   AppAuditRoute: AppAuditRoute,
+  AppConnectionsRoute: AppConnectionsRoute,
   AppDealRoomsRoute: AppDealRoomsRoute,
   AppDeskRoute: AppDeskRoute,
   AppDirectoryRoute: AppDirectoryRoute,
   AppDocumentsRoute: AppDocumentsRoute,
   AppEmailRoute: AppEmailRoute,
+  AppFeedbackRoute: AppFeedbackRoute,
   AppHomeRoute: AppHomeRoute,
   AppIntegrationsRoute: AppIntegrationsRoute,
   AppInvestorRoute: AppInvestorRouteWithChildren,

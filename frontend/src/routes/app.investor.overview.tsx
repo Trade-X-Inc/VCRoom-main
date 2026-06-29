@@ -351,7 +351,7 @@ function InvestorDashboard() {
   void stageCounts;
 
   return (
-    <div className="p-6 lg:p-8 max-w-[1500px] mx-auto space-y-6">
+    <div className="p-6 lg:p-8 space-y-6">
       <InvestorOnboarding profile={profile} watchlistCount={watchlistCount} roomIds={roomIds} />
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
@@ -360,7 +360,7 @@ function InvestorDashboard() {
           </h1>
           <div className="text-sm text-muted-foreground">{today}</div>
         </div>
-        <button className="rounded-[10px] border border-border/60 px-3 py-2 text-sm hover:bg-accent">How it works</button>
+        <Link to="/app/investor/settings" search={{ tab: "help" } as any} className="rounded-[10px] border border-border/60 px-3 py-2 text-sm hover:bg-accent">How it works</Link>
       </div>
 
       <section>

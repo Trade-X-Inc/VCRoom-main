@@ -605,7 +605,7 @@ function Directory() {
   const count = type === "founders" ? filteredStartups.length : filteredInvestors.length;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8">
       <div className="mb-6">
         <h1 className="text-2xl font-semibold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>Directory</h1>
         <p className="text-sm text-muted-foreground mt-1">Founders and investors from your deal room network.</p>

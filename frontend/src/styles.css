@@ -228,3 +228,43 @@ img { max-width: 100%; height: auto; }
   50% { opacity: 1 }
 }
 .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+
+/* AI thinking bar animations */
+@keyframes hs-bar1 {
+  0%, 100% { width: 20% }
+  50% { width: 80% }
+}
+@keyframes hs-bar2 {
+  0%, 100% { width: 40% }
+  50% { width: 90% }
+}
+@keyframes hs-bar3 {
+  0%, 100% { width: 10% }
+  50% { width: 60% }
+}
+
+/* Additional semantic CSS variables (used by AI panel and shell) */
+:root {
+  --hs-bg-primary: #FAFAFA;
+  --hs-bg-secondary: #F3F4F6;
+  --hs-bg-surface: #FFFFFF;
+  --hs-text-primary: #0A0A0B;
+  --hs-text-secondary: #374151;
+  --hs-text-muted: #6B7280;
+  --hs-border: #E5E7EB;
+  --hs-purple: #7C3AED;
+  --hs-purple-light: #EDE9FE;
+  --hs-purple-text: #6D28D9;
+}
+.dark {
+  --hs-bg-primary: #0A0A0B;
+  --hs-bg-secondary: #111113;
+  --hs-bg-surface: #18181B;
+  --hs-text-primary: #FAFAFA;
+  --hs-text-secondary: #D1D5DB;
+  --hs-text-muted: #6B7280;
+  --hs-border: #27272A;
+  --hs-purple: #7C3AED;
+  --hs-purple-light: #2E1065;
+  --hs-purple-text: #A78BFA;
+}

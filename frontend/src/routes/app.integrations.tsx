@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
@@ -6,6 +6,7 @@ import { Lock, CheckCircle, Bell } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/integrations")({
+  beforeLoad: () => { throw redirect({ to: "/app/settings" }); },
   head: () => ({ meta: [{ title: "Integrations — Hockystick" }] }),
   component: Integrations,
 });

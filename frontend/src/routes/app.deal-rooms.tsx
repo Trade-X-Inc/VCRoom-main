@@ -180,7 +180,7 @@ function DealRooms() {
   }
 
   return (
-    <div className="p-6 lg:p-8 max-w-7xl mx-auto">
+    <div className="p-6 lg:p-8">
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Deal Rooms</h1>
@@ -224,7 +224,7 @@ function DealRooms() {
         </select>
       </div>
 
-      <div className="mt-4 grid md:grid-cols-2 gap-4">
+      <div className="mt-4 flex flex-col gap-3">
         {sortedRooms.map((r: any) => {
           const investorName = r.investor_name ?? "Pending invite";
           const investorCompany = r.investor_company ?? startup?.company_name ?? "";

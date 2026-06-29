@@ -234,7 +234,11 @@ export function MemberShell({ children }: { children?: React.ReactNode }) {
             <UserMenu />
           </div>
         </header>
-        <main className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto flex flex-col">{children ?? <Outlet />}</main>
+        <main className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto flex flex-col">
+          <div className="flex flex-col flex-1 w-full max-w-[1600px] mx-auto">
+            {children ?? <Outlet />}
+          </div>
+        </main>
       </div>
 
       {feedbackOpen && <FeedbackModal onClose={() => setFeedbackOpen(false)} />}

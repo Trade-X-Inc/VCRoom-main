@@ -128,7 +128,7 @@ function Meetings() {
 
   if (isLoading) {
     return (
-      <div className="p-6 lg:p-8 max-w-4xl mx-auto">
+      <div className="p-6 lg:p-8">
         <div className="h-8 w-48 rounded-lg bg-muted animate-pulse mb-2" />
         <div className="h-4 w-72 rounded bg-muted/60 animate-pulse mb-6" />
         <div className="space-y-3">
@@ -139,7 +139,7 @@ function Meetings() {
   }
 
   return (
-    <div className="p-6 lg:p-8 max-w-4xl mx-auto">
+    <div className="p-6 lg:p-8">
       <div className="flex items-end justify-between flex-wrap gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Meetings</h1>

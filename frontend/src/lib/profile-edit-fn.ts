@@ -173,15 +173,14 @@ type ApplyInput = {
 export const applyProfileFieldEdit = createServerFn({ method: "POST" })
   .inputValidator((d: unknown): ApplyInput => d as ApplyInput)
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
+    const cfEnv = (globalThis as any).__cf_env || {};
     const supabaseUrl =
-      (import.meta.env as any).VITE_SUPABASE_URL ||
-      process.env.VITE_SUPABASE_URL ||
-      process.env.SUPABASE_URL || "";
+      cfEnv.SUPABASE_URL ||
+      process.env.SUPABASE_URL ||
+      import.meta.env.VITE_SUPABASE_URL || "";
     const supabaseKey =
-      (import.meta.env as any).VITE_SUPABASE_SERVICE_ROLE_KEY ||
-      process.env.SUPABASE_SERVICE_ROLE_KEY ||
-      (import.meta.env as any).VITE_SUPABASE_ANON_KEY ||
-      process.env.VITE_SUPABASE_ANON_KEY || "";
+      cfEnv.SUPABASE_SERVICE_ROLE_KEY ||
+      process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
     // HARD EXCLUSION: validate table is one of the two allowed targets
     if (data.table !== "startups" && data.table !== "founder_thesis") {

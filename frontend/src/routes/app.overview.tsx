@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { format, formatDistanceToNow } from "date-fns";
+import { getDeskTasks } from "@/lib/desk-fn";
 import {
   ArrowUpRight, TrendingUp, Users, Briefcase, Mail, Sparkles,
   Calendar, FileText, CheckCircle2, Clock, Building2, X, Loader2,
@@ -421,6 +422,17 @@ function AccessRequestsPanel({ startupId, companyName, profileSlug }: {
         }).then(({ error: nErr }) => {
           if (nErr) console.warn("[notification] access_approved insert failed:", nErr.message);
         });
+        // Auto-generate deal brief for the investor (fire and forget)
+        if (startupId) {
+          supabase.auth.getSession().then(({ data: { session } }) => {
+            const jwt = session?.access_token ?? "";
+            import("@/lib/deal-brief-fn").then(({ runDealBrief }) => {
+              runDealBrief({ startupId, investorId, userId: investorId, jwt }).catch(
+                (e: any) => console.warn("[deal-brief] auto-generate failed:", e?.message ?? e)
+              );
+            });
+          });
+        }
       } else {
         toast.success("Request declined.");
       }
@@ -687,6 +699,12 @@ function Overview() {
     },
   });
 
+  const { data: deskTasks = [] } = useQuery({
+    queryKey: ["desk-tasks-overview", user?.id],
+    enabled: !!user?.id,
+    queryFn: () => getDeskTasks({ data: { userId: user!.id, role: "founder" } }),
+  });
+
   const isQueriesLoading = !user?.id || startupLoading || leadLoading;
   const isNewUser = !isQueriesLoading && !startup && leadCount === 0;
 
@@ -714,12 +732,13 @@ function Overview() {
               Let's get your fundraise set up. Complete these steps to get started.
             </p>
           </div>
-          <button
-            onClick={() => setHowItWorksOpen(true)}
+          <Link
+            to="/app/settings"
+            search={{ tab: "help" } as any}
             className="rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent inline-flex items-center gap-1.5"
           >
             <HelpCircle className="h-4 w-4" /> How it works
-          </button>
+          </Link>
         </div>
 
         {/* Progress bar */}
@@ -794,8 +813,12 @@ function Overview() {
 
   const firstName = user?.name?.split(" ")[0] ?? "Founder";
 
+  const todayLabel = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+  const highPriorityTasks = deskTasks.filter((t: any) => t.priority === "high");
+  const normalPriorityTasks = deskTasks.filter((t: any) => t.priority !== "high");
+
   return (
-    <div className="p-6 lg:p-8 max-w-7xl mx-auto">
+    <div className="p-6 lg:p-8">
       <FounderOnboarding startup={startup} docs={docs} dealRooms={dealRooms} investorMembers={investorMembers} />
       {startup?.id && (
         <AccessRequestsPanel
@@ -804,6 +827,28 @@ function Overview() {
           profileSlug={startup.profile_slug}
         />
       )}
+
+      {/* Today section — tasks from Daily Desk */}
+      {deskTasks.length > 0 && (
+        <div className="mb-8">
+          <div className="mb-3">
+            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Today</div>
+            <div className="text-lg font-semibold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>{todayLabel}</div>
+          </div>
+          <div className="space-y-2">
+            {[...highPriorityTasks, ...normalPriorityTasks].slice(0, 5).map((t: any) => (
+              <div key={t.id} className="rounded-xl border border-border/60 bg-card px-4 py-3 flex items-center gap-3">
+                <span className="h-2 w-2 rounded-full shrink-0" style={{ background: t.priority === "high" ? "#EF4444" : t.priority === "normal" ? "#F59E0B" : "rgba(255,255,255,0.2)" }} />
+                <span className="text-sm flex-1 truncate">{t.title}</span>
+                {t.priority === "high" && (
+                  <span className="text-[10px] rounded-full px-2 py-0.5 font-semibold" style={{ background: "rgba(239,68,68,0.1)", color: "#EF4444" }}>High</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
@@ -813,12 +858,13 @@ function Overview() {
           </h1>
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={() => setHowItWorksOpen(true)}
+          <Link
+            to="/app/settings"
+            search={{ tab: "help" } as any}
             className="rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent inline-flex items-center gap-1.5"
           >
             <HelpCircle className="h-4 w-4" /> How it works
-          </button>
+          </Link>
           <Link
             to="/app/email"
             className="rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent inline-flex items-center gap-1.5"

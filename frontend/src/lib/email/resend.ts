@@ -5,11 +5,10 @@ function getResendKey(): string {
   const key =
     cfEnv.RESEND_API_KEY ||
     (typeof process !== "undefined" ? process.env?.RESEND_API_KEY : "") ||
-    (import.meta as any).env?.VITE_RESEND_API_KEY ||
     "";
 
   if (!key) {
-    console.error("[Resend] No API key found. Checked: __cf_env.RESEND_API_KEY, process.env.RESEND_API_KEY, import.meta.env.VITE_RESEND_API_KEY");
+    console.error("[Resend] No API key found. Checked: __cf_env.RESEND_API_KEY, process.env.RESEND_API_KEY");
   }
   return key;
 }

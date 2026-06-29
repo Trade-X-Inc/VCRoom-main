@@ -91,7 +91,7 @@ function PortfolioPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 max-w-[1400px] mx-auto">
+    <div className="p-6 lg:p-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Portfolio</h1>
         <div className="text-sm text-muted-foreground">Companies you've committed to invest in</div>

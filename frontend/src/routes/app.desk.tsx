@@ -1,23 +1,22 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   CheckCircle2, Clock, AlertTriangle, ChevronDown, ChevronUp,
-  Send, Loader2, X, Sparkles, MoreHorizontal, RotateCcw,
+  Loader2, X, MoreHorizontal, RotateCcw,
   Bell, BellOff, Check, ExternalLink, Copy, Lock,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { getAIAdvice } from "@/lib/advisor-fn";
-import { getFounderContext, buildContextBlock } from "@/lib/advisor-context-fn";
 import {
   getDeskTasks, updateDeskTask, updateDeskTaskDraft,
   completeCheckpointTask, type DeskTask, type ChainPhase,
 } from "@/lib/desk-fn";
 
 export const Route = createFileRoute("/app/desk")({
+  beforeLoad: () => { throw redirect({ to: "/app/overview" }); },
   component: FounderDesk,
 });
 
@@ -666,25 +665,6 @@ function renderTask(t: DeskTask, userId: string, senderName: string, onRefresh: 
 function FounderDesk() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [contextBlock, setContextBlock] = useState("");
-  const [startupId, setStartupId] = useState<string | null>(null);
-
-  // Fetch startup
-  useEffect(() => {
-    if (!user?.id) return;
-    supabase.from("startups").select("id").eq("founder_id", user.id).maybeSingle().then(({ data }) => {
-      if (data) setStartupId(data.id);
-    });
-  }, [user?.id]);
-
-  // Fetch founder context for sidebar
-  useEffect(() => {
-    if (!user?.id || !startupId) return;
-    getFounderContext({ data: { startupId, userId: user.id } }).then((ctx) => {
-      setContextBlock(buildContextBlock(ctx));
-    }).catch(() => {});
-  }, [user?.id, startupId]);
 
   const { data: tasks = [], isLoading, refetch } = useQuery({
     queryKey: ["desk-tasks", user?.id, "founder"],
@@ -723,7 +703,7 @@ function FounderDesk() {
   const normalPriority = tasks.filter((t) => t.priority !== "high");
 
   return (
-    <div style={{ display: "flex", height: "calc(100vh - 4rem)", background: "#0A0A0B", overflow: "hidden" }}>
+    <div style={{ display: "flex", flex: 1, minHeight: 0, background: "#0A0A0B", overflow: "hidden" }}>
       {/* Main desk panel */}
       <div style={{ flex: 1, overflowY: "auto", padding: "28px 32px" }}>
         {/* Header */}
@@ -778,21 +758,6 @@ function FounderDesk() {
         )}
       </div>
 
-      {/* Sidebar toggle */}
-      <button
-        onClick={() => setSidebarOpen((v) => !v)}
-        style={{ position: "absolute", top: "50%", right: sidebarOpen ? 320 : 0, transform: "translateY(-50%)", zIndex: 10, background: "#18181C", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px 0 0 8px", padding: "8px 4px", cursor: "pointer", color: "rgba(255,255,255,0.4)" }}
-        title={sidebarOpen ? "Hide advisor" : "Show advisor"}
-      >
-        <Sparkles size={14} />
-      </button>
-
-      {/* AI Advisor sidebar */}
-      {sidebarOpen && (
-        <div style={{ width: 320, flexShrink: 0, height: "100%", overflow: "hidden" }}>
-          <SidebarAdvisor userId={user?.id ?? ""} startupId={startupId} contextBlock={contextBlock} />
-        </div>
-      )}
     </div>
   );
 }
