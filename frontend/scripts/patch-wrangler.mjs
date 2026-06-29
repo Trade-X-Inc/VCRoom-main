@@ -10,6 +10,15 @@ if (existsSync(pagesWranglerPath)) {
   console.log("✓ dist/client/wrangler.json removed (CF will use wrangler.toml)");
 }
 
+// 1b. Remove stale .wrangler/deploy/config.json which references the now-deleted
+// dist/client/wrangler.json. If this file exists from a previous local deploy,
+// wrangler aborts on CF's build servers because the redirected path doesn't exist.
+const deployConfigPath = ".wrangler/deploy/config.json";
+if (existsSync(deployConfigPath)) {
+  unlinkSync(deployConfigPath);
+  console.log("✓ .wrangler/deploy/config.json removed (stale redirect reference)");
+}
+
 // 2. Bundle dist/server/server.js → dist/client/_worker.js
 // Pages Advanced Mode: _worker.js handles SSR, Pages CDN serves static assets.
 if (!existsSync("dist/server/server.js")) {
