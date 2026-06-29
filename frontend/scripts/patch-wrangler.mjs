@@ -1,5 +1,14 @@
-import { existsSync, readFileSync, writeFileSync, unlinkSync } from "fs";
+import { existsSync, readFileSync, writeFileSync, unlinkSync, rmSync } from "fs";
+import { join } from "path";
 import { execSync } from "child_process";
+
+// 0. Remove cached wrangler deploy config that conflicts with wrangler.toml.
+// Runs at postbuild start, before CF's wrangler deploy phase reads it.
+const deployConfig = join(process.cwd(), ".wrangler", "deploy", "config.json");
+if (existsSync(deployConfig)) {
+  rmSync(deployConfig, { force: true });
+  console.log("✓ .wrangler/deploy/config.json removed (prevents config conflict)");
+}
 
 // 1. Remove dist/client/wrangler.json so CF uses wrangler.toml instead.
 // The @cloudflare/vite-plugin generates this file with absolute local Mac paths
