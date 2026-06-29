@@ -1,18 +1,14 @@
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync, unlinkSync } from "fs";
 import { execSync } from "child_process";
 
-// 1. Replace dist/client/wrangler.json with a clean minimal file.
-// The @cloudflare/vite-plugin generates this with absolute local Mac paths
-// (configPath, userConfigPath, pages_build_output_dir) which break CF runtime.
-// We overwrite it with only the fields CF Pages actually needs.
+// 1. Remove dist/client/wrangler.json so CF uses wrangler.toml instead.
+// The @cloudflare/vite-plugin generates this file with absolute local Mac paths
+// which CF rejects as invalid. With it absent CF falls back to wrangler.toml.
 const pagesWranglerPath = "dist/client/wrangler.json";
-const cleanWrangler = {
-  name: "vcroom-main",
-  compatibility_date: "2026-01-01",
-  compatibility_flags: ["nodejs_compat"],
-};
-writeFileSync(pagesWranglerPath, JSON.stringify(cleanWrangler, null, 2));
-console.log("✓ dist/client/wrangler.json rewritten (clean, no local paths)");
+if (existsSync(pagesWranglerPath)) {
+  unlinkSync(pagesWranglerPath);
+  console.log("✓ dist/client/wrangler.json removed (CF will use wrangler.toml)");
+}
 
 // 2. Bundle dist/server/server.js → dist/client/_worker.js
 // Pages Advanced Mode: _worker.js handles SSR, Pages CDN serves static assets.
