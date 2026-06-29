@@ -1,0 +1,15 @@
+name = "vcroom-main"
+compatibility_date = "2026-01-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "./dist/client"
+
+[placement]
+mode = "smart"
+
+[vars]
+VITE_SUPABASE_URL = "https://ldimninnjlvxozubheib.supabase.co"
+VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI"
+VITE_APP_URL = "https://hockystick.app"
+SUPABASE_URL = "https://ldimninnjlvxozubheib.supabase.co"
+VITE_GOOGLE_CLIENT_ID = "1094004326767-hdd2dqad1ddtsehaa7qiqsbchfgiffou.apps.googleusercontent.com"
+VITE_TURNSTILE_SITE_KEY = "0x4AAAAAADh1iHD5_J7kFb23"
