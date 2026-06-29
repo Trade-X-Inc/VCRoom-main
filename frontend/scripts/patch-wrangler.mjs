@@ -170,24 +170,6 @@ execSync(
 const minifiedSize = (readFileSync("dist/client/_worker.js").length / 1024 / 1024).toFixed(2);
 console.log(`✓ _worker.js minified (${minifiedSize} MB uncompressed)`);
 
-// Step 3: append an explicit CF Pages fetch-handler export after minification.
-// Minification renames __patchedServer to a short var and emits
-// "export{xYz as default}" — valid ESM, but add a belt-and-suspenders
-// re-export that CF Pages Advanced Mode can always find.
-{
-  const minified = readFileSync("dist/client/_worker.js", "utf8");
-  // Extract the minified default export name (e.g. "qOe" from "export{qOe as default}")
-  const exportMatch = minified.match(/export\{(\w+) as default\}/);
-  if (exportMatch) {
-    const exportedName = exportMatch[1];
-    const safetyFooter = `\n;(function(){if(typeof ${exportedName}!=="undefined"&&typeof ${exportedName}.fetch==="function"){/* CF Pages default export verified: ${exportedName}.fetch exists */}})();\n`;
-    writeFileSync("dist/client/_worker.js", minified + safetyFooter);
-    console.log(`✓ _worker.js export verified: default=${exportedName} has .fetch`);
-  } else {
-    console.warn("⚠ Could not verify default export name after minification");
-  }
-}
-
 // Report gzip size
 try {
   const gzSize = execSync("gzip -c dist/client/_worker.js | wc -c").toString().trim();
@@ -197,3 +179,16 @@ try {
     console.error(`✘ WARNING: worker is ${gzMB} MB gzipped — exceeds CF Pages 1 MB limit`);
   }
 } catch (_) {}
+
+// Rewrite export to CF Pages compatible format
+const wp = "dist/client/_worker.js";
+let wc = readFileSync(wp, "utf8");
+wc = wc.replace(
+  /export\s*\{([^}]+)as default\s*\};?\s*$/,
+  (match, name) => {
+    const varName = name.trim();
+    return `var __D=${varName};export default{fetch:(r,e,c)=>{if(__D&&typeof __D.fetch==="function")return __D.fetch(r,e,c);if(typeof __D==="function")return __D(r,e,c);return new Response("no handler",{status:500});}}; `;
+  }
+);
+writeFileSync(wp, wc);
+console.log("✓ _worker.js export rewritten to CF Pages fetch handler");
