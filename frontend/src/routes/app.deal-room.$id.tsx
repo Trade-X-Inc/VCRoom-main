@@ -383,7 +383,7 @@ function DealRoom() {
   if (isTeamMember && !teamAssignmentLoading && teamAssignment === null) {
     return (
       <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 p-8">
-        <div className="grid h-14 w-14 place-items-center rounded-full bg-gray-100/30">
+        <div className="grid h-14 w-14 place-items-center rounded-full bg-gray-100/30 dark:bg-zinc-800/30">
           <Lock className="h-6 w-6 text-gray-500 dark:text-gray-400" />
         </div>
         <div className="text-center">
@@ -1292,7 +1292,7 @@ function InformationVaultPanel({
               )}
             </div>
           </div>
-          {profilesOpen ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
+          {profilesOpen ? <ChevronUp className="h-4 w-4 text-gray-400 dark:text-zinc-500" /> : <ChevronDown className="h-4 w-4 text-gray-400 dark:text-zinc-500" />}
         </button>
 
         {profilesOpen && (
@@ -2724,7 +2724,7 @@ function DueDiligencePanel({
                 <div key={cat} className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
                   <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 dark:border-zinc-800">
                     <span className="text-sm font-semibold text-gray-900 dark:text-white" style={{ fontFamily: "Syne, sans-serif" }}>{cat}</span>
-                    <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", DD_CATEGORY_COLORS[cat] ?? "bg-gray-100 text-gray-600")}>{catGoals.length}</span>
+                    <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", DD_CATEGORY_COLORS[cat] ?? "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400")}>{catGoals.length}</span>
                   </div>
                   <div className="divide-y divide-gray-100 dark:divide-zinc-800">
                     {catGoals.map((g: any) => (
@@ -2873,7 +2873,7 @@ function DueDiligencePanel({
                         className="text-left w-full"
                       >
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className={cn("text-sm font-medium", DD_CATEGORY_COLORS[goal.category] ?? "bg-gray-100 text-gray-600", "rounded-full px-2 py-0.5 text-[10px]")}>{goal.category}</span>
+                          <span className={cn("text-sm font-medium", DD_CATEGORY_COLORS[goal.category] ?? "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400", "rounded-full px-2 py-0.5 text-[10px]")}>{goal.category}</span>
                           {goal.is_standard && <span className="text-[10px] rounded-full bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 text-gray-500 dark:text-gray-400">Standard</span>}
                           {goal.due_by && <span className="text-[10px] text-gray-400 dark:text-gray-500">Due {format(new Date(goal.due_by), "MMM d")}</span>}
                         </div>
@@ -2893,7 +2893,7 @@ function DueDiligencePanel({
                             placeholder="Notes..."
                             className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none focus:border-[#7C3AED]"
                           />
-                          {savingNoteId === goal.id && <span className="text-[10px] text-gray-400">Saving…</span>}
+                          {savingNoteId === goal.id && <span className="text-[10px] text-gray-400 dark:text-zinc-500">Saving…</span>}
                           <div className="flex items-center gap-2">
                             <label className="text-xs text-gray-500 dark:text-gray-400">Due date</label>
                             <input
@@ -2922,13 +2922,13 @@ function DueDiligencePanel({
                       <button
                         onClick={() => flagGoal(goal)}
                         title="Flag"
-                        className="rounded-lg p-1.5 text-gray-400 hover:text-red-500"
+                        className="rounded-lg p-1.5 text-gray-400 dark:text-zinc-500 hover:text-red-500"
                       >
                         <AlertTriangle className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => deleteGoal(goal.id)}
-                        className="rounded-lg p-1.5 text-gray-400 hover:text-red-500"
+                        className="rounded-lg p-1.5 text-gray-400 dark:text-zinc-500 hover:text-red-500"
                         title="Delete"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -3596,7 +3596,7 @@ function NewTermSheetPanel({
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold text-gray-900 dark:text-white">Term Sheet v{sheet.version}</span>
-                      <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold", TS_STATUS_COLORS[sheet.status] ?? "bg-gray-100 text-gray-600")}>
+                      <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold", TS_STATUS_COLORS[sheet.status] ?? "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400")}>
                         {sheet.status?.replace(/_/g, " ")}
                       </span>
                     </div>
@@ -3662,7 +3662,7 @@ function NewTermSheetPanel({
                     <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-bold text-gray-900 dark:text-white">Term Sheet v{sheet.version}</span>
-                        <span className={cn("rounded-full px-2.5 py-0.5 text-[10px] font-semibold", TS_STATUS_COLORS[sheet.status] ?? "bg-gray-100 text-gray-600")}>
+                        <span className={cn("rounded-full px-2.5 py-0.5 text-[10px] font-semibold", TS_STATUS_COLORS[sheet.status] ?? "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400")}>
                           {sheet.status?.replace(/_/g, " ")}
                         </span>
                       </div>
@@ -4088,7 +4088,7 @@ function NewClosingPanel({
                                 {item.item_text}
                               </span>
                             </button>
-                            <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium capitalize", CLOSING_OWNER_COLORS[item.owner] ?? "bg-gray-100 text-gray-600")}>
+                            <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium capitalize", CLOSING_OWNER_COLORS[item.owner] ?? "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400")}>
                               {item.owner}
                             </span>
                           </div>
@@ -4743,7 +4743,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1 rounded-xl bg-gray-100/50 p-1">
+        <div className="flex items-center gap-1 rounded-xl bg-gray-100/50 dark:bg-zinc-800/50 p-1">
           <button
             onClick={() => setActiveVaultTab("documents")}
             className={cn(
@@ -5180,7 +5180,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                             : <ChevronDown className="h-3 w-3 shrink-0" />}
                         </button>
                         {isSummaryExpanded(doc.id) && (
-                          <div className="mt-2 rounded-lg border-l-2 border-brand/40 bg-gray-100/30 px-3 py-3">
+                          <div className="mt-2 rounded-lg border-l-2 border-brand/40 bg-gray-100/30 dark:bg-zinc-800/30 px-3 py-3">
                             {isEditing ? (
                               <div className="space-y-2">
                                 <textarea
@@ -5344,7 +5344,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
           </div>
           <div className="rounded-xl border border-dashed border-gray-200 dark:border-zinc-700 divide-y divide-border/40 overflow-hidden">
             {expectedForTab.map((expected) => (
-              <div key={expected.name} className="flex items-center gap-3 px-4 py-3 bg-gray-100/20">
+              <div key={expected.name} className="flex items-center gap-3 px-4 py-3 bg-gray-100/20 dark:bg-zinc-800/20">
                 <div className="grid h-8 w-8 place-items-center rounded-lg bg-muted shrink-0">
                   <FileText className="h-4 w-4 text-gray-500 dark:text-gray-400/50" />
                 </div>
@@ -5468,7 +5468,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                   </div>
                   {/* Visibility toggle — investor only */}
                   {isInvestor && (
-                    <div className="flex items-center gap-1 rounded-lg bg-gray-100/60 p-0.5 shrink-0">
+                    <div className="flex items-center gap-1 rounded-lg bg-gray-100/60 dark:bg-zinc-800/60 p-0.5 shrink-0">
                       {(["shared", "private"] as const).map((v) => (
                         <button
                           key={v}
@@ -6005,7 +6005,7 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
         />
         <div className="flex items-center justify-between">
           <label className="flex items-center gap-2 cursor-pointer">
-            <div className="flex items-center gap-1 rounded-lg bg-gray-100/60 p-0.5">
+            <div className="flex items-center gap-1 rounded-lg bg-gray-100/60 dark:bg-zinc-800/60 p-0.5">
               {(["public", "team", "private"] as const).map((v) => (
                 <button
                   key={v}
@@ -6961,7 +6961,7 @@ function OverviewPanel({
       <section className="mb-4">
         <h3 className="mb-2 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">TEAM</h3>
         {teamMembers.length === 0 ? (
-          <p className="text-gray-400 text-sm">Team members not added yet</p>
+          <p className="text-gray-400 dark:text-zinc-500 text-sm">Team members not added yet</p>
         ) : (
           <div className="flex gap-4 overflow-x-auto pb-2">
             {(teamMembers as any[]).map((member) => (
@@ -7025,7 +7025,7 @@ function OverviewPanel({
       <section className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-4 mb-4">
         <h3 className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4">RECENT ACTIVITY</h3>
         {recentActivity.length === 0 ? (
-          <p className="text-gray-400 text-sm">No activity yet</p>
+          <p className="text-gray-400 dark:text-zinc-500 text-sm">No activity yet</p>
         ) : (
           <div className="space-y-3">
             {(recentActivity as any[]).map((activity) => (
@@ -7035,7 +7035,7 @@ function OverviewPanel({
                   <span className="font-semibold text-gray-900 dark:text-white">{activity.actor_name ?? "Someone"}</span>
                   <span> · {activity.action_type ?? activity.target_label ?? "Activity"}</span>
                 </div>
-                <div className="ml-auto whitespace-nowrap text-xs text-gray-400">
+                <div className="ml-auto whitespace-nowrap text-xs text-gray-400 dark:text-zinc-500">
                   {activity.created_at ? new Date(activity.created_at).toLocaleDateString() : ""}
                 </div>
               </div>
