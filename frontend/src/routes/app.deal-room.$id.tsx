@@ -37,7 +37,8 @@ import { getQASuggestions } from "@/lib/qa-suggestions-fn";
 import { triggerDecisionEmail, triggerMeetingEmail, triggerDocumentUploadedEmail } from "@/lib/email/triggers";
 import { Stage2Gate } from "@/components/app/DealRoomWorkflow";
 import { withTimeout, AITimeoutError } from "@/lib/with-timeout";
-import { AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
+import { useTimedAI, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
+import { runDealBrief, fetchDealBrief, markBriefViewed, type AgentDealBrief } from "@/lib/deal-brief-fn";
 import { useStageTransition } from "@/hooks/useStageTransition";
 import {
   advanceDealStage, skipMeeting, completeMeeting, updateMeetingNotes,
@@ -6436,6 +6437,7 @@ function OverviewPanel({
   onApproveTransition: (id: string) => Promise<void>;
   onRejectTransition: (id: string) => Promise<void>;
 }) {
+  const queryClient = useQueryClient();
   const companyName = startup?.company_name ?? "Unknown";
   const companyInitial = companyName[0]?.toUpperCase() ?? "D";
   const daysOpen = dealRoom?.created_at
@@ -6452,20 +6454,39 @@ function OverviewPanel({
     },
   });
 
-  const { data: dealBrief } = useQuery({
-    queryKey: ["deal-room-overview-brief", startup?.id, dealRoom?.investor_user_id],
+  const dealBriefQueryKey = ["deal-room-overview-brief", startup?.id, dealRoom?.investor_user_id];
+  const { data: dealBrief } = useQuery<AgentDealBrief | null>({
+    queryKey: dealBriefQueryKey,
     enabled: !!startup?.id && !!dealRoom?.investor_user_id,
     staleTime: 5 * 60 * 1000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("deal_briefs")
-        .select("match_score,headline")
-        .eq("startup_id", startup.id)
-        .eq("investor_id", dealRoom.investor_user_id)
-        .maybeSingle();
-      return data ?? null;
-    },
+    queryFn: async () => fetchDealBrief(dealRoom.investor_user_id, startup.id),
   });
+
+  useEffect(() => {
+    if (dealBrief && !dealBrief.viewed_at) markBriefViewed(dealBrief.id).catch(() => {});
+  }, [dealBrief?.id]);
+
+  const { isWorking: generatingBrief, stillWorking: briefStillWorking, run: runBriefTimed } = useTimedAI();
+
+  const handleGenerateBrief = async () => {
+    if (!startup?.id || !dealRoom?.investor_user_id) return;
+    try {
+      await runBriefTimed(async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        const jwt = session?.access_token ?? "";
+        const result = await runDealBrief({
+          startupId: startup.id,
+          investorId: dealRoom.investor_user_id,
+          userId: currentUserId,
+          jwt,
+        });
+        queryClient.setQueryData(dealBriefQueryKey, result);
+        toast.success("Deal brief generated");
+      });
+    } catch (err) {
+      toast.error(err instanceof AITimeoutError ? AI_TIMEOUT_MESSAGE : "Failed to generate brief. Please try again.");
+    }
+  };
 
   const { data: recentActivity = [] } = useQuery({
     queryKey: ["deal-room-overview-activity", startup?.id, dealRoom?.id],
@@ -6572,6 +6593,68 @@ function OverviewPanel({
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-4 mb-4">
+        <div className="flex items-center justify-between gap-3 mb-1">
+          <h3 className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">DEAL BRIEF</h3>
+          <button
+            type="button"
+            data-testid="generate-brief-btn"
+            onClick={handleGenerateBrief}
+            disabled={generatingBrief || !dealRoom?.investor_user_id}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-[#7C3AED] px-3 py-1.5 text-xs font-medium text-white transition-colors disabled:cursor-not-allowed disabled:bg-[#7C3AED]/40"
+          >
+            {generatingBrief ? (
+              <>
+                <Loader2 className="h-3 w-3 animate-spin" />
+                {briefStillWorking ? "Still working…" : "Generating…"}
+              </>
+            ) : dealBrief ? (
+              <>
+                <Sparkles className="h-3 w-3" /> Refresh brief
+              </>
+            ) : (
+              <>
+                <FileText className="h-3 w-3" /> Generate brief
+              </>
+            )}
+          </button>
+        </div>
+
+        {!dealRoom?.investor_user_id ? (
+          <p className="text-sm text-gray-400 dark:text-gray-500">No investor assigned yet — assign one to generate a deal brief.</p>
+        ) : !dealBrief ? (
+          <p className="text-sm text-gray-400 dark:text-gray-500">No brief yet — generate one to see match score and analysis.</p>
+        ) : (
+          <div>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span
+                className="text-xs px-2 py-0.5 rounded-full font-medium"
+                style={
+                  dealBrief.match_score >= 80
+                    ? { background: "rgba(16,185,129,0.12)", color: "#10B981" }
+                    : dealBrief.match_score >= 50
+                    ? { background: "rgba(245,158,11,0.12)", color: "#F59E0B" }
+                    : { background: "rgba(239,68,68,0.12)", color: "#EF4444" }
+                }
+              >
+                {dealBrief.match_score}/100
+              </span>
+              {dealBrief.headline && (
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">{dealBrief.headline}</span>
+              )}
+            </div>
+            {dealBrief.investment_thesis && (
+              <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{dealBrief.investment_thesis}</p>
+            )}
+            <p className="mt-3 text-xs text-gray-400 dark:text-gray-500">
+              {dealBrief.generated_at
+                ? `Generated ${formatDistanceToNow(new Date(dealBrief.generated_at), { addSuffix: true })}`
+                : null}
+            </p>
+          </div>
+        )}
       </section>
 
       <section className="mb-4">
