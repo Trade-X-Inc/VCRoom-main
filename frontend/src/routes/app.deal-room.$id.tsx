@@ -39,6 +39,7 @@ import { Stage2Gate } from "@/components/app/DealRoomWorkflow";
 import { withTimeout, AITimeoutError } from "@/lib/with-timeout";
 import { useTimedAI, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 import { runDealBrief, fetchDealBrief, markBriefViewed, type AgentDealBrief } from "@/lib/deal-brief-fn";
+import { fetchNdaDocument, type NdaDocument } from "@/lib/nda-fn";
 import { useStageTransition } from "@/hooks/useStageTransition";
 import {
   advanceDealStage, skipMeeting, completeMeeting, updateMeetingNotes,
@@ -6489,6 +6490,33 @@ function OverviewPanel({
     }
   };
 
+  const [ndaModalOpen, setNdaModalOpen] = useState(false);
+
+  const { data: ndaDoc } = useQuery<NdaDocument | null>({
+    queryKey: ["nda-document", dealRoom?.id],
+    enabled: !!dealRoom?.id,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => fetchNdaDocument({ data: { dealRoomId: dealRoom.id } }),
+  });
+
+  const { data: ndaSigners = [] } = useQuery({
+    queryKey: ["nda-acceptances-overview", dealRoom?.id],
+    enabled: !!dealRoom?.id,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("nda_acceptances")
+        .select("signer_full_name, signer_company, role, accepted_at")
+        .eq("deal_room_id", dealRoom.id)
+        .order("accepted_at", { ascending: true });
+      return data ?? [];
+    },
+  });
+
+  const handlePrintNda = () => {
+    window.print();
+  };
+
   const { data: recentActivity = [] } = useQuery({
     queryKey: ["deal-room-overview-activity", startup?.id, dealRoom?.id],
     enabled: !!startup?.id && !!dealRoom?.id,
@@ -6657,6 +6685,140 @@ function OverviewPanel({
           </div>
         )}
       </section>
+
+      {/* ── NDA & Confidentiality card ─────────────────────────────── */}
+      <section className="mb-4">
+        <h3 className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">NDA &amp; CONFIDENTIALITY</h3>
+        <div className="bg-card border border-border/60 rounded-xl p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.2)]">
+                <Shield className="h-4 w-4 text-[#10B981]" />
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-foreground">NDA &amp; Confidentiality Agreement</div>
+                {ndaDoc ? (
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(16,185,129,0.12)] text-[#10B981] text-[11px] font-semibold px-2 py-0.5">
+                      <CheckCircle2 className="h-3 w-3" />
+                      Signed by {ndaSigners.length} {ndaSigners.length === 1 ? "party" : "parties"}
+                    </span>
+                    <span className="text-[11px] text-muted-foreground">
+                      · v{ndaDoc.version} · updated {formatDistanceToNow(new Date(ndaDoc.updated_at), { addSuffix: true })}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="mt-0.5">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.4)] text-[11px] font-semibold px-2 py-0.5">
+                      <Clock className="h-3 w-3" /> Pending
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              {ndaDoc && (
+                <>
+                  <button
+                    onClick={() => setNdaModalOpen(true)}
+                    className="text-xs text-muted-foreground hover:text-foreground border border-border/60 rounded-lg px-3 py-1.5 transition-colors"
+                  >
+                    View full NDA
+                  </button>
+                  <button
+                    onClick={handlePrintNda}
+                    className="inline-flex items-center gap-1.5 text-xs border border-border/60 rounded-lg px-3 py-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Download className="h-3.5 w-3.5" /> Download PDF
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Signatories list */}
+          {ndaSigners.length > 0 && (
+            <div className="mt-4 border-t border-border/60 pt-4 space-y-2">
+              {(ndaSigners as any[]).map((signer, i) => (
+                <div key={i} className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-[#10B981] shrink-0" />
+                    <span className="font-medium text-foreground">{signer.signer_full_name || "—"}</span>
+                    {signer.signer_company && (
+                      <span className="text-muted-foreground">· {signer.signer_company}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <span className="capitalize">{signer.role}</span>
+                    <span>·</span>
+                    <span>{signer.accepted_at ? format(new Date(signer.accepted_at), "MMM d, yyyy") : "—"}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ── NDA full-text modal ────────────────────────────────────── */}
+      {ndaModalOpen && ndaDoc && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm print:hidden"
+          onClick={() => setNdaModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-2xl max-h-[85vh] bg-card border border-border/60 rounded-2xl overflow-hidden shadow-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border/60 shrink-0">
+              <div className="flex items-center gap-3">
+                <Shield className="h-5 w-5 text-[#10B981]" />
+                <div>
+                  <div className="font-semibold text-sm text-foreground">Non-Disclosure Agreement</div>
+                  <div className="text-xs text-muted-foreground">
+                    {companyName} · v{ndaDoc.version} · {ndaSigners.length} {ndaSigners.length === 1 ? "party" : "parties"}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handlePrintNda}
+                  className="inline-flex items-center gap-1.5 text-xs bg-brand/10 hover:bg-brand/20 text-brand border border-brand/20 rounded-lg px-3 py-1.5 transition-colors"
+                >
+                  <Download className="h-3.5 w-3.5" /> Download PDF
+                </button>
+                <button
+                  onClick={() => setNdaModalOpen(false)}
+                  className="p-1.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <pre className="text-xs leading-relaxed text-muted-foreground whitespace-pre-wrap font-sans">
+                {ndaDoc.nda_text}
+              </pre>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Hidden print-only NDA layout ─────────────────────────── */}
+      <div className="nda-print-content hidden print:block">
+        <div style={{ fontFamily: "serif", maxWidth: "700px", margin: "0 auto", padding: "40px 0" }}>
+          <div style={{ textAlign: "center", marginBottom: "32px" }}>
+            <div style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.15em", color: "#6B7280", marginBottom: "4px" }}>Hockystick</div>
+            <div style={{ fontSize: "18px", fontWeight: "700" }}>{companyName}</div>
+            <div style={{ fontSize: "12px", color: "#6B7280", marginTop: "4px" }}>
+              Non-Disclosure Agreement · v{ndaDoc?.version ?? 1} · Generated {ndaDoc?.updated_at ? format(new Date(ndaDoc.updated_at), "MMMM d, yyyy") : ""}
+            </div>
+          </div>
+          <pre style={{ fontSize: "11px", lineHeight: "1.7", whiteSpace: "pre-wrap", fontFamily: "serif", color: "#111827" }}>
+            {ndaDoc?.nda_text ?? ""}
+          </pre>
+        </div>
+      </div>
 
       <section className="mb-4">
         <h3 className="mb-2 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">TEAM</h3>

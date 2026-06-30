@@ -268,3 +268,22 @@ img { max-width: 100%; height: auto; }
   --hs-purple-light: #2E1065;
   --hs-purple-text: #A78BFA;
 }
+
+/* ── NDA print layout ───────────────────────────────────────────────── */
+@media print {
+  body > *:not(.nda-print-root),
+  #root > *:not(.nda-print-root) { display: none !important; }
+
+  /* Hide everything on the page except the nda-print-content div */
+  body * { visibility: hidden; }
+  .nda-print-content,
+  .nda-print-content * { visibility: visible; }
+  .nda-print-content {
+    position: fixed;
+    inset: 0;
+    background: white;
+    color: black;
+    padding: 40px;
+    overflow: auto;
+  }
+}
