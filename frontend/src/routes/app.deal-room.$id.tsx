@@ -36,7 +36,8 @@ import { sendInviteEmail } from "@/lib/invite-fn";
 import { getQASuggestions } from "@/lib/qa-suggestions-fn";
 import { triggerDecisionEmail, triggerMeetingEmail, triggerDocumentUploadedEmail } from "@/lib/email/triggers";
 import { Stage2Gate } from "@/components/app/DealRoomWorkflow";
-import { generateDealBrief, type DealBriefResult } from "@/lib/deal-brief-fn";
+import { withTimeout, AITimeoutError } from "@/lib/with-timeout";
+import { AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 import { useStageTransition } from "@/hooks/useStageTransition";
 import {
   advanceDealStage, skipMeeting, completeMeeting, updateMeetingNotes,
@@ -802,19 +803,6 @@ function StagedDealRoom({
           stageRequesting={stageRequesting}
         />
       )}
-      {activeStageKey !== "information_vault" && activeStageKey !== "qa" && activeStageKey !== "due_diligence" && activeStage === "initial_review" && (
-        <InitialReviewPanel
-          dealRoomId={dealRoomId} room={room} isInvestor={isInvestor} isFounder={isFounder}
-          userId={userId} userName={userName} companyName={companyName} sector={sector}
-          readOnly={viewingHistory}
-        />
-      )}
-      {activeStageKey !== "information_vault" && activeStageKey !== "qa" && activeStageKey !== "due_diligence" && activeStage === "diligence" && (
-        <DiligencePanel
-          dealRoomId={dealRoomId} room={room} isInvestor={isInvestor} isFounder={isFounder}
-          userId={userId} readOnly={viewingHistory}
-        />
-      )}
       {activeStageKey === "term_sheet" && (
         <NewTermSheetPanel
           dealRoomId={dealRoomId}
@@ -835,25 +823,6 @@ function StagedDealRoom({
           userId={userId ?? ""}
           userName={userName}
         />
-      )}
-      {activeStageKey !== "information_vault" && activeStageKey !== "qa" && activeStageKey !== "due_diligence" && activeStageKey !== "term_sheet" && activeStageKey !== "closing" && activeStage === "initial_review" && (
-        <InitialReviewPanel
-          dealRoomId={dealRoomId} room={room} isInvestor={isInvestor} isFounder={isFounder}
-          userId={userId} userName={userName} companyName={companyName} sector={sector}
-          readOnly={viewingHistory}
-        />
-      )}
-      {activeStageKey !== "information_vault" && activeStageKey !== "qa" && activeStageKey !== "due_diligence" && activeStageKey !== "term_sheet" && activeStageKey !== "closing" && activeStage === "diligence" && (
-        <DiligencePanel
-          dealRoomId={dealRoomId} room={room} isInvestor={isInvestor} isFounder={isFounder}
-          userId={userId} readOnly={viewingHistory}
-        />
-      )}
-      {activeStageKey !== "information_vault" && activeStageKey !== "qa" && activeStageKey !== "due_diligence" && activeStageKey !== "term_sheet" && activeStageKey !== "closing" && activeStage === "term_sheet" && (
-        <TermSheetPanel dealRoomId={dealRoomId} room={room} isInvestor={isInvestor} isFounder={isFounder} userId={userId} readOnly={viewingHistory} />
-      )}
-      {activeStageKey !== "information_vault" && activeStageKey !== "qa" && activeStageKey !== "due_diligence" && activeStageKey !== "term_sheet" && activeStageKey !== "closing" && activeStage === "closed" && (
-        <ClosedPanel room={room} isInvestor={isInvestor} />
       )}
     </div>
   );
@@ -3168,549 +3137,6 @@ function companyNameOf(room: any) {
   return room?.startups?.company_name ?? (room as any)?.investor_company ?? "Deal Room";
 }
 
-// ── Initial review panel ───────────────────────────────────────────
-function InitialReviewPanel({
-  dealRoomId, room, isInvestor, isFounder, userId, userName, companyName, sector, readOnly,
-}: {
-  dealRoomId: string; room: any; isInvestor: boolean; isFounder: boolean;
-  userId?: string; userName: string; companyName: string; sector: string; readOnly: boolean;
-}) {
-  const queryClient = useQueryClient();
-  const [brief, setBrief] = useState<DealBriefResult | null>(null);
-  const [briefLoading, setBriefLoading] = useState(false);
-  const [advancing, setAdvancing] = useState(false);
-  const [showAdvance, setShowAdvance] = useState(false);
-  const [showPass, setShowPass] = useState(false);
-
-  const startupId = (room as any)?.startup_id ?? null;
-
-  const loadBrief = async () => {
-    if (!userId) return;
-    setBriefLoading(true);
-    try {
-      const result = await generateDealBrief({ data: { dealRoomId, userId } });
-      setBrief(result);
-    } catch {
-      toast.error("Could not generate brief");
-    } finally {
-      setBriefLoading(false);
-    }
-  };
-
-  const doAdvance = async () => {
-    if (!userId) return;
-    setAdvancing(true);
-    try {
-      const res = await advanceDealStage({ data: { deal_room_id: dealRoomId, to_stage: "diligence", actor_user_id: userId } });
-      if (!res.ok) { toast.error("Could not advance"); return; }
-      await queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
-      toast.success("Advanced to Diligence");
-      setShowAdvance(false);
-    } finally {
-      setAdvancing(false);
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <Eyebrow>Stage 1 Review</Eyebrow>
-        <h2 className="text-2xl font-semibold tracking-tight text-white" style={{ fontFamily: "Syne, sans-serif" }}>Initial review</h2>
-        <p className="mt-1 text-sm" style={{ color: "var(--color-muted-foreground)" }}>
-          {isInvestor ? "Review the deal brief and Stage 1 documents, then decide." : "The investor is reviewing your Stage 1 materials."}
-        </p>
-      </div>
-
-      {isInvestor && (
-        <DarkCard>
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2 text-sm font-semibold text-white">
-              <Sparkles className="h-4 w-4" style={{ color: "#A855F7" }} /> AI deal brief
-            </div>
-            {!brief && (
-              <button onClick={loadBrief} disabled={briefLoading} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50" style={{ background: "#7C3AED" }} data-testid="generate-brief">
-                {briefLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />} Generate
-              </button>
-            )}
-          </div>
-          {brief ? (
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="rounded-full px-2.5 py-1 text-xs font-semibold" style={{ background: "rgba(124,58,237,0.12)", color: "#A855F7" }}>{brief.matchScore}/100 · {brief.matchLabel}</span>
-              </div>
-              <BriefList label="Strengths" items={brief.strengths} color="#10B981" />
-              <BriefList label="Risks" items={brief.risks} color="#F59E0B" />
-              <div>
-                <Eyebrow>Suggested next action</Eyebrow>
-                <p style={{ color: "var(--color-foreground)" }}>{brief.nextAction}</p>
-              </div>
-            </div>
-          ) : (
-            <p className="text-xs" style={{ color: "var(--color-muted-foreground)" }}>Generate an AI brief summarizing fit, strengths, and risks for this deal.</p>
-          )}
-        </DarkCard>
-      )}
-
-      <DarkCard style={{ padding: 0 }}>
-        <div className="px-6 pt-5">
-          <Eyebrow>Stage 1 documents</Eyebrow>
-        </div>
-        <div className="-mt-2">
-          <Documents dealRoomId={dealRoomId} isFounder={isFounder} isInvestor={isInvestor} userId={userId} startupId={startupId} />
-        </div>
-      </DarkCard>
-
-      <DarkCard style={{ padding: 0 }}>
-        <QA dealRoomId={dealRoomId} userId={userId} userName={userName} isInvestor={isInvestor} isFounder={isFounder} companyName={companyName} sector={sector} />
-      </DarkCard>
-
-      {isInvestor && !readOnly && (
-        <div className="flex flex-wrap items-center gap-3">
-          <PrimaryButton onClick={() => setShowAdvance(true)} testid="advance-to-diligence">Advance to Diligence</PrimaryButton>
-          <button
-            onClick={() => setShowPass(true)}
-            data-testid="pass-deal"
-            className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold"
-            style={{ background: "rgba(239,68,68,0.12)", color: "#EF4444" }}
-          >
-            <ThumbsDown className="h-4 w-4" /> Pass
-          </button>
-        </div>
-      )}
-
-      {showAdvance && (
-        <ConfirmModal
-          title="Advance to Diligence"
-          body="This opens the diligence stage for both parties — meetings, document requests, and the DD checklist. The founder will see the change."
-          confirmLabel="Advance"
-          busy={advancing}
-          testid="advance-confirm-modal"
-          onConfirm={doAdvance}
-          onClose={() => setShowAdvance(false)}
-        />
-      )}
-      {showPass && <PassModal dealRoomId={dealRoomId} userId={userId} onClose={() => setShowPass(false)} />}
-    </div>
-  );
-}
-
-function BriefList({ label, items, color }: { label: string; items: string[]; color: string }) {
-  if (!items?.length) return null;
-  return (
-    <div>
-      <Eyebrow>{label}</Eyebrow>
-      <ul className="space-y-1">
-        {items.map((it, i) => (
-          <li key={i} className="flex gap-2 text-xs" style={{ color: "var(--color-foreground)" }}>
-            <span className="mt-1.5 h-1 w-1 rounded-full shrink-0" style={{ background: color }} /> {it}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-// ── Diligence panel (3 sub-tabs) ───────────────────────────────────
-function DiligencePanel({ dealRoomId, room, isInvestor, isFounder, userId, readOnly }: { dealRoomId: string; room: any; isInvestor: boolean; isFounder: boolean; userId?: string; readOnly: boolean }) {
-  const [sub, setSub] = useState<"meetings" | "requests" | "checklist">("meetings");
-  const subs = [
-    { k: "meetings" as const, l: "Meetings", i: Calendar },
-    { k: "requests" as const, l: "Document Requests", i: FolderOpen },
-    { k: "checklist" as const, l: "DD Checklist", i: ClipboardList },
-  ];
-  return (
-    <div className="space-y-6">
-      <div>
-        <Eyebrow>Diligence</Eyebrow>
-        <h2 className="text-2xl font-semibold tracking-tight text-white" style={{ fontFamily: "Syne, sans-serif" }}>Due diligence</h2>
-      </div>
-
-      <div className="flex items-center gap-1 rounded-xl p-1" style={{ background: "var(--color-muted)" }} data-testid="diligence-subtabs">
-        {subs.map((s) => (
-          <button
-            key={s.k}
-            onClick={() => setSub(s.k)}
-            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
-            style={sub === s.k ? { background: "#7C3AED", color: "var(--color-foreground)" } : { color: "var(--color-muted-foreground)" }}
-            data-testid={`diligence-sub-${s.k}`}
-          >
-            <s.i className="h-3.5 w-3.5" /> {s.l}
-          </button>
-        ))}
-      </div>
-
-      {sub === "meetings" && <MeetingsSubTab dealRoomId={dealRoomId} room={room} isInvestor={isInvestor} isFounder={isFounder} userId={userId} readOnly={readOnly} />}
-      {sub === "requests" && <DocumentRequestsSubTab dealRoomId={dealRoomId} isInvestor={isInvestor} isFounder={isFounder} userId={userId} readOnly={readOnly} />}
-      {sub === "checklist" && (
-        <DarkCard style={{ padding: 0 }}>
-          <DDWorkstation dealRoomId={dealRoomId} userId={userId} isInvestor={isInvestor} isFounder={isFounder} />
-        </DarkCard>
-      )}
-    </div>
-  );
-}
-
-// ── Meetings sub-tab ───────────────────────────────────────────────
-function MeetingsSubTab({ dealRoomId, room, isInvestor, isFounder, userId, readOnly }: { dealRoomId: string; room: any; isInvestor: boolean; isFounder: boolean; userId?: string; readOnly: boolean }) {
-  const queryClient = useQueryClient();
-  const [busyNum, setBusyNum] = useState<number | null>(null);
-  const [showAdvance, setShowAdvance] = useState(false);
-  const [advancing, setAdvancing] = useState(false);
-  const [drafts, setDrafts] = useState<Record<number, { type: string; scheduled: string }>>({});
-
-  const { data: meetings = [], refetch } = useQuery({
-    queryKey: ["dr-stage-meetings", dealRoomId],
-    enabled: !!dealRoomId,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("deal_room_meetings")
-        .select("*")
-        .eq("deal_room_id", dealRoomId)
-        .order("meeting_number", { ascending: true });
-      return data ?? [];
-    },
-  });
-
-  const byNumber = (n: number) => (meetings as any[]).find((m) => m.meeting_number === n);
-  const anyDone = (meetings as any[]).some((m) => m.completed_at);
-
-  const markDone = async (n: number) => {
-    if (!userId) return;
-    setBusyNum(n);
-    try {
-      const d = drafts[n];
-      await completeMeeting({ data: { deal_room_id: dealRoomId, meeting_number: n, actor_user_id: userId, meeting_type: d?.type === "in_person" ? "in_person" : "video", scheduled_at: d?.scheduled ? new Date(d.scheduled).toISOString() : undefined } });
-      await refetch();
-      toast.success(`Meeting ${n} marked done`);
-    } finally { setBusyNum(null); }
-  };
-
-  const doSkip = async (n: number) => {
-    if (!userId) return;
-    setBusyNum(n);
-    try {
-      await skipMeeting({ data: { deal_room_id: dealRoomId, meeting_number: n, actor_user_id: userId } });
-      await refetch();
-      toast.success(`Meeting ${n} skipped`);
-    } finally { setBusyNum(null); }
-  };
-
-  const saveNotes = async (n: number, notes_shared?: string, notes_investor?: string) => {
-    await updateMeetingNotes({ data: { deal_room_id: dealRoomId, meeting_number: n, notes_shared, notes_investor } });
-    await refetch();
-    toast.success("Notes saved");
-  };
-
-  const doAdvance = async () => {
-    if (!userId) return;
-    setAdvancing(true);
-    try {
-      const res = await advanceDealStage({ data: { deal_room_id: dealRoomId, to_stage: "term_sheet", actor_user_id: userId } });
-      if (!res.ok) { toast.error("Could not advance"); return; }
-      await queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
-      toast.success("Advanced to Term Sheet");
-      setShowAdvance(false);
-    } finally { setAdvancing(false); }
-  };
-
-  return (
-    <div className="space-y-4">
-      {[1, 2, 3].map((n) => {
-        const m = byNumber(n);
-        const skipped = m?.meeting_type === "skipped";
-        const done = !!m?.completed_at;
-        const status = skipped ? "Skipped" : done ? "Done" : "Scheduled";
-        const draft = drafts[n] ?? { type: m?.meeting_type === "in_person" ? "in_person" : "video", scheduled: "" };
-        return (
-          <DarkCard key={n}>
-            <div className="flex items-center justify-between gap-3">
-              <div className="text-sm font-semibold text-white">Meeting {n}</div>
-              <span className="rounded-full px-2.5 py-1 text-xs font-medium"
-                style={skipped
-                  ? { background: "var(--color-muted)", color: "var(--color-muted-foreground)" }
-                  : done
-                    ? { background: "rgba(16,185,129,0.12)", color: "#10B981" }
-                    : { background: "rgba(245,158,11,0.12)", color: "#F59E0B" }}
-                data-testid={`meeting-status-${n}`}>
-                {status}
-              </span>
-            </div>
-
-            {!done && !skipped && !readOnly && (
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-1 rounded-lg p-0.5" style={{ background: "var(--color-muted)" }}>
-                  {(["video", "in_person"] as const).map((t) => (
-                    <button key={t} onClick={() => setDrafts((s) => ({ ...s, [n]: { ...draft, type: t } }))}
-                      className="rounded-md px-2.5 py-1 text-xs font-medium"
-                      style={draft.type === t ? { background: "#7C3AED", color: "var(--color-foreground)" } : { color: "var(--color-muted-foreground)" }}>
-                      {t === "video" ? "Online" : "In-person"}
-                    </button>
-                  ))}
-                </div>
-                <input type="datetime-local" value={draft.scheduled}
-                  onChange={(e) => setDrafts((s) => ({ ...s, [n]: { ...draft, scheduled: e.target.value } }))}
-                  className="rounded-lg px-3 py-1.5 text-xs text-white outline-none"
-                  style={{ background: "var(--color-muted)", border: "1px solid var(--color-border)" }} />
-              </div>
-            )}
-
-            {m?.scheduled_at && (
-              <div className="mt-2 text-xs" style={{ color: "var(--color-muted-foreground)" }}>{format(new Date(m.scheduled_at), "EEE, d MMM · h:mm a")}</div>
-            )}
-
-            {isInvestor && !done && !skipped && !readOnly && (
-              <div className="mt-3 flex items-center gap-2">
-                <button onClick={() => markDone(n)} disabled={busyNum === n} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50" style={{ background: "#7C3AED" }} data-testid={`meeting-done-${n}`}>
-                  {busyNum === n ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />} Mark as done
-                </button>
-                <button onClick={() => doSkip(n)} disabled={busyNum === n} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium" style={{ color: "var(--color-muted-foreground)", border: "1px solid var(--color-border)" }} data-testid={`meeting-skip-${n}`}>
-                  Skip this meeting
-                </button>
-              </div>
-            )}
-
-            {/* Notes */}
-            <div className="mt-3 space-y-2">
-              <div>
-                <Eyebrow>Shared notes</Eyebrow>
-                <NotesEditor initial={m?.notes_shared ?? ""} readOnly={readOnly} onSave={(v) => saveNotes(n, v, undefined)} placeholder="Visible to both parties" />
-              </div>
-              {isInvestor && (
-                <div>
-                  <Eyebrow>Investor-only notes</Eyebrow>
-                  <NotesEditor initial={m?.notes_investor ?? ""} readOnly={readOnly} onSave={(v) => saveNotes(n, undefined, v)} placeholder="Private to your team" />
-                </div>
-              )}
-            </div>
-          </DarkCard>
-        );
-      })}
-
-      {isInvestor && anyDone && !readOnly && (
-        <div>
-          <PrimaryButton onClick={() => setShowAdvance(true)} testid="advance-to-term-sheet">Advance to Term Sheet</PrimaryButton>
-        </div>
-      )}
-      {showAdvance && (
-        <ConfirmModal
-          title="Advance to Term Sheet"
-          body="This moves the deal to the term sheet stage. The founder will see the change."
-          confirmLabel="Advance"
-          busy={advancing}
-          testid="advance-ts-confirm-modal"
-          onConfirm={doAdvance}
-          onClose={() => setShowAdvance(false)}
-        />
-      )}
-    </div>
-  );
-}
-
-function NotesEditor({ initial, onSave, readOnly, placeholder }: { initial: string; onSave: (v: string) => void; readOnly: boolean; placeholder?: string }) {
-  const [val, setVal] = useState(initial);
-  const [dirty, setDirty] = useState(false);
-  useEffect(() => { setVal(initial); setDirty(false); }, [initial]);
-  if (readOnly) {
-    return <p className="text-xs" style={{ color: "var(--color-foreground)" }}>{initial || "—"}</p>;
-  }
-  return (
-    <div className="flex items-start gap-2">
-      <textarea
-        value={val}
-        onChange={(e) => { setVal(e.target.value); setDirty(true); }}
-        rows={2}
-        placeholder={placeholder}
-        className="flex-1 rounded-lg px-3 py-2 text-xs text-white outline-none resize-none placeholder:text-gray-500 dark:text-gray-400"
-        style={{ background: "var(--color-muted)", border: "1px solid var(--color-border)" }}
-      />
-      {dirty && (
-        <button onClick={() => { onSave(val); setDirty(false); }} className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-white shrink-0" style={{ background: "#7C3AED" }}>Save</button>
-      )}
-    </div>
-  );
-}
-
-// ── Document requests sub-tab ──────────────────────────────────────
-const DOC_REQ_CATEGORIES: { value: string; label: string }[] = [
-  { value: "general",    label: "General documents" },
-  { value: "financial",  label: "Financial documents" },
-  { value: "legal",      label: "Legal documents" },
-  { value: "commercial", label: "Commercial / contracts" },
-  { value: "team",       label: "Team & HR documents" },
-];
-
-function DocumentRequestsSubTab({ dealRoomId, isInvestor, isFounder, userId, readOnly }: { dealRoomId: string; isInvestor: boolean; isFounder: boolean; userId?: string; readOnly: boolean }) {
-  const queryClient = useQueryClient();
-  const [name, setName] = useState("");
-  const [desc, setDesc] = useState("");
-  const [category, setCategory] = useState("general");
-  const [creating, setCreating] = useState(false);
-  const [blockedMsg, setBlockedMsg] = useState<string | null>(null);
-  const [respondingId, setRespondingId] = useState<string | null>(null);
-
-  const { data: requests = [], refetch } = useQuery({
-    queryKey: ["doc-requests", dealRoomId],
-    enabled: !!dealRoomId,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("deal_room_document_requests")
-        .select("*")
-        .eq("deal_room_id", dealRoomId)
-        .eq("is_blocked", false)
-        .order("created_at", { ascending: false });
-      return data ?? [];
-    },
-  });
-
-  const otherPartyId = async () => {
-    const { data } = await supabase
-      .from("deal_room_members")
-      .select("user_id, role")
-      .eq("deal_room_id", dealRoomId);
-    const target = (data ?? []).find((m: any) => m.user_id !== userId);
-    return target?.user_id ?? userId;
-  };
-
-  const submit = async () => {
-    if (!name.trim() || !desc.trim() || !userId) return;
-    setBlockedMsg(null);
-    setCreating(true);
-    try {
-      const requestedFrom = await otherPartyId();
-      const res = await createDocumentRequest({
-        data: {
-          deal_room_id: dealRoomId,
-          requested_by: userId,
-          requested_from: requestedFrom,
-          document_name: name.trim(),
-          document_description: desc.trim(),
-          category,
-        },
-      });
-      if (res.blocked) {
-        setBlockedMsg(res.blocked_reason ?? "This category cannot be requested.");
-        return;
-      }
-      setName(""); setDesc(""); setCategory("general");
-      await refetch();
-      toast.success("Document requested");
-    } finally {
-      setCreating(false);
-    }
-  };
-
-  const respond = async (req: any, response: "provided" | "declined" | "partial", extra: { decline_reason?: string; partial_explanation?: string; document_path?: string }) => {
-    if (!userId) return;
-    setRespondingId(req.id);
-    try {
-      await respondToDocumentRequest({ data: { request_id: req.id, deal_room_id: dealRoomId, actor_user_id: userId, response, ...extra } });
-      await refetch();
-      toast.success("Response sent");
-    } finally { setRespondingId(null); }
-  };
-
-  const statusPill = (status: string) => {
-    if (status === "provided") return { label: "Provided", style: { background: "rgba(16,185,129,0.12)", color: "#10B981" } };
-    if (status === "declined") return { label: "Declined", style: { background: "rgba(239,68,68,0.12)", color: "#EF4444" } };
-    if (status === "partial") return { label: "Partial", style: { background: "rgba(245,158,11,0.12)", color: "#F59E0B" } };
-    return { label: "Pending", style: { background: "var(--color-muted)", color: "var(--color-muted-foreground)" } };
-  };
-
-  return (
-    <div className="space-y-4">
-      {isInvestor && !readOnly && (
-        <DarkCard>
-          <Eyebrow>Request a document</Eyebrow>
-          <div className="space-y-3">
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Document name (required)" className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none placeholder:text-gray-500 dark:text-gray-400" style={{ background: "var(--color-muted)", border: "1px solid var(--color-border)" }} data-testid="doc-req-name" />
-            <textarea value={desc} onChange={(e) => setDesc(e.target.value)} rows={2} placeholder="What you need and why (required)" className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none resize-none placeholder:text-gray-500 dark:text-gray-400" style={{ background: "var(--color-muted)", border: "1px solid var(--color-border)" }} data-testid="doc-req-desc" />
-            <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none" style={{ background: "var(--color-muted)", border: "1px solid var(--color-border)" }} data-testid="doc-req-category">
-              {DOC_REQ_CATEGORIES.map((c) => <option key={c.value} value={c.value} style={{ background: "var(--color-card)" }}>{c.label}</option>)}
-            </select>
-            <div className="rounded-lg px-3 py-2.5 text-xs leading-relaxed" style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.18)", color: "var(--color-muted-foreground)" }} data-testid="doc-req-boundary-callout">
-              <span className="font-semibold" style={{ color: "var(--color-foreground)" }}>What we don't facilitate:</span> Hockystick does not support requests for source code, technical IP, personal employee data, or customer PII. These protect both parties.
-            </div>
-            <div className="flex justify-end">
-              <PrimaryButton onClick={submit} disabled={!name.trim() || !desc.trim() || creating} testid="doc-req-submit" className="!px-4 !py-2">
-                {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Request
-              </PrimaryButton>
-            </div>
-          </div>
-        </DarkCard>
-      )}
-
-      {(requests as any[]).length === 0 ? (
-        <DarkCard><p className="text-sm" style={{ color: "var(--color-muted-foreground)" }}>No document requests yet.</p></DarkCard>
-      ) : (
-        (requests as any[]).map((req) => {
-          const pill = statusPill(req.status);
-          const canRespond = isFounder && req.requested_from === userId && req.status === "pending" && !readOnly;
-          return (
-            <DarkCard key={req.id} className="space-y-2">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-sm font-semibold text-white">{req.document_name}</div>
-                  <div className="text-xs mt-0.5" style={{ color: "var(--color-muted-foreground)" }}>{req.document_description}</div>
-                  <div className="text-[10px] mt-1 uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.25)" }}>{DOC_REQ_CATEGORIES.find((c) => c.value === req.category)?.label ?? req.category}</div>
-                </div>
-                <span className="rounded-full px-2.5 py-1 text-xs font-medium shrink-0" style={pill.style}>{pill.label}</span>
-              </div>
-              {req.decline_reason && <p className="text-xs" style={{ color: "#EF4444" }}>Declined: {req.decline_reason}</p>}
-              {req.partial_explanation && <p className="text-xs" style={{ color: "#F59E0B" }}>Partial: {req.partial_explanation}</p>}
-              {canRespond && (
-                <DocRequestActions req={req} busy={respondingId === req.id} onRespond={respond} />
-              )}
-            </DarkCard>
-          );
-        })
-      )}
-    </div>
-  );
-}
-
-function DocRequestActions({ req, busy, onRespond }: { req: any; busy: boolean; onRespond: (req: any, r: "provided" | "declined" | "partial", extra: any) => void }) {
-  const [mode, setMode] = useState<"none" | "decline" | "partial">("none");
-  const [text, setText] = useState("");
-  return (
-    <div className="pt-1">
-      {mode === "none" && (
-        <div className="flex flex-wrap gap-2">
-          <button onClick={() => onRespond(req, "provided", { document_path: `requests/${req.id}` })} disabled={busy} className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50" style={{ background: "#7C3AED" }} data-testid="doc-provide">
-            {busy ? <Loader2 className="inline h-3.5 w-3.5 animate-spin" /> : "Provide"}
-          </button>
-          <button onClick={() => setMode("partial")} className="rounded-lg px-3 py-1.5 text-xs font-medium" style={{ color: "var(--color-muted-foreground)", border: "1px solid var(--color-border)" }}>Partial</button>
-          <button onClick={() => setMode("decline")} className="rounded-lg px-3 py-1.5 text-xs font-medium" style={{ color: "#EF4444", border: "1px solid rgba(239,68,68,0.2)" }}>Decline</button>
-        </div>
-      )}
-      {mode !== "none" && (
-        <div className="space-y-2">
-          <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2} placeholder={mode === "decline" ? "Reason for declining" : "What you can share, and what's missing"} className="w-full rounded-lg px-3 py-2 text-xs text-white outline-none resize-none placeholder:text-gray-500 dark:text-gray-400" style={{ background: "var(--color-muted)", border: "1px solid var(--color-border)" }} />
-          <div className="flex gap-2">
-            <button onClick={() => setMode("none")} className="rounded-lg px-3 py-1.5 text-xs" style={{ color: "var(--color-muted-foreground)", border: "1px solid var(--color-border)" }}>Cancel</button>
-            <button
-              onClick={() => onRespond(req, mode === "decline" ? "declined" : "partial", mode === "decline" ? { decline_reason: text } : { partial_explanation: text, document_path: `requests/${req.id}` })}
-              disabled={busy || !text.trim()}
-              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
-              style={{ background: "#7C3AED" }}
-            >
-              Submit
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Term sheet panel ───────────────────────────────────────────────
-const TERM_EXPLAIN: Record<string, string> = {
-  valuation: "The agreed worth of your company before this investment.",
-  investment_amount: "How much the investor will put in.",
-  equity_pct: "The share of the company the investor receives.",
-  instrument_type: "The legal form of the investment (SAFE, equity, note).",
-  pro_rata: "The investor's right to keep their ownership % in future rounds.",
-  board_seat: "Whether the investor takes a seat on your board.",
-};
 
 // ── New Term Sheet Panel (DR-4) ────────────────────────────────────
 
@@ -4732,229 +4158,6 @@ function NewClosingPanel({
   );
 }
 
-function TermSheetPanel({ dealRoomId, room, isInvestor, isFounder, userId, readOnly }: { dealRoomId: string; room: any; isInvestor: boolean; isFounder: boolean; userId?: string; readOnly: boolean }) {
-  const queryClient = useQueryClient();
-  const [form, setForm] = useState({ valuation: "", investment_amount: "", equity_pct: "", instrument_type: "safe", pro_rata: false, board_seat: false });
-  const [showSend, setShowSend] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [responding, setResponding] = useState(false);
-
-  const sent = !!(room as any)?.term_sheet_sent_at;
-  const status = (room as any)?.term_sheet_status as string | null;
-
-  const doSend = async () => {
-    if (!userId) return;
-    setSending(true);
-    try {
-      const res = await sendTermSheet({
-        data: {
-          deal_room_id: dealRoomId, actor_user_id: userId,
-          valuation: form.valuation ? Number(form.valuation) : null,
-          investment_amount: form.investment_amount ? Number(form.investment_amount) : null,
-          equity_pct: form.equity_pct ? Number(form.equity_pct) : null,
-          instrument_type: form.instrument_type,
-          pro_rata: form.pro_rata, board_seat: form.board_seat,
-        },
-      });
-      if (!res.ok) { toast.error("Could not send"); return; }
-      await queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
-      toast.success("Term sheet sent");
-      setShowSend(false);
-    } finally { setSending(false); }
-  };
-
-  const respond = async (response: "accepted" | "countered" | "rejected") => {
-    if (!userId) return;
-    setResponding(true);
-    try {
-      const res = await respondToTermSheet({ data: { deal_room_id: dealRoomId, actor_user_id: userId, response } });
-      if (!res.ok) { toast.error("Could not respond"); return; }
-      await queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
-      toast.success(response === "accepted" ? "Term sheet accepted" : response === "countered" ? "Counter requested" : "Term sheet flagged");
-    } finally { setResponding(false); }
-  };
-
-  const inputStyle: React.CSSProperties = { background: "var(--color-muted)", border: "1px solid var(--color-border)" };
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <Eyebrow>Term Sheet</Eyebrow>
-        <h2 className="text-2xl font-semibold tracking-tight text-white" style={{ fontFamily: "Syne, sans-serif" }}>Term sheet</h2>
-      </div>
-
-      {isInvestor && !sent && !readOnly && (
-        <DarkCard className="space-y-3">
-          <div className="grid sm:grid-cols-2 gap-3">
-            <div>
-              <Eyebrow>Pre-money valuation (USD)</Eyebrow>
-              <input type="number" value={form.valuation} onChange={(e) => setForm((f) => ({ ...f, valuation: e.target.value }))} className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none" style={inputStyle} data-testid="ts-valuation" />
-            </div>
-            <div>
-              <Eyebrow>Investment amount (USD)</Eyebrow>
-              <input type="number" value={form.investment_amount} onChange={(e) => setForm((f) => ({ ...f, investment_amount: e.target.value }))} className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none" style={inputStyle} data-testid="ts-amount" />
-            </div>
-            <div>
-              <Eyebrow>Equity %</Eyebrow>
-              <input type="number" value={form.equity_pct} onChange={(e) => setForm((f) => ({ ...f, equity_pct: e.target.value }))} className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none" style={inputStyle} data-testid="ts-equity" />
-            </div>
-            <div>
-              <Eyebrow>Instrument</Eyebrow>
-              <select value={form.instrument_type} onChange={(e) => setForm((f) => ({ ...f, instrument_type: e.target.value }))} className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none" style={inputStyle} data-testid="ts-instrument">
-                <option value="safe" style={{ background: "var(--color-card)" }}>SAFE</option>
-                <option value="convertible_note" style={{ background: "var(--color-card)" }}>Convertible Note</option>
-                <option value="equity" style={{ background: "var(--color-card)" }}>Equity</option>
-                <option value="priced" style={{ background: "var(--color-card)" }}>Priced Round</option>
-              </select>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-4">
-            <label className="flex items-center gap-2 cursor-pointer text-sm" style={{ color: "var(--color-foreground)" }}>
-              <input type="checkbox" checked={form.pro_rata} onChange={(e) => setForm((f) => ({ ...f, pro_rata: e.target.checked }))} style={{ accentColor: "#7C3AED" }} /> Pro-rata rights
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer text-sm" style={{ color: "var(--color-foreground)" }}>
-              <input type="checkbox" checked={form.board_seat} onChange={(e) => setForm((f) => ({ ...f, board_seat: e.target.checked }))} style={{ accentColor: "#7C3AED" }} /> Board seat
-            </label>
-          </div>
-          <div className="flex justify-end">
-            <PrimaryButton onClick={() => setShowSend(true)} testid="send-term-sheet">Send term sheet</PrimaryButton>
-          </div>
-        </DarkCard>
-      )}
-
-      {sent && (
-        <DarkCard className="space-y-3" data-testid="term-sheet-display">
-          <div className="flex items-center justify-between">
-            <div className="text-sm font-semibold text-white">Proposed terms</div>
-            <span className="rounded-full px-2.5 py-1 text-xs font-medium" style={{ background: "rgba(16,185,129,0.12)", color: "#10B981" }}>{status ?? "sent"}</span>
-          </div>
-          {([
-            ["valuation", "Pre-money valuation", (room as any)?.term_sheet_valuation],
-            ["investment_amount", "Investment amount", (room as any)?.term_sheet_investment_amount],
-            ["equity_pct", "Equity %", (room as any)?.term_sheet_equity_pct],
-            ["instrument_type", "Instrument", (room as any)?.term_sheet_type],
-            ["pro_rata", "Pro-rata rights", (room as any)?.term_sheet_pro_rata ? "Yes" : "No"],
-            ["board_seat", "Board seat", (room as any)?.term_sheet_board_seat ? "Yes" : "No"],
-          ] as const).map(([k, label, value]) => (
-            <div key={k} className="flex items-center justify-between gap-3 group" title={TERM_EXPLAIN[k]}>
-              <span className="text-xs" style={{ color: "var(--color-muted-foreground)" }}>{label}</span>
-              <span className="text-sm text-white">{value === null || value === undefined || value === "" ? "—" : String(value)}</span>
-            </div>
-          ))}
-
-          {isFounder && status === "sent" && !readOnly && (
-            <div className="flex flex-wrap gap-2 pt-2">
-              <PrimaryButton onClick={() => respond("accepted")} disabled={responding} testid="ts-accept" className="!px-4 !py-2">Accept</PrimaryButton>
-              <button onClick={() => respond("countered")} disabled={responding} className="rounded-lg px-4 py-2 text-sm font-medium" style={{ color: "var(--color-foreground)", border: "1px solid var(--color-border)" }} data-testid="ts-counter">Counter</button>
-              <button onClick={() => respond("rejected")} disabled={responding} className="rounded-lg px-4 py-2 text-sm font-medium" style={{ color: "#EF4444", border: "1px solid rgba(239,68,68,0.2)" }} data-testid="ts-flag">Flag</button>
-            </div>
-          )}
-
-          {isFounder && (
-            <p className="pt-2 text-[11px]" style={{ color: "rgba(255,255,255,0.25)" }}>
-              This summary is not legal advice. Review the full term sheet with a lawyer before signing.
-            </p>
-          )}
-        </DarkCard>
-      )}
-
-      {!isInvestor && !sent && (
-        <DarkCard><p className="text-sm" style={{ color: "var(--color-muted-foreground)" }}>The investor is preparing a term sheet.</p></DarkCard>
-      )}
-
-      {showSend && (
-        <ConfirmModal
-          title="Send term sheet"
-          body="The founder will see these terms immediately and can accept, counter, or flag them."
-          confirmLabel="Send"
-          busy={sending}
-          testid="send-ts-confirm-modal"
-          onConfirm={doSend}
-          onClose={() => setShowSend(false)}
-        />
-      )}
-    </div>
-  );
-}
-
-// ── Closed panel ───────────────────────────────────────────────────
-function ClosedPanel({ room, isInvestor }: { room: any; isInvestor: boolean }) {
-  const accepted = (room as any)?.term_sheet_status === "accepted";
-  const amount = (room as any)?.term_sheet_investment_amount;
-  const closedAt = (room as any)?.closed_at_workflow;
-  return (
-    <div className="space-y-6">
-      <div>
-        <Eyebrow>Closed</Eyebrow>
-        <h2 className="text-2xl font-semibold tracking-tight text-white" style={{ fontFamily: "Syne, sans-serif" }}>Deal closed</h2>
-      </div>
-      <DarkCard>
-        <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-lg" style={{ background: accepted ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.06)" }}>
-            {accepted ? <CheckCircle2 className="h-5 w-5" style={{ color: "#10B981" }} /> : <X className="h-5 w-5" style={{ color: "var(--color-muted-foreground)" }} />}
-          </div>
-          <div>
-            <div className="text-sm font-semibold text-white">{accepted ? "Deal closed — term sheet accepted" : "Deal closed"}</div>
-            <div className="text-xs" style={{ color: "var(--color-muted-foreground)" }}>{closedAt ? new Date(closedAt).toLocaleDateString() : "This deal room is now read-only."}</div>
-          </div>
-        </div>
-        {isInvestor && accepted && amount != null && (
-          <div className="mt-4 rounded-lg px-4 py-3" style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)" }}>
-            <Eyebrow>Investment recorded</Eyebrow>
-            <div className="text-lg font-semibold text-white">{formatMoney(amount)}</div>
-          </div>
-        )}
-        {!isInvestor && (
-          <p className="mt-4 text-sm" style={{ color: "var(--color-muted-foreground)" }}>
-            {accepted ? "Congratulations — the investment is confirmed." : "This deal has closed. Reach out to your investor for next steps."}
-          </p>
-        )}
-      </DarkCard>
-    </div>
-  );
-}
-
-function Metric({ icon: Icon, label, value }: { icon: any; label: string; value: React.ReactNode }) {
-  return (
-    <div className="rounded-lg border border-gray-200 dark:border-zinc-700 bg-background p-3">
-      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-        <Icon className="h-3.5 w-3.5" /> {label}
-      </div>
-      <div className="mt-1 text-sm font-semibold">{value || "—"}</div>
-    </div>
-  );
-}
-
-const DECISION_BADGES: Record<string, { className: string }> = {
-  "Under Review": { className: "bg-brand/10 text-brand border border-brand/20" },
-  Interested: { className: "bg-success/10 text-success border border-success/20" },
-  "Term Sheet": { className: "bg-violet/10 text-violet border border-violet/20" },
-  Passed: { className: "bg-destructive/10 text-destructive border border-destructive/20" },
-};
-
-function getDecisionLabel(status?: string | null) {
-  const normalized = String(status ?? "").toLowerCase();
-  if (["pass", "passed", "rejected"].includes(normalized)) return "Passed";
-  if (["accepted", "accept", "invest", "term_sheet", "term sheet"].includes(normalized)) return "Term Sheet";
-  if (["interested", "hold", "request info", "requested_info"].includes(normalized)) return "Interested";
-  return "Under Review";
-}
-
-function formatMoney(value: unknown) {
-  if (value === null || value === undefined || value === "") return "—";
-  const n = Number(value);
-  if (isNaN(n) || n === 0) return "—";
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    notation: n >= 1000000 ? "compact" : "standard",
-    maximumFractionDigits: n >= 1000000 ? 1 : 0,
-  }).format(n);
-}
-
-function qaMessagesAnswered(activity: any[]) {
-  return activity.some((item) => String(item.action ?? "").toLowerCase().includes("answer"));
-}
 
 // ── Documents ─────────────────────────────────────────────────────
 const CATEGORY_COLORS: Record<string, string> = {
@@ -5288,14 +4491,14 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
         return;
       }
 
-      const aiData = await generateDocSummary({
+      const aiData = await withTimeout(generateDocSummary({
         data: {
           userId: userId || "",
           documentContent: textContent.slice(0, 3000),
           fileName,
           category: doc.category,
         }
-      });
+      }));
       if (aiData.error === "usage_limit") {
         toast.error(aiData.reply || "Daily AI limit reached");
         return;
@@ -5315,7 +4518,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
       toast.success("Summary generated");
     } catch (err) {
       console.error("Summary error:", err);
-      toast.error(err instanceof Error ? err.message : "Summary failed");
+      toast.error(err instanceof AITimeoutError ? AI_TIMEOUT_MESSAGE : (err instanceof Error ? err.message : "Summary failed"));
     } finally {
       setGeneratingSummaryId(null);
     }
@@ -6876,14 +6079,14 @@ function QA({
       setOpenQaId(data.id);
       // Fetch AI suggestions for follow-up questions
       try {
-        const result = await getQASuggestions({
+        const result = await withTimeout(getQASuggestions({
           data: {
             question: text,
             startupName: companyName || "the startup",
             sector: sector || "tech",
             previousQuestions: msgs.filter((m) => m.is_qa).map((m) => m.body).slice(-5),
           },
-        });
+        }));
         if (result.suggestions.length > 0) {
           setSuggestions(result.suggestions);
           if (suggestionsTimerRef.current) clearTimeout(suggestionsTimerRef.current);
@@ -7093,18 +6296,18 @@ function QA({
                                   if (!userId || draftingAiReplyId === item.id) return;
                                   setDraftingAiReplyId(item.id);
                                   try {
-                                    const aiResp = await secureAICall({
+                                    const aiResp = await withTimeout(secureAICall({
                                       data: {
                                         userId: userId || "",
                                         systemPrompt: "You are a startup founder assistant. Write a clear, professional answer to an investor due-diligence question. Return only the answer text, under 120 words, no markdown symbols.",
                                         userMessage: `Investor question: "${item.body}"\n\nWrite a founder's answer.`,
                                         maxTokens: 300,
                                       }
-                                    });
+                                    }));
                                     const draft = (aiResp.reply ?? "").trim();
                                     if (draft) setAnswerDrafts((d) => ({ ...d, [item.id]: draft }));
-                                  } catch {
-                                    toast.error("AI draft failed");
+                                  } catch (err) {
+                                    toast.error(err instanceof AITimeoutError ? AI_TIMEOUT_MESSAGE : "AI draft failed");
                                   } finally {
                                     setDraftingAiReplyId(null);
                                   }
