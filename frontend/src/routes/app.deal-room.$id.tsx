@@ -970,6 +970,30 @@ function InformationVaultPanel({
 }) {
   const queryClient = useQueryClient();
 
+  // ── Pinned NDA document ──
+  const [vaultNdaModalOpen, setVaultNdaModalOpen] = useState(false);
+
+  const { data: vaultNdaDoc } = useQuery<NdaDocument | null>({
+    queryKey: ["nda-document", dealRoomId],
+    enabled: !!dealRoomId,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => fetchNdaDocument({ data: { dealRoomId } }),
+  });
+
+  const { data: vaultNdaSigners = [] } = useQuery({
+    queryKey: ["nda-acceptances-vault", dealRoomId],
+    enabled: !!dealRoomId,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("nda_acceptances")
+        .select("signer_full_name, signer_company, role, accepted_at")
+        .eq("deal_room_id", dealRoomId)
+        .order("accepted_at", { ascending: true });
+      return data ?? [];
+    },
+  });
+
   // ── Section 1: Digital Profiles ──
   const [profilesOpen, setProfilesOpen] = useState(true);
 
@@ -1134,6 +1158,120 @@ function InformationVaultPanel({
 
   return (
     <div className="space-y-6">
+
+      {/* ── PINNED: NDA Document ─────────────────────────────────── */}
+      <div
+        className={cn(
+          "rounded-xl border overflow-hidden",
+          vaultNdaDoc
+            ? "bg-white dark:bg-zinc-900 border-[rgba(16,185,129,0.3)]"
+            : "bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700",
+        )}
+      >
+        <div className="flex items-center justify-between px-5 py-4">
+          <div className="flex items-center gap-3">
+            <div className={cn(
+              "h-9 w-9 rounded-lg flex items-center justify-center shrink-0",
+              vaultNdaDoc
+                ? "bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.2)]"
+                : "bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700",
+            )}>
+              <Shield className={cn("h-4 w-4", vaultNdaDoc ? "text-[#10B981]" : "text-gray-400 dark:text-gray-500")} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">Non-Disclosure Agreement</span>
+                {vaultNdaDoc ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(16,185,129,0.12)] text-[#10B981] text-[10px] font-semibold px-2 py-0.5">
+                    <CheckCircle2 className="h-3 w-3" /> Signed
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(255,255,255,0.06)] text-gray-400 dark:text-gray-500 text-[10px] font-semibold px-2 py-0.5">
+                    <Clock className="h-3 w-3" /> Pending
+                  </span>
+                )}
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                {vaultNdaDoc
+                  ? `${vaultNdaSigners.length} ${vaultNdaSigners.length === 1 ? "party" : "parties"} bound · v${vaultNdaDoc.version} · System generated`
+                  : "Auto-generated once all parties sign"}
+              </div>
+            </div>
+          </div>
+          {vaultNdaDoc && (
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => setVaultNdaModalOpen(true)}
+                className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-zinc-700 rounded-lg px-3 py-1.5 transition-colors"
+              >
+                View NDA
+              </button>
+              <button
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-1.5 text-xs border border-gray-200 dark:border-zinc-700 rounded-lg px-3 py-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              >
+                <Download className="h-3.5 w-3.5" /> PDF
+              </button>
+            </div>
+          )}
+        </div>
+        {/* Mini signatories strip */}
+        {vaultNdaDoc && vaultNdaSigners.length > 0 && (
+          <div className="px-5 pb-4 flex flex-wrap gap-2">
+            {(vaultNdaSigners as any[]).map((s, i) => (
+              <div key={i} className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700 px-3 py-1 text-xs">
+                <CheckCircle2 className="h-3 w-3 text-[#10B981] shrink-0" />
+                <span className="font-medium text-gray-900 dark:text-white">{s.signer_full_name}</span>
+                <span className="text-gray-400 dark:text-gray-500">· {s.role}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Vault NDA full-text modal ─────────────────────────────── */}
+      {vaultNdaModalOpen && vaultNdaDoc && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm print:hidden"
+          onClick={() => setVaultNdaModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-2xl max-h-[85vh] bg-card border border-border/60 rounded-2xl overflow-hidden shadow-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border/60 shrink-0">
+              <div className="flex items-center gap-3">
+                <Shield className="h-5 w-5 text-[#10B981]" />
+                <div>
+                  <div className="font-semibold text-sm text-foreground">Non-Disclosure Agreement</div>
+                  <div className="text-xs text-muted-foreground">
+                    v{vaultNdaDoc.version} · {vaultNdaSigners.length} {vaultNdaSigners.length === 1 ? "party" : "parties"}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => window.print()}
+                  className="inline-flex items-center gap-1.5 text-xs bg-brand/10 hover:bg-brand/20 text-brand border border-brand/20 rounded-lg px-3 py-1.5 transition-colors"
+                >
+                  <Download className="h-3.5 w-3.5" /> Download PDF
+                </button>
+                <button
+                  onClick={() => setVaultNdaModalOpen(false)}
+                  className="p-1.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <pre className="text-xs leading-relaxed text-muted-foreground whitespace-pre-wrap font-sans">
+                {vaultNdaDoc.nda_text}
+              </pre>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── SECTION 1: Digital Profiles ── */}
       <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
