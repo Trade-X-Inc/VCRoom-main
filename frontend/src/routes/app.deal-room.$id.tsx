@@ -399,7 +399,8 @@ function DealRoom() {
   }
 
   const activeStage = viewStage ?? UI_TO_DEAL_STAGE[activeStageKey];
-  const viewingHistory = viewStage !== null && DEAL_STAGES.indexOf(viewStage) < currentIndex;
+  // Q&A is an ongoing channel throughout the deal — never treat it as "history"
+  const viewingHistory = viewStage !== null && activeStageKey !== "qa" && DEAL_STAGES.indexOf(viewStage) < currentIndex;
 
   return (
     <div className="flex flex-col h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] relative">
