@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { X, ArrowUp } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useRouterState } from "@tanstack/react-router";
+import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 
 export type PageContext = {
   route: string;
@@ -46,8 +47,25 @@ function parseConfirmCard(content: string): ConfirmCard | null {
 
 function buildSystemPrompt(pageContext: PageContext, userRole: string): string {
   const { pageName, entityId, relevantData } = pageContext;
+
+  const company = relevantData?.company as string | undefined;
+  const stage = relevantData?.stage as string | undefined;
+  const hasCompanyContext = !!company;
+
+  const identityLine = hasCompanyContext
+    ? `You are the Hockystick AI — a fundraising advisor for ${company}${stage ? `, a ${stage}-stage startup` : ""}.`
+    : "You are the Hockystick AI — a fundraising advisor built into this platform.";
+
+  // What this panel instance actually knows vs doesn't
+  const knownFields = [company && `company name (${company})`, stage && `stage (${stage})`]
+    .filter(Boolean)
+    .join(" and ");
+  const missingFieldsNote = hasCompanyContext
+    ? `You have the founder's ${knownFields}. You do NOT have their financials, burn rate, traction metrics, team details, or investor pipeline loaded here. When asked about those, say specifically: "I have your company name and stage here, but not your financials or traction — for a deeper analysis with full context, try the AI Advisor on your Desk page, which loads your live profile data."`
+    : "You have no profile data loaded for this user in this panel.";
+
   return [
-    "You are the Hockystick AI — a fundraising advisor built into this platform.",
+    identityLine,
     "You give direct, specific advice. You never use markdown formatting.",
     "Write in plain sentences. No asterisks, no hashtags, no bullet dashes.",
     "Keep responses under 150 words unless the user specifically asks for detail.",
@@ -56,7 +74,7 @@ function buildSystemPrompt(pageContext: PageContext, userRole: string): string {
     "What you can do:",
     "- Answer questions about fundraising strategy, investor relations, and startup preparation",
     "- Explain what each platform feature does and how to use it",
-    "- Give specific feedback based on the data shown on this page",
+    hasCompanyContext ? `- Give advice tailored to ${company}` : "- Give advice tailored to the user's situation when they share context",
     "- Help founders prepare for investor conversations",
     "",
     "What you cannot do:",
@@ -64,19 +82,19 @@ function buildSystemPrompt(pageContext: PageContext, userRole: string): string {
     "- Access other users' data",
     "- Guarantee investment outcomes",
     "",
-    "When you don't know something: say so in one sentence and suggest where to find it.",
+    missingFieldsNote,
+    "",
     "When giving advice: be direct. Say what to do, not what to consider.",
     "",
-    `Current page: ${pageName}`,
+    `Current page: ${pageName || "Dashboard"}`,
     `User role: ${userRole}`,
     entityId ? `Entity in view: ${entityId}` : "",
-    relevantData ? `Page data: ${JSON.stringify(relevantData)}` : "",
   ]
     .filter((l) => l !== undefined)
     .join("\n");
 }
 
-function ThinkingAnimation() {
+function ThinkingAnimation({ stillWorking }: { stillWorking?: boolean }) {
   const [labelIdx, setLabelIdx] = useState(0);
 
   useEffect(() => {
@@ -120,7 +138,7 @@ function ThinkingAnimation() {
           ))}
         </div>
         <div className="text-[11px]" style={{ color: "rgba(168,85,247,0.7)" }}>
-          {THINKING_LABELS[labelIdx]}
+          {stillWorking ? "Still working — this may take a moment..." : THINKING_LABELS[labelIdx]}
         </div>
       </div>
     </div>
@@ -238,6 +256,9 @@ export function AIOperatorPanel({
   const pageContext: PageContext = {
     route: currentPath,
     pageName: pageNameFromPath(currentPath),
+    // Merge in any data the parent shell pre-fetched (e.g. startup company/stage from AppShell)
+    entityId: _pageContextProp?.entityId,
+    relevantData: _pageContextProp?.relevantData,
   };
 
   const [isOpen, setIsOpen] = useState(() => {
@@ -258,7 +279,7 @@ export function AIOperatorPanel({
   const [activeSize, setActiveSize] = useState<"S" | "L">("S");
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { isWorking: isLoading, stillWorking, run } = useTimedAI();
   const [unreadCount, setUnreadCount] = useState(0);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -405,58 +426,61 @@ export function AIOperatorPanel({
     setMessages(nextMessages);
     setInputValue("");
     if (textareaRef.current) { textareaRef.current.style.height = "auto"; }
-    setIsLoading(true);
 
     try {
-      const { data: sessionData, error: sessErr } = await supabase.auth.getSession();
-      if (sessErr) { console.warn("[AI panel] session error:", sessErr.message); }
-      const jwt = sessionData?.session?.access_token ?? "";
+      await run(async () => {
+        const { data: sessionData, error: sessErr } = await supabase.auth.getSession();
+        if (sessErr) { console.warn("[AI panel] session error:", sessErr.message); }
+        const jwt = sessionData?.session?.access_token ?? "";
 
-      const res = await fetch(AI_ROUTER_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-          apikey: ANON_KEY,
-        },
-        body: JSON.stringify({
-          task_type: "chat",
-          messages: nextMessages.map(({ role, content }) => ({ role, content })),
-          system_prompt: buildSystemPrompt(pageContext, userRole),
-          user_id: userId,
-        }),
-      });
+        const res = await fetch(AI_ROUTER_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+            apikey: ANON_KEY,
+          },
+          body: JSON.stringify({
+            task_type: "chat",
+            messages: nextMessages.map(({ role, content }) => ({ role, content })),
+            system_prompt: buildSystemPrompt(pageContext, userRole),
+            user_id: userId,
+          }),
+        });
 
-      let json: any = {};
-      try { json = await res.json(); } catch { json = { error: "Invalid response" }; }
+        let json: any = {};
+        try { json = await res.json(); } catch { json = { error: "Invalid response" }; }
 
-      if (res.status === 429) {
-        const limitMsg: Message = { role: "assistant", content: "You've reached your daily AI limit. Try again tomorrow.", timestamp: new Date().toISOString() };
-        const updated = [...nextMessages, limitMsg];
+        if (res.status === 429) {
+          const limitMsg: Message = { role: "assistant", content: "You've reached your daily AI limit. Try again tomorrow.", timestamp: new Date().toISOString() };
+          const updated = [...nextMessages, limitMsg];
+          setMessages(updated);
+          await saveConversation(updated);
+          return;
+        }
+
+        if (!res.ok) {
+          console.warn("[AI panel] edge error:", json.error);
+        }
+        const assistantMsg: Message = {
+          role: "assistant",
+          content: json.content ?? "Something went wrong. Please try again.",
+          timestamp: new Date().toISOString(),
+        };
+        const updated = [...nextMessages, assistantMsg];
         setMessages(updated);
         await saveConversation(updated);
-        return;
-      }
-
-      if (!res.ok) {
-        console.warn("[AI panel] edge error:", json.error);
-      }
-      const assistantMsg: Message = {
-        role: "assistant",
-        content: json.content ?? "Something went wrong. Please try again.",
-        timestamp: new Date().toISOString(),
-      };
-      const updated = [...nextMessages, assistantMsg];
-      setMessages(updated);
-      await saveConversation(updated);
+      });
     } catch (e: any) {
       console.warn("[AI panel] send error:", e?.message);
-      const errMsg: Message = { role: "assistant", content: "Something went wrong. Please try again.", timestamp: new Date().toISOString() };
+      const errMsg: Message = {
+        role: "assistant",
+        content: e instanceof AITimeoutError ? AI_TIMEOUT_MESSAGE : "Something went wrong. Please try again.",
+        timestamp: new Date().toISOString(),
+      };
       const updated = [...nextMessages, errMsg];
       setMessages(updated);
       await saveConversation(updated);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -630,7 +654,7 @@ export function AIOperatorPanel({
               />
             ))
           )}
-          {isLoading && <ThinkingAnimation />}
+          {isLoading && <ThinkingAnimation stillWorking={stillWorking} />}
           <div ref={messagesEndRef} />
         </div>
 

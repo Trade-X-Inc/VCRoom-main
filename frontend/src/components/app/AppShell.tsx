@@ -571,6 +571,18 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
           <AIOperatorPanel
             userRole={isInvestor ? "investor" : "founder"}
             userId={user.id}
+            pageContext={
+              !isInvestor && startupData
+                ? {
+                    route: "",
+                    pageName: "",
+                    relevantData: {
+                      company: startupData.company_name,
+                      stage: startupData.stage ?? undefined,
+                    },
+                  }
+                : undefined
+            }
           />
         )}
       </div>
