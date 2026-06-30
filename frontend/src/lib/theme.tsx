@@ -20,12 +20,12 @@ function apply(resolved: "light" | "dark") {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("light");
-  const [resolved, setResolved] = useState<"light" | "dark">("light");
+  const [theme, setThemeState] = useState<Theme>("dark");
+  const [resolved, setResolved] = useState<"light" | "dark">("dark");
 
   useEffect(() => {
     // Default to "light" for new users; existing users keep their stored preference
-    const stored = (typeof window !== "undefined" && (localStorage.getItem(STORAGE_KEY) as Theme | null)) || "light";
+    const stored = (typeof window !== "undefined" && (localStorage.getItem(STORAGE_KEY) as Theme | null)) || "dark";
     setThemeState(stored);
   }, []);
 

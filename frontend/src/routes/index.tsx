@@ -41,26 +41,30 @@ const W40 = "rgba(255,255,255,0.4)";
 const W08 = "rgba(255,255,255,0.08)";
 
 /* ─── ROOT ───────────────────────────────────────────────────────────────── */
+// Landing page is always light — dark adaptive sections are no longer used
 function useDark(): boolean {
-  const [dark, setDark] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem("vr.theme") === "dark";
-  });
-
-  useEffect(() => {
-    const handler = () => {
-      setDark(localStorage.getItem("vr.theme") === "dark");
-    };
-    window.addEventListener("storage", handler);
-    return () => window.removeEventListener("storage", handler);
-  }, []);
-
-  return dark;
+  return false;
 }
 
 function Landing() {
   const dark = useDark();
   useEffect(() => { window.scrollTo(0, 0); }, []);
+
+  // Force light theme on the landing page — don't write to localStorage
+  useEffect(() => {
+    const root = document.documentElement;
+    const hadDark = root.classList.contains("dark");
+    root.classList.remove("dark");
+    root.setAttribute("data-theme", "light");
+    root.style.colorScheme = "light";
+    return () => {
+      if (hadDark) {
+        root.classList.add("dark");
+        root.setAttribute("data-theme", "dark");
+        root.style.colorScheme = "dark";
+      }
+    };
+  }, []);
   return (
     <div style={{ background: "#0A0A0B" }}>
       <SiteHeader />

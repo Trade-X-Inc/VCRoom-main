@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Logo } from "@/components/brand/Logo";
 import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
-import { ThemeToggle } from "@/components/app/ThemeToggle";
 import { useState, useRef, useEffect } from "react";
 
 const NAV_LINK = "text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors px-1";
@@ -81,7 +80,6 @@ export function SiteHeader() {
 
         {/* Right — Controls */}
         <div className="flex items-center gap-2 shrink-0">
-          <ThemeToggle />
           <Link to="/sign-in" search={{ redirect: "/app" }}
             className="hidden sm:inline-flex text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors px-3 py-1.5">
             Sign in
