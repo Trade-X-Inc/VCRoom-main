@@ -40,7 +40,7 @@ The Recipient agrees to:
 (a) Hold all Confidential Information in strict confidence;
 (b) Not disclose any Confidential Information to third parties without prior written consent from the Company;
 (c) Use the Confidential Information solely for the purpose of evaluating the Transaction;
-(d) Protect the Confidential Information using at least the same degree of care applied to its own confidential information, but in no event less than reasonable care.
+(d) Protect the Confidential Information using at least the same degree of care applied to its own confidential information, but in no event less than reasonable care, and in any event no less than the standard of care that a prudent person would exercise to protect their own trade secrets.
 
 4. EXCEPTIONS
 
@@ -48,7 +48,7 @@ These obligations do not apply to information that:
 (a) Is or becomes publicly known through no breach of this Agreement;
 (b) Was rightfully known to the Recipient prior to disclosure;
 (c) Is independently developed by the Recipient without use of Confidential Information;
-(d) Is required to be disclosed by applicable law or valid court order, provided the Recipient gives prompt notice where permitted by law.
+(d) Is required to be disclosed by applicable law or valid court order, provided the Recipient gives prompt notice where permitted by law, and provide reasonable prior notice to the disclosing party where legally permitted to allow them to seek a protective order.
 
 5. MONITORING AND WATERMARKING
 
@@ -56,7 +56,7 @@ All materials accessed via the Hockystick deal room are electronically watermark
 
 6. TERM
 
-This Agreement remains in effect for two (2) years from the date of execution. All confidentiality obligations survive termination.
+This Agreement remains in effect for three (3) years from the date of first execution by each respective party. All confidentiality obligations survive termination.
 
 7. RETURN OR DESTRUCTION OF INFORMATION
 
@@ -66,9 +66,25 @@ Upon written request, the Recipient shall promptly return or destroy all Confide
 
 Nothing herein grants the Recipient any rights in or to the Confidential Information except as expressly set forth.
 
-9. GOVERNING LAW
+9. GOVERNING LAW AND DISPUTE RESOLUTION
 
-This Agreement is governed by applicable law. Any disputes shall be subject to the exclusive jurisdiction of courts in the jurisdiction where the Company is domiciled.
+9.1 Governing Law
+This Agreement and any disputes arising out of or in connection with it shall be governed by and construed in accordance with the laws of the Dubai International Financial Centre (DIFC), United Arab Emirates, without regard to its conflict of laws provisions.
+
+9.2 Dispute Resolution — Negotiation
+The parties shall first attempt to resolve any dispute, controversy, or claim arising out of or relating to this Agreement through good-faith negotiation for a period of thirty (30) days following written notice of the dispute.
+
+9.3 Arbitration
+If the dispute is not resolved through negotiation, it shall be finally settled by binding arbitration under the Rules of the Dubai International Arbitration Centre (DIAC), which rules are deemed incorporated by reference into this clause. The number of arbitrators shall be one (1) for claims below USD 500,000 and three (3) for claims of USD 500,000 or above. The seat of arbitration shall be Dubai, UAE. The language of arbitration shall be English.
+
+9.4 Emergency Relief
+Notwithstanding the foregoing, either party may seek interim or emergency injunctive relief from any court of competent jurisdiction to prevent irreparable harm pending the constitution of the arbitral tribunal. Seeking such relief shall not be deemed a waiver of the right to arbitrate.
+
+9.5 International Parties
+The parties expressly agree that the United Nations Convention on Contracts for the International Sale of Goods (CISG) shall not apply to this Agreement. For parties domiciled outside the UAE, this Agreement shall be enforceable in their home jurisdiction to the maximum extent permitted by applicable local law, and the parties waive any objection to the arbitral seat on grounds of inconvenience.
+
+9.6 Recognition and Enforcement
+The parties agree that any arbitral award rendered under this clause shall be final and binding, and may be entered as a judgment in any court of competent jurisdiction. Enforcement of awards shall be subject to the New York Convention on the Recognition and Enforcement of Foreign Arbitral Awards (1958), to which the UAE is a signatory.
 
 10. ENTIRE AGREEMENT
 
@@ -159,7 +175,7 @@ function NdaPage() {
 
   const startupName = (room as any)?.startups?.company_name ?? "the Company";
   const founderName = (founderMember as any)?.users?.full_name ?? "its authorized representative";
-  const signerName = user?.name ?? "Signing Party";
+  const signerName = user?.fullName ?? "Signing Party";
   const today = new Date().toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -188,7 +204,7 @@ function NdaPage() {
         role,
         user_agent: navigator.userAgent,
         nda_html: ndaPreviewText,
-        signer_full_name: user.name ?? signerName,
+        signer_full_name: user.fullName ?? signerName,
         signer_company: signerCompany,
       });
       if (insertErr) throw insertErr;
