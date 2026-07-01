@@ -40,6 +40,7 @@ import { withTimeout, AITimeoutError } from "@/lib/with-timeout";
 import { useTimedAI, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 import { runDealBrief, fetchDealBrief, markBriefViewed, type AgentDealBrief } from "@/lib/deal-brief-fn";
 import { fetchNdaDocument, type NdaDocument } from "@/lib/nda-fn";
+import { completeQaAndGenerateReport } from "@/lib/qa-report-fn";
 import { useStageTransition } from "@/hooks/useStageTransition";
 import {
   advanceDealStage, skipMeeting, completeMeeting, updateMeetingNotes,
@@ -788,8 +789,11 @@ function StagedDealRoom({
           dealRoomId={dealRoomId}
           startupId={startupId ?? ""}
           isInvestor={isInvestor}
+          isFounder={isFounder}
           userId={userId ?? ""}
           userName={userName}
+          companyName={companyName}
+          room={room}
           onRequestNextStage={onRequestNextStage}
           stageRequesting={stageRequesting}
         />
@@ -990,6 +994,22 @@ function InformationVaultPanel({
         .select("signer_full_name, signer_company, role, accepted_at")
         .eq("deal_room_id", dealRoomId)
         .order("accepted_at", { ascending: true });
+      return data ?? [];
+    },
+  });
+
+  // ── Pinned Q&A Reports ──
+  const [qaReportModalOpen, setQaReportModalOpen] = useState<string | null>(null);
+  const { data: vaultQaReports = [] } = useQuery({
+    queryKey: ["vault-documents", dealRoomId],
+    enabled: !!dealRoomId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("documents")
+        .select("*")
+        .eq("deal_room_id", dealRoomId)
+        .eq("category", "qa_report")
+        .order("created_at", { ascending: false });
       return data ?? [];
     },
   });
@@ -1272,6 +1292,91 @@ function InformationVaultPanel({
           </div>
         </div>
       )}
+
+      {/* ── PINNED: Q&A Reports ─────────────────────────────────── */}
+      {(vaultQaReports as any[]).map((report) => {
+        const reportDate = new Date(report.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+        // Parse counts from header line "Questions: X | Answered: Y | Unanswered: Z"
+        const headerMatch = (report.report_text ?? "").match(/Questions:\s*(\d+)\s*\|\s*Answered:\s*(\d+)/);
+        const totalQs = headerMatch ? headerMatch[1] : "—";
+        const answeredQs = headerMatch ? headerMatch[2] : "—";
+        const isOpen = qaReportModalOpen === report.id;
+
+        return (
+          <div key={report.id} className="rounded-xl border border-[rgba(16,185,129,0.3)] bg-white dark:bg-zinc-900 overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.2)] flex items-center justify-center shrink-0">
+                  <MessagesSquare className="h-4 w-4 text-[#10B981]" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">Q&amp;A Report</span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(16,185,129,0.12)] text-[#10B981] text-[10px] font-semibold px-2 py-0.5">
+                      <CheckCircle2 className="h-3 w-3" /> Complete
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {reportDate} · {totalQs} questions · {answeredQs} answered
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setQaReportModalOpen(isOpen ? null : report.id)}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-zinc-700 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-zinc-800"
+              >
+                <Eye className="h-3.5 w-3.5" /> View report
+              </button>
+            </div>
+
+            {/* Q&A Report modal */}
+            {isOpen && report.report_text && (
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+                onClick={() => setQaReportModalOpen(null)}
+              >
+                <div
+                  className="w-full max-w-2xl max-h-[85vh] rounded-2xl border border-border/60 bg-card shadow-elev flex flex-col"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex items-center justify-between px-6 py-4 border-b border-border/60 shrink-0">
+                    <div className="flex items-center gap-3">
+                      <MessagesSquare className="h-5 w-5 text-[#10B981]" />
+                      <div>
+                        <div className="font-semibold text-sm text-foreground">Q&amp;A Report</div>
+                        <div className="text-xs text-muted-foreground">{reportDate} · {totalQs} questions</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => window.print()}
+                        className="inline-flex items-center gap-1.5 text-xs bg-brand/10 hover:bg-brand/20 text-brand border border-brand/20 rounded-lg px-3 py-1.5 transition-colors qa-report-print-trigger"
+                      >
+                        <Download className="h-3.5 w-3.5" /> Download PDF
+                      </button>
+                      <button
+                        onClick={() => setQaReportModalOpen(null)}
+                        className="p-1.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex-1 overflow-y-auto px-6 py-5">
+                    <pre className="text-xs leading-relaxed text-muted-foreground whitespace-pre-wrap font-sans qa-report-content">
+                      {report.report_text}
+                    </pre>
+                  </div>
+                </div>
+                {/* Print-only content for this report */}
+                <div className="qa-report-print-content hidden print:block">
+                  <pre className="whitespace-pre-wrap">{report.report_text}</pre>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
 
       {/* ── SECTION 1: Digital Profiles ── */}
       <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
@@ -1730,47 +1835,48 @@ const MEETING_TYPES: { value: string; label: string }[] = [
 ];
 
 function QAPanel({
-  dealRoomId, startupId, isInvestor, userId, userName, onRequestNextStage, stageRequesting,
+  dealRoomId, startupId, isInvestor, isFounder, userId, userName, companyName, room,
+  onRequestNextStage, stageRequesting,
 }: {
   dealRoomId: string;
   startupId: string;
   isInvestor: boolean;
+  isFounder: boolean;
   userId: string;
   userName: string;
+  companyName: string;
+  room: any;
   onRequestNextStage: () => Promise<void>;
   stageRequesting: boolean;
 }) {
   const queryClient = useQueryClient();
-  const threadRef = useRef<HTMLDivElement>(null);
+  const MAX_QUESTIONS = 10;
 
-  // ── Q&A state ──
-  const [qaMessages, setQaMessages] = useState<any[]>([]);
-  const [qaLoaded, setQaLoaded] = useState(false);
-  const [sendText, setSendText] = useState("");
-  const [isQuestion, setIsQuestion] = useState(isInvestor);
+  // ── Q&A rows (questions + answers) ──
+  const [rows, setRows] = useState<any[]>([]);
+  const [rowsLoaded, setRowsLoaded] = useState(false);
+
+  // ── Investor ask state ──
+  const [askText, setAskText] = useState("");
   const [sending, setSending] = useState(false);
+  const [suggestionInput, setSuggestionInput] = useState("");
+
+  // ── Founder answer state ──
+  const [answerDrafts, setAnswerDrafts] = useState<Record<string, string>>({});
+  const [answerSending, setAnswerSending] = useState<Record<string, boolean>>({});
+  const [expandedAnswers, setExpandedAnswers] = useState<Record<string, boolean>>({});
+
+  // ── AI suggestions (investor only) ──
+  const [suggestions, setSuggestions] = useState<{ text: string; source: string }[]>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+
+  // ── Completion flow ──
+  const [completingQA, setCompletingQA] = useState(false);
+  const [showCompleteConfirm, setShowCompleteConfirm] = useState(false);
   const [summarising, setSummarising] = useState(false);
-  const [prepNotesId, setPrepNotesId] = useState<string | null>(null);
-  const [prepText, setPrepText] = useState<Record<string, string>>({});
 
-  // ── Meetings state ──
-  const [showMeetForm, setShowMeetForm] = useState(false);
-  const [meetTitle, setMeetTitle] = useState("");
-  const [meetDate, setMeetDate] = useState("");
-  const [meetTime, setMeetTime] = useState("");
-  const [meetDuration, setMeetDuration] = useState("60");
-  const [meetType, setMeetType] = useState("intro_call");
-  const [meetNotes, setMeetNotes] = useState("");
-  const [meetSaving, setMeetSaving] = useState(false);
-  const [investorNotes, setInvestorNotes] = useState<Record<string, string>>({});
-
-  // ── Decision state ──
-  const [showDecision, setShowDecision] = useState(false);
-  const [decisionOutcome, setDecisionOutcome] = useState("Pass");
-  const [decisionReason, setDecisionReason] = useState("");
-
-  // ── Load Q&A messages ──
-  const { data: initialQa = [] } = useQuery({
+  // ── Load all Q&A rows ──
+  const { data: initialRows = [] } = useQuery({
     queryKey: ["qa-messages", dealRoomId],
     enabled: !!dealRoomId,
     queryFn: async () => {
@@ -1784,94 +1890,181 @@ function QAPanel({
   });
 
   useEffect(() => {
-    if (!qaLoaded && initialQa.length >= 0) {
-      setQaMessages(initialQa as any[]);
-      setQaLoaded(true);
+    if (!rowsLoaded && initialRows.length >= 0) {
+      setRows(initialRows as any[]);
+      setRowsLoaded(true);
     }
-  }, [initialQa, qaLoaded]);
+  }, [initialRows, rowsLoaded]);
 
-  // ── Realtime subscription ──
+  // ── Load deal room completion state ──
+  const { data: roomData, refetch: refetchRoom } = useQuery({
+    queryKey: ["qa-room-status", dealRoomId],
+    enabled: !!dealRoomId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("deal_rooms")
+        .select("qa_completed_at, qa_completed_by")
+        .eq("id", dealRoomId)
+        .single();
+      return data;
+    },
+  });
+
+  // ── Realtime — append new rows (dedup by id) ──
   useEffect(() => {
     if (!dealRoomId) return;
     const channel = supabase
-      .channel(`qa-${dealRoomId}`)
+      .channel(`qa-v2-${dealRoomId}`)
       .on(
         "postgres_changes" as any,
         { event: "INSERT", schema: "public", table: "deal_room_qa", filter: `deal_room_id=eq.${dealRoomId}` },
         (payload: any) => {
-          setQaMessages((prev) => {
-            if (prev.some((m) => m.id === payload.new.id)) return prev;
-            return [...prev, payload.new];
-          });
+          setRows((prev) =>
+            prev.some((r) => r.id === payload.new.id) ? prev : [...prev, payload.new],
+          );
         },
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [dealRoomId]);
 
-  // ── Auto-scroll on new messages ──
-  useEffect(() => {
-    if (threadRef.current) {
-      threadRef.current.scrollTop = threadRef.current.scrollHeight;
-    }
-  }, [qaMessages]);
+  // ── Derived data ──
+  const questions = rows
+    .filter((r) => r.is_question === true && r.parent_id === null)
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
 
-  // ── Load meetings ──
-  const { data: meetings = [], refetch: refetchMeetings } = useQuery({
-    queryKey: ["qa-meetings", dealRoomId],
-    enabled: !!dealRoomId,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("deal_room_meetings")
-        .select("*")
-        .eq("deal_room_id", dealRoomId)
-        .order("scheduled_at", { ascending: false });
-      return data ?? [];
-    },
-  });
+  const answerFor = (qId: string) =>
+    rows.find((r) => r.parent_id === qId) ?? null;
 
-  // ── Send message ──
-  const sendMessage = async () => {
-    if (!sendText.trim() || !userId) return;
+  const openQuestions = questions.filter((q) => !answerFor(q.id));
+  const answeredQuestions = questions.filter((q) => !!answerFor(q.id));
+  const orderedQuestions = [...openQuestions, ...answeredQuestions.slice().reverse()];
+
+  const questionCount = questions.length;
+  const answeredCount = answeredQuestions.length;
+  const isAtLimit = questionCount >= MAX_QUESTIONS;
+  const isCompleted = !!roomData?.qa_completed_at;
+
+  // Avg response time in hours
+  const avgResponseHours = (() => {
+    const pairs = answeredQuestions
+      .map((q) => {
+        const ans = answerFor(q.id);
+        if (!ans?.answered_at) return null;
+        return (new Date(ans.answered_at).getTime() - new Date(q.created_at).getTime()) / 3600000;
+      })
+      .filter((h): h is number => h !== null);
+    if (!pairs.length) return null;
+    return (pairs.reduce((a, b) => a + b, 0) / pairs.length).toFixed(1);
+  })();
+
+  // ── Ask a question (investor) ──
+  const sendQuestion = async (text: string) => {
+    const content = text.trim();
+    if (!content || !userId || isAtLimit || isCompleted) return;
     setSending(true);
     try {
-      const msgContent = sendText.trim();
-      const msgRole = isInvestor ? "investor" : "founder";
       const { data: inserted } = await supabase
         .from("deal_room_qa")
         .insert({
           deal_room_id: dealRoomId,
           user_id: userId,
-          sender_role: msgRole,
+          sender_role: "investor",
           sender_name: userName,
-          content: msgContent,
-          is_question: isQuestion,
-          ai_suggested: false,
+          content,
+          is_question: true,
+          ai_suggested: text !== askText,
         })
         .select()
         .single();
       if (inserted) {
-        // Append with real DB id so the realtime dedup guard won't create a duplicate
-        setQaMessages((prev) =>
-          prev.some((m) => m.id === inserted.id) ? prev : [...prev, inserted],
-        );
+        setRows((prev) => prev.some((r) => r.id === inserted.id) ? prev : [...prev, inserted]);
       }
-      setSendText("");
+      setAskText("");
+      setSuggestionInput("");
     } catch {
-      toast.error("Could not send message");
+      toast.error("Could not send question");
     } finally {
       setSending(false);
     }
   };
 
-  // ── AI summary ──
+  // ── Answer a question (founder) ──
+  const sendAnswer = async (questionId: string) => {
+    const content = (answerDrafts[questionId] ?? "").trim();
+    if (!content || !userId || content.length > 500) return;
+    setAnswerSending((prev) => ({ ...prev, [questionId]: true }));
+    try {
+      const now = new Date().toISOString();
+      const { data: inserted } = await supabase
+        .from("deal_room_qa")
+        .insert({
+          deal_room_id: dealRoomId,
+          user_id: userId,
+          sender_role: "founder",
+          sender_name: userName,
+          content,
+          is_question: false,
+          parent_id: questionId,
+          answered_at: now,
+        })
+        .select()
+        .single();
+      if (inserted) {
+        setRows((prev) => prev.some((r) => r.id === inserted.id) ? prev : [...prev, inserted]);
+        setAnswerDrafts((prev) => { const n = { ...prev }; delete n[questionId]; return n; });
+        // Auto-expand the answer just submitted
+        setExpandedAnswers((prev) => ({ ...prev, [questionId]: true }));
+      }
+      // Auto-complete if all 10 answered
+      if (questionCount >= MAX_QUESTIONS && answeredCount + 1 >= MAX_QUESTIONS) {
+        triggerCompletion();
+      }
+    } catch {
+      toast.error("Could not send answer");
+    } finally {
+      setAnswerSending((prev) => ({ ...prev, [questionId]: false }));
+    }
+  };
+
+  // ── Generate AI suggestions (investor) ──
+  const fetchSuggestions = async () => {
+    setLoadingSuggestions(true);
+    try {
+      const sector = room?.startups?.sector ?? "technology";
+      const prevQs = questions.map((q) => q.content);
+      const result = await getQASuggestions({
+        data: {
+          question: `Suggest 3 due diligence questions for ${companyName}`,
+          startupName: companyName,
+          sector,
+          previousQuestions: prevQs,
+        },
+      });
+      setSuggestions(
+        (result.suggestions ?? []).slice(0, 3).map((s: string) => ({
+          text: s,
+          source: companyName + " documents",
+        })),
+      );
+    } catch {
+      toast.error("Could not load suggestions");
+    } finally {
+      setLoadingSuggestions(false);
+    }
+  };
+
+  // ── AI summary (investor only) ──
   const generateSummary = async () => {
-    if (!userId || qaMessages.length === 0) return;
+    if (!userId || rows.length === 0) return;
     setSummarising(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) { toast.error("Not authenticated"); return; }
-      const threadText = qaMessages.map((m: any) => `${m.sender_role}: ${m.content}`).join("\n");
+      const threadText = questions.map((q, i) => {
+        const ans = answerFor(q.id);
+        return `Q${i + 1}: ${q.content}\nA: ${ans ? ans.content : "(unanswered)"}`;
+      }).join("\n\n");
       const resp = await fetch(
         `https://ldimninnjlvxozubheib.supabase.co/functions/v1/ai-router`,
         {
@@ -1880,20 +2073,16 @@ function QAPanel({
           body: JSON.stringify({
             task_type: "dd_report",
             user_id: userId,
-            system_prompt: "You are summarizing a Q&A thread from a deal room between a startup founder and an investor. Be concise and factual.",
-            messages: [{ role: "user", content: `Summarize this Q&A thread:\n\n${threadText}` }],
+            system_prompt: "You are summarizing a structured Q&A between a startup founder and an investor. Be concise and factual.",
+            messages: [{ role: "user", content: `Summarize this Q&A:\n\n${threadText}` }],
           }),
         },
       );
       const result = await resp.json();
       const content = result?.content ?? result?.reply ?? result?.message ?? "No summary generated.";
       await supabase.from("deal_room_notes").insert({
-        deal_room_id: dealRoomId,
-        user_id: userId,
-        title: "AI Q&A Summary",
-        content,
-        visibility: "private",
-        ai_generated: true,
+        deal_room_id: dealRoomId, user_id: userId,
+        title: "AI Q&A Summary", content, visibility: "private", ai_generated: true,
       });
       toast.success("Summary saved to your notes");
     } catch {
@@ -1903,425 +2092,354 @@ function QAPanel({
     }
   };
 
-  // ── AI prep notes for a meeting ──
-  const generatePrepNotes = async (meeting: any) => {
-    if (!userId) return;
-    setPrepNotesId(meeting.id);
+  // ── Completion trigger ──
+  const triggerCompletion = async () => {
+    if (!userId || completingQA) return;
+    setCompletingQA(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) { toast.error("Not authenticated"); return; }
-      const resp = await fetch(
-        `https://ldimninnjlvxozubheib.supabase.co/functions/v1/ai-router`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
-          body: JSON.stringify({
-            task_type: "coaching",
-            user_id: userId,
-            system_prompt: "You are helping an investor prepare for a deal meeting. Generate 5 specific questions to ask based on the meeting context and deal stage.",
-            messages: [{ role: "user", content: `Meeting: ${meeting.meeting_type}. Agenda: ${meeting.notes_shared ?? "none"}. Generate prep questions.` }],
-          }),
-        },
-      );
-      const result = await resp.json();
-      const content = result?.content ?? result?.reply ?? result?.message ?? "Could not generate prep notes.";
-      setPrepText((prev) => ({ ...prev, [meeting.id]: content }));
+      await completeQaAndGenerateReport({ data: { dealRoomId, userId } });
+      await refetchRoom();
+      queryClient.invalidateQueries({ queryKey: ["vault-documents", dealRoomId] });
+      toast.success("Q&A complete. Report saved to Information Vault.");
     } catch {
-      toast.error("Could not generate prep notes");
+      toast.error("Could not complete Q&A");
     } finally {
-      setPrepNotesId(null);
+      setCompletingQA(false);
+      setShowCompleteConfirm(false);
     }
   };
 
-  // ── Schedule meeting ──
-  const scheduleMeeting = async () => {
-    if (!meetDate || !meetTime || !dealRoomId) return;
-    setMeetSaving(true);
-    try {
-      const scheduledAt = new Date(`${meetDate}T${meetTime}`).toISOString();
-      await supabase.from("deal_room_meetings").insert({
-        deal_room_id: dealRoomId,
-        scheduled_at: scheduledAt,
-        duration_minutes: parseInt(meetDuration),
-        meeting_type: meetType,
-        notes_shared: meetNotes.trim() || null,
-      });
-      setMeetTitle(""); setMeetDate(""); setMeetTime(""); setMeetDuration("60"); setMeetType("intro_call"); setMeetNotes("");
-      setShowMeetForm(false);
-      await refetchMeetings();
-      toast.success("Meeting scheduled");
-    } catch {
-      toast.error("Could not schedule meeting");
-    } finally {
-      setMeetSaving(false);
-    }
-  };
-
-  // ── Save investor private notes on blur ──
-  const saveInvestorNote = async (meetingId: string, value: string) => {
-    await supabase.from("deal_room_meetings").update({ notes_investor: value }).eq("id", meetingId);
-  };
-
-  const meetingStatus = (m: any) => {
-    if (m.completed_at) return { label: "Completed", cls: "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400" };
-    if (new Date(m.scheduled_at) < new Date()) return { label: "Overdue", cls: "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400" };
-    return { label: "Scheduled", cls: "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400" };
-  };
+  const unansweredCount = openQuestions.length;
 
   return (
     <div className="space-y-6">
-      {/* ── Two-column layout ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      {/* ── Completion banner ── */}
+      {isCompleted && (
+        <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-card px-5 py-3">
+          <CheckCircle2 className="h-4 w-4 text-[#10B981] shrink-0" />
+          <span className="text-sm text-muted-foreground">
+            Q&A marked complete on {new Date(roomData!.qa_completed_at!).toLocaleDateString()}. Report saved to Information Vault.
+          </span>
+        </div>
+      )}
 
-        {/* ── LEFT: Q&A Thread (60%) ── */}
-        <div className="lg:col-span-3 flex flex-col gap-4">
-          <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-gray-900 dark:text-white" style={{ fontFamily: "Syne, sans-serif" }}>Q&A</span>
-                {qaMessages.length > 0 && (
-                  <span className="rounded-full bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 text-xs font-medium text-gray-600 dark:text-gray-400">
-                    {qaMessages.length}
-                  </span>
-                )}
-              </div>
-              <button
-                onClick={generateSummary}
-                disabled={summarising || qaMessages.length === 0}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[#7C3AED]/30 px-3 py-1.5 text-xs font-medium text-[#7C3AED] hover:bg-[#7C3AED]/5 disabled:opacity-40"
-                data-testid="qa-ai-summary-btn"
-              >
-                {summarising ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-                Generate AI summary
-              </button>
-            </div>
+      {/* ── Main grid: thread (left) + sidebar (right) ── */}
+      <div className="flex flex-col sm:flex-row gap-6">
 
-            {/* Thread */}
-            <div
-              ref={threadRef}
-              className="flex-1 overflow-y-auto px-4 py-4 space-y-4"
-              style={{ maxHeight: 480 }}
-              data-testid="qa-thread"
-            >
-              {qaMessages.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <MessagesSquare className="h-10 w-10 text-gray-200 dark:text-zinc-700 mb-3" />
-                  <p className="text-sm text-gray-500 dark:text-gray-400">No messages yet. Start the Q&A by asking the first question.</p>
-                  <button
-                    onClick={() => console.log("AI suggestions — not yet wired")}
-                    className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-[#7C3AED]/30 px-3 py-1.5 text-xs font-medium text-[#7C3AED] hover:bg-[#7C3AED]/5"
-                  >
-                    <Sparkles className="h-3.5 w-3.5" /> Ask AI for suggested questions
-                  </button>
-                </div>
-              ) : (
-                qaMessages.map((msg: any) => {
-                  const isMine = msg.sender_role === (isInvestor ? "investor" : "founder");
-                  const isInv = msg.sender_role === "investor";
-                  const parentMsg = msg.parent_id ? qaMessages.find((m: any) => m.id === msg.parent_id) : null;
+        {/* ── SIDEBAR (stacks above on mobile) ── */}
+        <div className="flex flex-col gap-4 sm:order-2 sm:w-72 shrink-0">
 
-                  return (
-                    <div key={msg.id} className={cn("flex gap-2.5", isInv ? "flex-row-reverse" : "flex-row")}>
-                      {/* Avatar */}
-                      <div className={cn(
-                        "h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0",
-                        isInv ? "bg-blue-500" : "bg-[#7C3AED]",
-                      )}>
-                        {isInv ? "I" : "F"}
-                      </div>
-
-                      <div className={cn("flex flex-col max-w-[78%]", isInv ? "items-end" : "items-start")}>
-                        {/* Parent quote */}
-                        {parentMsg && (
-                          <div className="mb-1 rounded-lg px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400 border-l-2 border-[#7C3AED] bg-gray-50 dark:bg-zinc-800 italic">
-                            {parentMsg.content.slice(0, 80)}{parentMsg.content.length > 80 ? "…" : ""}
-                          </div>
-                        )}
-
-                        {/* Sender name + time */}
-                        <div className={cn("flex items-center gap-1.5 mb-1", isInv ? "flex-row-reverse" : "flex-row")}>
-                          <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
-                            {msg.sender_name || (isInv ? "Investor" : "Founder")}
-                          </span>
-                          {msg.is_question && (
-                            <span className="rounded-full bg-[#7C3AED]/10 px-1.5 py-px text-[9px] font-semibold text-[#7C3AED]">Q</span>
-                          )}
-                          <span className="text-[10px] text-gray-400 dark:text-gray-500">
-                            {formatDistanceToNow(new Date(msg.created_at), { addSuffix: true })}
-                          </span>
-                        </div>
-
-                        {/* Bubble */}
-                        <div className={cn(
-                          "rounded-xl px-3.5 py-2.5 text-sm leading-relaxed",
-                          isInv
-                            ? "bg-[#7C3AED] text-white"
-                            : "bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-white",
-                          msg.ai_suggested && "italic",
-                        )}>
-                          {msg.ai_suggested && <span className="mr-1 not-italic">✦</span>}
-                          {msg.content}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
+          {/* Status card */}
+          <div className="rounded-xl border border-border/60 bg-card px-5 py-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Status</span>
+              {isInvestor && !isCompleted && (
+                <button
+                  onClick={() => setShowCompleteConfirm(true)}
+                  disabled={completingQA}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                  data-testid="qa-mark-complete-btn"
+                >
+                  {completingQA ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3" />}
+                  Mark complete
+                </button>
               )}
             </div>
 
-            {/* Send bar */}
-            <div className="border-t border-gray-100 dark:border-zinc-800 px-4 py-3 bg-gray-50 dark:bg-zinc-800/40">
+            {/* Question counter */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs text-muted-foreground">{questionCount} of {MAX_QUESTIONS} questions used</span>
+                {isAtLimit && <span className="text-[10px] font-semibold text-[#F59E0B]">Limit reached</span>}
+              </div>
+              <div className="h-1.5 w-full rounded-full bg-border/40 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-brand transition-all"
+                  style={{ width: `${(questionCount / MAX_QUESTIONS) * 100}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="rounded-lg border border-border/40 bg-background px-3 py-2">
+                <div className="text-muted-foreground mb-0.5">Answered</div>
+                <div className="font-semibold text-foreground">{answeredCount}</div>
+              </div>
+              <div className="rounded-lg border border-border/40 bg-background px-3 py-2">
+                <div className="text-muted-foreground mb-0.5">Open</div>
+                <div className="font-semibold text-foreground">{unansweredCount}</div>
+              </div>
+            </div>
+
+            {avgResponseHours !== null && (
+              <div className="text-xs text-muted-foreground">
+                Avg response time: <span className="font-medium text-foreground">{avgResponseHours}h</span>
+              </div>
+            )}
+          </div>
+
+          {/* AI Suggestions (investor only) */}
+          {isInvestor && (
+            <div className="rounded-xl border border-border/60 bg-card px-5 py-4 space-y-3">
+              <div>
+                <div className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Suggested questions</div>
+                <div className="text-xs text-muted-foreground mt-0.5">Generated from {companyName}'s documents</div>
+              </div>
+
+              {suggestions.length === 0 ? (
+                <p className="text-xs text-muted-foreground">Click "Generate" to get AI-suggested due diligence questions.</p>
+              ) : (
+                <div className="space-y-2">
+                  {suggestions.map((s, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setSuggestionInput(s.text)}
+                      className="w-full text-left rounded-lg border border-border/40 bg-background px-3 py-2.5 hover:border-brand/40 transition-colors"
+                    >
+                      <div className="text-xs text-foreground leading-relaxed">{s.text}</div>
+                      <div className="text-[10px] text-muted-foreground mt-1">Source: {s.source}</div>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <button
+                onClick={fetchSuggestions}
+                disabled={loadingSuggestions || isAtLimit || isCompleted}
+                className="inline-flex items-center gap-1.5 text-xs text-brand hover:opacity-80 disabled:opacity-40"
+              >
+                {loadingSuggestions ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                {suggestions.length === 0 ? "Generate suggestions" : "Generate more"}
+              </button>
+            </div>
+          )}
+
+          {/* AI Summary (investor only) */}
+          {isInvestor && (
+            <button
+              onClick={generateSummary}
+              disabled={summarising || rows.length === 0}
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border/60 bg-card px-4 py-3 text-xs font-medium text-foreground hover:bg-accent disabled:opacity-40"
+              data-testid="qa-ai-summary-btn"
+            >
+              {summarising ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+              Generate AI summary
+            </button>
+          )}
+        </div>
+
+        {/* ── THREAD (left / main) ── */}
+        <div className="flex-1 sm:order-1 space-y-4" data-testid="qa-thread">
+
+          {/* Investor ask bar */}
+          {isInvestor && !isCompleted && (
+            <div className="rounded-xl border border-border/60 bg-card px-4 py-3 space-y-2">
               <textarea
-                value={sendText}
-                onChange={(e) => setSendText(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+                value={suggestionInput || askText}
+                onChange={(e) => {
+                  if (suggestionInput) setSuggestionInput(e.target.value);
+                  else setAskText(e.target.value);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendQuestion(suggestionInput || askText);
+                  }
+                }}
                 rows={2}
-                placeholder={isInvestor ? "Ask a question..." : "Reply or add information..."}
-                className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none focus:border-[#7C3AED]"
+                placeholder={isAtLimit ? "Question limit reached (10/10)" : "Ask a question…"}
+                disabled={isAtLimit}
+                className="w-full resize-none rounded-lg border border-border/60 bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-brand disabled:opacity-50"
                 style={{ maxHeight: 96 }}
                 data-testid="qa-send-textarea"
               />
-              <div className="mt-2 flex items-center justify-between">
-                <label className="flex items-center gap-1.5 cursor-pointer text-xs text-gray-500 dark:text-gray-400">
-                  <input
-                    type="checkbox"
-                    checked={isQuestion}
-                    onChange={(e) => setIsQuestion(e.target.checked)}
-                    className="rounded"
-                  />
-                  Mark as question
-                </label>
+              <div className="flex items-center justify-end">
                 <button
-                  onClick={sendMessage}
-                  disabled={!sendText.trim() || sending}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
-                  style={{ background: "#7C3AED" }}
+                  onClick={() => sendQuestion(suggestionInput || askText)}
+                  disabled={!(suggestionInput || askText).trim() || sending || isAtLimit}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
                   data-testid="qa-send-btn"
                 >
                   {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                  Send
+                  Ask
                 </button>
               </div>
             </div>
-          </div>
-        </div>
+          )}
 
-        {/* ── RIGHT: Meetings (40%) ── */}
-        <div className="lg:col-span-2 flex flex-col gap-4">
-          <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
-              <span className="text-sm font-semibold text-gray-900 dark:text-white" style={{ fontFamily: "Syne, sans-serif" }}>Meetings</span>
-              <button
-                onClick={() => setShowMeetForm((v) => !v)}
-                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white"
-                style={{ background: "#7C3AED" }}
-                data-testid="schedule-meeting-btn"
-              >
-                <Plus className="h-3.5 w-3.5" /> Schedule meeting
-              </button>
+          {/* Question cards */}
+          {orderedQuestions.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center rounded-xl border border-border/60 bg-card">
+              <MessagesSquare className="h-10 w-10 text-muted-foreground/30 mb-3" />
+              <p className="text-sm text-muted-foreground">
+                {isInvestor ? "No questions yet. Ask the first one above." : "No questions from the investor yet."}
+              </p>
             </div>
+          ) : (
+            orderedQuestions.map((q, idx) => {
+              const qNum = questions.indexOf(q) + 1;
+              const ans = answerFor(q.id);
+              const isAnswered = !!ans;
+              const draft = answerDrafts[q.id] ?? "";
+              const charsLeft = 500 - draft.length;
+              const expanded = expandedAnswers[q.id] ?? false;
 
-            {/* Meeting form */}
-            {showMeetForm && (
-              <div className="px-5 py-4 border-b border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/50 space-y-3">
-                <input
-                  value={meetTitle}
-                  onChange={(e) => setMeetTitle(e.target.value)}
-                  placeholder="Title / purpose"
-                  className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none focus:border-[#7C3AED]"
-                />
-                <div className="grid grid-cols-2 gap-2">
-                  <input
-                    type="date"
-                    value={meetDate}
-                    onChange={(e) => setMeetDate(e.target.value)}
-                    className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:border-[#7C3AED]"
-                  />
-                  <input
-                    type="time"
-                    value={meetTime}
-                    onChange={(e) => setMeetTime(e.target.value)}
-                    className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:border-[#7C3AED]"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <select
-                    value={meetDuration}
-                    onChange={(e) => setMeetDuration(e.target.value)}
-                    className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none"
-                  >
-                    {[30, 45, 60, 90].map((d) => <option key={d} value={d}>{d} min</option>)}
-                  </select>
-                  <select
-                    value={meetType}
-                    onChange={(e) => setMeetType(e.target.value)}
-                    className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none"
-                  >
-                    {MEETING_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
-                  </select>
-                </div>
-                <textarea
-                  value={meetNotes}
-                  onChange={(e) => setMeetNotes(e.target.value)}
-                  rows={2}
-                  placeholder="Agenda or topics to cover — visible to both parties"
-                  className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none focus:border-[#7C3AED]"
-                />
-                <div className="flex items-center justify-end gap-2">
-                  <button onClick={() => setShowMeetForm(false)} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400">
-                    Cancel
-                  </button>
-                  <button
-                    onClick={scheduleMeeting}
-                    disabled={!meetDate || !meetTime || meetSaving}
-                    className="inline-flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-medium text-white disabled:opacity-50"
-                    style={{ background: "#7C3AED" }}
-                    data-testid="confirm-schedule-btn"
-                  >
-                    {meetSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Schedule"}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Meeting list */}
-            <div className="divide-y divide-gray-100 dark:divide-zinc-800">
-              {(meetings as any[]).length === 0 ? (
-                <div className="px-5 py-8 text-center">
-                  <Calendar className="h-8 w-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500 dark:text-gray-400">No meetings scheduled yet</p>
-                </div>
-              ) : (
-                (meetings as any[]).map((m: any) => {
-                  const status = meetingStatus(m);
-                  const typeLabel = MEETING_TYPES.find((t) => t.value === m.meeting_type)?.label ?? m.meeting_type;
-                  const hasPrepNotes = !!prepText[m.id];
-
-                  return (
-                    <div key={m.id} className="px-5 py-4">
-                      <div className="flex items-start justify-between gap-2 flex-wrap">
-                        <div>
-                          <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                            {m.scheduled_at ? format(new Date(m.scheduled_at), "MMM d, yyyy · h:mm a") : "—"}
-                          </div>
-                          <div className="mt-1 flex items-center gap-1.5 flex-wrap">
-                            <span className="text-[10px] rounded-full bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 text-gray-500 dark:text-gray-400 font-medium">{typeLabel}</span>
-                            {m.duration_minutes && (
-                              <span className="text-[10px] text-gray-400 dark:text-gray-500">{m.duration_minutes} min</span>
-                            )}
-                          </div>
-                        </div>
-                        <span className={cn("shrink-0 text-[10px] font-medium rounded-full px-2 py-0.5", status.cls)}>
-                          {status.label}
+              return (
+                <div
+                  key={q.id}
+                  className={cn(
+                    "rounded-xl border bg-card",
+                    isAnswered
+                      ? "border-border/60"
+                      : "border-border",
+                  )}
+                >
+                  {/* Question header */}
+                  <div className="px-4 py-3 flex items-start gap-3">
+                    {/* Avatar */}
+                    <div className="h-8 w-8 rounded-full bg-brand/10 border border-brand/20 flex items-center justify-center text-xs font-bold text-brand shrink-0">
+                      {(q.sender_name ?? "I").charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs font-semibold text-foreground">{q.sender_name}</span>
+                        <span className="text-[10px] rounded-full bg-background border border-border/60 px-1.5 py-px text-muted-foreground font-medium capitalize">{q.sender_role}</span>
+                        <span className="text-[10px] text-muted-foreground">
+                          {formatDistanceToNow(new Date(q.created_at), { addSuffix: true })}
+                        </span>
+                        <span className="ml-auto text-[10px] font-semibold text-muted-foreground">#{qNum}</span>
+                        <span className={cn(
+                          "text-[10px] font-semibold rounded-full px-2 py-px",
+                          isAnswered
+                            ? "bg-[#10B981]/10 text-[#10B981]"
+                            : "bg-border/40 text-muted-foreground",
+                        )}>
+                          {isAnswered ? "Answered" : "Open"}
                         </span>
                       </div>
+                      <p className="mt-1.5 text-sm text-foreground leading-relaxed">{q.content}</p>
+                    </div>
+                  </div>
 
-                      {m.notes_shared && (
-                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{m.notes_shared}</p>
-                      )}
-
-                      {isInvestor && (
-                        <div className="mt-3 space-y-2">
-                          <button
-                            onClick={() => hasPrepNotes
-                              ? setPrepText((prev) => { const n = { ...prev }; delete n[m.id]; return n; })
-                              : generatePrepNotes(m)
-                            }
-                            disabled={prepNotesId === m.id}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-[#7C3AED]/30 px-3 py-1.5 text-xs font-medium text-[#7C3AED] hover:bg-[#7C3AED]/5 disabled:opacity-40"
-                            data-testid="ai-prep-notes-btn"
-                          >
-                            {prepNotesId === m.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-                            {hasPrepNotes ? "Hide prep notes" : "AI prep notes"}
-                          </button>
-
-                          {hasPrepNotes && (
-                            <div className="rounded-lg bg-[#7C3AED]/5 border border-[#7C3AED]/15 px-3 py-3">
-                              <p className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">{prepText[m.id]}</p>
+                  {/* Answer section */}
+                  {isAnswered ? (
+                    <div className="border-t border-border/40">
+                      <button
+                        onClick={() => setExpandedAnswers((prev) => ({ ...prev, [q.id]: !prev[q.id] }))}
+                        className="w-full flex items-center gap-2 px-4 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", expanded && "rotate-180")} />
+                        {expanded ? "Hide answer" : "View answer"}
+                        <span className="ml-auto text-[10px]">{ans.sender_name} · {formatDistanceToNow(new Date(ans.answered_at ?? ans.created_at), { addSuffix: true })}</span>
+                      </button>
+                      {expanded && (
+                        <div className="px-4 pb-3 pt-1">
+                          <div className="flex items-start gap-3">
+                            <div className="h-7 w-7 rounded-full bg-border/40 flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0">
+                              {(ans.sender_name ?? "F").charAt(0).toUpperCase()}
                             </div>
-                          )}
-
-                          {m.completed_at && (
-                            <div>
-                              <div className="text-[10px] uppercase tracking-wider font-semibold text-gray-400 dark:text-gray-500 mb-1">My notes from this meeting</div>
-                              <textarea
-                                value={investorNotes[m.id] ?? (m.notes_investor ?? "")}
-                                onChange={(e) => setInvestorNotes((prev) => ({ ...prev, [m.id]: e.target.value }))}
-                                onBlur={(e) => saveInvestorNote(m.id, e.target.value)}
-                                rows={3}
-                                placeholder="Private notes about this meeting..."
-                                className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-xs text-gray-900 dark:text-white placeholder:text-gray-400 outline-none"
-                              />
-                            </div>
-                          )}
+                            <p className="text-sm text-foreground leading-relaxed">{ans.content}</p>
+                          </div>
                         </div>
                       )}
                     </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
+                  ) : isFounder ? (
+                    // Founder inline answer input
+                    <div className="border-t border-border/40 px-4 py-3 space-y-2">
+                      <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                        <Lock className="h-3 w-3" />
+                        Type your answer — no paste
+                      </div>
+                      <textarea
+                        value={draft}
+                        onChange={(e) => {
+                          if (e.target.value.length <= 500)
+                            setAnswerDrafts((prev) => ({ ...prev, [q.id]: e.target.value }));
+                        }}
+                        onPaste={(e) => e.preventDefault()}
+                        maxLength={500}
+                        rows={3}
+                        placeholder="Type your answer here…"
+                        className="w-full resize-none rounded-lg border border-border/60 bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-brand"
+                      />
+                      <div className="flex items-center justify-between">
+                        <span className={cn("text-[10px]", charsLeft < 50 ? "text-[#EF4444] font-semibold" : "text-muted-foreground")}>
+                          {charsLeft} characters remaining
+                        </span>
+                        <button
+                          onClick={() => sendAnswer(q.id)}
+                          disabled={!draft.trim() || answerSending[q.id]}
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
+                        >
+                          {answerSending[q.id] ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                          Send answer
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    // Investor sees awaiting state
+                    <div className="border-t border-border/40 px-4 py-2.5">
+                      <span className="text-xs text-muted-foreground italic">Awaiting answer…</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
 
-      {/* ── Next Stage / Decision ── */}
-      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-6 py-5">
-        {showDecision ? (
-          <div className="space-y-3">
-            <div className="text-sm font-semibold text-gray-900 dark:text-white">Submit a decision</div>
-            <select
-              value={decisionOutcome}
-              onChange={(e) => setDecisionOutcome(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none"
-            >
-              {["Pass", "Withdraw", "Pause"].map((o) => <option key={o} value={o}>{o}</option>)}
-            </select>
-            <textarea
-              value={decisionReason}
-              onChange={(e) => setDecisionReason(e.target.value)}
-              rows={3}
-              placeholder="Reason (required)"
-              className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none"
-            />
-            <div className="flex items-center gap-2">
-              <button onClick={() => setShowDecision(false)} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-4 py-2 text-sm text-gray-500 dark:text-gray-400">Cancel</button>
+      {/* ── Mark complete confirm dialog ── */}
+      {showCompleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-border/60 bg-card p-6 shadow-elev space-y-4">
+            <h3 className="text-base font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
+              Mark Q&amp;A as complete?
+            </h3>
+            {unansweredCount > 0 && (
+              <div className="rounded-lg border border-[#F59E0B]/30 bg-[#F59E0B]/5 px-4 py-3 text-sm text-[#F59E0B]">
+                {unansweredCount} question{unansweredCount !== 1 ? "s are" : " is"} still unanswered. The report will include all answered questions only.
+              </div>
+            )}
+            <p className="text-sm text-muted-foreground">
+              This will generate the Q&amp;A report and save it to the Information Vault. Both parties will see it.
+            </p>
+            <div className="flex items-center justify-end gap-3">
               <button
-                onClick={() => { console.log("submitDecision qa:", decisionOutcome, decisionReason); setShowDecision(false); setDecisionReason(""); }}
-                disabled={!decisionReason.trim()}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-                style={{ background: "#EF4444" }}
+                onClick={() => setShowCompleteConfirm(false)}
+                className="rounded-lg border border-border/60 px-4 py-2 text-sm text-muted-foreground hover:text-foreground"
               >
-                Submit decision
+                Cancel
+              </button>
+              <button
+                onClick={triggerCompletion}
+                disabled={completingQA}
+                className="inline-flex items-center gap-2 rounded-lg bg-brand px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+              >
+                {completingQA ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                Confirm
               </button>
             </div>
           </div>
-        ) : (
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <button
-              onClick={() => setShowDecision(true)}
-              className="rounded-lg border border-red-200 dark:border-red-900/40 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:bg-zinc-900 hover:bg-red-50 dark:hover:bg-red-900/10"
-            >
-              Decision
-            </button>
-            <button
-              onClick={onRequestNextStage}
-              disabled={stageRequesting}
-              className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
-              style={{ background: "#7C3AED" }}
-              data-testid="qa-next-stage"
-            >
-              {stageRequesting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-              Request next stage →
-            </button>
-          </div>
-        )}
+        </div>
+      )}
+
+      {/* ── Next stage ── */}
+      <div className="flex items-center justify-end">
+        <button
+          onClick={onRequestNextStage}
+          disabled={stageRequesting}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          data-testid="qa-next-stage"
+        >
+          {stageRequesting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+          Request next stage →
+        </button>
       </div>
     </div>
   );
 }
+
 
 // ── Due Diligence Panel ────────────────────────────────────────────
 
