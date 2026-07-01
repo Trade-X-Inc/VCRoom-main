@@ -105,6 +105,9 @@ function IntakePage() {
   // Per-file extraction results (shown even if no candidates extracted)
   const [fileResults, setFileResults] = useState<IntakeFileResult[]>([]);
 
+  // Cards dismissed by the investor (local only — row stays in DB)
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
+
   // Current batch result state
   const [currentBatchId, setCurrentBatchId] = useState<string | null>(null);
   const [currentCandidates, setCurrentCandidates] = useState<CandidateRow[]>([]);
@@ -115,7 +118,7 @@ function IntakePage() {
   // Per-batch strong match counts (fetched lazily when history renders)
   const [batchStrongCounts, setBatchStrongCounts] = useState<Record<string, number>>({});
 
-  // Fetch investor profile (id + thesis fields for the banner)
+  // Fetch investor profile (id + thesis fields + invite fields)
   const { data: investorProfile } = useQuery({
     queryKey: ["investor-profile-intake", user?.id],
     enabled: !!user?.id,
@@ -123,7 +126,7 @@ function IntakePage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("investor_profiles")
-        .select("id, sectors, stages, geography")
+        .select("id, sectors, stages, geography, your_name, fund_name, invite_token")
         .eq("user_id", user!.id)
         .maybeSingle();
       // sectors/stages may be stored as JSON string or real array — normalise here
@@ -135,20 +138,34 @@ function IntakePage() {
         }
         return [];
       };
-      return data ? { ...data, sectors: toArr(data.sectors), stages: toArr(data.stages) } as { id: string; sectors: string[]; stages: string[]; geography: string | null } : null;
+      return data
+        ? {
+            ...data,
+            sectors: toArr(data.sectors),
+            stages: toArr(data.stages),
+          } as {
+            id: string;
+            sectors: string[];
+            stages: string[];
+            geography: string | null;
+            your_name: string | null;
+            fund_name: string | null;
+            invite_token: string | null;
+          }
+        : null;
     },
   });
 
-  // Fetch past batches (include raw_input for input_type inference)
+  // Fetch past batches — investor_profile_id stores the auth user UUID
   const { data: batches = [], refetch: refetchBatches } = useQuery<BatchRow[]>({
-    queryKey: ["intake-batches", investorProfile?.id],
-    enabled: !!investorProfile?.id,
+    queryKey: ["intake-batches", user?.id],
+    enabled: !!user?.id,
     staleTime: 30_000,
     queryFn: async () => {
       const { data } = await supabase
         .from("investor_intake_batches")
         .select("id, created_at, status, parsed_count, raw_input")
-        .eq("investor_profile_id", investorProfile!.id)
+        .eq("investor_profile_id", user!.id)
         .order("created_at", { ascending: false })
         .limit(20);
       return (data ?? []) as BatchRow[];
@@ -749,105 +766,46 @@ function IntakePage() {
         )}
       </button>
 
-      {/* Per-file extraction status panel */}
-      {fileResults.length > 0 && fileResults.some((r) => r.status !== "ok") && (
-        <div style={{ marginBottom: 24 }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
-            File processing results
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {fileResults.map((r) => (
-              <div
-                key={r.file}
-                style={{
-                  display: "flex", alignItems: "flex-start", gap: 10,
-                  padding: "10px 14px", borderRadius: 8,
-                  background: r.status === "ok"
-                    ? "rgba(16,185,129,0.06)"
-                    : r.status === "rejected"
-                    ? "rgba(239,68,68,0.06)"
-                    : "rgba(245,158,11,0.06)",
-                  border: `1px solid ${r.status === "ok" ? "rgba(16,185,129,0.2)" : r.status === "rejected" ? "rgba(239,68,68,0.2)" : "rgba(245,158,11,0.2)"}`,
-                }}
-              >
-                {r.status === "ok"
-                  ? <CheckCircle2 size={13} style={{ color: "#10b981", flexShrink: 0, marginTop: 1 }} />
-                  : r.status === "rejected"
-                  ? <X size={13} style={{ color: "#ef4444", flexShrink: 0, marginTop: 1 }} />
-                  : <AlertTriangle size={13} style={{ color: "#f59e0b", flexShrink: 0, marginTop: 1 }} />}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-foreground)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {r.file}
-                  </div>
-                  {r.reason && (
-                    <div style={{ fontSize: 11, color: r.status === "rejected" ? "#ef4444" : "#f59e0b", marginTop: 2, lineHeight: 1.4 }}>
-                      {r.reason}
-                    </div>
-                  )}
-                </div>
+      {/* ── Results panel ──────────────────────────────────────────────── */}
+      {(currentCandidates.length > 0 || fileResults.some((r) => r.status !== "ok")) && (
+        <div style={{ marginTop: 32 }} data-testid="intake-results-panel">
+
+          {/* Extracted candidates */}
+          {currentCandidates.filter((c) => !dismissedIds.has(c.id)).length > 0 && (
+            <div style={{ marginBottom: 28 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>
+                Extracted ({currentCandidates.filter((c) => !dismissedIds.has(c.id)).length})
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Results */}
-      {currentCandidates.length > 0 && (
-        <div style={{ marginTop: 32 }}>
-          {/* Summary bar */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 20 }}>
-            <div style={{ fontSize: 15, fontWeight: 600, color: "var(--color-foreground)" }}>
-              Found <span style={{ color: "#a78bfa" }}>{currentCandidates.length}</span> potential lead{currentCandidates.length !== 1 ? "s" : ""} from this batch
-            </div>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              {(["all", "strong", "on_platform", "off_platform"] as Filter[]).map((f) => {
-                const labels: Record<Filter, string> = {
-                  all: `All (${currentCandidates.length})`,
-                  strong: `Strong fit (${strongCount})`,
-                  on_platform: `On Hockystick (${onPlatformCount})`,
-                  off_platform: `Not yet on Hockystick (${currentCandidates.length - onPlatformCount})`,
-                };
-                return (
-                  <button
-                    key={f}
-                    onClick={() => setActiveFilter(f)}
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 600,
-                      padding: "5px 12px",
-                      borderRadius: 99,
-                      border: "1px solid",
-                      cursor: "pointer",
-                      background: activeFilter === f ? "rgba(124,58,237,0.15)" : "transparent",
-                      borderColor: activeFilter === f ? "rgba(124,58,237,0.4)" : "rgba(255,255,255,0.1)",
-                      color: activeFilter === f ? "#a78bfa" : "rgba(255,255,255,0.4)",
-                    }}
-                  >
-                    {labels[f]}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {filtered.length === 0 && (
-            <div style={{ textAlign: "center", padding: "40px 24px", color: "var(--color-muted-foreground)", fontSize: 14 }}>
-              No results match this filter.
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {currentCandidates
+                  .filter((c) => !dismissedIds.has(c.id))
+                  .map((c) => (
+                    <ExtractedCard
+                      key={c.id}
+                      candidate={c}
+                      investorProfile={investorProfile}
+                      onDismiss={() => setDismissedIds((prev) => new Set([...prev, c.id]))}
+                    />
+                  ))}
+              </div>
             </div>
           )}
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {filtered.map((c) => (
-              <CandidateCard
-                key={c.id}
-                candidate={c}
-                watchlistNames={watchlistNames}
-                onMarkReviewed={() => markReviewed(c.id)}
-                onAddToWatchlist={() => addToWatchlist(c)}
-                investorId={user?.id}
-              />
-            ))}
-          </div>
+          {/* Could not extract — failed/rejected files */}
+          {fileResults.filter((r) => r.status !== "ok").length > 0 && (
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>
+                Could not extract ({fileResults.filter((r) => r.status !== "ok").length})
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {fileResults
+                  .filter((r) => r.status !== "ok")
+                  .map((r) => (
+                    <FailedCard key={r.file} result={r} />
+                  ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -855,357 +813,244 @@ function IntakePage() {
   );
 }
 
-// ── Candidate card ─────────────────────────────────────────────────────────────
+// ── Extracted candidate card ───────────────────────────────────────────────────
 
-// Fuzzy match: checks if a candidate company name is similar to any watchlist entry.
-// Uses simple substring / token overlap (no external library needed).
-function findWatchlistMatch(companyName: string, watchlistNames: string[]): string | null {
-  if (!companyName || watchlistNames.length === 0) return null;
-  const norm = companyName.toLowerCase().replace(/[^a-z0-9]/g, "");
-  for (const wl of watchlistNames) {
-    const wlNorm = wl.replace(/[^a-z0-9]/g, "");
-    if (!wlNorm || !norm) continue;
-    // Exact or substring match
-    if (wlNorm.includes(norm) || norm.includes(wlNorm)) return wl;
-    // Token overlap: any word >= 4 chars that appears in both
-    const aTokens = norm.match(/[a-z0-9]{4,}/g) ?? [];
-    const bTokens = new Set(wlNorm.match(/[a-z0-9]{4,}/g) ?? []);
-    if (aTokens.some((t) => bTokens.has(t))) return wl;
-  }
-  return null;
-}
-
-function CandidateCard({
+function ExtractedCard({
   candidate: c,
-  watchlistNames = [],
-  onMarkReviewed,
-  onAddToWatchlist,
-  investorId,
-  compact = false,
+  investorProfile,
+  onDismiss,
 }: {
   candidate: CandidateRow;
-  watchlistNames?: string[];
-  onMarkReviewed?: () => void;
-  onAddToWatchlist?: () => void;
-  investorId?: string;
-  compact?: boolean;
+  investorProfile: { your_name: string | null; fund_name: string | null; invite_token: string | null } | null;
+  onDismiss: () => void;
 }) {
-  const [snippetOpen, setSnippetOpen] = useState(false);
-  const [addedToWatchlist, setAddedToWatchlist] = useState(false);
-  const [briefResult, setBriefResult] = useState<any>(null);
-  const [briefLoading, setBriefLoading] = useState(false);
-  const [alreadyInPipeline, setAlreadyInPipeline] = useState<string | null>(null);
+  const [addedToPipeline, setAddedToPipeline] = useState(false);
+  const [addingToPipeline, setAddingToPipeline] = useState(false);
+  const [inviteSent, setInviteSent] = useState(false);
   const color = fitColor(c.thesis_fit_score);
 
-  // One-line "why" from thesis_fit_reasons[0]
-  const whyLine = c.thesis_fit_reasons?.[0] ?? null;
-
-  // Fuzzy duplicate detection against watchlist
-  const dupMatch = findWatchlistMatch(c.company_name ?? "", watchlistNames);
-
-  // Check if already in pipeline (matched_startup_id set — check via watchlist query on mount)
-  const { data: pipelineStatus } = useQuery({
-    queryKey: ["candidate-pipeline", c.matched_startup_id, investorId],
-    enabled: !!c.matched_startup_id && !!investorId,
-    staleTime: 60_000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("investor_watchlist")
-        .select("status")
-        .eq("investor_id", investorId!)
-        .ilike("company_name", `%${c.company_name ?? ""}%`)
-        .limit(1)
-        .maybeSingle();
-      return data?.status ?? null;
-    },
-  });
-
-  async function runFullAnalysis() {
-    if (!c.matched_startup_id || !investorId || briefLoading) return;
-    setBriefLoading(true);
-    try {
-      const { generateDealBrief } = await import("@/lib/deal-brief-fn");
-      // generateDealBrief requires a dealRoomId — but for intake we use a synthetic call
-      // by fetching from deal_briefs cache first (startup_id match)
-      const { data: cached } = await supabase
-        .from("deal_briefs")
-        .select("*")
-        .eq("startup_id", c.matched_startup_id)
-        .eq("investor_id", investorId)
-        .maybeSingle();
-      if (cached) {
-        setBriefResult(cached);
-        setBriefLoading(false);
-        return;
-      }
-      // No cache — fetch startup data and build a lightweight brief
-      const { data: startup } = await supabase
-        .from("startups")
-        .select("id, company_name, tagline, product_description, funding_stage, website_url")
-        .eq("id", c.matched_startup_id)
-        .maybeSingle();
-      if (startup) {
-        // Minimal brief from available data (no extra AI call — just structured display)
-        setBriefResult({
-          headline: startup.tagline ?? startup.company_name,
-          investment_thesis: startup.product_description ?? null,
-          match_score: c.thesis_fit_score,
-          strengths: c.thesis_fit_reasons ?? [],
-        });
-      }
-    } catch {
-      toast.error("Could not load analysis");
-    } finally {
-      setBriefLoading(false);
+  async function handleAddToPipeline() {
+    if (addedToPipeline || addingToPipeline) return;
+    setAddingToPipeline(true);
+    const { error } = await supabase
+      .from("investor_intake_candidates")
+      .update({ status: "identified" })
+      .eq("id", c.id);
+    setAddingToPipeline(false);
+    if (error) {
+      toast.error("Could not add to pipeline");
+    } else {
+      setAddedToPipeline(true);
+      toast.success(`${c.company_name || "Lead"} added to pipeline`);
     }
   }
+
+  function handleInvite() {
+    const name = c.founder_name || "there";
+    const company = c.company_name || "your work";
+    const token = investorProfile?.invite_token ?? "";
+    const inviterName = investorProfile?.your_name ?? "";
+    const fundName = investorProfile?.fund_name ?? "";
+
+    const subject = encodeURIComponent("Invitation to connect on Hockystick");
+    const bodyLines = [
+      `Hi ${name},`,
+      "",
+      `I came across ${company} and wanted to reach out.`,
+      "",
+      "I use Hockystick to manage my deal flow and review pitches — it gives founders a structured way to share materials with investors.",
+      "",
+      "I'd like to invite you to create a profile. It takes about 10 minutes:",
+      `https://hockystick.app/join/investor/${token}`,
+      "",
+      inviterName,
+      fundName,
+    ].filter((line, i, arr) => !(line === "" && arr[i - 1] === "")).join("\n");
+
+    const mailto = `mailto:${c.contact_email ?? ""}?subject=${subject}&body=${encodeURIComponent(bodyLines)}`;
+    window.open(mailto, "_blank");
+    setInviteSent(true);
+  }
+
+  // Metadata pills — only show fields that were actually extracted
+  const pills: { label: string; value: string }[] = [];
+  if ((c as any).funding_stage) pills.push({ label: "Stage", value: (c as any).funding_stage });
+  if ((c as any).sector) pills.push({ label: "Sector", value: (c as any).sector });
+  if ((c as any).geography) pills.push({ label: "Location", value: (c as any).geography });
+
+  const btnBase: React.CSSProperties = {
+    fontSize: 11, fontWeight: 600, borderRadius: 6, padding: "5px 12px",
+    cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4,
+    border: "1px solid", flexShrink: 0,
+  };
 
   return (
     <div
       className="bg-card border border-border/60 rounded-xl"
-      style={{ padding: compact ? "14px 16px" : "20px", opacity: c.status === "reviewed" ? 0.6 : 1 }}
+      style={{ padding: "16px 20px" }}
+      data-testid="extracted-card"
     >
-      {/* Top row */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+      {/* Source badge */}
+      <div style={{ marginBottom: 8 }}>
+        <span style={{
+          fontSize: 10, fontWeight: 600, color: "var(--color-muted-foreground)",
+          background: "rgba(255,255,255,0.05)", border: "1px solid var(--color-border)",
+          borderRadius: 4, padding: "2px 7px", textTransform: "uppercase", letterSpacing: "0.06em",
+        }}>
+          Pasted text
+        </span>
+      </div>
+
+      {/* Name / company row */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
-            <span className="text-base font-semibold text-foreground">
-              {c.company_name || "Unknown company"}
-            </span>
-            {c.founder_name && (
-              <span style={{ fontSize: 12, color: "var(--color-muted-foreground)" }}>
-                · {c.founder_name}
-              </span>
-            )}
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-            <span style={badge(color)}>
-              {color === "green" && <CheckCircle2 size={10} />}
-              {color === "amber" && <AlertTriangle size={10} />}
-              {fitLabel(c.thesis_fit_score)} · {c.thesis_fit_score}
-            </span>
-            {/* Already in pipeline badge (Part 2.3) */}
-            {pipelineStatus ? (
-              <span style={badge("green")}>
-                <CheckCircle2 size={10} /> Already in pipeline — {pipelineStatus}
-              </span>
-            ) : c.matched_startup_id ? (
-              <span style={badge("green")}>
-                <CheckCircle2 size={10} /> On Hockystick — verified profile
-              </span>
-            ) : (
-              <span style={badge("muted")}>Not on Hockystick yet</span>
-            )}
-          </div>
+          {c.founder_name && (
+            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--color-foreground)", lineHeight: 1.3 }}>
+              {c.founder_name}
+            </div>
+          )}
+          {c.company_name && (
+            <div style={{ fontSize: 13, color: c.founder_name ? "var(--color-muted-foreground)" : "var(--color-foreground)", fontWeight: c.founder_name ? 400 : 600, marginTop: c.founder_name ? 2 : 0 }}>
+              {c.company_name}
+            </div>
+          )}
+          {c.contact_email && (
+            <div style={{ fontSize: 12, color: "#a78bfa", fontFamily: "monospace", marginTop: 4 }}>
+              {c.contact_email}
+            </div>
+          )}
+          {c.contact_link && (
+            <a
+              href={c.contact_link} target="_blank" rel="noopener noreferrer"
+              style={{ fontSize: 11, color: "#a78bfa", textDecoration: "none", display: "flex", alignItems: "center", gap: 3, marginTop: 3 }}
+            >
+              <ExternalLink size={10} /> {c.contact_link.replace(/^https?:\/\//, "").slice(0, 45)}
+            </a>
+          )}
         </div>
 
-        {/* Score circle */}
+        {/* Fit score */}
         <div style={{
-          width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
+          width: 38, height: 38, borderRadius: "50%", flexShrink: 0,
           background: color === "green" ? "rgba(16,185,129,0.1)" : color === "amber" ? "rgba(245,158,11,0.1)" : "rgba(255,255,255,0.05)",
           border: `1px solid ${color === "green" ? "rgba(16,185,129,0.25)" : color === "amber" ? "rgba(245,158,11,0.25)" : "rgba(255,255,255,0.1)"}`,
           display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 13, fontWeight: 700,
+          fontSize: 12, fontWeight: 700,
           color: color === "green" ? "#10b981" : color === "amber" ? "#f59e0b" : "rgba(255,255,255,0.3)",
         }}>
           {c.thesis_fit_score}
         </div>
       </div>
 
-      {/* Why-line (Part 2.1) — first reason as a prominent single line */}
-      {whyLine && (
-        <div style={{ marginTop: 8, display: "flex", gap: 6, alignItems: "flex-start" }}>
-          <BookOpen size={11} style={{ color: "#a78bfa", marginTop: 2, flexShrink: 0 }} />
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", lineHeight: 1.5 }}>{whyLine}</span>
-        </div>
-      )}
-
-      {/* Remaining reasons (collapsible in compact mode) */}
-      {!compact && c.thesis_fit_reasons && c.thesis_fit_reasons.length > 1 && (
-        <ul style={{ margin: "6px 0 0", padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 3 }}>
-          {c.thesis_fit_reasons.slice(1).map((r, i) => (
-            <li key={i} style={{ fontSize: 12, color: "var(--color-muted-foreground)", display: "flex", gap: 6 }}>
-              <span style={{ color: "rgba(255,255,255,0.15)", flexShrink: 0 }}>·</span>
-              {r}
-            </li>
+      {/* Metadata pills */}
+      {pills.length > 0 && (
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 10 }}>
+          {pills.map((p) => (
+            <span key={p.label} style={{
+              fontSize: 11, color: "var(--color-muted-foreground)",
+              background: "rgba(255,255,255,0.04)", border: "1px solid var(--color-border)",
+              borderRadius: 4, padding: "2px 8px",
+            }}>
+              {p.label}: {p.value}
+            </span>
           ))}
-        </ul>
-      )}
-
-      {/* Duplicate detection warning (Part 2.2) */}
-      {dupMatch && !pipelineStatus && (
-        <div style={{
-          marginTop: 8, padding: "7px 12px",
-          background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 7,
-          display: "flex", alignItems: "center", gap: 7,
-        }}>
-          <AlertCircle size={11} style={{ color: "#f59e0b", flexShrink: 0 }} />
-          <span style={{ fontSize: 11, color: "#f59e0b" }}>
-            Similar to a company already in your pipeline
-          </span>
-          <a href="/app/investor/connections" style={{ fontSize: 11, color: "#f59e0b", textDecoration: "underline", marginLeft: "auto", flexShrink: 0 }}>
-            View pipeline →
-          </a>
         </div>
       )}
 
-      {/* Contact info */}
-      {(c.contact_email || c.contact_link) && (
-        <div style={{ marginTop: 10, display: "flex", gap: 12, flexWrap: "wrap" }}>
-          {c.contact_email && (
-            <a href={`mailto:${c.contact_email}`} style={{ fontSize: 12, color: "#a78bfa", textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
-              <ExternalLink size={11} /> {c.contact_email}
-            </a>
-          )}
-          {c.contact_link && (
-            <a href={c.contact_link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "#a78bfa", textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
-              <ExternalLink size={11} /> {c.contact_link.replace(/^https?:\/\//, "").slice(0, 50)}
-            </a>
-          )}
-        </div>
+      {/* Fit reason */}
+      {c.thesis_fit_reasons?.[0] && (
+        <p style={{ fontSize: 11, color: "var(--color-muted-foreground)", margin: "8px 0 0", lineHeight: 1.5 }}>
+          {c.thesis_fit_reasons[0]}
+        </p>
       )}
 
-      {/* Actions */}
-      {!compact && (
-        <div style={{ marginTop: 14, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-          {c.matched_startup_id && c.profile_slug && (
-            <a
-              href={`/p/${c.profile_slug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                fontSize: 12, fontWeight: 600, color: "var(--color-foreground)",
-                background: "#7C3AED", border: "none", borderRadius: 7,
-                padding: "6px 14px", cursor: "pointer", textDecoration: "none",
-                display: "inline-flex", alignItems: "center", gap: 5,
-              }}
-            >
-              View profile <ExternalLink size={11} />
-            </a>
-          )}
-          {/* Run full analysis (Part 2.4) — only when matched_startup_id exists */}
-          {c.matched_startup_id && !briefResult && (
-            <button
-              onClick={runFullAnalysis}
-              disabled={briefLoading}
-              style={{
-                fontSize: 12, fontWeight: 600, color: "#A855F7",
-                background: "rgba(124,58,237,0.10)", border: "1px solid rgba(124,58,237,0.3)",
-                borderRadius: 7, padding: "6px 14px", cursor: briefLoading ? "not-allowed" : "pointer",
-                display: "inline-flex", alignItems: "center", gap: 5, opacity: briefLoading ? 0.7 : 1,
-              }}
-            >
-              {briefLoading ? <Loader2 size={11} className="animate-spin" /> : <FlaskConical size={11} />}
-              Run full analysis
-            </button>
-          )}
-          {onAddToWatchlist && !addedToWatchlist && !pipelineStatus && (
-            <button
-              onClick={() => { onAddToWatchlist(); setAddedToWatchlist(true); }}
-              style={{
-                fontSize: 12, fontWeight: 600, color: "#A855F7",
-                background: "rgba(124,58,237,0.10)",
-                border: "1px solid rgba(124,58,237,0.3)",
-                borderRadius: 7,
-                padding: "6px 14px", cursor: "pointer",
-                display: "inline-flex", alignItems: "center", gap: 5,
-              }}
-            >
-              + Add to watchlist
-            </button>
-          )}
-          {addedToWatchlist && (
-            <span style={{ fontSize: 12, color: "#10B981", display: "flex", alignItems: "center", gap: 4 }}>
-              <CheckCircle2 size={11} /> Added to watchlist
-            </span>
-          )}
-          {!c.matched_startup_id && c.status !== "reviewed" && onMarkReviewed && (
-            <button
-              onClick={onMarkReviewed}
-              style={{
-                fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.6)",
-                background: "transparent",
-                border: "1px solid var(--color-border)",
-                borderRadius: 7,
-                padding: "6px 14px", cursor: "pointer",
-              }}
-            >
-              Track this lead
-            </button>
-          )}
-          {c.status === "reviewed" && (
-            <span style={{ fontSize: 12, color: "var(--color-muted-foreground)", display: "flex", alignItems: "center", gap: 4 }}>
-              <CheckCircle2 size={11} /> Tracked
-            </span>
-          )}
-          {c.raw_snippet && (
-            <button
-              onClick={() => setSnippetOpen((v) => !v)}
-              style={{
-                fontSize: 12, color: "var(--color-muted-foreground)",
-                background: "transparent", border: "none",
-                cursor: "pointer", display: "flex", alignItems: "center", gap: 4, padding: 0,
-              }}
-            >
-              {snippetOpen ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-              {snippetOpen ? "Hide" : "Show"} original text
-            </button>
-          )}
-        </div>
-      )}
+      {/* Action buttons */}
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 12, alignItems: "center" }}>
+        {/* Add to pipeline */}
+        <button
+          onClick={handleAddToPipeline}
+          disabled={addedToPipeline || addingToPipeline}
+          data-testid="btn-add-to-pipeline"
+          style={{
+            ...btnBase,
+            background: addedToPipeline ? "rgba(16,185,129,0.1)" : "rgba(124,58,237,0.1)",
+            borderColor: addedToPipeline ? "rgba(16,185,129,0.3)" : "rgba(124,58,237,0.3)",
+            color: addedToPipeline ? "var(--color-success, #10b981)" : "#a78bfa",
+            opacity: (addedToPipeline || addingToPipeline) ? 0.7 : 1,
+            cursor: (addedToPipeline || addingToPipeline) ? "default" : "pointer",
+          }}
+        >
+          {addingToPipeline
+            ? <><Loader2 size={10} className="animate-spin" /> Adding…</>
+            : addedToPipeline
+            ? <><CheckCircle2 size={10} /> Added to pipeline</>
+            : <>+ Add to pipeline</>}
+        </button>
 
-      {/* Run full analysis result card (Part 2.4) */}
-      {briefResult && (
-        <div style={{
-          marginTop: 12, padding: "14px 16px",
-          background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)",
-          borderRadius: 10,
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-            <FlaskConical size={12} style={{ color: "#a78bfa" }} />
-            <span style={{ fontSize: 12, fontWeight: 600, color: "#a78bfa" }}>Analysis</span>
-            {briefResult.match_score != null && (
-              <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 700, color: briefResult.match_score >= 70 ? "#10b981" : "#f59e0b" }}>
-                {briefResult.match_score}% match
-              </span>
-            )}
+        {/* Invite via mailto */}
+        {c.contact_email && (
+          <button
+            onClick={handleInvite}
+            data-testid="btn-invite"
+            style={{
+              ...btnBase,
+              background: inviteSent ? "rgba(16,185,129,0.06)" : "transparent",
+              borderColor: inviteSent ? "rgba(16,185,129,0.2)" : "var(--color-border)",
+              color: inviteSent ? "var(--color-success, #10b981)" : "var(--color-muted-foreground)",
+            }}
+          >
+            {inviteSent ? <><CheckCircle2 size={10} /> Invite sent</> : <><Mail size={10} /> Invite</>}
+          </button>
+        )}
+
+        {/* Dismiss */}
+        <button
+          onClick={onDismiss}
+          data-testid="btn-dismiss"
+          style={{
+            ...btnBase,
+            background: "transparent",
+            borderColor: "transparent",
+            color: "var(--color-muted-foreground)",
+            opacity: 0.6,
+            marginLeft: "auto",
+          }}
+        >
+          <X size={10} /> Dismiss
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Failed / rejected file card ────────────────────────────────────────────────
+
+function FailedCard({ result: r }: { result: IntakeFileResult }) {
+  const [removed, setRemoved] = useState(false);
+  if (removed) return null;
+  return (
+    <div
+      className="bg-card border border-border/60 rounded-xl"
+      style={{ padding: "14px 18px", display: "flex", alignItems: "flex-start", gap: 12 }}
+      data-testid="failed-card"
+    >
+      <AlertTriangle size={14} style={{ color: "var(--color-muted-foreground)", flexShrink: 0, marginTop: 1 }} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {r.file}
+        </div>
+        {r.reason && (
+          <div style={{ fontSize: 12, color: "var(--color-muted-foreground)", marginTop: 3, lineHeight: 1.5 }}>
+            {r.reason}
           </div>
-          {briefResult.headline && (
-            <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)", margin: "0 0 6px", lineHeight: 1.4 }}>{briefResult.headline}</p>
-          )}
-          {briefResult.investment_thesis && (
-            <p style={{ fontSize: 12, color: "var(--color-foreground)", margin: "0 0 8px", lineHeight: 1.5 }}>{briefResult.investment_thesis.slice(0, 200)}{briefResult.investment_thesis.length > 200 ? "…" : ""}</p>
-          )}
-          {briefResult.strengths?.length > 0 && (
-            <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 3 }}>
-              {briefResult.strengths.slice(0, 3).map((s: string, i: number) => (
-                <li key={i} style={{ fontSize: 11, color: "#10b981", display: "flex", gap: 5 }}>
-                  <CheckCircle2 size={10} style={{ marginTop: 2, flexShrink: 0 }} /> {s}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-
-      {/* Snippet */}
-      {snippetOpen && c.raw_snippet && (
-        <div style={{
-          marginTop: 12,
-          padding: "10px 14px",
-          background: "var(--color-muted)",
-          border: "1px solid rgba(255,255,255,0.06)",
-          borderRadius: 8,
-          fontSize: 12,
-          color: "var(--color-muted-foreground)",
-          fontFamily: "monospace",
-          lineHeight: 1.7,
-          whiteSpace: "pre-wrap" as const,
-          wordBreak: "break-word" as const,
-        }}>
-          {c.raw_snippet}
-        </div>
-      )}
+        )}
+      </div>
+      <button
+        onClick={() => setRemoved(true)}
+        style={{ fontSize: 11, fontWeight: 600, color: "var(--color-muted-foreground)", background: "transparent", border: "1px solid var(--color-border)", borderRadius: 6, padding: "4px 10px", cursor: "pointer", flexShrink: 0 }}
+      >
+        Remove
+      </button>
     </div>
   );
 }
