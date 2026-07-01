@@ -266,6 +266,75 @@ export const generateNdaDocument = createServerFn({ method: "POST" })
     return doc as NdaDocument;
   });
 
+// Admin helper — regenerate the canonical NDA document for any deal room.
+// Usage from browser console (must be signed in as a deal room member):
+//   import('/src/lib/nda-fn.ts').then(m => m.regenerateNdaForRoom({ data: { dealRoomId: '<uuid>' } }).then(console.log))
+// Or call via the server fn directly in any server context.
+export const regenerateNdaForRoom = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as { dealRoomId: string })
+  .handler(async ({ data }): Promise<{ ok: boolean; version?: number; error?: string }> => {
+    const cfEnv = (globalThis as any).__cf_env || {};
+    const serviceKey = cfEnv.SUPABASE_SERVICE_ROLE_KEY || cfEnv.SUPABASE_SERVICE_KEY || "";
+    const supabaseUrl = cfEnv.SUPABASE_URL || cfEnv.VITE_SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
+    if (!serviceKey) return { ok: false, error: "no service key" };
+
+    // Reuse the same generation logic as generateNdaDocument by calling it via internal import.
+    // We duplicate the minimal fetch+upsert here to keep this self-contained for admin use.
+    const svc = createClient(supabaseUrl, serviceKey);
+    const { dealRoomId } = data;
+
+    const { data: acceptances } = await svc
+      .from("nda_acceptances")
+      .select("user_id, signer_full_name, signer_company, role, accepted_at")
+      .eq("deal_room_id", dealRoomId)
+      .order("accepted_at", { ascending: true });
+
+    if (!acceptances?.length) return { ok: false, error: "no acceptances found for this deal room" };
+
+    const { data: room } = await svc.from("deal_rooms").select("startup_id").eq("id", dealRoomId).single();
+    if (!room) return { ok: false, error: "deal room not found" };
+
+    const { data: startup } = await svc
+      .from("startups")
+      .select("company_name, legal_entity_name, incorporated_in")
+      .eq("id", room.startup_id)
+      .maybeSingle();
+
+    const signers: NdaSigner[] = acceptances.map((a) => ({
+      user_id: a.user_id,
+      full_name: a.signer_full_name || "Unknown",
+      company: a.signer_company || "",
+      role: a.role,
+      accepted_at: a.accepted_at,
+    }));
+
+    const generatedAt = new Date().toLocaleString("en-US", {
+      year: "numeric", month: "long", day: "numeric",
+      hour: "2-digit", minute: "2-digit", timeZoneName: "short",
+    });
+
+    const ndaText = buildMultiPartyNdaText(
+      startup?.company_name ?? "the Company",
+      startup?.legal_entity_name ?? null,
+      startup?.incorporated_in ?? null,
+      signers,
+      generatedAt,
+    );
+
+    const { data: existing } = await svc.from("nda_documents").select("id, version").eq("deal_room_id", dealRoomId).maybeSingle();
+    const newVersion = (existing?.version ?? 0) + 1;
+
+    const { data: doc, error: upsertErr } = await svc
+      .from("nda_documents")
+      .upsert({ deal_room_id: dealRoomId, nda_text: ndaText, version: newVersion, updated_at: new Date().toISOString() }, { onConflict: "deal_room_id" })
+      .select()
+      .single();
+
+    if (upsertErr) return { ok: false, error: upsertErr.message };
+    console.log(`[nda-fn] regenerateNdaForRoom: deal room ${dealRoomId} → v${(doc as any).version}`);
+    return { ok: true, version: (doc as any).version };
+  });
+
 export const fetchNdaDocument = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as { dealRoomId: string })
   .handler(async ({ data }): Promise<NdaDocument | null> => {

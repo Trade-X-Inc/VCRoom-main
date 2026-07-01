@@ -1835,15 +1835,27 @@ function QAPanel({
     if (!sendText.trim() || !userId) return;
     setSending(true);
     try {
-      await supabase.from("deal_room_qa").insert({
-        deal_room_id: dealRoomId,
-        user_id: userId,
-        sender_role: isInvestor ? "investor" : "founder",
-        sender_name: userName,
-        content: sendText.trim(),
-        is_question: isQuestion,
-        ai_suggested: false,
-      });
+      const msgContent = sendText.trim();
+      const msgRole = isInvestor ? "investor" : "founder";
+      const { data: inserted } = await supabase
+        .from("deal_room_qa")
+        .insert({
+          deal_room_id: dealRoomId,
+          user_id: userId,
+          sender_role: msgRole,
+          sender_name: userName,
+          content: msgContent,
+          is_question: isQuestion,
+          ai_suggested: false,
+        })
+        .select()
+        .single();
+      if (inserted) {
+        // Append with real DB id so the realtime dedup guard won't create a duplicate
+        setQaMessages((prev) =>
+          prev.some((m) => m.id === inserted.id) ? prev : [...prev, inserted],
+        );
+      }
       setSendText("");
     } catch {
       toast.error("Could not send message");
