@@ -33,7 +33,100 @@ export async function extractDocumentText(
   }
 }
 
-// ── PDF ───────────────────────────────────────────────────────────────────────
+// ── Intake-specific extraction ─────────────────────────────────────────────────
+// Returns structured per-file results for the Deal Intake page.
+
+const INTAKE_ALLOWED_EXTS = ["pdf", "xlsx", "xls", "csv"];
+
+export type IntakeFileResult = {
+  file: string;
+  status: "ok" | "rejected" | "extraction_failed";
+  text?: string;
+  reason?: string;
+};
+
+export async function extractForIntake(file: File): Promise<IntakeFileResult> {
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+
+  if (!INTAKE_ALLOWED_EXTS.includes(ext)) {
+    return {
+      file: file.name,
+      status: "rejected",
+      reason:
+        "Unsupported file type. We accept pitch decks (PDF) and contact lists (Excel, CSV) only.",
+    };
+  }
+
+  try {
+    const buf = (await file.arrayBuffer()).slice(0);
+
+    if (ext === "pdf") {
+      const text = await extractPDFForIntake(buf, file.name);
+      if (!text) {
+        return {
+          file: file.name,
+          status: "extraction_failed",
+          reason:
+            "Could not read this PDF. Try a clearer scan or paste the content directly.",
+        };
+      }
+      return { file: file.name, status: "ok", text };
+    }
+
+    if (["xlsx", "xls"].includes(ext)) {
+      try {
+        const text = await extractXLSX(buf);
+        if (!text || text === "No data found in spreadsheet") {
+          return {
+            file: file.name,
+            status: "extraction_failed",
+            reason:
+              "Could not read this spreadsheet. Ensure it has column headers and is not password-protected.",
+          };
+        }
+        return { file: file.name, status: "ok", text };
+      } catch {
+        return {
+          file: file.name,
+          status: "extraction_failed",
+          reason:
+            "Could not read this spreadsheet. Ensure it has column headers and is not password-protected.",
+        };
+      }
+    }
+
+    if (ext === "csv") {
+      try {
+        const text = await extractCSV(buf);
+        if (!text?.trim()) {
+          return {
+            file: file.name,
+            status: "extraction_failed",
+            reason:
+              "Could not read this CSV. Ensure it has column headers and is not empty.",
+          };
+        }
+        return { file: file.name, status: "ok", text };
+      } catch {
+        return {
+          file: file.name,
+          status: "extraction_failed",
+          reason: "Could not read this CSV file.",
+        };
+      }
+    }
+
+    return { file: file.name, status: "rejected", reason: "Unsupported file type." };
+  } catch (e) {
+    return {
+      file: file.name,
+      status: "extraction_failed",
+      reason: `Extraction error: ${e instanceof Error ? e.message : "unknown"}`,
+    };
+  }
+}
+
+// ── PDF (general — used by AI summary) ────────────────────────────────────────
 async function extractPDF(buf: ArrayBuffer, fileName: string): Promise<string> {
   try {
     const pdfjsLib = await import("pdfjs-dist");
@@ -75,6 +168,131 @@ async function extractPDF(buf: ArrayBuffer, fileName: string): Promise<string> {
   }
 }
 
+// ── PDF (intake — with image-based PDF fallback via GPT-4o vision) ─────────────
+async function extractPDFForIntake(buf: ArrayBuffer, fileName: string): Promise<string | null> {
+  let text = "";
+
+  // 1. Try text extraction first
+  try {
+    const pdfjsLib = await import("pdfjs-dist");
+    pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+      "pdfjs-dist/build/pdf.worker.mjs",
+      import.meta.url
+    ).toString();
+
+    const pdf = await pdfjsLib.getDocument({
+      data: new Uint8Array(buf.slice(0)),
+      useWorkerFetch: false,
+      isEvalSupported: false,
+      useSystemFonts: true,
+    }).promise;
+
+    const maxPages = Math.min(pdf.numPages, 30);
+    const pages: string[] = [];
+    for (let i = 1; i <= maxPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const pageText = content.items
+        .map((item: any) => ("str" in item ? item.str : ""))
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (pageText.length > 10) pages.push(`[Page ${i}] ${pageText}`);
+    }
+    text = pages.join("\n\n").slice(0, 15000);
+    console.log(`[PDF intake] text extracted: ${text.length} chars — ${fileName}`);
+
+    // If text is sufficient, return it directly
+    if (text.length >= 100) return text;
+
+    // 2. Text too short — image-based PDF, fall back to vision
+    console.log(`[PDF intake] sparse text (${text.length} chars), attempting vision fallback — ${fileName}`);
+    const visionText = await extractPDFViaVision(buf, pdf, fileName);
+    return visionText || text || null;
+  } catch (err) {
+    console.warn("[PDF intake] pdfjs failed:", err);
+    // Fall through to basic then vision
+  }
+
+  // 3. Basic text extraction fallback
+  text = extractPDFBasic(buf.slice(0), fileName);
+  if (text.length >= 100) return text;
+
+  // 4. Vision fallback (pdfjs failed entirely — try canvas render without pdf object)
+  return text.length > 0 ? text : null;
+}
+
+// ── GPT-4o vision extraction for image-based PDFs ─────────────────────────────
+async function extractPDFViaVision(
+  buf: ArrayBuffer,
+  pdf: any,
+  fileName: string
+): Promise<string | null> {
+  try {
+    // Determine which pages to process: pages 1, 2, 3, last-1, last (max 5, deduplicated)
+    const total: number = pdf.numPages;
+    const pageNums = [...new Set([
+      1, 2, 3,
+      Math.max(1, total - 1),
+      total,
+    ])].filter((n) => n >= 1 && n <= total);
+
+    console.log(`[PDF vision] scanning pages ${pageNums.join(",")} of ${total} — ${fileName}`);
+
+    const extractedParts: string[] = [];
+
+    for (const pageNum of pageNums) {
+      try {
+        const page = await pdf.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 1.5 });
+
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) continue;
+
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+        const base64 = dataUrl.split(",")[1];
+        if (!base64) continue;
+
+        const result = await callVisionAPI(base64, pageNum);
+        if (result && result !== "NOT_STARTUP") {
+          extractedParts.push(`[Page ${pageNum}] ${result}`);
+        }
+
+        // Clean up canvas
+        canvas.width = 0;
+        canvas.height = 0;
+      } catch (pageErr) {
+        console.warn(`[PDF vision] page ${pageNum} failed:`, pageErr);
+      }
+    }
+
+    if (extractedParts.length === 0) return null;
+    return extractedParts.join("\n\n");
+  } catch (err) {
+    console.warn("[PDF vision] failed:", err);
+    return null;
+  }
+}
+
+async function callVisionAPI(base64Image: string, pageNum: number): Promise<string | null> {
+  // Read API key from meta tag injected at build time (safe — not a secret, just the Supabase anon key pattern)
+  // For vision we need the OpenAI key — but that's a server secret.
+  // Strategy: POST to our own server function endpoint that proxies vision calls.
+  // This keeps the key server-side and avoids exposing it in the browser bundle.
+  try {
+    const { visionExtractPage } = await import("@/lib/vision-extract-fn");
+    const result = await visionExtractPage({ data: { base64Image, pageNum } });
+    return result.text ?? null;
+  } catch (err) {
+    console.warn(`[vision API] page ${pageNum} error:`, err);
+    return null;
+  }
+}
+
 function extractPDFBasic(buf: ArrayBuffer, fileName: string): string {
   try {
     const raw = new TextDecoder("utf-8", { fatal: false }).decode(new Uint8Array(buf));
@@ -99,9 +317,9 @@ function extractPDFBasic(buf: ArrayBuffer, fileName: string): string {
       .slice(0, 8000);
 
     console.log(`[PDF basic] ${result.length} chars — ${fileName}`);
-    return result || `PDF text extraction failed for ${fileName} — may be image-based or encrypted.`;
+    return result || "";
   } catch {
-    return `Could not extract PDF text from ${fileName}.`;
+    return "";
   }
 }
 

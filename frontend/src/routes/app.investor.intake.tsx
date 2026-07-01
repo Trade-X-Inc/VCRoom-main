@@ -1,3 +1,4 @@
+import React from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useMemo, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -13,6 +14,7 @@ import { supabase } from "@/lib/supabase";
 // intake-fn contains createServerFn — static import causes TDZ crash in client bundle.
 // Use dynamic import inside the async handler instead.
 import type { IntakeCandidate } from "@/lib/intake-fn";
+import type { IntakeFileResult } from "@/lib/document-extractor";
 import { PageGuide } from "@/components/app/PageGuide";
 
 export const Route = createFileRoute("/app/investor/intake")({
@@ -100,6 +102,9 @@ function IntakePage() {
   const [links, setLinks] = useState<string[]>([""]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Per-file extraction results (shown even if no candidates extracted)
+  const [fileResults, setFileResults] = useState<IntakeFileResult[]>([]);
+
   // Current batch result state
   const [currentBatchId, setCurrentBatchId] = useState<string | null>(null);
   const [currentCandidates, setCurrentCandidates] = useState<CandidateRow[]>([]);
@@ -181,20 +186,29 @@ function IntakePage() {
     setCurrentCandidates([]);
     setCurrentBatchId(null);
     setActiveFilter("all");
+    setFileResults([]);
 
     // Build combined input: pasted text + extracted file text + links
     let combinedInput = trimmed;
     if (hasFiles) {
-      try {
-        const { extractDocumentText } = await import("@/lib/document-extractor");
-        for (const file of uploadedFiles) {
-          const text = await extractDocumentText(file, file.name);
-          if (text?.trim()) {
-            combinedInput += (combinedInput ? "\n\n" : "") + `--- ${file.name} ---\n${text.trim()}`;
-          }
+      const { extractForIntake } = await import("@/lib/document-extractor");
+      const results: IntakeFileResult[] = [];
+      for (const file of uploadedFiles) {
+        const result = await extractForIntake(file);
+        results.push(result);
+        if (result.status === "ok" && result.text?.trim()) {
+          combinedInput += (combinedInput ? "\n\n" : "") + `--- ${file.name} ---\n${result.text.trim()}`;
         }
-      } catch {
-        // If extraction fails, continue with whatever text we have
+      }
+      setFileResults(results);
+
+      const rejected = results.filter((r) => r.status === "rejected");
+      const failed = results.filter((r) => r.status === "extraction_failed");
+      if (rejected.length > 0) {
+        toast.warning(`${rejected.length} file${rejected.length > 1 ? "s" : ""} skipped — unsupported type`);
+      }
+      if (failed.length > 0) {
+        toast.warning(`${failed.length} file${failed.length > 1 ? "s" : ""} could not be read`);
       }
     }
     if (hasLinks) {
@@ -547,7 +561,7 @@ function IntakePage() {
             <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)" }}>Paste raw data</span>
           </div>
           <p style={{ fontSize: 12, color: "var(--color-muted-foreground)", margin: 0, lineHeight: 1.5 }}>
-            Forwarded emails, LinkedIn exports, event attendee lists, CRM exports — paste anything.
+            Paste forwarded emails, LinkedIn profiles, event attendee lists, or CRM exports. Plain text only.
           </p>
           <textarea
             value={rawInput}
@@ -593,13 +607,13 @@ function IntakePage() {
               </button>
             </div>
             <p style={{ fontSize: 11, color: "var(--color-muted-foreground)", margin: "0 0 10px", lineHeight: 1.5 }}>
-              Excel (.xlsx), CSV, or PDF pitch decks — up to 20 files
+              Pitch decks (PDF) and contact lists (Excel, CSV) — up to 20 files. Image-based PDFs are read using AI vision. Other file types are not supported.
             </p>
             <input
               ref={fileInputRef}
               type="file"
               multiple
-              accept=".xlsx,.csv,.pdf"
+              accept=".pdf,.xlsx,.xls,.csv"
               style={{ display: "none" }}
               onChange={handleFileSelect}
             />
@@ -664,25 +678,32 @@ function IntakePage() {
         </div>
       </div>
 
-      {/* Section 4 — What we evaluate */}
+      {/* Section 4 — What we extract */}
       <div style={{ marginBottom: 16, padding: "14px 18px", background: "rgba(255,255,255,0.02)", border: "1px solid var(--color-border)", borderRadius: 10 }}>
         <div style={{ fontSize: 11, fontWeight: 600, color: "var(--color-muted-foreground)", textTransform: "uppercase" as const, letterSpacing: "0.1em", marginBottom: 10 }}>
-          What we evaluate
+          What we extract
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 24px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 24px", marginBottom: 12 }}>
           {[
-            "Thesis fit (sector, stage, check size, geography)",
-            "Founder credibility signals",
-            "Company stage indicators",
-            "Red flags against your exclusion criteria",
-            "Overall match score (0–100)",
-          ].map((item) => (
-            <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: 7, fontSize: 12, color: "var(--color-foreground)", lineHeight: 1.5 }}>
-              <CheckCircle2 size={12} style={{ color: "#10B981", flexShrink: 0, marginTop: 2 }} />
-              {item}
-            </div>
+            ["Founder name and email", "Sector and geography"],
+            ["Company name and description", "Funding amount being raised"],
+            ["Funding stage (Pre-seed, Seed, Series A+)", "LinkedIn and website URLs"],
+          ].map(([left, right]) => (
+            <React.Fragment key={left}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 7, fontSize: 12, color: "var(--color-foreground)", lineHeight: 1.5 }}>
+                <CheckCircle2 size={12} style={{ color: "#10B981", flexShrink: 0, marginTop: 2 }} />
+                {left}
+              </div>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 7, fontSize: 12, color: "var(--color-foreground)", lineHeight: 1.5 }}>
+                <CheckCircle2 size={12} style={{ color: "#10B981", flexShrink: 0, marginTop: 2 }} />
+                {right}
+              </div>
+            </React.Fragment>
           ))}
         </div>
+        <p style={{ fontSize: 11, color: "var(--color-muted-foreground)", margin: 0, lineHeight: 1.6 }}>
+          Image-based and scanned PDFs are processed using AI vision (pages 1–3 and last 2 pages). Word documents, PowerPoint files, and images cannot be parsed — paste their content instead.
+        </p>
       </div>
 
       {/* Parse button */}
@@ -725,6 +746,48 @@ function IntakePage() {
           </>
         )}
       </button>
+
+      {/* Per-file extraction status panel */}
+      {fileResults.length > 0 && fileResults.some((r) => r.status !== "ok") && (
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
+            File processing results
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {fileResults.map((r) => (
+              <div
+                key={r.file}
+                style={{
+                  display: "flex", alignItems: "flex-start", gap: 10,
+                  padding: "10px 14px", borderRadius: 8,
+                  background: r.status === "ok"
+                    ? "rgba(16,185,129,0.06)"
+                    : r.status === "rejected"
+                    ? "rgba(239,68,68,0.06)"
+                    : "rgba(245,158,11,0.06)",
+                  border: `1px solid ${r.status === "ok" ? "rgba(16,185,129,0.2)" : r.status === "rejected" ? "rgba(239,68,68,0.2)" : "rgba(245,158,11,0.2)"}`,
+                }}
+              >
+                {r.status === "ok"
+                  ? <CheckCircle2 size={13} style={{ color: "#10b981", flexShrink: 0, marginTop: 1 }} />
+                  : r.status === "rejected"
+                  ? <X size={13} style={{ color: "#ef4444", flexShrink: 0, marginTop: 1 }} />
+                  : <AlertTriangle size={13} style={{ color: "#f59e0b", flexShrink: 0, marginTop: 1 }} />}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-foreground)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {r.file}
+                  </div>
+                  {r.reason && (
+                    <div style={{ fontSize: 11, color: r.status === "rejected" ? "#ef4444" : "#f59e0b", marginTop: 2, lineHeight: 1.4 }}>
+                      {r.reason}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Results */}
       {currentCandidates.length > 0 && (
