@@ -274,8 +274,9 @@ img { max-width: 100%; height: auto; }
   body > *:not(.nda-print-root),
   #root > *:not(.nda-print-root) { display: none !important; }
 
-  /* Hide everything on the page except the nda-print-content div */
+  /* Hide everything — show only the active print content div */
   body * { visibility: hidden; }
+
   .nda-print-content,
   .nda-print-content * { visibility: visible; }
   .nda-print-content {
@@ -285,5 +286,24 @@ img { max-width: 100%; height: auto; }
     color: black;
     padding: 40px;
     overflow: auto;
+  }
+
+  .qa-report-print-content,
+  .qa-report-print-content * { visibility: visible; }
+  .qa-report-print-content {
+    position: fixed;
+    inset: 0;
+    background: white;
+    color: black;
+    padding: 48px;
+    overflow: auto;
+    font-family: "DM Sans", system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .qa-report-print-content pre {
+    white-space: pre-wrap;
+    font-family: inherit;
+    font-size: inherit;
   }
 }
