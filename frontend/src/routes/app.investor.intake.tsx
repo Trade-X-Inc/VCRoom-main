@@ -1,12 +1,12 @@
 import React from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, useMemo, useRef } from "react";
+import { useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Sparkles, Loader2, AlertTriangle, CheckCircle2, ExternalLink,
-  ChevronDown, ChevronUp, Clock, FileInput, Upload, Link2,
-  Plus, X, Download, Target, ArrowRight, Mail, Table2, History,
-  BookOpen, AlertCircle, FlaskConical,
+  ChevronDown, ChevronUp, FileInput, Upload, Link2,
+  Plus, X, Download, Target, ArrowRight, Mail, History,
+  AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
@@ -23,24 +23,15 @@ export const Route = createFileRoute("/app/investor/intake")({
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type Filter = "all" | "strong" | "on_platform" | "off_platform";
-
-type BatchRow = {
+type IntakeRun = {
   id: string;
   created_at: string;
-  status: string;
-  parsed_count: number | null;
-  raw_input?: string | null;
+  input_summary: string;
+  total_items: number;
+  extracted_count: number;
+  failed_count: number;
+  results_json: CandidateRow[];
 };
-
-// Infer input type from raw_input content
-function inferInputType(raw: string | null | undefined): "email" | "table" | "links" {
-  if (!raw) return "table";
-  const lower = raw.toLowerCase();
-  if (lower.includes("--- links ---") || lower.includes("http")) return "links";
-  if (lower.includes("from:") || lower.includes("subject:") || lower.includes("forwarded")) return "email";
-  return "table";
-}
 
 type CandidateRow = IntakeCandidate & { id: string; status: string };
 
@@ -108,15 +99,10 @@ function IntakePage() {
   // Cards dismissed by the investor (local only — row stays in DB)
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
 
-  // Current batch result state
-  const [currentBatchId, setCurrentBatchId] = useState<string | null>(null);
+  // Current parse result state
   const [currentCandidates, setCurrentCandidates] = useState<CandidateRow[]>([]);
-  const [activeFilter, setActiveFilter] = useState<Filter>("all");
-  const [expandedBatchId, setExpandedBatchId] = useState<string | null>(null);
-  const [batchCandidates, setBatchCandidates] = useState<Record<string, CandidateRow[]>>({});
-  const [loadingBatch, setLoadingBatch] = useState<string | null>(null);
-  // Per-batch strong match counts (fetched lazily when history renders)
-  const [batchStrongCounts, setBatchStrongCounts] = useState<Record<string, number>>({});
+  // Which past run is currently loaded into the results panel (null = fresh parse or none)
+  const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
 
   // Fetch investor profile (id + thesis fields + invite fields)
   const { data: investorProfile } = useQuery({
@@ -156,35 +142,22 @@ function IntakePage() {
     },
   });
 
-  // Fetch past batches — investor_profile_id stores the auth user UUID
-  const { data: batches = [], refetch: refetchBatches } = useQuery<BatchRow[]>({
-    queryKey: ["intake-batches", user?.id],
+  // Fetch past intake runs (last 5, newest first)
+  const { data: intakeRuns = [], refetch: refetchRuns } = useQuery<IntakeRun[]>({
+    queryKey: ["intake-runs", user?.id],
     enabled: !!user?.id,
     staleTime: 30_000,
     queryFn: async () => {
       const { data } = await supabase
-        .from("investor_intake_batches")
-        .select("id, created_at, status, parsed_count, raw_input")
-        .eq("investor_profile_id", user!.id)
+        .from("intake_runs")
+        .select("id, created_at, input_summary, total_items, extracted_count, failed_count, results_json")
+        .eq("investor_id", user!.id)
         .order("created_at", { ascending: false })
-        .limit(20);
-      return (data ?? []) as BatchRow[];
+        .limit(5);
+      return (data ?? []) as IntakeRun[];
     },
   });
 
-  // Watchlist company names for duplicate detection (lowercase for fuzzy matching)
-  const { data: watchlistNames = [] } = useQuery<string[]>({
-    queryKey: ["watchlist-names", user?.id],
-    enabled: !!user?.id,
-    staleTime: 60_000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("investor_watchlist")
-        .select("company_name")
-        .eq("investor_id", user!.id);
-      return (data ?? []).map((r: any) => (r.company_name ?? "").toLowerCase());
-    },
-  });
 
   // ── Submit ──────────────────────────────────────────────────────────────────
 
@@ -201,9 +174,9 @@ function IntakePage() {
     setParsing(true);
     setParseError(null);
     setCurrentCandidates([]);
-    setCurrentBatchId(null);
-    setActiveFilter("all");
+    setSelectedRunId(null);
     setFileResults([]);
+    setDismissedIds(new Set());
 
     // Build combined input: pasted text + extracted file text + links
     let combinedInput = trimmed;
@@ -239,10 +212,14 @@ function IntakePage() {
       return;
     }
 
-    // 1. Create batch row
-    // investor_intake_batches.investor_profile_id references investor_profiles(user_id),
-    // so it stores the auth user's UUID — not the investor_profiles row UUID.
-    const { data: batch, error: batchErr } = await supabase
+    // Build input_summary for intake_runs: "N files, N paste, N links"
+    const filePart = hasFiles ? `${uploadedFiles.length} file${uploadedFiles.length !== 1 ? "s" : ""}` : "0 files";
+    const pastePart = trimmed ? "1 paste" : "0 paste";
+    const linkPart = hasLinks ? `${links.filter((l) => l.trim()).length} link${links.filter((l) => l.trim()).length !== 1 ? "s" : ""}` : "0 links";
+    const inputSummary = `${filePart}, ${pastePart}, ${linkPart}`;
+
+    // 1. Create legacy batch row (kept for backwards compat with existing DB rows)
+    const { data: batch } = await supabase
       .from("investor_intake_batches")
       .insert({
         investor_profile_id: user!.id,
@@ -252,24 +229,18 @@ function IntakePage() {
       .select("id")
       .single();
 
-    if (batchErr || !batch) {
-      toast.error("Could not start batch");
-      setParsing(false);
-      return;
-    }
-
-    setCurrentBatchId(batch.id);
-
     // 2. Call AI parse server function
     try {
       const { parseIntakeBatch } = await import("@/lib/intake-fn");
       const result = await parseIntakeBatch({
         data: {
-          batchId: batch.id,
-          investorProfileId: user!.id,  // intake-fn queries investor_profiles WHERE user_id = this
+          batchId: batch?.id ?? "",
+          investorProfileId: user!.id,
           rawInput: combinedInput,
         },
       });
+
+      const failedCount = fileResults.filter((r) => r.status !== "ok").length;
 
       if (result.error) {
         setParseError(result.error);
@@ -277,58 +248,62 @@ function IntakePage() {
       } else if (result.candidates.length === 0) {
         toast.info("No identifiable founders or companies found in that text.");
         setCurrentCandidates([]);
+        // Still save the run so the investor can see it in history
+        await supabase.from("intake_runs").insert({
+          investor_id: user!.id,
+          input_summary: inputSummary,
+          total_items: 0,
+          extracted_count: 0,
+          failed_count: failedCount,
+          results_json: [],
+        });
       } else {
         // Re-fetch candidates from DB so we have IDs
         const { data: dbCandidates } = await supabase
           .from("investor_intake_candidates")
           .select("*")
-          .eq("batch_id", batch.id)
+          .eq("batch_id", batch?.id ?? "")
           .order("thesis_fit_score", { ascending: false });
-        setCurrentCandidates((dbCandidates ?? []) as CandidateRow[]);
+        const candidates = (dbCandidates ?? []) as CandidateRow[];
+        setCurrentCandidates(candidates);
         toast.success(`Found ${result.candidates.length} lead${result.candidates.length !== 1 ? "s" : ""}`);
         setRawInput("");
         setUploadedFiles([]);
+
+        // Save intake run with full results_json for history restore
+        await supabase.from("intake_runs").insert({
+          investor_id: user!.id,
+          input_summary: inputSummary,
+          total_items: result.candidates.length + failedCount,
+          extracted_count: result.candidates.length,
+          failed_count: failedCount,
+          results_json: candidates,
+        });
       }
     } catch (err: any) {
       setParseError(err.message);
       toast.error("We couldn't parse that. Try pasting smaller chunks or check the formatting.");
     } finally {
       setParsing(false);
-      refetchBatches();
+      refetchRuns();
     }
   }
 
-  // ── Load historical batch ──────────────────────────────────────────────────
+  // ── Load past run into results panel ──────────────────────────────────────
 
-  async function loadBatch(batchId: string) {
-    if (batchCandidates[batchId]) {
-      setExpandedBatchId(expandedBatchId === batchId ? null : batchId);
+  function loadRun(run: IntakeRun) {
+    if (selectedRunId === run.id) {
+      // Toggle off: clear results panel
+      setSelectedRunId(null);
+      setCurrentCandidates([]);
+      setFileResults([]);
+      setDismissedIds(new Set());
       return;
     }
-    setLoadingBatch(batchId);
-    const { data } = await supabase
-      .from("investor_intake_candidates")
-      .select("*")
-      .eq("batch_id", batchId)
-      .order("thesis_fit_score", { ascending: false });
-    const rows = (data ?? []) as CandidateRow[];
-    setBatchCandidates((prev) => ({ ...prev, [batchId]: rows }));
-    // Cache the strong count (>= 70 per spec)
-    const strong = rows.filter((c) => c.thesis_fit_score >= 70).length;
-    setBatchStrongCounts((prev) => ({ ...prev, [batchId]: strong }));
-    setExpandedBatchId(batchId);
-    setLoadingBatch(null);
-  }
-
-  // Pre-fetch strong counts for all batches when batch list loads (for history header)
-  async function prefetchBatchStrongCount(batchId: string) {
-    if (batchStrongCounts[batchId] !== undefined) return;
-    const { count } = await supabase
-      .from("investor_intake_candidates")
-      .select("*", { count: "exact", head: true })
-      .eq("batch_id", batchId)
-      .gte("thesis_fit_score", 70);
-    setBatchStrongCounts((prev) => ({ ...prev, [batchId]: count ?? 0 }));
+    setSelectedRunId(run.id);
+    setCurrentCandidates(run.results_json);
+    setFileResults([]);
+    setDismissedIds(new Set());
   }
 
   // ── File handling ──────────────────────────────────────────────────────────
@@ -379,54 +354,6 @@ function IntakePage() {
     URL.revokeObjectURL(url);
   }
 
-  // ── Add to watchlist ───────────────────────────────────────────────────────
-
-  async function addToWatchlist(c: CandidateRow) {
-    if (!investorProfile?.id) return;
-    const { error } = await supabase.from("investor_watchlist").insert({
-      investor_id: user!.id,
-      company_name: c.company_name || "Unknown",
-      sector: c.sector ?? null,
-      stage: c.stage ?? null,
-      description: c.thesis_fit_reasons?.join("; ") ?? null,
-      source: "intake",
-      initial_score: c.thesis_fit_score,
-      status: "Sourcing",
-    });
-    if (error) {
-      toast.error("Could not add to watchlist");
-    } else {
-      toast.success(`${c.company_name || "Company"} added to watchlist`);
-    }
-  }
-
-  // ── Mark reviewed ──────────────────────────────────────────────────────────
-
-  async function markReviewed(candidateId: string) {
-    await supabase
-      .from("investor_intake_candidates")
-      .update({ status: "reviewed" })
-      .eq("id", candidateId);
-    setCurrentCandidates((prev) =>
-      prev.map((c: any) => c.id === candidateId ? { ...c, status: "reviewed" } : c)
-    );
-    toast.success("Marked as reviewed");
-  }
-
-  // ── Filtered candidates ────────────────────────────────────────────────────
-
-  const filtered = useMemo(() => {
-    switch (activeFilter) {
-      case "strong": return currentCandidates.filter((c) => c.thesis_fit_score >= 80);
-      case "on_platform": return currentCandidates.filter((c) => !!c.matched_startup_id);
-      case "off_platform": return currentCandidates.filter((c) => !c.matched_startup_id);
-      default: return currentCandidates;
-    }
-  }, [currentCandidates, activeFilter]);
-
-  const strongCount = currentCandidates.filter((c) => c.thesis_fit_score >= 80).length;
-  const onPlatformCount = currentCandidates.filter((c) => !!c.matched_startup_id).length;
-
   const hasInput = rawInput.trim() || uploadedFiles.length > 0 || links.some((l) => l.trim());
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -452,97 +379,72 @@ function IntakePage() {
         </div>
       </div>
 
-      {/* ── Past intake runs (ABOVE the inputs) ────────────────────────── */}
-      {batches.length === 0 && !investorProfile?.id ? null : (
-        <div style={{ marginBottom: 28 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-            <History size={13} style={{ color: "var(--color-muted-foreground)" }} />
-            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              Past intake runs
-            </span>
-          </div>
-          {batches.length === 0 ? (
-            <div className="rounded-xl border border-border/60 bg-card px-5 py-4 text-sm text-muted-foreground">
-              No intake runs yet — parse your first batch below.
-            </div>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {batches
-                .filter((b) => b.id !== currentBatchId)
-                .map((b) => {
-                  const itype = inferInputType(b.raw_input);
-                  const typeIcon = itype === "email"
-                    ? <Mail size={13} style={{ color: "#a78bfa" }} />
-                    : itype === "links"
-                    ? <Link2 size={13} style={{ color: "#a78bfa" }} />
-                    : <Table2 size={13} style={{ color: "#a78bfa" }} />;
-                  const typeLabel = itype === "email" ? "Forwarded emails" : itype === "links" ? "Links" : "Pasted data";
-                  const dateLabel = new Date(b.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
-                  const strongCount = batchStrongCounts[b.id];
-
-                  return (
-                    <div key={b.id} className="bg-card border border-border/60 rounded-xl overflow-hidden">
-                      <button
-                        onClick={() => {
-                          prefetchBatchStrongCount(b.id);
-                          loadBatch(b.id);
-                        }}
-                        disabled={b.status === "processing"}
-                        style={{
-                          width: "100%", background: "transparent", border: "none",
-                          cursor: b.status === "processing" ? "not-allowed" : "pointer",
-                          padding: "12px 16px", display: "flex", alignItems: "center", gap: 10,
-                          opacity: b.status === "processing" ? 0.7 : 1,
-                        }}
-                      >
-                        {/* Input type icon */}
-                        <div style={{ width: 30, height: 30, borderRadius: 7, background: "rgba(124,58,237,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          {b.status === "processing" ? <Loader2 size={12} style={{ color: "#a78bfa" }} className="animate-spin" /> : typeIcon}
-                        </div>
-                        {/* Label */}
-                        <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)" }}>
-                            {typeLabel} — {dateLabel}
-                          </div>
-                          <div style={{ fontSize: 11, color: "var(--color-muted-foreground)", marginTop: 2 }}>
-                            {b.status === "processing" ? "Processing…" : b.status === "failed" ? "Parse failed" : b.parsed_count != null ? `${b.parsed_count} lead${b.parsed_count !== 1 ? "s" : ""}` : "No leads found"}
-                          </div>
-                        </div>
-                        {/* Strong matches badge */}
-                        {b.status === "parsed" && strongCount !== undefined && strongCount > 0 && (
-                          <div style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 99, padding: "2px 8px", fontSize: 11, fontWeight: 600, color: "#10b981", flexShrink: 0 }}>
-                            {strongCount} strong
-                          </div>
-                        )}
-                        {b.status === "failed" && (
-                          <span style={{ fontSize: 11, color: "#ef4444", flexShrink: 0 }}>Failed</span>
-                        )}
-                        {b.status === "processing" ? null : loadingBatch === b.id
-                          ? <Loader2 size={13} style={{ color: "var(--color-muted-foreground)", flexShrink: 0 }} className="animate-spin" />
-                          : expandedBatchId === b.id
-                          ? <ChevronUp size={13} style={{ color: "var(--color-muted-foreground)", flexShrink: 0 }} />
-                          : <ChevronDown size={13} style={{ color: "var(--color-muted-foreground)", flexShrink: 0 }} />
-                        }
-                      </button>
-
-                      {expandedBatchId === b.id && batchCandidates[b.id] && (
-                        <div style={{ borderTop: "1px solid var(--hs-border)", padding: "12px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
-                          {batchCandidates[b.id].length === 0 ? (
-                            <p style={{ fontSize: 13, color: "var(--color-muted-foreground)", margin: 0 }}>No candidates extracted from this batch.</p>
-                          ) : (
-                            batchCandidates[b.id].map((c) => (
-                              <CandidateCard key={c.id} candidate={c} watchlistNames={watchlistNames} compact />
-                            ))
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-            </div>
-          )}
+      {/* ── Past intake runs ────────────────────────────────────────────── */}
+      <div style={{ marginBottom: 28 }} data-testid="past-runs-section">
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+          <History size={13} style={{ color: "var(--color-muted-foreground)" }} />
+          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--color-muted-foreground)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            Past intake runs
+          </span>
         </div>
-      )}
+        {intakeRuns.length === 0 ? (
+          <div className="rounded-xl border border-border/60 bg-card px-5 py-4 text-sm text-muted-foreground">
+            No intake runs yet — parse your first batch below.
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {intakeRuns.map((run) => {
+              const isActive = selectedRunId === run.id;
+              const dateLabel = new Date(run.created_at).toLocaleDateString("en-US", {
+                month: "short", day: "numeric", year: "numeric",
+              });
+              return (
+                <button
+                  key={run.id}
+                  data-testid="past-run-row"
+                  onClick={() => loadRun(run)}
+                  style={{
+                    width: "100%", border: "none", cursor: "pointer",
+                    padding: "12px 16px", display: "flex", alignItems: "center", gap: 10,
+                    borderRadius: 12, textAlign: "left",
+                    background: isActive ? "rgba(124,58,237,0.1)" : "var(--color-card, #111114)",
+                    outline: isActive ? "1px solid rgba(124,58,237,0.35)" : "1px solid rgba(255,255,255,0.08)",
+                    transition: "background 0.15s, outline 0.15s",
+                  }}
+                >
+                  <div style={{ width: 30, height: 30, borderRadius: 7, background: isActive ? "rgba(124,58,237,0.2)" : "rgba(124,58,237,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <History size={13} style={{ color: "#a78bfa" }} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--color-foreground)" }}>
+                      {dateLabel}
+                    </div>
+                    <div style={{ fontSize: 11, color: "var(--color-muted-foreground)", marginTop: 2 }}>
+                      {run.input_summary}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                    {run.extracted_count > 0 && (
+                      <span style={{ fontSize: 11, fontWeight: 600, color: "#10b981", background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 99, padding: "2px 8px" }}>
+                        {run.extracted_count} extracted
+                      </span>
+                    )}
+                    {run.failed_count > 0 && (
+                      <span style={{ fontSize: 11, fontWeight: 600, color: "#f59e0b", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 99, padding: "2px 8px" }}>
+                        {run.failed_count} failed
+                      </span>
+                    )}
+                    {isActive
+                      ? <ChevronUp size={13} style={{ color: "var(--color-muted-foreground)" }} />
+                      : <ChevronDown size={13} style={{ color: "var(--color-muted-foreground)" }} />
+                    }
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
       {/* Thesis banner */}
       <div style={{ marginBottom: 24, padding: "12px 16px", background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" as const }}>
