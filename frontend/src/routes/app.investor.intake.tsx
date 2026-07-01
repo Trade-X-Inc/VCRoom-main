@@ -223,10 +223,12 @@ function IntakePage() {
     }
 
     // 1. Create batch row
+    // investor_intake_batches.investor_profile_id references investor_profiles(user_id),
+    // so it stores the auth user's UUID — not the investor_profiles row UUID.
     const { data: batch, error: batchErr } = await supabase
       .from("investor_intake_batches")
       .insert({
-        investor_profile_id: investorProfile.id,
+        investor_profile_id: user!.id,
         raw_input: combinedInput,
         status: "processing",
       })
@@ -247,7 +249,7 @@ function IntakePage() {
       const result = await parseIntakeBatch({
         data: {
           batchId: batch.id,
-          investorProfileId: investorProfile.id,
+          investorProfileId: user!.id,  // intake-fn queries investor_profiles WHERE user_id = this
           rawInput: combinedInput,
         },
       });
