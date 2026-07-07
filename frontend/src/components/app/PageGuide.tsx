@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { HelpCircle, X, Send, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 
 // ─── Guide content definitions ────────────────────────────────────────────────
 
@@ -192,7 +193,7 @@ export function PageGuide({
   const [open, setOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [input, setInput] = useState("");
-  const [thinking, setThinking] = useState(false);
+  const { isWorking: thinking, stillWorking, run } = useTimedAI();
   const [history, setHistory] = useState<Array<{ role: string; content: string }>>([]);
   const [guideExpanded, setGuideExpanded] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -212,24 +213,21 @@ export function PageGuide({
     setInput("");
     const userMsg = { role: "user", content: msg };
     setHistory((h) => [...h, userMsg]);
-    setThinking(true);
     try {
-      const reply = await askPageAI({
+      const reply = await run(() => askPageAI({
         pageId,
         message: msg,
         history,
         userId: user.id,
         liveData,
         startupContext,
-      });
+      }));
       setHistory((h) => [...h, { role: "assistant", content: reply }]);
-    } catch {
+    } catch (err) {
       setHistory((h) => [
         ...h,
-        { role: "assistant", content: "Something went wrong. Please try again." },
+        { role: "assistant", content: err instanceof AITimeoutError ? AI_TIMEOUT_MESSAGE : "Something went wrong. Please try again." },
       ]);
-    } finally {
-      setThinking(false);
     }
   }
 
@@ -526,7 +524,7 @@ export function PageGuide({
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                         <Loader2 size={12} style={{ color: "#a78bfa", animation: "spin 1s linear infinite" }} />
                         <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", fontFamily: "DM Sans, sans-serif" }}>
-                          Thinking…
+                          {stillWorking ? "Still working — this may take a moment…" : "Thinking…"}
                         </span>
                       </div>
                     )}

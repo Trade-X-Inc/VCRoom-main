@@ -13,6 +13,8 @@ import { supabase } from "@/lib/supabase";
 import { getInvestorAdvice } from "@/lib/investor-advisor-fn";
 import { getInvestorContext, buildInvestorContextBlock, type InvestorContext } from "@/lib/investor-context-fn";
 import { generateInvestorDealBrief, type InvestorDealBrief } from "@/lib/investor-deal-brief-fn";
+import { withTimeout, AITimeoutError } from "@/lib/with-timeout";
+import { AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 import { ChatResultCard } from "@/components/app/ChatResultCard";
 import { PageGuide } from "@/components/app/PageGuide";
 import {
@@ -361,6 +363,7 @@ function InvestorChat() {
   }, [input]);
 
   const [thinking, setThinking] = useState(false);
+  const [stillThinking, setStillThinking] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
   const [errorBanner, setErrorBanner] = useState<string | null>(null);
@@ -481,6 +484,8 @@ function InvestorChat() {
     const userMsg: ChatMsg = { id: `u${Date.now()}`, role: "user", content: t };
     setMsgs((xs) => [...xs, userMsg]);
     setThinking(true);
+    setStillThinking(false);
+    const stillThinkingTimer = setTimeout(() => setStillThinking(true), 9000);
 
     try {
       // Completeness gate
@@ -549,16 +554,24 @@ function InvestorChat() {
           // Known startup ID from thesis alerts — generate brief
           const briefLoadId = `brief-loading-${Date.now()}`;
           setMsgs((xs) => [...xs, { id: briefLoadId, role: "assistant", content: `Running deal analysis on **${match.companyName}**…`, loading: true }]);
+          const stillWorkingTimer = setTimeout(() => {
+            setMsgs((xs) => xs.map((m) => m.id === briefLoadId
+              ? { ...m, content: "Still working — this may take a moment…" }
+              : m
+            ));
+          }, 9000);
           try {
-            const brief = await generateInvestorDealBrief({ data: { investorId: user.id, startupId: match.startupId } });
+            const brief = await withTimeout(generateInvestorDealBrief({ data: { investorId: user.id, startupId: match.startupId } }));
+            clearTimeout(stillWorkingTimer);
             setMsgs((xs) => xs.map((m) => m.id === briefLoadId
               ? { ...m, content: `Here's the deal brief for **${brief.companyName}**${brief.fromCache ? " (cached)" : ""}:`, card: { type: "deal_brief", brief }, loading: false }
               : m
             ));
             void supabase.from("advisor_messages").insert({ user_id: user.id, role: "user", content: t });
           } catch (e: any) {
+            clearTimeout(stillWorkingTimer);
             setMsgs((xs) => xs.map((m) => m.id === briefLoadId
-              ? { ...m, content: `Could not generate a deal brief: ${e.message ?? "unknown error"}`, loading: false }
+              ? { ...m, content: e instanceof AITimeoutError ? AI_TIMEOUT_MESSAGE : `Could not generate a deal brief: ${e.message ?? "unknown error"}`, loading: false }
               : m
             ));
           }
@@ -576,7 +589,7 @@ function InvestorChat() {
       // ── General AI call with live context injected ──
       const contextBlock = ctx ? buildInvestorContextBlock(ctx) : "";
       const history = msgs.slice(1).filter((m) => !m.loading).map((m) => ({ role: m.role as string, content: m.content }));
-      const result = await getInvestorAdvice({ data: { userId: user.id, message: t, history, liveContextBlock: contextBlock } });
+      const result = await withTimeout(getInvestorAdvice({ data: { userId: user.id, message: t, history, liveContextBlock: contextBlock } }));
 
       // Check if AI response warrants proactive treatment
       const isProactive = ctx
@@ -596,11 +609,18 @@ function InvestorChat() {
         void supabase.from("advisor_messages").insert({ user_id: user.id, role: "user", content: t });
         void supabase.from("advisor_messages").insert({ user_id: user.id, role: "assistant", content: result.reply });
       }
-    } catch {
-      toast.error("Request failed. Please try again.");
-      setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: "Sorry, I couldn't process that. Please try again." }]);
+    } catch (err) {
+      if (err instanceof AITimeoutError) {
+        toast.error(AI_TIMEOUT_MESSAGE);
+        setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: AI_TIMEOUT_MESSAGE }]);
+      } else {
+        toast.error("Request failed. Please try again.");
+        setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: "Sorry, I couldn't process that. Please try again." }]);
+      }
     } finally {
+      clearTimeout(stillThinkingTimer);
       setThinking(false);
+      setStillThinking(false);
     }
   };
 
@@ -750,7 +770,7 @@ function InvestorChat() {
                 <Sparkles size={13} />
               </div>
               <div style={{ borderRadius: "4px 18px 18px 18px", padding: "10px 16px", background: "#111114", border: "1px solid rgba(255,255,255,0.08)", display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
-                <Loader2 size={13} style={{ animation: "spin 1s linear infinite" }} /> Thinking…
+                <Loader2 size={13} style={{ animation: "spin 1s linear infinite" }} /> {stillThinking ? "Still working — this may take a moment…" : "Thinking…"}
               </div>
             </div>
           )}

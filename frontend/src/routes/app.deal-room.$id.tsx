@@ -1890,7 +1890,7 @@ function QAPanel({
   });
 
   useEffect(() => {
-    if (!rowsLoaded && initialRows.length >= 0) {
+    if (!rowsLoaded && initialRows.length > 0) {
       setRows(initialRows as any[]);
       setRowsLoaded(true);
     }
@@ -2251,7 +2251,7 @@ function QAPanel({
                 disabled={isAtLimit}
                 className="w-full resize-none rounded-lg border border-border/60 bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-brand disabled:opacity-50"
                 style={{ maxHeight: 96 }}
-                data-testid="qa-send-textarea"
+                data-testid="qa-ask-input"
               />
               <div className="flex items-center justify-end">
                 <button
@@ -2361,6 +2361,7 @@ function QAPanel({
                         rows={3}
                         placeholder="Type your answer here…"
                         className="w-full resize-none rounded-lg border border-border/60 bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-brand"
+                        data-testid={`qa-answer-input-${q.id}`}
                       />
                       <div className="flex items-center justify-between">
                         <span className={cn("text-[10px]", charsLeft < 50 ? "text-[#EF4444] font-semibold" : "text-muted-foreground")}>

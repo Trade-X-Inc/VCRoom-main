@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { Sparkles, Send, Loader2, User } from "lucide-react";
 import { getAIAdvice } from "@/lib/advisor-fn";
+import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 import ReactMarkdown from "react-markdown";
 
 export interface ChatMsg {
@@ -59,7 +60,7 @@ export function AIChat({ userId, scope, starters, initialAssistant, className = 
     },
   ]);
   const [input, setInput] = useState("");
-  const [thinking, setThinking] = useState(false);
+  const { isWorking: thinking, stillWorking, run } = useTimedAI();
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -71,17 +72,18 @@ export function AIChat({ userId, scope, starters, initialAssistant, className = 
     if (!t || thinking) return;
     setInput("");
     setMsgs((xs) => [...xs, { id: `u${Date.now()}`, role: "user", content: t, ts: Date.now() }]);
-    setThinking(true);
     try {
       const history = msgs.slice(1).map((m) => ({ role: m.role as string, content: m.content }));
       const contextPrefix = scope ? `Context: ${scope}\n\n` : "";
-      const result = await getAIAdvice({ data: { userId: userId || "", message: contextPrefix + t, history, pageContext, startupContext } });
+      const result = await run(() => getAIAdvice({ data: { userId: userId || "", message: contextPrefix + t, history, pageContext, startupContext } }));
       const reply = result.reply || "No AI response generated.";
       setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: reply, ts: Date.now() }]);
     } catch (error) {
-      setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: `AI request failed: ${error instanceof Error ? error.message : "unknown error"}`, ts: Date.now() }]);
+      const content = error instanceof AITimeoutError
+        ? AI_TIMEOUT_MESSAGE
+        : `AI request failed: ${error instanceof Error ? error.message : "unknown error"}`;
+      setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content, ts: Date.now() }]);
     }
-    setThinking(false);
   };
 
   const showStarters = msgs.length <= 1 && starters && starters.length > 0;
@@ -109,7 +111,7 @@ export function AIChat({ userId, scope, starters, initialAssistant, className = 
             <div className="flex gap-3">
               <div className="grid h-8 w-8 place-items-center rounded-full bg-accent border border-border/60"><Sparkles className="h-4 w-4 text-brand animate-pulse" /></div>
               <div className="rounded-2xl px-4 py-3 bg-card border border-border/60 shadow-card inline-flex items-center gap-2 text-xs text-muted-foreground">
-                <Loader2 className="h-3.5 w-3.5 animate-spin" /> Thinking…
+                <Loader2 className="h-3.5 w-3.5 animate-spin" /> {stillWorking ? "Still working — this may take a moment…" : "Thinking…"}
               </div>
             </div>
           )}

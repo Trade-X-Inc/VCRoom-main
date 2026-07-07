@@ -11,6 +11,7 @@ import { supabase } from "@/lib/supabase";
 import { secureAICall } from "@/lib/ai-secure-fn";
 import { PageGuide } from "@/components/app/PageGuide";
 import { generateInvestorMemo } from "@/lib/investor-memo-fn";
+import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 import ReactMarkdown from "react-markdown";
 
 export const Route = createFileRoute("/app/investor/analysis")({
@@ -21,10 +22,10 @@ function AnalysisPage() {
   const { user } = useAuth();
   const [selectedId, setSelectedId] = useState("");
   const [analysis, setAnalysis] = useState<any | null>(null);
-  const [generating, setGenerating] = useState(false);
+  const { isWorking: generating, stillWorking: analysisStillWorking, run: runAnalysis } = useTimedAI();
   const [analysisError, setAnalysisError] = useState("");
   const [memoText, setMemoText] = useState<string | null>(null);
-  const [generatingMemo, setGeneratingMemo] = useState(false);
+  const { isWorking: generatingMemo, stillWorking: memoStillWorking, run: runMemo } = useTimedAI();
   const [memoError, setMemoError] = useState("");
   const [copied, setCopied] = useState(false);
   const [savingMemo, setSavingMemo] = useState(false);
@@ -83,7 +84,6 @@ function AnalysisPage() {
 
   const handleGenerateAnalysis = async () => {
     if (!selectedCompany || !user?.id) return;
-    setGenerating(true);
     setAnalysisError("");
     setAnalysis(null);
 
@@ -115,9 +115,9 @@ Be concise and specific.
 Return this exact JSON shape:
 {"matchScore":<integer>,"strengths":["...","...","..."],"risks":["...","...","..."],"mitigants":["...","..."],"nextAction":"..."}`;
 
-      const result = await secureAICall({
+      const result = await runAnalysis(() => secureAICall({
         data: { userId: user.id, systemPrompt, userMessage, maxTokens: 600 },
-      });
+      }));
 
       if (result.error === "usage_limit") {
         setAnalysisError(result.reply);
@@ -150,19 +150,16 @@ Return this exact JSON shape:
       }
       setAnalysis(parsed);
     } catch (err: any) {
-      setAnalysisError(err?.message ?? "Analysis failed. Please try again.");
-    } finally {
-      setGenerating(false);
+      setAnalysisError(err instanceof AITimeoutError ? AI_TIMEOUT_MESSAGE : (err?.message ?? "Analysis failed. Please try again."));
     }
   };
 
   const handleGenerateMemo = async () => {
     if (!selectedId || !activeDealRoomId || !user?.id) return;
-    setGeneratingMemo(true);
     setMemoError("");
     try {
       const session = await supabase.auth.getSession();
-      const result = await generateInvestorMemo({
+      const result = await runMemo(() => generateInvestorMemo({
         data: {
           dealRoomId: activeDealRoomId,
           userId: user.id,
@@ -170,14 +167,12 @@ Return this exact JSON shape:
           supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
           userAccessToken: session.data.session?.access_token ?? "",
         },
-      });
+      }));
       setMemoText(result.memo);
       setMemoGeneratedAt(new Date());
       setMemoSaved(false);
-    } catch {
-      setMemoError("Failed to generate memo. Please try again.");
-    } finally {
-      setGeneratingMemo(false);
+    } catch (err) {
+      setMemoError(err instanceof AITimeoutError ? AI_TIMEOUT_MESSAGE : "Failed to generate memo. Please try again.");
     }
   };
 
@@ -368,7 +363,7 @@ Return this exact JSON shape:
           {generating && (
             <div className="rounded-2xl border border-border/60 bg-card p-12 flex flex-col items-center gap-4">
               <Loader2 className="h-8 w-8 animate-spin text-brand" />
-              <div className="text-sm text-muted-foreground">Analysing {selectedName} against your thesis…</div>
+              <div className="text-sm text-muted-foreground">{analysisStillWorking ? "Still working — this may take a moment…" : `Analysing ${selectedName} against your thesis…`}</div>
             </div>
           )}
 
@@ -535,7 +530,7 @@ Return this exact JSON shape:
               {generatingMemo && !memoText && (
                 <div className="p-10 flex flex-col items-center gap-3">
                   <Loader2 className="h-7 w-7 animate-spin text-brand" />
-                  <div className="text-sm text-muted-foreground">Writing investment memo for {selectedName}…</div>
+                  <div className="text-sm text-muted-foreground">{memoStillWorking ? "Still working — this may take a moment…" : `Writing investment memo for ${selectedName}…`}</div>
                 </div>
               )}
               {memoText && (

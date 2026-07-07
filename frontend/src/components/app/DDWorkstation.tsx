@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { analyzeThesisAlignment, generateDocSummary } from "@/lib/ai-secure-fn";
+import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 
 function formatThesisText(text: string) {
   const lines = text.split("\n").filter((l) => l.trim());
@@ -27,7 +28,7 @@ import {
   BarChart3, TrendingUp, Users, Scale, Target, Handshake, Play, Image, ExternalLink,
   Star, Zap, DollarSign, Wand2,
 } from "lucide-react";
-import { runAutoDetection } from "@/lib/dd-fn";
+import { runAutoDetection as runAutoDetectionFn } from "@/lib/dd-fn";
 
 const CATEGORIES = ["Financials", "Team", "Legal", "Market", "Product", "References"] as const;
 type DDCategory = (typeof CATEGORIES)[number];
@@ -80,7 +81,8 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
   const [analyzingDoc, setAnalyzingDoc] = useState<string | null>(null);
   const [scorecard, setScorecard] = useState<Record<string, number>>({});
   const [scorecardOpen, setScorecardOpen] = useState(false);
-  const [runningAutoDetect, setRunningAutoDetect] = useState(false);
+  const { isWorking: runningAutoDetect, stillWorking: autoDetectStillWorking, run: runAutoDetect } = useTimedAI();
+  const { stillWorking: thesisStillWorking, run: runThesisAnalysis } = useTimedAI();
 
   useEffect(() => {
     if (!dealRoomId || !userId) return;
@@ -242,9 +244,8 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
 
   const handleRunAutoDetection = async () => {
     if (!userId) return;
-    setRunningAutoDetect(true);
     try {
-      const result = await runAutoDetection({ data: { dealRoomId, userId } });
+      const result = await runAutoDetect(() => runAutoDetectionFn({ data: { dealRoomId, userId } }));
       if ("error" in result && result.error) {
         toast.error(result.error as string);
       } else {
@@ -253,9 +254,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
         qc.invalidateQueries({ queryKey: ["dd-workstation", dealRoomId] });
       }
     } catch (err: any) {
-      toast.error(err?.message || "Auto-detection failed");
-    } finally {
-      setRunningAutoDetect(false);
+      toast.error(err instanceof AITimeoutError ? AI_TIMEOUT_MESSAGE : (err?.message || "Auto-detection failed"));
     }
   };
 
@@ -382,18 +381,18 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
         ? `Document: ${fileName}\n\nAI SUMMARY (full text unavailable):\n${doc.ai_summary}`
         : `Document: ${fileName} (category: ${doc.category || "Other"}) — text extraction failed.`;
 
-      const result = await analyzeThesisAlignment({
+      const result = await runThesisAnalysis(() => analyzeThesisAlignment({
         data: {
           userId: investorProfile.user_id || "",
           investorThesis: thesis,
           documentContext: docContext,
           fileName,
         }
-      });
+      }));
       if (result.error) throw new Error(result.reply);
       setThesisAnalysis((prev) => ({ ...prev, [doc.id]: result.reply }));
-    } catch {
-      setThesisAnalysis((prev) => ({ ...prev, [doc.id]: "Analysis failed. Please try again." }));
+    } catch (err) {
+      setThesisAnalysis((prev) => ({ ...prev, [doc.id]: err instanceof AITimeoutError ? AI_TIMEOUT_MESSAGE : "Analysis failed. Please try again." }));
     } finally {
       setAnalyzingDoc(null);
     }
@@ -602,7 +601,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
             style={{ background: "rgba(124,58,237,0.15)", color: "#A855F7", border: "1px solid rgba(124,58,237,0.3)" }}
           >
             {runningAutoDetect
-              ? <><Loader2 className="h-3 w-3 animate-spin" /> Running…</>
+              ? <><Loader2 className="h-3 w-3 animate-spin" /> {autoDetectStillWorking ? "Still working…" : "Running…"}</>
               : <><Wand2 className="h-3 w-3" /> Run auto-detection</>}
           </button>
         </div>
@@ -751,7 +750,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                                       className="inline-flex items-center gap-1.5 rounded-md bg-brand text-brand-foreground px-3 py-1.5 text-xs font-medium hover:opacity-90 disabled:opacity-40 transition-opacity"
                                     >
                                       {analyzingDoc === doc.id
-                                        ? <><Loader2 className="h-3 w-3 animate-spin" /> Analyzing…</>
+                                        ? <><Loader2 className="h-3 w-3 animate-spin" /> {thesisStillWorking ? "Still working…" : "Analyzing…"}</>
                                         : <><Sparkles className="h-3 w-3" /> Analyze against my thesis</>}
                                     </button>
                                   )}

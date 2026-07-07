@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Paperclip, CheckCircle2, XCircle, Clock, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import type { ClaimStatus } from "@/lib/claims-fn";
+import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 
 interface AttachProofModalProps {
   claim: { type: string; label: string; value: string };
@@ -12,45 +13,44 @@ interface AttachProofModalProps {
 
 export function AttachProofModal({ claim, startupId, onClose, onDone }: AttachProofModalProps) {
   const [file, setFile] = useState<File | null>(null);
-  const [running, setRunning] = useState(false);
+  const { isWorking: running, stillWorking, run } = useTimedAI();
   const [result, setResult] = useState<{ proof_status: ClaimStatus; ai_result: any } | null>(null);
 
   const handleAttach = async () => {
     if (!file || running) return;
-    setRunning(true);
     try {
-      const { extractDocumentText } = await import("@/lib/document-extractor");
-      const text = await extractDocumentText(file, file.name);
-      const syntheticDocId = crypto.randomUUID();
-      const { attachProofAndCheck } = await import("@/lib/claims-fn");
-      const r = await attachProofAndCheck({
-        data: {
-          startup_id: startupId,
-          claim_type: claim.type,
-          proof_document_id: syntheticDocId,
-          document_text: text,
-          claim_label: claim.label,
-          claim_value: claim.value,
-          user_id: "",
-        },
+      await run(async () => {
+        const { extractDocumentText } = await import("@/lib/document-extractor");
+        const text = await extractDocumentText(file, file.name);
+        const syntheticDocId = crypto.randomUUID();
+        const { attachProofAndCheck } = await import("@/lib/claims-fn");
+        const r = await attachProofAndCheck({
+          data: {
+            startup_id: startupId,
+            claim_type: claim.type,
+            proof_document_id: syntheticDocId,
+            document_text: text,
+            claim_label: claim.label,
+            claim_value: claim.value,
+            user_id: "",
+          },
+        });
+        setResult(r);
+        const { logActivity } = await import("@/lib/activity-log-fn");
+        const { supabase } = await import("@/lib/supabase");
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        logActivity({
+          account_type: "founder",
+          account_id: startupId,
+          actor_user_id: authUser?.id ?? "",
+          actor_name: authUser?.user_metadata?.full_name || authUser?.email || "Founder",
+          action_type: "claim_proof_attached",
+          target_label: claim.label,
+          detail: `Attached proof for ${claim.label}: ${claim.value}`,
+        });
       });
-      setResult(r);
-      const { logActivity } = await import("@/lib/activity-log-fn");
-      const { supabase } = await import("@/lib/supabase");
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      logActivity({
-        account_type: "founder",
-        account_id: startupId,
-        actor_user_id: authUser?.id ?? "",
-        actor_name: authUser?.user_metadata?.full_name || authUser?.email || "Founder",
-        action_type: "claim_proof_attached",
-        target_label: claim.label,
-        detail: `Attached proof for ${claim.label}: ${claim.value}`,
-      });
-    } catch {
-      toast.error("Attach failed. Please try again.");
-    } finally {
-      setRunning(false);
+    } catch (err) {
+      toast.error(err instanceof AITimeoutError ? AI_TIMEOUT_MESSAGE : "Attach failed. Please try again.");
     }
   };
 
@@ -131,7 +131,7 @@ export function AttachProofModal({ claim, startupId, onClose, onDone }: AttachPr
                 }}
               >
                 {running ? (
-                  <span className="flex items-center gap-1.5"><Loader2 className="h-3 w-3 animate-spin" /> Running AI check…</span>
+                  <span className="flex items-center gap-1.5"><Loader2 className="h-3 w-3 animate-spin" /> {stillWorking ? "Still working — this may take a moment…" : "Running AI check…"}</span>
                 ) : "Attach & verify"}
               </button>
             </div>
