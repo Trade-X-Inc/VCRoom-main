@@ -15,6 +15,8 @@ import {
   getNextInterviewQuestion,
 } from "@/lib/profile-builder-fn";
 import { seedFounderPlaybook } from "@/lib/desk-fn";
+import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
+import { OnboardingTour } from "@/components/app/OnboardingTour";
 
 export const Route = createFileRoute("/app/profile-builder")({
   component: ProfileBuilder,
@@ -109,6 +111,7 @@ function ProfileBuilder() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { progress, markStep, setCurrentStep } = useOnboardingProgress();
 
   const [screen, setScreen] = useState<Screen>("select");
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -448,6 +451,14 @@ function ProfileBuilder() {
       }
 
       queryClient.invalidateQueries({ queryKey: ["profile-builder-startup"] });
+
+      try {
+        await markStep("profile_completed", true);
+        await setCurrentStep("publish");
+      } catch {
+        // Non-fatal — onboarding progress is best-effort, never blocks the founder.
+      }
+
       toast.success("Profile saved!");
       navigate({ to: "/app" as any });
     } catch (err: any) {
@@ -460,6 +471,8 @@ function ProfileBuilder() {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   if (screen === "select") return <SelectScreen
+    showIntro={!!progress && !progress.steps?.tour_viewed}
+    onDismissIntro={() => markStep("tour_viewed", true)}
     onSelect={async (path) => {
       if (path === "upload") { setScreen("upload"); }
       else { await startInterview(); }
@@ -520,12 +533,29 @@ function ProfileBuilder() {
 function SelectScreen({
   onSelect,
   onSkip,
+  showIntro,
+  onDismissIntro,
 }: {
   onSelect: (path: "upload" | "interview") => void;
   onSkip: () => void;
+  showIntro?: boolean;
+  onDismissIntro?: () => void;
 }) {
   return (
     <div style={{ minHeight: "100vh", background: "#0A0A0B", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 16px" }}>
+      {showIntro && onDismissIntro && (
+        <OnboardingTour
+          steps={[{
+            id: "intro",
+            title: "Welcome to Hockystick",
+            body: "Let's build your founder profile, then publish it and connect with investors. This first step takes about 10-15 minutes.",
+          }]}
+          activeIndex={0}
+          onSkip={onDismissIntro}
+          onNext={onDismissIntro}
+          onFinish={onDismissIntro}
+        />
+      )}
       <div style={{ maxWidth: 660, width: "100%" }}>
         <div style={{ marginBottom: 8, fontSize: 11, fontWeight: 600, color: "rgba(124,58,237,0.8)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
           Profile Builder

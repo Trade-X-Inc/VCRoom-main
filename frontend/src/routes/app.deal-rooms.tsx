@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { syncContactToHubSpot } from "@/lib/hubspot";
 import { Briefcase, ArrowUpRight, Plus, X, Loader2, Search, MoreHorizontal, Trash2, CheckCircle2, Copy, Check, Users, ChevronDown, ChevronUp } from "lucide-react";
 import { PageGuide } from "@/components/app/PageGuide";
@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { sendInviteEmail } from "@/lib/invite-fn";
+import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 
 export const Route = createFileRoute("/app/deal-rooms")({
   component: DealRooms,
@@ -44,6 +45,12 @@ function DealRooms() {
   const [loadError, setLoadError] = useState(false);
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const search = useSearch({ strict: false }) as { create?: string };
+  const { markStep: markOnboardingStep } = useOnboardingProgress();
+
+  useEffect(() => {
+    if (search.create === "1") setOpen(true);
+  }, [search.create]);
 
   const { data: startup } = useQuery({
     queryKey: ["dr-startup", user?.id],
@@ -417,7 +424,10 @@ function DealRooms() {
           startupId={startup?.id ?? ""}
           founderName={user?.fullName ?? user?.email ?? ""}
           onClose={() => setOpen(false)}
-          onCreated={() => queryClient.invalidateQueries({ queryKey: ["deal-rooms", user?.id, startup?.id] })}
+          onCreated={() => {
+            queryClient.invalidateQueries({ queryKey: ["deal-rooms", user?.id, startup?.id] });
+            markOnboardingStep("promote_dismissed", true);
+          }}
         />
       )}
 

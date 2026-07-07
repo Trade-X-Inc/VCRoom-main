@@ -12,6 +12,9 @@ import {
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
+import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
+import { OnboardingTour } from "@/components/app/OnboardingTour";
+import { PromoteProfileCard } from "@/components/app/PromoteProfileCard";
 
 export const Route = createFileRoute("/app/overview")({
   component: Overview,
@@ -198,9 +201,8 @@ function FounderOnboarding({
   dealRooms: any[];
   investorMembers: any[];
 }) {
-  const [dismissed, setDismissed] = useState(
-    () => typeof localStorage !== "undefined" && !!localStorage.getItem("hs_onboarding_founder_dismissed"),
-  );
+  const { progress, markStep } = useOnboardingProgress();
+  const dismissed = progress?.steps?.checklist_dismissed === true;
 
   const steps = [
     {
@@ -246,10 +248,7 @@ function FounderOnboarding({
           <div className="text-xs text-muted-foreground">{completed} of {steps.length} steps complete</div>
         </div>
         <button
-          onClick={() => {
-            localStorage.setItem("hs_onboarding_founder_dismissed", "1");
-            setDismissed(true);
-          }}
+          onClick={() => markStep("checklist_dismissed", true)}
           className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
           title="Dismiss"
         >
@@ -528,6 +527,8 @@ function AccessRequestsPanel({ startupId, companyName, profileSlug }: {
 function Overview() {
   const { user } = useAuth();
   const [howItWorksOpen, setHowItWorksOpen] = useState(false);
+  const navigate = useNavigate();
+  const { progress, markStep } = useOnboardingProgress();
 
   // FIX 1 — detect new vs returning user (parallel queries)
   const { data: startup = null, isLoading: startupLoading } = useQuery<Startup | null>({
@@ -817,8 +818,32 @@ function Overview() {
   const highPriorityTasks = deskTasks.filter((t: any) => t.priority === "high");
   const normalPriorityTasks = deskTasks.filter((t: any) => t.priority !== "high");
 
+  const founderTourStep =
+    progress?.account_type === "founder" && progress.current_step === "publish"
+      ? {
+          id: "publish-next",
+          title: "Your profile is built",
+          body: "Now let's publish it so investors can find you.",
+          cta: { label: "Go to Publish", onClick: () => navigate({ to: "/app/profile" as any }) },
+        }
+      : null;
+
   return (
     <div className="p-6 lg:p-8">
+      {founderTourStep && (
+        <OnboardingTour
+          steps={[founderTourStep]}
+          activeIndex={0}
+          onSkip={() => markStep("tour_viewed", true)}
+          onNext={() => markStep("tour_viewed", true)}
+          onFinish={() => markStep("tour_viewed", true)}
+        />
+      )}
+      {progress?.account_type === "founder" && progress.current_step === "promote" && (
+        <div className="mb-6">
+          <PromoteProfileCard />
+        </div>
+      )}
       <FounderOnboarding startup={startup} docs={docs} dealRooms={dealRooms} investorMembers={investorMembers} />
       {startup?.id && (
         <AccessRequestsPanel

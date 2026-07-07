@@ -17,6 +17,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
+import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
+import { OnboardingTour } from "@/components/app/OnboardingTour";
 
 export const Route = createFileRoute("/app/profile")({
   component: Profile,
@@ -183,6 +185,7 @@ function formatRelativeTime(dateStr: string): string {
 function Profile() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { progress, markStep, setCurrentStep } = useOnboardingProgress();
 
   const [mode, setMode] = useState<"edit" | "view">("edit");
   const [tab, setTab] = useState<"quick" | "full" | "privacy" | "preview" | "analytics">("quick");
@@ -461,6 +464,13 @@ function Profile() {
       if (error) throw error;
       toast.success("Profile is live on Hockystick.");
       queryClient.invalidateQueries({ queryKey: ["my-startup", user?.id] });
+
+      try {
+        await markStep("profile_published", true);
+        await setCurrentStep("promote");
+      } catch {
+        // Non-fatal — onboarding progress is best-effort, never blocks publishing.
+      }
     } catch (e: any) {
       toast.error(e.message || "Could not publish profile.");
     } finally {
@@ -1073,6 +1083,7 @@ function Profile() {
             </div>
           </div>
           <button
+            data-tour="publish-button"
             onClick={handleGoLive}
             disabled={!profileReady || profilePublishing}
             className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition ${profileReady ? "bg-[#7C3AED] text-white hover:bg-[#6d28d9]" : "bg-white/5 text-muted-foreground cursor-not-allowed"}`}
@@ -1080,6 +1091,20 @@ function Profile() {
             Go live
           </button>
         </div>
+        {progress?.account_type === "founder" && progress.current_step === "publish" && (
+          <OnboardingTour
+            steps={[{
+              id: "publish",
+              target: "publish-button",
+              title: "Publish your profile",
+              body: "Once you're at least 80% complete, go live to make your profile visible and ready to share with investors.",
+            }]}
+            activeIndex={0}
+            onSkip={() => markStep("tour_viewed", true)}
+            onNext={() => markStep("tour_viewed", true)}
+            onFinish={() => markStep("tour_viewed", true)}
+          />
+        )}
         {completenessScore < 80 && (
           <div className="mt-4 rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning">
             <span className="font-semibold">Your profile is not yet visible in the directory.</span> Complete at least 80% to go live.
