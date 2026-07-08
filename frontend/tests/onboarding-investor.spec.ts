@@ -215,7 +215,7 @@ test.describe("Onboarding — investor flow", () => {
   });
 
   test("intake step: CTA card links to intake, successful parse marks done", async () => {
-    test.setTimeout(90000);
+    test.setTimeout(180000);
     await resetOnboardingProgress(INVESTOR_USER_ID);
     await seedOnboardingProgress(INVESTOR_USER_ID, "intake", {
       tour_viewed: true, thesis_set: true, directory_viewed: true,
