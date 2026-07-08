@@ -442,19 +442,19 @@ function Documents() {
       </div>
 
       {/* Main content: sidebar + documents */}
-      <div className="grid grid-cols-12 gap-6 items-start">
-        {/* Sidebar categories */}
-        <div className="col-span-3">
-          <div className="space-y-1">
+      <div className="flex flex-col sm:grid sm:grid-cols-12 gap-4 sm:gap-6 items-start">
+        {/* Categories — horizontal scrollable chips on mobile, vertical rail from sm: up */}
+        <div className="w-full sm:col-span-3">
+          <div className="flex sm:flex-col gap-2 sm:gap-1 overflow-x-auto sm:overflow-visible pb-1 sm:pb-0 -mx-1 px-1 sm:mx-0 sm:px-0">
             {TEMPLATE_CATEGORIES.map(cat => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
                 className={cn(
-                  "w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                  "shrink-0 whitespace-nowrap text-left px-4 py-2 rounded-full sm:rounded-lg text-sm font-medium transition-colors",
                   selectedCategory === cat
                     ? "bg-brand text-white"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground bg-accent/40 sm:bg-transparent"
                 )}
               >
                 {CATEGORY_LABELS[cat] ?? cat}
@@ -464,7 +464,7 @@ function Documents() {
         </div>
 
         {/* Documents list */}
-        <div className="col-span-9">
+        <div className="w-full sm:col-span-9">
           <div className="space-y-3">
             {filteredDocs.length === 0 ? (
               <div className="rounded-xl border border-dashed border-border/60 bg-card py-12 text-center">
@@ -495,7 +495,7 @@ function Documents() {
                       getStatusBorderColor(status)
                     )}
                   >
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                           <StatusIcon className={cn("h-4 w-4 shrink-0", statusColor)} />
@@ -530,7 +530,7 @@ function Documents() {
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-muted-foreground truncate">
+                        <p className="text-xs text-muted-foreground break-words sm:truncate">
                           {doc?.file_name
                             ? `📎 ${doc.file_name}`
                             : doc && status !== "empty"
