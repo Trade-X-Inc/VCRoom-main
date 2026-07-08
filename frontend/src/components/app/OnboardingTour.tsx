@@ -1,6 +1,8 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const VIEWPORT_MARGIN = 8;
 
 export interface TourStep {
   id: string;
@@ -49,6 +51,20 @@ function useTargetRect(selector: string | undefined): TargetRect | null {
   return rect;
 }
 
+function useElementSize<T extends HTMLElement>(deps: unknown[]): [React.RefObject<T | null>, { width: number; height: number } | null] {
+  const ref = useRef<T | null>(null);
+  const [size, setSize] = useState<{ width: number; height: number } | null>(null);
+
+  useLayoutEffect(() => {
+    if (!ref.current) return;
+    const r = ref.current.getBoundingClientRect();
+    setSize({ width: r.width, height: r.height });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+
+  return [ref, size];
+}
+
 export function OnboardingTour({
   steps,
   activeIndex,
@@ -66,6 +82,7 @@ export function OnboardingTour({
   const isLast = activeIndex === steps.length - 1;
   const targetSelector = step?.target ? `[data-tour="${step.target}"]` : undefined;
   const rect = useTargetRect(targetSelector);
+  const [cardRef, cardSize] = useElementSize<HTMLDivElement>([step?.id, rect?.top, rect?.left]);
 
   useEffect(() => {
     if (!step) return;
@@ -80,14 +97,37 @@ export function OnboardingTour({
 
   const hasTarget = !!targetSelector && !!rect;
 
+  // Once we know the card's real size, decide if it fits anchored to the
+  // target in either direction. If not, fall back to the centered modal
+  // so the card never renders clipped off-screen.
+  let anchoredStyle: React.CSSProperties | null = null;
+  if (hasTarget) {
+    const cardWidth = cardSize?.width ?? 384; // max-w-sm fallback before first measure
+    const cardHeight = cardSize?.height ?? 160;
+
+    const fitsBelow = rect!.top + rect!.height + 16 + cardHeight <= window.innerHeight - VIEWPORT_MARGIN;
+    const fitsAbove = rect!.top - 16 - cardHeight >= VIEWPORT_MARGIN;
+
+    if (fitsBelow || fitsAbove) {
+      const top = fitsBelow
+        ? rect!.top + rect!.height + 16
+        : rect!.top - 16 - cardHeight;
+      const left = Math.max(
+        VIEWPORT_MARGIN,
+        Math.min(rect!.left, window.innerWidth - cardWidth - VIEWPORT_MARGIN),
+      );
+      anchoredStyle = { position: "fixed", top, left, pointerEvents: "auto" };
+    }
+  }
+
   function handlePrimary() {
     if (isLast) onFinish();
     else onNext();
   }
 
   return (
-    <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" style={{ pointerEvents: hasTarget ? "none" : undefined }}>
-      {hasTarget ? (
+    <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" style={{ pointerEvents: hasTarget && anchoredStyle ? "none" : undefined }}>
+      {hasTarget && anchoredStyle ? (
         <>
           <div
             className="fixed inset-0 bg-foreground/40 backdrop-blur-[1px] transition-all duration-200 pointer-events-none"
@@ -111,18 +151,14 @@ export function OnboardingTour({
             }}
           />
           <TourCard
+            cardRef={cardRef}
             step={step}
             steps={steps}
             activeIndex={activeIndex}
             isLast={isLast}
             onSkip={onSkip}
             onPrimary={handlePrimary}
-            style={{
-              position: "fixed",
-              top: rect!.top + rect!.height + 16,
-              left: Math.min(rect!.left, window.innerWidth - 360),
-              pointerEvents: "auto",
-            }}
+            style={anchoredStyle}
           />
         </>
       ) : (
@@ -131,6 +167,7 @@ export function OnboardingTour({
           onClick={onSkip}
         >
           <TourCard
+            cardRef={cardRef}
             step={step}
             steps={steps}
             activeIndex={activeIndex}
@@ -146,6 +183,7 @@ export function OnboardingTour({
 }
 
 function TourCard({
+  cardRef,
   step,
   steps,
   activeIndex,
@@ -155,6 +193,7 @@ function TourCard({
   style,
   onClick,
 }: {
+  cardRef: React.RefObject<HTMLDivElement | null>;
   step: TourStep;
   steps: TourStep[];
   activeIndex: number;
@@ -166,6 +205,7 @@ function TourCard({
 }) {
   return (
     <div
+      ref={cardRef}
       onClick={onClick}
       style={style}
       className="w-full max-w-sm rounded-2xl border border-border/60 bg-card shadow-elev p-6"
