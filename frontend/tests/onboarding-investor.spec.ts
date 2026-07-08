@@ -251,6 +251,7 @@ test.describe("Onboarding — investor flow", () => {
         () => Array.from(document.querySelectorAll("button")).find(
           (b) => b.textContent?.includes("Parse and score") && !b.hasAttribute("disabled")
         ),
+        undefined,
         { timeout: 45000 },
       );
 
