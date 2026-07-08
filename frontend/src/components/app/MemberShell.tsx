@@ -16,6 +16,8 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { X as CloseIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { getFounderProfileCompleteness } from "@/lib/profileCompleteness";
+import { ProfileCompletionBanner } from "@/components/app/ProfileCompletionBanner";
 
 function FeedbackModal({ onClose }: { onClose: () => void }) {
   const { user } = useAuth();
@@ -100,7 +102,27 @@ export function MemberShell({ children }: { children?: React.ReactNode }) {
 
   const roleLabel = ROLE_LABELS[ctx.role] ?? ctx.role;
   const canUseAI = FOUNDER_PERMISSIONS[ctx.role]?.use_ai_advisor ?? false;
+  const canEditProfile = FOUNDER_PERMISSIONS[ctx.role]?.edit_profile ?? false;
   const assignedCount = assignedRooms.length;
+
+  // Profile-completion banner (Task 2) — only for founder team members who
+  // can actually act on it (edit_profile permission, e.g. "manager").
+  const { data: memberStartup } = useQuery({
+    queryKey: ["member-shell-startup", ctx.startupId],
+    enabled: !!ctx.startupId && canEditProfile,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("startups")
+        .select(
+          "company_name, tagline, sector, stage, country, funding_target, description, problem, solution, why_us, intro_video_url, founder_name, revenue_model, use_of_funds"
+        )
+        .eq("id", ctx.startupId!)
+        .maybeSingle();
+      return data;
+    },
+  });
+  const memberFounderPercent = memberStartup ? getFounderProfileCompleteness(memberStartup).percent : null;
 
   const navItems = [
     { to: "/app/member", label: "Overview", icon: LayoutGrid },
@@ -236,6 +258,9 @@ export function MemberShell({ children }: { children?: React.ReactNode }) {
         </header>
         <main className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto flex flex-col">
           <div className="flex flex-col flex-1 w-full max-w-[1600px] mx-auto">
+            {canEditProfile && memberFounderPercent !== null && memberFounderPercent >= 40 && memberFounderPercent < 70 && (
+              <ProfileCompletionBanner variant="founder" percent={memberFounderPercent} />
+            )}
             {children ?? <Outlet />}
           </div>
         </main>
