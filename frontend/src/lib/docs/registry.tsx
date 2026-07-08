@@ -1,8 +1,9 @@
 // Maps a /docs/* slug to its page module. Content commits register sections here.
 import type { DocPage } from "./primitives";
+import { SECURITY_PAGES } from "./content/security";
 
 const SECTIONS: Record<string, DocPage>[] = [
-  // Populated by content modules — one import per docs section.
+  SECURITY_PAGES,
 ];
 
 export const DOCS_PAGES: Record<string, DocPage> = Object.assign({}, ...SECTIONS);
