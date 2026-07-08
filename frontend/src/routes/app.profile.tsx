@@ -19,6 +19,7 @@ import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { OnboardingTour } from "@/components/app/OnboardingTour";
+import { getFounderProfileCompleteness } from "@/lib/profileCompleteness";
 
 export const Route = createFileRoute("/app/profile")({
   component: Profile,
@@ -419,18 +420,7 @@ function Profile() {
 
   const profileSlug = startup?.profile_slug ?? slugify(form.company_name || "");
 
-  const calculateCompleteness = (f: FormState) => {
-    const fields = [
-      f.company_name, f.tagline, f.sector, f.stage, f.country,
-      f.funding_target, f.description, f.problem, f.solution,
-      f.why_us, f.intro_video_url, f.founder_name, f.revenue_model, f.use_of_funds,
-    ];
-    return Math.round(
-      (fields.filter((v) => v !== null && v !== undefined && String(v).trim().length > 0).length / fields.length) * 100,
-    );
-  };
-
-  const completenessScore = calculateCompleteness(form);
+  const completenessScore = getFounderProfileCompleteness(form).percent;
 
   const profileReady = completenessScore >= 80;
 
@@ -507,7 +497,7 @@ function Profile() {
     if (!user?.id) return;
     setSaving(true);
     try {
-      const completeness_score = calculateCompleteness(form);
+      const completeness_score = getFounderProfileCompleteness(form).percent;
 
       const payload = {
         company_name: form.company_name,
