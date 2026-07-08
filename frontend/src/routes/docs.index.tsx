@@ -1,17 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DocArticle } from "@/lib/docs/DocArticle";
 import { getDocPage } from "@/lib/docs/registry";
+import { docHead } from "@/lib/docs/seo";
 
 export const Route = createFileRoute("/docs/")({
-  head: () => {
-    const page = getDocPage("");
-    return {
-      meta: [
-        { title: page ? `${page.meta.title} — Hockystick Documentation` : "Hockystick Documentation" },
-        ...(page ? [{ name: "description", content: page.meta.description }] : []),
-      ],
-    };
-  },
+  head: () => docHead(""),
   component: DocsIndex,
 });
 

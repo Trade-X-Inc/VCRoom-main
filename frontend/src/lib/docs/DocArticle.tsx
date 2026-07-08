@@ -1,9 +1,14 @@
 import type { DocPage } from "./primitives";
+import { docJsonLd } from "./seo";
 
 export function DocArticle({ page }: { page: DocPage }) {
   const { meta, Body } = page;
+  const jsonLd = docJsonLd(meta.slug);
   return (
     <article className="max-w-3xl">
+      {jsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
+      )}
       <h1 className="mb-2 text-3xl font-bold text-gray-900" style={{ fontFamily: "Syne, sans-serif" }}>
         {meta.title}
       </h1>

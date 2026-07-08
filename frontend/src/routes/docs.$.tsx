@@ -1,18 +1,10 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { DocArticle } from "@/lib/docs/DocArticle";
 import { getDocPage } from "@/lib/docs/registry";
+import { docHead } from "@/lib/docs/seo";
 
 export const Route = createFileRoute("/docs/$")({
-  head: ({ params }) => {
-    const page = getDocPage((params as any)._splat ?? "");
-    if (!page) return { meta: [{ title: "Not found — Hockystick Documentation" }] };
-    return {
-      meta: [
-        { title: `${page.meta.title} — Hockystick Documentation` },
-        { name: "description", content: page.meta.description },
-      ],
-    };
-  },
+  head: ({ params }) => docHead(((params as any)._splat ?? "").replace(/\/$/, "")),
   component: DocsPage,
 });
 
