@@ -1,0 +1,4 @@
+Contact: mailto:security@hockystick.app
+Expires: 2027-07-08T00:00:00.000Z
+Preferred-Languages: en
+Policy: https://hockystick.app/docs/security/disclosure
