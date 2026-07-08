@@ -86,11 +86,11 @@ export function OnboardingTour({
   }
 
   return (
-    <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" style={{ pointerEvents: hasTarget ? "none" : undefined }}>
       {hasTarget ? (
         <>
           <div
-            className="fixed inset-0 bg-foreground/40 backdrop-blur-[1px] transition-all duration-200"
+            className="fixed inset-0 bg-foreground/40 backdrop-blur-[1px] transition-all duration-200 pointer-events-none"
             style={{
               clipPath: `polygon(
                 0% 0%, 0% 100%, ${rect!.left - 6}px 100%, ${rect!.left - 6}px ${rect!.top - 6}px,
@@ -100,7 +100,6 @@ export function OnboardingTour({
                 ${rect!.left - 6}px 100%, 100% 100%, 100% 0%
               )`,
             }}
-            onClick={onSkip}
           />
           <div
             className="fixed rounded-lg ring-2 ring-brand pointer-events-none transition-all duration-200"
@@ -122,6 +121,7 @@ export function OnboardingTour({
               position: "fixed",
               top: rect!.top + rect!.height + 16,
               left: Math.min(rect!.left, window.innerWidth - 360),
+              pointerEvents: "auto",
             }}
           />
         </>
