@@ -1,5 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+// This is unconditioned scheduled infrastructure (Supabase Edge Function
+// cron), not an AI-agent-callable tool — same category as daily-nudge-cron.
+// No confirm-first gate applies (see CLAUDE.md Section 3, which frames that
+// rule around user/agent-initiated actions, not system-scheduled jobs).
+
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
@@ -8,21 +14,6 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
-
-// Sourced from shared/investor-required-fields.json — single canonical list, do not add fields here.
-const INVESTOR_REQUIRED_KEYS = [
-  "fund_name", "your_name", "thesis", "sectors",
-  "stages", "check_size_min", "check_size_max", "geography",
-];
-
-function isInvestorComplete(profile: Record<string, unknown>): boolean {
-  return INVESTOR_REQUIRED_KEYS.every((k) => profile[k] && profile[k] !== "");
-}
-
-function investorPercent(profile: Record<string, unknown>): number {
-  const filled = INVESTOR_REQUIRED_KEYS.filter((k) => profile[k] && profile[k] !== "").length;
-  return Math.round((filled / INVESTOR_REQUIRED_KEYS.length) * 100);
-}
 
 // ── Email helpers (mirror of daily-nudge-cron) ────────────────────────────────
 
@@ -96,192 +87,133 @@ serve(async (req) => {
     const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-    let foundersNudged = 0;
-    let investorsNudged = 0;
+    let nudge48hSent = 0;
+    let nudge7dSent = 0;
 
-    // ── FOUNDER SIDE ──────────────────────────────────────────────────────────
+    // ── Nudge A: 48h after signup, setup still incomplete ──────────────────────
 
-    const { data: incompleteFounders, error: founderErr } = await admin
-      .from("profile_builder_sessions")
-      .select(`
-        id, startup_id, path, status, missing_fields,
-        nudge_count, nudge_sent_at, last_active_at,
-        startups!startup_id ( company_name, founder_id )
-      `)
-      .neq("status", "confirmed")
-      .lt("last_active_at", fortyEightHoursAgo)
-      .lt("nudge_count", 2);
+    const { data: incomplete48h, error: err48h } = await admin
+      .from("onboarding_progress")
+      .select("id, user_id, current_step, steps, created_at")
+      .eq("account_type", "founder")
+      .neq("current_step", "done")
+      .lt("created_at", fortyEightHoursAgo);
 
-    if (founderErr) {
-      console.error("[profile-gate-nudge-cron] founder query error:", founderErr);
+    if (err48h) {
+      console.error("[profile-gate-nudge-cron] 48h query error:", err48h);
     }
 
-    for (const session of incompleteFounders ?? []) {
-      const founderId = (session.startups as any)?.founder_id;
-      if (!founderId) continue;
+    for (const row of incomplete48h ?? []) {
+      const steps = (row.steps ?? {}) as Record<string, boolean>;
+      if (steps.nudge_48h_sent) continue;
 
-      const lastActive = session.last_active_at
-        ? new Date(session.last_active_at)
-        : new Date(0);
-      const hoursSinceActive = (Date.now() - lastActive.getTime()) / (1000 * 60 * 60);
-      const nudgeCount = session.nudge_count ?? 0;
-      const companyName: string = (session.startups as any)?.company_name ?? "your startup";
+      const { data: authUser } = await admin.auth.admin.getUserById(row.user_id);
+      const email = authUser?.user?.email;
+      if (!email) continue;
 
-      if (nudgeCount === 0 && hoursSinceActive >= 48) {
-        // First nudge: in-app notification only
-        await admin.from("notifications").insert({
-          user_id: founderId,
-          type: "profile_incomplete",
-          title: "Finish your profile",
-          body: "You left your profile partway through. Pick up where you stopped.",
-          link: "/app/profile-builder",
-        });
+      const html = buildLayout(`
+        <h1 style="font-size:24px;font-weight:700;color:#09090b;margin-bottom:12px;">
+          Your Hockystick setup is incomplete
+        </h1>
+        <p style="color:#3f3f46;font-size:15px;line-height:1.7;margin-bottom:16px;">
+          You started setting up Hockystick but haven't finished. It takes 5 more minutes.
+        </p>
+        <div style="text-align:center;margin-top:24px;">
+          <a href="https://hockystick.app/app" style="display:inline-block;padding:12px 28px;background:#7c3aed;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:15px;">
+            Continue setup →
+          </a>
+        </div>
+        <div style="height:1px;background:#e4e4e7;margin:32px 0;"></div>
+        <p style="color:#a1a1aa;font-size:12px;line-height:1.6;">
+          You are receiving this because you started setting up an account on Hockystick.
+          <a href="https://hockystick.app/app/settings" style="color:#7c3aed;">Manage notifications</a>
+        </p>
+      `, "Your Hockystick setup is incomplete");
+
+      const ok = await sendEmail(email, "Your Hockystick setup is incomplete", html);
+      if (ok) {
         await admin
-          .from("profile_builder_sessions")
-          .update({ nudge_count: 1, nudge_sent_at: new Date().toISOString() })
-          .eq("id", session.id);
-        foundersNudged++;
-        console.log(`[profile-gate-nudge-cron] In-app nudge sent to founder ${founderId}`);
-
-      } else if (
-        nudgeCount === 1 &&
-        hoursSinceActive >= 24 * 7 &&
-        session.nudge_sent_at &&
-        new Date(session.nudge_sent_at) < new Date(sevenDaysAgo)
-      ) {
-        // Second nudge: email
-        const { data: authUser } = await admin.auth.admin.getUserById(founderId);
-        const email = authUser?.user?.email;
-        if (!email) continue;
-
-        const pathLabel = session.path === "upload" ? "document upload" : "interview";
-
-        const html = buildLayout(`
-          <h1 style="font-size:24px;font-weight:700;color:#09090b;margin-bottom:12px;">
-            Your profile is still waiting
-          </h1>
-          <p style="color:#3f3f46;font-size:15px;line-height:1.7;margin-bottom:16px;">
-            You started building your ${companyName} profile on Hockystick using the ${pathLabel} path, but didn't finish.
-            It takes about 10 minutes and is the only thing standing between you and getting discovered by verified investors.
-          </p>
-          <div style="background:#f5f3ff;border-left:3px solid #7c3aed;padding:12px 16px;border-radius:0 6px 6px 0;margin:20px 0;">
-            <p style="margin:0;color:#4c1d95;font-weight:500;font-size:14px;">
-              Founders with complete profiles get 3× more investor discovery requests.
-            </p>
-          </div>
-          <div style="text-align:center;margin-top:24px;">
-            <a href="https://hockystick.app/app/profile-builder" style="display:inline-block;padding:12px 28px;background:#7c3aed;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:15px;">
-              Finish my profile →
-            </a>
-          </div>
-          <div style="height:1px;background:#e4e4e7;margin:32px 0;"></div>
-          <p style="color:#a1a1aa;font-size:12px;line-height:1.6;">
-            You are receiving this because you started a profile on Hockystick.
-            <a href="https://hockystick.app/app/settings" style="color:#7c3aed;">Manage notifications</a>
-          </p>
-        `, "Your Hockystick profile is still incomplete");
-
-        const ok = await sendEmail(email, "Your Hockystick profile is still incomplete", html);
-        if (ok) {
-          await admin
-            .from("profile_builder_sessions")
-            .update({ nudge_count: 2, nudge_sent_at: new Date().toISOString() })
-            .eq("id", session.id);
-          foundersNudged++;
-          console.log(`[profile-gate-nudge-cron] Email nudge sent to founder ${founderId}`);
-        }
+          .from("onboarding_progress")
+          .update({ steps: { ...steps, nudge_48h_sent: true } })
+          .eq("id", row.id);
+        nudge48hSent++;
+        console.log(`[profile-gate-nudge-cron] 48h nudge sent to founder ${row.user_id}`);
       }
     }
 
-    // ── INVESTOR SIDE ─────────────────────────────────────────────────────────
+    // ── Nudge B: 7d after signup, zero documents uploaded ───────────────────────
 
-    const { data: incompleteInvestors, error: investorErr } = await admin
-      .from("investor_profiles")
-      .select("*")
-      .lt("last_active_at", fortyEightHoursAgo)
-      .lt("nudge_count", 2);
+    const { data: incomplete7d, error: err7d } = await admin
+      .from("onboarding_progress")
+      .select("id, user_id, created_at, steps")
+      .eq("account_type", "founder")
+      .lt("created_at", sevenDaysAgo);
 
-    if (investorErr) {
-      console.error("[profile-gate-nudge-cron] investor query error:", investorErr);
+    if (err7d) {
+      console.error("[profile-gate-nudge-cron] 7d query error:", err7d);
     }
 
-    for (const profile of incompleteInvestors ?? []) {
-      if (isInvestorComplete(profile)) continue;
+    for (const row of incomplete7d ?? []) {
+      const steps = (row.steps ?? {}) as Record<string, boolean>;
+      if (steps.nudge_7d_sent) continue;
 
-      const investorId: string = profile.user_id;
-      if (!investorId) continue;
+      const { data: startup } = await admin
+        .from("startups")
+        .select("id")
+        .eq("founder_id", row.user_id)
+        .maybeSingle();
 
-      const lastActive = profile.last_active_at
-        ? new Date(profile.last_active_at)
-        : new Date(0);
-      const hoursSinceActive = (Date.now() - lastActive.getTime()) / (1000 * 60 * 60);
-      const nudgeCount = profile.nudge_count ?? 0;
-      const percent = investorPercent(profile);
+      if (!startup?.id) continue;
 
-      if (nudgeCount === 0 && hoursSinceActive >= 48) {
-        // First nudge: in-app notification only
-        await admin.from("notifications").insert({
-          user_id: investorId,
-          type: "profile_incomplete",
-          title: "Finish your investor profile",
-          body: `Your profile is ${percent}% complete. Finish your thesis to start getting matched with founders.`,
-          link: "/app/investor/profile",
-        });
+      const { count } = await admin
+        .from("founder_documents")
+        .select("id", { count: "exact", head: true })
+        .eq("startup_id", startup.id);
+
+      if ((count ?? 0) > 0) {
+        // Has documents — mark as handled so we don't re-check indefinitely.
         await admin
-          .from("investor_profiles")
-          .update({ nudge_count: 1, nudge_sent_at: new Date().toISOString() })
-          .eq("user_id", investorId);
-        investorsNudged++;
-        console.log(`[profile-gate-nudge-cron] In-app nudge sent to investor ${investorId}`);
+          .from("onboarding_progress")
+          .update({ steps: { ...steps, nudge_7d_sent: true } })
+          .eq("id", row.id);
+        continue;
+      }
 
-      } else if (
-        nudgeCount === 1 &&
-        hoursSinceActive >= 24 * 7 &&
-        profile.nudge_sent_at &&
-        new Date(profile.nudge_sent_at) < new Date(sevenDaysAgo)
-      ) {
-        // Second nudge: email
-        const { data: authUser } = await admin.auth.admin.getUserById(investorId);
-        const email = authUser?.user?.email;
-        if (!email) continue;
+      const { data: authUser } = await admin.auth.admin.getUserById(row.user_id);
+      const email = authUser?.user?.email;
+      if (!email) continue;
 
-        const html = buildLayout(`
-          <h1 style="font-size:24px;font-weight:700;color:#09090b;margin-bottom:12px;">
-            Your investor profile is still incomplete
-          </h1>
-          <p style="color:#3f3f46;font-size:15px;line-height:1.7;margin-bottom:16px;">
-            You're ${percent}% done setting up your Hockystick investor profile. Finishing your thesis takes about 5 minutes and unlocks discovery, deal intake, and deal rooms.
-          </p>
-          <div style="background:#f5f3ff;border-left:3px solid #7c3aed;padding:12px 16px;border-radius:0 6px 6px 0;margin:20px 0;">
-            <p style="margin:0;color:#4c1d95;font-weight:500;font-size:14px;">
-              Investors with a complete thesis profile get matched with relevant founders automatically.
-            </p>
-          </div>
-          <div style="text-align:center;margin-top:24px;">
-            <a href="https://hockystick.app/app/investor/profile" style="display:inline-block;padding:12px 28px;background:#7c3aed;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:15px;">
-              Complete my profile →
-            </a>
-          </div>
-          <div style="height:1px;background:#e4e4e7;margin:32px 0;"></div>
-          <p style="color:#a1a1aa;font-size:12px;line-height:1.6;">
-            You are receiving this because you have an account on Hockystick.
-            <a href="https://hockystick.app/app/investor/settings" style="color:#7c3aed;">Manage notifications</a>
-          </p>
-        `, "Your investor profile is still incomplete");
+      const html = buildLayout(`
+        <h1 style="font-size:24px;font-weight:700;color:#09090b;margin-bottom:12px;">
+          Investors can't evaluate your deal yet
+        </h1>
+        <p style="color:#3f3f46;font-size:15px;line-height:1.7;margin-bottom:16px;">
+          Your deal room has no documents. Investors need at least a pitch deck to take you seriously.
+        </p>
+        <div style="text-align:center;margin-top:24px;">
+          <a href="https://hockystick.app/app/documents" style="display:inline-block;padding:12px 28px;background:#7c3aed;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:15px;">
+            Upload now →
+          </a>
+        </div>
+        <div style="height:1px;background:#e4e4e7;margin:32px 0;"></div>
+        <p style="color:#a1a1aa;font-size:12px;line-height:1.6;">
+          You are receiving this because you have an account on Hockystick.
+          <a href="https://hockystick.app/app/settings" style="color:#7c3aed;">Manage notifications</a>
+        </p>
+      `, "Investors can't evaluate your deal yet");
 
-        const ok = await sendEmail(email, "Your Hockystick investor profile is still incomplete", html);
-        if (ok) {
-          await admin
-            .from("investor_profiles")
-            .update({ nudge_count: 2, nudge_sent_at: new Date().toISOString() })
-            .eq("user_id", investorId);
-          investorsNudged++;
-          console.log(`[profile-gate-nudge-cron] Email nudge sent to investor ${investorId}`);
-        }
+      const ok = await sendEmail(email, "Investors can't evaluate your deal yet", html);
+      if (ok) {
+        await admin
+          .from("onboarding_progress")
+          .update({ steps: { ...steps, nudge_7d_sent: true } })
+          .eq("id", row.id);
+        nudge7dSent++;
+        console.log(`[profile-gate-nudge-cron] 7d nudge sent to founder ${row.user_id}`);
       }
     }
 
-    const result = { foundersNudged, investorsNudged };
+    const result = { nudge48hSent, nudge7dSent };
     console.log("[profile-gate-nudge-cron] Done:", result);
     return new Response(JSON.stringify(result), {
       status: 200,
