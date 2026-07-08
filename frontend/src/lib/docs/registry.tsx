@@ -6,13 +6,17 @@ import { FOUNDER_PAGES } from "./content/founders";
 import { INVESTOR_PAGES } from "./content/investors";
 import { DEAL_ROOM_PAGES } from "./content/deal-rooms";
 import { AI_PAGES } from "./content/ai";
+import { GETTING_STARTED_PAGES } from "./content/getting-started";
+import { TOOLS_PAGES } from "./content/tools";
 
 const SECTIONS: Record<string, DocPage>[] = [
+  GETTING_STARTED_PAGES,
   FOUNDER_PAGES,
   INVESTOR_PAGES,
   DEAL_ROOM_PAGES,
   AI_PAGES,
   SECURITY_PAGES,
+  TOOLS_PAGES,
   CHANGELOG_PAGES,
 ];
 
