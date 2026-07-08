@@ -3,6 +3,7 @@ import { X, ArrowUp } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export type PageContext = {
   route: string;
@@ -252,6 +253,7 @@ export function AIOperatorPanel({
 }) {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
+  const isMobile = useIsMobile();
 
   const pageContext: PageContext = {
     route: currentPath,
@@ -554,26 +556,36 @@ export function AIOperatorPanel({
         @keyframes hs-dot-pulse { 0%,100%{opacity:0.3;transform:scale(0.85)} 50%{opacity:1;transform:scale(1)} }
       `}</style>
 
+      {/* Mobile backdrop — tap outside to dismiss */}
+      {isMobile && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
       <div
         data-testid="ai-panel"
         className="relative flex shrink-0 flex-col max-md:fixed max-md:inset-0 max-md:z-50 max-md:w-full max-md:max-w-none max-md:min-w-0 bg-white dark:bg-[#111113]"
         style={{
-          width: panelWidth,
-          minWidth: 280,
-          maxWidth: 640,
+          width: isMobile ? undefined : panelWidth,
+          minWidth: isMobile ? undefined : 280,
+          maxWidth: isMobile ? undefined : 640,
           borderLeft: "1px solid",
           borderColor: "rgba(229,231,235,1)",
           transition: "width 250ms ease",
         }}
       >
-        {/* Resize handle */}
-        <div
-          onMouseDown={startResize}
-          className="absolute left-0 top-0 h-full z-10 transition-colors"
-          style={{ width: 4, cursor: "col-resize", background: "rgba(124,58,237,0.08)" }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.3)"; }}
-          onMouseLeave={(e) => { if (!isResizing.current) (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.08)"; }}
-        />
+        {/* Resize handle — desktop only, mobile is always full-width */}
+        {!isMobile && (
+          <div
+            onMouseDown={startResize}
+            className="absolute left-0 top-0 h-full z-10 transition-colors"
+            style={{ width: 4, cursor: "col-resize", background: "rgba(124,58,237,0.08)" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.3)"; }}
+            onMouseLeave={(e) => { if (!isResizing.current) (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.08)"; }}
+          />
+        )}
 
         {/* Header */}
         <div
@@ -588,8 +600,8 @@ export function AIOperatorPanel({
           </div>
 
           <div className="flex items-center gap-0.5 shrink-0">
-            {/* S / L size buttons */}
-            {(["S", "L"] as const).map((sz) => (
+            {/* S / L size buttons — desktop only, mobile panel is always full-screen */}
+            {!isMobile && (["S", "L"] as const).map((sz) => (
               <button
                 key={sz}
                 onClick={() => setSize(sz)}
