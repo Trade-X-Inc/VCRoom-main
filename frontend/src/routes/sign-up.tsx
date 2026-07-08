@@ -163,7 +163,7 @@ function SignUp() {
                 onChange={e => setName(e.target.value)}
                 required
                 placeholder="Full name"
-                className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
               <input
                 type="email"
@@ -171,7 +171,7 @@ function SignUp() {
                 onChange={e => setEmail(e.target.value)}
                 required
                 placeholder="Email address"
-                className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
               <input
                 type="password"
@@ -180,7 +180,7 @@ function SignUp() {
                 required
                 minLength={6}
                 placeholder="Password (min 6 chars)"
-                className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
               <Turnstile
                 siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY ?? ''}
