@@ -3,9 +3,11 @@ import type { DocPage } from "./primitives";
 import { SECURITY_PAGES } from "./content/security";
 import { CHANGELOG_PAGES } from "./content/changelog";
 import { FOUNDER_PAGES } from "./content/founders";
+import { INVESTOR_PAGES } from "./content/investors";
 
 const SECTIONS: Record<string, DocPage>[] = [
   FOUNDER_PAGES,
+  INVESTOR_PAGES,
   SECURITY_PAGES,
   CHANGELOG_PAGES,
 ];
