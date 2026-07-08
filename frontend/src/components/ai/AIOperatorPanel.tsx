@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { X, ArrowUp } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 
 export type PageContext = {
@@ -497,6 +497,9 @@ export function AIOperatorPanel({
 
   const suggestedPrompts = userRole === "investor" ? INVESTOR_PROMPTS : FOUNDER_PROMPTS;
 
+  const completenessPercent = pageContext.relevantData?.completenessPercent as number | undefined;
+  const isGated = userRole === "founder" && typeof completenessPercent === "number" && completenessPercent < 40;
+
   // ── Pull tab (closed) ──────────────────────────────────────────────────────
   if (!isOpen) {
     return (
@@ -611,6 +614,23 @@ export function AIOperatorPanel({
           </div>
         </div>
 
+        {/* Gated view — founder profile below 40% complete */}
+        {isGated ? (
+          <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col items-center justify-center gap-4 text-center">
+            <div className="text-4xl" style={{ color: "#7C3AED" }}>✦</div>
+            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed max-w-xs">
+              Your profile is {completenessPercent}% complete. I can give better guidance once you have a company description, at least one document, and your funding stage set.
+            </p>
+            <Link
+              to="/app/profile-builder"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors"
+              style={{ background: "#7C3AED" }}
+            >
+              Complete your profile →
+            </Link>
+          </div>
+        ) : (
+        <>
         {/* Message list */}
         <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3">
           {messages.length === 0 ? (
@@ -704,6 +724,8 @@ export function AIOperatorPanel({
             </button>
           </div>
         </div>
+        </>
+        )}
       </div>
     </>
   );
