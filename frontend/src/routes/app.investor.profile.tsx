@@ -371,7 +371,7 @@ function InvestorProfilePage() {
       if (error) throw error;
       qc.invalidateQueries({ queryKey: ["investor-profile", user.id] });
 
-      if (form.thesis.trim()) {
+      if (form.thesis_statement.trim()) {
         try {
           await markStep("thesis_set", true);
           await setCurrentStep("directory");

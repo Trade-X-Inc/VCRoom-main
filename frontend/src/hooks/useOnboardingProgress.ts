@@ -30,49 +30,62 @@ export function useOnboardingProgress() {
   const onboardingAccountType = mapAccountType(accountContext.accountType);
   const queryKey = ["onboarding-progress", user?.id];
 
+  const queryFn = async (): Promise<OnboardingProgress | null> => {
+    const uid = user!.id;
+
+    const { data: existing } = await supabase
+      .from("onboarding_progress")
+      .select("*")
+      .eq("user_id", uid)
+      .maybeSingle();
+
+    if (existing) return existing as OnboardingProgress;
+
+    const { data: created, error } = await supabase
+      .from("onboarding_progress")
+      .upsert(
+        {
+          user_id: uid,
+          account_type: onboardingAccountType,
+          current_step: "tour",
+          steps: {},
+        },
+        { onConflict: "user_id" },
+      )
+      .select("*")
+      .single();
+
+    if (error) {
+      console.error("[onboarding] failed to create progress row", error);
+      return null;
+    }
+
+    return created as OnboardingProgress;
+  };
+
   const { data, isLoading } = useQuery({
     queryKey,
     enabled: !!user?.id && !accountContext.loading && !!onboardingAccountType,
     staleTime: 60 * 1000,
-    queryFn: async (): Promise<OnboardingProgress | null> => {
-      const uid = user!.id;
-
-      const { data: existing } = await supabase
-        .from("onboarding_progress")
-        .select("*")
-        .eq("user_id", uid)
-        .maybeSingle();
-
-      if (existing) return existing as OnboardingProgress;
-
-      const { data: created, error } = await supabase
-        .from("onboarding_progress")
-        .upsert(
-          {
-            user_id: uid,
-            account_type: onboardingAccountType,
-            current_step: "tour",
-            steps: {},
-          },
-          { onConflict: "user_id" },
-        )
-        .select("*")
-        .single();
-
-      if (error) {
-        console.error("[onboarding] failed to create progress row", error);
-        return null;
-      }
-
-      return created as OnboardingProgress;
-    },
+    queryFn,
   });
 
-  async function markStep(stepKey: string, value: boolean = true) {
-    if (!user?.id || !data) return;
+  // Resolves the current row even if the useQuery cache hasn't settled yet
+  // (e.g. a user acts on a page immediately after navigation) — avoids
+  // silently dropping a step-mark because `data` was still null.
+  async function resolveCurrent(): Promise<OnboardingProgress | null> {
+    if (data) return data;
+    if (!user?.id || !onboardingAccountType) return null;
+    return queryClient.fetchQuery({ queryKey, queryFn });
+  }
 
-    const nextSteps = { ...data.steps, [stepKey]: value };
-    queryClient.setQueryData(queryKey, { ...data, steps: nextSteps });
+  async function markStep(stepKey: string, value: boolean = true) {
+    const current = await resolveCurrent();
+    if (!user?.id || !current) return;
+
+    const nextSteps = { ...current.steps, [stepKey]: value };
+    const updated = { ...current, steps: nextSteps };
+    queryClient.setQueryData(queryKey, updated);
 
     const { error } = await supabase
       .from("onboarding_progress")
@@ -86,14 +99,16 @@ export function useOnboardingProgress() {
   }
 
   async function setCurrentStep(step: string) {
-    if (!user?.id || !data) return;
+    const current = await resolveCurrent();
+    if (!user?.id || !current) return;
 
     const isDone = step === "done";
-    queryClient.setQueryData(queryKey, {
-      ...data,
+    const updated = {
+      ...current,
       current_step: step,
-      completed_at: isDone ? new Date().toISOString() : data.completed_at,
-    });
+      completed_at: isDone ? new Date().toISOString() : current.completed_at,
+    };
+    queryClient.setQueryData(queryKey, updated);
 
     const { error } = await supabase
       .from("onboarding_progress")

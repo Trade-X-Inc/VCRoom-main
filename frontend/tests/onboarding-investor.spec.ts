@@ -163,9 +163,12 @@ test.describe("Onboarding — investor flow", () => {
     const spotlightedAccordion = page.locator('[data-tour="thesis-accordion"]');
     await expect(spotlightedAccordion).toBeVisible({ timeout: 10000 });
 
-    // Fixture may already have a thesis — fill idempotently so the test
-    // doesn't depend on a specific prior state, then save.
-    const thesisField = page.locator('textarea[placeholder*="thesis" i], textarea').first();
+    // Thesis statement is the first textarea inside the spotlighted accordion
+    // (the hero "Your investment thesis" field) — this is the actual editable
+    // field the onboarding gate checks (thesis_statement, not the legacy
+    // read-only `thesis` column). Fill idempotently so the test doesn't
+    // depend on a specific prior fixture state.
+    const thesisField = spotlightedAccordion.locator("textarea").first();
     const existingValue = await thesisField.inputValue().catch(() => "");
     if (!existingValue.trim()) {
       await thesisField.fill("We back B2B SaaS seed-stage founders across MENA and SEA.");

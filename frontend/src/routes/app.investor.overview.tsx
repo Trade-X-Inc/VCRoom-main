@@ -56,7 +56,7 @@ function InvestorOnboarding({
       id: "thesis",
       label: "Set your investment thesis",
       description: "Define your focus areas, stages, and check size",
-      done: !!(profile?.thesis),
+      done: !!(profile?.thesis_statement || profile?.thesis),
       href: "/app/investor/profile",
     },
     {
