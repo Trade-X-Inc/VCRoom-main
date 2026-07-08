@@ -9,9 +9,11 @@ import { AIOperatorPanel } from "@/components/ai/AIOperatorPanel";
 import {
   getFounderCompleteness,
   getInvestorCompleteness,
+  getFounderProfileCompleteness,
   type ProfileBuilderSession,
   type InvestorProfile,
 } from "@/lib/profileCompleteness";
+import { ProfileCompletionBanner } from "@/components/app/ProfileCompletionBanner";
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -114,18 +116,22 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   const nav = isInvestor ? investorNav : founderNav;
   const workspaceNav = isInvestor ? workspaceNavInvestor : workspaceNavFounder;
 
-  // Company name from startups table (founder only)
+  // Company name + profile-completeness fields from startups table (founder only)
   const { data: startupData } = useQuery({
     queryKey: ["shell-startup", user?.id],
     enabled: !!user?.id && !isInvestor,
     queryFn: async () => {
       const { data } = await supabase
         .from("startups")
-        .select("id, company_name, stage")
+        .select(
+          "id, company_name, stage, tagline, sector, country, funding_target, description, problem, solution, why_us, intro_video_url, founder_name, revenue_model, use_of_funds"
+        )
         .eq("founder_id", user!.id)
         .limit(1)
         .maybeSingle();
-      return data as { id: string; company_name: string; stage: string | null } | null;
+      return data as
+        | ({ id: string; company_name: string; stage: string | null } & Record<string, unknown>)
+        | null;
     },
   });
 
@@ -205,16 +211,25 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
     queryFn: async () => {
       const { data } = await supabase
         .from("investor_profiles")
-        .select("fund_name, your_name, thesis, sectors, stages, check_size_min, check_size_max, geography")
+        .select("fund_name, your_name, thesis, thesis_statement, sectors, stages, check_size_min, check_size_max, geography")
         .eq("user_id", user!.id)
         .maybeSingle();
-      return data as InvestorProfile | null;
+      return data as (InvestorProfile & { thesis_statement: string | null }) | null;
     },
   });
 
   const shellCompleteness = isInvestor
     ? getInvestorCompleteness(investorProfileFields ?? null)
     : getFounderCompleteness(pbSession ?? null);
+
+  // Profile-completion gate (Task 2) — distinct from the session/8-field
+  // completeness above, which drives the sidebar widget only.
+  const founderProfilePercent = !isInvestor && startupData
+    ? getFounderProfileCompleteness(startupData).percent
+    : null;
+  const investorHasThesisStatement = isInvestor
+    ? !!(investorProfileFields?.thesis_statement && investorProfileFields.thesis_statement.trim())
+    : null;
 
   const resumeUrl = isInvestor ? "/app/investor/profile" : "/app/profile-builder";
 
@@ -561,6 +576,12 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
           </header>
           <main className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto flex flex-col">
             <div className="flex flex-col flex-1 w-full max-w-[1600px] mx-auto">
+              {!isInvestor && founderProfilePercent !== null && founderProfilePercent >= 40 && founderProfilePercent < 70 && (
+                <ProfileCompletionBanner variant="founder" percent={founderProfilePercent} />
+              )}
+              {isInvestor && investorHasThesisStatement === false && (
+                <ProfileCompletionBanner variant="investor" />
+              )}
               {children ?? <Outlet />}
             </div>
           </main>
@@ -579,6 +600,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                     relevantData: {
                       company: startupData.company_name,
                       stage: startupData.stage ?? undefined,
+                      completenessPercent: founderProfilePercent ?? undefined,
                     },
                   }
                 : undefined
