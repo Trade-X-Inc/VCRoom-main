@@ -650,9 +650,29 @@ function StageBar({
     return false;
   };
 
+  const scrollRef = useRef<HTMLElement>(null);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const update = () => {
+      setCanScrollLeft(el.scrollLeft > 2);
+      setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
+    };
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      el.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
   return (
-    <div className="min-w-0 flex-1" data-testid="stage-pills">
-      <nav className="flex flex-nowrap overflow-x-auto border-b border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900">
+    <div className="relative min-w-0 flex-1" data-testid="stage-pills">
+      <nav ref={scrollRef} className="flex flex-nowrap overflow-x-auto border-b border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900">
         {STAGES.map((stage) => {
           const active = stage.key === "overview" ? showOverview : !showOverview && activeStageKey === stage.key;
           const accessible = canAccess(stage.key);
@@ -694,6 +714,13 @@ function StageBar({
           </button>
         )}
       </nav>
+      {/* Scroll affordance — fades in on either edge only while there's more to scroll to */}
+      {canScrollLeft && (
+        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-white dark:from-zinc-900 to-transparent" />
+      )}
+      {canScrollRight && (
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white dark:from-zinc-900 to-transparent" />
+      )}
     </div>
   );
 }
