@@ -244,32 +244,32 @@ test.describe("Onboarding — investor flow", () => {
     // false negative on AI infra hiccups unrelated to the onboarding wiring.
     let row: any = null;
     for (let attempt = 1; attempt <= 3 && !row; attempt++) {
-      await textarea.fill(seedText);
-      await overviewPage.click('button:has-text("Parse and score")');
-
-      await overviewPage.waitForFunction(
-        () => Array.from(document.querySelectorAll("button")).find(
-          (b) => b.textContent?.includes("Parse and score") && !b.hasAttribute("disabled")
-        ),
-        undefined,
-        { timeout: 45000 },
-      );
-
-      const failedToast = overviewPage.locator("text=We couldn't parse that");
-      const parseFailed = await failedToast.isVisible().catch(() => false);
-      if (parseFailed) {
-        console.log(`Attempt ${attempt}: AI parse failed, retrying...`);
-        continue;
-      }
-
       try {
+        await textarea.fill(seedText);
+        await overviewPage.click('button:has-text("Parse and score")');
+
+        await overviewPage.waitForFunction(
+          () => Array.from(document.querySelectorAll("button")).find(
+            (b) => b.textContent?.includes("Parse and score") && !b.hasAttribute("disabled")
+          ),
+          undefined,
+          { timeout: 45000 },
+        );
+
+        const failedToast = overviewPage.locator("text=We couldn't parse that");
+        const parseFailed = await failedToast.isVisible().catch(() => false);
+        if (parseFailed) {
+          console.log(`Attempt ${attempt}: AI parse failed, retrying...`);
+          continue;
+        }
+
         row = await waitForProgress(
           INVESTOR_USER_ID,
           (r) => r.steps?.intake_used === true && r.current_step === "done",
           10000,
         );
-      } catch {
-        console.log(`Attempt ${attempt}: parse succeeded but no candidates extracted, retrying...`);
+      } catch (err: any) {
+        console.log(`Attempt ${attempt}: ${err.message?.split("\n")[0] ?? err} — retrying...`);
       }
     }
 
