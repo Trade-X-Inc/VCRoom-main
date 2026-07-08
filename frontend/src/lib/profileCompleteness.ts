@@ -47,6 +47,34 @@ export function getFounderCompleteness(
   };
 }
 
+export type FounderStartupProfile = {
+  company_name?: string | null; tagline?: string | null; sector?: string | null;
+  stage?: string | null; country?: string | null; funding_target?: string | null;
+  description?: string | null; problem?: string | null; solution?: string | null;
+  why_us?: string | null; intro_video_url?: string | null; founder_name?: string | null;
+  revenue_model?: string | null; use_of_funds?: string | null;
+  [key: string]: unknown;
+};
+
+const FOUNDER_PROFILE_REQUIRED_KEYS: (keyof FounderStartupProfile)[] = [
+  "company_name", "tagline", "sector", "stage", "country", "funding_target",
+  "description", "problem", "solution", "why_us", "intro_video_url",
+  "founder_name", "revenue_model", "use_of_funds",
+];
+
+export function getFounderProfileCompleteness(
+  profile: FounderStartupProfile | null
+): CompletenessResult {
+  if (!profile) return { isComplete: false, percent: 0, missingFields: [] };
+  const missing = FOUNDER_PROFILE_REQUIRED_KEYS.filter(
+    (k) => !profile[k] || String(profile[k]).trim() === ""
+  );
+  const percent = Math.round(
+    ((FOUNDER_PROFILE_REQUIRED_KEYS.length - missing.length) / FOUNDER_PROFILE_REQUIRED_KEYS.length) * 100
+  );
+  return { isComplete: percent === 100, percent, missingFields: missing as string[] };
+}
+
 export function getInvestorCompleteness(
   profile: InvestorProfile | null
 ): CompletenessResult {
