@@ -9,6 +9,8 @@ import { AttentionStrip, type AttentionItem } from "@/components/app/AttentionSt
 import { AIBriefPanel, type AIBriefData } from "@/components/app/AIBriefPanel";
 import { generateDealBrief } from "@/lib/deal-brief-fn";
 import { cn } from "@/lib/utils";
+import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
+import { OnboardingTour } from "@/components/app/OnboardingTour";
 
 export const Route = createFileRoute("/app/investor/overview")({
   component: InvestorDashboard,
@@ -36,12 +38,18 @@ function InvestorOnboarding({
   watchlistCount: number;
   roomIds: string[];
 }) {
-  const [dismissed, setDismissed] = useState(
-    () => typeof localStorage !== "undefined" && !!localStorage.getItem("hs_onboarding_investor_dismissed"),
-  );
+  const { progress, markStep } = useOnboardingProgress();
+  const dismissed = progress?.steps?.checklist_dismissed === true;
   const [aiDone] = useState(
     () => typeof localStorage !== "undefined" && !!localStorage.getItem("hs_ai_done"),
   );
+
+  useEffect(() => {
+    if (aiDone && progress && !progress.steps?.legacy_ai_done) {
+      markStep("legacy_ai_done", true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [aiDone, progress?.id]);
 
   const steps = [
     {
@@ -87,10 +95,7 @@ function InvestorOnboarding({
           <div className="text-xs text-muted-foreground">{completed} of {steps.length} steps complete</div>
         </div>
         <button
-          onClick={() => {
-            localStorage.setItem("hs_onboarding_investor_dismissed", "1");
-            setDismissed(true);
-          }}
+          onClick={() => markStep("checklist_dismissed", true)}
           className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
           title="Dismiss"
         >
@@ -139,6 +144,7 @@ function InvestorDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+  const { progress, markStep } = useOnboardingProgress();
 
   // Gate: require investor profile before showing dashboard
   const { data: profile, isLoading: profileLoading } = useQuery({
@@ -350,8 +356,53 @@ function InvestorDashboard() {
   void inDiligence;
   void stageCounts;
 
+  const investorTourStep = (() => {
+    if (progress?.account_type !== "investor") return null;
+    if (progress.current_step === "tour") {
+      return {
+        id: "intro",
+        title: "Welcome to Hockystick",
+        body: "Set your investment thesis, see matched startups in the directory, and use Deal Intake to extract candidates from your own pipeline.",
+      };
+    }
+    if (progress.current_step === "thesis") {
+      return {
+        id: "thesis-next",
+        title: "Set your investment thesis",
+        body: "Define your focus areas, stages, and check size so we can match you to real deals.",
+        cta: { label: "Set my thesis", onClick: () => navigate({ to: "/app/investor/profile", search: { tour: "thesis" } as any }) },
+      };
+    }
+    if (progress.current_step === "directory") {
+      return {
+        id: "directory-next",
+        title: "See your matches",
+        body: "The directory shows startups matched to your thesis, if any exist yet.",
+        cta: { label: "View matches", onClick: () => navigate({ to: "/app/directory" as any }) },
+      };
+    }
+    if (progress.current_step === "intake") {
+      return {
+        id: "intake-next",
+        title: "Try Deal Intake",
+        body: "Paste in your own pipeline or inbox data and we'll extract thesis-matching startups.",
+        cta: { label: "Use Deal Intake", onClick: () => navigate({ to: "/app/investor/intake" as any }) },
+      };
+    }
+    return null;
+  })();
+
   return (
     <div className="p-6 lg:p-8 space-y-6">
+      {investorTourStep && (
+        <OnboardingTour
+          steps={[investorTourStep]}
+          activeIndex={0}
+          onSkip={() => markStep("tour_viewed", true)}
+          onNext={() => markStep("tour_viewed", true)}
+          onFinish={() => markStep("tour_viewed", true)}
+        />
+      )}
       <InvestorOnboarding profile={profile} watchlistCount={watchlistCount} roomIds={roomIds} />
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>

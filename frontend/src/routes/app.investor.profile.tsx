@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useEffect, useState, useRef, Component } from "react";
 import type { ReactNode, ErrorInfo } from "react";
 import {
@@ -19,6 +19,8 @@ import { FieldVerificationBadge, prewarmClassificationCache } from "@/components
 import { logActivity } from "@/lib/activity-log-fn";
 import type { InvestorClaim } from "@/lib/investor-claims-fn";
 import { CapitalVerificationSection } from "./app.investor.profile.capital";
+import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
+import { OnboardingTour } from "@/components/app/OnboardingTour";
 
 export const Route = createFileRoute("/app/investor/profile")({
   component: InvestorProfilePage,
@@ -136,7 +138,7 @@ function AccordionBlock({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-border/60 bg-card overflow-hidden">
+    <div data-tour={id === "thesis" ? "thesis-accordion" : undefined} className="rounded-2xl border border-border/60 bg-card overflow-hidden">
       <button
         type="button"
         onClick={() => onToggle(id)}
@@ -165,6 +167,8 @@ function AccordionBlock({
 function InvestorProfilePage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const search = useSearch({ strict: false }) as { tour?: string };
+  const { progress, markStep, setCurrentStep } = useOnboardingProgress();
   const [form, setForm] = useState<ProfileForm>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -366,6 +370,16 @@ function InvestorProfilePage() {
       }, { onConflict: "user_id" });
       if (error) throw error;
       qc.invalidateQueries({ queryKey: ["investor-profile", user.id] });
+
+      if (form.thesis.trim()) {
+        try {
+          await markStep("thesis_set", true);
+          await setCurrentStep("directory");
+        } catch {
+          // Non-fatal — onboarding progress is best-effort, never blocks saving.
+        }
+      }
+
       if (existing?.id) {
         logActivity({
           account_type: "investor",
@@ -398,8 +412,27 @@ function InvestorProfilePage() {
   const verificationScore = tier1Passed ? 75 : null;
   const profileUrl = `${import.meta.env.VITE_APP_URL || "https://hockystick.app"}/i/${form.profile_slug}`;
 
+  const showThesisSpotlight =
+    search.tour === "thesis" &&
+    progress?.account_type === "investor" &&
+    progress.current_step === "thesis";
+
   return (
     <div className="w-full p-6 lg:p-8 max-w-7xl mx-auto">
+      {showThesisSpotlight && (
+        <OnboardingTour
+          steps={[{
+            id: "thesis-accordion",
+            target: "thesis-accordion",
+            title: "Your investment thesis",
+            body: "Fill in your thesis statement, sectors, stages, and check size — this drives matching in the directory.",
+          }]}
+          activeIndex={0}
+          onSkip={() => markStep("tour_viewed", true)}
+          onNext={() => markStep("tour_viewed", true)}
+          onFinish={() => markStep("tour_viewed", true)}
+        />
+      )}
 
       {/* ── HERO CARD ──────────────────────────────────────────────── */}
       <div className="rounded-2xl border border-border/60 bg-card p-6 mb-8">

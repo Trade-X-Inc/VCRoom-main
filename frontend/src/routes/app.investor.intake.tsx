@@ -16,6 +16,7 @@ import { supabase } from "@/lib/supabase";
 import type { IntakeCandidate } from "@/lib/intake-fn";
 import type { IntakeFileResult } from "@/lib/document-extractor";
 import { PageGuide } from "@/components/app/PageGuide";
+import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 
 export const Route = createFileRoute("/app/investor/intake")({
   component: IntakePage,
@@ -85,6 +86,7 @@ function fitLabel(score: number) {
 function IntakePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { markStep, setCurrentStep } = useOnboardingProgress();
 
   const [rawInput, setRawInput] = useState("");
   const [parsing, setParsing] = useState(false);
@@ -270,6 +272,13 @@ function IntakePage() {
         setRawInput("");
         setUploadedFiles([]);
 
+        try {
+          await markStep("intake_used", true);
+          await setCurrentStep("done");
+        } catch {
+          // Non-fatal — onboarding progress is best-effort, never blocks intake results.
+        }
+
         // Save intake run with full results_json for history restore
         await supabase.from("intake_runs").insert({
           investor_id: user!.id,
@@ -362,7 +371,7 @@ function IntakePage() {
     <div className="p-6 lg:p-8">
 
       {/* Header */}
-      <div className="mb-7 flex items-start gap-3">
+      <div data-tour="intake-header" className="mb-7 flex items-start gap-3">
         <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(124,58,237,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <FileInput size={16} style={{ color: "#a78bfa" }} />
         </div>

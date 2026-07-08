@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FounderProfilePanel } from "@/components/directory/FounderProfilePanel";
 import { InvestorOnboardingModal } from "@/components/directory/InvestorOnboardingModal";
 import { supabase } from "@/lib/supabase";
@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { Search, Building2, Users, ArrowRight, Globe, X, Loader2 } from "lucide-react";
 import { VerificationBadge } from "@/components/shared/VerificationBadge";
 import { toast } from "sonner";
+import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 
 export const Route = createFileRoute("/app/directory")({
   head: () => ({ meta: [{ title: "Directory — Hockystick" }] }),
@@ -411,6 +412,15 @@ function Directory() {
   const isInvestor = user?.role === "investor";
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
   const [pendingConnectStartupId, setPendingConnectStartupId] = useState<string | null>(null);
+  const { progress, markStep, setCurrentStep } = useOnboardingProgress();
+
+  useEffect(() => {
+    if (progress?.account_type === "investor" && progress.current_step === "directory") {
+      markStep("directory_viewed", true);
+      setCurrentStep("intake");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [progress?.id, progress?.current_step]);
 
   const { data: myAlerts } = useQuery({
     queryKey: ["thesis-alerts", user?.id],
@@ -659,7 +669,7 @@ function Directory() {
 
       {/* Thesis matches banner — investors only */}
       {isInvestor && myAlerts && myAlerts.length > 0 && type === "founders" && (
-        <div className="mb-6 p-4 rounded-xl border border-[#7C3AED]/20 bg-[#7C3AED]/5">
+        <div data-tour="thesis-matches-banner" className="mb-6 p-4 rounded-xl border border-[#7C3AED]/20 bg-[#7C3AED]/5">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[#7C3AED]">✦</span>
             <p className="text-sm font-semibold text-white">
