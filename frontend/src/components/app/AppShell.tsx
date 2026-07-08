@@ -96,6 +96,10 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [collapsed, setCollapsedState] = useState(getSidebarDefault);
   const [mobileOpen, setMobileOpen] = useState(false);
+  // The mobile drawer always renders at full width regardless of the desktop
+  // collapsed/expanded preference, so labels must show whenever it's open —
+  // otherwise nav items render as unlabeled icons with no way to identify them.
+  const showExpanded = !collapsed || mobileOpen;
 
   const setCollapsed = (val: boolean) => {
     setCollapsedState(val);
@@ -342,7 +346,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
         mobileOpen && "!flex fixed inset-y-0 left-0 w-[248px] shadow-xl",
       )}>
         <div className="h-14 md:h-16 flex items-center px-4 border-b border-border/60 shrink-0">
-          <Link to="/" className="flex-1"><Logo withWordmark={!collapsed} /></Link>
+          <Link to="/" className="flex-1"><Logo withWordmark={showExpanded} /></Link>
           {/* Desktop collapse button */}
           {!collapsed && (
             <button onClick={() => setCollapsed(true)} className="hidden md:block text-muted-foreground hover:text-foreground">
@@ -356,7 +360,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
         </div>
 
         <div className="px-3 py-3">
-          <div className={cn("flex items-center gap-2 rounded-lg border border-border/60 bg-background/60 px-2.5 py-2", collapsed && "justify-center")}>
+          <div className={cn("flex items-center gap-2 rounded-lg border border-border/60 bg-background/60 px-2.5 py-2", !showExpanded && "justify-center")}>
             {profile?.logoDataUrl && !isInvestor ? (
               <img src={profile.logoDataUrl} alt={workspaceName} className="h-6 w-6 rounded-md object-cover" />
             ) : (
@@ -364,7 +368,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                 {user.fullName ? user.fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) : "VR"}
               </div>
             )}
-            {!collapsed && (
+            {showExpanded && (
               <div className="flex-1 min-w-0">
                 {workspaceName ? (
                   <>
@@ -384,7 +388,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
         </div>
 
         {/* Profile completeness banner — hidden when complete or sidebar collapsed */}
-        {!collapsed && !shellCompleteness.isComplete && (
+        {showExpanded && !shellCompleteness.isComplete && (
           <div style={{
             background: "rgba(124,58,237,0.06)",
             border: "1px solid rgba(124,58,237,0.2)",
@@ -418,7 +422,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
         )}
 
         <nav className="flex-1 px-2 space-y-0.5 overflow-y-auto">
-          {!collapsed && (
+          {showExpanded && (
             <div className="px-2 pt-3 pb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
               {isInvestor ? "Investor" : "Workspace"}
             </div>
@@ -432,8 +436,8 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
             })();
             
             // Show COMMUNITY section label before directory item
-            const showCommunityLabel = n.to === "/app/directory" && !collapsed;
-            
+            const showCommunityLabel = n.to === "/app/directory" && showExpanded;
+
             return (
               <div key={n.to}>
                 {showCommunityLabel && (
@@ -445,15 +449,16 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                   to={n.to as any}
                   preload="intent"
                   onClick={() => setMobileOpen(false)}
+                  aria-label={n.label}
                   className={cn(
                     "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors group",
                     active ? "bg-accent text-foreground font-medium shadow-xs" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
-                    collapsed && "justify-center px-0",
+                    !showExpanded && "justify-center px-0",
                   )}
                 >
                   <n.icon className={cn("h-4 w-4", active && "text-brand")} />
-                  {!collapsed && <span className="flex-1">{n.label}</span>}
-                  {!collapsed && badge && (
+                  {showExpanded && <span className="flex-1">{n.label}</span>}
+                  {showExpanded && badge && (
                     <span className="text-[10px] rounded-full bg-background border border-border/60 px-1.5 py-0.5 text-muted-foreground">
                       {badge}
                     </span>
@@ -463,7 +468,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
             );
           })}
 
-          {!collapsed && (
+          {showExpanded && (
             <>
               <div className="px-2 pt-4 pb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
                 Admin
@@ -477,6 +482,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                       to={n.to as any}
                       preload="intent"
                       onClick={() => setMobileOpen(false)}
+                      aria-label={n.label}
                       className={cn(
                         "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
                         active ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
@@ -490,6 +496,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                       <Link
                         to={"/app/feedback" as any}
                         onClick={() => setMobileOpen(false)}
+                        aria-label="Feedback"
                         className="w-full flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors text-muted-foreground hover:bg-accent/60 hover:text-foreground"
                       >
                         <MessageCircle className="h-4 w-4" />
@@ -504,7 +511,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
         </nav>
 
         <div className="p-3 border-t border-border/60">
-          {collapsed ? (
+          {!showExpanded ? (
             <>
               {/* Percent ring when sidebar collapsed + profile incomplete */}
               {!shellCompleteness.isComplete && (
