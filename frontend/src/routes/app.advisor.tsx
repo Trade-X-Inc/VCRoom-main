@@ -132,7 +132,7 @@ function VerificationPage() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-6 max-w-2xl">
+      <div className="flex-1 overflow-y-auto p-6 lg:p-8">
         <div className="bg-card border border-border/60 rounded-xl p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>

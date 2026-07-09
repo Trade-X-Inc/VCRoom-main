@@ -108,7 +108,7 @@ function ClaimsPage() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-6 max-w-3xl space-y-4">
+      <div className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-4">
         {/* Gate status */}
         <div className="bg-card border border-border/60 rounded-xl px-5 py-4 flex items-center justify-between flex-wrap gap-3">
           <div className="text-sm">
