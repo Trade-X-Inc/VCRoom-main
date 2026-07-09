@@ -86,6 +86,7 @@ import { Route as ApiHubspotSyncRouteImport } from './routes/api.hubspot-sync'
 import { Route as ApiHubspotNewsletterRouteImport } from './routes/api.hubspot-newsletter'
 import { Route as ApiEmailtestRouteImport } from './routes/api.emailtest'
 import { Route as ApiEmailTestRouteImport } from './routes/api.email-test'
+import { Route as ApiAdminVerificationRouteImport } from './routes/api.admin-verification'
 import { Route as ApiAdminDataRouteImport } from './routes/api.admin-data'
 import { Route as ApiAdminRouteImport } from './routes/api.admin'
 import { Route as AppMemberIndexRouteImport } from './routes/app.member.index'
@@ -502,6 +503,11 @@ const ApiEmailTestRoute = ApiEmailTestRouteImport.update({
   path: '/api/email-test',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminVerificationRoute = ApiAdminVerificationRouteImport.update({
+  id: '/api/admin-verification',
+  path: '/api/admin-verification',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAdminDataRoute = ApiAdminDataRouteImport.update({
   id: '/api/admin-data',
   path: '/api/admin-data',
@@ -674,6 +680,7 @@ export interface FileRoutesByFullPath {
   '/waitlist': typeof WaitlistRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
+  '/api/admin-verification': typeof ApiAdminVerificationRoute
   '/api/email-test': typeof ApiEmailTestRoute
   '/api/emailtest': typeof ApiEmailtestRoute
   '/api/hubspot-newsletter': typeof ApiHubspotNewsletterRoute
@@ -779,6 +786,7 @@ export interface FileRoutesByTo {
   '/waitlist': typeof WaitlistRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
+  '/api/admin-verification': typeof ApiAdminVerificationRoute
   '/api/email-test': typeof ApiEmailTestRoute
   '/api/emailtest': typeof ApiEmailtestRoute
   '/api/hubspot-newsletter': typeof ApiHubspotNewsletterRoute
@@ -887,6 +895,7 @@ export interface FileRoutesById {
   '/waitlist': typeof WaitlistRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
+  '/api/admin-verification': typeof ApiAdminVerificationRoute
   '/api/email-test': typeof ApiEmailTestRoute
   '/api/emailtest': typeof ApiEmailtestRoute
   '/api/hubspot-newsletter': typeof ApiHubspotNewsletterRoute
@@ -997,6 +1006,7 @@ export interface FileRouteTypes {
     | '/waitlist'
     | '/api/admin'
     | '/api/admin-data'
+    | '/api/admin-verification'
     | '/api/email-test'
     | '/api/emailtest'
     | '/api/hubspot-newsletter'
@@ -1102,6 +1112,7 @@ export interface FileRouteTypes {
     | '/waitlist'
     | '/api/admin'
     | '/api/admin-data'
+    | '/api/admin-verification'
     | '/api/email-test'
     | '/api/emailtest'
     | '/api/hubspot-newsletter'
@@ -1209,6 +1220,7 @@ export interface FileRouteTypes {
     | '/waitlist'
     | '/api/admin'
     | '/api/admin-data'
+    | '/api/admin-verification'
     | '/api/email-test'
     | '/api/emailtest'
     | '/api/hubspot-newsletter'
@@ -1318,6 +1330,7 @@ export interface RootRouteChildren {
   WaitlistRoute: typeof WaitlistRoute
   ApiAdminRoute: typeof ApiAdminRoute
   ApiAdminDataRoute: typeof ApiAdminDataRoute
+  ApiAdminVerificationRoute: typeof ApiAdminVerificationRoute
   ApiEmailTestRoute: typeof ApiEmailTestRoute
   ApiEmailtestRoute: typeof ApiEmailtestRoute
   ApiHubspotNewsletterRoute: typeof ApiHubspotNewsletterRoute
@@ -1887,6 +1900,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiEmailTestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin-verification': {
+      id: '/api/admin-verification'
+      path: '/api/admin-verification'
+      fullPath: '/api/admin-verification'
+      preLoaderRoute: typeof ApiAdminVerificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin-data': {
       id: '/api/admin-data'
       path: '/api/admin-data'
@@ -2282,6 +2302,7 @@ const rootRouteChildren: RootRouteChildren = {
   WaitlistRoute: WaitlistRoute,
   ApiAdminRoute: ApiAdminRoute,
   ApiAdminDataRoute: ApiAdminDataRoute,
+  ApiAdminVerificationRoute: ApiAdminVerificationRoute,
   ApiEmailTestRoute: ApiEmailTestRoute,
   ApiEmailtestRoute: ApiEmailtestRoute,
   ApiHubspotNewsletterRoute: ApiHubspotNewsletterRoute,
