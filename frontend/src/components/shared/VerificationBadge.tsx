@@ -1,11 +1,13 @@
 import { Link } from "@tanstack/react-router";
 
 interface VerificationBadgeProps {
-  /** Legacy string tier (investor-side) OR numeric tier (0-3) */
+  /** Numeric tier (0-4) or legacy string tier (investor-side) */
   tier: "none" | "checked" | "verified" | number | string | null | undefined;
   size?: "sm" | "md";
   showLabel?: boolean;
-  /** If provided, badge becomes a link to the verify page */
+  /** ISO date of the last check — rendered as "Checked [date]" when provided */
+  checkedAt?: string | null;
+  /** If provided, badge becomes a link to the public verification report */
   verifySlug?: string;
   entityType?: "founder" | "investor";
 }
@@ -24,31 +26,47 @@ const TIER_CONFIG: Record<string, { icon: string; label: string; className: stri
     className: "bg-[rgba(124,58,237,0.12)] text-[#A855F7] border-[rgba(124,58,237,0.2)]",
     tooltip: "Full verification: identity, registration, and background verified by the Hockystick team.",
   },
-  // Numeric tier keys
+  // Numeric tiers — the founder 0-4 model. Each tooltip states exactly what
+  // the badge means, because that is the question a VC will ask.
   "1": {
     icon: "✓",
-    label: "Hockystick Checked",
-    className: "bg-[rgba(255,255,255,0.08)] text-[rgba(255,255,255,0.6)] border-[rgba(255,255,255,0.12)]",
-    tooltip: "Automated verification passed: website resolves, content matches profile, LinkedIn exists, email domain matches. Score ≥60/100.",
+    label: "Identity Confirmed",
+    className: "bg-[rgba(255,255,255,0.08)] text-[rgba(255,255,255,0.65)] border-[rgba(255,255,255,0.12)]",
+    tooltip: "All four identity checks passed: business email matches the company domain, the website mentions the company, the company was found in a public registry, and the domain has real mail infrastructure and history.",
   },
   "2": {
     icon: "✓",
-    label: "Document Verified",
+    label: "Claims Verified",
     className: "bg-[rgba(16,185,129,0.12)] text-[#10B981] border-[rgba(16,185,129,0.2)]",
-    tooltip: "Document verification: business registration or trade license cross-checked by AI against company profile.",
+    tooltip: "At least 3 stated claims (including 1 financial) are each backed by a document that AI review confirmed supports that specific claim.",
   },
   "3": {
+    icon: "✓",
+    label: "Operationally Verified",
+    className: "bg-[rgba(59,130,246,0.12)] text-[#3B82F6] border-[rgba(59,130,246,0.2)]",
+    tooltip: "Three primary operational documents (financial activity, customer contract, team evidence) passed strict AI checks, then a Hockystick team member manually reviewed them before the badge was awarded.",
+  },
+  "4": {
     icon: "✦",
     label: "Hockystick Verified",
     className: "bg-[rgba(124,58,237,0.12)] text-[#A855F7] border-[rgba(124,58,237,0.2)]",
-    tooltip: "Human-reviewed verification: identity and registration manually confirmed by the Hockystick team.",
+    tooltip: "All prior tiers complete, plus a live video review with a named Hockystick reviewer who confirmed identity against documents.",
   },
 };
+
+function formatChecked(dateStr: string): string {
+  try {
+    return new Date(dateStr).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  } catch {
+    return dateStr;
+  }
+}
 
 export function VerificationBadge({
   tier,
   size = "sm",
   showLabel = true,
+  checkedAt,
   verifySlug,
   entityType = "founder",
 }: VerificationBadgeProps) {
@@ -65,6 +83,9 @@ export function VerificationBadge({
     <>
       <span>{c.icon}</span>
       {showLabel && <span>{c.label}</span>}
+      {showLabel && checkedAt && (
+        <span className="opacity-60 font-normal">· Checked {formatChecked(checkedAt)}</span>
+      )}
     </>
   );
 
@@ -72,7 +93,7 @@ export function VerificationBadge({
     return (
       <Link
         to={`/verify/${verifySlug}` as any}
-        title={c.tooltip}
+        title={`${c.tooltip} Click for the full verification report.`}
         data-testid="verification-badge"
         className={`${className} cursor-pointer hover:opacity-80 transition-opacity`}
       >

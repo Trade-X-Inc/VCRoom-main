@@ -240,7 +240,7 @@ export function VerificationSection({
             </a>
           )}
         </div>
-        <VerificationBadge tier={currentTier} size="md" />
+        <VerificationBadge tier={currentTier} size="md" checkedAt={tier1CheckedAt ?? null} />
       </div>
 
       {/* Tier 1 — Identity Confirmed */}

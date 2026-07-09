@@ -97,7 +97,7 @@ function VerificationPage() {
             <div>
               <div className="text-sm font-semibold">{startup?.company_name ?? "Your company"}</div>
               <div className="mt-1">
-                <VerificationBadge tier={tier} size="md" />
+                <VerificationBadge tier={tier} size="md" checkedAt={verif?.tier1_checked_at ?? null} />
               </div>
             </div>
             <button
