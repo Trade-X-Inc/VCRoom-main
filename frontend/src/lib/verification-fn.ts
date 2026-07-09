@@ -480,24 +480,41 @@ export const requestHumanReview = createServerFn({ method: "POST" })
 // (used by /verify/$slug page — no auth required, reads public data only)
 // ─────────────────────────────────────────────────────────────────────────────
 
+export type PublicCheckLine = {
+  label: string;
+  passed: boolean | null;
+  detail: string | null;
+};
+
 export type PublicVerificationData = {
-  entity_type: "founder" | "investor";
+  entity_type: "founder";
   display_name: string;
   company_or_fund: string;
   current_tier: number;
-  tier1_passed: boolean;
-  tier1_score: number;
-  tier1_checked_at: string | null;
-  checks: {
-    website_resolves: boolean | null;
-    website_matches_pitch: boolean | null;
-    linkedin_valid: boolean | null;
-    email_domain_matches: boolean | null;
-    registry_confirmed: boolean | null;
+  generated_at: string;
+  tier1: {
+    passed: boolean;
+    checked_at: string | null;
+    checks: PublicCheckLine[];
+    registry_source: string | null;
   };
-  website_content_summary: string | null;
-  tier2_passed: boolean;
-  tier3_passed: boolean;
+  tier2: {
+    met: boolean;
+    verified_claims: { text: string; category: string | null; checked_at: string | null }[];
+    total_claims: number;
+    last_checked_at: string | null;
+  };
+  tier3: {
+    met: boolean;
+    docs: { label: string; verified: boolean; uploaded_at: string | null }[];
+    human_reviewed: boolean;
+    human_reviewed_at: string | null;
+  };
+  tier4: {
+    signed_off: boolean;
+    reviewer_name: string | null;
+    reviewed_at: string | null;
+  };
 };
 
 type GetVerificationInput = {
@@ -510,75 +527,77 @@ export const getPublicVerification = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<PublicVerificationData | null> => {
     const { url: sbUrl, key: sbKey } = getSupabaseAdmin();
     if (!sbUrl || !sbKey) return null;
+    if (data.entity_type !== "founder") return null;
 
-    if (data.entity_type === "founder") {
-      // Look up startup by slug
-      const startups: any[] = await supabaseQuery(sbUrl, sbKey,
-        `startups?profile_slug=eq.${encodeURIComponent(data.slug)}&select=id,company_name,founder_name`,
-        "GET"
-      ).catch(() => []);
-      const startup = startups?.[0];
-      if (!startup) return null;
-
-      const verif: any[] = await supabaseQuery(sbUrl, sbKey,
-        `founder_verifications?startup_id=eq.${startup.id}&select=current_tier,tier1_passed,tier1_score,tier1_checked_at,website_resolves,website_matches_pitch,linkedin_valid,email_domain_matches,registry_confirmed,website_content_summary,tier2_passed,tier3_passed`,
-        "GET"
-      ).catch(() => []);
-      const v = verif?.[0];
-
-      return {
-        entity_type: "founder",
-        display_name: startup.founder_name || "Founder",
-        company_or_fund: startup.company_name || "",
-        current_tier: v?.current_tier ?? 0,
-        tier1_passed: v?.tier1_passed ?? false,
-        tier1_score: v?.tier1_score ?? 0,
-        tier1_checked_at: v?.tier1_checked_at ?? null,
-        checks: {
-          website_resolves: v?.website_resolves ?? null,
-          website_matches_pitch: v?.website_matches_pitch ?? null,
-          linkedin_valid: v?.linkedin_valid ?? null,
-          email_domain_matches: v?.email_domain_matches ?? null,
-          registry_confirmed: v?.registry_confirmed ?? null,
-        },
-        website_content_summary: v?.website_content_summary ?? null,
-        tier2_passed: v?.tier2_passed ?? false,
-        tier3_passed: v?.tier3_passed ?? false,
-      };
-    }
-
-    // Investor path (by slug = investor profile user_id or fund slug — use investor_profiles lookup)
-    const investors: any[] = await supabaseQuery(sbUrl, sbKey,
-      `investor_profiles?user_id=eq.${encodeURIComponent(data.slug)}&select=user_id,your_name,fund_name`,
+    // Look up startup by slug
+    const startups: any[] = await supabaseQuery(sbUrl, sbKey,
+      `startups?profile_slug=eq.${encodeURIComponent(data.slug)}&select=id,company_name,founder_name`,
       "GET"
     ).catch(() => []);
-    const inv = investors?.[0];
-    if (!inv) return null;
+    const startup = startups?.[0];
+    if (!startup) return null;
 
-    const verif: any[] = await supabaseQuery(sbUrl, sbKey,
-      `investor_verifications?investor_id=eq.${inv.user_id}&select=current_tier,tier1_passed,overall_score,checked_at,website_resolves,linkedin_valid,email_domain_matches,website_content_summary,tier2_passed,tier3_passed`,
-      "GET"
-    ).catch(() => []);
-    const v = verif?.[0];
+    const [verifRows, claimRows] = await Promise.all([
+      supabaseQuery(sbUrl, sbKey,
+        `founder_verifications?startup_id=eq.${startup.id}&select=current_tier,tier1_passed,tier1_checked_at,tier1_email_match,tier1_email_detail,tier1_website_match,tier1_website_detail,tier1_registry_match,tier1_registry_source,tier1_registry_detail,tier1_infra_match,tier1_infra_detail,tier2_passed,operational_bank_verified,operational_bank_doc_uploaded_at,operational_contract_verified,operational_contract_doc_uploaded_at,operational_team_verified,operational_team_doc_uploaded_at,tier3_passed,human_verified_at,tier4_passed,tier4_reviewer_name,tier4_reviewed_at`,
+        "GET"
+      ).catch(() => []),
+      supabaseQuery(sbUrl, sbKey,
+        `startup_claims?startup_id=eq.${startup.id}&select=claim_type,claim_label,claim_value,claim_category,ai_verdict,ai_checked_at&order=ai_checked_at.desc`,
+        "GET"
+      ).catch(() => []),
+    ]);
+
+    const v = verifRows?.[0] ?? {};
+    const claims: any[] = claimRows ?? [];
+    const verifiedClaims = claims.filter((c) => c.ai_verdict === "verified");
+    const checkedClaims = claims.filter((c) => c.ai_checked_at);
 
     return {
-      entity_type: "investor",
-      display_name: inv.your_name || "Investor",
-      company_or_fund: inv.fund_name || "",
-      current_tier: v?.current_tier ?? 0,
-      tier1_passed: v?.tier1_passed ?? false,
-      tier1_score: v?.overall_score ?? 0,
-      tier1_checked_at: v?.checked_at ?? null,
-      checks: {
-        website_resolves: v?.website_resolves ?? null,
-        website_matches_pitch: null,
-        linkedin_valid: v?.linkedin_valid ?? null,
-        email_domain_matches: v?.email_domain_matches ?? null,
-        registry_confirmed: null,
+      entity_type: "founder",
+      display_name: startup.founder_name || "Founder",
+      company_or_fund: startup.company_name || "",
+      current_tier: v.current_tier ?? 0,
+      generated_at: new Date().toISOString(),
+      tier1: {
+        passed: v.tier1_passed ?? false,
+        checked_at: v.tier1_checked_at ?? null,
+        registry_source: v.tier1_registry_source ?? null,
+        checks: [
+          { label: "Email domain matches website", passed: v.tier1_email_match ?? null, detail: v.tier1_email_detail ?? null },
+          { label: "Website mentions the company", passed: v.tier1_website_match ?? null, detail: v.tier1_website_detail ?? null },
+          { label: "Found in a public company registry", passed: v.tier1_registry_match ?? null, detail: v.tier1_registry_detail ?? null },
+          { label: "Real domain infrastructure", passed: v.tier1_infra_match ?? null, detail: v.tier1_infra_detail ?? null },
+        ],
       },
-      website_content_summary: v?.website_content_summary ?? null,
-      tier2_passed: v?.tier2_passed ?? false,
-      tier3_passed: v?.tier3_passed ?? false,
+      tier2: {
+        met: v.tier2_passed ?? false,
+        verified_claims: verifiedClaims.map((c) => ({
+          text: c.claim_type?.startsWith("custom_") ? c.claim_value : `${c.claim_label}: ${c.claim_value}`,
+          category: c.claim_category ?? null,
+          checked_at: c.ai_checked_at ?? null,
+        })),
+        total_claims: checkedClaims.length,
+        last_checked_at: checkedClaims[0]?.ai_checked_at ?? null,
+      },
+      tier3: {
+        met: (v.tier3_passed ?? false) &&
+          (v.operational_bank_verified ?? false) &&
+          (v.operational_contract_verified ?? false) &&
+          (v.operational_team_verified ?? false),
+        docs: [
+          { label: "Financial activity (bank/revenue statement)", verified: v.operational_bank_verified ?? false, uploaded_at: v.operational_bank_doc_uploaded_at ?? null },
+          { label: "Customer / contract evidence", verified: v.operational_contract_verified ?? false, uploaded_at: v.operational_contract_doc_uploaded_at ?? null },
+          { label: "Team evidence (payroll / employment record)", verified: v.operational_team_verified ?? false, uploaded_at: v.operational_team_doc_uploaded_at ?? null },
+        ],
+        human_reviewed: v.tier3_passed ?? false,
+        human_reviewed_at: v.human_verified_at ?? null,
+      },
+      tier4: {
+        signed_off: v.tier4_passed ?? false,
+        reviewer_name: v.tier4_reviewer_name ?? null,
+        reviewed_at: v.tier4_reviewed_at ?? null,
+      },
     };
   });
 
