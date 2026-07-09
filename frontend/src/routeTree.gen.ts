@@ -79,6 +79,7 @@ import { Route as AppDeskRouteImport } from './routes/app.desk'
 import { Route as AppDealRoomsRouteImport } from './routes/app.deal-rooms'
 import { Route as AppConnectionsRouteImport } from './routes/app.connections'
 import { Route as AppClaimsRouteImport } from './routes/app.claims'
+import { Route as AppBadgesRouteImport } from './routes/app.badges'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
 import { Route as AppAdvisorRouteImport } from './routes/app.advisor'
 import { Route as ApiTestAiRouteImport } from './routes/api.test-ai'
@@ -468,6 +469,11 @@ const AppClaimsRoute = AppClaimsRouteImport.update({
   path: '/claims',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBadgesRoute = AppBadgesRouteImport.update({
+  id: '/badges',
+  path: '/badges',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAuditRoute = AppAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
@@ -688,6 +694,7 @@ export interface FileRoutesByFullPath {
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/badges': typeof AppBadgesRoute
   '/app/claims': typeof AppClaimsRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
@@ -794,6 +801,7 @@ export interface FileRoutesByTo {
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/badges': typeof AppBadgesRoute
   '/app/claims': typeof AppClaimsRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
@@ -903,6 +911,7 @@ export interface FileRoutesById {
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/badges': typeof AppBadgesRoute
   '/app/claims': typeof AppClaimsRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
@@ -1014,6 +1023,7 @@ export interface FileRouteTypes {
     | '/api/test-ai'
     | '/app/advisor'
     | '/app/audit'
+    | '/app/badges'
     | '/app/claims'
     | '/app/connections'
     | '/app/deal-rooms'
@@ -1120,6 +1130,7 @@ export interface FileRouteTypes {
     | '/api/test-ai'
     | '/app/advisor'
     | '/app/audit'
+    | '/app/badges'
     | '/app/claims'
     | '/app/connections'
     | '/app/deal-rooms'
@@ -1228,6 +1239,7 @@ export interface FileRouteTypes {
     | '/api/test-ai'
     | '/app/advisor'
     | '/app/audit'
+    | '/app/badges'
     | '/app/claims'
     | '/app/connections'
     | '/app/deal-rooms'
@@ -1851,6 +1863,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppClaimsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/badges': {
+      id: '/app/badges'
+      path: '/badges'
+      fullPath: '/app/badges'
+      preLoaderRoute: typeof AppBadgesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/audit': {
       id: '/app/audit'
       path: '/audit'
@@ -2178,6 +2197,7 @@ const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(
 interface AppRouteChildren {
   AppAdvisorRoute: typeof AppAdvisorRoute
   AppAuditRoute: typeof AppAuditRoute
+  AppBadgesRoute: typeof AppBadgesRoute
   AppClaimsRoute: typeof AppClaimsRoute
   AppConnectionsRoute: typeof AppConnectionsRoute
   AppDealRoomsRoute: typeof AppDealRoomsRoute
@@ -2210,6 +2230,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAdvisorRoute: AppAdvisorRoute,
   AppAuditRoute: AppAuditRoute,
+  AppBadgesRoute: AppBadgesRoute,
   AppClaimsRoute: AppClaimsRoute,
   AppConnectionsRoute: AppConnectionsRoute,
   AppDealRoomsRoute: AppDealRoomsRoute,
