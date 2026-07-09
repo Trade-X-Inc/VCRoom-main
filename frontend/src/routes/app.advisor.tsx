@@ -1,12 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ShieldCheck, RefreshCw, CheckCircle2, XCircle } from "lucide-react";
+import { ShieldCheck, RefreshCw, CheckCircle2, XCircle, FileUp, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { VerificationBadge } from "@/components/shared/VerificationBadge";
 import { fetchVerificationStatus } from "@/lib/verification-fn";
 import { useState } from "react";
 import { toast } from "sonner";
+
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 export const Route = createFileRoute("/app/advisor")({
   component: VerificationPage,
@@ -15,6 +24,7 @@ export const Route = createFileRoute("/app/advisor")({
 function VerificationPage() {
   const { user } = useAuth();
   const [running, setRunning] = useState(false);
+  const [licenseChecking, setLicenseChecking] = useState(false);
 
   const { data: startup } = useQuery({
     queryKey: ["advisor-startup", user?.id],
@@ -53,6 +63,37 @@ function VerificationPage() {
       toast.error("Verification failed — try again");
     } finally {
       setRunning(false);
+    }
+  };
+
+  const handleLicenseUpload = async (file: File) => {
+    if (!startup?.id || !user?.id || licenseChecking) return;
+    setLicenseChecking(true);
+    try {
+      const isImage = /\.(png|jpe?g|webp)$/i.test(file.name);
+      const payload: Record<string, unknown> = {
+        startup_id: startup.id,
+        caller_user_id: user.id,
+        document_name: file.name,
+      };
+      if (isImage) {
+        payload.image_data_url = await fileToDataUrl(file);
+      } else {
+        const { extractDocumentText } = await import("@/lib/document-extractor");
+        payload.document_text = await extractDocumentText(file, file.name);
+      }
+      const { verifyTradeLicense } = await import("@/lib/verification-fn");
+      const r = await verifyTradeLicense({ data: payload as any });
+      await refetch();
+      if (r.passed) {
+        toast.success(`License accepted — issued by ${r.authority}, valid until ${r.expiry}`);
+      } else {
+        toast.error(r.detail || r.error || "License check failed");
+      }
+    } catch {
+      toast.error("License check failed — try again");
+    } finally {
+      setLicenseChecking(false);
     }
   };
 
@@ -132,6 +173,33 @@ function VerificationPage() {
                   </div>
                 </div>
               ))}
+              {verif?.tier1_registry_match === false && (
+                <label className="flex items-start gap-2.5 rounded-lg px-3.5 py-3 cursor-pointer text-sm" style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)" }}>
+                  {licenseChecking
+                    ? <Loader2 className="h-4 w-4 shrink-0 mt-0.5 animate-spin text-brand" />
+                    : <FileUp className="h-4 w-4 shrink-0 mt-0.5 text-brand" />}
+                  <div className="min-w-0">
+                    <div className="font-medium text-foreground">
+                      {licenseChecking ? "Checking your license…" : "Not in the registries we can query? Upload your trade license"}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                      AI reads the license and must find your exact company name, a future expiry date, and the
+                      issuing authority (DED, DIFC, ADGM, RAKEZ…). A valid license satisfies this check.
+                    </div>
+                  </div>
+                  <input
+                    type="file"
+                    className="sr-only"
+                    accept=".pdf,.png,.jpg,.jpeg,.webp,.docx"
+                    disabled={licenseChecking}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) handleLicenseUpload(f);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+              )}
               {verif?.tier1_checked_at && (
                 <div className="text-[11px] text-muted-foreground">
                   Last checked {new Date(verif.tier1_checked_at).toLocaleString("en-GB", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}

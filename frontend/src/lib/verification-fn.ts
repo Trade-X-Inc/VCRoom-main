@@ -245,27 +245,53 @@ async function checkRegistry(companyName: string): Promise<{ found: boolean; sou
     }
   } catch { /* fall through to next source */ }
 
-  // ── Source 2: OpenCorporates (requires API key) ─────────────────────────
+  // ── Source 2: OpenCorporates ────────────────────────────────────────────
+  // Tried keyless first (free tier when available); api_token appended when
+  // OPENCORPORATES_API_KEY is configured. A 401/403 skips silently.
   const cfEnv = (globalThis as any).__cf_env || {};
   const ocKey = cfEnv.OPENCORPORATES_API_KEY || "";
-  if (ocKey) {
+  try {
+    sourcesQueried.push("OpenCorporates");
+    const tokenParam = ocKey ? `&api_token=${encodeURIComponent(ocKey)}` : "";
+    const resp = await fetch(
+      `https://api.opencorporates.com/v0.4/companies/search?q=${encodeURIComponent(companyName)}&per_page=20${tokenParam}`,
+      { signal: AbortSignal.timeout(10000), headers: { "User-Agent": "Hockystick-Verification-Bot/1.0" } },
+    );
+    if (resp.ok) {
+      const json: any = await resp.json();
+      for (const entry of json?.results?.companies ?? []) {
+        const c = entry?.company;
+        if (!c?.name) continue;
+        const candidate = normalizeCompanyName(c.name);
+        if (candidate === target || candidate.includes(target) || target.includes(candidate)) {
+          return {
+            found: true,
+            source: `OpenCorporates (${(c.jurisdiction_code || "unknown").toUpperCase()} · ${c.company_number || "n/a"})`,
+            detail: `Matched "${c.name}" in jurisdiction ${(c.jurisdiction_code || "unknown").toUpperCase()}, company number ${c.company_number || "n/a"}.`,
+          };
+        }
+      }
+    }
+  } catch { /* fall through */ }
+
+  // ── Source 3: Companies House (UK) — free API key, when configured ──────
+  const chKey = cfEnv.COMPANIES_HOUSE_API_KEY || "";
+  if (chKey) {
     try {
-      sourcesQueried.push("OpenCorporates");
+      sourcesQueried.push("Companies House");
       const resp = await fetch(
-        `https://api.opencorporates.com/v0.4/companies/search?q=${encodeURIComponent(companyName)}&per_page=20&api_token=${encodeURIComponent(ocKey)}`,
-        { signal: AbortSignal.timeout(10000), headers: { "User-Agent": "Hockystick-Verification-Bot/1.0" } },
+        `https://api.company-information.service.gov.uk/search/companies?q=${encodeURIComponent(companyName)}&items_per_page=20`,
+        { signal: AbortSignal.timeout(10000), headers: { Authorization: `Basic ${btoa(`${chKey}:`)}` } },
       );
       if (resp.ok) {
         const json: any = await resp.json();
-        for (const entry of json?.results?.companies ?? []) {
-          const c = entry?.company;
-          if (!c?.name) continue;
-          const candidate = normalizeCompanyName(c.name);
-          if (candidate === target || candidate.includes(target) || target.includes(candidate)) {
+        for (const item of json?.items ?? []) {
+          const candidate = normalizeCompanyName(item?.title ?? "");
+          if (candidate && (candidate === target || candidate.includes(target) || target.includes(candidate))) {
             return {
               found: true,
-              source: `OpenCorporates (${(c.jurisdiction_code || "unknown").toUpperCase()} · ${c.company_number || "n/a"})`,
-              detail: `Matched "${c.name}" in jurisdiction ${(c.jurisdiction_code || "unknown").toUpperCase()}, company number ${c.company_number || "n/a"}.`,
+              source: `Companies House (UK · ${item.company_number || "n/a"})`,
+              detail: `Matched "${item.title}" at Companies House, company number ${item.company_number || "n/a"}.`,
             };
           }
         }
@@ -276,7 +302,7 @@ async function checkRegistry(companyName: string): Promise<{ found: boolean; sou
   return {
     found: false,
     source: null,
-    detail: `No matching company found in ${sourcesQueried.join(" or ")}.${ocKey ? "" : " (OpenCorporates coverage of 140+ national registries requires an API key not yet configured — coverage is currently limited to entities holding an LEI.)"}`,
+    detail: `No matching company found in ${sourcesQueried.join(", ")}. If your company is registered with a national or free-zone authority these sources don't cover, upload your trade license instead — it satisfies this check after AI review.`,
   };
 }
 
@@ -352,10 +378,27 @@ export const runTier1Check = createServerFn({ method: "POST" })
       }
     }
 
-    // ── Check 3: public registry lookup (OpenCorporates) ───────────────────
-    const reg = companyName
+    // ── Check 3: public registry lookup, or a previously verified license ──
+    let reg = companyName
       ? await checkRegistry(companyName)
       : { found: false, source: null as string | null, detail: "No company name on the profile." };
+
+    if (!reg.found) {
+      // A trade license that passed AI review and is still in force also
+      // satisfies the registry requirement (see verifyTradeLicense below).
+      const licRows: any[] = await supabaseQuery(sbUrl, sbKey,
+        `founder_verifications?startup_id=eq.${data.startup_id}&select=license_name_match,license_expiry,license_authority`,
+        "GET").catch(() => []);
+      const lic = licRows?.[0];
+      if (lic?.license_name_match === true && lic?.license_expiry && new Date(lic.license_expiry) > new Date()) {
+        reg = {
+          found: true,
+          source: `Trade license · ${lic.license_authority || "issuing authority"}`,
+          detail: `Trade license issued by ${lic.license_authority || "a recognized authority"}, valid until ${lic.license_expiry}, company name matched by AI review.`,
+        };
+      }
+    }
+
     const registry: Tier1Check & { source: string | null } = {
       passed: reg.found,
       detail: reg.detail,
@@ -428,6 +471,162 @@ export const runTier1Check = createServerFn({ method: "POST" })
     }).catch(() => null);
 
     return { startup_id: data.startup_id, email, website, registry, infrastructure, tier1_passed, tier1_checked_at };
+  });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Trade license path for the registry check.
+// GPT-4o reads the license (text, or image via vision) and must extract a
+// company name matching the profile, a FUTURE expiry date, and a recognizable
+// issuing authority. A passed license satisfies Tier 1 check 3 and is
+// reported as "Trade license · [authority]" — never as a registry match.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type VerifyLicenseInput = {
+  startup_id: string;
+  caller_user_id: string;
+  /** Text extracted client-side, when the document is text-based */
+  document_text?: string;
+  /** data: URL of the license image, when the document is a scan/photo */
+  image_data_url?: string;
+  document_name: string;
+};
+
+export type VerifyLicenseResult = {
+  ok: boolean;
+  passed: boolean;
+  authority: string | null;
+  expiry: string | null;
+  name_match: boolean;
+  detail: string;
+  error?: string;
+};
+
+export const verifyTradeLicense = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as VerifyLicenseInput)
+  .handler(async ({ data }): Promise<VerifyLicenseResult> => {
+    const { url: sbUrl, key: sbKey } = getSupabaseAdmin();
+    const cfEnv = (globalThis as any).__cf_env || {};
+    const openaiKey = cfEnv.OPENAI_API_KEY || cfEnv.OPEN_AI_API_KEY || cfEnv["OPEN AI API KEY"] || "";
+
+    const fail = (error: string): VerifyLicenseResult =>
+      ({ ok: false, passed: false, authority: null, expiry: null, name_match: false, detail: error, error });
+
+    if (!sbUrl || !sbKey) return fail("Service unavailable — try again later.");
+    if (!openaiKey) return fail("AI unavailable.");
+    if (!data.document_text && !data.image_data_url) return fail("No readable document provided.");
+
+    const allowed = await supabaseQuery(sbUrl, sbKey, "rpc/check_ai_rate_limit", "POST", {
+      p_user_id: data.caller_user_id, p_feature: "verification",
+    }).catch(() => true);
+    if (allowed === false) return fail("Daily verification limit reached — try again tomorrow.");
+
+    const startupRows: any[] = await supabaseQuery(sbUrl, sbKey,
+      `startups?id=eq.${data.startup_id}&select=company_name`, "GET").catch(() => []);
+    const companyName = startupRows?.[0]?.company_name || "";
+    if (!companyName) return fail("Startup not found.");
+
+    const today = new Date().toISOString().slice(0, 10);
+    const systemPrompt = [
+      `You are verifying a company trade license / registration certificate for "${companyName}".`,
+      "Return JSON only:",
+      '{ "company_name_found": string|null, "name_matches": boolean, "expiry_date": "YYYY-MM-DD"|null, "issuing_authority": string|null, "is_license_document": boolean, "reasoning": "[one sentence]" }',
+      "Rules:",
+      `- name_matches = true only if the company name on the document matches or clearly corresponds to "${companyName}" (legal suffixes like LLC/FZ-LLC may differ).`,
+      "- expiry_date = the license expiry/renewal date exactly as printed, ISO formatted. null if not present.",
+      "- issuing_authority = the authority named on the document (e.g. Dubai DED, DIFC, ADGM, RAKEZ, SHAMS, Companies House, Ministry of Commerce). null if none.",
+      "- is_license_document = false for pitch decks, invoices, bank statements, utility bills, or anything that is not a government/free-zone issued registration document.",
+      "Never assume — only extract what is explicitly on the document. When unsure, use null/false.",
+    ].join("\n");
+
+    const userContent: any[] = [];
+    if (data.document_text) {
+      userContent.push({ type: "text", text: `DOCUMENT NAME: ${data.document_name}\nDOCUMENT TEXT (first 6000 chars):\n${data.document_text.slice(0, 6000)}` });
+    } else {
+      userContent.push({ type: "text", text: `DOCUMENT NAME: ${data.document_name}` });
+      userContent.push({ type: "image_url", image_url: { url: data.image_data_url, detail: "high" } });
+    }
+
+    let parsed: any = null;
+    try {
+      const aiResp = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${openaiKey}` },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          max_tokens: 300,
+          temperature: 0,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userContent },
+          ],
+        }),
+        signal: AbortSignal.timeout(45000),
+      });
+      if (aiResp.ok) {
+        const aiData: any = await aiResp.json();
+        const raw = aiData.choices?.[0]?.message?.content || "{}";
+        parsed = JSON.parse(raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim());
+      }
+    } catch {
+      return fail("AI check timed out — try again.");
+    }
+    if (!parsed) return fail("AI returned an unusable response — try again.");
+
+    const nameMatch = parsed.name_matches === true && parsed.is_license_document === true;
+    const expiry: string | null = /^\d{4}-\d{2}-\d{2}$/.test(parsed.expiry_date ?? "") ? parsed.expiry_date : null;
+    const expiryFuture = !!expiry && expiry > today;
+    const authority: string | null = (parsed.issuing_authority ?? null) || null;
+    const passed = nameMatch && expiryFuture && !!authority;
+
+    const detail = passed
+      ? `Trade license issued by ${authority}, valid until ${expiry}, company name matched.`
+      : !parsed.is_license_document
+        ? `Rejected: the document does not appear to be a registration/license document. ${parsed.reasoning ?? ""}`.trim()
+        : !nameMatch
+          ? `Rejected: company name on the document (${parsed.company_name_found ?? "not found"}) does not match "${companyName}".`
+          : !expiryFuture
+            ? `Rejected: license expiry ${expiry ?? "not found"} is not a future date.`
+            : "Rejected: no issuing authority identified on the document.";
+
+    const now = new Date().toISOString();
+    await supabaseQuery(sbUrl, sbKey, `founder_verifications?startup_id=eq.${data.startup_id}`, "PATCH", {
+      license_doc_type: data.document_name,
+      license_doc_uploaded_at: now,
+      license_ai_extracted: parsed,
+      license_ai_matches_profile: nameMatch,
+      license_verified_at: passed ? now : null,
+      license_authority: authority,
+      license_expiry: expiry,
+      license_name_match: passed,
+      ...(passed ? {
+        tier1_registry_match: true,
+        tier1_registry_source: `Trade license · ${authority}`,
+        tier1_registry_detail: detail,
+        registry_confirmed: true,
+      } : {}),
+      updated_at: now,
+    }).catch(() => null);
+
+    // If the other three checks already passed, this completes Tier 1.
+    if (passed) {
+      const rows: any[] = await supabaseQuery(sbUrl, sbKey,
+        `founder_verifications?startup_id=eq.${data.startup_id}&select=tier1_email_match,tier1_website_match,tier1_infra_match`,
+        "GET").catch(() => []);
+      const r = rows?.[0];
+      if (r?.tier1_email_match && r?.tier1_website_match && r?.tier1_infra_match) {
+        await supabaseQuery(sbUrl, sbKey, `founder_verifications?startup_id=eq.${data.startup_id}`, "PATCH", {
+          tier1_passed: true, tier1_checked_at: now, updated_at: now,
+        }).catch(() => null);
+      }
+      const { recomputeVerificationTier } = await import("@/lib/tier-calc");
+      await recomputeVerificationTier(sbUrl, sbKey, data.startup_id).catch(() => null);
+    }
+
+    await supabaseQuery(sbUrl, sbKey, "rpc/check_and_increment_ai_usage", "POST", {
+      p_user_id: data.caller_user_id, p_feature: "verification",
+    }).catch(() => null);
+
+    return { ok: true, passed, authority, expiry, name_match: nameMatch, detail };
   });
 
 // ─────────────────────────────────────────────────────────────────────────────

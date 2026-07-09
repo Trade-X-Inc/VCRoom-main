@@ -66,3 +66,9 @@ UPDATE founder_verifications SET
   current_tier = 0,
   tier1_passed = false,
   tier1_checked_at = NULL;
+
+-- ── 6. Trade license as a registry-equivalent Tier 1 path (added same day) ──
+ALTER TABLE founder_verifications
+  ADD COLUMN IF NOT EXISTS license_authority text,
+  ADD COLUMN IF NOT EXISTS license_expiry date,
+  ADD COLUMN IF NOT EXISTS license_name_match boolean;
