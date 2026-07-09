@@ -38,6 +38,7 @@ export function SiteHeader() {
         <nav className="hidden md:flex items-center gap-5 flex-1 justify-center">
           <a href="/#how-it-works" className={NAV_LINK}>Product</a>
           <Link to="/pricing" className={NAV_LINK}>Pricing</Link>
+          <Link to={"/docs" as any} className={NAV_LINK}>Docs</Link>
           <Link to="/blog" className={NAV_LINK}>Blog</Link>
 
           <Link to="/tools" className={NAV_LINK}>Tools</Link>
@@ -109,6 +110,10 @@ export function SiteHeader() {
           <Link to="/pricing" onClick={close}
             className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
             Pricing
+          </Link>
+          <Link to={"/docs" as any} onClick={close}
+            className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
+            Docs
           </Link>
           <Link to="/blog" onClick={close}
             className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">

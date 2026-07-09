@@ -97,6 +97,9 @@ export function SiteFooter() {
                 <li><Link to="/sign-up" search={{ role: "founder" } as any} className={lnk}>Get started</Link></li>
                 <li><Link to="/sign-in" className={lnk}>Sign in</Link></li>
                 <li><Link to="/pricing" className={lnk}>Pricing</Link></li>
+                <li><Link to={"/docs" as any} className={lnk}>Docs</Link></li>
+                <li><Link to={"/docs/security" as any} className={lnk}>Security</Link></li>
+                <li><Link to={"/docs/changelog" as any} className={lnk}>Changelog</Link></li>
                 <li><Link to="/trust" className={lnk}>Trust & Verification</Link></li>
               </ul>
             </div>
