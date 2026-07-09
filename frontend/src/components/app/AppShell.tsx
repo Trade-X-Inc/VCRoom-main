@@ -6,6 +6,7 @@ import {
   PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, UserCircle2, Gift, Globe, Trophy, Menu, X, FileInput, LayoutDashboard, Award, BadgeCheck,
 } from "lucide-react";
 import { AIOperatorPanel } from "@/components/ai/AIOperatorPanel";
+import { useSubscription } from "@/hooks/useSubscription";
 import {
   getFounderCompleteness,
   getInvestorCompleteness,
@@ -586,6 +587,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
               <UserMenu />
             </div>
           </header>
+          <SubscriptionBanner />
           <main className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto flex flex-col">
             <div className="flex flex-col flex-1 w-full max-w-[1600px] mx-auto">
               {!isInvestor && founderProfilePercent !== null && founderProfilePercent >= 40 && founderProfilePercent < 70 && (
@@ -708,4 +710,47 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       )}
     </div>
   );
+}
+
+// ── Subscription banner — trial expiry / payment failure (soft gate only) ─────
+// Shown at the top of every /app/* page. Not dismissible. Does NOT block
+// access — hard blocking arrives with Stripe.
+
+function SubscriptionBanner() {
+  const { trialExpired, isPastDue, trialEndsAt } = useSubscription();
+
+  if (isPastDue) {
+    return (
+      <div
+        className="w-full px-4 py-2.5 text-center text-sm font-medium text-white shrink-0"
+        style={{ background: "#B45309" }}
+        data-testid="subscription-banner-pastdue"
+      >
+        Your payment failed. Update your payment method to restore full access.{" "}
+        <Link to={"/pricing" as any} className="underline underline-offset-2 font-semibold">
+          Update payment →
+        </Link>
+      </div>
+    );
+  }
+
+  if (trialExpired) {
+    const ended = trialEndsAt
+      ? new Date(trialEndsAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
+      : "recently";
+    return (
+      <div
+        className="w-full px-4 py-2.5 text-center text-sm font-medium text-white shrink-0"
+        style={{ background: "#7C3AED" }}
+        data-testid="subscription-banner-trial"
+      >
+        Your free trial ended on {ended}. Choose a plan to keep access.{" "}
+        <Link to={"/pricing" as any} className="underline underline-offset-2 font-semibold">
+          View plans →
+        </Link>
+      </div>
+    );
+  }
+
+  return null;
 }
