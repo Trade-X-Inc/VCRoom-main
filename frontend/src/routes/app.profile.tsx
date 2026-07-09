@@ -241,15 +241,18 @@ function Profile() {
   useEffect(() => { prewarmClassificationCache(); }, []);
 
   // ── Founder Tier 1 verification result ───────────────────────────────────
+  // (Was previously querying a nonexistent verification_tier column keyed by a
+  //  nonexistent user_id column — the query 400'd silently and tier state never
+  //  loaded on this page.)
   const { data: founderVerification } = useQuery({
-    queryKey: ["founder-verification", user?.id],
-    enabled: !!user?.id,
+    queryKey: ["founder-verification", startup?.id],
+    enabled: !!startup?.id,
     staleTime: 5 * 60_000,
     queryFn: async () => {
       const { data } = await supabase
         .from("founder_verifications")
-        .select("tier1_passed, tier1_score, verification_tier")
-        .eq("user_id", user!.id)
+        .select("tier1_passed, current_tier")
+        .eq("startup_id", startup!.id)
         .maybeSingle();
       return data;
     },

@@ -5,33 +5,37 @@ import { supabase } from "@/lib/supabase";
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type VerificationRun = {
-  startup_id: string;
-  website_resolves: boolean;
-  website_matches_pitch: boolean;
-  website_content_summary: string;
-  linkedin_valid: boolean;
-  email_domain_matches: boolean;
-  registry_confirmed: boolean;
-  tier1_score: number;
-  tier1_passed: boolean;
-  current_tier: number;
-  tier1_checked_at: string;
-  error?: string;
+export type Tier1Check = {
+  passed: boolean;
+  detail: string;
 };
 
 export type Tier1Result = {
   startup_id: string;
-  website_resolves: boolean;
-  website_matches_pitch: boolean;
-  website_content_summary: string;
-  linkedin_valid: boolean;
-  email_domain_matches: boolean;
-  registry_confirmed: boolean;
-  tier1_score: number;
+  email: Tier1Check;
+  website: Tier1Check;
+  registry: Tier1Check & { source: string | null };
+  infrastructure: Tier1Check;
   tier1_passed: boolean;
   tier1_checked_at: string;
   error?: string;
+};
+
+/** Legacy shape kept for fetchVerificationStatus consumers */
+export type VerificationRun = {
+  startup_id: string;
+  tier1_passed: boolean;
+  current_tier: number;
+  tier1_checked_at: string | null;
+  tier1_email_match: boolean | null;
+  tier1_email_detail: string | null;
+  tier1_website_match: boolean | null;
+  tier1_website_detail: string | null;
+  tier1_registry_match: boolean | null;
+  tier1_registry_source: string | null;
+  tier1_registry_detail: string | null;
+  tier1_infra_match: boolean | null;
+  tier1_infra_detail: string | null;
 };
 
 type RunTier1Input = {
@@ -149,199 +153,278 @@ function urlDomain(url: string): string {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Tier 1 — Hockystick Checked (automated)
+// Tier 1 — Identity Confirmed (automated, ALL checks must pass, no scores)
+//
+// Four checks, each independently verifiable and each reported with a
+// specific reason. There are no partial passes and no special-cased IDs:
+// a fake company fails because the checks catch it.
 // ─────────────────────────────────────────────────────────────────────────────
+
+/** Normalize a company name for matching: lowercase, strip legal suffixes + punctuation. */
+function normalizeCompanyName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/\b(ltd|limited|llc|inc|incorporated|corp|corporation|fz|fzc|fzco|fze|fz-llc|dmcc|plc|gmbh|sarl|pte|pvt|co)\b/g, "")
+    .replace(/[^a-z0-9]/g, "");
+}
+
+/** Check MX records via DNS-over-HTTPS (Cloudflare resolver). */
+async function domainHasMx(domain: string): Promise<boolean> {
+  try {
+    const resp = await fetch(
+      `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=MX`,
+      { headers: { accept: "application/dns-json" }, signal: AbortSignal.timeout(6000) },
+    );
+    if (!resp.ok) return false;
+    const json: any = await resp.json();
+    return Array.isArray(json.Answer) && json.Answer.some((a: any) => a.type === 15);
+  } catch {
+    return false;
+  }
+}
+
+/** Domain registration date via RDAP (Verisign direct for .com/.net, rdap.org otherwise). */
+async function domainAgeDays(domain: string): Promise<number | null> {
+  const tld = domain.split(".").pop() ?? "";
+  const urls = ["com", "net"].includes(tld)
+    ? [`https://rdap.verisign.com/${tld}/v1/domain/${encodeURIComponent(domain)}`, `https://rdap.org/domain/${encodeURIComponent(domain)}`]
+    : [`https://rdap.org/domain/${encodeURIComponent(domain)}`];
+  for (const url of urls) {
+    try {
+      const resp = await fetch(url, {
+        redirect: "follow",
+        signal: AbortSignal.timeout(8000),
+        headers: { accept: "application/rdap+json, application/json" },
+      });
+      if (!resp.ok) continue;
+      const json: any = await resp.json();
+      const reg = (json.events ?? []).find((e: any) => e.eventAction === "registration");
+      if (!reg?.eventDate) continue;
+      return Math.floor((Date.now() - new Date(reg.eventDate).getTime()) / 86_400_000);
+    } catch {
+      // try next source
+    }
+  }
+  return null;
+}
+
+/**
+ * Public registry lookup, multi-source:
+ *  1. GLEIF LEI database — free, keyless, global legal-entity registry.
+ *  2. OpenCorporates — only when OPENCORPORATES_API_KEY is configured
+ *     (their API now requires a token; unauthenticated requests 401).
+ * A name match is validated with normalized comparison — fuzzy noise from
+ * either source never counts as a match.
+ */
+async function checkRegistry(companyName: string): Promise<{ found: boolean; source: string | null; detail: string }> {
+  const target = normalizeCompanyName(companyName);
+  if (!target || target.length < 3) {
+    return { found: false, source: null, detail: "Company name too short to search registries." };
+  }
+  const sourcesQueried: string[] = [];
+
+  // ── Source 1: GLEIF ─────────────────────────────────────────────────────
+  try {
+    sourcesQueried.push("GLEIF");
+    const resp = await fetch(
+      `https://api.gleif.org/api/v1/fuzzycompletions?field=entity.legalName&q=${encodeURIComponent(companyName)}`,
+      { signal: AbortSignal.timeout(10000), headers: { accept: "application/vnd.api+json" } },
+    );
+    if (resp.ok) {
+      const json: any = await resp.json();
+      for (const d of json?.data ?? []) {
+        const candidate = normalizeCompanyName(d?.attributes?.value ?? "");
+        if (candidate && (candidate === target || candidate.includes(target) || target.includes(candidate))) {
+          return {
+            found: true,
+            source: "GLEIF (Global LEI Index)",
+            detail: `Matched legal entity "${d.attributes.value}" in the Global LEI Index.`,
+          };
+        }
+      }
+    }
+  } catch { /* fall through to next source */ }
+
+  // ── Source 2: OpenCorporates (requires API key) ─────────────────────────
+  const cfEnv = (globalThis as any).__cf_env || {};
+  const ocKey = cfEnv.OPENCORPORATES_API_KEY || "";
+  if (ocKey) {
+    try {
+      sourcesQueried.push("OpenCorporates");
+      const resp = await fetch(
+        `https://api.opencorporates.com/v0.4/companies/search?q=${encodeURIComponent(companyName)}&per_page=20&api_token=${encodeURIComponent(ocKey)}`,
+        { signal: AbortSignal.timeout(10000), headers: { "User-Agent": "Hockystick-Verification-Bot/1.0" } },
+      );
+      if (resp.ok) {
+        const json: any = await resp.json();
+        for (const entry of json?.results?.companies ?? []) {
+          const c = entry?.company;
+          if (!c?.name) continue;
+          const candidate = normalizeCompanyName(c.name);
+          if (candidate === target || candidate.includes(target) || target.includes(candidate)) {
+            return {
+              found: true,
+              source: `OpenCorporates (${(c.jurisdiction_code || "unknown").toUpperCase()} · ${c.company_number || "n/a"})`,
+              detail: `Matched "${c.name}" in jurisdiction ${(c.jurisdiction_code || "unknown").toUpperCase()}, company number ${c.company_number || "n/a"}.`,
+            };
+          }
+        }
+      }
+    } catch { /* fall through */ }
+  }
+
+  return {
+    found: false,
+    source: null,
+    detail: `No matching company found in ${sourcesQueried.join(" or ")}.${ocKey ? "" : " (OpenCorporates coverage of 140+ national registries requires an API key not yet configured — coverage is currently limited to entities holding an LEI.)"}`,
+  };
+}
 
 export const runTier1Check = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as RunTier1Input)
   .handler(async ({ data }): Promise<Tier1Result> => {
     const { url: sbUrl, key: sbKey } = getSupabaseAdmin();
-    const cfEnv = (globalThis as any).__cf_env || {};
-    const openaiKey = cfEnv.OPENAI_API_KEY || cfEnv.OPEN_AI_API_KEY || cfEnv["OPEN AI API KEY"] || "";
-
-    if (!sbUrl || !sbKey) {
-      return { startup_id: data.startup_id, website_resolves: false, website_matches_pitch: false, website_content_summary: "", linkedin_valid: false, email_domain_matches: false, registry_confirmed: false, tier1_score: 0, tier1_passed: false, tier1_checked_at: new Date().toISOString(), error: "db_unavailable" };
-    }
-
-    // ── 1. Fetch startup data ──────────────────────────────────────────────
-    const startupRows: any[] = await supabaseQuery(sbUrl, sbKey,
-      `startups?id=eq.${data.startup_id}&select=id,founder_id,company_name,website,founder_linkedin,sector,stage,description,tagline,founder_email`,
-      "GET"
-    ).catch(() => []);
-
-    const startup = startupRows?.[0];
-    if (!startup) {
-      return { startup_id: data.startup_id, website_resolves: false, website_matches_pitch: false, website_content_summary: "Startup not found", linkedin_valid: false, email_domain_matches: false, registry_confirmed: false, tier1_score: 0, tier1_passed: false, tier1_checked_at: new Date().toISOString(), error: "startup_not_found" };
-    }
-
-    // ── 2. Website resolves (20 pts) ───────────────────────────────────────
-    const website_resolves = await checkUrlResolves(startup.website || "");
-
-    // ── 3. Website content matches pitch (25 pts) — AI check ──────────────
-    let website_matches_pitch = false;
-    let website_content_summary = "";
-
-    if (website_resolves && startup.website && openaiKey) {
-      const pageText = await fetchPageText(startup.website);
-      if (pageText.length > 100) {
-        const pitchContext = [
-          startup.company_name && `Company: ${startup.company_name}`,
-          startup.sector && `Sector: ${startup.sector}`,
-          startup.stage && `Stage: ${startup.stage}`,
-          startup.tagline && `Tagline: ${startup.tagline}`,
-          startup.description && `Description: ${startup.description?.slice(0, 300)}`,
-        ].filter(Boolean).join("\n");
-
-        try {
-          const aiResp = await fetch("https://api.openai.com/v1/chat/completions", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${openaiKey}` },
-            body: JSON.stringify({
-              model: "gpt-4o-mini",
-              max_tokens: 200,
-              messages: [
-                {
-                  role: "system",
-                  content: "You are a verification analyst. Given a company profile and website text, determine if the website content is consistent with the company profile. Respond with JSON only: {\"matches\": true/false, \"summary\": \"one sentence explanation\"}",
-                },
-                {
-                  role: "user",
-                  content: `COMPANY PROFILE:\n${pitchContext}\n\nWEBSITE TEXT (first 3000 chars):\n${pageText}`,
-                },
-              ],
-            }),
-            signal: AbortSignal.timeout(15000),
-          });
-          if (aiResp.ok) {
-            const aiData: any = await aiResp.json();
-            const raw = aiData.choices?.[0]?.message?.content || "{}";
-            const cleaned = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
-            const parsed = JSON.parse(cleaned);
-            website_matches_pitch = parsed.matches === true;
-            website_content_summary = parsed.summary || "";
-          }
-        } catch {
-          // AI check failed — don't penalise, just skip
-          website_content_summary = "AI check unavailable";
-        }
-      }
-    } else if (!openaiKey) {
-      website_content_summary = "AI check skipped (no key)";
-    }
-
-    // ── 4. LinkedIn URL valid (15 pts) ─────────────────────────────────────
-    // ToS: never scrape content — HEAD request only to check URL existence
-    const linkedin_valid = await checkUrlResolves(startup.founder_linkedin || "");
-
-    // ── 5. Email domain matches website (15 pts) ───────────────────────────
-    let email_domain_matches = false;
-    if (startup.founder_email && startup.website) {
-      const eDomain = emailDomain(startup.founder_email);
-      const wDomain = urlDomain(startup.website);
-      // Common free email providers never match
-      const freeProviders = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com", "me.com"];
-      if (eDomain && wDomain && !freeProviders.includes(eDomain)) {
-        email_domain_matches = eDomain === wDomain || eDomain.endsWith(`.${wDomain}`) || wDomain.endsWith(`.${eDomain}`);
-      }
-    }
-
-    // ── 6. Registry confirmed (25 pts) — read existing row only ───────────
-    let registry_confirmed = false;
-    const regRows: any[] = await supabaseQuery(sbUrl, sbKey,
-      `company_registry_checks?startup_id=eq.${data.startup_id}&select=verified,confidence_score&order=checked_at.desc&limit=1`,
-      "GET"
-    ).catch(() => []);
-    if (regRows?.[0]?.verified === true && (regRows[0].confidence_score ?? 0) >= 60) {
-      registry_confirmed = true;
-    }
-
-    // ── 7. Score ───────────────────────────────────────────────────────────
-    const tier1_score =
-      (website_resolves ? 20 : 0) +
-      (website_matches_pitch ? 25 : 0) +
-      (linkedin_valid ? 15 : 0) +
-      (email_domain_matches ? 15 : 0) +
-      (registry_confirmed ? 25 : 0);
-
-    const tier1_passed = tier1_score >= 60;
     const tier1_checked_at = new Date().toISOString();
-    const current_tier = tier1_passed ? 1 : 0;
 
-    // ── 8. Upsert founder_verifications ───────────────────────────────────
-    await supabaseQuery(sbUrl, sbKey, "founder_verifications", "POST", {
+    const fail = (error: string): Tier1Result => ({
       startup_id: data.startup_id,
-      website_resolves,
-      website_matches_pitch,
-      website_content_summary,
-      linkedin_valid,
-      email_domain_matches,
-      registry_confirmed,
-      tier1_score,
-      tier1_passed,
+      email: { passed: false, detail: error },
+      website: { passed: false, detail: error },
+      registry: { passed: false, detail: error, source: null },
+      infrastructure: { passed: false, detail: error },
+      tier1_passed: false,
       tier1_checked_at,
-      current_tier,
-      last_full_check_at: tier1_checked_at,
-      updated_at: tier1_checked_at,
-    }).catch(async () => {
-      // Row may already exist — try PATCH
-      await supabaseQuery(sbUrl, sbKey,
-        `founder_verifications?startup_id=eq.${data.startup_id}`,
-        "PATCH",
-        {
-          website_resolves, website_matches_pitch, website_content_summary,
-          linkedin_valid, email_domain_matches, registry_confirmed,
-          tier1_score, tier1_passed, tier1_checked_at, current_tier,
-          last_full_check_at: tier1_checked_at, updated_at: tier1_checked_at,
-        }
-      ).catch(() => null);
+      error,
     });
 
-    // ── 9. Award badge if passed ───────────────────────────────────────────
-    if (tier1_passed) {
-      await supabaseQuery(sbUrl, sbKey, "profile_badges", "POST", {
-        startup_id: data.startup_id,
-        badge_type: "hockystick_checked",
-        badge_label: "Hockystick Checked",
-        badge_source: "hockystick",
-        verified_by_hockystick: true,
-        issued_at: tier1_checked_at,
-        verification_evidence: {
-          tier1_score,
-          website_resolves,
-          website_matches_pitch,
-          linkedin_valid,
-          email_domain_matches,
-          registry_confirmed,
-        },
-      }).catch(async () => {
-        // Badge may already exist — update it
-        await supabaseQuery(sbUrl, sbKey,
-          `profile_badges?startup_id=eq.${data.startup_id}&badge_type=eq.hockystick_checked`,
-          "PATCH",
-          {
-            badge_label: "Hockystick Checked",
-            issued_at: tier1_checked_at,
-            verification_evidence: {
-              tier1_score, website_resolves, website_matches_pitch,
-              linkedin_valid, email_domain_matches, registry_confirmed,
-            },
-          }
-        ).catch(() => null);
-      });
+    if (!sbUrl || !sbKey) return fail("Verification service unavailable — try again later.");
+
+    // ── Rate limit (same rpc the rest of the AI stack uses) ────────────────
+    const allowed = await supabaseQuery(sbUrl, sbKey, "rpc/check_ai_rate_limit", "POST", {
+      p_user_id: data.caller_user_id,
+      p_feature: "verification",
+    }).catch(() => true);
+    if (allowed === false) return fail("Daily verification limit reached — try again tomorrow.");
+
+    // ── Startup data ───────────────────────────────────────────────────────
+    const startupRows: any[] = await supabaseQuery(sbUrl, sbKey,
+      `startups?id=eq.${data.startup_id}&select=id,founder_id,company_name,website,founder_email`,
+      "GET"
+    ).catch(() => []);
+    const startup = startupRows?.[0];
+    if (!startup) return fail("Startup not found.");
+
+    const companyName: string = startup.company_name || "";
+    const wDomain = urlDomain(startup.website || "");
+
+    // ── Check 1: email domain matches website domain ───────────────────────
+    let email: Tier1Check;
+    const eDomain = emailDomain(startup.founder_email || "");
+    const freeProviders = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com", "me.com", "live.com", "protonmail.com", "proton.me"];
+    if (!eDomain) {
+      email = { passed: false, detail: "No founder email on the profile." };
+    } else if (freeProviders.includes(eDomain)) {
+      email = { passed: false, detail: `${eDomain} is a personal email provider — a business email on the company domain is required.` };
+    } else if (!wDomain) {
+      email = { passed: false, detail: "No company website on the profile to match the email domain against." };
+    } else if (eDomain === wDomain || eDomain.endsWith(`.${wDomain}`) || wDomain.endsWith(`.${eDomain}`)) {
+      email = { passed: true, detail: `Email domain ${eDomain} matches website domain ${wDomain}.` };
+    } else {
+      email = { passed: false, detail: `Email domain ${eDomain} does not match website domain ${wDomain}.` };
     }
 
-    return {
+    // ── Check 2: website resolves AND mentions the company name ────────────
+    let website: Tier1Check;
+    if (!startup.website) {
+      website = { passed: false, detail: "No website on the profile." };
+    } else {
+      const pageText = await fetchPageText(startup.website);
+      if (!pageText) {
+        website = { passed: false, detail: `${startup.website} did not return readable content.` };
+      } else {
+        const normTarget = normalizeCompanyName(companyName);
+        const normPage = pageText.toLowerCase().replace(/[^a-z0-9]/g, "");
+        if (normTarget && normPage.includes(normTarget)) {
+          website = { passed: true, detail: `Website resolves and its content mentions "${companyName}".` };
+        } else {
+          website = { passed: false, detail: `Website resolves but its content does not mention "${companyName}".` };
+        }
+      }
+    }
+
+    // ── Check 3: public registry lookup (OpenCorporates) ───────────────────
+    const reg = companyName
+      ? await checkRegistry(companyName)
+      : { found: false, source: null as string | null, detail: "No company name on the profile." };
+    const registry: Tier1Check & { source: string | null } = {
+      passed: reg.found,
+      detail: reg.detail,
+      source: reg.source,
+    };
+
+    // ── Check 4: domain infrastructure (MX records + domain age ≥ 90 days) ─
+    let infrastructure: Tier1Check;
+    if (!wDomain) {
+      infrastructure = { passed: false, detail: "No website domain to check." };
+    } else {
+      const [hasMx, ageDays] = await Promise.all([domainHasMx(wDomain), domainAgeDays(wDomain)]);
+      if (!hasMx) {
+        infrastructure = { passed: false, detail: `${wDomain} has no mail (MX) records — no real email infrastructure exists on this domain.` };
+      } else if (ageDays !== null && ageDays < 90) {
+        infrastructure = { passed: false, detail: `${wDomain} was registered ${ageDays} days ago — domains under 90 days old do not pass.` };
+      } else {
+        infrastructure = {
+          passed: true,
+          detail: ageDays !== null
+            ? `${wDomain} has mail records and was registered ${Math.floor(ageDays / 30)} months ago.`
+            : `${wDomain} has mail records (domain age unavailable from RDAP — not held against the domain).`,
+        };
+      }
+    }
+
+    // ── Verdict: ALL FOUR must pass ────────────────────────────────────────
+    const tier1_passed = email.passed && website.passed && registry.passed && infrastructure.passed;
+
+    // ── Persist per-check results (+ legacy columns for older readers) ─────
+    const payload = {
       startup_id: data.startup_id,
-      website_resolves,
-      website_matches_pitch,
-      website_content_summary,
-      linkedin_valid,
-      email_domain_matches,
-      registry_confirmed,
-      tier1_score,
+      tier1_email_match: email.passed,
+      tier1_email_detail: email.detail,
+      tier1_website_match: website.passed,
+      tier1_website_detail: website.detail,
+      tier1_registry_match: registry.passed,
+      tier1_registry_source: registry.source,
+      tier1_registry_detail: registry.detail,
+      tier1_infra_match: infrastructure.passed,
+      tier1_infra_detail: infrastructure.detail,
       tier1_passed,
       tier1_checked_at,
+      current_tier: tier1_passed ? 1 : 0,
+      // Legacy columns still read by older components until they're migrated:
+      email_domain_matches: email.passed,
+      website_resolves: website.passed,
+      registry_confirmed: registry.passed,
+      tier1_score: tier1_passed ? 100 : 0,
+      last_full_check_at: tier1_checked_at,
+      updated_at: tier1_checked_at,
     };
+
+    const existing: any[] = await supabaseQuery(sbUrl, sbKey,
+      `founder_verifications?startup_id=eq.${data.startup_id}&select=id`, "GET").catch(() => []);
+    if (existing?.length) {
+      const { startup_id: _omit, ...patch } = payload;
+      await supabaseQuery(sbUrl, sbKey, `founder_verifications?startup_id=eq.${data.startup_id}`, "PATCH", patch).catch(() => null);
+    } else {
+      await supabaseQuery(sbUrl, sbKey, "founder_verifications", "POST", payload).catch(() => null);
+    }
+
+    // ── Meter usage ────────────────────────────────────────────────────────
+    await supabaseQuery(sbUrl, sbKey, "rpc/check_and_increment_ai_usage", "POST", {
+      p_user_id: data.caller_user_id,
+      p_feature: "verification",
+    }).catch(() => null);
+
+    return { startup_id: data.startup_id, email, website, registry, infrastructure, tier1_passed, tier1_checked_at };
   });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -497,36 +580,10 @@ export const getPublicVerification = createServerFn({ method: "POST" })
   });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Edge-function wrapper — calls run-verification via HTTP (client-callable)
+// Status read — per-check Tier 1 results for the founder-facing UI
+// (The legacy run-verification edge function is retired; runTier1Check above
+//  is the single Tier 1 implementation.)
 // ─────────────────────────────────────────────────────────────────────────────
-
-const EDGE_URL =
-  "https://ldimninnjlvxozubheib.supabase.co/functions/v1/run-verification";
-const ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM3MTA2MTYsImV4cCI6MjAyOTI4NjYxNn0.wLFUJmHMy0_5f5CZxE5P5CflK0v8Mop0iHLrj73uqFY";
-
-export async function runVerification({
-  startupId,
-  userId,
-  jwt,
-}: {
-  startupId: string;
-  userId: string;
-  jwt: string;
-}): Promise<VerificationRun> {
-  const res = await fetch(EDGE_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${jwt}`,
-      apikey: ANON_KEY,
-    },
-    body: JSON.stringify({ startup_id: startupId, user_id: userId }),
-  });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.error ?? `HTTP ${res.status}`);
-  return json as VerificationRun;
-}
 
 export async function fetchVerificationStatus(
   startupId: string,
@@ -534,9 +591,9 @@ export async function fetchVerificationStatus(
   const { data } = await supabase
     .from("founder_verifications")
     .select(
-      "startup_id, website_resolves, website_matches_pitch, website_content_summary, linkedin_valid, email_domain_matches, registry_confirmed, tier1_score, tier1_passed, current_tier, tier1_checked_at"
+      "startup_id, tier1_passed, current_tier, tier1_checked_at, tier1_email_match, tier1_email_detail, tier1_website_match, tier1_website_detail, tier1_registry_match, tier1_registry_source, tier1_registry_detail, tier1_infra_match, tier1_infra_detail"
     )
     .eq("startup_id", startupId)
     .maybeSingle();
-  return data ?? null;
+  return (data as VerificationRun | null) ?? null;
 }

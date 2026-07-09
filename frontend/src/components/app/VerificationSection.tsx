@@ -26,14 +26,16 @@ interface VerificationSectionProps {
 interface FounderVerif {
   current_tier: number;
   tier1_passed: boolean;
-  tier1_score: number;
   tier1_checked_at: string | null;
-  website_resolves: boolean | null;
-  website_matches_pitch: boolean | null;
-  linkedin_valid: boolean | null;
-  email_domain_matches: boolean | null;
-  registry_confirmed: boolean | null;
-  website_content_summary: string | null;
+  tier1_email_match: boolean | null;
+  tier1_email_detail: string | null;
+  tier1_website_match: boolean | null;
+  tier1_website_detail: string | null;
+  tier1_registry_match: boolean | null;
+  tier1_registry_source: string | null;
+  tier1_registry_detail: string | null;
+  tier1_infra_match: boolean | null;
+  tier1_infra_detail: string | null;
   tier2_passed: boolean;
   tier3_passed: boolean;
   human_reviewed: boolean | null;
@@ -139,7 +141,7 @@ export function VerificationSection({
         .from(table)
         .select(
           entityType === "founder"
-            ? "current_tier,tier1_passed,tier1_score,tier1_checked_at,website_resolves,website_matches_pitch,linkedin_valid,email_domain_matches,registry_confirmed,website_content_summary,tier2_passed,tier3_passed,human_reviewed"
+            ? "current_tier,tier1_passed,tier1_checked_at,tier1_email_match,tier1_email_detail,tier1_website_match,tier1_website_detail,tier1_registry_match,tier1_registry_source,tier1_registry_detail,tier1_infra_match,tier1_infra_detail,tier2_passed,tier3_passed,human_reviewed"
             : "current_tier,tier1_passed,overall_score,checked_at,website_resolves,linkedin_valid,email_domain_matches,website_content_summary,tier2_passed,tier3_passed"
         )
         .eq(idCol, entityId)
@@ -150,10 +152,16 @@ export function VerificationSection({
 
   const currentTier = verif?.current_tier ?? 0;
   const tier1Passed = verif?.tier1_passed ?? false;
-  const tier1Score = entityType === "founder" ? (verif?.tier1_score ?? 0) : ((verif as any)?.overall_score ?? 0);
   const tier1CheckedAt = entityType === "founder" ? verif?.tier1_checked_at : (verif as any)?.checked_at;
   const tier2Passed = verif?.tier2_passed ?? false;
   const tier3Passed = verif?.tier3_passed ?? false;
+
+  const founderChecks = entityType === "founder" && verif ? [
+    { label: "Email domain matches website", passed: verif.tier1_email_match ?? null, tooltip: verif.tier1_email_detail ?? undefined },
+    { label: "Website mentions your company", passed: verif.tier1_website_match ?? null, tooltip: verif.tier1_website_detail ?? undefined },
+    { label: "Found in a public company registry", passed: verif.tier1_registry_match ?? null, tooltip: verif.tier1_registry_detail ?? undefined },
+    { label: "Real domain infrastructure (mail records + age)", passed: verif.tier1_infra_match ?? null, tooltip: verif.tier1_infra_detail ?? undefined },
+  ] : [];
 
   const handleRunTier1 = async () => {
     if (!entityId || running) return;
@@ -168,9 +176,9 @@ export function VerificationSection({
       const result = await runTier1Check({ data: { startup_id: entityId, caller_user_id: userId } });
       await qc.invalidateQueries({ queryKey: ["my-verification", entityType, entityId] });
       if (result.tier1_passed) {
-        toast.success(`Verification passed — score ${result.tier1_score}/100. Hockystick Checked badge awarded.`);
+        toast.success("Identity confirmed — all four checks passed.");
       } else {
-        toast.error(`Verification did not reach the 60-point threshold. Score: ${result.tier1_score}/100. See details below.`);
+        toast.error("Identity check incomplete — one or more checks did not pass. See details below.");
       }
       // Auto-recompute readiness whenever verification reruns
       if (entityType === "founder") {
@@ -235,31 +243,31 @@ export function VerificationSection({
         <VerificationBadge tier={currentTier} size="md" />
       </div>
 
-      {/* Tier 1 — Hockystick Checked */}
+      {/* Tier 1 — Identity Confirmed */}
       <TierBlock
         number={1}
-        title="Hockystick Checked"
-        description="Automated checks: website resolves, content matches your profile, LinkedIn URL exists, email domain matches your website, company registry confirmed."
+        title="Identity Confirmed"
+        description="Four automated checks, all must pass: business email matches your domain, website mentions your company, company found in a public registry, and real domain infrastructure (mail records, domain age)."
         unlocked={tier1Passed}
         active={!tier1Passed}
       >
         {tier1Passed ? (
           <>
-            <div className="mb-3 flex items-center gap-2">
-              <span className="text-xs text-white/40">Score: {tier1Score}/100</span>
-              {tier1CheckedAt && (
+            {tier1CheckedAt && (
+              <div className="mb-3 flex items-center gap-2">
                 <span className="text-xs text-white/25 flex items-center gap-1">
-                  <Clock className="h-3 w-3" /> {new Date(tier1CheckedAt).toLocaleDateString()}
+                  <Clock className="h-3 w-3" /> Checked {new Date(tier1CheckedAt).toLocaleDateString()}
                 </span>
-              )}
-            </div>
+                {verif?.tier1_registry_source && (
+                  <span className="text-xs text-white/25">· {verif.tier1_registry_source}</span>
+                )}
+              </div>
+            )}
             <div className="rounded-lg overflow-hidden" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
               <div className="px-4 py-1">
-                <CheckRow label="Website resolves" passed={verif?.website_resolves ?? null} />
-                <CheckRow label="Website content matches profile" passed={verif?.website_matches_pitch ?? null} tooltip={verif?.website_content_summary ?? undefined} />
-                <CheckRow label="LinkedIn URL valid" passed={verif?.linkedin_valid ?? null} tooltip="HEAD request only — no content scraped" />
-                <CheckRow label="Email domain matches website" passed={verif?.email_domain_matches ?? null} />
-                <CheckRow label="Company registry confirmed" passed={verif?.registry_confirmed ?? null} />
+                {founderChecks.map((c) => (
+                  <CheckRow key={c.label} label={c.label} passed={c.passed} tooltip={c.tooltip} />
+                ))}
               </div>
             </div>
             <button
@@ -272,25 +280,21 @@ export function VerificationSection({
           </>
         ) : (
           <>
-            {verif && !tier1Passed && (
+            {verif && !tier1Passed && founderChecks.length > 0 && (
               <div className="mb-3 rounded-lg overflow-hidden" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
                 <div className="px-4 py-1">
-                  <CheckRow label="Website resolves (20 pts)" passed={verif.website_resolves ?? null} />
-                  <CheckRow label="Website content matches profile (25 pts)" passed={verif.website_matches_pitch ?? null} tooltip={verif.website_content_summary ?? undefined} />
-                  <CheckRow label="LinkedIn URL valid (15 pts)" passed={verif.linkedin_valid ?? null} />
-                  <CheckRow label="Email domain matches website (15 pts)" passed={verif.email_domain_matches ?? null} />
-                  <CheckRow label="Company registry confirmed (25 pts)" passed={verif.registry_confirmed ?? null} />
+                  {founderChecks.map((c) => (
+                    <CheckRow key={c.label} label={c.label} passed={c.passed} tooltip={c.tooltip} />
+                  ))}
                 </div>
-                {tier1Score > 0 && (
-                  <div className="px-4 py-2 border-t border-white/5">
-                    <span className="text-xs text-white/40">Current score: {tier1Score}/100 — need 60 to pass</span>
-                  </div>
-                )}
+                <div className="px-4 py-2 border-t border-white/5">
+                  <span className="text-xs text-white/40">All four checks must pass — there is no partial credit.</span>
+                </div>
               </div>
             )}
             {!verif && (
               <p className="text-xs text-white/30 mb-3">
-                No checks run yet. Complete your profile (website, LinkedIn URL, email) then run the automated check.
+                No checks run yet. Complete your profile (website, business email) then run the identity check.
               </p>
             )}
             <button

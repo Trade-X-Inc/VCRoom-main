@@ -27,14 +27,16 @@ export const Route = createFileRoute("/app/")({
 interface FounderVerif {
   current_tier: number;
   tier1_passed: boolean;
-  tier1_score: number;
   tier1_checked_at: string | null;
-  website_resolves: boolean | null;
-  website_matches_pitch: boolean | null;
-  linkedin_valid: boolean | null;
-  email_domain_matches: boolean | null;
-  registry_confirmed: boolean | null;
-  website_content_summary: string | null;
+  tier1_email_match: boolean | null;
+  tier1_email_detail: string | null;
+  tier1_website_match: boolean | null;
+  tier1_website_detail: string | null;
+  tier1_registry_match: boolean | null;
+  tier1_registry_source: string | null;
+  tier1_registry_detail: string | null;
+  tier1_infra_match: boolean | null;
+  tier1_infra_detail: string | null;
   tier2_passed: boolean;
   tier3_passed: boolean;
 }
@@ -126,7 +128,7 @@ function VerificationCard({
     queryFn: async () => {
       const { data } = await supabase
         .from("founder_verifications")
-        .select("current_tier,tier1_passed,tier1_score,tier1_checked_at,website_resolves,website_matches_pitch,linkedin_valid,email_domain_matches,registry_confirmed,website_content_summary,tier2_passed,tier3_passed")
+        .select("current_tier,tier1_passed,tier1_checked_at,tier1_email_match,tier1_email_detail,tier1_website_match,tier1_website_detail,tier1_registry_match,tier1_registry_source,tier1_registry_detail,tier1_infra_match,tier1_infra_detail,tier2_passed,tier3_passed")
         .eq("startup_id", startupId)
         .maybeSingle();
       return (data as FounderVerif | null) ?? null;
@@ -162,8 +164,10 @@ function VerificationCard({
 
   const neverRun = !verif || !verif.tier1_checked_at;
   const tier1Passed = verif?.tier1_passed ?? false;
-  const tier1Score = verif?.tier1_score ?? 0;
   const currentTier = verif?.current_tier ?? 0;
+  const passedCheckCount = verif
+    ? [verif.tier1_email_match, verif.tier1_website_match, verif.tier1_registry_match, verif.tier1_infra_match].filter(Boolean).length
+    : 0;
 
   const confirmedClaims = claims.filter((c) => c.proof_status === "ai_confirmed").length;
   const mismatchedClaims = claims.filter((c) => c.proof_status === "ai_mismatch");
@@ -176,9 +180,9 @@ function VerificationCard({
   if (neverRun) {
     subtext = "Not yet verified — run your first check";
   } else if (tier1Passed) {
-    subtext = `Hockystick Checked · ${tier1Score}/100`;
+    subtext = "Identity Confirmed · all 4 checks passed";
   } else {
-    subtext = `Verification check found gaps · ${tier1Score}/100`;
+    subtext = `Identity check found gaps · ${passedCheckCount}/4 checks passed`;
   }
 
   const headerBadgeStyle: React.CSSProperties = neverRun
@@ -196,9 +200,9 @@ function VerificationCard({
       const result = await runTier1Check({ data: { startup_id: startupId, caller_user_id: userId } });
       await qc.invalidateQueries({ queryKey: ["home-verif", startupId] });
       if (result.tier1_passed) {
-        toast.success(`Verification passed — score ${result.tier1_score}/100`);
+        toast.success("Identity confirmed — all four checks passed");
       } else {
-        toast.error(`Score ${result.tier1_score}/100 — 60 needed to pass. See which checks failed below.`);
+        toast.error("Identity check incomplete — see which checks failed below.");
       }
       // Auto-recompute readiness after verification reruns
       try {
@@ -322,32 +326,28 @@ function VerificationCard({
                 >
                   <div style={{ padding: "0 16px" }}>
                     <CheckRow
-                      label="Website resolves"
-                      icon={<Globe className="h-3.5 w-3.5" />}
-                      passed={verif?.website_resolves ?? null}
-                      note={verif?.website_resolves === false ? "No valid HTTP response from listed website" : null}
-                    />
-                    <CheckRow
-                      label="Website content matches profile"
-                      icon={<Building2 className="h-3.5 w-3.5" />}
-                      passed={verif?.website_matches_pitch ?? null}
-                      note={verif?.website_content_summary ?? null}
-                    />
-                    <CheckRow
-                      label="LinkedIn URL reachable"
-                      icon={<Linkedin className="h-3.5 w-3.5" />}
-                      passed={verif?.linkedin_valid ?? null}
-                    />
-                    <CheckRow
                       label="Email domain matches website"
                       icon={<Mail className="h-3.5 w-3.5" />}
-                      passed={verif?.email_domain_matches ?? null}
-                      note={verif?.email_domain_matches === false ? "Free email providers excluded" : null}
+                      passed={verif?.tier1_email_match ?? null}
+                      note={verif?.tier1_email_detail ?? null}
                     />
                     <CheckRow
-                      label="Company registry confirmed"
+                      label="Website mentions your company"
+                      icon={<Globe className="h-3.5 w-3.5" />}
+                      passed={verif?.tier1_website_match ?? null}
+                      note={verif?.tier1_website_detail ?? null}
+                    />
+                    <CheckRow
+                      label="Found in a public company registry"
                       icon={<Building2 className="h-3.5 w-3.5" />}
-                      passed={verif?.registry_confirmed ?? null}
+                      passed={verif?.tier1_registry_match ?? null}
+                      note={verif?.tier1_registry_detail ?? null}
+                    />
+                    <CheckRow
+                      label="Real domain infrastructure"
+                      icon={<Globe className="h-3.5 w-3.5" />}
+                      passed={verif?.tier1_infra_match ?? null}
+                      note={verif?.tier1_infra_detail ?? null}
                     />
                   </div>
                   <div
@@ -355,7 +355,7 @@ function VerificationCard({
                     className="flex items-center justify-between"
                   >
                     <span className="text-xs text-muted-foreground">
-                      Score: {tier1Score}/100 — {tier1Passed ? "passed (60 required)" : "60 needed to pass"}
+                      {tier1Passed ? "All 4 checks passed — Identity Confirmed" : `${passedCheckCount}/4 passed — all four required`}
                     </span>
                     <button
                       data-testid="run-verification-btn"
