@@ -19,6 +19,7 @@ import { FieldVerificationBadge, prewarmClassificationCache } from "@/components
 import { logActivity } from "@/lib/activity-log-fn";
 import type { InvestorClaim } from "@/lib/investor-claims-fn";
 import { CapitalVerificationSection } from "./app.investor.profile.capital";
+import { BadgeDisplay, useBadges } from "@/components/app/BadgeDisplay";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { OnboardingTour } from "@/components/app/OnboardingTour";
 
@@ -782,6 +783,11 @@ function InvestorProfilePage() {
             />
           )}
 
+          {/* Investor badges — activity + founder-facing trust signals */}
+          {existing?.id && user?.id && (
+            <InvestorBadgesCard profileId={existing.id} userId={user.id} />
+          )}
+
           {/* Fund at a glance */}
           <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-card space-y-3">
             <div className="text-sm font-semibold">Fund at a glance</div>
@@ -1244,6 +1250,58 @@ function Field({ label, badge, children }: { label: string; badge?: React.ReactN
         {badge}
       </div>
       {children}
+    </div>
+  );
+}
+
+// ── Investor badges card — earned badges + manual evaluation ─────────────────
+
+function InvestorBadgesCard({ profileId, userId }: { profileId: string; userId: string }) {
+  const qc = useQueryClient();
+  const [evaluating, setEvaluating] = useState(false);
+  const { data: badges = [] } = useBadges({ investorProfileId: profileId });
+
+  const runEvaluation = async () => {
+    if (evaluating) return;
+    setEvaluating(true);
+    try {
+      const { evaluateAndAwardBadges } = await import("@/lib/badge-award-engine");
+      const result = await evaluateAndAwardBadges({
+        data: { investor_profile_id: profileId, investor_user_id: userId },
+      });
+      qc.invalidateQueries({ queryKey: ["profile-badges", profileId] });
+      if (result.awarded.length > 0) {
+        toast.success(`Newly earned: ${result.awarded.join(", ").replace(/_/g, " ")}`);
+      } else {
+        toast.info("No new badges yet — badges reflect real deal activity and decision behavior.");
+      }
+    } catch {
+      toast.error("Evaluation failed — try again.");
+    } finally {
+      setEvaluating(false);
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-card space-y-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="text-sm font-semibold">Your badges</div>
+        <button
+          onClick={runEvaluation}
+          disabled={evaluating}
+          className="text-xs text-muted-foreground hover:text-foreground disabled:opacity-50"
+        >
+          {evaluating ? "Evaluating…" : "Re-check"}
+        </button>
+      </div>
+      {badges.length > 0 ? (
+        <BadgeDisplay badges={badges} size="md" context="profile" />
+      ) : (
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          No badges yet. Investor badges are earned from real behavior founders care about —
+          deciding quickly, never ghosting, and giving reasons on every pass.
+        </p>
+      )}
     </div>
   );
 }

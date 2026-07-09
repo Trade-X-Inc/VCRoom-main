@@ -10,6 +10,7 @@ import {
 import type { StartupClaim, ClaimStatus } from "@/lib/claims-fn";
 import type { FounderThesis } from "@/lib/founder-thesis-fn";
 import { AttachProofModal } from "@/components/app/AttachProofModal";
+import { BadgesSection } from "@/components/app/BadgesSection";
 import { OperationalVerificationSection } from "./app.profile.operational";
 import { PageGuide } from "@/components/app/PageGuide";
 import { FieldVerificationBadge, prewarmClassificationCache } from "@/components/app/FieldVerificationBadge";
@@ -2125,6 +2126,13 @@ function Profile() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Badges — earned + locked criteria, below the verification area */}
+      {startup?.id && tab !== "analytics" && (
+        <div className="mt-8">
+          <BadgesSection startupId={startup.id} />
         </div>
       )}
 

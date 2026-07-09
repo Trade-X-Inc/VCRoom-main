@@ -9,6 +9,18 @@ import { createClient } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { VerificationBadge } from "@/components/shared/VerificationBadge";
+import { BadgeDisplay, useBadges } from "@/components/app/BadgeDisplay";
+
+/** Public view: earned badges only — no locked states, tooltip descriptions. */
+function PublicBadges({ startupId }: { startupId: string }) {
+  const { data: badges = [] } = useBadges({ startupId });
+  if (!badges.length) return null;
+  return (
+    <div className="mt-3">
+      <BadgeDisplay badges={badges} size="sm" maxVisible={6} context="public" />
+    </div>
+  );
+}
 
 interface PublicStartup {
   id: string;
@@ -753,6 +765,8 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
                 )}
               </div>
             )}
+            {/* Earned badges — trust first, then readiness, then community */}
+            {startup?.id && <PublicBadges startupId={startup.id} />}
             {(startup.social_links ?? []).length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
                 {(startup.social_links ?? []).map((link, i) => (
