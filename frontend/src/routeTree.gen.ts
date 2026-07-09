@@ -24,6 +24,7 @@ import { Route as InvestorsRouteImport } from './routes/investors'
 import { Route as FoundersRouteImport } from './routes/founders'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeedbackRouteImport } from './routes/feedback'
+import { Route as DocsRouteImport } from './routes/docs'
 import { Route as DebugRouteImport } from './routes/debug'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -31,6 +32,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools/index'
+import { Route as DocsIndexRouteImport } from './routes/docs.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as VerifySlugRouteImport } from './routes/verify.$slug'
@@ -50,6 +52,7 @@ import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as JoinTokenRouteImport } from './routes/join.$token'
 import { Route as JoinInvestorTokenRouteImport } from './routes/join-investor.$token'
 import { Route as ISlugRouteImport } from './routes/i.$slug'
+import { Route as DocsSplatRouteImport } from './routes/docs.$'
 import { Route as CvSlugRouteImport } from './routes/cv.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
@@ -75,6 +78,7 @@ import { Route as AppDirectoryRouteImport } from './routes/app.directory'
 import { Route as AppDeskRouteImport } from './routes/app.desk'
 import { Route as AppDealRoomsRouteImport } from './routes/app.deal-rooms'
 import { Route as AppConnectionsRouteImport } from './routes/app.connections'
+import { Route as AppClaimsRouteImport } from './routes/app.claims'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
 import { Route as AppAdvisorRouteImport } from './routes/app.advisor'
 import { Route as ApiTestAiRouteImport } from './routes/api.test-ai'
@@ -187,6 +191,11 @@ const FeedbackRoute = FeedbackRouteImport.update({
   path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocsRoute = DocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DebugRoute = DebugRouteImport.update({
   id: '/debug',
   path: '/debug',
@@ -221,6 +230,11 @@ const ToolsIndexRoute = ToolsIndexRouteImport.update({
   id: '/tools/',
   path: '/tools/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DocsIndexRoute = DocsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DocsRoute,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/',
@@ -317,6 +331,11 @@ const ISlugRoute = ISlugRouteImport.update({
   id: '/i/$slug',
   path: '/i/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DocsSplatRoute = DocsSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => DocsRoute,
 } as any)
 const CvSlugRoute = CvSlugRouteImport.update({
   id: '/cv/$slug',
@@ -441,6 +460,11 @@ const AppDealRoomsRoute = AppDealRoomsRouteImport.update({
 const AppConnectionsRoute = AppConnectionsRouteImport.update({
   id: '/connections',
   path: '/connections',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppClaimsRoute = AppClaimsRouteImport.update({
+  id: '/claims',
+  path: '/claims',
   getParentRoute: () => AppRoute,
 } as any)
 const AppAuditRoute = AppAuditRouteImport.update({
@@ -632,6 +656,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
   '/debug': typeof DebugRoute
+  '/docs': typeof DocsRouteWithChildren
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
@@ -656,6 +681,7 @@ export interface FileRoutesByFullPath {
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/claims': typeof AppClaimsRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
   '/app/desk': typeof AppDeskRoute
@@ -681,6 +707,7 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/cv/$slug': typeof CvSlugRoute
+  '/docs/$': typeof DocsSplatRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/join/$token': typeof JoinTokenRoute
@@ -700,6 +727,7 @@ export interface FileRoutesByFullPath {
   '/verify/$slug': typeof VerifySlugRoute
   '/app/': typeof AppIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/docs/': typeof DocsIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
@@ -758,6 +786,7 @@ export interface FileRoutesByTo {
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/claims': typeof AppClaimsRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
   '/app/desk': typeof AppDeskRoute
@@ -782,6 +811,7 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/cv/$slug': typeof CvSlugRoute
+  '/docs/$': typeof DocsSplatRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/join/$token': typeof JoinTokenRoute
@@ -801,6 +831,7 @@ export interface FileRoutesByTo {
   '/verify/$slug': typeof VerifySlugRoute
   '/app': typeof AppIndexRoute
   '/blog': typeof BlogIndexRoute
+  '/docs': typeof DocsIndexRoute
   '/tools': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
@@ -838,6 +869,7 @@ export interface FileRoutesById {
   '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
   '/debug': typeof DebugRoute
+  '/docs': typeof DocsRouteWithChildren
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
@@ -862,6 +894,7 @@ export interface FileRoutesById {
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/claims': typeof AppClaimsRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
   '/app/desk': typeof AppDeskRoute
@@ -887,6 +920,7 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/cv/$slug': typeof CvSlugRoute
+  '/docs/$': typeof DocsSplatRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/join/$token': typeof JoinTokenRoute
@@ -906,6 +940,7 @@ export interface FileRoutesById {
   '/verify/$slug': typeof VerifySlugRoute
   '/app/': typeof AppIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/docs/': typeof DocsIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
@@ -944,6 +979,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/debug'
+    | '/docs'
     | '/feedback'
     | '/forgot-password'
     | '/founders'
@@ -968,6 +1004,7 @@ export interface FileRouteTypes {
     | '/api/test-ai'
     | '/app/advisor'
     | '/app/audit'
+    | '/app/claims'
     | '/app/connections'
     | '/app/deal-rooms'
     | '/app/desk'
@@ -993,6 +1030,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/cv/$slug'
+    | '/docs/$'
     | '/i/$slug'
     | '/join-investor/$token'
     | '/join/$token'
@@ -1012,6 +1050,7 @@ export interface FileRouteTypes {
     | '/verify/$slug'
     | '/app/'
     | '/blog/'
+    | '/docs/'
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
@@ -1070,6 +1109,7 @@ export interface FileRouteTypes {
     | '/api/test-ai'
     | '/app/advisor'
     | '/app/audit'
+    | '/app/claims'
     | '/app/connections'
     | '/app/deal-rooms'
     | '/app/desk'
@@ -1094,6 +1134,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/cv/$slug'
+    | '/docs/$'
     | '/i/$slug'
     | '/join-investor/$token'
     | '/join/$token'
@@ -1113,6 +1154,7 @@ export interface FileRouteTypes {
     | '/verify/$slug'
     | '/app'
     | '/blog'
+    | '/docs'
     | '/tools'
     | '/api/internal/data'
     | '/api/internal/email-test'
@@ -1149,6 +1191,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/debug'
+    | '/docs'
     | '/feedback'
     | '/forgot-password'
     | '/founders'
@@ -1173,6 +1216,7 @@ export interface FileRouteTypes {
     | '/api/test-ai'
     | '/app/advisor'
     | '/app/audit'
+    | '/app/claims'
     | '/app/connections'
     | '/app/deal-rooms'
     | '/app/desk'
@@ -1198,6 +1242,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/cv/$slug'
+    | '/docs/$'
     | '/i/$slug'
     | '/join-investor/$token'
     | '/join/$token'
@@ -1217,6 +1262,7 @@ export interface FileRouteTypes {
     | '/verify/$slug'
     | '/app/'
     | '/blog/'
+    | '/docs/'
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
@@ -1254,6 +1300,7 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRouteWithChildren
   ContactRoute: typeof ContactRoute
   DebugRoute: typeof DebugRoute
+  DocsRoute: typeof DocsRouteWithChildren
   FeedbackRoute: typeof FeedbackRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   FoundersRoute: typeof FoundersRoute
@@ -1406,6 +1453,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/docs': {
+      id: '/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/debug': {
       id: '/debug'
       path: '/debug'
@@ -1454,6 +1508,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/tools/'
       preLoaderRoute: typeof ToolsIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/docs/': {
+      id: '/docs/'
+      path: '/'
+      fullPath: '/docs/'
+      preLoaderRoute: typeof DocsIndexRouteImport
+      parentRoute: typeof DocsRoute
     }
     '/blog/': {
       id: '/blog/'
@@ -1587,6 +1648,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/i/$slug'
       preLoaderRoute: typeof ISlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/docs/$': {
+      id: '/docs/$'
+      path: '/$'
+      fullPath: '/docs/$'
+      preLoaderRoute: typeof DocsSplatRouteImport
+      parentRoute: typeof DocsRoute
     }
     '/cv/$slug': {
       id: '/cv/$slug'
@@ -1761,6 +1829,13 @@ declare module '@tanstack/react-router' {
       path: '/connections'
       fullPath: '/app/connections'
       preLoaderRoute: typeof AppConnectionsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/claims': {
+      id: '/app/claims'
+      path: '/claims'
+      fullPath: '/app/claims'
+      preLoaderRoute: typeof AppClaimsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/audit': {
@@ -2083,6 +2158,7 @@ const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(
 interface AppRouteChildren {
   AppAdvisorRoute: typeof AppAdvisorRoute
   AppAuditRoute: typeof AppAuditRoute
+  AppClaimsRoute: typeof AppClaimsRoute
   AppConnectionsRoute: typeof AppConnectionsRoute
   AppDealRoomsRoute: typeof AppDealRoomsRoute
   AppDeskRoute: typeof AppDeskRoute
@@ -2114,6 +2190,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAdvisorRoute: AppAdvisorRoute,
   AppAuditRoute: AppAuditRoute,
+  AppClaimsRoute: AppClaimsRoute,
   AppConnectionsRoute: AppConnectionsRoute,
   AppDealRoomsRoute: AppDealRoomsRoute,
   AppDeskRoute: AppDeskRoute,
@@ -2156,6 +2233,18 @@ const BlogRouteChildren: BlogRouteChildren = {
 
 const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 
+interface DocsRouteChildren {
+  DocsSplatRoute: typeof DocsSplatRoute
+  DocsIndexRoute: typeof DocsIndexRoute
+}
+
+const DocsRouteChildren: DocsRouteChildren = {
+  DocsSplatRoute: DocsSplatRoute,
+  DocsIndexRoute: DocsIndexRoute,
+}
+
+const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
+
 interface JoinRouteChildren {
   JoinTokenRoute: typeof JoinTokenRoute
   JoinTeamTokenRoute: typeof JoinTeamTokenRoute
@@ -2175,6 +2264,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRouteWithChildren,
   ContactRoute: ContactRoute,
   DebugRoute: DebugRoute,
+  DocsRoute: DocsRouteWithChildren,
   FeedbackRoute: FeedbackRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   FoundersRoute: FoundersRoute,

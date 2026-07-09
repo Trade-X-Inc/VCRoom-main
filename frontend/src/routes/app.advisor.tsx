@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ShieldCheck, RefreshCw, CheckCircle2, XCircle } from "lucide-react";
 import { useAuth } from "@/lib/auth";
@@ -147,6 +147,23 @@ function VerificationPage() {
               registry, and your domain has real mail infrastructure and history.
             </div>
           )}
+        </div>
+
+        {/* Tier 2 pointer */}
+        <div className="mt-4 bg-card border border-border/60 rounded-xl p-6 flex items-center justify-between gap-4 flex-wrap">
+          <div className="min-w-0">
+            <div className="text-sm font-semibold">Tier 2 — Claims Verified</div>
+            <div className="text-xs text-muted-foreground mt-1 leading-relaxed">
+              Back every number you state with a document the AI confirms supports that specific claim.
+              Requires Tier 1, then at least 3 verified claims including 1 financial.
+            </div>
+          </div>
+          <Link
+            to={"/app/claims" as any}
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-border/60 px-4 py-2 text-sm font-medium text-foreground hover:bg-accent"
+          >
+            Manage claims →
+          </Link>
         </div>
       </div>
     </div>

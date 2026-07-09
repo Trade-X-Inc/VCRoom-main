@@ -10,14 +10,22 @@ export type ClaimStatus =
   | "ai_confirmed"    // AI says document supports the claim
   | "ai_mismatch";    // AI says document does NOT support the claim — worse than unverified
 
+export type ClaimCategory = "financial" | "legal" | "operational" | "team";
+export type ClaimVerdict = "verified" | "insufficient" | "contradicted";
+
 export interface StartupClaim {
   id: string;
   startup_id: string;
   claim_type: string;
   claim_label: string;
   claim_value: string;
+  claim_category: ClaimCategory | null;
   proof_document_id: string | null;
   proof_status: ClaimStatus;
+  ai_verdict: ClaimVerdict | null;
+  ai_reasoning: string | null;
+  ai_confidence: "high" | "medium" | "low" | null;
+  human_reviewed: boolean;
   ai_check_result: {
     supports_claim: boolean;
     confidence: "low" | "medium" | "high";
@@ -256,6 +264,178 @@ export const attachProofAndCheck = createServerFn({ method: "POST" })
     ).catch(() => null);
 
     return { ok: true, proof_status, ai_result };
+  });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 2b. Tier 2 claim verdict — the strict category-aware check.
+// The founder states a claim, picks its category, and uploads one document
+// specifically for that claim. GPT-4o returns verified / insufficient /
+// contradicted with reasoning. Conservative by instruction: doubt = insufficient.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type AddManualClaimInput = {
+  startup_id: string;
+  claim_text: string;
+  claim_category: ClaimCategory;
+};
+
+export const addManualClaim = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as AddManualClaimInput)
+  .handler(async ({ data }): Promise<{ ok: boolean; id: string | null; error?: string }> => {
+    const { url, key } = getSupabaseAdmin();
+    if (!url || !key) return { ok: false, id: null, error: "db_unavailable" };
+    const text = (data.claim_text ?? "").trim();
+    if (text.length < 8) return { ok: false, id: null, error: "Claim is too short — state a specific, checkable fact." };
+    if (!["financial", "legal", "operational", "team"].includes(data.claim_category)) {
+      return { ok: false, id: null, error: "invalid_category" };
+    }
+    const inserted: any[] = await sbFetch(url, key, "startup_claims", "POST", {
+      startup_id: data.startup_id,
+      claim_type: `custom_${crypto.randomUUID().slice(0, 8)}`,
+      claim_label: "Claim",
+      claim_value: text,
+      claim_category: data.claim_category,
+      proof_status: "unverified",
+    }).catch(() => null);
+    return inserted?.[0]?.id
+      ? { ok: true, id: inserted[0].id }
+      : { ok: false, id: null, error: "insert_failed" };
+  });
+
+export const deleteClaim = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as { startup_id: string; claim_id: string })
+  .handler(async ({ data }): Promise<{ ok: boolean }> => {
+    const { url, key } = getSupabaseAdmin();
+    if (!url || !key) return { ok: false };
+    await sbFetch(url, key,
+      `startup_claims?id=eq.${data.claim_id}&startup_id=eq.${data.startup_id}`,
+      "DELETE"
+    ).catch(() => null);
+    return { ok: true };
+  });
+
+type VerifyClaimInput = {
+  startup_id: string;
+  claim_id: string;
+  claim_text: string;
+  claim_category: ClaimCategory;
+  /** Plain text extracted client-side from the evidence document */
+  document_text: string;
+  document_name: string;
+  user_id: string;
+};
+
+type VerifyClaimResult = {
+  ok: boolean;
+  verdict: ClaimVerdict | null;
+  reasoning: string | null;
+  confidence: "high" | "medium" | "low" | null;
+  error?: string;
+};
+
+export const verifyClaim = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as VerifyClaimInput)
+  .handler(async ({ data }): Promise<VerifyClaimResult> => {
+    const { url, key } = getSupabaseAdmin();
+    if (!url || !key) return { ok: false, verdict: null, reasoning: null, confidence: null, error: "db_unavailable" };
+
+    const cfEnv = (globalThis as any).__cf_env || {};
+    const openaiKey = cfEnv.OPENAI_API_KEY || cfEnv.OPEN_AI_API_KEY || cfEnv["OPEN AI API KEY"] || "";
+    if (!openaiKey) return { ok: false, verdict: null, reasoning: null, confidence: null, error: "AI unavailable" };
+    if (!data.document_text || data.document_text.length < 50) {
+      return { ok: false, verdict: null, reasoning: null, confidence: null, error: "Could not read enough text from that document — try a text-based PDF or spreadsheet export." };
+    }
+
+    // Rate limit — same rpc as the rest of the AI stack
+    const allowed = await sbFetch(url, key, "rpc/check_ai_rate_limit", "POST", {
+      p_user_id: data.user_id,
+      p_feature: "verification",
+    }).catch(() => true);
+    if (allowed === false) {
+      return { ok: false, verdict: null, reasoning: null, confidence: null, error: "Daily verification limit reached — try again tomorrow." };
+    }
+
+    const systemPrompt = [
+      "You are verifying a specific claim for a startup's Hockystick profile.",
+      `The claim is: "${data.claim_text}". Category: ${data.claim_category}.`,
+      "Read the attached document carefully.",
+      "Return JSON only:",
+      '{ "verdict": "verified" | "insufficient" | "contradicted", "reasoning": "[one sentence explaining why, specific to the document]", "confidence": "high" | "medium" | "low" }',
+      "Rules:",
+      "- 'verified': document contains specific evidence supporting this exact claim",
+      "- 'insufficient': document is real but does not contain evidence for this specific claim",
+      "- 'contradicted': document contains evidence that contradicts the claim",
+      "Never verify a financial claim from a pitch deck.",
+      "Never verify a legal claim from a financial document.",
+      "Be conservative: when in doubt, return 'insufficient'.",
+    ].join("\n");
+
+    const userMessage = [
+      `DOCUMENT NAME: ${data.document_name}`,
+      "DOCUMENT TEXT (first 6000 characters):",
+      data.document_text.slice(0, 6000),
+    ].join("\n");
+
+    let parsed: { verdict?: string; reasoning?: string; confidence?: string } | null = null;
+    try {
+      const aiResp = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${openaiKey}` },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          max_tokens: 300,
+          temperature: 0,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userMessage },
+          ],
+        }),
+        signal: AbortSignal.timeout(30000),
+      });
+      if (aiResp.ok) {
+        const aiData: any = await aiResp.json();
+        const raw = aiData.choices?.[0]?.message?.content || "{}";
+        const cleaned = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+        parsed = JSON.parse(cleaned);
+      }
+    } catch {
+      return { ok: false, verdict: null, reasoning: null, confidence: null, error: "AI check timed out — try again." };
+    }
+
+    const verdict = (["verified", "insufficient", "contradicted"].includes(parsed?.verdict ?? "")
+      ? parsed!.verdict
+      : null) as ClaimVerdict | null;
+    if (!verdict) {
+      return { ok: false, verdict: null, reasoning: null, confidence: null, error: "AI returned an unusable response — try again." };
+    }
+    const reasoning = (parsed?.reasoning ?? "").slice(0, 500) || null;
+    const confidence = (["high", "medium", "low"].includes(parsed?.confidence ?? "")
+      ? parsed!.confidence
+      : "low") as "high" | "medium" | "low";
+
+    const now = new Date().toISOString();
+    await sbFetch(url, key,
+      `startup_claims?id=eq.${data.claim_id}&startup_id=eq.${data.startup_id}`,
+      "PATCH",
+      {
+        claim_category: data.claim_category,
+        ai_verdict: verdict,
+        ai_reasoning: reasoning,
+        ai_confidence: confidence,
+        ai_checked_at: now,
+        proof_document_id: crypto.randomUUID(),
+        // Legacy status kept in sync so FieldVerificationBadge renders correctly:
+        proof_status: verdict === "verified" ? "ai_confirmed" : "ai_mismatch",
+        updated_at: now,
+      }
+    ).catch(() => null);
+
+    await sbFetch(url, key, "rpc/check_and_increment_ai_usage", "POST", {
+      p_user_id: data.user_id,
+      p_feature: "verification",
+    }).catch(() => null);
+
+    return { ok: true, verdict, reasoning, confidence };
   });
 
 // ─────────────────────────────────────────────────────────────────────────────
