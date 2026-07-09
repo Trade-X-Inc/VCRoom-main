@@ -399,7 +399,6 @@ export const runTier1Check = createServerFn({ method: "POST" })
       tier1_infra_detail: infrastructure.detail,
       tier1_passed,
       tier1_checked_at,
-      current_tier: tier1_passed ? 1 : 0,
       // Legacy columns still read by older components until they're migrated:
       email_domain_matches: email.passed,
       website_resolves: website.passed,
@@ -415,8 +414,12 @@ export const runTier1Check = createServerFn({ method: "POST" })
       const { startup_id: _omit, ...patch } = payload;
       await supabaseQuery(sbUrl, sbKey, `founder_verifications?startup_id=eq.${data.startup_id}`, "PATCH", patch).catch(() => null);
     } else {
-      await supabaseQuery(sbUrl, sbKey, "founder_verifications", "POST", payload).catch(() => null);
+      await supabaseQuery(sbUrl, sbKey, "founder_verifications", "POST", { ...payload, current_tier: 0 }).catch(() => null);
     }
+
+    // ── Recompute tier via the single source of truth ──────────────────────
+    const { recomputeVerificationTier } = await import("@/lib/tier-calc");
+    await recomputeVerificationTier(sbUrl, sbKey, data.startup_id).catch(() => null);
 
     // ── Meter usage ────────────────────────────────────────────────────────
     await supabaseQuery(sbUrl, sbKey, "rpc/check_and_increment_ai_usage", "POST", {

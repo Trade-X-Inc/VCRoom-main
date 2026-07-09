@@ -430,6 +430,10 @@ export const verifyClaim = createServerFn({ method: "POST" })
       }
     ).catch(() => null);
 
+    // Recompute tier via the single source of truth
+    const { recomputeVerificationTier } = await import("@/lib/tier-calc");
+    await recomputeVerificationTier(url, key, data.startup_id).catch(() => null);
+
     await sbFetch(url, key, "rpc/check_and_increment_ai_usage", "POST", {
       p_user_id: data.user_id,
       p_feature: "verification",

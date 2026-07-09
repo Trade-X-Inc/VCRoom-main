@@ -206,6 +206,10 @@ export const checkOperationalDoc = createServerFn({ method: "POST" })
 
     await sbFetch(url, key, `founder_verifications?startup_id=eq.${data.startup_id}`, "PATCH", aiPatch).catch(() => null);
 
+    // Recompute tier via the single source of truth
+    const { recomputeVerificationTier } = await import("@/lib/tier-calc");
+    await recomputeVerificationTier(url, key, data.startup_id).catch(() => null);
+
     if (allThreeVerified) {
       const resendKey = cfEnv.RESEND_API_KEY || "";
       const fromEmail = cfEnv.RESEND_FROM_EMAIL || "hello@hockystick.app";
