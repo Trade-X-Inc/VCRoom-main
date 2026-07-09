@@ -3,7 +3,7 @@ import { Logo } from "@/components/brand/Logo";
 import {
   LayoutGrid, Users, Building2, FileText, Briefcase,
   MessageSquare, MessageCircle, Calendar, Search, Settings, ChevronsLeft, Plus, Gavel,
-  PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, UserCircle2, Gift, Globe, Trophy, Menu, X, FileInput, LayoutDashboard,
+  PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, UserCircle2, Gift, Globe, Trophy, Menu, X, FileInput, LayoutDashboard, Award,
 } from "lucide-react";
 import { AIOperatorPanel } from "@/components/ai/AIOperatorPanel";
 import {
@@ -70,6 +70,7 @@ const investorNav: NavItem[] = [
 
 const workspaceNavFounder: NavItem[] = [
   { to: "/app/profile", label: "Profile", icon: UserCircle2 },
+  { to: "/app/badges", label: "Badges", icon: Award },
   { to: "/app/users", label: "Team", icon: UserCog },
   { to: "/app/settings", label: "Settings", icon: Settings },
 ];
@@ -473,8 +474,10 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
               <div className="px-2 pt-4 pb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
                 Admin
               </div>
-              {/* Render workspace nav items, injecting Feedback button after "Team" item (index 1) */}
-              {[...workspaceNav, ...(isTeamMember ? [memberProfileNav] : [])].map((n, idx) => {
+              {/* Render workspace nav items, injecting Feedback button after "Team".
+                  Badges is founder-owner only — excluded for investors (not in
+                  workspaceNavInvestor) and for team members (filtered here). */}
+              {[...workspaceNav.filter((n) => !(n.to === "/app/badges" && isTeamMember)), ...(isTeamMember ? [memberProfileNav] : [])].map((n) => {
                 const active = path === n.to || path.startsWith(n.to + "/");
                 return (
                   <div key={n.to}>
@@ -491,8 +494,8 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                       <n.icon className={cn("h-4 w-4", active && "text-brand")} />
                       <span>{n.label}</span>
                     </Link>
-                    {/* Inject Feedback after Team (index 1 = second item) */}
-                    {idx === 1 && (
+                    {/* Inject Feedback right after the "Team" item, wherever it lands */}
+                    {n.to === (isInvestor ? "/app/investor/team" : "/app/users") && (
                       <Link
                         to={"/app/feedback" as any}
                         onClick={() => setMobileOpen(false)}
