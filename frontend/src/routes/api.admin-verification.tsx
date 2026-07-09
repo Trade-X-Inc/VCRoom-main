@@ -117,6 +117,8 @@ const approveTier3 = createServerFn({ method: "POST" })
 
     const { recomputeVerificationTier } = await import("@/lib/tier-calc");
     await recomputeVerificationTier(url, serviceKey, data.startup_id).catch(() => null);
+    const { evaluateAndAwardBadgesCore } = await import("@/lib/badge-award-engine");
+    await evaluateAndAwardBadgesCore({ startupId: data.startup_id });
 
     // Notify the founder
     const startups: any[] = await sbFetch(url, serviceKey,
@@ -154,6 +156,8 @@ const approveTier4 = createServerFn({ method: "POST" })
     });
     const { recomputeVerificationTier } = await import("@/lib/tier-calc");
     await recomputeVerificationTier(url, serviceKey, data.startup_id).catch(() => null);
+    const { evaluateAndAwardBadgesCore } = await import("@/lib/badge-award-engine");
+    await evaluateAndAwardBadgesCore({ startupId: data.startup_id });
     return { ok: true };
   });
 

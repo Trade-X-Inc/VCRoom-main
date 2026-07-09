@@ -621,6 +621,9 @@ function CreateRoomForm({
         action: `Deal room created for ${investorName.trim()}${investorFirm.trim() ? ` · ${investorFirm.trim()}` : ""} · ${dealType}${fundingTarget ? ` · $${fundingTarget}` : ""}`,
       });
 
+      // Badge evaluation — fire-and-forget on this write event
+      import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { startup_id: startupId } })).catch(() => {});
+
       // 4. Send invite email via server fn if email provided
       let inviteLink: string | undefined;
       if (inviteEmail.trim()) {

@@ -209,6 +209,9 @@ function NdaPage() {
       });
       if (insertErr) throw insertErr;
 
+      // Badge evaluation — fire-and-forget on this write event
+      import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { deal_room_id: dealRoomId } })).catch(() => {});
+
       await supabase.from("deal_room_members").upsert(
         {
           deal_room_id: dealRoomId,

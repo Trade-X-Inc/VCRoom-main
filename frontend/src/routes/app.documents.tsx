@@ -346,6 +346,8 @@ function Documents() {
       }, { onConflict: "startup_id,template_slug" });
       if (upsertError) throw upsertError;
       toast.success(`${templateName} uploaded`);
+      // Badge evaluation — fire-and-forget on this write event
+      import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { startup_id: startup?.id } })).catch(() => {});
       refetchFounderDocs();
       const { logActivity } = await import("@/lib/activity-log-fn");
       logActivity({
@@ -691,6 +693,8 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
 
       if (error) throw error;
       toast.success("Document saved");
+      // Badge evaluation — fire-and-forget on this write event
+      import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { startup_id: startup?.id } })).catch(() => {});
       onSave();
     } catch (e: any) {
       toast.error(e.message || "Save failed");

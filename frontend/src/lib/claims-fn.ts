@@ -433,6 +433,8 @@ export const verifyClaim = createServerFn({ method: "POST" })
     // Recompute tier via the single source of truth
     const { recomputeVerificationTier } = await import("@/lib/tier-calc");
     await recomputeVerificationTier(url, key, data.startup_id).catch(() => null);
+    const { evaluateAndAwardBadgesCore } = await import("@/lib/badge-award-engine");
+    await evaluateAndAwardBadgesCore({ startupId: data.startup_id });
 
     await sbFetch(url, key, "rpc/check_and_increment_ai_usage", "POST", {
       p_user_id: data.user_id,

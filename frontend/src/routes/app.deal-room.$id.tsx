@@ -2042,6 +2042,8 @@ function QAPanel({
         setAnswerDrafts((prev) => { const n = { ...prev }; delete n[questionId]; return n; });
         // Auto-expand the answer just submitted
         setExpandedAnswers((prev) => ({ ...prev, [questionId]: true }));
+        // Badge evaluation — fire-and-forget on this write event
+        import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { deal_room_id: dealRoomId } })).catch(() => {});
       }
       // Auto-complete if all 10 answered
       if (questionCount >= MAX_QUESTIONS && answeredCount + 1 >= MAX_QUESTIONS) {
@@ -4129,6 +4131,8 @@ function NewClosingPanel({
         outcome: "invested", reason_detail: finalNotes || null, ai_summary: null,
       });
       await supabase.from("deal_rooms").update({ status: "closed" }).eq("id", dealRoomId);
+      // Badge evaluation — fire-and-forget on this write event
+      import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { deal_room_id: dealRoomId } })).catch(() => {});
       console.log("Email closing report to both parties — Claude Code will wire email");
       setDealClosed(true);
       setCloseDealOpen(false);
@@ -4149,6 +4153,8 @@ function NewClosingPanel({
         ai_summary: null,
       });
       await supabase.from("deal_rooms").update({ status: "closed" }).eq("id", dealRoomId);
+      // Badge evaluation — fire-and-forget on this write event
+      import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { deal_room_id: dealRoomId } })).catch(() => {});
       setExitDone(true);
       setExitOpen(false);
     } catch { toast.error("Could not close deal room"); }

@@ -330,10 +330,28 @@ export async function evaluateAndAwardBadgesCore(opts: {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const evaluateAndAwardBadges = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { startup_id?: string; investor_profile_id?: string; investor_user_id?: string })
-  .handler(async ({ data }): Promise<BadgeEvalResult> =>
-    evaluateAndAwardBadgesCore({
-      startupId: data.startup_id,
-      investorProfileId: data.investor_profile_id,
-      investorUserId: data.investor_user_id,
-    }));
+  .inputValidator((d: unknown) => d as { startup_id?: string; investor_profile_id?: string; investor_user_id?: string; deal_room_id?: string })
+  .handler(async ({ data }): Promise<BadgeEvalResult> => {
+    const { url, key } = admin();
+    let startupId = data.startup_id;
+    let investorUserId = data.investor_user_id;
+    let investorProfileId = data.investor_profile_id;
+
+    // A deal room id resolves both sides — call sites pass whatever they have.
+    if (data.deal_room_id && url && key) {
+      const rooms = await sbGet(url, key,
+        `deal_rooms?id=eq.${data.deal_room_id}&select=startup_id,investor_user_id`);
+      startupId = startupId ?? rooms[0]?.startup_id ?? undefined;
+      investorUserId = investorUserId ?? rooms[0]?.investor_user_id ?? undefined;
+    }
+    if (!investorProfileId && investorUserId && url && key) {
+      const rows = await sbGet(url, key,
+        `investor_profiles?user_id=eq.${investorUserId}&select=id`);
+      investorProfileId = rows[0]?.id;
+    }
+    return evaluateAndAwardBadgesCore({
+      startupId,
+      investorProfileId,
+      investorUserId,
+    });
+  });

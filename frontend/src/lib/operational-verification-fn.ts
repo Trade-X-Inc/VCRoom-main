@@ -209,6 +209,8 @@ export const checkOperationalDoc = createServerFn({ method: "POST" })
     // Recompute tier via the single source of truth
     const { recomputeVerificationTier } = await import("@/lib/tier-calc");
     await recomputeVerificationTier(url, key, data.startup_id).catch(() => null);
+    const { evaluateAndAwardBadgesCore } = await import("@/lib/badge-award-engine");
+    await evaluateAndAwardBadgesCore({ startupId: data.startup_id });
 
     if (allThreeVerified) {
       const resendKey = cfEnv.RESEND_API_KEY || "";

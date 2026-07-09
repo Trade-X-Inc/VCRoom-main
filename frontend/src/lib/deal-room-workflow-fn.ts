@@ -82,6 +82,20 @@ export const advanceWorkflowStage = createServerFn({ method: "POST" })
       action: `Advanced deal to ${STAGE_LABELS[data.to_stage]}`,
       metadata: { to_stage: data.to_stage },
     }).catch(() => null);
+
+    // Badge evaluation — stage changes can earn first_close/round_closed/deal_closed
+    {
+      const rooms: any[] = await sbFetch(url, key, `deal_rooms?id=eq.${data.deal_room_id}&select=startup_id,investor_user_id`, "GET").catch(() => []);
+      const invProfiles: any[] = rooms[0]?.investor_user_id
+        ? await sbFetch(url, key, `investor_profiles?user_id=eq.${rooms[0].investor_user_id}&select=id`, "GET").catch(() => [])
+        : [];
+      const { evaluateAndAwardBadgesCore } = await import("@/lib/badge-award-engine");
+      await evaluateAndAwardBadgesCore({
+        startupId: rooms[0]?.startup_id ?? undefined,
+        investorProfileId: invProfiles[0]?.id ?? undefined,
+        investorUserId: rooms[0]?.investor_user_id ?? undefined,
+      });
+    }
     return { ok: true };
   });
 
@@ -243,6 +257,19 @@ export const respondToTermSheet = createServerFn({ method: "POST" })
       metadata: { response: data.response },
     }).catch(() => null);
 
+    // Badge evaluation — stage changes can earn first_close/round_closed/deal_closed
+    {
+      const rooms: any[] = await sbFetch(url, key, `deal_rooms?id=eq.${data.deal_room_id}&select=startup_id,investor_user_id`, "GET").catch(() => []);
+      const invProfiles: any[] = rooms[0]?.investor_user_id
+        ? await sbFetch(url, key, `investor_profiles?user_id=eq.${rooms[0].investor_user_id}&select=id`, "GET").catch(() => [])
+        : [];
+      const { evaluateAndAwardBadgesCore } = await import("@/lib/badge-award-engine");
+      await evaluateAndAwardBadgesCore({
+        startupId: rooms[0]?.startup_id ?? undefined,
+        investorProfileId: invProfiles[0]?.id ?? undefined,
+        investorUserId: rooms[0]?.investor_user_id ?? undefined,
+      });
+    }
     return { ok: true };
   });
 

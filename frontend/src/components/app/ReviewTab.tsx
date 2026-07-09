@@ -213,6 +213,9 @@ function InvestorReview({ dealRoomId, startupId }: { dealRoomId: string; startup
 
     await logActivity(dealRoomId, user.id, `Decision: ${type}`);
 
+    // Badge evaluation — fire-and-forget on this write event
+    import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { deal_room_id: dealRoomId } })).catch(() => {});
+
     if (startupId) {
       const { data: startup } = await supabase
         .from("startups")

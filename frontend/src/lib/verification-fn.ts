@@ -463,6 +463,8 @@ export const runTier1Check = createServerFn({ method: "POST" })
     // ── Recompute tier via the single source of truth ──────────────────────
     const { recomputeVerificationTier } = await import("@/lib/tier-calc");
     await recomputeVerificationTier(sbUrl, sbKey, data.startup_id).catch(() => null);
+    const { evaluateAndAwardBadgesCore } = await import("@/lib/badge-award-engine");
+    await evaluateAndAwardBadgesCore({ startupId: data.startup_id });
 
     // ── Meter usage ────────────────────────────────────────────────────────
     await supabaseQuery(sbUrl, sbKey, "rpc/check_and_increment_ai_usage", "POST", {
@@ -620,6 +622,8 @@ export const verifyTradeLicense = createServerFn({ method: "POST" })
       }
       const { recomputeVerificationTier } = await import("@/lib/tier-calc");
       await recomputeVerificationTier(sbUrl, sbKey, data.startup_id).catch(() => null);
+      const { evaluateAndAwardBadgesCore } = await import("@/lib/badge-award-engine");
+      await evaluateAndAwardBadgesCore({ startupId: data.startup_id });
     }
 
     await supabaseQuery(sbUrl, sbKey, "rpc/check_and_increment_ai_usage", "POST", {
