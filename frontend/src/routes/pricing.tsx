@@ -258,8 +258,7 @@ function PricingPage() {
                     </a>
                   ) : user ? (
                     <Link
-                      to={"/app/settings" as any}
-                      search={{ tab: "billing" } as any}
+                      to={"/app/settings/billing" as any}
                       className="block w-full rounded-xl bg-purple-600 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-purple-700"
                     >
                       Upgrade

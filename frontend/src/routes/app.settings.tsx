@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useRouterState, useSearch } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Settings, Bell, Shield, User, Loader2, Camera, HelpCircle, Info } from "lucide-react";
+import { Settings, Bell, Shield, User, Loader2, Camera, HelpCircle, Info, CreditCard } from "lucide-react";
 import { VerificationSection } from "@/components/app/VerificationSection";
 import { FounderHelpGuide, AboutSection } from "@/components/app/HelpGuide";
 import { toast } from "sonner";
@@ -15,6 +15,7 @@ export const Route = createFileRoute("/app/settings")({
 
 const routeTabs = [
   { to: "/app/settings", label: "Profile", icon: User, exact: true },
+  { to: "/app/settings/billing", label: "Billing", icon: CreditCard },
   { to: "/app/settings/notifications", label: "Notifications", icon: Bell },
   { to: "/app/settings/security", label: "Security", icon: Shield },
 ];
