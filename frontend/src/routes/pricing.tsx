@@ -202,6 +202,27 @@ function PricingPage() {
           </div>
         </div>
 
+        {/* Investor beta framing */}
+        {audience === "investor" && (
+          <div className="mx-auto mb-10 max-w-2xl rounded-2xl border border-purple-200 bg-purple-50 p-6 text-center">
+            <div className="text-xs font-bold uppercase tracking-[0.14em] text-purple-700" style={{ fontFamily: "Syne, sans-serif" }}>
+              Investor access — beta invitation
+            </div>
+            <p className="mt-3 text-sm leading-relaxed text-gray-700">
+              During our beta phase, investor access is by invitation. We verify each
+              investor's fund, thesis, and active deal mandate before granting access.
+              This ensures founders receive only qualified interest.
+            </p>
+            <Link
+              to="/sign-up"
+              search={{ role: "investor" } as any}
+              className="mt-4 inline-block rounded-xl bg-purple-600 px-6 py-3 text-sm font-semibold text-white hover:bg-purple-700"
+            >
+              Apply for investor access →
+            </Link>
+          </div>
+        )}
+
         {/* Plan cards */}
         <div className="grid gap-6 md:grid-cols-3">
           {visible.map((p) => {
@@ -295,6 +316,19 @@ function PricingPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Why we charge founders */}
+        <div className="mx-auto mt-16 max-w-2xl rounded-2xl border border-gray-200 bg-gray-50 p-8 text-center">
+          <h2 className="text-xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>
+            Why we charge founders
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-gray-600">
+            Fundraising infrastructure should be accountable to founders, not to investors.
+            We charge founders — not investors — because our job is to make founders
+            fundable, not to sell their information to the highest bidder. Your data is
+            never sold.
+          </p>
         </div>
 
         {/* Cost comparison vs traditional tools */}
