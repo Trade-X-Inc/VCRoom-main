@@ -75,6 +75,7 @@ function Landing() {
       <HowItWorks dark={dark} />
       <ForFounders dark={dark} />
       <ForInvestors dark={dark} />
+      <WhoThisIsFor dark={dark} />
       <TrustSection />
       <PricingSection dark={dark} />
       <FinalCTA />
@@ -864,6 +865,83 @@ function ForInvestors({ dark }: { dark: boolean }) {
             >
               Join as an investor <ArrowRight className="h-4 w-4" />
             </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 6.5 — WHO THIS IS FOR
+═══════════════════════════════════════════════════════════════════════════ */
+const AUDIENCE_FOR = [
+  "Seed and Series A founders in UAE, KSA, Qatar, Egypt, Jordan",
+  "Family offices managing 5–50 active deals",
+  "VC analysts sourcing deal flow without a full team",
+  "Accelerator cohorts preparing portfolio companies for investment",
+];
+
+const AUDIENCE_NOT_FOR = [
+  "Pre-idea stage founders with no product",
+  "Retail investors looking for crowdfunding opportunities",
+  "Companies seeking debt financing or bank loans",
+];
+
+function WhoThisIsFor({ dark }: { dark: boolean }) {
+  const bg = dark ? "#111113" : "#F9FAFB";
+  const headingColor = dark ? "#FFFFFF" : "#111827";
+  const itemColor = dark ? W70 : "#374151";
+  const notColor = dark ? W40 : "#6B7280";
+  const cardBg = dark ? "#0A0A0B" : "#FFFFFF";
+  const cardBorder = dark ? "1px solid rgba(255,255,255,0.08)" : "1px solid #E5E7EB";
+
+  return (
+    <section className="w-full py-24" style={{ background: bg }}>
+      <div className="max-w-[1100px] mx-auto px-6">
+        <div className="text-center mb-12">
+          <h2
+            style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: headingColor }}
+          >
+            Built for serious capital. On both sides.
+          </h2>
+        </div>
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div className="rounded-2xl p-8" style={{ background: cardBg, border: cardBorder }}>
+            <h3
+              className="mb-5 text-xs font-bold uppercase tracking-[0.14em]"
+              style={{ color: PURPLE, fontFamily: SYNE }}
+            >
+              This platform is for
+            </h3>
+            <ul className="space-y-3">
+              {AUDIENCE_FOR.map((a) => (
+                <li key={a} className="flex gap-3">
+                  <ArrowRight className="h-4 w-4 shrink-0 mt-0.5" style={{ color: PURPLE }} />
+                  <span className="text-sm leading-relaxed" style={{ color: itemColor, fontFamily: DM }}>
+                    {a}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-2xl p-8" style={{ background: cardBg, border: cardBorder }}>
+            <h3
+              className="mb-5 text-xs font-bold uppercase tracking-[0.14em]"
+              style={{ color: notColor, fontFamily: SYNE }}
+            >
+              This platform is not for
+            </h3>
+            <ul className="space-y-3">
+              {AUDIENCE_NOT_FOR.map((a) => (
+                <li key={a} className="flex gap-3">
+                  <span className="text-sm shrink-0 mt-0.5" style={{ color: notColor }}>✕</span>
+                  <span className="text-sm leading-relaxed" style={{ color: notColor, fontFamily: DM }}>
+                    {a}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
