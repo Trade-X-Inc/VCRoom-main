@@ -154,14 +154,14 @@ function DealRoomCard() {
               className="h-7 w-7 rounded-md flex items-center justify-center text-white text-[10px] font-bold"
               style={{ background: PURPLE, fontFamily: SYNE }}
             >
-              AR
+              ML
             </div>
             <div>
               <div className="text-white text-xs font-bold tracking-wide" style={{ fontFamily: SYNE }}>
-                ATLAS ROBOTICS
+                MERIDIAN LOGISTICS
               </div>
               <div className="text-[10px]" style={{ color: W40, fontFamily: DM }}>
-                Seed · Robotics
+                Seed · Logistics Tech · UAE
               </div>
             </div>
           </div>
@@ -178,7 +178,7 @@ function DealRoomCard() {
           {[
             { label: "37 days open" },
             { label: "14 doc views" },
-            { label: "Match score 85/100" },
+            { label: "Match score 82/100" },
           ].map(({ label }) => (
             <span key={label} className="text-[10px]" style={{ color: W60, fontFamily: DM }}>
               {label}
@@ -187,7 +187,7 @@ function DealRoomCard() {
         </div>
 
         {/* Document rows */}
-        {docRow("📄", "Pitch Deck", "Opened 3× by Dr Henry", "↓ Viewed", "#A855F7", "rgba(168,85,247,0.12)")}
+        {docRow("📄", "Pitch Deck", "Opened 3× this week", "↓ Viewed", "#A855F7", "rgba(168,85,247,0.12)")}
         {docRow("📊", "Financial Model", "First opened 2 days ago", "⟳ Reviewing", "#F59E0B", "rgba(245,158,11,0.12)")}
         {docRow("📋", "Cap Table", "Awaiting access request", "🔒 Locked", "rgba(255,255,255,0.35)", "rgba(255,255,255,0.06)")}
 
@@ -198,10 +198,10 @@ function DealRoomCard() {
               className="h-6 w-6 rounded-full flex items-center justify-center text-white text-[9px] font-bold shrink-0"
               style={{ background: "rgba(124,58,237,0.3)", fontFamily: SYNE }}
             >
-              DH
+              SR
             </div>
             <span className="text-xs" style={{ color: W60, fontFamily: DM }}>
-              Dr Henry · ACME Ventures
+              S. Rahman · Crescent Capital
             </span>
           </div>
           <div className="flex items-center gap-1">
@@ -380,14 +380,15 @@ function ProblemSection({ dark }: { dark: boolean }) {
   const bodyColor = dark ? W60 : "#4B5563";
   const statColor = dark ? "#FFFFFF" : "#111827";
 
+  // Real platform numbers — keep these honest and update as they grow
   const stats = [
     {
-      n: "73%",
-      label: "of GCC founders say no warm intro is their biggest barrier",
+      n: "7",
+      label: "NDAs executed on-platform, DIAC-arbitrated",
     },
     {
-      n: "6 weeks",
-      label: "average time wasted pitching investors who were never a fit",
+      n: "3",
+      label: "encrypted deal rooms live with staged document access",
     },
     {
       n: "1 platform",
@@ -725,20 +726,20 @@ function InvestorCardMockup() {
             className="h-8 w-8 rounded-md flex items-center justify-center text-white text-[10px] font-bold"
             style={{ background: PURPLE, fontFamily: SYNE }}
           >
-            AR
+            ML
           </div>
           <div>
             <div className="text-white text-xs font-bold tracking-wide" style={{ fontFamily: SYNE }}>
-              ATLAS ROBOTICS
+              MERIDIAN LOGISTICS
             </div>
-            <div className="text-[10px]" style={{ color: W40, fontFamily: DM }}>Seed · Robotics</div>
+            <div className="text-[10px]" style={{ color: W40, fontFamily: DM }}>Seed · Logistics Tech · UAE</div>
           </div>
         </div>
         <span
           className="text-[10px] font-bold px-2 py-1 rounded-full"
           style={{ background: "rgba(16,185,129,0.12)", color: "#10B981", fontFamily: SYNE }}
         >
-          Match: 85/100
+          Match: 82/100
         </span>
       </div>
       {/* Body rows */}
@@ -752,7 +753,7 @@ function InvestorCardMockup() {
         <div className="flex items-center gap-2">
           <CheckCircle2 className="h-3.5 w-3.5 shrink-0" style={{ color: "#10B981" }} />
           <span className="text-xs" style={{ color: W70, fontFamily: DM }}>
-            Stage: Seed · Sector: Robotics · Raise: $2M
+            Stage: Seed · Sector: Logistics Tech · Raise: $2M
           </span>
         </div>
         <div className="flex items-center justify-between pt-1">
@@ -1086,10 +1087,10 @@ function PricingSection({ dark }: { dark: boolean }) {
               className="mb-1"
               style={{ fontFamily: SYNE, fontWeight: 800, fontSize: "40px", color: priceColor }}
             >
-              Free
+              By invitation
             </div>
             <p className="text-xs mb-6" style={{ color: labelColor, fontFamily: DM }}>
-              Always free for verified investors.
+              During beta, serious investors apply for verified access. We review each application.
             </p>
             <ul className="space-y-3 mb-8">
               {INVESTOR_PLAN.map(tick)}
@@ -1102,7 +1103,7 @@ function PricingSection({ dark }: { dark: boolean }) {
               onMouseEnter={(e) => { e.currentTarget.style.background = investorBtnHover; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
             >
-              Join as an investor →
+              Apply for investor access →
             </Link>
           </div>
         </div>
@@ -1139,9 +1140,9 @@ function FinalCTA() {
             maxWidth: "480px",
           }}
         >
-          GCC &amp; MENA focused. Free to start.
+          GCC &amp; MENA focused.
           <br />
-          Your next investor is already on Hockystick.
+          The infrastructure serious founders use to raise.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link

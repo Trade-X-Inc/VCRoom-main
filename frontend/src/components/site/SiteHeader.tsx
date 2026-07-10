@@ -1,22 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { Logo } from "@/components/brand/Logo";
-import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { ArrowRight, Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const NAV_LINK = "text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors px-1";
 
 export function SiteHeader() {
-  const [resourcesOpen, setResourcesOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (!ref.current?.contains(e.target as Node)) setResourcesOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
 
   useEffect(() => {
     const handler = () => { if (window.innerWidth >= 768) setMobileMenuOpen(false); };
@@ -40,43 +30,7 @@ export function SiteHeader() {
           <Link to="/pricing" className={NAV_LINK}>Pricing</Link>
           <Link to={"/docs" as any} className={NAV_LINK}>Docs</Link>
           <Link to="/blog" className={NAV_LINK}>Blog</Link>
-
           <Link to="/tools" className={NAV_LINK}>Tools</Link>
-
-          {/* Resources dropdown */}
-          <div className="relative" ref={ref}>
-            <button
-              onClick={() => setResourcesOpen((v) => !v)}
-              className={`${NAV_LINK} inline-flex items-center gap-1`}
-            >
-              Resources
-              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${resourcesOpen ? "rotate-180" : ""}`} />
-            </button>
-            {resourcesOpen && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 rounded-xl border border-border/60 bg-popover shadow-elev p-1.5 z-50">
-                <Link to="/about" onClick={() => setResourcesOpen(false)}
-                  className="block rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-                  About
-                </Link>
-                <Link to="/resources" onClick={() => setResourcesOpen(false)}
-                  className="block rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-                  Resources Hub
-                </Link>
-                <Link to="/registry" onClick={() => setResourcesOpen(false)}
-                  className="block rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-                  Company Registry
-                </Link>
-                <Link to="/trust" onClick={() => setResourcesOpen(false)}
-                  className="block rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-                  Trust & Verification
-                </Link>
-                <Link to="/contact" onClick={() => setResourcesOpen(false)}
-                  className="block rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-                  Contact
-                </Link>
-              </div>
-            )}
-          </div>
         </nav>
 
         {/* Right — Controls */}
@@ -119,29 +73,9 @@ export function SiteHeader() {
             className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
             Blog
           </Link>
-          <Link to="/about" onClick={close}
-            className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
-            About
-          </Link>
           <Link to="/tools" onClick={close}
             className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
             Tools
-          </Link>
-          <Link to="/resources" onClick={close}
-            className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
-            Resources Hub
-          </Link>
-          <Link to="/registry" onClick={close}
-            className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
-            Company Registry
-          </Link>
-          <Link to="/trust" onClick={close}
-            className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
-            Trust & Verification
-          </Link>
-          <Link to="/contact" onClick={close}
-            className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
-            Contact
           </Link>
           <div className="pt-3 border-t border-border/60 flex flex-col gap-2">
             <Link to="/sign-in" search={{ redirect: "/app" }} onClick={close}

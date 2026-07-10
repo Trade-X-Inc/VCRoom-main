@@ -36,18 +36,28 @@ function getNotionClient(): Client {
   return new Client({ auth: key });
 }
 
+// Brand is "Hockystick" (no e). Notion-authored content has shipped with the
+// misspelling before — normalize every rendered string so it can't reach the
+// page or meta tags. Slugs are exempt: changing them would break live URLs.
+function fixBrand(text: string): string {
+  return text.replace(/Hockeystick/g, "Hockystick").replace(/hockeystick/g, "hockystick");
+}
+
 function richTextToString(richText: RichTextItemResponse[]): string {
-  return richText.map((t) => t.plain_text).join("");
+  return fixBrand(richText.map((t) => t.plain_text).join(""));
 }
 
 function extractPostMeta(page: PageObjectResponse): BlogPost {
   const props = page.properties as any;
 
-  const title = props.Title?.title ? richTextToString(props.Title.title) :
-                props.Name?.title  ? richTextToString(props.Name.title)  : "Untitled";
+  const rawJoin = (rt: any[]) => rt.map((t: any) => t.plain_text).join("");
+  const rawTitle = props.Title?.title ? rawJoin(props.Title.title) :
+                   props.Name?.title  ? rawJoin(props.Name.title)  : "Untitled";
+  const title = fixBrand(rawTitle);
 
-  const slug = props.Slug?.rich_text ? richTextToString(props.Slug.rich_text) :
-               title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  // Slug bypasses fixBrand — normalizing it would break already-indexed URLs
+  const slug = props.Slug?.rich_text ? rawJoin(props.Slug.rich_text) :
+               rawTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
   const excerpt = props.Excerpt?.rich_text ? richTextToString(props.Excerpt.rich_text) : "";
   const seoTitle = props["SEO Title"]?.rich_text ? richTextToString(props["SEO Title"].rich_text) : title;
@@ -77,7 +87,7 @@ function extractPostMeta(page: PageObjectResponse): BlogPost {
 
 function richTextToHtml(richText: RichTextItemResponse[]): string {
   return richText.map((t) => {
-    let text = t.plain_text
+    let text = fixBrand(t.plain_text)
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     if (t.annotations.bold)          text = `<strong>${text}</strong>`;
     if (t.annotations.italic)        text = `<em>${text}</em>`;
