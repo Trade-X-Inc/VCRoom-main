@@ -77,6 +77,7 @@ function Landing() {
       <ForInvestors dark={dark} />
       <WhoThisIsFor dark={dark} />
       <TrustSection />
+      <EarlyAccessSection dark={dark} />
       <PricingSection dark={dark} />
       <FinalCTA />
       <SiteFooter />
@@ -984,6 +985,44 @@ function TrustSection() {
           style={{ color: "rgba(255,255,255,0.85)", fontFamily: DM, fontWeight: 400 }}
         >
           Competitors verify founders only.&nbsp;&nbsp;Hockystick verifies both.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 7.5 — EARLY ACCESS (social proof)
+   No fabricated testimonials — the feedback table is empty as of July 2026.
+   When real founder quotes exist, replace this section with them.
+═══════════════════════════════════════════════════════════════════════════ */
+function EarlyAccessSection({ dark }: { dark: boolean }) {
+  const bg = dark ? "#0A0A0B" : "#FFFFFF";
+  const headingColor = dark ? "#FFFFFF" : "#111827";
+  const bodyColor = dark ? W60 : "#4B5563";
+
+  return (
+    <section className="w-full py-20" style={{ background: bg }}>
+      <div className="max-w-[700px] mx-auto px-6 text-center">
+        <div
+          className="mb-3 text-xs font-semibold uppercase tracking-[0.14em]"
+          style={{ color: PURPLE, fontFamily: SYNE }}
+        >
+          EARLY ACCESS
+        </div>
+        <h2
+          className="mb-4"
+          style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(24px, 3.5vw, 32px)", color: headingColor }}
+        >
+          Join our growing community of founders preparing for institutional fundraising.
+        </h2>
+        <p
+          className="leading-relaxed"
+          style={{ fontFamily: DM, fontWeight: 300, fontSize: "16px", color: bodyColor }}
+        >
+          Hockystick is in beta with founders raising across the GCC. Every profile is
+          verified, every deal room is NDA-gated, and every claim on this page is a real
+          platform number — not a projection.
         </p>
       </div>
     </section>
