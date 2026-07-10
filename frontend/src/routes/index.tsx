@@ -694,7 +694,7 @@ function ForFounders({ dark }: { dark: boolean }) {
               Start raising <ArrowRight className="h-4 w-4" />
             </Link>
             <p className="mt-3 text-xs" style={{ color: captionColor, fontFamily: DM }}>
-              8 founders currently fundraising on Hockystick
+              Verified founders, actively raising on Hockystick
             </p>
           </div>
 
