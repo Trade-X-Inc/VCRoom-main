@@ -313,16 +313,13 @@ function ProfileBuilder() {
           userId: user!.id,
           history: history.map((m) => ({ role: m.role, content: m.content })),
           questionIndex: qIdx,
+          companyName: startup?.company_name ?? undefined,
         },
       });
 
       if (result.isDone) {
         setInterviewDone(true);
-        const doneMsg: ChatMsg = {
-          id: `ai-done`,
-          role: "ai",
-          content: "Great — I have enough to build your profile. Let me put it together now.",
-        };
+        const doneMsg: ChatMsg = { id: `ai-done`, role: "ai", content: result.question };
         setMsgs((prev) => [...prev, doneMsg]);
       } else {
         const aiMsg: ChatMsg = { id: `ai-${Date.now()}`, role: "ai", content: result.question };
@@ -330,8 +327,8 @@ function ProfileBuilder() {
         if (!result.isFollowUp) setQuestionIndex(qIdx + 1);
       }
     } catch {
-      const fallback = qIdx < 8
-        ? `Question ${qIdx + 1}: Let's continue — what else can you tell me?`
+      const fallback = qIdx < 10
+        ? `Let's continue — what else can you tell me about that?`
         : "Thanks — I have enough to build your profile.";
       setMsgs((prev) => [...prev, { id: `ai-err-${Date.now()}`, role: "ai", content: fallback }]);
     } finally {

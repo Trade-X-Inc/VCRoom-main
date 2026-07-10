@@ -166,11 +166,20 @@ ${data.transcript}`;
     }
   });
 
-// ── Interview next question ────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Interview v3 — sector-aware and stage-aware question tree.
+//
+// Phase 1 (everyone, 4 questions) → Phase 2 (4 questions branched on stage)
+// → Phase 3 (2 questions branched on sector). 10 main questions total, at
+// most 2 clarifying follow-ups across the whole interview (12 hard cap).
+// Conduct: one question at a time, acknowledge each answer, never argue.
+// ─────────────────────────────────────────────────────────────────────────────
+
 type InterviewQuestionInput = {
   userId: string;
   history: Array<{ role: "ai" | "founder"; content: string }>;
   questionIndex: number;
+  companyName?: string;
 };
 
 type InterviewQuestionResult = {
@@ -180,58 +189,180 @@ type InterviewQuestionResult = {
   error: string | null;
 };
 
-const INTERVIEW_QUESTIONS = [
-  "What's your company called, and what does it do in one sentence?",
-  "What stage are you at — pre-revenue, pre-seed, seed, or Series A?",
-  "What problem are you solving, and for who?",
-  "How do you make money? (Or plan to)",
-  "What's your traction so far? (users, revenue, pilots, LOIs — whatever you have)",
-  "Who's on your team? Names and what they do.",
-  "How much are you raising, and what's it for?",
-  "What's your biggest competitive advantage?",
-];
+type StageKey = "pre_revenue" | "early_revenue" | "growing";
+type SectorKey =
+  | "fintech" | "deeptech" | "saas" | "healthtech" | "agritech"
+  | "cleantech" | "logistics" | "edtech" | "ecommerce" | "other";
+
+function classifyStage(answer: string): StageKey {
+  const a = answer.toLowerCase();
+  if (/(pre[- ]?revenue|idea|concept|no revenue|not launched|pre[- ]?launch)/.test(a)) return "pre_revenue";
+  if (/(scal|growth|growing|series [ab]|expand)/.test(a)) return "growing";
+  return "early_revenue";
+}
+
+function classifySector(answer: string): SectorKey {
+  const a = answer.toLowerCase();
+  if (/fin(tech)?|payment|banking|lending|insur/.test(a)) return "fintech";
+  if (/deep ?tech|robot|hardware|semiconductor|space|biotech(?!.*health)|quantum|ai chip/.test(a)) return "deeptech";
+  if (/saas|software|b2b tool|platform/.test(a)) return "saas";
+  if (/health|medical|med(tech)?|pharma|clinic|diagnos/.test(a)) return "healthtech";
+  if (/agri|farm|food production|crop/.test(a)) return "agritech";
+  if (/clean|climate|carbon|solar|energy|sustainab/.test(a)) return "cleantech";
+  if (/logisti|freight|shipping|supply chain|delivery|fulfillment/.test(a)) return "logistics";
+  if (/ed(u|tech)|learning|school|training/.test(a)) return "edtech";
+  if (/e-?commerce|marketplace|retail|d2c|dtc|consumer brand/.test(a)) return "ecommerce";
+  return "other";
+}
+
+const PHASE2: Record<StageKey, string[]> = {
+  pre_revenue: [
+    "What problem are you solving and who specifically has this problem? Give me a real example of a customer you've spoken to.",
+    "What's your unfair advantage — why will you win over the next competitor to enter this space?",
+    "Who is on your founding team and what makes them the right people to solve this?",
+    "What does your path to first revenue look like and when do you expect it?",
+  ],
+  early_revenue: [
+    "What is your current MRR or ARR and how has it trended over the last 3 months?",
+    "Describe your average customer — who are they, how did you find them, and what do they pay?",
+    "What does your cost structure look like — what are your main expenses?",
+    "What specifically will the funding enable that you cannot do today?",
+  ],
+  growing: [
+    "What are your key metrics? MRR, growth rate, churn, CAC, LTV — give me the real numbers.",
+    "What is your go-to-market strategy and what's working versus what you're still figuring out?",
+    "What does your competitive landscape look like and how do you win against the alternatives?",
+    "What does your team look like and what key hires are you planning with this round?",
+  ],
+};
+
+const PHASE3: Record<SectorKey, string[]> = {
+  fintech: [
+    "Are you regulated? What licenses do you hold or plan to obtain, and in which jurisdictions?",
+    "How do you handle fraud risk and what is your current fraud rate?",
+  ],
+  deeptech: [
+    "What is the core IP — do you have patents filed or granted, and what specifically do they cover?",
+    "What is your hardware unit economics — what does it cost to manufacture and what do you sell it for?",
+  ],
+  saas: [
+    "What is your net revenue retention rate and how does it trend as customers mature?",
+    "What does your sales cycle look like and who in the customer organization signs the contract?",
+  ],
+  healthtech: [
+    "What regulatory pathway are you on (FDA, CE, CDSCO, etc.) and where are you in that process?",
+    "Are you selling to hospitals, payers, or patients directly — and who actually pays?",
+  ],
+  agritech: [
+    "What is your distribution model — do you sell direct to farmers or through aggregators?",
+    "What is the seasonal revenue pattern and how do you manage working capital through off-seasons?",
+  ],
+  cleantech: [
+    "What is your carbon impact claim and how is it measured and verified?",
+    "Are you dependent on government subsidies or regulatory mandates to be economically viable?",
+  ],
+  logistics: [
+    "Do you own assets (vehicles, warehouses) or run an asset-light model — and what does that mean for your margins?",
+    "What are your unit economics per shipment or delivery, and how do they change with density?",
+  ],
+  edtech: [
+    "Who pays — institutions, parents, or learners — and how long is the sales cycle for that buyer?",
+    "What are your engagement and completion rates, and how do they compare to your category?",
+  ],
+  ecommerce: [
+    "What are your contribution margins after shipping, returns, and acquisition costs?",
+    "What is your repeat purchase rate and what share of revenue comes from returning customers?",
+  ],
+  other: [
+    "What is the single metric that best proves your business is working, and where is it today?",
+    "What is the biggest risk to this business in the next 12 months and how are you handling it?",
+  ],
+};
+
+/** Build the full ordered plan of 10 main questions from what's known so far. */
+function buildQuestionPlan(companyName: string | undefined, stage: StageKey, sector: SectorKey): string[] {
+  const name = companyName?.trim() || "your company";
+  return [
+    `What does ${name} do? Describe it in one sentence as if explaining to someone who doesn't know your industry.`,
+    "What stage are you at? (Pre-revenue idea / Early revenue / Growing revenue / Scaling / Other)",
+    "What sector are you in? (Fintech / DeepTech / SaaS / HealthTech / AgriTech / CleanTech / Logistics / EdTech / E-commerce / Other)",
+    "How much are you looking to raise, and what will you use it for?",
+    ...PHASE2[stage],
+    ...PHASE3[sector],
+  ];
+}
+
+/** Find the founder's answer to main question N by locating the AI message that asked it. */
+function answerToQuestion(history: InterviewQuestionInput["history"], questionText: string): string | null {
+  for (let i = 0; i < history.length; i++) {
+    const m = history[i];
+    if (m.role === "ai" && m.content.includes(questionText.slice(0, 30))) {
+      const next = history.slice(i + 1).find((h) => h.role === "founder");
+      return next?.content ?? null;
+    }
+  }
+  return null;
+}
+
+const DONE_MESSAGE =
+  "I have enough to build your profile. Let me put this together — you can review and edit everything before it goes live.";
 
 export const getNextInterviewQuestion = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as InterviewQuestionInput)
   .handler(async ({ data }): Promise<InterviewQuestionResult> => {
-    // All 8 areas answered — done
-    if (data.questionIndex >= INTERVIEW_QUESTIONS.length) {
-      return { question: "", isFollowUp: false, isDone: true, error: null };
+    // Resolve the plan from answers so far. Stage/sector default until Q2/Q3
+    // are answered; the plan is stable for Phase 1 regardless.
+    const provisionalPlan = buildQuestionPlan(data.companyName, "early_revenue", "other");
+    const stageAnswer = answerToQuestion(data.history, provisionalPlan[1]);
+    const sectorAnswer = answerToQuestion(data.history, provisionalPlan[2]);
+    const stage = stageAnswer ? classifyStage(stageAnswer) : "early_revenue";
+    const sector = sectorAnswer ? classifySector(sectorAnswer) : "other";
+    const plan = buildQuestionPlan(data.companyName, stage, sector);
+
+    // All 10 main questions answered — done.
+    if (data.questionIndex >= plan.length) {
+      return { question: DONE_MESSAGE, isFollowUp: false, isDone: true, error: null };
     }
 
-    // If there was a last founder answer, check if a follow-up is warranted
     const lastExchanges = data.history.slice(-2);
     const lastFounderAnswer = lastExchanges.find((h) => h.role === "founder");
     const lastAIMsg = lastExchanges.find((h) => h.role === "ai");
 
-    // If the last AI message was already a follow-up (not a main question), move on
-    const lastWasFollowUp = lastAIMsg && !INTERVIEW_QUESTIONS.some((q) => lastAIMsg.content.startsWith(q.slice(0, 20)));
+    // Was the last AI message a main question (vs. a follow-up)?
+    const lastWasMainQuestion = !!lastAIMsg && plan.some((q) => lastAIMsg.content.includes(q.slice(0, 30)));
 
-    if (lastFounderAnswer && !lastWasFollowUp) {
-      // Ask AI: should we follow up or move on?
+    // Hard cap: at most 2 follow-ups across the interview (10 main + 2 = 12 max)
+    const followUpsSoFar = data.history.filter(
+      (m) => m.role === "ai" && !plan.some((q) => m.content.includes(q.slice(0, 30))) && m.content !== DONE_MESSAGE,
+    ).length;
+
+    let ack = "";
+    if (lastFounderAnswer && lastWasMainQuestion) {
+      // One combined AI call: acknowledge the answer, decide on a follow-up.
       try {
-        const systemPrompt = `You are conducting a structured founder interview to build a startup profile.
-The current main question was: "${INTERVIEW_QUESTIONS[data.questionIndex - 1]}"
-The founder answered: "${lastFounderAnswer.content}"
-
-Decide: is ONE brief clarifying follow-up question warranted because the answer was vague, ambiguous, or incomplete for building a startup profile?
-
-Rules:
-- If the answer is clear enough, respond with exactly: MOVE_ON
-- If a follow-up is needed, write ONLY the follow-up question (one sentence, conversational, not a form field).
-- Never ask more than one follow-up per main question.
-- Do not re-ask the main question.`;
-
-        const decision = await callOpenAI(systemPrompt, "Should I follow up?", 100);
-        const trimmed = decision.trim();
-        if (trimmed !== "MOVE_ON" && trimmed.length > 5) {
-          return { question: trimmed, isFollowUp: true, isDone: false, error: null };
+        const systemPrompt = [
+          "You are a sharp, warm venture investor conducting a founder interview to build their profile.",
+          `The question you asked was: "${lastAIMsg!.content}"`,
+          `The founder answered: "${lastFounderAnswer.content}"`,
+          "Return ONLY JSON: { \"ack\": string, \"follow_up\": string | null }",
+          "Rules:",
+          "- ack: ONE short sentence acknowledging their answer naturally (max 15 words). Never argue, never say the answer is wrong, never grade it.",
+          "- follow_up: only if the answer is vague or missing a concrete number/timeframe (e.g. \"we're growing fast\"), ask ONE specific clarifier like \"Can you give me a specific number or timeframe for that?\". Otherwise null.",
+          "- Never re-ask the question. Never ask more than one thing.",
+        ].join("\n");
+        const raw = await callOpenAI(systemPrompt, "Respond with the JSON.", 150);
+        const parsed = parseExtractionJSON(raw) as { ack?: string; follow_up?: string | null };
+        ack = (parsed.ack ?? "").trim();
+        const followUp = (parsed.follow_up ?? "").toString().trim();
+        if (followUp && followUp.toLowerCase() !== "null" && followUpsSoFar < 2) {
+          return { question: followUp, isFollowUp: true, isDone: false, error: null };
         }
       } catch {
-        // Fall through to next main question on error
+        ack = "Got it.";
       }
     }
 
-    const nextQ = INTERVIEW_QUESTIONS[data.questionIndex];
-    return { question: nextQ, isFollowUp: false, isDone: false, error: null };
+    const nextQ = plan[data.questionIndex];
+    const question = ack ? `${ack} ${nextQ}` : nextQ;
+    return { question, isFollowUp: false, isDone: false, error: null };
   });
