@@ -664,9 +664,9 @@ function ForFounders({ dark }: { dark: boolean }) {
               className="mb-5 leading-tight"
               style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: headingColor }}
             >
-              Stop chasing investors.
+              Everything an analyst, lawyer, and advisor would prepare.
               <br />
-              Start closing rounds.
+              Built in minutes.
             </h2>
             <ul className="space-y-3 mb-8">
               {FOUNDER_FEATS.map((f) => (
@@ -833,9 +833,9 @@ function ForInvestors({ dark }: { dark: boolean }) {
               className="mb-5 leading-tight"
               style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: headingColor }}
             >
-              Every deal. One place.
+              Analyst-grade deal flow.
               <br />
-              Zero noise.
+              Without the analyst.
             </h2>
             <ul className="space-y-3 mb-8">
               {INVESTOR_FEATS.map((f) => (
