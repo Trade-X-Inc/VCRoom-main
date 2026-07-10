@@ -716,6 +716,7 @@ function ProfileBuilder() {
       isMissing={isMissing}
       onField={field}
       onSave={handleSave}
+      docResults={docResults}
     />
   );
 }
@@ -1066,8 +1067,52 @@ function ExtractingScreen() {
 
 // ── CONFIRM ────────────────────────────────────────────────────────────────────
 
+const DOC_TYPE_LABELS: Record<string, string> = {
+  pitch_deck: "Pitch deck",
+  financial_model: "Financial model",
+  cap_table: "Cap table",
+  legal_document: "Legal document",
+  team_document: "Team document",
+  unknown: "Not recognized",
+};
+
+// Human-readable summary of what a typed extraction actually pulled out,
+// so the founder can see per-document what came from where.
+function extractionSummary(r: TypedExtraction): string[] {
+  const out: string[] = [];
+  const push = (label: string, v: unknown) => {
+    if (v !== null && v !== undefined && v !== "") out.push(`${label}: ${v}`);
+  };
+  if (r.pitch) {
+    const filled = Object.entries(r.pitch).filter(([k, v]) => k !== "missing_fields" && v !== null && v !== "").length;
+    out.push(`${filled} profile fields extracted`);
+  }
+  if (r.financial) {
+    push("MRR", r.financial.mrr_usd != null ? `$${r.financial.mrr_usd.toLocaleString()}` : null);
+    push("ARR", r.financial.arr_usd != null ? `$${r.financial.arr_usd.toLocaleString()}` : null);
+    push("Growth (3mo)", r.financial.growth_rate_3mo);
+    push("Runway", r.financial.runway_months != null ? `${r.financial.runway_months} months` : null);
+    push("Monthly burn", r.financial.burn_rate_monthly_usd != null ? `$${r.financial.burn_rate_monthly_usd.toLocaleString()}` : null);
+    push("Headcount", r.financial.headcount);
+  }
+  if (r.cap_table) {
+    push("Founder ownership", r.cap_table.founder_ownership_pct != null ? `${r.cap_table.founder_ownership_pct}%` : null);
+    push("Shareholders", r.cap_table.total_shareholders);
+    push("Options pool", r.cap_table.has_options_pool == null ? null : r.cap_table.has_options_pool ? "yes" : "no");
+    push("Shares issued", r.cap_table.total_shares_issued?.toLocaleString());
+  }
+  if (r.legal) {
+    push("Legal name", r.legal.legal_name);
+    push("Registration #", r.legal.registration_number);
+    push("Jurisdiction", r.legal.jurisdiction);
+    push("Incorporated", r.legal.incorporated_at);
+  }
+  if (r.team?.length) out.push(`${r.team.length} team member${r.team.length !== 1 ? "s" : ""} found`);
+  return out;
+}
+
 function ConfirmScreen({
-  form, missingFields, extractionError, saving, isMissing, onField, onSave,
+  form, missingFields, extractionError, saving, isMissing, onField, onSave, docResults,
 }: {
   form: ExtractedProfile;
   missingFields: string[];
@@ -1076,6 +1121,7 @@ function ConfirmScreen({
   isMissing: (key: string) => boolean;
   onField: <K extends keyof ExtractedProfile>(key: K) => (val: ExtractedProfile[K]) => void;
   onSave: () => void;
+  docResults?: Array<{ fileName: string; result: TypedExtraction }>;
 }) {
   const textareaFields = TEXTAREA_FIELDS;
 
@@ -1170,6 +1216,60 @@ function ConfirmScreen({
           <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "10px 14px", marginBottom: 24, fontSize: 12, color: "#EF4444", display: "flex", alignItems: "center", gap: 8 }}>
             <AlertTriangle size={14} />
             We had trouble processing that. You can still fill in the details manually below.
+          </div>
+        )}
+
+        {/* Per-document detection results */}
+        {docResults && docResults.length > 0 && (
+          <div style={{ ...card, marginBottom: 24 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 2 }}>Documents we read</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginBottom: 14 }}>
+              What each file was detected as, and what we pulled from it.
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {docResults.map(({ fileName, result }) => {
+                const unknown = result.document_type === "unknown";
+                const lowConf = result.confidence !== "high";
+                const summary = extractionSummary(result);
+                return (
+                  <div key={fileName} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8, padding: "10px 14px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                      <FileText size={13} style={{ color: "rgba(255,255,255,0.35)", flexShrink: 0 }} />
+                      <span style={{ fontSize: 13, color: "#fff", fontWeight: 500, wordBreak: "break-all" }}>{fileName}</span>
+                      <span style={{
+                        fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 999,
+                        background: unknown ? "rgba(245,158,11,0.12)" : "rgba(16,185,129,0.12)",
+                        color: unknown ? "#F59E0B" : "#10B981",
+                      }}>
+                        {DOC_TYPE_LABELS[result.document_type]}
+                      </span>
+                      {!unknown && (
+                        <span style={{
+                          fontSize: 11, padding: "2px 8px", borderRadius: 999,
+                          background: lowConf ? "rgba(245,158,11,0.12)" : "rgba(255,255,255,0.06)",
+                          color: lowConf ? "#F59E0B" : "rgba(255,255,255,0.4)",
+                        }}>
+                          {lowConf ? "Low confidence — double-check below" : "High confidence"}
+                        </span>
+                      )}
+                    </div>
+                    {unknown ? (
+                      <div style={{ fontSize: 12, color: "#F59E0B", marginTop: 6 }}>
+                        Could not detect document type — please review manually.{result.detail ? ` ${result.detail}` : ""}
+                      </div>
+                    ) : summary.length > 0 ? (
+                      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 6, display: "flex", flexWrap: "wrap", gap: "4px 14px" }}>
+                        {summary.map((s) => <span key={s}>{s}</span>)}
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", marginTop: 6 }}>
+                        Detected, but no structured fields could be extracted.
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
