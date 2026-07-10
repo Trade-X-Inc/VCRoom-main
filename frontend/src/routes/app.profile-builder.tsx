@@ -42,7 +42,35 @@ interface ExtractedProfile {
   funding_target: string | null;
   use_of_funds: string | null;
   competitive_advantage: string | null;
+  // v3 — investor-ready output
+  one_liner: string | null;
+  investor_narrative: string | null;
+  fundraising_instrument: string | null;
+  fundraising_target_close: string | null;
+  fundraising_committed_amount: string | null;
+  // v3 — key metrics card
+  mrr_usd: string | null;
+  growth_rate: string | null;
+  runway_months: string | null;
+  team_size: string | null;
+  founded_year: string | null;
+  // v3 — cap table + legal (from document extraction)
+  founder_ownership_pct: string | null;
+  total_shareholders: string | null;
+  has_options_pool: boolean | null;
+  legal_entity_name: string | null;
+  registration_number: string | null;
+  incorporated_in: string | null;
+  incorporated_at: string | null;
 }
+
+const V3_EMPTY = {
+  one_liner: null, investor_narrative: null,
+  fundraising_instrument: null, fundraising_target_close: null, fundraising_committed_amount: null,
+  mrr_usd: null, growth_rate: null, runway_months: null, team_size: null, founded_year: null,
+  founder_ownership_pct: null, total_shareholders: null, has_options_pool: null,
+  legal_entity_name: null, registration_number: null, incorporated_in: null, incorporated_at: null,
+} as const;
 
 interface ChatMsg {
   id: string;
@@ -66,9 +94,27 @@ const FIELD_LABELS: Record<string, string> = {
   funding_target: "Funding target",
   use_of_funds: "Use of funds",
   competitive_advantage: "Competitive advantage",
+  // v3
+  one_liner: "One-liner (max 25 words)",
+  investor_narrative: "Investor narrative",
+  fundraising_instrument: "Instrument",
+  fundraising_target_close: "Target close",
+  fundraising_committed_amount: "Committed so far (USD)",
+  mrr_usd: "MRR (USD)",
+  growth_rate: "Growth rate",
+  runway_months: "Runway (months)",
+  team_size: "Team size",
+  founded_year: "Founded year",
+  founder_ownership_pct: "Founder ownership %",
+  total_shareholders: "Shareholders",
+  has_options_pool: "Options pool",
+  legal_entity_name: "Legal name",
+  registration_number: "Registration number",
+  incorporated_in: "Jurisdiction",
+  incorporated_at: "Incorporation date",
 };
 
-const TEXTAREA_FIELDS = new Set(["problem", "solution", "business_model", "traction", "use_of_funds", "competitive_advantage"]);
+const TEXTAREA_FIELDS = new Set(["problem", "solution", "business_model", "traction", "use_of_funds", "competitive_advantage", "investor_narrative"]);
 
 // ── Styles ─────────────────────────────────────────────────────────────────────
 
@@ -150,6 +196,7 @@ function ProfileBuilder() {
     problem: null, solution: null, business_model: null, market_size: null,
     traction: null, team: [], funding_target: null, use_of_funds: null,
     competitive_advantage: null,
+    ...V3_EMPTY,
   });
   const [saving, setSaving] = useState(false);
 
@@ -338,6 +385,8 @@ function ProfileBuilder() {
             ],
           }));
         }
+        // Metrics from documents + AI-drafted one-liner/narrative
+        await enrichV3(pitchData ?? {}, undefined, merged);
       }
     } catch (err: any) {
       setExtractionError(err.message);
@@ -415,9 +464,9 @@ function ProfileBuilder() {
       .map((m) => `${m.role === "ai" ? "Interviewer" : "Founder"}: ${m.content}`)
       .join("\n\n");
 
-    const result = await extractProfileFromInterview({
+    const result = (await extractProfileFromInterview({
       data: { userId: user!.id, transcript },
-    });
+    })) as { data: Record<string, unknown> | null; missing_fields: string[]; error?: string };
 
     if (result.error || !result.data) {
       setExtractionError(result.error ?? "Extraction failed");
@@ -429,6 +478,8 @@ function ProfileBuilder() {
       });
       setMissingFields(result.missing_fields);
       populateForm(result.data);
+      // AI-drafted one-liner, narrative, fundraising terms from the transcript
+      await enrichV3(result.data, transcript);
     }
     setScreen("confirm");
   }
@@ -436,7 +487,8 @@ function ProfileBuilder() {
   // ── Confirmation helpers ───────────────────────────────────────────────────
 
   function populateForm(data: Record<string, unknown>) {
-    setForm({
+    setForm((prev) => ({
+      ...prev,
       company_name: (data.company_name as string) ?? null,
       tagline: (data.tagline as string) ?? null,
       sector: (data.sector as string) ?? null,
@@ -450,7 +502,48 @@ function ProfileBuilder() {
       funding_target: (data.funding_target as string) ?? null,
       use_of_funds: (data.use_of_funds as string) ?? null,
       competitive_advantage: (data.competitive_advantage as string) ?? null,
-    });
+    }));
+  }
+
+  /** Merge v3 typed document extractions + generate the investor-ready copy. */
+  async function enrichV3(profileData: Record<string, unknown>, transcript?: string, extras?: typeof extraV3) {
+    // Numbers from documents flow straight into the metrics fields
+    if (extras) {
+      setForm((prev) => ({
+        ...prev,
+        mrr_usd: extras.financial?.mrr_usd != null ? String(extras.financial.mrr_usd) : prev.mrr_usd,
+        growth_rate: extras.financial?.growth_rate_3mo ?? prev.growth_rate,
+        runway_months: extras.financial?.runway_months != null ? String(extras.financial.runway_months) : prev.runway_months,
+        team_size: extras.financial?.headcount != null ? String(extras.financial.headcount) : prev.team_size,
+        founder_ownership_pct: extras.cap_table?.founder_ownership_pct != null ? String(extras.cap_table.founder_ownership_pct) : prev.founder_ownership_pct,
+        total_shareholders: extras.cap_table?.total_shareholders != null ? String(extras.cap_table.total_shareholders) : prev.total_shareholders,
+        has_options_pool: extras.cap_table?.has_options_pool ?? prev.has_options_pool,
+        legal_entity_name: extras.legal?.legal_name ?? prev.legal_entity_name,
+        registration_number: extras.legal?.registration_number ?? prev.registration_number,
+        incorporated_in: extras.legal?.jurisdiction ?? prev.incorporated_in,
+        incorporated_at: extras.legal?.incorporated_at ?? prev.incorporated_at,
+      }));
+    }
+
+    // AI-drafted one-liner, narrative, and fundraising terms — founder edits before saving
+    try {
+      const { generateProfileNarrative } = await import("@/lib/profile-builder-fn");
+      const narrative = await generateProfileNarrative({
+        data: { userId: user!.id, profile: profileData, transcript, extras: extras as Record<string, unknown> | undefined },
+      });
+      if (!narrative.error) {
+        setForm((prev) => ({
+          ...prev,
+          one_liner: narrative.one_liner ?? prev.one_liner,
+          investor_narrative: narrative.investor_narrative ?? prev.investor_narrative,
+          fundraising_instrument: narrative.fundraising_instrument ?? prev.fundraising_instrument,
+          fundraising_target_close: narrative.fundraising_target_close ?? prev.fundraising_target_close,
+          fundraising_committed_amount: narrative.fundraising_committed_amount != null ? String(narrative.fundraising_committed_amount) : prev.fundraising_committed_amount,
+        }));
+      }
+    } catch {
+      // Narrative is an enhancement — never blocks the confirm screen.
+    }
   }
 
   function field<K extends keyof ExtractedProfile>(key: K) {
@@ -463,6 +556,12 @@ function ProfileBuilder() {
     if (!startup?.id || !user?.id) return;
     setSaving(true);
     try {
+      const num = (v: string | null): number | undefined => {
+        if (!v) return undefined;
+        const n = Number(String(v).replace(/[^0-9.\-]/g, ""));
+        return Number.isFinite(n) ? n : undefined;
+      };
+
       const { error } = await supabase
         .from("startups")
         .update({
@@ -478,11 +577,52 @@ function ProfileBuilder() {
           funding_target: form.funding_target ?? undefined,
           use_of_funds: form.use_of_funds ?? undefined,
           competitive_advantage: form.competitive_advantage ?? undefined,
+          // v3 — investor-ready output
+          one_liner: form.one_liner ?? undefined,
+          investor_narrative: form.investor_narrative ?? undefined,
+          fundraising_instrument: form.fundraising_instrument ?? undefined,
+          fundraising_target_close: form.fundraising_target_close ?? undefined,
+          fundraising_committed_amount: num(form.fundraising_committed_amount),
+          // v3 — metrics card
+          mrr_usd: num(form.mrr_usd),
+          growth_rate: form.growth_rate ?? undefined,
+          runway_months: num(form.runway_months),
+          team_size: num(form.team_size),
+          founded_year: num(form.founded_year),
+          // v3 — cap table + legal
+          founder_ownership_pct: num(form.founder_ownership_pct),
+          total_shareholders: num(form.total_shareholders),
+          has_options_pool: form.has_options_pool ?? undefined,
+          legal_entity_name: form.legal_entity_name ?? undefined,
+          registration_number: form.registration_number ?? undefined,
+          incorporated_in: form.incorporated_in ?? undefined,
+          incorporated_at: form.incorporated_at ?? undefined,
           updated_at: new Date().toISOString(),
         })
         .eq("id", startup.id);
 
       if (error) throw error;
+
+      // Persist team to team_members (previously collected but never saved)
+      const teamRows = form.team.filter((t) => t.name.trim());
+      if (teamRows.length) {
+        const { data: existingMembers } = await supabase
+          .from("team_members")
+          .select("name")
+          .eq("startup_id", startup.id);
+        const existingNames = new Set((existingMembers ?? []).map((m) => m.name));
+        const newMembers = teamRows
+          .filter((t) => !existingNames.has(t.name.trim()))
+          .map((t, i) => ({
+            startup_id: startup.id,
+            name: t.name.trim(),
+            title: t.role?.trim() || null,
+            display_order: existingNames.size + i,
+          }));
+        if (newMembers.length) {
+          await supabase.from("team_members").insert(newMembers);
+        }
+      }
 
       if (sessionId) {
         await patchSession(sessionId, {
@@ -939,10 +1079,10 @@ function ConfirmScreen({
 }) {
   const textareaFields = TEXTAREA_FIELDS;
 
-  function FieldRow({ fieldKey }: { fieldKey: keyof ExtractedProfile }) {
+  function FieldRow({ fieldKey, optional }: { fieldKey: keyof ExtractedProfile; optional?: boolean }) {
     if (fieldKey === "team") return null; // handled separately
     const val = (form[fieldKey] as string) ?? "";
-    const missing = isMissing(fieldKey as string);
+    const missing = !optional && isMissing(fieldKey as string);
     const style = missing ? missingBorder : inputBase;
     const isTA = textareaFields.has(fieldKey as string);
 
@@ -954,7 +1094,7 @@ function ConfirmScreen({
             <AlertTriangle size={11} /> We couldn't find this — please fill it in.
           </div>
         )}
-        {!missing && (
+        {!missing && !optional && (
           <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", marginBottom: 4 }}>
             AI-extracted — review and edit
           </div>
@@ -968,11 +1108,20 @@ function ConfirmScreen({
             <option value="">Select stage…</option>
             {STAGES.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
+        ) : fieldKey === "fundraising_instrument" ? (
+          <select
+            value={val}
+            onChange={(e) => (onField("fundraising_instrument") as (v: string | null) => void)(e.target.value || null)}
+            style={{ ...style, appearance: "none" }}
+          >
+            <option value="">TBD</option>
+            {["SAFE", "Equity", "Convertible Note"].map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
         ) : isTA ? (
           <textarea
             value={val}
             onChange={(e) => (onField(fieldKey) as (v: string | null) => void)(e.target.value)}
-            rows={3}
+            rows={fieldKey === "investor_narrative" ? 9 : 3}
             style={{ ...style, resize: "vertical" }}
           />
         ) : (
@@ -983,6 +1132,15 @@ function ConfirmScreen({
             style={style}
           />
         )}
+      </div>
+    );
+  }
+
+  function SectionHeader({ title, hint }: { title: string; hint: string }) {
+    return (
+      <div style={{ margin: "26px 0 14px", paddingTop: 20, borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{title}</div>
+        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>{hint}</div>
       </div>
     );
   }
@@ -1066,6 +1224,64 @@ function ConfirmScreen({
               >
                 <Plus size={12} /> Add team member
               </button>
+            </div>
+          </div>
+
+          {/* v3 — Investor-ready profile */}
+          <SectionHeader
+            title="Investor-ready profile"
+            hint="AI-drafted from your answers and documents. Edit anything before publishing."
+          />
+          <FieldRow fieldKey="one_liner" optional />
+          <FieldRow fieldKey="investor_narrative" optional />
+
+          <SectionHeader
+            title="Key metrics"
+            hint="Shown as a metrics card on your profile. Leave blank what doesn't apply."
+          />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", columnGap: 12 }}>
+            <FieldRow fieldKey="mrr_usd" optional />
+            <FieldRow fieldKey="growth_rate" optional />
+            <FieldRow fieldKey="runway_months" optional />
+            <FieldRow fieldKey="team_size" optional />
+            <FieldRow fieldKey="founded_year" optional />
+          </div>
+
+          <SectionHeader
+            title="Fundraising status"
+            hint="What you're raising, on what instrument, and how much is committed."
+          />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", columnGap: 12 }}>
+            <FieldRow fieldKey="fundraising_instrument" optional />
+            <FieldRow fieldKey="fundraising_target_close" optional />
+            <FieldRow fieldKey="fundraising_committed_amount" optional />
+          </div>
+
+          <SectionHeader
+            title="Legal & ownership"
+            hint="From your cap table and incorporation documents, if provided."
+          />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", columnGap: 12 }}>
+            <FieldRow fieldKey="legal_entity_name" optional />
+            <FieldRow fieldKey="registration_number" optional />
+            <FieldRow fieldKey="incorporated_in" optional />
+            <FieldRow fieldKey="incorporated_at" optional />
+            <FieldRow fieldKey="founder_ownership_pct" optional />
+            <FieldRow fieldKey="total_shareholders" optional />
+            <div style={{ marginBottom: 16 }}>
+              <label style={labelStyle}>{FIELD_LABELS.has_options_pool}</label>
+              <select
+                value={form.has_options_pool === true ? "yes" : form.has_options_pool === false ? "no" : ""}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  (onField("has_options_pool") as (v: boolean | null) => void)(v === "yes" ? true : v === "no" ? false : null);
+                }}
+                style={{ ...inputBase, appearance: "none" }}
+              >
+                <option value="">Unknown</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
             </div>
           </div>
         </div>

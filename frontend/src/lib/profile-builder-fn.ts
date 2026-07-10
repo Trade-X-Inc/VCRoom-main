@@ -303,6 +303,76 @@ export const detectAndExtractDocument = createServerFn({ method: "POST" })
   });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Investor-ready output: one-liner + 3-paragraph narrative + fundraising terms.
+// Generated from what the founder actually said/uploaded — the founder reviews
+// and edits everything before it goes anywhere.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type NarrativeInput = {
+  userId: string;
+  profile: Record<string, unknown>;
+  transcript?: string;
+  extras?: Record<string, unknown>;
+};
+
+export type NarrativeResult = {
+  one_liner: string | null;
+  investor_narrative: string | null;
+  fundraising_instrument: "SAFE" | "Equity" | "Convertible Note" | "TBD" | null;
+  fundraising_target_close: string | null;
+  fundraising_committed_amount: number | null;
+  error: string | null;
+};
+
+export const generateProfileNarrative = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as NarrativeInput)
+  .handler(async ({ data }): Promise<NarrativeResult> => {
+    const systemPrompt = [
+      "You turn structured startup data (and optionally an interview transcript) into investor-ready profile copy.",
+      "Return ONLY valid JSON:",
+      '{ "one_liner": string, "investor_narrative": string, "fundraising_instrument": "SAFE"|"Equity"|"Convertible Note"|"TBD", "fundraising_target_close": string|null, "fundraising_committed_amount": number|null }',
+      "Rules for one_liner:",
+      '- Format: "[Company] [does/makes/enables] [what] for [who] by [how]". Maximum 25 words. Concrete, no buzzwords, no superlatives.',
+      "Rules for investor_narrative — exactly 3 paragraphs separated by blank lines:",
+      "- Paragraph 1 — Problem + Market: what problem, how big, why now.",
+      "- Paragraph 2 — Solution + Traction: what they built, proof it works, key metrics.",
+      "- Paragraph 3 — Ask + Use of funds: how much, what for, why these investors.",
+      "- Use ONLY facts the founder stated. Never invent numbers, customers, or claims. If a paragraph lacks material, keep it short rather than padding it.",
+      "- Write in third person, plain confident prose. No exclamation marks. Sentences under 20 words where possible.",
+      "Fundraising fields: infer instrument only if explicitly stated (e.g. 'on a SAFE'), else 'TBD'. target_close like 'Q1 2027' only if stated, else null. committed_amount only if stated, else null.",
+    ].join("\n");
+
+    const userMessage = [
+      "STRUCTURED PROFILE:",
+      JSON.stringify(data.profile, null, 1).slice(0, 4000),
+      data.extras ? `\nEXTRACTED DOCUMENT DATA:\n${JSON.stringify(data.extras, null, 1).slice(0, 2000)}` : "",
+      data.transcript ? `\nINTERVIEW TRANSCRIPT:\n${data.transcript.slice(0, 8000)}` : "",
+    ].join("\n");
+
+    try {
+      const raw = await callOpenAI(systemPrompt, userMessage, 900);
+      const parsed = parseExtractionJSON(raw) as Record<string, unknown>;
+      const instrument = ["SAFE", "Equity", "Convertible Note", "TBD"].includes(parsed.fundraising_instrument as string)
+        ? parsed.fundraising_instrument as NarrativeResult["fundraising_instrument"]
+        : "TBD";
+      return {
+        one_liner: typeof parsed.one_liner === "string" ? parsed.one_liner.trim() : null,
+        investor_narrative: typeof parsed.investor_narrative === "string" ? parsed.investor_narrative.trim() : null,
+        fundraising_instrument: instrument,
+        fundraising_target_close: typeof parsed.fundraising_target_close === "string" ? parsed.fundraising_target_close : null,
+        fundraising_committed_amount: typeof parsed.fundraising_committed_amount === "number" ? parsed.fundraising_committed_amount : null,
+        error: null,
+      };
+    } catch (err: any) {
+      return {
+        one_liner: null, investor_narrative: null, fundraising_instrument: null,
+        fundraising_target_close: null, fundraising_committed_amount: null,
+        error: err.message ?? "narrative_failed",
+      };
+    }
+  });
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Interview v3 — sector-aware and stage-aware question tree.
 //
 // Phase 1 (everyone, 4 questions) → Phase 2 (4 questions branched on stage)
