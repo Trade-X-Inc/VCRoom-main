@@ -167,6 +167,142 @@ ${data.transcript}`;
   });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Document detection + typed extraction (Path A v3).
+// One gpt-4o call per document: classify the document type, then extract the
+// type-appropriate fields. Never silently fails — unknown types and missing
+// fields are reported to the founder explicitly.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type DetectedDocType =
+  | "pitch_deck" | "financial_model" | "cap_table" | "legal_document" | "team_document" | "unknown";
+
+export interface TypedExtraction {
+  document_type: DetectedDocType;
+  confidence: "high" | "low";
+  detail: string;
+  pitch: Record<string, unknown> | null;
+  financial: {
+    mrr_usd: number | null;
+    arr_usd: number | null;
+    growth_rate_3mo: string | null;
+    runway_months: number | null;
+    burn_rate_monthly_usd: number | null;
+    headcount: number | null;
+  } | null;
+  cap_table: {
+    founder_ownership_pct: number | null;
+    total_shareholders: number | null;
+    has_options_pool: boolean | null;
+    total_shares_issued: number | null;
+  } | null;
+  legal: {
+    legal_name: string | null;
+    registration_number: string | null;
+    jurisdiction: string | null;
+    incorporated_at: string | null;
+  } | null;
+  team: Array<{ name: string; title: string; linkedin_url: string | null }> | null;
+  missing_fields: string[];
+  error: string | null;
+}
+
+const DETECT_SCHEMA = `{
+  "document_type": "pitch_deck" | "financial_model" | "cap_table" | "legal_document" | "team_document" | "unknown",
+  "confidence": "high" | "low",
+  "detail": "one sentence: what this document is and what was extractable",
+  "pitch": ${EXTRACTION_SCHEMA.replace(/\n/g, " ")} or null,
+  "financial": { "mrr_usd": number|null, "arr_usd": number|null, "growth_rate_3mo": "string like '+12% MoM' or null", "runway_months": number|null, "burn_rate_monthly_usd": number|null, "headcount": number|null } or null,
+  "cap_table": { "founder_ownership_pct": number|null, "total_shareholders": number|null, "has_options_pool": boolean|null, "total_shares_issued": number|null } or null,
+  "legal": { "legal_name": string|null, "registration_number": string|null, "jurisdiction": string|null, "incorporated_at": "YYYY-MM-DD or null" } or null,
+  "team": [{"name": string, "title": string, "linkedin_url": string|null}] or null,
+  "missing_fields": ["fields of the detected type that could not be extracted"]
+}`;
+
+type DetectExtractInput = {
+  userId: string;
+  fileName: string;
+  documentText: string;
+};
+
+export const detectAndExtractDocument = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as DetectExtractInput)
+  .handler(async ({ data }): Promise<TypedExtraction> => {
+    const empty: TypedExtraction = {
+      document_type: "unknown", confidence: "low",
+      detail: "Could not detect document type — please review manually.",
+      pitch: null, financial: null, cap_table: null, legal: null, team: null,
+      missing_fields: [], error: null,
+    };
+
+    if (!data.documentText || data.documentText.trim().length < 80) {
+      return { ...empty, detail: "Could not read enough text from this document — it may be image-based or empty.", error: "unreadable" };
+    }
+
+    const systemPrompt = [
+      "You are an expert startup-document analyst. Classify the document, then extract ONLY the fields for its type.",
+      "Return ONLY valid JSON matching this schema exactly:",
+      DETECT_SCHEMA,
+      "Classification signals:",
+      "- financial_model: columns/sheets/rows named Revenue, MRR, ARR, Expenses, EBITDA, Runway, Burn, Headcount, P&L, Summary",
+      "- cap_table: Shareholder, Shares, Ownership %, Vesting, Option Pool, Fully Diluted",
+      "- legal_document: Certificate of Incorporation, Trade License, Memorandum of Association, SHA, Term Sheet, registration numbers, jurisdictions",
+      "- team_document: a roster of people with names and titles (org chart, team page)",
+      "- pitch_deck: slides covering problem/solution/market/traction/team/ask",
+      "- unknown: none of the above (e.g. a menu, an invoice, an unrelated report)",
+      "Rules:",
+      "- Fill ONLY the payload for the detected type; set the other payloads to null.",
+      "- Extract only what is explicitly present — never guess or invent numbers.",
+      "- For financial models: prefer a 'Summary' or 'P&L' sheet/section when several exist; report the CURRENT (most recent) MRR/ARR, growth over the last 3 months, runway in months, monthly burn, headcount.",
+      "- For cap tables: report the founders' combined ownership % and counts ONLY. Never include individual investor names — privacy-sensitive.",
+      "- For legal documents: the registered legal name, registration/license number, jurisdiction (e.g. DIFC, ADGM, Dubai DED, Delaware), incorporation date.",
+      "- confidence: 'high' only when the type is unmistakable and the key fields were found; otherwise 'low'.",
+      "- missing_fields: list every field of the detected type you could not extract.",
+      "- document_type 'unknown': all payloads null, detail = 'Could not detect document type — please review manually.'",
+    ].join("\n");
+
+    const userMessage = `FILE NAME: ${data.fileName}\n\nDOCUMENT CONTENT (first 14000 chars):\n${data.documentText.slice(0, 14000)}`;
+
+    try {
+      const apiKey = getOpenAIKey();
+      if (!apiKey) return { ...empty, error: "AI unavailable" };
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          max_tokens: 1600,
+          temperature: 0,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userMessage },
+          ],
+        }),
+        signal: AbortSignal.timeout(45000),
+      });
+      if (!response.ok) return { ...empty, error: `AI error ${response.status}` };
+      const result = await response.json() as any;
+      const raw = result.choices?.[0]?.message?.content || "{}";
+      const parsed = parseExtractionJSON(raw) as Partial<TypedExtraction>;
+      const type = (["pitch_deck", "financial_model", "cap_table", "legal_document", "team_document", "unknown"]
+        .includes(parsed.document_type as string) ? parsed.document_type : "unknown") as DetectedDocType;
+      return {
+        document_type: type,
+        confidence: parsed.confidence === "high" ? "high" : "low",
+        detail: (parsed.detail as string) || empty.detail,
+        pitch: type === "pitch_deck" ? (parsed.pitch as Record<string, unknown> ?? null) : null,
+        financial: type === "financial_model" ? (parsed.financial as TypedExtraction["financial"] ?? null) : null,
+        cap_table: type === "cap_table" ? (parsed.cap_table as TypedExtraction["cap_table"] ?? null) : null,
+        legal: type === "legal_document" ? (parsed.legal as TypedExtraction["legal"] ?? null) : null,
+        team: type === "team_document" ? (parsed.team as TypedExtraction["team"] ?? null) : null,
+        missing_fields: Array.isArray(parsed.missing_fields) ? parsed.missing_fields as string[] : [],
+        error: null,
+      };
+    } catch (err: any) {
+      return { ...empty, error: err.message ?? "extraction_failed" };
+    }
+  });
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Interview v3 — sector-aware and stage-aware question tree.
 //
 // Phase 1 (everyone, 4 questions) → Phase 2 (4 questions branched on stage)

@@ -8,11 +8,13 @@ import {
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { extractDocumentText } from "@/lib/document-extractor";
+import { extractDocumentText, extractForIntake } from "@/lib/document-extractor";
 import {
   extractProfileFromDocument,
   extractProfileFromInterview,
   getNextInterviewQuestion,
+  detectAndExtractDocument,
+  type TypedExtraction,
 } from "@/lib/profile-builder-fn";
 import { seedFounderPlaybook } from "@/lib/desk-fn";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
@@ -121,6 +123,15 @@ function ProfileBuilder() {
   // Path A state
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
+  /** Per-file detection results: shown in the UI, drives typed merging */
+  const [docResults, setDocResults] = useState<Array<{ fileName: string; result: TypedExtraction }>>([]);
+  /** v3 typed payloads merged across documents (financial/cap/legal/team) */
+  const [extraV3, setExtraV3] = useState<{
+    financial?: NonNullable<TypedExtraction["financial"]>;
+    cap_table?: NonNullable<TypedExtraction["cap_table"]>;
+    legal?: NonNullable<TypedExtraction["legal"]>;
+    team?: NonNullable<TypedExtraction["team"]>;
+  }>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -200,12 +211,12 @@ function ProfileBuilder() {
   // ── Path A — Upload flow ───────────────────────────────────────────────────
 
   const addFiles = useCallback((incoming: FileList | File[]) => {
-    const allowed = ["pdf", "pptx", "ppt", "docx", "doc", "xlsx", "xls"];
+    const allowed = ["pdf", "pptx", "ppt", "docx", "doc", "xlsx", "xls", "csv"];
     const valid = Array.from(incoming).filter((f) => {
       const ext = f.name.split(".").pop()?.toLowerCase() ?? "";
       return allowed.includes(ext);
     });
-    if (valid.length < incoming.length) toast.warning("Some files skipped — only PDF, PPTX, DOCX, XLSX allowed.");
+    if (valid.length < incoming.length) toast.warning("Some files skipped — only PDF, PPTX, DOCX, XLSX, CSV allowed.");
     setUploadedFiles((prev) => {
       const names = new Set(prev.map((f) => f.name));
       return [...prev, ...valid.filter((f) => !names.has(f.name))];
@@ -227,13 +238,27 @@ function ProfileBuilder() {
     try {
       setScreen("extracting");
 
-      // Extract text from all uploaded files
-      let combinedText = "";
+      // Per-file: extract text (PDFs get the vision fallback for image-based
+      // decks — same pattern as the intake parser), then detect the document
+      // type and run the type-specific extraction.
       const docIds: string[] = [];
+      const results: Array<{ fileName: string; result: TypedExtraction }> = [];
 
       for (const file of uploadedFiles) {
-        const text = await extractDocumentText(file, file.name);
-        combinedText += `\n\n=== ${file.name} ===\n${text}`;
+        const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+        let text = "";
+        if (ext === "pdf") {
+          const intakeResult = await extractForIntake(file);
+          text = intakeResult.status === "ok" ? (intakeResult.text ?? "") : "";
+        }
+        if (!text) {
+          text = await extractDocumentText(file, file.name).catch(() => "");
+        }
+
+        const detection = await detectAndExtractDocument({
+          data: { userId: user!.id, fileName: file.name, documentText: text },
+        });
+        results.push({ fileName: file.name, result: detection });
 
         // Store in founder_documents (same pattern as app.documents.tsx)
         if (startup?.id) {
@@ -267,22 +292,52 @@ function ProfileBuilder() {
         await patchSession(sid, { source_document_ids: docIds });
       }
 
-      // Call extraction AI
-      const result = await extractProfileFromDocument({
-        data: { userId: user!.id, documentText: combinedText },
-      });
+      setDocResults(results);
 
-      if (result.error || !result.data) {
-        setExtractionError(result.error ?? "Extraction failed");
+      // Merge typed extractions across all documents
+      const detected = results.filter((r) => r.result.document_type !== "unknown");
+      if (detected.length === 0) {
+        setExtractionError("Could not detect document type — please review manually. None of the uploaded files look like a pitch deck, financial model, cap table, legal document, or team roster.");
         await patchSession(sid, { status: "error" });
       } else {
+        const merged: typeof extraV3 = {};
+        let pitchData: Record<string, unknown> | null = null;
+        const allMissing: string[] = [];
+        for (const { result } of results) {
+          if (result.pitch && !pitchData) pitchData = result.pitch;
+          if (result.financial) merged.financial = { ...merged.financial, ...result.financial };
+          if (result.cap_table) merged.cap_table = { ...merged.cap_table, ...result.cap_table };
+          if (result.legal) merged.legal = { ...merged.legal, ...result.legal };
+          if (result.team?.length) merged.team = [...(merged.team ?? []), ...result.team];
+          allMissing.push(...result.missing_fields);
+        }
+        setExtraV3(merged);
+
         await patchSession(sid, {
-          extracted_data: result.data,
-          missing_fields: result.missing_fields,
+          extracted_data: {
+            pitch: pitchData,
+            financial: merged.financial ?? null,
+            cap_table: merged.cap_table ?? null,
+            legal: merged.legal ?? null,
+            team: merged.team ?? null,
+            detections: results.map((r) => ({ file: r.fileName, type: r.result.document_type, confidence: r.result.confidence })),
+          },
+          missing_fields: allMissing,
           status: "extracted",
         });
-        setMissingFields(result.missing_fields);
-        populateForm(result.data);
+        setMissingFields(pitchData ? (Array.isArray((pitchData as any).missing_fields) ? (pitchData as any).missing_fields : []) : []);
+        if (pitchData) populateForm(pitchData);
+        // Team roster from documents feeds the form's team editor
+        if (merged.team?.length) {
+          setForm((prev) => ({
+            ...prev,
+            team: [
+              ...prev.team,
+              ...merged.team!.filter((t) => !prev.team.some((p) => p.name === t.name))
+                .map((t) => ({ name: t.name, role: t.title })),
+            ],
+          }));
+        }
       }
     } catch (err: any) {
       setExtractionError(err.message);
@@ -713,7 +768,7 @@ function UploadScreen({
           ref={fileInputRef}
           type="file"
           multiple
-          accept=".pdf,.pptx,.ppt,.docx,.doc,.xlsx,.xls"
+          accept=".pdf,.pptx,.ppt,.docx,.doc,.xlsx,.xls,.csv"
           style={{ display: "none" }}
           onChange={(e) => { if (e.target.files) onFiles(e.target.files); e.target.value = ""; }}
         />
