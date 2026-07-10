@@ -43,7 +43,7 @@ const sections = [
   },
   {
     title: "8. Governing Law",
-    body: "These Terms are governed by the laws of the State of Delaware, United States, without regard to conflict of law principles. Any disputes shall be resolved exclusively in the courts of Delaware. If any provision of these terms is found unenforceable, the remaining provisions remain in full effect.",
+    body: "These Terms are governed by the laws of the Dubai International Financial Centre (DIFC), United Arab Emirates, without regard to conflict of law principles. Any disputes shall be resolved exclusively in the DIFC Courts. If any provision of these terms is found unenforceable, the remaining provisions remain in full effect.",
   },
 ];
 

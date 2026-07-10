@@ -39,7 +39,7 @@ const sections = [
   },
   {
     title: "7. Contact Us",
-    body: "If you have questions about this Privacy Policy or how we handle your data, please contact our privacy team at privacy@hockystick.app. For data deletion requests or GDPR inquiries, we aim to respond within 30 days. Our registered address is Hockystick, Inc., Delaware, United States.",
+    body: "If you have questions about this Privacy Policy or how we handle your data, please contact our privacy team at privacy@hockystick.app. For data deletion requests or GDPR inquiries, we aim to respond within 30 days. Hockystick operates from Dubai, UAE, under the intended entity name Venture Tech LLC (DIFC, Dubai) — formal registration is in progress and this page will be updated once complete.",
   },
 ];
 
