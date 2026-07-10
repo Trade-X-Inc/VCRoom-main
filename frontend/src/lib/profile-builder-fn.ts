@@ -330,9 +330,11 @@ export const generateProfileNarrative = createServerFn({ method: "POST" })
     const systemPrompt = [
       "You turn structured startup data (and optionally an interview transcript) into investor-ready profile copy.",
       "Return ONLY valid JSON:",
-      '{ "one_liner": string, "investor_narrative": string, "fundraising_instrument": "SAFE"|"Equity"|"Convertible Note"|"TBD", "fundraising_target_close": string|null, "fundraising_committed_amount": number|null }',
+      '{ "one_liner": string|null, "investor_narrative": string|null, "fundraising_instrument": "SAFE"|"Equity"|"Convertible Note"|"TBD", "fundraising_target_close": string|null, "fundraising_committed_amount": number|null }',
       "Rules for one_liner:",
       '- Format: "[Company] [does/makes/enables] [what] for [who] by [how]". Maximum 25 words. Concrete, no buzzwords, no superlatives.',
+      "- The bracketed words above are placeholders describing the shape — NEVER output brackets or placeholder text. If you don't know the company name or what it does, return null for one_liner instead.",
+      "- If the data lacks what a paragraph or field needs, return null for it. Never write filler like 'details are being finalized'.",
       "Rules for investor_narrative — exactly 3 paragraphs separated by blank lines:",
       "- Paragraph 1 — Problem + Market: what problem, how big, why now.",
       "- Paragraph 2 — Solution + Traction: what they built, proof it works, key metrics.",
@@ -355,9 +357,16 @@ export const generateProfileNarrative = createServerFn({ method: "POST" })
       const instrument = ["SAFE", "Equity", "Convertible Note", "TBD"].includes(parsed.fundraising_instrument as string)
         ? parsed.fundraising_instrument as NarrativeResult["fundraising_instrument"]
         : "TBD";
+      // The model occasionally echoes the format template when data is too
+      // sparse — bracketed placeholders must never reach the founder's form.
+      const clean = (v: unknown) => {
+        if (typeof v !== "string") return null;
+        const t = v.trim();
+        return !t || /\[[^\]]+\]/.test(t) ? null : t;
+      };
       return {
-        one_liner: typeof parsed.one_liner === "string" ? parsed.one_liner.trim() : null,
-        investor_narrative: typeof parsed.investor_narrative === "string" ? parsed.investor_narrative.trim() : null,
+        one_liner: clean(parsed.one_liner),
+        investor_narrative: clean(parsed.investor_narrative),
         fundraising_instrument: instrument,
         fundraising_target_close: typeof parsed.fundraising_target_close === "string" ? parsed.fundraising_target_close : null,
         fundraising_committed_amount: typeof parsed.fundraising_committed_amount === "number" ? parsed.fundraising_committed_amount : null,

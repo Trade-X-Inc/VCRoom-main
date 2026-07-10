@@ -1111,26 +1111,21 @@ function extractionSummary(r: TypedExtraction): string[] {
   return out;
 }
 
-function ConfirmScreen({
-  form, missingFields, extractionError, saving, isMissing, onField, onSave, docResults,
-}: {
+// Module-scope so its identity is stable across ConfirmScreen re-renders —
+// defining it inside the component remounted the input on every keystroke,
+// dropping focus (and all but the first character of typed text).
+function FieldRow({ fieldKey, optional, form, isMissing, onField }: {
+  fieldKey: keyof ExtractedProfile;
+  optional?: boolean;
   form: ExtractedProfile;
-  missingFields: string[];
-  extractionError: string | null;
-  saving: boolean;
   isMissing: (key: string) => boolean;
   onField: <K extends keyof ExtractedProfile>(key: K) => (val: ExtractedProfile[K]) => void;
-  onSave: () => void;
-  docResults?: Array<{ fileName: string; result: TypedExtraction }>;
 }) {
-  const textareaFields = TEXTAREA_FIELDS;
-
-  function FieldRow({ fieldKey, optional }: { fieldKey: keyof ExtractedProfile; optional?: boolean }) {
     if (fieldKey === "team") return null; // handled separately
     const val = (form[fieldKey] as string) ?? "";
     const missing = !optional && isMissing(fieldKey as string);
     const style = missing ? missingBorder : inputBase;
-    const isTA = textareaFields.has(fieldKey as string);
+    const isTA = TEXTAREA_FIELDS.has(fieldKey as string);
 
     return (
       <div style={{ marginBottom: 16 }}>
@@ -1180,16 +1175,32 @@ function ConfirmScreen({
         )}
       </div>
     );
-  }
+}
 
-  function SectionHeader({ title, hint }: { title: string; hint: string }) {
-    return (
-      <div style={{ margin: "26px 0 14px", paddingTop: 20, borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{title}</div>
-        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>{hint}</div>
-      </div>
-    );
-  }
+function SectionHeader({ title, hint }: { title: string; hint: string }) {
+  return (
+    <div style={{ margin: "26px 0 14px", paddingTop: 20, borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+      <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{title}</div>
+      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>{hint}</div>
+    </div>
+  );
+}
+
+function ConfirmScreen({
+  form, missingFields, extractionError, saving, isMissing, onField, onSave, docResults,
+}: {
+  form: ExtractedProfile;
+  missingFields: string[];
+  extractionError: string | null;
+  saving: boolean;
+  isMissing: (key: string) => boolean;
+  onField: <K extends keyof ExtractedProfile>(key: K) => (val: ExtractedProfile[K]) => void;
+  onSave: () => void;
+  docResults?: Array<{ fileName: string; result: TypedExtraction }>;
+}) {
+  const fr = (fieldKey: keyof ExtractedProfile, optional?: boolean) => (
+    <FieldRow key={fieldKey} fieldKey={fieldKey} optional={optional} form={form} isMissing={isMissing} onField={onField} />
+  );
 
   const textFields: Array<keyof ExtractedProfile> = [
     "company_name", "tagline", "sector", "stage",
@@ -1274,7 +1285,7 @@ function ConfirmScreen({
         )}
 
         <div style={card}>
-          {textFields.map((k) => <FieldRow key={k} fieldKey={k} />)}
+          {textFields.map((k) => fr(k))}
 
           {/* Team */}
           <div style={{ marginBottom: 16 }}>
@@ -1332,19 +1343,19 @@ function ConfirmScreen({
             title="Investor-ready profile"
             hint="AI-drafted from your answers and documents. Edit anything before publishing."
           />
-          <FieldRow fieldKey="one_liner" optional />
-          <FieldRow fieldKey="investor_narrative" optional />
+          {fr("one_liner", true)}
+          {fr("investor_narrative", true)}
 
           <SectionHeader
             title="Key metrics"
             hint="Shown as a metrics card on your profile. Leave blank what doesn't apply."
           />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", columnGap: 12 }}>
-            <FieldRow fieldKey="mrr_usd" optional />
-            <FieldRow fieldKey="growth_rate" optional />
-            <FieldRow fieldKey="runway_months" optional />
-            <FieldRow fieldKey="team_size" optional />
-            <FieldRow fieldKey="founded_year" optional />
+            {fr("mrr_usd", true)}
+            {fr("growth_rate", true)}
+            {fr("runway_months", true)}
+            {fr("team_size", true)}
+            {fr("founded_year", true)}
           </div>
 
           <SectionHeader
@@ -1352,9 +1363,9 @@ function ConfirmScreen({
             hint="What you're raising, on what instrument, and how much is committed."
           />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", columnGap: 12 }}>
-            <FieldRow fieldKey="fundraising_instrument" optional />
-            <FieldRow fieldKey="fundraising_target_close" optional />
-            <FieldRow fieldKey="fundraising_committed_amount" optional />
+            {fr("fundraising_instrument", true)}
+            {fr("fundraising_target_close", true)}
+            {fr("fundraising_committed_amount", true)}
           </div>
 
           <SectionHeader
@@ -1362,12 +1373,12 @@ function ConfirmScreen({
             hint="From your cap table and incorporation documents, if provided."
           />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", columnGap: 12 }}>
-            <FieldRow fieldKey="legal_entity_name" optional />
-            <FieldRow fieldKey="registration_number" optional />
-            <FieldRow fieldKey="incorporated_in" optional />
-            <FieldRow fieldKey="incorporated_at" optional />
-            <FieldRow fieldKey="founder_ownership_pct" optional />
-            <FieldRow fieldKey="total_shareholders" optional />
+            {fr("legal_entity_name", true)}
+            {fr("registration_number", true)}
+            {fr("incorporated_in", true)}
+            {fr("incorporated_at", true)}
+            {fr("founder_ownership_pct", true)}
+            {fr("total_shareholders", true)}
             <div style={{ marginBottom: 16 }}>
               <label style={labelStyle}>{FIELD_LABELS.has_options_pool}</label>
               <select
