@@ -89,6 +89,21 @@ function About() {
               ))}
             </div>
           </div>
+
+          <div>
+            <h2 className="font-syne font-bold text-xl text-white mb-3">
+              Who built this
+            </h2>
+            <p className="text-white/60 leading-relaxed">
+              Hockystick is built by a small team operating from DIFC FinTech Hive,
+              Dubai. We are in beta, and we say so. Every number on our site is a real
+              platform figure, every verification check runs against live registries,
+              and every NDA is DIAC-arbitrated. We would rather earn trust slowly with
+              working infrastructure than borrow it with logos and press releases.
+              Questions about how anything works — verification, deal rooms, data
+              handling — reach us at hello@hockystick.app and we answer directly.
+            </p>
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4">
