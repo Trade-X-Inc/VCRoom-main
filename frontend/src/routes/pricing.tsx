@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { CostComparisonTable } from "@/components/site/CostComparisonTable";
 import { useAuth } from "@/lib/auth";
 import { useSubscription } from "@/hooks/useSubscription";
 
@@ -294,6 +295,17 @@ function PricingPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Cost comparison vs traditional tools */}
+        <div className="mx-auto mt-16 max-w-3xl">
+          <h2 className="text-center text-xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>
+            What this replaces
+          </h2>
+          <p className="mt-2 mb-6 text-center text-sm text-gray-600">
+            The same work, done the traditional way, costs thousands per raise.
+          </p>
+          <CostComparisonTable variant="light" compact />
         </div>
 
         {/* FAQ */}

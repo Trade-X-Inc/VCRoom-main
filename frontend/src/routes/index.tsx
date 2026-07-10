@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { CostComparisonTable } from "@/components/site/CostComparisonTable";
 import { CheckCircle2, ArrowRight, Shield, Lock } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -873,39 +874,17 @@ function ForInvestors({ dark }: { dark: boolean }) {
 /* ═══════════════════════════════════════════════════════════════════════════
    SECTION 7 — TRUST — always purple
 ═══════════════════════════════════════════════════════════════════════════ */
-const FOUNDER_CHECKS = [
-  "Company registration (live registry check)",
-  "Business email domain (MX records)",
-  "Website existence (live HTTP check)",
-  "LinkedIn URL format (no scraping — validated only)",
-];
-const INVESTOR_CHECKS = [
-  "Investment thesis (stage, sector, geography)",
-  "Stated check size range",
-  "Geographic mandate match",
-  "Active vs inactive status",
-];
-
 function TrustSection() {
-  const check = (text: string) => (
-    <li key={text} className="flex gap-3">
-      <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5 text-white" />
-      <span className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.82)", fontFamily: DM }}>
-        {text}
-      </span>
-    </li>
-  );
-
   return (
     <section className="w-full py-20" style={{ background: PURPLE }}>
       <div className="max-w-[1100px] mx-auto px-6">
         {/* Header */}
-        <div className="text-center mb-14">
+        <div className="text-center mb-12">
           <h2
             className="mb-4"
             style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: "#FFFFFF" }}
           >
-            The only platform that verifies both sides.
+            The full stack. One subscription.
           </h2>
           <p
             className="mx-auto leading-relaxed"
@@ -916,44 +895,9 @@ function TrustSection() {
           </p>
         </div>
 
-        {/* 2-col */}
-        <div className="grid md:grid-cols-2 gap-8 md:gap-12">
-          <div>
-            <h3
-              className="mb-5 text-xs font-bold uppercase tracking-[0.14em]"
-              style={{ color: "rgba(255,255,255,0.55)", fontFamily: SYNE }}
-            >
-              Founders get verified for:
-            </h3>
-            <ul className="space-y-3">
-              {FOUNDER_CHECKS.map(check)}
-            </ul>
-            <p className="mt-5 text-xs" style={{ color: "rgba(255,255,255,0.5)", fontFamily: DM }}>
-              Verification score 0–100. Tier 1–4 badges shown on profile.
-            </p>
-          </div>
-
-          {/* Divider (desktop only) */}
-          <div className="relative">
-            <div
-              className="hidden md:block absolute left-0 top-0 bottom-0 w-px"
-              style={{ background: "rgba(255,255,255,0.2)" }}
-            />
-            <div className="md:pl-12">
-              <h3
-                className="mb-5 text-xs font-bold uppercase tracking-[0.14em]"
-                style={{ color: "rgba(255,255,255,0.55)", fontFamily: SYNE }}
-              >
-                Investors are screened for:
-              </h3>
-              <ul className="space-y-3">
-                {INVESTOR_CHECKS.map(check)}
-              </ul>
-              <p className="mt-5 text-xs" style={{ color: "rgba(255,255,255,0.5)", fontFamily: DM }}>
-                Investors set their thesis. Founders only appear in matched feeds.
-              </p>
-            </div>
-          </div>
+        {/* Comparison table */}
+        <div className="max-w-3xl mx-auto">
+          <CostComparisonTable variant="dark" />
         </div>
 
         {/* Bottom line */}
