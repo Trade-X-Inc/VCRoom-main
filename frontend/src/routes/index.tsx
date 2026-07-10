@@ -7,17 +7,17 @@ import { CheckCircle2, ArrowRight, Shield, Lock } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Hockystick — Where deals get done" },
-      { name: "description", content: "Hockystick is the private fundraising platform for founders and investors. Verified deal rooms. AI-powered matching. No warm intro required." },
-      { name: "keywords", content: "startup fundraising platform, verified investor platform, founder due diligence, VC deal flow management, deal rooms" },
+      { title: "Hockystick — Fundraising infrastructure for GCC founders" },
+      { name: "description", content: "Verified profiles, encrypted deal rooms, AI due diligence. The complete fundraising stack for GCC and MENA founders and investors." },
+      { name: "keywords", content: "startup fundraising infrastructure, verified investor platform, founder due diligence, VC deal flow management, deal rooms, GCC fundraising" },
       { name: "robots", content: "index, follow" },
-      { property: "og:title", content: "Hockystick — Where deals get done" },
-      { property: "og:description", content: "Private deal rooms for early-stage fundraising. Verified profiles. AI matching." },
+      { property: "og:title", content: "Hockystick — Fundraising infrastructure for GCC founders" },
+      { property: "og:description", content: "Verified profiles. Encrypted deal rooms. AI due diligence. The complete stack for GCC & MENA." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://hockystick.app" },
       { property: "og:image", content: "https://hockystick.app/og-image.png" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Hockystick — Where deals get done" },
+      { name: "twitter:title", content: "Hockystick — Fundraising infrastructure for GCC founders" },
       { name: "twitter:description", content: "Private deal rooms. Verified founders. Serious investors. Deals that close." },
     ],
     links: [
@@ -262,18 +262,18 @@ function Hero() {
 
         {/* H1 */}
         <h1
-          className="text-center mb-6 leading-none"
+          className="text-center mb-6 leading-[1.05]"
           style={{
             fontFamily: SYNE,
             fontWeight: 800,
-            fontSize: "clamp(48px, 8vw, 80px)",
+            fontSize: "clamp(38px, 6.5vw, 68px)",
             letterSpacing: "-2px",
             color: "#FFFFFF",
           }}
         >
-          Where deals
+          The fundraising infrastructure
           <br />
-          <span style={{ color: PURPLE }}>get done.</span>
+          <span style={{ color: PURPLE }}>GCC founders needed.</span>
         </h1>
 
         {/* Subhead */}
@@ -284,12 +284,12 @@ function Hero() {
             fontWeight: 300,
             fontSize: "clamp(16px, 2.5vw, 22px)",
             color: "rgba(250,250,250,0.65)",
-            maxWidth: "580px",
+            maxWidth: "640px",
           }}
         >
-          Founders build secure, verified deal rooms.
+          Verified profiles. Encrypted deal rooms. AI due diligence.
           <br />
-          Investors discover and close deals — without the cold email.
+          The complete stack — built for the region where it never existed before.
         </p>
 
         {/* CTAs */}
@@ -302,7 +302,7 @@ function Hero() {
             onMouseEnter={(e) => { e.currentTarget.style.background = PURPLE_DARK; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = PURPLE; }}
           >
-            Start raising <ArrowRight className="h-4 w-4" />
+            Build your deal room <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
             to="/sign-up"
@@ -312,7 +312,7 @@ function Hero() {
             onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
           >
-            Explore deals as an investor
+            Review verified deals
           </Link>
         </div>
 
