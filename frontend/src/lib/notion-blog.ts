@@ -63,7 +63,7 @@ function extractPostMeta(page: PageObjectResponse): BlogPost {
   const seoTitle = props["SEO Title"]?.rich_text ? richTextToString(props["SEO Title"].rich_text) : title;
   const seoDescription = props["SEO Description"]?.rich_text ? richTextToString(props["SEO Description"].rich_text) : excerpt;
   const author = props.Author?.rich_text ? richTextToString(props.Author.rich_text) :
-                 props.Author?.people?.[0]?.name ?? "Hockystick Team";
+                 props.Author?.people?.[0]?.name ?? "The Hockystick Team";
   const readingTimeRaw = props["Reading Time"]?.number;
   const readingTime = readingTimeRaw != null ? `${readingTimeRaw} min read` : "5 min read";
 

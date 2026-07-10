@@ -37,7 +37,8 @@ function BlogIndex() {
             Insights for Founders & Investors
           </h1>
           <p className="text-xl text-muted-foreground">
-            Latest thoughts on fundraising, venture capital, and deal management.
+            Insights from building fundraising infrastructure for GCC founders.
+            No sponsored content. No PR. What we actually see in the data.
           </p>
         </div>
 
@@ -84,7 +85,7 @@ function BlogIndex() {
                 </p>
 
                 <div className="flex items-center justify-between text-xs text-muted-foreground pt-4 border-t border-border/60">
-                  <span>{formatDate(post.publishDate)}</span>
+                  <span>By {post.author} · {formatDate(post.publishDate)}</span>
                   <span className="inline-flex items-center gap-1 text-brand group-hover:translate-x-0.5 transition-transform">
                     Read article <ArrowRight className="h-3.5 w-3.5" />
                   </span>

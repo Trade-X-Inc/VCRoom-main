@@ -94,7 +94,7 @@ function BlogArticle() {
 
           {/* Meta */}
           <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 border-t border-gray-200 pt-6">
-            <span className="inline-flex items-center gap-1.5"><User className="h-3.5 w-3.5" />{post.author}</span>
+            <span className="inline-flex items-center gap-1.5"><User className="h-3.5 w-3.5" />By {post.author}, Hockystick</span>
             <span className="inline-flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" />{formatDate(post.publishDate)}</span>
             <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" />{post.readingTime}</span>
           </div>
