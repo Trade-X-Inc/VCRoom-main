@@ -381,9 +381,10 @@ function DealRoom() {
 
   const handleSaveAnswer = async (questionId: string, answer: string) => {
     const { data: existing } = await supabase.from("messages").select("metadata").eq("id", questionId).maybeSingle();
-    await supabase.from("messages").update({
+    const { error } = await supabase.from("messages").update({
       metadata: { ...(existing?.metadata ?? {}), answer, answeredAt: new Date().toISOString(), editedAt: new Date().toISOString() },
     }).eq("id", questionId);
+    if (error) { console.error("[deal-room] save answer failed:", error); toast.error("Could not save answer. Please try again."); return; }
     queryClient.invalidateQueries({ queryKey: ["deal-room-qa", dealRoomId] });
   };
 
@@ -1116,7 +1117,7 @@ function InformationVaultPanel({
     setReqCreating(true);
     try {
       const requestedFrom = isInvestor ? startupFounderId : investorUserId;
-      await supabase.from("deal_room_document_requests").insert({
+      const { error } = await supabase.from("deal_room_document_requests").insert({
         deal_room_id: dealRoomId,
         requested_by: userId,
         requested_from: requestedFrom,
@@ -1125,6 +1126,7 @@ function InformationVaultPanel({
         category: reqCategory,
         status: "pending",
       });
+      if (error) throw error;
       setReqName(""); setReqDesc(""); setReqCategory("Financial");
       setShowReqForm(false);
       await refetchRequests();
@@ -1140,11 +1142,12 @@ function InformationVaultPanel({
     if (!declineReason.trim()) return;
     setRespondingReqId(reqId);
     try {
-      await supabase.from("deal_room_document_requests").update({
+      const { error } = await supabase.from("deal_room_document_requests").update({
         status: "declined",
         decline_reason: declineReason.trim(),
         responded_at: new Date().toISOString(),
       }).eq("id", reqId);
+      if (error) throw error;
       setDeclineMode(null);
       setDeclineReason("");
       await refetchRequests();
@@ -1186,7 +1189,7 @@ function InformationVaultPanel({
     if (!noteContent.trim() || !userId) return;
     setNoteSaving(true);
     try {
-      await supabase.from("deal_room_notes").insert({
+      const { error } = await supabase.from("deal_room_notes").insert({
         deal_room_id: dealRoomId,
         user_id: userId,
         title: noteTitle.trim() || null,
@@ -1194,6 +1197,7 @@ function InformationVaultPanel({
         visibility: noteVisibility,
         ai_generated: false,
       });
+      if (error) throw error;
       setNoteTitle(""); setNoteContent(""); setNoteVisibility("private");
       setShowNoteForm(false);
       await refetchNotes();
@@ -1206,7 +1210,8 @@ function InformationVaultPanel({
   };
 
   const deleteNote = async (noteId: string) => {
-    await supabase.from("deal_room_notes").delete().eq("id", noteId);
+    const { error } = await supabase.from("deal_room_notes").delete().eq("id", noteId);
+    if (error) { console.error("[deal-room] delete note failed:", error); toast.error("Could not delete note."); return; }
     await refetchNotes();
   };
 
@@ -2129,10 +2134,11 @@ function QAPanel({
       );
       const result = await resp.json();
       const content = result?.content ?? result?.reply ?? result?.message ?? "No summary generated.";
-      await supabase.from("deal_room_notes").insert({
+      const { error: sumNoteErr } = await supabase.from("deal_room_notes").insert({
         deal_room_id: dealRoomId, user_id: userId,
         title: "AI Q&A Summary", content, visibility: "private", ai_generated: true,
       });
+      if (sumNoteErr) throw sumNoteErr;
       toast.success("Summary saved to your notes");
     } catch {
       toast.error("Could not generate summary");
@@ -2704,39 +2710,45 @@ function DueDiligencePanel({
     const update: any = { status: next };
     if (next === "complete") update.completed_at = new Date().toISOString();
     else update.completed_at = null;
-    await supabase.from("deal_room_dd_goals").update(update).eq("id", goal.id);
+    const { error } = await supabase.from("deal_room_dd_goals").update(update).eq("id", goal.id);
+    if (error) { console.error("[dd-goals] status update failed:", error); toast.error("Could not update goal status."); return; }
     await refetchGoals();
   };
 
   // ── Flag goal ──
   const flagGoal = async (goal: any) => {
-    await supabase.from("deal_room_dd_goals").update({ status: "flagged" }).eq("id", goal.id);
+    const { error } = await supabase.from("deal_room_dd_goals").update({ status: "flagged" }).eq("id", goal.id);
+    if (error) { console.error("[dd-goals] flag failed:", error); toast.error("Could not flag goal."); return; }
     await refetchGoals();
   };
 
   // ── Save note on blur ──
   const saveNote = async (goalId: string, value: string) => {
     setSavingNoteId(goalId);
-    await supabase.from("deal_room_dd_goals").update({ notes: value }).eq("id", goalId);
+    const { error } = await supabase.from("deal_room_dd_goals").update({ notes: value }).eq("id", goalId);
+    if (error) { console.error("[dd-goals] note save failed:", error); toast.error("Could not save note."); }
     setSavingNoteId(null);
   };
 
   // ── Save due date ──
   const saveDueDate = async (goalId: string, value: string) => {
-    await supabase.from("deal_room_dd_goals").update({ due_by: value || null }).eq("id", goalId);
+    const { error } = await supabase.from("deal_room_dd_goals").update({ due_by: value || null }).eq("id", goalId);
+    if (error) { console.error("[dd-goals] due date save failed:", error); toast.error("Could not save due date."); return; }
     await refetchGoals();
   };
 
   // ── Mark complete ──
   const markComplete = async (goalId: string) => {
-    await supabase.from("deal_room_dd_goals").update({ status: "complete", completed_at: new Date().toISOString() }).eq("id", goalId);
+    const { error } = await supabase.from("deal_room_dd_goals").update({ status: "complete", completed_at: new Date().toISOString() }).eq("id", goalId);
+    if (error) { console.error("[dd-goals] mark complete failed:", error); toast.error("Could not mark goal complete."); return; }
     await refetchGoals();
     setExpandedGoalId(null);
   };
 
   // ── Delete goal ──
   const deleteGoal = async (goalId: string) => {
-    await supabase.from("deal_room_dd_goals").delete().eq("id", goalId);
+    const { error } = await supabase.from("deal_room_dd_goals").delete().eq("id", goalId);
+    if (error) { console.error("[dd-goals] delete failed:", error); toast.error("Could not delete goal."); return; }
     await refetchGoals();
   };
 
@@ -2745,7 +2757,7 @@ function DueDiligencePanel({
     if (!newGoalText.trim() || !userId) return;
     setAddingGoal(true);
     try {
-      await supabase.from("deal_room_dd_goals").insert({
+      const { error } = await supabase.from("deal_room_dd_goals").insert({
         deal_room_id: dealRoomId,
         investor_id: userId,
         category: newGoalCategory,
@@ -2753,6 +2765,7 @@ function DueDiligencePanel({
         is_standard: false,
         status: "pending",
       });
+      if (error) throw error;
       setNewGoalText("");
       setAddGoalOpen(false);
       await refetchGoals();
@@ -2813,7 +2826,7 @@ function DueDiligencePanel({
       try { parsed = JSON.parse(cleaned); } catch { parsed = { summary: cleaned, risk_level: "medium", risks: [], strengths: [], flags: [], recommendation: "See summary above." }; }
 
       setAnalysisResult(parsed);
-      await supabase.from("deal_room_notes").insert({
+      const { error: ddNoteErr } = await supabase.from("deal_room_notes").insert({
         deal_room_id: dealRoomId,
         user_id: userId,
         title: "DD AI Analysis",
@@ -2821,6 +2834,7 @@ function DueDiligencePanel({
         visibility: "private",
         ai_generated: true,
       });
+      if (ddNoteErr) throw ddNoteErr;
       toast.success("Analysis saved to your notes");
     } catch {
       toast.error("Analysis failed — try again");
@@ -3547,9 +3561,11 @@ function NewTermSheetPanel({
     setSavingDraft(true);
     try {
       if (editingVersion) {
-        await supabase.from("deal_room_term_sheets").update({ terms: tsForm, notes: tsNotes, status: "draft" }).eq("id", editingVersion.id);
+        const { error } = await supabase.from("deal_room_term_sheets").update({ terms: tsForm, notes: tsNotes, status: "draft" }).eq("id", editingVersion.id);
+        if (error) throw error;
       } else {
-        await supabase.from("deal_room_term_sheets").insert({ deal_room_id: dealRoomId, created_by: userId, version: nextVersion, terms: tsForm, notes: tsNotes, status: "draft" });
+        const { error } = await supabase.from("deal_room_term_sheets").insert({ deal_room_id: dealRoomId, created_by: userId, version: nextVersion, terms: tsForm, notes: tsNotes, status: "draft" });
+        if (error) throw error;
       }
       await refetchTS();
       setEditorOpen(false);
@@ -3563,9 +3579,11 @@ function NewTermSheetPanel({
     setSending(true);
     try {
       if (editingVersion) {
-        await supabase.from("deal_room_term_sheets").update({ terms: tsForm, notes: tsNotes, status: "sent", sent_at: new Date().toISOString() }).eq("id", editingVersion.id);
+        const { error } = await supabase.from("deal_room_term_sheets").update({ terms: tsForm, notes: tsNotes, status: "sent", sent_at: new Date().toISOString() }).eq("id", editingVersion.id);
+        if (error) throw error;
       } else {
-        await supabase.from("deal_room_term_sheets").insert({ deal_room_id: dealRoomId, created_by: userId, version: nextVersion, terms: tsForm, notes: tsNotes, status: "sent", sent_at: new Date().toISOString() });
+        const { error } = await supabase.from("deal_room_term_sheets").insert({ deal_room_id: dealRoomId, created_by: userId, version: nextVersion, terms: tsForm, notes: tsNotes, status: "sent", sent_at: new Date().toISOString() });
+        if (error) throw error;
       }
       await refetchTS();
       setEditorOpen(false);
@@ -3607,7 +3625,8 @@ function NewTermSheetPanel({
   const updateStatus = async (sheetId: string, status: string) => {
     setRespondingId(sheetId);
     try {
-      await supabase.from("deal_room_term_sheets").update({ status, responded_at: new Date().toISOString() }).eq("id", sheetId);
+      const { error } = await supabase.from("deal_room_term_sheets").update({ status, responded_at: new Date().toISOString() }).eq("id", sheetId);
+      if (error) throw error;
       await refetchTS();
       toast.success(status === "accepted" ? "Term sheet accepted" : status === "rejected" ? "Term sheet rejected" : "Status updated");
     } catch { toast.error("Could not update term sheet"); }
@@ -3618,12 +3637,14 @@ function NewTermSheetPanel({
     if (!counterText.trim() || !userId) return;
     setRespondingId(sheetId);
     try {
-      await supabase.from("deal_room_term_sheets").update({ status: "counter_proposed", responded_at: new Date().toISOString() }).eq("id", sheetId);
-      await supabase.from("deal_room_notes").insert({
+      const { error: counterErr } = await supabase.from("deal_room_term_sheets").update({ status: "counter_proposed", responded_at: new Date().toISOString() }).eq("id", sheetId);
+      if (counterErr) throw counterErr;
+      const { error: noteErr } = await supabase.from("deal_room_notes").insert({
         deal_room_id: dealRoomId, user_id: userId,
         title: `Counter-offer: Term Sheet v${version}`,
         content: counterText.trim(), visibility: "deal_room", ai_generated: false,
       });
+      if (noteErr) throw noteErr;
       await refetchTS();
       setCounterOpen(null);
       setCounterText("");
@@ -4104,7 +4125,8 @@ function NewClosingPanel({
         status: "pending",
         is_standard: true,
       }));
-      await supabase.from("deal_room_closing_items").insert(rows);
+      const { error } = await supabase.from("deal_room_closing_items").insert(rows);
+      if (error) throw error;
       await refetchItems();
       toast.success("Closing checklist loaded");
     } catch { toast.error("Could not load checklist"); }
@@ -4117,28 +4139,33 @@ function NewClosingPanel({
     if (next === "complete") update.completed_at = new Date().toISOString();
     else update.completed_at = null;
     setItemStatuses((p) => ({ ...p, [item.id]: next }));
-    await supabase.from("deal_room_closing_items").update(update).eq("id", item.id);
+    const { error } = await supabase.from("deal_room_closing_items").update(update).eq("id", item.id);
+    if (error) { console.error("[closing] status cycle failed:", error); toast.error("Could not update item status."); return; }
     await refetchItems();
   };
 
   const markItemComplete = async (itemId: string) => {
     setItemStatuses((p) => ({ ...p, [itemId]: "complete" }));
-    await supabase.from("deal_room_closing_items").update({ status: "complete", completed_at: new Date().toISOString() }).eq("id", itemId);
+    const { error } = await supabase.from("deal_room_closing_items").update({ status: "complete", completed_at: new Date().toISOString() }).eq("id", itemId);
+    if (error) { console.error("[closing] mark complete failed:", error); toast.error("Could not mark item complete."); return; }
     await refetchItems();
     setExpandedItemId(null);
   };
 
   const saveItemNote = async (itemId: string, value: string) => {
-    await supabase.from("deal_room_closing_items").update({ notes: value }).eq("id", itemId);
+    const { error } = await supabase.from("deal_room_closing_items").update({ notes: value }).eq("id", itemId);
+    if (error) { console.error("[closing] note save failed:", error); toast.error("Could not save note."); }
   };
 
   const saveItemDueDate = async (itemId: string, value: string) => {
-    await supabase.from("deal_room_closing_items").update({ due_by: value || null }).eq("id", itemId);
+    const { error } = await supabase.from("deal_room_closing_items").update({ due_by: value || null }).eq("id", itemId);
+    if (error) { console.error("[closing] due date save failed:", error); toast.error("Could not save due date."); }
   };
 
   const changeItemStatus = async (itemId: string, status: string) => {
     setItemStatuses((p) => ({ ...p, [itemId]: status }));
-    await supabase.from("deal_room_closing_items").update({ status }).eq("id", itemId);
+    const { error } = await supabase.from("deal_room_closing_items").update({ status }).eq("id", itemId);
+    if (error) { console.error("[closing] status change failed:", error); toast.error("Could not update item status."); return; }
     await refetchItems();
   };
 
@@ -4146,11 +4173,13 @@ function NewClosingPanel({
     if (!userId) return;
     setClosingDeal(true);
     try {
-      await supabase.from("deal_room_closure_reports").insert({
+      const { error: reportErr } = await supabase.from("deal_room_closure_reports").insert({
         deal_room_id: dealRoomId, closed_by: userId,
         outcome: "invested", reason_detail: finalNotes || null, ai_summary: null,
       });
-      await supabase.from("deal_rooms").update({ status: "closed" }).eq("id", dealRoomId);
+      if (reportErr) throw reportErr;
+      const { error: closeErr } = await supabase.from("deal_rooms").update({ status: "closed" }).eq("id", dealRoomId);
+      if (closeErr) throw closeErr;
       // Badge evaluation — fire-and-forget on this write event
       import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { deal_room_id: dealRoomId } })).catch(() => {});
       console.log("Email closing report to both parties — Claude Code will wire email");
@@ -4165,14 +4194,16 @@ function NewClosingPanel({
     if (!userId) return;
     setExiting(true);
     try {
-      await supabase.from("deal_room_closure_reports").insert({
+      const { error: reportErr } = await supabase.from("deal_room_closure_reports").insert({
         deal_room_id: dealRoomId, closed_by: userId,
         outcome: exitOutcome.toLowerCase(),
         reason_category: exitReasonCat,
         reason_detail: exitReasonDetail.trim() || null,
         ai_summary: null,
       });
-      await supabase.from("deal_rooms").update({ status: "closed" }).eq("id", dealRoomId);
+      if (reportErr) throw reportErr;
+      const { error: closeErr } = await supabase.from("deal_rooms").update({ status: "closed" }).eq("id", dealRoomId);
+      if (closeErr) throw closeErr;
       // Badge evaluation — fire-and-forget on this write event
       import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { deal_room_id: dealRoomId } })).catch(() => {});
       setExitDone(true);
@@ -4576,7 +4607,8 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
         .eq("user_id", authUser.id)
         .maybeSingle();
       const viewerName = profile?.your_name ?? profile?.fund_name ?? "Investor";
-      await supabase.from("document_views").insert({
+      // Background analytics write — log failures, never surface to the user
+      const { error } = await supabase.from("document_views").insert({
         document_id: params.documentId ?? null,
         founder_document_id: params.founderDocumentId ?? null,
         deal_room_id: dealRoomId,
@@ -4585,6 +4617,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
         viewer_role: "investor",
         viewer_name: viewerName,
       });
+      if (error) console.error("[trackDocumentView] insert failed:", error);
     } catch (e) {
       console.error("[trackDocumentView]", e);
     }
@@ -4703,12 +4736,14 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
 
   const updateDocVisibility = async (docId: string, visibility: "shared" | "private") => {
     setInvestorDocVisibility((prev) => ({ ...prev, [docId]: visibility }));
-    await supabase.from("documents").update({ visibility }).eq("id", docId);
+    const { error } = await supabase.from("documents").update({ visibility }).eq("id", docId);
+    if (error) { console.error("[docs] visibility update failed:", error); toast.error("Could not change document visibility."); return; }
     queryClient.invalidateQueries({ queryKey: ["investor-documents", dealRoomId, userId] });
   };
 
   const removeInvestorDoc = async (docId: string) => {
-    await supabase.from("documents").update({ deal_room_id: null }).eq("id", docId);
+    const { error } = await supabase.from("documents").update({ deal_room_id: null }).eq("id", docId);
+    if (error) { console.error("[docs] remove failed:", error); toast.error("Could not remove document."); return; }
     queryClient.invalidateQueries({ queryKey: ["investor-documents", dealRoomId, userId] });
     toast.success("Document removed");
   };
@@ -4717,20 +4752,22 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
     if (!linkName.trim() || !linkUrl.trim() || !userId) return;
     setAddingLink(true);
     const url = linkUrl.startsWith("http") ? linkUrl : `https://${linkUrl}`;
-    await supabase.from("deal_room_links").insert({
+    const { error } = await supabase.from("deal_room_links").insert({
       deal_room_id: dealRoomId,
       uploader_id: userId,
       name: linkName.trim(),
       url,
       visibility: "shared",
     });
+    if (error) { console.error("[links] add failed:", error); toast.error("Could not add link."); setAddingLink(false); return; }
     queryClient.invalidateQueries({ queryKey: ["deal-room-links", dealRoomId] });
     setLinkName(""); setLinkUrl(""); setShowAddLink(false); setAddingLink(false);
     toast.success("Link added");
   };
 
   const removeLink = async (linkId: string) => {
-    await supabase.from("deal_room_links").delete().eq("id", linkId);
+    const { error } = await supabase.from("deal_room_links").delete().eq("id", linkId);
+    if (error) { console.error("[links] remove failed:", error); toast.error("Could not remove link."); return; }
     queryClient.invalidateQueries({ queryKey: ["deal-room-links", dealRoomId] });
     toast.success("Link removed");
   };
@@ -4750,7 +4787,8 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
     const displayName = rawName.replace(/^\d{13}-/, "");
     let toastId: string | number;
     const timer = setTimeout(async () => {
-      await supabase.from("documents").update({ deal_room_id: null }).eq("id", doc.id);
+      const { error } = await supabase.from("documents").update({ deal_room_id: null }).eq("id", doc.id);
+      if (error) { console.error("[docs] deferred remove failed:", error); toast.error(`Could not remove "${displayName}".`); }
       queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
     }, 5000);
     toastId = toast(`"${displayName}" removed`, {
@@ -4768,7 +4806,8 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
 
   const addFromLibrary = async (docId: string) => {
     setAddingFromLib(docId);
-    await supabase.from("documents").update({ deal_room_id: dealRoomId }).eq("id", docId);
+    const { error } = await supabase.from("documents").update({ deal_room_id: dealRoomId }).eq("id", docId);
+    if (error) { console.error("[docs] add from library failed:", error); toast.error("Could not add document."); setAddingFromLib(null); return; }
     await queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
     await queryClient.invalidateQueries({ queryKey: ["library-docs", userId] });
     setAddingFromLib(null);
@@ -4805,7 +4844,8 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
       // from the extractor already explains the situation when text couldn't be read.
       if (!textContent || textContent.length < 30) {
         const honestMessage = `Could not extract readable text from this file.\n\nTo review: Click Preview or Download to open locally.`;
-        await supabase.from("documents").update({ ai_summary: honestMessage }).eq("id", doc.id);
+        const { error: msgErr } = await supabase.from("documents").update({ ai_summary: honestMessage }).eq("id", doc.id);
+        if (msgErr) console.error("[docs] ai_summary placeholder save failed:", msgErr);
         queryClient.setQueryData(["documents", dealRoomId], (old: any[]) =>
           (old ?? []).map((d: any) => d.id === doc.id ? { ...d, ai_summary: honestMessage } : d)
         );
@@ -4834,7 +4874,8 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
         return;
       }
 
-      await supabase.from("documents").update({ ai_summary: summary }).eq("id", doc.id);
+      const { error: sumErr } = await supabase.from("documents").update({ ai_summary: summary }).eq("id", doc.id);
+      if (sumErr) throw sumErr;
       queryClient.setQueryData(["documents", dealRoomId], (old: any[]) =>
         (old ?? []).map((d: any) => d.id === doc.id ? { ...d, ai_summary: summary } : d)
       );
@@ -5482,7 +5523,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                   const path = `${dealRoomId}/${userId}/${Date.now()}-${file.name}`;
                   const { error } = await supabase.storage.from("documents").upload(path, file);
                   if (error) { toast.error("Upload failed"); return; }
-                  await supabase.from("documents").insert({
+                  const { error: insErr } = await supabase.from("documents").insert({
                     deal_room_id: dealRoomId,
                     uploader_id: userId,
                     storage_path: path,
@@ -5490,6 +5531,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                     file_size: file.size,
                     category: "Other",
                   });
+                  if (insErr) { console.error("[docs] insert after upload failed:", insErr); toast.error("Upload failed — please try again."); return; }
                   queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
                   toast.success("Uploaded!");
                   e.target.value = "";
@@ -5552,7 +5594,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                         const path = `${dealRoomId}/${userId}/${Date.now()}-${file.name}`;
                         const { error: upErr } = await supabase.storage.from("documents").upload(path, file);
                         if (upErr) { toast.error("Upload failed"); return; }
-                        await supabase.from("documents").insert({
+                        const { error: insErr } = await supabase.from("documents").insert({
                           deal_room_id: dealRoomId,
                           uploader_id: userId,
                           storage_path: path,
@@ -5560,6 +5602,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                           file_name: file.name,
                           file_size: file.size,
                         });
+                        if (insErr) { console.error("[docs] insert after upload failed:", insErr); toast.error("Upload failed — please try again."); return; }
                         queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
                         toast.success(`${file.name} uploaded`);
                         e.target.value = "";
@@ -6429,7 +6472,7 @@ function QA({
     if (!answer || !userId || !isFounder) return;
     setAnsweringId(messageId);
     const current = msgs.find((m) => m.id === messageId);
-    await supabase
+    const { error } = await supabase
       .from("messages")
       .update({
         metadata: {
@@ -6440,6 +6483,7 @@ function QA({
         },
       })
       .eq("id", messageId);
+    if (error) { console.error("[qa] answer save failed:", error); toast.error("Could not post answer."); setAnsweringId(null); return; }
     await logActivity(dealRoomId, userId, "Answered a structured Q&A question", { question_id: messageId });
     setAnswerDrafts((drafts) => ({ ...drafts, [messageId]: "" }));
     setAnsweringId(null);
