@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useRef } from "react";
 import {
   Plus, Upload, X, Search, ChevronRight, ExternalLink,
@@ -482,6 +482,183 @@ function DetailPanel({ lead, onClose, onStatusChange }: { lead: VCLead; onClose:
 
 // ── Main Page ─────────────────────────────────────────────────────────────
 
+// ── Incoming connection requests (investor → founder) ─────────────────────
+// Approve is CONFIRM-FIRST: it creates a deal room visible to the investor,
+// so the confirmation card below must be acknowledged before the call.
+
+function IncomingRequests() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [actingId, setActingId] = useState<string | null>(null);
+
+  const { data: requests = [] } = useQuery({
+    queryKey: ["incoming-connection-requests", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data: myStartups } = await supabase
+        .from("startups").select("id, company_name").eq("founder_id", user!.id);
+      const startupIds = (myStartups ?? []).map((s: any) => s.id);
+      if (!startupIds.length) return [];
+
+      const { data: reqs } = await supabase
+        .from("discovery_requests")
+        .select("id, investor_id, startup_id, status, message, created_at")
+        .in("startup_id", startupIds)
+        .eq("status", "pending")
+        .order("created_at", { ascending: false });
+      if (!reqs?.length) return [];
+
+      const { data: profiles } = await supabase
+        .from("investor_profiles")
+        .select("user_id, your_name, fund_name, sectors, stages, check_size_min, check_size_max")
+        .in("user_id", reqs.map((r: any) => r.investor_id));
+      const pmap = Object.fromEntries((profiles ?? []).map((p: any) => [p.user_id, p]));
+      return reqs.map((r: any) => ({ ...r, profile: pmap[r.investor_id] ?? null }));
+    },
+  });
+
+  const navigate = useNavigate();
+
+  const approve = async (requestId: string) => {
+    setActingId(requestId);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { toast.error("Session expired — sign in again"); return; }
+      const { approveConnectionRequest } = await import("@/lib/connection-request-fn");
+      const result = await approveConnectionRequest({
+        data: { userAccessToken: session.access_token, requestId },
+      });
+      if (result.ok && result.dealRoomId) {
+        toast.success("Deal room created — investor notified");
+        qc.invalidateQueries({ queryKey: ["incoming-connection-requests", user?.id] });
+        qc.invalidateQueries({ queryKey: ["vc-leads", user?.id] });
+        navigate({ to: "/app/deal-room/$id", params: { id: result.dealRoomId } });
+      } else {
+        toast.error("Could not create deal room. Please try again.");
+      }
+    } finally {
+      setActingId(null);
+      setConfirmId(null);
+    }
+  };
+
+  const decline = async (requestId: string) => {
+    setActingId(requestId);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { toast.error("Session expired — sign in again"); return; }
+      const { declineConnectionRequest } = await import("@/lib/connection-request-fn");
+      const result = await declineConnectionRequest({
+        data: { userAccessToken: session.access_token, requestId },
+      });
+      if (result.ok) {
+        toast.success("Request declined");
+        qc.invalidateQueries({ queryKey: ["incoming-connection-requests", user?.id] });
+      } else {
+        toast.error("Could not decline request.");
+      }
+    } finally {
+      setActingId(null);
+    }
+  };
+
+  const daysAgo = (iso: string) => {
+    const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+    if (d === 0) return "today";
+    if (d === 1) return "1 day ago";
+    return `${d} days ago`;
+  };
+
+  if (!requests.length) return null;
+
+  return (
+    <div className="px-6 py-4" style={{ borderBottom: "1px solid var(--hs-border)", background: "rgba(124,58,237,0.04)" }}>
+      <div className="flex items-center gap-2 mb-3">
+        <Users className="h-4 w-4 text-brand" />
+        <span className="text-sm font-semibold" style={{ color: "var(--hs-text-primary)" }}>
+          Connection requests
+        </span>
+        <span className="inline-flex items-center justify-center h-5 min-w-[20px] rounded-full bg-brand text-brand-foreground text-[10px] font-semibold px-1.5">
+          {requests.length}
+        </span>
+      </div>
+      <div className="grid gap-3 md:grid-cols-2">
+        {requests.map((r: any) => {
+          const name = r.profile?.your_name ?? "Investor";
+          const fund = r.profile?.fund_name;
+          const thesis = [r.profile?.sectors, r.profile?.stages,
+            r.profile?.check_size_min ? `$${r.profile.check_size_min}${r.profile?.check_size_max ? `–$${r.profile.check_size_max}` : "+"}` : null,
+          ].filter(Boolean).join(" · ");
+          return (
+            <div key={r.id} className="rounded-xl border border-border/60 bg-card p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold truncate" style={{ color: "var(--hs-text-primary)" }}>
+                    {name}{fund ? <span className="font-normal text-muted-foreground"> · {fund}</span> : null}
+                  </div>
+                  {thesis && <div className="text-xs text-muted-foreground mt-0.5 truncate">{thesis}</div>}
+                  {r.message && (
+                    <div className="text-xs mt-2 rounded-lg px-3 py-2" style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)", color: "var(--hs-text-secondary)" }}>
+                      “{r.message}”
+                    </div>
+                  )}
+                </div>
+                <span className="text-[11px] text-muted-foreground whitespace-nowrap flex items-center gap-1">
+                  <Clock className="h-3 w-3" /> {daysAgo(r.created_at)}
+                </span>
+              </div>
+
+              {confirmId === r.id ? (
+                <div className="mt-3 rounded-lg px-3 py-3" style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)" }}>
+                  <p className="text-xs leading-relaxed" style={{ color: "var(--hs-text-secondary)" }}>
+                    This will create a deal room with <span className="font-semibold text-foreground">{name}</span>.
+                    They'll be notified immediately and can view your Information Vault after signing the NDA. Proceed?
+                  </p>
+                  <div className="mt-2.5 flex gap-2">
+                    <button
+                      onClick={() => approve(r.id)}
+                      disabled={actingId === r.id}
+                      className="flex items-center gap-1.5 rounded-lg bg-brand text-brand-foreground px-3 py-1.5 text-xs font-semibold hover:bg-brand/90 disabled:opacity-60"
+                    >
+                      {actingId === r.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3" />}
+                      Confirm
+                    </button>
+                    <button
+                      onClick={() => setConfirmId(null)}
+                      disabled={actingId === r.id}
+                      className="rounded-lg border border-border/60 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-3 flex gap-2">
+                  <button
+                    onClick={() => setConfirmId(r.id)}
+                    disabled={!!actingId}
+                    className="flex items-center gap-1.5 rounded-lg bg-brand text-brand-foreground px-3 py-1.5 text-xs font-semibold hover:bg-brand/90 disabled:opacity-60"
+                  >
+                    Open deal room <ArrowRight className="h-3 w-3" />
+                  </button>
+                  <button
+                    onClick={() => decline(r.id)}
+                    disabled={!!actingId}
+                    className="rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground disabled:opacity-60"
+                  >
+                    {actingId === r.id ? "…" : "Decline"}
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function ConnectionsPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
@@ -561,6 +738,9 @@ function ConnectionsPage() {
           </button>
         </div>
       </div>
+
+      {/* ── Incoming connection requests */}
+      <IncomingRequests />
 
       {/* ── Summary strip */}
       {leads.length > 0 && (
