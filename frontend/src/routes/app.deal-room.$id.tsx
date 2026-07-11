@@ -238,6 +238,20 @@ function DealRoom() {
     }
   }, [ndaLoading, ndaAcceptance, user?.id, navigate, dealRoomId]);
 
+  // ── Origin: was this room created from a connection request? ─
+  const { data: connectionOrigin } = useQuery({
+    queryKey: ["deal-room-origin", dealRoomId],
+    staleTime: 10 * 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("discovery_requests")
+        .select("responded_at, created_at")
+        .eq("deal_room_id", dealRoomId)
+        .maybeSingle();
+      return data ?? null;
+    },
+  });
+
   // ── Seed stores from Supabase data ────────────────────────────
   useEffect(() => {
     if (qaMessages.length > 0) {
@@ -427,7 +441,12 @@ function DealRoom() {
             </div>
             <div className="min-w-0 hidden sm:block">
               <div className="text-sm font-semibold text-gray-900 dark:text-white truncate" style={{ fontFamily: "Syne, sans-serif" }}>{companyName}</div>
-              <div className="text-[10px] text-gray-500 dark:text-gray-400">{isInvestor ? "Founder · Deal Room" : "Investor · Deal Room"}</div>
+              <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                {isInvestor ? "Founder · Deal Room" : "Investor · Deal Room"}
+                {connectionOrigin && (
+                  <> · Connected via directory request · {new Date(connectionOrigin.responded_at ?? connectionOrigin.created_at).toLocaleDateString()}</>
+                )}
+              </div>
             </div>
           </div>
 

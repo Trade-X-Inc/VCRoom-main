@@ -7,7 +7,7 @@ import { getDeskTasks } from "@/lib/desk-fn";
 import {
   ArrowUpRight, TrendingUp, Users, Briefcase, Mail, Sparkles,
   Calendar, FileText, CheckCircle2, Clock, Building2, X, Loader2,
-  HelpCircle, ExternalLink, AlertCircle, ShieldCheck, Check,
+  HelpCircle, ExternalLink, AlertCircle, ShieldCheck, Check, ArrowRight,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -358,7 +358,6 @@ function AccessRequestsPanel({ startupId, companyName, profileSlug }: {
 }) {
   const [requests, setRequests] = useState<AccessRequest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [actingId, setActingId] = useState<string | null>(null);
 
   const loadRequests = async () => {
     setLoading(true);
@@ -396,50 +395,6 @@ function AccessRequestsPanel({ startupId, companyName, profileSlug }: {
   };
 
   useEffect(() => { loadRequests(); }, [startupId]);
-
-  const handleAction = async (requestId: string, investorId: string, action: "approved" | "declined", investorName: string | null) => {
-    setActingId(requestId);
-    const { error } = await supabase
-      .from("discovery_requests")
-      .update({ status: action, updated_at: new Date().toISOString() })
-      .eq("id", requestId);
-
-    if (!error) {
-      setRequests((prev) => prev.filter((r) => r.id !== requestId));
-      if (action === "approved") {
-        toast.success(`Access approved. ${investorName ?? "Investor"} can now view your on-request sections.`);
-        // Write in-app notification to the investor
-        const name = companyName ?? "The founder";
-        supabase.from("notifications").insert({
-          user_id: investorId,
-          kind: "access_approved",
-          title: `${name} approved your access`,
-          body: "You can now view their business model, market, traction, and team sections.",
-          read: false,
-          action_url: profileSlug ? `/p/${profileSlug}` : null,
-          meta: { startup_id: startupId },
-        }).then(({ error: nErr }) => {
-          if (nErr) console.warn("[notification] access_approved insert failed:", nErr.message);
-        });
-        // Auto-generate deal brief for the investor (fire and forget)
-        if (startupId) {
-          supabase.auth.getSession().then(({ data: { session } }) => {
-            const jwt = session?.access_token ?? "";
-            import("@/lib/deal-brief-fn").then(({ runDealBrief }) => {
-              runDealBrief({ startupId, investorId, userId: investorId, jwt }).catch(
-                (e: any) => console.warn("[deal-brief] auto-generate failed:", e?.message ?? e)
-              );
-            });
-          });
-        }
-      } else {
-        toast.success("Request declined.");
-      }
-    } else {
-      toast.error("Could not update request.");
-    }
-    setActingId(null);
-  };
 
   const daysAgo = (iso: string) => {
     const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
@@ -479,7 +434,6 @@ function AccessRequestsPanel({ startupId, companyName, profileSlug }: {
               const name = profile?.your_name ?? "Unknown investor";
               const firm = profile?.fund_name ?? null;
               const role = profile?.role ?? null;
-              const isActing = actingId === req.id;
 
               return (
                 <div key={req.id} className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-lg border border-border/60 bg-background/40 p-4">
@@ -494,23 +448,16 @@ function AccessRequestsPanel({ startupId, companyName, profileSlug }: {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      disabled={isActing}
-                      onClick={() => handleAction(req.id, req.investor_id, "approved", name)}
-                      className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
-                      style={{ background: "rgba(16,185,129,0.15)", color: "#10B981", border: "1px solid rgba(16,185,129,0.3)" }}
+                    {/* Approval now lives in /app/connections — it can open a
+                        deal room (confirm-first), so there is one review flow,
+                        not two with different outcomes. */}
+                    <Link
+                      to="/app/connections"
+                      className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
+                      style={{ background: "rgba(124,58,237,0.15)", color: "#A855F7", border: "1px solid rgba(124,58,237,0.3)" }}
                     >
-                      {isActing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
-                      Approve
-                    </button>
-                    <button
-                      disabled={isActing}
-                      onClick={() => handleAction(req.id, req.investor_id, "declined", name)}
-                      className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
-                      style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.08)" }}
-                    >
-                      Decline
-                    </button>
+                      Review <ArrowRight className="h-3 w-3" />
+                    </Link>
                   </div>
                 </div>
               );
