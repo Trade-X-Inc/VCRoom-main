@@ -205,13 +205,13 @@ async function getAccessLevel(startup: PublicStartup): Promise<{ level: AccessLe
     if (membership) return { level: "deal_room", userId, userRole };
   }
 
-  // Check approved discovery request
+  // Check approved discovery request (deal_room_created implies approved)
   const { data: request } = await supabase
     .from("discovery_requests")
     .select("status")
     .eq("investor_id", userId)
     .eq("startup_id", startup.id)
-    .eq("status", "approved")
+    .in("status", ["approved", "deal_room_created"])
     .maybeSingle();
 
   if (request) return { level: "on_request", userId, userRole };
@@ -467,6 +467,9 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
   const [requestStatuses, setRequestStatuses] = useState<Record<string, RequestStatus>>({});
   // Existing request record from DB
   const [existingRequest, setExistingRequest] = useState<{ status: string } | null>(null);
+  const [showConnectModal, setShowConnectModal] = useState(false);
+  const [connectMessage, setConnectMessage] = useState("");
+  const [connectSending, setConnectSending] = useState(false);
 
   useEffect(() => {
     if (isOwnerPreview) {
@@ -499,12 +502,18 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
         .maybeSingle();
       if (data) {
         setExistingRequest(data);
-        // Pre-populate all on_request sections with the existing status
+        // Pre-populate all on_request sections with the existing status.
+        // DB statuses → UI statuses: deal_room_created counts as approved,
+        // declined (what the founder side writes) maps to rejected.
+        const uiStatus: RequestStatus =
+          data.status === "deal_room_created" ? "approved" :
+          data.status === "declined" || data.status === "rejected" ? "rejected" :
+          (data.status as RequestStatus);
         const vis = getVisibility(startup);
         const statuses: Record<string, RequestStatus> = {};
         Object.entries(vis).forEach(([k, v]) => {
           if (v === "on_request") {
-            statuses[k] = data.status as RequestStatus;
+            statuses[k] = uiStatus;
           }
         });
         setRequestStatuses(statuses);
@@ -643,45 +652,54 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
         setRequestStatuses((prev) => ({ ...prev, [sectionKey]: "pending" }));
         return;
       }
-      if (existing.status === "approved") {
+      if (existing.status === "approved" || existing.status === "deal_room_created") {
         return;
       }
-      if (existing.status === "rejected") {
+      if (existing.status === "rejected" || existing.status === "declined") {
         toast.error("Your previous request was not approved. Connect with this founder through other channels.");
         setRequestStatuses((prev) => ({ ...prev, [sectionKey]: "rejected" }));
         return;
       }
     }
 
-    // Create request
-    setRequestStatuses((prev) => ({ ...prev, [sectionKey]: "submitting" }));
-    const { error } = await supabase.from("discovery_requests").insert({
-      investor_id: viewerId,
-      startup_id: startup.id,
-      status: "pending",
-      stage: 1,
-    });
+    // Open the message modal — the actual send happens in submitConnectRequest
+    setShowConnectModal(true);
+  };
 
-    if (error) {
-      toast.error("Could not submit request. Please try again.");
-      setRequestStatuses((prev) => ({ ...prev, [sectionKey]: "idle" }));
-      return;
+  const submitConnectRequest = async () => {
+    if (connectSending) return;
+    setConnectSending(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = `/sign-up?role=investor&interest=${startup.profile_slug ?? ""}`;
+        return;
+      }
+      const { sendConnectionRequest } = await import("@/lib/connection-request-fn");
+      const result = await sendConnectionRequest({
+        data: {
+          userAccessToken: session.access_token,
+          targetStartupId: startup.id,
+          message: connectMessage.trim() || undefined,
+        },
+      });
+
+      if (result.ok || result.error === "already_exists") {
+        const allPending: Record<string, RequestStatus> = {};
+        Object.entries(vis).forEach(([k, v]) => {
+          if (v === "on_request") allPending[k] = "pending";
+        });
+        setRequestStatuses(allPending);
+        setExistingRequest({ status: result.status ?? "pending" });
+        setShowConnectModal(false);
+        setConnectMessage("");
+        toast.success(result.ok ? "Connection request sent" : "Request already sent — pending founder approval");
+      } else {
+        toast.error("Could not submit request. Please try again.");
+      }
+    } finally {
+      setConnectSending(false);
     }
-
-    // Mark all on_request sections as pending in one shot
-    const allPending: Record<string, RequestStatus> = {};
-    Object.entries(vis).forEach(([k, v]) => {
-      if (v === "on_request") allPending[k] = "pending";
-    });
-    setRequestStatuses(allPending);
-    setExistingRequest({ status: "pending" });
-
-    // Fire-and-forget: notify founder via edge function (non-blocking)
-    supabase.functions.invoke("notify-access-request", {
-      body: { startup_id: startup.id, investor_id: viewerId },
-    }).catch(() => {
-      console.warn("[notify-access-request] Notification failed — request was still created");
-    });
   };
 
   const sectionLabels: Record<string, string> = {
@@ -712,6 +730,55 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <SiteHeader />
+
+      {/* Connection request modal — optional message, max 200 chars */}
+      {showConnectModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+          onClick={() => !connectSending && setShowConnectModal(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl bg-white border border-gray-200 shadow-xl p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-bold text-gray-900" style={{ fontFamily: "Syne, sans-serif" }}>
+              Request access to {startup.company_name}
+            </h3>
+            <p className="mt-1 text-sm text-gray-600">
+              The founder reviews every request. If approved, a private deal room opens for both of you.
+            </p>
+            <label className="mt-4 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Add a message (optional)
+            </label>
+            <textarea
+              value={connectMessage}
+              onChange={(e) => setConnectMessage(e.target.value.slice(0, 200))}
+              rows={3}
+              maxLength={200}
+              placeholder="Why you're interested, your fund's thesis fit…"
+              className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-purple-500 focus:outline-none resize-none"
+            />
+            <div className="mt-1 text-right text-[11px] text-gray-400">{connectMessage.length}/200</div>
+            <div className="mt-4 flex gap-3">
+              <button
+                onClick={submitConnectRequest}
+                disabled={connectSending}
+                className="flex-1 rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-purple-700 disabled:opacity-60"
+              >
+                {connectSending ? "Sending…" : "Send request"}
+              </button>
+              <button
+                onClick={() => setShowConnectModal(false)}
+                disabled={connectSending}
+                className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Owner preview banner — amber, same style as /i/$slug */}
       {isOwnerPreview && (
         <div style={{

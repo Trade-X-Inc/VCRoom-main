@@ -412,6 +412,9 @@ function Directory() {
   const isInvestor = user?.role === "investor";
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
   const [pendingConnectStartupId, setPendingConnectStartupId] = useState<string | null>(null);
+  const [connectModalStartupId, setConnectModalStartupId] = useState<string | null>(null);
+  const [connectMessage, setConnectMessage] = useState("");
+  const [connectSending, setConnectSending] = useState(false);
   const { progress, markStep, setCurrentStep } = useOnboardingProgress();
 
   useEffect(() => {
@@ -471,101 +474,45 @@ function Directory() {
       setShowOnboardingModal(true);
       return;
     }
-    await doConnect(startupId);
+    // Open the message modal — the send happens in doConnect
+    setConnectModalStartupId(startupId);
+    setConnectMessage("");
   };
 
-  const doConnect = async (startupId: string) => {
-    if (!user?.id) return;
-
-    // 1) Insert discovery_request and get its id
-    const { data: requestData, error: reqError } = await supabase
-      .from("discovery_requests")
-      .insert({
-        investor_id: user.id,
-        startup_id: startupId,
-        status: "pending",
-        stage: 1,
-      })
-      .select("id")
-      .maybeSingle();
-
-    if (reqError || !requestData) {
-      console.error("Connect failed:", reqError);
-      toast.error("Could not send request");
-      return;
-    }
-
-    const requestId = (requestData as any).id;
-
-    // 2) Fetch startup and investor profile for populating vc_leads
-    const { data: startup } = await supabase
-      .from("startups")
-      .select("founder_id, company_name, sector, stage, country, website")
-      .eq("id", startupId)
-      .maybeSingle();
-
-    const { data: investorProfile } = await supabase
-      .from("investor_profiles")
-      .select("fund_name, your_name, role")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    if (!startup) {
-      toast.error("Startup not found");
-      return;
-    }
-
-    // 3) Auto-create vc_lead on the founder's side
+  // Server fn handles the request insert, vc_lead auto-create, and founder
+  // notification in one place (shared with the public profile page).
+  const doConnect = async (startupId: string, message?: string) => {
+    if (!user?.id || connectSending) return;
+    setConnectSending(true);
     try {
-      const investorDisplayName = investorProfile?.your_name ?? (user as any)?.full_name ?? user?.email ?? "Investor";
-      const { data: lead, error: leadError } = await supabase
-        .from("vc_leads")
-        .insert({
-          founder_id: startup.founder_id,
-          investor_name: investorDisplayName,
-          firm_name: investorProfile?.fund_name ?? null,
-          sector: startup.sector,
-          stage: startup.stage,
-          geography: startup.country,
-          status: "New",
-          source: "Hockystick",
-          discovery_request_id: requestId,
-        })
-        .select("id")
-        .maybeSingle();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { toast.error("Session expired — sign in again"); return; }
 
-      if (!leadError && lead) {
-        // 4) Link the vc_lead back to the discovery_request
-        await supabase
-          .from("discovery_requests")
-          .update({ vc_lead_id: (lead as any).id })
-          .eq("id", requestId);
-      }
-    } catch (e) {
-      // non-fatal: continue
-      console.error("vc_lead creation failed", e);
-    }
-
-    // 5) Create in-app notification for founder
-    try {
-      await supabase.from("notifications").insert({
-        user_id: startup.founder_id,
-        kind: "deal",
-        title: "New connection request",
-        body: `${investorProfile?.your_name ?? "An investor"} from ${investorProfile?.fund_name ?? "a fund"} wants to connect with ${startup.company_name}.`,
-        read: false,
-        action_url: "/app/vc-leads",
+      const { sendConnectionRequest } = await import("@/lib/connection-request-fn");
+      const result = await sendConnectionRequest({
+        data: {
+          userAccessToken: session.access_token,
+          targetStartupId: startupId,
+          message: message?.trim() || undefined,
+        },
       });
-    } catch (e) {
-      console.error("notification insert failed", e);
-    }
 
-    // 6) Optimistic UI update — mark as pending in directory requests cache
-    queryClient.setQueryData(["directory-discovery-requests", user.id], (old: any[] = []) => [
-      ...old.filter((r) => r.startup_id !== startupId),
-      { startup_id: startupId, status: "pending" },
-    ]);
-    toast.success("Connection request sent");
+      if (!result.ok && result.error !== "already_exists") {
+        console.error("Connect failed:", result.error);
+        toast.error("Could not send request");
+        return;
+      }
+
+      // Optimistic UI update — mark as pending in directory requests cache
+      queryClient.setQueryData(["directory-discovery-requests", user.id], (old: any[] = []) => [
+        ...old.filter((r) => r.startup_id !== startupId),
+        { startup_id: startupId, status: result.status ?? "pending" },
+      ]);
+      setConnectModalStartupId(null);
+      toast.success(result.ok ? "Connection request sent" : "Request already sent");
+    } finally {
+      setConnectSending(false);
+    }
   };
 
   const handleCancel = async (startupId: string) => {
@@ -738,13 +685,63 @@ function Directory() {
         onDetailPackRequested={() => queryClient.invalidateQueries({ queryKey: ["directory-discovery-requests", user?.id] })}
       />
 
+      {/* Connection request message modal (dark — inside /app) */}
+      {connectModalStartupId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+          onClick={() => !connectSending && setConnectModalStartupId(null)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl bg-card border border-border/60 shadow-xl p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-semibold" style={{ fontFamily: "Syne, sans-serif" }}>
+              Send connection request
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              The founder reviews every request. If approved, a private deal room opens for both of you.
+            </p>
+            <label className="mt-4 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Add a message (optional)
+            </label>
+            <textarea
+              value={connectMessage}
+              onChange={(e) => setConnectMessage(e.target.value.slice(0, 200))}
+              rows={3}
+              maxLength={200}
+              placeholder="Why you're interested, your fund's thesis fit…"
+              className="mt-1.5 w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
+            />
+            <div className="mt-1 text-right text-[11px] text-muted-foreground/60">{connectMessage.length}/200</div>
+            <div className="mt-4 flex gap-3">
+              <button
+                onClick={() => doConnect(connectModalStartupId, connectMessage)}
+                disabled={connectSending}
+                className="flex-1 rounded-lg bg-brand text-brand-foreground px-4 py-2.5 text-sm font-semibold hover:bg-brand/90 disabled:opacity-60"
+              >
+                {connectSending ? "Sending…" : "Send request"}
+              </button>
+              <button
+                onClick={() => setConnectModalStartupId(null)}
+                disabled={connectSending}
+                className="rounded-lg border border-border/60 px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <InvestorOnboardingModal
         isOpen={showOnboardingModal}
         userId={user?.id ?? ""}
         onComplete={async () => {
           setShowOnboardingModal(false);
           if (pendingConnectStartupId) {
-            await doConnect(pendingConnectStartupId);
+            // Resume into the message modal rather than sending silently
+            setConnectModalStartupId(pendingConnectStartupId);
+            setConnectMessage("");
             setPendingConnectStartupId(null);
           }
         }}
