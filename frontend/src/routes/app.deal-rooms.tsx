@@ -120,13 +120,12 @@ function DealRooms() {
   const handleDelete = async (roomId: string) => {
     setDeletingId(roomId);
     try {
-      await supabase.from("invites").delete().eq("deal_room_id", roomId);
-      await supabase.from("deal_room_members").delete().eq("deal_room_id", roomId);
-      await supabase.from("activities").delete().eq("deal_room_id", roomId);
-      await supabase.from("messages").delete().eq("deal_room_id", roomId);
-      await supabase.from("deal_tasks").delete().eq("deal_room_id", roomId);
-      await supabase.from("notes").delete().eq("deal_room_id", roomId);
-      await supabase.from("documents").delete().eq("deal_room_id", roomId);
+      // Child rows must actually delete before the room — a silent failure
+      // here would leave orphaned data while the UI reports success.
+      for (const table of ["invites", "deal_room_members", "activities", "messages", "deal_tasks", "notes", "documents"] as const) {
+        const { error: childErr } = await supabase.from(table).delete().eq("deal_room_id", roomId);
+        if (childErr) throw childErr;
+      }
       const { error } = await supabase.from("deal_rooms").delete().eq("id", roomId);
       if (error) throw error;
       queryClient.invalidateQueries({ queryKey: ["deal-rooms", user?.id, startup?.id] });
@@ -607,19 +606,22 @@ function CreateRoomForm({
       if (roomErr) throw roomErr;
       if (!newRoom?.id) throw new Error("No room ID returned");
 
-      // 2. Add founder as member
-      await supabase.from("deal_room_members").insert({
+      // 2. Add founder as member — load-bearing: without membership the
+      // founder can't access their own room
+      const { error: memberErr } = await supabase.from("deal_room_members").insert({
         deal_room_id: newRoom.id,
         user_id: userId,
         role: "founder",
       });
+      if (memberErr) throw memberErr;
 
-      // 3. Log activity
-      await supabase.from("activities").insert({
+      // 3. Log activity (background — log failures only)
+      const { error: actErr } = await supabase.from("activities").insert({
         deal_room_id: newRoom.id,
         actor_id: userId,
         action: `Deal room created for ${investorName.trim()}${investorFirm.trim() ? ` · ${investorFirm.trim()}` : ""} · ${dealType}${fundingTarget ? ` · $${fundingTarget}` : ""}`,
       });
+      if (actErr) console.error("[deal-rooms] activity log failed:", actErr);
 
       // Badge evaluation — fire-and-forget on this write event
       import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { startup_id: startupId } })).catch(() => {});
