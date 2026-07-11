@@ -238,7 +238,7 @@ export function FounderProfilePanel({
       return;
     }
     console.log('Detail pack requested successfully');
-    await supabase.from('notifications').insert({
+    const { error: notifErr } = await supabase.from('notifications').insert({
       user_id: startup.founder_id,
       kind: 'deal',
       title: 'Detail pack requested',
@@ -246,6 +246,7 @@ export function FounderProfilePanel({
       read: false,
       action_url: '/app/connections',
     });
+    if (notifErr) console.error('[detail-pack] notification failed:', notifErr);
     setDetailPackRequested(true);
     onDetailPackRequested?.();
   }

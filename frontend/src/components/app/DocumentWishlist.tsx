@@ -93,7 +93,8 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
   };
 
   const handleFulfill = async (id: string) => {
-    await supabase.from("document_requests").update({ status: "fulfilled" }).eq("id", id);
+    const { error } = await supabase.from("document_requests").update({ status: "fulfilled" }).eq("id", id);
+    if (error) { console.error("[wishlist] fulfill failed:", error); toast.error("Could not update request."); return; }
     toast.success("Marked as uploaded");
     qc.invalidateQueries({ queryKey: ["doc-wishlist", dealRoomId] });
   };
@@ -124,7 +125,7 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
       const { error: upErr } = await supabase.storage.from("documents").upload(path, file, { upsert: true });
       if (upErr) throw upErr;
       const req = (requests as any[]).find((r) => r.id === id);
-      await supabase.from("documents").insert({
+      const { error: docErr } = await supabase.from("documents").insert({
         deal_room_id: dealRoomId,
         uploader_id: userId,
         category: "Other",
@@ -133,7 +134,9 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
         file_name: file.name,
         file_size: file.size,
       });
-      await supabase.from("document_requests").update({ status: "fulfilled" }).eq("id", id);
+      if (docErr) throw docErr;
+      const { error: reqErr } = await supabase.from("document_requests").update({ status: "fulfilled" }).eq("id", id);
+      if (reqErr) throw reqErr;
       qc.invalidateQueries({ queryKey: ["doc-wishlist", dealRoomId] });
       qc.invalidateQueries({ queryKey: ["documents", dealRoomId] });
       toast.success(`${file.name} uploaded and request fulfilled`);
@@ -142,7 +145,8 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
   };
 
   const handleDelete = async (id: string) => {
-    await supabase.from("document_requests").delete().eq("id", id);
+    const { error } = await supabase.from("document_requests").delete().eq("id", id);
+    if (error) { console.error("[wishlist] delete failed:", error); toast.error("Could not delete request."); return; }
     qc.invalidateQueries({ queryKey: ["doc-wishlist", dealRoomId] });
   };
 

@@ -106,16 +106,18 @@ export function NotificationBell() {
 
   const markAll = async () => {
     if (!user?.id || unread === 0) return;
-    await supabase
+    const { error } = await supabase
       .from("notifications")
       .update({ read: true })
       .eq("user_id", user.id)
       .eq("read", false);
+    if (error) console.error("[notifications] mark all read failed:", error);
     queryClient.invalidateQueries({ queryKey: ["notifications", user.id] });
   };
 
   const markOneRead = async (id: string) => {
-    await supabase.from("notifications").update({ read: true }).eq("id", id);
+    const { error } = await supabase.from("notifications").update({ read: true }).eq("id", id);
+    if (error) console.error("[notifications] mark read failed:", error);
     queryClient.setQueryData<NotifRow[]>(["notifications", user?.id], (old) =>
       (old ?? []).map((n) => n.id === id ? { ...n, read: true } : n)
     );

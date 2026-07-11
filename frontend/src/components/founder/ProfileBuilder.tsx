@@ -365,7 +365,8 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
             ai_generated: false,
             last_edited_by: userId,
           }));
-          await supabase.from("startup_profile_sections").insert(rows);
+          const { error } = await supabase.from("startup_profile_sections").insert(rows);
+          if (error) throw error;
           await refetch();
         } catch {
           // Sections likely already exist — refetch
@@ -400,18 +401,20 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
     if (next === "public" && NO_PUBLIC_SECTIONS.has(section.section_key)) {
       setVisibilityWarning(section.section_key);
       // Snap to deal_room instead
-      await supabase
+      const { error: snapErr } = await supabase
         .from("startup_profile_sections")
         .update({ visibility: "deal_room" })
         .eq("id", section.id);
+      if (snapErr) { console.error("[profile-sections] visibility snap failed:", snapErr); toast.error("Could not update visibility."); return; }
       await refetch();
       setTimeout(() => setVisibilityWarning(null), 3000);
       return;
     }
-    await supabase
+    const { error: visErr } = await supabase
       .from("startup_profile_sections")
       .update({ visibility: next })
       .eq("id", section.id);
+    if (visErr) { console.error("[profile-sections] visibility update failed:", visErr); toast.error("Could not update visibility."); return; }
     await refetch();
   };
 
@@ -419,7 +422,7 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
     const key = section.section_key;
     setSavingKey(key);
     try {
-      await supabase
+      const { error } = await supabase
         .from("startup_profile_sections")
         .update({
           content: localContents[key] ?? section.content,
@@ -427,6 +430,7 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
           last_edited_by: userId,
         })
         .eq("id", section.id);
+      if (error) throw error;
       await refetch();
       setSavedKey(key);
       setTimeout(() => setSavedKey(null), 2000);
@@ -442,7 +446,7 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
     setAddingSec(true);
     try {
       const maxOrder = allSections.length > 0 ? Math.max(...allSections.map((s: any) => s.display_order ?? 0)) : 10;
-      await supabase.from("startup_profile_sections").insert({
+      const { error } = await supabase.from("startup_profile_sections").insert({
         startup_id: startupId,
         section_key: slugify(newSectionName),
         section_label: newSectionName.trim(),
@@ -453,6 +457,7 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
         ai_generated: false,
         last_edited_by: userId,
       });
+      if (error) throw error;
       await refetch();
       setNewSectionName("");
       setAddSectionOpen(false);

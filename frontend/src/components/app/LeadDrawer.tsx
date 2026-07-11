@@ -364,7 +364,8 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
     const tag = emailType === "cold" ? "Cold Email" : "Follow-up Email";
     const entry = `**${tag} (${new Date().toLocaleDateString()}):**\n${generatedEmail}`;
     const appended = [f.notes, entry].filter(Boolean).join("\n\n---\n\n");
-    await supabase.from("vc_leads").update({ notes: appended, updated_at: new Date().toISOString() }).eq("id", lead.id);
+    const { error } = await supabase.from("vc_leads").update({ notes: appended, updated_at: new Date().toISOString() }).eq("id", lead.id);
+    if (error) { console.error("[leads] notes save failed:", error); toast.error("Could not save to notes."); return; }
     setF((s) => ({ ...s, notes: appended }));
     queryClient.invalidateQueries({ queryKey: ["leads", user?.id] });
     toast.success("Saved to notes");
@@ -390,11 +391,12 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
       // Promote lead status to Meeting Booked if it's early in the pipeline
       const promotable: LeadStatus[] = ["New", "Shortlisted", "Contacted", "Replied"];
       if (promotable.includes(f.status)) {
-        await supabase
+        const { error: bookErr } = await supabase
           .from("vc_leads")
           .update({ status: "Meeting Booked", updated_at: new Date().toISOString() })
           .eq("id", lead.id)
           .eq("founder_id", user.id);
+        if (bookErr) console.error("[leads] auto-promote failed:", bookErr);
         setF((s) => ({ ...s, status: "Meeting Booked" }));
       }
 

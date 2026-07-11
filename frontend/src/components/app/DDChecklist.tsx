@@ -62,7 +62,8 @@ export function DDChecklist({ dealRoomId, userId }: { dealRoomId: string; userId
     if (!userId) return;
     const next = statusMeta[task.completed ? "done" : "todo"].next;
     const completed = next === "done";
-    await supabase.from("deal_tasks").update({ completed }).eq("id", task.id);
+    const { error } = await supabase.from("deal_tasks").update({ completed }).eq("id", task.id);
+    if (error) { console.error("[dd-checklist] toggle failed:", error); toast.error("Could not update task."); return; }
     queryClient.invalidateQueries({ queryKey: ["deal-tasks-checklist", dealRoomId] });
     queryClient.invalidateQueries({ queryKey: ["deal-tasks", dealRoomId] });
   };

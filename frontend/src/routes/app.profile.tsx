@@ -433,7 +433,8 @@ function Profile() {
     const nextVisibility = { ...form.section_visibility, [section]: visibility };
     setForm((f) => ({ ...f, section_visibility: nextVisibility }));
     try {
-      await supabase.from("startups").update({ section_visibility: nextVisibility }).eq("id", startup.id);
+      const { error } = await supabase.from("startups").update({ section_visibility: nextVisibility }).eq("id", startup.id);
+      if (error) throw error;
       toast.success("Section visibility updated");
     } catch {
       toast.error("Could not save visibility");
@@ -594,8 +595,10 @@ function Profile() {
           supabase
             .from("profile_builder_sessions")
             .insert({ startup_id: newStartupId, status: "skipped", path: null })
-            .then(() => { localStorage.removeItem("pb_skipped"); })
-            .catch(() => null); // non-blocking, localStorage flag remains as fallback
+            .then(({ error }) => {
+              if (error) { console.error("[profile] pb_skipped migration failed:", error); return; }
+              localStorage.removeItem("pb_skipped");
+            }); // non-blocking, localStorage flag remains as fallback
         }
 
         // If founder arrived via an investor invite link, wire up the auto-add flow
@@ -658,7 +661,8 @@ function Profile() {
       const url = `${data.publicUrl}?t=${Date.now()}`;
       setLogoUrl(url);
       if (startup?.id) {
-        await supabase.from("startups").update({ logo_url: url }).eq("id", startup.id);
+        const { error: logoErr } = await supabase.from("startups").update({ logo_url: url }).eq("id", startup.id);
+        if (logoErr) throw logoErr;
         queryClient.invalidateQueries({ queryKey: ["my-startup", user.id] });
       }
       toast.success("Logo updated");
@@ -683,7 +687,8 @@ function Profile() {
       const url = `${data.publicUrl}?t=${Date.now()}`;
       setAvatarUrl(url);
       if (startup?.id) {
-        await supabase.from("startups").update({ founder_avatar_url: url }).eq("id", startup.id);
+        const { error: avatarErr } = await supabase.from("startups").update({ founder_avatar_url: url }).eq("id", startup.id);
+        if (avatarErr) throw avatarErr;
         queryClient.invalidateQueries({ queryKey: ["my-startup", user.id] });
       }
       toast.success("Profile photo updated");
@@ -702,7 +707,8 @@ function Profile() {
       const { error } = await supabase.storage.from("documents").upload(path, file, { upsert: false });
       if (error) throw error;
       if (startup?.id) {
-        await supabase.from("startups").update({ pitch_deck_url: path }).eq("id", startup.id);
+        const { error: deckErr } = await supabase.from("startups").update({ pitch_deck_url: path }).eq("id", startup.id);
+        if (deckErr) throw deckErr;
         queryClient.invalidateQueries({ queryKey: ["my-startup", user.id] });
       }
       setDeckName(file.name);
@@ -2562,9 +2568,11 @@ function CapTableSection({ startupId }: { startupId: string }) {
         updated_at: new Date().toISOString(),
       };
       if (editingId) {
-        await supabase.from("startup_cap_table").update(payload).eq("id", editingId);
+        const { error } = await supabase.from("startup_cap_table").update(payload).eq("id", editingId);
+        if (error) throw error;
       } else {
-        await supabase.from("startup_cap_table").insert({ ...payload, social_verified: false });
+        const { error } = await supabase.from("startup_cap_table").insert({ ...payload, social_verified: false });
+        if (error) throw error;
       }
       qc.invalidateQueries({ queryKey: ["cap-table", startupId] });
       setForm(blank); setShowForm(false); setEditingId(null);
@@ -2593,7 +2601,8 @@ function CapTableSection({ startupId }: { startupId: string }) {
   };
 
   const handleDelete = async (id: string) => {
-    await supabase.from("startup_cap_table").delete().eq("id", id);
+    const { error } = await supabase.from("startup_cap_table").delete().eq("id", id);
+    if (error) { console.error("[cap-table] delete failed:", error); toast.error("Could not delete shareholder."); return; }
     qc.invalidateQueries({ queryKey: ["cap-table", startupId] });
   };
 

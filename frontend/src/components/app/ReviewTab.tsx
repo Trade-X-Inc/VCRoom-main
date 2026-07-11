@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 import { supabase, logActivity } from "@/lib/supabase";
 import { notifyUser } from "@/lib/notify";
 
@@ -179,14 +180,16 @@ function InvestorReview({ dealRoomId, startupId }: { dealRoomId: string; startup
     }
 
     if (decision?.id) {
-      await supabase.from("decisions").update({ metadata: metaPayload }).eq("id", decision.id);
+      const { error } = await supabase.from("decisions").update({ metadata: metaPayload }).eq("id", decision.id);
+      if (error) { console.error("[review] decision meta update failed:", error); toast.error("Could not save review state."); return; }
     } else {
-      await supabase.from("decisions").insert({
+      const { error } = await supabase.from("decisions").insert({
         deal_room_id: dealRoomId,
         decided_by: user!.id,
         status: "under_review",
         metadata: metaPayload,
       });
+      if (error) { console.error("[review] decision insert failed:", error); toast.error("Could not save review state."); return; }
     }
     queryClient.invalidateQueries({ queryKey: ["decision", dealRoomId] });
   };
@@ -204,13 +207,14 @@ function InvestorReview({ dealRoomId, startupId }: { dealRoomId: string; startup
     if (extra?.requestInfo) metaPayload["request_info"] = extra.requestInfo;
     if (extra?.reason) metaPayload["reason"] = extra.reason;
 
-    await supabase.from("decisions").insert({
+    const { error: decInsErr } = await supabase.from("decisions").insert({
       deal_room_id: dealRoomId,
       decided_by: user.id,
       status: DECISION_TO_DB[type],
       notes: extra?.message ?? null,
       metadata: metaPayload,
     });
+    if (decInsErr) { console.error("[review] decision insert failed:", decInsErr); toast.error("Could not record decision. Please try again."); return; }
 
     await logActivity(dealRoomId, user.id, `Decision: ${type}`);
 

@@ -240,7 +240,8 @@ function ChatSection({ startupId, userId, userName, channels, onChannelCreated }
   };
 
   const pinMessage = async (msg: Message) => {
-    await supabase.from("team_messages").update({ pinned: !msg.pinned }).eq("id", msg.id);
+    const { error } = await supabase.from("team_messages").update({ pinned: !msg.pinned }).eq("id", msg.id);
+    if (error) { console.error("[messages] pin failed:", error); toast.error("Could not pin message."); return; }
     refetchMessages();
   };
 
@@ -612,7 +613,8 @@ function TasksSection({ startupId, userId, teamMembers }: { startupId: string; u
 
   const handleDrop = async (newStatus: TaskStatus) => {
     if (!draggingId) return;
-    await supabase.from("team_tasks").update({ status: newStatus, updated_at: new Date().toISOString() }).eq("id", draggingId);
+    const { error } = await supabase.from("team_tasks").update({ status: newStatus, updated_at: new Date().toISOString() }).eq("id", draggingId);
+    if (error) { console.error("[tasks] drop failed:", error); toast.error("Could not move task."); setDraggingId(null); return; }
     qc.setQueryData<Task[]>(["workspace-tasks", startupId], (prev) =>
       prev?.map((t) => t.id === draggingId ? { ...t, status: newStatus } : t) ?? []
     );
@@ -621,12 +623,14 @@ function TasksSection({ startupId, userId, teamMembers }: { startupId: string; u
 
   const deleteTask = async (id: string) => {
     if (!confirm("Delete this task?")) return;
-    await supabase.from("team_tasks").delete().eq("id", id);
+    const { error } = await supabase.from("team_tasks").delete().eq("id", id);
+    if (error) { console.error("[tasks] delete failed:", error); toast.error("Could not delete task."); return; }
     refetch();
   };
 
   const markDone = async (id: string) => {
-    await supabase.from("team_tasks").update({ status: "done", updated_at: new Date().toISOString() }).eq("id", id);
+    const { error } = await supabase.from("team_tasks").update({ status: "done", updated_at: new Date().toISOString() }).eq("id", id);
+    if (error) { console.error("[tasks] mark done failed:", error); toast.error("Could not update task."); return; }
     refetch();
   };
 
@@ -797,7 +801,8 @@ function NotesSection({ startupId, userId, userName }: { startupId: string; user
 
   const autoSave = useCallback(async (id: string, title: string, content: string) => {
     setSaving(true);
-    await supabase.from("team_notes").update({ title: title || "Untitled", content, updated_at: new Date().toISOString() }).eq("id", id);
+    const { error } = await supabase.from("team_notes").update({ title: title || "Untitled", content, updated_at: new Date().toISOString() }).eq("id", id);
+    if (error) { console.error("[notes] autosave failed:", error); toast.error("Note not saved — check your connection."); setSaving(false); return; }
     setSaving(false);
     qc.setQueryData<Note[]>(["workspace-notes", startupId], (prev) =>
       prev?.map((n) => n.id === id ? { ...n, title: title || "Untitled", content, updated_at: new Date().toISOString() } : n) ?? []
@@ -819,13 +824,15 @@ function NotesSection({ startupId, userId, userName }: { startupId: string; user
   };
 
   const togglePin = async (note: Note) => {
-    await supabase.from("team_notes").update({ pinned: !note.pinned }).eq("id", note.id);
+    const { error } = await supabase.from("team_notes").update({ pinned: !note.pinned }).eq("id", note.id);
+    if (error) { console.error("[notes] pin failed:", error); toast.error("Could not pin note."); return; }
     refetch();
   };
 
   const deleteNote = async (id: string) => {
     if (!confirm("Delete this note?")) return;
-    await supabase.from("team_notes").delete().eq("id", id);
+    const { error } = await supabase.from("team_notes").delete().eq("id", id);
+    if (error) { console.error("[notes] delete failed:", error); toast.error("Could not delete note."); return; }
     if (activeNoteId === id) setActiveNoteId(null);
     refetch();
   };

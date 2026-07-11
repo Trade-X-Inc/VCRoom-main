@@ -302,12 +302,13 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
 
   const addItem = async (cat: DDCategory) => {
     if (!newItemLabel.trim()) return;
-    await supabase.from("dd_checklist_items").insert({
+    const { error } = await supabase.from("dd_checklist_items").insert({
       deal_room_id: dealRoomId,
       category: cat,
       label: newItemLabel.trim(),
       checked: false,
     });
+    if (error) { console.error("[dd] add item failed:", error); toast.error("Could not add item."); return; }
     qc.invalidateQueries({ queryKey: ["dd-workstation", dealRoomId] });
     setNewItemLabel("");
     setAddingItem(null);
@@ -885,9 +886,10 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                                   defaultValue={roomMedia?.pitch_deck_url ?? ""}
                                   placeholder="https://docsend.com/view/..."
                                   onBlur={async (e) => {
-                                    await supabase.from("deal_rooms")
+                                    const { error } = await supabase.from("deal_rooms")
                                       .update({ pitch_deck_url: e.target.value || null })
                                       .eq("id", dealRoomId);
+                                    if (error) { console.error("[dd] pitch deck url save failed:", error); toast.error("Could not save link."); }
                                   }}
                                   className="w-full rounded-md border border-border/60 bg-background px-3 py-1.5 text-xs focus:outline-none focus:border-brand/50"
                                 />
@@ -916,9 +918,10 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                             defaultValue={roomMedia?.product_video_url ?? ""}
                             placeholder="https://youtube.com/watch?v=..."
                             onBlur={async (e) => {
-                              await supabase.from("deal_rooms")
+                              const { error } = await supabase.from("deal_rooms")
                                 .update({ product_video_url: e.target.value || null })
                                 .eq("id", dealRoomId);
+                              if (error) { console.error("[dd] product video url save failed:", error); toast.error("Could not save link."); }
                             }}
                             className="w-full rounded-md border border-border/60 bg-background px-3 py-1.5 text-xs focus:outline-none focus:border-brand/50"
                           />
@@ -945,9 +948,10 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                             onBlur={async (e) => {
                               if (!e.target.value.trim()) return;
                               const existing = (roomMedia?.product_images as string[]) ?? [];
-                              await supabase.from("deal_rooms")
+                              const { error } = await supabase.from("deal_rooms")
                                 .update({ product_images: [...existing, e.target.value.trim()] })
                                 .eq("id", dealRoomId);
+                              if (error) { console.error("[dd] product image save failed:", error); toast.error("Could not save image."); return; }
                               e.target.value = "";
                               qc.invalidateQueries({ queryKey: ["room-media", dealRoomId] });
                             }}
@@ -1315,7 +1319,7 @@ function DocumentReviewPanel({ doc, review, dealRoomId, userId, category, onRevi
     if (!userId) return;
     setSaving(true);
     try {
-      await supabase.from("document_reviews").upsert({
+      const { error } = await supabase.from("document_reviews").upsert({
         document_id: doc.id,
         deal_room_id: dealRoomId,
         reviewer_id: userId,
@@ -1324,6 +1328,7 @@ function DocumentReviewPanel({ doc, review, dealRoomId, userId, category, onRevi
         feedback: feedback.trim() || null,
         updated_at: new Date().toISOString(),
       }, { onConflict: "document_id,reviewer_id" });
+      if (error) throw error;
       onReviewed();
       setShowFeedback(false);
       toast.success(

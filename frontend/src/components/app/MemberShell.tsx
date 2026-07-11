@@ -29,13 +29,14 @@ function FeedbackModal({ onClose }: { onClose: () => void }) {
     if (!rating) { toast.error("Please select a rating"); return; }
     setSaving(true);
     try {
-      await supabase.from("feedback").insert({
+      const { error } = await supabase.from("feedback").insert({
         user_id: user?.id,
         email: user?.email,
         rating,
         message: comment.trim(),
         created_at: new Date().toISOString(),
       });
+      if (error) throw error;
       toast.success("Thank you for your feedback!");
       onClose();
     } catch (e: any) {

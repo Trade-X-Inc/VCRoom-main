@@ -147,7 +147,7 @@ export function useStageTransition({
         // Notify the other party
         const recipient = isInvestor ? founderUserId : investorUserId;
         if (recipient) {
-          await supabase.from("notifications").insert({
+          const { error: notifErr } = await supabase.from("notifications").insert({
             user_id: recipient,
             kind: "ai_operator",
             title: "Stage advance request",
@@ -158,6 +158,7 @@ export function useStageTransition({
             meta: { deal_room_id: dealRoomId, transition_id: inserted.id },
             action_url: `/app/deal-room/${dealRoomId}`,
           });
+          if (notifErr) console.error("[stage] request notification failed:", notifErr);
         }
         setPendingTransition(inserted as TransitionRow);
         toast.success("Stage advance requested — waiting for approval.");
@@ -200,7 +201,7 @@ export function useStageTransition({
 
       // Notify the requester (if different from approver)
       if (transition.requested_by && transition.requested_by !== userId) {
-        await supabase.from("notifications").insert({
+        const { error: apprNotifErr } = await supabase.from("notifications").insert({
           user_id: transition.requested_by,
           kind: "ai_operator",
           title: "Stage advance approved",
@@ -209,6 +210,7 @@ export function useStageTransition({
           meta: { deal_room_id: dealRoomId, transition_id: transitionId },
           action_url: `/app/deal-room/${dealRoomId}`,
         });
+        if (apprNotifErr) console.error("[stage] approval notification failed:", apprNotifErr);
       }
 
       setPendingTransition(null);
@@ -234,13 +236,14 @@ export function useStageTransition({
         .eq("id", transitionId)
         .single();
 
-      await supabase
+      const { error: rejErr } = await supabase
         .from("deal_room_stage_transitions")
         .update({ status: "rejected", resolved_at: new Date().toISOString() })
         .eq("id", transitionId);
+      if (rejErr) { console.error("[stage] reject update failed:", rejErr); return { ok: false }; }
 
       if (transition?.requested_by && transition.requested_by !== userId) {
-        await supabase.from("notifications").insert({
+        const { error: declNotifErr } = await supabase.from("notifications").insert({
           user_id: transition.requested_by,
           kind: "ai_operator",
           title: "Stage advance declined",
@@ -249,6 +252,7 @@ export function useStageTransition({
           meta: { deal_room_id: dealRoomId, transition_id: transitionId },
           action_url: `/app/deal-room/${dealRoomId}`,
         });
+        if (declNotifErr) console.error("[stage] decline notification failed:", declNotifErr);
       }
 
       setPendingTransition(null);
