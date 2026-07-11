@@ -251,7 +251,7 @@ function IntakePage() {
         toast.info("No identifiable founders or companies found in that text.");
         setCurrentCandidates([]);
         // Still save the run so the investor can see it in history
-        await supabase.from("intake_runs").insert({
+        const { error: runErr } = await supabase.from("intake_runs").insert({
           investor_id: user!.id,
           input_summary: inputSummary,
           total_items: 0,
@@ -280,7 +280,7 @@ function IntakePage() {
         }
 
         // Save intake run with full results_json for history restore
-        await supabase.from("intake_runs").insert({
+        const { error: runErr2 } = await supabase.from("intake_runs").insert({
           investor_id: user!.id,
           input_summary: inputSummary,
           total_items: result.candidates.length + failedCount,

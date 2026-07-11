@@ -628,7 +628,8 @@ function InvestorChat() {
   const clearConversation = async () => {
     setConfirmClear(false);
     if (!user?.id) return;
-    await supabase.from("advisor_messages").delete().eq("user_id", user.id);
+    const { error } = await supabase.from("advisor_messages").delete().eq("user_id", user.id);
+    if (error) { console.error("[advisor] clear failed:", error); toast.error("Could not clear conversation."); return; }
     queryClient.invalidateQueries({ queryKey: ["investor-advisor-messages", user.id] });
     historyApplied.current = false;
     const ctx = liveCtxRef.current;

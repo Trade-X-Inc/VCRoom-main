@@ -601,21 +601,23 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
 
       if (user && trackedRole === "investor" && startup!.founder_id) {
         const investorLabel = viewerFund ? `${viewerName ?? "An investor"} from ${viewerFund}` : viewerName ?? "An investor";
-        await supabase.from("notifications").insert({
+        const { error: viewNotifErr } = await supabase.from("notifications").insert({
           user_id: startup!.founder_id,
           kind: "view", type: "profile_view",
           title: `${investorLabel} viewed your profile`,
           body: `${investorLabel} just visited your Hockystick profile.`,
           read: false, action_url: "/app/profile?tab=analytics",
           meta: { viewer_name: viewerName, viewer_fund: viewerFund, viewer_id: user.id },
-        }).then(() => {});
+        });
+        if (viewNotifErr) console.error("[profile-views] notification failed:", viewNotifErr);
       }
     }
 
     const logDuration = async () => {
       const duration = Math.round((Date.now() - startTime) / 1000);
       if (duration < 3 || !viewRowId) return;
-      await supabase.from("profile_views").update({ duration_seconds: duration }).eq("id", viewRowId);
+      const { error: durErr } = await supabase.from("profile_views").update({ duration_seconds: duration }).eq("id", viewRowId);
+      if (durErr) console.error("[profile-views] duration update failed:", durErr);
     };
 
     trackView();

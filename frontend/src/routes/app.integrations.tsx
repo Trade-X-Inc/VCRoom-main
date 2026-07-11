@@ -35,7 +35,7 @@ function Integrations() {
     if (!user?.email) { toast.error("Email not found"); return; }
     setNotifying(slug);
     try {
-      await supabase.from("waitlist_entries").insert({
+      const { error } = await supabase.from("waitlist_entries").insert({
         full_name: user.full_name || "",
         email: user.email,
         role: user.role,

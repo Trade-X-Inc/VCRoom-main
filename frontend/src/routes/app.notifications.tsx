@@ -90,18 +90,20 @@ function NotificationsPage() {
   // ── mark all read
   const markAll = async () => {
     if (!user?.id || unread === 0) return;
-    await supabase
+    const { error } = await supabase
       .from("notifications")
       .update({ read: true })
       .eq("user_id", user.id)
       .eq("read", false);
+    if (error) console.error("[notifications] mark all read failed:", error);
     qc.invalidateQueries({ queryKey: ["notifications-page", user?.id] });
     qc.invalidateQueries({ queryKey: ["notifications", user?.id] }); // also refresh bell
   };
 
   // ── mark single read
   const markRead = async (id: string) => {
-    await supabase.from("notifications").update({ read: true }).eq("id", id);
+    const { error } = await supabase.from("notifications").update({ read: true }).eq("id", id);
+    if (error) console.error("[notifications] mark read failed:", error);
     qc.invalidateQueries({ queryKey: ["notifications-page", user?.id] });
     qc.invalidateQueries({ queryKey: ["notifications", user?.id] });
   };

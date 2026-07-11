@@ -622,7 +622,8 @@ function ConnectionsPage() {
 
   // ── Mark seen
   const handleMarkSeen = async (id: string) => {
-    await supabase.from("investor_watchlist").update({ seen_by_investor: true }).eq("id", id);
+    const { error } = await supabase.from("investor_watchlist").update({ seen_by_investor: true }).eq("id", id);
+    if (error) console.error("[connections] mark seen failed:", error);
     qc.setQueryData<WatchlistRow[]>(["connections-watchlist", user?.id], (prev) =>
       prev?.map((r) => r.id === id ? { ...r, seen_by_investor: true } : r) ?? []
     );
@@ -636,9 +637,10 @@ function ConnectionsPage() {
     setDecidingId(id);
     const row = watchlist.find((w) => w.id === id);
     try {
-      await supabase.from("investor_watchlist")
+      const { error } = await supabase.from("investor_watchlist")
         .update({ status: decision, seen_by_investor: true, updated_at: new Date().toISOString() })
         .eq("id", id);
+      if (error) { console.error("[connections] decide failed:", error); toast.error("Could not update. Please try again."); return; }
       logActivity({
         account_type: "investor",
         account_id: user?.id ?? "",

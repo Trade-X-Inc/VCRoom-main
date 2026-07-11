@@ -77,7 +77,7 @@ function JoinTeamFlow() {
       if (updateErr) throw updateErr;
 
       // Add to organization_members if table exists (best-effort)
-      await supabase.from("organization_members").upsert(
+      const { error: orgErr } = await supabase.from("organization_members").upsert(
         {
           user_id: user.id,
           invited_by: invite.invited_by,
@@ -85,9 +85,8 @@ function JoinTeamFlow() {
           joined_at: new Date().toISOString(),
         },
         { onConflict: "user_id,invited_by" },
-      ).then(({ error }) => {
-        if (error) console.warn("organization_members upsert skipped:", error.message);
-      });
+      );
+      if (orgErr) console.warn("organization_members upsert skipped:", orgErr.message);
 
       setAccepted(true);
     } catch (err) {

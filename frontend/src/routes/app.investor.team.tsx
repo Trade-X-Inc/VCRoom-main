@@ -168,7 +168,8 @@ function InvestorTeamPage() {
 
   const handleResendInvite = async (invite: InviteRow) => {
     const newExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-    await supabase.from("team_invites").update({ expires_at: newExpiry }).eq("id", invite.id);
+    const { error } = await supabase.from("team_invites").update({ expires_at: newExpiry }).eq("id", invite.id);
+    if (error) { console.error("[team] invite renew failed:", error); toast.error("Could not resend invite."); return; }
     triggerStartupTeamInvite({
       data: {
         to: invite.email,

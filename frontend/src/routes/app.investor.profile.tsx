@@ -308,7 +308,8 @@ function InvestorProfilePage() {
       const { data } = supabase.storage.from("avatars").getPublicUrl(path);
       const url = `${data.publicUrl}?t=${Date.now()}`;
       setAvatarUrl(url);
-      await supabase.from("investor_profiles").update({ avatar_url: url }).eq("user_id", user.id);
+      const { error: avErr } = await supabase.from("investor_profiles").update({ avatar_url: url }).eq("user_id", user.id);
+      if (avErr) throw avErr;
       qc.invalidateQueries({ queryKey: ["investor-profile", user.id] });
       toast.success("Profile photo updated");
     } catch (e: any) {

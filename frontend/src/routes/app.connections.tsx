@@ -690,7 +690,8 @@ function ConnectionsPage() {
   });
 
   const handleStatusChange = async (id: string, status: LeadStatus) => {
-    await supabase.from("vc_leads").update({ status, updated_at: new Date().toISOString() }).eq("id", id);
+    const { error } = await supabase.from("vc_leads").update({ status, updated_at: new Date().toISOString() }).eq("id", id);
+    if (error) { console.error("[connections] status change failed:", error); toast.error("Could not update status."); return; }
     qc.setQueryData<VCLead[]>(["vc-leads", user?.id], (prev) =>
       prev?.map((l) => l.id === id ? { ...l, status } : l) ?? []
     );

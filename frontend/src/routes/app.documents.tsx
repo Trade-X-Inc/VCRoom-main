@@ -562,7 +562,8 @@ function Documents() {
                             onClick={async (e) => {
                               e.stopPropagation();
                               const newVisibility = doc.visibility === "deal_room" ? "stage2" : "deal_room";
-                              await supabase.from("founder_documents").update({ visibility: newVisibility }).eq("id", doc.id);
+                              const { error } = await supabase.from("founder_documents").update({ visibility: newVisibility }).eq("id", doc.id);
+                              if (error) { console.error("[documents] visibility toggle failed:", error); toast.error("Could not change visibility."); return; }
                               refetchFounderDocs();
                             }}
                             title={doc.visibility === "deal_room" ? "Visible in deal room — click to restrict" : "Not in deal room — click to include"}
@@ -725,10 +726,11 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
       if (!data?.success) throw new Error("Review failed");
       setReviewFeedback(data.feedback);
       if (startup?.id) {
-        await supabase.from("founder_documents")
+        const { error: fbErr } = await supabase.from("founder_documents")
           .update({ ai_feedback: data.feedback, status: "needs_review", updated_at: new Date().toISOString() })
           .eq("startup_id", startup.id)
           .eq("template_slug", template.slug);
+        if (fbErr) console.error("[documents] ai feedback save failed:", fbErr);
       }
     } catch (err) {
       setReviewError(err instanceof Error ? err.message : "Review failed. Try again.");

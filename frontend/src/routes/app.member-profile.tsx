@@ -233,15 +233,17 @@ function MemberProfilePage() {
       const url = `${data.publicUrl}?t=${Date.now()}`;
 
       // Save to team_member_profiles
-      await supabase
+      const { error: profErr } = await supabase
         .from("team_member_profiles")
         .upsert({ user_id: user.id, avatar_url: url }, { onConflict: "user_id" });
+      if (profErr) throw profErr;
 
       // Also update startup_team_accounts.avatar_url for quick access in lists
-      await supabase
+      const { error: acctErr } = await supabase
         .from("startup_team_accounts")
         .update({ avatar_url: url })
         .eq("user_id", user.id);
+      if (acctErr) console.error("[member-profile] avatar mirror failed:", acctErr);
 
       setAvatarUrl(url);
       qc.invalidateQueries({ queryKey: ["member-profile", user.id] });

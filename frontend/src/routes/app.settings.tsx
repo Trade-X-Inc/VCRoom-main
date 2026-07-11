@@ -223,7 +223,8 @@ function ProfileSettings() {
       if (upErr) throw upErr;
       const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
       const url = urlData.publicUrl + `?v=${Date.now()}`;
-      await supabase.from("users").update({ avatar_url: url }).eq("id", user.id);
+      const { error: avErr } = await supabase.from("users").update({ avatar_url: url }).eq("id", user.id);
+      if (avErr) throw avErr;
       setAvatarUrl(url);
       qc.invalidateQueries({ queryKey: ["settings-user"] });
       toast.success("Avatar updated");

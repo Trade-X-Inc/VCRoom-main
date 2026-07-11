@@ -88,24 +88,27 @@ function JoinFlow() {
         throw new Error("Please sign in before accepting this invite.");
       }
 
-      // Insert member record — plain insert, ignore if already a member
-      await supabase.from("deal_room_members").insert({
+      // Insert member record — duplicate insert is OK (unique violation logged only)
+      const { error: memberErr } = await supabase.from("deal_room_members").insert({
         deal_room_id: invite.deal_room_id,
         user_id: userId,
         role: "investor",
       });
+      if (memberErr && memberErr.code !== "23505") throw memberErr;
 
       // Mark deal room as active now that investor has accepted
-      await supabase
+      const { error: activeErr } = await supabase
         .from("deal_rooms")
         .update({ status: "active" })
         .eq("id", invite.deal_room_id);
+      if (activeErr) console.error("[join] deal room activate failed:", activeErr);
 
       // Mark invite as accepted
-      await supabase
+      const { error: invErr } = await supabase
         .from("invites")
         .update({ accepted_at: new Date().toISOString() })
         .eq("token", token);
+      if (invErr) console.error("[join] invite accept-mark failed:", invErr);
 
       // Write deal_room_invite notification for the investor
       const startupName = (invite.deal_rooms?.startups as any)?.company_name ?? "a startup";

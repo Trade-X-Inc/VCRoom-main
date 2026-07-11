@@ -26,10 +26,11 @@ function SignUp() {
   const [turnstileToken, setTurnstileToken] = useState('')
 
   const saveRole = async (userId: string, userRole: Role, fullName: string) => {
-    await supabase.from('users').upsert(
+    const { error } = await supabase.from('users').upsert(
       { id: userId, role: userRole, full_name: fullName, updated_at: new Date().toISOString() },
       { onConflict: 'id' }
     )
+    if (error) console.error('[sign-up] role save failed:', error)
   }
 
   const handleGoogle = async () => {

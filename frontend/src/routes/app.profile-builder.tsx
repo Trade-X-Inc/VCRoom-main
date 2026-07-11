@@ -249,10 +249,11 @@ function ProfileBuilder() {
   }
 
   async function patchSession(id: string, patch: Record<string, unknown>) {
-    await supabase
+    const { error } = await supabase
       .from("profile_builder_sessions")
       .update({ ...patch, updated_at: new Date().toISOString(), last_active_at: new Date().toISOString() })
       .eq("id", id);
+    if (error) console.error("[profile-builder] session patch failed:", error);
   }
 
   // ── Path A — Upload flow ───────────────────────────────────────────────────
@@ -620,7 +621,8 @@ function ProfileBuilder() {
             display_order: existingNames.size + i,
           }));
         if (newMembers.length) {
-          await supabase.from("team_members").insert(newMembers);
+          const { error: teamErr } = await supabase.from("team_members").insert(newMembers);
+          if (teamErr) { console.error("[profile-builder] team save failed:", teamErr); toast.error("Team members could not be saved."); }
         }
       }
 

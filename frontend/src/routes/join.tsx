@@ -106,7 +106,8 @@ function JoinTeamPage() {
       if (accountErr) {
         if (accountErr.code === "23505") {
           // Already a member — mark accepted anyway
-          await supabase.from("team_invites").update({ accepted_at: new Date().toISOString() }).eq("id", invite.id);
+          const { error: markErr } = await supabase.from("team_invites").update({ accepted_at: new Date().toISOString() }).eq("id", invite.id);
+          if (markErr) console.error("[join] invite accept-mark failed:", markErr);
           setPageState("accepted");
           return;
         }
@@ -114,12 +115,14 @@ function JoinTeamPage() {
       }
 
       // 2. Mark invite accepted
-      await supabase.from("team_invites").update({ accepted_at: new Date().toISOString() }).eq("id", invite.id);
+      const { error: acceptErr } = await supabase.from("team_invites").update({ accepted_at: new Date().toISOString() }).eq("id", invite.id);
+      if (acceptErr) throw acceptErr;
 
-      // 3. Create empty team_member_profiles row
-      await supabase
+      // 3. Create empty team_member_profiles row (best-effort)
+      const { error: profErr } = await supabase
         .from("team_member_profiles")
         .upsert({ user_id: freshUser.id }, { onConflict: "user_id", ignoreDuplicates: true });
+      if (profErr) console.error("[join] team_member_profiles upsert failed:", profErr);
 
       setPageState("accepted");
     } catch (e: any) {
