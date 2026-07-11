@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Plus, Copy, Check, Loader2, ChevronRight,
@@ -430,6 +430,75 @@ function KanbanView({ rows }: { rows: WatchlistRow[] }) {
 }
 
 // ── Main page ──────────────────────────────────────────────────────────────
+
+// ── Sent connection requests — closes the loop for the investor ────────────
+function SentRequestsPanel({ investorUserId }: { investorUserId: string }) {
+  const { data: sent = [] } = useQuery({
+    queryKey: ["sent-connection-requests", investorUserId],
+    staleTime: 30_000,
+    queryFn: async () => {
+      const { data: reqs } = await supabase
+        .from("discovery_requests")
+        .select("id, startup_id, status, deal_room_id, created_at")
+        .eq("investor_id", investorUserId)
+        .order("created_at", { ascending: false })
+        .limit(15);
+      if (!reqs?.length) return [];
+      const { data: startups } = await supabase
+        .from("startups")
+        .select("id, company_name, users(full_name)")
+        .in("id", reqs.map((r: any) => r.startup_id));
+      const smap = Object.fromEntries((startups ?? []).map((s: any) => [s.id, s]));
+      return reqs.map((r: any) => ({ ...r, startup: smap[r.startup_id] ?? null }));
+    },
+  });
+
+  if (!sent.length) return null;
+
+  const pill = (r: any) => {
+    if (r.status === "deal_room_created" && r.deal_room_id) {
+      return (
+        <Link
+          to="/app/deal-room/$id"
+          params={{ id: r.deal_room_id }}
+          className="text-[11px] font-semibold px-2 py-0.5 rounded-full hover:opacity-80"
+          style={{ background: "rgba(16,185,129,0.12)", color: "#10B981" }}
+        >
+          Deal room →
+        </Link>
+      );
+    }
+    if (r.status === "approved" || r.status === "connected") {
+      return <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(16,185,129,0.12)", color: "#10B981" }}>Approved</span>;
+    }
+    if (r.status === "declined" || r.status === "rejected") {
+      return <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" }}>Declined</span>;
+    }
+    return <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(245,158,11,0.12)", color: "#F59E0B" }}>Pending</span>;
+  };
+
+  return (
+    <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "18px 20px" }}>
+      <div className="text-sm font-semibold text-white mb-3" style={{ fontFamily: "Syne, sans-serif" }}>Sent requests</div>
+      <div className="space-y-2.5">
+        {sent.map((r: any) => {
+          const founderName = Array.isArray(r.startup?.users) ? r.startup?.users?.[0]?.full_name : r.startup?.users?.full_name;
+          return (
+            <div key={r.id} className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <div className="text-xs text-white/80 truncate">{r.startup?.company_name ?? "Startup"}</div>
+                <div className="text-[10px] text-white/30 truncate">
+                  {founderName ? `${founderName} · ` : ""}{new Date(r.created_at).toLocaleDateString()}
+                </div>
+              </div>
+              {pill(r)}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 function ConnectionsPage() {
   const { user } = useAuth();
@@ -867,6 +936,9 @@ function ConnectionsPage() {
         <div className="space-y-4">
           {/* Invite link */}
           {user?.id && <InviteLinkPanel investorId={user.id} />}
+
+          {/* Sent connection requests */}
+          {user?.id && <SentRequestsPanel investorUserId={user.id} />}
 
           {/* Pipeline stats */}
           <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "18px 20px" }}>
