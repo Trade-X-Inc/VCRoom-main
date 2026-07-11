@@ -29,6 +29,10 @@ export async function logActivity(
     .insert({ deal_room_id: dealRoomId, actor_id: actorId, action, metadata: metadata ?? {} });
 }
 
+// DEPRECATED — use lib/notify.ts instead.
+// This helper has a schema bug (inserts a nonexistent deal_room_id column,
+// omits the NOT NULL kind) and silently fails on every call.
+// Do not use. Will be removed when supabase.ts is next touched.
 export async function createNotification(
   userId: string,
   title: string,
