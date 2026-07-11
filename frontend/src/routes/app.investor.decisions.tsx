@@ -216,13 +216,15 @@ function DecisionsPage() {
 
     if (error) { toast.error("Could not update stage."); setAdvancing(null); return; }
 
-    await supabase.from("activity_log").insert({
+    // Background activity log — log failures, never block the user
+    const { error: stageLogErr } = await supabase.from("activity_log").insert({
       account_type: "investor", account_id: user!.id, actor_user_id: user!.id,
       actor_name: user!.user_metadata?.full_name ?? user!.email ?? "Investor",
       action_type: "pipeline_status_changed", target_type: "watchlist",
       target_id: entry.id, target_label: entry.company_name,
       detail: `${entry.status} → ${next}`, metadata: { from: entry.status, to: next },
     });
+    if (stageLogErr) console.error("[decisions] activity log failed:", stageLogErr);
 
     qc.invalidateQueries({ queryKey: ["investor-pipeline", user?.id] });
     toast.success(`${entry.company_name} moved to ${next}`);
@@ -237,23 +239,32 @@ function DecisionsPage() {
     const now = new Date().toISOString();
 
     if (type === "invest") {
-      await supabase.from("investor_watchlist").update({ status: "Invested", stage_entered_at: now, updated_at: now }).eq("id", entry.id);
-      await supabase.from("decisions").insert({ deal_room_id: entry.deal_room_id ?? null, decided_by: user!.id, status: "invested", decision_type: "invest", notes: modal.investNotes ?? null });
-      await supabase.from("activity_log").insert({ account_type: "investor", account_id: user!.id, actor_user_id: user!.id, actor_name: user!.user_metadata?.full_name ?? user!.email ?? "Investor", action_type: "pipeline_status_changed", target_type: "watchlist", target_id: entry.id, target_label: entry.company_name, detail: "Decision: Invest", metadata: { type: "invest", amount: modal.investAmount } });
+      const { error: wlErr } = await supabase.from("investor_watchlist").update({ status: "Invested", stage_entered_at: now, updated_at: now }).eq("id", entry.id);
+      if (wlErr) { console.error("[decisions] invest update failed:", wlErr); toast.error("Could not record decision. Please try again."); return; }
+      const { error: decErr } = await supabase.from("decisions").insert({ deal_room_id: entry.deal_room_id ?? null, decided_by: user!.id, status: "invested", decision_type: "invest", notes: modal.investNotes ?? null });
+      if (decErr) { console.error("[decisions] invest insert failed:", decErr); toast.error("Could not record decision. Please try again."); return; }
+      const { error: logErr } = await supabase.from("activity_log").insert({ account_type: "investor", account_id: user!.id, actor_user_id: user!.id, actor_name: user!.user_metadata?.full_name ?? user!.email ?? "Investor", action_type: "pipeline_status_changed", target_type: "watchlist", target_id: entry.id, target_label: entry.company_name, detail: "Decision: Invest", metadata: { type: "invest", amount: modal.investAmount } });
+      if (logErr) console.error("[decisions] activity log failed:", logErr);
       toast.success(`${entry.company_name} — investment recorded`);
     }
 
     if (type === "hold") {
-      await supabase.from("investor_watchlist").update({ updated_at: now }).eq("id", entry.id);
-      await supabase.from("decisions").insert({ deal_room_id: entry.deal_room_id ?? null, decided_by: user!.id, status: "hold", decision_type: "hold", follow_up_date: modal.holdDate ?? null, notes: modal.holdNotes ?? null });
-      await supabase.from("activity_log").insert({ account_type: "investor", account_id: user!.id, actor_user_id: user!.id, actor_name: user!.user_metadata?.full_name ?? user!.email ?? "Investor", action_type: "pipeline_status_changed", target_type: "watchlist", target_id: entry.id, target_label: entry.company_name, detail: "Decision: Hold", metadata: { type: "hold", follow_up: modal.holdDate } });
+      const { error: wlErr } = await supabase.from("investor_watchlist").update({ updated_at: now }).eq("id", entry.id);
+      if (wlErr) { console.error("[decisions] hold update failed:", wlErr); toast.error("Could not record decision. Please try again."); return; }
+      const { error: decErr } = await supabase.from("decisions").insert({ deal_room_id: entry.deal_room_id ?? null, decided_by: user!.id, status: "hold", decision_type: "hold", follow_up_date: modal.holdDate ?? null, notes: modal.holdNotes ?? null });
+      if (decErr) { console.error("[decisions] hold insert failed:", decErr); toast.error("Could not record decision. Please try again."); return; }
+      const { error: logErr } = await supabase.from("activity_log").insert({ account_type: "investor", account_id: user!.id, actor_user_id: user!.id, actor_name: user!.user_metadata?.full_name ?? user!.email ?? "Investor", action_type: "pipeline_status_changed", target_type: "watchlist", target_id: entry.id, target_label: entry.company_name, detail: "Decision: Hold", metadata: { type: "hold", follow_up: modal.holdDate } });
+      if (logErr) console.error("[decisions] activity log failed:", logErr);
       toast.success(`${entry.company_name} — held, follow-up set`);
     }
 
     if (type === "pass") {
-      await supabase.from("investor_watchlist").update({ status: "Passed", stage_entered_at: now, updated_at: now, pass_reason_category: modal.passCategory ?? null, pass_reason_detail: modal.passDetail ?? null }).eq("id", entry.id);
-      await supabase.from("decisions").insert({ deal_room_id: entry.deal_room_id ?? null, decided_by: user!.id, status: "passed", decision_type: "pass", pass_reason_category: modal.passCategory ?? null, pass_reason_detail: modal.passDetail ?? null });
-      await supabase.from("activity_log").insert({ account_type: "investor", account_id: user!.id, actor_user_id: user!.id, actor_name: user!.user_metadata?.full_name ?? user!.email ?? "Investor", action_type: "pipeline_status_changed", target_type: "watchlist", target_id: entry.id, target_label: entry.company_name, detail: `Decision: Pass — ${modal.passCategory ?? "no reason"}`, metadata: { type: "pass", category: modal.passCategory } });
+      const { error: wlErr } = await supabase.from("investor_watchlist").update({ status: "Passed", stage_entered_at: now, updated_at: now, pass_reason_category: modal.passCategory ?? null, pass_reason_detail: modal.passDetail ?? null }).eq("id", entry.id);
+      if (wlErr) { console.error("[decisions] pass update failed:", wlErr); toast.error("Could not record decision. Please try again."); return; }
+      const { error: decErr } = await supabase.from("decisions").insert({ deal_room_id: entry.deal_room_id ?? null, decided_by: user!.id, status: "passed", decision_type: "pass", pass_reason_category: modal.passCategory ?? null, pass_reason_detail: modal.passDetail ?? null });
+      if (decErr) { console.error("[decisions] pass insert failed:", decErr); toast.error("Could not record decision. Please try again."); return; }
+      const { error: logErr } = await supabase.from("activity_log").insert({ account_type: "investor", account_id: user!.id, actor_user_id: user!.id, actor_name: user!.user_metadata?.full_name ?? user!.email ?? "Investor", action_type: "pipeline_status_changed", target_type: "watchlist", target_id: entry.id, target_label: entry.company_name, detail: `Decision: Pass — ${modal.passCategory ?? "no reason"}`, metadata: { type: "pass", category: modal.passCategory } });
+      if (logErr) console.error("[decisions] activity log failed:", logErr);
       toast.success(`${entry.company_name} — passed`);
       // Auto-trigger founder coaching for rejection (fire and forget)
       if (entry.startup_id) {
