@@ -72,5 +72,12 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // lib/supabase.ts is a do-not-touch file (CLAUDE.md §12). Its two
+    // violations are the deprecated createNotification (documented, replaced
+    // by lib/notify.ts) and logActivity — exempted here instead of edited.
+    files: ["src/lib/supabase.ts"],
+    rules: { "no-restricted-syntax": "off" },
+  },
   eslintPluginPrettier,
 );

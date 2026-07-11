@@ -211,8 +211,9 @@ export async function fetchDealBrief(
 }
 
 export async function markBriefViewed(briefId: string): Promise<void> {
-  await supabase
+  const { error } = await supabase
     .from("deal_briefs")
     .update({ viewed_at: new Date().toISOString() })
     .eq("id", briefId);
+  if (error) console.error("[deal-brief] mark viewed failed:", error.message);
 }

@@ -34,12 +34,13 @@ export const triggerWelcomeEmail = createServerFn({ method: "POST" })
     });
     if (result?.id) {
       try {
-        await getServiceClient().from("email_events").insert({
+        const { error: evErr } = await getServiceClient().from("email_events").insert({
           event_type: "email.sent",
           email_id: result.id,
           to_email: data.email,
           tags: [{ type: "welcome" }],
         });
+        if (evErr) console.error("[email] event log failed:", evErr.message);
       } catch {}
     }
     return result;

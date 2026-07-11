@@ -73,6 +73,7 @@ Keep it under 150 words. Use plain text with natural paragraph breaks. No ** or 
     const reply = (json.choices[0]?.message?.content ?? "").trim();
     if (!reply) throw new Error("Invalid AI response");
 
-    await adminClient.from("ai_usage").insert({ user_id: data.userId, action: "reply_gen" });
+    const { error: usageErr } = await adminClient.from("ai_usage").insert({ user_id: data.userId, action: "reply_gen" });
+    if (usageErr) console.error("[reply-fn] usage log failed:", usageErr.message);
     return { reply };
   });

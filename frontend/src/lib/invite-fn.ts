@@ -88,14 +88,19 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
       if (existingUser?.id) {
         const roomName = data.startupName ?? data.dealRoomName ?? "a deal room";
         const senderName = data.founderName ?? "A founder";
-        await client.from("notifications").insert({
+        // NOTE: notifications has no deal_room_id column and kind is NOT NULL —
+        // the previous insert failed silently on every call.
+        const { error: notifErr } = await client.from("notifications").insert({
           user_id: existingUser.id,
+          kind: "deal_room_invite",
           title: "You have been invited to a deal room",
           body: `${senderName} invited you to the ${roomName} deal room`,
           type: "deal_room_invite",
-          deal_room_id: data.dealRoomId,
+          read: false,
+          meta: { deal_room_id: data.dealRoomId },
           action_url: inviteLink,
         });
+        if (notifErr) console.error("[invite] notification insert failed:", notifErr.message);
       }
     } catch {
       // Non-blocking

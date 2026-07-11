@@ -115,7 +115,8 @@ Be warm but direct.`;
     if (!parsed.subject || !parsed.body) throw new Error("Invalid AI response");
 
     // 6. Log usage
-    await adminClient.from("ai_usage").insert({ user_id: data.userId, action: "email_gen" });
+    const { error: usageErr } = await adminClient.from("ai_usage").insert({ user_id: data.userId, action: "email_gen" });
+    if (usageErr) console.error("[ai-fn] usage log failed:", usageErr.message);
 
     // 7. Return
     return { subject: parsed.subject, body: parsed.body };

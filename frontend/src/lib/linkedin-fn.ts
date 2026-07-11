@@ -57,6 +57,7 @@ Keep the message under 300 characters. Be genuine and specific, not salesy. Just
     const message = (json.choices[0]?.message?.content ?? "").trim();
     if (!message) throw new Error("Invalid AI response");
 
-    await adminClient.from("ai_usage").insert({ user_id: data.userId, action: "linkedin_gen" });
+    const { error: usageErr } = await adminClient.from("ai_usage").insert({ user_id: data.userId, action: "linkedin_gen" });
+    if (usageErr) console.error("[linkedin-fn] usage log failed:", usageErr.message);
     return { message };
   });

@@ -110,10 +110,11 @@ export const completeQaAndGenerateReport = createServerFn({ method: "POST" })
     }
 
     // 6. Mark deal room Q&A complete
-    await svc
+    const { error: qaErr } = await svc
       .from("deal_rooms")
       .update({ qa_completed_at: new Date().toISOString(), qa_completed_by: userId })
       .eq("id", dealRoomId);
+    if (qaErr) console.error("[qa-report-fn] qa complete mark failed:", qaErr.message);
 
     console.log(`[qa-report-fn] Q&A complete for deal room ${dealRoomId} — doc ${(doc as any).id}`);
     return { ok: true, documentId: (doc as any).id };

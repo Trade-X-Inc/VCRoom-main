@@ -257,11 +257,12 @@ export const completeCheckpointTask = createServerFn({ method: "POST" })
 
     // Mark task completed
     const admin = adminClient();
-    await admin.from("desk_tasks").update({
+    const { error: doneErr } = await admin.from("desk_tasks").update({
       status: "done",
       chain_phase: "completed",
       completed_at: new Date().toISOString(),
     }).eq("id", data.taskId).eq("user_id", data.userId);
+    if (doneErr) console.error("[desk-fn] task complete mark failed:", doneErr.message);
 
     return { ok: true, messageId: sent.id };
   });

@@ -182,10 +182,11 @@ Rate the match score based on how well this startup aligns with the investor's s
       generated_at: now,
     };
 
-    await admin.from("deal_briefs").upsert(briefRow, {
+    const { error: briefErr } = await admin.from("deal_briefs").upsert(briefRow, {
       onConflict: "investor_id,startup_id",
       ignoreDuplicates: false,
     });
+    if (briefErr) console.error("[deal-brief] upsert failed:", briefErr.message);
 
     return {
       startupId: data.startupId,

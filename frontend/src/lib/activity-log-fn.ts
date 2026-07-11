@@ -12,7 +12,7 @@ export interface ActivityLogEntry {
 
 export async function logActivity(entry: ActivityLogEntry): Promise<void> {
   try {
-    await supabase.from("activity_log").insert({
+    const { error } = await supabase.from("activity_log").insert({
       account_type: entry.account_type,
       account_id: entry.account_id,
       actor_user_id: entry.actor_user_id,
@@ -22,6 +22,7 @@ export async function logActivity(entry: ActivityLogEntry): Promise<void> {
       detail: entry.detail,
       created_at: new Date().toISOString(),
     });
+    if (error) console.error("[activity-log] insert failed:", error.message);
   } catch {
     // Fire-and-forget — never block the main action on a log failure
   }

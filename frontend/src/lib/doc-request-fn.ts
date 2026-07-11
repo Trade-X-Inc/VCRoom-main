@@ -77,13 +77,14 @@ export const createDocRequest = createServerFn({ method: "POST" })
 
     // Notify founder
     try {
-      await sb.from("notifications").insert({
+      const { error: n1 } = await sb.from("notifications").insert({
         user_id: data.forUserId,
         kind: "document_request",
         title: "Document requested",
         body: `An investor requested: "${data.title}"`,
         meta: { deal_room_id: data.dealRoomId, request_id: req.id },
       });
+      if (n1) console.error("[doc-request] founder notification failed:", n1.message);
     } catch { /* non-blocking */ }
 
     return { success: true, requestId: req.id };
@@ -123,13 +124,14 @@ export const fulfillDocRequest = createServerFn({ method: "POST" })
 
     // Notify investor
     try {
-      await sb.from("notifications").insert({
+      const { error: n2 } = await sb.from("notifications").insert({
         user_id: data.requestedBy,
         kind: "document_request",
         title: "Document uploaded",
         body: `The founder uploaded: "${data.title}"`,
         meta: { deal_room_id: data.dealRoomId, request_id: data.requestId },
       });
+      if (n2) console.error("[doc-request] investor notification failed:", n2.message);
     } catch { /* non-blocking */ }
 
     return { success: true };

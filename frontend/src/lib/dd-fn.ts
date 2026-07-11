@@ -387,12 +387,13 @@ Respond with ONLY valid JSON: {"contains": true} or {"contains": false}`;
 
     // Batch update all items
     for (const u of updates) {
-      await sb.from("dd_checklist_items").update({
+      const { error: updErr } = await sb.from("dd_checklist_items").update({
         auto_detected: u.auto_detected,
         auto_source: u.auto_source,
         auto_source_label: u.auto_source_label,
         checked: u.checked,
       }).eq("id", u.id);
+      if (updErr) console.error("[dd-fn] item update failed:", updErr.message);
     }
 
     return { detected };
