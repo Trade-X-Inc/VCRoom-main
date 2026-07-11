@@ -510,6 +510,9 @@ function Directory() {
       ]);
       setConnectModalStartupId(null);
       toast.success(result.ok ? "Connection request sent" : "Request already sent");
+    } catch (e) {
+      console.error("sendConnectionRequest failed:", e);
+      toast.error("Could not send request");
     } finally {
       setConnectSending(false);
     }

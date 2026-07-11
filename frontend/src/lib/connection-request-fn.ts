@@ -183,26 +183,49 @@ export const approveConnectionRequest = createServerFn({ method: "POST" })
     const fundName = profiles?.[0]?.fund_name ?? null;
     const investorEmail = users?.[0]?.email ?? null;
 
+    // Reuse a room left over from a previously interrupted approval of the
+    // same pair — keeps retries idempotent instead of piling up rooms.
+    const leftover: any[] = await sbFetch(
+      url, key,
+      `deal_rooms?startup_id=eq.${startup.id}&investor_user_id=eq.${request.investor_id}&workflow_stage=eq.information_vault&status=eq.active&select=id&order=created_at.desc&limit=1`,
+      "GET"
+    ).catch(() => []);
+
     // Create the deal room at the Information Vault stage — the NDA gate on
     // the deal room page fires automatically for any member without an
     // nda_acceptances row, so no extra gating is needed here.
-    const rooms: any[] = await sbFetch(url, key, "deal_rooms", "POST", {
-      startup_id: startup.id,
-      status: "active",
-      workflow_stage: "information_vault",
-      investor_name: investorName,
-      investor_company: fundName,
-      investor_email: investorEmail,
-      investor_user_id: request.investor_id,
-      created_by: uid,
-    });
-    const dealRoomId = rooms?.[0]?.id;
+    let dealRoomId: string | undefined = leftover?.[0]?.id;
+    if (!dealRoomId) {
+      const rooms: any[] = await sbFetch(url, key, "deal_rooms", "POST", {
+        startup_id: startup.id,
+        status: "active",
+        workflow_stage: "information_vault",
+        investor_name: investorName,
+        investor_company: fundName,
+        investor_email: investorEmail,
+        investor_user_id: request.investor_id,
+        created_by: uid,
+      });
+      dealRoomId = rooms?.[0]?.id;
+    }
     if (!dealRoomId) return { ok: false, error: "deal_room_insert_failed" };
 
-    await sbFetch(url, key, "deal_room_members", "POST", [
-      { deal_room_id: dealRoomId, user_id: uid, role: "founder" },
+    // PostgREST bulk inserts require identical keys on every row.
+    // Members are load-bearing (no membership → no room access), so this
+    // must NOT fail silently — a failure aborts before the request is
+    // marked deal_room_created, keeping the flow retryable. Skip members
+    // that already exist so retries don't duplicate rows.
+    const existingMembers: any[] = await sbFetch(
+      url, key, `deal_room_members?deal_room_id=eq.${dealRoomId}&select=user_id`, "GET"
+    ).catch(() => []);
+    const has = new Set((existingMembers ?? []).map((m: any) => m.user_id));
+    const memberRows = [
+      { deal_room_id: dealRoomId, user_id: uid, role: "founder", invited_by: null },
       { deal_room_id: dealRoomId, user_id: request.investor_id, role: "investor", invited_by: uid },
-    ], "return=minimal").catch(() => null);
+    ].filter((m) => !has.has(m.user_id));
+    if (memberRows.length) {
+      await sbFetch(url, key, "deal_room_members", "POST", memberRows, "return=minimal");
+    }
 
     await sbFetch(url, key, "activities", "POST", {
       deal_room_id: dealRoomId,

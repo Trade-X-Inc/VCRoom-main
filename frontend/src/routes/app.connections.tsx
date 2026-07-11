@@ -537,6 +537,9 @@ function IncomingRequests() {
       } else {
         toast.error("Could not create deal room. Please try again.");
       }
+    } catch (e) {
+      console.error("approveConnectionRequest failed:", e);
+      toast.error("Could not create deal room. Please try again.");
     } finally {
       setActingId(null);
       setConfirmId(null);
@@ -558,6 +561,9 @@ function IncomingRequests() {
       } else {
         toast.error("Could not decline request.");
       }
+    } catch (e) {
+      console.error("declineConnectionRequest failed:", e);
+      toast.error("Could not decline request.");
     } finally {
       setActingId(null);
     }

@@ -697,6 +697,9 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
       } else {
         toast.error("Could not submit request. Please try again.");
       }
+    } catch (e) {
+      console.error("sendConnectionRequest failed:", e);
+      toast.error("Could not submit request. Please try again.");
     } finally {
       setConnectSending(false);
     }
