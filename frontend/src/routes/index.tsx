@@ -8,17 +8,17 @@ import { CheckCircle2, ArrowRight, Shield, Lock } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Hockystick — Fundraising infrastructure for GCC founders" },
-      { name: "description", content: "Verified profiles, encrypted deal rooms, AI due diligence. The complete fundraising stack for GCC and MENA founders and investors." },
-      { name: "keywords", content: "startup fundraising infrastructure, verified investor platform, founder due diligence, VC deal flow management, deal rooms, GCC fundraising" },
+      { title: "Hockystick — Fundraising infrastructure for GCC & MENA founders" },
+      { name: "description", content: "Verified profiles, encrypted deal rooms, AI due diligence. The complete fundraising stack for founders raising from GCC & MENA investors." },
+      { name: "keywords", content: "startup fundraising infrastructure, verified investor platform, founder due diligence, VC deal flow management, deal rooms, GCC & MENA fundraising" },
       { name: "robots", content: "index, follow" },
-      { property: "og:title", content: "Hockystick — Fundraising infrastructure for GCC founders" },
+      { property: "og:title", content: "Hockystick — Fundraising infrastructure for GCC & MENA founders" },
       { property: "og:description", content: "Verified profiles. Encrypted deal rooms. AI due diligence. The complete stack for GCC & MENA." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://hockystick.app" },
       { property: "og:image", content: "https://hockystick.app/og-image.png" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Hockystick — Fundraising infrastructure for GCC founders" },
+      { name: "twitter:title", content: "Hockystick — Fundraising infrastructure for GCC & MENA founders" },
       { name: "twitter:description", content: "Private deal rooms. Verified founders. Serious investors. Deals that close." },
     ],
     links: [
@@ -164,7 +164,7 @@ function DealRoomCard() {
                 MERIDIAN LOGISTICS
               </div>
               <div className="text-[10px]" style={{ color: W40, fontFamily: DM }}>
-                Seed · Logistics Tech · UAE
+                Seed · Logistics Tech · GCC
               </div>
             </div>
           </div>
@@ -276,7 +276,7 @@ function Hero() {
         >
           The fundraising infrastructure
           <br />
-          <span style={{ color: PURPLE }}>GCC founders needed.</span>
+          <span style={{ color: PURPLE }}>GCC & MENA founders needed.</span>
         </h1>
 
         {/* Subhead */}
@@ -292,7 +292,7 @@ function Hero() {
         >
           Verified profiles. Encrypted deal rooms. AI due diligence.
           <br />
-          The complete stack — built for the region where it never existed before.
+          Built for founders raising capital from GCC & MENA investors — wherever they're based.
         </p>
 
         {/* CTAs */}
@@ -343,13 +343,6 @@ function Hero() {
    SECTION 2 — SOCIAL PROOF BAR
 ═══════════════════════════════════════════════════════════════════════════ */
 function SocialProofBar() {
-  const countries = [
-    { flag: "🇦🇪", label: "UAE" },
-    { flag: "🇸🇦", label: "KSA" },
-    { flag: "🇶🇦", label: "Qatar" },
-    { flag: "🇪🇬", label: "Egypt" },
-    { flag: "🇯🇴", label: "Jordan" },
-  ];
   return (
     <section className="w-full py-4" style={{ background: "#111113" }}>
       <div className="max-w-[1100px] mx-auto px-6">
@@ -357,16 +350,9 @@ function SocialProofBar() {
           <span className="text-xs" style={{ color: W40, fontFamily: DM }}>
             Founders raising across
           </span>
-          {countries.map(({ flag, label }, i) => (
-            <span key={label} className="flex items-center gap-3">
-              <span className="text-sm font-medium text-white" style={{ fontFamily: DM }}>
-                {flag} {label}
-              </span>
-              {i < countries.length - 1 && (
-                <span style={{ color: "rgba(255,255,255,0.15)", fontSize: "10px" }}>|</span>
-              )}
-            </span>
-          ))}
+          <span className="text-sm font-medium text-white" style={{ fontFamily: DM }}>
+            🌍 GCC & MENA & Beyond
+          </span>
         </div>
       </div>
     </section>
@@ -735,7 +721,7 @@ function InvestorCardMockup() {
             <div className="text-white text-xs font-bold tracking-wide" style={{ fontFamily: SYNE }}>
               MERIDIAN LOGISTICS
             </div>
-            <div className="text-[10px]" style={{ color: W40, fontFamily: DM }}>Seed · Logistics Tech · UAE</div>
+            <div className="text-[10px]" style={{ color: W40, fontFamily: DM }}>Seed · Logistics Tech · GCC</div>
           </div>
         </div>
         <span
@@ -877,7 +863,7 @@ function ForInvestors({ dark }: { dark: boolean }) {
    SECTION 6.5 — WHO THIS IS FOR
 ═══════════════════════════════════════════════════════════════════════════ */
 const AUDIENCE_FOR = [
-  "Seed and Series A founders in UAE, KSA, Qatar, Egypt, Jordan",
+  "Seed and Series A founders raising capital from GCC & MENA investors",
   "Family offices managing 5–50 active deals",
   "VC analysts sourcing deal flow without a full team",
   "Accelerator cohorts preparing portfolio companies for investment",
@@ -1201,7 +1187,7 @@ function FinalCTA() {
             maxWidth: "480px",
           }}
         >
-          GCC &amp; MENA focused.
+          GCC &amp; MENA focused. Global by design.
           <br />
           The infrastructure serious founders use to raise.
         </p>

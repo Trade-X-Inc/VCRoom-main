@@ -19,14 +19,14 @@ function About() {
           About
         </p>
         <h1 className="font-syne font-bold text-4xl text-white mb-6 leading-tight">
-          Built in Dubai.<br />
+          Built in the GCC.<br />
           For the founders who don't know the right people.
         </h1>
         <p className="text-white/60 text-lg leading-relaxed mb-12">
           Most fundraising platforms are built for Silicon Valley.
           They assume you have a warm network, a Stanford alumni
-          connection, or a prior exit. Most MENA founders have none
-          of these.
+          connection, or a prior exit. Most founders across GCC & MENA have
+          none of these.
         </p>
 
         <div className="space-y-8 mb-16">
@@ -65,8 +65,8 @@ function About() {
             <p className="text-white/60 leading-relaxed">
               Hockystick is based at DIFC FinTech Hive, Dubai —
               the region's leading financial technology hub.
-              We are GCC-first and global by design. Our platform
-              is built for MENA founders raising from regional and
+              We are GCC & MENA focused and global by design. Our platform
+              is built for founders across GCC & MENA raising from regional and
               international investors.
             </p>
           </div>
