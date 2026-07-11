@@ -244,7 +244,7 @@ export function FounderProfilePanel({
       title: 'Detail pack requested',
       body: `An investor wants to see your full profile — traction, team, and business model details.`,
       read: false,
-      action_url: '/app/vc-leads',
+      action_url: '/app/connections',
     });
     setDetailPackRequested(true);
     onDetailPackRequested?.();

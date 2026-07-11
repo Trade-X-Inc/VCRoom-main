@@ -17,7 +17,8 @@ import { DealRoomChat } from "@/components/app/DealRoomChat";
 import { DDWorkstation } from "@/components/app/DDWorkstation";
 import { Dropzone } from "@/components/app/Dropzone";
 import { useAuth } from "@/lib/auth";
-import { supabase, logActivity, createNotification } from "@/lib/supabase";
+import { supabase, logActivity } from "@/lib/supabase";
+import { notifyUser } from "@/lib/notify";
 import { DocumentWishlist } from "@/components/app/DocumentWishlist";
 import { generateDocSummary, secureAICall } from "@/lib/ai-secure-fn";
 import { extractDocumentText } from "@/lib/document-extractor";
@@ -6466,14 +6467,13 @@ function QA({
         .eq("deal_room_id", dealRoomId)
         .neq("user_id", userId!);
       for (const m of members ?? []) {
-        await createNotification(
-          m.user_id,
-          "New Q&A message",
-          text.slice(0, 100),
-          "message",
-          dealRoomId,
-          `/app/deal-room/${dealRoomId}`,
-        );
+        await notifyUser({
+          userId: m.user_id,
+          title: "New Q&A message",
+          body: text.slice(0, 100),
+          kind: "message",
+          actionUrl: `/app/deal-room/${dealRoomId}`,
+        });
       }
     }
     setSending(false);

@@ -58,8 +58,11 @@ function SecuritySettings() {
     if (!user?.id) return;
     setDeleting(true);
     try {
-      // Soft-delete: mark user as deleted in DB, then sign out
-      await supabase.from("users").update({ role: "deleted", updated_at: new Date().toISOString() } as any).eq("id", user.id);
+      // Soft-delete: mark user as deleted in DB, then sign out.
+      // The update must be verified — signing out on a failed update would
+      // leave the account fully active while the user believes it's deleted.
+      const { error } = await supabase.from("users").update({ role: "deleted", updated_at: new Date().toISOString() } as any).eq("id", user.id);
+      if (error) throw new Error(`Could not delete account: ${error.message}`);
       await supabase.auth.signOut();
       nav({ to: "/", replace: true });
       toast.success("Account deleted. Sorry to see you go.");

@@ -8,7 +8,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
-import { supabase, createNotification, logActivity } from "@/lib/supabase";
+import { supabase, logActivity } from "@/lib/supabase";
+import { notifyUser } from "@/lib/notify";
 
 // --- Types ---
 type ReviewSectionKey = "pitch" | "financial" | "team" | "meeting" | "dd" | "qa";
@@ -223,14 +224,13 @@ function InvestorReview({ dealRoomId, startupId }: { dealRoomId: string; startup
         .eq("id", startupId)
         .maybeSingle();
       if (startup?.founder_id) {
-        await createNotification(
-          startup.founder_id,
-          `Deal update: ${type}`,
-          extra?.message ?? `An investor updated your deal status to "${type}".`,
-          "decision",
-          dealRoomId,
-          `/app/deal-room/${dealRoomId}`,
-        );
+        await notifyUser({
+          userId: startup.founder_id,
+          title: `Deal update: ${type}`,
+          body: extra?.message ?? `An investor updated your deal status to "${type}".`,
+          kind: "decision",
+          actionUrl: `/app/deal-room/${dealRoomId}`,
+        });
       }
     }
 

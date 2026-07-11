@@ -451,9 +451,12 @@ function Profile() {
     }
     setProfilePublishing(true);
     try {
+      // Going live also makes the startup discoverable in the directory —
+      // without this, published profiles never appeared anywhere (the
+      // settings toggle remains available as an opt-out).
       const { error } = await supabase
         .from("startups")
-        .update({ profile_published: true, profile_slug: profileSlug })
+        .update({ profile_published: true, profile_slug: profileSlug, publicly_discoverable: true })
         .eq("id", startup.id);
       if (error) throw error;
       toast.success("Profile is live on Hockystick.");

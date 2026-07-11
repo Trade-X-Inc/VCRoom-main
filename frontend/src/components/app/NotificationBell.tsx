@@ -201,8 +201,13 @@ export function NotificationBell() {
                   </div>
                 </div>
               );
+              // Absolute URLs (e.g. invite links) can't go through the router
               return n.action_url ? (
-                <Link key={n.id} to={n.action_url as any} onClick={handleClick}>{content}</Link>
+                n.action_url.startsWith("http") ? (
+                  <a key={n.id} href={n.action_url} onClick={handleClick}>{content}</a>
+                ) : (
+                  <Link key={n.id} to={n.action_url as any} onClick={handleClick}>{content}</Link>
+                )
               ) : (
                 <div key={n.id}>{content}</div>
               );
