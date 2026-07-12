@@ -20,6 +20,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase, logActivity } from "@/lib/supabase";
 import { notifyUser } from "@/lib/notify";
 import { ProfileChecklist } from "@/components/app/ProfileChecklist";
+import { DDAnalysisPanel } from "@/components/app/DDAnalysisPanel";
 import { DocumentWishlist } from "@/components/app/DocumentWishlist";
 import { generateDocSummary, secureAICall } from "@/lib/ai-secure-fn";
 import { extractDocumentText } from "@/lib/document-extractor";
@@ -3368,6 +3369,9 @@ function DueDiligencePanel({
           </div>
         )}
       </div>
+
+      {/* Confrontational AI analysis — cross-checks documents vs claims */}
+      <DDAnalysisPanel dealRoomId={dealRoomId} startupId={startupId} isInvestor={isInvestor} />
     </div>
   );
 }
@@ -6362,6 +6366,22 @@ function QA({
   const [msgs, setMsgs] = useState<any[]>([]);
   const [input, setInput] = useState("");
   const [question, setQuestion] = useState("");
+
+  // Prefill handoff from the DD analysis panel ("Ask this in Q&A")
+  useEffect(() => {
+    const prefill = sessionStorage.getItem("hs_qa_prefill");
+    if (prefill) {
+      setQuestion(prefill);
+      setInput(prefill);
+      sessionStorage.removeItem("hs_qa_prefill");
+    }
+    const onPrefill = (e: Event) => {
+      const q = (e as CustomEvent).detail;
+      if (typeof q === "string") { setQuestion(q); setInput(q); }
+    };
+    window.addEventListener("hs-qa-prefill", onPrefill);
+    return () => window.removeEventListener("hs-qa-prefill", onPrefill);
+  }, []);
   const [answerDrafts, setAnswerDrafts] = useState<Record<string, string>>({});
   const [openQaId, setOpenQaId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
