@@ -53,13 +53,22 @@ export type FounderStartupProfile = {
   description?: string | null; problem?: string | null; solution?: string | null;
   why_us?: string | null; intro_video_url?: string | null; founder_name?: string | null;
   revenue_model?: string | null; use_of_funds?: string | null;
+  business_model?: string | null; traction?: string | null;
+  competitive_advantage?: string | null; one_liner?: string | null;
+  investor_narrative?: string | null;
   [key: string]: unknown;
 };
 
+// The publish gate counts substance fields the profile builder actually
+// fills. The old list required intro_video_url / why_us / revenue_model /
+// description — fields the AI interview never asks — so a founder who
+// completed the whole interview capped at ~57% and could never reach the
+// 80% needed to go live. Videos and extras still improve the profile;
+// they just don't block publishing.
 const FOUNDER_PROFILE_REQUIRED_KEYS: (keyof FounderStartupProfile)[] = [
   "company_name", "tagline", "sector", "stage", "country", "funding_target",
-  "description", "problem", "solution", "why_us", "intro_video_url",
-  "founder_name", "revenue_model", "use_of_funds",
+  "business_model", "problem", "solution", "traction",
+  "competitive_advantage", "use_of_funds", "one_liner", "investor_narrative",
 ];
 
 export function getFounderProfileCompleteness(

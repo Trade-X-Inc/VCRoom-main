@@ -236,11 +236,32 @@ function ProfileBuilder() {
 
   // ── Session helpers ────────────────────────────────────────────────────────
 
+  // Brand-new founders arrive here straight from signup with no startups
+  // row yet — self-provision a draft row instead of dead-ending with
+  // "complete your profile setup first" (which pointed nowhere).
+  async function ensureStartupId(): Promise<string | null> {
+    if (startup?.id) return startup.id;
+    if (!user?.id) return null;
+    const { data, error } = await supabase
+      .from("startups")
+      .insert({ founder_id: user.id, company_name: "Draft profile", created_at: new Date().toISOString() })
+      .select("id")
+      .single();
+    if (error) {
+      console.error("[profile-builder] draft startup create failed:", error);
+      toast.error("Could not start — please try again.");
+      return null;
+    }
+    queryClient.invalidateQueries({ queryKey: ["profile-builder-startup"] });
+    return data.id;
+  }
+
   async function createSession(path: "upload" | "interview") {
-    if (!startup?.id) { toast.error("No startup found — please complete your profile setup first."); return null; }
+    const startupId = await ensureStartupId();
+    if (!startupId) return null;
     const { data, error } = await supabase
       .from("profile_builder_sessions")
-      .insert({ startup_id: startup.id, path, status: "in_progress" })
+      .insert({ startup_id: startupId, path, status: "in_progress" })
       .select("id")
       .single();
     if (error) { toast.error("Could not start session"); return null; }
@@ -554,7 +575,9 @@ function ProfileBuilder() {
   const isMissing = (key: string) => missingFields.includes(key) || !(form as any)[key];
 
   async function handleSave() {
-    if (!startup?.id || !user?.id) return;
+    if (!user?.id) return;
+    const startupId = await ensureStartupId();
+    if (!startupId) { toast.error("Could not save — please try again."); return; }
     setSaving(true);
     try {
       const num = (v: string | null): number | undefined => {
@@ -600,7 +623,7 @@ function ProfileBuilder() {
           incorporated_at: form.incorporated_at ?? undefined,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", startup.id);
+        .eq("id", startupId);
 
       if (error) throw error;
 
@@ -610,12 +633,12 @@ function ProfileBuilder() {
         const { data: existingMembers } = await supabase
           .from("team_members")
           .select("name")
-          .eq("startup_id", startup.id);
+          .eq("startup_id", startupId);
         const existingNames = new Set((existingMembers ?? []).map((m) => m.name));
         const newMembers = teamRows
           .filter((t) => !existingNames.has(t.name.trim()))
           .map((t, i) => ({
-            startup_id: startup.id,
+            startup_id: startupId,
             name: t.name.trim(),
             title: t.role?.trim() || null,
             display_order: existingNames.size + i,
@@ -636,9 +659,9 @@ function ProfileBuilder() {
       // Seed playbook immediately so /app/desk has real content on first visit.
       // Blocking — prevents a race condition where the founder lands on the desk
       // before the task exists. A failure here must never block the founder.
-      if (startup?.id && user?.id) {
+      if (user?.id) {
         try {
-          await seedFounderPlaybook({ data: { founderId: user.id, startupId: startup.id } });
+          await seedFounderPlaybook({ data: { founderId: user.id, startupId } });
         } catch {
           // Non-fatal — daily cron will catch it. Don't surface to user.
         }

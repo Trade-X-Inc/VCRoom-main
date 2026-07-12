@@ -424,7 +424,9 @@ function Profile() {
 
   const profileSlug = startup?.profile_slug ?? slugify(form.company_name || "");
 
-  const completenessScore = getFounderProfileCompleteness(form).percent;
+  // Merge the startup row underneath: the form doesn't track builder-only
+  // fields (one_liner, investor_narrative) but they count toward publish.
+  const completenessScore = getFounderProfileCompleteness({ ...(startup ?? {}), ...form }).percent;
 
   const profileReady = completenessScore >= 80;
 
@@ -516,7 +518,7 @@ function Profile() {
     if (!user?.id) return;
     setSaving(true);
     try {
-      const completeness_score = getFounderProfileCompleteness(form).percent;
+      const completeness_score = getFounderProfileCompleteness({ ...(startup ?? {}), ...form }).percent;
 
       const payload = {
         company_name: form.company_name,
