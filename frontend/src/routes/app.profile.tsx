@@ -52,7 +52,7 @@ interface StartupRow {
 }
 
 interface TeamMember {
-  id: string; full_name: string; role: string; email: string | null;
+  id: string; name: string | null; title: string | null;
   linkedin_url: string | null; bio: string | null; photo_url: string | null;
   tag: string | null; display_order: number;
 }
@@ -2886,7 +2886,7 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
   });
 
   const openEdit = (m: TeamMember) => {
-    setMf({ full_name: m.full_name, role: m.role, email: m.email ?? "", linkedin_url: m.linkedin_url ?? "", bio: m.bio ?? "", tag: m.tag ?? "Employee", photo_url: m.photo_url ?? "" });
+    setMf({ full_name: m.name ?? "", role: m.title ?? "", email: "", linkedin_url: m.linkedin_url ?? "", bio: m.bio ?? "", tag: m.tag ?? "Employee", photo_url: m.photo_url ?? "" });
     setEditingId(m.id);
     setShowForm(true);
   };
@@ -2916,8 +2916,9 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
+      // team_members columns are name/title — full_name/role/email do not exist
       const payload = {
-        full_name: mf.full_name, role: mf.role, email: mf.email || null,
+        name: mf.full_name, title: mf.role,
         linkedin_url: mf.linkedin_url || null, bio: mf.bio || null,
         tag: mf.tag || null, photo_url: mf.photo_url || null,
       };
@@ -3058,16 +3059,16 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {members.map((m) => {
-            const inits = m.full_name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+            const inits = (m.name ?? "?").split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
             return (
               <div key={m.id} className="rounded-xl border border-border/60 bg-card p-4 shadow-card">
                 <div className="flex items-start gap-3">
                   <div className="grid h-10 w-10 place-items-center rounded-full bg-accent border border-border/60 overflow-hidden text-xs font-semibold shrink-0">
-                    {m.photo_url ? <img src={m.photo_url} alt={m.full_name} className="h-full w-full object-cover" /> : inits}
+                    {m.photo_url ? <img src={m.photo_url} alt={m.name ?? ""} className="h-full w-full object-cover" /> : inits}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold truncate">{m.full_name}</div>
-                    <div className="text-xs text-muted-foreground truncate">{m.role}</div>
+                    <div className="text-sm font-semibold truncate">{m.name}</div>
+                    <div className="text-xs text-muted-foreground truncate">{m.title}</div>
                     {m.tag && (
                       <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full font-medium mt-1 inline-block", tagColor[m.tag] ?? "bg-muted text-muted-foreground")}>
                         {m.tag}
