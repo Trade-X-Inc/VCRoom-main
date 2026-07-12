@@ -64,6 +64,8 @@ interface QuestionRow {
   phase: string;
   race_round: number | null;
   is_answered: boolean;
+  answer_flag: string | null;
+  flag_acknowledged: boolean;
 }
 
 function useCountdown(deadline: string | null) {
@@ -158,7 +160,9 @@ function RoastLiveControl() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("roast_questions")
-        .select("id, asker_name, question_text, phase, race_round, is_answered")
+        .select(
+          "id, asker_name, question_text, phase, race_round, is_answered, answer_flag, flag_acknowledged",
+        )
         .eq("session_id", id)
         .is("removed_at", null);
       if (error) {
@@ -352,6 +356,10 @@ function RoastLiveControl() {
     poolCount,
     questions.filter((q) => q.phase === "written").length,
   );
+  // Written round: what still blocks the badge (unanswered or unacked flags)
+  const openCount = questions.filter(
+    (q) => !q.is_answered || (q.answer_flag !== null && !q.flag_acknowledged),
+  ).length;
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
@@ -457,7 +465,8 @@ function RoastLiveControl() {
             className="rounded-lg px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
             style={{ background: "#F59E0B" }}
           >
-            Go to the answers queue ({writtenCount} written questions) →
+            Go to the answers queue ({openCount} question
+            {openCount === 1 ? "" : "s"} still open) →
           </a>
         )}
       </div>

@@ -17,7 +17,10 @@ import { createServerFn } from "@tanstack/react-start";
 // - Everything else touches only the caller's own state.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const ROAST_LEVELS: Record<1 | 2 | 3, { maxAudience: number; qaMinutes: number; priceUsd: number }> = {
+export const ROAST_LEVELS: Record<
+  1 | 2 | 3,
+  { maxAudience: number; qaMinutes: number; priceUsd: number }
+> = {
   1: { maxAudience: 20, qaMinutes: 20, priceUsd: 40 },
   2: { maxAudience: 50, qaMinutes: 35, priceUsd: 50 },
   3: { maxAudience: 100, qaMinutes: 50, priceUsd: 60 },
@@ -40,7 +43,13 @@ export interface RoastCredibilityFlag {
 
 export interface RoastReport {
   pitch_summary: string; // 2 sentences, from stated positioning
-  question_themes: Array<{ theme: string; count: number; answered_directly: number; answered_generally: number; deflected: number }>;
+  question_themes: Array<{
+    theme: string;
+    count: number;
+    answered_directly: number;
+    answered_generally: number;
+    deflected: number;
+  }>;
   live_direct_answer_rate: string; // e.g. "12/14 (86%)"
   written_completion: string; // e.g. "47/47 (100%)"
   strongest_area: string;
@@ -56,31 +65,53 @@ const REPORT_DISCLAIMER =
 function getEnv() {
   const cfEnv = (globalThis as any).__cf_env || {};
   return {
-    url: cfEnv.SUPABASE_URL || cfEnv.VITE_SUPABASE_URL || (import.meta.env as any).VITE_SUPABASE_URL || "",
+    url:
+      cfEnv.SUPABASE_URL ||
+      cfEnv.VITE_SUPABASE_URL ||
+      (import.meta.env as any).VITE_SUPABASE_URL ||
+      "",
     key: cfEnv.SUPABASE_SERVICE_ROLE_KEY || "",
     dailyKey: cfEnv.DAILY_API_KEY || "",
-    openaiKey: cfEnv.OPENAI_API_KEY || cfEnv.OPEN_AI_API_KEY || cfEnv["OPEN AI API KEY"] || "",
+    openaiKey:
+      cfEnv.OPENAI_API_KEY ||
+      cfEnv.OPEN_AI_API_KEY ||
+      cfEnv["OPEN AI API KEY"] ||
+      "",
     appUrl: cfEnv.VITE_APP_URL || "https://hockystick.app",
   };
 }
 
-async function sbFetch(url: string, key: string, path: string, method = "GET", body?: unknown, prefer?: string) {
+async function sbFetch(
+  url: string,
+  key: string,
+  path: string,
+  method = "GET",
+  body?: unknown,
+  prefer?: string,
+) {
   const resp = await fetch(`${url}/rest/v1/${path}`, {
     method,
     headers: {
       "Content-Type": "application/json",
       apikey: key,
       Authorization: `Bearer ${key}`,
-      Prefer: prefer ?? (method === "POST" ? "return=representation" : "return=minimal"),
+      Prefer:
+        prefer ??
+        (method === "POST" ? "return=representation" : "return=minimal"),
     },
     body: body ? JSON.stringify(body) : undefined,
   });
   const text = await resp.text();
-  if (!resp.ok) throw new Error(`Supabase ${method} ${path} (${resp.status}): ${text}`);
+  if (!resp.ok)
+    throw new Error(`Supabase ${method} ${path} (${resp.status}): ${text}`);
   return text ? JSON.parse(text) : null;
 }
 
-async function verifyUser(url: string, key: string, accessToken: string): Promise<string | null> {
+async function verifyUser(
+  url: string,
+  key: string,
+  accessToken: string,
+): Promise<string | null> {
   if (!accessToken) return null;
   const resp = await fetch(`${url}/auth/v1/user`, {
     headers: { apikey: key, Authorization: `Bearer ${accessToken}` },
@@ -90,205 +121,370 @@ async function verifyUser(url: string, key: string, accessToken: string): Promis
   return user?.id ?? null;
 }
 
-async function notify(url: string, key: string, row: { user_id: string; title: string; body: string; action_url?: string | null; meta?: Record<string, unknown> }) {
+async function notify(
+  url: string,
+  key: string,
+  row: {
+    user_id: string;
+    title: string;
+    body: string;
+    action_url?: string | null;
+    meta?: Record<string, unknown>;
+  },
+) {
   const { user_id, title, body, action_url, meta } = row;
-  await sbFetch(url, key, "notifications", "POST", { user_id, kind: "roast", title, body, read: false, action_url: action_url ?? null, meta: meta ?? null }, "return=minimal")
-    .catch((e) => console.error("[roast] notification failed:", e?.message ?? e));
+  await sbFetch(
+    url,
+    key,
+    "notifications",
+    "POST",
+    {
+      user_id,
+      kind: "roast",
+      title,
+      body,
+      read: false,
+      action_url: action_url ?? null,
+      meta: meta ?? null,
+    },
+    "return=minimal",
+  ).catch((e) =>
+    console.error("[roast] notification failed:", e?.message ?? e),
+  );
 }
 
 // ── 1. Create a session (founder; rules acknowledgement is the confirm) ─────
 
 export const createRoastSession = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as {
-    userAccessToken: string;
-    startupId: string;
-    level: 1 | 2 | 3;
-    scheduledAt: string; // ISO
-    rulesAcknowledged: boolean;
-  })
-  .handler(async ({ data }): Promise<{ ok: boolean; error?: string; sessionId?: string; roomUrl?: string; publicUrl?: string }> => {
-    const { url, key, dailyKey, appUrl } = getEnv();
-    if (!url || !key) return { ok: false, error: "db_unavailable" };
-    if (!dailyKey) return { ok: false, error: "video_unavailable" };
+  .inputValidator(
+    (d: unknown) =>
+      d as {
+        userAccessToken: string;
+        startupId: string;
+        level: 1 | 2 | 3;
+        scheduledAt: string; // ISO
+        rulesAcknowledged: boolean;
+      },
+  )
+  .handler(
+    async ({
+      data,
+    }): Promise<{
+      ok: boolean;
+      error?: string;
+      sessionId?: string;
+      roomUrl?: string;
+      publicUrl?: string;
+    }> => {
+      const { url, key, dailyKey, appUrl } = getEnv();
+      if (!url || !key) return { ok: false, error: "db_unavailable" };
+      if (!dailyKey) return { ok: false, error: "video_unavailable" };
 
-    const uid = await verifyUser(url, key, data.userAccessToken);
-    if (!uid) return { ok: false, error: "not_authenticated" };
+      const uid = await verifyUser(url, key, data.userAccessToken);
+      if (!uid) return { ok: false, error: "not_authenticated" };
 
-    // The no-delete rule must be explicitly acknowledged — this is the
-    // confirm-first step for scheduling a public event.
-    if (!data.rulesAcknowledged) return { ok: false, error: "rules_not_acknowledged" };
+      // The no-delete rule must be explicitly acknowledged — this is the
+      // confirm-first step for scheduling a public event.
+      if (!data.rulesAcknowledged)
+        return { ok: false, error: "rules_not_acknowledged" };
 
-    const level = ([1, 2, 3] as const).includes(data.level) ? data.level : null;
-    if (!level) return { ok: false, error: "invalid_level" };
-    const scheduledAt = new Date(data.scheduledAt);
-    if (!(scheduledAt.getTime() > Date.now() - 60_000)) return { ok: false, error: "invalid_time" };
+      const level = ([1, 2, 3] as const).includes(data.level)
+        ? data.level
+        : null;
+      if (!level) return { ok: false, error: "invalid_level" };
+      const scheduledAt = new Date(data.scheduledAt);
+      if (!(scheduledAt.getTime() > Date.now() - 60_000))
+        return { ok: false, error: "invalid_time" };
 
-    const startups: any[] = await sbFetch(url, key, `startups?id=eq.${data.startupId}&select=id,founder_id,company_name`).catch(() => []);
-    const startup = startups?.[0];
-    if (!startup) return { ok: false, error: "startup_not_found" };
-    if (startup.founder_id !== uid) return { ok: false, error: "not_authorized" };
+      const startups: any[] = await sbFetch(
+        url,
+        key,
+        `startups?id=eq.${data.startupId}&select=id,founder_id,company_name`,
+      ).catch(() => []);
+      const startup = startups?.[0];
+      if (!startup) return { ok: false, error: "startup_not_found" };
+      if (startup.founder_id !== uid)
+        return { ok: false, error: "not_authorized" };
 
-    // One live/upcoming session at a time per startup
-    const existing: any[] = await sbFetch(
-      url, key,
-      `roast_sessions?startup_id=eq.${data.startupId}&status=in.(scheduled,lobby,pitch_phase,question_writing,qa_phase,closing,written_phase)&select=id`,
-    ).catch(() => []);
-    if (existing?.length) return { ok: false, error: "session_already_active" };
+      // One live/upcoming session at a time per startup
+      const existing: any[] = await sbFetch(
+        url,
+        key,
+        `roast_sessions?startup_id=eq.${data.startupId}&status=in.(scheduled,lobby,pitch_phase,question_writing,qa_phase,closing,written_phase)&select=id`,
+      ).catch(() => []);
+      if (existing?.length)
+        return { ok: false, error: "session_already_active" };
 
-    const cfg = ROAST_LEVELS[level];
+      const cfg = ROAST_LEVELS[level];
 
-    // Daily room. Public room, capped participants, expires 3h after the
-    // scheduled start. Audience joins muted/camera-off; free tier has no
-    // cloud recording — the Q&A transcript is the permanent record.
-    const roomName = `roast-${crypto.randomUUID().slice(0, 12)}`;
-    const roomResp = await fetch("https://api.daily.co/v1/rooms", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${dailyKey}` },
-      body: JSON.stringify({
-        name: roomName,
-        privacy: "public",
-        properties: {
-          max_participants: cfg.maxAudience + 1,
-          exp: Math.floor(scheduledAt.getTime() / 1000) + 3 * 3600,
-          start_video_off: true,
-          start_audio_off: true,
-          enable_chat: false,
-          enable_knocking: false,
-          eject_at_room_exp: true,
+      // Daily room. Public room, capped participants, expires 3h after the
+      // scheduled start. Audience joins muted/camera-off; free tier has no
+      // cloud recording — the Q&A transcript is the permanent record.
+      const roomName = `roast-${crypto.randomUUID().slice(0, 12)}`;
+      const roomResp = await fetch("https://api.daily.co/v1/rooms", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${dailyKey}`,
         },
-      }),
-    });
-    if (!roomResp.ok) {
-      const detail = await roomResp.text();
-      console.error("[roast] Daily room creation failed:", roomResp.status, detail);
-      return { ok: false, error: "video_room_failed" };
-    }
-    const room: any = await roomResp.json();
+        body: JSON.stringify({
+          name: roomName,
+          privacy: "public",
+          properties: {
+            // max_participants is a paid Daily feature — capacity is enforced
+            // app-side in joinRoastAudience instead.
+            exp: Math.floor(scheduledAt.getTime() / 1000) + 3 * 3600,
+            start_video_off: true,
+            start_audio_off: true,
+            enable_chat: false,
+            enable_knocking: false,
+            eject_at_room_exp: true,
+          },
+        }),
+      });
+      if (!roomResp.ok) {
+        const detail = await roomResp.text();
+        console.error(
+          "[roast] Daily room creation failed:",
+          roomResp.status,
+          detail,
+        );
+        return { ok: false, error: "video_room_failed" };
+      }
+      const room: any = await roomResp.json();
 
-    const inserted: any[] = await sbFetch(url, key, "roast_sessions", "POST", {
-      startup_id: data.startupId,
-      founder_id: uid,
-      level,
-      status: "scheduled",
-      payment_status: "comp", // beta: comp access; Stripe gate arrives at creation time later
-      scheduled_at: scheduledAt.toISOString(),
-      qa_duration_minutes: cfg.qaMinutes,
-      max_audience: cfg.maxAudience,
-      daily_room_name: room.name,
-      daily_room_url: room.url,
-      rules_acknowledged_at: new Date().toISOString(),
-    });
-    const sessionId = inserted?.[0]?.id;
-    if (!sessionId) return { ok: false, error: "insert_failed" };
+      const inserted: any[] = await sbFetch(
+        url,
+        key,
+        "roast_sessions",
+        "POST",
+        {
+          startup_id: data.startupId,
+          founder_id: uid,
+          level,
+          status: "scheduled",
+          payment_status: "comp", // beta: comp access; Stripe gate arrives at creation time later
+          scheduled_at: scheduledAt.toISOString(),
+          qa_duration_minutes: cfg.qaMinutes,
+          max_audience: cfg.maxAudience,
+          daily_room_name: room.name,
+          daily_room_url: room.url,
+          rules_acknowledged_at: new Date().toISOString(),
+        },
+      );
+      const sessionId = inserted?.[0]?.id;
+      if (!sessionId) return { ok: false, error: "insert_failed" };
 
-    // Founder occupies the founder seat
-    const users: any[] = await sbFetch(url, key, `users?id=eq.${uid}&select=full_name`).catch(() => []);
-    await sbFetch(url, key, "roast_audience", "POST", {
-      session_id: sessionId,
-      user_id: uid,
-      display_name: users?.[0]?.full_name ?? "Founder",
-      role: "founder",
-    }, "return=minimal").catch((e) => console.error("[roast] founder seat insert failed:", e?.message));
+      // Founder occupies the founder seat
+      const users: any[] = await sbFetch(
+        url,
+        key,
+        `users?id=eq.${uid}&select=full_name`,
+      ).catch(() => []);
+      await sbFetch(
+        url,
+        key,
+        "roast_audience",
+        "POST",
+        {
+          session_id: sessionId,
+          user_id: uid,
+          display_name: users?.[0]?.full_name ?? "Founder",
+          role: "founder",
+        },
+        "return=minimal",
+      ).catch((e) =>
+        console.error("[roast] founder seat insert failed:", e?.message),
+      );
 
-    await notify(url, key, {
-      user_id: uid,
-      title: `Your Level ${level} Roast is scheduled`,
-      body: `${startup.company_name} goes live ${scheduledAt.toUTCString()}. Share your public Roast page to fill the room.`,
-      action_url: `/roast/${sessionId}`,
-      meta: { session_id: sessionId },
-    });
+      await notify(url, key, {
+        user_id: uid,
+        title: `Your Level ${level} Roast is scheduled`,
+        body: `${startup.company_name} goes live ${scheduledAt.toUTCString()}. Share your public Roast page to fill the room.`,
+        action_url: `/roast/${sessionId}`,
+        meta: { session_id: sessionId },
+      });
 
-    return { ok: true, sessionId, roomUrl: room.url, publicUrl: `${appUrl}/roast/${sessionId}` };
-  });
+      return {
+        ok: true,
+        sessionId,
+        roomUrl: room.url,
+        publicUrl: `${appUrl}/roast/${sessionId}`,
+      };
+    },
+  );
 
 // ── 2. Join the audience ─────────────────────────────────────────────────────
 
 export const joinRoastAudience = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { userAccessToken: string; sessionId: string })
-  .handler(async ({ data }): Promise<{ ok: boolean; error?: string; audienceCount?: number }> => {
-    const { url, key } = getEnv();
-    if (!url || !key) return { ok: false, error: "db_unavailable" };
-    const uid = await verifyUser(url, key, data.userAccessToken);
-    if (!uid) return { ok: false, error: "not_authenticated" };
+  .inputValidator(
+    (d: unknown) => d as { userAccessToken: string; sessionId: string },
+  )
+  .handler(
+    async ({
+      data,
+    }): Promise<{ ok: boolean; error?: string; audienceCount?: number }> => {
+      const { url, key } = getEnv();
+      if (!url || !key) return { ok: false, error: "db_unavailable" };
+      const uid = await verifyUser(url, key, data.userAccessToken);
+      if (!uid) return { ok: false, error: "not_authenticated" };
 
-    const sessions: any[] = await sbFetch(
-      url, key,
-      `roast_sessions?id=eq.${data.sessionId}&select=id,is_public,status,max_audience,founder_id`,
-    ).catch(() => []);
-    const s = sessions?.[0];
-    if (!s || !s.is_public) return { ok: false, error: "session_not_found" };
-    if (!["scheduled", "lobby", "pitch_phase", "question_writing", "qa_phase"].includes(s.status)) {
-      return { ok: false, error: "session_closed" };
-    }
+      const sessions: any[] = await sbFetch(
+        url,
+        key,
+        `roast_sessions?id=eq.${data.sessionId}&select=id,is_public,status,max_audience,founder_id`,
+      ).catch(() => []);
+      const s = sessions?.[0];
+      if (!s || !s.is_public) return { ok: false, error: "session_not_found" };
+      if (
+        ![
+          "scheduled",
+          "lobby",
+          "pitch_phase",
+          "question_writing",
+          "qa_phase",
+        ].includes(s.status)
+      ) {
+        return { ok: false, error: "session_closed" };
+      }
 
-    const counted: any[] = await sbFetch(url, key, `roast_audience?session_id=eq.${data.sessionId}&role=eq.challenger&select=id`).catch(() => []);
-    const already: any[] = await sbFetch(url, key, `roast_audience?session_id=eq.${data.sessionId}&user_id=eq.${uid}&select=id`).catch(() => []);
-    if (!already?.length && (counted?.length ?? 0) >= s.max_audience) return { ok: false, error: "session_full" };
+      const counted: any[] = await sbFetch(
+        url,
+        key,
+        `roast_audience?session_id=eq.${data.sessionId}&role=eq.challenger&select=id`,
+      ).catch(() => []);
+      const already: any[] = await sbFetch(
+        url,
+        key,
+        `roast_audience?session_id=eq.${data.sessionId}&user_id=eq.${uid}&select=id`,
+      ).catch(() => []);
+      if (!already?.length && (counted?.length ?? 0) >= s.max_audience)
+        return { ok: false, error: "session_full" };
 
-    const [users, invProfiles]: [any[], any[]] = await Promise.all([
-      sbFetch(url, key, `users?id=eq.${uid}&select=full_name,role`).catch(() => []),
-      sbFetch(url, key, `investor_profiles?user_id=eq.${uid}&select=verification_tier`).catch(() => []),
-    ]);
-    const displayName = users?.[0]?.full_name ?? "Challenger";
-    const isVerifiedInvestor = !!invProfiles?.length && invProfiles[0]?.verification_tier === "verified";
+      const [users, invProfiles]: [any[], any[]] = await Promise.all([
+        sbFetch(url, key, `users?id=eq.${uid}&select=full_name,role`).catch(
+          () => [],
+        ),
+        sbFetch(
+          url,
+          key,
+          `investor_profiles?user_id=eq.${uid}&select=verification_tier`,
+        ).catch(() => []),
+      ]);
+      const displayName = users?.[0]?.full_name ?? "Challenger";
+      const isVerifiedInvestor =
+        !!invProfiles?.length &&
+        invProfiles[0]?.verification_tier === "verified";
 
-    if (!already?.length) {
-      await sbFetch(url, key, "roast_audience", "POST", {
-        session_id: data.sessionId,
-        user_id: uid,
-        display_name: displayName,
-        role: uid === s.founder_id ? "founder" : "challenger",
-        is_verified_investor: isVerifiedInvestor,
-      }, "return=minimal");
-    }
+      if (!already?.length) {
+        await sbFetch(
+          url,
+          key,
+          "roast_audience",
+          "POST",
+          {
+            session_id: data.sessionId,
+            user_id: uid,
+            display_name: displayName,
+            role: uid === s.founder_id ? "founder" : "challenger",
+            is_verified_investor: isVerifiedInvestor,
+          },
+          "return=minimal",
+        );
+      }
 
-    const after: any[] = await sbFetch(url, key, `roast_audience?session_id=eq.${data.sessionId}&role=eq.challenger&select=id`).catch(() => []);
-    return { ok: true, audienceCount: after?.length ?? 0 };
-  });
+      const after: any[] = await sbFetch(
+        url,
+        key,
+        `roast_audience?session_id=eq.${data.sessionId}&role=eq.challenger&select=id`,
+      ).catch(() => []);
+      return { ok: true, audienceCount: after?.length ?? 0 };
+    },
+  );
 
 // ── 3. Founder controls: start / end early / cancel ─────────────────────────
 
 export const controlRoast = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { userAccessToken: string; sessionId: string; action: "start" | "end_qa" | "cancel" })
-  .handler(async ({ data }): Promise<{ ok: boolean; error?: string; status?: string }> => {
-    const { url, key } = getEnv();
-    if (!url || !key) return { ok: false, error: "db_unavailable" };
-    const uid = await verifyUser(url, key, data.userAccessToken);
-    if (!uid) return { ok: false, error: "not_authenticated" };
+  .inputValidator(
+    (d: unknown) =>
+      d as {
+        userAccessToken: string;
+        sessionId: string;
+        action: "start" | "end_qa" | "cancel";
+      },
+  )
+  .handler(
+    async ({
+      data,
+    }): Promise<{ ok: boolean; error?: string; status?: string }> => {
+      const { url, key } = getEnv();
+      if (!url || !key) return { ok: false, error: "db_unavailable" };
+      const uid = await verifyUser(url, key, data.userAccessToken);
+      if (!uid) return { ok: false, error: "not_authenticated" };
 
-    const sessions: any[] = await sbFetch(url, key, `roast_sessions?id=eq.${data.sessionId}&select=*`).catch(() => []);
-    const s = sessions?.[0];
-    if (!s) return { ok: false, error: "session_not_found" };
-    if (s.founder_id !== uid) return { ok: false, error: "not_authorized" };
+      const sessions: any[] = await sbFetch(
+        url,
+        key,
+        `roast_sessions?id=eq.${data.sessionId}&select=*`,
+      ).catch(() => []);
+      const s = sessions?.[0];
+      if (!s) return { ok: false, error: "session_not_found" };
+      if (s.founder_id !== uid) return { ok: false, error: "not_authorized" };
 
-    const nowIso = new Date().toISOString();
+      const nowIso = new Date().toISOString();
 
-    if (data.action === "start") {
-      if (!["scheduled", "lobby"].includes(s.status)) return { ok: false, error: "wrong_state" };
-      const deadline = new Date(Date.now() + s.pitch_duration_seconds * 1000).toISOString();
-      await sbFetch(url, key, `roast_sessions?id=eq.${data.sessionId}`, "PATCH", {
-        status: "pitch_phase", started_at: nowIso, phase_deadline: deadline,
-      });
-      return { ok: true, status: "pitch_phase" };
-    }
+      if (data.action === "start") {
+        if (!["scheduled", "lobby"].includes(s.status))
+          return { ok: false, error: "wrong_state" };
+        const deadline = new Date(
+          Date.now() + s.pitch_duration_seconds * 1000,
+        ).toISOString();
+        await sbFetch(
+          url,
+          key,
+          `roast_sessions?id=eq.${data.sessionId}`,
+          "PATCH",
+          {
+            status: "pitch_phase",
+            started_at: nowIso,
+            phase_deadline: deadline,
+          },
+        );
+        return { ok: true, status: "pitch_phase" };
+      }
 
-    if (data.action === "end_qa") {
-      if (s.status !== "qa_phase") return { ok: false, error: "wrong_state" };
-      const deadline = new Date(Date.now() + 120 * 1000).toISOString();
-      await sbFetch(url, key, `roast_sessions?id=eq.${data.sessionId}`, "PATCH", {
-        status: "closing", phase_deadline: deadline,
-      });
-      return { ok: true, status: "closing" };
-    }
+      if (data.action === "end_qa") {
+        if (s.status !== "qa_phase") return { ok: false, error: "wrong_state" };
+        const deadline = new Date(Date.now() + 120 * 1000).toISOString();
+        await sbFetch(
+          url,
+          key,
+          `roast_sessions?id=eq.${data.sessionId}`,
+          "PATCH",
+          {
+            status: "closing",
+            phase_deadline: deadline,
+          },
+        );
+        return { ok: true, status: "closing" };
+      }
 
-    if (data.action === "cancel") {
-      if (!["scheduled", "lobby"].includes(s.status)) return { ok: false, error: "cannot_cancel_live" };
-      await sbFetch(url, key, `roast_sessions?id=eq.${data.sessionId}`, "PATCH", { status: "cancelled" });
-      return { ok: true, status: "cancelled" };
-    }
+      if (data.action === "cancel") {
+        if (!["scheduled", "lobby"].includes(s.status))
+          return { ok: false, error: "cannot_cancel_live" };
+        await sbFetch(
+          url,
+          key,
+          `roast_sessions?id=eq.${data.sessionId}`,
+          "PATCH",
+          { status: "cancelled" },
+        );
+        return { ok: true, status: "cancelled" };
+      }
 
-    return { ok: false, error: "unknown_action" };
-  });
+      return { ok: false, error: "unknown_action" };
+    },
+  );
 
 // ── 4. Deadline-driven auto-advance (idempotent, callable by anyone) ────────
 // Safe by construction: it only follows the server-side transition table
@@ -297,79 +493,123 @@ export const controlRoast = createServerFn({ method: "POST" })
 
 export const autoAdvanceRoast = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as { sessionId: string })
-  .handler(async ({ data }): Promise<{ ok: boolean; status?: string; raceRound?: number }> => {
-    const { url, key } = getEnv();
-    if (!url || !key) return { ok: false };
+  .handler(
+    async ({
+      data,
+    }): Promise<{ ok: boolean; status?: string; raceRound?: number }> => {
+      const { url, key } = getEnv();
+      if (!url || !key) return { ok: false };
 
-    const sessions: any[] = await sbFetch(url, key, `roast_sessions?id=eq.${data.sessionId}&select=*`).catch(() => []);
-    const s = sessions?.[0];
-    if (!s) return { ok: false };
+      const sessions: any[] = await sbFetch(
+        url,
+        key,
+        `roast_sessions?id=eq.${data.sessionId}&select=*`,
+      ).catch(() => []);
+      const s = sessions?.[0];
+      if (!s) return { ok: false };
 
-    const now = Date.now();
+      const now = Date.now();
 
-    // Keep the race round fresh during qa_phase (round N opens at
-    // qa_start + (N-1) * interval; qa_start = deadline - duration).
-    if (s.status === "qa_phase" && s.phase_deadline) {
-      const qaEnd = new Date(s.phase_deadline).getTime();
-      const qaStart = qaEnd - s.qa_duration_minutes * 60_000;
-      const expectedRound = Math.max(1, Math.min(
-        Math.floor((now - qaStart) / (s.race_interval_seconds * 1000)) + 1,
-        Math.ceil((s.qa_duration_minutes * 60) / s.race_interval_seconds),
-      ));
-      if (now < qaEnd && expectedRound !== s.current_race_round) {
-        await sbFetch(url, key, `roast_sessions?id=eq.${data.sessionId}&current_race_round=eq.${s.current_race_round}`, "PATCH", {
-          current_race_round: expectedRound,
+      // Keep the race round fresh during qa_phase (round N opens at
+      // qa_start + (N-1) * interval; qa_start = deadline - duration).
+      if (s.status === "qa_phase" && s.phase_deadline) {
+        const qaEnd = new Date(s.phase_deadline).getTime();
+        const qaStart = qaEnd - s.qa_duration_minutes * 60_000;
+        const expectedRound = Math.max(
+          1,
+          Math.min(
+            Math.floor((now - qaStart) / (s.race_interval_seconds * 1000)) + 1,
+            Math.ceil((s.qa_duration_minutes * 60) / s.race_interval_seconds),
+          ),
+        );
+        if (now < qaEnd && expectedRound !== s.current_race_round) {
+          await sbFetch(
+            url,
+            key,
+            `roast_sessions?id=eq.${data.sessionId}&current_race_round=eq.${s.current_race_round}`,
+            "PATCH",
+            {
+              current_race_round: expectedRound,
+            },
+          ).catch(() => null);
+          return { ok: true, status: s.status, raceRound: expectedRound };
+        }
+      }
+
+      if (!s.phase_deadline || now < new Date(s.phase_deadline).getTime()) {
+        return { ok: true, status: s.status, raceRound: s.current_race_round };
+      }
+
+      // Deadline passed — advance. Guard on current status+deadline.
+      const guard = `roast_sessions?id=eq.${data.sessionId}&status=eq.${s.status}&phase_deadline=eq.${encodeURIComponent(s.phase_deadline)}`;
+
+      if (s.status === "pitch_phase") {
+        const deadline = new Date(
+          now + s.question_writing_seconds * 1000,
+        ).toISOString();
+        await sbFetch(url, key, guard, "PATCH", {
+          status: "question_writing",
+          phase_deadline: deadline,
         }).catch(() => null);
-        return { ok: true, status: s.status, raceRound: expectedRound };
+        return { ok: true, status: "question_writing" };
       }
-    }
-
-    if (!s.phase_deadline || now < new Date(s.phase_deadline).getTime()) {
-      return { ok: true, status: s.status, raceRound: s.current_race_round };
-    }
-
-    // Deadline passed — advance. Guard on current status+deadline.
-    const guard = `roast_sessions?id=eq.${data.sessionId}&status=eq.${s.status}&phase_deadline=eq.${encodeURIComponent(s.phase_deadline)}`;
-
-    if (s.status === "pitch_phase") {
-      const deadline = new Date(now + s.question_writing_seconds * 1000).toISOString();
-      await sbFetch(url, key, guard, "PATCH", { status: "question_writing", phase_deadline: deadline }).catch(() => null);
-      return { ok: true, status: "question_writing" };
-    }
-    if (s.status === "question_writing") {
-      const deadline = new Date(now + s.qa_duration_minutes * 60_000).toISOString();
-      await sbFetch(url, key, guard, "PATCH", { status: "qa_phase", phase_deadline: deadline, current_race_round: 1 }).catch(() => null);
-      return { ok: true, status: "qa_phase", raceRound: 1 };
-    }
-    if (s.status === "qa_phase") {
-      const deadline = new Date(now + 120 * 1000).toISOString();
-      await sbFetch(url, key, guard, "PATCH", { status: "closing", phase_deadline: deadline }).catch(() => null);
-      return { ok: true, status: "closing" };
-    }
-    if (s.status === "closing") {
-      const writtenDeadline = new Date(now + 48 * 3600 * 1000).toISOString();
-      const patched = await sbFetch(url, key, guard, "PATCH", {
-        status: "written_phase", phase_deadline: null, ended_at: new Date(now).toISOString(), written_deadline_at: writtenDeadline,
-      }, "return=representation").catch(() => null);
-      if (patched?.length) {
-        await notify(url, key, {
-          user_id: s.founder_id,
-          title: "Live session complete — 48-hour written round is open",
-          body: "Answer every remaining question before the deadline to earn your Roast badge. Miss it and the session is permanently marked incomplete.",
-          action_url: `/app/roast/${data.sessionId}/answers`,
-          meta: { session_id: data.sessionId, deadline: writtenDeadline },
-        });
+      if (s.status === "question_writing") {
+        const deadline = new Date(
+          now + s.qa_duration_minutes * 60_000,
+        ).toISOString();
+        await sbFetch(url, key, guard, "PATCH", {
+          status: "qa_phase",
+          phase_deadline: deadline,
+          current_race_round: 1,
+        }).catch(() => null);
+        return { ok: true, status: "qa_phase", raceRound: 1 };
       }
-      return { ok: true, status: "written_phase" };
-    }
+      if (s.status === "qa_phase") {
+        const deadline = new Date(now + 120 * 1000).toISOString();
+        await sbFetch(url, key, guard, "PATCH", {
+          status: "closing",
+          phase_deadline: deadline,
+        }).catch(() => null);
+        return { ok: true, status: "closing" };
+      }
+      if (s.status === "closing") {
+        const writtenDeadline = new Date(now + 48 * 3600 * 1000).toISOString();
+        const patched = await sbFetch(
+          url,
+          key,
+          guard,
+          "PATCH",
+          {
+            status: "written_phase",
+            phase_deadline: null,
+            ended_at: new Date(now).toISOString(),
+            written_deadline_at: writtenDeadline,
+          },
+          "return=representation",
+        ).catch(() => null);
+        if (patched?.length) {
+          await notify(url, key, {
+            user_id: s.founder_id,
+            title: "Live session complete — 48-hour written round is open",
+            body: "Answer every remaining question before the deadline to earn your Roast badge. Miss it and the session is permanently marked incomplete.",
+            action_url: `/app/roast/${data.sessionId}/answers`,
+            meta: { session_id: data.sessionId, deadline: writtenDeadline },
+          });
+        }
+        return { ok: true, status: "written_phase" };
+      }
 
-    return { ok: true, status: s.status };
-  });
+      return { ok: true, status: s.status };
+    },
+  );
 
 // ── 5. Written question (Phase 2 onward, one per user) ──────────────────────
 
 export const submitWrittenQuestion = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { userAccessToken: string; sessionId: string; questionText: string })
+  .inputValidator(
+    (d: unknown) =>
+      d as { userAccessToken: string; sessionId: string; questionText: string },
+  )
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getEnv();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
@@ -377,193 +617,334 @@ export const submitWrittenQuestion = createServerFn({ method: "POST" })
     if (!uid) return { ok: false, error: "not_authenticated" };
 
     const text = (data.questionText ?? "").trim();
-    if (text.length < 10 || text.length > 500) return { ok: false, error: "question_length" };
+    if (text.length < 10 || text.length > 500)
+      return { ok: false, error: "question_length" };
 
-    const sessions: any[] = await sbFetch(url, key, `roast_sessions?id=eq.${data.sessionId}&select=id,status,founder_id`).catch(() => []);
+    const sessions: any[] = await sbFetch(
+      url,
+      key,
+      `roast_sessions?id=eq.${data.sessionId}&select=id,status,founder_id`,
+    ).catch(() => []);
     const s = sessions?.[0];
     if (!s) return { ok: false, error: "session_not_found" };
-    if (!["question_writing", "qa_phase"].includes(s.status)) return { ok: false, error: "questions_closed" };
+    if (!["question_writing", "qa_phase"].includes(s.status))
+      return { ok: false, error: "questions_closed" };
     if (s.founder_id === uid) return { ok: false, error: "founder_cannot_ask" };
 
-    const seats: any[] = await sbFetch(url, key, `roast_audience?session_id=eq.${data.sessionId}&user_id=eq.${uid}&select=display_name,is_verified_investor`).catch(() => []);
+    const seats: any[] = await sbFetch(
+      url,
+      key,
+      `roast_audience?session_id=eq.${data.sessionId}&user_id=eq.${uid}&select=display_name,is_verified_investor`,
+    ).catch(() => []);
     if (!seats?.length) return { ok: false, error: "join_first" };
 
     // One question per user: update while still written, never once live.
-    const existing: any[] = await sbFetch(url, key, `roast_questions?session_id=eq.${data.sessionId}&asker_id=eq.${uid}&select=id,phase`).catch(() => []);
+    const existing: any[] = await sbFetch(
+      url,
+      key,
+      `roast_questions?session_id=eq.${data.sessionId}&asker_id=eq.${uid}&select=id,phase`,
+    ).catch(() => []);
     if (existing?.length) {
-      if (existing[0].phase === "live") return { ok: false, error: "question_already_live" };
-      await sbFetch(url, key, `roast_questions?id=eq.${existing[0].id}`, "PATCH", { question_text: text, submitted_at: new Date().toISOString() });
+      if (existing[0].phase === "live")
+        return { ok: false, error: "question_already_live" };
+      await sbFetch(
+        url,
+        key,
+        `roast_questions?id=eq.${existing[0].id}`,
+        "PATCH",
+        { question_text: text, submitted_at: new Date().toISOString() },
+      );
       return { ok: true };
     }
 
-    await sbFetch(url, key, "roast_questions", "POST", {
-      session_id: data.sessionId,
-      asker_id: uid,
-      asker_name: seats[0].display_name,
-      asker_is_investor: seats[0].is_verified_investor,
-      question_text: text,
-      phase: "written",
-    }, "return=minimal");
+    await sbFetch(
+      url,
+      key,
+      "roast_questions",
+      "POST",
+      {
+        session_id: data.sessionId,
+        asker_id: uid,
+        asker_name: seats[0].display_name,
+        asker_is_investor: seats[0].is_verified_investor,
+        question_text: text,
+        phase: "written",
+      },
+      "return=minimal",
+    );
     return { ok: true };
   });
 
 // ── 6. The race (IMMEDIATE — this is the mechanic) ──────────────────────────
 
 export const submitRaceClick = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { userAccessToken: string; sessionId: string; round: number })
-  .handler(async ({ data }): Promise<{ ok: boolean; error?: string; rank?: number; madeIt?: boolean }> => {
-    const { url, key } = getEnv();
-    if (!url || !key) return { ok: false, error: "db_unavailable" };
-    const uid = await verifyUser(url, key, data.userAccessToken);
-    if (!uid) return { ok: false, error: "not_authenticated" };
+  .inputValidator(
+    (d: unknown) =>
+      d as { userAccessToken: string; sessionId: string; round: number },
+  )
+  .handler(
+    async ({
+      data,
+    }): Promise<{
+      ok: boolean;
+      error?: string;
+      rank?: number;
+      madeIt?: boolean;
+    }> => {
+      const { url, key } = getEnv();
+      if (!url || !key) return { ok: false, error: "db_unavailable" };
+      const uid = await verifyUser(url, key, data.userAccessToken);
+      if (!uid) return { ok: false, error: "not_authenticated" };
 
-    const resp = await fetch(`${url}/rest/v1/rpc/roast_submit_race_click`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", apikey: key, Authorization: `Bearer ${key}` },
-      body: JSON.stringify({ p_session_id: data.sessionId, p_user_id: uid, p_round: data.round }),
-    });
-    const text = await resp.text();
-    if (!resp.ok) {
-      const reason =
-        text.includes("wrong_round") ? "wrong_round" :
-        text.includes("not_in_qa_phase") ? "not_in_qa_phase" :
-        text.includes("no_eligible_question") ? "no_eligible_question" :
-        text.includes("duplicate key") ? "already_clicked" : "race_failed";
-      return { ok: false, error: reason };
-    }
-    const rows = JSON.parse(text) as Array<{ out_rank: number; made_it: boolean }>;
-    const r = rows?.[0];
-    if (!r) return { ok: false, error: "race_failed" };
-    return { ok: true, rank: r.out_rank, madeIt: r.made_it };
-  });
+      const resp = await fetch(`${url}/rest/v1/rpc/roast_submit_race_click`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+        },
+        body: JSON.stringify({
+          p_session_id: data.sessionId,
+          p_user_id: uid,
+          p_round: data.round,
+        }),
+      });
+      const text = await resp.text();
+      if (!resp.ok) {
+        const reason = text.includes("wrong_round")
+          ? "wrong_round"
+          : text.includes("not_in_qa_phase")
+            ? "not_in_qa_phase"
+            : text.includes("no_eligible_question")
+              ? "no_eligible_question"
+              : text.includes("duplicate key")
+                ? "already_clicked"
+                : "race_failed";
+        return { ok: false, error: reason };
+      }
+      const rows = JSON.parse(text) as Array<{
+        out_rank: number;
+        made_it: boolean;
+      }>;
+      const r = rows?.[0];
+      if (!r) return { ok: false, error: "race_failed" };
+      return { ok: true, rank: r.out_rank, madeIt: r.made_it };
+    },
+  );
 
 // ── 7. Founder marks a live question answered (control panel) ───────────────
 
 export const markLiveQuestionAnswered = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { userAccessToken: string; sessionId: string; questionId: string })
+  .inputValidator(
+    (d: unknown) =>
+      d as { userAccessToken: string; sessionId: string; questionId: string },
+  )
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getEnv();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
     const uid = await verifyUser(url, key, data.userAccessToken);
     if (!uid) return { ok: false, error: "not_authenticated" };
 
-    const sessions: any[] = await sbFetch(url, key, `roast_sessions?id=eq.${data.sessionId}&select=founder_id`).catch(() => []);
-    if (sessions?.[0]?.founder_id !== uid) return { ok: false, error: "not_authorized" };
+    const sessions: any[] = await sbFetch(
+      url,
+      key,
+      `roast_sessions?id=eq.${data.sessionId}&select=founder_id`,
+    ).catch(() => []);
+    if (sessions?.[0]?.founder_id !== uid)
+      return { ok: false, error: "not_authorized" };
 
-    await sbFetch(url, key, `roast_questions?id=eq.${data.questionId}&session_id=eq.${data.sessionId}&phase=eq.live`, "PATCH", {
-      is_answered: true,
-      answered_at: new Date().toISOString(),
-      answer_text: "Answered live on video during the session.",
-    });
+    await sbFetch(
+      url,
+      key,
+      `roast_questions?id=eq.${data.questionId}&session_id=eq.${data.sessionId}&phase=eq.live`,
+      "PATCH",
+      {
+        is_answered: true,
+        answered_at: new Date().toISOString(),
+        answer_text: "Answered live on video during the session.",
+      },
+    );
     return { ok: true };
   });
 
 // ── 8. Written answers with the quality gate ─────────────────────────────────
 
-const NON_ANSWER_RE = /^(yes|no|noted|correct|maybe|sure|ok|okay|n\/a|na|true|false)[.!\s]*$/i;
+const NON_ANSWER_RE =
+  /^(yes|no|noted|correct|maybe|sure|ok|okay|n\/a|na|true|false)[.!\s]*$/i;
 
 export const submitFounderAnswer = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as {
-    userAccessToken: string;
-    sessionId: string;
-    questionId: string;
-    answerText: string;
-    confirmFlag?: boolean; // founder explicitly stands by a flagged answer
-    flagNote?: string;
-  })
-  .handler(async ({ data }): Promise<{ ok: boolean; error?: string; flagged?: "too_short" | "non_answer" | null; allAnswered?: boolean }> => {
-    const { url, key } = getEnv();
-    if (!url || !key) return { ok: false, error: "db_unavailable" };
-    const uid = await verifyUser(url, key, data.userAccessToken);
-    if (!uid) return { ok: false, error: "not_authenticated" };
+  .inputValidator(
+    (d: unknown) =>
+      d as {
+        userAccessToken: string;
+        sessionId: string;
+        questionId: string;
+        answerText: string;
+        confirmFlag?: boolean; // founder explicitly stands by a flagged answer
+        flagNote?: string;
+      },
+  )
+  .handler(
+    async ({
+      data,
+    }): Promise<{
+      ok: boolean;
+      error?: string;
+      flagged?: "too_short" | "non_answer" | null;
+      allAnswered?: boolean;
+    }> => {
+      const { url, key } = getEnv();
+      if (!url || !key) return { ok: false, error: "db_unavailable" };
+      const uid = await verifyUser(url, key, data.userAccessToken);
+      if (!uid) return { ok: false, error: "not_authenticated" };
 
-    const sessions: any[] = await sbFetch(url, key, `roast_sessions?id=eq.${data.sessionId}&select=*`).catch(() => []);
-    const s = sessions?.[0];
-    if (!s) return { ok: false, error: "session_not_found" };
-    if (s.founder_id !== uid) return { ok: false, error: "not_authorized" };
-    if (s.status !== "written_phase") return { ok: false, error: "not_in_written_phase" };
-    if (s.written_deadline_at && Date.now() > new Date(s.written_deadline_at).getTime()) {
-      return { ok: false, error: "deadline_passed" };
-    }
+      const sessions: any[] = await sbFetch(
+        url,
+        key,
+        `roast_sessions?id=eq.${data.sessionId}&select=*`,
+      ).catch(() => []);
+      const s = sessions?.[0];
+      if (!s) return { ok: false, error: "session_not_found" };
+      if (s.founder_id !== uid) return { ok: false, error: "not_authorized" };
+      if (s.status !== "written_phase")
+        return { ok: false, error: "not_in_written_phase" };
+      if (
+        s.written_deadline_at &&
+        Date.now() > new Date(s.written_deadline_at).getTime()
+      ) {
+        return { ok: false, error: "deadline_passed" };
+      }
 
-    const answer = (data.answerText ?? "").trim();
-    if (!answer) return { ok: false, error: "empty_answer" };
+      const answer = (data.answerText ?? "").trim();
+      if (!answer) return { ok: false, error: "empty_answer" };
 
-    // Quality gate (confirmed rule): <50 chars or bare yes/no/etc. → flagged.
-    const flag: "too_short" | "non_answer" | null =
-      answer.length < 50 ? "too_short" : NON_ANSWER_RE.test(answer) ? "non_answer" : null;
+      // Quality gate (confirmed rule): <50 chars or bare yes/no/etc. → flagged.
+      // Check the non-answer pattern first — bare "yes"/"no" is always under
+      // 50 chars, so the length check would otherwise shadow it.
+      const flag: "too_short" | "non_answer" | null = NON_ANSWER_RE.test(answer)
+        ? "non_answer"
+        : answer.length < 50
+          ? "too_short"
+          : null;
 
-    if (flag && !data.confirmFlag) {
-      // Saved but not counted — founder must improve or explicitly confirm.
-      await sbFetch(url, key, `roast_questions?id=eq.${data.questionId}&session_id=eq.${data.sessionId}`, "PATCH", {
-        answer_text: answer, answered_at: new Date().toISOString(),
-        is_answered: false, answer_flag: flag, flag_acknowledged: false, flag_note: null,
-      });
-      return { ok: true, flagged: flag, allAnswered: false };
-    }
+      if (flag && !data.confirmFlag) {
+        // Saved but not counted — founder must improve or explicitly confirm.
+        await sbFetch(
+          url,
+          key,
+          `roast_questions?id=eq.${data.questionId}&session_id=eq.${data.sessionId}`,
+          "PATCH",
+          {
+            answer_text: answer,
+            answered_at: new Date().toISOString(),
+            is_answered: false,
+            answer_flag: flag,
+            flag_acknowledged: false,
+            flag_note: null,
+          },
+        );
+        return { ok: true, flagged: flag, allAnswered: false };
+      }
 
-    await sbFetch(url, key, `roast_questions?id=eq.${data.questionId}&session_id=eq.${data.sessionId}`, "PATCH", {
-      answer_text: answer,
-      answered_at: new Date().toISOString(),
-      is_answered: true,
-      answer_flag: flag, // a confirmed flag stays visible — the record is honest
-      flag_acknowledged: !!flag,
-      flag_note: flag ? (data.flagNote ?? "Founder confirmed this answer as final.") : null,
-    });
+      await sbFetch(
+        url,
+        key,
+        `roast_questions?id=eq.${data.questionId}&session_id=eq.${data.sessionId}`,
+        "PATCH",
+        {
+          answer_text: answer,
+          answered_at: new Date().toISOString(),
+          is_answered: true,
+          answer_flag: flag, // a confirmed flag stays visible — the record is honest
+          flag_acknowledged: !!flag,
+          flag_note: flag
+            ? (data.flagNote ?? "Founder confirmed this answer as final.")
+            : null,
+        },
+      );
 
-    // Notify the asker their question got answered (retention loop)
-    const q: any[] = await sbFetch(url, key, `roast_questions?id=eq.${data.questionId}&select=asker_id,question_text`).catch(() => []);
-    if (q?.[0]?.asker_id) {
-      await notify(url, key, {
-        user_id: q[0].asker_id,
-        title: "Your Roast question was answered",
-        body: `"${(q[0].question_text as string).slice(0, 80)}…" — read the founder's written answer.`,
-        action_url: `/roast/${data.sessionId}`,
-        meta: { session_id: data.sessionId, question_id: data.questionId },
-      });
-    }
+      // Notify the asker their question got answered (retention loop)
+      const q: any[] = await sbFetch(
+        url,
+        key,
+        `roast_questions?id=eq.${data.questionId}&select=asker_id,question_text`,
+      ).catch(() => []);
+      if (q?.[0]?.asker_id) {
+        await notify(url, key, {
+          user_id: q[0].asker_id,
+          title: "Your Roast question was answered",
+          body: `"${(q[0].question_text as string).slice(0, 80)}…" — read the founder's written answer.`,
+          action_url: `/roast/${data.sessionId}`,
+          meta: { session_id: data.sessionId, question_id: data.questionId },
+        });
+      }
 
-    // Completion check: every non-removed question answered, zero
-    // unacknowledged flags.
-    const open: any[] = await sbFetch(
-      url, key,
-      `roast_questions?session_id=eq.${data.sessionId}&removed_at=is.null&or=(is_answered.eq.false,and(answer_flag.not.is.null,flag_acknowledged.eq.false))&select=id`,
-    ).catch(() => []);
-    const allAnswered = (open?.length ?? 0) === 0;
-    if (allAnswered) {
-      await finalizeRoastCompletion(url, key, s);
-    }
-    return { ok: true, flagged: flag ?? null, allAnswered };
-  });
+      // Completion check: every non-removed question answered, zero
+      // unacknowledged flags.
+      const open: any[] = await sbFetch(
+        url,
+        key,
+        `roast_questions?session_id=eq.${data.sessionId}&removed_at=is.null&or=(is_answered.eq.false,and(answer_flag.not.is.null,flag_acknowledged.eq.false))&select=id`,
+      ).catch(() => []);
+      const allAnswered = (open?.length ?? 0) === 0;
+      if (allAnswered) {
+        await finalizeRoastCompletion(url, key, s);
+      }
+      return { ok: true, flagged: flag ?? null, allAnswered };
+    },
+  );
 
 // ── 9. Completion: badge + report ────────────────────────────────────────────
 
-async function finalizeRoastCompletion(url: string, key: string, s: any): Promise<void> {
+async function finalizeRoastCompletion(
+  url: string,
+  key: string,
+  s: any,
+): Promise<void> {
   // Guarded transition — only once
-  const patched: any[] = await sbFetch(
-    url, key,
-    `roast_sessions?id=eq.${s.id}&status=eq.written_phase`, "PATCH",
-    { status: "completed" }, "return=representation",
-  ).catch(() => null) as any[];
+  const patched: any[] = (await sbFetch(
+    url,
+    key,
+    `roast_sessions?id=eq.${s.id}&status=eq.written_phase`,
+    "PATCH",
+    { status: "completed" },
+    "return=representation",
+  ).catch(() => null)) as any[];
   if (!patched?.length) return;
 
   // Award Roast Survivor with level metadata (roast_champion stays reserved
   // for cohort judging). Direct insert — this badge is event-driven, not
   // criteria-scanned by the auto engine.
-  const already: any[] = await sbFetch(url, key, `profile_badges?startup_id=eq.${s.startup_id}&badge_type=eq.roast_survivor&select=id`).catch(() => []);
+  const already: any[] = await sbFetch(
+    url,
+    key,
+    `profile_badges?startup_id=eq.${s.startup_id}&badge_type=eq.roast_survivor&select=id`,
+  ).catch(() => []);
   if (!already?.length) {
-    await sbFetch(url, key, "profile_badges", "POST", {
-      startup_id: s.startup_id,
-      badge_type: "roast_survivor",
-      badge_label: "Roast Survivor",
-      badge_source: "hockystick",
-      verified_by_hockystick: true,
-      verification_evidence: { level: s.level, session_id: s.id, completed_at: new Date().toISOString() },
-      issued_at: new Date().toISOString(),
-    }, "return=minimal").catch((e) => console.error("[roast] badge insert failed:", e?.message));
+    await sbFetch(
+      url,
+      key,
+      "profile_badges",
+      "POST",
+      {
+        startup_id: s.startup_id,
+        badge_type: "roast_survivor",
+        badge_label: "Roast Survivor",
+        badge_source: "hockystick",
+        verified_by_hockystick: true,
+        verification_evidence: {
+          level: s.level,
+          session_id: s.id,
+          completed_at: new Date().toISOString(),
+        },
+        issued_at: new Date().toISOString(),
+      },
+      "return=minimal",
+    ).catch((e) => console.error("[roast] badge insert failed:", e?.message));
   }
   await sbFetch(url, key, `roast_sessions?id=eq.${s.id}`, "PATCH", {
-    badge_awarded: true, badge_awarded_at: new Date().toISOString(),
+    badge_awarded: true,
+    badge_awarded_at: new Date().toISOString(),
   }).catch(() => null);
 
   await notify(url, key, {
@@ -575,7 +956,9 @@ async function finalizeRoastCompletion(url: string, key: string, s: any): Promis
   });
 
   // Roast Report — fire and forget; failures logged, regenerable manually.
-  generateRoastReportInternal(url, key, s.id).catch((e) => console.error("[roast] report generation failed:", e?.message ?? e));
+  generateRoastReportInternal(url, key, s.id).catch((e) =>
+    console.error("[roast] report generation failed:", e?.message ?? e),
+  );
 }
 
 // ── 10. Roast Report (AI) — credibility flags in DD-engine format ───────────
@@ -602,17 +985,33 @@ Your job:
 Return JSON only:
 { "pitch_summary": str, "question_themes": [...], "strongest_area": str, "weakest_area": str, "pattern": str, "credibility_flags": [...] }`;
 
-async function generateRoastReportInternal(url: string, key: string, sessionId: string): Promise<void> {
+async function generateRoastReportInternal(
+  url: string,
+  key: string,
+  sessionId: string,
+): Promise<void> {
   const { openaiKey } = getEnv();
   if (!openaiKey) throw new Error("ai_unavailable");
 
-  const sessions: any[] = await sbFetch(url, key, `roast_sessions?id=eq.${sessionId}&select=*`);
+  const sessions: any[] = await sbFetch(
+    url,
+    key,
+    `roast_sessions?id=eq.${sessionId}&select=*`,
+  );
   const s = sessions?.[0];
   if (!s) throw new Error("session_not_found");
 
   const [startups, questions]: [any[], any[]] = await Promise.all([
-    sbFetch(url, key, `startups?id=eq.${s.startup_id}&select=company_name,one_liner,tagline,sector,stage,mrr_usd,revenue,growth_rate,team_size,funding_target,traction,investor_narrative`),
-    sbFetch(url, key, `roast_questions?session_id=eq.${sessionId}&removed_at=is.null&select=question_text,answer_text,phase,is_answered,answer_flag,flag_acknowledged&order=display_order.asc.nullslast,submitted_at.asc`),
+    sbFetch(
+      url,
+      key,
+      `startups?id=eq.${s.startup_id}&select=company_name,one_liner,tagline,sector,stage,mrr_usd,revenue,growth_rate,team_size,funding_target,traction,investor_narrative`,
+    ),
+    sbFetch(
+      url,
+      key,
+      `roast_questions?session_id=eq.${sessionId}&removed_at=is.null&select=question_text,answer_text,phase,is_answered,answer_flag,flag_acknowledged&order=display_order.asc.nullslast,submitted_at.asc`,
+    ),
   ]);
 
   const live = (questions ?? []).filter((q) => q.phase === "live");
@@ -629,7 +1028,10 @@ async function generateRoastReportInternal(url: string, key: string, sessionId: 
 
   const resp = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${openaiKey}` },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${openaiKey}`,
+    },
     body: JSON.stringify({
       model: "gpt-4o",
       temperature: 0.2,
@@ -642,10 +1044,18 @@ async function generateRoastReportInternal(url: string, key: string, sessionId: 
     }),
   });
   const json: any = await resp.json();
-  const parsed = JSON.parse((json.choices?.[0]?.message?.content ?? "{}").trim());
+  const parsed = JSON.parse(
+    (json.choices?.[0]?.message?.content ?? "{}").trim(),
+  );
 
-  const flags: RoastCredibilityFlag[] = (Array.isArray(parsed.credibility_flags) ? parsed.credibility_flags : [])
-    .filter((f: any) => ["contradiction", "deflection", "inconsistency"].includes(f?.finding_type))
+  const flags: RoastCredibilityFlag[] = (
+    Array.isArray(parsed.credibility_flags) ? parsed.credibility_flags : []
+  )
+    .filter((f: any) =>
+      ["contradiction", "deflection", "inconsistency"].includes(
+        f?.finding_type,
+      ),
+    )
     .map((f: any) => ({ ...f, source: "roast" as const }));
 
   const answeredLive = live.filter((q) => q.is_answered).length;
@@ -653,7 +1063,9 @@ async function generateRoastReportInternal(url: string, key: string, sessionId: 
 
   const report: RoastReport = {
     pitch_summary: parsed.pitch_summary ?? "",
-    question_themes: Array.isArray(parsed.question_themes) ? parsed.question_themes : [],
+    question_themes: Array.isArray(parsed.question_themes)
+      ? parsed.question_themes
+      : [],
     live_direct_answer_rate: `${answeredLive}/${live.length}`,
     written_completion: `${answeredWritten}/${written.length}`,
     strongest_area: parsed.strongest_area ?? "",
@@ -664,23 +1076,31 @@ async function generateRoastReportInternal(url: string, key: string, sessionId: 
   };
 
   await sbFetch(url, key, `roast_sessions?id=eq.${sessionId}`, "PATCH", {
-    report, report_generated_at: new Date().toISOString(),
+    report,
+    report_generated_at: new Date().toISOString(),
   });
 }
 
 /** Manual regeneration — founder or platform can rebuild the report. */
 export const regenerateRoastReport = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { userAccessToken: string; sessionId: string })
+  .inputValidator(
+    (d: unknown) => d as { userAccessToken: string; sessionId: string },
+  )
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getEnv();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
     const uid = await verifyUser(url, key, data.userAccessToken);
     if (!uid) return { ok: false, error: "not_authenticated" };
-    const sessions: any[] = await sbFetch(url, key, `roast_sessions?id=eq.${data.sessionId}&select=founder_id,status`).catch(() => []);
+    const sessions: any[] = await sbFetch(
+      url,
+      key,
+      `roast_sessions?id=eq.${data.sessionId}&select=founder_id,status`,
+    ).catch(() => []);
     const s = sessions?.[0];
     if (!s) return { ok: false, error: "session_not_found" };
     if (s.founder_id !== uid) return { ok: false, error: "not_authorized" };
-    if (!["completed", "expired"].includes(s.status)) return { ok: false, error: "session_not_finished" };
+    if (!["completed", "expired"].includes(s.status))
+      return { ok: false, error: "session_not_finished" };
     try {
       await generateRoastReportInternal(url, key, data.sessionId);
       return { ok: true };
@@ -700,17 +1120,21 @@ export const expireOverdueRoasts = createServerFn({ method: "POST" })
     if (!url || !key) return { ok: false, expired: 0 };
 
     const overdue: any[] = await sbFetch(
-      url, key,
+      url,
+      key,
       `roast_sessions?status=eq.written_phase&written_deadline_at=lt.${encodeURIComponent(new Date().toISOString())}&select=id,founder_id,level`,
     ).catch(() => []);
 
     let expired = 0;
     for (const s of overdue ?? []) {
-      const patched: any[] = await sbFetch(
-        url, key,
-        `roast_sessions?id=eq.${s.id}&status=eq.written_phase`, "PATCH",
-        { status: "expired" }, "return=representation",
-      ).catch(() => null) as any[];
+      const patched: any[] = (await sbFetch(
+        url,
+        key,
+        `roast_sessions?id=eq.${s.id}&status=eq.written_phase`,
+        "PATCH",
+        { status: "expired" },
+        "return=representation",
+      ).catch(() => null)) as any[];
       if (patched?.length) {
         expired++;
         await notify(url, key, {
@@ -728,7 +1152,6 @@ export const expireOverdueRoasts = createServerFn({ method: "POST" })
     return { ok: true, expired };
   });
 
-
 // ── 12. Public state loader ──────────────────────────────────────────────────
 // roast_questions has NO public RLS on purpose — this loader is the only
 // public read path and it redacts: question text is exposed only once a
@@ -742,35 +1165,56 @@ export const getRoastPublicState = createServerFn({ method: "POST" })
     const { url, key } = getEnv();
     if (!url || !key) return { ok: false as const, error: "db_unavailable" };
 
-    const sessions: any[] = await sbFetch(url, key, `roast_sessions?id=eq.${data.sessionId}&select=*`).catch(() => []);
+    const sessions: any[] = await sbFetch(
+      url,
+      key,
+      `roast_sessions?id=eq.${data.sessionId}&select=*`,
+    ).catch(() => []);
     const s = sessions?.[0];
-    if (!s || !s.is_public) return { ok: false as const, error: "session_not_found" };
+    if (!s || !s.is_public)
+      return { ok: false as const, error: "session_not_found" };
 
-    const [startups, audience, questions]: [any[], any[], any[]] = await Promise.all([
-      sbFetch(url, key, `startups?id=eq.${s.startup_id}&select=id,company_name,one_liner,tagline,sector,stage,profile_slug,logo_url,founder_name`).catch(() => []),
-      sbFetch(url, key, `roast_audience?session_id=eq.${data.sessionId}&select=user_id,display_name,role,is_verified_investor`).catch(() => []),
-      sbFetch(url, key, `roast_questions?session_id=eq.${data.sessionId}&select=id,asker_name,asker_is_investor,question_text,phase,race_round,answer_text,answered_at,is_answered,answer_flag,flag_acknowledged,flag_note,removed_at,display_order,submitted_at&order=display_order.asc.nullslast,submitted_at.asc`).catch(() => []),
-    ]);
+    const [startups, audience, questions]: [any[], any[], any[]] =
+      await Promise.all([
+        sbFetch(
+          url,
+          key,
+          `startups?id=eq.${s.startup_id}&select=id,company_name,one_liner,tagline,sector,stage,profile_slug,logo_url,founder_name`,
+        ).catch(() => []),
+        sbFetch(
+          url,
+          key,
+          `roast_audience?session_id=eq.${data.sessionId}&select=user_id,display_name,role,is_verified_investor`,
+        ).catch(() => []),
+        sbFetch(
+          url,
+          key,
+          `roast_questions?session_id=eq.${data.sessionId}&select=id,asker_name,asker_is_investor,question_text,phase,race_round,answer_text,answered_at,is_answered,answer_flag,flag_acknowledged,flag_note,removed_at,display_order,submitted_at&order=display_order.asc.nullslast,submitted_at.asc`,
+        ).catch(() => []),
+      ]);
 
     const removedCount = (questions ?? []).filter((q) => q.removed_at).length;
-    const visible = (questions ?? []).filter((q) => !q.removed_at).map((q) => {
-      const textVisible = q.phase === "live" || q.is_answered;
-      return {
-        id: q.id,
-        asker_name: q.asker_name,
-        asker_is_investor: q.asker_is_investor,
-        phase: q.phase,
-        race_round: q.race_round,
-        is_answered: q.is_answered,
-        answered_at: q.answered_at,
-        display_order: q.display_order,
-        // Redaction: written+unanswered questions show the asker, never the text
-        question_text: textVisible ? q.question_text : null,
-        answer_text: q.is_answered ? q.answer_text : null,
-        answer_flag: q.is_answered && q.flag_acknowledged ? q.answer_flag : null,
-        flag_note: q.is_answered && q.flag_acknowledged ? q.flag_note : null,
-      };
-    });
+    const visible = (questions ?? [])
+      .filter((q) => !q.removed_at)
+      .map((q) => {
+        const textVisible = q.phase === "live" || q.is_answered;
+        return {
+          id: q.id,
+          asker_name: q.asker_name,
+          asker_is_investor: q.asker_is_investor,
+          phase: q.phase,
+          race_round: q.race_round,
+          is_answered: q.is_answered,
+          answered_at: q.answered_at,
+          display_order: q.display_order,
+          // Redaction: written+unanswered questions show the asker, never the text
+          question_text: textVisible ? q.question_text : null,
+          answer_text: q.is_answered ? q.answer_text : null,
+          answer_flag:
+            q.is_answered && q.flag_acknowledged ? q.answer_flag : null,
+          flag_note: q.is_answered && q.flag_acknowledged ? q.flag_note : null,
+        };
+      });
 
     // Strip internals the public page has no business seeing
     const { daily_room_name: _n, ...publicSession } = s;
@@ -780,8 +1224,14 @@ export const getRoastPublicState = createServerFn({ method: "POST" })
       serverNow: new Date().toISOString(),
       session: publicSession,
       startup: startups?.[0] ?? null,
-      audienceCount: (audience ?? []).filter((a) => a.role === "challenger").length,
-      audience: (audience ?? []).map((a) => ({ user_id: a.user_id, display_name: a.display_name, role: a.role, is_verified_investor: a.is_verified_investor })),
+      audienceCount: (audience ?? []).filter((a) => a.role === "challenger")
+        .length,
+      audience: (audience ?? []).map((a) => ({
+        user_id: a.user_id,
+        display_name: a.display_name,
+        role: a.role,
+        is_verified_investor: a.is_verified_investor,
+      })),
       questions: visible,
       removedCount,
     };
