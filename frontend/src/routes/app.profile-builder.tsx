@@ -26,7 +26,7 @@ export const Route = createFileRoute("/app/profile-builder")({
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type Screen = "select" | "upload" | "interview" | "extracting" | "confirm";
+type Screen = "select" | "upload" | "interview" | "extracting" | "confirm" | "done";
 
 interface ExtractedProfile {
   company_name: string | null;
@@ -654,7 +654,8 @@ function ProfileBuilder() {
       }
 
       toast.success("Profile saved!");
-      navigate({ to: "/app" as any });
+      // Don't dump the founder onto the dashboard — show the next step.
+      setScreen("done");
     } catch (err: any) {
       toast.error(err.message || "Save failed");
     } finally {
@@ -707,6 +708,39 @@ function ProfileBuilder() {
   );
 
   if (screen === "extracting") return <ExtractingScreen />;
+
+  // done — profile saved, point at the next step instead of the dashboard
+  if (screen === "done") return (
+    <div style={{ minHeight: "100vh", background: "#0A0A0B", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 16px" }}>
+      <div style={{ maxWidth: 520, width: "100%", textAlign: "center" }}>
+        <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(16,185,129,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+          <Check size={26} style={{ color: "#10B981" }} />
+        </div>
+        <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: 26, color: "#fff", letterSpacing: "-0.03em", marginBottom: 10 }}>
+          Profile built.
+        </h2>
+        <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.6, marginBottom: 28 }}>
+          Now verify your identity to unlock your deal room and appear in the directory.
+          Four automatic checks, about two minutes.
+        </p>
+        <button
+          onClick={() => navigate({ to: "/app/advisor" as any })}
+          data-testid="pb-done-verify-cta"
+          style={{ background: "#7C3AED", color: "#fff", border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "Syne, sans-serif" }}
+        >
+          Run verification →
+        </button>
+        <div style={{ marginTop: 16 }}>
+          <button
+            onClick={() => navigate({ to: "/app" as any })}
+            style={{ background: "transparent", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 13, cursor: "pointer" }}
+          >
+            Skip for now — go to dashboard
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   // confirm
   return (
