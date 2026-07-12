@@ -599,6 +599,18 @@ function Profile() {
       } else {
         toast.success("Profile saved");
         queryClient.invalidateQueries({ queryKey: ["my-startup", user.id] });
+        // Regenerate the fundraising readiness checklist in the background
+        const checklistStartupId = existing?.id ?? newStartupId;
+        if (checklistStartupId) {
+          supabase.auth.getSession().then(({ data: { session } }) => {
+            if (!session) return;
+            import("@/lib/profile-checklist-fn").then(({ generateFounderChecklist }) =>
+              generateFounderChecklist({ data: { userAccessToken: session.access_token, startupId: checklistStartupId } })
+            ).then(() => {
+              queryClient.invalidateQueries({ queryKey: ["profile-checklist"] });
+            }).catch((e) => console.error("[checklist] background run failed:", e));
+          });
+        }
         queryClient.invalidateQueries({ queryKey: ["my-startup-overview"] });
         queryClient.invalidateQueries({ queryKey: ["shell-startup", user.id] });
         setMode("view");

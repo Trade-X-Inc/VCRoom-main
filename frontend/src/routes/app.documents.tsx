@@ -348,6 +348,15 @@ function Documents() {
       toast.success(`${templateName} uploaded`);
       // Badge evaluation — fire-and-forget on this write event
       import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { startup_id: startup?.id } })).catch(() => {});
+      // Readiness checklist refresh — new documents change the gap analysis
+      if (startup?.id) {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (!session) return;
+          import("@/lib/profile-checklist-fn").then(({ generateFounderChecklist }) =>
+            generateFounderChecklist({ data: { userAccessToken: session.access_token, startupId: startup.id } })
+          ).catch((e) => console.error("[checklist] background run failed:", e));
+        });
+      }
       refetchFounderDocs();
       const { logActivity } = await import("@/lib/activity-log-fn");
       logActivity({
