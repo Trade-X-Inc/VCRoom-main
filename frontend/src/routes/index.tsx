@@ -68,6 +68,48 @@ function Landing() {
   }, []);
   return (
     <div style={{ background: "#0A0A0B" }}>
+      {/* SoftwareApplication structured data — what AI crawlers and search
+          engines read when asked what Hockystick is. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "Hockystick",
+            applicationCategory: "BusinessApplication",
+            operatingSystem: "Web",
+            description:
+              "AI-native deal flow platform for founders and investors in GCC & MENA. Verified profiles, NDA-gated deal rooms, structured due diligence, and recorded investment decisions.",
+            offers: {
+              "@type": "Offer",
+              price: "49",
+              priceCurrency: "USD",
+              priceSpecification: {
+                "@type": "RecurringChargeSpecification",
+                billingDuration: "P1M",
+              },
+            },
+            featureList: [
+              "AI-powered founder profile extraction",
+              "Evidence-based 5-tier verification system",
+              "NDA-gated deal rooms with 6-stage workflow",
+              "Confrontational AI due diligence analysis",
+              "Investment memo generation",
+              "Fundraising readiness scoring",
+              "Badge and credential system",
+              "Connection request to deal room automation",
+            ],
+            applicationSubCategory: "Fundraising · Due Diligence · Deal Flow Management",
+            provider: {
+              "@type": "Organization",
+              name: "Hockystick",
+              url: "https://hockystick.app",
+              location: "DIFC, Dubai, UAE",
+            },
+          }),
+        }}
+      />
       <SiteHeader />
       <Hero />
       <SocialProofBar />
