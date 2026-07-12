@@ -30,6 +30,8 @@ interface Startup {
   stage?: string | null;
   target_raise?: number | null;
   founder_id?: string;
+  profile_published?: boolean | null;
+  publicly_discoverable?: boolean | null;
 }
 
 interface Activity {
@@ -515,6 +517,20 @@ function Overview() {
     },
   });
 
+  // Journey state: has the founder passed Tier 1 identity verification?
+  const { data: tier1Passed = false } = useQuery<boolean>({
+    queryKey: ["tier1-passed", startup?.id],
+    enabled: !!startup?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("founder_verifications")
+        .select("tier1_passed")
+        .eq("startup_id", startup!.id)
+        .maybeSingle();
+      return !!data?.tier1_passed;
+    },
+  });
+
   // Returning-user queries
   const { data: meetingCount = 0 } = useQuery<number>({
     queryKey: ["meeting-count", startup?.id],
@@ -654,7 +670,12 @@ function Overview() {
   });
 
   const isQueriesLoading = !user?.id || startupLoading || leadLoading;
-  const isNewUser = !isQueriesLoading && !startup && leadCount === 0;
+  // Guided journey persists until the profile is live in the directory —
+  // previously it vanished as soon as a startup row existed, dropping
+  // mid-journey founders onto a dashboard of empty widgets.
+  const isNewUser =
+    !isQueriesLoading &&
+    (!startup || (!startup.profile_published && dealRoomCount === 0 && leadCount === 0));
 
   // ── Loading state ────────────────────────────────────────────────
   if (isQueriesLoading) {
@@ -667,17 +688,48 @@ function Overview() {
 
   // ── FIX 2 — New user onboarding view ────────────────────────────
   if (isNewUser) {
-    const completedSteps =
-      (startup ? 1 : 0) + (leadCount > 0 ? 1 : 0) + (dealRoomCount > 0 ? 1 : 0);
-    const progressPct = Math.round((completedSteps / 4) * 100);
+    // One sequential path: build → verify → publish. One primary CTA at a
+    // time — a brand-new founder should never face four parallel choices.
+    const journeySteps = [
+      {
+        key: "build",
+        done: !!startup,
+        title: "Build your profile",
+        time: "~10 minutes",
+        description: "Answer a short AI interview or upload your pitch deck. We turn it into an investor-ready profile.",
+        cta: "Build your profile",
+        to: "/app/profile-builder",
+      },
+      {
+        key: "verify",
+        done: tier1Passed,
+        title: "Verify your identity",
+        time: "~2 minutes",
+        description: "Four automatic checks — email domain, website, public registry, mail infrastructure. Investors see exactly what was confirmed.",
+        cta: "Run identity check",
+        to: "/app/advisor",
+      },
+      {
+        key: "publish",
+        done: !!startup?.profile_published,
+        title: "Publish to the directory",
+        time: "~1 minute",
+        description: "Go live so investors can find you and request access — no warm intro needed.",
+        cta: "Publish your profile",
+        to: "/app/profile",
+      },
+    ];
+    const currentIdx = journeySteps.findIndex((s) => !s.done);
+    const current = journeySteps[currentIdx === -1 ? journeySteps.length - 1 : currentIdx];
+    const doneCount = journeySteps.filter((s) => s.done).length;
 
     return (
-      <div className="p-6 lg:p-8 max-w-4xl mx-auto">
+      <div className="p-6 lg:p-8 max-w-2xl mx-auto">
         <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Welcome to Hockystick 👋</h1>
             <p className="mt-1.5 text-sm text-muted-foreground">
-              Let's get your fundraise set up. Complete these steps to get started.
+              Three steps to a live, verified profile investors can find.
             </p>
           </div>
           <Link
@@ -689,56 +741,63 @@ function Overview() {
           </Link>
         </div>
 
-        {/* Progress bar */}
+        {/* Progress */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium">{completedSteps} of 4 steps complete</span>
-            <span className="text-xs text-muted-foreground">{progressPct}%</span>
+            <span className="text-sm font-medium">{doneCount} of {journeySteps.length} steps complete</span>
+            <span className="text-xs text-muted-foreground">{Math.round((doneCount / journeySteps.length) * 100)}%</span>
           </div>
           <div className="h-2 rounded-full bg-muted overflow-hidden">
             <div
               className="h-full bg-gradient-brand rounded-full transition-all duration-500"
-              style={{ width: `${progressPct}%` }}
+              style={{ width: `${Math.round((doneCount / journeySteps.length) * 100)}%` }}
             />
           </div>
         </div>
 
-        {/* Step cards 2×2 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <OnboardingStep
-            icon={Building2}
-            title="Set up your company profile"
-            description="Add your startup details, team, and pitch so investors know who you are."
-            buttonLabel="Set up profile"
-            to="/app/profile"
-            done={!!startup}
-          />
-          <OnboardingStep
-            icon={Users}
-            title="Build your investor list"
-            description="Add VCs manually or import a CSV of investor contacts to target."
-            buttonLabel="Go to deal rooms"
-            to="/app/deal-rooms"
-            done={leadCount > 0}
-          />
-          <OnboardingStep
-            icon={Briefcase}
-            title="Create your first deal room"
-            description="A secure space to share documents and collaborate with investors."
-            buttonLabel="Create deal room"
-            to="/app/deal-rooms"
-            done={dealRoomCount > 0}
-          />
-          <OnboardingStep
-            icon={Mail}
-            title="Invite your first investor"
-            description="Send a deal room invite with NDA to a VC you're in conversation with."
-            buttonLabel="Go to deal rooms"
-            to="/app/deal-rooms"
-            done={false}
-            disabled={dealRoomCount === 0}
-          />
+        {/* The ONE thing to do next */}
+        <div className="rounded-xl border-2 p-6 mb-4" style={{ borderColor: "rgba(124,58,237,0.5)", background: "rgba(124,58,237,0.06)" }}>
+          <div className="text-xs font-semibold uppercase tracking-widest text-brand mb-2">
+            Your next step · {current.time}
+          </div>
+          <div className="text-lg font-semibold">{current.title}</div>
+          <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">{current.description}</p>
+          <button
+            onClick={() => navigate({ to: current.to as any })}
+            className="mt-4 inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+            style={{ background: "#7C3AED" }}
+            data-testid="journey-primary-cta"
+          >
+            {current.cta} <ArrowRight className="h-4 w-4" />
+          </button>
         </div>
+
+        {/* The full path, compact */}
+        <div className="rounded-xl border border-border/60 bg-card divide-y divide-border/60">
+          {journeySteps.map((s, i) => (
+            <div key={s.key} className={cn("flex items-center gap-3 px-4 py-3", i === currentIdx && "bg-brand/[0.04]")}>
+              {s.done ? (
+                <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "#10B981" }} />
+              ) : (
+                <span className={cn(
+                  "grid h-4 w-4 place-items-center rounded-full border text-[9px] font-bold shrink-0",
+                  i === currentIdx ? "border-brand text-brand" : "border-border text-muted-foreground"
+                )}>
+                  {i + 1}
+                </span>
+              )}
+              <span className={cn("text-sm flex-1", s.done ? "text-muted-foreground line-through" : i === currentIdx ? "font-medium" : "text-muted-foreground")}>
+                {s.title}
+              </span>
+              <span className="text-[11px] text-muted-foreground">{s.time}</span>
+            </div>
+          ))}
+        </div>
+
+        <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
+          After you're live: back your numbers with <Link to={"/app/claims" as any} className="text-brand hover:underline">verified claims</Link> to
+          earn the Claims Verified badge, and share your profile link — investors request access directly, no cold outreach.
+        </p>
 
         {howItWorksOpen && <HowItWorksModal onClose={() => setHowItWorksOpen(false)} />}
       </div>
