@@ -208,7 +208,7 @@ function ProfileBuilder() {
     queryFn: async () => {
       const { data } = await supabase
         .from("startups")
-        .select("id, company_name")
+        .select("id, company_name, profile_slug")
         .eq("founder_id", user!.id)
         .maybeSingle();
       return data;
@@ -586,10 +586,19 @@ function ProfileBuilder() {
         return Number.isFinite(n) ? n : undefined;
       };
 
+      // Set the profile slug here, where the real company name is known —
+      // deriving it later from possibly-stale form state produced slugs
+      // like "draft-profile" from the self-provisioned placeholder row.
+      // Never overwrite an existing slug — published URLs must not change.
+      const slug = !startup?.profile_slug && form.company_name
+        ? form.company_name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+        : undefined;
+
       const { error } = await supabase
         .from("startups")
         .update({
           company_name: form.company_name ?? undefined,
+          profile_slug: slug,
           tagline: form.tagline ?? undefined,
           sector: form.sector ?? undefined,
           stage: form.stage ?? undefined,
