@@ -3,7 +3,7 @@ import { Logo } from "@/components/brand/Logo";
 import {
   LayoutGrid, Users, Building2, FileText, Briefcase,
   MessageSquare, MessageCircle, Calendar, Search, Settings, ChevronsLeft, Plus, Gavel,
-  PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, UserCircle2, Gift, Globe, Trophy, Menu, X, FileInput, LayoutDashboard, Award, BadgeCheck,
+  PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, UserCircle2, Gift, Globe, Trophy, Menu, X, FileInput, LayoutDashboard, Award, BadgeCheck, Flame,
 } from "lucide-react";
 import { AIOperatorPanel } from "@/components/ai/AIOperatorPanel";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -47,6 +47,7 @@ const founderNav: NavItem[] = [
   { to: "/app/documents", label: "Documents", icon: FileText },
   { to: "/app/advisor", label: "Verification", icon: ShieldCheck },
   { to: "/app/claims", label: "Claims", icon: BadgeCheck },
+  { to: "/app/roast", label: "Roast", icon: Flame },
   { to: "/app/meetings", label: "Meetings", icon: Calendar },
   { to: "/app/connections", label: "Connections", icon: Users },
   { to: "/app/messages", label: "Team Chat", icon: MessageSquare },
