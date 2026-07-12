@@ -17,6 +17,7 @@ export const DEAL_ROOM_PAGES: Record<string, DocPage> = {
         { id: "principles", label: "Design principles" },
         { id: "anatomy", label: "Anatomy of a room" },
         { id: "shared", label: "Shared features" },
+        { id: "origin", label: "Origin: connection requests" },
       ],
     },
     Body: () => (
@@ -66,6 +67,17 @@ export const DEAL_ROOM_PAGES: Record<string, DocPage> = {
             <><strong>Ask AI</strong> — a room-scoped AI assistant that answers against this room's context.</>,
           ]}
         />
+
+        <H2 id="origin">Deal room origin: connection requests</H2>
+        <P>
+          Deal rooms start in one of two ways. A founder can create one manually for an investor
+          they're already talking to. Or — the inbound path — an investor sends a connection
+          request from the directory or the founder's public profile; when the founder approves
+          it (an explicit, confirmed action), the room is created automatically with both
+          parties as members, opens at the Information Vault, and the NDA gate applies before
+          any document is visible. Rooms created this way carry a "Connected via directory
+          request" origin label in the header.
+        </P>
       </>
     ),
   },
@@ -270,6 +282,7 @@ export const DEAL_ROOM_PAGES: Record<string, DocPage> = {
       toc: [
         { id: "overview", label: "Overview" },
         { id: "how", label: "How it works" },
+        { id: "ai-analysis", label: "AI deep analysis" },
         { id: "difference", label: "Relation to the investor DD page" },
       ],
     },
@@ -291,6 +304,19 @@ export const DEAL_ROOM_PAGES: Record<string, DocPage> = {
             <>DD completion feeds the stage decision — when the checklist is satisfied, the room moves toward Term Sheet.</>,
           ]}
         />
+
+        <H2 id="ai-analysis">AI deep analysis</H2>
+        <P>
+          <strong>Run deep analysis</strong> (investor-only button) has the AI read the actual
+          extracted contents of every document in the room and the founder's library, plus every
+          claim and its verification verdict, and cross-examine them. It reports four kinds of
+          findings — contradictions, gaps, red flags, and unverifiable claims — grouped by type
+          and severity. Every finding quotes its evidence, proposes the exact question to ask,
+          and describes what a satisfactory answer would include; <em>Ask this in Q&A</em>
+          pre-fills the room's Q&A input with the suggested question. When the AI finds no
+          contradictions it must say so explicitly with its reasoning — silence is never treated
+          as a pass. Both parties can read the findings; only investors can trigger a run.
+        </P>
 
         <H2 id="difference">Relation to the investor DD page</H2>
         <P>

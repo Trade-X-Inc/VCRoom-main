@@ -90,6 +90,11 @@ export const DOCS_NAV: DocsNavSection[] = [
     items: [{ slug: "tools", title: "Financial calculators" }],
   },
   {
+    slug: "pricing",
+    title: "Pricing",
+    items: [{ slug: "pricing", title: "Pricing & plans" }],
+  },
+  {
     slug: "changelog",
     title: "Changelog",
     items: [{ slug: "changelog", title: "Changelog" }],

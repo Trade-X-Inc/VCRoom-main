@@ -8,6 +8,7 @@ import { DEAL_ROOM_PAGES } from "./content/deal-rooms";
 import { AI_PAGES } from "./content/ai";
 import { GETTING_STARTED_PAGES } from "./content/getting-started";
 import { TOOLS_PAGES } from "./content/tools";
+import { PRICING_PAGES } from "./content/pricing";
 
 const SECTIONS: Record<string, DocPage>[] = [
   GETTING_STARTED_PAGES,
@@ -17,6 +18,7 @@ const SECTIONS: Record<string, DocPage>[] = [
   AI_PAGES,
   SECURITY_PAGES,
   TOOLS_PAGES,
+  PRICING_PAGES,
   CHANGELOG_PAGES,
 ];
 

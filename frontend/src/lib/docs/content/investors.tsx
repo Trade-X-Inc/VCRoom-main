@@ -16,6 +16,9 @@ export const INVESTOR_PAGES: Record<string, DocPage> = {
         { id: "map", label: "Feature map" },
         { id: "watchlist", label: "The watchlist" },
         { id: "flow", label: "The investor flow" },
+        { id: "connections", label: "Connection requests" },
+        { id: "deep-dd", label: "Deep due diligence analysis" },
+        { id: "plans", label: "Subscription plans" },
       ],
     },
     Body: () => (
@@ -60,6 +63,36 @@ export const INVESTOR_PAGES: Record<string, DocPage> = {
             <>Record the decision — Invest, Hold, or Pass with a reason the founder actually receives.</>,
           ]}
         />
+
+        <H2 id="connections">Connection requests</H2>
+        <P>
+          From the directory or a founder's public profile, send a connection request with an
+          optional 200-character message. The founder reviews it — name, fund, thesis summary —
+          and on approval a deal room is <strong>created automatically</strong> with both parties
+          as members, opening at the Information Vault behind the NDA gate. Declines return a
+          neutral message. Your sent requests are tracked with live status (Pending / Approved
+          with a room link / Declined) on the connections page. Approval is always an explicit
+          founder action; nothing auto-creates without it.
+        </P>
+
+        <H2 id="deep-dd">Deep due diligence analysis</H2>
+        <P>
+          Inside any deal room's Due Diligence stage, <strong>Run deep analysis</strong> has the
+          AI read the actual contents of every document in the room and the founder's library,
+          then cross-examine them against every stated claim and metric. It returns
+          contradictions, gaps, red flags, and unverifiable claims — each with quoted evidence,
+          the exact question to ask, and what a satisfactory answer would include. One click
+          sends any suggested question into the room's Q&A. See{" "}
+          <A href="/docs/deal-rooms/due-diligence">the DD panel docs</A>.
+        </P>
+
+        <H2 id="plans">Subscription plans</H2>
+        <P>
+          During beta, investor access is by invitation: your fund, thesis, and active mandate
+          are reviewed before an account is granted. Paid tiers (Growth $99, Pro $299,
+          Enterprise $1,999 per month) scale deal room count, team seats, and AI usage — see{" "}
+          <A href="/docs/pricing">Pricing &amp; plans</A>.
+        </P>
       </>
     ),
   },

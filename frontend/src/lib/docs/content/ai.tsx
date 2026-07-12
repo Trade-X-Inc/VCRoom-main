@@ -17,6 +17,9 @@ export const AI_PAGES: Record<string, DocPage> = {
         { id: "two-agents", label: "Two agents, never one" },
         { id: "confirm-first", label: "The confirm-first rule" },
         { id: "features", label: "AI features" },
+        { id: "readiness-ai", label: "Fundraising readiness AI" },
+        { id: "confrontational-dd", label: "Confrontational DD analysis" },
+        { id: "scope-note", label: "Where the line is" },
       ],
     },
     Body: () => (
@@ -68,8 +71,41 @@ export const AI_PAGES: Record<string, DocPage> = {
             ["Investment memos", "Investors", <A href="/docs/investors/analysis">Memos</A>],
             ["Document review", "Founders", <A href="/docs/founders/vault">Vault</A>],
             ["Data handling policy", "Everyone", <A href="/docs/ai/data-handling">Data handling</A>],
+            ["Readiness checklist", "Founders", <A href="/docs/founders#readiness">Readiness</A>],
+            ["Deep DD analysis", "Investors", <A href="/docs/deal-rooms/due-diligence">DD analysis</A>],
           ]}
         />
+
+        <H2 id="readiness-ai">Fundraising readiness AI</H2>
+        <P>
+          After every profile save or document upload, the AI reviews the founder's complete
+          file — profile fields, documents, verification state, claim verdicts — and produces a
+          0–100 readiness score with the 5–7 gaps most likely to make an investor pass, specific
+          to that company's stage and sector. Each gap carries the investor's-eye rationale and a
+          concrete fix. Deal-room investors see the score and top gaps, so diligence starts
+          focused.
+        </P>
+
+        <H2 id="confrontational-dd">Confrontational DD analysis</H2>
+        <P>
+          On investor request inside a deal room, the AI reads the actual extracted contents of
+          every document and cross-examines them against every stated claim and metric. It is
+          instructed <em>not</em> to summarize: it reports contradictions (statement vs.
+          document), gaps (absent from both), red flags, and unverifiable claims — always citing
+          the specific source, and explicitly stating its reasoning when it finds no
+          contradictions. Findings include the exact question to ask and what a good answer looks
+          like.
+        </P>
+
+        <H2 id="scope-note">Where the line is</H2>
+        <P>
+          Honest update: the AI now goes further than drafting and summarizing — it critiques,
+          scores readiness, and cross-examines documents. What has not changed: it only reads
+          data the requesting user could already see, every party-visible action still requires
+          an explicit confirmation click, verdicts are conservative by instruction (it flags what
+          it cannot verify rather than assuming it's fine), and no AI output — score, finding, or
+          verdict — ever auto-triggers a decision. Humans decide; the AI prepares.
+        </P>
       </>
     ),
   },
