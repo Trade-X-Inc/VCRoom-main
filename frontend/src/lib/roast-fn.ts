@@ -727,3 +727,62 @@ export const expireOverdueRoasts = createServerFn({ method: "POST" })
     }
     return { ok: true, expired };
   });
+
+
+// ── 12. Public state loader ──────────────────────────────────────────────────
+// roast_questions has NO public RLS on purpose — this loader is the only
+// public read path and it redacts: question text is exposed only once a
+// question is live or answered. Also returns serverNow so clients compute
+// clock_offset and every countdown (including the race gun) fires on server
+// time, not the viewer's clock.
+
+export const getRoastPublicState = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as { sessionId: string })
+  .handler(async ({ data }) => {
+    const { url, key } = getEnv();
+    if (!url || !key) return { ok: false as const, error: "db_unavailable" };
+
+    const sessions: any[] = await sbFetch(url, key, `roast_sessions?id=eq.${data.sessionId}&select=*`).catch(() => []);
+    const s = sessions?.[0];
+    if (!s || !s.is_public) return { ok: false as const, error: "session_not_found" };
+
+    const [startups, audience, questions]: [any[], any[], any[]] = await Promise.all([
+      sbFetch(url, key, `startups?id=eq.${s.startup_id}&select=id,company_name,one_liner,tagline,sector,stage,profile_slug,logo_url,founder_name`).catch(() => []),
+      sbFetch(url, key, `roast_audience?session_id=eq.${data.sessionId}&select=user_id,display_name,role,is_verified_investor`).catch(() => []),
+      sbFetch(url, key, `roast_questions?session_id=eq.${data.sessionId}&select=id,asker_name,asker_is_investor,question_text,phase,race_round,answer_text,answered_at,is_answered,answer_flag,flag_acknowledged,flag_note,removed_at,display_order,submitted_at&order=display_order.asc.nullslast,submitted_at.asc`).catch(() => []),
+    ]);
+
+    const removedCount = (questions ?? []).filter((q) => q.removed_at).length;
+    const visible = (questions ?? []).filter((q) => !q.removed_at).map((q) => {
+      const textVisible = q.phase === "live" || q.is_answered;
+      return {
+        id: q.id,
+        asker_name: q.asker_name,
+        asker_is_investor: q.asker_is_investor,
+        phase: q.phase,
+        race_round: q.race_round,
+        is_answered: q.is_answered,
+        answered_at: q.answered_at,
+        display_order: q.display_order,
+        // Redaction: written+unanswered questions show the asker, never the text
+        question_text: textVisible ? q.question_text : null,
+        answer_text: q.is_answered ? q.answer_text : null,
+        answer_flag: q.is_answered && q.flag_acknowledged ? q.answer_flag : null,
+        flag_note: q.is_answered && q.flag_acknowledged ? q.flag_note : null,
+      };
+    });
+
+    // Strip internals the public page has no business seeing
+    const { daily_room_name: _n, ...publicSession } = s;
+
+    return {
+      ok: true as const,
+      serverNow: new Date().toISOString(),
+      session: publicSession,
+      startup: startups?.[0] ?? null,
+      audienceCount: (audience ?? []).filter((a) => a.role === "challenger").length,
+      audience: (audience ?? []).map((a) => ({ user_id: a.user_id, display_name: a.display_name, role: a.role, is_verified_investor: a.is_verified_investor })),
+      questions: visible,
+      removedCount,
+    };
+  });
