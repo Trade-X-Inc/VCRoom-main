@@ -58,11 +58,11 @@ function DealRooms() {
     queryFn: async () => {
       const { data } = await supabase
         .from("startups")
-        .select("id, company_name")
+        .select("id, company_name, profile_slug, profile_published")
         .eq("founder_id", user!.id)
         .limit(1)
         .maybeSingle();
-      return data as { id: string; company_name: string } | null;
+      return data as { id: string; company_name: string; profile_slug: string | null; profile_published: boolean | null } | null;
     },
   });
 
@@ -400,15 +400,27 @@ function DealRooms() {
             <div className="text-sm font-medium">
               {filter === "all" ? "No deal rooms yet" : `No ${filter} deal rooms`}
             </div>
-            <div className="text-xs text-muted-foreground mt-1">
+            <div className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto leading-relaxed">
               {filter === "all"
-                ? "Create your first deal room to start a structured investor review."
+                ? "Share your profile link and investors can request access directly — a deal room opens automatically when you approve. Or create one manually for an investor you're already talking to."
                 : `Try a different filter or create a new deal room.`}
             </div>
+            {filter === "all" && startup?.profile_slug && (
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(`https://hockystick.app/p/${startup.profile_slug}`);
+                  toast.success(startup.profile_published ? "Profile link copied" : "Link copied — publish your profile so investors can open it");
+                }}
+                className="mt-4 mr-2 inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-semibold text-white hover:opacity-90"
+                style={{ background: "#7C3AED" }}
+              >
+                Copy profile link
+              </button>
+            )}
             {filter === "all" && (
               <button
                 onClick={() => setOpen(true)}
-                className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"
+                className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent"
               >
                 <Plus className="h-4 w-4" /> Create deal room
               </button>
