@@ -452,3 +452,195 @@ export const getDDSummaryForInvestor = createServerFn({ method: "POST" })
 
     return { dealRooms };
   });
+
+
+// ─── Confrontational DD analysis ─────────────────────────────────────────────
+// Reads every document + verified claim + stated metric and asks GPT-4o for
+// contradictions, gaps, red flags and unverifiable claims — an analysis,
+// not a summary. Investor-triggered; caller must be a deal room member.
+
+export interface DDFinding {
+  finding_type: "contradiction" | "gap" | "red_flag" | "unverifiable";
+  severity: "critical" | "significant" | "minor";
+  title: string;
+  evidence: string;
+  question_to_ask: string;
+  what_good_looks_like: string;
+}
+
+export interface DDAnalysisResult {
+  ok: boolean;
+  error?: string;
+  findings?: DDFinding[];
+  no_contradictions_reasoning?: string | null;
+  documents_analysed?: number;
+  claims_checked?: number;
+  run_at?: string;
+}
+
+const CONFRONTATIONAL_PROMPT = `You are a senior investment analyst at a top-tier private equity firm conducting due diligence on a startup seeking investment. You have access to all their documents and stated claims.
+
+Your job is NOT to summarize what they told you.
+Your job is to find:
+1. CONTRADICTIONS: Where what they say conflicts with what their documents show
+2. GAPS: Important information that is completely absent from both their claims and documents
+3. RED FLAGS: Patterns that experienced investors recognize as warning signs
+4. UNVERIFIABLE CLAIMS: Statements they make that cannot be confirmed from any document provided
+
+For each finding:
+- finding_type: 'contradiction' | 'gap' | 'red_flag' | 'unverifiable'
+- severity: 'critical' | 'significant' | 'minor'
+- title: what the issue is (max 10 words)
+- evidence: exactly what you found (quote the document or claim specifically)
+- question_to_ask: the exact question an investor should ask the founder about this
+- what_good_looks_like: what a satisfactory answer would include
+
+RULES:
+- Never say something is fine when you don't have evidence to confirm it
+- Always cite the specific document or claim you found the issue in
+- If you find no contradictions, say so explicitly with your reasoning in "no_contradictions_reasoning"
+- Be conservative: flag things you cannot verify rather than assume they're correct
+- Do not compliment the pitch deck design or presentation quality — only analyze content
+
+Return JSON only:
+{ "findings": [array of finding objects], "no_contradictions_reasoning": string | null }`;
+
+export const runConfrontationalAnalysis = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as { userAccessToken: string; dealRoomId: string; startupId: string })
+  .handler(async ({ data }): Promise<DDAnalysisResult> => {
+    const sb = getAdminClient();
+    const cfEnv = (globalThis as any).__cf_env || {};
+    const openaiKey = cfEnv.OPENAI_API_KEY || cfEnv.OPEN_AI_API_KEY || cfEnv["OPEN AI API KEY"] || "";
+    if (!openaiKey) return { ok: false, error: "ai_unavailable" };
+
+    // Identity from the token — caller must be a member of this deal room
+    const { data: userData } = await sb.auth.getUser(data.userAccessToken);
+    const uid = userData?.user?.id;
+    if (!uid) return { ok: false, error: "not_authenticated" };
+    const { data: membership } = await sb
+      .from("deal_room_members").select("id")
+      .eq("deal_room_id", data.dealRoomId).eq("user_id", uid).maybeSingle();
+    if (!membership) return { ok: false, error: "not_authorized" };
+
+    // 1. All documents: founder library docs + deal-room uploads
+    const [{ data: founderDocs }, { data: roomDocs }] = await Promise.all([
+      sb.from("founder_documents")
+        .select("title, template_slug, status, file_name, file_path, ai_feedback")
+        .eq("startup_id", data.startupId),
+      sb.from("documents")
+        .select("file_name, category, storage_path, ai_summary")
+        .eq("deal_room_id", data.dealRoomId),
+    ]);
+
+    async function fetchDocText(storagePath: string | null, fileName: string, fallback: string): Promise<string> {
+      if (!storagePath) return fallback;
+      try {
+        const { data: signed } = await sb.storage.from("documents").createSignedUrl(storagePath, 60);
+        if (!signed?.signedUrl) return fallback;
+        const res = await fetch(signed.signedUrl);
+        if (!res.ok) return fallback;
+        const buf = await res.arrayBuffer();
+        const lower = (fileName || "").toLowerCase();
+        if (lower.endsWith(".csv") || lower.endsWith(".txt")) {
+          return new TextDecoder("utf-8", { fatal: false }).decode(new Uint8Array(buf))
+            .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, " ").slice(0, 5000).trim();
+        }
+        if (lower.endsWith(".pdf")) {
+          const raw = new TextDecoder("latin1", { fatal: false }).decode(new Uint8Array(buf));
+          const textMatches = [...raw.matchAll(/\(([^\)]{3,200})\)/g)].map((m) => m[1]);
+          const extracted = textMatches.join(" ").replace(/\\n/g, " ").replace(/\s+/g, " ").trim();
+          if (extracted.length > 100) return extracted.slice(0, 5000);
+          return fallback;
+        }
+        return fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    const docPayloads: Array<{ name: string; source: string; content: string }> = [];
+    for (const d of roomDocs ?? []) {
+      const text = await fetchDocText(d.storage_path, d.file_name ?? "", d.ai_summary ?? "");
+      docPayloads.push({ name: d.file_name ?? "Untitled", source: "deal_room", content: text || "(no readable content)" });
+    }
+    for (const d of founderDocs ?? []) {
+      const text = await fetchDocText(d.file_path, d.file_name ?? "", "");
+      docPayloads.push({ name: d.title ?? d.file_name ?? "Untitled", source: "founder_library", content: text || `(status: ${d.status}; no readable content)` });
+    }
+
+    // 2. Claims with verdicts
+    const { data: claims } = await sb
+      .from("startup_claims")
+      .select("claim_type, claim_label, claim_value, claim_category, ai_verdict, proof_status")
+      .eq("startup_id", data.startupId);
+
+    // 3. Stated metrics from the profile
+    const { data: startup } = await sb
+      .from("startups")
+      .select("company_name, stage, sector, mrr_usd, revenue, growth_rate, runway_months, burn_rate, team_size, founded_year, funding_target, traction, one_liner, investor_narrative, legal_entity_name, incorporated_in")
+      .eq("id", data.startupId)
+      .maybeSingle();
+
+    // 4. Existing DD goals + status
+    const { data: goals } = await sb
+      .from("deal_room_dd_goals")
+      .select("category, goal_text, status, notes")
+      .eq("deal_room_id", data.dealRoomId);
+
+    const userMessage = [
+      "STATED PROFILE AND METRICS:",
+      JSON.stringify(startup ?? {}, null, 1),
+      "\nCLAIMS (with our AI verification verdicts — 'verified' means a document supported it):",
+      claims?.length ? JSON.stringify(claims, null, 1) : "No claims submitted.",
+      "\nDD CHECKLIST STATE:",
+      goals?.length ? JSON.stringify(goals) : "No DD goals set.",
+      "\nDOCUMENTS (extracted content, may be partial):",
+      ...docPayloads.map((d) => `--- ${d.name} [${d.source}] ---\n${d.content.slice(0, 4000)}`),
+      docPayloads.length === 0 ? "No documents provided." : "",
+    ].join("\n");
+
+    try {
+      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${openaiKey}` },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          temperature: 0.2,
+          max_tokens: 2400,
+          response_format: { type: "json_object" },
+          messages: [
+            { role: "system", content: CONFRONTATIONAL_PROMPT },
+            { role: "user", content: userMessage.slice(0, 60000) },
+          ],
+        }),
+      });
+      const json: any = await resp.json();
+      const raw = json.choices?.[0]?.message?.content ?? "";
+      const parsed = JSON.parse(raw.replace(/^```json\s*/i, "").replace(/```\s*$/i, "").trim());
+      const findings: DDFinding[] = Array.isArray(parsed.findings) ? parsed.findings : [];
+      const reasoning = typeof parsed.no_contradictions_reasoning === "string" ? parsed.no_contradictions_reasoning : null;
+
+      const { data: inserted, error: insErr } = await sb.from("deal_room_dd_analysis").insert({
+        deal_room_id: data.dealRoomId,
+        run_by: uid,
+        findings,
+        no_contradictions_reasoning: reasoning,
+        documents_analysed: docPayloads.length,
+        claims_checked: claims?.length ?? 0,
+        ai_model: "gpt-4o",
+      }).select("run_at").single();
+      if (insErr) console.error("[dd-analysis] insert failed:", insErr.message);
+
+      return {
+        ok: true,
+        findings,
+        no_contradictions_reasoning: reasoning,
+        documents_analysed: docPayloads.length,
+        claims_checked: claims?.length ?? 0,
+        run_at: inserted?.run_at ?? new Date().toISOString(),
+      };
+    } catch (err: any) {
+      console.error("[dd-analysis] failed:", err?.message ?? err);
+      return { ok: false, error: err?.message ?? "analysis_failed" };
+    }
+  });
