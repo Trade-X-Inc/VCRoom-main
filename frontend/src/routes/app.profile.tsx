@@ -461,6 +461,17 @@ function Profile() {
         .eq("id", startup.id);
       if (error) throw error;
       toast.success("Profile is live on Hockystick.");
+      // Durable confirmation — the founder should know they're now visible
+      // in the directory, with a link to their own public profile.
+      import("@/lib/notify").then(({ notifyUser }) =>
+        notifyUser({
+          userId: user!.id,
+          kind: "system",
+          title: "Your profile is live in the directory",
+          body: "Investors can now find you and request access. Share your public profile link anywhere.",
+          actionUrl: `/p/${profileSlug}`,
+        })
+      ).catch((e) => console.error("[profile] live notification failed:", e));
       queryClient.invalidateQueries({ queryKey: ["my-startup", user?.id] });
 
       try {

@@ -911,6 +911,37 @@ function Overview() {
         </div>
       </div>
 
+      {/* Live-in-directory confirmation */}
+      {startup?.profile_published && startup?.profile_slug && (
+        <div className="flex items-center justify-between flex-wrap gap-3 rounded-xl px-4 py-3" style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)" }}>
+          <div className="flex items-center gap-2.5 text-sm">
+            <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "#10B981" }} />
+            <span className="text-foreground font-medium">Your profile is live in the directory.</span>
+            <span className="text-muted-foreground hidden sm:inline">Investors can find you and request access.</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`https://hockystick.app/p/${startup.profile_slug}`);
+                toast.success("Profile link copied");
+              }}
+              className="rounded-md border border-border/60 px-3 py-1.5 text-xs font-medium hover:bg-accent"
+            >
+              Copy profile link
+            </button>
+            <a
+              href={`/p/${startup.profile_slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-md px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
+              style={{ background: "#7C3AED" }}
+            >
+              View your public profile →
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* Today's actions */}
       {(() => {
         const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
