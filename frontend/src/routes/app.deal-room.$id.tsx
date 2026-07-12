@@ -19,6 +19,7 @@ import { Dropzone } from "@/components/app/Dropzone";
 import { useAuth } from "@/lib/auth";
 import { supabase, logActivity } from "@/lib/supabase";
 import { notifyUser } from "@/lib/notify";
+import { ProfileChecklist } from "@/components/app/ProfileChecklist";
 import { DocumentWishlist } from "@/components/app/DocumentWishlist";
 import { generateDocSummary, secureAICall } from "@/lib/ai-secure-fn";
 import { extractDocumentText } from "@/lib/document-extractor";
@@ -6971,6 +6972,14 @@ function OverviewPanel({
           </div>
         </div>
       </section>
+
+      {/* Founder readiness — score + top gaps tells the investor where to
+          focus Q&A. Read-only here; generation stays founder-side. */}
+      {startup?.id && (
+        <section className="mb-4">
+          <ProfileChecklist startupId={startup.id} compact canRegenerate={false} />
+        </section>
+      )}
 
       <section className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-4 mb-4">
         <h3 className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">TRACTION METRICS</h3>
