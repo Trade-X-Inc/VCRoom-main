@@ -14,6 +14,7 @@ import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { OnboardingTour } from "@/components/app/OnboardingTour";
+import { ProfileChecklist } from "@/components/app/ProfileChecklist";
 import { PromoteProfileCard } from "@/components/app/PromoteProfileCard";
 
 export const Route = createFileRoute("/app/overview")({
@@ -794,6 +795,12 @@ function Overview() {
           ))}
         </div>
 
+        {startup?.id && (
+          <div className="mt-4">
+            <ProfileChecklist startupId={startup.id} />
+          </div>
+        )}
+
         <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
           After you're live: back your numbers with <Link to={"/app/claims" as any} className="text-brand hover:underline">verified claims</Link> to
           earn the Claims Verified badge, and share your profile link — investors request access directly, no cold outreach.
@@ -941,6 +948,9 @@ function Overview() {
           </div>
         </div>
       )}
+
+      {/* Fundraising readiness checklist */}
+      {startup?.id && <ProfileChecklist startupId={startup.id} />}
 
       {/* Today's actions */}
       {(() => {
