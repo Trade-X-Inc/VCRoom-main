@@ -133,6 +133,8 @@ function VerificationPage() {
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 lg:p-8">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] items-start">
+        <div className="min-w-0">
         <div className="bg-card border border-border/60 rounded-xl p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>
@@ -232,6 +234,47 @@ function VerificationPage() {
           >
             Manage claims →
           </Link>
+        </div>
+        </div>
+
+        {/* Right panel — why this matters */}
+        <aside className="space-y-4 lg:sticky lg:top-6">
+          <div className="bg-card border border-border/60 rounded-xl p-5">
+            <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+              What investors see when you're verified
+            </div>
+            {/* Directory-card mockup */}
+            <div className="rounded-lg border border-border/60 bg-background p-4">
+              <div className="flex items-center gap-3">
+                <div className="grid h-10 w-10 place-items-center rounded-lg text-white text-xs font-bold shrink-0" style={{ background: "#7C3AED" }}>
+                  {(startup?.company_name ?? "YC").slice(0, 2).toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold truncate">{startup?.company_name ?? "Your Company"}</div>
+                  <div className="text-[11px] text-muted-foreground">Seed · Your sector</div>
+                </div>
+              </div>
+              <div className="mt-3">
+                <VerificationBadge tier="checked" size="sm" checkedAt={new Date().toISOString()} />
+              </div>
+              <div className="mt-3 flex items-center gap-2 text-[11px] text-muted-foreground">
+                <CheckCircle2 className="h-3 w-3" style={{ color: "#10B981" }} />
+                Identity confirmed — 4 automated checks passed
+              </div>
+            </div>
+            <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
+              Verified profiles rank above unverified ones in the directory, and investors can expand
+              your badge to see exactly which facts were confirmed and when.
+            </p>
+          </div>
+          <div className="rounded-xl p-5" style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)" }}>
+            <div className="text-sm font-semibold mb-1.5">Why there's no partial credit</div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              A badge investors can't trust is worthless. Each check is a specific fact we can defend —
+              if one fails, fix it and re-run. Most founders pass in one or two attempts.
+            </p>
+          </div>
+        </aside>
         </div>
       </div>
     </div>

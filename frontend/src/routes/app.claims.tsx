@@ -108,7 +108,9 @@ function ClaimsPage() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-4">
+      <div className="flex-1 overflow-y-auto p-6 lg:p-8">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] items-start">
+        <div className="min-w-0 space-y-4">
         {/* Gate status */}
         <div className="bg-card border border-border/60 rounded-xl px-5 py-4 flex items-center justify-between flex-wrap gap-3">
           <div className="text-sm">
@@ -241,6 +243,45 @@ function ClaimsPage() {
           Claims synced from your <Link to={"/app/profile" as any} className="text-brand hover:underline">profile</Link> appear
           here automatically. The AI is conservative by instruction: a pitch deck never verifies a financial
           claim, and when in doubt it returns "insufficient" rather than guessing in your favor.
+        </div>
+        </div>
+
+        {/* Right panel — example verified claims */}
+        <aside className="space-y-4 lg:sticky lg:top-6">
+          <div className="bg-card border border-border/60 rounded-xl p-5">
+            <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+              What good claims look like
+            </div>
+            <div className="space-y-2.5">
+              {[
+                { text: "$42K MRR as of June 2026", cat: "Financial", evidence: "Bank statement" },
+                { text: "DIFC registered entity, license #4821", cat: "Legal", evidence: "Trade license" },
+                { text: "3 signed enterprise contracts", cat: "Operational", evidence: "Signed contracts" },
+              ].map((ex) => (
+                <div key={ex.text} className="rounded-lg border border-border/60 bg-background p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="text-xs font-medium leading-snug">{ex.text}</div>
+                    <span className="shrink-0 inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: "rgba(16,185,129,0.12)", color: "#10B981" }}>
+                      <CheckCircle2 className="h-2.5 w-2.5" /> Verified
+                    </span>
+                  </div>
+                  <div className="mt-1.5 text-[10px] text-muted-foreground">{ex.cat} · Evidence: {ex.evidence}</div>
+                </div>
+              ))}
+            </div>
+            <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
+              One specific number or fact per claim, backed by one document that states it directly.
+              Vague claims ("strong growth") can't be verified.
+            </p>
+          </div>
+          <div className="rounded-xl p-5" style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)" }}>
+            <div className="text-sm font-semibold mb-1.5">Two minutes per claim</div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Type the claim, attach the document, and the AI returns a verdict immediately.
+              Three verified claims (one financial) earn the Claims Verified badge.
+            </p>
+          </div>
+        </aside>
         </div>
       </div>
 
