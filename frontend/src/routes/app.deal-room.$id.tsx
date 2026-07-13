@@ -1230,8 +1230,61 @@ function InformationVaultPanel({
 
   const startup = room?.startups;
 
+  // ── Roast record: public voluntary Q&A — a due-diligence input ──
+  const { data: roastRecord = [] } = useQuery({
+    queryKey: ["deal-room-roast-record", startupId],
+    enabled: !!startupId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("roast_sessions")
+        .select("id, level, status, badge_awarded, scheduled_at")
+        .eq("startup_id", startupId!)
+        .in("status", ["completed", "expired"])
+        .order("scheduled_at", { ascending: false });
+      if (error) { console.error("[deal-room] roast record fetch failed:", error); return []; }
+      return data ?? [];
+    },
+  });
+
   return (
     <div className="space-y-6">
+
+      {/* ── Roast record ─────────────────────────────────────────── */}
+      {roastRecord.length > 0 && (
+        <div className="rounded-xl border border-border/60 bg-card p-5">
+          <div className="text-sm font-semibold mb-2" style={{ fontFamily: "Syne, sans-serif" }}>
+            🔥 Roast record
+          </div>
+          <div className="space-y-2">
+            {roastRecord.map((r: any) => (
+              <a
+                key={r.id}
+                href={`/roast/${r.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between gap-3 rounded-lg px-4 py-3 text-sm border transition-opacity hover:opacity-80"
+                style={r.status === "completed"
+                  ? { background: "rgba(16,185,129,0.08)", borderColor: "rgba(16,185,129,0.25)" }
+                  : { background: "rgba(239,68,68,0.08)", borderColor: "rgba(239,68,68,0.25)" }}
+              >
+                <span>
+                  {r.status === "completed"
+                    ? `Completed a Level ${r.level} Roast — every public question answered on the record`
+                    : `Level ${r.level} Roast expired incomplete — public questions left unanswered`}
+                </span>
+                <span className="text-xs text-muted-foreground shrink-0">
+                  {new Date(r.scheduled_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })} · view →
+                </span>
+              </a>
+            ))}
+          </div>
+          {isInvestor && (
+            <p className="text-xs text-muted-foreground mt-2">
+              The Roast report's credibility flags feed the confrontational DD analysis automatically.
+            </p>
+          )}
+        </div>
+      )}
 
       {/* ── PINNED: NDA Document ─────────────────────────────────── */}
       <div

@@ -587,6 +587,23 @@ export const runConfrontationalAnalysis = createServerFn({ method: "POST" })
       .select("category, goal_text, status, notes")
       .eq("deal_room_id", data.dealRoomId);
 
+    // 5. Roast record — public voluntary Q&A. Credibility flags in the report
+    // use this engine's exact finding shape (tagged source:'roast'), so they
+    // are ingested as first-class evidence alongside document findings.
+    const { data: roasts, error: roastErr } = await sb
+      .from("roast_sessions")
+      .select("id, level, status, badge_awarded, report, round_closed_at")
+      .eq("startup_id", data.startupId)
+      .in("status", ["completed", "expired"]);
+    if (roastErr) console.error("[dd] roast record fetch failed:", roastErr);
+    const roastSections = (roasts ?? []).map((r) => {
+      const header =
+        r.status === "expired"
+          ? `ROAST RECORD — Level ${r.level}, EXPIRED: the founder did not answer all public questions within the 48-hour written round. Treat unanswered public questions as a meaningful signal.`
+          : `ROAST RECORD — Level ${r.level}, completed${r.badge_awarded ? " (Roast Survivor badge earned)" : ""}. Public voluntary Q&A; the report below was AI-generated from it. Its credibility_flags use our finding format — weigh them as evidence, cite them as "Roast:".`;
+      return `${header}\n${r.report ? JSON.stringify(r.report, null, 1).slice(0, 4000) : "(report not yet generated)"}`;
+    });
+
     const userMessage = [
       "STATED PROFILE AND METRICS:",
       JSON.stringify(startup ?? {}, null, 1),
@@ -597,6 +614,7 @@ export const runConfrontationalAnalysis = createServerFn({ method: "POST" })
       "\nDOCUMENTS (extracted content, may be partial):",
       ...docPayloads.map((d) => `--- ${d.name} [${d.source}] ---\n${d.content.slice(0, 4000)}`),
       docPayloads.length === 0 ? "No documents provided." : "",
+      roastSections.length ? "\n" + roastSections.join("\n\n") : "",
     ].join("\n");
 
     try {

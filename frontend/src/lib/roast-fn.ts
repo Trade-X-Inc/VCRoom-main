@@ -1152,6 +1152,56 @@ export const expireOverdueRoasts = createServerFn({ method: "POST" })
     return { ok: true, expired };
   });
 
+// ── 11b. Upcoming public Roasts (landing rail) ───────────────────────────────
+// Anon clients can't read startups directly (RLS), so the rail gets names
+// through this service-role read. Public sessions only, nothing sensitive.
+
+export const getUpcomingRoasts = createServerFn({ method: "POST" }).handler(
+  async (): Promise<{
+    ok: boolean;
+    roasts: Array<{
+      id: string;
+      level: number;
+      scheduled_at: string;
+      max_audience: number;
+      company_name: string | null;
+      tagline: string | null;
+    }>;
+  }> => {
+    const { url, key } = getEnv();
+    if (!url || !key) return { ok: false, roasts: [] };
+    try {
+      const sessions: any[] = await sbFetch(
+        url,
+        key,
+        `roast_sessions?status=in.(scheduled,lobby)&is_public=eq.true&scheduled_at=gte.${new Date(Date.now() - 3600_000).toISOString()}&select=id,level,scheduled_at,max_audience,startup_id&order=scheduled_at.asc&limit=6`,
+      );
+      if (!sessions?.length) return { ok: true, roasts: [] };
+      const ids = sessions.map((s) => s.startup_id).join(",");
+      const startups: any[] = await sbFetch(
+        url,
+        key,
+        `startups?id=in.(${ids})&select=id,company_name,tagline`,
+      ).catch(() => []);
+      const byId = new Map(startups.map((s) => [s.id, s]));
+      return {
+        ok: true,
+        roasts: sessions.map((s) => ({
+          id: s.id,
+          level: s.level,
+          scheduled_at: s.scheduled_at,
+          max_audience: s.max_audience,
+          company_name: byId.get(s.startup_id)?.company_name ?? null,
+          tagline: byId.get(s.startup_id)?.tagline ?? null,
+        })),
+      };
+    } catch (e) {
+      console.error("[roast] upcoming roasts fetch failed:", e);
+      return { ok: false, roasts: [] };
+    }
+  },
+);
+
 // ── 12. Public state loader ──────────────────────────────────────────────────
 // roast_questions has NO public RLS on purpose — this loader is the only
 // public read path and it redacts: question text is exposed only once a

@@ -81,6 +81,24 @@ function useDirectoryData() {
     },
   });
 
+  // Roast Survivor flame markers
+  const { data: roastSurvivorIds = new Set<string>() } = useQuery({
+    queryKey: ["directory-roast-survivors"],
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profile_badges")
+        .select("startup_id")
+        .eq("badge_type", "roast_survivor");
+      if (error) {
+        console.error("[directory] roast survivor fetch failed:", error);
+        return new Set<string>();
+      }
+      return new Set((data ?? []).map((b) => b.startup_id as string));
+    },
+  });
+
   const { data: rooms = [] } = useQuery({
     queryKey: ["directory-rooms-map", myRoomIds],
     enabled: myRoomIds.length > 0,
@@ -118,7 +136,7 @@ function useDirectoryData() {
     },
   });
 
-  return { startups, rooms, myRequests, investors, startupsLoading, investorsLoading };
+  return { startups, rooms, myRequests, investors, startupsLoading, investorsLoading, roastSurvivorIds };
 }
 
 function StartupCard({
@@ -129,6 +147,7 @@ function StartupCard({
   currentUserId,
   currentUserRole,
   alert,
+  isRoastSurvivor,
   onConnect,
   onCancel,
   onEditProfile,
@@ -137,6 +156,7 @@ function StartupCard({
   s: any;
   founder?: any;
   roomId?: string;
+  isRoastSurvivor?: boolean;
   requestStatus?: DiscoveryStatus;
   currentUserId?: string;
   currentUserRole?: string;
@@ -232,6 +252,15 @@ function StartupCard({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <div className="text-sm font-semibold truncate">{s.company_name}</div>
+            {isRoastSurvivor && (
+              <span
+                title="Roast Survivor — answered every public question in a live Roast"
+                className="shrink-0 text-xs"
+                aria-label="Roast Survivor"
+              >
+                🔥
+              </span>
+            )}
           </div>
           {founder && <div className="text-xs text-muted-foreground truncate">{founder.full_name}</div>}
         </div>
@@ -403,7 +432,7 @@ function Directory() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { startups, rooms, myRequests, investors, startupsLoading, investorsLoading } = useDirectoryData();
+  const { startups, rooms, myRequests, investors, startupsLoading, investorsLoading, roastSurvivorIds } = useDirectoryData();
   const [type, setType] = useState<"founders" | "investors">("founders");
   const [search, setSearch] = useState("");
   const [stage, setStage] = useState("");
@@ -658,6 +687,7 @@ function Directory() {
                 currentUserId={user?.id}
                 currentUserRole={user?.role}
                 alert={isInvestor ? alertsByStartup[s.id] ?? null : null}
+                isRoastSurvivor={roastSurvivorIds.has(s.id)}
                 onConnect={handleConnect}
                 onCancel={handleCancel}
                 onEditProfile={() => navigate({ to: "/app/profile" })}

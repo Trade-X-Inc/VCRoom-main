@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getUpcomingRoasts } from "@/lib/roast-fn";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { CostComparisonTable } from "@/components/site/CostComparisonTable";
@@ -119,6 +121,7 @@ function Landing() {
       <ForInvestors dark={dark} />
       <WhoThisIsFor dark={dark} />
       <TrustSection />
+      <UpcomingRoastsRail dark={dark} />
       <EarlyAccessSection dark={dark} />
       <PricingSection dark={dark} />
       <FinalCTA />
@@ -981,6 +984,122 @@ function WhoThisIsFor({ dark }: { dark: boolean }) {
 /* ═══════════════════════════════════════════════════════════════════════════
    SECTION 7 — TRUST — always purple
 ═══════════════════════════════════════════════════════════════════════════ */
+function UpcomingRoastsRail({ dark }: { dark: boolean }) {
+  const { data } = useQuery({
+    queryKey: ["upcoming-roasts"],
+    staleTime: 2 * 60 * 1000,
+    queryFn: async () => getUpcomingRoasts(),
+  });
+  const roasts = data?.roasts ?? [];
+  if (!roasts.length) return null;
+  return (
+    <section
+      className="w-full py-16"
+      style={{ background: dark ? "#0A0A0B" : "#FAFAFA" }}
+    >
+      <div className="max-w-[1100px] mx-auto px-6">
+        <div className="text-center mb-8">
+          <div
+            className="uppercase mb-2"
+            style={{
+              fontFamily: SYNE,
+              fontWeight: 600,
+              fontSize: 12,
+              letterSpacing: "0.12em",
+              color: "#EF4444",
+            }}
+          >
+            🔥 Live Founder Roasts
+          </div>
+          <h2
+            style={{
+              fontFamily: SYNE,
+              fontWeight: 700,
+              fontSize: "clamp(24px, 3.5vw, 34px)",
+              color: dark ? "#FFFFFF" : "#111827",
+            }}
+          >
+            Watch founders answer anything, in public
+          </h2>
+          <p
+            className="mx-auto mt-3 leading-relaxed"
+            style={{
+              fontFamily: DM,
+              fontWeight: 300,
+              fontSize: 16,
+              color: dark ? "rgba(255,255,255,0.6)" : "#6B7280",
+              maxWidth: 520,
+            }}
+          >
+            A 60-second pitch, then the audience races to ask. Every question
+            gets answered on the record — or the record says so.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 max-w-[900px] mx-auto">
+          {roasts.map((r) => (
+            <a
+              key={r.id}
+              href={`/roast/${r.id}`}
+              className="rounded-xl border p-5 transition-transform hover:-translate-y-0.5"
+              style={{
+                background: dark ? "#111114" : "#FFFFFF",
+                borderColor: dark ? "rgba(255,255,255,0.08)" : "#E5E7EB",
+              }}
+            >
+              <div
+                className="text-xs font-bold px-2 py-0.5 rounded-full inline-block mb-3"
+                style={{ background: "rgba(239,68,68,0.12)", color: "#EF4444" }}
+              >
+                Level {r.level}
+              </div>
+              <div
+                className="mb-1"
+                style={{
+                  fontFamily: SYNE,
+                  fontWeight: 700,
+                  fontSize: 16,
+                  color: dark ? "#FFFFFF" : "#111827",
+                }}
+              >
+                {r.company_name ?? "A Hockystick founder"}
+              </div>
+              {r.tagline && (
+                <div
+                  className="mb-3 line-clamp-2"
+                  style={{
+                    fontFamily: DM,
+                    fontSize: 13,
+                    color: dark ? "rgba(255,255,255,0.5)" : "#6B7280",
+                  }}
+                >
+                  {r.tagline}
+                </div>
+              )}
+              <div
+                style={{
+                  fontFamily: DM,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: dark ? "rgba(255,255,255,0.7)" : "#374151",
+                }}
+              >
+                {new Date(r.scheduled_at).toLocaleString("en-GB", {
+                  weekday: "short",
+                  day: "numeric",
+                  month: "short",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}{" "}
+                · join as a challenger →
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function TrustSection() {
   return (
     <section className="w-full py-20" style={{ background: PURPLE }}>

@@ -22,6 +22,63 @@ function PublicBadges({ startupId }: { startupId: string }) {
   );
 }
 
+/** Roast record: the receipts behind the badge. Public sessions only. */
+function RoastRecordLink({ startupId }: { startupId: string }) {
+  const { data: sessions = [] } = useQuery({
+    queryKey: ["public-roast-record", startupId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("roast_sessions")
+        .select("id, level, status, scheduled_at, badge_awarded")
+        .eq("startup_id", startupId)
+        .eq("is_public", true)
+        .in("status", ["scheduled", "lobby", "completed", "expired"])
+        .order("scheduled_at", { ascending: false })
+        .limit(3);
+      if (error) {
+        console.error("[roast] public record fetch failed:", error);
+        return [];
+      }
+      return data ?? [];
+    },
+  });
+  if (!sessions.length) return null;
+  return (
+    <div className="mt-4 space-y-2">
+      {sessions.map((s) => {
+        const upcoming = s.status === "scheduled" || s.status === "lobby";
+        const label = upcoming
+          ? `Live Roast ${new Date(s.scheduled_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })} — join as a challenger`
+          : s.status === "completed"
+            ? `Survived a Level ${s.level} Roast — read the public Q&A record`
+            : `Level ${s.level} Roast expired incomplete — see the record`;
+        return (
+          <a
+            key={s.id}
+            href={`/roast/${s.id}`}
+            className="inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-opacity hover:opacity-80"
+            style={
+              s.status === "expired"
+                ? {
+                    background: "rgba(239,68,68,0.12)",
+                    borderColor: "rgba(239,68,68,0.3)",
+                    color: "#F87171",
+                  }
+                : {
+                    background: "rgba(249,115,22,0.12)",
+                    borderColor: "rgba(249,115,22,0.3)",
+                    color: "#FB923C",
+                  }
+            }
+          >
+            <span aria-hidden>🔥</span> {label} <span aria-hidden>→</span>
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
 interface PublicStartup {
   id: string;
   company_name: string | null;
@@ -839,6 +896,7 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
             )}
             {/* Earned badges — trust first, then readiness, then community */}
             {startup?.id && <PublicBadges startupId={startup.id} />}
+            {startup?.id && <RoastRecordLink startupId={startup.id} />}
             {(startup.social_links ?? []).length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
                 {(startup.social_links ?? []).map((link, i) => (
