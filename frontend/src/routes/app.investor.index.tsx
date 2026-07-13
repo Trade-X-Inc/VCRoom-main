@@ -6,7 +6,7 @@ import {
   TrendingUp, Eye, Clock, AlertCircle, Briefcase,
   ChevronRight, BarChart3, ArrowUpRight, Paperclip, X as XIcon,
 } from "lucide-react";
-import ReactMarkdown from "react-markdown";
+import { Markdown } from "@/components/shared/LazyMarkdown";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -735,7 +735,7 @@ function InvestorChat() {
                     <div style={{ borderRadius: isUser ? "18px 4px 18px 18px" : "4px 18px 18px 18px", padding: "10px 14px", fontSize: 13, lineHeight: 1.6, background: isUser ? "linear-gradient(135deg, #7C3AED, #A855F7)" : "#111114", color: isUser ? "#fff" : "#FAFAFA", border: isUser ? "none" : "1px solid rgba(255,255,255,0.08)" }}>
                       {isUser ? m.content : (
                         <div className="[&_p]:mb-1.5 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:space-y-0.5 [&_ol]:list-decimal [&_ol]:pl-4 [&_strong]:font-semibold">
-                          <ReactMarkdown>{m.content}</ReactMarkdown>
+                          <Markdown>{m.content}</Markdown>
                         </div>
                       )}
                     </div>

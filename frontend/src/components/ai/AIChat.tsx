@@ -3,7 +3,7 @@ import { useRouterState } from "@tanstack/react-router";
 import { Sparkles, Send, Loader2, User } from "lucide-react";
 import { getAIAdvice } from "@/lib/advisor-fn";
 import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
-import ReactMarkdown from "react-markdown";
+import { Markdown } from "@/components/shared/LazyMarkdown";
 
 export interface ChatMsg {
   id: string;
@@ -100,7 +100,7 @@ export function AIChat({ userId, scope, starters, initialAssistant, className = 
               <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.role === "user" ? "bg-gradient-brand text-brand-foreground" : "bg-card border border-border/60 shadow-card"}`}>
                 {m.role === "assistant" ? (
                   <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0">
-                    <ReactMarkdown>{m.content}</ReactMarkdown>
+                    <Markdown>{m.content}</Markdown>
                   </div>
                 ) : m.content}
               </div>

@@ -12,7 +12,7 @@ import { secureAICall } from "@/lib/ai-secure-fn";
 import { PageGuide } from "@/components/app/PageGuide";
 import { generateInvestorMemo } from "@/lib/investor-memo-fn";
 import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
-import ReactMarkdown from "react-markdown";
+import { Markdown } from "@/components/shared/LazyMarkdown";
 
 export const Route = createFileRoute("/app/investor/analysis")({
   component: AnalysisPage,
@@ -536,7 +536,7 @@ Return this exact JSON shape:
               {memoText && (
                 <div>
                   <div className="p-6 prose prose-sm prose-neutral dark:prose-invert max-w-none text-sm leading-relaxed">
-                    <ReactMarkdown>{memoText}</ReactMarkdown>
+                    <Markdown>{memoText}</Markdown>
                   </div>
                   {memoGeneratedAt && (
                     <div className="px-6 pb-4 text-[11px] text-muted-foreground border-t border-border/40 pt-3">

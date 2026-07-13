@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { Client } from "@notionhq/client";
 import type {
   PageObjectResponse,
   BlockObjectResponse,
@@ -26,15 +25,9 @@ export interface BlogPostWithContent extends BlogPost {
   contentHtml: string;
 }
 
-function getNotionClient(): Client {
-  const cfEnv = (globalThis as any).__cf_env || {};
-  const key =
-    cfEnv.NOTION_API_KEY ||
-    (typeof process !== "undefined" ? process.env?.NOTION_API_KEY : "") ||
-    "";
-  if (!key) throw new Error("NOTION_API_KEY not set in Cloudflare secrets");
-  return new Client({ auth: key });
-}
+// All Notion calls in this file use raw fetch against api.notion.com — the
+// @notionhq/client SDK was 88KB of dead weight in the CF worker bundle and
+// only its types are used now.
 
 // Brand is "Hockystick" (no e). Notion-authored content has shipped with the
 // misspelling before — normalize every rendered string so it can't reach the

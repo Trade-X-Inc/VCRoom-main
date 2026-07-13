@@ -6,7 +6,6 @@ import {
   Loader2, X, MoreHorizontal,
   BellOff, Check, ExternalLink, TrendingUp, BarChart3,
 } from "lucide-react";
-import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
