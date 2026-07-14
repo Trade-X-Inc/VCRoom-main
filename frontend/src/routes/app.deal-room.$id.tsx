@@ -50,6 +50,7 @@ import {
   sendTermSheet, respondToTermSheet, createDocumentRequest, respondToDocumentRequest, passDeal,
   DEAL_STAGES, type DealStage,
 } from "@/lib/deal-room-fn";
+import { EmptyState } from "@/components/system";
 
 const ALLOWED_UPLOAD_EXTENSIONS = new Set(["pdf","pptx","ppt","xlsx","xls","docx","doc","csv","png","jpg","jpeg"]);
 const MAX_UPLOAD_SIZE = 50 * 1024 * 1024;
@@ -393,7 +394,7 @@ function DealRoom() {
   if (!user?.id || ndaLoading || !ndaAcceptance) {
     return (
       <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] items-center justify-center">
-        <div className="text-sm text-gray-500 dark:text-gray-400 animate-pulse">Verifying access…</div>
+        <div className="text-sm text-gray-500 animate-pulse">Verifying access…</div>
       </div>
     );
   }
@@ -402,12 +403,12 @@ function DealRoom() {
   if (isTeamMember && !teamAssignmentLoading && teamAssignment === null) {
     return (
       <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 p-8">
-        <div className="grid h-14 w-14 place-items-center rounded-full bg-gray-100/30 dark:bg-zinc-800/30">
-          <Lock className="h-6 w-6 text-gray-500 dark:text-gray-400" />
+        <div className="grid h-14 w-14 place-items-center rounded-full bg-gray-100/30 ">
+          <Lock className="h-6 w-6 text-gray-500 " />
         </div>
         <div className="text-center">
           <div className="font-semibold">Access restricted</div>
-          <div className="mt-1 text-sm text-gray-500 dark:text-gray-400 max-w-sm">
+          <div className="mt-1 text-sm text-gray-500 max-w-sm">
             You haven't been assigned to this deal room. Ask your team admin to give you access.
           </div>
         </div>
@@ -426,7 +427,7 @@ function DealRoom() {
     <div className="flex flex-col h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] relative">
       {/* ── Top header bar ─────────────────────────────────────── */}
       <header
-        className="shrink-0 border-b bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700"
+        className="shrink-0 border-b bg-white border-gray-200 "
         data-testid="deal-stage-bar"
       >
         <div className="flex items-center gap-3 px-4 py-3">
@@ -434,7 +435,7 @@ function DealRoom() {
           <div className="flex items-center gap-2.5 min-w-0">
             <Link
               to={"/app/deal-rooms" as any}
-              className="grid h-8 w-8 place-items-center rounded-lg text-gray-500 dark:text-gray-400 hover:text-foreground hover:bg-accent shrink-0"
+              className="grid h-8 w-8 place-items-center rounded-lg text-gray-500 hover:text-foreground hover:bg-accent shrink-0"
               title="All deal rooms"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -444,8 +445,8 @@ function DealRoom() {
               {companyName[0] ?? "D"}
             </div>
             <div className="min-w-0 hidden sm:block">
-              <div className="text-sm font-semibold text-gray-900 dark:text-foreground truncate" style={{ fontFamily: "Syne, sans-serif" }}>{companyName}</div>
-              <div className="text-[10px] text-gray-500 dark:text-gray-400">
+              <div className="text-sm font-semibold text-gray-900 truncate" style={{ fontFamily: "Syne, sans-serif" }}>{companyName}</div>
+              <div className="text-[10px] text-gray-500 ">
                 {isInvestor ? "Founder · Deal Room" : "Investor · Deal Room"}
                 {connectionOrigin && (
                   <> · Connected via directory request · {new Date(connectionOrigin.responded_at ?? connectionOrigin.created_at).toLocaleDateString()}</>
@@ -482,7 +483,7 @@ function DealRoom() {
           <div className="flex items-center gap-2 shrink-0 ml-auto">
             <button
               onClick={() => setActivityOpen(true)}
-              className="grid h-9 w-9 place-items-center rounded-lg text-gray-500 dark:text-gray-400 hover:text-foreground hover:bg-gray-100 dark:hover:bg-zinc-800"
+              className="grid h-9 w-9 place-items-center rounded-lg text-gray-500 hover:text-foreground hover:bg-gray-100 "
               title="Activity"
               data-testid="open-activity"
             >
@@ -501,14 +502,14 @@ function DealRoom() {
       </header>
 
       {/* ── Main content (full width) ──────────────────────────── */}
-      <main key={showOverview ? "overview" : activeStage} className="flex-1 overflow-y-auto min-h-0 bg-gray-50 dark:bg-background">
+      <main key={showOverview ? "overview" : activeStage} className="flex-1 overflow-y-auto min-h-0 bg-gray-50 ">
         {/* Stage approval banner — shown to the approver whenever a pending transition exists */}
         {isApprover && pendingTransition && (
           <div
-            className="mx-6 mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 px-4 py-3"
+            className="mx-6 mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"
             data-testid="stage-approval-banner"
           >
-            <div className="text-sm text-amber-900 dark:text-amber-200">
+            <div className="text-sm text-amber-900 ">
               <span className="font-semibold">{pendingTransition.requested_by === drInvestorUserId ? "Investor" : "Founder"}</span>
               {" "}has requested to advance to{" "}
               <span className="font-semibold">{pendingTransition.to_stage.replace(/_/g, " ")}</span>.
@@ -516,7 +517,7 @@ function DealRoom() {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => doRejectTransition(pendingTransition.id)}
-                className="rounded-lg border border-red-300 dark:border-red-700 px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                className="rounded-lg border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 "
                 data-testid="stage-reject-btn"
               >
                 Decline
@@ -578,12 +579,12 @@ function DealRoom() {
         <>
           <div className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm" onClick={() => setActivityOpen(false)} />
           <aside
-            className="fixed top-0 bottom-0 right-0 z-40 w-full sm:w-[420px] border-l border-gray-200 dark:border-zinc-700 flex flex-col bg-white dark:bg-zinc-900"
+            className="fixed top-0 bottom-0 right-0 z-40 w-full sm:w-[420px] border-l border-gray-200 flex flex-col bg-white "
             data-testid="activity-drawer"
           >
-            <div className="h-14 border-b border-gray-200 dark:border-zinc-700 flex items-center justify-between px-4">
+            <div className="h-14 border-b border-gray-200 flex items-center justify-between px-4">
               <div className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Activity</div>
-              <button onClick={() => setActivityOpen(false)} className="grid h-8 w-8 place-items-center rounded-md text-gray-500 dark:text-gray-400 hover:bg-accent hover:text-foreground"><X className="h-4 w-4" /></button>
+              <button onClick={() => setActivityOpen(false)} className="grid h-8 w-8 place-items-center rounded-md text-gray-500 hover:bg-accent hover:text-foreground"><X className="h-4 w-4" /></button>
             </div>
             <div className="flex-1 min-h-0 overflow-y-auto">
               <Timeline dealRoomId={dealRoomId} />
@@ -596,16 +597,16 @@ function DealRoom() {
       {aiOpen && (
         <>
           <div className="fixed inset-0 z-30 bg-foreground/20 backdrop-blur-sm" onClick={() => setAiOpen(false)} />
-          <aside className="fixed top-16 bottom-0 right-0 z-40 w-full sm:w-[440px] border-l border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-xl flex flex-col" data-testid="ai-panel">
-            <div className="h-14 border-b border-gray-200 dark:border-zinc-700 flex items-center justify-between px-4">
+          <aside className="fixed top-16 bottom-0 right-0 z-40 w-full sm:w-[440px] border-l border-gray-200 bg-white shadow-xl flex flex-col" data-testid="ai-panel">
+            <div className="h-14 border-b border-gray-200 flex items-center justify-between px-4">
               <div className="flex items-center gap-2">
                 <div className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-brand text-brand-foreground"><Sparkles className="h-3.5 w-3.5" /></div>
                 <div>
                   <div className="text-sm font-semibold leading-tight">Deal Room AI</div>
-                  <div className="text-[10px] text-gray-500 dark:text-gray-400">{companyName}</div>
+                  <div className="text-[10px] text-gray-500 ">{companyName}</div>
                 </div>
               </div>
-              <button onClick={() => setAiOpen(false)} className="grid h-8 w-8 place-items-center rounded-md text-gray-500 dark:text-gray-400 hover:bg-accent hover:text-foreground" data-testid="close-ai"><X className="h-4 w-4" /></button>
+              <button onClick={() => setAiOpen(false)} className="grid h-8 w-8 place-items-center rounded-md text-gray-500 hover:bg-accent hover:text-foreground" data-testid="close-ai"><X className="h-4 w-4" /></button>
             </div>
             <div className="flex-1 min-h-0">
               <AIChat
@@ -695,15 +696,15 @@ function StageBar({
 
   return (
     <div className="relative min-w-0 flex-1" data-testid="stage-pills">
-      <nav ref={scrollRef} className="flex flex-nowrap overflow-x-auto border-b border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900">
+      <nav ref={scrollRef} className="flex flex-nowrap overflow-x-auto border-b border-gray-200 bg-white ">
         {STAGES.map((stage) => {
           const active = stage.key === "overview" ? showOverview : !showOverview && activeStageKey === stage.key;
           const accessible = canAccess(stage.key);
           const className = active
             ? "hs-gradient text-white rounded-t-lg px-4 py-2 text-sm font-medium whitespace-nowrap"
             : accessible
-              ? "text-gray-600 dark:text-gray-400 px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-t-lg whitespace-nowrap"
-              : "text-gray-300 dark:text-gray-600 px-4 py-2 text-sm cursor-not-allowed whitespace-nowrap";
+              ? "text-gray-600 px-4 py-2 text-sm hover:bg-gray-50 rounded-t-lg whitespace-nowrap"
+              : "text-gray-300 px-4 py-2 text-sm cursor-not-allowed whitespace-nowrap";
           return (
             <button
               key={stage.key}
@@ -730,7 +731,7 @@ function StageBar({
         {!canAccess("qa") && activeStageKey === "information_vault" && isInvestor && (
           <button
             onClick={onUnlockQa}
-            className="ml-2 text-gray-600 dark:text-gray-400 px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-t-lg whitespace-nowrap"
+            className="ml-2 text-gray-600 px-4 py-2 text-sm hover:bg-gray-50 rounded-t-lg whitespace-nowrap"
             data-testid="stage-next-qa"
           >
             Next →
@@ -739,23 +740,23 @@ function StageBar({
       </nav>
       {/* Scroll affordance — fades in on either edge only while there's more to scroll to */}
       {canScrollLeft && (
-        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-white dark:from-zinc-900 to-transparent" />
+        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-white to-transparent" />
       )}
       {canScrollRight && (
-        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white dark:from-zinc-900 to-transparent" />
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent" />
       )}
     </div>
   );
 }
 
 // ── Reusable dark UI atoms ─────────────────────────────────────────
-const CARD_CLASSES = "bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl";
+const CARD_CLASSES = "bg-white border border-gray-200 rounded-xl";
 const CARD: React.CSSProperties = {
   borderRadius: 12,
 };
 function DarkCard({ children, className = "", style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
   return (
-    <div className={`bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl ${className}`} style={{ padding: "20px 24px", ...style }}>
+    <div className={`bg-white border border-gray-200 rounded-xl ${className}`} style={{ padding: "20px 24px", ...style }}>
       {children}
     </div>
   );
@@ -775,7 +776,7 @@ function PrimaryButton({ children, onClick, disabled, testid, className = "" }: 
 }
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <div className="text-[10px] uppercase tracking-[0.12em] font-semibold mb-2 text-gray-500 dark:text-gray-400" style={{ fontFamily: "Syne, sans-serif" }}>
+    <div className="text-[10px] uppercase tracking-[0.12em] font-semibold mb-2 text-gray-500 " style={{ fontFamily: "Syne, sans-serif" }}>
       {children}
     </div>
   );
@@ -814,7 +815,7 @@ function StagedDealRoom({
   return (
     <div className="p-6 md:p-8 max-w-5xl mx-auto">
       {viewingHistory && (
-        <div style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)" }} className="mb-5 flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs text-gray-700 dark:text-gray-300">
+        <div style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)" }} className="mb-5 flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs text-gray-700 ">
           <Clock className="h-3.5 w-3.5" style={{ color: "#A855F7" }} />
           Viewing {STAGE_SHORT[activeStage]} history. This stage is complete — current stage is {STAGE_SHORT[currentStage]}.
         </div>
@@ -920,10 +921,10 @@ function PassModal({ dealRoomId, userId, onClose }: { dealRoomId: string; userId
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-2xl" style={{ padding: 0 }} onClick={(e) => e.stopPropagation()} data-testid="pass-modal">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-zinc-700">
+      <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl" style={{ padding: 0 }} onClick={(e) => e.stopPropagation()} data-testid="pass-modal">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 ">
           <div className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Pass on this deal</div>
-          <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md text-gray-500 dark:text-gray-400 hover:bg-accent hover:text-foreground"><X className="h-4 w-4" /></button>
+          <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md text-gray-500 hover:bg-accent hover:text-foreground"><X className="h-4 w-4" /></button>
         </div>
         <div className="p-5 space-y-4">
           <div>
@@ -931,7 +932,7 @@ function PassModal({ dealRoomId, userId, onClose }: { dealRoomId: string; userId
             <select
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full rounded-lg px-3 py-2.5 text-sm text-gray-900 dark:text-foreground outline-none bg-muted border border-gray-200 dark:border-zinc-700"
+              className="w-full rounded-lg px-3 py-2.5 text-sm text-gray-900 outline-none bg-muted border border-gray-200 "
               data-testid="pass-reason"
             >
               {PASS_REASONS.map((r) => <option key={r} value={r} style={{ background: "var(--color-card)" }}>{r}</option>)}
@@ -944,7 +945,7 @@ function PassModal({ dealRoomId, userId, onClose }: { dealRoomId: string; userId
               onChange={(e) => setContext(e.target.value)}
               rows={2}
               placeholder="One or two sentences the founder will see."
-              className="w-full rounded-lg px-3 py-2.5 text-sm text-foreground outline-none resize-none placeholder:text-gray-500 dark:text-gray-400"
+              className="w-full rounded-lg px-3 py-2.5 text-sm text-foreground outline-none resize-none placeholder:text-gray-500 "
               style={{ background: "var(--color-muted)", border: "1px solid var(--color-border)" }}
             />
           </div>
@@ -954,7 +955,7 @@ function PassModal({ dealRoomId, userId, onClose }: { dealRoomId: string; userId
               value={reconsider}
               onChange={(e) => setReconsider(e.target.value)}
               placeholder="e.g. you reach $50K MRR"
-              className="w-full rounded-lg px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-gray-500 dark:text-gray-400"
+              className="w-full rounded-lg px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-gray-500 "
               style={{ background: "var(--color-muted)", border: "1px solid var(--color-border)" }}
             />
           </div>
@@ -980,7 +981,7 @@ function PassModal({ dealRoomId, userId, onClose }: { dealRoomId: string; userId
 function ConfirmModal({ title, body, confirmLabel, onConfirm, onClose, testid, busy }: { title: string; body: string; confirmLabel: string; onConfirm: () => void; onClose: () => void; testid?: string; busy?: boolean }) {
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-sm bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-2xl" style={{ padding: 0 }} onClick={(e) => e.stopPropagation()} data-testid={testid}>
+      <div className="w-full max-w-sm bg-white border border-gray-200 rounded-2xl" style={{ padding: 0 }} onClick={(e) => e.stopPropagation()} data-testid={testid}>
         <div className="px-5 py-4 border-b" style={{ borderColor: "var(--color-border)" }}>
           <div className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{title}</div>
         </div>
@@ -1291,8 +1292,8 @@ function InformationVaultPanel({
         className={cn(
           "rounded-xl border overflow-hidden",
           vaultNdaDoc
-            ? "bg-white dark:bg-zinc-900 border-[rgba(16,185,129,0.3)]"
-            : "bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700",
+            ? "bg-white border-[rgba(16,185,129,0.3)]"
+            : "bg-white border-gray-200 ",
         )}
       >
         <div className="flex items-center justify-between px-5 py-4">
@@ -1301,13 +1302,13 @@ function InformationVaultPanel({
               "h-9 w-9 rounded-lg flex items-center justify-center shrink-0",
               vaultNdaDoc
                 ? "bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.2)]"
-                : "bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700",
+                : "bg-gray-100 border border-gray-200 ",
             )}>
-              <Shield className={cn("h-4 w-4", vaultNdaDoc ? "text-[#10B981]" : "text-gray-400 dark:text-gray-500")} />
+              <Shield className={cn("h-4 w-4", vaultNdaDoc ? "text-[#10B981]" : "text-gray-400 ")} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-gray-900 dark:text-foreground">Non-Disclosure Agreement</span>
+                <span className="text-sm font-semibold text-gray-900 ">Non-Disclosure Agreement</span>
                 {vaultNdaDoc ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(16,185,129,0.12)] text-[#10B981] text-[10px] font-semibold px-2 py-0.5">
                     <CheckCircle2 className="h-3 w-3" /> Signed
@@ -1318,7 +1319,7 @@ function InformationVaultPanel({
                   </span>
                 )}
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              <div className="text-xs text-gray-500 mt-0.5">
                 {vaultNdaDoc
                   ? `${vaultNdaSigners.length} ${vaultNdaSigners.length === 1 ? "party" : "parties"} bound · v${vaultNdaDoc.version} · System generated`
                   : "Auto-generated once all parties sign"}
@@ -1329,13 +1330,13 @@ function InformationVaultPanel({
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => setVaultNdaModalOpen(true)}
-                className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-foreground border border-gray-200 dark:border-zinc-700 rounded-lg px-3 py-1.5 transition-colors"
+                className="text-xs text-gray-500 hover:text-gray-900 border border-gray-200 rounded-lg px-3 py-1.5 transition-colors"
               >
                 View NDA
               </button>
               <button
                 onClick={() => window.print()}
-                className="inline-flex items-center gap-1.5 text-xs border border-gray-200 dark:border-zinc-700 rounded-lg px-3 py-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-foreground transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs border border-gray-200 rounded-lg px-3 py-1.5 text-gray-500 hover:text-gray-900 transition-colors"
               >
                 <Download className="h-3.5 w-3.5" /> PDF
               </button>
@@ -1346,10 +1347,10 @@ function InformationVaultPanel({
         {vaultNdaDoc && vaultNdaSigners.length > 0 && (
           <div className="px-5 pb-4 flex flex-wrap gap-2">
             {(vaultNdaSigners as any[]).map((s, i) => (
-              <div key={i} className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700 px-3 py-1 text-xs">
+              <div key={i} className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 border border-gray-100 px-3 py-1 text-xs">
                 <CheckCircle2 className="h-3 w-3 text-[#10B981] shrink-0" />
-                <span className="font-medium text-gray-900 dark:text-foreground">{s.signer_full_name}</span>
-                <span className="text-gray-400 dark:text-gray-500">· {s.role}</span>
+                <span className="font-medium text-gray-900 ">{s.signer_full_name}</span>
+                <span className="text-gray-400 ">· {s.role}</span>
               </div>
             ))}
           </div>
@@ -1410,7 +1411,7 @@ function InformationVaultPanel({
         const isOpen = qaReportModalOpen === report.id;
 
         return (
-          <div key={report.id} className="rounded-xl border border-[rgba(16,185,129,0.3)] bg-white dark:bg-zinc-900 overflow-hidden">
+          <div key={report.id} className="rounded-xl border border-[rgba(16,185,129,0.3)] bg-white overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4">
               <div className="flex items-center gap-3">
                 <div className="h-9 w-9 rounded-lg bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.2)] flex items-center justify-center shrink-0">
@@ -1418,19 +1419,19 @@ function InformationVaultPanel({
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-gray-900 dark:text-foreground">Q&amp;A Report</span>
+                    <span className="text-sm font-semibold text-gray-900 ">Q&amp;A Report</span>
                     <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(16,185,129,0.12)] text-[#10B981] text-[10px] font-semibold px-2 py-0.5">
                       <CheckCircle2 className="h-3 w-3" /> Complete
                     </span>
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  <div className="text-xs text-gray-500 mt-0.5">
                     {reportDate} · {totalQs} questions · {answeredQs} answered
                   </div>
                 </div>
               </div>
               <button
                 onClick={() => setQaReportModalOpen(isOpen ? null : report.id)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-zinc-700 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-zinc-800"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 "
               >
                 <Eye className="h-3.5 w-3.5" /> View report
               </button>
@@ -1486,39 +1487,39 @@ function InformationVaultPanel({
       })}
 
       {/* ── SECTION 1: Digital Profiles ── */}
-      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <button
           onClick={() => setProfilesOpen((o) => !o)}
-          className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
+          className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition-colors"
         >
           <div className="flex items-center gap-3">
             <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center">
               <Building2 className="h-4 w-4 text-brand" />
             </div>
             <div>
-              <div className="text-sm font-semibold text-gray-900 dark:text-foreground">Digital Profiles</div>
+              <div className="text-sm font-semibold text-gray-900 ">Digital Profiles</div>
               {!profilesOpen && (
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                <div className="text-xs text-gray-500 mt-0.5">
                   {startup?.company_name ?? "—"} {startup?.tagline ? `· ${startup.tagline}` : ""}
                 </div>
               )}
             </div>
           </div>
-          {profilesOpen ? <ChevronUp className="h-4 w-4 text-gray-400 dark:text-zinc-500" /> : <ChevronDown className="h-4 w-4 text-gray-400 dark:text-zinc-500" />}
+          {profilesOpen ? <ChevronUp className="h-4 w-4 text-gray-400 " /> : <ChevronDown className="h-4 w-4 text-gray-400 " />}
         </button>
 
         {profilesOpen && (
-          <div className="px-6 pb-6 border-t border-gray-100 dark:border-zinc-800">
+          <div className="px-6 pb-6 border-t border-gray-100 ">
             {(profileSections as any[]).length === 0 ? (
               <div className="mt-4 space-y-2">
                 {DEFAULT_PROFILE_SECTIONS.map((s) => (
-                  <div key={s.key} className="flex items-center justify-between rounded-lg border border-gray-100 dark:border-zinc-800 px-4 py-3">
-                    <span className="text-sm font-medium text-gray-400 dark:text-gray-500">{s.label}</span>
-                    <span className="text-xs text-gray-300 dark:text-gray-600 italic">Not added yet</span>
+                  <div key={s.key} className="flex items-center justify-between rounded-lg border border-gray-100 px-4 py-3">
+                    <span className="text-sm font-medium text-gray-400 ">{s.label}</span>
+                    <span className="text-xs text-gray-300 italic">Not added</span>
                   </div>
                 ))}
                 {isFounder && (
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
+                  <p className="text-xs text-gray-400 mt-3">
                     Add profile sections in your <Link to="/app/documents" className="text-brand hover:underline">Documents page</Link>.
                   </p>
                 )}
@@ -1526,33 +1527,33 @@ function InformationVaultPanel({
             ) : (
               <div className="mt-4 space-y-3">
                 {(profileSections as any[]).map((sec: any) => (
-                  <div key={sec.id} className="rounded-lg border border-gray-100 dark:border-zinc-800 px-4 py-3">
+                  <div key={sec.id} className="rounded-lg border border-gray-100 px-4 py-3">
                     <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="text-sm font-semibold text-gray-900 dark:text-foreground">{sec.section_label}</span>
+                      <span className="text-sm font-semibold text-gray-900 ">{sec.section_label}</span>
                       <div className="flex items-center gap-2">
                         <span className={cn(
                           "text-[10px] font-medium rounded-full px-2 py-0.5",
                           sec.visibility === "public"
-                            ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                            ? "bg-green-50 text-green-700  "
                             : "bg-accent text-brand"
                         )}>
                           {sec.visibility === "public" ? "Public" : "Deal Room"}
                         </span>
                         {isFounder && (
-                          <button className="grid h-6 w-6 place-items-center rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" onClick={() => console.log("edit section — Claude Code will wire")}>
+                          <button className="grid h-6 w-6 place-items-center rounded text-gray-400 hover:text-gray-600 " onClick={() => console.log("edit section — Claude Code will wire")}>
                             <Pencil className="h-3 w-3" />
                           </button>
                         )}
                       </div>
                     </div>
                     {sec.content && (
-                      <div className="text-sm text-gray-600 dark:text-gray-300">
+                      <div className="text-sm text-gray-600 ">
                         {typeof sec.content === "object" && sec.content !== null
                           ? (sec.content.text
                             ? <p>{sec.content.text}</p>
                             : Object.entries(sec.content).map(([k, v]) => (
                               <div key={k} className="flex gap-1.5 text-xs">
-                                <span className="font-medium text-gray-500 dark:text-gray-400 shrink-0">{k}:</span>
+                                <span className="font-medium text-gray-500 shrink-0">{k}:</span>
                                 <span>{String(v)}</span>
                               </div>
                             ))
@@ -1570,12 +1571,12 @@ function InformationVaultPanel({
       </div>
 
       {/* ── SECTION 2: Document Requests ── */}
-      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800">
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 ">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-gray-900 dark:text-foreground">Document Requests</span>
+            <span className="text-sm font-semibold text-gray-900 ">Document Requests</span>
             {(docRequests as any[]).length > 0 && (
-              <span className="rounded-full bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 text-xs font-medium text-gray-600 dark:text-gray-400">
+              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 ">
                 {(docRequests as any[]).length}
               </span>
             )}
@@ -1593,12 +1594,12 @@ function InformationVaultPanel({
         </div>
 
         {showReqForm && (
-          <div className="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/50 space-y-3">
+          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 space-y-3">
             <input
               value={reqName}
               onChange={(e) => setReqName(e.target.value)}
               placeholder="Document name (e.g. Cap table, Bank statement)"
-              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
+              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
               data-testid="iv-req-name"
             />
             <textarea
@@ -1606,12 +1607,12 @@ function InformationVaultPanel({
               onChange={(e) => setReqDesc(e.target.value)}
               rows={2}
               placeholder="Why you need this document (optional)"
-              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none resize-none focus:border-brand"
+              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none resize-none focus:border-brand"
             />
             <select
               value={reqCategory}
               onChange={(e) => setReqCategory(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground outline-none"
+              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none"
               data-testid="iv-req-category"
             >
               {["Financial", "Legal", "Team", "Product", "Other"].map((c) => (
@@ -1619,7 +1620,7 @@ function InformationVaultPanel({
               ))}
             </select>
             <div className="flex items-center justify-end gap-2">
-              <button onClick={() => { setShowReqForm(false); setReqName(""); setReqDesc(""); }} className="rounded-lg px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border border-gray-200 dark:border-zinc-700">
+              <button onClick={() => { setShowReqForm(false); setReqName(""); setReqDesc(""); }} className="rounded-lg px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 border border-gray-200 ">
                 Cancel
               </button>
               <button
@@ -1635,20 +1636,16 @@ function InformationVaultPanel({
           </div>
         )}
 
-        <div className="divide-y divide-gray-100 dark:divide-zinc-800">
+        <div className="divide-y divide-gray-100 ">
           {(docRequests as any[]).length === 0 ? (
-            <div className="px-6 py-8 text-center">
-              <FolderOpen className="h-8 w-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-              <p className="text-sm text-gray-500 dark:text-gray-400">No document requests yet</p>
-              {isInvestor && <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Request specific documents from the founder above.</p>}
-            </div>
+            <EmptyState kind="empty" title="No requests" />
           ) : (
             (docRequests as any[]).map((req: any) => {
               const statusMap: Record<string, { label: string; cls: string }> = {
-                pending: { label: "Pending", cls: "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400" },
-                fulfilled: { label: "Fulfilled", cls: "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400" },
-                provided: { label: "Fulfilled", cls: "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400" },
-                declined: { label: "Declined", cls: "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400" },
+                pending: { label: "Pending", cls: "bg-amber-50 text-amber-700  " },
+                fulfilled: { label: "Fulfilled", cls: "bg-green-50 text-green-700  " },
+                provided: { label: "Fulfilled", cls: "bg-green-50 text-green-700  " },
+                declined: { label: "Declined", cls: "bg-red-50 text-red-700  " },
               };
               const pill = statusMap[req.status] ?? statusMap.pending;
               const canFounderRespond = isFounder && req.status === "pending" && req.requested_from === userId;
@@ -1658,18 +1655,18 @@ function InformationVaultPanel({
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-semibold text-gray-900 dark:text-foreground">{req.document_name}</span>
+                        <span className="text-sm font-semibold text-gray-900 ">{req.document_name}</span>
                         {req.category && (
-                          <span className="rounded-full bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400">
+                          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-500 ">
                             {req.category}
                           </span>
                         )}
                       </div>
                       {req.document_description && (
-                        <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{req.document_description}</p>
+                        <p className="mt-0.5 text-xs text-gray-500 line-clamp-1">{req.document_description}</p>
                       )}
                       {req.decline_reason && (
-                        <p className="mt-1 text-xs text-red-600 dark:text-red-400">Declined: {req.decline_reason}</p>
+                        <p className="mt-1 text-xs text-red-600 ">Declined: {req.decline_reason}</p>
                       )}
                     </div>
                     <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-xs font-medium", pill.cls)}>
@@ -1679,14 +1676,14 @@ function InformationVaultPanel({
 
                   {canFounderRespond && declineMode !== req.id && (
                     <div className="mt-3 flex items-center gap-2">
-                      <label className="inline-flex items-center gap-1.5 cursor-pointer rounded-lg border border-gray-200 dark:border-zinc-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800">
+                      <label className="inline-flex items-center gap-1.5 cursor-pointer rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 ">
                         <Upload className="h-3.5 w-3.5" />
                         Upload
                         <input type="file" className="sr-only" onChange={() => console.log("upload — Claude Code will wire")} />
                       </label>
                       <button
                         onClick={() => { setDeclineMode(req.id); setDeclineReason(""); }}
-                        className="rounded-lg border border-red-200 dark:border-red-900/40 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10"
+                        className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 "
                       >
                         Decline
                       </button>
@@ -1700,10 +1697,10 @@ function InformationVaultPanel({
                         onChange={(e) => setDeclineReason(e.target.value)}
                         rows={2}
                         placeholder="Reason for declining"
-                        className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-xs text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none resize-none"
+                        className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-xs text-gray-900 placeholder:text-gray-400 outline-none resize-none"
                       />
                       <div className="flex gap-2">
-                        <button onClick={() => setDeclineMode(null)} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400">Cancel</button>
+                        <button onClick={() => setDeclineMode(null)} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-500 ">Cancel</button>
                         <button
                           onClick={() => declineRequest(req.id)}
                           disabled={!declineReason.trim() || respondingReqId === req.id}
@@ -1723,9 +1720,9 @@ function InformationVaultPanel({
       </div>
 
       {/* ── SECTION 3: Documents & Links ── */}
-      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 dark:border-zinc-800">
-          <span className="text-sm font-semibold text-gray-900 dark:text-foreground">Documents & Links</span>
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 ">
+          <span className="text-sm font-semibold text-gray-900 ">Documents & Links</span>
         </div>
         <div className="px-0 py-0">
           <Documents
@@ -1740,9 +1737,9 @@ function InformationVaultPanel({
 
       {/* ── SECTION 4: Notes ── */}
       {isInvestor && (
-        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800">
-            <span className="text-sm font-semibold text-gray-900 dark:text-foreground">My Notes</span>
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 ">
+            <span className="text-sm font-semibold text-gray-900 ">My Notes</span>
             <button
               onClick={() => setShowNoteForm((v) => !v)}
               className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-foreground"
@@ -1754,25 +1751,25 @@ function InformationVaultPanel({
           </div>
 
           {showNoteForm && (
-            <div className="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/50 space-y-3">
+            <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 space-y-3">
               <input
                 value={noteTitle}
                 onChange={(e) => setNoteTitle(e.target.value)}
                 placeholder="Note title"
-                className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
+                className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
               />
               <textarea
                 value={noteContent}
                 onChange={(e) => setNoteContent(e.target.value)}
                 rows={4}
                 placeholder="Write your notes here..."
-                className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none resize-none focus:border-brand"
+                className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none resize-none focus:border-brand"
               />
               <div className="flex items-center gap-3 flex-wrap">
                 <select
                   value={noteVisibility}
                   onChange={(e) => setNoteVisibility(e.target.value as "private" | "shared")}
-                  className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground outline-none"
+                  className="rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none"
                 >
                   <option value="private">Private (only me)</option>
                   <option value="shared">Share with founder</option>
@@ -1784,7 +1781,7 @@ function InformationVaultPanel({
                   <Sparkles className="h-3.5 w-3.5" /> Generate with AI
                 </button>
                 <div className="ml-auto flex items-center gap-2">
-                  <button onClick={() => setShowNoteForm(false)} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-3 py-2 text-xs text-gray-500 dark:text-gray-400">Cancel</button>
+                  <button onClick={() => setShowNoteForm(false)} className="rounded-lg border border-gray-200 px-3 py-2 text-xs text-gray-500 ">Cancel</button>
                   <button
                     onClick={saveNote}
                     disabled={!noteContent.trim() || noteSaving}
@@ -1799,20 +1796,16 @@ function InformationVaultPanel({
             </div>
           )}
 
-          <div className="divide-y divide-gray-100 dark:divide-zinc-800">
+          <div className="divide-y divide-gray-100 ">
             {(notes as any[]).length === 0 ? (
-              <div className="px-6 py-8 text-center">
-                <StickyNote className="h-8 w-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                <p className="text-sm text-gray-500 dark:text-gray-400">No notes yet</p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Notes are private by default.</p>
-              </div>
+              <EmptyState kind="empty" title="No notes" />
             ) : (
               (notes as any[]).map((note: any) => (
                 <div key={note.id} className="px-6 py-4 group">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      {note.title && <div className="text-sm font-semibold text-gray-900 dark:text-foreground mb-1">{note.title}</div>}
-                      <p className={cn("text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap", expandedNoteId !== note.id && "line-clamp-2")}>
+                      {note.title && <div className="text-sm font-semibold text-gray-900 mb-1">{note.title}</div>}
+                      <p className={cn("text-sm text-gray-600 whitespace-pre-wrap", expandedNoteId !== note.id && "line-clamp-2")}>
                         {note.content}
                       </p>
                       {note.content?.length > 120 && (
@@ -1826,12 +1819,12 @@ function InformationVaultPanel({
                       <div className="mt-2 flex items-center gap-2">
                         <span className={cn("text-[10px] rounded-full px-2 py-0.5 font-medium",
                           note.visibility === "shared"
-                            ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
-                            : "bg-gray-100 text-gray-500 dark:bg-zinc-800 dark:text-gray-400"
+                            ? "bg-green-50 text-green-700  "
+                            : "bg-gray-100 text-gray-500  "
                         )}>
                           {note.visibility === "shared" ? "Shared" : "Private"}
                         </span>
-                        <span className="text-[10px] text-gray-400 dark:text-gray-500">
+                        <span className="text-[10px] text-gray-400 ">
                           {formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}
                         </span>
                       </div>
@@ -1851,22 +1844,19 @@ function InformationVaultPanel({
       )}
 
       {isFounder && (
-        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 dark:border-zinc-800">
-            <span className="text-sm font-semibold text-gray-900 dark:text-foreground">Notes from investor</span>
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 ">
+            <span className="text-sm font-semibold text-gray-900 ">Notes from investor</span>
           </div>
-          <div className="divide-y divide-gray-100 dark:divide-zinc-800">
+          <div className="divide-y divide-gray-100 ">
             {(notes as any[]).length === 0 ? (
-              <div className="px-6 py-8 text-center">
-                <StickyNote className="h-8 w-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                <p className="text-sm text-gray-500 dark:text-gray-400">No shared notes yet</p>
-              </div>
+              <EmptyState kind="empty" title="No shared notes" />
             ) : (
               (notes as any[]).map((note: any) => (
                 <div key={note.id} className="px-6 py-4">
-                  {note.title && <div className="text-sm font-semibold text-gray-900 dark:text-foreground mb-1">{note.title}</div>}
-                  <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 whitespace-pre-wrap">{note.content}</p>
-                  <div className="mt-2 text-[10px] text-gray-400 dark:text-gray-500">
+                  {note.title && <div className="text-sm font-semibold text-gray-900 mb-1">{note.title}</div>}
+                  <p className="text-sm text-gray-600 line-clamp-2 whitespace-pre-wrap">{note.content}</p>
+                  <div className="mt-2 text-[10px] text-gray-400 ">
                     {formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}
                   </div>
                 </div>
@@ -1877,14 +1867,14 @@ function InformationVaultPanel({
       )}
 
       {/* ── SECTION 5: Next Stage / Decision ── */}
-      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-6 py-5">
+      <div className="bg-white border border-gray-200 rounded-xl px-6 py-5">
         {showDecisionForm ? (
           <div className="space-y-3">
-            <div className="text-sm font-semibold text-gray-900 dark:text-foreground">Submit a decision</div>
+            <div className="text-sm font-semibold text-gray-900 ">Submit a decision</div>
             <select
               value={decisionOutcome}
               onChange={(e) => setDecisionOutcome(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground outline-none"
+              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none"
             >
               {["Pass", "Withdraw", "Pause"].map((o) => <option key={o} value={o}>{o}</option>)}
             </select>
@@ -1893,10 +1883,10 @@ function InformationVaultPanel({
               onChange={(e) => setDecisionReason(e.target.value)}
               rows={3}
               placeholder="Reason (required)"
-              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none resize-none"
+              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none resize-none"
             />
             <div className="flex items-center gap-2">
-              <button onClick={() => setShowDecisionForm(false)} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-4 py-2 text-sm text-gray-500 dark:text-gray-400">Cancel</button>
+              <button onClick={() => setShowDecisionForm(false)} className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-500 ">Cancel</button>
               <button
                 onClick={submitDecision}
                 disabled={!decisionReason.trim()}
@@ -1911,7 +1901,7 @@ function InformationVaultPanel({
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <button
               onClick={() => setShowDecisionForm(true)}
-              className="rounded-lg border border-red-200 dark:border-red-900/40 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:bg-zinc-900 hover:bg-red-50 dark:hover:bg-red-900/10"
+              className="rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 bg-white hover:bg-red-50 "
             >
               Decision
             </button>
@@ -2379,12 +2369,7 @@ function QAPanel({
 
           {/* Question cards */}
           {orderedQuestions.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center rounded-xl border border-border/60 bg-card">
-              <MessagesSquare className="h-10 w-10 text-muted-foreground/30 mb-3" />
-              <p className="text-sm text-muted-foreground">
-                {isInvestor ? "No questions yet. Ask the first one above." : "No questions from the investor yet."}
-              </p>
-            </div>
+            <EmptyState kind="empty" title="No questions" />
           ) : (
             orderedQuestions.map((q, idx) => {
               const qNum = questions.indexOf(q) + 1;
@@ -2555,12 +2540,12 @@ function QAPanel({
 // ── Due Diligence Panel ────────────────────────────────────────────
 
 const DD_CATEGORY_COLORS: Record<string, string> = {
-  Team: "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
-  Market: "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400",
-  Financials: "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-brand",
-  Legal: "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400",
-  Product: "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400",
-  Traction: "bg-pink-50 text-pink-700 dark:bg-pink-900/20 dark:text-pink-400",
+  Team: "bg-blue-50 text-blue-700  ",
+  Market: "bg-green-50 text-green-700  ",
+  Financials: "bg-purple-50 text-purple-700  ",
+  Legal: "bg-amber-50 text-amber-700  ",
+  Product: "bg-indigo-50 text-indigo-700  ",
+  Traction: "bg-pink-50 text-pink-700  ",
 };
 
 const DD_STATUS_CYCLE: Record<string, string> = {
@@ -2906,14 +2891,14 @@ function DueDiligencePanel({
       </div>
     );
     if (status === "in_progress") return (
-      <div className="h-6 w-6 rounded-full border-2 border-amber-400 bg-amber-50 dark:bg-amber-900/20 shrink-0" />
+      <div className="h-6 w-6 rounded-full border-2 border-amber-400 bg-amber-50 shrink-0" />
     );
     if (status === "flagged") return (
       <div className="h-6 w-6 rounded-full bg-red-500 flex items-center justify-center shrink-0">
         <AlertCircle className="h-3.5 w-3.5 text-foreground" />
       </div>
     );
-    return <div className="h-6 w-6 rounded-full border-2 border-gray-300 dark:border-zinc-600 shrink-0" />;
+    return <div className="h-6 w-6 rounded-full border-2 border-gray-300 shrink-0" />;
   };
 
   // ══════════════════════════════════════════════
@@ -2940,47 +2925,47 @@ function DueDiligencePanel({
     return (
       <div className="space-y-6">
         {fGoals.length === 0 ? (
-          <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-6 py-12 text-center">
-            <ClipboardList className="h-12 w-12 text-gray-200 dark:text-zinc-700 mx-auto mb-4" />
-            <p className="text-sm font-semibold text-gray-900 dark:text-foreground mb-1">The investor has not started due diligence yet</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">You will see their diligence goals and progress here once they begin.</p>
+          <div className="bg-white border border-gray-200 rounded-xl px-6 py-12 text-center">
+            <ClipboardList className="h-12 w-12 text-gray-200 mx-auto mb-4" />
+            <p className="text-sm font-semibold text-gray-900 mb-1">Due diligence not started</p>
+            <p className="text-sm text-gray-500 ">You will see their diligence goals and progress here once they begin.</p>
           </div>
         ) : (
           <>
             {/* Header */}
             <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Diligence Report</h2>
-              {lastUpdated && <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Updated by investor · {lastUpdated}</p>}
+              <h2 className="text-xl font-bold text-gray-900 " style={{ fontFamily: "Syne, sans-serif" }}>Diligence Report</h2>
+              {lastUpdated && <p className="text-sm text-gray-500 mt-0.5">Updated by investor · {lastUpdated}</p>}
             </div>
 
             {/* Progress summary */}
-            <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-6 py-5">
+            <div className="bg-white border border-gray-200 rounded-xl px-6 py-5">
               <div className="flex items-center gap-4 flex-wrap mb-4">
-                <span className="rounded-full bg-gray-100 dark:bg-zinc-800 px-3 py-1 text-xs font-medium text-gray-700 dark:text-gray-300">{fTotal} total goals</span>
-                <span className="rounded-full bg-green-50 dark:bg-green-900/20 px-3 py-1 text-xs font-medium text-green-700 dark:text-green-400">{fCompleted} complete</span>
-                {fFlagged > 0 && <span className="rounded-full bg-red-50 dark:bg-red-900/20 px-3 py-1 text-xs font-medium text-red-700 dark:text-red-400">{fFlagged} flagged</span>}
+                <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 ">{fTotal} total goals</span>
+                <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700 ">{fCompleted} complete</span>
+                {fFlagged > 0 && <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-700 ">{fFlagged} flagged</span>}
               </div>
-              <div className="h-2 rounded-full bg-gray-200 dark:bg-zinc-700 overflow-hidden">
+              <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
                 <div className="h-2 rounded-full transition-all" style={{ width: `${fPct}%`, background: "var(--gradient-brand)" }} />
               </div>
-              <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">{fPct}% complete</p>
+              <p className="mt-1.5 text-xs text-gray-500 ">{fPct}% complete</p>
             </div>
 
             {/* Goals by category */}
             {fCategories.map((cat) => {
               const catGoals = fGoals.filter((g: any) => g.category === cat);
               return (
-                <div key={cat} className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
-                  <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 dark:border-zinc-800">
-                    <span className="text-sm font-semibold text-gray-900 dark:text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{cat}</span>
-                    <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", DD_CATEGORY_COLORS[cat] ?? "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400")}>{catGoals.length}</span>
+                <div key={cat} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                  <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 ">
+                    <span className="text-sm font-semibold text-gray-900 " style={{ fontFamily: "Syne, sans-serif" }}>{cat}</span>
+                    <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", DD_CATEGORY_COLORS[cat] ?? "bg-gray-100 text-gray-600  ")}>{catGoals.length}</span>
                   </div>
-                  <div className="divide-y divide-gray-100 dark:divide-zinc-800">
+                  <div className="divide-y divide-gray-100 ">
                     {catGoals.map((g: any) => (
                       <div key={g.id} className="flex items-center gap-3 px-5 py-3">
                         <StatusCircle status={g.status} />
-                        <span className={cn("text-sm flex-1", g.status === "complete" ? "line-through text-gray-400 dark:text-gray-500" : "text-gray-900 dark:text-white")}>{g.goal_text}</span>
-                        {g.status === "flagged" && <span className="text-[10px] rounded-full bg-red-50 dark:bg-red-900/20 px-2 py-0.5 text-red-600 dark:text-red-400 font-medium">Flagged</span>}
+                        <span className={cn("text-sm flex-1", g.status === "complete" ? "line-through text-gray-400 " : "text-gray-900 ")}>{g.goal_text}</span>
+                        {g.status === "flagged" && <span className="text-[10px] rounded-full bg-red-50 px-2 py-0.5 text-red-600 font-medium">Flagged</span>}
                       </div>
                     ))}
                   </div>
@@ -2989,29 +2974,29 @@ function DueDiligencePanel({
             })}
 
             {/* AI Analysis */}
-            <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-6 py-5">
-              <div className="text-sm font-semibold text-gray-900 dark:text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>AI Analysis</div>
+            <div className="bg-white border border-gray-200 rounded-xl px-6 py-5">
+              <div className="text-sm font-semibold text-gray-900 mb-1" style={{ fontFamily: "Syne, sans-serif" }}>AI Analysis</div>
               {analysisShared && ddAnalysisParsed ? (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <span className={cn("rounded-full px-3 py-1 text-xs font-semibold",
-                      ddAnalysisParsed.risk_level === "low" ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400" :
-                      ddAnalysisParsed.risk_level === "high" ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400" :
-                      "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
+                      ddAnalysisParsed.risk_level === "low" ? "bg-green-50 text-green-700  " :
+                      ddAnalysisParsed.risk_level === "high" ? "bg-red-50 text-red-700  " :
+                      "bg-amber-50 text-amber-700  "
                     )}>
                       {ddAnalysisParsed.risk_level?.toUpperCase() ?? "—"} RISK
                     </span>
                   </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{ddAnalysisParsed.summary}</p>
+                  <p className="text-sm text-gray-700 leading-relaxed">{ddAnalysisParsed.summary}</p>
                   <div style={{ borderLeft: "3px solid var(--brand)" }} className="pl-4 py-1">
-                    <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Recommendation</div>
-                    <p className="text-sm text-gray-800 dark:text-gray-200">{ddAnalysisParsed.recommendation}</p>
+                    <div className="text-xs font-semibold text-gray-500 mb-1">Recommendation</div>
+                    <p className="text-sm text-gray-800 ">{ddAnalysisParsed.recommendation}</p>
                   </div>
                 </div>
               ) : (
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Investor analysis not shared yet.</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Investors can choose to share their analysis with you.</p>
+                  <p className="text-sm text-gray-500">Not shared</p>
+                  <p className="text-xs text-gray-400 mt-1">Investors can choose to share their analysis with you.</p>
                 </div>
               )}
             </div>
@@ -3029,12 +3014,12 @@ function DueDiligencePanel({
 
       {/* ── SECTION A: Onboarding card ── */}
       {showOnboarding && (
-        <div className="bg-white dark:bg-zinc-900 border border-brand/20 rounded-xl px-6 py-6 text-center">
+        <div className="bg-white border border-brand/20 rounded-xl px-6 py-6 text-center">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl" style={{ background: "rgba(124,58,237,0.08)" }}>
             <ClipboardList className="h-6 w-6 text-brand" />
           </div>
-          <h3 className="text-base font-bold text-gray-900 dark:text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>Set up your diligence goals</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-5">
+          <h3 className="text-base font-bold text-gray-900 mb-1" style={{ fontFamily: "Syne, sans-serif" }}>Set up your diligence goals</h3>
+          <p className="text-sm text-gray-500 max-w-sm mx-auto mb-5">
             Choose from standard goals or add your own. Goals guide your diligence and generate a structured report.
           </p>
           <div className="flex items-center justify-center gap-3 flex-wrap">
@@ -3050,7 +3035,7 @@ function DueDiligencePanel({
             </button>
             <button
               onClick={() => { setOnboardingDone(true); setShowOnboarding(false); }}
-              className="rounded-lg border border-gray-200 dark:border-zinc-700 px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 "
             >
               Start from scratch
             </button>
@@ -3060,9 +3045,9 @@ function DueDiligencePanel({
 
       {/* ── SECTION B: Goal Workstation (shown when goals exist or onboarding dismissed) ── */}
       {(!showOnboarding || onboardingDone) && (
-        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           {/* Category tabs */}
-          <div className="flex items-center gap-0 border-b border-gray-100 dark:border-zinc-800 overflow-x-auto px-4 pt-3">
+          <div className="flex items-center gap-0 border-b border-gray-100 overflow-x-auto px-4 pt-3">
             {categories.map((cat) => (
               <button
                 key={cat}
@@ -3071,7 +3056,7 @@ function DueDiligencePanel({
                   "px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors",
                   activeCategory === cat
                     ? "border-brand text-brand"
-                    : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white",
+                    : "border-transparent text-gray-600 hover:text-gray-900 ",
                 )}
               >
                 {cat}
@@ -3083,10 +3068,10 @@ function DueDiligencePanel({
           {totalCount > 0 && (
             <div className="px-5 pt-4 pb-2">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs text-gray-500 dark:text-gray-400">{completedCount} / {totalCount} goals complete</span>
+                <span className="text-xs text-gray-500 ">{completedCount} / {totalCount} goals complete</span>
                 <span className="text-xs font-semibold text-brand">{progressPct}%</span>
               </div>
-              <div className="h-1.5 rounded-full bg-gray-200 dark:bg-zinc-700 overflow-hidden">
+              <div className="h-1.5 rounded-full bg-gray-200 overflow-hidden">
                 <div className="h-1.5 rounded-full transition-all" style={{ width: `${progressPct}%`, background: "var(--gradient-brand)" }} />
               </div>
             </div>
@@ -3095,15 +3080,13 @@ function DueDiligencePanel({
           {/* Goal list */}
           <div className="px-4 py-3 space-y-2">
             {filteredGoals.length === 0 && (
-              <div className="py-8 text-center">
-                <p className="text-sm text-gray-400 dark:text-gray-500">No goals in this category yet</p>
-              </div>
+              <EmptyState kind="empty" title="No goals" />
             )}
 
             {filteredGoals.map((goal: any) => {
               const isExpanded = expandedGoalId === goal.id;
               return (
-                <div key={goal.id} className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-4">
+                <div key={goal.id} className="bg-white border border-gray-200 rounded-xl p-4">
                   <div className="flex items-start gap-3">
                     {/* Status circle (clickable) */}
                     <button
@@ -3122,11 +3105,11 @@ function DueDiligencePanel({
                         className="text-left w-full"
                       >
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className={cn("text-sm font-medium", DD_CATEGORY_COLORS[goal.category] ?? "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400", "rounded-full px-2 py-0.5 text-[10px]")}>{goal.category}</span>
-                          {goal.is_standard && <span className="text-[10px] rounded-full bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 text-gray-500 dark:text-gray-400">Standard</span>}
-                          {goal.due_by && <span className="text-[10px] text-gray-400 dark:text-gray-500">Due {format(new Date(goal.due_by), "MMM d")}</span>}
+                          <span className={cn("text-sm font-medium", DD_CATEGORY_COLORS[goal.category] ?? "bg-gray-100 text-gray-600  ", "rounded-full px-2 py-0.5 text-[10px]")}>{goal.category}</span>
+                          {goal.is_standard && <span className="text-[10px] rounded-full bg-gray-100 px-2 py-0.5 text-gray-500 ">Standard</span>}
+                          {goal.due_by && <span className="text-[10px] text-gray-400 ">Due {format(new Date(goal.due_by), "MMM d")}</span>}
                         </div>
-                        <p className={cn("mt-1 text-sm", goal.status === "complete" ? "line-through text-gray-400 dark:text-gray-500" : "text-gray-900 dark:text-white")}>
+                        <p className={cn("mt-1 text-sm", goal.status === "complete" ? "line-through text-gray-400 " : "text-gray-900 ")}>
                           {goal.goal_text}
                         </p>
                       </button>
@@ -3140,17 +3123,17 @@ function DueDiligencePanel({
                             onBlur={(e) => saveNote(goal.id, e.target.value)}
                             rows={3}
                             placeholder="Notes..."
-                            className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
+                            className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
                           />
-                          {savingNoteId === goal.id && <span className="text-[10px] text-gray-400 dark:text-zinc-500">Saving…</span>}
+                          {savingNoteId === goal.id && <span className="text-[10px] text-gray-400 ">Saving…</span>}
                           <div className="flex items-center gap-2">
-                            <label className="text-xs text-gray-500 dark:text-gray-400">Due date</label>
+                            <label className="text-xs text-gray-500 ">Due date</label>
                             <input
                               type="date"
                               value={goalDueDates[goal.id] ?? ""}
                               onChange={(e) => setGoalDueDates((prev) => ({ ...prev, [goal.id]: e.target.value }))}
                               onBlur={(e) => saveDueDate(goal.id, e.target.value)}
-                              className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-1.5 text-sm text-gray-900 dark:text-foreground outline-none"
+                              className="rounded-lg border border-gray-300 bg-gray-50 px-3 py-1.5 text-sm text-gray-900 outline-none"
                             />
                           </div>
                           {goal.status !== "complete" && (
@@ -3171,13 +3154,13 @@ function DueDiligencePanel({
                       <button
                         onClick={() => flagGoal(goal)}
                         title="Flag"
-                        className="rounded-lg p-1.5 text-gray-400 dark:text-zinc-500 hover:text-red-500"
+                        className="rounded-lg p-1.5 text-gray-400 hover:text-red-500"
                       >
                         <AlertTriangle className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => deleteGoal(goal.id)}
-                        className="rounded-lg p-1.5 text-gray-400 dark:text-zinc-500 hover:text-red-500"
+                        className="rounded-lg p-1.5 text-gray-400 hover:text-red-500"
                         title="Delete"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -3195,7 +3178,7 @@ function DueDiligencePanel({
                   <select
                     value={newGoalCategory}
                     onChange={(e) => setNewGoalCategory(e.target.value)}
-                    className="col-span-1 rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm outline-none"
+                    className="col-span-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none"
                   >
                     {["Team", "Market", "Financials", "Legal", "Product", "Traction"].map((c) => (
                       <option key={c} value={c}>{c}</option>
@@ -3205,12 +3188,12 @@ function DueDiligencePanel({
                     value={newGoalText}
                     onChange={(e) => setNewGoalText(e.target.value)}
                     placeholder="Describe the goal..."
-                    className="col-span-2 rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
+                    className="col-span-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
                     onKeyDown={(e) => { if (e.key === "Enter") addCustomGoal(); }}
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setAddGoalOpen(false)} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-3 py-1.5 text-xs text-gray-500">Cancel</button>
+                  <button onClick={() => setAddGoalOpen(false)} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-500">Cancel</button>
                   <button
                     onClick={addCustomGoal}
                     disabled={!newGoalText.trim() || addingGoal}
@@ -3225,7 +3208,7 @@ function DueDiligencePanel({
             ) : (
               <button
                 onClick={() => setAddGoalOpen(true)}
-                className="w-full rounded-xl border border-dashed border-gray-300 dark:border-zinc-600 py-3 text-sm text-gray-500 dark:text-gray-400 hover:border-brand hover:text-brand flex items-center justify-center gap-2"
+                className="w-full rounded-xl border border-dashed border-gray-300 py-3 text-sm text-gray-500 hover:border-brand hover:text-brand flex items-center justify-center gap-2"
                 data-testid="dd-add-goal-btn"
               >
                 <Plus className="h-4 w-4" /> Add custom goal
@@ -3236,14 +3219,14 @@ function DueDiligencePanel({
       )}
 
       {/* ── SECTION C: AI Analysis ── */}
-      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <button
           onClick={() => setAnalysisOpen((v) => !v)}
           className="w-full flex items-center justify-between px-5 py-4"
         >
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-brand" />
-            <span className="text-sm font-semibold text-gray-900 dark:text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>AI Analysis</span>
+            <span className="text-sm font-semibold text-gray-900 " style={{ fontFamily: "Syne, sans-serif" }}>AI Analysis</span>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -3260,14 +3243,14 @@ function DueDiligencePanel({
         </button>
 
         {analysisOpen && (
-          <div className="border-t border-gray-100 dark:border-zinc-800 px-5 py-5">
+          <div className="border-t border-gray-100 px-5 py-5">
             {!analysisResult && !runningAnalysis && (
-              <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">Click "Run analysis" to generate an AI diligence report based on your goals and Q&A thread.</p>
+              <p className="text-sm text-gray-400 text-center py-4">Click "Run analysis" to generate an AI diligence report based on your goals and Q&A thread.</p>
             )}
             {runningAnalysis && (
               <div className="flex items-center justify-center gap-2 py-6">
                 <Loader2 className="h-5 w-5 animate-spin text-brand" />
-                <span className="text-sm text-gray-500 dark:text-gray-400">Analysing…</span>
+                <span className="text-sm text-gray-500 ">Analysing…</span>
               </div>
             )}
             {analysisResult && !runningAnalysis && (
@@ -3275,26 +3258,26 @@ function DueDiligencePanel({
                 {/* Risk badge */}
                 <div className="flex items-center gap-3">
                   <span className={cn("rounded-full px-3 py-1 text-xs font-bold",
-                    analysisResult.risk_level === "low" ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400" :
-                    analysisResult.risk_level === "high" ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400" :
-                    "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
+                    analysisResult.risk_level === "low" ? "bg-green-50 text-green-700  " :
+                    analysisResult.risk_level === "high" ? "bg-red-50 text-red-700  " :
+                    "bg-amber-50 text-amber-700  "
                   )}>
                     {(analysisResult.risk_level ?? "medium").toUpperCase()} RISK
                   </span>
                 </div>
                 {/* Summary */}
-                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{analysisResult.summary}</p>
+                <p className="text-sm text-gray-700 leading-relaxed">{analysisResult.summary}</p>
                 {/* 3 columns */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {[
-                    { label: "Strengths", items: analysisResult.strengths ?? [], color: "text-green-600 dark:text-green-400", dot: "bg-green-500" },
-                    { label: "Risks", items: analysisResult.risks ?? [], color: "text-red-600 dark:text-red-400", dot: "bg-red-500" },
-                    { label: "Flags", items: analysisResult.flags ?? [], color: "text-amber-600 dark:text-amber-400", dot: "bg-amber-500" },
+                    { label: "Strengths", items: analysisResult.strengths ?? [], color: "text-green-600 ", dot: "bg-green-500" },
+                    { label: "Risks", items: analysisResult.risks ?? [], color: "text-red-600 ", dot: "bg-red-500" },
+                    { label: "Flags", items: analysisResult.flags ?? [], color: "text-amber-600 ", dot: "bg-amber-500" },
                   ].map(({ label, items, color, dot }) => (
                     <div key={label}>
-                      <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">{label}</div>
+                      <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">{label}</div>
                       {(items as string[]).length === 0 ? (
-                        <p className="text-xs text-gray-400 dark:text-gray-500 italic">None identified</p>
+                        <p className="text-xs text-gray-400 italic">None identified</p>
                       ) : (
                         <ul className="space-y-1.5">
                           {(items as string[]).map((item, i) => (
@@ -3310,8 +3293,8 @@ function DueDiligencePanel({
                 </div>
                 {/* Recommendation */}
                 <div style={{ borderLeft: "3px solid var(--brand)" }} className="pl-4 py-1">
-                  <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">Recommendation</div>
-                  <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">{analysisResult.recommendation}</p>
+                  <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Recommendation</div>
+                  <p className="text-sm text-gray-800 leading-relaxed">{analysisResult.recommendation}</p>
                 </div>
               </div>
             )}
@@ -3321,47 +3304,47 @@ function DueDiligencePanel({
 
       {/* ── SECTION D: Research from previous stages ── */}
       <div className="space-y-3">
-        <div className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-xs" style={{ fontFamily: "Syne, sans-serif" }}>Research from previous stages</div>
+        <div className="text-sm font-semibold text-gray-500 uppercase tracking-wider text-xs" style={{ fontFamily: "Syne, sans-serif" }}>Research from previous stages</div>
 
         {/* Q&A Summary */}
-        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <button
             onClick={() => setQaSummaryOpen((v) => !v)}
             className="w-full flex items-center justify-between px-5 py-4"
           >
-            <span className="text-sm font-semibold text-gray-900 dark:text-foreground">Q&A Summary</span>
+            <span className="text-sm font-semibold text-gray-900 ">Q&A Summary</span>
             {qaSummaryOpen ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
           </button>
           {qaSummaryOpen && (
-            <div className="border-t border-gray-100 dark:border-zinc-800 px-5 py-4">
+            <div className="border-t border-gray-100 px-5 py-4">
               {qaSummaryNote ? (
-                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{qaSummaryNote.content}</p>
+                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{qaSummaryNote.content}</p>
               ) : (
-                <p className="text-sm text-gray-400 dark:text-gray-500">Q&A summary not generated yet. Go to the Q&A stage to generate one.</p>
+                <p className="text-sm text-gray-400">Not generated</p>
               )}
             </div>
           )}
         </div>
 
         {/* Vault notes */}
-        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <button
             onClick={() => setVaultNotesOpen((v) => !v)}
             className="w-full flex items-center justify-between px-5 py-4"
           >
-            <span className="text-sm font-semibold text-gray-900 dark:text-foreground">Notes from Information Vault</span>
+            <span className="text-sm font-semibold text-gray-900 ">Notes from Information Vault</span>
             {vaultNotesOpen ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
           </button>
           {vaultNotesOpen && (
-            <div className="border-t border-gray-100 dark:border-zinc-800 divide-y divide-gray-100 dark:divide-zinc-800">
+            <div className="border-t border-gray-100 divide-y divide-gray-100 ">
               {(vaultNotes as any[]).length === 0 ? (
-                <p className="px-5 py-4 text-sm text-gray-400 dark:text-gray-500">No notes from the information vault yet.</p>
+                <p className="px-5 py-4 text-sm text-gray-400">No notes</p>
               ) : (
                 (vaultNotes as any[]).map((note: any) => (
                   <div key={note.id} className="px-5 py-4">
-                    <div className="text-sm font-medium text-gray-900 dark:text-foreground mb-0.5">{note.title}</div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">{note.content?.slice(0, 100)}{(note.content?.length ?? 0) > 100 ? "…" : ""}</p>
-                    <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">{formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}</p>
+                    <div className="text-sm font-medium text-gray-900 mb-0.5">{note.title}</div>
+                    <p className="text-xs text-gray-500 line-clamp-2">{note.content?.slice(0, 100)}{(note.content?.length ?? 0) > 100 ? "…" : ""}</p>
+                    <p className="text-[10px] text-gray-400 mt-1">{formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}</p>
                   </div>
                 ))
               )}
@@ -3371,14 +3354,14 @@ function DueDiligencePanel({
       </div>
 
       {/* ── Next Stage / Decision ── */}
-      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-6 py-5">
+      <div className="bg-white border border-gray-200 rounded-xl px-6 py-5">
         {showDecision ? (
           <div className="space-y-3">
-            <div className="text-sm font-semibold text-gray-900 dark:text-foreground">Submit a decision</div>
+            <div className="text-sm font-semibold text-gray-900 ">Submit a decision</div>
             <select
               value={decisionOutcome}
               onChange={(e) => setDecisionOutcome(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground outline-none"
+              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none"
             >
               {["Pass", "Withdraw", "Pause"].map((o) => <option key={o}>{o}</option>)}
             </select>
@@ -3387,10 +3370,10 @@ function DueDiligencePanel({
               onChange={(e) => setDecisionReason(e.target.value)}
               rows={3}
               placeholder="Reason (required)"
-              className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none"
+              className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
             />
             <div className="flex items-center gap-2">
-              <button onClick={() => setShowDecision(false)} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-4 py-2 text-sm text-gray-500 dark:text-gray-400">Cancel</button>
+              <button onClick={() => setShowDecision(false)} className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-500 ">Cancel</button>
               <button
                 onClick={() => { console.log("submitDecision dd:", decisionOutcome, decisionReason); setShowDecision(false); setDecisionReason(""); }}
                 disabled={!decisionReason.trim()}
@@ -3405,7 +3388,7 @@ function DueDiligencePanel({
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <button
               onClick={() => setShowDecision(true)}
-              className="rounded-lg border border-red-200 dark:border-red-900/40 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:bg-zinc-900 hover:bg-red-50 dark:hover:bg-red-900/10"
+              className="rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 bg-white hover:bg-red-50 "
             >
               Decision
             </button>
@@ -3513,7 +3496,7 @@ function NdaStagePanel({ dealRoomId, room, memberList, isInvestor, isFounder }: 
         {isFounder ? (
           <div className="text-sm" style={{ color: "var(--color-foreground)" }}>
             <div className="font-semibold text-foreground">Upload your Stage 1 documents</div>
-            <p className="mt-1 text-xs" style={{ color: "var(--color-muted-foreground)" }}>Add your deck and key materials. They appear in the investor's Stage 1 review when the investor opens it.</p>
+            <p className="mt-1 text-xs" style={{ color: "var(--color-muted-foreground)" }}>Appears in the investor's Stage 1 review.</p>
           </div>
         ) : (
           <div className="text-sm" style={{ color: "var(--color-foreground)" }}>
@@ -3534,11 +3517,11 @@ function companyNameOf(room: any) {
 // ── New Term Sheet Panel (DR-4) ────────────────────────────────────
 
 const TS_STATUS_COLORS: Record<string, string> = {
-  draft: "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400",
-  sent: "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
-  counter_proposed: "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400",
-  accepted: "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400",
-  rejected: "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400",
+  draft: "bg-gray-100 text-gray-600  ",
+  sent: "bg-blue-50 text-blue-700  ",
+  counter_proposed: "bg-amber-50 text-amber-700  ",
+  accepted: "bg-green-50 text-green-700  ",
+  rejected: "bg-red-50 text-red-700  ",
 };
 
 const DEFAULT_TS_TERMS = {
@@ -3713,24 +3696,24 @@ function NewTermSheetPanel({
 
   const TermInput = ({ label, field, type = "text", placeholder = "" }: { label: string; field: keyof typeof tsForm; type?: string; placeholder?: string }) => (
     <div>
-      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{label}</label>
+      <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
       <input
         type={type}
         value={tsForm[field]}
         onChange={(e) => setTsForm((p) => ({ ...p, [field]: e.target.value }))}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
+        className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
       />
     </div>
   );
 
   const TermSelect = ({ label, field, options }: { label: string; field: keyof typeof tsForm; options: string[] }) => (
     <div>
-      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{label}</label>
+      <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
       <select
         value={tsForm[field]}
         onChange={(e) => setTsForm((p) => ({ ...p, [field]: e.target.value }))}
-        className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground outline-none"
+        className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none"
       >
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
       </select>
@@ -3742,9 +3725,9 @@ function NewTermSheetPanel({
 
       {/* ── Editor ── */}
       {editorOpen && isInvestor && (
-        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
-            <h3 className="text-sm font-bold text-gray-900 dark:text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 ">
+            <h3 className="text-sm font-bold text-gray-900 " style={{ fontFamily: "Syne, sans-serif" }}>
               Term Sheet v{editingVersion ? editingVersion.version : nextVersion}
             </h3>
             <div className="flex items-center gap-2">
@@ -3777,23 +3760,23 @@ function NewTermSheetPanel({
               <TermInput label="Closing date" field="closing_date" type="date" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Conditions precedent</label>
+              <label className="block text-xs font-medium text-gray-500 mb-1">Conditions precedent</label>
               <textarea
                 value={tsForm.conditions_precedent}
                 onChange={(e) => setTsForm((p) => ({ ...p, conditions_precedent: e.target.value }))}
                 rows={2}
                 placeholder="e.g. Completion of legal audit..."
-                className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
+                className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Additional notes</label>
+              <label className="block text-xs font-medium text-gray-500 mb-1">Additional notes</label>
               <textarea
                 value={tsNotes}
                 onChange={(e) => setTsNotes(e.target.value)}
                 rows={2}
                 placeholder="Any other terms or conditions..."
-                className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
+                className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
               />
             </div>
 
@@ -3801,7 +3784,7 @@ function NewTermSheetPanel({
               <button
                 onClick={saveDraft}
                 disabled={savingDraft}
-                className="rounded-lg border border-gray-200 dark:border-zinc-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-50"
+                className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 disabled:opacity-50"
               >
                 {savingDraft ? "Saving…" : "Save draft"}
               </button>
@@ -3822,12 +3805,12 @@ function NewTermSheetPanel({
 
       {/* ── Onboarding (investor, no sheets yet) ── */}
       {isInvestor && !editorOpen && allSheets.length === 0 && (
-        <div className="bg-white dark:bg-zinc-900 border border-brand/20 rounded-xl px-6 py-10 text-center">
+        <div className="bg-white border border-brand/20 rounded-xl px-6 py-10 text-center">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl" style={{ background: "rgba(124,58,237,0.08)" }}>
             <FileText className="h-6 w-6 text-brand" />
           </div>
-          <h3 className="text-base font-bold text-gray-900 dark:text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>Draft a term sheet</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-5">Create the investment terms to share with the founder. You can save a draft before sending.</p>
+          <h3 className="text-base font-bold text-gray-900 mb-1" style={{ fontFamily: "Syne, sans-serif" }}>Draft a term sheet</h3>
+          <p className="text-sm text-gray-500 max-w-sm mx-auto mb-5">Share investment terms with the founder.</p>
           <button
             onClick={() => openEditor()}
             className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-foreground"
@@ -3843,26 +3826,26 @@ function NewTermSheetPanel({
       {isInvestor && !editorOpen && allSheets.length > 0 && (
         <>
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-gray-900 dark:text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Term sheets</h3>
+            <h3 className="text-sm font-bold text-gray-900 " style={{ fontFamily: "Syne, sans-serif" }}>Term sheets</h3>
             <button onClick={() => openEditor()} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-foreground" style={{ background: "var(--gradient-brand)" }}>
               <Plus className="h-3.5 w-3.5" /> New version
             </button>
           </div>
           <div className="space-y-3">
             {allSheets.map((sheet: any) => (
-              <div key={sheet.id} className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-5">
+              <div key={sheet.id} className="bg-white border border-gray-200 rounded-xl p-5">
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-gray-900 dark:text-foreground">Term Sheet v{sheet.version}</span>
-                      <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold", TS_STATUS_COLORS[sheet.status] ?? "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400")}>
+                      <span className="text-sm font-semibold text-gray-900 ">Term Sheet v{sheet.version}</span>
+                      <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold", TS_STATUS_COLORS[sheet.status] ?? "bg-gray-100 text-gray-600  ")}>
                         {sheet.status?.replace(/_/g, " ")}
                       </span>
                     </div>
-                    {sheet.sent_at && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Sent {formatDistanceToNow(new Date(sheet.sent_at), { addSuffix: true })}</p>}
+                    {sheet.sent_at && <p className="text-xs text-gray-400 mt-0.5">Sent {formatDistanceToNow(new Date(sheet.sent_at), { addSuffix: true })}</p>}
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <button onClick={() => openEditor(sheet)} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300">View / Edit</button>
+                    <button onClick={() => openEditor(sheet)} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 ">View / Edit</button>
                     {sheet.status === "sent" && (
                       <>
                         <button
@@ -3876,7 +3859,7 @@ function NewTermSheetPanel({
                         <button
                           onClick={() => updateStatus(sheet.id, "rejected")}
                           disabled={respondingId === sheet.id}
-                          className="rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/40"
+                          className="rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 border border-red-200 "
                         >
                           Reject
                         </button>
@@ -3894,11 +3877,7 @@ function NewTermSheetPanel({
       {!isInvestor && (
         <>
           {visibleSheets.length === 0 ? (
-            <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-6 py-10 text-center">
-              <FileText className="h-10 w-10 text-gray-200 dark:text-zinc-700 mx-auto mb-3" />
-              <p className="text-sm font-semibold text-gray-900 dark:text-foreground mb-1">No term sheet received yet</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">The investor will send one when ready.</p>
-            </div>
+            <EmptyState kind="empty" title="No term sheet" />
           ) : (
             <div className="space-y-4">
               {visibleSheets.map((sheet: any) => {
@@ -3917,31 +3896,31 @@ function NewTermSheetPanel({
                   ["conditions_precedent", "Conditions precedent"],
                 ];
                 return (
-                  <div key={sheet.id} className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
-                    <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
+                  <div key={sheet.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                    <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 ">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-gray-900 dark:text-foreground">Term Sheet v{sheet.version}</span>
-                        <span className={cn("rounded-full px-2.5 py-0.5 text-[10px] font-semibold", TS_STATUS_COLORS[sheet.status] ?? "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400")}>
+                        <span className="text-sm font-bold text-gray-900 ">Term Sheet v{sheet.version}</span>
+                        <span className={cn("rounded-full px-2.5 py-0.5 text-[10px] font-semibold", TS_STATUS_COLORS[sheet.status] ?? "bg-gray-100 text-gray-600  ")}>
                           {sheet.status?.replace(/_/g, " ")}
                         </span>
                       </div>
-                      {sheet.sent_at && <span className="text-xs text-gray-400 dark:text-gray-500">{formatDistanceToNow(new Date(sheet.sent_at), { addSuffix: true })}</span>}
+                      {sheet.sent_at && <span className="text-xs text-gray-400 ">{formatDistanceToNow(new Date(sheet.sent_at), { addSuffix: true })}</span>}
                     </div>
 
                     <div className="px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
                       {TERM_LABELS.filter(([k]) => terms[k]).map(([k, label]) => (
                         <div key={k} className="flex items-start justify-between gap-2">
-                          <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">{label}</span>
-                          <span className="text-sm text-gray-900 dark:text-foreground text-right">{String(terms[k])}</span>
+                          <span className="text-xs text-gray-500 shrink-0">{label}</span>
+                          <span className="text-sm text-gray-900 text-right">{String(terms[k])}</span>
                         </div>
                       ))}
                     </div>
 
                     {sheet.notes && (
                       <div className="px-5 pb-4">
-                        <div className="rounded-lg bg-gray-50 dark:bg-zinc-800 px-3 py-3">
-                          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Additional notes</p>
-                          <p className="text-sm text-gray-700 dark:text-gray-300">{sheet.notes}</p>
+                        <div className="rounded-lg bg-gray-50 px-3 py-3">
+                          <p className="text-xs text-gray-500 font-medium mb-1">Additional notes</p>
+                          <p className="text-sm text-gray-700 ">{sheet.notes}</p>
                         </div>
                       </div>
                     )}
@@ -3956,10 +3935,10 @@ function NewTermSheetPanel({
                               onChange={(e) => setCounterText(e.target.value)}
                               rows={3}
                               placeholder="Describe your counter-offer terms in plain language..."
-                              className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none"
+                              className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
                             />
                             <div className="flex gap-2">
-                              <button onClick={() => { setCounterOpen(null); setCounterText(""); }} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-3 py-1.5 text-xs text-gray-500">Cancel</button>
+                              <button onClick={() => { setCounterOpen(null); setCounterText(""); }} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-500">Cancel</button>
                               <button
                                 onClick={() => submitCounter(sheet.id, sheet.version)}
                                 disabled={!counterText.trim() || respondingId === sheet.id}
@@ -3975,7 +3954,7 @@ function NewTermSheetPanel({
                           <div className="flex flex-wrap gap-2">
                             <button
                               onClick={() => setCounterOpen(sheet.id)}
-                              className="rounded-lg border border-amber-200 dark:border-amber-900/40 px-4 py-2 text-sm font-medium text-amber-700 dark:text-amber-400"
+                              className="rounded-lg border border-amber-200 px-4 py-2 text-sm font-medium text-amber-700 "
                               data-testid="counter-offer-btn"
                             >
                               Submit counter-offer
@@ -4015,10 +3994,10 @@ function NewTermSheetPanel({
 
       {/* Investor: advance to Closing */}
       {isInvestor && (
-        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-5 flex items-center justify-between gap-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-5 flex items-center justify-between gap-4">
           <div>
-            <div className="text-sm font-semibold text-gray-900 dark:text-foreground">Ready to close?</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Request to advance to the Closing stage when terms are agreed.</div>
+            <div className="text-sm font-semibold text-gray-900 ">Ready to close?</div>
+            <div className="text-xs text-gray-500 mt-0.5">Request to advance to the Closing stage when terms are agreed.</div>
           </div>
           <button
             onClick={onRequestNextStage}
@@ -4036,11 +4015,11 @@ function NewTermSheetPanel({
       {/* Accept confirm dialog */}
       {acceptConfirmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-700 p-6 max-w-sm w-full mx-4 space-y-4">
-            <h3 className="text-base font-bold text-gray-900 dark:text-foreground">Accept this term sheet?</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">This will mark the term sheet as accepted. The investor will be notified. Review with a lawyer before accepting.</p>
+          <div className="bg-white rounded-xl border border-gray-200 p-6 max-w-sm w-full mx-4 space-y-4">
+            <h3 className="text-base font-bold text-gray-900 ">Accept this term sheet?</h3>
+            <p className="text-sm text-gray-500">Review with a lawyer before accepting.</p>
             <div className="flex gap-2">
-              <button onClick={() => setAcceptConfirmId(null)} className="flex-1 rounded-lg border border-gray-200 dark:border-zinc-700 px-4 py-2 text-sm text-gray-500">Cancel</button>
+              <button onClick={() => setAcceptConfirmId(null)} className="flex-1 rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-500">Cancel</button>
               <button
                 onClick={async () => { await updateStatus(acceptConfirmId, "accepted"); setAcceptConfirmId(null); }}
                 className="flex-1 rounded-lg px-4 py-2 text-sm font-semibold text-foreground"
@@ -4066,10 +4045,10 @@ const CLOSING_STATUS_CYCLE: Record<string, string> = {
 };
 
 const CLOSING_OWNER_COLORS: Record<string, string> = {
-  founder: "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-brand",
-  investor: "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
-  both: "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400",
-  lawyer: "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400",
+  founder: "bg-purple-50 text-purple-700  ",
+  investor: "bg-blue-50 text-blue-700  ",
+  both: "bg-gray-100 text-gray-600  ",
+  lawyer: "bg-amber-50 text-amber-700  ",
 };
 
 const EXIT_REASON_CATEGORIES = [
@@ -4276,25 +4255,25 @@ function NewClosingPanel({
         <Check className="h-3 w-3 text-foreground" />
       </div>
     );
-    if (status === "in_progress") return <div className="h-5 w-5 rounded-full border-2 border-amber-400 bg-amber-50 dark:bg-amber-900/20 shrink-0" />;
+    if (status === "in_progress") return <div className="h-5 w-5 rounded-full border-2 border-amber-400 bg-amber-50 shrink-0" />;
     if (status === "blocked") return (
       <div className="h-5 w-5 rounded-full bg-red-500 flex items-center justify-center shrink-0">
         <X className="h-3 w-3 text-foreground" />
       </div>
     );
-    return <div className="h-5 w-5 rounded-full border-2 border-gray-300 dark:border-zinc-600 shrink-0" />;
+    return <div className="h-5 w-5 rounded-full border-2 border-gray-300 shrink-0" />;
   };
 
   if (dealClosed || exitDone) {
     return (
-      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-6 py-12 text-center">
+      <div className="bg-white border border-gray-200 rounded-xl px-6 py-12 text-center">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full" style={{ background: dealClosed ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)" }}>
           <CheckCircle2 className={cn("h-7 w-7", dealClosed ? "text-green-500" : "text-red-400")} />
         </div>
-        <h3 className="text-base font-bold text-gray-900 dark:text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
+        <h3 className="text-base font-bold text-gray-900 mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
           {dealClosed ? "Deal closed successfully" : "Deal room closed"}
         </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm text-gray-500 ">
           {dealClosed ? "Both parties will receive a closing report." : "A report has been sent to both parties."}
         </p>
       </div>
@@ -4305,9 +4284,9 @@ function NewClosingPanel({
     <div className="space-y-6">
 
       {/* ── SECTION 1: Closing Checklist ── */}
-      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Closing Checklist</h3>
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 ">
+          <h3 className="text-sm font-bold text-gray-900 " style={{ fontFamily: "Syne, sans-serif" }}>Closing Checklist</h3>
           {items.length === 0 && (
             <button
               onClick={seedChecklist}
@@ -4325,10 +4304,10 @@ function NewClosingPanel({
         {items.length > 0 && (
           <div className="px-5 pt-4 pb-2">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs text-gray-500 dark:text-gray-400">{completedCount} / {totalCount} items complete</span>
-              <span className="text-xs font-semibold text-green-600 dark:text-green-400">{progressPct}%</span>
+              <span className="text-xs text-gray-500 ">{completedCount} / {totalCount} items complete</span>
+              <span className="text-xs font-semibold text-green-600 ">{progressPct}%</span>
             </div>
-            <div className="h-1.5 rounded-full bg-gray-200 dark:bg-zinc-700 overflow-hidden">
+            <div className="h-1.5 rounded-full bg-gray-200 overflow-hidden">
               <div className="h-1.5 rounded-full transition-all" style={{ width: `${progressPct}%`, background: "#10B981" }} />
             </div>
           </div>
@@ -4336,8 +4315,8 @@ function NewClosingPanel({
 
         {items.length === 0 ? (
           <div className="px-5 py-8 text-center">
-            <ClipboardList className="h-8 w-8 text-gray-200 dark:text-zinc-700 mx-auto mb-2" />
-            <p className="text-sm text-gray-500 dark:text-gray-400">Load the standard closing checklist to get started.</p>
+            <ClipboardList className="h-8 w-8 text-gray-200 mx-auto mb-2" />
+            <p className="text-sm text-gray-500 ">Load the standard closing checklist to get started.</p>
           </div>
         ) : (
           <div className="px-4 py-3 space-y-4">
@@ -4345,23 +4324,23 @@ function NewClosingPanel({
               const catItems = items.filter((i: any) => i.category === cat);
               return (
                 <div key={cat}>
-                  <div className="text-[10px] uppercase tracking-wider font-semibold text-gray-400 dark:text-gray-500 mb-2">{cat}</div>
+                  <div className="text-[10px] uppercase tracking-wider font-semibold text-gray-400 mb-2">{cat}</div>
                   <div className="space-y-2">
                     {catItems.map((item: any) => {
                       const isExpanded = expandedItemId === item.id;
                       const currentStatus = itemStatuses[item.id] ?? item.status;
                       return (
-                        <div key={item.id} className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg p-3">
+                        <div key={item.id} className="bg-white border border-gray-200 rounded-lg p-3">
                           <div className="flex items-start gap-3">
                             <button onClick={() => cycleItemStatus(item)} className="mt-0.5 focus:outline-none" title="Click to cycle status">
                               <ItemStatusCircle status={currentStatus} />
                             </button>
                             <button onClick={() => setExpandedItemId(isExpanded ? null : item.id)} className="flex-1 text-left">
-                              <span className={cn("text-sm", currentStatus === "complete" ? "line-through text-gray-400 dark:text-gray-500" : "text-gray-900 dark:text-white")}>
+                              <span className={cn("text-sm", currentStatus === "complete" ? "line-through text-gray-400 " : "text-gray-900 ")}>
                                 {item.item_text}
                               </span>
                             </button>
-                            <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium capitalize", CLOSING_OWNER_COLORS[item.owner] ?? "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400")}>
+                            <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium capitalize", CLOSING_OWNER_COLORS[item.owner] ?? "bg-gray-100 text-gray-600  ")}>
                               {item.owner}
                             </span>
                           </div>
@@ -4369,11 +4348,11 @@ function NewClosingPanel({
                           {isExpanded && (
                             <div className="mt-3 pl-8 space-y-3">
                               <div>
-                                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Status</label>
+                                <label className="block text-xs font-medium text-gray-500 mb-1">Status</label>
                                 <select
                                   value={currentStatus}
                                   onChange={(e) => changeItemStatus(item.id, e.target.value)}
-                                  className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground outline-none"
+                                  className="rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none"
                                 >
                                   {["pending", "in_progress", "complete", "blocked"].map((s) => <option key={s} value={s}>{s.replace(/_/g, " ")}</option>)}
                                 </select>
@@ -4384,16 +4363,16 @@ function NewClosingPanel({
                                 onBlur={(e) => saveItemNote(item.id, e.target.value)}
                                 rows={2}
                                 placeholder="Notes..."
-                                className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none"
+                                className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
                               />
                               <div className="flex items-center gap-2">
-                                <label className="text-xs text-gray-500 dark:text-gray-400">Due date</label>
+                                <label className="text-xs text-gray-500 ">Due date</label>
                                 <input
                                   type="date"
                                   value={itemDueDates[item.id] ?? ""}
                                   onChange={(e) => setItemDueDates((p) => ({ ...p, [item.id]: e.target.value }))}
                                   onBlur={(e) => saveItemDueDate(item.id, e.target.value)}
-                                  className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground outline-none"
+                                  className="rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none"
                                 />
                               </div>
                               {currentStatus !== "complete" && (
@@ -4419,10 +4398,10 @@ function NewClosingPanel({
       </div>
 
       {/* ── SECTION 2: Deal Summary ── */}
-      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-5 py-5">
-        <h3 className="text-sm font-bold text-gray-900 dark:text-foreground mb-4" style={{ fontFamily: "Syne, sans-serif" }}>Deal Summary</h3>
+      <div className="bg-white border border-gray-200 rounded-xl px-5 py-5">
+        <h3 className="text-sm font-bold text-gray-900 mb-4" style={{ fontFamily: "Syne, sans-serif" }}>Deal Summary</h3>
         {!acceptedTS ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400">No accepted term sheet yet. Complete the Term Sheet stage first.</p>
+          <p className="text-sm text-gray-500">No accepted term sheet</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {([
@@ -4431,9 +4410,9 @@ function NewClosingPanel({
               ["Equity", (acceptedTS as any).terms?.equity_percentage],
               ["Instrument", (acceptedTS as any).terms?.investment_type],
             ] as [string, string][]).map(([label, value]) => (
-              <div key={label} className="rounded-lg bg-gray-50 dark:bg-zinc-800 px-3 py-3">
-                <div className="text-[10px] uppercase tracking-wider font-semibold text-gray-400 dark:text-gray-500 mb-1">{label}</div>
-                <div className="text-sm font-semibold text-gray-900 dark:text-foreground">{value || "—"}</div>
+              <div key={label} className="rounded-lg bg-gray-50 px-3 py-3">
+                <div className="text-[10px] uppercase tracking-wider font-semibold text-gray-400 mb-1">{label}</div>
+                <div className="text-sm font-semibold text-gray-900 ">{value || "—"}</div>
               </div>
             ))}
           </div>
@@ -4442,14 +4421,14 @@ function NewClosingPanel({
 
       {/* ── SECTION 3: Close Deal (investor only) ── */}
       {isInvestor && (
-        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-5 py-5">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-foreground mb-3" style={{ fontFamily: "Syne, sans-serif" }}>Close this deal</h3>
+        <div className="bg-white border border-gray-200 rounded-xl px-5 py-5">
+          <h3 className="text-sm font-bold text-gray-900 mb-3" style={{ fontFamily: "Syne, sans-serif" }}>Close this deal</h3>
 
           {!closeDealOpen ? (
             <div className="space-y-3">
               {!allComplete && !overrideClose && (
-                <div className="rounded-lg bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 px-4 py-3">
-                  <p className="text-sm text-amber-700 dark:text-amber-400">{totalCount - completedCount} closing items still pending. Complete all items before closing.</p>
+                <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3">
+                  <p className="text-sm text-amber-700 ">{totalCount - completedCount} closing items still pending. Complete all items before closing.</p>
                 </div>
               )}
               <button
@@ -4464,13 +4443,13 @@ function NewClosingPanel({
                 <div>
                   <button
                     onClick={() => setOverrideClose(true)}
-                    className="text-sm text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400"
+                    className="text-sm text-gray-400 hover:text-red-500 "
                   >
                     Close deal anyway →
                   </button>
                   {overrideClose && (
-                    <div className="mt-2 rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 px-4 py-3">
-                      <p className="text-sm text-red-700 dark:text-red-400">{totalCount - completedCount} items still pending. Proceed anyway?</p>
+                    <div className="mt-2 rounded-lg bg-red-50 border border-red-200 px-4 py-3">
+                      <p className="text-sm text-red-700 ">{totalCount - completedCount} items still pending. Proceed anyway?</p>
                       <button
                         onClick={() => setCloseDealOpen(true)}
                         className="mt-2 rounded-lg px-4 py-1.5 text-sm font-medium text-foreground"
@@ -4485,16 +4464,16 @@ function NewClosingPanel({
             </div>
           ) : (
             <div className="space-y-3">
-              <p className="text-sm text-gray-700 dark:text-gray-300">This will mark the deal as closed and notify both parties.</p>
+              <p className="text-sm text-gray-700 ">This will mark the deal as closed and notify both parties.</p>
               <textarea
                 value={finalNotes}
                 onChange={(e) => setFinalNotes(e.target.value)}
                 rows={3}
                 placeholder="Final notes (optional)..."
-                className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none"
+                className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
               />
               <div className="flex gap-2">
-                <button onClick={() => setCloseDealOpen(false)} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-4 py-2 text-sm text-gray-500">Cancel</button>
+                <button onClick={() => setCloseDealOpen(false)} className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-500">Cancel</button>
                 <button
                   onClick={closeDeal}
                   disabled={closingDeal}
@@ -4516,32 +4495,32 @@ function NewClosingPanel({
         {!exitOpen ? (
           <button
             onClick={() => setExitOpen(true)}
-            className="text-sm text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400"
+            className="text-sm text-gray-400 hover:text-red-500 "
             data-testid="exit-deal-btn"
           >
             Exit deal →
           </button>
         ) : (
-          <div className="bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-900/30 rounded-xl px-5 py-5 space-y-3">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-foreground">Exit this deal</h3>
+          <div className="bg-white border border-red-200 rounded-xl px-5 py-5 space-y-3">
+            <h3 className="text-sm font-semibold text-gray-900 ">Exit this deal</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Outcome</label>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Outcome</label>
                 <select
                   value={exitOutcome}
                   onChange={(e) => setExitOutcome(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground outline-none"
+                  className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none"
                 >
                   <option>Pass</option>
                   <option>Withdraw</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Reason category</label>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Reason category</label>
                 <select
                   value={exitReasonCat}
                   onChange={(e) => setExitReasonCat(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground outline-none"
+                  className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none"
                 >
                   {EXIT_REASON_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
                 </select>
@@ -4552,10 +4531,10 @@ function NewClosingPanel({
               onChange={(e) => setExitReasonDetail(e.target.value)}
               rows={2}
               placeholder="Reason detail..."
-              className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none"
+              className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
             />
             <div className="flex gap-2">
-              <button onClick={() => setExitOpen(false)} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-4 py-2 text-sm text-gray-500">Cancel</button>
+              <button onClick={() => setExitOpen(false)} className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-500">Cancel</button>
               <button
                 onClick={exitDeal}
                 disabled={exiting}
@@ -4581,7 +4560,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   "Market Research": "bg-warning/10 text-warning",
   "Team": "bg-accent text-brand",
   "Product": "bg-violet/10 text-violet",
-  "Other": "bg-accent text-gray-500 dark:text-gray-400",
+  "Other": "bg-accent text-gray-500 ",
 };
 
 const TEXT_EXTS = new Set(["pdf", "docx", "doc", "xlsx", "xls", "csv", "pptx", "ppt", "txt"]);
@@ -4593,7 +4572,7 @@ function getFileTypeStyle(ext: string): { bg: string; color: string; Icon: any }
   if (["pptx", "ppt"].includes(ext)) return { bg: "bg-orange-500/10", color: "text-orange-500", Icon: FileText };
   if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) return { bg: "bg-accent", color: "text-purple-500", Icon: Image };
   if (["mp4", "mov", "avi", "webm"].includes(ext)) return { bg: "bg-orange-500/10", color: "text-orange-500", Icon: Film };
-  return { bg: "bg-accent", color: "text-gray-500 dark:text-gray-400", Icon: FileText };
+  return { bg: "bg-accent", color: "text-gray-500 ", Icon: FileText };
 }
 
 function formatFileSize(bytes: number | null): string {
@@ -5026,26 +5005,26 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1 rounded-xl bg-gray-100/50 dark:bg-zinc-800/50 p-1">
+        <div className="flex items-center gap-1 rounded-xl bg-gray-100/50 p-1">
           <button
             onClick={() => setActiveVaultTab("documents")}
             className={cn(
               "px-4 py-1.5 rounded-lg text-sm font-medium transition-colors",
-              activeVaultTab === "documents" ? "hs-gradient text-brand-foreground shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-foreground"
+              activeVaultTab === "documents" ? "hs-gradient text-brand-foreground shadow-sm" : "text-gray-500 hover:text-foreground"
             )}
           >
             📁 Documents
-            <span className="ml-1.5 text-[10px] text-gray-500 dark:text-gray-400">({(docs as any[]).length})</span>
+            <span className="ml-1.5 text-[10px] text-gray-500 ">({(docs as any[]).length})</span>
           </button>
           <button
             onClick={() => setActiveVaultTab("links")}
             className={cn(
               "px-4 py-1.5 rounded-lg text-sm font-medium transition-colors",
-              activeVaultTab === "links" ? "hs-gradient text-brand-foreground shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-foreground"
+              activeVaultTab === "links" ? "hs-gradient text-brand-foreground shadow-sm" : "text-gray-500 hover:text-foreground"
             )}
           >
             🔗 Links
-            <span className="ml-1.5 text-[10px] text-gray-500 dark:text-gray-400">({(dealRoomLinks as any[]).length})</span>
+            <span className="ml-1.5 text-[10px] text-gray-500 ">({(dealRoomLinks as any[]).length})</span>
           </button>
         </div>
         <div className="flex gap-2">
@@ -5084,7 +5063,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
           {/* Stage 1 docs */}
           {isInvestor && platformDocsSplit.stage1.length > 0 && (
             <div className="mb-2">
-              <div className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 font-semibold">Stage 1 — Initial review</div>
+              <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-2 font-semibold">Stage 1 — Initial review</div>
               <div className="space-y-2">
                 {platformDocsSplit.stage1.map((doc: any) => (
                   <div key={doc.id}
@@ -5092,8 +5071,8 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-brand text-sm shrink-0">≡</div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 dark:text-foreground truncate">{doc.title}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        <p className="text-sm font-medium text-gray-900 truncate">{doc.title}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">
                           {doc.document_templates?.category
                             ? doc.document_templates.category.charAt(0).toUpperCase() + doc.document_templates.category.slice(1)
                             : "Document"}
@@ -5123,7 +5102,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
           {/* Stage 2 docs — gated */}
           {isInvestor && platformDocsSplit.stage2.length > 0 && stage2Unlocked && (
             <div>
-              <div className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 font-semibold">Stage 2 — Full diligence</div>
+              <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-2 font-semibold">Stage 2 — Full diligence</div>
               <div className="space-y-2">
                 {platformDocsSplit.stage2.map((doc: any) => (
                   <div key={doc.id}
@@ -5131,8 +5110,8 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-brand text-sm shrink-0">≡</div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 dark:text-foreground truncate">{doc.title}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        <p className="text-sm font-medium text-gray-900 truncate">{doc.title}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">
                           {doc.document_templates?.category
                             ? doc.document_templates.category.charAt(0).toUpperCase() + doc.document_templates.category.slice(1)
                             : "Document"}
@@ -5168,8 +5147,8 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-brand text-sm shrink-0">≡</div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-foreground truncate">{doc.title}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    <p className="text-sm font-medium text-gray-900 truncate">{doc.title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
                       {doc.document_templates?.category
                         ? doc.document_templates.category.charAt(0).toUpperCase() + doc.document_templates.category.slice(1)
                         : "Document"}
@@ -5206,14 +5185,14 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
       {(platformDocs as any[]).length > 0 && (docs as any[]).length > 0 && (
         <div className="flex items-center gap-3 mb-5">
           <div className="flex-1 h-px bg-border/40" />
-          <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Uploaded files</span>
+          <span className="text-xs text-gray-500 uppercase tracking-wider">Uploaded files</span>
           <div className="flex-1 h-px bg-border/40" />
         </div>
       )}
 
       {isFounder && (
         <div className="mt-5 space-y-3">
-          <div className="rounded-lg bg-gray-100/40 border border-gray-200 dark:border-zinc-700 px-4 py-3 text-xs text-gray-500 dark:text-gray-400 space-y-1">
+          <div className="rounded-lg bg-gray-100/40 border border-gray-200 px-4 py-3 text-xs text-gray-500 space-y-1">
             <div>💡 <strong>Documents shared here are visible to the investor</strong> and appear in their Workstation automatically.</div>
             <div className="flex flex-wrap gap-1.5 mt-1.5">
               {[
@@ -5226,7 +5205,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
               ].map(({ ext, color }) => (
                 <span key={ext} className={cn("rounded px-1.5 py-0.5 text-[9px] font-bold uppercase", color)}>{ext}</span>
               ))}
-              <span className="text-[10px] text-gray-500 dark:text-gray-400 self-center">· Max 50MB per file</span>
+              <span className="text-[10px] text-gray-500 self-center">· Max 50MB per file</span>
             </div>
           </div>
           <Dropzone
@@ -5267,7 +5246,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
       )}
 
       {/* Category tabs with count badges */}
-      <div className="flex gap-1 mt-5 pb-2 overflow-x-auto border-b border-gray-200 dark:border-zinc-700">
+      <div className="flex gap-1 mt-5 pb-2 overflow-x-auto border-b border-gray-200 ">
         {DOC_CATEGORIES.map((cat) => {
           const count = cat === "All" ? (docs as any[]).length : (catCounts[cat] ?? 0);
           return (
@@ -5278,12 +5257,12 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                 "shrink-0 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs transition-colors",
                 activeDocTab === cat
                   ? "hs-gradient text-brand-foreground"
-                  : "border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800"
+                  : "border border-gray-200 hover:bg-gray-100 "
               )}
             >
               {cat}
               {count > 0 && (
-                <span className={cn("rounded-full px-1.5 py-0.5 text-[9px] font-bold", activeDocTab === cat ? "bg-background/20" : "bg-accent text-gray-500 dark:text-gray-400")}>
+                <span className={cn("rounded-full px-1.5 py-0.5 text-[9px] font-bold", activeDocTab === cat ? "bg-background/20" : "bg-accent text-gray-500 ")}>
                   {count}
                 </span>
               )}
@@ -5299,23 +5278,23 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
           onClick={() => setShowLibrary(false)}
         >
           <div
-            className="w-full max-w-lg rounded-2xl border border-gray-200 dark:border-zinc-700 bg-card shadow-elev"
+            className="w-full max-w-lg rounded-2xl border border-gray-200 bg-card shadow-elev"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-zinc-700">
+            <div className="flex items-center justify-between p-5 border-b border-gray-200 ">
               <div className="text-sm font-semibold">Add from document library</div>
               <button
                 onClick={() => setShowLibrary(false)}
-                className="grid h-8 w-8 place-items-center rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800"
+                className="grid h-8 w-8 place-items-center rounded-md text-gray-500 hover:bg-gray-100 "
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
             <div className="p-3 max-h-80 overflow-y-auto">
-              {libLoading && <div className="text-sm text-gray-500 dark:text-gray-400 p-3 animate-pulse">Loading…</div>}
+              {libLoading && <div className="text-sm text-gray-500 p-3 animate-pulse">Loading…</div>}
               {!libLoading && (libraryDocs as any[]).length === 0 && (
-                <div className="text-sm text-gray-500 dark:text-gray-400 p-3 text-center py-6">
-                  <FileText className="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
+                <div className="text-sm text-gray-500 p-3 text-center py-6">
+                  <FileText className="h-8 w-8 mx-auto mb-2 text-gray-300 " />
                   No documents to add. Upload documents from the main Documents page first.
                 </div>
               )}
@@ -5328,7 +5307,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                     <div className="text-sm font-medium truncate">
                       {doc.name || doc.storage_path?.split("/").pop() || "Document"}
                     </div>
-                    {doc.category && <div className="text-xs text-gray-500 dark:text-gray-400">{doc.category}</div>}
+                    {doc.category && <div className="text-xs text-gray-500 ">{doc.category}</div>}
                   </div>
                   <button
                     onClick={() => addFromLibrary(doc.id)}
@@ -5347,17 +5326,17 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
 
       {ndaDocs.length > 0 && (
         <div className="mt-5">
-          <div className="text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold mb-2">System generated</div>
-          <div className="rounded-xl border border-gray-200 dark:border-zinc-700 bg-card shadow-card divide-y divide-border/60">
+          <div className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-2">System generated</div>
+          <div className="rounded-xl border border-gray-200 bg-card shadow-card divide-y divide-border/60">
             {ndaDocs.map((d) => (
               <div key={d.name} className="flex items-center gap-3 px-5 py-3">
                 <div className="grid h-8 w-8 place-items-center rounded-md bg-success/10"><Shield className="h-4 w-4 text-success" /></div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium truncate">{d.name}</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Auto-generated NDA · {new Date(d.createdAt).toLocaleDateString()}</div>
+                  <div className="text-xs text-gray-500 ">Auto-generated NDA · {new Date(d.createdAt).toLocaleDateString()}</div>
                 </div>
                 <span className="inline-flex items-center gap-1 text-success text-xs"><CheckCircle2 className="h-3.5 w-3.5" /> Signed by all</span>
-                <button className="text-gray-500 dark:text-gray-400 hover:text-foreground"><Download className="h-4 w-4" /></button>
+                <button className="text-gray-500 hover:text-foreground"><Download className="h-4 w-4" /></button>
               </div>
             ))}
           </div>
@@ -5374,7 +5353,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
             const isGenerating = generatingSummaryId === doc.id;
             const isEditing = editingSummaryId === doc.id;
             const supportsAI = TEXT_EXTS.has(ext);
-            const catColor = CATEGORY_COLORS[doc.category] ?? "bg-accent text-gray-500 dark:text-gray-400";
+            const catColor = CATEGORY_COLORS[doc.category] ?? "bg-accent text-gray-500 ";
             const catBorder = CAT_BORDER[doc.category] ?? "border-l-muted-foreground/40";
             const { bg: iconBg, color: iconColor, Icon: FileIcon } = getFileTypeStyle(ext);
             const fileSize = formatFileSize(doc.file_size ?? null);
@@ -5383,7 +5362,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
               <div
                 key={doc.id}
                 className={cn(
-                  "rounded-xl bg-card shadow-card overflow-hidden border border-gray-200 dark:border-zinc-700 border-l-4",
+                  "rounded-xl bg-card shadow-card overflow-hidden border border-gray-200 border-l-4",
                   catBorder
                 )}
               >
@@ -5404,7 +5383,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                         </span>
                       )}
                     </div>
-                    <div className="mt-0.5 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                    <div className="mt-0.5 flex items-center gap-1.5 text-xs text-gray-500 ">
                       <span>{doc.uploader?.full_name ?? "Unknown"}</span>
                       <span>·</span>
                       <span>{new Date(doc.created_at).toLocaleDateString()}</span>
@@ -5417,14 +5396,14 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                         setPreviewDoc(doc);
                         trackDocumentView({ documentId: doc.id });
                       }}
-                      className="grid h-7 w-7 place-items-center rounded-md text-gray-500 dark:text-gray-400 hover:bg-accent hover:text-foreground"
+                      className="grid h-7 w-7 place-items-center rounded-md text-gray-500 hover:bg-accent hover:text-foreground"
                       title="Preview"
                     >
                       <Eye className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => handleDownload(doc.storage_path)}
-                      className="grid h-7 w-7 place-items-center rounded-md text-gray-500 dark:text-gray-400 hover:bg-accent hover:text-foreground"
+                      className="grid h-7 w-7 place-items-center rounded-md text-gray-500 hover:bg-accent hover:text-foreground"
                       title="Download"
                     >
                       <Download className="h-3.5 w-3.5" />
@@ -5433,7 +5412,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                       <button
                         onClick={() => handleDocRemove(doc)}
                         title="Remove from deal room"
-                        className="grid h-7 w-7 place-items-center rounded-md text-gray-500 dark:text-gray-400 hover:text-destructive hover:bg-destructive/10 transition-colors"
+                        className="grid h-7 w-7 place-items-center rounded-md text-gray-500 hover:text-destructive hover:bg-destructive/10 transition-colors"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -5443,7 +5422,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
 
                 {/* AI Summary section — only for text-based files */}
                 {supportsAI && (
-                  <div className="border-t border-gray-200 dark:border-zinc-700/40">
+                  <div className="border-t border-gray-200 ">
                     {hasSummary ? (
                       <div className="px-4 py-2.5">
                         <button
@@ -5454,7 +5433,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                           <span className="flex-1">AI Summary</span>
                           <span className={cn(
                             "px-1.5 py-0.5 rounded text-[9px] font-medium",
-                            doc.summary_edited ? "bg-accent text-brand" : "bg-muted/60 text-gray-500 dark:text-gray-400"
+                            doc.summary_edited ? "bg-accent text-brand" : "bg-muted/60 text-gray-500 "
                           )}>
                             {doc.summary_edited ? "Edited" : "AI"}
                           </span>
@@ -5463,19 +5442,19 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                             : <ChevronDown className="h-3 w-3 shrink-0" />}
                         </button>
                         {isSummaryExpanded(doc.id) && (
-                          <div className="mt-2 rounded-lg border-l-2 border-brand/40 bg-gray-100/30 dark:bg-zinc-800/30 px-3 py-3">
+                          <div className="mt-2 rounded-lg border-l-2 border-brand/40 bg-gray-100/30 px-3 py-3">
                             {isEditing ? (
                               <div className="space-y-2">
                                 <textarea
                                   value={summaryEdits[doc.id] ?? ""}
                                   onChange={(e) => setSummaryEdits((s) => ({ ...s, [doc.id]: e.target.value }))}
                                   rows={4}
-                                  className="w-full rounded-md border border-gray-200 dark:border-zinc-700 bg-background px-3 py-2 text-xs resize-none focus:outline-none focus:border-brand/50"
+                                  className="w-full rounded-md border border-gray-200 bg-background px-3 py-2 text-xs resize-none focus:outline-none focus:border-brand/50"
                                 />
                                 <div className="flex gap-2">
                                   <button
                                     onClick={() => setEditingSummaryId(null)}
-                                    className="text-[10px] border border-gray-200 dark:border-zinc-700 rounded px-2 py-1 hover:bg-gray-100 dark:hover:bg-zinc-800"
+                                    className="text-[10px] border border-gray-200 rounded px-2 py-1 hover:bg-gray-100 "
                                   >
                                     Cancel
                                   </button>
@@ -5501,14 +5480,14 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                               </div>
                             ) : (
                               <>
-                                <p className="text-sm text-gray-900 dark:text-muted-foreground leading-relaxed whitespace-pre-line">
+                                <p className="text-sm text-gray-900 leading-relaxed whitespace-pre-line">
                                   {doc.ai_summary}
                                 </p>
                                 <div className="flex gap-2 mt-2">
                                   <button
                                     onClick={() => generateSummary(doc)}
                                     disabled={isGenerating}
-                                    className="text-[10px] text-gray-500 dark:text-gray-400 hover:text-foreground border border-gray-200 dark:border-zinc-700 rounded px-2 py-0.5 hover:bg-accent disabled:opacity-50"
+                                    className="text-[10px] text-gray-500 hover:text-foreground border border-gray-200 rounded px-2 py-0.5 hover:bg-accent disabled:opacity-50"
                                   >
                                     {isGenerating ? "Regenerating…" : "Regenerate"}
                                   </button>
@@ -5518,7 +5497,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                                         setEditingSummaryId(doc.id);
                                         setSummaryEdits((s) => ({ ...s, [doc.id]: doc.ai_summary! }));
                                       }}
-                                      className="text-[10px] text-gray-500 dark:text-gray-400 hover:text-foreground border border-gray-200 dark:border-zinc-700 rounded px-2 py-0.5 hover:bg-gray-100 dark:hover:bg-zinc-800"
+                                      className="text-[10px] text-gray-500 hover:text-foreground border border-gray-200 rounded px-2 py-0.5 hover:bg-gray-100 "
                                     >
                                       Edit
                                     </button>
@@ -5534,7 +5513,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                       <div className="flex items-center gap-2 px-4 py-2.5">
                         <Sparkles className="h-3.5 w-3.5 text-brand shrink-0" />
                         <span className="text-xs font-medium text-brand flex-1">AI Summary</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 italic mr-2">Not generated yet</span>
+                        <span className="text-xs text-gray-500 italic mr-2">Not generated</span>
                         <button
                           onClick={() => generateSummary(doc)}
                           disabled={isGenerating}
@@ -5555,19 +5534,11 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
       )}
 
       {filteredDocs.length === 0 && activeDocTab === "All" && (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="grid h-16 w-16 place-items-center rounded-2xl bg-muted mx-auto mb-4">
-            <FolderOpen className="h-7 w-7 text-gray-500 dark:text-gray-400/50" />
-          </div>
-          <p className="text-sm font-medium">No documents yet</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-4">
-            {isFounder
-              ? "Upload your pitch deck and key documents to share with investors."
-              : "The founder hasn't shared any documents yet."}
-          </p>
+        <div className="flex flex-col items-center justify-center text-center">
+          <EmptyState kind="empty" title="No documents" />
           {isFounder && (
-            <label className="inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-4 py-2 text-sm cursor-pointer shadow-sm">
-              <Upload className="h-4 w-4" /> Upload first document
+            <label className="-mt-4 inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-4 py-2 text-sm cursor-pointer">
+              <Upload className="h-4 w-4" /> Upload
               <input
                 type="file"
                 className="sr-only"
@@ -5623,18 +5594,18 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
       {/* Expected docs for active category */}
       {activeDocTab !== "All" && expectedForTab.length > 0 && (
         <div className="pb-4">
-          <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 mt-4">
+          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-4">
             Recommended for this category
           </div>
-          <div className="rounded-xl border border-dashed border-gray-200 dark:border-zinc-700 divide-y divide-border/40 overflow-hidden">
+          <div className="rounded-xl border border-dashed border-gray-200 divide-y divide-border/40 overflow-hidden">
             {expectedForTab.map((expected) => (
-              <div key={expected.name} className="flex items-center gap-3 px-4 py-3 bg-gray-100/20 dark:bg-zinc-800/20">
+              <div key={expected.name} className="flex items-center gap-3 px-4 py-3 bg-gray-100/20 ">
                 <div className="grid h-8 w-8 place-items-center rounded-lg bg-muted shrink-0">
-                  <FileText className="h-4 w-4 text-gray-500 dark:text-gray-400/50" />
+                  <FileText className="h-4 w-4 text-gray-500 " />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm text-gray-500 dark:text-gray-400">{expected.name}</div>
-                  <div className="text-[10px] text-gray-500 dark:text-gray-400/60 mt-0.5">Not uploaded yet</div>
+                  <div className="text-sm text-gray-500 ">{expected.name}</div>
+                  <div className="text-[10px] text-gray-500 mt-0.5">Not uploaded</div>
                 </div>
                 {isFounder && (
                   <label className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 text-brand px-3 py-1.5 text-xs cursor-pointer hover:bg-accent transition-colors shrink-0">
@@ -5703,7 +5674,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                   🔒 Investor Documents
                 </span>
               </h3>
-              <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+              <p className="text-[10px] text-gray-500 mt-0.5">
                 {isInvestor
                   ? "Only you can upload here. Choose visibility per document."
                   : "Documents shared with you by the investor."}
@@ -5726,9 +5697,9 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
 
           {/* Investor doc list */}
           {visibleInvestorDocs.length === 0 && isInvestor && (
-            <div className="rounded-xl border border-dashed border-gray-200 dark:border-zinc-700 p-8 text-center">
-              <FileText className="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
-              <p className="text-sm text-gray-500 dark:text-gray-400">No investor documents yet. Upload above.</p>
+            <div className="rounded-xl border border-dashed border-gray-200 p-8 text-center">
+              <FileText className="h-8 w-8 mx-auto mb-2 text-gray-300 " />
+              <p className="text-sm text-gray-500">No investor documents</p>
             </div>
           )}
 
@@ -5741,19 +5712,19 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
               const currentVisibility = investorDocVisibility[doc.id] ?? doc.visibility ?? "shared";
 
               return (
-                <div key={doc.id} className="flex items-center gap-3 rounded-xl border border-gray-200 dark:border-zinc-700 bg-card px-4 py-3 shadow-card border-l-4 border-l-success/60">
+                <div key={doc.id} className="flex items-center gap-3 rounded-xl border border-gray-200 bg-card px-4 py-3 shadow-card border-l-4 border-l-success/60">
                   <div className={cn("grid h-9 w-9 place-items-center rounded-lg shrink-0", iconBg)}>
                     <FileIcon className={cn("h-4 w-4", iconColor)} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium truncate">{displayName}</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                    <div className="text-xs text-gray-500 ">
                       {doc.uploader?.full_name ?? "Investor"} · {new Date(doc.created_at).toLocaleDateString()}
                     </div>
                   </div>
                   {/* Visibility toggle — investor only */}
                   {isInvestor && (
-                    <div className="flex items-center gap-1 rounded-lg bg-gray-100/60 dark:bg-zinc-800/60 p-0.5 shrink-0">
+                    <div className="flex items-center gap-1 rounded-lg bg-gray-100/60 p-0.5 shrink-0">
                       {(["shared", "private"] as const).map((v) => (
                         <button
                           key={v}
@@ -5764,7 +5735,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                               ? v === "shared"
                                 ? "bg-success text-success-foreground shadow-sm"
                                 : "bg-warning text-warning-foreground shadow-sm"
-                              : "text-gray-500 dark:text-gray-400 hover:text-foreground"
+                              : "text-gray-500 hover:text-foreground"
                           )}
                         >
                           {v === "shared" ? "🌐 Shared" : "🔒 Private"}
@@ -5780,7 +5751,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                   <div className="flex items-center gap-1 shrink-0">
                     <button
                       onClick={() => handleDownload(doc.storage_path)}
-                      className="grid h-7 w-7 place-items-center rounded-md text-gray-500 dark:text-gray-400 hover:bg-accent hover:text-foreground"
+                      className="grid h-7 w-7 place-items-center rounded-md text-gray-500 hover:bg-accent hover:text-foreground"
                       title="Download"
                     >
                       <Download className="h-3.5 w-3.5" />
@@ -5788,7 +5759,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                     {isInvestor && (
                       <button
                         onClick={() => removeInvestorDoc(doc.id)}
-                        className="grid h-7 w-7 place-items-center rounded-md text-gray-500 dark:text-gray-400 hover:text-destructive hover:bg-destructive/10"
+                        className="grid h-7 w-7 place-items-center rounded-md text-gray-500 hover:text-destructive hover:bg-destructive/10"
                         title="Remove"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -5807,10 +5778,10 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
       {activeVaultTab === "links" && (
         <div className="mt-5 space-y-3">
           {(dealRoomLinks as any[]).length === 0 && (
-            <div className="rounded-xl border border-dashed border-gray-200 dark:border-zinc-700 p-10 text-center">
-              <LinkIcon className="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
-              <p className="text-sm font-medium">No links yet</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Add product videos, Loom recordings, external documents, or any URL</p>
+            <div className="rounded-xl border border-dashed border-gray-200 p-10 text-center">
+              <LinkIcon className="h-8 w-8 mx-auto mb-2 text-gray-300 " />
+              <p className="text-sm font-medium">No links</p>
+              <p className="text-xs text-gray-500 mt-1">Add product videos, Loom recordings, external documents, or any URL</p>
               <button
                 onClick={() => setShowAddLink(true)}
                 className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow"
@@ -5820,20 +5791,20 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
             </div>
           )}
           {(dealRoomLinks as any[]).map((link: any) => (
-            <div key={link.id} className="flex items-center gap-3 rounded-xl border border-gray-200 dark:border-zinc-700 bg-card px-4 py-3 shadow-card">
+            <div key={link.id} className="flex items-center gap-3 rounded-xl border border-gray-200 bg-card px-4 py-3 shadow-card">
               <div className="grid h-9 w-9 place-items-center rounded-lg bg-accent shrink-0">
                 <LinkIcon className="h-4 w-4 text-brand" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium truncate">{link.name}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{link.url}</div>
+                <div className="text-xs text-gray-500 truncate">{link.url}</div>
               </div>
               <div className="flex items-center gap-1 shrink-0">
                 <a
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="grid h-7 w-7 place-items-center rounded-md text-gray-500 dark:text-gray-400 hover:bg-accent hover:text-foreground"
+                  className="grid h-7 w-7 place-items-center rounded-md text-gray-500 hover:bg-accent hover:text-foreground"
                   title="Open link"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
@@ -5841,7 +5812,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                 {link.uploader_id === userId && (
                   <button
                     onClick={() => removeLink(link.id)}
-                    className="grid h-7 w-7 place-items-center rounded-md text-gray-500 dark:text-gray-400 hover:text-destructive hover:bg-destructive/10"
+                    className="grid h-7 w-7 place-items-center rounded-md text-gray-500 hover:text-destructive hover:bg-destructive/10"
                     title="Remove link"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -5860,37 +5831,37 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
           onClick={() => setShowAddLink(false)}
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-gray-200 dark:border-zinc-700 bg-card shadow-elev"
+            className="w-full max-w-md rounded-2xl border border-gray-200 bg-card shadow-elev"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-zinc-700">
+            <div className="flex items-center justify-between p-5 border-b border-gray-200 ">
               <div className="text-sm font-semibold">Add a link</div>
-              <button onClick={() => setShowAddLink(false)} className="grid h-8 w-8 place-items-center rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800">
+              <button onClick={() => setShowAddLink(false)} className="grid h-8 w-8 place-items-center rounded-md text-gray-500 hover:bg-gray-100 ">
                 <X className="h-4 w-4" />
               </button>
             </div>
             <div className="p-5 space-y-4">
               <div>
-                <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 block">Link name</label>
+                <label className="text-xs font-medium text-gray-500 mb-1.5 block">Link name</label>
                 <input
                   value={linkName}
                   onChange={(e) => setLinkName(e.target.value)}
                   placeholder="e.g. Product Demo Video, Financial Model..."
-                  className="w-full rounded-md border border-gray-200 dark:border-zinc-700 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                  className="w-full rounded-md border border-gray-200 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 block">URL</label>
+                <label className="text-xs font-medium text-gray-500 mb-1.5 block">URL</label>
                 <input
                   value={linkUrl}
                   onChange={(e) => setLinkUrl(e.target.value)}
                   placeholder="https://..."
                   type="url"
-                  className="w-full rounded-md border border-gray-200 dark:border-zinc-700 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                  className="w-full rounded-md border border-gray-200 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-1">
-                <button onClick={() => setShowAddLink(false)} className="px-4 py-2 rounded-md border border-gray-200 dark:border-zinc-700 text-sm hover:bg-gray-100 dark:hover:bg-zinc-800">
+                <button onClick={() => setShowAddLink(false)} className="px-4 py-2 rounded-md border border-gray-200 text-sm hover:bg-gray-100 ">
                   Cancel
                 </button>
                 <button
@@ -5920,24 +5891,24 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
             <div className="flex items-center justify-between p-6 border-b border-border">
               <div>
                 <h2 className="text-lg font-bold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{viewingDoc.title}</h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-xs text-gray-500 mt-1">
                   {viewingDoc.completeness_score}% complete · Updated {formatRelativeTime(viewingDoc.updated_at)}
                 </p>
               </div>
-              <button onClick={() => setViewingDoc(null)} className="text-gray-500 dark:text-gray-400 hover:text-foreground text-xl leading-none">×</button>
+              <button onClick={() => setViewingDoc(null)} className="text-gray-500 hover:text-foreground text-xl leading-none">×</button>
             </div>
             <div className="overflow-y-auto p-6 space-y-4 flex-1">
               {viewingDoc.content && Object.entries(viewingDoc.content as Record<string, string>)
                 .filter(([, v]) => v && String(v).trim())
                 .map(([key, value]) => (
                   <div key={key}>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">{key.replace(/_/g, " ")}</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{key.replace(/_/g, " ")}</p>
                     <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{String(value)}</p>
                   </div>
                 ))
               }
               {(!viewingDoc.content || Object.keys(viewingDoc.content).length === 0) && (
-                <p className="text-gray-500 dark:text-gray-400 text-sm text-center py-8">No content available</p>
+                <p className="text-gray-500 text-sm text-center py-8">No content available</p>
               )}
             </div>
             {viewingDoc.ai_feedback && (viewingDoc.ai_feedback as Record<string, unknown>).overall_score && (
@@ -5949,7 +5920,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                 )}>
                   {String((viewingDoc.ai_feedback as Record<string, unknown>).overall_score)}
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 flex-1">
+                <p className="text-xs text-gray-500 flex-1">
                   AI score: {String((viewingDoc.ai_feedback as Record<string, unknown>).summary ?? "").substring(0, 120)}...
                 </p>
               </div>
@@ -5983,14 +5954,14 @@ function DocPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-4xl rounded-2xl border border-gray-200 dark:border-zinc-700 bg-card shadow-elev overflow-hidden"
+        className="w-full max-w-4xl rounded-2xl border border-gray-200 bg-card shadow-elev overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-zinc-700">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 ">
           <div className="text-sm font-semibold truncate">{displayName}</div>
           <button
             onClick={onClose}
-            className="grid h-7 w-7 place-items-center rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800"
+            className="grid h-7 w-7 place-items-center rounded-md text-gray-500 hover:bg-gray-100 "
           >
             <X className="h-4 w-4" />
           </button>
@@ -5998,28 +5969,28 @@ function DocPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
         <div className="p-6">
           {!url ? (
             <div className="flex justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-gray-500 dark:text-gray-400" />
+              <Loader2 className="h-6 w-6 animate-spin text-gray-500 " />
             </div>
           ) : isImage ? (
             <img src={url} alt={displayName} className="max-w-full max-h-[60vh] object-contain mx-auto rounded-lg" />
           ) : isPdf ? (
             <iframe
               src={url}
-              className="w-full h-[70vh] rounded-lg border border-gray-200 dark:border-zinc-700"
+              className="w-full h-[70vh] rounded-lg border border-gray-200 "
               title={displayName}
             />
           ) : isOffice ? (
             <iframe
               src={`https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`}
-              className="w-full h-[70vh] rounded-lg border border-gray-200 dark:border-zinc-700"
+              className="w-full h-[70vh] rounded-lg border border-gray-200 "
               title={displayName}
             />
           ) : (
             <div className="flex flex-col items-center gap-4 py-8 text-center">
               <div className="grid h-16 w-16 place-items-center rounded-2xl bg-accent">
-                <FileText className="h-8 w-8 text-gray-500 dark:text-gray-400" />
+                <FileText className="h-8 w-8 text-gray-500 " />
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Preview not available for this file type.</p>
+              <p className="text-sm text-gray-500 ">Preview not available for this file type.</p>
               <a
                 href={url}
                 download={displayName}
@@ -6044,13 +6015,13 @@ function ParticipantsSection({ dealRoomId }: { dealRoomId: string }) {
       : "bg-warning/10 text-warning";
   return (
     <div className="px-8 pb-10 max-w-5xl mx-auto">
-      <div className="rounded-xl border border-gray-200 dark:border-zinc-700 bg-card shadow-card p-5">
+      <div className="rounded-xl border border-gray-200 bg-card shadow-card p-5">
         <div className="flex items-center justify-between">
           <div className="text-sm font-semibold inline-flex items-center gap-2"><Users className="h-4 w-4 text-brand" /> Participants</div>
-          <button className="text-xs inline-flex items-center gap-1 text-gray-500 dark:text-gray-400 hover:text-foreground"><UserPlus className="h-3.5 w-3.5" /> Invite</button>
+          <button className="text-xs inline-flex items-center gap-1 text-gray-500 hover:text-foreground"><UserPlus className="h-3.5 w-3.5" /> Invite</button>
         </div>
         {list.length === 0 ? (
-          <div className="mt-4 text-xs text-gray-500 dark:text-gray-400">No participants yet.</div>
+          <div className="mt-4 text-xs text-gray-500">No participants</div>
         ) : (
           <div className="mt-4 divide-y divide-border/60">
             {list.map((p) => (
@@ -6059,11 +6030,11 @@ function ParticipantsSection({ dealRoomId }: { dealRoomId: string }) {
                   <div className="grid h-8 w-8 place-items-center rounded-full bg-accent text-[11px] font-semibold shrink-0">{p.name.split(" ").map((s) => s[0]).slice(0, 2).join("")}</div>
                   <span className="font-medium truncate">{p.name}</span>
                 </div>
-                <div className="col-span-3 text-gray-500 dark:text-gray-400 truncate">{p.email}</div>
-                <div className="col-span-2 text-gray-500 dark:text-gray-400 truncate">{p.role}</div>
-                <div className="col-span-2 text-gray-500 dark:text-gray-400 truncate">{p.company || "—"}</div>
+                <div className="col-span-3 text-gray-500 truncate">{p.email}</div>
+                <div className="col-span-2 text-gray-500 truncate">{p.role}</div>
+                <div className="col-span-2 text-gray-500 truncate">{p.company || "—"}</div>
                 <div className="col-span-1"><span className={cn("text-[10px] px-2 py-0.5 rounded", statusColor(p.status))}>{p.status}</span></div>
-                <div className="col-span-1 text-right text-xs text-gray-500 dark:text-gray-400">{p.dateJoined ?? "—"}</div>
+                <div className="col-span-1 text-right text-xs text-gray-500 ">{p.dateJoined ?? "—"}</div>
               </div>
             ))}
           </div>
@@ -6136,14 +6107,14 @@ function InviteModal({
       <div className="fixed inset-0 z-50 bg-foreground/40 backdrop-blur-sm" onClick={onClose} />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
-          className="pointer-events-auto w-full max-w-md rounded-2xl border border-gray-200 dark:border-zinc-700 bg-card shadow-elev p-6"
+          className="pointer-events-auto w-full max-w-md rounded-2xl border border-gray-200 bg-card shadow-elev p-6"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between mb-4">
             <div className="text-base font-semibold">Invite investor to deal room</div>
             <button
               onClick={onClose}
-              className="grid h-7 w-7 place-items-center rounded-md text-gray-500 dark:text-gray-400 hover:bg-accent hover:text-foreground"
+              className="grid h-7 w-7 place-items-center rounded-md text-gray-500 hover:bg-accent hover:text-foreground"
             >
               <X className="h-4 w-4" />
             </button>
@@ -6156,16 +6127,16 @@ function InviteModal({
                 Invite sent to {email}
               </div>
               <div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mb-1.5">Or share this link directly</div>
+                <div className="text-xs text-gray-500 mb-1.5">Or share this link directly</div>
                 <div className="flex items-center gap-2">
                   <input
                     readOnly
                     value={sentLink}
-                    className="flex-1 rounded-md border border-gray-200 dark:border-zinc-700 bg-background px-3 py-1.5 text-xs font-mono text-gray-500 dark:text-gray-400 focus:outline-none min-w-0"
+                    className="flex-1 rounded-md border border-gray-200 bg-background px-3 py-1.5 text-xs font-mono text-gray-500 focus:outline-none min-w-0"
                   />
                   <button
                     onClick={copyLink}
-                    className="shrink-0 inline-flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-zinc-700 px-3 py-1.5 text-xs hover:bg-gray-100 dark:hover:bg-zinc-800"
+                    className="shrink-0 inline-flex items-center gap-1.5 rounded-md border border-gray-200 px-3 py-1.5 text-xs hover:bg-gray-100 "
                   >
                     {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
                     {copied ? "Copied" : "Copy"}
@@ -6182,24 +6153,24 @@ function InviteModal({
           ) : (
             <form onSubmit={send} className="space-y-3">
               <div>
-                <label className="text-xs text-gray-500 dark:text-gray-400">Investor email *</label>
+                <label className="text-xs text-gray-500 ">Investor email *</label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="investor@firm.com"
-                  className="mt-1 w-full rounded-md border border-gray-200 dark:border-zinc-700 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                  className="mt-1 w-full rounded-md border border-gray-200 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-500 dark:text-gray-400">Personal message (optional)</label>
+                <label className="text-xs text-gray-500 ">Personal message (optional)</label>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   rows={3}
                   placeholder="Hi, I'd love to share our deal room with you…"
-                  className="mt-1 w-full rounded-md border border-gray-200 dark:border-zinc-700 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
+                  className="mt-1 w-full rounded-md border border-gray-200 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
                 />
               </div>
               {error && <p className="text-xs text-destructive">{error}</p>}
@@ -6207,7 +6178,7 @@ function InviteModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 rounded-md border border-gray-200 dark:border-zinc-700 px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-zinc-800"
+                  className="flex-1 rounded-md border border-gray-200 px-4 py-2 text-sm hover:bg-gray-100 "
                 >
                   Cancel
                 </button>
@@ -6280,17 +6251,17 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
     <div className="p-8 max-w-3xl mx-auto">
       <h2 className="text-lg font-bold tracking-tight">Notes</h2>
 
-      <form onSubmit={submit} className="mt-5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-card p-4 shadow-card space-y-3">
+      <form onSubmit={submit} className="mt-5 rounded-xl border border-gray-200 bg-card p-4 shadow-card space-y-3">
         <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
           placeholder="Write a note…"
           rows={3}
-          className="w-full rounded-md border border-gray-200 dark:border-zinc-700 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
+          className="w-full rounded-md border border-gray-200 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
         />
         <div className="flex items-center justify-between">
           <label className="flex items-center gap-2 cursor-pointer">
-            <div className="flex items-center gap-1 rounded-lg bg-gray-100/60 dark:bg-zinc-800/60 p-0.5">
+            <div className="flex items-center gap-1 rounded-lg bg-gray-100/60 p-0.5">
               {(["public", "team", "private"] as const).map((v) => (
                 <button
                   key={v}
@@ -6302,16 +6273,16 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
                       ? v === "public"
                         ? "hs-gradient text-brand-foreground shadow-sm"
                         : v === "team"
-                        ? "bg-blue-500 text-gray-900 dark:text-white shadow-sm"
+                        ? "bg-blue-500 text-gray-900 shadow-sm"
                         : "bg-warning text-warning-foreground shadow-sm"
-                      : "text-gray-500 dark:text-gray-400 hover:text-foreground"
+                      : "text-gray-500 hover:text-foreground"
                   )}
                 >
                   {v === "public" ? "🌐 Public" : v === "team" ? "👥 Team" : "🔒 Private"}
                 </button>
               ))}
             </div>
-            <span className="text-[10px] text-gray-500 dark:text-gray-400">
+            <span className="text-[10px] text-gray-500 ">
               {noteVisibility === "public" ? "Visible to all deal room members" : noteVisibility === "team" ? "Visible to your role only (founder or investor)" : "Only visible to you"}
             </span>
           </label>
@@ -6323,14 +6294,14 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
       </form>
 
       {isError && <p className="mt-4 text-sm text-destructive">Could not load data. Please refresh.</p>}
-      {isLoading && <div className="mt-4 text-sm text-gray-500 dark:text-gray-400 animate-pulse">Loading…</div>}
+      {isLoading && <div className="mt-4 text-sm text-gray-500 animate-pulse">Loading…</div>}
 
       <div className="mt-5 grid gap-3">
         {(notes as any[]).map((n) => (
-          <div key={n.id} className={`rounded-xl border border-gray-200 dark:border-zinc-700 p-4 shadow-card ${n.private ? "bg-warning/5 border-warning/30" : "bg-white dark:bg-zinc-900"}`}>
+          <div key={n.id} className={`rounded-xl border border-gray-200 p-4 shadow-card ${n.private ? "bg-warning/5 border-warning/30" : "bg-white "}`}>
             <div className="flex items-center gap-2 text-xs">
               <span className="font-medium">{n.author_id === userId ? "You" : (n.users?.full_name ?? "Unknown")}</span>
-              <span className="text-gray-500 dark:text-gray-400">{formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}</span>
+              <span className="text-gray-500 ">{formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}</span>
               {(n.private || n.visibility === "private") && (
                       <span className="ml-auto text-[10px] uppercase tracking-wider text-warning bg-warning/10 px-1.5 py-0.5 rounded-full">🔒 Private</span>
                     )}
@@ -6375,18 +6346,18 @@ function Timeline({ dealRoomId }: { dealRoomId: string }) {
     <div className="p-8 max-w-3xl mx-auto">
       <h2 className="text-lg font-bold tracking-tight">Activity</h2>
       {isError && <p className="mt-4 text-sm text-destructive">Could not load data. Please refresh.</p>}
-      {isLoading && <div className="mt-4 text-sm text-gray-500 dark:text-gray-400 animate-pulse">Loading…</div>}
+      {isLoading && <div className="mt-4 text-sm text-gray-500 animate-pulse">Loading…</div>}
       {!isLoading && !isError && events.length === 0 && (
-        <p className="mt-6 text-sm text-gray-500 dark:text-gray-400">No activity yet. Activity is recorded automatically as the deal room is used.</p>
+        <p className="mt-6 text-sm text-gray-500">No activity</p>
       )}
       {events.length > 0 && (
         <div className="mt-6 relative pl-6">
           <div className="absolute left-2 top-2 bottom-2 w-px bg-border" />
           {(events as any[]).map((e) => (
             <div key={e.id} className="relative pb-6 last:pb-0">
-              <div className="absolute -left-[18px] top-1.5 h-3 w-3 rounded-full hs-gradient ring-4 ring-white dark:ring-zinc-900" />
-              <div className="text-sm font-medium text-gray-900 dark:text-foreground">{e.action_type ?? e.target_label ?? "Activity"}</div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 inline-flex items-center gap-1 mt-0.5">
+              <div className="absolute -left-[18px] top-1.5 h-3 w-3 rounded-full hs-gradient ring-4 ring-white " />
+              <div className="text-sm font-medium text-gray-900 ">{e.action_type ?? e.target_label ?? "Activity"}</div>
+              <div className="text-xs text-gray-500 inline-flex items-center gap-1 mt-0.5">
                 <Clock className="h-3 w-3" />
                 {e.actor_name ? `${e.actor_name} · ` : ""}
                 {formatDistanceToNow(new Date(e.created_at), { addSuffix: true })}
@@ -6603,7 +6574,7 @@ function QA({
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-lg font-bold tracking-tight">Q&amp;A</h2>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Structured diligence questions stay separate from the live discussion.</p>
+            <p className="mt-1 text-sm text-gray-500 ">Structured diligence questions stay separate from the live discussion.</p>
           </div>
           {isInvestor && (
             <button
@@ -6615,14 +6586,14 @@ function QA({
           )}
         </div>
 
-        <section className="rounded-xl border border-gray-200 dark:border-zinc-700 bg-card shadow-card">
-          <div className="border-b border-gray-200 dark:border-zinc-700 p-5">
+        <section className="rounded-xl border border-gray-200 bg-card shadow-card">
+          <div className="border-b border-gray-200 p-5">
             <div className="text-sm font-semibold">Structured Q&amp;A</div>
-            <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">Investor questions and founder answers, organized as expandable cards.</div>
+            <div className="mt-1 text-xs text-gray-500 ">Investor questions and founder answers, organized as expandable cards.</div>
           </div>
 
           {isInvestor && (
-            <div className="border-b border-gray-200 dark:border-zinc-700 p-5">
+            <div className="border-b border-gray-200 p-5">
               <textarea
                 id="ask-question-box"
                 value={question}
@@ -6635,11 +6606,11 @@ function QA({
                 }}
                 rows={3}
                 placeholder="Ask a diligence question for the founder..."
-                className="w-full resize-none rounded-md border border-gray-200 dark:border-zinc-700 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
+                className="w-full resize-none rounded-md border border-gray-200 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
               />
               {suggestions.length > 0 && (
                 <div className="mt-2">
-                  <div className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold mb-1.5 flex items-center gap-1">
+                  <div className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1.5 flex items-center gap-1">
                     <Sparkles className="h-3 w-3 text-brand" /> Suggested follow-ups
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -6674,10 +6645,16 @@ function QA({
           )}
 
           <div className="divide-y divide-border/60">
-            {loading && <div className="p-5 text-sm text-gray-500 dark:text-gray-400 animate-pulse">Loading…</div>}
-            {loadError && <p className="p-5 text-sm text-destructive">Could not load data. Please refresh.</p>}
+            {loading && <EmptyState kind="loading" title="Loading" />}
+            {loadError && (
+              <EmptyState
+                kind="error"
+                title="Something went wrong"
+                action={{ label: "Try again", onClick: () => window.location.reload() }}
+              />
+            )}
             {!loading && !loadError && structured.length === 0 && (
-              <div className="p-5 text-sm text-gray-500 dark:text-gray-400">No structured questions yet.</div>
+              <EmptyState kind="empty" title="No questions" />
             )}
             {structured.map((item) => {
               const answer = item.metadata?.answer ?? "";
@@ -6695,7 +6672,7 @@ function QA({
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="text-sm font-semibold">{item.body}</div>
-                      <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      <div className="mt-1 text-xs text-gray-500 ">
                         Asked by {author} · {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
                       </div>
                     </div>
@@ -6703,20 +6680,20 @@ function QA({
                       <span className={cn("rounded-full px-2 py-1 text-[11px] font-medium", answer ? "bg-success/10 text-success" : "bg-warning/10 text-warning")}>
                         {answer ? `${words} words` : "Awaiting answer"}
                       </span>
-                      <ChevronDown className={cn("h-4 w-4 text-gray-500 dark:text-gray-400 transition-transform", open && "rotate-180")} />
+                      <ChevronDown className={cn("h-4 w-4 text-gray-500 transition-transform", open && "rotate-180")} />
                     </div>
                   </button>
                   {open && (
-                    <div className="border-t border-gray-200 dark:border-zinc-700 bg-background/60 px-5 py-4">
+                    <div className="border-t border-gray-200 bg-background/60 px-5 py-4">
                       {answer ? (
                         <div>
-                          <div className="mb-2 flex items-center justify-between gap-3 text-xs text-gray-500 dark:text-gray-400">
+                          <div className="mb-2 flex items-center justify-between gap-3 text-xs text-gray-500 ">
                             <span>Founder answer</span>
                             <span>{words} words</span>
                           </div>
                           <p className="text-sm leading-relaxed">{answer}</p>
                           {item.metadata?.answeredAt && (
-                            <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                            <div className="mt-3 text-xs text-gray-500 ">
                               Answered by {item.metadata?.answeredBy || "Founder"} · {formatDistanceToNow(new Date(item.metadata.answeredAt), { addSuffix: true })}
                             </div>
                           )}
@@ -6728,10 +6705,10 @@ function QA({
                             onChange={(e) => setAnswerDrafts((drafts) => ({ ...drafts, [item.id]: e.target.value }))}
                             rows={4}
                             placeholder="Answer this question..."
-                            className="w-full resize-none rounded-md border border-gray-200 dark:border-zinc-700 bg-card px-3 py-2 text-sm outline-none focus:border-brand/50"
+                            className="w-full resize-none rounded-md border border-gray-200 bg-card px-3 py-2 text-sm outline-none focus:border-brand/50"
                           />
                           <div className="mt-3 flex items-center justify-between gap-2">
-                            <span className="text-xs text-gray-500 dark:text-gray-400">{countWords(answerDrafts[item.id] ?? "")} words</span>
+                            <span className="text-xs text-gray-500 ">{countWords(answerDrafts[item.id] ?? "")} words</span>
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={async () => {
@@ -6772,7 +6749,7 @@ function QA({
                           </div>
                         </div>
                       ) : (
-                        <div className="text-sm text-gray-500 dark:text-gray-400">The founder has not answered this question yet.</div>
+                        <div className="text-sm text-gray-500">Not answered</div>
                       )}
                     </div>
                   )}
@@ -6782,16 +6759,16 @@ function QA({
           </div>
         </section>
 
-        <section className="rounded-xl border border-gray-200 dark:border-zinc-700 bg-card shadow-card">
-          <div className="border-b border-gray-200 dark:border-zinc-700 p-5">
+        <section className="rounded-xl border border-gray-200 bg-card shadow-card">
+          <div className="border-b border-gray-200 p-5">
             <div className="text-sm font-semibold">Live discussion</div>
-            <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">Informal back-and-forth for quick clarifications.</div>
+            <div className="mt-1 text-xs text-gray-500 ">Informal back-and-forth for quick clarifications.</div>
           </div>
 
           <div ref={scrollRef} className="max-h-[360px] overflow-y-auto px-5 py-4 space-y-3">
-            {loading && <div className="text-sm text-gray-500 dark:text-gray-400 animate-pulse">Loading…</div>}
+            {loading && <div className="text-sm text-gray-500 animate-pulse">Loading…</div>}
             {!loading && !loadError && discussion.length === 0 && (
-              <div className="text-sm text-gray-500 dark:text-gray-400">No live discussion yet.</div>
+              <div className="text-sm text-gray-500">No discussion</div>
             )}
             {discussion.map((m, i) => {
               const isMe = m.sender_id === userId;
@@ -6810,10 +6787,10 @@ function QA({
                     {!grouped && (
                       <div className={cn("mb-1 flex items-center gap-2 text-[11px]", isMe && "flex-row-reverse")}>
                         <span className="font-medium">{name}</span>
-                        <span className="text-gray-500 dark:text-gray-400">{format(new Date(m.created_at), "h:mm a")}</span>
+                        <span className="text-gray-500 ">{format(new Date(m.created_at), "h:mm a")}</span>
                       </div>
                     )}
-                    <div className={cn("rounded-2xl px-3.5 py-2 text-sm", isMe ? "bg-gradient-brand text-brand-foreground rounded-tr-sm" : "bg-gray-100 dark:bg-zinc-800 rounded-tl-sm")}>
+                    <div className={cn("rounded-2xl px-3.5 py-2 text-sm", isMe ? "bg-gradient-brand text-brand-foreground rounded-tr-sm" : "bg-gray-100 rounded-tl-sm")}>
                       {m.body}
                     </div>
                   </div>
@@ -6822,8 +6799,8 @@ function QA({
             })}
           </div>
 
-          <div className="border-t border-gray-200 dark:border-zinc-700 bg-background px-5 py-4">
-            <div className="flex items-end gap-2 rounded-xl border border-gray-200 dark:border-zinc-700 bg-card px-3 py-2 transition focus-within:border-brand/50 focus-within:ring-2 focus-within:ring-brand/10">
+          <div className="border-t border-gray-200 bg-background px-5 py-4">
+            <div className="flex items-end gap-2 rounded-xl border border-gray-200 bg-card px-3 py-2 transition focus-within:border-brand/50 focus-within:ring-2 focus-within:ring-brand/10">
               <textarea
                 rows={1}
                 value={input}
@@ -7008,21 +6985,21 @@ function OverviewPanel({
 
   return (
     <div className="w-full px-6 py-6">
-      <section className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-4 mb-4">
+      <section className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex min-w-0 items-start gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full hs-gradient text-sm font-bold text-foreground">
               {companyInitial}
             </div>
             <div className="min-w-0">
-              <h2 className="truncate text-xl font-semibold text-gray-900 dark:text-foreground">{companyName.toUpperCase()}</h2>
+              <h2 className="truncate text-xl font-semibold text-gray-900 ">{companyName.toUpperCase()}</h2>
               <div className="mt-1 flex flex-wrap items-center gap-2">
                 {startup?.stage && (
                   <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-brand">
                     {startup.stage}
                   </span>
                 )}
-                {startup?.sector && <span className="text-sm text-gray-500 dark:text-gray-400">{startup.sector}</span>}
+                {startup?.sector && <span className="text-sm text-gray-500 ">{startup.sector}</span>}
               </div>
             </div>
           </div>
@@ -7034,12 +7011,12 @@ function OverviewPanel({
                 ["Match score", dealBrief?.match_score ?? "—"],
               ].map(([label, value]) => (
                 <div key={label} className="min-w-[92px]">
-                  <div className="text-xs text-gray-500 dark:text-gray-400">{label}</div>
-                  <div className="mt-1 text-lg font-semibold text-gray-900 dark:text-foreground">{value}</div>
+                  <div className="text-xs text-gray-500 ">{label}</div>
+                  <div className="mt-1 text-lg font-semibold text-gray-900 ">{value}</div>
                 </div>
               ))}
             </div>
-            <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+            <div className="mt-3 text-sm text-gray-500 ">
               {[dealRoom?.investor_name, dealRoom?.investor_company].filter(Boolean).join(" · ") || "Investor not assigned"}
             </div>
           </div>
@@ -7054,8 +7031,8 @@ function OverviewPanel({
         </section>
       )}
 
-      <section className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-4 mb-4">
-        <h3 className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">TRACTION METRICS</h3>
+      <section className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+        <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-2">TRACTION METRICS</h3>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {[
             ["Revenue", formatValue(startup?.revenue)],
@@ -7064,16 +7041,16 @@ function OverviewPanel({
             ["Team size", formatValue(startup?.team_size)],
           ].map(([label, value]) => (
             <div key={label}>
-              <div className="text-xs text-gray-500 dark:text-gray-400">{label}</div>
-              <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-foreground">{value}</div>
+              <div className="text-xs text-gray-500 ">{label}</div>
+              <div className="mt-1 text-2xl font-bold text-gray-900 ">{value}</div>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-4 mb-4">
+      <section className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
         <div className="flex items-center justify-between gap-3 mb-1">
-          <h3 className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">DEAL BRIEF</h3>
+          <h3 className="text-xs uppercase tracking-wider text-gray-500 ">DEAL BRIEF</h3>
           <button
             type="button"
             data-testid="generate-brief-btn"
@@ -7099,9 +7076,9 @@ function OverviewPanel({
         </div>
 
         {!dealRoom?.investor_user_id ? (
-          <p className="text-sm text-gray-400 dark:text-gray-500">No investor assigned yet — assign one to generate a deal brief.</p>
+          <p className="text-sm text-gray-400">No investor assigned</p>
         ) : !dealBrief ? (
-          <p className="text-sm text-gray-400 dark:text-gray-500">No brief yet — generate one to see match score and analysis.</p>
+          <p className="text-sm text-gray-400">No brief</p>
         ) : (
           <div>
             <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -7118,13 +7095,13 @@ function OverviewPanel({
                 {dealBrief.match_score}/100
               </span>
               {dealBrief.headline && (
-                <span className="text-sm font-semibold text-gray-900 dark:text-foreground">{dealBrief.headline}</span>
+                <span className="text-sm font-semibold text-gray-900 ">{dealBrief.headline}</span>
               )}
             </div>
             {dealBrief.investment_thesis && (
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{dealBrief.investment_thesis}</p>
+              <p className="mt-2 text-sm text-gray-600 line-clamp-2">{dealBrief.investment_thesis}</p>
             )}
-            <p className="mt-3 text-xs text-gray-400 dark:text-gray-500">
+            <p className="mt-3 text-xs text-gray-400 ">
               {dealBrief.generated_at
                 ? `Generated ${formatDistanceToNow(new Date(dealBrief.generated_at), { addSuffix: true })}`
                 : null}
@@ -7135,7 +7112,7 @@ function OverviewPanel({
 
       {/* ── NDA & Confidentiality card ─────────────────────────────── */}
       <section className="mb-4">
-        <h3 className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">NDA &amp; CONFIDENTIALITY</h3>
+        <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-2">NDA &amp; CONFIDENTIALITY</h3>
         <div className="bg-card border border-border/60 rounded-xl p-5">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -7268,13 +7245,13 @@ function OverviewPanel({
       </div>
 
       <section className="mb-4">
-        <h3 className="mb-2 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">TEAM</h3>
+        <h3 className="mb-2 text-xs uppercase tracking-wider text-gray-500 ">TEAM</h3>
         {teamMembers.length === 0 ? (
-          <p className="text-gray-400 dark:text-zinc-500 text-sm">Team members not added yet</p>
+          <p className="text-gray-400 text-sm">No team members</p>
         ) : (
           <div className="flex gap-4 overflow-x-auto pb-2">
             {(teamMembers as any[]).map((member) => (
-              <article key={member.id ?? member.name} className="min-w-[180px] bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-4">
+              <article key={member.id ?? member.name} className="min-w-[180px] bg-white border border-gray-200 rounded-xl p-4">
                 {member.photo_url ? (
                   <img src={member.photo_url} alt="" className="w-12 h-12 rounded-full object-cover mb-2" />
                 ) : (
@@ -7282,11 +7259,11 @@ function OverviewPanel({
                     {initials(member.name)}
                   </div>
                 )}
-                <div className="text-sm font-semibold text-gray-900 dark:text-foreground">{member.name ?? "Team member"}</div>
-                {member.title && <div className="text-xs text-gray-500 dark:text-gray-400">{member.title}</div>}
-                {member.bio && <p className="mt-2 text-xs text-gray-600 dark:text-gray-300 line-clamp-2">{member.bio}</p>}
+                <div className="text-sm font-semibold text-gray-900 ">{member.name ?? "Team member"}</div>
+                {member.title && <div className="text-xs text-gray-500 ">{member.title}</div>}
+                {member.bio && <p className="mt-2 text-xs text-gray-600 line-clamp-2">{member.bio}</p>}
                 {member.linkedin_url && (
-                  <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex text-gray-500 hover:text-brand dark:text-gray-400">
+                  <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex text-gray-500 hover:text-brand ">
                     <ExternalLink className="h-3.5 w-3.5" />
                   </a>
                 )}
@@ -7297,54 +7274,54 @@ function OverviewPanel({
       </section>
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 mb-4">
-        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
           <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand">FOUNDER</div>
-          <div className="font-semibold text-gray-900 dark:text-foreground">{companyName}</div>
-          {startup?.country && <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">{startup.country}</div>}
-          <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
+          <div className="font-semibold text-gray-900 ">{companyName}</div>
+          {startup?.country && <div className="mt-1 text-sm text-gray-500 ">{startup.country}</div>}
+          <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-500 ">
             <span>Founded: {formatValue(startup?.founded_year)}</span>
             <span>Team: {formatValue(startup?.team_size)}</span>
           </div>
-          {startup?.description && <p className="mt-3 line-clamp-3 text-sm text-gray-600 dark:text-gray-300">{startup.description}</p>}
+          {startup?.description && <p className="mt-3 line-clamp-3 text-sm text-gray-600 ">{startup.description}</p>}
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
           <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand">INVESTOR</div>
           {dealRoom?.investor_name ? (
             <>
-              <div className="font-semibold text-gray-900 dark:text-foreground">{dealRoom.investor_name}</div>
-              {dealRoom?.investor_company && <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">{dealRoom.investor_company}</div>}
-              {investorProfile?.thesis && <p className="mt-3 text-sm line-clamp-2 text-gray-600 dark:text-gray-300">{investorProfile.thesis}</p>}
+              <div className="font-semibold text-gray-900 ">{dealRoom.investor_name}</div>
+              {dealRoom?.investor_company && <div className="mt-1 text-sm text-gray-500 ">{dealRoom.investor_company}</div>}
+              {investorProfile?.thesis && <p className="mt-3 text-sm line-clamp-2 text-gray-600 ">{investorProfile.thesis}</p>}
               {investorProfile?.thesis_statement && !investorProfile?.thesis && (
-                <p className="mt-3 text-sm line-clamp-2 text-gray-600 dark:text-gray-300">{investorProfile.thesis_statement}</p>
+                <p className="mt-3 text-sm line-clamp-2 text-gray-600 ">{investorProfile.thesis_statement}</p>
               )}
-              {sectors && <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">{sectors}</div>}
+              {sectors && <div className="mt-3 text-sm text-gray-500 ">{sectors}</div>}
               {dealBrief?.match_score !== undefined && (
-                <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">
-                  Match score: <span className="font-semibold text-gray-900 dark:text-foreground">{dealBrief.match_score}</span>
+                <div className="mt-3 text-sm text-gray-500 ">
+                  Match score: <span className="font-semibold text-gray-900 ">{dealBrief.match_score}</span>
                 </div>
               )}
             </>
           ) : (
-            <p className="text-sm text-gray-500 dark:text-gray-400">No investor in this deal room yet</p>
+            <p className="text-sm text-gray-500">No investor</p>
           )}
         </div>
       </section>
 
-      <section className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-4 mb-4">
-        <h3 className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4">RECENT ACTIVITY</h3>
+      <section className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+        <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-4">RECENT ACTIVITY</h3>
         {recentActivity.length === 0 ? (
-          <p className="text-gray-400 dark:text-zinc-500 text-sm">No activity yet</p>
+          <p className="text-gray-400 text-sm">No activity</p>
         ) : (
           <div className="space-y-3">
             {(recentActivity as any[]).map((activity) => (
               <div key={activity.id} className="flex items-start gap-3">
                 <div className="w-2 h-2 rounded-full hs-gradient mt-1.5 flex-shrink-0" />
-                <div className="min-w-0 text-sm text-gray-700 dark:text-gray-300">
-                  <span className="font-semibold text-gray-900 dark:text-foreground">{activity.actor_name ?? "Someone"}</span>
+                <div className="min-w-0 text-sm text-gray-700 ">
+                  <span className="font-semibold text-gray-900 ">{activity.actor_name ?? "Someone"}</span>
                   <span> · {activity.action_type ?? activity.target_label ?? "Activity"}</span>
                 </div>
-                <div className="ml-auto whitespace-nowrap text-xs text-gray-400 dark:text-zinc-500">
+                <div className="ml-auto whitespace-nowrap text-xs text-gray-400 ">
                   {activity.created_at ? new Date(activity.created_at).toLocaleDateString() : ""}
                 </div>
               </div>
@@ -7353,7 +7330,7 @@ function OverviewPanel({
         )}
       </section>
 
-      <section className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-4" data-testid="stage-progress-bar">
+      <section className="bg-white border border-gray-200 rounded-xl p-4" data-testid="stage-progress-bar">
         <div className="flex items-start">
           {progressStages.map((stage, index) => {
             const rank = UI_STAGE_ORDER.indexOf(stage.key);
@@ -7363,13 +7340,13 @@ function OverviewPanel({
               ? "hs-gradient text-white"
               : isComplete
                 ? "bg-green-500 text-white"
-                : "bg-gray-300 text-gray-500 dark:bg-zinc-700 dark:text-gray-400";
-            const lineClass = rank < workflowRank ? "bg-green-500" : "bg-gray-200 dark:bg-zinc-700";
+                : "bg-gray-300 text-gray-500  ";
+            const lineClass = rank < workflowRank ? "bg-green-500" : "bg-gray-200 ";
             return (
               <div key={stage.key} className="flex flex-1 items-start last:flex-none">
                 <div className="flex min-w-[64px] flex-col items-center gap-2">
                   <div className={`h-4 w-4 rounded-full ${dotClass}`} data-testid={`stage-progress-dot-${stage.key}`} />
-                  <div className="text-center text-xs text-gray-500 dark:text-gray-400">{stage.label}</div>
+                  <div className="text-center text-xs text-gray-500 ">{stage.label}</div>
                 </div>
                 {index < progressStages.length - 1 && <div className={`mt-2 h-0.5 flex-1 ${lineClass}`} />}
               </div>
@@ -7379,7 +7356,7 @@ function OverviewPanel({
         {stageRank(dealRoom?.workflow_stage) !== stageRank("closing") && (
           <div className="mt-5 flex justify-end">
             {pendingTransition ? (
-              <span className="text-xs text-amber-600 dark:text-amber-400 px-3 py-2">Stage advance pending approval…</span>
+              <span className="text-xs text-amber-600 px-3 py-2">Stage advance pending approval…</span>
             ) : (
               <button
                 onClick={onRequestNextStage}
