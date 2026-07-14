@@ -189,7 +189,7 @@ function DealRooms() {
     <div className="p-6 lg:p-8">
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Deal Rooms</h1>
+          <h1 className="text-lg font-bold tracking-tight">Deal Rooms</h1>
           <div className="text-sm text-muted-foreground">{rooms.length} room{rooms.length !== 1 ? "s" : ""}</div>
         </div>
         <div className="flex items-center gap-2">

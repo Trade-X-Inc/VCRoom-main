@@ -885,7 +885,7 @@ function Profile() {
         <div className="p-6 lg:p-8 max-w-5xl mx-auto">
           <div className="flex items-center justify-between flex-wrap gap-3 mb-6 no-print">
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight">Company Profile</h1>
+              <h1 className="text-lg font-bold tracking-tight">Company Profile</h1>
               <p className="text-sm text-muted-foreground mt-0.5">How investors see your startup.</p>
               {/* Part 3 — claims + cap table summary */}
               {claims.length > 0 && (() => {
@@ -931,7 +931,7 @@ function Profile() {
             </div>
             <div className="px-6 pb-6 -mt-10">
               <div className="flex items-end gap-4">
-                <div className="grid h-20 w-20 place-items-center rounded-2xl bg-gradient-brand text-brand-foreground text-2xl font-semibold border-4 border-background shadow-elev overflow-hidden shrink-0">
+                <div className="grid h-20 w-20 place-items-center rounded-2xl bg-gradient-brand text-brand-foreground text-lg font-bold border-4 border-background shadow-elev overflow-hidden shrink-0">
                   {logoUrl
                     ? <img src={logoUrl} alt="logo" className="h-full w-full object-cover" />
                     : <span>{initials}</span>}
@@ -1080,7 +1080,7 @@ function Profile() {
     <div className="p-6 lg:p-8 max-w-5xl mx-auto">
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{startup ? "Edit profile" : "Create your profile"}</h1>
+          <h1 className="text-lg font-bold tracking-tight">{startup ? "Edit profile" : "Create your profile"}</h1>
           <div className="text-sm text-muted-foreground">
             {startup ? "Edit your startup details, team, and pitch." : "Set up your startup profile so investors know who you are."}
           </div>
@@ -1169,7 +1169,7 @@ function Profile() {
         <div className="px-6 pb-6 -mt-10">
           <div className="flex items-end gap-4">
             <label className="relative cursor-pointer group shrink-0">
-              <div className="grid h-20 w-20 place-items-center rounded-2xl bg-gradient-brand text-brand-foreground text-2xl font-semibold border-4 border-background shadow-elev overflow-hidden">
+              <div className="grid h-20 w-20 place-items-center rounded-2xl bg-gradient-brand text-brand-foreground text-lg font-bold border-4 border-background shadow-elev overflow-hidden">
                 {logoUploading
                   ? <Loader2 className="h-6 w-6 animate-spin text-brand-foreground" />
                   : logoUrl

@@ -316,7 +316,7 @@ function Stat({
       <div className="text-xs text-muted-foreground">{label}</div>
       <div className="mt-1.5 flex items-baseline gap-2">
         <span
-          className={cn("text-2xl font-semibold tracking-tight", comingSoon && "text-muted-foreground")}
+          className={cn("text-lg font-bold tracking-tight", comingSoon && "text-muted-foreground")}
         >
           {value}
         </span>
@@ -728,7 +728,7 @@ function Overview() {
       <div className="p-6 lg:p-8 max-w-2xl mx-auto">
         <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Welcome to Hockystick 👋</h1>
+            <h1 className="text-lg font-bold tracking-tight">Welcome to Hockystick 👋</h1>
             <p className="mt-1.5 text-sm text-muted-foreground">
               Three steps to a live, verified profile investors can find.
             </p>
@@ -891,7 +891,7 @@ function Overview() {
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
           <div className="text-xs text-muted-foreground">{greeting}, {firstName}</div>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">
+          <h1 className="mt-1 text-lg font-bold tracking-tight">
             {startup?.name ?? "Your Startup"}{startup?.stage ? ` — ${startup.stage}` : ""}
           </h1>
         </div>
@@ -1062,7 +1062,7 @@ function Overview() {
             <div className="text-xs text-muted-foreground">Round progress</div>
             <div className="mt-1 flex items-baseline gap-2">
               <span
-                className="text-3xl font-semibold tracking-tight text-muted-foreground"
+                className="text-xl font-semibold tracking-tight text-muted-foreground"
                 title="Coming soon"
               >
                 --

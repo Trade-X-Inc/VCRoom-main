@@ -1,54 +1,40 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, type ReactNode } from "react";
 
-export type Theme = "light" | "dark" | "system";
-type Ctx = { theme: Theme; resolved: "light" | "dark"; setTheme: (t: Theme) => void };
-const ThemeContext = createContext<Ctx | null>(null);
+// One theme. The app is white. Period. (CLAUDE.md §9.1)
+// The provider survives only to scrub any stale dark preference from
+// pre-redesign visitors and to keep the ThemeProvider mount point stable.
+
+export type Theme = "light";
+type Ctx = { theme: Theme; resolved: "light"; setTheme: (t: Theme) => void };
+const ThemeContext = createContext<Ctx>({
+  theme: "light",
+  resolved: "light",
+  setTheme: () => {},
+});
 
 const STORAGE_KEY = "vr.theme";
 
-function systemPref(): "light" | "dark" {
-  if (typeof window === "undefined") return "light";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
-
-function apply(resolved: "light" | "dark") {
-  if (typeof document === "undefined") return;
-  const root = document.documentElement;
-  root.classList.toggle("dark", resolved === "dark");
-  root.setAttribute("data-theme", resolved);
-  root.style.colorScheme = resolved;
-}
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
-  const [resolved, setResolved] = useState<"light" | "dark">("dark");
-
   useEffect(() => {
-    // Default to "light" for new users; existing users keep their stored preference
-    const stored = (typeof window !== "undefined" && (localStorage.getItem(STORAGE_KEY) as Theme | null)) || "dark";
-    setThemeState(stored);
+    const root = document.documentElement;
+    root.classList.remove("dark");
+    root.setAttribute("data-theme", "light");
+    root.style.colorScheme = "light";
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      /* private mode */
+    }
   }, []);
-
-  useEffect(() => {
-    const next = theme === "system" ? systemPref() : theme;
-    setResolved(next);
-    apply(next);
-    if (typeof window !== "undefined") localStorage.setItem(STORAGE_KEY, theme);
-  }, [theme]);
-
-  useEffect(() => {
-    if (theme !== "system" || typeof window === "undefined") return;
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => { const n = systemPref(); setResolved(n); apply(n); };
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, [theme]);
-
-  return <ThemeContext.Provider value={{ theme, resolved, setTheme: setThemeState }}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider
+      value={{ theme: "light", resolved: "light", setTheme: () => {} }}
+    >
+      {children}
+    </ThemeContext.Provider>
+  );
 }
 
-export function useTheme() {
-  const ctx = useContext(ThemeContext);
-  if (!ctx) throw new Error("useTheme must be used within ThemeProvider");
-  return ctx;
+export function useTheme(): Ctx {
+  return useContext(ThemeContext);
 }

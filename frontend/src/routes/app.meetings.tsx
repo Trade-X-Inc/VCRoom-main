@@ -142,7 +142,7 @@ function Meetings() {
     <div className="p-6 lg:p-8">
       <div className="flex items-end justify-between flex-wrap gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Meetings</h1>
+          <h1 className="text-lg font-bold tracking-tight">Meetings</h1>
           <div className="text-sm text-muted-foreground mt-0.5">
             {meetings.length} meeting{meetings.length !== 1 ? "s" : ""} scheduled
           </div>

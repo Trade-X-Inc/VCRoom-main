@@ -81,7 +81,7 @@ function FeedbackPage() {
           <CheckCircle2 className="h-8 w-8" style={{ color: "#10B981" }} />
         </div>
         <div>
-          <h1 className="text-2xl font-semibold mb-2" style={{ fontFamily: "Syne, sans-serif" }}>Thank you.</h1>
+          <h1 className="text-lg font-bold mb-2" style={{ fontFamily: "Syne, sans-serif" }}>Thank you.</h1>
           <p className="text-sm text-muted-foreground max-w-xs">
             We read every response and use it to prioritise what to build next. Expect to see changes.
           </p>
@@ -105,7 +105,7 @@ function FeedbackPage() {
         >
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
-        <h1 className="text-2xl font-semibold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
+        <h1 className="text-lg font-bold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
           Share your feedback
         </h1>
         <p className="mt-1.5 text-sm text-muted-foreground">

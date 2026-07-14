@@ -29,7 +29,7 @@ function EmailComposer() {
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">AI Email Assistant</h1>
+        <h1 className="text-lg font-bold tracking-tight">AI Email Assistant</h1>
         <div className="text-sm text-muted-foreground">Drafts that sound like you. Approved by you.</div>
       </div>
 

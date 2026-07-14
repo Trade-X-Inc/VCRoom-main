@@ -9,7 +9,6 @@ import { useAuth } from "@/lib/auth";
 import { useAccountContext } from "@/hooks/useAccountContext";
 import { NotificationBell } from "@/components/app/NotificationBell";
 import { UserMenu } from "@/components/app/UserMenu";
-import { ThemeToggle } from "@/components/app/ThemeToggle";
 import { cn } from "@/lib/utils";
 import { ROLE_LABELS, FOUNDER_PERMISSIONS } from "@/lib/roles";
 import { supabase } from "@/lib/supabase";
@@ -252,7 +251,6 @@ export function MemberShell({ children }: { children?: React.ReactNode }) {
           </button>
           <div className="flex-1" />
           <div className="ml-auto flex items-center gap-1.5 md:gap-2">
-            <ThemeToggle />
             <NotificationBell />
             <UserMenu />
           </div>

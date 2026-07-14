@@ -244,19 +244,18 @@ function RoastManagement() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
+    <div className="p-6 lg:p-12 max-w-4xl mx-auto">
       <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
         <div>
           <h1
-            className="text-2xl font-semibold tracking-tight flex items-center gap-2"
+            className="text-lg font-bold tracking-tight flex items-center gap-2"
             style={{ fontFamily: "Syne, sans-serif" }}
           >
             <Flame className="h-6 w-6" style={{ color: "#EF4444" }} /> Founder
             Roast
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            A live public pitch challenge. One minute to pitch, a competitive
-            Q&A, and every question answered on the record.
+            Pitch live — answer everything on the record.
           </p>
         </div>
         {!activeSession && startup?.id && (
@@ -460,9 +459,7 @@ function RoastManagement() {
           />
           <div className="text-sm font-medium">No Roasts yet</div>
           <div className="text-xs text-muted-foreground mt-1 max-w-md mx-auto leading-relaxed">
-            Host a live public pitch challenge to earn the Roast Survivor badge
-            — the single strongest trust signal a founder can show an investor.
-            Voluntary, on camera, on the record.
+            The strongest trust signal a founder can earn.
           </div>
         </div>
       ) : (

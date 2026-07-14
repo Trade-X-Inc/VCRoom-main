@@ -35,9 +35,9 @@ export function ProfileCompletionBanner({ variant, percent }: ProfileCompletionB
         <p className="text-sm text-foreground min-w-0">
           {isFounder ? (
             <>
-              Your profile is {percent}% complete. Investors see incomplete profiles as a risk signal.{" "}
+              {percent}% ready ·{" "}
               <Link to="/app/profile" className="font-medium underline underline-offset-2" style={{ color: "#F59E0B" }}>
-                See what's missing →
+                Complete profile →
               </Link>
             </>
           ) : (

@@ -36,7 +36,7 @@ function SettingsLayout() {
     <div className="px-4 py-6 sm:px-6 lg:px-8">
       <div className="flex items-center gap-2 mb-6">
         <Settings className="h-5 w-5 text-brand" />
-        <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
+        <h1 className="text-lg font-bold tracking-tight">Settings</h1>
       </div>
 
       <div className="flex gap-6 lg:gap-8">

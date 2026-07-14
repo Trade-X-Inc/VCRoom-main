@@ -268,7 +268,7 @@ function NdaPage() {
               <Shield className="h-6 w-6 text-brand" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold tracking-tight">Non-Disclosure Agreement</h1>
+              <h1 className="text-lg font-bold tracking-tight">Non-Disclosure Agreement</h1>
               <p className="text-sm text-muted-foreground mt-0.5">
                 Review and sign to access this deal room.
               </p>

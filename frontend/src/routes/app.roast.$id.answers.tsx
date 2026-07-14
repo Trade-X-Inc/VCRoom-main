@@ -338,7 +338,7 @@ function RoastAnswersQueue() {
   const pct = total > 0 ? Math.round((done.length / total) * 100) : 0;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto">
+    <div className="p-6 lg:p-12 max-w-3xl mx-auto">
       <div className="flex items-center justify-between flex-wrap gap-3 mb-2">
         <h1
           className="text-xl font-semibold flex items-center gap-2"

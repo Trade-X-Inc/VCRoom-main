@@ -3450,7 +3450,7 @@ function NdaStagePanel({ dealRoomId, room, memberList, isInvestor, isFounder }: 
     <div className="space-y-6">
       <div>
         <Eyebrow>NDA & Profiles</Eyebrow>
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{companyNameOf(room)}</h2>
+        <h2 className="text-lg font-bold tracking-tight text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{companyNameOf(room)}</h2>
         <p className="mt-1 text-sm" style={{ color: "var(--color-muted-foreground)" }}>Both parties signed the NDA. Profiles are shared.</p>
       </div>
 
@@ -6278,7 +6278,7 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
 
   return (
     <div className="p-8 max-w-3xl mx-auto">
-      <h2 className="text-xl font-semibold tracking-tight">Notes</h2>
+      <h2 className="text-lg font-bold tracking-tight">Notes</h2>
 
       <form onSubmit={submit} className="mt-5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-card p-4 shadow-card space-y-3">
         <textarea
@@ -6373,7 +6373,7 @@ function Timeline({ dealRoomId }: { dealRoomId: string }) {
 
   return (
     <div className="p-8 max-w-3xl mx-auto">
-      <h2 className="text-xl font-semibold tracking-tight">Activity</h2>
+      <h2 className="text-lg font-bold tracking-tight">Activity</h2>
       {isError && <p className="mt-4 text-sm text-destructive">Could not load data. Please refresh.</p>}
       {isLoading && <div className="mt-4 text-sm text-gray-500 dark:text-gray-400 animate-pulse">Loading…</div>}
       {!isLoading && !isError && events.length === 0 && (
@@ -6602,7 +6602,7 @@ function QA({
       <div className="mx-auto max-w-5xl space-y-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold tracking-tight">Q&amp;A</h2>
+            <h2 className="text-lg font-bold tracking-tight">Q&amp;A</h2>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Structured diligence questions stay separate from the live discussion.</p>
           </div>
           {isInvestor && (

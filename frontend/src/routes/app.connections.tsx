@@ -717,7 +717,7 @@ function ConnectionsPage() {
       {/* ── Header bar */}
       <div className="flex items-center justify-between px-6 py-5 flex-wrap gap-4" style={{ borderBottom: "1px solid var(--hs-border)" }}>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: "Syne, sans-serif", color: "var(--hs-text-primary)" }}>
+          <h1 className="text-lg font-bold tracking-tight" style={{ fontFamily: "Syne, sans-serif", color: "var(--hs-text-primary)" }}>
             Connections
           </h1>
           <p className="text-sm mt-0.5" style={{ color: "var(--hs-text-muted)" }}>

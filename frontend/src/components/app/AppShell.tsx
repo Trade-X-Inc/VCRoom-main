@@ -22,7 +22,6 @@ import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/app/NotificationBell";
 import { UserMenu } from "@/components/app/UserMenu";
-import { ThemeToggle } from "@/components/app/ThemeToggle";
 import { useAuth } from "@/lib/auth";
 import { useProfile } from "@/lib/store";
 
@@ -574,7 +573,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                 className="relative w-full flex items-center rounded-md border border-border/60 bg-background/60 pl-9 pr-12 py-2 text-sm text-muted-foreground/70 hover:border-brand/40 hover:text-muted-foreground transition-colors text-left"
               >
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                Search investors, documents, deals…
+                Search
                 <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground border border-border/60 rounded px-1.5 py-0.5">⌘K</kbd>
               </button>
             </div>
@@ -583,7 +582,6 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
               <button className="hidden md:grid h-9 w-9 place-items-center rounded-md border border-border/60 hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
                 <Plus className="h-4 w-4" />
               </button>
-              <ThemeToggle />
               <NotificationBell />
               <UserMenu />
             </div>

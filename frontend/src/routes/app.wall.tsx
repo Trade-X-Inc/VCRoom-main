@@ -47,7 +47,7 @@ function Wall() {
   return (
     <div className="p-6 lg:p-8 space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
+        <h1 className="text-lg font-bold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
           The Wall
         </h1>
         <p className="text-muted-foreground text-sm mt-1">Milestones worth celebrating.</p>

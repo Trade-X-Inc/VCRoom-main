@@ -127,7 +127,7 @@ function NotificationsPage() {
         <div>
           <div className="flex items-center gap-2">
             <Bell className="h-5 w-5 text-brand" />
-            <h1 className="text-2xl font-semibold tracking-tight">Notifications</h1>
+            <h1 className="text-lg font-bold tracking-tight">Notifications</h1>
             {unread > 0 && (
               <span className="text-[10px] rounded-full bg-accent text-brand px-1.5 py-0.5 font-medium">
                 {unread} unread
