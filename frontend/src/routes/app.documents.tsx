@@ -230,7 +230,7 @@ function getStatusBorderColor(status?: string) {
 function getStatusIcon(status: string): { Icon: any; color: string; label: string } {
   switch (status) {
     case "empty":
-      return { Icon: () => <div className="w-5 h-5 rounded-full border-2 border-white/20 shrink-0" />, color: "text-white/20", label: "Not started" };
+      return { Icon: () => <div className="w-5 h-5 rounded-full border-2 border-border shrink-0" />, color: "text-faint", label: "Not started" };
     case "draft":
       return { Icon: AlertCircle, color: "text-amber-400", label: "In progress" };
     case "ai_extracted":
@@ -240,7 +240,7 @@ function getStatusIcon(status: string): { Icon: any; color: string; label: strin
     case "needs_review":
       return { Icon: AlertCircle, color: "text-amber-400", label: "Needs attention" };
     default:
-      return { Icon: FileText, color: "text-white/40", label: status };
+      return { Icon: FileText, color: "text-muted-foreground", label: status };
   }
 }
 
@@ -418,13 +418,13 @@ function Documents() {
       )}
 
       {/* How it works — collapsible */}
-      <div className="mb-6 border border-white/8 rounded-xl p-5 bg-white/[0.02]">
+      <div className="mb-6 border border-border rounded-xl p-5 bg-white/[0.02]">
         <div
           className="flex items-center justify-between cursor-pointer"
           onClick={() => setShowInstructions(prev => !prev)}
         >
           <div className="flex items-center gap-2">
-            <span className="text-[#7C3AED]">✦</span>
+            <span className="text-brand">✦</span>
             <span className="text-sm font-medium text-foreground">How your document workspace works</span>
           </div>
           <span className="text-muted-foreground text-xs">{showInstructions ? "Hide" : "Show"}</span>
@@ -436,8 +436,8 @@ function Documents() {
               { n: "02", title: "AI reviews for gaps", body: "Our AI checks each document against what investors actually ask for your stage. It flags weak areas and tells you what to improve." },
               { n: "03", title: "Investors see what matters", body: "Stage 2 documents unlock when an investor connects. Stage 3 (financials, cap table, legal) unlock only inside a deal room. You control all access." },
             ].map(({ n, title, body }) => (
-              <div key={n} className="bg-white/5 rounded-lg p-4">
-                <div className="text-[#7C3AED] text-lg font-semibold mb-2">{n}</div>
+              <div key={n} className="bg-accent rounded-lg p-4">
+                <div className="text-brand text-lg font-semibold mb-2">{n}</div>
                 <div className="text-sm font-medium text-foreground mb-1">{title}</div>
                 <div className="text-xs text-muted-foreground leading-relaxed">{body}</div>
               </div>
@@ -447,9 +447,9 @@ function Documents() {
       </div>
 
       {/* Stage guidance */}
-      <div className="mb-6 p-4 rounded-xl border border-[#7C3AED]/20 bg-[#7C3AED]/5">
-        <p className="text-[#7C3AED] text-xs font-semibold uppercase tracking-wider mb-1">Stage guidance — {selectedStage}</p>
-        <p className="text-[#7C3AED]/80 text-sm mt-1">{STAGE_GUIDANCE[selectedStage]}</p>
+      <div className="mb-6 p-4 rounded-xl border border-brand/20 bg-accent">
+        <p className="text-brand text-xs font-semibold uppercase tracking-wider mb-1">Stage guidance — {selectedStage}</p>
+        <p className="text-brand/80 text-sm mt-1">{STAGE_GUIDANCE[selectedStage]}</p>
       </div>
 
       {/* Main content: sidebar + documents */}
@@ -464,7 +464,7 @@ function Documents() {
                 className={cn(
                   "shrink-0 whitespace-nowrap text-left px-4 py-2 rounded-full sm:rounded-lg text-sm font-medium transition-colors",
                   selectedCategory === cat
-                    ? "bg-brand text-white"
+                    ? "hs-gradient text-white"
                     : "text-muted-foreground hover:bg-accent hover:text-foreground bg-accent/40 sm:bg-transparent"
                 )}
               >
@@ -526,7 +526,7 @@ function Documents() {
                               Required
                             </span>
                           ) : (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-white/5 text-white/40">
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-accent text-muted-foreground">
                               Optional
                             </span>
                           )}
@@ -536,7 +536,7 @@ function Documents() {
                             </span>
                           )}
                           {isStage2 && !isStage3 && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-purple-400/10 text-purple-400">
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-purple-400/10 text-brand">
                               Detail pack
                             </span>
                           )}
@@ -550,7 +550,7 @@ function Documents() {
                         </p>
                         {doc && doc.completeness_score > 0 && status !== "complete" && (
                           <div className="mt-2 flex items-center gap-2">
-                            <div className="flex-1 bg-white/10 h-1 rounded-full overflow-hidden">
+                            <div className="flex-1 bg-accent h-1 rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-amber-400 rounded-full transition-all"
                                 style={{ width: `${doc.completeness_score}%` }}
@@ -580,7 +580,7 @@ function Documents() {
                               "mt-1.5 text-xs px-2 py-0.5 rounded-full transition-colors",
                               doc.visibility === "deal_room"
                                 ? "bg-orange-500/15 text-orange-400 hover:bg-orange-500/25"
-                                : "bg-white/8 text-white/40 hover:bg-white/15"
+                                : "bg-accent text-muted-foreground hover:bg-accent"
                             )}
                           >
                             {doc.visibility === "deal_room" ? "🏛 Deal room" : "+ Add to deal room"}
@@ -748,7 +748,7 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
     }
   };
 
-  const inputCls = "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#7C3AED]/60 focus:ring-1 focus:ring-[#7C3AED]/20";
+  const inputCls = "w-full rounded-lg border border-border bg-accent px-3 py-2.5 text-sm text-foreground placeholder:text-faint focus:outline-none focus:border-brand/60 focus:ring-1 focus:ring-brand/20";
 
   return (
     <div
@@ -762,18 +762,18 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
         {/* Header */}
         <div className="px-6 py-4 border-b border-border/60 flex items-center justify-between sticky top-0 bg-card z-10">
           <div className="flex-1 min-w-0 pr-4">
-            <h2 className="text-base font-semibold text-white" style={{ fontFamily: "Syne, sans-serif" }}>{template?.name ?? "Document"}</h2>
+            <h2 className="text-base font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{template?.name ?? "Document"}</h2>
             <div className="flex items-center gap-2 mt-1.5">
-              <div className="flex-1 bg-white/10 h-1 rounded-full overflow-hidden">
+              <div className="flex-1 bg-accent h-1 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#7C3AED] rounded-full transition-all duration-300"
+                  className="h-full hs-gradient rounded-full transition-all duration-300"
                   style={{ width: `${liveScore}%` }}
                 />
               </div>
-              <span className="text-[10px] text-white/40 tabular-nums shrink-0">{liveScore}% complete</span>
+              <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">{liveScore}% complete</span>
             </div>
           </div>
-          <button onClick={onClose} className="text-white/40 hover:text-white transition-colors shrink-0">
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors shrink-0">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -782,12 +782,12 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
         <div className="px-6 py-6 space-y-5 max-h-[calc(100vh-200px)] overflow-y-auto">
           {fields.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-sm text-white/40">No fields configured for this template yet.</p>
+              <p className="text-sm text-muted-foreground">No fields configured for this template yet.</p>
             </div>
           ) : (
             fields.map(field => (
               <div key={field.key}>
-                <label className="text-xs uppercase tracking-wider text-white/40 font-medium block mb-1.5">
+                <label className="text-xs uppercase tracking-wider text-muted-foreground font-medium block mb-1.5">
                   {field.label}
                   {field.required && <span className="text-red-400 ml-1">*</span>}
                 </label>
@@ -817,7 +817,7 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
                       placeholder={field.placeholder}
                       className={cn(inputCls, "flex-1")}
                     />
-                    <span className="text-sm text-white/40">%</span>
+                    <span className="text-sm text-muted-foreground">%</span>
                   </div>
                 ) : (
                   <input
@@ -843,10 +843,10 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
         {/* AI Feedback */}
         {reviewFeedback && (
           <div className="mx-6 mb-6 space-y-4">
-            <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/8">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-accent border border-border">
               <div className="flex-1 min-w-0 pr-4">
-                <p className="text-xs text-white/40 uppercase tracking-wider mb-1">AI Review</p>
-                <p className="text-sm text-white leading-relaxed">{reviewFeedback.summary}</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">AI Review</p>
+                <p className="text-sm text-foreground leading-relaxed">{reviewFeedback.summary}</p>
               </div>
               <div className={cn(
                 "shrink-0 w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold border-2",
@@ -862,16 +862,16 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
             {reviewFeedback.investor_flag && (
               <div className="p-3 rounded-lg bg-red-500/8 border border-red-500/20">
                 <p className="text-xs text-red-400 uppercase tracking-wider mb-1">⚠ Investor will push back on</p>
-                <p className="text-sm text-white/80">{reviewFeedback.investor_flag}</p>
+                <p className="text-sm text-muted-foreground">{reviewFeedback.investor_flag}</p>
               </div>
             )}
 
             {reviewFeedback.strengths?.length > 0 && (
               <div>
-                <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Strengths</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Strengths</p>
                 <ul className="space-y-1">
                   {reviewFeedback.strengths.map((s, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-white/70">
+                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                       <span className="text-green-400 mt-0.5 shrink-0">✓</span>{s}
                     </li>
                   ))}
@@ -881,10 +881,10 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
 
             {reviewFeedback.gaps?.length > 0 && (
               <div>
-                <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Gaps to address</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Gaps to address</p>
                 <ul className="space-y-1">
                   {reviewFeedback.gaps.map((g, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-white/70">
+                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                       <span className="text-amber-400 mt-0.5 shrink-0">→</span>{g}
                     </li>
                   ))}
@@ -894,11 +894,11 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
 
             {reviewFeedback.recommendations?.length > 0 && (
               <div>
-                <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Fix these</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Fix these</p>
                 <ul className="space-y-1">
                   {reviewFeedback.recommendations.map((r, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-white/70">
-                      <span className="text-[#7C3AED] mt-0.5 shrink-0 font-bold">{i + 1}</span>{r}
+                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                      <span className="text-brand mt-0.5 shrink-0 font-bold">{i + 1}</span>{r}
                     </li>
                   ))}
                 </ul>
@@ -911,7 +911,7 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
         <div className="px-6 py-4 border-t border-border/60 flex items-center justify-between sticky bottom-0 bg-card">
           <button
             onClick={onClose}
-            className="rounded-lg border border-white/10 px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+            className="rounded-lg border border-border px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
           >
             Close
           </button>
@@ -919,7 +919,7 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
             <button
               onClick={handleAIReview}
               disabled={isReviewing}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#7C3AED]/40 text-[#7C3AED] px-4 py-2 text-sm hover:bg-[#7C3AED]/10 disabled:opacity-50 transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-brand/40 text-brand px-4 py-2 text-sm hover:bg-accent disabled:opacity-50 transition-colors"
             >
               {isReviewing && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               {isReviewing ? "Reviewing…" : "AI Review"}
@@ -927,7 +927,7 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
             <button
               onClick={handleSave}
               disabled={saving}
-              className="inline-flex items-center gap-2 rounded-lg bg-[#7C3AED] text-white px-4 py-2 text-sm font-medium hover:bg-[#6d28d9] disabled:opacity-50 transition-colors"
+              className="inline-flex items-center gap-2 rounded-lg hs-gradient text-foreground px-4 py-2 text-sm font-medium hover:bg-[#6d28d9] disabled:opacity-50 transition-colors"
             >
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
               Save

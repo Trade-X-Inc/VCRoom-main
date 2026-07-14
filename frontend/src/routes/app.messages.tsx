@@ -96,7 +96,7 @@ function initials(name: string) {
 }
 
 function colorFromId(id: string) {
-  const COLORS = ["#7C3AED", "#10B981", "#F59E0B", "#3B82F6", "#EC4899", "#14B8A6", "#8B5CF6", "#F97316"];
+  const COLORS = ["var(--brand)", "#10B981", "#F59E0B", "#3B82F6", "#EC4899", "#14B8A6", "#8B5CF6", "#F97316"];
   let h = 0;
   for (let i = 0; i < id.length; i++) h = ((h << 5) - h + id.charCodeAt(i)) | 0;
   return COLORS[Math.abs(h) % COLORS.length];
@@ -135,9 +135,9 @@ const STATUS_COLS: { key: TaskStatus; label: string; color: string }[] = [
 ];
 
 const ACTION_COLORS: Record<string, string> = {
-  upload: "#3B82F6", decision: "#7C3AED", connect: "#10B981",
-  message: "rgba(255,255,255,0.3)", approved: "#10B981", rejected: "#EF4444",
-  invite: "#F59E0B", profile_update: "#A855F7", default: "rgba(255,255,255,0.2)",
+  upload: "#3B82F6", decision: "var(--brand)", connect: "#10B981",
+  message: "var(--faint)", approved: "#10B981", rejected: "#EF4444",
+  invite: "#F59E0B", profile_update: "#A855F7", default: "var(--faint)",
 };
 
 function actionColor(type: string) {
@@ -152,7 +152,7 @@ function actionColor(type: string) {
 function Avatar({ name, userId, size = 28 }: { name: string; userId: string; size?: number }) {
   const bg = colorFromId(userId);
   return (
-    <div style={{ width: size, height: size, borderRadius: "50%", background: bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: size * 0.38, fontWeight: 700, color: "#fff" }}>
+    <div style={{ width: size, height: size, borderRadius: "50%", background: bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: size * 0.38, fontWeight: 700, color: "var(--foreground)" }}>
       {initials(name || "?")}
     </div>
   );
@@ -299,7 +299,7 @@ function ChatSection({ startupId, userId, userName, channels, onChannelCreated }
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3" style={{ background: "var(--hs-bg-primary)" }} data-testid="message-list">
         {topMessages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full gap-3">
-            <MessageSquare className="h-8 w-8" style={{ color: "rgba(255,255,255,0.1)" }} />
+            <MessageSquare className="h-8 w-8" style={{ color: "var(--faint)" }} />
             <div className="text-sm" style={{ color: "var(--hs-text-muted)" }}>No messages yet — say hello!</div>
           </div>
         )}
@@ -321,7 +321,7 @@ function ChatSection({ startupId, userId, userName, channels, onChannelCreated }
                     <button
                       onClick={() => setExpandedThreads((s) => { const n = new Set(s); n.has(msg.id) ? n.delete(msg.id) : n.add(msg.id); return n; })}
                       className="flex items-center gap-1.5 mt-1.5 text-[11px] hover:underline"
-                      style={{ color: "#7C3AED" }}
+                      style={{ color: "var(--brand)" }}
                     >
                       {expanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
                       {replies.length} {replies.length === 1 ? "reply" : "replies"}
@@ -373,7 +373,7 @@ function ChatSection({ startupId, userId, userName, channels, onChannelCreated }
               className="flex-1 text-sm outline-none bg-transparent"
               style={{ color: "var(--hs-text-primary)" }}
             />
-            <button onClick={addChannel} className="text-xs font-medium px-2 py-1 rounded" style={{ background: "#7C3AED", color: "#fff" }}>Create</button>
+            <button onClick={addChannel} className="text-xs font-medium px-2 py-1 rounded" style={{ background: "var(--gradient-brand)", color: "#fff" }}>Create</button>
             <button onClick={() => setShowAddChannel(false)}><X className="h-3.5 w-3.5" style={{ color: "var(--hs-text-muted)" }} /></button>
           </div>
         </div>
@@ -402,7 +402,7 @@ function ChatSection({ startupId, userId, userName, channels, onChannelCreated }
             disabled={!draft.trim() || sending}
             data-testid="send-message-btn"
             className="flex-shrink-0 rounded-lg p-1.5 transition-colors"
-            style={{ background: draft.trim() ? "#7C3AED" : "rgba(255,255,255,0.06)", color: draft.trim() ? "#fff" : "rgba(255,255,255,0.2)" }}
+            style={{ background: draft.trim() ? "var(--gradient-brand)" : "var(--accent)", color: draft.trim() ? "#fff" : "var(--faint)" }}
           >
             {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </button>
@@ -426,7 +426,7 @@ function TaskCard({ task, onDragStart, onClick }: {
       draggable
       onDragStart={onDragStart}
       onClick={onClick}
-      className="rounded-xl p-3 cursor-grab active:cursor-grabbing transition-colors hover:border-purple-500/30"
+      className="rounded-xl p-3 cursor-grab active:cursor-grabbing transition-colors hover:border-border"
       style={{ background: "var(--hs-bg-secondary)", border: "1px solid var(--hs-border)" }}
     >
       <div className="text-sm font-medium mb-2" style={{ color: "var(--hs-text-primary)" }}>{task.title}</div>
@@ -569,7 +569,7 @@ function TaskSlideOver({ startupId, userId, task, teamMembers, dealRooms, onClos
         </div>
         <div className="px-5 py-4 flex gap-3" style={{ borderTop: "1px solid var(--hs-border)" }}>
           <button onClick={onClose} className="flex-1 rounded-lg py-2 text-sm font-medium" style={{ background: "var(--hs-bg-primary)", border: "1px solid var(--hs-border)", color: "var(--hs-text-secondary)" }}>Cancel</button>
-          <button onClick={handleSave} disabled={saving} className="flex-1 rounded-lg py-2 text-sm font-medium flex items-center justify-center gap-2" style={{ background: "#7C3AED", color: "#fff" }} data-testid="save-task-btn">
+          <button onClick={handleSave} disabled={saving} className="flex-1 rounded-lg py-2 text-sm font-medium flex items-center justify-center gap-2" style={{ background: "var(--gradient-brand)", color: "#fff" }} data-testid="save-task-btn">
             {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             {saving ? "Saving…" : isEdit ? "Update" : "Create task"}
           </button>
@@ -640,21 +640,21 @@ function TasksSection({ startupId, userId, teamMembers }: { startupId: string; u
         <div className="flex items-center gap-2">
           <CheckSquare className="h-4 w-4" style={{ color: "var(--hs-text-muted)" }} />
           <span className="font-semibold text-sm" style={{ fontFamily: "Syne, sans-serif", color: "var(--hs-text-primary)" }}>Tasks</span>
-          <span className="text-xs rounded-full px-2 py-0.5 font-medium" style={{ background: "rgba(255,255,255,0.06)", color: "var(--hs-text-muted)" }}>{tasks.length}</span>
+          <span className="text-xs rounded-full px-2 py-0.5 font-medium" style={{ background: "var(--accent)", color: "var(--hs-text-muted)" }}>{tasks.length}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid var(--hs-border)" }}>
-            <button onClick={() => setView("kanban")} className="px-2.5 py-1.5 text-xs" style={{ background: view === "kanban" ? "#7C3AED" : "var(--hs-bg-primary)", color: view === "kanban" ? "#fff" : "var(--hs-text-muted)" }}>
+            <button onClick={() => setView("kanban")} className="px-2.5 py-1.5 text-xs" style={{ background: view === "kanban" ? "var(--gradient-brand)" : "var(--hs-bg-primary)", color: view === "kanban" ? "#fff" : "var(--hs-text-muted)" }}>
               <Columns3 className="h-3.5 w-3.5" />
             </button>
-            <button onClick={() => setView("list")} className="px-2.5 py-1.5 text-xs" style={{ background: view === "list" ? "#7C3AED" : "var(--hs-bg-primary)", color: view === "list" ? "#fff" : "var(--hs-text-muted)", borderLeft: "1px solid var(--hs-border)" }}>
+            <button onClick={() => setView("list")} className="px-2.5 py-1.5 text-xs" style={{ background: view === "list" ? "var(--gradient-brand)" : "var(--hs-bg-primary)", color: view === "list" ? "#fff" : "var(--hs-text-muted)", borderLeft: "1px solid var(--hs-border)" }}>
               <LayoutList className="h-3.5 w-3.5" />
             </button>
           </div>
           <button
             onClick={() => { setEditingTask(null); setShowSlideOver(true); }}
             className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium"
-            style={{ background: "#7C3AED", color: "#fff" }}
+            style={{ background: "var(--gradient-brand)", color: "#fff" }}
             data-testid="add-task-btn"
           >
             <Plus className="h-3.5 w-3.5" /> Add task
@@ -678,7 +678,7 @@ function TasksSection({ startupId, userId, teamMembers }: { startupId: string; u
                 <div className="flex items-center gap-2 mb-3">
                   <Circle className="h-2 w-2" style={{ fill: col.color, color: col.color }} />
                   <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: col.color }}>{col.label}</span>
-                  <span className="text-[10px] rounded-full px-1.5 py-0.5 ml-auto font-medium" style={{ background: "rgba(255,255,255,0.06)", color: "var(--hs-text-muted)" }}>{colTasks.length}</span>
+                  <span className="text-[10px] rounded-full px-1.5 py-0.5 ml-auto font-medium" style={{ background: "var(--accent)", color: "var(--hs-text-muted)" }}>{colTasks.length}</span>
                 </div>
                 <div className="space-y-2 flex-1">
                   {colTasks.map((t) => (
@@ -690,7 +690,7 @@ function TasksSection({ startupId, userId, teamMembers }: { startupId: string; u
                     />
                   ))}
                   {colTasks.length === 0 && (
-                    <div className="rounded-xl py-6 text-center" style={{ border: "1px dashed rgba(255,255,255,0.08)" }}>
+                    <div className="rounded-xl py-6 text-center" style={{ border: "1px dashed var(--border)" }}>
                       <p className="text-xs" style={{ color: "var(--hs-text-muted)" }}>No tasks</p>
                     </div>
                   )}
@@ -880,7 +880,7 @@ function NotesSection({ startupId, userId, userName }: { startupId: string; user
           <button
             onClick={newNote}
             className="w-full flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-medium"
-            style={{ background: "#7C3AED", color: "#fff" }}
+            style={{ background: "var(--gradient-brand)", color: "#fff" }}
             data-testid="new-note-btn"
           >
             <Plus className="h-3 w-3" /> New note
@@ -925,9 +925,9 @@ function NotesSection({ startupId, userId, userName }: { startupId: string; user
           </>
         ) : (
           <div className="flex flex-col items-center justify-center h-full gap-3">
-            <FileText className="h-8 w-8" style={{ color: "rgba(255,255,255,0.1)" }} />
+            <FileText className="h-8 w-8" style={{ color: "var(--faint)" }} />
             <div className="text-sm" style={{ color: "var(--hs-text-muted)" }}>Select a note or create a new one</div>
-            <button onClick={newNote} className="text-xs flex items-center gap-1.5 rounded-lg px-3 py-2" style={{ background: "#7C3AED", color: "#fff" }}>
+            <button onClick={newNote} className="text-xs flex items-center gap-1.5 rounded-lg px-3 py-2" style={{ background: "var(--gradient-brand)", color: "#fff" }}>
               <Plus className="h-3 w-3" /> New note
             </button>
           </div>
@@ -968,7 +968,7 @@ function ActivitySection({ startupId, userId, isInvestor }: { startupId: string;
         <div className="flex justify-center py-12"><Loader2 className="h-5 w-5 animate-spin" style={{ color: "var(--hs-text-muted)" }} /></div>
       ) : entries.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-60 gap-3">
-          <Activity className="h-8 w-8" style={{ color: "rgba(255,255,255,0.1)" }} />
+          <Activity className="h-8 w-8" style={{ color: "var(--faint)" }} />
           <div className="text-sm text-center" style={{ color: "var(--hs-text-muted)" }}>
             No activity yet. Actions in deal rooms and the platform will appear here.
           </div>

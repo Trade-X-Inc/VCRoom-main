@@ -147,8 +147,8 @@ function VerificationPage() {
               onClick={handleRun}
               disabled={running || !startup?.id}
               data-testid="run-verification-btn"
-              className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 transition-opacity hover:opacity-90"
-              style={{ background: "#7C3AED" }}
+              className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-50 transition-opacity hover:opacity-90"
+              style={{ background: "var(--gradient-brand)" }}
             >
               <RefreshCw className={`h-3.5 w-3.5 ${running ? "animate-spin" : ""}`} />
               {running ? "Running…" : hasNewResults ? "Re-run identity check" : "Run identity check"}
@@ -246,7 +246,7 @@ function VerificationPage() {
             {/* Directory-card mockup */}
             <div className="rounded-lg border border-border/60 bg-background p-4">
               <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-lg text-white text-xs font-bold shrink-0" style={{ background: "#7C3AED" }}>
+                <div className="grid h-10 w-10 place-items-center rounded-lg text-foreground text-xs font-bold shrink-0" style={{ background: "var(--gradient-brand)" }}>
                   {(startup?.company_name ?? "YC").slice(0, 2).toUpperCase()}
                 </div>
                 <div className="min-w-0">

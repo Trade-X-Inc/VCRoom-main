@@ -61,7 +61,7 @@ function Referrals() {
       </div>
 
       {/* Referral link */}
-      <div className="rounded-xl border border-brand/20 bg-brand/10 p-6">
+      <div className="rounded-xl border border-brand/20 bg-accent p-6">
         <h2 className="text-sm font-semibold mb-1">Your referral link</h2>
         <p className="text-xs text-muted-foreground mb-4">
           Share this link. Every 3 people who join = 1 extra deal room for you.
@@ -70,7 +70,7 @@ function Referrals() {
           <input readOnly value={referralLink}
             className="flex-1 px-3 py-2 rounded-lg border border-border/60 bg-background text-sm font-mono text-muted-foreground" />
           <button onClick={handleCopy}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-brand text-brand-foreground text-sm font-semibold hover:bg-brand/90 transition-colors whitespace-nowrap">
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg hs-gradient text-brand-foreground text-sm font-semibold hover:bg-accent transition-colors whitespace-nowrap">
             {copied ? <><Check className="h-4 w-4" /> Copied</> : <><Copy className="h-4 w-4" /> Copy</>}
           </button>
         </div>
@@ -86,7 +86,7 @@ function Referrals() {
           <div className="text-xs text-muted-foreground mb-1">Joined</div>
           <div className="text-3xl font-bold text-brand">{stats?.converted ?? 0}</div>
         </div>
-        <div className="rounded-xl border border-brand/20 bg-brand/10 p-5">
+        <div className="rounded-xl border border-brand/20 bg-accent p-5">
           <div className="flex items-center gap-1.5 mb-1">
             <Gift className="h-3.5 w-3.5 text-brand" />
             <span className="text-xs font-semibold text-brand">Bonus unlocked</span>

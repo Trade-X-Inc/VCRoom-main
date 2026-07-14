@@ -53,13 +53,13 @@ function Wall() {
         <p className="text-muted-foreground text-sm mt-1">Milestones worth celebrating.</p>
       </div>
 
-      <div className="mb-6 px-4 py-3 rounded-xl bg-brand/10 border border-brand/20 text-sm text-brand text-center">
+      <div className="mb-6 px-4 py-3 rounded-xl bg-accent border border-brand/20 text-sm text-brand text-center">
         🏆 The Achievement Wall goes live at public launch. Founders share milestones, investors celebrate wins.
       </div>
 
       <div className="rounded-2xl border border-brand/20 bg-card p-10">
         <div className="max-w-xl mx-auto text-center space-y-5">
-          <div className="inline-block px-3 py-1 rounded-full bg-brand/10 border border-brand/20">
+          <div className="inline-block px-3 py-1 rounded-full bg-accent border border-brand/20">
             <span className="text-sm text-brand font-medium">Coming in Stage 2</span>
           </div>
           <h2 className="text-3xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>
@@ -75,7 +75,7 @@ function Wall() {
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com" required disabled={loading} className="flex-1" />
               <button type="submit" disabled={loading}
-                className="px-4 py-2 rounded-lg bg-brand text-brand-foreground text-sm font-semibold hover:bg-brand/90 transition-colors disabled:opacity-50">
+                className="px-4 py-2 rounded-lg hs-gradient text-brand-foreground text-sm font-semibold hover:bg-accent transition-colors disabled:opacity-50">
                 {loading ? "..." : "Notify me"}
               </button>
             </form>

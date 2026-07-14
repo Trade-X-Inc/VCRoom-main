@@ -56,7 +56,7 @@ const CLAIM_STATUS_STYLE: Record<ClaimStatus, { style: React.CSSProperties; labe
     label: "Unverified",
   },
   pending_review: {
-    style: { background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)", color: "#7C3AED" },
+    style: { background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)", color: "var(--brand)" },
     label: "Proof attached",
   },
   ai_confirmed: {
@@ -82,14 +82,14 @@ function CheckRow({
 }) {
   return (
     <div className="flex items-start gap-3 py-3 border-b border-border/60 last:border-0">
-      <span className="mt-0.5 text-muted-foreground dark:text-white/30 shrink-0">{icon}</span>
+      <span className="mt-0.5 text-muted-foreground dark:text-faint shrink-0">{icon}</span>
       <div className="flex-1 min-w-0">
-        <span className="text-sm text-foreground/70 dark:text-white/70">{label}</span>
-        {note && <p className="text-xs text-muted-foreground dark:text-white/35 mt-0.5 leading-relaxed truncate" title={note}>{note}</p>}
+        <span className="text-sm text-foreground/70 dark:text-muted-foreground">{label}</span>
+        {note && <p className="text-xs text-muted-foreground dark:text-faint mt-0.5 leading-relaxed truncate" title={note}>{note}</p>}
       </div>
       <div className="shrink-0">
         {passed === null ? (
-          <span className="text-xs text-muted-foreground dark:text-white/25">Not checked</span>
+          <span className="text-xs text-muted-foreground dark:text-faint">Not checked</span>
         ) : passed ? (
           <span className="flex items-center gap-1 text-xs" style={{ color: "#10B981" }}>
             <CheckCircle2 className="h-3.5 w-3.5" /> Pass
@@ -296,9 +296,9 @@ function VerificationCard({
                 data-testid="run-verification-btn"
                 onClick={handleRunTier1}
                 disabled={running}
-                className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-white transition-colors"
+                className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-foreground transition-colors"
                 style={{
-                  background: running ? "rgba(124,58,237,0.4)" : "#7C3AED",
+                  background: running ? "rgba(124,58,237,0.4)" : "var(--gradient-brand)",
                   cursor: running ? "not-allowed" : "pointer",
                   opacity: running ? 0.8 : 1,
                 }}
@@ -315,7 +315,7 @@ function VerificationCard({
           {!neverRun && (
             <div>
               {verifLoading ? (
-                <div className="flex items-center gap-2 py-4 text-sm text-muted-foreground dark:text-white/30">
+                <div className="flex items-center gap-2 py-4 text-sm text-muted-foreground dark:text-faint">
                   <Loader2 className="h-4 w-4 animate-spin" /> Loading…
                 </div>
               ) : (
@@ -375,7 +375,7 @@ function VerificationCard({
           {/* Claims subsection */}
           <div className="border-t border-border/40 pt-4" style={{ marginTop: neverRun ? 16 : 0 }}>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-foreground/60 dark:text-white/60 uppercase tracking-wider" style={{ letterSpacing: "0.1em" }}>
+              <span className="text-xs font-semibold text-foreground/60 dark:text-muted-foreground uppercase tracking-wider" style={{ letterSpacing: "0.1em" }}>
                 Claims
               </span>
               <span
@@ -418,11 +418,11 @@ function VerificationCard({
                     <div
                       key={claim.id}
                       className="flex items-center justify-between gap-3 rounded-lg px-3 py-2.5"
-                      style={{ background: "rgba(255,255,255,0.025)", border: "var(--color-border)" }}
+                      style={{ background: "var(--accent)", border: "var(--color-border)" }}
                     >
                       <div className="flex-1 min-w-0">
-                        <span className="text-sm text-foreground/70 dark:text-white/70 truncate block">{claim.claim_label}</span>
-                        <span className="text-xs text-muted-foreground dark:text-white/35 truncate block">{claim.claim_value}</span>
+                        <span className="text-sm text-foreground/70 dark:text-muted-foreground truncate block">{claim.claim_label}</span>
+                        <span className="text-xs text-muted-foreground dark:text-faint truncate block">{claim.claim_value}</span>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <span
@@ -457,7 +457,7 @@ function VerificationCard({
           {/* Cap table subsection */}
           <div className="border-t border-border/40 pt-4 mt-4">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-foreground/60 dark:text-white/60 uppercase tracking-wider" style={{ letterSpacing: "0.1em" }}>
+              <span className="text-xs font-semibold text-foreground/60 dark:text-muted-foreground uppercase tracking-wider" style={{ letterSpacing: "0.1em" }}>
                 Cap Table
               </span>
               <span
@@ -586,13 +586,13 @@ function ConfirmDialog({
       >
         <p className="text-sm text-foreground leading-relaxed mb-5">{message}</p>
         <div className="flex justify-end gap-2">
-          <button onClick={onCancel} className="px-4 py-2 text-xs text-white/40 hover:text-foreground/70 dark:text-white/70 transition-colors">
+          <button onClick={onCancel} className="px-4 py-2 text-xs text-muted-foreground hover:text-foreground/70 dark:text-muted-foreground transition-colors">
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 text-xs font-medium rounded-lg text-white dark:text-white transition-colors"
-            style={{ background: confirmDanger ? "#EF4444" : "#7C3AED" }}
+            className="px-4 py-2 text-xs font-medium rounded-lg text-foreground dark:text-foreground transition-colors"
+            style={{ background: confirmDanger ? "#EF4444" : "var(--gradient-brand)" }}
           >
             {confirmLabel}
           </button>
@@ -702,7 +702,7 @@ function ReadinessCard({
       {/* Body */}
       <div style={{ padding: "20px 24px" }}>
         {isLoading ? (
-          <div className="flex items-center gap-2 text-muted-foreground dark:text-white/30">
+          <div className="flex items-center gap-2 text-muted-foreground dark:text-faint">
             <Loader2 className="h-4 w-4 animate-spin" />
             <span className="text-sm">Computing readiness…</span>
           </div>
@@ -716,7 +716,7 @@ function ReadinessCard({
               >
                 {score}
               </span>
-              <span className="text-lg text-muted-foreground dark:text-white/30 mb-1">/100</span>
+              <span className="text-lg text-muted-foreground dark:text-faint mb-1">/100</span>
               {passed && (
                 <span className="mb-2 text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(16,185,129,0.15)", color: "#10B981" }}>
                   Ready for outreach
@@ -749,9 +749,9 @@ function ReadinessCard({
                 <div
                   key={label}
                   className="rounded-lg px-3 py-2 text-xs"
-                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
+                  style={{ background: "var(--accent)", border: "1px solid var(--border)" }}
                 >
-                  <div className="font-medium text-foreground/60 dark:text-white/60">{label} <span className="text-muted-foreground dark:text-white/25">({weight})</span></div>
+                  <div className="font-medium text-foreground/60 dark:text-muted-foreground">{label} <span className="text-muted-foreground dark:text-faint">({weight})</span></div>
                   <div className="font-semibold mt-0.5" style={{ color: na ? "var(--color-muted-foreground)" : value >= 60 ? "#10B981" : value >= 30 ? "#F59E0B" : "#EF4444" }}>
                     {na ? "Not run" : `${value}/100`}
                   </div>
@@ -973,7 +973,7 @@ function DealActivityCard({
           </div>
           <div>
             <h2
-              className="text-sm font-semibold text-white"
+              className="text-sm font-semibold text-foreground"
               style={{ fontFamily: "Syne, sans-serif" }}
             >
               Deal Activity
@@ -986,14 +986,14 @@ function DealActivityCard({
 
         <div style={{ padding: "20px 24px" }} className="space-y-4">
           {reqLoading && (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground dark:text-white/30">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground dark:text-faint">
               <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading requests…
             </div>
           )}
 
           {!reqLoading && requests.length > 0 && (
             <div>
-              <div className="text-xs font-semibold text-foreground/60 dark:text-white/60 uppercase tracking-wider mb-2" style={{ letterSpacing: "0.1em" }}>
+              <div className="text-xs font-semibold text-foreground/60 dark:text-muted-foreground uppercase tracking-wider mb-2" style={{ letterSpacing: "0.1em" }}>
                 Pending access requests
               </div>
               <div className="space-y-2">
@@ -1008,7 +1008,7 @@ function DealActivityCard({
                       style={{ background: "rgba(245,158,11,0.05)", border: "1px solid rgba(245,158,11,0.15)" }}
                     >
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-white truncate">{name}</div>
+                        <div className="text-sm font-medium text-foreground truncate">{name}</div>
                         <div className="text-xs mt-0.5 text-muted-foreground">
                           {firm && <span>{firm} · </span>}
                           Requested {daysAgo(req.created_at)}
@@ -1016,7 +1016,7 @@ function DealActivityCard({
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
                         {isActing ? (
-                          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground dark:text-white/30" />
+                          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground dark:text-faint" />
                         ) : (
                           <>
                             <button
@@ -1055,7 +1055,7 @@ function DealActivityCard({
             dealRooms.length > 0 && (
               <div>
                 {requests.length > 0 && (
-                  <div className="text-xs font-semibold text-foreground/60 dark:text-white/60 uppercase tracking-wider mb-2" style={{ letterSpacing: "0.1em" }}>
+                  <div className="text-xs font-semibold text-foreground/60 dark:text-muted-foreground uppercase tracking-wider mb-2" style={{ letterSpacing: "0.1em" }}>
                     Deal rooms
                   </div>
                 )}
@@ -1066,11 +1066,11 @@ function DealActivityCard({
                       <div
                         key={room.id}
                         className="flex items-center justify-between gap-3 rounded-lg px-4 py-3 flex-wrap"
-                        style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)" }}
+                        style={{ background: "var(--accent)", border: "1px solid var(--border)" }}
                       >
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-medium text-white truncate">
+                            <span className="text-sm font-medium text-foreground truncate">
                               {room.investor_name ?? "Investor"}
                               {room.investor_company ? ` · ${room.investor_company}` : ""}
                             </span>
@@ -1193,7 +1193,7 @@ function ScoreAuditCard({
             className="grid h-8 w-8 place-items-center rounded-lg"
             style={{ background: "rgba(124,58,237,0.12)" }}
           >
-            <ScanLine className="h-4 w-4" style={{ color: "#7C3AED" }} />
+            <ScanLine className="h-4 w-4" style={{ color: "var(--brand)" }} />
           </div>
           <div>
             <div className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
@@ -1212,7 +1212,7 @@ function ScoreAuditCard({
             <div className="flex items-center gap-1.5">
               <span
                 className="text-2xl font-bold"
-                style={{ fontFamily: "Syne, sans-serif", color: "#7C3AED" }}
+                style={{ fontFamily: "Syne, sans-serif", color: "var(--brand)" }}
               >
                 {latestRun.score}
               </span>
@@ -1234,8 +1234,8 @@ function ScoreAuditCard({
             onClick={handleRun}
             disabled={running}
             data-testid="run-score-audit-btn"
-            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
-            style={{ background: "#7C3AED" }}
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-foreground disabled:opacity-60"
+            style={{ background: "var(--gradient-brand)" }}
           >
             {running ? (
               <>
@@ -1274,7 +1274,7 @@ function ScoreAuditCard({
               <div className="space-y-2">
                 {latestRun.data_gaps.map((gap: ScoreRunGap, i: number) => (
                   <div key={i} className="flex items-start gap-2" data-testid="score-audit-gap-item">
-                    <span className="font-semibold text-sm text-white capitalize">{gap.field.replace(/_/g, " ")}</span>
+                    <span className="font-semibold text-sm text-foreground capitalize">{gap.field.replace(/_/g, " ")}</span>
                     <span
                       className="text-xs font-semibold rounded px-1.5 py-0.5 shrink-0"
                       style={{ background: "rgba(245,158,11,0.12)", color: "#F59E0B" }}
@@ -1301,15 +1301,15 @@ function ScoreAuditCard({
                 return (
                   <div key={key}>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-medium text-white">{FACTOR_LABELS[key]}</span>
+                      <span className="text-xs font-medium text-foreground">{FACTOR_LABELS[key]}</span>
                       <span className="text-xs text-muted-foreground">
                         {factor.score}/{factor.max}
                       </span>
                     </div>
-                    <div className="h-1.5 rounded-full w-full" style={{ background: "rgba(255,255,255,0.08)" }}>
+                    <div className="h-1.5 rounded-full w-full" style={{ background: "var(--accent)" }}>
                       <div
                         className="h-1.5 rounded-full transition-all"
-                        style={{ width: `${pct}%`, background: "#7C3AED" }}
+                        style={{ width: `${pct}%`, background: "var(--gradient-brand)" }}
                       />
                     </div>
                     <div className="text-xs mt-1 text-muted-foreground">
@@ -1327,8 +1327,8 @@ function ScoreAuditCard({
               Your highest-impact next action
             </div>
             <div
-              className="pl-3 py-2 text-sm text-white"
-              style={{ borderLeft: "3px solid #7C3AED" }}
+              className="pl-3 py-2 text-sm text-foreground"
+              style={{ borderLeft: "3px solid var(--brand)" }}
             >
               {latestRun.top_action}
             </div>
@@ -1458,11 +1458,11 @@ function InvestorSimCard({
             className="grid h-8 w-8 place-items-center rounded-lg"
             style={{ background: "rgba(124,58,237,0.12)" }}
           >
-            <Users className="h-4 w-4" style={{ color: "#7C3AED" }} />
+            <Users className="h-4 w-4" style={{ color: "var(--brand)" }} />
           </div>
           <div>
             <div
-              className="text-sm font-semibold text-white"
+              className="text-sm font-semibold text-foreground"
               style={{ fontFamily: "Syne, sans-serif" }}
             >
               Investor Simulation
@@ -1479,8 +1479,8 @@ function InvestorSimCard({
           onClick={handleRun}
           disabled={running}
           data-testid="run-investor-sim-btn"
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
-          style={{ background: "#7C3AED" }}
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-foreground disabled:opacity-60"
+          style={{ background: "var(--gradient-brand)" }}
         >
           {running ? (
             <>
@@ -1524,7 +1524,7 @@ function InvestorSimCard({
                 >
                   {b.label}
                 </div>
-                <div className="text-sm text-white leading-relaxed">{b.content}</div>
+                <div className="text-sm text-foreground leading-relaxed">{b.content}</div>
               </div>
             </div>
           ))}
@@ -1595,7 +1595,7 @@ function CoachingCard({
   };
 
   const SECTION: React.CSSProperties = {
-    borderLeft: "3px solid #7C3AED",
+    borderLeft: "3px solid var(--brand)",
     paddingLeft: 12,
     marginBottom: 16,
   };
@@ -1609,11 +1609,11 @@ function CoachingCard({
             className="grid h-8 w-8 place-items-center rounded-lg"
             style={{ background: "rgba(124,58,237,0.12)" }}
           >
-            <TrendingUp className="h-4 w-4" style={{ color: "#7C3AED" }} />
+            <TrendingUp className="h-4 w-4" style={{ color: "var(--brand)" }} />
           </div>
           <div>
             <div
-              className="text-sm font-semibold text-white"
+              className="text-sm font-semibold text-foreground"
               style={{ fontFamily: "Syne, sans-serif" }}
             >
               Founder Coaching
@@ -1630,8 +1630,8 @@ function CoachingCard({
           onClick={handleRun}
           disabled={running}
           data-testid="run-coaching-btn"
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
-          style={{ background: "#7C3AED" }}
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-foreground disabled:opacity-60"
+          style={{ background: "var(--gradient-brand)" }}
         >
           {running ? (
             <>
@@ -1665,7 +1665,7 @@ function CoachingCard({
               What investors at {session.stage ?? stage ?? "this stage"} expect
             </div>
             <div style={SECTION}>
-              <div className="text-sm text-white leading-relaxed">{session.stage_guide}</div>
+              <div className="text-sm text-foreground leading-relaxed">{session.stage_guide}</div>
             </div>
           </div>
 
@@ -1682,7 +1682,7 @@ function CoachingCard({
               >
                 Financial readiness
               </div>
-              <div className="text-sm text-white leading-relaxed">{session.financial}</div>
+              <div className="text-sm text-foreground leading-relaxed">{session.financial}</div>
             </div>
             <div
               className="rounded-lg px-3 py-3"
@@ -1695,7 +1695,7 @@ function CoachingCard({
               >
                 Legal readiness
               </div>
-              <div className="text-sm text-white leading-relaxed">{session.legal}</div>
+              <div className="text-sm text-foreground leading-relaxed">{session.legal}</div>
             </div>
           </div>
 
@@ -1712,7 +1712,7 @@ function CoachingCard({
               >
                 Why this investor passed
               </div>
-              <div className="text-sm text-white leading-relaxed">{session.rejection_debrief}</div>
+              <div className="text-sm text-foreground leading-relaxed">{session.rejection_debrief}</div>
             </div>
           )}
 
@@ -1741,7 +1741,7 @@ function CoachingCard({
                       {item.priority}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-white">{item.action}</div>
+                      <div className="text-sm font-semibold text-foreground">{item.action}</div>
                       <div className="text-xs mt-1 text-muted-foreground">
                         {item.why}
                       </div>
@@ -1821,7 +1821,7 @@ function FounderHome() {
   if (isLoading) {
     return (
       <div className="p-8 flex items-center justify-center">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground dark:text-white/30" />
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground dark:text-faint" />
       </div>
     );
   }
@@ -1830,15 +1830,15 @@ function FounderHome() {
     return (
       <div className="p-6 lg:p-8 max-w-3xl mx-auto">
         <div className="rounded-xl border border-dashed border-border/60 bg-card p-8 text-center">
-          <Building2 className="h-8 w-8 text-muted-foreground dark:text-white/20 mx-auto mb-3" />
+          <Building2 className="h-8 w-8 text-muted-foreground dark:text-faint mx-auto mb-3" />
           <div className="text-sm font-medium mb-1">No company profile yet</div>
           <div className="text-xs text-muted-foreground mb-4">
             Build your profile to start verification, claim proof, and track investor activity.
           </div>
           <Link
             to="/app/profile-builder"
-            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
-            style={{ background: "#7C3AED" }}
+            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-foreground"
+            style={{ background: "var(--gradient-brand)" }}
           >
             Build my profile
           </Link>

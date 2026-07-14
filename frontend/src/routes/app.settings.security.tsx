@@ -123,7 +123,7 @@ function SecuritySettings() {
           <button
             onClick={handleChangePassword}
             disabled={savingPw}
-            className="inline-flex items-center gap-1.5 rounded-md bg-brand text-brand-foreground px-4 py-2 text-sm font-medium hover:bg-brand/90 disabled:opacity-60 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-4 py-2 text-sm font-medium hover:bg-accent disabled:opacity-60 transition-colors"
           >
             {savingPw && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             Update password
@@ -138,7 +138,7 @@ function SecuritySettings() {
           <div>
             <div className="text-sm font-medium">
               {user?.email}
-              <span className="ml-2 text-[10px] rounded bg-brand/10 text-brand px-1.5 py-0.5">Active</span>
+              <span className="ml-2 text-[10px] rounded bg-accent text-brand px-1.5 py-0.5">Active</span>
             </div>
             <div className="text-xs text-muted-foreground mt-0.5">Signed in as {user?.role}</div>
           </div>

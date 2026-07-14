@@ -57,8 +57,8 @@ const ALL_STATUSES: LeadStatus[] = [
 ];
 
 const STATUS_CONFIG: Record<LeadStatus, { bg: string; text: string; step: number }> = {
-  "New":               { bg: "rgba(255,255,255,0.08)", text: "rgba(255,255,255,0.4)", step: 0 },
-  "Shortlisted":       { bg: "rgba(255,255,255,0.10)", text: "rgba(255,255,255,0.6)", step: 1 },
+  "New":               { bg: "var(--accent)", text: "var(--muted-foreground)", step: 0 },
+  "Shortlisted":       { bg: "var(--accent)", text: "var(--muted-foreground)", step: 1 },
   "Contacted":         { bg: "rgba(124,58,237,0.15)",  text: "#A855F7",               step: 2 },
   "Replied":           { bg: "rgba(139,92,246,0.15)",  text: "#8B5CF6",               step: 3 },
   "Meeting Booked":    { bg: "rgba(245,158,11,0.15)",  text: "#F59E0B",               step: 4 },
@@ -201,7 +201,7 @@ function AddInvestorSlideOver({ founderId, onClose, onSaved }: AddInvestorProps)
             Cancel
           </button>
           <button onClick={handleSave} disabled={saving} className="flex-1 rounded-lg py-2 text-sm font-medium flex items-center justify-center gap-2"
-            style={{ background: "#7C3AED", color: "#fff" }}>
+            style={{ background: "var(--gradient-brand)", color: "#fff" }}>
             {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             {saving ? "Saving…" : "Add investor"}
           </button>
@@ -275,7 +275,7 @@ function CSVImportModal({ founderId, onClose, onImported }: { founderId: string;
           {rows.length === 0 ? (
             <>
               <div
-                className="rounded-xl border-2 border-dashed flex flex-col items-center justify-center py-10 cursor-pointer transition-colors hover:border-purple-500"
+                className="rounded-xl border-2 border-dashed flex flex-col items-center justify-center py-10 cursor-pointer transition-colors hover:border-brand"
                 style={{ borderColor: "rgba(124,58,237,0.3)", background: "rgba(124,58,237,0.04)" }}
                 onClick={() => fileRef.current?.click()}
                 onDragOver={(e) => e.preventDefault()}
@@ -329,7 +329,7 @@ function CSVImportModal({ founderId, onClose, onImported }: { founderId: string;
           </button>
           {rows.length > 0 && (
             <button onClick={handleImport} disabled={importing} className="flex-1 rounded-lg py-2 text-sm font-medium flex items-center justify-center gap-2"
-              style={{ background: "#7C3AED", color: "#fff" }}>
+              style={{ background: "var(--gradient-brand)", color: "#fff" }}>
               {importing && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               {importing ? "Importing…" : `Import ${rows.length} investors`}
             </button>
@@ -393,18 +393,18 @@ function DetailPanel({ lead, onClose, onStatusChange }: { lead: VCLead; onClose:
                     <div className="flex flex-col items-center">
                       <div style={{
                         width: 20, height: 20, borderRadius: "50%",
-                        background: done ? "#7C3AED" : "rgba(255,255,255,0.08)",
+                        background: done ? "var(--gradient-brand)" : "var(--accent)",
                         border: isCurrent ? "2px solid #A855F7" : "2px solid transparent",
                         display: "flex", alignItems: "center", justifyContent: "center",
                       }}>
-                        {done && <CheckCircle2 className="h-3 w-3" style={{ color: "#fff" }} />}
+                        {done && <CheckCircle2 className="h-3 w-3" style={{ color: "var(--foreground)" }} />}
                       </div>
                       <div className="text-[9px] mt-1 text-center" style={{ color: done ? "var(--hs-text-secondary)" : "var(--hs-text-muted)", whiteSpace: "nowrap" }}>
                         {step === "Deal Room Created" ? "Deal Room" : step}
                       </div>
                     </div>
                     {i < PIPELINE_STEPS.length - 1 && (
-                      <div className="flex-1 h-0.5 mb-4" style={{ background: stepIndex > i ? "#7C3AED" : "rgba(255,255,255,0.08)" }} />
+                      <div className="flex-1 h-0.5 mb-4" style={{ background: stepIndex > i ? "var(--gradient-brand)" : "var(--accent)" }} />
                     )}
                   </div>
                 );
@@ -585,7 +585,7 @@ function IncomingRequests() {
         <span className="text-sm font-semibold" style={{ color: "var(--hs-text-primary)" }}>
           Connection requests
         </span>
-        <span className="inline-flex items-center justify-center h-5 min-w-[20px] rounded-full bg-brand text-brand-foreground text-[10px] font-semibold px-1.5">
+        <span className="inline-flex items-center justify-center h-5 min-w-[20px] rounded-full hs-gradient text-brand-foreground text-[10px] font-semibold px-1.5">
           {requests.length}
         </span>
       </div>
@@ -625,7 +625,7 @@ function IncomingRequests() {
                     <button
                       onClick={() => approve(r.id)}
                       disabled={actingId === r.id}
-                      className="flex items-center gap-1.5 rounded-lg bg-brand text-brand-foreground px-3 py-1.5 text-xs font-semibold hover:bg-brand/90 disabled:opacity-60"
+                      className="flex items-center gap-1.5 rounded-lg hs-gradient text-brand-foreground px-3 py-1.5 text-xs font-semibold hover:bg-accent disabled:opacity-60"
                     >
                       {actingId === r.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3" />}
                       Confirm
@@ -644,7 +644,7 @@ function IncomingRequests() {
                   <button
                     onClick={() => setConfirmId(r.id)}
                     disabled={!!actingId}
-                    className="flex items-center gap-1.5 rounded-lg bg-brand text-brand-foreground px-3 py-1.5 text-xs font-semibold hover:bg-brand/90 disabled:opacity-60"
+                    className="flex items-center gap-1.5 rounded-lg hs-gradient text-brand-foreground px-3 py-1.5 text-xs font-semibold hover:bg-accent disabled:opacity-60"
                   >
                     Open deal room <ArrowRight className="h-3 w-3" />
                   </button>
@@ -737,7 +737,7 @@ function ConnectionsPage() {
           <button
             onClick={() => setShowAdd(true)}
             className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
-            style={{ background: "#7C3AED", color: "#fff" }}
+            style={{ background: "var(--gradient-brand)", color: "#fff" }}
             data-testid="add-investor-btn"
           >
             <Plus className="h-3.5 w-3.5" />
@@ -768,7 +768,7 @@ function ConnectionsPage() {
                 className="flex items-center gap-1.5 text-xs font-medium whitespace-nowrap rounded-full px-3 py-1 transition-colors"
                 style={{
                   background: statusFilter === status ? cfg.bg : "transparent",
-                  color: statusFilter === status ? cfg.text : "rgba(255,255,255,0.4)",
+                  color: statusFilter === status ? cfg.text : "var(--muted-foreground)",
                   border: statusFilter === status ? `1px solid ${cfg.text}30` : "1px solid transparent",
                 }}
               >
@@ -829,7 +829,7 @@ function ConnectionsPage() {
                   <button
                     onClick={() => setShowAdd(true)}
                     className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium"
-                    style={{ background: "#7C3AED", color: "#fff" }}
+                    style={{ background: "var(--gradient-brand)", color: "#fff" }}
                   >
                     <Plus className="h-3.5 w-3.5" />
                     Add your first investor

@@ -55,7 +55,7 @@ function MemberOverview() {
     <div style={{ padding: "32px", maxWidth: 800, margin: "0 auto" }}>
       {/* Welcome */}
       <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: "#fff", letterSpacing: "-0.03em", marginBottom: 6 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.03em", marginBottom: 6 }}>
           Welcome, {firstName}
         </h1>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -66,7 +66,7 @@ function MemberOverview() {
             {roleLabel}
           </span>
           {roleDescription && (
-            <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
+            <span style={{ fontSize: 13, color: "var(--muted-foreground)" }}>
               {roleDescription}
             </span>
           )}
@@ -91,16 +91,16 @@ function MemberOverview() {
 
       {/* Assigned deal rooms */}
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>
           My Deal Rooms
         </div>
         {isLoading ? (
-          <div style={{ height: 80, borderRadius: 10, background: "rgba(255,255,255,0.04)" }} />
+          <div style={{ height: 80, borderRadius: 10, background: "var(--accent)" }} />
         ) : assignedRooms.length === 0 ? (
           <div style={{
-            background: "#111114", border: "1px solid rgba(255,255,255,0.06)",
+            background: "var(--card)", border: "1px solid var(--border)",
             borderRadius: 12, padding: "24px", textAlign: "center",
-            color: "rgba(255,255,255,0.3)", fontSize: 13,
+            color: "var(--faint)", fontSize: 13,
           }}>
             No deal rooms assigned yet — your admin will assign you when ready.
           </div>
@@ -115,9 +115,9 @@ function MemberOverview() {
                   params={{ id: r.deal_room_id }}
                   style={{
                     display: "flex", alignItems: "center", justifyContent: "space-between",
-                    background: "#111114", border: "1px solid rgba(255,255,255,0.06)",
+                    background: "var(--card)", border: "1px solid var(--border)",
                     borderRadius: 10, padding: "14px 16px", textDecoration: "none",
-                    color: "#fff",
+                    color: "var(--foreground)",
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -126,7 +126,7 @@ function MemberOverview() {
                     </div>
                     <span style={{ fontSize: 14, fontWeight: 500 }}>{companyName}</span>
                   </div>
-                  <ArrowRight size={14} style={{ color: "rgba(255,255,255,0.3)" }} />
+                  <ArrowRight size={14} style={{ color: "var(--faint)" }} />
                 </Link>
               );
             })}
@@ -135,7 +135,7 @@ function MemberOverview() {
         {assignedRooms.length > 0 && (
           <Link
             to={"/app/deal-rooms" as any}
-            style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 10, fontSize: 12, color: "rgba(255,255,255,0.4)" }}
+            style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 10, fontSize: 12, color: "var(--muted-foreground)" }}
           >
             View all deal rooms <ArrowRight size={12} />
           </Link>
@@ -144,7 +144,7 @@ function MemberOverview() {
 
       {/* Quick links */}
       <div>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>
           Quick Links
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 8 }}>
@@ -162,15 +162,15 @@ function StatCard({ label, value, icon, note }: {
 }) {
   return (
     <div style={{
-      background: "#111114", border: "1px solid rgba(255,255,255,0.06)",
+      background: "var(--card)", border: "1px solid var(--border)",
       borderRadius: 12, padding: "16px 18px",
     }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</span>
+        <span style={{ fontSize: 11, color: "var(--muted-foreground)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</span>
         {icon}
       </div>
-      <div style={{ fontSize: 28, fontWeight: 700, color: "#fff", lineHeight: 1 }}>{value}</div>
-      {note && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginTop: 4 }}>{note}</div>}
+      <div style={{ fontSize: 28, fontWeight: 700, color: "var(--foreground)", lineHeight: 1 }}>{value}</div>
+      {note && <div style={{ fontSize: 11, color: "var(--faint)", marginTop: 4 }}>{note}</div>}
     </div>
   );
 }
@@ -181,13 +181,13 @@ function QuickLink({ to, label, icon }: { to: string; label: string; icon: React
       to={to as any}
       style={{
         display: "flex", alignItems: "center", gap: 10,
-        background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
+        background: "var(--accent)", border: "1px solid var(--border)",
         borderRadius: 10, padding: "12px 14px", textDecoration: "none",
-        color: "rgba(255,255,255,0.6)", fontSize: 13, fontWeight: 500,
+        color: "var(--muted-foreground)", fontSize: 13, fontWeight: 500,
         transition: "background 0.15s",
       }}
     >
-      <span style={{ color: "rgba(255,255,255,0.4)" }}>{icon}</span>
+      <span style={{ color: "var(--muted-foreground)" }}>{icon}</span>
       {label}
     </Link>
   );

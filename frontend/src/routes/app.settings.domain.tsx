@@ -42,7 +42,7 @@ function DomainEmail() {
               <div className="flex items-center gap-2 text-sm">
                 <Globe className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">{d.name}</span>
-                {d.primary && <span className="text-[10px] rounded bg-brand/10 text-brand px-1.5 py-0.5">Primary</span>}
+                {d.primary && <span className="text-[10px] rounded bg-accent text-brand px-1.5 py-0.5">Primary</span>}
                 <span className={cn("inline-flex items-center gap-1 text-[11px]", d.verified ? "text-success" : "text-warning")}>
                   {d.verified ? <><CheckCircle2 className="h-3 w-3" /> Verified</> : "Pending DNS"}
                 </span>

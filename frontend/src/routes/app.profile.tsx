@@ -941,7 +941,7 @@ function Profile() {
                   {filled(form.tagline) && <p className="text-sm text-muted-foreground mt-0.5">{form.tagline}</p>}
                   <div className="flex items-center gap-2 mt-2 flex-wrap">
                     {filled(form.stage) && (
-                      <span className="rounded-full bg-brand/10 text-brand text-xs px-2.5 py-0.5 font-medium">{form.stage}</span>
+                      <span className="rounded-full bg-accent text-brand text-xs px-2.5 py-0.5 font-medium">{form.stage}</span>
                     )}
                     {filled(form.sector) && (
                       <span className="rounded-full bg-violet/10 text-violet text-xs px-2.5 py-0.5 font-medium">{form.sector}</span>
@@ -1104,7 +1104,7 @@ function Profile() {
           <div>
             <div className="text-sm text-muted-foreground">Profile completion</div>
             <div className="mt-2 flex items-center gap-3">
-              <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
+              <div className="h-2 flex-1 overflow-hidden rounded-full bg-accent">
                 <div className={`h-full rounded-full ${completenessScore < 41 ? "bg-red-500" : completenessScore < 80 ? "bg-amber-400" : "bg-emerald-500"}`} style={{ width: `${Math.min(completenessScore, 100)}%` }} />
               </div>
               <div className="text-sm font-semibold">{completenessScore}%</div>
@@ -1114,7 +1114,7 @@ function Profile() {
             data-tour="publish-button"
             onClick={handleGoLive}
             disabled={!profileReady || profilePublishing}
-            className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition ${profileReady ? "bg-[#7C3AED] text-white hover:bg-[#6d28d9]" : "bg-white/5 text-muted-foreground cursor-not-allowed"}`}
+            className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition ${profileReady ? "hs-gradient text-foreground hover:bg-[#6d28d9]" : "bg-accent text-muted-foreground cursor-not-allowed"}`}
           >
             Go live
           </button>
@@ -1177,7 +1177,7 @@ function Profile() {
                   : <span>{initials}</span>}
               </div>
               <div className="absolute inset-0 rounded-2xl bg-black/40 grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <Upload className="h-5 w-5 text-white" />
+                <Upload className="h-5 w-5 text-foreground" />
               </div>
               <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleLogoUpload(e.target.files[0])} />
             </label>
@@ -1186,7 +1186,7 @@ function Profile() {
               <div className="text-sm text-muted-foreground">{form.tagline || form.description || "Add a tagline below"}</div>
               <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span>Your profile link:</span>
-                <span className="rounded-full bg-white/5 px-2 py-1 text-[11px] font-medium text-foreground">hockystick.app/p/{profileSlug || "your-slug"}</span>
+                <span className="rounded-full bg-accent px-2 py-1 text-[11px] font-medium text-foreground">hockystick.app/p/{profileSlug || "your-slug"}</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -1195,7 +1195,7 @@ function Profile() {
                       toast.success("Profile URL copied");
                     }
                   }}
-                  className="inline-flex items-center gap-1 rounded-md border border-border/60 bg-white/5 px-2 py-1 text-xs text-muted-foreground hover:bg-white/10 transition-colors"
+                  className="inline-flex items-center gap-1 rounded-md border border-border/60 bg-accent px-2 py-1 text-xs text-muted-foreground hover:bg-accent transition-colors"
                 >
                   <Copy className="h-3.5 w-3.5" /> Copy
                 </button>
@@ -1280,7 +1280,7 @@ function Profile() {
                 return (
                   <label key={key} className="flex items-start gap-3 cursor-pointer group">
                     <input type="checkbox" checked={checked} onChange={(e) => setSelectedFields((prev) => { const next = new Set(prev); e.target.checked ? next.add(key) : next.delete(key); return next; })}
-                      className="mt-0.5 accent-purple-600 shrink-0" />
+                      className="mt-0.5 accent-[var(--brand)] shrink-0" />
                     <div className="min-w-0">
                       <span className="text-xs font-medium text-muted-foreground">{label}: </span>
                       <span className="text-xs text-foreground break-words">{safeStringify(val)}</span>
@@ -1342,7 +1342,7 @@ function Profile() {
               <Field label="Company name" value={form.company_name} onChange={field("company_name")} placeholder="Atlas Robotics" />
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs text-white/40 uppercase tracking-wider">Legal entity name</label>
+                  <label className="text-xs text-muted-foreground uppercase tracking-wider">Legal entity name</label>
                   <FieldVerificationBadge profileType="startup" fieldName="legal_entity_name" tier1Passed={founderTier1Passed} />
                 </div>
                 <input
@@ -1350,12 +1350,12 @@ function Profile() {
                   value={form.legal_entity_name ?? ""}
                   onChange={(e) => setForm((prev) => ({ ...prev, legal_entity_name: e.target.value }))}
                   placeholder="Full registered legal name (if different from trading name)"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/20 focus:border-[#7C3AED]/50 outline-none transition-colors"
+                  className="w-full bg-accent border border-border rounded-xl px-4 py-3 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors"
                 />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs text-white/40 uppercase tracking-wider">Company registration number</label>
+                  <label className="text-xs text-muted-foreground uppercase tracking-wider">Company registration number</label>
                   <FieldVerificationBadge profileType="startup" fieldName="registration_number" tier1Passed={founderTier1Passed} />
                 </div>
                 <input
@@ -1363,24 +1363,24 @@ function Profile() {
                   value={form.registration_number ?? ""}
                   onChange={(e) => setForm((prev) => ({ ...prev, registration_number: e.target.value }))}
                   placeholder="e.g. 0001234 (Companies House), CL1234 (DIFC)"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/20 focus:border-[#7C3AED]/50 outline-none transition-colors"
+                  className="w-full bg-accent border border-border rounded-xl px-4 py-3 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors"
                 />
-                <p className="text-xs text-white/25 mt-1">Optional but improves registry verification accuracy</p>
+                <p className="text-xs text-faint mt-1">Optional but improves registry verification accuracy</p>
               </div>
 
               {/* Registry verification section */}
               {registryCheck ? (
                 <div className="p-4 rounded-xl border mt-2" style={{
-                  background: registryCheck.verified ? "rgba(16,185,129,0.07)" : "rgba(255,255,255,0.03)",
-                  border: registryCheck.verified ? "1px solid rgba(16,185,129,0.2)" : "1px solid rgba(255,255,255,0.08)",
+                  background: registryCheck.verified ? "rgba(16,185,129,0.07)" : "var(--accent)",
+                  border: registryCheck.verified ? "1px solid rgba(16,185,129,0.2)" : "1px solid var(--border)",
                 }}>
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-white/50">Company registry check</p>
-                    <span className="text-xs font-bold" style={{ color: registryCheck.verified ? "#10B981" : "rgba(255,255,255,0.3)" }}>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Company registry check</p>
+                    <span className="text-xs font-bold" style={{ color: registryCheck.verified ? "#10B981" : "var(--faint)" }}>
                       {registryCheck.verified ? `✓ ${registryCheck.confidence_score}% confidence` : "○ Not verified"}
                     </span>
                   </div>
-                  <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>{registryCheck.verification_summary}</p>
+                  <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>{registryCheck.verification_summary}</p>
 
                   {/* Structured registry sources (OpenCorporates / Companies House) */}
                   {(registryCheck.sources as Array<{ registry: string; url: string; confidence?: string }> | null)
@@ -1391,7 +1391,7 @@ function Profile() {
                         .filter((s) => !s.registry?.includes("DIFC"))
                         .map((source, i) => (
                           <a key={i} href={source.url} target="_blank" rel="noopener noreferrer"
-                            className="text-xs block hover:underline" style={{ color: "#7C3AED" }}>
+                            className="text-xs block hover:underline" style={{ color: "var(--brand)" }}>
                             ↗ {source.registry}
                           </a>
                         ))}
@@ -1400,21 +1400,21 @@ function Profile() {
 
                   {/* DIFC result — visually secondary, clearly labeled as best-effort */}
                   {registryCheck.difc_check_method === "ai_web_search" && (
-                    <div className="mt-3 rounded-lg px-3 py-2.5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                    <div className="mt-3 rounded-lg px-3 py-2.5" style={{ background: "var(--accent)", border: "1px solid var(--border)" }}>
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-[11px] font-medium" style={{ color: "rgba(255,255,255,0.4)" }}>DIFC (UAE): best-effort web search</span>
-                        <span className="text-[11px]" style={{ color: registryCheck.difc_found ? "#10B981" : "rgba(255,255,255,0.25)" }}>
+                        <span className="text-[11px] font-medium" style={{ color: "var(--muted-foreground)" }}>DIFC (UAE): best-effort web search</span>
+                        <span className="text-[11px]" style={{ color: registryCheck.difc_found ? "#10B981" : "var(--faint)" }}>
                           {registryCheck.difc_found ? "✓ Match found" : "○ No match"}
                           {registryCheck.difc_confidence ? ` · ${registryCheck.difc_confidence} confidence` : ""}
                         </span>
                       </div>
-                      <p className="text-[11px] leading-snug" style={{ color: "rgba(255,255,255,0.3)" }}>
+                      <p className="text-[11px] leading-snug" style={{ color: "var(--faint)" }}>
                         Not a direct registry API — AI-assisted search of the DIFC public register page.
                         {registryCheck.difc_source_url && (
                           <>
                             {" "}
                             <a href={registryCheck.difc_source_url} target="_blank" rel="noopener noreferrer"
-                              className="hover:underline" style={{ color: "#7C3AED" }}>
+                              className="hover:underline" style={{ color: "var(--brand)" }}>
                               Verify on difc.ae ↗
                             </a>
                           </>
@@ -1423,13 +1423,13 @@ function Profile() {
                     </div>
                   )}
 
-                  <p className="text-xs mt-2" style={{ color: "rgba(255,255,255,0.2)" }}>
+                  <p className="text-xs mt-2" style={{ color: "var(--faint)" }}>
                     Checked {new Date(registryCheck.checked_at).toLocaleDateString()} · Source-cited, not manually confirmed
                   </p>
                 </div>
               ) : (
-                <div className="p-4 rounded-xl border mt-2" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                  <p className="text-xs text-white/30">
+                <div className="p-4 rounded-xl border mt-2" style={{ background: "var(--accent)", border: "1px solid var(--border)" }}>
+                  <p className="text-xs text-faint">
                     Registry check runs automatically when your profile is published. Checks OpenCorporates (140+ jurisdictions), UK Companies House, and DIFC (best-effort web search).
                   </p>
                 </div>
@@ -1635,7 +1635,7 @@ function Profile() {
                       : <span>{(form.founder_name || user?.name || "?").split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()}</span>}
                   </div>
                   <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Upload className="h-4 w-4 text-white" />
+                    <Upload className="h-4 w-4 text-foreground" />
                   </div>
                   <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])} />
                 </label>
@@ -1710,9 +1710,9 @@ function Profile() {
                     { label: "Avg duration", value: avgDuration > 0 ? `${avgDuration}s` : "0s" },
                     { label: "Last 7 days", value: String(last7Days) },
                   ].map(({ label, value }) => (
-                    <div key={label} className="bg-white/5 border border-white/8 rounded-xl p-5">
-                      <p className="text-3xl font-bold text-white" style={{ fontFamily: "Syne, sans-serif" }}>{value}</p>
-                      <p className="text-xs text-white/40 uppercase tracking-wider mt-1">{label}</p>
+                    <div key={label} className="bg-accent border border-border rounded-xl p-5">
+                      <p className="text-3xl font-bold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{value}</p>
+                      <p className="text-xs text-muted-foreground uppercase tracking-wider mt-1">{label}</p>
                     </div>
                   ))}
                 </div>
@@ -1720,9 +1720,9 @@ function Profile() {
 
               {totalViews === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-white/20 text-4xl mb-3">◎</p>
-                  <p className="text-white/50 text-sm">No views yet</p>
-                  <p className="text-white/30 text-xs mt-1">Share your profile link to start tracking views</p>
+                  <p className="text-faint text-4xl mb-3">◎</p>
+                  <p className="text-muted-foreground text-sm">No views yet</p>
+                  <p className="text-faint text-xs mt-1">Share your profile link to start tracking views</p>
                 </div>
               ) : (
                 <div className="grid lg:grid-cols-2 gap-6">
@@ -1732,11 +1732,11 @@ function Profile() {
                     <div className="space-y-3">
                       {Object.entries(sourceBreakdown).sort(([, a], [, b]) => (b as number) - (a as number)).map(([source, count]) => (
                         <div key={source} className="flex items-center gap-3">
-                          <span className="text-sm text-white/60 w-20 shrink-0">{source}</span>
-                          <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                            <div className="h-full bg-[#7C3AED] rounded-full" style={{ width: `${((count as number) / totalViews) * 100}%` }} />
+                          <span className="text-sm text-muted-foreground w-20 shrink-0">{source}</span>
+                          <div className="flex-1 h-1.5 bg-accent rounded-full overflow-hidden">
+                            <div className="h-full hs-gradient rounded-full" style={{ width: `${((count as number) / totalViews) * 100}%` }} />
                           </div>
-                          <span className="text-sm text-white/60 w-6 text-right tabular-nums">{count as number}</span>
+                          <span className="text-sm text-muted-foreground w-6 text-right tabular-nums">{count as number}</span>
                         </div>
                       ))}
                     </div>
@@ -1762,36 +1762,36 @@ function Profile() {
                           : null;
                         return (
                         <div key={view.id} className={cn(
-                          "flex items-center justify-between py-3 border-b border-white/5 last:border-0",
-                          namedInvestor && "bg-[#7C3AED]/5 rounded-lg px-3 -mx-3 border-l-2 border-l-[#7C3AED]/40"
+                          "flex items-center justify-between py-3 border-b border-border last:border-0",
+                          namedInvestor && "bg-accent rounded-lg px-3 -mx-3 border-l-2 border-l-brand/40"
                         )}>
                           <div className="flex items-center gap-3 min-w-0">
                             {avatarLetter ? (
-                              <div className="w-8 h-8 rounded-full bg-[#7C3AED]/20 flex items-center justify-center text-xs text-[#7C3AED] font-bold shrink-0">
+                              <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-xs text-brand font-bold shrink-0">
                                 {avatarLetter}
                               </div>
                             ) : (
-                              <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/30 shrink-0">?</div>
+                              <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-faint shrink-0">?</div>
                             )}
                             <div className="min-w-0">
-                              <p className="text-sm text-white truncate flex items-center gap-1.5">
+                              <p className="text-sm text-foreground truncate flex items-center gap-1.5">
                                 {viewerLabel}
                                 {namedInvestor && (
-                                  <span className="text-xs bg-[#7C3AED]/20 text-[#7C3AED] px-1.5 py-0.5 rounded">Investor</span>
+                                  <span className="text-xs bg-accent text-brand px-1.5 py-0.5 rounded">Investor</span>
                                 )}
                               </p>
-                              <p className="text-xs text-white/40 truncate">
+                              <p className="text-xs text-muted-foreground truncate">
                                 {view.source || (view.referrer?.includes("linkedin") ? "via LinkedIn" : view.referrer?.includes("x.com") ? "via X" : view.referrer ? `via ${(() => { try { return new URL(view.referrer).hostname; } catch { return view.referrer; } })()}` : "Direct link")}
                               </p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2 shrink-0 ml-4">
                             {view.duration_seconds > 0 && (
-                              <span className="text-xs text-white/30 tabular-nums">
+                              <span className="text-xs text-faint tabular-nums">
                                 {view.duration_seconds < 60 ? `${view.duration_seconds}s` : `${Math.floor(view.duration_seconds / 60)}m ${view.duration_seconds % 60}s`}
                               </span>
                             )}
-                            <p className="text-xs text-white/40 tabular-nums">{formatRelativeTime(view.created_at)}</p>
+                            <p className="text-xs text-muted-foreground tabular-nums">{formatRelativeTime(view.created_at)}</p>
                           </div>
                         </div>
                         );
@@ -1802,19 +1802,19 @@ function Profile() {
               )}
 
               {/* Share link */}
-              <div className="p-4 rounded-xl border border-white/8 bg-white/[0.02]">
-                <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Your shareable profile link</p>
+              <div className="p-4 rounded-xl border border-border bg-white/[0.02]">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Your shareable profile link</p>
                 <div className="flex items-center gap-2">
-                  <span className="flex-1 text-sm text-white/70 font-mono truncate">hockystick.app/p/{startup.profile_slug}</span>
+                  <span className="flex-1 text-sm text-muted-foreground font-mono truncate">hockystick.app/p/{startup.profile_slug}</span>
                   <button
                     onClick={() => { navigator.clipboard.writeText(`https://hockystick.app/p/${startup.profile_slug}`); toast.success("Copied!"); }}
-                    className="px-3 py-1.5 text-xs bg-white/5 border border-white/10 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+                    className="px-3 py-1.5 text-xs bg-accent border border-border rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
                   >Copy</button>
                   <a
                     href={`https://hockystick.app/p/${startup.profile_slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1.5 text-xs bg-[#7C3AED]/20 border border-[#7C3AED]/30 rounded-lg text-[#7C3AED] hover:bg-[#7C3AED]/30 transition-colors"
+                    className="px-3 py-1.5 text-xs bg-accent border border-brand/30 rounded-lg text-brand hover:bg-accent transition-colors"
                   >Open →</a>
                 </div>
               </div>
@@ -1986,7 +1986,7 @@ function Profile() {
           {existingThesis?.status !== "complete" && (
             <div className="rounded-lg px-4 py-3 flex items-center justify-between gap-3 flex-wrap"
               style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.15)" }}>
-              <p className="text-xs text-white/50 leading-relaxed flex-1">
+              <p className="text-xs text-muted-foreground leading-relaxed flex-1">
                 Based on your profile and documents, we can suggest a starting point — edit anything that's wrong.
               </p>
               <button
@@ -1996,7 +1996,7 @@ function Profile() {
                 style={{
                   background: thesisProposing ? "rgba(124,58,237,0.3)" : "rgba(124,58,237,0.15)",
                   border: "1px solid rgba(124,58,237,0.3)",
-                  color: thesisProposing ? "rgba(255,255,255,0.4)" : "#A855F7",
+                  color: thesisProposing ? "var(--muted-foreground)" : "#A855F7",
                   cursor: thesisProposing ? "not-allowed" : "pointer",
                 }}
               >
@@ -2013,7 +2013,7 @@ function Profile() {
               onClick={handleThesisAIPropose}
               disabled={thesisProposing}
               className="inline-flex items-center gap-1.5 text-xs transition-colors"
-              style={{ color: "rgba(255,255,255,0.3)", background: "none", border: "none", cursor: thesisProposing ? "not-allowed" : "pointer", padding: 0 }}
+              style={{ color: "var(--faint)", background: "none", border: "none", cursor: thesisProposing ? "not-allowed" : "pointer", padding: 0 }}
             >
               {thesisProposing
                 ? <><Loader2 className="h-3 w-3 animate-spin" /> Regenerating…</>
@@ -2056,7 +2056,7 @@ function Profile() {
                     onClick={() => setThesisForm((p) => ({ ...p, preferred_investor_type: val }))}
                     className={`rounded-lg border px-3 py-2.5 text-left text-sm transition-colors ${
                       thesisForm.preferred_investor_type === val
-                        ? "border-brand/60 bg-brand/10 text-foreground"
+                        ? "border-brand/60 bg-accent text-foreground"
                         : "border-border/60 bg-background text-muted-foreground hover:border-border"
                     }`}
                   >
@@ -2081,7 +2081,7 @@ function Profile() {
                     onClick={() => setThesisForm((p) => ({ ...p, board_preference: val }))}
                     className={`rounded-lg border px-3 py-2.5 text-left text-sm transition-colors ${
                       thesisForm.board_preference === val
-                        ? "border-brand/60 bg-brand/10 text-foreground"
+                        ? "border-brand/60 bg-accent text-foreground"
                         : "border-border/60 bg-background text-muted-foreground hover:border-border"
                     }`}
                   >
@@ -2143,7 +2143,7 @@ function Profile() {
                 type="button"
                 onClick={() => handleThesisSave("complete")}
                 disabled={thesisSaving || !startup?.id}
-                className="inline-flex items-center gap-2 rounded-lg bg-brand text-brand-foreground px-5 py-2.5 text-sm font-medium disabled:opacity-60 transition-colors"
+                className="inline-flex items-center gap-2 rounded-lg hs-gradient text-brand-foreground px-5 py-2.5 text-sm font-medium disabled:opacity-60 transition-colors"
               >
                 {thesisSaving ? <Loader2 className="h-4 w-4 animate-spin" />
                   : thesisSaved ? <CheckCircle2 className="h-4 w-4" />
@@ -2289,7 +2289,7 @@ function PrivacyTab({
     <div className="mt-4 space-y-4">
       <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
         <div className="flex items-start gap-3 mb-6">
-          <div className="grid h-9 w-9 place-items-center rounded-lg bg-brand/10 shrink-0 mt-0.5">
+          <div className="grid h-9 w-9 place-items-center rounded-lg bg-accent shrink-0 mt-0.5">
             <Shield className="h-5 w-5 text-brand" />
           </div>
           <div>
@@ -2326,7 +2326,7 @@ function PrivacyTab({
                   {/* Right: toggle */}
                   <div className="shrink-0">
                     {section.locked ? (
-                      <div className="inline-flex items-center gap-1.5 rounded-full border border-brand bg-brand/10 px-3 py-1.5 text-xs font-medium text-brand">
+                      <div className="inline-flex items-center gap-1.5 rounded-full border border-brand bg-accent px-3 py-1.5 text-xs font-medium text-brand">
                         🌐 Public — always on
                       </div>
                     ) : (
@@ -2340,7 +2340,7 @@ function PrivacyTab({
                             className={cn(
                               "px-3 py-1.5 text-xs font-medium transition-colors border-r last:border-r-0 border-border/60",
                               current === opt.value
-                                ? "bg-brand text-white"
+                                ? "hs-gradient text-white"
                                 : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-accent",
                             )}
                           >
@@ -2396,10 +2396,10 @@ function RightCol({ form, deckName, deckUploading, isExtracting, onDeckUpload, s
       <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
         <div className="flex items-center gap-1.5 mb-3">
           <div className="text-sm font-semibold">Pitch deck</div>
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-brand/10 text-brand font-medium">AI</span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-accent text-brand font-medium">AI</span>
         </div>
         {isExtracting ? (
-          <div className="rounded-xl border border-brand/20 bg-brand/5 p-5 text-center">
+          <div className="rounded-xl border border-brand/20 bg-accent p-5 text-center">
             <Loader2 className="h-6 w-6 text-brand mx-auto animate-spin" />
             <div className="text-sm font-medium mt-3 text-foreground">Analysing pitch deck…</div>
             <div className="text-xs text-muted-foreground mt-1">This takes 10–20 seconds</div>
@@ -2492,7 +2492,7 @@ const STATUS_CONFIG: Record<ClaimStatus, { label: string; icon: React.ReactNode;
   pending_review: {
     label: "Proof attached",
     icon: <Clock className="h-3 w-3" />,
-    style: { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.5)" },
+    style: { background: "var(--accent)", border: "1px solid var(--border)", color: "var(--muted-foreground)" },
   },
   ai_confirmed: {
     label: "AI confirmed",
@@ -2676,20 +2676,20 @@ function CapTableSection({ startupId }: { startupId: string }) {
         <div className="space-y-2 mb-4">
           {rows.map((row) => (
             <div key={row.id}
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10 }}
+              style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: 10 }}
               className="px-4 py-3"
             >
               <div className="flex items-start justify-between gap-2 flex-wrap">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-medium text-white">{row.shareholder_name}</span>
+                    <span className="text-sm font-medium text-foreground">{row.shareholder_name}</span>
                     {row.shareholder_role && (
                       <span className="text-xs px-1.5 py-0.5 rounded-full"
                         style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.2)", color: "#A855F7" }}>
                         {row.shareholder_role}
                       </span>
                     )}
-                    <span className="text-sm font-semibold text-white/70">{row.ownership_percent}%</span>
+                    <span className="text-sm font-semibold text-muted-foreground">{row.ownership_percent}%</span>
                     {row.social_verified ? (
                       <span className="inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-full"
                         style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }}>
@@ -2701,13 +2701,13 @@ function CapTableSection({ startupId }: { startupId: string }) {
                         <AlertTriangle className="h-3 w-3" /> Unverified links
                       </span>
                     ) : (
-                      <span className="text-[11px] text-white/25">No social links</span>
+                      <span className="text-[11px] text-faint">No social links</span>
                     )}
                   </div>
                   <div className="flex items-center gap-3 mt-1.5">
-                    {row.linkedin_url && <a href={row.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white/60 transition-colors"><Linkedin className="h-3.5 w-3.5" /></a>}
-                    {row.x_url && <a href={row.x_url} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white/60 transition-colors"><Twitter className="h-3.5 w-3.5" /></a>}
-                    {row.instagram_url && <a href={row.instagram_url} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white/60 transition-colors"><Instagram className="h-3.5 w-3.5" /></a>}
+                    {row.linkedin_url && <a href={row.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-faint hover:text-muted-foreground transition-colors"><Linkedin className="h-3.5 w-3.5" /></a>}
+                    {row.x_url && <a href={row.x_url} target="_blank" rel="noopener noreferrer" className="text-faint hover:text-muted-foreground transition-colors"><Twitter className="h-3.5 w-3.5" /></a>}
+                    {row.instagram_url && <a href={row.instagram_url} target="_blank" rel="noopener noreferrer" className="text-faint hover:text-muted-foreground transition-colors"><Instagram className="h-3.5 w-3.5" /></a>}
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
@@ -2715,15 +2715,15 @@ function CapTableSection({ startupId }: { startupId: string }) {
                     <button
                       onClick={() => handleVerify(row)}
                       disabled={verifyingId === row.id}
-                      className="text-xs text-white/30 hover:text-white/60 transition-colors flex items-center gap-1"
+                      className="text-xs text-faint hover:text-muted-foreground transition-colors flex items-center gap-1"
                       title="Re-run social link verification"
                     >
                       {verifyingId === row.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
                       Verify
                     </button>
                   )}
-                  <button onClick={() => startEdit(row)} className="text-white/30 hover:text-white/60 p-1"><Pencil className="h-3.5 w-3.5" /></button>
-                  <button onClick={() => handleDelete(row.id)} className="text-white/30 hover:text-red-400 p-1"><Trash2 className="h-3.5 w-3.5" /></button>
+                  <button onClick={() => startEdit(row)} className="text-faint hover:text-muted-foreground p-1"><Pencil className="h-3.5 w-3.5" /></button>
+                  <button onClick={() => handleDelete(row.id)} className="text-faint hover:text-red-400 p-1"><Trash2 className="h-3.5 w-3.5" /></button>
                 </div>
               </div>
             </div>
@@ -2739,7 +2739,7 @@ function CapTableSection({ startupId }: { startupId: string }) {
       )}
 
       {showForm && (
-        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10 }} className="p-4 space-y-3">
+        <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: 10 }} className="p-4 space-y-3">
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
               <label className="text-xs text-muted-foreground">Shareholder name *</label>
@@ -2776,7 +2776,7 @@ function CapTableSection({ startupId }: { startupId: string }) {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="inline-flex items-center gap-1.5 rounded-md bg-brand text-brand-foreground px-4 py-1.5 text-xs font-medium disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-4 py-1.5 text-xs font-medium disabled:opacity-60"
             >
               {saving && <Loader2 className="h-3 w-3 animate-spin" />}
               {editingId ? "Update" : "Add shareholder"}
@@ -2865,7 +2865,7 @@ function VisibilitySelector({ visibility, onChange }: { visibility: SectionVisib
           key={option.value}
           type="button"
           onClick={() => onChange(option.value)}
-          className={`rounded-full border px-3 py-1 text-[11px] transition ${visibility === option.value ? "border-brand bg-brand/10 text-brand" : "border-border/70 bg-white/5 text-muted-foreground hover:border-white/30 hover:bg-white/10"}`}
+          className={`rounded-full border px-3 py-1 text-[11px] transition ${visibility === option.value ? "border-brand bg-accent text-brand" : "border-border/70 bg-accent text-muted-foreground hover:border-border hover:bg-accent"}`}
         >
           {option.label}
         </button>
@@ -2969,7 +2969,7 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
 
   const tagColor: Record<string, string> = {
     Founder: "bg-violet/10 text-violet", "Co-Founder": "bg-violet/10 text-violet",
-    Advisor: "bg-warning/10 text-warning", Employee: "bg-brand/10 text-brand",
+    Advisor: "bg-warning/10 text-warning", Employee: "bg-accent text-brand",
     "Board Member": "bg-success/10 text-success",
   };
 

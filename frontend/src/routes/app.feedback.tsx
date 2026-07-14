@@ -132,7 +132,7 @@ function FeedbackPage() {
                   className={cn(
                     "h-8 w-8 transition-colors",
                     v <= (hoveredRating || rating)
-                      ? "fill-[#7C3AED] text-[#7C3AED]"
+                      ? "fill-brand text-brand"
                       : "text-muted-foreground/30"
                   )}
                 />
@@ -185,7 +185,7 @@ function FeedbackPage() {
                 className={cn(
                   "rounded-lg border px-3 py-2 text-xs font-medium text-left transition-colors",
                   selectedFeatures.includes(id)
-                    ? "border-brand/60 bg-brand/10 text-brand"
+                    ? "border-brand/60 bg-accent text-brand"
                     : "border-border/60 text-muted-foreground hover:border-border hover:text-foreground"
                 )}
               >
@@ -212,7 +212,7 @@ function FeedbackPage() {
           onClick={handleSubmit}
           disabled={loading || !rating}
           data-testid="feedback-submit-btn"
-          className="w-full rounded-lg bg-brand text-brand-foreground py-3 text-sm font-semibold hover:bg-brand/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="w-full rounded-lg hs-gradient text-brand-foreground py-3 text-sm font-semibold hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? "Sending…" : "Submit feedback"}
         </button>

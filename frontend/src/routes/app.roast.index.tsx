@@ -54,8 +54,8 @@ const STATUS_PILL: Record<
   },
   cancelled: {
     label: "Cancelled",
-    bg: "rgba(255,255,255,0.06)",
-    color: "rgba(255,255,255,0.4)",
+    bg: "var(--accent)",
+    color: "var(--muted-foreground)",
   },
 };
 
@@ -262,7 +262,7 @@ function RoastManagement() {
         {!activeSession && startup?.id && (
           <button
             onClick={() => setShowSchedule(true)}
-            className="rounded-lg px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+            className="rounded-lg px-4 py-2.5 text-sm font-semibold text-foreground hover:opacity-90"
             style={{ background: "#EF4444" }}
             data-testid="schedule-roast-btn"
           >
@@ -310,7 +310,7 @@ function RoastManagement() {
                   style={{
                     borderColor: selected
                       ? "#EF4444"
-                      : "rgba(255,255,255,0.08)",
+                      : "var(--accent)",
                     background: selected
                       ? "rgba(239,68,68,0.06)"
                       : "transparent",
@@ -427,7 +427,7 @@ function RoastManagement() {
             <button
               onClick={schedule}
               disabled={creating || !rulesAck}
-              className="rounded-lg px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+              className="rounded-lg px-5 py-2.5 text-sm font-semibold text-foreground disabled:opacity-50"
               style={{ background: "#EF4444" }}
               data-testid="confirm-schedule"
             >
@@ -523,7 +523,7 @@ function RoastManagement() {
                       <>
                         <a
                           href={`/app/roast/${s.id}/live`}
-                          className="rounded-lg px-3.5 py-2 text-xs font-semibold text-white hover:opacity-90"
+                          className="rounded-lg px-3.5 py-2 text-xs font-semibold text-foreground hover:opacity-90"
                           style={{ background: "#EF4444" }}
                         >
                           Go live →
@@ -540,7 +540,7 @@ function RoastManagement() {
                     {isLive && (
                       <a
                         href={`/app/roast/${s.id}/live`}
-                        className="rounded-lg px-3.5 py-2 text-xs font-semibold text-white hover:opacity-90"
+                        className="rounded-lg px-3.5 py-2 text-xs font-semibold text-foreground hover:opacity-90"
                         style={{ background: "#EF4444" }}
                       >
                         Open control panel →
@@ -549,7 +549,7 @@ function RoastManagement() {
                     {s.status === "written_phase" && (
                       <a
                         href={`/app/roast/${s.id}/answers`}
-                        className="rounded-lg px-3.5 py-2 text-xs font-semibold text-white hover:opacity-90"
+                        className="rounded-lg px-3.5 py-2 text-xs font-semibold text-foreground hover:opacity-90"
                         style={{ background: "#F59E0B" }}
                       >
                         Answer questions ({qc2 ? qc2.total - qc2.answered : "…"}{" "}

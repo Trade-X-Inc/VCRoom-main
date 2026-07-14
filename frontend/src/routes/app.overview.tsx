@@ -78,8 +78,8 @@ const DEAL_ROOM_PROGRESS: Record<string, { p: number; bar: string }> = {
   diligence: { p: 75, bar: "bg-success" },
   qa: { p: 52, bar: "bg-warning" },
   "q&a": { p: 52, bar: "bg-warning" },
-  review: { p: 40, bar: "bg-brand" },
-  onboard: { p: 20, bar: "bg-brand" },
+  review: { p: 40, bar: "hs-gradient" },
+  onboard: { p: 20, bar: "hs-gradient" },
 };
 
 function dealRoomProgress(status: string | null | undefined): { p: number; bar: string } {
@@ -87,7 +87,7 @@ function dealRoomProgress(status: string | null | undefined): { p: number; bar: 
   for (const [key, val] of Object.entries(DEAL_ROOM_PROGRESS)) {
     if (s.includes(key)) return val;
   }
-  return { p: 10, bar: "bg-brand" };
+  return { p: 10, bar: "hs-gradient" };
 }
 
 // ── How it works modal ─────────────────────────────────────────────
@@ -164,7 +164,7 @@ function OnboardingStep({
       )}
     >
       <div className="flex items-start justify-between">
-        <div className={cn("grid h-10 w-10 place-items-center rounded-lg", disabled ? "bg-muted" : "bg-brand/10")}>
+        <div className={cn("grid h-10 w-10 place-items-center rounded-lg", disabled ? "bg-muted" : "bg-accent")}>
           <Icon className={cn("h-5 w-5", disabled ? "text-muted-foreground" : "text-brand")} />
         </div>
         {done && <CheckCircle2 className="h-5 w-5 text-success shrink-0" />}
@@ -413,7 +413,7 @@ function AccessRequestsPanel({ startupId, companyName, profileSlug }: {
           <ShieldCheck className="h-4 w-4 text-brand" />
           <span className="text-sm font-semibold">Investor Access Requests</span>
           {!loading && requests.length > 0 && (
-            <span className="inline-flex items-center justify-center h-5 min-w-[20px] rounded-full bg-brand text-brand-foreground text-[10px] font-semibold px-1.5">
+            <span className="inline-flex items-center justify-center h-5 min-w-[20px] rounded-full hs-gradient text-brand-foreground text-[10px] font-semibold px-1.5">
               {requests.length}
             </span>
           )}
@@ -765,8 +765,8 @@ function Overview() {
           <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">{current.description}</p>
           <button
             onClick={() => navigate({ to: current.to as any })}
-            className="mt-4 inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
-            style={{ background: "#7C3AED" }}
+            className="mt-4 inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-foreground hover:opacity-90"
+            style={{ background: "var(--gradient-brand)" }}
             data-testid="journey-primary-cta"
           >
             {current.cta} <ArrowRight className="h-4 w-4" />
@@ -776,7 +776,7 @@ function Overview() {
         {/* The full path, compact */}
         <div className="rounded-xl border border-border/60 bg-card divide-y divide-border/60">
           {journeySteps.map((s, i) => (
-            <div key={s.key} className={cn("flex items-center gap-3 px-4 py-3", i === currentIdx && "bg-brand/[0.04]")}>
+            <div key={s.key} className={cn("flex items-center gap-3 px-4 py-3", i === currentIdx && "hs-gradient/[0.04]")}>
               {s.done ? (
                 <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "#10B981" }} />
               ) : (
@@ -876,7 +876,7 @@ function Overview() {
           <div className="space-y-2">
             {[...highPriorityTasks, ...normalPriorityTasks].slice(0, 5).map((t: any) => (
               <div key={t.id} className="rounded-xl border border-border/60 bg-card px-4 py-3 flex items-center gap-3">
-                <span className="h-2 w-2 rounded-full shrink-0" style={{ background: t.priority === "high" ? "#EF4444" : t.priority === "normal" ? "#F59E0B" : "rgba(255,255,255,0.2)" }} />
+                <span className="h-2 w-2 rounded-full shrink-0" style={{ background: t.priority === "high" ? "#EF4444" : t.priority === "normal" ? "#F59E0B" : "var(--faint)" }} />
                 <span className="text-sm flex-1 truncate">{t.title}</span>
                 {t.priority === "high" && (
                   <span className="text-[10px] rounded-full px-2 py-0.5 font-semibold" style={{ background: "rgba(239,68,68,0.1)", color: "#EF4444" }}>High</span>
@@ -940,8 +940,8 @@ function Overview() {
               href={`/p/${startup.profile_slug}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-md px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
-              style={{ background: "#7C3AED" }}
+              className="rounded-md px-3 py-1.5 text-xs font-semibold text-foreground hover:opacity-90"
+              style={{ background: "var(--gradient-brand)" }}
             >
               View your public profile →
             </a>
@@ -1033,7 +1033,7 @@ function Overview() {
                         href={a.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-xs hover:bg-brand/10"
+                        className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-accent text-brand px-3 py-1.5 text-xs hover:bg-accent"
                       >
                         <ExternalLink className="h-3 w-3" /> Join
                       </a>
@@ -1137,7 +1137,7 @@ function Overview() {
               [
                 ["New", statusMap["New"] ?? 0, "bg-muted-foreground/40"],
                 ["Contact", statusMap["Contacted"] ?? 0, "bg-foreground/40"],
-                ["Replied", statusMap["Replied"] ?? 0, "bg-brand"],
+                ["Replied", statusMap["Replied"] ?? 0, "hs-gradient"],
                 ["Meeting", statusMap["Meeting Booked"] ?? 0, "bg-violet"],
                 ["Interest", statusMap["Interested"] ?? 0, "bg-warning"],
                 ["DR", statusMap["Deal Room Created"] ?? 0, "bg-success"],

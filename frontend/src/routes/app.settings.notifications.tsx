@@ -118,7 +118,7 @@ function NotificationsSettings() {
                 className="sr-only peer"
               />
               <div className={`h-4 w-4 rounded border-2 flex items-center justify-center transition-colors ${
-                prefs[key] ? "bg-brand border-brand" : "border-border/60 bg-background group-hover:border-brand/40"
+                prefs[key] ? "hs-gradient border-brand" : "border-border/60 bg-background group-hover:border-brand/40"
               }`}>
                 {prefs[key] && (
                   <svg className="h-2.5 w-2.5 text-brand-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -139,7 +139,7 @@ function NotificationsSettings() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="inline-flex items-center gap-1.5 rounded-md bg-brand text-brand-foreground px-4 py-2 text-sm font-medium hover:bg-brand/90 disabled:opacity-60 transition-colors"
+          className="inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-4 py-2 text-sm font-medium hover:bg-accent disabled:opacity-60 transition-colors"
         >
           {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
           Save preferences

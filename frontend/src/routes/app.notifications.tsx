@@ -42,10 +42,10 @@ const iconFor = (kind: string) => {
 
 const tintFor = (kind: string) => {
   if (kind === "deal")             return "bg-success/10 text-success";
-  if (kind === "message")          return "bg-brand/10 text-brand";
+  if (kind === "message")          return "bg-accent text-brand";
   if (kind === "invite")           return "bg-warning/10 text-warning";
   if (kind === "ai")               return "bg-violet/10 text-violet";
-  if (kind === "document_request") return "bg-brand/10 text-brand";
+  if (kind === "document_request") return "bg-accent text-brand";
   if (kind === "dd_update")        return "bg-success/10 text-success";
   return "bg-muted text-muted-foreground";
 };
@@ -129,7 +129,7 @@ function NotificationsPage() {
             <Bell className="h-5 w-5 text-brand" />
             <h1 className="text-2xl font-semibold tracking-tight">Notifications</h1>
             {unread > 0 && (
-              <span className="text-[10px] rounded-full bg-brand/10 text-brand px-1.5 py-0.5 font-medium">
+              <span className="text-[10px] rounded-full bg-accent text-brand px-1.5 py-0.5 font-medium">
                 {unread} unread
               </span>
             )}
@@ -205,7 +205,7 @@ function NotificationsPage() {
                   onClick={() => { if (!n.read) markRead(n.id); }}
                   className={cn(
                     "flex gap-4 px-5 py-4 hover:bg-accent/40 transition-colors cursor-pointer",
-                    !n.read ? "bg-brand/[0.02]" : "",
+                    !n.read ? "hs-gradient/[0.02]" : "",
                   )}
                 >
                   <div className={cn(
@@ -222,7 +222,7 @@ function NotificationsPage() {
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         {!n.read && (
-                          <span className="h-2 w-2 rounded-full bg-brand" />
+                          <span className="h-2 w-2 rounded-full hs-gradient" />
                         )}
                         <span className="text-xs text-muted-foreground tabular-nums">
                           {n.created_at

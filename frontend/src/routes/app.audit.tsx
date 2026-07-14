@@ -34,12 +34,12 @@ interface LogRow {
 
 const ACTION_CONFIG: Record<string, { icon: React.ElementType; label: string; color: string; category: string }> = {
   team_member_added:      { icon: UserPlus,       label: "Team member added",   color: "text-success bg-success/10",            category: "Team" },
-  deal_room_assigned:     { icon: ArrowLeftRight,  label: "Deal room assigned",  color: "text-brand bg-brand/10",                category: "Deal rooms" },
+  deal_room_assigned:     { icon: ArrowLeftRight,  label: "Deal room assigned",  color: "text-brand bg-accent",                category: "Deal rooms" },
   pipeline_status_changed:{ icon: TrendingUp,      label: "Status changed",      color: "text-warning bg-warning/10",            category: "Pipeline" },
-  invite_sent:            { icon: Users,            label: "Invite sent",         color: "text-brand bg-brand/10",                category: "Connections" },
+  invite_sent:            { icon: Users,            label: "Invite sent",         color: "text-brand bg-accent",                category: "Connections" },
   connection_approved:    { icon: CheckCircle2,     label: "Connection approved", color: "text-success bg-success/10",            category: "Connections" },
   connection_rejected:    { icon: XCircle,          label: "Connection declined", color: "text-destructive bg-destructive/10",    category: "Connections" },
-  document_uploaded:      { icon: FileText,         label: "Document uploaded",   color: "text-brand bg-brand/10",                category: "Documents" },
+  document_uploaded:      { icon: FileText,         label: "Document uploaded",   color: "text-brand bg-accent",                category: "Documents" },
   claim_proof_attached:   { icon: Paperclip,        label: "Proof attached",      color: "text-success bg-success/10",            category: "Documents" },
   profile_edited:         { icon: Pencil,           label: "Profile updated",     color: "text-muted-foreground bg-muted",        category: "Profile" },
   decision_recorded:      { icon: CheckCircle2,     label: "Decision recorded",   color: "text-success bg-success/10",            category: "Decisions" },

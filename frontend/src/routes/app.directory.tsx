@@ -178,7 +178,7 @@ function StartupCard({
               e.stopPropagation();
               onEditProfile();
             }}
-            className="flex-1 text-xs py-1.5 rounded-lg bg-brand text-brand-foreground hover:bg-brand/90 transition-colors"
+            className="flex-1 text-xs py-1.5 rounded-lg hs-gradient text-brand-foreground hover:bg-accent transition-colors"
           >
             Edit Profile
           </button>
@@ -209,7 +209,7 @@ function StartupCard({
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onCancel(s.id); }}
-            className="px-3 py-1.5 rounded-md text-xs bg-white/5 text-white/50 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+            className="px-3 py-1.5 rounded-md text-xs bg-accent text-muted-foreground hover:bg-red-500/10 hover:text-red-400 transition-colors"
           >
             Cancel
           </button>
@@ -223,7 +223,7 @@ function StartupCard({
           to="/app/deal-room/$id"
           params={{ id: roomId }}
           onClick={(e) => e.stopPropagation()}
-          className="flex-1 text-center text-xs py-1.5 rounded-lg bg-brand text-brand-foreground hover:bg-brand/90 transition-colors"
+          className="flex-1 text-center text-xs py-1.5 rounded-lg hs-gradient text-brand-foreground hover:bg-accent transition-colors"
         >
           View Deal Room
         </Link>
@@ -267,14 +267,14 @@ function StartupCard({
       </div>
       <div className="flex flex-wrap gap-1.5 mb-3">
         {s.sector && <span className="text-xs px-2 py-0.5 rounded-full bg-accent text-muted-foreground border border-border/60">{s.sector}</span>}
-        {s.stage && <span className="text-xs px-2 py-0.5 rounded-full bg-brand/10 text-brand border border-brand/20">{s.stage}</span>}
+        {s.stage && <span className="text-xs px-2 py-0.5 rounded-full bg-accent text-brand border border-brand/20">{s.stage}</span>}
         {alert && (
           <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
             alert.match_score >= 80
               ? "bg-green-500/15 text-green-400"
               : alert.match_score >= 60
-              ? "bg-[#7C3AED]/15 text-[#7C3AED]"
-              : "bg-white/8 text-white/40"
+              ? "bg-accent text-brand"
+              : "bg-accent text-muted-foreground"
           }`}>
             {alert.match_score}% match
           </span>
@@ -392,7 +392,7 @@ function WaitlistModal({ onClose, defaultRole }: { onClose: () => void; defaultR
               <div className="flex gap-2">
                 {(["founder", "investor"] as const).map((r) => (
                   <button key={r} type="button" onClick={() => set("role", r)}
-                    className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors capitalize ${form.role === r ? "bg-brand text-brand-foreground border-brand" : "border-border/60 text-muted-foreground hover:text-foreground"}`}>
+                    className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors capitalize ${form.role === r ? "hs-gradient text-brand-foreground border-brand" : "border-border/60 text-muted-foreground hover:text-foreground"}`}>
                     {r}
                   </button>
                 ))}
@@ -417,7 +417,7 @@ function WaitlistModal({ onClose, defaultRole }: { onClose: () => void; defaultR
                 className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
             </div>
             <button type="submit" disabled={loading}
-              className="w-full py-2.5 rounded-lg bg-brand text-brand-foreground text-sm font-semibold hover:bg-brand/90 disabled:opacity-60 transition-colors inline-flex items-center justify-center gap-2">
+              className="w-full py-2.5 rounded-lg hs-gradient text-brand-foreground text-sm font-semibold hover:bg-accent disabled:opacity-60 transition-colors inline-flex items-center justify-center gap-2">
               {loading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               {loading ? "Submitting…" : "Get early access →"}
             </button>
@@ -610,11 +610,11 @@ function Directory() {
         </div>
         <div className="flex rounded-lg border border-border/60 overflow-hidden shrink-0">
           <button onClick={() => setType("founders")}
-            className={`px-4 py-2 text-sm font-medium transition-colors ${type === "founders" ? "bg-brand text-brand-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+            className={`px-4 py-2 text-sm font-medium transition-colors ${type === "founders" ? "hs-gradient text-brand-foreground" : "text-muted-foreground hover:text-foreground"}`}>
             Founders ({startups.length})
           </button>
           <button onClick={() => setType("investors")}
-            className={`px-4 py-2 text-sm font-medium transition-colors border-l border-border/60 ${type === "investors" ? "bg-brand text-brand-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+            className={`px-4 py-2 text-sm font-medium transition-colors border-l border-border/60 ${type === "investors" ? "hs-gradient text-brand-foreground" : "text-muted-foreground hover:text-foreground"}`}>
             Investors ({investors.length})
           </button>
         </div>
@@ -627,7 +627,7 @@ function Directory() {
         )}
       </div>
 
-      <div className="mb-4 px-4 py-3 rounded-xl bg-brand/10 border border-brand/20 text-sm text-brand">
+      <div className="mb-4 px-4 py-3 rounded-xl bg-accent border border-brand/20 text-sm text-brand">
         🚀 Full features and founder discovery across VC circles available after public launch.
         <button onClick={() => setWaitlistOpen(true)} className="underline ml-1 hover:opacity-80">
           {isInvestor ? "Join early access →" : "Get early access →"}
@@ -648,14 +648,14 @@ function Directory() {
 
       {/* Thesis matches banner — investors only */}
       {isInvestor && myAlerts && myAlerts.length > 0 && type === "founders" && (
-        <div data-tour="thesis-matches-banner" className="mb-6 p-4 rounded-xl border border-[#7C3AED]/20 bg-[#7C3AED]/5">
+        <div data-tour="thesis-matches-banner" className="mb-6 p-4 rounded-xl border border-brand/20 bg-accent">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[#7C3AED]">✦</span>
-            <p className="text-sm font-semibold text-white">
+            <span className="text-brand">✦</span>
+            <p className="text-sm font-semibold text-foreground">
               {myAlerts.length} thesis {myAlerts.length === 1 ? "match" : "matches"} found
             </p>
           </div>
-          <p className="text-xs text-white/40">
+          <p className="text-xs text-muted-foreground">
             Based on your investment thesis — sector, stage, and geography.
           </p>
         </div>
@@ -750,7 +750,7 @@ function Directory() {
               <button
                 onClick={() => doConnect(connectModalStartupId, connectMessage)}
                 disabled={connectSending}
-                className="flex-1 rounded-lg bg-brand text-brand-foreground px-4 py-2.5 text-sm font-semibold hover:bg-brand/90 disabled:opacity-60"
+                className="flex-1 rounded-lg hs-gradient text-brand-foreground px-4 py-2.5 text-sm font-semibold hover:bg-accent disabled:opacity-60"
               >
                 {connectSending ? "Sending…" : "Send request"}
               </button>
@@ -789,7 +789,7 @@ function Directory() {
           <>
             <h2 className="text-lg font-bold mb-2" style={{ fontFamily: "Syne, sans-serif" }}>Verified founder profiles, launching soon</h2>
             <p className="text-sm text-muted-foreground mb-5">Get notified when verified MENA founders go live — with traction, team, and financials already checked.</p>
-            <button onClick={() => setWaitlistOpen(true)} className="inline-flex items-center gap-2 rounded-lg bg-brand text-brand-foreground px-5 py-2.5 text-sm font-semibold hover:bg-brand/90 transition-colors">
+            <button onClick={() => setWaitlistOpen(true)} className="inline-flex items-center gap-2 rounded-lg hs-gradient text-brand-foreground px-5 py-2.5 text-sm font-semibold hover:bg-accent transition-colors">
               Join early access <ArrowRight className="h-4 w-4" />
             </button>
           </>
@@ -797,7 +797,7 @@ function Directory() {
           <>
             <h2 className="text-lg font-bold mb-2" style={{ fontFamily: "Syne, sans-serif" }}>Get your verified founder profile</h2>
             <p className="text-sm text-muted-foreground mb-5">A structured profile that replaces your pitch deck. Shared directly with investors. No cold outreach needed.</p>
-            <button onClick={() => setWaitlistOpen(true)} className="inline-flex items-center gap-2 rounded-lg bg-brand text-brand-foreground px-5 py-2.5 text-sm font-semibold hover:bg-brand/90 transition-colors">
+            <button onClick={() => setWaitlistOpen(true)} className="inline-flex items-center gap-2 rounded-lg hs-gradient text-brand-foreground px-5 py-2.5 text-sm font-semibold hover:bg-accent transition-colors">
               Get early access <ArrowRight className="h-4 w-4" />
             </button>
           </>

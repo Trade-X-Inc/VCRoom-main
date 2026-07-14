@@ -48,6 +48,7 @@ img { max-width: 100%; height: auto; }
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-faint: var(--faint);
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-foreground);
   --color-violet: var(--violet);
@@ -101,6 +102,7 @@ img { max-width: 100%; height: auto; }
 
   --border: oklch(0.92 0.005 270);
   --input: oklch(0.92 0.005 270);
+  --faint: rgba(0, 0, 0, 0.25);
   --ring: oklch(0.62 0.22 264);
 
   --sidebar: oklch(0.985 0.003 270);
@@ -113,7 +115,7 @@ img { max-width: 100%; height: auto; }
   --sidebar-ring: oklch(0.62 0.22 264);
 
   /* Gradients & shadows */
-  --gradient-brand: linear-gradient(135deg, oklch(0.62 0.22 264), oklch(0.58 0.24 295));
+  --gradient-brand: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
   --gradient-soft: linear-gradient(180deg, oklch(0.99 0.005 270), oklch(0.96 0.008 270));
   --gradient-hero: radial-gradient(ellipse 80% 60% at 50% 0%, color-mix(in oklab, var(--brand) 18%, transparent), transparent 70%);
   --gradient-mesh: radial-gradient(at 20% 20%, color-mix(in oklab, var(--brand) 22%, transparent) 0%, transparent 50%),
@@ -161,6 +163,7 @@ img { max-width: 100%; height: auto; }
 
   --border: oklch(1 0 0 / 8%);
   --input: oklch(1 0 0 / 12%);
+  --faint: rgba(255, 255, 255, 0.25);
   --ring: oklch(0.7 0.2 264);
 
   --sidebar: oklch(0.135 0.01 270);

@@ -143,7 +143,7 @@ function AnswerCard({
       style={{
         borderColor: needsWork
           ? "rgba(245,158,11,0.35)"
-          : "rgba(255,255,255,0.08)",
+          : "var(--accent)",
       }}
     >
       <div className="flex items-start justify-between gap-3 mb-3">
@@ -201,8 +201,8 @@ function AnswerCard({
             <button
               onClick={() => save(false)}
               disabled={saving || !text.trim()}
-              className="rounded-lg px-4 py-2 text-xs font-semibold text-white disabled:opacity-50"
-              style={{ background: "#7C3AED" }}
+              className="rounded-lg px-4 py-2 text-xs font-semibold text-foreground disabled:opacity-50"
+              style={{ background: "var(--gradient-brand)" }}
               data-testid={`answer-submit-${q.id}`}
             >
               {saving ? "Saving…" : "Publish answer"}
@@ -405,7 +405,7 @@ function RoastAnswersQueue() {
             className="h-full rounded-full transition-all"
             style={{
               width: `${pct}%`,
-              background: pct === 100 ? "#10B981" : "#7C3AED",
+              background: pct === 100 ? "#10B981" : "var(--gradient-brand)",
             }}
           />
         </div>

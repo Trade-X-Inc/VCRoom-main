@@ -55,7 +55,7 @@ function ProgressBar({ label, current, target }: { label: string; current: numbe
     <div className="flex items-center gap-3 text-xs">
       <span className="w-56 shrink-0 text-muted-foreground truncate">{label}</span>
       <div className="flex-1 h-1.5 rounded-full bg-accent overflow-hidden">
-        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: done ? "#10B981" : "#7C3AED" }} />
+        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: done ? "#10B981" : "var(--gradient-brand)" }} />
       </div>
       <span className="w-12 shrink-0 text-right tabular-nums" style={{ color: done ? "#10B981" : "var(--color-muted-foreground)" }}>
         {current}/{target}
@@ -136,8 +136,8 @@ function BadgesPage() {
           <button
             onClick={runEvaluation}
             disabled={evaluating || !startup?.id}
-            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-            style={{ background: "#7C3AED" }}
+            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-50"
+            style={{ background: "var(--gradient-brand)" }}
           >
             {evaluating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
             Run evaluation

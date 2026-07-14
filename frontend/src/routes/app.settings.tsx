@@ -326,7 +326,7 @@ function ProfileSettings() {
           <div>
             <div className="text-sm font-medium">{fullName || user?.email}</div>
             <div className="text-xs text-muted-foreground mt-0.5">
-              <span className="inline-block px-2 py-0.5 rounded-full bg-brand/10 text-brand font-medium capitalize">{user?.role ?? "founder"}</span>
+              <span className="inline-block px-2 py-0.5 rounded-full bg-accent text-brand font-medium capitalize">{user?.role ?? "founder"}</span>
             </div>
           </div>
         </div>
@@ -344,7 +344,7 @@ function ProfileSettings() {
           <button
             onClick={saveProfile}
             disabled={savingProfile}
-            className="inline-flex items-center gap-1.5 rounded-md bg-brand text-brand-foreground px-4 py-2 text-sm font-medium hover:bg-brand/90 disabled:opacity-60 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-4 py-2 text-sm font-medium hover:bg-accent disabled:opacity-60 transition-colors"
           >
             {savingProfile && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             Save profile
@@ -393,7 +393,7 @@ function ProfileSettings() {
           <button
             onClick={saveCompany}
             disabled={savingCompany}
-            className="inline-flex items-center gap-1.5 rounded-md bg-brand text-brand-foreground px-4 py-2 text-sm font-medium hover:bg-brand/90 disabled:opacity-60 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-4 py-2 text-sm font-medium hover:bg-accent disabled:opacity-60 transition-colors"
           >
             {savingCompany && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             {isInvestor ? "Save fund details" : "Save company info"}
@@ -437,7 +437,7 @@ function ProfileSettings() {
               }}
               className={cn(
                 "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 focus:ring-offset-background disabled:opacity-60",
-                discoverable ? "bg-brand" : "bg-muted"
+                discoverable ? "hs-gradient" : "bg-muted"
               )}
             >
               <span className={cn(

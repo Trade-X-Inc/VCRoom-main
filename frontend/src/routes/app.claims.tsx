@@ -127,7 +127,7 @@ function ClaimsPage() {
               ✓ Requirement met
             </span>
           ) : (
-            <span className="text-xs px-2.5 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" }}>
+            <span className="text-xs px-2.5 py-1 rounded-full" style={{ background: "var(--accent)", color: "var(--muted-foreground)" }}>
               {Math.max(0, 3 - verifiedClaims.length)} more needed
             </span>
           )}
@@ -159,8 +159,8 @@ function ClaimsPage() {
             <button
               onClick={handleAdd}
               disabled={adding || newText.trim().length < 8 || !startup?.id}
-              className="inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
-              style={{ background: "#7C3AED" }}
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-40"
+              style={{ background: "var(--gradient-brand)" }}
             >
               {adding ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
               Add
@@ -216,8 +216,8 @@ function ClaimsPage() {
                     <div className="flex items-center gap-2 shrink-0">
                       <button
                         onClick={() => setVerifying(claim)}
-                        className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white"
-                        style={{ background: "#7C3AED" }}
+                        className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-foreground"
+                        style={{ background: "var(--gradient-brand)" }}
                       >
                         <Paperclip className="h-3 w-3" />
                         {claim.ai_verdict ? "Re-verify" : "Verify this claim"}
@@ -398,8 +398,8 @@ function VerifyClaimModal({
               <button
                 onClick={handleVerify}
                 disabled={!file || running}
-                className="rounded-lg px-4 py-2 text-xs font-semibold text-white disabled:opacity-40"
-                style={{ background: "#7C3AED" }}
+                className="rounded-lg px-4 py-2 text-xs font-semibold text-foreground disabled:opacity-40"
+                style={{ background: "var(--gradient-brand)" }}
               >
                 {running
                   ? <span className="flex items-center gap-1.5"><Loader2 className="h-3 w-3 animate-spin" /> {stillWorking ? "Still working…" : "Checking document…"}</span>
@@ -416,7 +416,7 @@ function VerifyClaimModal({
               {result.reasoning && <p className="text-xs text-muted-foreground leading-relaxed">{result.reasoning}</p>}
             </div>
             <div className="flex justify-end">
-              <button onClick={onClose} className="rounded-lg px-4 py-2 text-xs font-semibold text-white" style={{ background: "#7C3AED" }}>
+              <button onClick={onClose} className="rounded-lg px-4 py-2 text-xs font-semibold text-foreground" style={{ background: "var(--gradient-brand)" }}>
                 Done
               </button>
             </div>

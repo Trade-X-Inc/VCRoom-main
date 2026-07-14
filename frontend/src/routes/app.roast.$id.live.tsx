@@ -423,7 +423,7 @@ function RoastLiveControl() {
             <button
               onClick={() => act("start")}
               disabled={!!acting}
-              className="rounded-lg px-6 py-3 text-sm font-bold text-white disabled:opacity-50"
+              className="rounded-lg px-6 py-3 text-sm font-bold text-foreground disabled:opacity-50"
               style={{ background: "#EF4444" }}
               data-testid="start-roast"
             >
@@ -462,7 +462,7 @@ function RoastLiveControl() {
         {session.status === "written_phase" && (
           <a
             href={`/app/roast/${session.id}/answers`}
-            className="rounded-lg px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+            className="rounded-lg px-5 py-2.5 text-sm font-semibold text-foreground hover:opacity-90"
             style={{ background: "#F59E0B" }}
           >
             Go to the answers queue ({openCount} question
@@ -516,7 +516,7 @@ function RoastLiveControl() {
                   </div>
                   <button
                     onClick={() => markAnswered(q.id)}
-                    className="shrink-0 rounded-lg px-3 py-2 text-xs font-semibold text-white hover:opacity-90"
+                    className="shrink-0 rounded-lg px-3 py-2 text-xs font-semibold text-foreground hover:opacity-90"
                     style={{ background: "#10B981" }}
                   >
                     Mark answered

@@ -119,20 +119,20 @@ const TEXTAREA_FIELDS = new Set(["problem", "solution", "business_model", "tract
 // ── Styles ─────────────────────────────────────────────────────────────────────
 
 const card: React.CSSProperties = {
-  background: "#111114",
-  border: "1px solid rgba(255,255,255,0.07)",
+  background: "var(--card)",
+  border: "1px solid var(--border)",
   borderRadius: 16,
   padding: 28,
 };
 
 const inputBase: React.CSSProperties = {
   width: "100%",
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.1)",
+  background: "var(--accent)",
+  border: "1px solid var(--border)",
   borderRadius: 8,
   padding: "10px 12px",
   fontSize: 13,
-  color: "#fff",
+  color: "var(--foreground)",
   outline: "none",
   boxSizing: "border-box",
 };
@@ -146,7 +146,7 @@ const missingBorder: React.CSSProperties = {
 const labelStyle: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 600,
-  color: "rgba(255,255,255,0.4)",
+  color: "var(--muted-foreground)",
   textTransform: "uppercase",
   letterSpacing: "0.06em",
   display: "block",
@@ -743,29 +743,29 @@ function ProfileBuilder() {
 
   // done — profile saved, point at the next step instead of the dashboard
   if (screen === "done") return (
-    <div style={{ minHeight: "100vh", background: "#0A0A0B", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 16px" }}>
+    <div style={{ minHeight: "100vh", background: "var(--background)", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 16px" }}>
       <div style={{ maxWidth: 520, width: "100%", textAlign: "center" }}>
         <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(16,185,129,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
           <Check size={26} style={{ color: "#10B981" }} />
         </div>
-        <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: 26, color: "#fff", letterSpacing: "-0.03em", marginBottom: 10 }}>
+        <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: 26, color: "var(--foreground)", letterSpacing: "-0.03em", marginBottom: 10 }}>
           Profile built.
         </h2>
-        <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.6, marginBottom: 28 }}>
+        <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 15, color: "var(--muted-foreground)", lineHeight: 1.6, marginBottom: 28 }}>
           Now verify your identity to unlock your deal room and appear in the directory.
           Four automatic checks, about two minutes.
         </p>
         <button
           onClick={() => navigate({ to: "/app/advisor" as any })}
           data-testid="pb-done-verify-cta"
-          style={{ background: "#7C3AED", color: "#fff", border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "Syne, sans-serif" }}
+          style={{ background: "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "Syne, sans-serif" }}
         >
           Run verification →
         </button>
         <div style={{ marginTop: 16 }}>
           <button
             onClick={() => navigate({ to: "/app" as any })}
-            style={{ background: "transparent", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 13, cursor: "pointer" }}
+            style={{ background: "transparent", border: "none", color: "var(--faint)", fontSize: 13, cursor: "pointer" }}
           >
             Skip for now — go to dashboard
           </button>
@@ -803,7 +803,7 @@ function SelectScreen({
   onDismissIntro?: () => void;
 }) {
   return (
-    <div style={{ minHeight: "100vh", background: "#0A0A0B", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 16px" }}>
+    <div style={{ minHeight: "100vh", background: "var(--background)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 16px" }}>
       {showIntro && onDismissIntro && (
         <OnboardingTour
           steps={[{
@@ -821,10 +821,10 @@ function SelectScreen({
         <div style={{ marginBottom: 8, fontSize: 11, fontWeight: 600, color: "rgba(124,58,237,0.8)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
           Profile Builder
         </div>
-        <h1 style={{ fontSize: 32, fontWeight: 700, color: "#fff", letterSpacing: "-0.03em", marginBottom: 8 }}>
+        <h1 style={{ fontSize: 32, fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.03em", marginBottom: 8 }}>
           Let's build your profile
         </h1>
-        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.45)", marginBottom: 40, lineHeight: 1.6 }}>
+        <p style={{ fontSize: 15, color: "var(--muted-foreground)", marginBottom: 40, lineHeight: 1.6 }}>
           Two ways to do this. Pick whichever is faster for you.
         </p>
 
@@ -858,17 +858,17 @@ function SelectScreen({
               border: "none",
               cursor: "pointer",
               fontSize: 13,
-              color: "rgba(255,255,255,0.35)",
+              color: "var(--faint)",
               padding: "8px 16px",
               borderRadius: 8,
               transition: "color 0.15s",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.35)")}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--muted-foreground)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--faint)")}
           >
             Skip for now — explore first
           </button>
-          <p style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", marginTop: 4 }}>
+          <p style={{ fontSize: 11, color: "var(--faint)", marginTop: 4 }}>
             You can always come back to this from your dashboard.
           </p>
         </div>
@@ -888,8 +888,8 @@ function PathCard({ icon, title, description, time, cta, onClick }: {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
-        background: "#111114",
-        border: `1px solid ${hover ? "rgba(124,58,237,0.4)" : "rgba(255,255,255,0.07)"}`,
+        background: "var(--card)",
+        border: `1px solid ${hover ? "rgba(124,58,237,0.4)" : "var(--border)"}`,
         borderRadius: 16,
         padding: 28,
         cursor: "pointer",
@@ -904,11 +904,11 @@ function PathCard({ icon, title, description, time, cta, onClick }: {
         {icon}
       </div>
       <div>
-        <div style={{ fontSize: 16, fontWeight: 600, color: "#fff", marginBottom: 8 }}>{title}</div>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: 1.6, margin: 0 }}>{description}</p>
+        <div style={{ fontSize: 16, fontWeight: 600, color: "var(--foreground)", marginBottom: 8 }}>{title}</div>
+        <p style={{ fontSize: 13, color: "var(--muted-foreground)", lineHeight: 1.6, margin: 0 }}>{description}</p>
       </div>
       <div style={{ marginTop: "auto" }}>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", marginBottom: 12 }}>{time}</div>
+        <div style={{ fontSize: 11, color: "var(--faint)", marginBottom: 12 }}>{time}</div>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: "#a78bfa" }}>
           {cta} <ChevronRight size={14} />
         </div>
@@ -935,15 +935,15 @@ function UploadScreen({
   onSubmit: () => void;
 }) {
   return (
-    <div style={{ minHeight: "100vh", background: "#0A0A0B", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 16px" }}>
+    <div style={{ minHeight: "100vh", background: "var(--background)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 16px" }}>
       <div style={{ maxWidth: 560, width: "100%" }}>
         <div style={{ marginBottom: 4, fontSize: 11, fontWeight: 600, color: "rgba(124,58,237,0.8)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
           Step 1 of 2
         </div>
-        <h2 style={{ fontSize: 26, fontWeight: 700, color: "#fff", letterSpacing: "-0.03em", marginBottom: 6 }}>
+        <h2 style={{ fontSize: 26, fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.03em", marginBottom: 6 }}>
           Upload your documents
         </h2>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 28 }}>
+        <p style={{ fontSize: 13, color: "var(--muted-foreground)", marginBottom: 28 }}>
           PDF, PPTX, DOCX, or XLSX. Add as many as you like — we'll extract from all of them.
         </p>
 
@@ -955,7 +955,7 @@ function UploadScreen({
           onDragLeave={onDragLeave}
           onClick={() => fileInputRef.current?.click()}
           style={{
-            border: `2px dashed ${dragOver ? "rgba(124,58,237,0.6)" : "rgba(255,255,255,0.1)"}`,
+            border: `2px dashed ${dragOver ? "rgba(124,58,237,0.6)" : "var(--border)"}`,
             borderRadius: 12,
             padding: "40px 24px",
             textAlign: "center",
@@ -965,11 +965,11 @@ function UploadScreen({
             marginBottom: 16,
           }}
         >
-          <Upload size={28} style={{ color: "rgba(255,255,255,0.2)", margin: "0 auto 12px" }} />
-          <div style={{ fontSize: 14, fontWeight: 500, color: "rgba(255,255,255,0.6)", marginBottom: 4 }}>
+          <Upload size={28} style={{ color: "var(--faint)", margin: "0 auto 12px" }} />
+          <div style={{ fontSize: 14, fontWeight: 500, color: "var(--muted-foreground)", marginBottom: 4 }}>
             Drop files here or click to browse
           </div>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)" }}>
+          <div style={{ fontSize: 12, color: "var(--faint)" }}>
             Pitch deck · Financials · Any document you have
           </div>
         </div>
@@ -986,11 +986,11 @@ function UploadScreen({
         {files.length > 0 && (
           <div style={{ marginBottom: 24, display: "flex", flexDirection: "column", gap: 8 }}>
             {files.map((f) => (
-              <div key={f.name} style={{ display: "flex", alignItems: "center", gap: 10, background: "#111114", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8, padding: "10px 14px" }}>
+              <div key={f.name} style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 14px" }}>
                 <FileText size={14} style={{ color: "#a78bfa", flexShrink: 0 }} />
-                <span style={{ flex: 1, fontSize: 13, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</span>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", flexShrink: 0 }}>{(f.size / 1024).toFixed(0)} KB</span>
-                <button onClick={(e) => { e.stopPropagation(); onRemove(f.name); }} style={{ background: "transparent", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.3)", padding: 2, display: "flex" }}>
+                <span style={{ flex: 1, fontSize: 13, color: "var(--foreground)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</span>
+                <span style={{ fontSize: 11, color: "var(--faint)", flexShrink: 0 }}>{(f.size / 1024).toFixed(0)} KB</span>
+                <button onClick={(e) => { e.stopPropagation(); onRemove(f.name); }} style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--faint)", padding: 2, display: "flex" }}>
                   <X size={14} />
                 </button>
               </div>
@@ -1002,8 +1002,8 @@ function UploadScreen({
           onClick={onSubmit}
           disabled={!files.length || uploading}
           style={{
-            width: "100%", background: files.length && !uploading ? "#7C3AED" : "rgba(255,255,255,0.06)",
-            color: files.length && !uploading ? "#fff" : "rgba(255,255,255,0.3)",
+            width: "100%", background: files.length && !uploading ? "var(--gradient-brand)" : "var(--accent)",
+            color: files.length && !uploading ? "#fff" : "var(--faint)",
             border: "none", borderRadius: 10, padding: "13px 24px",
             fontSize: 14, fontWeight: 600, cursor: files.length && !uploading ? "pointer" : "not-allowed",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
@@ -1029,15 +1029,15 @@ function InterviewScreen({
   onFinish: () => void;
 }) {
   return (
-    <div style={{ height: "100vh", background: "#0A0A0B", display: "flex", flexDirection: "column" }}>
+    <div style={{ height: "100vh", background: "var(--background)", display: "flex", flexDirection: "column" }}>
       {/* Header */}
-      <div style={{ borderBottom: "1px solid rgba(255,255,255,0.07)", padding: "16px 24px", display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+      <div style={{ borderBottom: "1px solid var(--border)", padding: "16px 24px", display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
         <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(124,58,237,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Sparkles size={16} style={{ color: "#a78bfa" }} />
         </div>
         <div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>Profile Interview</div>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>Answer freely — we'll structure it for you</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "var(--foreground)" }}>Profile Interview</div>
+          <div style={{ fontSize: 11, color: "var(--faint)" }}>Answer freely — we'll structure it for you</div>
         </div>
       </div>
 
@@ -1048,16 +1048,16 @@ function InterviewScreen({
             <div key={m.id} style={{ display: "flex", gap: 12, flexDirection: m.role === "founder" ? "row-reverse" : "row" }}>
               <div style={{
                 width: 32, height: 32, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
-                background: m.role === "founder" ? "linear-gradient(135deg, #7C3AED, #a78bfa)" : "rgba(255,255,255,0.06)",
-                border: m.role === "ai" ? "1px solid rgba(255,255,255,0.1)" : "none",
+                background: m.role === "founder" ? "var(--gradient-brand)" : "var(--accent)",
+                border: m.role === "ai" ? "1px solid var(--border)" : "none",
               }}>
-                {m.role === "founder" ? <User size={14} style={{ color: "#fff" }} /> : <Sparkles size={14} style={{ color: "#a78bfa" }} />}
+                {m.role === "founder" ? <User size={14} style={{ color: "var(--foreground)" }} /> : <Sparkles size={14} style={{ color: "#a78bfa" }} />}
               </div>
               <div style={{
                 maxWidth: "78%", padding: "12px 16px", borderRadius: 16, fontSize: 14, lineHeight: 1.6,
-                background: m.role === "founder" ? "linear-gradient(135deg, #7C3AED, #6D28D9)" : "#111114",
-                border: m.role === "ai" ? "1px solid rgba(255,255,255,0.07)" : "none",
-                color: "#fff",
+                background: m.role === "founder" ? "var(--gradient-brand)" : "var(--card)",
+                border: m.role === "ai" ? "1px solid var(--border)" : "none",
+                color: "var(--foreground)",
               }}>
                 {m.content}
               </div>
@@ -1066,10 +1066,10 @@ function InterviewScreen({
 
           {thinking && (
             <div style={{ display: "flex", gap: 12 }}>
-              <div style={{ width: 32, height: 32, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
+              <div style={{ width: 32, height: 32, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--accent)", border: "1px solid var(--border)" }}>
                 <Sparkles size={14} style={{ color: "#a78bfa" }} />
               </div>
-              <div style={{ padding: "12px 16px", borderRadius: 16, background: "#111114", border: "1px solid rgba(255,255,255,0.07)", display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
+              <div style={{ padding: "12px 16px", borderRadius: 16, background: "var(--card)", border: "1px solid var(--border)", display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--muted-foreground)" }}>
                 <Loader2 size={13} className="animate-spin" /> Thinking…
               </div>
             </div>
@@ -1079,31 +1079,31 @@ function InterviewScreen({
       </div>
 
       {/* Input or Finish */}
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", padding: "16px 24px", flexShrink: 0 }}>
+      <div style={{ borderTop: "1px solid var(--border)", padding: "16px 24px", flexShrink: 0 }}>
         <div style={{ maxWidth: 680, margin: "0 auto" }}>
           {done ? (
             <button
               onClick={onFinish}
-              style={{ width: "100%", background: "#7C3AED", color: "#fff", border: "none", borderRadius: 10, padding: "13px 24px", fontSize: 14, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+              style={{ width: "100%", background: "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 10, padding: "13px 24px", fontSize: 14, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
             >
               <Sparkles size={15} /> Build my profile from this conversation →
             </button>
           ) : (
-            <div style={{ display: "flex", gap: 10, alignItems: "flex-end", background: "#111114", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: 10 }}>
+            <div style={{ display: "flex", gap: 10, alignItems: "flex-end", background: "var(--card)", border: "1px solid var(--border)", borderRadius: 12, padding: 10 }}>
               <textarea
                 value={input}
                 onChange={(e) => onInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); onSend(); } }}
                 rows={1}
                 placeholder="Type your answer…"
-                style={{ flex: 1, background: "transparent", border: "none", outline: "none", resize: "none", fontSize: 14, color: "#fff", padding: "4px 6px", maxHeight: 120 }}
+                style={{ flex: 1, background: "transparent", border: "none", outline: "none", resize: "none", fontSize: 14, color: "var(--foreground)", padding: "4px 6px", maxHeight: 120 }}
               />
               <button
                 onClick={onSend}
                 disabled={!input.trim() || thinking}
-                style={{ width: 34, height: 34, borderRadius: 8, background: input.trim() && !thinking ? "#7C3AED" : "rgba(255,255,255,0.06)", border: "none", cursor: input.trim() && !thinking ? "pointer" : "not-allowed", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
+                style={{ width: 34, height: 34, borderRadius: 8, background: input.trim() && !thinking ? "var(--gradient-brand)" : "var(--accent)", border: "none", cursor: input.trim() && !thinking ? "pointer" : "not-allowed", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
               >
-                <Send size={14} style={{ color: input.trim() && !thinking ? "#fff" : "rgba(255,255,255,0.3)" }} />
+                <Send size={14} style={{ color: input.trim() && !thinking ? "#fff" : "var(--faint)" }} />
               </button>
             </div>
           )}
@@ -1117,16 +1117,16 @@ function InterviewScreen({
 
 function ExtractingScreen() {
   return (
-    <div style={{ minHeight: "100vh", background: "#0A0A0B", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 20 }}>
+    <div style={{ minHeight: "100vh", background: "var(--background)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 20 }}>
       <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(124,58,237,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <Sparkles size={22} style={{ color: "#a78bfa" }} className="animate-pulse" />
       </div>
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 18, fontWeight: 600, color: "#fff", marginBottom: 6 }}>Reading your documents…</div>
-        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>This usually takes 10–20 seconds</div>
+        <div style={{ fontSize: 18, fontWeight: 600, color: "var(--foreground)", marginBottom: 6 }}>Reading your documents…</div>
+        <div style={{ fontSize: 13, color: "var(--muted-foreground)" }}>This usually takes 10–20 seconds</div>
       </div>
-      <div style={{ width: 200, height: 3, background: "rgba(255,255,255,0.06)", borderRadius: 99, overflow: "hidden" }}>
-        <div style={{ height: "100%", background: "linear-gradient(90deg, #7C3AED, #a78bfa)", borderRadius: 99, animation: "extractProgress 2s ease-in-out infinite" }} />
+      <div style={{ width: 200, height: 3, background: "var(--accent)", borderRadius: 99, overflow: "hidden" }}>
+        <div style={{ height: "100%", background: "var(--gradient-brand)", borderRadius: 99, animation: "extractProgress 2s ease-in-out infinite" }} />
       </div>
       <style>{`@keyframes extractProgress { 0%{width:0%} 50%{width:80%} 100%{width:100%} }`}</style>
     </div>
@@ -1204,7 +1204,7 @@ function FieldRow({ fieldKey, optional, form, isMissing, onField }: {
           </div>
         )}
         {!missing && !optional && (
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", marginBottom: 4 }}>
+          <div style={{ fontSize: 11, color: "var(--faint)", marginBottom: 4 }}>
             AI-extracted — review and edit
           </div>
         )}
@@ -1247,9 +1247,9 @@ function FieldRow({ fieldKey, optional, form, isMissing, onField }: {
 
 function SectionHeader({ title, hint }: { title: string; hint: string }) {
   return (
-    <div style={{ margin: "26px 0 14px", paddingTop: 20, borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-      <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{title}</div>
-      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>{hint}</div>
+    <div style={{ margin: "26px 0 14px", paddingTop: 20, borderTop: "1px solid var(--border)" }}>
+      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--foreground)" }}>{title}</div>
+      <div style={{ fontSize: 12, color: "var(--faint)", marginTop: 2 }}>{hint}</div>
     </div>
   );
 }
@@ -1277,12 +1277,12 @@ function ConfirmScreen({
   ];
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0A0A0B", padding: "40px 16px" }}>
+    <div style={{ minHeight: "100vh", background: "var(--background)", padding: "40px 16px" }}>
       <div style={{ maxWidth: 700, margin: "0 auto" }}>
         <div style={{ marginBottom: 6, fontSize: 11, fontWeight: 600, color: "rgba(124,58,237,0.8)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
           Step 2 of 2
         </div>
-        <h2 style={{ fontSize: 26, fontWeight: 700, color: "#fff", letterSpacing: "-0.03em", marginBottom: 8 }}>
+        <h2 style={{ fontSize: 26, fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.03em", marginBottom: 8 }}>
           Here's what we found. Confirm or fix anything that's off.
         </h2>
         {missingFields.length > 0 && (
@@ -1301,8 +1301,8 @@ function ConfirmScreen({
         {/* Per-document detection results */}
         {docResults && docResults.length > 0 && (
           <div style={{ ...card, marginBottom: 24 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 2 }}>Documents we read</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginBottom: 14 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--foreground)", marginBottom: 2 }}>Documents we read</div>
+            <div style={{ fontSize: 12, color: "var(--faint)", marginBottom: 14 }}>
               What each file was detected as, and what we pulled from it.
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -1311,10 +1311,10 @@ function ConfirmScreen({
                 const lowConf = result.confidence !== "high";
                 const summary = extractionSummary(result);
                 return (
-                  <div key={fileName} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8, padding: "10px 14px" }}>
+                  <div key={fileName} style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 14px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                      <FileText size={13} style={{ color: "rgba(255,255,255,0.35)", flexShrink: 0 }} />
-                      <span style={{ fontSize: 13, color: "#fff", fontWeight: 500, wordBreak: "break-all" }}>{fileName}</span>
+                      <FileText size={13} style={{ color: "var(--faint)", flexShrink: 0 }} />
+                      <span style={{ fontSize: 13, color: "var(--foreground)", fontWeight: 500, wordBreak: "break-all" }}>{fileName}</span>
                       <span style={{
                         fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 999,
                         background: unknown ? "rgba(245,158,11,0.12)" : "rgba(16,185,129,0.12)",
@@ -1325,8 +1325,8 @@ function ConfirmScreen({
                       {!unknown && (
                         <span style={{
                           fontSize: 11, padding: "2px 8px", borderRadius: 999,
-                          background: lowConf ? "rgba(245,158,11,0.12)" : "rgba(255,255,255,0.06)",
-                          color: lowConf ? "#F59E0B" : "rgba(255,255,255,0.4)",
+                          background: lowConf ? "rgba(245,158,11,0.12)" : "var(--accent)",
+                          color: lowConf ? "#F59E0B" : "var(--muted-foreground)",
                         }}>
                           {lowConf ? "Low confidence — double-check below" : "High confidence"}
                         </span>
@@ -1337,11 +1337,11 @@ function ConfirmScreen({
                         Could not detect document type — please review manually.{result.detail ? ` ${result.detail}` : ""}
                       </div>
                     ) : summary.length > 0 ? (
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 6, display: "flex", flexWrap: "wrap", gap: "4px 14px" }}>
+                      <div style={{ fontSize: 12, color: "var(--muted-foreground)", marginTop: 6, display: "flex", flexWrap: "wrap", gap: "4px 14px" }}>
                         {summary.map((s) => <span key={s}>{s}</span>)}
                       </div>
                     ) : (
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", marginTop: 6 }}>
+                      <div style={{ fontSize: 12, color: "var(--faint)", marginTop: 6 }}>
                         Detected, but no structured fields could be extracted.
                       </div>
                     )}
@@ -1359,7 +1359,7 @@ function ConfirmScreen({
           <div style={{ marginBottom: 16 }}>
             <label style={labelStyle}>Team</label>
             {!isMissing("team") && (
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", marginBottom: 4 }}>AI-extracted — review and edit</div>
+              <div style={{ fontSize: 11, color: "var(--faint)", marginBottom: 4 }}>AI-extracted — review and edit</div>
             )}
             {isMissing("team") && (
               <div style={{ fontSize: 11, color: "#F59E0B", marginBottom: 4, display: "flex", alignItems: "center", gap: 4 }}>
@@ -1391,7 +1391,7 @@ function ConfirmScreen({
                   />
                   <button
                     onClick={() => onField("team")(form.team.filter((_, j) => j !== i))}
-                    style={{ background: "transparent", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.3)", padding: "0 4px", display: "flex", alignItems: "center" }}
+                    style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--faint)", padding: "0 4px", display: "flex", alignItems: "center" }}
                   >
                     <X size={14} />
                   </button>
@@ -1399,7 +1399,7 @@ function ConfirmScreen({
               ))}
               <button
                 onClick={() => onField("team")([...form.team, { name: "", role: "" }])}
-                style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "transparent", border: "1px dashed rgba(255,255,255,0.1)", borderRadius: 8, padding: "8px 14px", fontSize: 12, color: "rgba(255,255,255,0.4)", cursor: "pointer", width: "fit-content" }}
+                style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "transparent", border: "1px dashed var(--border)", borderRadius: 8, padding: "8px 14px", fontSize: 12, color: "var(--muted-foreground)", cursor: "pointer", width: "fit-content" }}
               >
                 <Plus size={12} /> Add team member
               </button>
@@ -1469,8 +1469,8 @@ function ConfirmScreen({
           onClick={onSave}
           disabled={saving}
           style={{
-            marginTop: 24, width: "100%", background: saving ? "rgba(255,255,255,0.06)" : "#7C3AED",
-            color: saving ? "rgba(255,255,255,0.3)" : "#fff",
+            marginTop: 24, width: "100%", background: saving ? "var(--accent)" : "var(--gradient-brand)",
+            color: saving ? "var(--faint)" : "#fff",
             border: "none", borderRadius: 10, padding: "14px 24px",
             fontSize: 15, fontWeight: 600, cursor: saving ? "not-allowed" : "pointer",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 8,

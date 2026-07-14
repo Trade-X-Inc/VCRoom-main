@@ -62,8 +62,8 @@ function BillingSettings() {
                 <Link
                   key={p.name}
                   to={"/pricing" as any}
-                  className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
-                  style={{ background: "#7C3AED" }}
+                  className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold text-foreground hover:opacity-90"
+                  style={{ background: "var(--gradient-brand)" }}
                 >
                   {p.name} ${p.price}/mo
                 </Link>
@@ -115,8 +115,8 @@ function BillingSettings() {
             </p>
             <Link
               to={"/pricing" as any}
-              className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
-              style={{ background: "#7C3AED" }}
+              className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold text-foreground hover:opacity-90"
+              style={{ background: "var(--gradient-brand)" }}
             >
               Update payment →
             </Link>
@@ -132,8 +132,8 @@ function BillingSettings() {
             </div>
             <Link
               to={"/pricing" as any}
-              className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
-              style={{ background: "#7C3AED" }}
+              className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold text-foreground hover:opacity-90"
+              style={{ background: "var(--gradient-brand)" }}
             >
               Reactivate →
             </Link>

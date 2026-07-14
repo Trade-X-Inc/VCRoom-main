@@ -16,7 +16,7 @@ export const Route = createFileRoute("/app/users")({
 type FounderRole = "admin" | "manager" | "analyst" | "viewer";
 
 const ROLE_COLORS: Record<string, { bg: string; text: string }> = {
-  admin:   { bg: "rgba(124,58,237,0.15)",  text: "#7C3AED" },
+  admin:   { bg: "rgba(124,58,237,0.15)",  text: "var(--brand)" },
   manager: { bg: "rgba(16,185,129,0.15)",  text: "#10B981" },
   analyst: { bg: "rgba(245,158,11,0.15)",  text: "#F59E0B" },
   viewer:  { bg: "rgba(107,114,128,0.12)", text: "#6B7280" },
@@ -241,7 +241,7 @@ function UsersPage() {
           onClick={() => { if (!isFreePlan && !atLimit) setShowInvite(true); }}
           disabled={isFreePlan || atLimit}
           className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          style={{ background: isFreePlan || atLimit ? "rgba(255,255,255,0.06)" : "#7C3AED", color: isFreePlan || atLimit ? "rgba(255,255,255,0.4)" : "#fff" }}
+          style={{ background: isFreePlan || atLimit ? "var(--accent)" : "var(--gradient-brand)", color: isFreePlan || atLimit ? "var(--muted-foreground)" : "#fff" }}
         >
           <UserPlus className="h-4 w-4" /> Invite member
         </button>
@@ -249,7 +249,7 @@ function UsersPage() {
 
       {/* Free plan paywall */}
       {isFreePlan && (
-        <div className="rounded-xl border border-brand/30 bg-brand/5 p-6 text-center mb-6">
+        <div className="rounded-xl border border-brand/30 bg-accent p-6 text-center mb-6">
           <p className="text-sm font-semibold mb-2">Team collaboration is a paid feature</p>
           <p className="text-xs text-muted-foreground mb-5 max-w-sm mx-auto leading-relaxed">
             Upgrade to Starter to invite 1 team member, or Pro to invite up to 4.
@@ -257,7 +257,7 @@ function UsersPage() {
           </p>
           <a
             href="/pricing"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-brand text-brand-foreground px-4 py-2 text-sm font-semibold hover:bg-brand/90 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-lg hs-gradient text-brand-foreground px-4 py-2 text-sm font-semibold hover:bg-accent transition-colors"
           >
             View plans →
           </a>
@@ -436,7 +436,7 @@ function UsersPage() {
               </button>
               <button
                 onClick={confirmAppoint}
-                className="flex-1 rounded-lg bg-brand text-brand-foreground py-2.5 text-sm font-semibold hover:bg-brand/90 transition-colors"
+                className="flex-1 rounded-lg hs-gradient text-brand-foreground py-2.5 text-sm font-semibold hover:bg-accent transition-colors"
               >
                 Appoint as Admin
               </button>
@@ -461,7 +461,7 @@ function MemberRow({
 
   return (
     <div className="flex items-center gap-3 px-5 py-3.5 border-b border-border/40 last:border-0">
-      <div className="h-9 w-9 rounded-full shrink-0 bg-brand flex items-center justify-center text-xs font-bold text-white overflow-hidden">
+      <div className="h-9 w-9 rounded-full shrink-0 hs-gradient flex items-center justify-center text-xs font-bold text-white overflow-hidden">
         {avatarUrl
           ? <img src={avatarUrl} className="w-full h-full object-cover" alt="" />
           : initials(name)}
@@ -488,7 +488,7 @@ function MemberRow({
                 key={r.value}
                 onClick={() => { onChangeRole(r.value); setRoleOpen(false); }}
                 className="block w-full text-left px-3.5 py-2.5 text-xs font-medium hover:bg-accent transition-colors"
-                style={{ color: r.value === role ? "#7C3AED" : "rgba(255,255,255,0.7)", background: r.value === role ? "rgba(124,58,237,0.08)" : "transparent" }}
+                style={{ color: r.value === role ? "var(--brand)" : "var(--muted-foreground)", background: r.value === role ? "rgba(124,58,237,0.08)" : "transparent" }}
               >
                 {r.label}
               </button>
@@ -652,7 +652,7 @@ function InviteModal({
           </button>
           <button
             onClick={handleSend} disabled={sending || !email.trim()}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-brand text-brand-foreground px-4 py-2 text-sm font-medium hover:bg-brand/90 disabled:opacity-50 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-lg hs-gradient text-brand-foreground px-4 py-2 text-sm font-medium hover:bg-accent disabled:opacity-50 transition-colors"
           >
             {sending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             Send invite

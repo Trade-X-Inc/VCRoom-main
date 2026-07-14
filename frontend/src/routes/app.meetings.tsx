@@ -380,7 +380,7 @@ function MeetingRow({
               ? "bg-gradient-brand text-brand-foreground"
               : variant === "past"
               ? "bg-muted/60 text-muted-foreground"
-              : "bg-brand/10 text-brand",
+              : "bg-accent text-brand",
           )}
         >
           <div className="text-[10px] font-semibold uppercase">{format(d, "MMM")}</div>
@@ -436,7 +436,7 @@ function MeetingRow({
             href={m.meeting_link}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-xs hover:bg-brand/10"
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-accent text-brand px-3 py-1.5 text-xs hover:bg-accent"
           >
             <ExternalLink className="h-3 w-3" /> Join
           </a>
