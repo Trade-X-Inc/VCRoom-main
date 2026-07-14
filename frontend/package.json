@@ -16,6 +16,8 @@
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",
     "@daily-co/daily-js": "^0.91.0",
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/syne": "^5.2.7",
     "@hookform/resolvers": "^5.2.2",
     "@marsidev/react-turnstile": "^1.5.3",
     "@notionhq/client": "^5.22.0",
