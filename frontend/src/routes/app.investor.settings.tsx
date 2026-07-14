@@ -36,7 +36,7 @@ function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
         width: "36px",
         height: "20px",
         borderRadius: "10px",
-        background: on ? "#7C3AED" : "rgba(255,255,255,0.1)",
+        background: on ? "var(--gradient-brand)" : "var(--accent)",
         border: "none",
         cursor: "pointer",
         position: "relative",
@@ -79,14 +79,14 @@ function PrefRow({
         justifyContent: "space-between",
         gap: "16px",
         padding: "16px 0",
-        borderBottom: "1px solid rgba(255,255,255,0.06)",
+        borderBottom: "1px solid var(--border)",
       }}
     >
       <div style={{ minWidth: 0, flex: 1 }}>
         <div style={{ fontSize: "14px", fontWeight: 500, color: "#ffffff", marginBottom: "2px" }}>
           {label}
         </div>
-        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", lineHeight: 1.5 }}>
+        <div style={{ fontSize: "12px", color: "var(--muted-foreground)", lineHeight: 1.5 }}>
           {description}
         </div>
       </div>

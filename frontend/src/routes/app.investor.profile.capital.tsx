@@ -77,9 +77,9 @@ function ProgressStepper({ verifData }: { verifData: CapitalVerificationData | n
         const state = getSlotState(verifData, slot.key);
         const status = slotStatus(state);
 
-        let dotColor = "rgba(255,255,255,0.15)";
-        let dotBorder = "rgba(255,255,255,0.12)";
-        let labelColor = "rgba(255,255,255,0.3)";
+        let dotColor = "var(--faint)";
+        let dotBorder = "var(--border)";
+        let labelColor = "var(--faint)";
         let DotIcon: React.ElementType = Circle;
 
         if (status === "verified") {
@@ -116,7 +116,7 @@ function ProgressStepper({ verifData }: { verifData: CapitalVerificationData | n
             {/* Label */}
             <div style={{ textAlign: "center" }}>
               <div style={{ fontSize: 11, fontWeight: 600, color: labelColor }}>{slot.shortLabel}</div>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", marginTop: 1 }}>
+              <div style={{ fontSize: 10, color: "var(--faint)", marginTop: 1 }}>
                 {status === "verified" ? "Verified"
                   : status === "rejected" ? "Not confirmed"
                   : status === "uploaded" ? "Pending"
@@ -214,29 +214,29 @@ function SlotCard({
       <Clock style={{ width: 11, height: 11 }} /> Pending check
     </span>
   ) : (
-    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)" }}>No document uploaded</span>
+    <span style={{ fontSize: 11, color: "var(--faint)" }}>No document uploaded</span>
   );
 
   const borderColor = status === "verified"
     ? "rgba(16,185,129,0.25)"
     : status === "rejected"
     ? "rgba(239,68,68,0.18)"
-    : "rgba(255,255,255,0.08)";
+    : "var(--accent)";
 
   return (
     <div
       data-testid={slot.testId}
-      style={{ background: "#111114", border: `1px solid ${borderColor}`, borderRadius: 12, padding: "18px 20px", display: "flex", flexDirection: "column", gap: 12 }}
+      style={{ background: "var(--card)", border: `1px solid ${borderColor}`, borderRadius: 12, padding: "18px 20px", display: "flex", flexDirection: "column", gap: 12 }}
     >
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <FileText style={{ width: 14, height: 14, color: "rgba(255,255,255,0.3)", flexShrink: 0 }} />
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#fff", fontFamily: "Syne, sans-serif" }}>{slot.title}</span>
+          <FileText style={{ width: 14, height: 14, color: "var(--faint)", flexShrink: 0 }} />
+          <span style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)", fontFamily: "Syne, sans-serif" }}>{slot.title}</span>
         </div>
         {statusBadge}
       </div>
 
-      <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", lineHeight: 1.6, margin: 0 }}>
+      <p style={{ fontSize: 12, color: "var(--muted-foreground)", lineHeight: 1.6, margin: 0 }}>
         {slot.requirement}
       </p>
 
@@ -260,7 +260,7 @@ function SlotCard({
               <span style={{ fontSize: 11, fontWeight: 600, color: "#F59E0B" }}>What's missing</span>
             </div>
           )}
-          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", lineHeight: 1.55, margin: 0 }}>
+          <p style={{ fontSize: 12, color: "var(--muted-foreground)", lineHeight: 1.55, margin: 0 }}>
             {state.aiExtracted.explanation}
           </p>
           {state.aiExtracted.issues && status !== "verified" && (
@@ -277,20 +277,20 @@ function SlotCard({
       {/* Confirm dialog */}
       {pendingConfirm && (
         <div style={{ background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)", borderRadius: 8, padding: "12px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
-          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", margin: 0 }}>
-            Upload <strong style={{ color: "#fff" }}>{pendingConfirm.name}</strong> for AI verification? This will replace any existing document for this slot.
+          <p style={{ fontSize: 12, color: "var(--muted-foreground)", margin: 0 }}>
+            Upload <strong style={{ color: "var(--foreground)" }}>{pendingConfirm.name}</strong> for AI verification? This will replace any existing document for this slot.
           </p>
           <div style={{ display: "flex", gap: 8 }}>
             <button
               data-testid={`${slot.testId}-confirm`}
               onClick={handleConfirm}
-              style={{ fontSize: 12, fontWeight: 600, padding: "6px 16px", borderRadius: 6, border: "none", cursor: "pointer", background: "#7C3AED", color: "#fff" }}
+              style={{ fontSize: 12, fontWeight: 600, padding: "6px 16px", borderRadius: 6, border: "none", cursor: "pointer", background: "var(--gradient-brand)", color: "#fff" }}
             >
               Confirm upload
             </button>
             <button
               onClick={() => setPendingConfirm(null)}
-              style={{ fontSize: 12, fontWeight: 500, padding: "6px 14px", borderRadius: 6, border: "1px solid rgba(255,255,255,0.12)", cursor: "pointer", background: "transparent", color: "rgba(255,255,255,0.5)" }}
+              style={{ fontSize: 12, fontWeight: 500, padding: "6px 14px", borderRadius: 6, border: "1px solid var(--border)", cursor: "pointer", background: "transparent", color: "var(--muted-foreground)" }}
             >
               Cancel
             </button>
@@ -344,7 +344,7 @@ function HumanReviewButton({
         <CheckCircle2 style={{ width: 14, height: 14, color: "#10B981", flexShrink: 0 }} />
         <div>
           <span style={{ fontSize: 12, fontWeight: 600, color: "#10B981" }}>Review requested</span>
-          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", display: "block", marginTop: 1 }}>
+          <span style={{ fontSize: 11, color: "var(--faint)", display: "block", marginTop: 1 }}>
             Submitted {new Date(reviewRequestedAt).toLocaleDateString()} — you will be notified when reviewed.
           </span>
         </div>
@@ -385,12 +385,12 @@ function HumanReviewButton({
         display: "inline-flex", alignItems: "center", gap: 7,
         fontSize: 12, fontWeight: 600, padding: "8px 18px", borderRadius: 8,
         cursor: requesting ? "not-allowed" : "pointer",
-        background: "#7C3AED", color: "#fff", border: "none",
+        background: "var(--gradient-brand)", color: "#fff", border: "none",
         opacity: requesting ? 0.6 : 1,
       }}
     >
       {requesting
-        ? <><span style={{ width: 12, height: 12, border: "1.5px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 0.8s linear infinite" }} />Sending…</>
+        ? <><span style={{ width: 12, height: 12, border: "1.5px solid var(--border)", borderTopColor: "var(--foreground)", borderRadius: "50%", display: "inline-block", animation: "spin 0.8s linear infinite" }} />Sending…</>
         : <><Send style={{ width: 12, height: 12 }} />Request human review</>
       }
     </button>
@@ -442,14 +442,14 @@ export function CapitalVerificationSection({
               : <span style={{ fontSize: 11, fontWeight: 700, color: "#F59E0B" }}>T3</span>}
           </div>
           <div style={{ textAlign: "left" }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#fff", fontFamily: "Syne, sans-serif" }}>Capital Verified — Tier 3</div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)", fontFamily: "Syne, sans-serif" }}>Capital Verified — Tier 3</div>
+            <div style={{ fontSize: 11, color: "var(--faint)", marginTop: 1 }}>
               {isLoading ? "Loading…" : `${verifiedCount} of 3 documents verified`}
             </div>
           </div>
         </div>
-        {open ? <ChevronUp style={{ width: 15, height: 15, color: "rgba(255,255,255,0.3)", flexShrink: 0 }} />
-               : <ChevronDown style={{ width: 15, height: 15, color: "rgba(255,255,255,0.3)", flexShrink: 0 }} />}
+        {open ? <ChevronUp style={{ width: 15, height: 15, color: "var(--faint)", flexShrink: 0 }} />
+               : <ChevronDown style={{ width: 15, height: 15, color: "var(--faint)", flexShrink: 0 }} />}
       </button>
 
       {open && (
@@ -457,7 +457,7 @@ export function CapitalVerificationSection({
           {/* Part 1a: stepper */}
           <ProgressStepper verifData={verifData ?? null} />
 
-          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", lineHeight: 1.6, margin: 0 }}>
+          <p style={{ fontSize: 12, color: "var(--faint)", lineHeight: 1.6, margin: 0 }}>
             Upload three independent documents. Each is AI-checked against your stated fund details.
             One document cannot satisfy multiple slots — each slot requires distinct content.
           </p>
@@ -478,7 +478,7 @@ export function CapitalVerificationSection({
             onRequested={refresh}
           />
 
-          <p style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", margin: 0 }}>
+          <p style={{ fontSize: 11, color: "var(--faint)", margin: 0 }}>
             Accepted: Limited Partnership Agreement, Articles of Association, Board Resolution with capital commitment, Bank statement or custodian letter (dated within 12 months)
           </p>
         </div>

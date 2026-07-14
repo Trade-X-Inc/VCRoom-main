@@ -11,7 +11,7 @@ export const Route = createFileRoute("/app/investor/deal-rooms")({
 });
 
 const STATUS_TO_LABEL: Record<string, { label: string; cls: string }> = {
-  under_review:   { label: "Reviewing",   cls: "bg-brand/10 text-brand" },
+  under_review:   { label: "Reviewing",   cls: "bg-accent text-brand" },
   info_requested: { label: "Diligence",   cls: "bg-warning/10 text-warning" },
   partner_review: { label: "Partner",     cls: "bg-violet/10 text-violet" },
   term_sheet:     { label: "Term Sheet",  cls: "bg-success/10 text-success" },
@@ -21,7 +21,7 @@ const STATUS_TO_LABEL: Record<string, { label: string; cls: string }> = {
 
 const STAGE_TO_LABEL: Record<string, { label: string; cls: string }> = {
   information_vault: { label: "Info Vault",  cls: "bg-muted text-muted-foreground" },
-  qa:                { label: "Q&A",         cls: "bg-brand/10 text-brand" },
+  qa:                { label: "Q&A",         cls: "bg-accent text-brand" },
   due_diligence:     { label: "Diligence",   cls: "bg-warning/10 text-warning" },
   term_sheet:        { label: "Term Sheet",  cls: "bg-success/10 text-success" },
   closing:           { label: "Closing",     cls: "bg-success/10 text-success" },

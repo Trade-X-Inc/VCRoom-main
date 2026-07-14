@@ -45,7 +45,7 @@ function InvestorLayout() {
     return (
       <div style={{
         minHeight: '100vh',
-        background: '#0A0A0B',
+        background: 'var(--background)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -54,15 +54,15 @@ function InvestorLayout() {
         fontFamily: 'DM Sans, sans-serif',
       }}>
         <p style={{ color: '#ffffff', fontSize: 18, fontWeight: 600 }}>Connection issue</p>
-        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>
+        <p style={{ color: 'var(--muted-foreground)', fontSize: 14 }}>
           Could not connect to Hockystick. Please check your connection and try again.
         </p>
         <button
           onClick={() => window.location.reload()}
-          style={{ background: '#7C3AED', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: 8, cursor: 'pointer', fontSize: 14 }}>
+          style={{ background: 'var(--gradient-brand)', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: 8, cursor: 'pointer', fontSize: 14 }}>
           Retry
         </button>
-        <a href="/sign-in" style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, textDecoration: 'none' }}>
+        <a href="/sign-in" style={{ color: 'var(--muted-foreground)', fontSize: 13, textDecoration: 'none' }}>
           Back to sign in
         </a>
       </div>

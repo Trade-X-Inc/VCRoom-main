@@ -41,7 +41,7 @@ function PhaseBadge({ phase }: { phase: ChainPhase }) {
 }
 
 function PriorityDot({ priority }: { priority: string }) {
-  const color = priority === "high" ? "#EF4444" : priority === "normal" ? "#F59E0B" : "rgba(255,255,255,0.2)";
+  const color = priority === "high" ? "#EF4444" : priority === "normal" ? "#F59E0B" : "var(--faint)";
   return <span style={{ width: 7, height: 7, borderRadius: "50%", background: color, flexShrink: 0, display: "inline-block", marginRight: 2 }} />;
 }
 
@@ -60,7 +60,7 @@ function InlineDealBriefCard({ startupId, investorId }: { startupId: string; inv
   }, [investorId, startupId]);
 
   if (loading) return (
-    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "rgba(255,255,255,0.4)", padding: "8px 0" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--muted-foreground)", padding: "8px 0" }}>
       <Loader2 size={12} style={{ animation: "spin 1s linear infinite" }} /> Loading deal brief…
     </div>
   );
@@ -75,25 +75,25 @@ function InlineDealBriefCard({ startupId, investorId }: { startupId: string; inv
   const vc = VERDICT_COLORS[brief.verdictSignal] ?? VERDICT_COLORS.neutral;
 
   return (
-    <div style={{ background: "rgba(255,255,255,0.02)", borderRadius: 10, padding: "14px 16px", marginTop: 12 }}>
+    <div style={{ background: "var(--accent)", borderRadius: 10, padding: "14px 16px", marginTop: 12 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
         <span style={{ fontSize: 20, fontWeight: 800, color: vc.color }}>{brief.matchScore}</span>
-        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>/100 deal quality score</span>
+        <span style={{ fontSize: 11, color: "var(--muted-foreground)" }}>/100 deal quality score</span>
         <span style={{ background: vc.bg, color: vc.color, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 600, marginLeft: "auto" }}>
           {brief.verdictSignal.charAt(0).toUpperCase() + brief.verdictSignal.slice(1)} fit
         </span>
       </div>
-      <div style={{ fontSize: 13, fontWeight: 600, color: "#fff", marginBottom: 8, lineHeight: 1.4 }}>{brief.headline}</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)", marginBottom: 8, lineHeight: 1.4 }}>{brief.headline}</div>
       {brief.strengths.length > 0 && (
         <div style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)", borderRadius: 8, padding: "8px 12px", marginBottom: 8 }}>
           <div style={{ fontSize: 10, fontWeight: 600, color: "#10B981", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.06em" }}>Strengths</div>
-          <ul style={{ margin: 0, paddingLeft: 14 }}>{brief.strengths.slice(0, 2).map((s, i) => <li key={i} style={{ fontSize: 12, color: "rgba(255,255,255,0.65)", lineHeight: 1.5 }}>{s}</li>)}</ul>
+          <ul style={{ margin: 0, paddingLeft: 14 }}>{brief.strengths.slice(0, 2).map((s, i) => <li key={i} style={{ fontSize: 12, color: "var(--muted-foreground)", lineHeight: 1.5 }}>{s}</li>)}</ul>
         </div>
       )}
       {brief.redFlags.length > 0 && (
         <div style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)", borderRadius: 8, padding: "8px 12px" }}>
           <div style={{ fontSize: 10, fontWeight: 600, color: "#F59E0B", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.06em" }}>Watch points</div>
-          <ul style={{ margin: 0, paddingLeft: 14 }}>{brief.redFlags.slice(0, 2).map((r, i) => <li key={i} style={{ fontSize: 12, color: "rgba(255,255,255,0.65)", lineHeight: 1.5 }}>{r}</li>)}</ul>
+          <ul style={{ margin: 0, paddingLeft: 14 }}>{brief.redFlags.slice(0, 2).map((r, i) => <li key={i} style={{ fontSize: 12, color: "var(--muted-foreground)", lineHeight: 1.5 }}>{r}</li>)}</ul>
         </div>
       )}
     </div>
@@ -166,7 +166,7 @@ function InvestorTaskCard({ task, userId, onRefresh }: TaskCardProps) {
   const isWatchlistStale = task.taskType === "follow_up_watchlist";
 
   return (
-    <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden", marginBottom: 12 }}>
+    <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden", marginBottom: 12 }}>
       {/* Header */}
       <div
         style={{ padding: "16px 20px", cursor: "pointer", display: "flex", alignItems: "flex-start", gap: 10 }}
@@ -176,34 +176,34 @@ function InvestorTaskCard({ task, userId, onRefresh }: TaskCardProps) {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
             {!isSingle && <PhaseBadge phase={task.chainPhase} />}
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{task.title}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)" }}>{task.title}</span>
           </div>
           {task.description && !expanded && (
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", lineHeight: 1.4, marginTop: 2 }}>{task.description}</div>
+            <div style={{ fontSize: 12, color: "var(--muted-foreground)", lineHeight: 1.4, marginTop: 2 }}>{task.description}</div>
           )}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
           <div style={{ position: "relative" }} ref={menuRef}>
-            <button onClick={(e) => { e.stopPropagation(); setMenuOpen((v) => !v); }} style={{ width: 28, height: 28, borderRadius: 7, background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.35)" }}>
+            <button onClick={(e) => { e.stopPropagation(); setMenuOpen((v) => !v); }} style={{ width: 28, height: 28, borderRadius: 7, background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--faint)" }}>
               <MoreHorizontal size={14} />
             </button>
             {menuOpen && (
-              <div style={{ position: "absolute", top: 32, right: 0, background: "#18181C", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "5px 4px", minWidth: 160, zIndex: 20, boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}>
+              <div style={{ position: "absolute", top: 32, right: 0, background: "var(--accent)", border: "1px solid var(--border)", borderRadius: 10, padding: "5px 4px", minWidth: 160, zIndex: 20, boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}>
                 <button onClick={() => doAction("done")} style={menuItemStyle}><Check size={12} /> Mark done</button>
                 <button onClick={() => doAction("snooze")} style={menuItemStyle}><BellOff size={12} /> Snooze 24h</button>
                 <button onClick={() => doAction("dismiss")} style={{ ...menuItemStyle, color: "rgba(239,68,68,0.8)" }}><X size={12} /> Dismiss</button>
               </div>
             )}
           </div>
-          {expanded ? <ChevronUp size={14} color="rgba(255,255,255,0.3)" /> : <ChevronDown size={14} color="rgba(255,255,255,0.3)" />}
+          {expanded ? <ChevronUp size={14} color="var(--faint)" /> : <ChevronDown size={14} color="var(--faint)" />}
         </div>
       </div>
 
       {/* Body */}
       {expanded && (
-        <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "16px 20px" }}>
+        <div style={{ borderTop: "1px solid var(--border)", padding: "16px 20px" }}>
           {task.autonomousSummary && (
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", lineHeight: 1.6, marginBottom: 14 }}>
+            <div style={{ fontSize: 13, color: "var(--muted-foreground)", lineHeight: 1.6, marginBottom: 14 }}>
               {task.autonomousSummary}
             </div>
           )}
@@ -234,11 +234,11 @@ function InvestorTaskCard({ task, userId, onRefresh }: TaskCardProps) {
               </button>
             )}
             {task.actionUrl && !isThesisMatch && (
-              <a href={task.actionUrl} style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.7)", borderRadius: 8, padding: "8px 14px", fontSize: 12, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 5, border: "1px solid rgba(255,255,255,0.08)" }}>
+              <a href={task.actionUrl} style={{ background: "var(--accent)", color: "var(--muted-foreground)", borderRadius: 8, padding: "8px 14px", fontSize: 12, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 5, border: "1px solid var(--border)" }}>
                 {task.actionLabel ?? "View details"} <ExternalLink size={11} />
               </a>
             )}
-            <button onClick={() => doAction("dismiss")} disabled={acting} style={{ background: "transparent", color: "rgba(255,255,255,0.3)", border: "none", borderRadius: 8, padding: "8px 12px", fontSize: 12, cursor: "pointer" }}>
+            <button onClick={() => doAction("dismiss")} disabled={acting} style={{ background: "transparent", color: "var(--faint)", border: "none", borderRadius: 8, padding: "8px 12px", fontSize: 12, cursor: "pointer" }}>
               Dismiss
             </button>
           </div>
@@ -251,7 +251,7 @@ function InvestorTaskCard({ task, userId, onRefresh }: TaskCardProps) {
 const menuItemStyle: React.CSSProperties = {
   display: "flex", alignItems: "center", gap: 8, width: "100%",
   background: "none", border: "none", padding: "7px 12px", borderRadius: 7,
-  color: "rgba(255,255,255,0.7)", fontSize: 12, fontWeight: 500, cursor: "pointer", textAlign: "left",
+  color: "var(--muted-foreground)", fontSize: 12, fontWeight: 500, cursor: "pointer", textAlign: "left",
 };
 
 // ── Main ───────────────────────────────────────────────────────────────────────
@@ -294,29 +294,29 @@ function InvestorDesk() {
   const normalPriority = tasks.filter((t) => t.priority !== "high");
 
   return (
-    <div style={{ display: "flex", flex: 1, minHeight: 0, background: "#0A0A0B", overflow: "hidden" }}>
+    <div style={{ display: "flex", flex: 1, minHeight: 0, background: "var(--background)", overflow: "hidden" }}>
       {/* Main panel */}
       <div style={{ flex: 1, overflowY: "auto", padding: "28px 32px" }}>
         <div style={{ maxWidth: 680, marginBottom: 28 }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Daily Desk</div>
-          <div style={{ fontSize: 22, fontWeight: 800, color: "#fff", fontFamily: "Syne, sans-serif", marginBottom: 2 }}>{today}</div>
-          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: "var(--faint)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Daily Desk</div>
+          <div style={{ fontSize: 22, fontWeight: 800, color: "var(--foreground)", fontFamily: "Syne, sans-serif", marginBottom: 2 }}>{today}</div>
+          <div style={{ fontSize: 13, color: "var(--muted-foreground)" }}>
             {isLoading ? "Loading…" : tasks.length === 0 ? "All clear — no tasks right now." : `${tasks.length} task${tasks.length !== 1 ? "s" : ""} need${tasks.length === 1 ? "s" : ""} your attention`}
           </div>
         </div>
 
         {isLoading ? (
           <div style={{ maxWidth: 680 }}>
-            {[1, 2].map((i) => <div key={i} style={{ background: "#111114", borderRadius: 12, height: 80, marginBottom: 12, opacity: 0.5 }} />)}
+            {[1, 2].map((i) => <div key={i} style={{ background: "var(--card)", borderRadius: 12, height: 80, marginBottom: 12, opacity: 0.5 }} />)}
           </div>
         ) : tasks.length === 0 ? (
           <div style={{ maxWidth: 480 }}>
-            <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "40px 32px", textAlign: "center" }}>
+            <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 14, padding: "40px 32px", textAlign: "center" }}>
               <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.15)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
                 <CheckCircle2 size={22} color="#10B981" />
               </div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", fontFamily: "Syne, sans-serif", marginBottom: 8 }}>All clear</div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", lineHeight: 1.6 }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "var(--foreground)", fontFamily: "Syne, sans-serif", marginBottom: 8 }}>All clear</div>
+              <div style={{ fontSize: 13, color: "var(--muted-foreground)", lineHeight: 1.6 }}>
                 No tasks right now. The AI advisor runs nightly and will surface new thesis matches and pipeline updates automatically.
               </div>
               {resolvedTasks.length > 0 && (
@@ -335,7 +335,7 @@ function InvestorDesk() {
             )}
             {normalPriority.length > 0 && (
               <>
-                {highPriority.length > 0 && <div style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Other tasks</div>}
+                {highPriority.length > 0 && <div style={{ fontSize: 10, fontWeight: 600, color: "var(--faint)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Other tasks</div>}
                 {normalPriority.map((t) => <InvestorTaskCard key={t.id} task={t} userId={user!.id} onRefresh={onRefresh} />)}
               </>
             )}
@@ -344,12 +344,12 @@ function InvestorDesk() {
 
         {resolvedTasks.length > 0 && tasks.length > 0 && (
           <div style={{ maxWidth: 680, marginTop: 32 }}>
-            <div style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>Recently resolved</div>
+            <div style={{ fontSize: 10, fontWeight: 600, color: "var(--faint)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>Recently resolved</div>
             {resolvedTasks.map((t: any) => (
-              <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "rgba(255,255,255,0.02)", borderRadius: 8, marginBottom: 6 }}>
+              <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "var(--accent)", borderRadius: 8, marginBottom: 6 }}>
                 <CheckCircle2 size={13} color="rgba(16,185,129,0.5)" />
-                <span style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", flex: 1 }}>{t.title}</span>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.2)" }}>
+                <span style={{ fontSize: 12, color: "var(--faint)", flex: 1 }}>{t.title}</span>
+                <span style={{ fontSize: 11, color: "var(--faint)" }}>
                   {t.completed_at ? new Date(t.completed_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : ""}
                 </span>
               </div>

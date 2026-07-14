@@ -169,8 +169,8 @@ function InvestorAdvisor() {
                     onClick={() => navigate({ to: "/app/investor/profile" as any })}
                     style={{
                       alignSelf: "flex-start",
-                      background: "#7C3AED",
-                      color: "#fff",
+                      background: "var(--gradient-brand)",
+                      color: "var(--foreground)",
                       border: "none",
                       borderRadius: 8,
                       padding: "8px 16px",

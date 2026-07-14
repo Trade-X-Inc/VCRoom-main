@@ -117,7 +117,7 @@ function DiligencePage() {
                           className="h-full rounded-full transition-all"
                           style={{
                             width: `${pct}%`,
-                            background: pct === 100 ? "#10B981" : "#7C3AED",
+                            background: pct === 100 ? "#10B981" : "var(--gradient-brand)",
                           }}
                         />
                       </div>

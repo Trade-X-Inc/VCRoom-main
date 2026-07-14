@@ -458,7 +458,7 @@ function InvestorDashboard() {
               const stage = DB_STATUS_TO_STAGE[status ?? ""] ?? "Sourced";
               const stageColors: Record<string, string> = {
                 Sourced: "bg-muted text-muted-foreground",
-                Reviewing: "bg-brand/10 text-brand",
+                Reviewing: "bg-accent text-brand",
                 Diligence: "bg-warning/10 text-warning",
                 Partner: "bg-violet/10 text-violet",
                 "Term Sheet": "bg-success/10 text-success",

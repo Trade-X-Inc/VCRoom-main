@@ -46,7 +46,7 @@ const TAB_STATUSES = ["All", "Sourcing", "Reviewing", "Diligence", "Passed", "In
 const STATUS_STYLES: Record<string, string> = {
   Sourcing: "bg-blue-500/10 text-blue-600 border-blue-500/30",
   Reviewing: "bg-amber-500/10 text-amber-600 border-amber-500/30",
-  Diligence: "bg-purple-500/10 text-purple-600 border-purple-500/30",
+  Diligence: "bg-accent text-brand border-border",
   Passed: "bg-muted text-muted-foreground border-border/60",
   Invested: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
   Watching: "bg-indigo-500/10 text-indigo-600 border-indigo-500/30",
@@ -359,7 +359,7 @@ function StartupsPage() {
           </button>
           <button
             onClick={() => setShowAdd(true)}
-            className="inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-glow"
+            className="inline-flex items-center gap-1.5 rounded-[10px] hs-gradient px-4 py-2 text-sm font-medium text-white shadow-glow"
           >
             <Plus className="h-4 w-4" /> Add company
           </button>
@@ -381,7 +381,7 @@ function StartupsPage() {
             <button
               key={String(b.key)}
               onClick={() => setStageFilter(b.key)}
-              className={`px-3 py-1 rounded-md text-sm ${active ? "bg-brand text-white" : "bg-white/5 text-white/60 hover:bg-white/10"}`}
+              className={`px-3 py-1 rounded-md text-sm ${active ? "hs-gradient text-white" : "bg-accent text-muted-foreground hover:bg-accent"}`}
             >
               {b.label}
             </button>
@@ -469,13 +469,13 @@ function StartupsPage() {
         <div className="flex items-center gap-2 mb-4">
           <button
             onClick={() => setPlatformFilter("all")}
-            className={`px-3 py-1 rounded-md text-sm ${platformFilter === "all" ? "bg-brand text-brand-foreground" : "text-muted-foreground hover:bg-accent"}`}
+            className={`px-3 py-1 rounded-md text-sm ${platformFilter === "all" ? "hs-gradient text-brand-foreground" : "text-muted-foreground hover:bg-accent"}`}
           >
             All leads
           </button>
           <button
             onClick={() => setPlatformFilter("hockystick")}
-            className={`px-3 py-1 rounded-md text-sm ${platformFilter === "hockystick" ? "bg-brand text-brand-foreground" : "text-muted-foreground hover:bg-accent"}`}
+            className={`px-3 py-1 rounded-md text-sm ${platformFilter === "hockystick" ? "hs-gradient text-brand-foreground" : "text-muted-foreground hover:bg-accent"}`}
           >
             From Hockystick
           </button>
@@ -493,8 +493,8 @@ function StartupsPage() {
                     key={r}
                     onClick={() => setRegionFilter(r)}
                     style={{
-                      background: active ? "#7C3AED" : "rgba(255,255,255,0.06)",
-                      color: active ? "#ffffff" : "rgba(255,255,255,0.5)",
+                      background: active ? "var(--gradient-brand)" : "var(--accent)",
+                      color: active ? "#ffffff" : "var(--muted-foreground)",
                       borderRadius: "20px",
                       padding: "6px 14px",
                       fontSize: "13px",
@@ -511,7 +511,7 @@ function StartupsPage() {
 
             {/* Result count — only after load */}
             {!platformLoading && (
-              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)", marginBottom: "12px" }}>
+              <div style={{ fontSize: "12px", color: "var(--faint)", marginBottom: "12px" }}>
                 {(() => {
                   const count = platformLeads.filter((l: any) => {
                     if (regionFilter === "All") return true;
@@ -564,12 +564,12 @@ function StartupsPage() {
                         title={slug ? undefined : "No Hockystick profile — add their details manually"}
                         className="rounded-2xl bg-card p-5 group relative overflow-hidden transition-all"
                         style={{
-                          border: "1px solid rgba(255,255,255,0.08)",
+                          border: "1px solid var(--border)",
                           cursor: slug ? "pointer" : "default",
                           transition: "border-color 0.15s, box-shadow 0.15s",
                         }}
                         onMouseEnter={(e) => { if (slug) { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(124,58,237,0.4)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 0 0 1px rgba(124,58,237,0.15)"; } }}
-                        onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,0.08)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "none"; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "none"; }}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex items-center gap-3 min-w-0">
@@ -593,7 +593,7 @@ function StartupsPage() {
                           {slug && (
                             <span
                               className="text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity ml-auto"
-                              style={{ color: "#7C3AED" }}
+                              style={{ color: "var(--brand)" }}
                             >
                               View profile →
                             </span>
@@ -634,7 +634,7 @@ function StartupsPage() {
             </p>
             <button
               onClick={() => setShowAdd(true)}
-              className="mt-4 inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-to-r from-purple-600 to-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
+              className="mt-4 inline-flex items-center gap-1.5 rounded-[10px] hs-gradient px-3 py-1.5 text-sm font-medium text-white"
             >
               <Plus className="h-4 w-4" /> Add company
             </button>
@@ -941,7 +941,7 @@ function StartupsPage() {
                   step={1}
                   value={addForm.initial_score}
                   onChange={(e) => set("initial_score", Number(e.target.value))}
-                  className="w-full accent-purple-600"
+                  className="w-full accent-[var(--brand)]"
                 />
               </Field>
 
@@ -967,7 +967,7 @@ function StartupsPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-1.5 text-sm font-medium text-white shadow-glow disabled:opacity-60"
+                  className="inline-flex items-center gap-1.5 rounded-[10px] hs-gradient px-4 py-1.5 text-sm font-medium text-white shadow-glow disabled:opacity-60"
                 >
                   {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                   Add
@@ -1011,8 +1011,8 @@ function StartupsPage() {
                     display: "inline-flex",
                     alignItems: "center",
                     gap: 6,
-                    background: "#7C3AED",
-                    color: "#fff",
+                    background: "var(--gradient-brand)",
+                    color: "var(--foreground)",
                     padding: "8px 16px",
                     borderRadius: 8,
                     textDecoration: "none",
@@ -1176,7 +1176,7 @@ function StartupsPage() {
                   type="range" min={1} max={10} step={1}
                   value={editForm.initial_score}
                   onChange={(e) => setEditForm((f) => ({ ...f, initial_score: Number(e.target.value) }))}
-                  className="w-full accent-purple-600"
+                  className="w-full accent-[var(--brand)]"
                 />
               </Field>
               <div className="flex items-center justify-end gap-2 pt-2">
@@ -1186,7 +1186,7 @@ function StartupsPage() {
                 <button
                   type="submit"
                   disabled={editSaving}
-                  className="inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-1.5 text-sm font-medium text-white shadow-glow disabled:opacity-60"
+                  className="inline-flex items-center gap-1.5 rounded-[10px] hs-gradient px-4 py-1.5 text-sm font-medium text-white shadow-glow disabled:opacity-60"
                 >
                   {editSaving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                   Save changes

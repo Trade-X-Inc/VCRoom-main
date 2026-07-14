@@ -277,7 +277,7 @@ Return this exact JSON shape:
               Analysis is generated from your watchlist data — no deal room required.
             </p>
           </div>
-          <div className="rounded-2xl border border-brand/20 bg-brand/5 p-6">
+          <div className="rounded-2xl border border-brand/20 bg-accent p-6">
             <div className="flex items-center gap-2 mb-4">
               <Lightbulb className="h-4 w-4 text-brand shrink-0" />
               <span className="text-sm font-semibold">How it works</span>
@@ -290,7 +290,7 @@ Return this exact JSON shape:
                 { n: "4", title: "Generate full investment memo", body: "If the company has a deal room, you can also generate a full investment memo from deal room documents." },
               ].map(({ n, title, body }) => (
                 <li key={n} className="flex gap-3">
-                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/15 text-[10px] font-bold text-brand">{n}</span>
+                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-accent text-[10px] font-bold text-brand">{n}</span>
                   <div>
                     <div className="text-xs font-semibold">{title}</div>
                     <div className="text-xs text-muted-foreground mt-0.5">{body}</div>
@@ -340,7 +340,7 @@ Return this exact JSON shape:
                 <button
                   onClick={handleGenerateAnalysis}
                   disabled={generating}
-                  className="inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-glow disabled:opacity-50 shrink-0"
+                  className="inline-flex items-center gap-1.5 rounded-[10px] hs-gradient px-4 py-2.5 text-sm font-medium text-white shadow-glow disabled:opacity-50 shrink-0"
                 >
                   {generating
                     ? <><Loader2 className="h-4 w-4 animate-spin" /> Analysing…</>

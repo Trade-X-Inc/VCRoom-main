@@ -78,7 +78,7 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   Diligence:  { bg: "rgba(59,130,246,0.12)", text: "#60A5FA" },
   Invested:   { bg: "rgba(16,185,129,0.12)", text: "#10B981" },
   Passed:     { bg: "rgba(239,68,68,0.10)",  text: "#EF4444" },
-  Watching:   { bg: "rgba(255,255,255,0.06)", text: "rgba(255,255,255,0.4)" },
+  Watching:   { bg: "var(--accent)", text: "var(--muted-foreground)" },
 };
 
 // ── Confirm-first modal ────────────────────────────────────────────────────
@@ -101,7 +101,7 @@ function ConfirmModal({ count, onConfirm, onCancel, confirming }: {
         <div className="flex gap-2 justify-end">
           <button onClick={onCancel} className="px-4 py-2 text-xs transition-colors" style={{ color: "var(--hs-text-muted)" }}>Cancel</button>
           <button onClick={onConfirm} disabled={confirming}
-            style={{ background: confirming ? "rgba(124,58,237,0.4)" : "#7C3AED", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 12, fontWeight: 600, cursor: confirming ? "not-allowed" : "pointer" }}>
+            style={{ background: confirming ? "rgba(124,58,237,0.4)" : "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 12, fontWeight: 600, cursor: confirming ? "not-allowed" : "pointer" }}>
             {confirming ? <span className="flex items-center gap-1.5"><Loader2 className="h-3 w-3 animate-spin" /> Sending…</span> : `Send ${count} invite${count !== 1 ? "s" : ""}`}
           </button>
         </div>
@@ -127,7 +127,7 @@ function PipelineRow({ row, onMarkSeen, onDecide }: {
       className="flex items-center gap-3 transition-colors"
     >
       {/* New dot */}
-      {isNew && <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#7C3AED", flexShrink: 0 }} title="New — auto-added via invite link" />}
+      {isNew && <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--gradient-brand)", flexShrink: 0 }} title="New — auto-added via invite link" />}
 
       {/* Avatar placeholder */}
       <div style={{ width: 36, height: 36, borderRadius: 8, background: "rgba(124,58,237,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -167,7 +167,7 @@ function PipelineRow({ row, onMarkSeen, onDecide }: {
         </div>
       )}
 
-      {!isNew && <ChevronRight className="h-4 w-4 text-white/15 flex-shrink-0" />}
+      {!isNew && <ChevronRight className="h-4 w-4 text-faint flex-shrink-0" />}
     </div>
   );
 }
@@ -180,31 +180,31 @@ function CandidateRow({ candidate, selected, onToggle }: {
   onToggle: () => void;
 }) {
   const score = candidate.thesis_fit_score ?? 0;
-  const scoreColor = score >= 80 ? "#10B981" : score >= 60 ? "#F59E0B" : "rgba(255,255,255,0.3)";
+  const scoreColor = score >= 80 ? "#10B981" : score >= 60 ? "#F59E0B" : "var(--faint)";
   const alreadyInvited = !!candidate.invite_sent_at;
 
   return (
-    <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "10px 14px" }}
+    <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 14px" }}
       className="flex items-center gap-3">
       <input type="checkbox" checked={selected} onChange={onToggle} disabled={alreadyInvited}
-        style={{ width: 15, height: 15, accentColor: "#7C3AED", flexShrink: 0, cursor: alreadyInvited ? "not-allowed" : "pointer" }} />
+        style={{ width: 15, height: 15, accentColor: "var(--brand)", flexShrink: 0, cursor: alreadyInvited ? "not-allowed" : "pointer" }} />
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-white truncate">{candidate.company_name}</span>
+          <span className="text-sm font-semibold text-foreground truncate">{candidate.company_name}</span>
           {candidate.matched_startup_id && (
             <span style={{ background: "rgba(16,185,129,0.1)", color: "#10B981", borderRadius: 99, padding: "1px 7px", fontSize: 10, fontWeight: 600 }}>On platform</span>
           )}
           {alreadyInvited && (
-            <span style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.35)", borderRadius: 99, padding: "1px 7px", fontSize: 10 }}>Invited</span>
+            <span style={{ background: "var(--accent)", color: "var(--faint)", borderRadius: 99, padding: "1px 7px", fontSize: 10 }}>Invited</span>
           )}
         </div>
         {candidate.contact_email && (
-          <div className="text-[11px] text-white/30 mt-0.5">{candidate.contact_email}</div>
+          <div className="text-[11px] text-faint mt-0.5">{candidate.contact_email}</div>
         )}
       </div>
 
-      <span style={{ background: score >= 60 ? "rgba(245,158,11,0.12)" : "rgba(255,255,255,0.05)", color: scoreColor, borderRadius: 99, padding: "2px 8px", fontSize: 11, fontWeight: 600, flexShrink: 0 }}>
+      <span style={{ background: score >= 60 ? "rgba(245,158,11,0.12)" : "var(--accent)", color: scoreColor, borderRadius: 99, padding: "2px 8px", fontSize: 11, fontWeight: 600, flexShrink: 0 }}>
         {score}% fit
       </span>
     </div>
@@ -261,31 +261,31 @@ function InviteLinkPanel({ investorId }: { investorId: string }) {
   };
 
   return (
-    <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "18px 20px" }}>
+    <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px" }}>
       <div className="flex items-center gap-2 mb-3">
         <LinkIcon className="h-4 w-4" style={{ color: "#A855F7" }} />
-        <span className="text-sm font-semibold text-white" style={{ fontFamily: "Syne, sans-serif" }}>Your invite link</span>
+        <span className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Your invite link</span>
       </div>
-      <p className="text-xs text-white/40 leading-relaxed mb-4">
+      <p className="text-xs text-muted-foreground leading-relaxed mb-4">
         Share this link with founders directly. Anyone who joins through it is automatically added to your pipeline.
       </p>
 
       {isLoading ? (
-        <div className="flex items-center gap-2 text-xs text-white/30"><Loader2 className="h-3 w-3 animate-spin" /> Loading…</div>
+        <div className="flex items-center gap-2 text-xs text-faint"><Loader2 className="h-3 w-3 animate-spin" /> Loading…</div>
       ) : link ? (
         <div className="space-y-3">
-          <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "8px 12px", display: "flex", alignItems: "center", gap: 8 }}>
-            <span className="text-xs text-white/50 truncate flex-1 font-mono">{linkUrl}</span>
+          <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px", display: "flex", alignItems: "center", gap: 8 }}>
+            <span className="text-xs text-muted-foreground truncate flex-1 font-mono">{linkUrl}</span>
             <button onClick={handleCopy}
               style={{ background: copied ? "rgba(16,185,129,0.15)" : "rgba(124,58,237,0.15)", color: copied ? "#10B981" : "#A855F7", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, fontWeight: 600, cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", gap: 4 }}>
               {copied ? <><Check className="h-3 w-3" /> Copied</> : <><Copy className="h-3 w-3" /> Copy</>}
             </button>
           </div>
-          <div className="text-xs text-white/30">{link.uses_count ?? 0} founder{(link.uses_count ?? 0) !== 1 ? "s" : ""} joined via this link</div>
+          <div className="text-xs text-faint">{link.uses_count ?? 0} founder{(link.uses_count ?? 0) !== 1 ? "s" : ""} joined via this link</div>
         </div>
       ) : (
         <button onClick={handleGenerate} disabled={generating}
-          style={{ background: generating ? "rgba(124,58,237,0.3)" : "#7C3AED", color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 12, fontWeight: 600, cursor: generating ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+          style={{ background: generating ? "rgba(124,58,237,0.3)" : "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 12, fontWeight: 600, cursor: generating ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 6 }}>
           {generating ? <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</> : <><Plus className="h-3 w-3" /> Generate invite link</>}
         </button>
       )}
@@ -302,7 +302,7 @@ function ListView({ rows, search }: { rows: WatchlistRow[]; search: string }) {
   );
 
   if (filtered.length === 0) return (
-    <div style={{ padding: "40px 16px", textAlign: "center", border: "1px dashed rgba(255,255,255,0.08)", borderRadius: 12 }}>
+    <div style={{ padding: "40px 16px", textAlign: "center", border: "1px dashed var(--border)", borderRadius: 12 }}>
       <p className="text-sm text-muted-foreground">{search ? "No results matching your search." : "No companies in pipeline yet."}</p>
     </div>
   );
@@ -346,7 +346,7 @@ function CardView({ rows, search }: { rows: WatchlistRow[]; search: string }) {
   );
 
   if (filtered.length === 0) return (
-    <div style={{ padding: "40px 16px", textAlign: "center", border: "1px dashed rgba(255,255,255,0.08)", borderRadius: 12 }}>
+    <div style={{ padding: "40px 16px", textAlign: "center", border: "1px dashed var(--border)", borderRadius: 12 }}>
       <p className="text-sm text-muted-foreground">{search ? "No results." : "No companies yet."}</p>
     </div>
   );
@@ -372,7 +372,7 @@ function CardView({ rows, search }: { rows: WatchlistRow[]; search: string }) {
             </div>
             <div className="flex items-center gap-2 flex-wrap mt-auto">
               {r.stage && <span className="text-[11px] rounded-full px-2 py-0.5" style={{ background: "rgba(124,58,237,0.1)", color: "#A855F7" }}>{r.stage}</span>}
-              {r.source && <span className="text-[11px] rounded-full px-2 py-0.5" style={{ background: "rgba(255,255,255,0.06)", color: "var(--hs-text-muted)" }}>{r.source}</span>}
+              {r.source && <span className="text-[11px] rounded-full px-2 py-0.5" style={{ background: "var(--accent)", color: "var(--hs-text-muted)" }}>{r.source}</span>}
             </div>
           </div>
         );
@@ -400,7 +400,7 @@ function KanbanView({ rows }: { rows: WatchlistRow[] }) {
           <div key={col.label} style={{ minWidth: 220, flex: "0 0 220px" }}>
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--hs-text-muted)" }}>{col.label}</span>
-              <span className="text-[10px] rounded-full px-2 py-0.5 font-semibold" style={{ background: "rgba(255,255,255,0.06)", color: "var(--hs-text-muted)" }}>{cards.length}</span>
+              <span className="text-[10px] rounded-full px-2 py-0.5 font-semibold" style={{ background: "var(--accent)", color: "var(--hs-text-muted)" }}>{cards.length}</span>
             </div>
             <div className="space-y-2">
               {cards.map((r) => {
@@ -417,7 +417,7 @@ function KanbanView({ rows }: { rows: WatchlistRow[] }) {
                 );
               })}
               {cards.length === 0 && (
-                <div style={{ border: "1px dashed rgba(255,255,255,0.08)", borderRadius: 10, padding: "16px 12px", textAlign: "center" }}>
+                <div style={{ border: "1px dashed var(--border)", borderRadius: 10, padding: "16px 12px", textAlign: "center" }}>
                   <p className="text-xs" style={{ color: "var(--hs-text-muted)" }}>No connections yet</p>
                 </div>
               )}
@@ -472,22 +472,22 @@ function SentRequestsPanel({ investorUserId }: { investorUserId: string }) {
       return <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(16,185,129,0.12)", color: "#10B981" }}>Approved</span>;
     }
     if (r.status === "declined" || r.status === "rejected") {
-      return <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" }}>Declined</span>;
+      return <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "var(--accent)", color: "var(--muted-foreground)" }}>Declined</span>;
     }
     return <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(245,158,11,0.12)", color: "#F59E0B" }}>Pending</span>;
   };
 
   return (
-    <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "18px 20px" }}>
-      <div className="text-sm font-semibold text-white mb-3" style={{ fontFamily: "Syne, sans-serif" }}>Sent requests</div>
+    <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px" }}>
+      <div className="text-sm font-semibold text-foreground mb-3" style={{ fontFamily: "Syne, sans-serif" }}>Sent requests</div>
       <div className="space-y-2.5">
         {sent.map((r: any) => {
           const founderName = Array.isArray(r.startup?.users) ? r.startup?.users?.[0]?.full_name : r.startup?.users?.full_name;
           return (
             <div key={r.id} className="flex items-center justify-between gap-2">
               <div className="min-w-0">
-                <div className="text-xs text-white/80 truncate">{r.startup?.company_name ?? "Startup"}</div>
-                <div className="text-[10px] text-white/30 truncate">
+                <div className="text-xs text-muted-foreground truncate">{r.startup?.company_name ?? "Startup"}</div>
+                <div className="text-[10px] text-faint truncate">
                   {founderName ? `${founderName} · ` : ""}{new Date(r.created_at).toLocaleDateString()}
                 </div>
               </div>
@@ -748,7 +748,7 @@ function ConnectionsPage() {
                 title={label}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors"
                 style={{
-                  background: viewMode === mode ? "#7C3AED" : "var(--hs-bg-secondary)",
+                  background: viewMode === mode ? "var(--gradient-brand)" : "var(--hs-bg-secondary)",
                   color: viewMode === mode ? "#fff" : "var(--hs-text-muted)",
                   borderRight: "1px solid var(--hs-border)",
                 }}
@@ -787,7 +787,7 @@ function ConnectionsPage() {
                 className={cn(
                   "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5",
                   activeTab === tab.key
-                    ? "bg-brand/10 text-brand border border-brand/20"
+                    ? "bg-accent text-brand border border-brand/20"
                     : "text-muted-foreground hover:text-foreground border border-transparent hover:bg-accent"
                 )}
               >
@@ -795,7 +795,7 @@ function ConnectionsPage() {
                 {tabCounts[tab.key] > 0 && (
                   <span className={cn(
                     "rounded-full px-1.5 py-0.5 text-[10px] font-semibold",
-                    activeTab === tab.key ? "bg-brand/20 text-brand" : "bg-accent text-muted-foreground"
+                    activeTab === tab.key ? "bg-accent text-brand" : "bg-accent text-muted-foreground"
                   )}>
                     {tabCounts[tab.key]}
                   </span>
@@ -827,7 +827,7 @@ function ConnectionsPage() {
                     {selectedIds.size > 0 && (
                       <button
                         onClick={() => setShowConfirm(true)}
-                        style={{ background: "#7C3AED", color: "#fff", border: "none", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}
+                        style={{ background: "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}
                       >
                         <Send className="h-3 w-3" />
                         Send {selectedIds.size} invite{selectedIds.size !== 1 ? "s" : ""}
@@ -838,7 +838,7 @@ function ConnectionsPage() {
               </div>
 
               {matchedCandidates.length === 0 ? (
-                <div style={{ background: "rgba(255,255,255,0.03)", border: "1px dashed rgba(255,255,255,0.08)", borderRadius: 8, padding: "20px 16px", textAlign: "center" }}>
+                <div style={{ background: "var(--accent)", border: "1px dashed var(--border)", borderRadius: 8, padding: "20px 16px", textAlign: "center" }}>
                   <p className="text-xs text-muted-foreground">No thesis-matched candidates yet — run a deal intake to surface leads above {THESIS_THRESHOLD}% fit.</p>
                 </div>
               ) : (
@@ -909,7 +909,7 @@ function ConnectionsPage() {
               </div>
 
               {filteredPipeline.length === 0 ? (
-                <div style={{ background: "rgba(255,255,255,0.03)", border: "1px dashed rgba(255,255,255,0.08)", borderRadius: 8, padding: "20px 16px", textAlign: "center" }}>
+                <div style={{ background: "var(--accent)", border: "1px dashed var(--border)", borderRadius: 8, padding: "20px 16px", textAlign: "center" }}>
                   {activeTab === "all" ? (
                     <p className="text-xs text-muted-foreground">
                       No companies in your pipeline yet. Add from intake matches above, or use Deal Intake to find new leads.
@@ -943,8 +943,8 @@ function ConnectionsPage() {
           {user?.id && <SentRequestsPanel investorUserId={user.id} />}
 
           {/* Pipeline stats */}
-          <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "18px 20px" }}>
-            <div className="text-sm font-semibold text-white mb-3" style={{ fontFamily: "Syne, sans-serif" }}>Pipeline summary</div>
+          <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px" }}>
+            <div className="text-sm font-semibold text-foreground mb-3" style={{ fontFamily: "Syne, sans-serif" }}>Pipeline summary</div>
             <div className="space-y-2">
               {[
                 { label: "Sourcing",  count: watchlist.filter((w) => w.status === "Sourcing").length,   color: "#A855F7" },
@@ -956,9 +956,9 @@ function ConnectionsPage() {
                 <div key={label} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Circle className="h-2 w-2" style={{ fill: color, color }} />
-                    <span className="text-xs text-white/50">{label}</span>
+                    <span className="text-xs text-muted-foreground">{label}</span>
                   </div>
-                  <span className="text-xs font-semibold" style={{ color: count > 0 ? color : "rgba(255,255,255,0.2)" }}>{count}</span>
+                  <span className="text-xs font-semibold" style={{ color: count > 0 ? color : "var(--faint)" }}>{count}</span>
                 </div>
               ))}
             </div>
@@ -969,8 +969,8 @@ function ConnectionsPage() {
             <div style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)", borderRadius: 10, padding: "12px 14px", display: "flex", gap: 8 }}>
               <AlertCircle className="h-4 w-4 text-brand mt-0.5 shrink-0" />
               <div>
-                <div className="text-xs font-semibold text-white/70">Founders waiting for review</div>
-                <div className="text-[11px] text-white/40 mt-0.5">
+                <div className="text-xs font-semibold text-muted-foreground">Founders waiting for review</div>
+                <div className="text-[11px] text-muted-foreground mt-0.5">
                   {watchlist.filter((w) => w.auto_added && !w.seen_by_investor).length} founder{watchlist.filter((w) => w.auto_added && !w.seen_by_investor).length !== 1 ? "s" : ""} joined via your invite link. Click each row to approve or decline.
                 </div>
               </div>

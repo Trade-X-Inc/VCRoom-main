@@ -297,7 +297,7 @@ function DecisionsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center" style={{ minHeight: 400 }}>
-        <div style={{ width: 32, height: 32, border: "2px solid rgba(124,58,237,0.3)", borderTopColor: "#7C3AED", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        <div style={{ width: 32, height: 32, border: "2px solid rgba(124,58,237,0.3)", borderTopColor: "var(--brand)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
         <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
       </div>
     );
@@ -434,7 +434,7 @@ function FilterBar({ search, onSearch, stageFilter, onStageFilter, sectors, sect
           data-testid="pipeline-search"
           value={search} onChange={(e) => onSearch(e.target.value)}
           placeholder="Search…"
-          style={{ width: "100%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "7px 12px 7px 28px", color: "var(--color-foreground)", fontSize: 12, outline: "none", boxSizing: "border-box" as const }}
+          style={{ width: "100%", background: "var(--accent)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 12px 7px 28px", color: "var(--color-foreground)", fontSize: 12, outline: "none", boxSizing: "border-box" as const }}
         />
       </div>
 
@@ -524,12 +524,12 @@ function CompanyCard({ entry, compact = false, onAdvance, onDecision, advancing 
           {stale ? `Stale ${days}d` : `${days}d in stage`}
         </span>
         {entry.deal_room_id && (
-          <a href={`/app/deal-room/${entry.deal_room_id}`} style={{ fontSize: 11, color: "#7C3AED", display: "flex", alignItems: "center", gap: 3 }}>
+          <a href={`/app/deal-room/${entry.deal_room_id}`} style={{ fontSize: 11, color: "var(--brand)", display: "flex", alignItems: "center", gap: 3 }}>
             <ExternalLink size={10} />Open DD
           </a>
         )}
         {isPassed && entry.pass_reason_category && (
-          <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>Passed: {entry.pass_reason_category}</span>
+          <span style={{ fontSize: 10, color: "var(--faint)" }}>Passed: {entry.pass_reason_category}</span>
         )}
       </div>
 
@@ -542,7 +542,7 @@ function CompanyCard({ entry, compact = false, onAdvance, onDecision, advancing 
               <button onClick={() => onDecision(entry, "pass")} style={actionBtn("#EF4444")}>Pass</button>
             </>
           ) : next ? (
-            <button onClick={() => onAdvance(entry)} disabled={isAdvancing} style={{ ...actionBtn("#7C3AED"), opacity: isAdvancing ? 0.6 : 1, display: "flex", alignItems: "center", gap: 4 }}>
+            <button onClick={() => onAdvance(entry)} disabled={isAdvancing} style={{ ...actionBtn("var(--brand)"), opacity: isAdvancing ? 0.6 : 1, display: "flex", alignItems: "center", gap: 4 }}>
               {isAdvancing ? "Moving…" : <>{`→ ${next}`}<ArrowRight size={10} /></>}
             </button>
           ) : null}
@@ -612,7 +612,7 @@ function ListView({ entries, advancing, onAdvance, onDecision }: {
   );
 
   return (
-    <div style={{ overflowX: "auto", borderRadius: 10, border: "1px solid rgba(255,255,255,0.08)" }}>
+    <div style={{ overflowX: "auto", borderRadius: 10, border: "1px solid var(--border)" }}>
       <table data-testid="list-view-table" style={{ width: "100%", borderCollapse: "collapse" as const }}>
         <thead><tr>{th("company_name", "Company")}{th("status", "Stage")}{th("days", "Days")}{th("initial_score", "Score")}<th style={{ padding: "8px 12px", fontSize: 11, fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase" as const, letterSpacing: "0.08em", borderBottom: "1px solid var(--color-border)", background: "var(--color-card)" }}>Sector</th><th style={{ padding: "8px 12px", fontSize: 11, fontWeight: 700, color: "var(--color-muted-foreground)", textTransform: "uppercase" as const, letterSpacing: "0.08em", borderBottom: "1px solid var(--color-border)", background: "var(--color-card)" }}>Actions</th></tr></thead>
         <tbody>
@@ -624,10 +624,10 @@ function ListView({ entries, advancing, onAdvance, onDecision }: {
             const isDecisionStage = e.status === "Decision";
             const isAdv = advancing === e.id;
             return (
-              <tr key={e.id} style={{ borderLeft: stale ? "3px solid #F59E0B" : "3px solid transparent", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+              <tr key={e.id} style={{ borderLeft: stale ? "3px solid #F59E0B" : "3px solid transparent", borderBottom: "1px solid var(--border)" }}>
                 <td style={{ padding: "10px 12px" }}>
                   <div style={{ fontWeight: 600, fontSize: 13, color: "var(--color-foreground)" }}>{e.company_name}</div>
-                  {e.deal_room_id && <a href={`/app/deal-room/${e.deal_room_id}`} style={{ fontSize: 10, color: "#7C3AED", display: "flex", alignItems: "center", gap: 3, marginTop: 2 }}><ExternalLink size={9} />Open DD</a>}
+                  {e.deal_room_id && <a href={`/app/deal-room/${e.deal_room_id}`} style={{ fontSize: 10, color: "var(--brand)", display: "flex", alignItems: "center", gap: 3, marginTop: 2 }}><ExternalLink size={9} />Open DD</a>}
                 </td>
                 <td style={{ padding: "10px 12px" }}><StageBadge status={e.status} /></td>
                 <td style={{ padding: "10px 12px", fontSize: 12, color: stale ? "#F59E0B" : "var(--color-muted-foreground)", whiteSpace: "nowrap" as const }}>
@@ -641,7 +641,7 @@ function ListView({ entries, advancing, onAdvance, onDecision }: {
                       {isDecisionStage ? (
                         <><button onClick={() => onDecision(e, "invest")} style={actionBtn("#10B981")}>Invest</button><button onClick={() => onDecision(e, "hold")} style={actionBtn("#F59E0B")}>Hold</button><button onClick={() => onDecision(e, "pass")} style={actionBtn("#EF4444")}>Pass</button></>
                       ) : next ? (
-                        <button onClick={() => onAdvance(e)} disabled={isAdv} style={{ ...actionBtn("#7C3AED"), opacity: isAdv ? 0.6 : 1 }}>{isAdv ? "…" : `→ ${next}`}</button>
+                        <button onClick={() => onAdvance(e)} disabled={isAdv} style={{ ...actionBtn("var(--brand)"), opacity: isAdv ? 0.6 : 1 }}>{isAdv ? "…" : `→ ${next}`}</button>
                       ) : null}
                     </div>
                   )}
@@ -692,11 +692,11 @@ function FieldRow({ label, children }: { label: string; children: React.ReactNod
   );
 }
 
-function ModalBtns({ onConfirm, onCancel, label, color = "#7C3AED", disabled = false }: { onConfirm: () => void; onCancel: () => void; label: string; color?: string; disabled?: boolean }) {
+function ModalBtns({ onConfirm, onCancel, label, color = "var(--brand)", disabled = false }: { onConfirm: () => void; onCancel: () => void; label: string; color?: string; disabled?: boolean }) {
   return (
     <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 20 }}>
       <button onClick={onCancel} style={{ padding: "8px 18px", borderRadius: 8, border: "1px solid var(--color-border)", background: "transparent", color: "var(--color-muted-foreground)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
-      <button onClick={onConfirm} disabled={disabled} style={{ padding: "8px 20px", borderRadius: 8, border: "none", background: color, color: "#fff", fontSize: 13, fontWeight: 600, cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.5 : 1 }}>{label}</button>
+      <button onClick={onConfirm} disabled={disabled} style={{ padding: "8px 20px", borderRadius: 8, border: "none", background: color, color: "var(--foreground)", fontSize: 13, fontWeight: 600, cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.5 : 1 }}>{label}</button>
     </div>
   );
 }
@@ -704,7 +704,7 @@ function ModalBtns({ onConfirm, onCancel, label, color = "#7C3AED", disabled = f
 function ConfirmModal({ title, body, confirmLabel, onConfirm, onCancel }: { title: string; body: string; confirmLabel: string; onConfirm: () => void; onCancel: () => void }) {
   return (
     <ModalOverlay>
-      <h2 style={{ fontFamily: "Syne, sans-serif", fontSize: 18, fontWeight: 700, color: "#fff", margin: "0 0 6px" }}>{title}</h2>
+      <h2 style={{ fontFamily: "Syne, sans-serif", fontSize: 18, fontWeight: 700, color: "var(--foreground)", margin: "0 0 6px" }}>{title}</h2>
       <p style={{ fontSize: 13, color: "var(--color-muted-foreground)", margin: "0 0 4px" }}>{body}</p>
       <ModalBtns onConfirm={onConfirm} onCancel={onCancel} label={confirmLabel} />
     </ModalOverlay>
@@ -714,7 +714,7 @@ function ConfirmModal({ title, body, confirmLabel, onConfirm, onCancel }: { titl
 function InvestModal({ entry, amount, notes, onChange, onConfirm, onCancel }: { entry: WatchlistEntry; amount: string; notes: string; onChange: (f: string, v: string) => void; onConfirm: () => void; onCancel: () => void }) {
   return (
     <ModalOverlay>
-      <h2 style={{ fontFamily: "Syne, sans-serif", fontSize: 18, fontWeight: 700, color: "#fff", margin: "0 0 4px" }}>Record investment — {entry.company_name}</h2>
+      <h2 style={{ fontFamily: "Syne, sans-serif", fontSize: 18, fontWeight: 700, color: "var(--foreground)", margin: "0 0 4px" }}>Record investment — {entry.company_name}</h2>
       <p style={{ fontSize: 13, color: "var(--color-muted-foreground)", margin: "0 0 16px" }}>This will move the company to Invested and record the decision.</p>
       <FieldRow label="Investment amount (optional)"><input value={amount} onChange={(e) => onChange("investAmount", e.target.value)} placeholder="e.g. $250,000" style={inputStyle} /></FieldRow>
       <FieldRow label="Notes (optional)"><textarea value={notes} onChange={(e) => onChange("investNotes", e.target.value)} rows={3} placeholder="Board seat, pro-rata, terms…" style={{ ...inputStyle, resize: "vertical" as const }} /></FieldRow>
@@ -726,7 +726,7 @@ function InvestModal({ entry, amount, notes, onChange, onConfirm, onCancel }: { 
 function HoldModal({ entry, date, notes, onChange, onConfirm, onCancel }: { entry: WatchlistEntry; date: string; notes: string; onChange: (f: string, v: string) => void; onConfirm: () => void; onCancel: () => void }) {
   return (
     <ModalOverlay>
-      <h2 style={{ fontFamily: "Syne, sans-serif", fontSize: 18, fontWeight: 700, color: "#fff", margin: "0 0 4px" }}>Hold — {entry.company_name}</h2>
+      <h2 style={{ fontFamily: "Syne, sans-serif", fontSize: 18, fontWeight: 700, color: "var(--foreground)", margin: "0 0 4px" }}>Hold — {entry.company_name}</h2>
       <p style={{ fontSize: 13, color: "var(--color-muted-foreground)", margin: "0 0 16px" }}>Set a follow-up date. Company stays in Decision stage.</p>
       <FieldRow label="Follow-up date (required)"><input type="date" value={date} onChange={(e) => onChange("holdDate", e.target.value)} style={inputStyle} /></FieldRow>
       <FieldRow label="Notes (optional)"><textarea value={notes} onChange={(e) => onChange("holdNotes", e.target.value)} rows={2} placeholder="What needs to change before you invest?" style={{ ...inputStyle, resize: "vertical" as const }} /></FieldRow>
@@ -738,7 +738,7 @@ function HoldModal({ entry, date, notes, onChange, onConfirm, onCancel }: { entr
 function PassModal({ entry, category, detail, onChange, onConfirm, onCancel }: { entry: WatchlistEntry; category: string; detail: string; onChange: (f: string, v: string) => void; onConfirm: () => void; onCancel: () => void }) {
   return (
     <ModalOverlay>
-      <h2 style={{ fontFamily: "Syne, sans-serif", fontSize: 18, fontWeight: 700, color: "#fff", margin: "0 0 4px" }}>Pass — {entry.company_name}</h2>
+      <h2 style={{ fontFamily: "Syne, sans-serif", fontSize: 18, fontWeight: 700, color: "var(--foreground)", margin: "0 0 4px" }}>Pass — {entry.company_name}</h2>
       <p style={{ fontSize: 13, color: "var(--color-muted-foreground)", margin: "0 0 16px" }}>Select the primary reason. Not shared with the founder.</p>
       <FieldRow label="Primary reason">
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>

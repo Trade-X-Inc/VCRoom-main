@@ -63,7 +63,7 @@ const badge = (color: "green" | "amber" | "muted") => ({
     border: "1px solid rgba(245,158,11,0.2)",
   }),
   ...(color === "muted" && {
-    background: "rgba(255,255,255,0.05)",
+    background: "var(--accent)",
     color: "var(--color-muted-foreground)",
     border: "1px solid var(--color-border)",
   }),
@@ -416,8 +416,8 @@ function IntakePage() {
                     width: "100%", border: "none", cursor: "pointer",
                     padding: "12px 16px", display: "flex", alignItems: "center", gap: 10,
                     borderRadius: 12, textAlign: "left",
-                    background: isActive ? "rgba(124,58,237,0.1)" : "var(--color-card, #111114)",
-                    outline: isActive ? "1px solid rgba(124,58,237,0.35)" : "1px solid rgba(255,255,255,0.08)",
+                    background: isActive ? "var(--accent)" : "var(--card)",
+                    outline: isActive ? "1px solid var(--brand)" : "1px solid var(--border)",
                     transition: "background 0.15s, outline 0.15s",
                   }}
                 >
@@ -562,7 +562,7 @@ function IntakePage() {
             {uploadedFiles.length < 20 && (
               <button
                 onClick={() => fileInputRef.current?.click()}
-                style={{ width: "100%", background: "var(--color-muted)", border: "1px dashed rgba(255,255,255,0.15)", borderRadius: 8, padding: "10px", fontSize: 12, color: "var(--color-muted-foreground)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+                style={{ width: "100%", background: "var(--color-muted)", border: "1px dashed var(--border)", borderRadius: 8, padding: "10px", fontSize: 12, color: "var(--color-muted-foreground)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
               >
                 <Plus size={13} /> Add files
               </button>
@@ -609,7 +609,7 @@ function IntakePage() {
       </div>
 
       {/* Section 4 — What we extract */}
-      <div style={{ marginBottom: 16, padding: "14px 18px", background: "rgba(255,255,255,0.02)", border: "1px solid var(--color-border)", borderRadius: 10 }}>
+      <div style={{ marginBottom: 16, padding: "14px 18px", background: "var(--accent)", border: "1px solid var(--color-border)", borderRadius: 10 }}>
         <div style={{ fontSize: 11, fontWeight: 600, color: "var(--color-muted-foreground)", textTransform: "uppercase" as const, letterSpacing: "0.1em", marginBottom: 10 }}>
           What we extract
         </div>
@@ -648,7 +648,7 @@ function IntakePage() {
         onClick={handleSubmit}
         disabled={parsing || !hasInput}
         style={{
-          background: parsing || !hasInput ? "var(--hs-bg-secondary)" : "#7C3AED",
+          background: parsing || !hasInput ? "var(--hs-bg-secondary)" : "var(--brand)",
           color: parsing || !hasInput ? "var(--hs-text-muted)" : "#fff",
           border: "none",
           borderRadius: 10,
@@ -805,7 +805,7 @@ function ExtractedCard({
       <div style={{ marginBottom: 8 }}>
         <span style={{
           fontSize: 10, fontWeight: 600, color: "var(--color-muted-foreground)",
-          background: "rgba(255,255,255,0.05)", border: "1px solid var(--color-border)",
+          background: "var(--accent)", border: "1px solid var(--color-border)",
           borderRadius: 4, padding: "2px 7px", textTransform: "uppercase", letterSpacing: "0.06em",
         }}>
           Pasted text
@@ -843,11 +843,11 @@ function ExtractedCard({
         {/* Fit score */}
         <div style={{
           width: 38, height: 38, borderRadius: "50%", flexShrink: 0,
-          background: color === "green" ? "rgba(16,185,129,0.1)" : color === "amber" ? "rgba(245,158,11,0.1)" : "rgba(255,255,255,0.05)",
-          border: `1px solid ${color === "green" ? "rgba(16,185,129,0.25)" : color === "amber" ? "rgba(245,158,11,0.25)" : "rgba(255,255,255,0.1)"}`,
+          background: color === "green" ? "rgba(16,185,129,0.1)" : color === "amber" ? "rgba(245,158,11,0.1)" : "var(--faint)",
+          border: `1px solid ${color === "green" ? "rgba(16,185,129,0.25)" : color === "amber" ? "rgba(245,158,11,0.25)" : "var(--faint)"}`,
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 12, fontWeight: 700,
-          color: color === "green" ? "#10b981" : color === "amber" ? "#f59e0b" : "rgba(255,255,255,0.3)",
+          color: color === "green" ? "#10b981" : color === "amber" ? "#f59e0b" : "var(--faint)",
         }}>
           {c.thesis_fit_score}
         </div>
@@ -859,7 +859,7 @@ function ExtractedCard({
           {pills.map((p) => (
             <span key={p.label} style={{
               fontSize: 11, color: "var(--color-muted-foreground)",
-              background: "rgba(255,255,255,0.04)", border: "1px solid var(--color-border)",
+              background: "var(--accent)", border: "1px solid var(--color-border)",
               borderRadius: 4, padding: "2px 8px",
             }}>
               {p.label}: {p.value}

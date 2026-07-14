@@ -16,7 +16,7 @@ export const Route = createFileRoute("/app/investor/team")({
 type InvestorRole = "admin" | "associate" | "analyst" | "external";
 
 const ROLE_COLORS: Record<string, { bg: string; text: string }> = {
-  admin:     { bg: "rgba(124,58,237,0.15)",  text: "#7C3AED" },
+  admin:     { bg: "rgba(124,58,237,0.15)",  text: "var(--brand)" },
   associate: { bg: "rgba(16,185,129,0.15)",  text: "#10B981" },
   analyst:   { bg: "rgba(245,158,11,0.15)",  text: "#F59E0B" },
   external:  { bg: "rgba(107,114,128,0.12)", text: "#6B7280" },
@@ -205,8 +205,8 @@ function InvestorTeamPage() {
           disabled={isFreePlan || atLimit}
           style={{
             display: "inline-flex", alignItems: "center", gap: 6,
-            background: isFreePlan || atLimit ? "var(--color-muted)" : "#7C3AED",
-            color: isFreePlan || atLimit ? "rgba(255,255,255,0.3)" : "#fff",
+            background: isFreePlan || atLimit ? "var(--color-muted)" : "var(--gradient-brand)",
+            color: isFreePlan || atLimit ? "var(--faint)" : "#fff",
             border: "none", borderRadius: 8, padding: "9px 16px",
             fontSize: 13, fontWeight: 500,
             cursor: isFreePlan || atLimit ? "not-allowed" : "pointer",
@@ -224,7 +224,7 @@ function InvestorTeamPage() {
             Upgrade to Starter to invite 1 team member, or Pro to invite up to 4.
             Your analysts get role-based access to deal rooms and documents.
           </p>
-          <a href="/pricing" className="inline-block bg-brand text-white px-6 py-2.5 rounded-lg text-sm font-semibold no-underline hover:bg-brand/90 transition-colors">
+          <a href="/pricing" className="inline-block hs-gradient text-white px-6 py-2.5 rounded-lg text-sm font-semibold no-underline hover:bg-accent transition-colors">
             View plans →
           </a>
         </div>
@@ -236,7 +236,7 @@ function InvestorTeamPage() {
           <AlertTriangle size={14} style={{ color: "#F59E0B", flexShrink: 0 }} />
           <span style={{ fontSize: 13, color: "var(--color-foreground)" }}>
             You've used all {teamLimit} seat(s) on the {userPlan?.plan_name ?? ""} plan.{" "}
-            <a href="/pricing" style={{ color: "#7C3AED" }}>Upgrade plan →</a>
+            <a href="/pricing" style={{ color: "var(--brand)" }}>Upgrade plan →</a>
           </span>
         </div>
       )}
@@ -264,7 +264,7 @@ function InvestorTeamPage() {
 
         {/* Owner row */}
         <div className="flex items-center px-5 py-3.5 border-b border-border/40 gap-3">
-          <div style={{ width: 36, height: 36, borderRadius: "50%", flexShrink: 0, background: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "var(--color-foreground)" }}>
+          <div style={{ width: 36, height: 36, borderRadius: "50%", flexShrink: 0, background: "var(--gradient-brand)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "var(--color-foreground)" }}>
             {initials(user?.name ?? user?.email ?? "?")}
           </div>
           <div className="flex-1 min-w-0">
@@ -273,7 +273,7 @@ function InvestorTeamPage() {
             </div>
             <div className="text-xs text-muted-foreground mt-px">{user?.email}</div>
           </div>
-          <span className="text-xs font-semibold bg-brand/15 text-brand px-2.5 py-0.5 rounded-full">Owner</span>
+          <span className="text-xs font-semibold bg-accent text-brand px-2.5 py-0.5 rounded-full">Owner</span>
         </div>
 
         {loadingMembers ? (
@@ -359,7 +359,7 @@ function InvestorTeamPage() {
               <button onClick={() => setAppointConfirm(null)} className="flex-1 bg-accent text-muted-foreground hover:text-foreground border-0 rounded-lg py-2.5 text-sm cursor-pointer transition-colors">
                 Cancel
               </button>
-              <button onClick={confirmAppoint} className="flex-1 bg-brand text-white border-0 rounded-lg py-2.5 text-sm font-semibold cursor-pointer hover:bg-brand/90 transition-colors">
+              <button onClick={confirmAppoint} className="flex-1 hs-gradient text-white border-0 rounded-lg py-2.5 text-sm font-semibold cursor-pointer hover:bg-accent transition-colors">
                 Appoint as Admin
               </button>
             </div>
@@ -383,7 +383,7 @@ function MemberRow({
 
   return (
     <div style={{ display: "flex", alignItems: "center", padding: "14px 20px", borderBottom: "1px solid var(--color-border)", gap: 12 }}>
-      <div style={{ width: 36, height: 36, borderRadius: "50%", flexShrink: 0, background: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "var(--color-foreground)", overflow: "hidden" }}>
+      <div style={{ width: 36, height: 36, borderRadius: "50%", flexShrink: 0, background: "var(--gradient-brand)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "var(--color-foreground)", overflow: "hidden" }}>
         {avatarUrl ? <img src={avatarUrl} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="" /> : initials(name)}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -404,7 +404,7 @@ function MemberRow({
               <button
                 key={r.value}
                 onClick={() => { onChangeRole(r.value); setRoleOpen(false); }}
-                style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", fontSize: 12, fontWeight: 500, color: r.value === role ? "#7C3AED" : "rgba(255,255,255,0.7)", background: r.value === role ? "rgba(124,58,237,0.08)" : "transparent", border: "none", cursor: "pointer" }}
+                style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", fontSize: 12, fontWeight: 500, color: r.value === role ? "var(--brand)" : "var(--muted-foreground)", background: r.value === role ? "rgba(124,58,237,0.08)" : "transparent", border: "none", cursor: "pointer" }}
               >
                 {r.label}
               </button>
@@ -419,7 +419,7 @@ function MemberRow({
         onClick={onRemove}
         style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--color-muted-foreground)", padding: 4, borderRadius: 4, display: "flex", alignItems: "center" }}
         onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#EF4444"; }}
-        onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.25)"; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "var(--faint)"; }}
       >
         <X size={14} />
       </button>
@@ -446,7 +446,7 @@ function PendingRow({ invite, onCancel, onResend }: { invite: InviteRow; onCance
       </button>
       <button onClick={onCancel} style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--color-muted-foreground)", padding: 4, borderRadius: 4, display: "flex", alignItems: "center" }}
         onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#EF4444"; }}
-        onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.25)"; }}>
+        onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "var(--faint)"; }}>
         <X size={14} />
       </button>
     </div>
@@ -509,7 +509,7 @@ function InviteModal({
       onClick={onClose}
     >
       <div
-        style={{ background: "#111114", border: "1px solid var(--color-border)", borderRadius: 16, padding: 28, width: "100%", maxWidth: 440 }}
+        style={{ background: "var(--card)", border: "1px solid var(--color-border)", borderRadius: 16, padding: 28, width: "100%", maxWidth: 440 }}
         onClick={(e) => e.stopPropagation()}
       >
         <div style={{ fontSize: 16, fontWeight: 600, color: "var(--color-foreground)", marginBottom: 4 }}>Invite team member</div>
@@ -532,8 +532,8 @@ function InviteModal({
           {INVESTOR_PERMISSIONS[role] && (
             <div style={{
               marginTop: 8,
-              background: role === "admin" || role === "external" ? "rgba(245,158,11,0.06)" : "rgba(255,255,255,0.03)",
-              border: `1px solid ${role === "admin" || role === "external" ? "rgba(245,158,11,0.2)" : "rgba(255,255,255,0.08)"}`,
+              background: role === "admin" || role === "external" ? "rgba(245,158,11,0.06)" : "var(--accent)",
+              border: `1px solid ${role === "admin" || role === "external" ? "rgba(245,158,11,0.2)" : "var(--accent)"}`,
               borderRadius: 8,
               padding: "14px 16px",
             }}>
@@ -553,7 +553,7 @@ function InviteModal({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                 {Object.entries(INVESTOR_PERMISSIONS[role]).map(([perm, allowed]) => (
                   PERMISSION_LABELS[perm] ? (
-                    <div key={perm} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: allowed ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.25)" }}>
+                    <div key={perm} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: allowed ? "var(--muted-foreground)" : "var(--faint)" }}>
                       <span style={{ color: allowed ? "#10B981" : "#EF4444", fontSize: 13, lineHeight: 1 }}>
                         {allowed ? "✓" : "✗"}
                       </span>
@@ -571,7 +571,7 @@ function InviteModal({
           </button>
           <button
             onClick={handleSend} disabled={sending || !email.trim()}
-            style={{ background: "#7C3AED", border: "none", borderRadius: 8, padding: "9px 18px", fontSize: 13, color: "var(--color-foreground)", fontWeight: 500, cursor: "pointer", opacity: sending || !email.trim() ? 0.6 : 1, display: "inline-flex", alignItems: "center", gap: 6 }}
+            style={{ background: "var(--gradient-brand)", border: "none", borderRadius: 8, padding: "9px 18px", fontSize: 13, color: "var(--color-foreground)", fontWeight: 500, cursor: "pointer", opacity: sending || !email.trim() ? 0.6 : 1, display: "inline-flex", alignItems: "center", gap: 6 }}
           >
             {sending && <Loader2 size={13} className="animate-spin" />}
             Send invite

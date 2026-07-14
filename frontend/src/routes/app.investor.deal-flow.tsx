@@ -54,18 +54,18 @@ function DealBriefPanel({ startupId, investorId, dealRoomId }: { startupId: stri
     return (
       <div
         data-testid="deal-brief-panel"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "12px 20px" }}
+        style={{ borderTop: "1px solid var(--border)", padding: "12px 20px" }}
         className="flex items-center justify-between gap-3"
       >
-        <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
+        <span className="text-xs" style={{ color: "var(--faint)" }}>
           No deal brief yet
         </span>
         <button
           data-testid="generate-brief-btn"
           onClick={handleGenerate}
           disabled={generating}
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white transition-colors"
-          style={{ background: generating ? "rgba(124,58,237,0.4)" : "#7C3AED", cursor: generating ? "not-allowed" : "pointer" }}
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-foreground transition-colors"
+          style={{ background: generating ? "rgba(124,58,237,0.4)" : "var(--gradient-brand)", cursor: generating ? "not-allowed" : "pointer" }}
         >
           {generating ? <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</> : <><FileText className="h-3 w-3" /> Generate brief</>}
         </button>
@@ -88,16 +88,16 @@ function DealBriefPanel({ startupId, investorId, dealRoomId }: { startupId: stri
       ? "#10B981"
       : brief.verdict_signal === "negative"
       ? "#EF4444"
-      : "rgba(255,255,255,0.12)";
+      : "var(--accent)";
 
   return (
     <div
       data-testid="deal-brief-panel"
-      style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "16px 20px 20px" }}
+      style={{ borderTop: "1px solid var(--border)", padding: "16px 20px 20px" }}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
-        <span className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "Syne, sans-serif", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+        <span className="text-xs font-semibold" style={{ color: "var(--muted-foreground)", fontFamily: "Syne, sans-serif", textTransform: "uppercase", letterSpacing: "0.1em" }}>
           Deal Brief
         </span>
         <span
@@ -111,14 +111,14 @@ function DealBriefPanel({ startupId, investorId, dealRoomId }: { startupId: stri
 
       {/* Headline */}
       {brief.headline && (
-        <p className="text-sm font-semibold text-white mb-2" style={{ fontFamily: "Syne, sans-serif" }}>
+        <p className="text-sm font-semibold text-foreground mb-2" style={{ fontFamily: "Syne, sans-serif" }}>
           {brief.headline}
         </p>
       )}
 
       {/* Thesis */}
       {brief.investment_thesis && (
-        <p className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.55)", lineHeight: 1.6 }}>
+        <p className="text-xs mb-3" style={{ color: "var(--muted-foreground)", lineHeight: 1.6 }}>
           {brief.investment_thesis}
         </p>
       )}
@@ -127,7 +127,7 @@ function DealBriefPanel({ startupId, investorId, dealRoomId }: { startupId: stri
       {brief.key_metrics && (
         <div className="flex flex-wrap gap-1.5 mb-3">
           {Object.entries(brief.key_metrics).filter(([, v]) => v != null && v !== "").slice(0, 4).map(([k, v]) => (
-            <span key={k} className="text-[11px] px-2 py-0.5 rounded-md" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)" }}>
+            <span key={k} className="text-[11px] px-2 py-0.5 rounded-md" style={{ background: "var(--accent)", color: "var(--muted-foreground)" }}>
               {String(v)}
             </span>
           ))}
@@ -143,7 +143,7 @@ function DealBriefPanel({ startupId, investorId, dealRoomId }: { startupId: stri
               <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "#10B981" }}>Strengths</span>
             </div>
             {brief.strengths.slice(0, 2).map((s, i) => (
-              <p key={i} className="text-[11px] mb-0.5" style={{ color: "rgba(255,255,255,0.5)" }}>· {s}</p>
+              <p key={i} className="text-[11px] mb-0.5" style={{ color: "var(--muted-foreground)" }}>· {s}</p>
             ))}
           </div>
         )}
@@ -154,7 +154,7 @@ function DealBriefPanel({ startupId, investorId, dealRoomId }: { startupId: stri
               <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "#EF4444" }}>Red flags</span>
             </div>
             {brief.red_flags.slice(0, 2).map((f, i) => (
-              <p key={i} className="text-[11px] mb-0.5" style={{ color: "rgba(255,255,255,0.5)" }}>· {f}</p>
+              <p key={i} className="text-[11px] mb-0.5" style={{ color: "var(--muted-foreground)" }}>· {f}</p>
             ))}
           </div>
         )}
@@ -168,7 +168,7 @@ function DealBriefPanel({ startupId, investorId, dealRoomId }: { startupId: stri
             <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "rgba(124,58,237,0.8)" }}>Questions to ask</span>
           </div>
           {brief.suggested_questions.slice(0, 2).map((q, i) => (
-            <p key={i} className="text-[11px] mb-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>{i + 1}. {q}</p>
+            <p key={i} className="text-[11px] mb-0.5" style={{ color: "var(--muted-foreground)" }}>{i + 1}. {q}</p>
           ))}
         </div>
       )}
@@ -178,9 +178,9 @@ function DealBriefPanel({ startupId, investorId, dealRoomId }: { startupId: stri
         <div
           className="rounded-lg px-3 py-2.5 mb-3 text-xs leading-relaxed"
           style={{
-            background: "rgba(255,255,255,0.03)",
+            background: "var(--accent)",
             borderLeft: `3px solid ${verdictBorder}`,
-            color: "rgba(255,255,255,0.55)",
+            color: "var(--muted-foreground)",
           }}
         >
           {brief.overall_verdict}
@@ -190,8 +190,8 @@ function DealBriefPanel({ startupId, investorId, dealRoomId }: { startupId: stri
       {/* Docs */}
       {brief.document_readiness && (
         <div className="flex items-center gap-2 mb-2">
-          <CheckCircle2 className="h-3 w-3" style={{ color: "rgba(255,255,255,0.25)" }} />
-          <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.35)" }}>
+          <CheckCircle2 className="h-3 w-3" style={{ color: "var(--faint)" }} />
+          <span className="text-[11px]" style={{ color: "var(--faint)" }}>
             {(brief.document_readiness as any).uploaded_count ?? 0} docs uploaded
             {(brief.document_readiness as any).top_missing ? ` · Missing: ${(brief.document_readiness as any).top_missing}` : ""}
           </span>
@@ -200,7 +200,7 @@ function DealBriefPanel({ startupId, investorId, dealRoomId }: { startupId: stri
 
       {/* Footer */}
       <div className="flex items-center justify-between mt-1 flex-wrap gap-2">
-        <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.2)" }}>
+        <span className="text-[10px]" style={{ color: "var(--faint)" }}>
           Brief generated {format(new Date(brief.generated_at), "d MMM yyyy")}
           {brief.viewed_at ? ` · Viewed ${format(new Date(brief.viewed_at), "d MMM")}` : ""}
         </span>
@@ -383,7 +383,7 @@ function DealFlowPage() {
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); void navigate({ to: "/app/deal-room/$id", params: { id: room.id } }); }}
-                      className="inline-flex items-center gap-1 rounded-md bg-brand/10 text-brand px-2 py-0.5 text-[10px] font-medium hover:bg-brand/20"
+                      className="inline-flex items-center gap-1 rounded-md bg-accent text-brand px-2 py-0.5 text-[10px] font-medium hover:bg-accent"
                     >
                       Open <ArrowRight className="h-2.5 w-2.5" />
                     </button>

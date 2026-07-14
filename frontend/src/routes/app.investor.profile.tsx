@@ -108,7 +108,7 @@ function BulletEditor({ bullets, onChange, placeholder }: { bullets: string[]; o
     <div className="space-y-2">
       {bullets.map((b, i) => (
         <div key={i} className="flex items-start gap-2">
-          <span className="mt-2.5 h-1.5 w-1.5 rounded-full bg-brand/50 shrink-0" />
+          <span className="mt-2.5 h-1.5 w-1.5 rounded-full bg-accent shrink-0" />
           <input value={b} onChange={(e) => update(i, e.target.value)}
             className={cn(input, "flex-1")} placeholder={placeholder} />
           <button type="button" onClick={() => remove(i)}
@@ -145,7 +145,7 @@ function AccordionBlock({
         onClick={() => onToggle(id)}
         className="w-full flex items-center gap-3 px-6 py-5 text-left hover:bg-accent/40 transition-colors"
       >
-        <div className="grid h-9 w-9 place-items-center rounded-lg bg-brand/10 text-brand shrink-0">
+        <div className="grid h-9 w-9 place-items-center rounded-lg bg-accent text-brand shrink-0">
           <Icon className="h-4 w-4" />
         </div>
         <div className="flex-1 min-w-0">
@@ -448,7 +448,7 @@ function InvestorProfilePage() {
                 : <span>{(form.your_name || user?.fullName || "?").split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()}</span>}
             </div>
             <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <Upload className="h-4 w-4 text-white" />
+              <Upload className="h-4 w-4 text-foreground" />
             </div>
             <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])} />
           </label>
@@ -474,7 +474,7 @@ function InvestorProfilePage() {
                   </span>
               }
               {form.profile_published
-                ? <span className="inline-flex items-center gap-1.5 text-[11px] bg-brand/10 text-brand border border-brand/20 rounded-full px-2.5 py-1 font-medium">
+                ? <span className="inline-flex items-center gap-1.5 text-[11px] bg-accent text-brand border border-brand/20 rounded-full px-2.5 py-1 font-medium">
                     <Eye className="h-3 w-3" /> Profile public
                   </span>
                 : <span className="inline-flex items-center gap-1.5 text-[11px] bg-muted text-muted-foreground border border-border/60 rounded-full px-2.5 py-1">
@@ -579,7 +579,7 @@ function InvestorProfilePage() {
           <AccordionBlock id="thesis" open={open.has("thesis")} onToggle={toggleSection}
             icon={Lightbulb} title="Investment thesis" description="Your one-sentence thesis, bullet points, and what makes your conviction different">
             {/* Thesis statement — hero field */}
-            <div className="rounded-xl border border-brand/20 bg-brand/5 p-4 space-y-2">
+            <div className="rounded-xl border border-brand/20 bg-accent p-4 space-y-2">
               <div className="flex items-center gap-1.5 text-xs font-semibold text-brand">
                 <Lightbulb className="h-3.5 w-3.5" /> Thesis statement
               </div>
@@ -713,7 +713,7 @@ function InvestorProfilePage() {
               <button
                 type="button"
                 onClick={() => set("profile_published", !form.profile_published)}
-                className={cn("h-6 w-11 rounded-full transition-colors relative shrink-0", form.profile_published ? "bg-brand" : "bg-muted")}
+                className={cn("h-6 w-11 rounded-full transition-colors relative shrink-0", form.profile_published ? "hs-gradient" : "bg-muted")}
               >
                 <div className={cn("absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform", form.profile_published ? "translate-x-5" : "translate-x-0.5")} />
               </button>
@@ -1001,28 +1001,28 @@ function AttachInvestorProofModal({ claim, investorId, onClose, onDone }: {
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }} onClick={onClose}>
-      <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 28, maxWidth: 460, width: "100%" }} onClick={(e) => e.stopPropagation()}>
+      <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 16, padding: 28, maxWidth: 460, width: "100%" }} onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between mb-4">
           <div>
-            <div className="text-sm font-semibold text-white" style={{ fontFamily: "Syne, sans-serif" }}>Attach proof for claim</div>
-            <div className="text-xs text-white/40 mt-1">{claim.label}: <span className="text-white/60">{claim.value}</span></div>
+            <div className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Attach proof for claim</div>
+            <div className="text-xs text-muted-foreground mt-1">{claim.label}: <span className="text-muted-foreground">{claim.value}</span></div>
           </div>
-          <button onClick={onClose} className="text-white/30 hover:text-white/60"><X className="h-4 w-4" /></button>
+          <button onClick={onClose} className="text-faint hover:text-muted-foreground"><X className="h-4 w-4" /></button>
         </div>
         {!result ? (
           <>
-            <div style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.15)", borderRadius: 8, padding: "12px 16px", marginBottom: 16 }} className="text-xs text-white/40 leading-relaxed">
+            <div style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.15)", borderRadius: 8, padding: "12px 16px", marginBottom: 16 }} className="text-xs text-muted-foreground leading-relaxed">
               Upload a document containing evidence for this claim. AI will cross-check it.
             </div>
-            <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: "2px dashed rgba(255,255,255,0.12)", borderRadius: 10, padding: "24px 16px", cursor: "pointer", gap: 8, marginBottom: 16 }}>
-              <Paperclip className="h-5 w-5 text-white/30" />
-              <span className="text-xs text-white/40 text-center">{file ? file.name : "Click to select PDF, DOCX, XLSX, CSV"}</span>
+            <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: "2px dashed var(--border)", borderRadius: 10, padding: "24px 16px", cursor: "pointer", gap: 8, marginBottom: 16 }}>
+              <Paperclip className="h-5 w-5 text-faint" />
+              <span className="text-xs text-muted-foreground text-center">{file ? file.name : "Click to select PDF, DOCX, XLSX, CSV"}</span>
               <input type="file" accept=".pdf,.docx,.doc,.xlsx,.xls,.csv,.txt" style={{ display: "none" }} onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
             </label>
             <div className="flex gap-2 justify-end">
-              <button onClick={onClose} className="px-4 py-2 text-xs text-white/40 hover:text-white/70">Cancel</button>
+              <button onClick={onClose} className="px-4 py-2 text-xs text-muted-foreground hover:text-muted-foreground">Cancel</button>
               <button onClick={handleAttach} disabled={!file || running}
-                style={{ background: !file || running ? "rgba(124,58,237,0.3)" : "#7C3AED", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 12, fontWeight: 600, cursor: !file || running ? "not-allowed" : "pointer" }}>
+                style={{ background: !file || running ? "rgba(124,58,237,0.3)" : "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 12, fontWeight: 600, cursor: !file || running ? "not-allowed" : "pointer" }}>
                 {running ? <span className="flex items-center gap-1.5"><Loader2 className="h-3 w-3 animate-spin" /> Checking…</span> : "Attach & verify"}
               </button>
             </div>
@@ -1032,23 +1032,23 @@ function AttachInvestorProofModal({ claim, investorId, onClose, onDone }: {
             {result.proof_status === "ai_confirmed" && (
               <div style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 8, padding: "14px 16px", marginBottom: 16 }}>
                 <div className="flex items-center gap-2 text-[#10B981] text-sm font-medium mb-1"><CheckCircle2 className="h-4 w-4" /> Claim confirmed</div>
-                <p className="text-xs text-white/50">{result.ai_result?.explanation}</p>
+                <p className="text-xs text-muted-foreground">{result.ai_result?.explanation}</p>
               </div>
             )}
             {result.proof_status === "ai_mismatch" && (
               <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "14px 16px", marginBottom: 16 }}>
                 <div className="flex items-center gap-2 text-[#EF4444] text-sm font-medium mb-1"><XCircle className="h-4 w-4" /> Claim doesn't match</div>
-                <p className="text-xs text-white/50">{result.ai_result?.explanation}</p>
+                <p className="text-xs text-muted-foreground">{result.ai_result?.explanation}</p>
               </div>
             )}
             {result.proof_status === "pending_review" && (
-              <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "14px 16px", marginBottom: 16 }}>
-                <div className="flex items-center gap-2 text-white/50 text-sm font-medium mb-1"><Clock className="h-4 w-4" /> Proof attached</div>
-                <p className="text-xs text-white/40">AI check inconclusive — set to pending review.</p>
+              <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: 8, padding: "14px 16px", marginBottom: 16 }}>
+                <div className="flex items-center gap-2 text-muted-foreground text-sm font-medium mb-1"><Clock className="h-4 w-4" /> Proof attached</div>
+                <p className="text-xs text-muted-foreground">AI check inconclusive — set to pending review.</p>
               </div>
             )}
             <div className="flex justify-end">
-              <button onClick={onDone} style={{ background: "#7C3AED", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Done</button>
+              <button onClick={onDone} style={{ background: "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Done</button>
             </div>
           </>
         )}
@@ -1155,7 +1155,7 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
               <div className="h-10 w-10 rounded-full overflow-hidden bg-gradient-brand flex items-center justify-center text-brand-foreground font-bold">
                 {avatarUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : mf.avatar_url ? <img src={mf.avatar_url} alt="" className="h-full w-full object-cover" /> : <span>{(mf.name || "?").charAt(0).toUpperCase()}</span>}
               </div>
-              <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><Upload className="h-3 w-3 text-white" /></div>
+              <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><Upload className="h-3 w-3 text-foreground" /></div>
               <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])} />
             </label>
             <div className="text-xs text-muted-foreground">Photo (optional, max 2MB)</div>
@@ -1168,7 +1168,7 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
             <div><label className="text-xs text-muted-foreground">Role *</label><input value={mf.role} onChange={(e) => setMf((f) => ({ ...f, role: e.target.value }))} required className={cn(input, "mt-1")} placeholder="Partner" /></div>
             <div className="flex items-end pb-2">
               <label className="flex items-center gap-2 cursor-pointer select-none">
-                <div className={cn("h-4 w-8 rounded-full relative transition-colors", mf.is_admin ? "bg-brand" : "bg-muted")} onClick={() => setMf((f) => ({ ...f, is_admin: !f.is_admin }))}>
+                <div className={cn("h-4 w-8 rounded-full relative transition-colors", mf.is_admin ? "hs-gradient" : "bg-muted")} onClick={() => setMf((f) => ({ ...f, is_admin: !f.is_admin }))}>
                   <div className={cn("absolute top-0.5 h-3 w-3 rounded-full bg-white transition-transform", mf.is_admin ? "translate-x-4" : "translate-x-0.5")} />
                 </div>
                 <span className="text-xs text-muted-foreground">Fund admin</span>
@@ -1199,7 +1199,7 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="text-sm font-medium">{m.name}</span>
-                  {m.designation && <span className="text-[10px] bg-brand/10 text-brand px-1.5 py-0.5 rounded-full font-medium">{m.designation}</span>}
+                  {m.designation && <span className="text-[10px] bg-accent text-brand px-1.5 py-0.5 rounded-full font-medium">{m.designation}</span>}
                   {m.role && m.role !== m.designation && <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full">{m.role}</span>}
                   {m.is_admin && <span className="text-[9px] bg-success/10 text-success px-1.5 py-0.5 rounded-full font-semibold uppercase">Admin</span>}
                 </div>
