@@ -45,7 +45,7 @@ function ThesisPage() {
 
       <PrepareSection
         id="thesis"
-        label="Investment thesis"
+        label="Thesis"
         status={p?.thesisSet ? "complete" : "in-progress"}
         summary={p?.thesisSet ? "Set" : "Not set"}
       >

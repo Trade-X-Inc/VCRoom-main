@@ -592,7 +592,7 @@ export function InvestorProfilePage() {
             </div>
 
             {/* Thesis bullets */}
-            <Field label="Thesis bullets — edit or add your investment parameters">
+            <Field label="Thesis">
               <BulletEditor bullets={form.thesis_bullets} onChange={(b) => set("thesis_bullets", b)}
                 placeholder="e.g. Sectors: DevTools, AI/ML, B2B SaaS" />
             </Field>
@@ -601,7 +601,7 @@ export function InvestorProfilePage() {
             <details className="group">
               <summary className="text-xs text-muted-foreground cursor-pointer select-none hover:text-foreground list-none flex items-center gap-1">
                 <ChevronDown className="h-3 w-3 group-open:rotate-180 transition-transform" />
-                Advanced matching fields (used by AI scoring — edit if bullets don't capture them)
+                Matching fields
               </summary>
               <div className="mt-3 space-y-3">
                 <div className="grid sm:grid-cols-2 gap-3">
@@ -634,13 +634,13 @@ export function InvestorProfilePage() {
                     <input value={form.check_size_max} onChange={(e) => set("check_size_max", e.target.value)} className={input} placeholder="$2M" />
                   </Field>
                 </div>
-                <Field label="What you don't invest in">
+                <Field label="Exclusions">
                   <textarea value={form.red_flags} onChange={(e) => set("red_flags", e.target.value)} rows={2} className={cn(input, "resize-none")} placeholder="No crypto, no consumer apps…" />
                 </Field>
               </div>
             </details>
 
-            <Field label="Secret sauce — what makes your conviction different">
+            <Field label="Edge">
               <textarea value={form.secret_sauce} onChange={(e) => set("secret_sauce", e.target.value)}
                 rows={2} className={cn(input, "resize-none")}
                 placeholder="Deep engineering network at FAANG, 3 unicorn exits as an operator, active board seat pattern from day one." />

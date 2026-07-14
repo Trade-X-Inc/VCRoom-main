@@ -114,7 +114,7 @@ function PreparePage() {
 
       <PrepareSection
         id="verification"
-        label="Identity verification"
+        label="Verification"
         status={p?.sections.verification ?? "not-started"}
       >
         <VerificationSection />

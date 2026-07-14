@@ -7,6 +7,7 @@ import { VerificationBadge } from "@/components/shared/VerificationBadge";
 import { fetchVerificationStatus } from "@/lib/verification-fn";
 import { useState } from "react";
 import { toast } from "sonner";
+import { StatusDot } from "@/components/system";
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -59,12 +60,12 @@ export function VerificationPage() {
       if (result.error) {
         toast.error(result.error);
       } else if (result.tier1_passed) {
-        toast.success("Identity confirmed — all four checks passed");
+        toast.success("Identity confirmed");
       } else {
-        toast.info("Check complete — see results below for what didn't pass");
+        toast.info("Check complete — see results below");
       }
     } catch {
-      toast.error("Verification failed — try again");
+      toast.error("Check failed — try again");
     } finally {
       setRunning(false);
     }
@@ -90,12 +91,12 @@ export function VerificationPage() {
       const r = await verifyTradeLicense({ data: payload as any });
       await refetch();
       if (r.passed) {
-        toast.success(`License accepted — issued by ${r.authority}, valid until ${r.expiry}`);
+        toast.success(`License accepted — valid until ${r.expiry}`);
       } else {
         toast.error(r.detail || r.error || "License check failed");
       }
     } catch {
-      toast.error("License check failed — try again");
+      toast.error("Check failed — try again");
     } finally {
       setLicenseChecking(false);
     }
@@ -105,10 +106,10 @@ export function VerificationPage() {
 
   const checks = verif
     ? [
-        { label: "Email domain matches website", passed: verif.tier1_email_match, detail: verif.tier1_email_detail },
-        { label: "Website mentions your company", passed: verif.tier1_website_match, detail: verif.tier1_website_detail },
+        { label: "Email matches domain", passed: verif.tier1_email_match, detail: verif.tier1_email_detail },
+        { label: "Website confirms company", passed: verif.tier1_website_match, detail: verif.tier1_website_detail },
         {
-          label: "Found in a public company registry",
+          label: "Found in a registry",
           passed: verif.tier1_registry_match,
           detail: verif.tier1_registry_match && verif.tier1_registry_source
             ? `${verif.tier1_registry_detail ?? ""} Source: ${verif.tier1_registry_source}.`
@@ -119,6 +120,7 @@ export function VerificationPage() {
     : [];
 
   const hasNewResults = checks.some((c) => c.passed !== null && c.passed !== undefined);
+  const tier1Passed = verif?.tier1_passed === true;
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
@@ -127,12 +129,7 @@ export function VerificationPage() {
           <div className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-brand text-brand-foreground shrink-0">
             <ShieldCheck className="h-4 w-4" />
           </div>
-          <div>
-            <h1 className="text-lg font-semibold tracking-tight">Verification</h1>
-            <div className="text-xs text-muted-foreground">
-              Every badge is backed by a specific, checkable fact — investors see exactly what was confirmed.
-            </div>
-          </div>
+          <h1 className="text-lg font-semibold tracking-tight">Verification</h1>
         </div>
       </div>
 
@@ -140,11 +137,12 @@ export function VerificationPage() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] items-start">
         <div className="min-w-0">
         <div className="bg-card border border-border/60 rounded-none p-6 space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
               <div className="text-sm font-semibold">{startup?.company_name ?? "Your company"}</div>
-              <div className="mt-1">
-                <VerificationBadge tier={tier} size="md" checkedAt={verif?.tier1_checked_at ?? null} />
+              <div className="mt-1.5 flex items-center gap-3">
+                <StatusDot tone={tier1Passed ? "positive" : "neutral"} label="Tier 1" />
+                <span className="text-xs text-muted-foreground">Identity</span>
               </div>
             </div>
             <button
@@ -155,17 +153,12 @@ export function VerificationPage() {
               style={{ background: "var(--gradient-brand)" }}
             >
               <RefreshCw className={`h-3.5 w-3.5 ${running ? "animate-spin" : ""}`} />
-              {running ? "Running…" : hasNewResults ? "Re-run identity check" : "Run identity check"}
+              {running ? "Running…" : hasNewResults ? "Re-run check" : "Run check"}
             </button>
           </div>
 
-          <div className="text-xs text-muted-foreground leading-relaxed border-t border-border/60 pt-4">
-            Tier 1 — Identity Confirmed requires <strong className="text-foreground">all four</strong> checks to pass.
-            There is no partial credit: each check is a specific fact we can defend to an investor.
-          </div>
-
           {hasNewResults && (
-            <div className="space-y-3">
+            <div className="space-y-3 border-t border-border/60 pt-4">
               {checks.map(({ label, passed, detail }) => (
                 <div key={label} className="flex items-start gap-2.5 text-sm rounded-lg border border-border/60 px-3.5 py-3">
                   {passed ? (
@@ -186,11 +179,10 @@ export function VerificationPage() {
                     : <FileUp className="h-4 w-4 shrink-0 mt-0.5 text-brand" />}
                   <div className="min-w-0">
                     <div className="font-medium text-foreground">
-                      {licenseChecking ? "Checking your license…" : "Not in the registries we can query? Upload your trade license"}
+                      {licenseChecking ? "Checking license…" : "Upload trade license"}
                     </div>
-                    <div className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                      AI reads the license and must find your exact company name, a future expiry date, and the
-                      issuing authority (DED, DIFC, ADGM, RAKEZ…). A valid license satisfies this check.
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      Company name, expiry, and issuing authority must match.
                     </div>
                   </div>
                   <input
@@ -208,29 +200,24 @@ export function VerificationPage() {
               )}
               {verif?.tier1_checked_at && (
                 <div className="text-[11px] text-muted-foreground">
-                  Last checked {new Date(verif.tier1_checked_at).toLocaleString("en-GB", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                  Checked {new Date(verif.tier1_checked_at).toLocaleString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
                 </div>
               )}
             </div>
           )}
 
           {!hasNewResults && (
-            <div className="text-sm text-muted-foreground">
-              No identity check has been run yet. The check confirms four facts automatically: your business
-              email matches your domain, your website mentions your company, your company appears in a public
-              registry, and your domain has real mail infrastructure and history.
+            <div className="text-sm text-muted-foreground border-t border-border/60 pt-4">
+              No check run yet.
             </div>
           )}
         </div>
 
         {/* Tier 2 pointer */}
         <div className="mt-4 bg-card border border-border/60 rounded-none p-6 flex items-center justify-between gap-4 flex-wrap">
-          <div className="min-w-0">
-            <div className="text-sm font-semibold">Tier 2 — Claims Verified</div>
-            <div className="text-xs text-muted-foreground mt-1 leading-relaxed">
-              Back every number you state with a document the AI confirms supports that specific claim.
-              Requires Tier 1, then at least 3 verified claims including 1 financial.
-            </div>
+          <div className="flex items-center gap-3">
+            <StatusDot tone="neutral" label="Tier 2" />
+            <span className="text-sm font-semibold">Claims</span>
           </div>
           <Link
             to={"/app/claims" as any}
@@ -241,13 +228,12 @@ export function VerificationPage() {
         </div>
         </div>
 
-        {/* Right panel — why this matters */}
+        {/* Right panel — investor preview */}
         <aside className="space-y-4 lg:sticky lg:top-6">
           <div className="bg-card border border-border/60 rounded-none p-5">
             <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
-              What investors see when you're verified
+              Investor view
             </div>
-            {/* Directory-card mockup */}
             <div className="rounded-lg border border-border/60 bg-background p-4">
               <div className="flex items-center gap-3">
                 <div className="grid h-10 w-10 place-items-center rounded-lg text-foreground text-xs font-bold shrink-0" style={{ background: "var(--gradient-brand)" }}>
@@ -261,22 +247,7 @@ export function VerificationPage() {
               <div className="mt-3">
                 <VerificationBadge tier="checked" size="sm" checkedAt={new Date().toISOString()} />
               </div>
-              <div className="mt-3 flex items-center gap-2 text-[11px] text-muted-foreground">
-                <CheckCircle2 className="h-3 w-3" style={{ color: "#10B981" }} />
-                Identity confirmed — 4 automated checks passed
-              </div>
             </div>
-            <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
-              Verified profiles rank above unverified ones in the directory, and investors can expand
-              your badge to see exactly which facts were confirmed and when.
-            </p>
-          </div>
-          <div className="rounded-lg p-5" style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)" }}>
-            <div className="text-sm font-semibold mb-1.5">Why there's no partial credit</div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              A badge investors can't trust is worthless. Each check is a specific fact we can defend —
-              if one fails, fix it and re-run. Most founders pass in one or two attempts.
-            </p>
           </div>
         </aside>
         </div>
