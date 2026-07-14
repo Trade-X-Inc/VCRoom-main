@@ -287,15 +287,15 @@ export function OnboardingChat({
   const dotColor = darkMode ? "bg-gray-400/50" : "bg-muted-foreground/50";
   const qrBtn = darkMode
     ? "border-violet-500/40 bg-violet-500/10 text-violet-300 hover:bg-violet-500 hover:text-white"
-    : "border-brand/40 bg-brand/5 text-brand hover:bg-brand hover:text-brand-foreground";
+    : "border-brand/40 bg-accent text-brand hover:opacity-90 hover:text-brand-foreground";
   const inputWrap = darkMode
-    ? "border-white/20 bg-gray-800/80 focus-within:border-violet-500/50"
+    ? "border-border bg-gray-800/80 focus-within:border-violet-500/50"
     : "border-border/60 bg-background/80 focus-within:border-brand/50";
   const inputText = darkMode ? "text-white placeholder:text-gray-500" : "placeholder:text-muted-foreground";
   const sendBtn = darkMode ? "bg-violet-600" : "bg-gradient-brand";
   const ctaBtn = darkMode
     ? "bg-violet-500 text-white hover:bg-violet-400"
-    : "bg-brand text-brand-foreground shadow-glow hover:opacity-90";
+    : "hs-gradient text-brand-foreground shadow-glow hover:opacity-90";
 
   // ── Chat UI ────────────────────────────────────────────────────────
 
@@ -382,7 +382,7 @@ export function OnboardingChat({
       {/* Starter questions — shown when in freetext phase with no user messages yet */}
       {phase === "freetext" && userMessageCount === 0 && convRole && (
         <div className="px-4 pb-3 shrink-0">
-          <p className="text-[10px] text-white/30 mb-2 uppercase tracking-wider">Quick questions</p>
+          <p className="text-[10px] text-faint mb-2 uppercase tracking-wider">Quick questions</p>
           <div className="flex flex-wrap gap-2">
             {STARTER_QUESTIONS[convRole]?.map((q, i) => (
               <button
@@ -392,7 +392,7 @@ export function OnboardingChat({
                   "text-xs px-3 py-1.5 rounded-full border text-left transition-colors",
                   darkMode
                     ? "border-violet-500/30 bg-violet-500/10 text-violet-300 hover:bg-violet-500/20 hover:text-white"
-                    : "border-brand/30 bg-brand/5 text-brand hover:bg-brand hover:text-brand-foreground",
+                    : "border-brand/30 bg-accent text-brand hover:opacity-90 hover:text-brand-foreground",
                 )}
               >
                 {q}
@@ -406,16 +406,16 @@ export function OnboardingChat({
       {phase === "freetext" && (
         <div className="px-4 pb-4 shrink-0">
           {questionsRemaining <= 5 && questionsRemaining > 0 && (
-            <p className="text-[11px] text-white/30 text-center mb-2">
+            <p className="text-[11px] text-faint text-center mb-2">
               {questionsRemaining} question{questionsRemaining !== 1 ? "s" : ""} remaining
             </p>
           )}
           {limitReached ? (
-            <div className="text-center p-4 rounded-xl border border-white/8 bg-white/3">
-              <p className="text-sm text-white/60 mb-3">You've used all 10 questions.</p>
+            <div className="text-center p-4 rounded-xl border border-border bg-accent">
+              <p className="text-sm text-muted-foreground mb-3">You've used all 10 questions.</p>
               <a
                 href="/sign-up"
-                className="inline-block px-4 py-2 bg-[#7C3AED] text-white rounded-lg text-sm font-medium hover:bg-[#6d28d9] transition-colors"
+                className="inline-block px-4 py-2 hs-gradient text-foreground rounded-lg text-sm font-medium hover:bg-[#6d28d9] transition-colors"
               >
                 Create your free account →
               </a>

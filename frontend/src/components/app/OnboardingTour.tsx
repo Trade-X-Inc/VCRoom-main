@@ -228,7 +228,7 @@ function TourCard({
               key={s.id}
               className={cn(
                 "h-1.5 rounded-full transition-all",
-                i === activeIndex ? "w-4 bg-brand" : "w-1.5 bg-muted",
+                i === activeIndex ? "w-4 hs-gradient" : "w-1.5 bg-muted",
               )}
             />
           ))}

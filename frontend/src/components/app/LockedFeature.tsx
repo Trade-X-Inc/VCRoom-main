@@ -8,9 +8,9 @@ export function LockedFeature({ message, upgradeRole, style }: LockedFeatureProp
   return (
     <div style={{
       padding: "32px 24px",
-      border: "1px solid rgba(255,255,255,0.08)",
+      border: "1px solid var(--border)",
       borderRadius: 12,
-      background: "#111114",
+      background: "var(--card)",
       textAlign: "center",
       ...style,
     }}>
@@ -26,12 +26,12 @@ export function LockedFeature({ message, upgradeRole, style }: LockedFeatureProp
       }}>
         🔒
       </div>
-      <p style={{ color: "#fff", fontWeight: 600, fontSize: 14, marginBottom: 6 }}>
+      <p style={{ color: "var(--foreground)", fontWeight: 600, fontSize: 14, marginBottom: 6 }}>
         {message}
       </p>
       {upgradeRole && (
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>
-          Ask your admin to change your role to <strong style={{ color: "rgba(255,255,255,0.6)" }}>{upgradeRole}</strong>.
+        <p style={{ color: "var(--muted-foreground)", fontSize: 13 }}>
+          Ask your admin to change your role to <strong style={{ color: "var(--muted-foreground)" }}>{upgradeRole}</strong>.
         </p>
       )}
     </div>

@@ -74,8 +74,8 @@ function MismatchDialog({
           </button>
           <button
             onClick={onContinue}
-            className="px-4 py-2 text-xs font-medium rounded-lg text-white transition-colors"
-            style={{ background: "#7C3AED" }}
+            className="px-4 py-2 text-xs font-medium rounded-lg text-foreground transition-colors"
+            style={{ background: "var(--gradient-brand)" }}
           >
             Upload to {activeTab} anyway
           </button>
@@ -228,7 +228,7 @@ export function Dropzone({
           onClick={() => inputRef.current?.click()}
           className={cn(
             "relative rounded-xl border-2 border-dashed p-8 text-center cursor-pointer transition-all",
-            isOver ? "border-brand bg-brand/5" : "border-border bg-muted/30 hover:border-brand/50 hover:bg-accent/40"
+            isOver ? "border-brand bg-accent" : "border-border bg-muted/30 hover:border-brand/50 hover:bg-accent/40"
           )}
         >
           <div className="grid h-12 w-12 place-items-center rounded-full bg-gradient-brand text-brand-foreground mx-auto shadow-glow">

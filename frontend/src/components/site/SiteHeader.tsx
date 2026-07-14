@@ -40,7 +40,7 @@ export function SiteHeader() {
             Sign in
           </Link>
           <Link to="/sign-up" search={{ role: "founder" } as any}
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-lg bg-[#7C3AED] text-white px-4 py-2 text-sm font-semibold hover:bg-[#6d28d9] transition-colors">
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-lg hs-gradient text-foreground px-4 py-2 text-sm font-semibold hover:bg-[#6d28d9] transition-colors">
             Get started <ArrowRight className="h-3.5 w-3.5" />
           </Link>
           {/* Hamburger — mobile only */}
@@ -83,7 +83,7 @@ export function SiteHeader() {
               Sign in
             </Link>
             <Link to="/sign-up" search={{ role: "founder" } as any} onClick={close}
-              className="block rounded-lg px-3 py-2.5 text-sm font-semibold text-center bg-[#7C3AED] text-white hover:bg-[#6d28d9] transition-colors">
+              className="block rounded-lg px-3 py-2.5 text-sm font-semibold text-center hs-gradient text-foreground hover:bg-[#6d28d9] transition-colors">
               Get started free
             </Link>
           </div>

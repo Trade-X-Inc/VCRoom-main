@@ -10,7 +10,7 @@ function YouTubeEmbed({ url, label }: { url: string; label: string }) {
   if (!videoId) {
     return (
       <a href={url} target="_blank" rel="noopener noreferrer"
-        className="flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300">
+        className="flex items-center gap-2 text-sm text-brand hover:text-brand">
         Watch {label} →
       </a>
     );
@@ -155,20 +155,20 @@ export function FounderProfilePanel({
   const renderNextStepSection = () => {
     if (requestStatus === "pending") {
       return (
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-4 text-sm text-muted-foreground">
-          <div className="text-xs uppercase tracking-[0.2em] text-white/60 mb-2">YOUR NEXT STEP</div>
-          <div className="font-semibold text-white">Waiting for founder to accept your connection.</div>
-          <div className="mt-3 text-white/60">You’ll be notified when they accept and you can request the next pack.</div>
+        <div className="rounded-3xl border border-border bg-accent p-4 text-sm text-muted-foreground">
+          <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">YOUR NEXT STEP</div>
+          <div className="font-semibold text-foreground">Waiting for founder to accept your connection.</div>
+          <div className="mt-3 text-muted-foreground">You’ll be notified when they accept and you can request the next pack.</div>
         </div>
       );
     }
 
     if (isConnected) {
       return (
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-4 text-sm text-muted-foreground">
-          <div className="text-xs uppercase tracking-[0.2em] text-white/60 mb-2">YOUR NEXT STEP</div>
-          <div className="font-semibold text-white">You're connected — detail pack available</div>
-          <div className="mt-3 space-y-2 text-white/70">
+        <div className="rounded-3xl border border-border bg-accent p-4 text-sm text-muted-foreground">
+          <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">YOUR NEXT STEP</div>
+          <div className="font-semibold text-foreground">You're connected — detail pack available</div>
+          <div className="mt-3 space-y-2 text-muted-foreground">
             <div>✓ Financial metrics</div>
             <div>✓ Competitive analysis</div>
             <div>✓ Full team details</div>
@@ -185,34 +185,34 @@ export function FounderProfilePanel({
                 Detail pack approved — view full profile →
               </a>
             ) : detailPackRequested ? (
-              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-muted-foreground">
+              <div className="rounded-2xl border border-border bg-accent px-4 py-3 text-sm text-muted-foreground">
                 Detail pack requested — awaiting founder approval
               </div>
             ) : (
               <button
                 onClick={handleRequestDetailPack}
-                className="inline-flex items-center justify-center rounded-xl bg-[#7C3AED] text-white px-4 py-3 text-sm font-semibold hover:bg-[#6d28d9] transition-colors"
+                className="inline-flex items-center justify-center rounded-xl hs-gradient text-foreground px-4 py-3 text-sm font-semibold hover:bg-[#6d28d9] transition-colors"
               >
                 Request detail pack →
               </button>
             )}
           </div>
-          <div className="mt-3 text-xs text-white/50">Then → request a deal room for full DD.</div>
+          <div className="mt-3 text-xs text-muted-foreground">Then → request a deal room for full DD.</div>
         </div>
       );
     }
 
     return (
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-4 text-sm text-muted-foreground">
-        <div className="text-xs uppercase tracking-[0.2em] text-white/60 mb-2">YOUR NEXT STEP</div>
-        <div className="font-semibold text-white">Connect to unlock</div>
-        <div className="mt-3 grid gap-2 text-white/70">
+      <div className="rounded-3xl border border-border bg-accent p-4 text-sm text-muted-foreground">
+        <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">YOUR NEXT STEP</div>
+        <div className="font-semibold text-foreground">Connect to unlock</div>
+        <div className="mt-3 grid gap-2 text-muted-foreground">
           <div>✓ Full traction data</div>
           <div>✓ Business model</div>
           <div>✓ Team backgrounds</div>
           <div>✓ Market analysis</div>
         </div>
-        <div className="mt-3 text-xs text-white/50">After founder accepts → request the detail pack.</div>
+        <div className="mt-3 text-xs text-muted-foreground">After founder accepts → request the detail pack.</div>
       </div>
     );
   };
@@ -256,7 +256,7 @@ export function FounderProfilePanel({
       return (
         <button
           onClick={onClose}
-          className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#7C3AED] text-white px-4 py-3 text-sm font-semibold hover:bg-[#6d28d9] transition-colors"
+          className="w-full inline-flex items-center justify-center gap-2 rounded-xl hs-gradient text-foreground px-4 py-3 text-sm font-semibold hover:bg-[#6d28d9] transition-colors"
         >
           Edit Profile →
         </button>
@@ -267,7 +267,7 @@ export function FounderProfilePanel({
       return (
         <button
           onClick={() => onConnect(startup.id)}
-          className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#7C3AED] text-white px-4 py-3 text-sm font-semibold hover:bg-[#6d28d9] transition-colors"
+          className="w-full inline-flex items-center justify-center gap-2 rounded-xl hs-gradient text-foreground px-4 py-3 text-sm font-semibold hover:bg-[#6d28d9] transition-colors"
         >
           Connect
         </button>
@@ -277,12 +277,12 @@ export function FounderProfilePanel({
     if (requestStatus === "pending") {
       return (
         <div className="flex gap-2">
-          <button disabled className="flex-1 rounded-xl border border-border/60 bg-white/5 px-4 py-3 text-sm font-semibold text-muted-foreground opacity-80 cursor-not-allowed">
+          <button disabled className="flex-1 rounded-xl border border-border/60 bg-accent px-4 py-3 text-sm font-semibold text-muted-foreground opacity-80 cursor-not-allowed">
             Pending →
           </button>
           <button
             onClick={() => onCancel(startup.id)}
-            className="px-4 py-3 rounded-xl text-sm bg-white/5 text-white/50 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+            className="px-4 py-3 rounded-xl text-sm bg-accent text-muted-foreground hover:bg-red-500/10 hover:text-red-400 transition-colors"
           >
             Cancel
           </button>
@@ -295,19 +295,19 @@ export function FounderProfilePanel({
         <Link
           to="/app/deal-room/$id"
           params={{ id: roomId }}
-          className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#7C3AED] text-white px-4 py-3 text-sm font-semibold hover:bg-[#6d28d9] transition-colors"
+          className="w-full inline-flex items-center justify-center gap-2 rounded-xl hs-gradient text-foreground px-4 py-3 text-sm font-semibold hover:bg-[#6d28d9] transition-colors"
         >
           View Deal Room
         </Link>
       ) : (
-        <button disabled className="w-full rounded-xl border border-border/60 bg-white/5 px-4 py-3 text-sm font-semibold text-muted-foreground opacity-80 cursor-not-allowed">
+        <button disabled className="w-full rounded-xl border border-border/60 bg-accent px-4 py-3 text-sm font-semibold text-muted-foreground opacity-80 cursor-not-allowed">
           Approved
         </button>
       );
     }
 
     return (
-      <button disabled className="w-full rounded-xl border border-border/60 bg-white/5 px-4 py-3 text-sm font-semibold text-muted-foreground opacity-80 cursor-not-allowed">
+      <button disabled className="w-full rounded-xl border border-border/60 bg-accent px-4 py-3 text-sm font-semibold text-muted-foreground opacity-80 cursor-not-allowed">
         {requestStatus}
       </button>
     );
@@ -323,12 +323,12 @@ export function FounderProfilePanel({
       />
       <div className={`absolute inset-y-0 right-0 w-full max-w-full sm:w-[560px] bg-[#0D0D14] shadow-2xl transition-transform duration-300 ease-out ${isOpen ? "translate-x-0" : "translate-x-full"}`}>
         <div className="relative flex h-full flex-col">
-          <div className="flex items-center justify-between gap-4 border-b border-white/10 px-5 py-4">
+          <div className="flex items-center justify-between gap-4 border-b border-border px-5 py-4">
             <div>
               <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Founder profile</div>
               <h2 className="mt-2 text-2xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>{startup.company_name}</h2>
             </div>
-            <button onClick={onClose} className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-muted-foreground hover:bg-white/10 transition-colors">
+            <button onClick={onClose} className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-muted-foreground hover:bg-accent transition-colors">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -342,7 +342,7 @@ export function FounderProfilePanel({
                   <div>
                     <div className="flex items-center gap-2">
                       <span style={{ color: '#a78bfa' }}>✦</span>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-white" style={{ fontFamily: "Syne, sans-serif" }}>Deal Brief</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Deal Brief</p>
                       {dealBrief?.match_score && (
                         <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{
                           background: dealBrief.match_score >= 80 ? 'rgba(34,197,94,0.15)' : 'rgba(124,58,237,0.15)',
@@ -381,7 +381,7 @@ export function FounderProfilePanel({
                 {dealBrief && !generatingBrief && (
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm font-semibold text-white leading-snug">"{dealBrief.headline}"</p>
+                      <p className="text-sm font-semibold text-foreground leading-snug">"{dealBrief.headline}"</p>
                       {dealBrief.investment_thesis && (
                         <p className="text-xs mt-1.5 leading-relaxed" style={{ color: '#c4b5fd' }}>{dealBrief.investment_thesis}</p>
                       )}
@@ -393,9 +393,9 @@ export function FounderProfilePanel({
                           .filter(([, v]) => v && v !== 'unknown')
                           .slice(0, 6)
                           .map(([k, v]) => (
-                            <div key={k} className="rounded-lg px-2 py-1.5 text-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                            <div key={k} className="rounded-lg px-2 py-1.5 text-center" style={{ background: 'var(--accent)' }}>
                               <p className="text-[9px] uppercase" style={{ color: '#7c6baa' }}>{k.replace(/_/g, ' ')}</p>
-                              <p className="text-xs font-semibold text-white mt-0.5 truncate">{v}</p>
+                              <p className="text-xs font-semibold text-foreground mt-0.5 truncate">{v}</p>
                             </div>
                           ))}
                       </div>
@@ -406,7 +406,7 @@ export function FounderProfilePanel({
                         <div className="rounded-lg p-2.5" style={{ background: 'rgba(34,197,94,0.07)', border: '1px solid rgba(34,197,94,0.15)' }}>
                           <p className="text-[10px] font-semibold mb-1.5" style={{ color: '#22c55e' }}>✓ Strengths</p>
                           {(dealBrief.strengths as string[]).slice(0, 3).map((s, i) => (
-                            <p key={i} className="text-[10px] mb-0.5" style={{ color: 'rgba(255,255,255,0.7)' }}>· {s}</p>
+                            <p key={i} className="text-[10px] mb-0.5" style={{ color: 'var(--muted-foreground)' }}>· {s}</p>
                           ))}
                         </div>
                       )}
@@ -414,17 +414,17 @@ export function FounderProfilePanel({
                         <div className="rounded-lg p-2.5" style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.15)' }}>
                           <p className="text-[10px] font-semibold mb-1.5" style={{ color: '#ef4444' }}>⚠ Red flags</p>
                           {(dealBrief.red_flags as string[]).slice(0, 3).map((r, i) => (
-                            <p key={i} className="text-[10px] mb-0.5" style={{ color: 'rgba(255,255,255,0.7)' }}>· {r}</p>
+                            <p key={i} className="text-[10px] mb-0.5" style={{ color: 'var(--muted-foreground)' }}>· {r}</p>
                           ))}
                         </div>
                       )}
                     </div>
 
                     {(dealBrief.suggested_questions as string[])?.length > 0 && (
-                      <div className="rounded-lg p-2.5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                        <p className="text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'rgba(255,255,255,0.35)' }}>DD questions</p>
+                      <div className="rounded-lg p-2.5" style={{ background: 'var(--accent)', border: '1px solid var(--border)' }}>
+                        <p className="text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--faint)' }}>DD questions</p>
                         {(dealBrief.suggested_questions as string[]).slice(0, 3).map((q, i) => (
-                          <p key={i} className="text-[10px] mb-1.5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>{i + 1}. "{q}"</p>
+                          <p key={i} className="text-[10px] mb-1.5 leading-relaxed" style={{ color: 'var(--muted-foreground)' }}>{i + 1}. "{q}"</p>
                         ))}
                       </div>
                     )}
@@ -434,12 +434,12 @@ export function FounderProfilePanel({
                         background: dealBrief.verdict_signal === 'strong' ? 'rgba(34,197,94,0.07)' : dealBrief.verdict_signal === 'weak' ? 'rgba(239,68,68,0.07)' : 'rgba(124,58,237,0.07)',
                         border: `1px solid ${dealBrief.verdict_signal === 'strong' ? 'rgba(34,197,94,0.2)' : dealBrief.verdict_signal === 'weak' ? 'rgba(239,68,68,0.2)' : 'rgba(124,58,237,0.2)'}`,
                       }}>
-                        <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.35)' }}>Verdict</p>
-                        <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)' }}>{dealBrief.overall_verdict}</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--faint)' }}>Verdict</p>
+                        <p className="text-xs leading-relaxed" style={{ color: 'var(--muted-foreground)' }}>{dealBrief.overall_verdict}</p>
                       </div>
                     )}
 
-                    <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
+                    <p className="text-[9px]" style={{ color: 'var(--faint)' }}>
                       Generated {new Date(dealBrief.generated_at).toLocaleDateString()} · Refreshes every 24h
                     </p>
                   </div>
@@ -447,7 +447,7 @@ export function FounderProfilePanel({
               </div>
             )}
 
-            <div className="flex items-center gap-4 rounded-3xl border border-white/8 bg-[#111118] p-4">
+            <div className="flex items-center gap-4 rounded-3xl border border-border bg-[#111118] p-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-purple-900 text-lg font-semibold text-white overflow-hidden shrink-0">
                 {startup.logo_url ? (
                   <img src={startup.logo_url} alt={startup.company_name ?? "Logo"} className="h-full w-full object-cover" />
@@ -456,20 +456,20 @@ export function FounderProfilePanel({
                 )}
               </div>
               <div className="space-y-1 min-w-0">
-                <div className="text-base font-semibold text-white truncate" style={{ fontFamily: "Syne, sans-serif" }}>{startup.company_name}</div>
-                <div className="text-xs uppercase tracking-[0.28em] text-white/40">{startup.sector || "—"}</div>
-                <div className="text-xs text-white/40">{startup.stage || "—"} · {startup.country || "—"}</div>
-                <div className="text-xs text-white/40">{startup.founded_year || "—"} · {startup.team_size ? `${startup.team_size} people` : "—"}</div>
+                <div className="text-base font-semibold text-foreground truncate" style={{ fontFamily: "Syne, sans-serif" }}>{startup.company_name}</div>
+                <div className="text-xs uppercase tracking-[0.28em] text-muted-foreground">{startup.sector || "—"}</div>
+                <div className="text-xs text-muted-foreground">{startup.stage || "—"} · {startup.country || "—"}</div>
+                <div className="text-xs text-muted-foreground">{startup.founded_year || "—"} · {startup.team_size ? `${startup.team_size} people` : "—"}</div>
               </div>
             </div>
 
             {(startup.social_links ?? []).length > 0 && (
               <div className="mt-6">
-                <div className="text-xs uppercase tracking-[0.2em] text-white/40 mb-2">Connect</div>
+                <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">Connect</div>
                 <div className="flex flex-wrap gap-2">
                   {(startup.social_links ?? []).map((link: { platform: string; url: string }, i: number) => (
                     <a key={i} href={link.url} target="_blank" rel="noopener noreferrer"
-                      className="px-3 py-1.5 rounded-md text-xs bg-white/5 border border-white/8 text-white/70 hover:bg-white/10 hover:text-white transition-colors">
+                      className="px-3 py-1.5 rounded-md text-xs bg-accent border border-border text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
                       {link.platform} →
                     </a>
                   ))}
@@ -478,33 +478,33 @@ export function FounderProfilePanel({
             )}
 
             <div className="mt-6">
-              <div className="text-xs uppercase tracking-[0.2em] text-white/40 mb-3">FOUNDER INTRO</div>
+              <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-3">FOUNDER INTRO</div>
               {startup.intro_video_url ? (
                 <>
                   <YouTubeEmbed url={startup.intro_video_url} label="founder intro" />
-                  <a href={startup.intro_video_url} target="_blank" rel="noopener noreferrer" className="text-xs text-white/40 hover:text-white/70 transition-colors mt-1 inline-block">Open video link →</a>
+                  <a href={startup.intro_video_url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-muted-foreground transition-colors mt-1 inline-block">Open video link →</a>
                 </>
               ) : (
-                <div className="w-full aspect-video rounded-lg bg-white/5 border border-white/8 flex items-center justify-center">
-                  <p className="text-white/30 text-sm">Intro video not yet added</p>
+                <div className="w-full aspect-video rounded-lg bg-accent border border-border flex items-center justify-center">
+                  <p className="text-faint text-sm">Intro video not yet added</p>
                 </div>
               )}
             </div>
 
             <div className="mt-6 space-y-4">
               <section>
-                <div className="text-xs uppercase tracking-[0.2em] text-white/40 mb-3">About</div>
+                <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-3">About</div>
                 <p className="text-sm leading-relaxed text-muted-foreground">{startup.description || startup.tagline || "No description available."}</p>
               </section>
 
               {metrics.length > 0 && (
                 <section>
-                  <div className="text-xs uppercase tracking-[0.2em] text-white/40 mb-3">Key metrics</div>
+                  <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-3">Key metrics</div>
                   <div className="grid grid-cols-2 gap-3">
                     {metrics.map((metric) => (
-                      <div key={metric.label} className="rounded-3xl border border-white/8 bg-[#111118] p-4">
-                        <div className="text-xs uppercase tracking-[0.22em] text-white/40 mb-2">{metric.label}</div>
-                        <div className="text-sm font-semibold text-[#7C3AED]">{metric.value}</div>
+                      <div key={metric.label} className="rounded-3xl border border-border bg-[#111118] p-4">
+                        <div className="text-xs uppercase tracking-[0.22em] text-muted-foreground mb-2">{metric.label}</div>
+                        <div className="text-sm font-semibold text-brand">{metric.value}</div>
                       </div>
                     ))}
                   </div>
@@ -513,8 +513,8 @@ export function FounderProfilePanel({
 
               {(startup.key_metric || startup.customer_count || startup.traction) && (
                 <section>
-                  <div className="text-xs uppercase tracking-[0.2em] text-white/40 mb-3">Traction</div>
-                  <div className="rounded-3xl border border-white/8 bg-[#111118] p-4 space-y-2">
+                  <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-3">Traction</div>
+                  <div className="rounded-3xl border border-border bg-[#111118] p-4 space-y-2">
                     {startup.key_metric && <div className="text-sm font-semibold text-brand-foreground">{startup.key_metric}</div>}
                     {startup.customer_count && <div className="text-sm text-muted-foreground">{startup.customer_count}</div>}
                     {startup.traction && <div className="text-sm leading-relaxed text-muted-foreground">{startup.traction}</div>}
@@ -524,22 +524,22 @@ export function FounderProfilePanel({
 
               {startup.product_video_url && (
                 <section>
-                  <div className="text-xs uppercase tracking-[0.2em] text-white/40 mb-3">PRODUCT DEMO</div>
+                  <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-3">PRODUCT DEMO</div>
                   <YouTubeEmbed url={startup.product_video_url} label="product demo" />
-                  <a href={startup.product_video_url} target="_blank" rel="noopener noreferrer" className="text-xs text-white/40 hover:text-white/70 transition-colors mt-1 inline-block">Open video link →</a>
+                  <a href={startup.product_video_url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-muted-foreground transition-colors mt-1 inline-block">Open video link →</a>
                 </section>
               )}
 
               {startup.use_of_funds && (
                 <section>
-                  <div className="text-xs uppercase tracking-[0.2em] text-white/40 mb-3">Use of funds</div>
+                  <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-3">Use of funds</div>
                   <p className="text-sm leading-relaxed text-muted-foreground">{startup.use_of_funds}</p>
                 </section>
               )}
 
               <section>
-                <div className="text-xs uppercase tracking-[0.2em] text-white/40 mb-3">Team</div>
-                <div className="rounded-3xl border border-white/8 bg-[#111118] p-4 space-y-2 text-sm text-muted-foreground">
+                <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-3">Team</div>
+                <div className="rounded-3xl border border-border bg-[#111118] p-4 space-y-2 text-sm text-muted-foreground">
                   <div>Founder: {startup.founder_name || "Unknown"}</div>
                   {startup.cofounder_name && <div>Co-founder: {startup.cofounder_name}</div>}
                 </div>
@@ -547,8 +547,8 @@ export function FounderProfilePanel({
 
               {startup.current_investors && (
                 <section>
-                  <div className="text-xs uppercase tracking-[0.2em] text-white/40 mb-3">Current investors</div>
-                  <div className="rounded-3xl border border-white/8 bg-[#111118] p-4 text-sm leading-relaxed text-muted-foreground">
+                  <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-3">Current investors</div>
+                  <div className="rounded-3xl border border-border bg-[#111118] p-4 text-sm leading-relaxed text-muted-foreground">
                     {startup.current_investors}
                   </div>
                 </section>
@@ -560,7 +560,7 @@ export function FounderProfilePanel({
             </div>
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 border-t border-white/10 bg-[#0D0D14]/95 px-5 py-4 backdrop-blur">
+          <div className="absolute bottom-0 left-0 right-0 border-t border-border bg-[#0D0D14]/95 px-5 py-4 backdrop-blur">
             {renderConnectButton()}
           </div>
         </div>

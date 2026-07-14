@@ -737,45 +737,45 @@ function FounderReview({ dealRoomId }: { dealRoomId: string }) {
         <div className={cn("p-4 rounded-xl border", {
           "bg-green-500/10 border-green-500/20": roomCloser.decision === "invest",
           "bg-amber-500/10 border-amber-500/20": roomCloser.decision === "hold",
-          "bg-white/5 border-white/8": roomCloser.decision === "pass",
+          "bg-accent border-border": roomCloser.decision === "pass",
         })}>
           <p className={cn("font-semibold text-sm", {
             "text-green-400": roomCloser.decision === "invest",
             "text-amber-400": roomCloser.decision === "hold",
-            "text-white/50": roomCloser.decision === "pass",
+            "text-muted-foreground": roomCloser.decision === "pass",
           })}>
             {roomCloser.decision === "invest" ? "✓ Investor wants to proceed"
               : roomCloser.decision === "hold" ? `⏸ Investor is reviewing until ${roomCloser.follow_up_date}`
               : "✗ Investor passed"}
           </p>
           {roomCloser.decision_reason && (
-            <p className="text-white/60 text-sm mt-1">"{roomCloser.decision_reason}"</p>
+            <p className="text-muted-foreground text-sm mt-1">"{roomCloser.decision_reason}"</p>
           )}
         </div>
       )}
 
       {/* Term sheet card */}
       {termSheetData && (
-        <div className="rounded-xl border border-[#7C3AED]/20 bg-[#7C3AED]/5 p-5">
-          <p className="text-sm font-semibold text-white mb-3">Term Sheet — {termSheetData.status === "draft" ? "Draft" : "Proposed"}</p>
+        <div className="rounded-xl border border-brand/20 bg-accent p-5">
+          <p className="text-sm font-semibold text-foreground mb-3">Term Sheet — {termSheetData.status === "draft" ? "Draft" : "Proposed"}</p>
           <div className="grid sm:grid-cols-3 gap-3 text-sm">
             {termSheetData.investment_amount && (
-              <div><p className="text-xs text-white/40 uppercase tracking-wider">Investment</p><p className="text-white mt-0.5">${Number(termSheetData.investment_amount).toLocaleString()}</p></div>
+              <div><p className="text-xs text-muted-foreground uppercase tracking-wider">Investment</p><p className="text-foreground mt-0.5">${Number(termSheetData.investment_amount).toLocaleString()}</p></div>
             )}
             {termSheetData.valuation_pre_money && (
-              <div><p className="text-xs text-white/40 uppercase tracking-wider">Pre-money valuation</p><p className="text-white mt-0.5">${Number(termSheetData.valuation_pre_money).toLocaleString()}</p></div>
+              <div><p className="text-xs text-muted-foreground uppercase tracking-wider">Pre-money valuation</p><p className="text-foreground mt-0.5">${Number(termSheetData.valuation_pre_money).toLocaleString()}</p></div>
             )}
             {termSheetData.equity_percentage && (
-              <div><p className="text-xs text-white/40 uppercase tracking-wider">Equity</p><p className="text-white mt-0.5">{termSheetData.equity_percentage}%</p></div>
+              <div><p className="text-xs text-muted-foreground uppercase tracking-wider">Equity</p><p className="text-foreground mt-0.5">{termSheetData.equity_percentage}%</p></div>
             )}
-            <div><p className="text-xs text-white/40 uppercase tracking-wider">Instrument</p><p className="text-white mt-0.5 capitalize">{termSheetData.instrument?.replace("_", " ")}</p></div>
+            <div><p className="text-xs text-muted-foreground uppercase tracking-wider">Instrument</p><p className="text-foreground mt-0.5 capitalize">{termSheetData.instrument?.replace("_", " ")}</p></div>
           </div>
           <div className="mt-3 flex flex-wrap gap-3 text-xs">
             {termSheetData.information_rights && <span className="text-green-400">✓ Information rights</span>}
             {termSheetData.board_seat && <span className="text-green-400">✓ Board seat</span>}
             {termSheetData.pro_rata_rights && <span className="text-green-400">✓ Pro-rata rights</span>}
           </div>
-          {termSheetData.notes && <p className="mt-3 text-xs text-white/50">{termSheetData.notes}</p>}
+          {termSheetData.notes && <p className="mt-3 text-xs text-muted-foreground">{termSheetData.notes}</p>}
         </div>
       )}
 
@@ -843,7 +843,7 @@ function FounderReview({ dealRoomId }: { dealRoomId: string }) {
           <div className="space-y-2.5">
             {activities.map((a) => (
               <div key={a.id} className="flex items-center gap-2 text-sm">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand" />
+                <span className="h-1.5 w-1.5 rounded-full hs-gradient" />
                 <span className="flex-1">{a.action}</span>
                 <span className="text-xs text-muted-foreground">{relTime(a.created_at)}</span>
               </div>

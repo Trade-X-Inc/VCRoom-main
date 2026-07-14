@@ -71,7 +71,7 @@ function FeedbackModal({ onClose }: { onClose: () => void }) {
         <div className="flex gap-2">
           <button onClick={onClose} className="flex-1 rounded-lg border border-border/60 py-2 text-sm hover:bg-accent transition-colors">Cancel</button>
           <button onClick={submit} disabled={saving || !rating}
-            className="flex-1 rounded-lg bg-brand text-brand-foreground py-2 text-sm font-medium hover:bg-brand/90 disabled:opacity-50 transition-colors">
+            className="flex-1 rounded-lg hs-gradient text-brand-foreground py-2 text-sm font-medium hover:bg-accent disabled:opacity-50 transition-colors">
             {saving ? "Sending…" : "Submit"}
           </button>
         </div>

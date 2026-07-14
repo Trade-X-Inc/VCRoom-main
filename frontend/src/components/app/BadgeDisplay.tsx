@@ -135,7 +135,7 @@ function BadgePill({ badge, size, expandable }: { badge: BadgeRow; size: "sm" | 
           // Trust badges get a solid border; others a softer one. Roast is dashed — its own thing.
           border: isRoast
             ? `1px dashed ${c.border}`
-            : `1px solid ${isTrust ? c.border : "rgba(255,255,255,0.10)"}`,
+            : `1px solid ${isTrust ? c.border : "var(--border)"}`,
           cursor: expandable ? "pointer" : "help",
         }}
       >
@@ -149,16 +149,16 @@ function BadgePill({ badge, size, expandable }: { badge: BadgeRow; size: "sm" | 
       {open && (
         <div
           className="mt-1.5 rounded-lg px-3 py-2.5 text-xs leading-relaxed"
-          style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", maxWidth: 340 }}
+          style={{ background: "var(--accent)", border: "1px solid var(--border)", maxWidth: 340 }}
         >
-          <div className="text-foreground/80 dark:text-white/70">{badge.description}</div>
+          <div className="text-foreground/80 dark:text-muted-foreground">{badge.description}</div>
           {badge.issued_at && (
-            <div className="mt-1 text-muted-foreground dark:text-white/40">
+            <div className="mt-1 text-muted-foreground dark:text-muted-foreground">
               Earned {new Date(badge.issued_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
             </div>
           )}
           {lines.length > 0 && (
-            <div className="mt-1 text-muted-foreground dark:text-white/35">
+            <div className="mt-1 text-muted-foreground dark:text-faint">
               {lines.map((l) => <div key={l}>{l}</div>)}
             </div>
           )}
@@ -196,7 +196,7 @@ export function BadgeDisplay({
       <div className="space-y-3">
         {[...groups.entries()].map(([cat, rows]) => (
           <div key={cat}>
-            <div className="mb-1.5 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground dark:text-white/35">
+            <div className="mb-1.5 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground dark:text-faint">
               {CATEGORY_LABELS[cat]}
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -218,8 +218,8 @@ export function BadgeDisplay({
         <button
           type="button"
           onClick={() => setShowAll(true)}
-          className="rounded-full px-2 py-0.5 text-[11px] text-muted-foreground dark:text-white/40 hover:text-foreground"
-          style={{ border: "1px solid rgba(255,255,255,0.10)" }}
+          className="rounded-full px-2 py-0.5 text-[11px] text-muted-foreground dark:text-muted-foreground hover:text-foreground"
+          style={{ border: "1px solid var(--border)" }}
         >
           +{hidden} more
         </button>

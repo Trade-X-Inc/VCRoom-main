@@ -208,7 +208,7 @@ function QACard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 text-xs">
             <span className="font-medium">{q.authorName}</span>
-            <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-brand/10 text-brand">{q.authorRole}</span>
+            <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-accent text-brand">{q.authorRole}</span>
             {q.answer && <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-success/10 text-success">Answered</span>}
             {!q.answer && <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-warning/10 text-warning">Open</span>}
             {q.editedAt && <span className="text-[10px] text-muted-foreground">edited {new Date(q.editedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>}

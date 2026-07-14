@@ -57,8 +57,8 @@ function Steps({ items }: { items: string[] }) {
       {items.map((item, i) => (
         <li key={i} className="flex gap-3">
           <span
-            className="h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0 mt-0.5"
-            style={{ background: "#7C3AED", minWidth: "20px" }}
+            className="h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-bold text-foreground shrink-0 mt-0.5"
+            style={{ background: "var(--gradient-brand)", minWidth: "20px" }}
           >
             {i + 1}
           </span>

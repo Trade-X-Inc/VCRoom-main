@@ -26,8 +26,8 @@ export function ChatResultCard({
   return (
     <div
       style={{
-        background: "#111114",
-        border: "1px solid rgba(255,255,255,0.08)",
+        background: "var(--card)",
+        border: "1px solid var(--border)",
         borderRadius: 12,
         padding: "16px 20px",
         marginTop: 4,
@@ -51,7 +51,7 @@ export function ChatResultCard({
         >
           {icon}
         </div>
-        <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{title}</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)" }}>{title}</span>
       </div>
 
       <div>{children}</div>

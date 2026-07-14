@@ -17,7 +17,7 @@ const TIER_CONFIG: Record<string, { icon: string; label: string; className: stri
   checked: {
     icon: "✓",
     label: "Hockystick Checked",
-    className: "bg-[rgba(255,255,255,0.08)] text-[rgba(255,255,255,0.6)] border-[rgba(255,255,255,0.12)]",
+    className: "bg-accent text-muted-foreground border-border",
     tooltip: "Basic automated verification: website, LinkedIn, and email signals checked. Does not verify fund size or track record.",
   },
   verified: {
@@ -31,7 +31,7 @@ const TIER_CONFIG: Record<string, { icon: string; label: string; className: stri
   "1": {
     icon: "✓",
     label: "Identity Confirmed",
-    className: "bg-[rgba(255,255,255,0.08)] text-[rgba(255,255,255,0.65)] border-[rgba(255,255,255,0.12)]",
+    className: "bg-accent text-muted-foreground border-border",
     tooltip: "All four identity checks passed: business email matches the company domain, the website mentions the company, the company was found in a public registry, and the domain has real mail infrastructure and history.",
   },
   "2": {

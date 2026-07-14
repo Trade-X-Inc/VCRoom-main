@@ -18,13 +18,13 @@ export function CostComparisonTable({ variant, compact }: { variant: "dark" | "l
   const dark = variant === "dark";
   const rows = compact ? COMPACT_ROWS : ROWS;
 
-  const border = dark ? "rgba(255,255,255,0.1)" : "#E5E7EB";
-  const headColor = dark ? "rgba(255,255,255,0.5)" : "#6B7280";
+  const border = dark ? "var(--border)" : "#E5E7EB";
+  const headColor = dark ? "var(--muted-foreground)" : "#6B7280";
   const needColor = dark ? "#FFFFFF" : "#111827";
-  const oldColor = dark ? "rgba(255,255,255,0.55)" : "#6B7280";
+  const oldColor = dark ? "var(--muted-foreground)" : "#6B7280";
   const hsColor = dark ? "#10B981" : "#059669";
   const cardBg = dark ? "#111113" : "#FFFFFF";
-  const totalColor = dark ? "rgba(255,255,255,0.8)" : "#4B5563";
+  const totalColor = dark ? "var(--muted-foreground)" : "#4B5563";
 
   return (
     <div>
@@ -74,7 +74,7 @@ export function CostComparisonTable({ variant, compact }: { variant: "dark" | "l
       </div>
       <p className="mt-5 text-center text-sm" style={{ color: totalColor, fontFamily: DM }}>
         Total cost with traditional tools: <span style={{ fontWeight: 600 }}>$5,000–15,000+ per raise.</span>{" "}
-        Hockystick: <span style={{ fontWeight: 700, color: dark ? "#FFFFFF" : "#7C3AED", fontFamily: SYNE }}>$49/month.</span>
+        Hockystick: <span style={{ fontWeight: 700, color: dark ? "#FFFFFF" : "var(--brand)", fontFamily: SYNE }}>$49/month.</span>
       </p>
     </div>
   );

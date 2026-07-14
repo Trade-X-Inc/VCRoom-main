@@ -37,7 +37,7 @@ type DDStatus = (typeof STATUSES)[number];
 
 const STATUS_CONFIG: Record<DDStatus, { label: string; icon: any; cls: string; dot: string }> = {
   "Pending":   { label: "Pending",   icon: Clock,        cls: "bg-muted text-muted-foreground",     dot: "bg-muted-foreground" },
-  "In Review": { label: "In Review", icon: Eye,          cls: "bg-brand/10 text-brand",             dot: "bg-brand" },
+  "In Review": { label: "In Review", icon: Eye,          cls: "bg-accent text-brand",             dot: "hs-gradient" },
   "Complete":  { label: "Complete",  icon: CheckCircle2, cls: "bg-success/10 text-success",         dot: "bg-success" },
   "Red Flag":  { label: "Red Flag",  icon: Flag,         cls: "bg-destructive/10 text-destructive", dot: "bg-destructive" },
 };
@@ -663,7 +663,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                         className={cn(
                           "shrink-0 rounded-full px-3 py-1 text-xs transition-colors",
                           vaultFilter === cat
-                            ? "bg-brand text-brand-foreground"
+                            ? "hs-gradient text-brand-foreground"
                             : "border border-border/60 hover:bg-accent",
                         )}
                       >
@@ -731,7 +731,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
 
                           {/* Thesis Alignment — investor only, NOT gated on ai_summary */}
                           {isInvestor && (
-                            <div className="rounded-xl border border-brand/25 bg-brand/5 p-4">
+                            <div className="rounded-xl border border-brand/25 bg-accent p-4">
                               <div className="flex items-center justify-between mb-3">
                                 <div className="text-xs font-semibold text-brand uppercase tracking-wider flex items-center gap-1.5">
                                   <Sparkles className="h-3.5 w-3.5" /> Thesis Alignment
@@ -748,7 +748,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                                       onClick={() => void analyzeAgainstThesis(doc)}
                                       disabled={analyzingDoc === doc.id || !investorProfile?.thesis}
                                       title={!investorProfile?.thesis ? "Add thesis in your Profile first" : ""}
-                                      className="inline-flex items-center gap-1.5 rounded-md bg-brand text-brand-foreground px-3 py-1.5 text-xs font-medium hover:opacity-90 disabled:opacity-40 transition-opacity"
+                                      className="inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-3 py-1.5 text-xs font-medium hover:opacity-90 disabled:opacity-40 transition-opacity"
                                     >
                                       {analyzingDoc === doc.id
                                         ? <><Loader2 className="h-3 w-3 animate-spin" /> {thesisStillWorking ? "Still working…" : "Analyzing…"}</>
@@ -866,7 +866,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                                     const isOffice = ["pptx", "ppt"].includes(ext);
                                     window.open(isOffice ? `https://docs.google.com/gview?url=${encodeURIComponent(data.signedUrl)}&embedded=false` : data.signedUrl, "_blank");
                                   }}
-                                  className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-xs font-medium hover:bg-brand/15 transition-colors"
+                                  className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-accent text-brand px-3 py-1.5 text-xs font-medium hover:bg-accent transition-colors"
                                 >
                                   <FileText className="h-3 w-3" />
                                   {uploadedDeck.file_name || uploadedDeck.storage_path?.split("/").pop()?.replace(/^\d{13}-/, "") || "Pitch Deck"} ↗
@@ -993,7 +993,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
         const scores = Object.values(scorecard);
         const avg = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
         const verdict = avg >= 4.2 ? { l: "Strong Pass", c: "text-success bg-success/10 border-success/30" }
-          : avg >= 3.5 ? { l: "Lean Pass", c: "text-brand bg-brand/10 border-brand/30" }
+          : avg >= 3.5 ? { l: "Lean Pass", c: "text-brand bg-accent border-brand/30" }
           : avg >= 2.8 ? { l: "Watch List", c: "text-warning bg-warning/10 border-warning/30" }
           : avg >= 2 ? { l: "Lean No", c: "text-orange-500 bg-orange-500/10 border-orange-500/30" }
           : scores.length > 0 ? { l: "Pass", c: "text-destructive bg-destructive/10 border-destructive/30" }
@@ -1005,7 +1005,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
               className="w-full flex items-center justify-between px-5 py-4 hover:bg-accent/40 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="grid h-9 w-9 place-items-center rounded-xl bg-brand/10 shrink-0">
+                <div className="grid h-9 w-9 place-items-center rounded-xl bg-accent shrink-0">
                   <Star className="h-4 w-4 text-brand" />
                 </div>
                 <div className="text-left">
@@ -1043,7 +1043,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                               "h-8 w-8 rounded-md text-xs font-bold transition-all border",
                               (scorecard[key] ?? 0) >= s
                                 ? s >= 4 ? "bg-success text-success-foreground border-success"
-                                  : s === 3 ? "bg-brand text-brand-foreground border-brand"
+                                  : s === 3 ? "hs-gradient text-brand-foreground border-brand"
                                   : "bg-warning text-warning-foreground border-warning"
                                 : "border-border/60 text-muted-foreground hover:border-brand/50 hover:text-brand"
                             )}
@@ -1196,7 +1196,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                                   )}
                                   {item.manually_overridden && item.auto_detected && (
                                     <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium"
-                                      style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" }}>
+                                      style={{ background: "var(--accent)", color: "var(--muted-foreground)" }}>
                                       overridden
                                     </span>
                                   )}

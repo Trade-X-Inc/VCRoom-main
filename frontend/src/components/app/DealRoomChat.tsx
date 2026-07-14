@@ -39,7 +39,7 @@ function Avatar({ name, avatarUrl, isMe, size = "md" }: { name: string; avatarUr
     return <img src={avatarUrl} alt={name} className={cn(sz, "rounded-full object-cover border-2", isMe ? "border-brand/30" : "border-border/60")} />;
   }
   return (
-    <div className={cn("grid place-items-center rounded-full font-semibold shrink-0", sz, isMe ? "bg-brand text-brand-foreground" : "bg-accent text-muted-foreground")}>
+    <div className={cn("grid place-items-center rounded-full font-semibold shrink-0", sz, isMe ? "hs-gradient text-brand-foreground" : "bg-accent text-muted-foreground")}>
       {initials}
     </div>
   );
@@ -133,7 +133,7 @@ export function DealRoomChat({ dealRoomId, userId, userName }: Props) {
         <div className="flex-1 min-w-0">
           <div className="text-sm font-semibold flex items-center gap-2">
             Team Chat
-            <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-medium text-brand">
+            <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-medium text-brand">
               <Lock className="h-2.5 w-2.5" /> Private
             </span>
           </div>
@@ -148,9 +148,9 @@ export function DealRoomChat({ dealRoomId, userId, userName }: Props) {
 
       {/* Privacy notice — shown once at top of empty chat */}
       {!loading && msgs.length === 0 && (
-        <div className="mx-5 mt-5 rounded-xl border border-brand/20 bg-brand/5 p-4">
+        <div className="mx-5 mt-5 rounded-xl border border-brand/20 bg-accent p-4">
           <div className="flex items-start gap-3">
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand/15">
+            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-accent">
               <Lock className="h-4 w-4 text-brand" />
             </div>
             <div>
@@ -207,7 +207,7 @@ export function DealRoomChat({ dealRoomId, userId, userName }: Props) {
                   <div className={cn(
                     "rounded-2xl px-3.5 py-2 text-sm leading-relaxed break-words",
                     isMe
-                      ? "bg-brand text-brand-foreground rounded-tr-[4px]"
+                      ? "hs-gradient text-brand-foreground rounded-tr-[4px]"
                       : "bg-accent text-foreground rounded-tl-[4px]",
                   )}>
                     {m.body}
@@ -277,7 +277,7 @@ export function DealRoomChat({ dealRoomId, userId, userName }: Props) {
             className={cn(
               "inline-flex items-center justify-center rounded-lg p-2 transition-all shrink-0 mb-0.5",
               draft.trim() && !sending
-                ? "bg-brand text-brand-foreground shadow-glow hover:opacity-90"
+                ? "hs-gradient text-brand-foreground shadow-glow hover:opacity-90"
                 : "bg-muted text-muted-foreground opacity-50 cursor-not-allowed"
             )}
           >

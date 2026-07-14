@@ -128,9 +128,9 @@ function HockystickVerifiedBadge({
       title="Not yet verified by Hockystick"
       className="inline-flex items-center gap-1 rounded-full text-[11px] font-medium px-2 py-0.5"
       style={{
-        background: "rgba(255,255,255,0.05)",
-        border: "1px solid rgba(255,255,255,0.1)",
-        color: "rgba(255,255,255,0.35)",
+        background: "var(--accent)",
+        border: "1px solid var(--border)",
+        color: "var(--faint)",
       }}
     >
       <Clock className="h-3 w-3 shrink-0" />
@@ -180,9 +180,9 @@ function AiCrossCheckBadge({
         title="Proof attached — AI check in progress"
         className="inline-flex items-center gap-1 rounded-full text-[11px] font-medium px-2 py-0.5"
         style={{
-          background: "rgba(255,255,255,0.06)",
-          border: "1px solid rgba(255,255,255,0.12)",
-          color: "rgba(255,255,255,0.5)",
+          background: "var(--accent)",
+          border: "1px solid var(--border)",
+          color: "var(--muted-foreground)",
         }}
       >
         <Clock className="h-3 w-3 shrink-0" />
@@ -253,9 +253,9 @@ function CannotVerifyBadge({
       title={`This is a ${profileType === "investor" ? "investor" : "founder"} perspective — not a verifiable fact`}
       className="inline-flex items-center gap-1 rounded-full text-[11px] font-medium px-2 py-0.5"
       style={{
-        background: "rgba(255,255,255,0.05)",
-        border: "1px solid rgba(255,255,255,0.08)",
-        color: "rgba(255,255,255,0.35)",
+        background: "var(--accent)",
+        border: "1px solid var(--border)",
+        color: "var(--faint)",
       }}
     >
       <Lock className="h-3 w-3 shrink-0" />
@@ -277,9 +277,9 @@ function CounterpartyVerifiesBadge({
       title={`Confirm this with the ${who} directly — not independently verifiable here`}
       className="inline-flex items-center gap-1 rounded-full text-[11px] font-medium px-2 py-0.5"
       style={{
-        background: "rgba(255,255,255,0.04)",
-        border: "1px solid rgba(255,255,255,0.08)",
-        color: "rgba(255,255,255,0.3)",
+        background: "var(--accent)",
+        border: "1px solid var(--border)",
+        color: "var(--faint)",
       }}
     >
       <Users className="h-3 w-3 shrink-0" />

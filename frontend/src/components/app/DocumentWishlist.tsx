@@ -156,7 +156,7 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
   if (requests.length === 0 && !isInvestor) return null;
 
   return (
-    <div className="mb-5 rounded-xl border border-brand/25 bg-brand/5 overflow-hidden">
+    <div className="mb-5 rounded-xl border border-brand/25 bg-accent overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-brand/15">
         <button className="flex items-center gap-2 flex-1 text-left" onClick={() => setCollapsed((v) => !v)}>
@@ -245,7 +245,7 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
                 <button onClick={() => { setAdding(false); setTitle(""); setDescription(""); }}
                   className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
                 <button onClick={() => handleAdd()} disabled={!title.trim() || saving}
-                  className="rounded-md bg-brand text-brand-foreground px-3 py-1.5 text-xs disabled:opacity-50 inline-flex items-center gap-1">
+                  className="rounded-md hs-gradient text-brand-foreground px-3 py-1.5 text-xs disabled:opacity-50 inline-flex items-center gap-1">
                   {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />} Add
                 </button>
               </div>
@@ -313,7 +313,7 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
                             onKeyDown={(e) => e.key === "Enter" && handleSaveLink(r.id)}
                           />
                           <button onClick={() => handleSaveLink(r.id)} disabled={!linkValue.trim() || savingLink}
-                            className="rounded-md bg-brand text-brand-foreground px-2.5 py-1 text-[10px] disabled:opacity-50">
+                            className="rounded-md hs-gradient text-brand-foreground px-2.5 py-1 text-[10px] disabled:opacity-50">
                             {savingLink ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
                           </button>
                           <button onClick={() => { setLinkInputId(null); setLinkValue(""); }}

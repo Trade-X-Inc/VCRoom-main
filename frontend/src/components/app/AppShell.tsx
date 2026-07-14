@@ -402,7 +402,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
             margin: "0 12px 8px",
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-              <span style={{ fontSize: 12, fontWeight: 600, color: "#fff" }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>
                 Profile {shellCompleteness.percent}% complete
               </span>
             </div>
@@ -410,7 +410,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
               <div style={{
                 height: "100%",
                 width: `${shellCompleteness.percent}%`,
-                background: "#7C3AED",
+                background: "var(--gradient-brand)",
                 borderRadius: 2,
                 transition: "width 0.3s",
               }} />
@@ -528,7 +528,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                     <circle cx="16" cy="16" r="13" fill="none" stroke="var(--color-muted)" strokeWidth="3" />
                     <circle
                       cx="16" cy="16" r="13" fill="none"
-                      stroke="#7C3AED" strokeWidth="3"
+                      stroke="var(--brand)" strokeWidth="3"
                       strokeDasharray={`${2 * Math.PI * 13}`}
                       strokeDashoffset={`${2 * Math.PI * 13 * (1 - shellCompleteness.percent / 100)}`}
                       strokeLinecap="round"
@@ -646,7 +646,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                 className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-sm"
               />
               {searching && (
-                <div className="w-4 h-4 border-2 border-muted border-t-[#7C3AED] rounded-full animate-spin shrink-0" />
+                <div className="w-4 h-4 border-2 border-muted border-t-brand rounded-full animate-spin shrink-0" />
               )}
               <kbd className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded shrink-0">ESC</kbd>
             </div>
@@ -701,7 +701,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
 
             {/* Footer */}
             {searchResults.length > 0 && (
-              <div className="px-4 py-2 border-t border-white/5 flex items-center gap-3">
+              <div className="px-4 py-2 border-t border-border flex items-center gap-3">
                 <span className="text-xs text-muted-foreground">{searchResults.length} result{searchResults.length !== 1 ? "s" : ""}</span>
                 <span className="text-xs text-muted-foreground ml-auto">↵ to open</span>
               </div>
@@ -723,7 +723,7 @@ function SubscriptionBanner() {
   if (isPastDue) {
     return (
       <div
-        className="w-full px-4 py-2.5 text-center text-sm font-medium text-white shrink-0"
+        className="w-full px-4 py-2.5 text-center text-sm font-medium text-foreground shrink-0"
         style={{ background: "#B45309" }}
         data-testid="subscription-banner-pastdue"
       >
@@ -741,8 +741,8 @@ function SubscriptionBanner() {
       : "recently";
     return (
       <div
-        className="w-full px-4 py-2.5 text-center text-sm font-medium text-white shrink-0"
-        style={{ background: "#7C3AED" }}
+        className="w-full px-4 py-2.5 text-center text-sm font-medium text-foreground shrink-0"
+        style={{ background: "var(--gradient-brand)" }}
         data-testid="subscription-banner-trial"
       >
         Your free trial ended on {ended}. Choose a plan to keep access.{" "}

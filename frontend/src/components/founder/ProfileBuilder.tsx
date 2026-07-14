@@ -38,7 +38,7 @@ const VISIBILITY_LABELS: Record<string, string> = {
 
 const VISIBILITY_CLASSES: Record<string, string> = {
   private: "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400",
-  deal_room: "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400",
+  deal_room: "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-brand",
   public: "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400",
 };
 
@@ -56,7 +56,7 @@ function Field({ label, value, onChange, placeholder, type = "text" }: {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none focus:border-[#7C3AED]"
+        className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
       />
     </div>
   );
@@ -74,7 +74,7 @@ function TextArea({ label, value, onChange, placeholder, rows = 3 }: {
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}
-        className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none focus:border-[#7C3AED]"
+        className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
       />
     </div>
   );
@@ -121,7 +121,7 @@ function TeamEditor({ content, onChange }: { content: any; onChange: (c: any) =>
       ))}
       <button
         onClick={add}
-        className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-gray-300 dark:border-zinc-600 px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:border-[#7C3AED] hover:text-[#7C3AED]"
+        className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-gray-300 dark:border-zinc-600 px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:border-brand hover:text-brand"
       >
         <Plus className="h-3.5 w-3.5" /> Add team member
       </button>
@@ -172,7 +172,7 @@ function RevenueModelEditor({ content, onChange }: { content: any; onChange: (c:
         <select
           value={content.type ?? "SaaS"}
           onChange={(e) => onChange({ ...content, type: e.target.value })}
-          className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-white outline-none"
+          className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground outline-none"
         >
           {["SaaS", "Marketplace", "Transactional", "Subscription", "Other"].map((o) => <option key={o}>{o}</option>)}
         </select>
@@ -241,7 +241,7 @@ function ProductEditor({ content, onChange }: { content: any; onChange: (c: any)
         <select
           value={content.stage ?? "Idea"}
           onChange={(e) => onChange({ ...content, stage: e.target.value })}
-          className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-white outline-none"
+          className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground outline-none"
         >
           {["Idea", "Prototype", "MVP", "Beta", "Live", "Scaling"].map((o) => <option key={o}>{o}</option>)}
         </select>
@@ -271,7 +271,7 @@ function CompetitiveLandscapeEditor({ content, onChange }: { content: any; onCha
           </div>
         </div>
       ))}
-      <button onClick={addComp} className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-gray-300 dark:border-zinc-600 px-4 py-2 text-sm text-gray-500 hover:border-[#7C3AED] hover:text-[#7C3AED]">
+      <button onClick={addComp} className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-gray-300 dark:border-zinc-600 px-4 py-2 text-sm text-gray-500 hover:border-brand hover:text-brand">
         <Plus className="h-3.5 w-3.5" /> Add competitor
       </button>
     </div>
@@ -478,7 +478,7 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
         data-testid="profile-builder-header"
       >
         <div>
-          <div className="text-sm font-bold text-gray-900 dark:text-white" style={{ fontFamily: "Syne, sans-serif" }}>Digital Profile</div>
+          <div className="text-sm font-bold text-gray-900 dark:text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Digital Profile</div>
           <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Build your investor-ready profile</div>
         </div>
         <div className="flex items-center gap-3 shrink-0 mt-0.5">
@@ -519,7 +519,7 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                         className="flex-1 text-left min-w-0"
                         onClick={() => setExpandedKey(isExpanded ? null : key)}
                       >
-                        <span className="text-sm font-medium text-gray-900 dark:text-white truncate">{section.section_label}</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-foreground truncate">{section.section_label}</span>
                       </button>
 
                       <div className="flex items-center gap-2 shrink-0">
@@ -564,8 +564,8 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                           <button
                             onClick={() => saveSection(section)}
                             disabled={savingKey === key}
-                            className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-                            style={{ background: "#7C3AED" }}
+                            className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-50"
+                            style={{ background: "var(--gradient-brand)" }}
                             data-testid={`save-section-${key}`}
                           >
                             {savedKey === key ? (
@@ -579,7 +579,7 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
 
                           <button
                             onClick={() => console.log(`AI extraction from document — Claude Code will wire to edge function [section: ${key}]`)}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-[#7C3AED]/30 px-3 py-2 text-xs font-medium text-[#7C3AED] hover:bg-[#7C3AED]/5"
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-brand/30 px-3 py-2 text-xs font-medium text-brand hover:bg-accent"
                             title="Upload a document above and AI will extract relevant data into this section"
                             data-testid={`extract-section-${key}`}
                           >
@@ -601,13 +601,13 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                         value={newSectionName}
                         onChange={(e) => setNewSectionName(e.target.value)}
                         placeholder="Section name"
-                        className="col-span-2 rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none focus:border-[#7C3AED]"
+                        className="col-span-2 rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
                         onKeyDown={(e) => { if (e.key === "Enter") addCustomSection(); }}
                       />
                       <select
                         value={newSectionVisibility}
                         onChange={(e) => setNewSectionVisibility(e.target.value as any)}
-                        className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-white outline-none"
+                        className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground outline-none"
                       >
                         <option value="private">Private</option>
                         <option value="deal_room">Deal Room</option>
@@ -619,8 +619,8 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                       <button
                         onClick={addCustomSection}
                         disabled={!newSectionName.trim() || addingSec}
-                        className="rounded-lg px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
-                        style={{ background: "#7C3AED" }}
+                        className="rounded-lg px-4 py-1.5 text-xs font-semibold text-foreground disabled:opacity-50"
+                        style={{ background: "var(--gradient-brand)" }}
                         data-testid="add-custom-section-btn"
                       >
                         {addingSec ? "Adding…" : "Add section"}
@@ -630,7 +630,7 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                 ) : (
                   <button
                     onClick={() => setAddSectionOpen(true)}
-                    className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-[#7C3AED] dark:hover:text-[#7C3AED]"
+                    className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-brand"
                     data-testid="add-custom-section-open-btn"
                   >
                     <Plus className="h-4 w-4" /> Add custom section

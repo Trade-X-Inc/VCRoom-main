@@ -30,7 +30,7 @@ export function ProfileCompletionBanner({ variant, percent }: ProfileCompletionB
         {isFounder ? (
           <AlertTriangle className="h-4 w-4 shrink-0" style={{ color: "#F59E0B" }} />
         ) : (
-          <Lightbulb className="h-4 w-4 shrink-0" style={{ color: "#7C3AED" }} />
+          <Lightbulb className="h-4 w-4 shrink-0" style={{ color: "var(--brand)" }} />
         )}
         <p className="text-sm text-foreground min-w-0">
           {isFounder ? (
@@ -43,7 +43,7 @@ export function ProfileCompletionBanner({ variant, percent }: ProfileCompletionB
           ) : (
             <>
               Set your investment thesis to get matched with relevant founders.{" "}
-              <Link to="/app/investor/profile" className="font-medium underline underline-offset-2" style={{ color: "#7C3AED" }}>
+              <Link to="/app/investor/profile" className="font-medium underline underline-offset-2" style={{ color: "var(--brand)" }}>
                 Set thesis →
               </Link>
             </>

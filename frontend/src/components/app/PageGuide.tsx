@@ -241,23 +241,23 @@ export function PageGuide({
           display: "inline-flex",
           alignItems: "center",
           gap: 6,
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.08)",
+          background: "var(--accent)",
+          border: "1px solid var(--border)",
           borderRadius: 8,
           padding: "6px 12px",
           fontSize: 12,
-          color: "rgba(255,255,255,0.4)",
+          color: "var(--muted-foreground)",
           cursor: "pointer",
           fontFamily: "DM Sans, sans-serif",
           transition: "color 0.15s, border-color 0.15s",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.color = "rgba(255,255,255,0.7)";
-          e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
+          e.currentTarget.style.color = "var(--muted-foreground)";
+          e.currentTarget.style.borderColor = "var(--border)";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.color = "rgba(255,255,255,0.4)";
-          e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
+          e.currentTarget.style.color = "var(--muted-foreground)";
+          e.currentTarget.style.borderColor = "var(--border)";
         }}
       >
         <HelpCircle size={13} />
@@ -294,8 +294,8 @@ export function PageGuide({
               pointerEvents: "all",
               width: "100%",
               maxWidth: 420,
-              background: "#111114",
-              border: "1px solid rgba(255,255,255,0.1)",
+              background: "var(--card)",
+              border: "1px solid var(--border)",
               borderRadius: 16,
               boxShadow: "0 24px 60px rgba(0,0,0,0.6)",
               display: "flex",
@@ -312,7 +312,7 @@ export function PageGuide({
                 alignItems: "center",
                 justifyContent: "space-between",
                 padding: "16px 20px",
-                borderBottom: "1px solid rgba(255,255,255,0.07)",
+                borderBottom: "1px solid var(--border)",
                 flexShrink: 0,
               }}
             >
@@ -334,7 +334,7 @@ export function PageGuide({
                   style={{
                     fontSize: 13,
                     fontWeight: 600,
-                    color: "#fff",
+                    color: "var(--foreground)",
                     fontFamily: "Syne, sans-serif",
                   }}
                 >
@@ -347,7 +347,7 @@ export function PageGuide({
                   background: "none",
                   border: "none",
                   cursor: "pointer",
-                  color: "rgba(255,255,255,0.3)",
+                  color: "var(--faint)",
                   padding: 4,
                   borderRadius: 4,
                   display: "flex",
@@ -372,7 +372,7 @@ export function PageGuide({
                     gap: 6,
                     padding: 0,
                     marginBottom: guideExpanded ? 12 : 0,
-                    color: "rgba(255,255,255,0.5)",
+                    color: "var(--muted-foreground)",
                     fontSize: 11,
                     fontWeight: 600,
                     textTransform: "uppercase",
@@ -391,7 +391,7 @@ export function PageGuide({
                         style={{
                           fontSize: 13,
                           lineHeight: 1.65,
-                          color: "rgba(255,255,255,0.65)",
+                          color: "var(--muted-foreground)",
                           margin: 0,
                           fontFamily: "DM Sans, sans-serif",
                         }}
@@ -404,7 +404,7 @@ export function PageGuide({
               </div>
 
               {/* Divider */}
-              <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "0 20px" }} />
+              <div style={{ height: 1, background: "var(--accent)", margin: "0 20px" }} />
 
               {/* AI chat section */}
               <div style={{ padding: "14px 20px" }}>
@@ -453,7 +453,7 @@ export function PageGuide({
                       <div
                         style={{
                           fontSize: 11,
-                          color: "rgba(255,255,255,0.35)",
+                          color: "var(--faint)",
                           fontFamily: "DM Sans, sans-serif",
                         }}
                       >
@@ -475,14 +475,14 @@ export function PageGuide({
                       <span style={{ fontSize: 12, color: "rgba(124,58,237,0.9)", fontWeight: 600, fontFamily: "Syne, sans-serif" }}>
                         ✦ AI Advisor
                       </span>
-                      <span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", fontFamily: "DM Sans, sans-serif" }}>
+                      <span style={{ fontSize: 11, color: "var(--faint)", fontFamily: "DM Sans, sans-serif" }}>
                         — context-aware, same boundary as main advisor
                       </span>
                     </div>
 
                     {/* Messages */}
                     {history.length === 0 && (
-                      <p style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", margin: 0, fontFamily: "DM Sans, sans-serif", fontStyle: "italic" }}>
+                      <p style={{ fontSize: 12, color: "var(--faint)", margin: 0, fontFamily: "DM Sans, sans-serif", fontStyle: "italic" }}>
                         Ask anything about this page — e.g. "what should I do here?" or "explain my readiness score"
                       </p>
                     )}
@@ -504,14 +504,14 @@ export function PageGuide({
                             background:
                               m.role === "user"
                                 ? "rgba(124,58,237,0.18)"
-                                : "rgba(255,255,255,0.05)",
+                                : "var(--accent)",
                             border:
                               m.role === "user"
                                 ? "1px solid rgba(124,58,237,0.25)"
-                                : "1px solid rgba(255,255,255,0.07)",
+                                : "1px solid var(--border)",
                             fontSize: 12,
                             lineHeight: 1.6,
-                            color: m.role === "user" ? "#d8b4fe" : "rgba(255,255,255,0.75)",
+                            color: m.role === "user" ? "#d8b4fe" : "var(--muted-foreground)",
                             fontFamily: "DM Sans, sans-serif",
                             whiteSpace: "pre-wrap",
                           }}
@@ -523,7 +523,7 @@ export function PageGuide({
                     {thinking && (
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                         <Loader2 size={12} style={{ color: "#a78bfa", animation: "spin 1s linear infinite" }} />
-                        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", fontFamily: "DM Sans, sans-serif" }}>
+                        <span style={{ fontSize: 11, color: "var(--faint)", fontFamily: "DM Sans, sans-serif" }}>
                           {stillWorking ? "Still working — this may take a moment…" : "Thinking…"}
                         </span>
                       </div>
@@ -536,8 +536,8 @@ export function PageGuide({
                         display: "flex",
                         gap: 6,
                         marginTop: 4,
-                        background: "rgba(255,255,255,0.04)",
-                        border: "1px solid rgba(255,255,255,0.1)",
+                        background: "var(--accent)",
+                        border: "1px solid var(--border)",
                         borderRadius: 10,
                         padding: "6px 8px",
                       }}
@@ -555,7 +555,7 @@ export function PageGuide({
                           border: "none",
                           outline: "none",
                           fontSize: 12,
-                          color: "#fff",
+                          color: "var(--foreground)",
                           fontFamily: "DM Sans, sans-serif",
                         }}
                       />
@@ -563,7 +563,7 @@ export function PageGuide({
                         onClick={send}
                         disabled={!input.trim() || thinking}
                         style={{
-                          background: input.trim() && !thinking ? "#7C3AED" : "rgba(255,255,255,0.06)",
+                          background: input.trim() && !thinking ? "var(--gradient-brand)" : "var(--accent)",
                           border: "none",
                           borderRadius: 7,
                           padding: "4px 8px",
@@ -574,7 +574,7 @@ export function PageGuide({
                           transition: "background 0.15s",
                         }}
                       >
-                        <Send size={12} style={{ color: input.trim() && !thinking ? "#fff" : "rgba(255,255,255,0.2)" }} />
+                        <Send size={12} style={{ color: input.trim() && !thinking ? "#fff" : "var(--faint)" }} />
                       </button>
                     </div>
                   </div>

@@ -78,7 +78,7 @@ export function AppPreview() {
             <div className="grid grid-cols-4 gap-2 p-3">
               {[
                 { stage: "Contacted", count: 18, color: "bg-muted-foreground/40" },
-                { stage: "Replied", count: 9, color: "bg-brand" },
+                { stage: "Replied", count: 9, color: "hs-gradient" },
                 { stage: "Meeting", count: 5, color: "bg-violet" },
                 { stage: "Deal Room", count: 4, color: "bg-success" },
               ].map((c) => (

@@ -45,7 +45,7 @@ const STATUS_CONFIG = {
   uploaded: {
     label: "Uploaded",
     icon: Upload,
-    cls: "bg-brand/10 text-brand",
+    cls: "bg-accent text-brand",
   },
   fulfilled: {
     label: "Fulfilled",
@@ -214,7 +214,7 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
 
       {/* Request form — investor only */}
       {isInvestor && showForm && (
-        <div className="rounded-xl border border-brand/30 bg-brand/5 p-4 space-y-3">
+        <div className="rounded-xl border border-brand/30 bg-accent p-4 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold">New document request</span>
             <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground">

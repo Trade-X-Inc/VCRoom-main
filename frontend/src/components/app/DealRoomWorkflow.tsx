@@ -35,8 +35,8 @@ export function WorkflowStepper({
 
   return (
     <div data-testid="workflow-stepper" style={{
-      background: "#111114",
-      border: "1px solid rgba(255,255,255,0.08)",
+      background: "var(--card)",
+      border: "1px solid var(--border)",
       borderRadius: 12,
       padding: "16px 20px",
     }}>
@@ -53,20 +53,20 @@ export function WorkflowStepper({
                 <div style={{
                   width: 28, height: 28, borderRadius: "50%",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  background: done ? "rgba(16,185,129,0.15)" : active ? "rgba(124,58,237,0.2)" : "rgba(255,255,255,0.04)",
-                  border: `1.5px solid ${done ? "rgba(16,185,129,0.5)" : active ? "rgba(124,58,237,0.6)" : "rgba(255,255,255,0.1)"}`,
+                  background: done ? "rgba(16,185,129,0.15)" : active ? "rgba(124,58,237,0.2)" : "var(--accent)",
+                  border: `1.5px solid ${done ? "rgba(16,185,129,0.5)" : active ? "rgba(124,58,237,0.6)" : "var(--accent)"}`,
                 }}>
                   {done
                     ? <CheckCircle2 style={{ width: 13, height: 13, color: "#10B981" }} />
                     : active
-                    ? <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#7C3AED" }} />
-                    : <Circle style={{ width: 10, height: 10, color: "rgba(255,255,255,0.15)" }} />
+                    ? <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--gradient-brand)" }} />
+                    : <Circle style={{ width: 10, height: 10, color: "var(--faint)" }} />
                   }
                 </div>
                 <span style={{
                   fontSize: 9,
                   fontWeight: active ? 700 : 500,
-                  color: done ? "#10B981" : active ? "#A855F7" : "rgba(255,255,255,0.2)",
+                  color: done ? "#10B981" : active ? "#A855F7" : "var(--faint)",
                   letterSpacing: "0.04em",
                   whiteSpace: "nowrap",
                   textAlign: "center",
@@ -79,7 +79,7 @@ export function WorkflowStepper({
               {i < WORKFLOW_STAGES.length - 1 && (
                 <div style={{
                   flex: 1, height: 1.5, marginBottom: 18,
-                  background: done ? "rgba(16,185,129,0.35)" : "rgba(255,255,255,0.06)",
+                  background: done ? "rgba(16,185,129,0.35)" : "var(--accent)",
                 }} />
               )}
             </div>
@@ -89,7 +89,7 @@ export function WorkflowStepper({
 
       {/* Days in stage */}
       {daysInStage !== null && stage !== "closed" && (
-        <div style={{ marginTop: 8, fontSize: 11, color: "rgba(255,255,255,0.3)" }}>
+        <div style={{ marginTop: 8, fontSize: 11, color: "var(--faint)" }}>
           <Clock style={{ width: 10, height: 10, display: "inline", marginRight: 4, verticalAlign: "middle" }} />
           Day {daysInStage + 1} in {STAGE_LABELS[stage]}
         </div>
@@ -183,14 +183,14 @@ export function NextActionCallout({
     >
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <Lightbulb style={{ width: 14, height: 14, color: "#A855F7", flexShrink: 0 }} />
-        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", lineHeight: 1.5 }}>{text}</span>
+        <span style={{ fontSize: 12, color: "var(--muted-foreground)", lineHeight: 1.5 }}>{text}</span>
       </div>
       {cta && (
         <button
           onClick={() => cta!.tab && onTabChange(cta!.tab)}
           style={{
             fontSize: 11, fontWeight: 600, padding: "5px 12px", borderRadius: 6,
-            background: "#7C3AED", color: "#fff", border: "none", cursor: "pointer",
+            background: "var(--gradient-brand)", color: "#fff", border: "none", cursor: "pointer",
             whiteSpace: "nowrap", flexShrink: 0,
           }}
         >
@@ -211,11 +211,11 @@ function Stage1Panel({ isInvestor, founderName, onTabChange }: {
       <div style={{ padding: "24px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
           <Clock style={{ width: 16, height: 16, color: "#F59E0B" }} />
-          <span style={{ fontSize: 14, fontWeight: 600, color: "#fff", fontFamily: "Syne, sans-serif" }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--foreground)", fontFamily: "Syne, sans-serif" }}>
             Waiting for Stage 1 data pack
           </span>
         </div>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>
+        <p style={{ fontSize: 13, color: "var(--muted-foreground)", lineHeight: 1.6 }}>
           {founderName ?? "The founder"} has signed the NDA. You will be notified when they share their Stage 1 documents
           (pitch deck, financials, company overview).
         </p>
@@ -226,17 +226,17 @@ function Stage1Panel({ isInvestor, founderName, onTabChange }: {
     <div style={{ padding: "24px 0" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
         <CheckCircle2 style={{ width: 16, height: 16, color: "#10B981" }} />
-        <span style={{ fontSize: 14, fontWeight: 600, color: "#fff", fontFamily: "Syne, sans-serif" }}>
+        <span style={{ fontSize: 14, fontWeight: 600, color: "var(--foreground)", fontFamily: "Syne, sans-serif" }}>
           NDA confirmed — share your Stage 1 data pack
         </span>
       </div>
-      <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: 1.6, marginBottom: 16 }}>
-        Upload your pitch deck, one-pager, and any initial financial summary as <strong style={{ color: "rgba(255,255,255,0.6)" }}>Stage 1 documents</strong>.
+      <p style={{ fontSize: 13, color: "var(--muted-foreground)", lineHeight: 1.6, marginBottom: 16 }}>
+        Upload your pitch deck, one-pager, and any initial financial summary as <strong style={{ color: "var(--muted-foreground)" }}>Stage 1 documents</strong>.
         These will be visible to the investor once they advance to Stage 1 Review.
       </p>
       <button
         onClick={() => onTabChange("documents")}
-        style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600, padding: "8px 16px", borderRadius: 8, background: "#7C3AED", color: "#fff", border: "none", cursor: "pointer" }}
+        style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600, padding: "8px 16px", borderRadius: 8, background: "var(--gradient-brand)", color: "#fff", border: "none", cursor: "pointer" }}
       >
         <Upload style={{ width: 12, height: 12 }} /> Go to Document Vault
       </button>
@@ -293,21 +293,21 @@ function Stage2Panel({ isInvestor, dealRoomId, userId, founderName, workflow, on
       <div style={{ padding: "24px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
           <Clock style={{ width: 16, height: 16, color: "#F59E0B" }} />
-          <span style={{ fontSize: 14, fontWeight: 600, color: "#fff", fontFamily: "Syne, sans-serif" }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--foreground)", fontFamily: "Syne, sans-serif" }}>
             Under review — {docs.length} Stage 1 document{docs.length !== 1 ? "s" : ""} shared
           </span>
         </div>
         {docs.length > 0 ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {(docs as any[]).map((d: any) => (
-              <div key={d.id} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
+              <div key={d.id} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--muted-foreground)" }}>
                 <FileText style={{ width: 12, height: 12, flexShrink: 0 }} />
                 {d.title}
               </div>
             ))}
           </div>
         ) : (
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>No Stage 1 documents uploaded yet.</p>
+          <p style={{ fontSize: 13, color: "var(--muted-foreground)" }}>No Stage 1 documents uploaded yet.</p>
         )}
         <button onClick={() => onTabChange("documents")} style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600, padding: "7px 14px", borderRadius: 8, background: "rgba(124,58,237,0.12)", color: "#A855F7", border: "1px solid rgba(124,58,237,0.25)", cursor: "pointer" }}>
           <Upload style={{ width: 11, height: 11 }} /> Add more documents
@@ -320,21 +320,21 @@ function Stage2Panel({ isInvestor, dealRoomId, userId, founderName, workflow, on
     <div style={{ padding: "24px 0" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
         <FileText style={{ width: 16, height: 16, color: "#A855F7" }} />
-        <span style={{ fontSize: 14, fontWeight: 600, color: "#fff", fontFamily: "Syne, sans-serif" }}>
+        <span style={{ fontSize: 14, fontWeight: 600, color: "var(--foreground)", fontFamily: "Syne, sans-serif" }}>
           Stage 1 documents — {docs.length} file{docs.length !== 1 ? "s" : ""} from {founderName ?? "founder"}
         </span>
       </div>
       {docs.length > 0 ? (
         <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}>
           {(docs as any[]).map((d: any) => (
-            <div key={d.id} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "rgba(255,255,255,0.55)" }}>
+            <div key={d.id} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--muted-foreground)" }}>
               <FileText style={{ width: 12, height: 12, flexShrink: 0, color: "#A855F7" }} />
               {d.title}
             </div>
           ))}
         </div>
       ) : (
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", marginBottom: 16 }}>No Stage 1 documents shared yet.</p>
+        <p style={{ fontSize: 13, color: "var(--faint)", marginBottom: 16 }}>No Stage 1 documents shared yet.</p>
       )}
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
         <button onClick={() => onTabChange("documents")} style={{ fontSize: 12, fontWeight: 600, padding: "7px 14px", borderRadius: 8, background: "rgba(124,58,237,0.10)", color: "#A855F7", border: "1px solid rgba(124,58,237,0.25)", cursor: "pointer" }}>
@@ -344,7 +344,7 @@ function Stage2Panel({ isInvestor, dealRoomId, userId, founderName, workflow, on
           data-testid="advance-to-meetings"
           onClick={advance}
           disabled={advancing}
-          style={{ fontSize: 12, fontWeight: 600, padding: "7px 16px", borderRadius: 8, background: "#7C3AED", color: "#fff", border: "none", cursor: advancing ? "not-allowed" : "pointer", opacity: advancing ? 0.6 : 1 }}
+          style={{ fontSize: 12, fontWeight: 600, padding: "7px 16px", borderRadius: 8, background: "var(--gradient-brand)", color: "#fff", border: "none", cursor: advancing ? "not-allowed" : "pointer", opacity: advancing ? 0.6 : 1 }}
         >
           {advancing ? "Advancing…" : "Advance to Meetings"}
         </button>
@@ -436,7 +436,7 @@ function Stage3Panel({ isInvestor, dealRoomId, userId, workflow, onTabChange, on
     <div style={{ padding: "24px 0" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
         <Calendar style={{ width: 16, height: 16, color: "#A855F7" }} />
-        <span style={{ fontSize: 14, fontWeight: 600, color: "#fff", fontFamily: "Syne, sans-serif" }}>
+        <span style={{ fontSize: 14, fontWeight: 600, color: "var(--foreground)", fontFamily: "Syne, sans-serif" }}>
           Meetings — {completed} of 3 completed
         </span>
       </div>
@@ -452,8 +452,8 @@ function Stage3Panel({ isInvestor, dealRoomId, userId, workflow, onTabChange, on
               key={num}
               data-testid={`meeting-slot-${num}`}
               style={{
-                background: isCompleted ? "rgba(16,185,129,0.06)" : isScheduled ? "rgba(245,158,11,0.06)" : "rgba(255,255,255,0.03)",
-                border: `1px solid ${isCompleted ? "rgba(16,185,129,0.2)" : isScheduled ? "rgba(245,158,11,0.18)" : "rgba(255,255,255,0.07)"}`,
+                background: isCompleted ? "rgba(16,185,129,0.06)" : isScheduled ? "rgba(245,158,11,0.06)" : "var(--accent)",
+                border: `1px solid ${isCompleted ? "rgba(16,185,129,0.2)" : isScheduled ? "rgba(245,158,11,0.18)" : "var(--accent)"}`,
                 borderRadius: 10,
                 padding: "12px 16px",
               }}
@@ -462,25 +462,25 @@ function Stage3Panel({ isInvestor, dealRoomId, userId, workflow, onTabChange, on
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <div style={{
                     width: 22, height: 22, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
-                    background: isCompleted ? "rgba(16,185,129,0.15)" : isScheduled ? "rgba(245,158,11,0.12)" : "rgba(255,255,255,0.06)",
-                    border: `1px solid ${isCompleted ? "rgba(16,185,129,0.3)" : isScheduled ? "rgba(245,158,11,0.25)" : "rgba(255,255,255,0.08)"}`,
+                    background: isCompleted ? "rgba(16,185,129,0.15)" : isScheduled ? "rgba(245,158,11,0.12)" : "var(--accent)",
+                    border: `1px solid ${isCompleted ? "rgba(16,185,129,0.3)" : isScheduled ? "rgba(245,158,11,0.25)" : "var(--accent)"}`,
                   }}>
                     {isCompleted
                       ? <CheckCircle2 style={{ width: 12, height: 12, color: "#10B981" }} />
-                      : <span style={{ fontSize: 10, fontWeight: 700, color: isScheduled ? "#F59E0B" : "rgba(255,255,255,0.3)" }}>{num}</span>}
+                      : <span style={{ fontSize: 10, fontWeight: 700, color: isScheduled ? "#F59E0B" : "var(--faint)" }}>{num}</span>}
                   </div>
                   <div>
                     <div style={{ fontSize: 12, fontWeight: 600, color: isCompleted ? "#10B981" : "#fff" }}>
                       Meeting {num}
                     </div>
                     {m?.scheduled_at && (
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 1 }}>
+                      <div style={{ fontSize: 11, color: "var(--faint)", marginTop: 1 }}>
                         {new Date(m.scheduled_at).toLocaleDateString("en-US", { dateStyle: "medium" })}
                         {isCompleted ? " — Completed" : " — Scheduled"}
                       </div>
                     )}
                     {m?.notes_shared && (
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 3, maxWidth: 280 }}>
+                      <div style={{ fontSize: 11, color: "var(--muted-foreground)", marginTop: 3, maxWidth: 280 }}>
                         Notes: {m.notes_shared}
                       </div>
                     )}
@@ -502,13 +502,13 @@ function Stage3Panel({ isInvestor, dealRoomId, userId, workflow, onTabChange, on
                         type="date"
                         value={meetingDates[num] ?? ""}
                         onChange={(e) => setMeetingDates((p) => ({ ...p, [num]: e.target.value }))}
-                        style={{ fontSize: 11, padding: "4px 8px", borderRadius: 6, border: "1px solid rgba(255,255,255,0.12)", background: "#18181C", color: "rgba(255,255,255,0.7)", cursor: "pointer" }}
+                        style={{ fontSize: 11, padding: "4px 8px", borderRadius: 6, border: "1px solid var(--border)", background: "var(--accent)", color: "var(--muted-foreground)", cursor: "pointer" }}
                       />
                       <button
                         data-testid={`schedule-meeting-${num}`}
                         onClick={() => scheduleMeeting(num)}
                         disabled={!meetingDates[num] || savingMeeting === num}
-                        style={{ fontSize: 11, fontWeight: 600, padding: "4px 12px", borderRadius: 6, background: "#7C3AED", color: "#fff", border: "none", cursor: !meetingDates[num] ? "not-allowed" : "pointer", opacity: !meetingDates[num] ? 0.5 : 1 }}
+                        style={{ fontSize: 11, fontWeight: 600, padding: "4px 12px", borderRadius: 6, background: "var(--gradient-brand)", color: "#fff", border: "none", cursor: !meetingDates[num] ? "not-allowed" : "pointer", opacity: !meetingDates[num] ? 0.5 : 1 }}
                       >
                         {savingMeeting === num ? "…" : "Schedule"}
                       </button>
@@ -529,7 +529,7 @@ function Stage3Panel({ isInvestor, dealRoomId, userId, workflow, onTabChange, on
             disabled={!canAdvance || advancing}
             style={{
               fontSize: 12, fontWeight: 600, padding: "8px 16px", borderRadius: 8,
-              background: canAdvance ? "#7C3AED" : "rgba(124,58,237,0.2)",
+              background: canAdvance ? "var(--gradient-brand)" : "rgba(124,58,237,0.2)",
               color: canAdvance ? "#fff" : "rgba(124,58,237,0.4)",
               border: "none", cursor: !canAdvance ? "not-allowed" : "pointer",
             }}
@@ -545,7 +545,7 @@ function Stage3Panel({ isInvestor, dealRoomId, userId, workflow, onTabChange, on
             Pass on deal
           </button>
           {!canAdvance && (
-            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", alignSelf: "center" }}>
+            <span style={{ fontSize: 11, color: "var(--faint)", alignSelf: "center" }}>
               Complete at least 1 meeting to advance
             </span>
           )}
@@ -582,13 +582,13 @@ function Stage4Panel({ isInvestor, workflow, onTabChange }: {
 
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
         <FileText style={{ width: 15, height: 15, color: "#A855F7" }} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: "#fff", fontFamily: "Syne, sans-serif" }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)", fontFamily: "Syne, sans-serif" }}>
           {isInvestor ? "Full diligence documents unlocked" : "Upload Stage 2 — full diligence documents"}
         </span>
       </div>
 
       {!isInvestor && (
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", lineHeight: 1.6, marginBottom: 14 }}>
+        <p style={{ fontSize: 12, color: "var(--muted-foreground)", lineHeight: 1.6, marginBottom: 14 }}>
           Stage 2 documents are now visible to the investor. Upload: P&L, cap table, legal documents,
           customer contracts, team/employment records, technical architecture docs.
         </p>
@@ -611,8 +611,8 @@ function Stage4Panel({ isInvestor, workflow, onTabChange }: {
 function TermField({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</div>
-      <div style={{ fontSize: 13, fontWeight: 600, color: "#fff", marginTop: 2 }}>{value}</div>
+      <div style={{ fontSize: 10, color: "var(--faint)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)", marginTop: 2 }}>{value}</div>
     </div>
   );
 }
@@ -672,18 +672,18 @@ function Stage5Panel({ isInvestor, dealRoomId, userId, workflow, onStageChange }
       <div style={{ padding: "24px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
           <Send style={{ width: 15, height: 15, color: "#A855F7" }} />
-          <span style={{ fontSize: 14, fontWeight: 600, color: "#fff", fontFamily: "Syne, sans-serif" }}>Send term sheet</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--foreground)", fontFamily: "Syne, sans-serif" }}>Send term sheet</span>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
           <TsField label="Pre-money valuation ($)" value={form.valuation} onChange={(v) => setForm((f) => ({ ...f, valuation: v }))} placeholder="e.g. 5000000" type="number" />
           <TsField label="Investment amount ($)" value={form.investment} onChange={(v) => setForm((f) => ({ ...f, investment: v }))} placeholder="e.g. 500000" type="number" />
           <TsField label="Equity (%)" value={form.equity} onChange={(v) => setForm((f) => ({ ...f, equity: v }))} placeholder="e.g. 9" type="number" />
           <div>
-            <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>Instrument</label>
+            <label style={{ fontSize: 11, color: "var(--muted-foreground)", display: "block", marginBottom: 4 }}>Instrument</label>
             <select
               value={form.instrument}
               onChange={(e) => setForm((f) => ({ ...f, instrument: e.target.value }))}
-              style={{ width: "100%", fontSize: 12, padding: "6px 10px", borderRadius: 6, border: "1px solid rgba(255,255,255,0.12)", background: "#18181C", color: "#fff" }}
+              style={{ width: "100%", fontSize: 12, padding: "6px 10px", borderRadius: 6, border: "1px solid var(--border)", background: "var(--accent)", color: "var(--foreground)" }}
             >
               <option>SAFE</option>
               <option>Priced Equity</option>
@@ -692,10 +692,10 @@ function Stage5Panel({ isInvestor, dealRoomId, userId, workflow, onStageChange }
           </div>
         </div>
         <div style={{ display: "flex", gap: 16, marginBottom: 14 }}>
-          <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--muted-foreground)", cursor: "pointer" }}>
             <input type="checkbox" checked={form.pro_rata} onChange={(e) => setForm((f) => ({ ...f, pro_rata: e.target.checked }))} /> Pro-rata rights
           </label>
-          <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--muted-foreground)", cursor: "pointer" }}>
             <input type="checkbox" checked={form.board_seat} onChange={(e) => setForm((f) => ({ ...f, board_seat: e.target.checked }))} /> Board seat
           </label>
         </div>
@@ -703,7 +703,7 @@ function Stage5Panel({ isInvestor, dealRoomId, userId, workflow, onStageChange }
           data-testid="send-term-sheet"
           onClick={handleSend}
           disabled={sending}
-          style={{ fontSize: 12, fontWeight: 600, padding: "9px 20px", borderRadius: 8, background: "#7C3AED", color: "#fff", border: "none", cursor: sending ? "not-allowed" : "pointer", opacity: sending ? 0.6 : 1 }}
+          style={{ fontSize: 12, fontWeight: 600, padding: "9px 20px", borderRadius: 8, background: "var(--gradient-brand)", color: "#fff", border: "none", cursor: sending ? "not-allowed" : "pointer", opacity: sending ? 0.6 : 1 }}
         >
           {sending ? "Sending…" : "Send term sheet"}
         </button>
@@ -716,13 +716,13 @@ function Stage5Panel({ isInvestor, dealRoomId, userId, workflow, onStageChange }
       <div style={{ padding: "24px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
           <FileText style={{ width: 15, height: 15, color: "#10B981" }} />
-          <span style={{ fontSize: 14, fontWeight: 600, color: "#fff", fontFamily: "Syne, sans-serif" }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--foreground)", fontFamily: "Syne, sans-serif" }}>
             Term sheet received
           </span>
         </div>
         {/* Summary */}
         {workflow && (
-          <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
             {workflow.term_sheet_investment_amount && <TermField label="Investment" value={`$${Number(workflow.term_sheet_investment_amount).toLocaleString()}`} />}
             {workflow.term_sheet_valuation && <TermField label="Pre-money" value={`$${Number(workflow.term_sheet_valuation).toLocaleString()}`} />}
             {workflow.term_sheet_equity_pct && <TermField label="Equity" value={`${workflow.term_sheet_equity_pct}%`} />}
@@ -766,7 +766,7 @@ function Stage5Panel({ isInvestor, dealRoomId, userId, workflow, onStageChange }
   }
 
   return (
-    <div style={{ padding: "24px 0", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
+    <div style={{ padding: "24px 0", fontSize: 13, color: "var(--muted-foreground)" }}>
       {isInvestor ? "Term sheet already sent." : "Awaiting term sheet from the investor."}
     </div>
   );
@@ -777,13 +777,13 @@ function TsField({ label, value, onChange, placeholder, type = "text" }: {
 }) {
   return (
     <div>
-      <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 4 }}>{label}</label>
+      <label style={{ fontSize: 11, color: "var(--muted-foreground)", display: "block", marginBottom: 4 }}>{label}</label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        style={{ width: "100%", fontSize: 12, padding: "6px 10px", borderRadius: 6, border: "1px solid rgba(255,255,255,0.12)", background: "#18181C", color: "#fff", boxSizing: "border-box" }}
+        style={{ width: "100%", fontSize: 12, padding: "6px 10px", borderRadius: 6, border: "1px solid var(--border)", background: "var(--accent)", color: "var(--foreground)", boxSizing: "border-box" }}
       />
     </div>
   );
@@ -797,13 +797,13 @@ function Stage6Panel({ isInvestor, workflow }: { isInvestor: boolean; workflow: 
       <div style={{ background: "rgba(16,185,129,0.07)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 12, padding: "20px 24px", textAlign: "center" }}>
         <CheckCircle2 style={{ width: 28, height: 28, color: "#10B981", margin: "0 auto 12px" }} />
         <div style={{ fontSize: 16, fontWeight: 700, color: "#10B981", marginBottom: 6, fontFamily: "Syne, sans-serif" }}>Deal Closed</div>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", lineHeight: 1.6 }}>
+        <p style={{ fontSize: 13, color: "var(--muted-foreground)", lineHeight: 1.6 }}>
           {isInvestor
             ? `Investment of ${workflow?.term_sheet_investment_amount ? `$${Number(workflow.term_sheet_investment_amount).toLocaleString()}` : "an agreed amount"} closed. This company has been added to your portfolio.`
             : `Congratulations — your round with this investor is closed. This deal room is now archived and read-only.`}
         </p>
         {workflow?.term_sheet_accepted_at && (
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", marginTop: 8 }}>
+          <div style={{ fontSize: 11, color: "var(--faint)", marginTop: 8 }}>
             Accepted {new Date(workflow.term_sheet_accepted_at).toLocaleDateString()}
           </div>
         )}
@@ -826,7 +826,7 @@ export function Stage2Gate({ stage2Unlocked }: { stage2Unlocked: boolean }) {
       }}
     >
       <Lock style={{ width: 14, height: 14, color: "#F59E0B", flexShrink: 0 }} />
-      <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", lineHeight: 1.5 }}>
+      <span style={{ fontSize: 12, color: "var(--muted-foreground)", lineHeight: 1.5 }}>
         Full diligence documents unlock after a term sheet is sent.
       </span>
     </div>
@@ -873,7 +873,7 @@ export function StageAwareOverviewPanel({
   const stage = workflow?.workflow_stage ?? null;
 
   if (isLoading) {
-    return <div style={{ padding: "24px 0", fontSize: 13, color: "rgba(255,255,255,0.3)" }}>Loading workflow…</div>;
+    return <div style={{ padding: "24px 0", fontSize: 13, color: "var(--faint)" }}>Loading workflow…</div>;
   }
 
   return (
@@ -894,7 +894,7 @@ export function StageAwareOverviewPanel({
       />
 
       {/* Stage content */}
-      <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "4px 20px 20px" }}>
+      <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 12, padding: "4px 20px 20px" }}>
         {(!stage || stage === "nda_signed") && (
           <Stage1Panel isInvestor={isInvestor} founderName={founderName} onTabChange={onTabChange} />
         )}
@@ -917,7 +917,7 @@ export function StageAwareOverviewPanel({
 
       {/* Archived banner */}
       {stage === "closed" && (
-        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "10px 16px", fontSize: 11, color: "rgba(255,255,255,0.25)", textAlign: "center" }}>
+        <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 16px", fontSize: 11, color: "var(--faint)", textAlign: "center" }}>
           This deal room is archived — read-only.
         </div>
       )}

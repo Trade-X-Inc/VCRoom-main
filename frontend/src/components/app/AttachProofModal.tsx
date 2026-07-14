@@ -66,21 +66,21 @@ export function AttachProofModal({ claim, startupId, onClose, onDone }: AttachPr
     >
       <div
         style={{
-          background: "#111114", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16,
+          background: "var(--card)", border: "1px solid var(--border)", borderRadius: 16,
           padding: 28, maxWidth: 460, width: "100%",
         }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-4">
           <div>
-            <div className="text-sm font-semibold text-white" style={{ fontFamily: "Syne, sans-serif" }}>
+            <div className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
               Attach proof for claim
             </div>
-            <div className="text-xs text-white/40 mt-1">
-              {claim.label}: <span className="text-white/60">{claim.value}</span>
+            <div className="text-xs text-muted-foreground mt-1">
+              {claim.label}: <span className="text-muted-foreground">{claim.value}</span>
             </div>
           </div>
-          <button onClick={onClose} className="text-white/30 hover:text-white/60 transition-colors">
+          <button onClick={onClose} className="text-faint hover:text-muted-foreground transition-colors">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -89,7 +89,7 @@ export function AttachProofModal({ claim, startupId, onClose, onDone }: AttachPr
           <>
             <div
               style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.15)", borderRadius: 8, padding: "12px 16px", marginBottom: 16 }}
-              className="text-xs text-white/40 leading-relaxed"
+              className="text-xs text-muted-foreground leading-relaxed"
             >
               Upload a document that contains evidence for this claim — a financial statement,
               contract, or bank statement. The AI will check if the document supports the claimed value.
@@ -98,12 +98,12 @@ export function AttachProofModal({ claim, startupId, onClose, onDone }: AttachPr
             <label
               style={{
                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                border: "2px dashed rgba(255,255,255,0.12)", borderRadius: 10, padding: "24px 16px",
+                border: "2px dashed var(--border)", borderRadius: 10, padding: "24px 16px",
                 cursor: "pointer", gap: 8, marginBottom: 16,
               }}
             >
-              <Paperclip className="h-5 w-5 text-white/30" />
-              <span className="text-xs text-white/40 text-center">
+              <Paperclip className="h-5 w-5 text-faint" />
+              <span className="text-xs text-muted-foreground text-center">
                 {file ? file.name : "Click to select PDF, DOCX, XLSX, CSV"}
               </span>
               <input
@@ -117,7 +117,7 @@ export function AttachProofModal({ claim, startupId, onClose, onDone }: AttachPr
             <div className="flex gap-2 justify-end">
               <button
                 onClick={onClose}
-                className="px-4 py-2 text-xs text-white/40 hover:text-white/70 transition-colors"
+                className="px-4 py-2 text-xs text-muted-foreground hover:text-muted-foreground transition-colors"
               >
                 Cancel
               </button>
@@ -125,8 +125,8 @@ export function AttachProofModal({ claim, startupId, onClose, onDone }: AttachPr
                 onClick={handleAttach}
                 disabled={!file || running}
                 style={{
-                  background: !file || running ? "rgba(124,58,237,0.3)" : "#7C3AED",
-                  color: "#fff", border: "none", borderRadius: 8,
+                  background: !file || running ? "rgba(124,58,237,0.3)" : "var(--gradient-brand)",
+                  color: "var(--foreground)", border: "none", borderRadius: 8,
                   padding: "8px 18px", fontSize: 12, fontWeight: 600, cursor: !file || running ? "not-allowed" : "pointer",
                 }}
               >
@@ -143,7 +143,7 @@ export function AttachProofModal({ claim, startupId, onClose, onDone }: AttachPr
                 <div className="flex items-center gap-2 text-[#10B981] text-sm font-medium mb-1">
                   <CheckCircle2 className="h-4 w-4" /> Claim confirmed
                 </div>
-                <p className="text-xs text-white/50 leading-relaxed">{result.ai_result?.explanation}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{result.ai_result?.explanation}</p>
               </div>
             )}
             {result.proof_status === "ai_mismatch" && (
@@ -151,24 +151,24 @@ export function AttachProofModal({ claim, startupId, onClose, onDone }: AttachPr
                 <div className="flex items-center gap-2 text-[#EF4444] text-sm font-medium mb-1">
                   <XCircle className="h-4 w-4" /> Claim doesn't match document
                 </div>
-                <p className="text-xs text-white/50 leading-relaxed">{result.ai_result?.explanation}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{result.ai_result?.explanation}</p>
                 {result.ai_result?.found_value && (
-                  <p className="text-xs text-white/40 mt-1">Found in document: <span className="text-white/60">{result.ai_result.found_value}</span></p>
+                  <p className="text-xs text-muted-foreground mt-1">Found in document: <span className="text-muted-foreground">{result.ai_result.found_value}</span></p>
                 )}
               </div>
             )}
             {result.proof_status === "pending_review" && (
-              <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "14px 16px", marginBottom: 16 }}>
-                <div className="flex items-center gap-2 text-white/50 text-sm font-medium mb-1">
+              <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: 8, padding: "14px 16px", marginBottom: 16 }}>
+                <div className="flex items-center gap-2 text-muted-foreground text-sm font-medium mb-1">
                   <Clock className="h-4 w-4" /> Proof attached
                 </div>
-                <p className="text-xs text-white/40">Document saved. AI check was inconclusive — status set to pending review.</p>
+                <p className="text-xs text-muted-foreground">Document saved. AI check was inconclusive — status set to pending review.</p>
               </div>
             )}
             <div className="flex justify-end">
               <button
                 onClick={() => { onDone(); onClose(); }}
-                style={{ background: "#7C3AED", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+                style={{ background: "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
               >
                 Done
               </button>

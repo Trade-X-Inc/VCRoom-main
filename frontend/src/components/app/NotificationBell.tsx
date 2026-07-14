@@ -45,10 +45,10 @@ const tintFor = (kind: NotifKind) => {
   if (kind === "thesis_match" || kind === "match") return "bg-amber-500/10 text-amber-400";
   if (kind === "access_approved") return "bg-success/10 text-success";
   if (kind === "access_declined") return "bg-destructive/10 text-destructive";
-  if (kind === "deal_room_invite") return "bg-brand/10 text-brand";
+  if (kind === "deal_room_invite") return "bg-accent text-brand";
   if (kind === "deal_activity") return "bg-muted text-muted-foreground";
   if (kind === "decision" || kind === "deal") return "bg-success/10 text-success";
-  if (kind === "message") return "bg-brand/10 text-brand";
+  if (kind === "message") return "bg-accent text-brand";
   if (kind === "invite") return "bg-warning/10 text-warning";
   if (kind === "ai") return "bg-violet/10 text-violet";
   if (kind === "view") return "bg-blue-500/10 text-blue-400";
@@ -132,7 +132,7 @@ export function NotificationBell() {
       >
         <Bell className="h-4 w-4" />
         {unread > 0 && (
-          <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-brand ring-2 ring-background" />
+          <span className="absolute top-1 right-1 h-2 w-2 rounded-full hs-gradient ring-2 ring-background" />
         )}
       </button>
 
@@ -142,7 +142,7 @@ export function NotificationBell() {
             <div className="flex items-center gap-2">
               <div className="text-sm font-semibold">Notifications</div>
               {unread > 0 && (
-                <span className="text-[10px] rounded-full bg-brand/10 text-brand px-1.5 py-0.5 font-medium">
+                <span className="text-[10px] rounded-full bg-accent text-brand px-1.5 py-0.5 font-medium">
                   {unread > 9 ? "9+" : unread} new
                 </span>
               )}
@@ -170,7 +170,7 @@ export function NotificationBell() {
               };
               const content = (
                 <div
-                  className={`flex gap-3 p-3.5 hover:bg-accent/50 transition-colors cursor-pointer ${!n.read ? "bg-brand/[0.03]" : ""}`}
+                  className={`flex gap-3 p-3.5 hover:bg-accent/50 transition-colors cursor-pointer ${!n.read ? "hs-gradient/[0.03]" : ""}`}
                   onClick={!n.action_url ? handleClick : undefined}
                 >
                   <div className={`grid h-8 w-8 place-items-center rounded-md shrink-0 text-sm font-bold ${tintFor(n.kind)}`}>
@@ -183,12 +183,12 @@ export function NotificationBell() {
                           {n.title}
                         </div>
                         {isMatchKind && n.meta?.match_score && (
-                          <span className="text-xs bg-[#7C3AED]/20 text-[#7C3AED] px-1.5 py-0.5 rounded font-semibold shrink-0">
+                          <span className="text-xs bg-accent text-brand px-1.5 py-0.5 rounded font-semibold shrink-0">
                             {n.meta.match_score}%
                           </span>
                         )}
                       </div>
-                      {!n.read && <span className="h-1.5 w-1.5 rounded-full bg-brand mt-1.5 shrink-0" />}
+                      {!n.read && <span className="h-1.5 w-1.5 rounded-full hs-gradient mt-1.5 shrink-0" />}
                     </div>
                     {isView && n.meta?.viewer_name ? (
                       <div className="mt-0.5 text-xs text-muted-foreground">

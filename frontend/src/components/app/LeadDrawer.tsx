@@ -61,12 +61,12 @@ const PIPELINE_MAIN: LeadStatus[] = [
 const STATUS_COLOR: Record<LeadStatus, string> = {
   "New":               "bg-muted-foreground/20 text-muted-foreground",
   "Shortlisted":       "bg-foreground/10 text-foreground",
-  "Contacted":         "bg-brand/15 text-brand",
+  "Contacted":         "bg-accent text-brand",
   "Replied":           "bg-violet/15 text-violet",
   "Meeting Booked":    "bg-warning/15 text-warning",
   "Interested":        "bg-warning/20 text-warning",
   "Deal Room Created": "bg-success/15 text-success",
-  "Follow Up":         "bg-brand/10 text-brand",
+  "Follow Up":         "bg-accent text-brand",
   "Rejected":          "bg-destructive/15 text-destructive",
 };
 
@@ -922,9 +922,9 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
                               className={cn(
                                 "flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-all border disabled:opacity-60",
                                 isActive
-                                  ? "bg-brand text-brand-foreground border-brand shadow-glow"
+                                  ? "hs-gradient text-brand-foreground border-brand shadow-glow"
                                   : isPast
-                                    ? "bg-brand/10 text-brand border-brand/30"
+                                    ? "bg-accent text-brand border-brand/30"
                                     : "bg-muted/40 text-muted-foreground border-transparent hover:border-border/60",
                               )}
                             >

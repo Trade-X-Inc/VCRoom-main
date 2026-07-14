@@ -11,7 +11,7 @@ export function AuthLayout({ title, subtitle, children, footer }: { title: strin
         <div className="relative h-full flex flex-col">
           <Logo />
           <div className="my-auto max-w-md">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-accent px-3 py-1 text-xs">
               <ShieldCheck className="h-3.5 w-3.5" /> SOC 2 · Bank-grade encryption
             </div>
             <h1 className="mt-5 text-4xl font-semibold tracking-[-0.03em] leading-tight">The fundraising operating system for serious teams.</h1>

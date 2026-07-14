@@ -117,7 +117,7 @@ function ThinkingAnimation({ stillWorking }: { stillWorking?: boolean }) {
               key={i}
               className="w-4 h-1 rounded-full"
               style={{
-                background: i === 0 ? "#7C3AED" : i === 1 ? "#A855F7" : "#6B21A8",
+                background: i === 0 ? "var(--gradient-brand)" : i === 1 ? "#A855F7" : "#6B21A8",
                 animation: `hs-bar${i + 1} ${1.2 + i * 0.3}s ease-in-out infinite`,
                 animationDelay: `${delay}s`,
               }}
@@ -131,7 +131,7 @@ function ThinkingAnimation({ stillWorking }: { stillWorking?: boolean }) {
               key={i}
               className="w-2 h-2 rounded-full"
               style={{
-                background: "#7C3AED",
+                background: "var(--gradient-brand)",
                 animation: "hs-dot-pulse 1.2s ease-in-out infinite",
                 animationDelay: `${delay}s`,
               }}
@@ -167,13 +167,13 @@ function MessageBubble({
     return (
       <div className="flex flex-col items-end gap-1">
         <div
-          className="max-w-[80%] rounded-[12px_12px_0_12px] px-3 py-2.5 text-sm text-white leading-relaxed"
-          style={{ background: "#7C3AED" }}
+          className="max-w-[80%] rounded-[12px_12px_0_12px] px-3 py-2.5 text-sm text-foreground leading-relaxed"
+          style={{ background: "var(--gradient-brand)" }}
           data-testid="ai-message"
         >
           {msg.content}
         </div>
-        <span className="text-[11px] pr-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+        <span className="text-[11px] pr-1" style={{ color: "var(--muted-foreground)" }}>
           {formatTime(msg.timestamp)}
         </span>
       </div>
@@ -189,19 +189,19 @@ function MessageBubble({
           style={{ background: "var(--ai-bubble-bg, #f3f4f6)", border: "1px solid rgba(124,58,237,0.4)" }}
           data-testid="ai-message"
         >
-          <div className="font-semibold mb-1 text-gray-900 dark:text-white">About to: {card.action}</div>
+          <div className="font-semibold mb-1 text-gray-900 dark:text-foreground">About to: {card.action}</div>
           <div className="text-xs mb-3 text-gray-500 dark:text-gray-400">{card.description}</div>
           <div className="flex gap-2">
             <button
               onClick={onCancel}
-              className="rounded px-3 py-1 text-sm border border-gray-300 dark:border-zinc-600 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="rounded px-3 py-1 text-sm border border-gray-300 dark:border-zinc-600 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-foreground transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={onConfirm}
-              className="rounded px-3 py-1 text-sm text-white transition-opacity hover:opacity-90"
-              style={{ background: "#7C3AED" }}
+              className="rounded px-3 py-1 text-sm text-foreground transition-opacity hover:opacity-90"
+              style={{ background: "var(--gradient-brand)" }}
             >
               Confirm
             </button>
@@ -217,7 +217,7 @@ function MessageBubble({
   return (
     <div className="flex flex-col items-start gap-1">
       <div
-        className="max-w-[85%] rounded-[0_12px_12px_12px] px-3 py-2.5 text-sm leading-relaxed text-gray-900 dark:text-white"
+        className="max-w-[85%] rounded-[0_12px_12px_12px] px-3 py-2.5 text-sm leading-relaxed text-gray-900 dark:text-foreground"
         style={{ background: "var(--ai-bubble-bg, #f3f4f6)" }}
         data-testid="ai-message"
       >
@@ -518,15 +518,15 @@ export function AIOperatorPanel({
           style={{
             width: 24,
             height: 72,
-            background: "#7C3AED",
+            background: "var(--gradient-brand)",
             borderRadius: "8px 0 0 8px",
             cursor: "pointer",
           }}
           onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "#6D28D9"; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "#7C3AED"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--gradient-brand)"; }}
         >
           <span
-            className="text-white font-bold text-[10px] select-none"
+            className="text-foreground font-bold text-[10px] select-none"
             style={{ writingMode: "vertical-rl", transform: "rotate(-90deg)", letterSpacing: "0.05em" }}
           >
             AI
@@ -593,8 +593,8 @@ export function AIOperatorPanel({
           style={{ height: 56, borderBottom: "1px solid", borderColor: "rgba(229,231,235,1)" }}
         >
           <div className="flex items-center gap-1.5 min-w-0">
-            <span className="text-base leading-none" style={{ color: "#7C3AED" }}>✦</span>
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">AI</span>
+            <span className="text-base leading-none" style={{ color: "var(--brand)" }}>✦</span>
+            <span className="text-sm font-semibold text-gray-900 dark:text-foreground">AI</span>
             <span className="text-sm text-gray-400">·</span>
             <span className="text-sm text-gray-500 dark:text-gray-400 truncate">{pageContext.pageName}</span>
           </div>
@@ -609,7 +609,7 @@ export function AIOperatorPanel({
                 className="grid h-8 w-8 place-items-center rounded-lg text-xs font-semibold transition-colors"
                 style={{
                   background: activeSize === sz ? "rgba(124,58,237,0.1)" : "transparent",
-                  color: activeSize === sz ? "#7C3AED" : "#6B7280",
+                  color: activeSize === sz ? "var(--brand)" : "#6B7280",
                 }}
               >
                 {sz}
@@ -618,7 +618,7 @@ export function AIOperatorPanel({
             <button
               onClick={() => setIsOpen(false)}
               data-testid="ai-panel-close"
-              className="grid h-8 w-8 place-items-center rounded-lg text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors text-lg leading-none"
+              className="grid h-8 w-8 place-items-center rounded-lg text-gray-500 hover:text-gray-900 dark:hover:text-foreground transition-colors text-lg leading-none"
               aria-label="Close AI panel"
             >
               <X className="h-4 w-4" />
@@ -629,14 +629,14 @@ export function AIOperatorPanel({
         {/* Gated view — founder profile below 40% complete */}
         {isGated ? (
           <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col items-center justify-center gap-4 text-center">
-            <div className="text-4xl" style={{ color: "#7C3AED" }}>✦</div>
+            <div className="text-4xl" style={{ color: "var(--brand)" }}>✦</div>
             <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed max-w-xs">
               Your profile is {completenessPercent}% complete. I can give better guidance once you have a company description, at least one document, and your funding stage set.
             </p>
             <Link
               to="/app/profile-builder"
-              className="rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors"
-              style={{ background: "#7C3AED" }}
+              className="rounded-lg px-4 py-2 text-sm font-medium text-foreground transition-colors"
+              style={{ background: "var(--gradient-brand)" }}
             >
               Complete your profile →
             </Link>
@@ -649,8 +649,8 @@ export function AIOperatorPanel({
             /* Empty state */
             <div className="flex flex-col items-center justify-center h-full gap-5 pb-8 select-none">
               <div>
-                <div className="text-4xl text-center mb-3" style={{ color: "#7C3AED" }}>✦</div>
-                <div className="text-sm font-semibold text-gray-900 dark:text-white text-center">AI Advisor</div>
+                <div className="text-4xl text-center mb-3" style={{ color: "var(--brand)" }}>✦</div>
+                <div className="text-sm font-semibold text-gray-900 dark:text-foreground text-center">AI Advisor</div>
                 <div className="text-sm text-gray-500 dark:text-gray-400 text-center mt-1">
                   Ask about your raise, profile, or next steps.
                 </div>
@@ -663,8 +663,8 @@ export function AIOperatorPanel({
                     className="rounded-full px-3 py-1.5 text-sm border transition-colors"
                     style={{ borderColor: "rgba(209,213,219,1)", color: "#6B7280" }}
                     onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.borderColor = "#7C3AED";
-                      (e.currentTarget as HTMLElement).style.color = "#7C3AED";
+                      (e.currentTarget as HTMLElement).style.borderColor = "var(--brand)";
+                      (e.currentTarget as HTMLElement).style.color = "var(--brand)";
                     }}
                     onMouseLeave={(e) => {
                       (e.currentTarget as HTMLElement).style.borderColor = "rgba(209,213,219,1)";
@@ -705,7 +705,7 @@ export function AIOperatorPanel({
               disabled={isLoading}
               rows={1}
               data-testid="ai-panel-input"
-              className="w-full resize-none rounded-xl pr-12 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none disabled:opacity-50 transition-colors"
+              className="w-full resize-none rounded-xl pr-12 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder-gray-400 focus:outline-none disabled:opacity-50 transition-colors"
               style={{
                 minHeight: 40,
                 maxHeight: 96,
@@ -713,7 +713,7 @@ export function AIOperatorPanel({
                 background: "rgba(243,244,246,1)",
                 border: "1px solid rgba(229,231,235,1)",
               }}
-              onFocus={(e) => { (e.target as HTMLTextAreaElement).style.borderColor = "#7C3AED"; }}
+              onFocus={(e) => { (e.target as HTMLTextAreaElement).style.borderColor = "var(--brand)"; }}
               onBlur={(e) => { (e.target as HTMLTextAreaElement).style.borderColor = "rgba(229,231,235,1)"; }}
             />
             <button
@@ -721,16 +721,16 @@ export function AIOperatorPanel({
               disabled={isLoading || !inputValue.trim()}
               data-testid="ai-panel-send"
               aria-label="Send"
-              className="absolute right-2 bottom-2 grid h-8 w-8 place-items-center rounded-lg text-white transition-opacity"
+              className="absolute right-2 bottom-2 grid h-8 w-8 place-items-center rounded-lg text-foreground transition-opacity"
               style={{
-                background: "#7C3AED",
+                background: "var(--gradient-brand)",
                 opacity: (isLoading || !inputValue.trim()) ? 0.4 : 1,
                 cursor: (isLoading || !inputValue.trim()) ? "not-allowed" : "pointer",
               }}
               onMouseEnter={(e) => {
                 if (!isLoading && inputValue.trim()) (e.currentTarget as HTMLElement).style.background = "#6D28D9";
               }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "#7C3AED"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--gradient-brand)"; }}
             >
               <ArrowUp className="h-4 w-4" />
             </button>

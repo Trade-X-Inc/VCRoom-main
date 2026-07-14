@@ -97,10 +97,10 @@ export function DDAnalysisPanel({
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2.5">
           <div className="grid h-9 w-9 place-items-center rounded-lg" style={{ background: "rgba(124,58,237,0.12)" }}>
-            <Microscope className="h-4 w-4" style={{ color: "#7C3AED" }} />
+            <Microscope className="h-4 w-4" style={{ color: "var(--brand)" }} />
           </div>
           <div>
-            <div className="text-sm font-semibold text-gray-900 dark:text-white">
+            <div className="text-sm font-semibold text-gray-900 dark:text-foreground">
               AI Analysis{findings.length > 0 ? ` — ${findings.length} finding${findings.length !== 1 ? "s" : ""}` : ""}
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400">
@@ -113,8 +113,8 @@ export function DDAnalysisPanel({
             onClick={run}
             disabled={running}
             data-testid="run-deep-analysis"
-            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
-            style={{ background: "#7C3AED" }}
+            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-60"
+            style={{ background: "var(--gradient-brand)" }}
           >
             {running ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Microscope className="h-3.5 w-3.5" />}
             {running ? "Analysing…" : analysis ? "Re-run deep analysis" : "Run deep analysis"}
@@ -166,7 +166,7 @@ export function DDAnalysisPanel({
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
                             <span className="h-2 w-2 rounded-full shrink-0" style={{ background: SEVERITY_COLOR[f.severity] ?? "#6B7280" }} title={f.severity} />
-                            <span className="text-sm font-medium text-gray-900 dark:text-white truncate">{f.title}</span>
+                            <span className="text-sm font-medium text-gray-900 dark:text-foreground truncate">{f.title}</span>
                           </div>
                           {open ? <ChevronUp className="h-4 w-4 text-gray-400 shrink-0" /> : <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />}
                         </button>
@@ -187,8 +187,8 @@ export function DDAnalysisPanel({
                             {isInvestor && (
                               <button
                                 onClick={() => askInQa(f.question_to_ask)}
-                                className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
-                                style={{ background: "#7C3AED" }}
+                                className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold text-foreground hover:opacity-90"
+                                style={{ background: "var(--gradient-brand)" }}
                               >
                                 <MessageSquarePlus className="h-3 w-3" /> Ask this in Q&A →
                               </button>

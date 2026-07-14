@@ -8,7 +8,7 @@ const CHECK_MIN = ["$10K", "$25K", "$50K", "$100K", "$250K", "$500K", "$1M", "$2
 const CHECK_MAX = ["$50K", "$100K", "$250K", "$500K", "$1M", "$2M", "$5M", "$10M", "$25M", "$50M+"];
 
 const inputCls =
-  "w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#7C3AED]/60 focus:ring-1 focus:ring-[#7C3AED]/30";
+  "w-full rounded-md border border-border bg-accent px-3 py-2 text-sm text-white placeholder:text-faint focus:outline-none focus:border-brand/60 focus:ring-1 focus:ring-brand/30";
 const selectCls = inputCls + " appearance-none";
 
 interface FormData {
@@ -86,18 +86,18 @@ export function InvestorOnboardingModal({
   return (
     <div className="fixed inset-0 z-[60] bg-black/70 grid place-items-center p-4" onClick={onCancel}>
       <div
-        className="w-full max-w-lg rounded-xl border border-white/10 bg-[#111118] shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-lg rounded-xl border border-border bg-[#111118] shadow-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-white/10">
+        <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-border">
           <div>
-            <h2 className="text-lg font-bold text-white" style={{ fontFamily: "Syne, sans-serif" }}>
+            <h2 className="text-lg font-bold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
               Complete your investor profile
             </h2>
-            <p className="text-sm text-white/50 mt-1">Required before connecting with founders.</p>
+            <p className="text-sm text-muted-foreground mt-1">Required before connecting with founders.</p>
           </div>
-          <button onClick={onCancel} className="text-white/30 hover:text-white/70 transition-colors ml-4 mt-0.5">
+          <button onClick={onCancel} className="text-faint hover:text-muted-foreground transition-colors ml-4 mt-0.5">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -106,17 +106,17 @@ export function InvestorOnboardingModal({
         <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-white/50 block mb-1.5">Your full name *</label>
+              <label className="text-xs text-muted-foreground block mb-1.5">Your full name *</label>
               <input value={form.your_name} onChange={set("your_name")} placeholder="Jane Smith" className={inputCls} />
             </div>
             <div>
-              <label className="text-xs text-white/50 block mb-1.5">Fund / firm name *</label>
+              <label className="text-xs text-muted-foreground block mb-1.5">Fund / firm name *</label>
               <input value={form.fund_name} onChange={set("fund_name")} placeholder="Acme Ventures or Angel" className={inputCls} />
             </div>
           </div>
 
           <div>
-            <label className="text-xs text-white/50 block mb-1.5">Role *</label>
+            <label className="text-xs text-muted-foreground block mb-1.5">Role *</label>
             <select value={form.role} onChange={set("role")} className={selectCls}>
               <option value="">Select role…</option>
               {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
@@ -125,14 +125,14 @@ export function InvestorOnboardingModal({
 
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-white/50 block mb-1.5">Min check size *</label>
+              <label className="text-xs text-muted-foreground block mb-1.5">Min check size *</label>
               <select value={form.check_size_min} onChange={set("check_size_min")} className={selectCls}>
                 <option value="">Select…</option>
                 {CHECK_MIN.map((v) => <option key={v} value={v}>{v}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-xs text-white/50 block mb-1.5">Max check size *</label>
+              <label className="text-xs text-muted-foreground block mb-1.5">Max check size *</label>
               <select value={form.check_size_max} onChange={set("check_size_max")} className={selectCls}>
                 <option value="">Select…</option>
                 {CHECK_MAX.map((v) => <option key={v} value={v}>{v}</option>)}
@@ -141,22 +141,22 @@ export function InvestorOnboardingModal({
           </div>
 
           <div>
-            <label className="text-xs text-white/50 block mb-1.5">Sectors you invest in *</label>
+            <label className="text-xs text-muted-foreground block mb-1.5">Sectors you invest in *</label>
             <input value={form.sectors} onChange={set("sectors")} placeholder="e.g. FinTech, HealthTech, Robotics" className={inputCls} />
           </div>
 
           <div>
-            <label className="text-xs text-white/50 block mb-1.5">Stages you invest in *</label>
+            <label className="text-xs text-muted-foreground block mb-1.5">Stages you invest in *</label>
             <input value={form.stages} onChange={set("stages")} placeholder="e.g. Pre-seed, Seed, Series A" className={inputCls} />
           </div>
 
           <div>
-            <label className="text-xs text-white/50 block mb-1.5">Geography focus *</label>
+            <label className="text-xs text-muted-foreground block mb-1.5">Geography focus *</label>
             <input value={form.geography} onChange={set("geography")} placeholder="e.g. GCC, MENA, Global" className={inputCls} />
           </div>
 
           <div>
-            <label className="text-xs text-white/50 block mb-1.5">LinkedIn profile URL</label>
+            <label className="text-xs text-muted-foreground block mb-1.5">LinkedIn profile URL</label>
             <input value={form.linkedin_url} onChange={set("linkedin_url")} placeholder="https://linkedin.com/in/..." className={inputCls} />
           </div>
 
@@ -168,12 +168,12 @@ export function InvestorOnboardingModal({
             <button
               type="submit"
               disabled={saving}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#7C3AED] text-white px-4 py-2.5 text-sm font-semibold hover:bg-[#6d28d9] disabled:opacity-60 transition-colors"
+              className="w-full inline-flex items-center justify-center gap-2 rounded-lg hs-gradient text-foreground px-4 py-2.5 text-sm font-semibold hover:bg-[#6d28d9] disabled:opacity-60 transition-colors"
             >
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}
               Save and connect →
             </button>
-            <button type="button" onClick={onCancel} className="text-xs text-white/40 hover:text-white/70 transition-colors">
+            <button type="button" onClick={onCancel} className="text-xs text-muted-foreground hover:text-muted-foreground transition-colors">
               Cancel
             </button>
           </div>

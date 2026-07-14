@@ -20,7 +20,7 @@ interface ChecklistRow {
 const URGENCY_DOT: Record<string, string> = {
   critical: "#EF4444",
   important: "#F59E0B",
-  nice_to_have: "rgba(255,255,255,0.35)",
+  nice_to_have: "var(--faint)",
 };
 
 const READINESS_LABEL: Record<string, string> = {
@@ -117,8 +117,8 @@ export function ProfileChecklist({
             <button
               onClick={regenerate}
               disabled={regenerating}
-              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-white disabled:opacity-60"
-              style={{ background: "#7C3AED" }}
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-foreground disabled:opacity-60"
+              style={{ background: "var(--gradient-brand)" }}
             >
               <RefreshCw className={`h-3 w-3 ${regenerating ? "animate-spin" : ""}`} />
               {regenerating ? "Analysing…" : "Analyse my profile"}
