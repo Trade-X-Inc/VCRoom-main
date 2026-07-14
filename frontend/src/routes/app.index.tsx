@@ -16,9 +16,13 @@ import { PageGuide } from "@/components/app/PageGuide";
 import type { StartupClaim, ClaimStatus } from "@/lib/claims-fn";
 import type { ReadinessResult, ScoreRun, ScoreRunFactor, ScoreRunGap } from "@/lib/readiness-fn";
 
+// P4: /app is now the 4-step raise Home. The workstation (FounderHome,
+// exported below) moved to /app/assistant as the AI Advisor.
 export const Route = createFileRoute("/app/")({
-  component: FounderHome,
+  component: RaiseHome,
 });
+
+import { RaiseHome } from "@/components/app/RaiseHome";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -1768,7 +1772,7 @@ function CoachingCard({
 // Page
 // ─────────────────────────────────────────────────────────────────────────────
 
-function FounderHome() {
+export function FounderHome() {
   const { user } = useAuth();
   const [latestScoreRun, setLatestScoreRun] = useState<ScoreRun | null>(null);
   const [latestSimRun, setLatestSimRun] = useState<import("@/lib/investor-sim-fn").SimRun | null>(null);

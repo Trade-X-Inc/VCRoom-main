@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -18,6 +18,10 @@ import { ProfileChecklist } from "@/components/app/ProfileChecklist";
 import { PromoteProfileCard } from "@/components/app/PromoteProfileCard";
 
 export const Route = createFileRoute("/app/overview")({
+  // P4: the 4-step Home at /app IS the overview now.
+  beforeLoad: () => {
+    throw redirect({ to: "/app", replace: true });
+  },
   component: Overview,
 });
 

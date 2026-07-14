@@ -24,8 +24,9 @@ import { NotificationBell } from "@/components/app/NotificationBell";
 import { UserMenu } from "@/components/app/UserMenu";
 import { useAuth } from "@/lib/auth";
 import { useProfile } from "@/lib/store";
+import { useRaiseProgress } from "@/hooks/useRaiseProgress";
 
-interface NavItem { to: string; label: string; icon: any; badge?: string; }
+interface NavItem { to: string; label: string; icon: any; badge?: string; step?: string; section?: string; }
 
 interface SearchResult {
   id: string;
@@ -40,19 +41,13 @@ interface SearchResult {
 }
 
 const founderNav: NavItem[] = [
-  { to: "/app/overview", label: "Overview", icon: LayoutGrid },
-  { to: "/app", label: "Workstation", icon: LayoutDashboard },
-  { to: "/app/deal-rooms", label: "Deal Rooms", icon: Briefcase },
-  { to: "/app/documents", label: "Documents", icon: FileText },
-  { to: "/app/advisor", label: "Verification", icon: ShieldCheck },
-  { to: "/app/claims", label: "Claims", icon: BadgeCheck },
-  { to: "/app/roast", label: "Roast", icon: Flame },
+  { to: "/app/prepare", label: "Prepare", icon: ClipboardCheck, step: "\u2460", section: "Your raise" },
+  { to: "/app/go-live", label: "Go live", icon: Globe, step: "\u2461" },
+  { to: "/app/deal-rooms", label: "Deal rooms", icon: Briefcase, step: "\u2462" },
+  { to: "/app/close", label: "Close", icon: Gavel, step: "\u2463" },
+  { to: "/app/assistant", label: "AI Advisor", icon: Brain, section: "Tools" },
   { to: "/app/meetings", label: "Meetings", icon: Calendar },
-  { to: "/app/connections", label: "Connections", icon: Users },
-  { to: "/app/messages", label: "Team Chat", icon: MessageSquare },
-  { to: "/app/directory", label: "Directory", icon: Globe },
-  { to: "/app/wall", label: "The Wall", icon: Trophy },
-  { to: "/app/referrals", label: "Referrals", icon: Gift },
+  { to: "/app/users", label: "Team", icon: Users },
 ];
 
 const investorNav: NavItem[] = [
@@ -72,9 +67,6 @@ const investorNav: NavItem[] = [
 ];
 
 const workspaceNavFounder: NavItem[] = [
-  { to: "/app/profile", label: "Profile", icon: UserCircle2 },
-  { to: "/app/badges", label: "Badges", icon: Award },
-  { to: "/app/users", label: "Team", icon: UserCog },
   { to: "/app/settings", label: "Settings", icon: Settings },
 ];
 
@@ -121,6 +113,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   const profile = useProfile();
 
   const isInvestor = user?.role === "investor";
+  const { data: raise } = useRaiseProgress();
   const nav = isInvestor ? investorNav : founderNav;
   const workspaceNav = isInvestor ? workspaceNavInvestor : workspaceNavFounder;
 
@@ -426,21 +419,39 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
         )}
 
         <nav className="flex-1 px-2 space-y-0.5 overflow-y-auto">
-          {showExpanded && (
+          {showExpanded && isInvestor && (
             <div className="px-2 pt-3 pb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-              {isInvestor ? "Investor" : "Workspace"}
+              Investor
             </div>
           )}
           {nav.map((n, index) => {
             const active = path === n.to || path === n.to + "/" || (n.to !== "/app" && n.to !== "/app/overview" && n.to !== "/app/investor" && path.startsWith(n.to));
             const badge = (() => {
-              if (n.to === "/app/deal-rooms") return dealRoomCount && dealRoomCount > 0 ? String(dealRoomCount) : undefined;
+              if (!isInvestor && n.to === "/app/prepare" && raise)
+                return `${raise.prepareDone}/${raise.prepareTotal}`;
+              if (n.to === "/app/deal-rooms")
+                return raise?.activeRooms
+                  ? String(raise.activeRooms)
+                  : dealRoomCount && dealRoomCount > 0 ? String(dealRoomCount) : undefined;
               if (n.to === "/app/investor/connections") return investorDealCount && investorDealCount > 0 ? String(investorDealCount) : undefined;
               return n.badge;
             })();
-            
-            // Show COMMUNITY section label before directory item
-            const showCommunityLabel = n.to === "/app/directory" && showExpanded;
+
+            // Soft locks — grey + tooltip, never a hard block.
+            const lock = (() => {
+              if (isInvestor || !raise) return null;
+              if (n.to === "/app/go-live" && !raise.prepareUnlocked && !raise.goLiveDone)
+                return "Complete Prepare first";
+              if (
+                n.to === "/app/close" &&
+                raise.closingRooms === 0 && raise.closedRooms === 0 && raise.termSheetRooms === 0
+              )
+                return "No rooms at closing yet";
+              return null;
+            })();
+
+            // Investor community label (legacy layout — restructured in P5)
+            const showCommunityLabel = isInvestor && n.to === "/app/directory" && showExpanded;
 
             return (
               <div key={n.to}>
@@ -449,21 +460,57 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                     Community
                   </div>
                 )}
+                {n.section && showExpanded && (
+                  <div
+                    className="px-2 pb-1.5 font-medium uppercase"
+                    style={{
+                      paddingTop: index === 0 ? 12 : 20,
+                      fontSize: 10,
+                      letterSpacing: "0.1em",
+                      color: "rgba(0,0,0,0.35)",
+                    }}
+                  >
+                    {n.section}
+                  </div>
+                )}
                 <Link
                   to={n.to as any}
                   preload="intent"
                   onClick={() => setMobileOpen(false)}
                   aria-label={n.label}
+                  title={lock ?? undefined}
                   className={cn(
-                    "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors group",
-                    active ? "bg-accent text-foreground font-medium shadow-xs" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
+                    "relative flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors group",
+                    active
+                      ? "text-foreground font-medium"
+                      : lock
+                        ? "text-faint hover:text-muted-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent/60",
                     !showExpanded && "justify-center px-0",
                   )}
                 >
-                  <n.icon className={cn("h-4 w-4", active && "text-brand")} />
+                  {active && (
+                    <span
+                      aria-hidden
+                      className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-full hs-gradient-static"
+                    />
+                  )}
+                  {n.step && showExpanded ? (
+                    <span
+                      className={cn("w-4 text-center", active ? "hs-gradient-text" : undefined)}
+                      style={{ fontFamily: "'Syne', sans-serif", fontSize: 13, fontWeight: 700 }}
+                    >
+                      {n.step}
+                    </span>
+                  ) : (
+                    <n.icon className={cn("h-4 w-4", active && "text-brand")} />
+                  )}
                   {showExpanded && <span className="flex-1">{n.label}</span>}
-                  {showExpanded && badge && (
-                    <span className="text-[10px] rounded-full bg-background border border-border/60 px-1.5 py-0.5 text-muted-foreground">
+                  {showExpanded && badge && !lock && (
+                    <span
+                      className="rounded-full px-1.5 py-0.5 text-muted-foreground tabular-nums"
+                      style={{ fontSize: 11, background: "rgba(0,0,0,0.04)" }}
+                    >
                       {badge}
                     </span>
                   )}
@@ -474,9 +521,13 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
 
           {showExpanded && (
             <>
-              <div className="px-2 pt-4 pb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                Admin
-              </div>
+              {isInvestor ? (
+                <div className="px-2 pt-4 pb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                  Admin
+                </div>
+              ) : (
+                <div className="mx-2 mt-5 mb-2 hs-hairline-t" />
+              )}
               {/* Render workspace nav items, injecting Feedback button after "Team".
                   Badges is founder-owner only — excluded for investors (not in
                   workspaceNavInvestor) and for team members (filtered here). */}

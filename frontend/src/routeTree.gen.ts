@@ -63,6 +63,7 @@ import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppReferralsRouteImport } from './routes/app.referrals'
 import { Route as AppProfileBuilderRouteImport } from './routes/app.profile-builder'
 import { Route as AppProfileRouteImport } from './routes/app.profile'
+import { Route as AppPrepareRouteImport } from './routes/app.prepare'
 import { Route as AppOverviewRouteImport } from './routes/app.overview'
 import { Route as AppNotificationsRouteImport } from './routes/app.notifications'
 import { Route as AppMessagesRouteImport } from './routes/app.messages'
@@ -70,6 +71,7 @@ import { Route as AppMemberProfileRouteImport } from './routes/app.member-profil
 import { Route as AppMeetingsRouteImport } from './routes/app.meetings'
 import { Route as AppInvestorRouteImport } from './routes/app.investor'
 import { Route as AppHomeRouteImport } from './routes/app.home'
+import { Route as AppGoLiveRouteImport } from './routes/app.go-live'
 import { Route as AppFeedbackRouteImport } from './routes/app.feedback'
 import { Route as AppEmailRouteImport } from './routes/app.email'
 import { Route as AppDocumentsRouteImport } from './routes/app.documents'
@@ -77,9 +79,11 @@ import { Route as AppDirectoryRouteImport } from './routes/app.directory'
 import { Route as AppDeskRouteImport } from './routes/app.desk'
 import { Route as AppDealRoomsRouteImport } from './routes/app.deal-rooms'
 import { Route as AppConnectionsRouteImport } from './routes/app.connections'
+import { Route as AppCloseRouteImport } from './routes/app.close'
 import { Route as AppClaimsRouteImport } from './routes/app.claims'
 import { Route as AppBadgesRouteImport } from './routes/app.badges'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
+import { Route as AppAssistantRouteImport } from './routes/app.assistant'
 import { Route as AppAdvisorRouteImport } from './routes/app.advisor'
 import { Route as ApiTestAiRouteImport } from './routes/api.test-ai'
 import { Route as ApiHubspotSyncRouteImport } from './routes/api.hubspot-sync'
@@ -390,6 +394,11 @@ const AppProfileRoute = AppProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPrepareRoute = AppPrepareRouteImport.update({
+  id: '/prepare',
+  path: '/prepare',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppOverviewRoute = AppOverviewRouteImport.update({
   id: '/overview',
   path: '/overview',
@@ -423,6 +432,11 @@ const AppInvestorRoute = AppInvestorRouteImport.update({
 const AppHomeRoute = AppHomeRouteImport.update({
   id: '/home',
   path: '/home',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppGoLiveRoute = AppGoLiveRouteImport.update({
+  id: '/go-live',
+  path: '/go-live',
   getParentRoute: () => AppRoute,
 } as any)
 const AppFeedbackRoute = AppFeedbackRouteImport.update({
@@ -460,6 +474,11 @@ const AppConnectionsRoute = AppConnectionsRouteImport.update({
   path: '/connections',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCloseRoute = AppCloseRouteImport.update({
+  id: '/close',
+  path: '/close',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppClaimsRoute = AppClaimsRouteImport.update({
   id: '/claims',
   path: '/claims',
@@ -473,6 +492,11 @@ const AppBadgesRoute = AppBadgesRouteImport.update({
 const AppAuditRoute = AppAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAssistantRoute = AppAssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
   getParentRoute: () => AppRoute,
 } as any)
 const AppAdvisorRoute = AppAdvisorRouteImport.update({
@@ -699,9 +723,11 @@ export interface FileRoutesByFullPath {
   '/api/hubspot-sync': typeof ApiHubspotSyncRoute
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
+  '/app/assistant': typeof AppAssistantRoute
   '/app/audit': typeof AppAuditRoute
   '/app/badges': typeof AppBadgesRoute
   '/app/claims': typeof AppClaimsRoute
+  '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
   '/app/desk': typeof AppDeskRoute
@@ -709,6 +735,7 @@ export interface FileRoutesByFullPath {
   '/app/documents': typeof AppDocumentsRoute
   '/app/email': typeof AppEmailRoute
   '/app/feedback': typeof AppFeedbackRoute
+  '/app/go-live': typeof AppGoLiveRoute
   '/app/home': typeof AppHomeRoute
   '/app/investor': typeof AppInvestorRouteWithChildren
   '/app/meetings': typeof AppMeetingsRoute
@@ -716,6 +743,7 @@ export interface FileRoutesByFullPath {
   '/app/messages': typeof AppMessagesRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/overview': typeof AppOverviewRoute
+  '/app/prepare': typeof AppPrepareRoute
   '/app/profile': typeof AppProfileRoute
   '/app/profile-builder': typeof AppProfileBuilderRoute
   '/app/referrals': typeof AppReferralsRoute
@@ -807,9 +835,11 @@ export interface FileRoutesByTo {
   '/api/hubspot-sync': typeof ApiHubspotSyncRoute
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
+  '/app/assistant': typeof AppAssistantRoute
   '/app/audit': typeof AppAuditRoute
   '/app/badges': typeof AppBadgesRoute
   '/app/claims': typeof AppClaimsRoute
+  '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
   '/app/desk': typeof AppDeskRoute
@@ -817,12 +847,14 @@ export interface FileRoutesByTo {
   '/app/documents': typeof AppDocumentsRoute
   '/app/email': typeof AppEmailRoute
   '/app/feedback': typeof AppFeedbackRoute
+  '/app/go-live': typeof AppGoLiveRoute
   '/app/home': typeof AppHomeRoute
   '/app/meetings': typeof AppMeetingsRoute
   '/app/member-profile': typeof AppMemberProfileRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/overview': typeof AppOverviewRoute
+  '/app/prepare': typeof AppPrepareRoute
   '/app/profile': typeof AppProfileRoute
   '/app/profile-builder': typeof AppProfileBuilderRoute
   '/app/referrals': typeof AppReferralsRoute
@@ -918,9 +950,11 @@ export interface FileRoutesById {
   '/api/hubspot-sync': typeof ApiHubspotSyncRoute
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
+  '/app/assistant': typeof AppAssistantRoute
   '/app/audit': typeof AppAuditRoute
   '/app/badges': typeof AppBadgesRoute
   '/app/claims': typeof AppClaimsRoute
+  '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
   '/app/desk': typeof AppDeskRoute
@@ -928,6 +962,7 @@ export interface FileRoutesById {
   '/app/documents': typeof AppDocumentsRoute
   '/app/email': typeof AppEmailRoute
   '/app/feedback': typeof AppFeedbackRoute
+  '/app/go-live': typeof AppGoLiveRoute
   '/app/home': typeof AppHomeRoute
   '/app/investor': typeof AppInvestorRouteWithChildren
   '/app/meetings': typeof AppMeetingsRoute
@@ -935,6 +970,7 @@ export interface FileRoutesById {
   '/app/messages': typeof AppMessagesRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/overview': typeof AppOverviewRoute
+  '/app/prepare': typeof AppPrepareRoute
   '/app/profile': typeof AppProfileRoute
   '/app/profile-builder': typeof AppProfileBuilderRoute
   '/app/referrals': typeof AppReferralsRoute
@@ -1031,9 +1067,11 @@ export interface FileRouteTypes {
     | '/api/hubspot-sync'
     | '/api/test-ai'
     | '/app/advisor'
+    | '/app/assistant'
     | '/app/audit'
     | '/app/badges'
     | '/app/claims'
+    | '/app/close'
     | '/app/connections'
     | '/app/deal-rooms'
     | '/app/desk'
@@ -1041,6 +1079,7 @@ export interface FileRouteTypes {
     | '/app/documents'
     | '/app/email'
     | '/app/feedback'
+    | '/app/go-live'
     | '/app/home'
     | '/app/investor'
     | '/app/meetings'
@@ -1048,6 +1087,7 @@ export interface FileRouteTypes {
     | '/app/messages'
     | '/app/notifications'
     | '/app/overview'
+    | '/app/prepare'
     | '/app/profile'
     | '/app/profile-builder'
     | '/app/referrals'
@@ -1139,9 +1179,11 @@ export interface FileRouteTypes {
     | '/api/hubspot-sync'
     | '/api/test-ai'
     | '/app/advisor'
+    | '/app/assistant'
     | '/app/audit'
     | '/app/badges'
     | '/app/claims'
+    | '/app/close'
     | '/app/connections'
     | '/app/deal-rooms'
     | '/app/desk'
@@ -1149,12 +1191,14 @@ export interface FileRouteTypes {
     | '/app/documents'
     | '/app/email'
     | '/app/feedback'
+    | '/app/go-live'
     | '/app/home'
     | '/app/meetings'
     | '/app/member-profile'
     | '/app/messages'
     | '/app/notifications'
     | '/app/overview'
+    | '/app/prepare'
     | '/app/profile'
     | '/app/profile-builder'
     | '/app/referrals'
@@ -1249,9 +1293,11 @@ export interface FileRouteTypes {
     | '/api/hubspot-sync'
     | '/api/test-ai'
     | '/app/advisor'
+    | '/app/assistant'
     | '/app/audit'
     | '/app/badges'
     | '/app/claims'
+    | '/app/close'
     | '/app/connections'
     | '/app/deal-rooms'
     | '/app/desk'
@@ -1259,6 +1305,7 @@ export interface FileRouteTypes {
     | '/app/documents'
     | '/app/email'
     | '/app/feedback'
+    | '/app/go-live'
     | '/app/home'
     | '/app/investor'
     | '/app/meetings'
@@ -1266,6 +1313,7 @@ export interface FileRouteTypes {
     | '/app/messages'
     | '/app/notifications'
     | '/app/overview'
+    | '/app/prepare'
     | '/app/profile'
     | '/app/profile-builder'
     | '/app/referrals'
@@ -1764,6 +1812,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProfileRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/prepare': {
+      id: '/app/prepare'
+      path: '/prepare'
+      fullPath: '/app/prepare'
+      preLoaderRoute: typeof AppPrepareRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/overview': {
       id: '/app/overview'
       path: '/overview'
@@ -1811,6 +1866,13 @@ declare module '@tanstack/react-router' {
       path: '/home'
       fullPath: '/app/home'
       preLoaderRoute: typeof AppHomeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/go-live': {
+      id: '/app/go-live'
+      path: '/go-live'
+      fullPath: '/app/go-live'
+      preLoaderRoute: typeof AppGoLiveRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/feedback': {
@@ -1862,6 +1924,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppConnectionsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/close': {
+      id: '/app/close'
+      path: '/close'
+      fullPath: '/app/close'
+      preLoaderRoute: typeof AppCloseRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/claims': {
       id: '/app/claims'
       path: '/claims'
@@ -1881,6 +1950,13 @@ declare module '@tanstack/react-router' {
       path: '/audit'
       fullPath: '/app/audit'
       preLoaderRoute: typeof AppAuditRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/assistant': {
+      id: '/app/assistant'
+      path: '/assistant'
+      fullPath: '/app/assistant'
+      preLoaderRoute: typeof AppAssistantRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/advisor': {
@@ -2214,9 +2290,11 @@ const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(
 
 interface AppRouteChildren {
   AppAdvisorRoute: typeof AppAdvisorRoute
+  AppAssistantRoute: typeof AppAssistantRoute
   AppAuditRoute: typeof AppAuditRoute
   AppBadgesRoute: typeof AppBadgesRoute
   AppClaimsRoute: typeof AppClaimsRoute
+  AppCloseRoute: typeof AppCloseRoute
   AppConnectionsRoute: typeof AppConnectionsRoute
   AppDealRoomsRoute: typeof AppDealRoomsRoute
   AppDeskRoute: typeof AppDeskRoute
@@ -2224,6 +2302,7 @@ interface AppRouteChildren {
   AppDocumentsRoute: typeof AppDocumentsRoute
   AppEmailRoute: typeof AppEmailRoute
   AppFeedbackRoute: typeof AppFeedbackRoute
+  AppGoLiveRoute: typeof AppGoLiveRoute
   AppHomeRoute: typeof AppHomeRoute
   AppInvestorRoute: typeof AppInvestorRouteWithChildren
   AppMeetingsRoute: typeof AppMeetingsRoute
@@ -2231,6 +2310,7 @@ interface AppRouteChildren {
   AppMessagesRoute: typeof AppMessagesRoute
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppOverviewRoute: typeof AppOverviewRoute
+  AppPrepareRoute: typeof AppPrepareRoute
   AppProfileRoute: typeof AppProfileRoute
   AppProfileBuilderRoute: typeof AppProfileBuilderRoute
   AppReferralsRoute: typeof AppReferralsRoute
@@ -2248,9 +2328,11 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppAdvisorRoute: AppAdvisorRoute,
+  AppAssistantRoute: AppAssistantRoute,
   AppAuditRoute: AppAuditRoute,
   AppBadgesRoute: AppBadgesRoute,
   AppClaimsRoute: AppClaimsRoute,
+  AppCloseRoute: AppCloseRoute,
   AppConnectionsRoute: AppConnectionsRoute,
   AppDealRoomsRoute: AppDealRoomsRoute,
   AppDeskRoute: AppDeskRoute,
@@ -2258,6 +2340,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDocumentsRoute: AppDocumentsRoute,
   AppEmailRoute: AppEmailRoute,
   AppFeedbackRoute: AppFeedbackRoute,
+  AppGoLiveRoute: AppGoLiveRoute,
   AppHomeRoute: AppHomeRoute,
   AppInvestorRoute: AppInvestorRouteWithChildren,
   AppMeetingsRoute: AppMeetingsRoute,
@@ -2265,6 +2348,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppMessagesRoute: AppMessagesRoute,
   AppNotificationsRoute: AppNotificationsRoute,
   AppOverviewRoute: AppOverviewRoute,
+  AppPrepareRoute: AppPrepareRoute,
   AppProfileRoute: AppProfileRoute,
   AppProfileBuilderRoute: AppProfileBuilderRoute,
   AppReferralsRoute: AppReferralsRoute,

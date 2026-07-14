@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import {
@@ -12,6 +12,10 @@ import type { StartupClaim, ClaimCategory, ClaimVerdict } from "@/lib/claims-fn"
 import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 
 export const Route = createFileRoute("/app/claims")({
+  // P4: consolidated into /app/prepare — old links must keep resolving.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/prepare", hash: "claims", replace: true });
+  },
   component: ClaimsPage,
 });
 
@@ -28,7 +32,7 @@ const VERDICT_STYLE: Record<ClaimVerdict, { bg: string; border: string; color: s
   contradicted: { bg: "rgba(239,68,68,0.12)", border: "rgba(239,68,68,0.25)", color: "#EF4444", label: "Contradicted by evidence", Icon: XCircle },
 };
 
-function ClaimsPage() {
+export function ClaimsPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
 

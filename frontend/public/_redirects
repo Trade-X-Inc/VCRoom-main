@@ -7,3 +7,11 @@
 /app/leads /app 301
 /app/reports /app 301
 /app/accelerators /app 301
+
+# P4: founder nav restructure — old pages consolidated into /app/prepare
+/app/profile      /app/prepare#profile        301
+/app/documents    /app/prepare#documents      301
+/app/advisor      /app/prepare#verification   301
+/app/claims       /app/prepare#claims         301
+/app/badges       /app/prepare#badges         301
+/app/overview     /app                        301

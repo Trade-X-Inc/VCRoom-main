@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Award, ChevronDown, Lock, RefreshCw, Loader2, CheckCircle2 } from "lucide-react";
@@ -8,6 +8,10 @@ import { supabase } from "@/lib/supabase";
 import { BadgeDisplay, useBadges } from "@/components/app/BadgeDisplay";
 
 export const Route = createFileRoute("/app/badges")({
+  // P4: consolidated into /app/prepare — old links must keep resolving.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/prepare", hash: "badges", replace: true });
+  },
   component: BadgesPage,
 });
 
@@ -66,7 +70,7 @@ function ProgressBar({ label, current, target }: { label: string; current: numbe
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-function BadgesPage() {
+export function BadgesPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [evaluating, setEvaluating] = useState(false);
