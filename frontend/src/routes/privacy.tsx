@@ -49,7 +49,7 @@ function PrivacyPage() {
       <SiteHeader />
       <main className="flex-1 mx-auto w-full max-w-3xl px-6 py-16">
         <div className="mb-8">
-          <a href="/" className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors mb-8 block">
+          <a href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8 block">
             ← Back to Hockystick
           </a>
         </div>
@@ -67,7 +67,7 @@ function PrivacyPage() {
           ))}
         </div>
         <div className="mt-16 pt-8 border-t border-border/40">
-          <a href="/" className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors">
+          <a href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
             ← Back to Hockystick
           </a>
         </div>

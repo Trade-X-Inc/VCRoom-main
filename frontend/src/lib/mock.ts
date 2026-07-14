@@ -27,7 +27,7 @@ export const leads: Lead[] = [];
 export const stageColor: Record<Stage, string> = {
   New: "bg-muted-foreground/40",
   Contacted: "bg-foreground/40",
-  Replied: "bg-brand",
+  Replied: "bg-accent",
   Meeting: "bg-violet",
   Interested: "bg-warning",
   "Deal Room": "bg-success",

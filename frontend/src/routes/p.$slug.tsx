@@ -210,7 +210,7 @@ function YouTubeEmbed({ url, label }: { url: string; label: string }) {
   if (!videoId) {
     return (
       <a href={url} target="_blank" rel="noopener noreferrer"
-        className="flex items-center gap-2 text-sm text-purple-600 hover:text-purple-500">
+        className="flex items-center gap-2 text-sm text-brand hover:opacity-80">
         Watch {label} →
       </a>
     );
@@ -310,8 +310,8 @@ function LockedSectionCard({
 
   return (
     <div style={{
-      background: '#111114',
-      border: '1px solid rgba(255,255,255,0.08)',
+      background: 'var(--card)',
+      border: '1px solid var(--border)',
       borderRadius: 12,
       padding: '32px 24px',
       textAlign: 'center',
@@ -326,21 +326,21 @@ function LockedSectionCard({
         justifyContent: 'center',
         margin: '0 auto 16px',
       }}>
-        <Lock size={18} style={{ color: '#7C3AED' }} />
+        <Lock size={18} style={{ color: 'var(--brand)' }} />
       </div>
       <p style={{ color: '#ffffff', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>
         {sectionLabel}
       </p>
       {isDealRoom ? (
         <>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginBottom: 20 }}>
+          <p style={{ color: 'var(--muted-foreground)', fontSize: 13, marginBottom: 20 }}>
             This section is available inside the deal room. Founders share financials with investors they have approved.
           </p>
           <a
             href="/sign-up?role=investor"
             style={{
               display: 'inline-block',
-              background: '#7C3AED',
+              background: 'var(--gradient-brand)',
               color: '#fff',
               border: 'none',
               padding: '10px 20px',
@@ -355,7 +355,7 @@ function LockedSectionCard({
         </>
       ) : requestStatus === "pending" ? (
         <>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginBottom: 16 }}>
+          <p style={{ color: 'var(--muted-foreground)', fontSize: 13, marginBottom: 16 }}>
             This section is available to verified investors with an approved access request.
           </p>
           <div style={{
@@ -377,7 +377,7 @@ function LockedSectionCard({
         <p style={{ color: '#10B981', fontSize: 13 }}>Access approved — content should be visible.</p>
       ) : requestStatus === "rejected" ? (
         <>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginBottom: 16 }}>
+          <p style={{ color: 'var(--muted-foreground)', fontSize: 13, marginBottom: 16 }}>
             This section is available to verified investors with an approved access request.
           </p>
           <p style={{ color: 'rgba(239,68,68,0.7)', fontSize: 12 }}>
@@ -386,14 +386,14 @@ function LockedSectionCard({
         </>
       ) : (
         <>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginBottom: 20 }}>
+          <p style={{ color: 'var(--muted-foreground)', fontSize: 13, marginBottom: 20 }}>
             This section is available to verified investors with an approved access request.
           </p>
           <button
             onClick={onRequestAccess}
             disabled={requestStatus === "submitting"}
             style={{
-              background: '#7C3AED',
+              background: 'var(--gradient-brand)',
               color: '#fff',
               border: 'none',
               padding: '10px 20px',
@@ -463,8 +463,8 @@ function FounderPublicProfileWrapper() {
   // Still resolving session
   if (ownerState.loading) {
     return (
-      <div style={{ background: "#0A0A0B", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ width: 32, height: 32, border: "2px solid rgba(124,58,237,0.3)", borderTopColor: "#7C3AED", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+      <div style={{ background: "var(--background)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ width: 32, height: 32, border: "2px solid rgba(124,58,237,0.3)", borderTopColor: "var(--brand)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
@@ -477,11 +477,11 @@ function FounderPublicProfileWrapper() {
 
   // Not published / not owner
   return (
-    <div style={{ background: "#0A0A0B", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <div style={{ background: "var(--background)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ textAlign: "center", color: "#FAFAFA" }}>
         <h1 style={{ fontSize: 32, fontFamily: "Syne, sans-serif", fontWeight: 800, marginBottom: 12 }}>Profile private</h1>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 15 }}>This founder profile hasn't been published yet.</p>
-        <a href="/" style={{ display: "inline-block", marginTop: 24, color: "#7C3AED", textDecoration: "underline", fontSize: 14 }}>Back to Hockystick</a>
+        <p style={{ color: "var(--muted-foreground)", fontSize: 15 }}>This founder profile hasn't been published yet.</p>
+        <a href="/" style={{ display: "inline-block", marginTop: 24, color: "var(--brand)", textDecoration: "underline", fontSize: 14 }}>Back to Hockystick</a>
       </div>
     </div>
   );
@@ -818,14 +818,14 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
               rows={3}
               maxLength={200}
               placeholder="Why you're interested, your fund's thesis fit…"
-              className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-purple-500 focus:outline-none resize-none"
+              className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none resize-none"
             />
             <div className="mt-1 text-right text-[11px] text-gray-400">{connectMessage.length}/200</div>
             <div className="mt-4 flex gap-3">
               <button
                 onClick={submitConnectRequest}
                 disabled={connectSending}
-                className="flex-1 rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-purple-700 disabled:opacity-60"
+                className="flex-1 rounded-lg hs-gradient px-4 py-2.5 text-sm font-semibold text-white hover:hs-gradient disabled:opacity-60"
               >
                 {connectSending ? "Sending…" : "Send request"}
               </button>
@@ -901,7 +901,7 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
               <div className="flex flex-wrap gap-2 mt-3">
                 {(startup.social_links ?? []).map((link, i) => (
                   <a key={i} href={link.url} target="_blank" rel="noopener noreferrer"
-                    className="px-3 py-1.5 rounded-md text-xs bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-colors">
+                    className="px-3 py-1.5 rounded-md text-xs bg-accent border border-border text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                     {link.platform} →
                   </a>
                 ))}
@@ -1164,7 +1164,7 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
       {startup && viewerId !== startup.founder_id && (
         <div style={{
           position: 'fixed', bottom: 0, left: 0, right: 0,
-          background: 'rgba(10,10,11,0.95)', borderTop: '1px solid rgba(255,255,255,0.08)',
+          background: 'var(--background)', borderTop: '1px solid var(--border)',
           backdropFilter: 'blur(12px)', padding: '16px 24px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           zIndex: 50, fontFamily: 'DM Sans, sans-serif',
@@ -1173,7 +1173,7 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
             <p style={{ color: '#ffffff', fontSize: 14, fontWeight: 600, margin: 0 }}>
               Interested in {startup.company_name}?
             </p>
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, margin: 0 }}>
+            <p style={{ color: 'var(--muted-foreground)', fontSize: 12, margin: 0 }}>
               Request access to their full data room on Hockystick
             </p>
           </div>
@@ -1182,7 +1182,7 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
               ? "/app/investor/deal-flow"
               : `/sign-up?role=investor&interest=${startup.profile_slug}`}
             style={{
-              background: '#7C3AED', color: '#ffffff', padding: '10px 20px',
+              background: 'var(--gradient-brand)', color: '#ffffff', padding: '10px 20px',
               borderRadius: 8, textDecoration: 'none', fontSize: 14, fontWeight: 500, whiteSpace: 'nowrap',
             }}>
             {viewerRole === "investor" ? "View in deal flow →" : "Request access →"}

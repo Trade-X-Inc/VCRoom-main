@@ -64,7 +64,7 @@ function DocsLayout() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search docs"
-          className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-purple-400 focus:outline-none"
+          className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand focus:outline-none"
         />
       </div>
       <div className="flex-1 space-y-6 overflow-y-auto pb-8">
@@ -106,7 +106,7 @@ function DocsLayout() {
   return (
     <div className="min-h-screen bg-white text-gray-900">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/90 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-gray-200 bg-accent backdrop-blur">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:px-6">
           <button
             onClick={() => setSidebarOpen(true)}
@@ -131,7 +131,7 @@ function DocsLayout() {
             </a>
             <Link
               to={"/sign-in" as any}
-              className="rounded-lg bg-purple-600 px-3.5 py-1.5 text-sm font-medium text-white hover:bg-purple-700"
+              className="rounded-lg hs-gradient px-3.5 py-1.5 text-sm font-medium text-white hover:hs-gradient"
             >
               Sign in
             </Link>
@@ -237,7 +237,7 @@ function DocsLayout() {
                 <li key={t.id}>
                   <a
                     href={`#${t.id}`}
-                    className="-ml-px block border-l border-transparent pl-3 text-[13px] leading-6 text-gray-600 hover:border-purple-400 hover:text-gray-900"
+                    className="-ml-px block border-l border-transparent pl-3 text-[13px] leading-6 text-gray-600 hover:border-brand hover:text-gray-900"
                   >
                     {t.label}
                   </a>

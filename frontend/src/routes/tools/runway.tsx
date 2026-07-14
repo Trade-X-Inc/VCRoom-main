@@ -68,18 +68,18 @@ function NumberInput({
 }) {
   return (
     <div style={{ marginBottom: "16px" }}>
-      <label style={{ display: "block", fontSize: "13px", color: "rgba(255,255,255,0.6)", marginBottom: "6px" }}>
+      <label style={{ display: "block", fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "6px" }}>
         {label}
       </label>
-      <div style={{ display: "flex", alignItems: "center", background: "#1a1a1f", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", overflow: "hidden" }}>
-        <span style={{ padding: "10px 12px", fontSize: "13px", color: "rgba(255,255,255,0.35)", borderRight: "1px solid rgba(255,255,255,0.08)", whiteSpace: "nowrap" }}>{prefix}</span>
+      <div style={{ display: "flex", alignItems: "center", background: "#1a1a1f", border: "1px solid var(--border)", borderRadius: "8px", overflow: "hidden" }}>
+        <span style={{ padding: "10px 12px", fontSize: "13px", color: "var(--faint)", borderRight: "1px solid var(--border)", whiteSpace: "nowrap" }}>{prefix}</span>
         <input
           type="number" value={value || ""}
           onChange={(e) => onChange(Number(e.target.value) || 0)}
-          style={{ flex: 1, background: "transparent", border: "none", outline: "none", padding: "10px 12px", fontSize: "14px", color: "#fff" }}
+          style={{ flex: 1, background: "transparent", border: "none", outline: "none", padding: "10px 12px", fontSize: "14px", color: "var(--foreground)" }}
         />
       </div>
-      {hint && <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px", lineHeight: 1.5 }}>{hint}</p>}
+      {hint && <p style={{ fontSize: "11px", color: "var(--faint)", marginTop: "4px", lineHeight: 1.5 }}>{hint}</p>}
     </div>
   );
 }
@@ -93,15 +93,15 @@ function SliderInput({
   return (
     <div style={{ marginBottom: "16px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-        <label style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>{label}</label>
-        <span style={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>{value}{unit}</span>
+        <label style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>{label}</label>
+        <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>{value}{unit}</span>
       </div>
       <input
         type="range" min={min} max={max} step={step} value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        style={{ width: "100%", accentColor: "#7C3AED", cursor: "pointer" }}
+        style={{ width: "100%", accentColor: "var(--brand)", cursor: "pointer" }}
       />
-      {hint && <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>{hint}</p>}
+      {hint && <p style={{ fontSize: "11px", color: "var(--faint)", marginTop: "4px" }}>{hint}</p>}
     </div>
   );
 }
@@ -109,15 +109,15 @@ function SliderInput({
 function Accordion({ title, children }: { title: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
-    <div style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+    <div style={{ borderBottom: "1px solid var(--border)" }}>
       <button
         onClick={() => setOpen((v) => !v)}
         style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "18px 0", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}
       >
-        <span style={{ fontSize: "15px", fontWeight: 600, color: "#fff" }}>{title}</span>
+        <span style={{ fontSize: "15px", fontWeight: 600, color: "var(--foreground)" }}>{title}</span>
         {open
-          ? <ChevronUp size={16} style={{ color: "#7C3AED", flexShrink: 0 }} />
-          : <ChevronDown size={16} style={{ color: "rgba(255,255,255,0.4)", flexShrink: 0 }} />}
+          ? <ChevronUp size={16} style={{ color: "var(--brand)", flexShrink: 0 }} />
+          : <ChevronDown size={16} style={{ color: "var(--muted-foreground)", flexShrink: 0 }} />}
       </button>
       {open && <div style={{ paddingBottom: "20px" }}>{children}</div>}
     </div>
@@ -127,15 +127,15 @@ function Accordion({ title, children }: { title: string; children: React.ReactNo
 function CollapsibleBlock({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", overflow: "hidden", marginBottom: "12px" }}>
+    <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", overflow: "hidden", marginBottom: "12px" }}>
       <button
         onClick={() => setOpen((v) => !v)}
         style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}
       >
-        <span style={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>{title}</span>
+        <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>{title}</span>
         {open
-          ? <ChevronUp size={14} style={{ color: "#7C3AED", flexShrink: 0 }} />
-          : <ChevronDown size={14} style={{ color: "rgba(255,255,255,0.4)", flexShrink: 0 }} />}
+          ? <ChevronUp size={14} style={{ color: "var(--brand)", flexShrink: 0 }} />
+          : <ChevronDown size={14} style={{ color: "var(--muted-foreground)", flexShrink: 0 }} />}
       </button>
       {open && <div style={{ padding: "0 20px 20px" }}>{children}</div>}
     </div>
@@ -221,9 +221,9 @@ function RunwayChart({
   const anyHitsZero = co0 > 0 || co1 > 0 || co2 > 0;
 
   const seriesDefs = [
-    ...(showRaise ? [{ s: s2, stroke: "rgba(255,255,255,0.3)",   co: co2, label: "Post-raise" }] : []),
+    ...(showRaise ? [{ s: s2, stroke: "var(--faint)",   co: co2, label: "Post-raise" }] : []),
     { s: s1, stroke: "rgba(16,185,129,0.65)",  co: co1, label: "20% cost cut" },
-    { s: s0, stroke: "#7C3AED",               co: co0, label: "Current trajectory" },
+    { s: s0, stroke: "var(--brand)",               co: co0, label: "Current trajectory" },
   ];
 
   return (
@@ -232,14 +232,14 @@ function RunwayChart({
         {/* Y grid */}
         {yTicks.map((v) => (
           <g key={v}>
-            <line x1={PAD.left} x2={W - PAD.right} y1={y(v)} y2={y(v)} stroke="rgba(255,255,255,0.05)" strokeWidth={1} />
-            <text x={PAD.left - 6} y={y(v) + 4} textAnchor="end" fontSize={9} fill="rgba(255,255,255,0.3)">{fmt(v)}</text>
+            <line x1={PAD.left} x2={W - PAD.right} y1={y(v)} y2={y(v)} stroke="var(--faint)" strokeWidth={1} />
+            <text x={PAD.left - 6} y={y(v) + 4} textAnchor="end" fontSize={9} fill="var(--faint)">{fmt(v)}</text>
           </g>
         ))}
 
         {/* X axis labels */}
         {Array.from({ length: MONTHS + 1 }, (_, i) => i).filter((i) => i % 2 === 0).map((i) => (
-          <text key={i} x={x(i)} y={H - 8} textAnchor="middle" fontSize={9} fill="rgba(255,255,255,0.3)">{monthLabel(i)}</text>
+          <text key={i} x={x(i)} y={H - 8} textAnchor="middle" fontSize={9} fill="var(--faint)">{monthLabel(i)}</text>
         ))}
 
         {/* Cash-out dashed vertical lines */}
@@ -256,25 +256,25 @@ function RunwayChart({
         ))}
 
         {/* Zero baseline */}
-        <line x1={PAD.left} x2={W - PAD.right} y1={y(0)} y2={y(0)} stroke="rgba(255,255,255,0.12)" strokeWidth={1} />
+        <line x1={PAD.left} x2={W - PAD.right} y1={y(0)} y2={y(0)} stroke="var(--faint)" strokeWidth={1} />
       </svg>
 
       {/* Legend */}
       <div style={{ display: "flex", gap: "20px", marginTop: "12px", flexWrap: "wrap" }}>
         {[
-          { color: "#7C3AED",               label: "Current trajectory" },
+          { color: "var(--brand)",               label: "Current trajectory" },
           { color: "rgba(16,185,129,0.65)", label: "20% cost cut" },
-          ...(showRaise ? [{ color: "rgba(255,255,255,0.3)", label: "Post-raise" }] : []),
+          ...(showRaise ? [{ color: "var(--faint)", label: "Post-raise" }] : []),
         ].map(({ color, label }) => (
           <div key={label} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <div style={{ width: "24px", height: "2px", background: color, borderRadius: "2px" }} />
-            <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>{label}</span>
+            <span style={{ fontSize: "11px", color: "var(--muted-foreground)" }}>{label}</span>
           </div>
         ))}
         {anyHitsZero && (
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <div style={{ width: "24px", height: "0", borderTop: "1px dashed #EF4444" }} />
-            <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>Cash out</span>
+            <span style={{ fontSize: "11px", color: "var(--muted-foreground)" }}>Cash out</span>
           </div>
         )}
       </div>
@@ -407,25 +407,25 @@ Calculate yours at hockystick.app/tools/runway`;
   };
 
   return (
-    <div style={{ background: "#0A0A0B", minHeight: "100vh", color: "#fff" }}>
+    <div style={{ background: "var(--background)", minHeight: "100vh", color: "var(--foreground)" }}>
       <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <div className="tool-no-print"><SiteHeader /></div>
 
       {/* S1 — Hero */}
       <section style={{ ...pw, padding: "56px 24px 48px" }}>
-        <nav style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)", marginBottom: "20px" }}>
-          <Link to="/tools" style={{ color: "rgba(255,255,255,0.35)", textDecoration: "none" }}>Tools</Link>
+        <nav style={{ fontSize: "12px", color: "var(--faint)", marginBottom: "20px" }}>
+          <Link to="/tools" style={{ color: "var(--faint)", textDecoration: "none" }}>Tools</Link>
           <span style={{ margin: "0 6px" }}>→</span>
-          <span style={{ color: "rgba(255,255,255,0.7)" }}>Runway Calculator</span>
+          <span style={{ color: "var(--muted-foreground)" }}>Runway Calculator</span>
         </nav>
         <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(28px, 5vw, 46px)", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "16px" }}>
           Startup Runway Calculator
         </h1>
-        <p style={{ fontSize: "16px", color: "rgba(255,255,255,0.55)", lineHeight: 1.6, maxWidth: "560px", marginBottom: "12px" }}>
+        <p style={{ fontSize: "16px", color: "var(--muted-foreground)", lineHeight: 1.6, maxWidth: "560px", marginBottom: "12px" }}>
           Enter your cash balance and burn rate. Get your cash-out date, months of runway, and the exact window to start your next raise.
         </p>
-        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>Used by founders tracking cash between funding rounds</p>
+        <p style={{ fontSize: "12px", color: "var(--faint)" }}>Used by founders tracking cash between funding rounds</p>
       </section>
 
       {/* S2 — Calculator */}
@@ -437,8 +437,8 @@ Calculate yours at hockystick.app/tools/runway`;
           <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
 
             {/* Block A: Cash Position */}
-            <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "20px", marginBottom: "12px" }}>
-              <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.35)", textTransform: "uppercase", marginBottom: "16px" }}>
+            <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px", marginBottom: "12px" }}>
+              <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "var(--faint)", textTransform: "uppercase", marginBottom: "16px" }}>
                 Block A — Cash position
               </p>
               <NumberInput
@@ -462,18 +462,18 @@ Calculate yours at hockystick.app/tools/runway`;
             </div>
 
             {/* Block B: Growth Adjustment (collapsed) */}
-            <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", overflow: "hidden", marginBottom: "12px" }}>
+            <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", overflow: "hidden", marginBottom: "12px" }}>
               <button
                 onClick={() => setShowGrowth((v) => !v)}
                 style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}
               >
                 <div>
-                  <span style={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>Block B — Adjust for revenue growth</span>
-                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)", marginLeft: "8px" }}>optional</span>
+                  <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>Block B — Adjust for revenue growth</span>
+                  <span style={{ fontSize: "11px", color: "var(--faint)", marginLeft: "8px" }}>optional</span>
                 </div>
                 {showGrowth
-                  ? <ChevronUp size={14} style={{ color: "#7C3AED", flexShrink: 0 }} />
-                  : <ChevronDown size={14} style={{ color: "rgba(255,255,255,0.4)", flexShrink: 0 }} />}
+                  ? <ChevronUp size={14} style={{ color: "var(--brand)", flexShrink: 0 }} />
+                  : <ChevronDown size={14} style={{ color: "var(--muted-foreground)", flexShrink: 0 }} />}
               </button>
               {showGrowth && (
                 <div style={{ padding: "0 20px 20px" }}>
@@ -487,7 +487,7 @@ Calculate yours at hockystick.app/tools/runway`;
                     value={expGrowth} onChange={setExpGrowth}
                     min={0} max={10} step={1}
                   />
-                  <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", lineHeight: 1.5 }}>
+                  <p style={{ fontSize: "11px", color: "var(--faint)", lineHeight: 1.5 }}>
                     Growth adjustments model a changing burn rate rather than a fixed monthly number.
                   </p>
                 </div>
@@ -515,8 +515,8 @@ Calculate yours at hockystick.app/tools/runway`;
           <div style={{ display: "flex", flexDirection: "column", gap: "16px", position: "sticky", top: "24px" }}>
 
             {/* Primary metric */}
-            <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "28px 24px", textAlign: "center" }}>
-              <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", color: "rgba(255,255,255,0.35)", textTransform: "uppercase", marginBottom: "8px" }}>
+            <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "28px 24px", textAlign: "center" }}>
+              <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", color: "var(--faint)", textTransform: "uppercase", marginBottom: "8px" }}>
                 Months of runway
               </p>
               <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(56px, 8vw, 80px)", color, lineHeight: 1, marginBottom: "12px" }}>
@@ -529,42 +529,42 @@ Calculate yours at hockystick.app/tools/runway`;
               }}>
                 {badge.label}
               </span>
-              <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: "16px" }}>
-                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginBottom: "4px" }}>Cash out date</p>
-                <p style={{ fontSize: "18px", fontWeight: 700, color: "#fff" }}>
+              <div style={{ borderTop: "1px solid var(--border)", paddingTop: "16px" }}>
+                <p style={{ fontSize: "12px", color: "var(--muted-foreground)", marginBottom: "4px" }}>Cash out date</p>
+                <p style={{ fontSize: "18px", fontWeight: 700, color: "var(--foreground)" }}>
                   {current.cashOut ? formatDateLong(current.cashOut) : "No cash-out projected"}
                 </p>
               </div>
             </div>
 
             {/* Three scenarios */}
-            <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "20px" }}>
-              <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.35)", textTransform: "uppercase", marginBottom: "16px" }}>
+            <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px" }}>
+              <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "var(--faint)", textTransform: "uppercase", marginBottom: "16px" }}>
                 Scenarios
               </p>
 
               {/* Scenario 1 */}
-              <div style={{ marginBottom: "14px", paddingBottom: "14px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ marginBottom: "14px", paddingBottom: "14px", borderBottom: "1px solid var(--border)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                  <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>Current trajectory</span>
+                  <span style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>Current trajectory</span>
                   <span style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "20px", color: runwayColor(current.months) }}>
                     {current.months >= 999 ? "∞" : Math.round(current.months)} mo
                   </span>
                 </div>
-                <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "2px" }}>
+                <p style={{ fontSize: "11px", color: "var(--faint)", marginTop: "2px" }}>
                   Cash-out: {current.cashOut ? formatDateShort(current.cashOut) : "—"}
                 </p>
               </div>
 
               {/* Scenario 2 */}
-              <div style={{ marginBottom: "14px", paddingBottom: "14px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ marginBottom: "14px", paddingBottom: "14px", borderBottom: "1px solid var(--border)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                  <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>If you cut costs 20%</span>
+                  <span style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>If you cut costs 20%</span>
                   <span style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "20px", color: runwayColor(cut20.months) }}>
                     {cut20.months >= 999 ? "∞" : Math.round(cut20.months)} mo
                   </span>
                 </div>
-                <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "2px" }}>
+                <p style={{ fontSize: "11px", color: "var(--faint)", marginTop: "2px" }}>
                   Cash-out: {cut20.cashOut ? formatDateShort(cut20.cashOut) : "—"}
                 </p>
               </div>
@@ -573,27 +573,27 @@ Calculate yours at hockystick.app/tools/runway`;
               {raiseAmount > 0 ? (
                 <div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                    <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>
+                    <span style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>
                       After {fmt(raiseAmount)} raise closes in {monthsToClose} mo
                     </span>
                     <span style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "20px", color: runwayColor(postRaiseMonths ?? 0) }}>
                       {postRaiseMonths != null ? (postRaiseMonths >= 999 ? "∞" : Math.round(postRaiseMonths)) : "—"} mo
                     </span>
                   </div>
-                  <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "2px" }}>
+                  <p style={{ fontSize: "11px", color: "var(--faint)", marginTop: "2px" }}>
                     Cash-out: {postRaiseCashOut ? formatDateShort(postRaiseCashOut) : "—"}
                   </p>
                 </div>
               ) : (
-                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.25)", fontStyle: "italic" }}>
+                <p style={{ fontSize: "12px", color: "var(--faint)", fontStyle: "italic" }}>
                   Enter a target raise above to model post-funding runway
                 </p>
               )}
             </div>
 
             {/* 12-month chart */}
-            <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "20px" }}>
-              <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.35)", textTransform: "uppercase", marginBottom: "16px" }}>
+            <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px" }}>
+              <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "var(--faint)", textTransform: "uppercase", marginBottom: "16px" }}>
                 12-month cash projection
               </p>
               <RunwayChart
@@ -606,12 +606,12 @@ Calculate yours at hockystick.app/tools/runway`;
 
             {/* Raise timing card */}
             <div style={{ border: "1px solid rgba(124,58,237,0.3)", background: "rgba(124,58,237,0.05)", borderRadius: "12px", padding: "20px", display: "flex", gap: "16px", alignItems: "flex-start" }}>
-              <Calendar size={18} style={{ color: "#7C3AED", flexShrink: 0, marginTop: "2px" }} />
+              <Calendar size={18} style={{ color: "var(--brand)", flexShrink: 0, marginTop: "2px" }} />
               <div>
-                <p style={{ fontSize: "14px", fontWeight: 700, color: "#fff", marginBottom: "8px" }}>
+                <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)", marginBottom: "8px" }}>
                   When should you start raising?
                 </p>
-                <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: "12px" }}>
+                <p style={{ fontSize: "13px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "12px" }}>
                   {raiseTimingText()}
                 </p>
                 <Link
@@ -659,7 +659,7 @@ Calculate yours at hockystick.app/tools/runway`;
       </section>
 
       {/* S3 — How to use */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>
             How to use this calculator
@@ -684,8 +684,8 @@ Calculate yours at hockystick.app/tools/runway`;
             ].map((step) => (
               <div key={step.n}>
                 <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "32px", color: "rgba(124,58,237,0.3)", marginBottom: "12px" }}>{step.n}</div>
-                <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#fff", marginBottom: "8px" }}>{step.title}</h3>
-                <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", lineHeight: 1.7 }}>{step.body}</p>
+                <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--foreground)", marginBottom: "8px" }}>{step.title}</h3>
+                <p style={{ fontSize: "13px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>{step.body}</p>
               </div>
             ))}
           </div>
@@ -693,13 +693,13 @@ Calculate yours at hockystick.app/tools/runway`;
       </section>
 
       {/* S4 — Methodology */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>
             How runway is calculated
           </h2>
           <Accordion title="Basic runway calculation">
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: "16px" }}>
+            <p style={{ fontSize: "14px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "16px" }}>
               Runway is your current cash divided by your net burn rate per month. It assumes constant burn — no growth, no cuts. This is the conservative baseline. The scenario models adjust for cost cuts and new capital.
             </p>
             <div style={{ background: "#0d0d10", borderRadius: "8px", padding: "12px 16px", fontFamily: "monospace", fontSize: "12px", color: "#a78bfa", lineHeight: 1.9 }}>
@@ -708,7 +708,7 @@ Calculate yours at hockystick.app/tools/runway`;
             </div>
           </Accordion>
           <Accordion title="Scenario modeling">
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: "16px" }}>
+            <p style={{ fontSize: "14px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "16px" }}>
               The 20% expense reduction scenario reduces your net burn by 20% (net burn × 0.8) and recalculates runway. The post-raise scenario adds the raise amount to your cash balance after accounting for burn during the raise process (cash − burn × months_to_close + raise_amount), then calculates remaining runway at your current burn rate.
             </p>
             <div style={{ background: "#0d0d10", borderRadius: "8px", padding: "12px 16px", fontFamily: "monospace", fontSize: "12px", color: "#a78bfa", lineHeight: 1.9 }}>
@@ -721,7 +721,7 @@ Calculate yours at hockystick.app/tools/runway`;
       </section>
 
       {/* S5 — FAQ */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>
             Frequently asked questions
@@ -749,14 +749,14 @@ Calculate yours at hockystick.app/tools/runway`;
             },
           ].map(({ q, a }) => (
             <Accordion key={q} title={q}>
-              <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>{a}</p>
+              <p style={{ fontSize: "14px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>{a}</p>
             </Accordion>
           ))}
         </div>
       </section>
 
       {/* S6 — Related tools */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "22px", marginBottom: "24px", letterSpacing: "-0.02em" }}>
             Related tools
@@ -764,17 +764,17 @@ Calculate yours at hockystick.app/tools/runway`;
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }} className="rwy-related">
             <style>{`@media (max-width: 480px) { .rwy-related { grid-template-columns: 1fr !important; } }`}</style>
             <Link to="/tools/burn-rate" style={{ textDecoration: "none" }}>
-              <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "12px", padding: "20px", cursor: "pointer" }}>
+              <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px", cursor: "pointer" }}>
                 <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#10B981", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
-                <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#fff", margin: "10px 0 6px" }}>Burn Rate Calculator</h3>
-                <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", margin: 0 }}>Calculate monthly gross and net burn broken down by expense category.</p>
+                <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)", margin: "10px 0 6px" }}>Burn Rate Calculator</h3>
+                <p style={{ fontSize: "13px", color: "var(--muted-foreground)", margin: 0 }}>Calculate monthly gross and net burn broken down by expense category.</p>
               </div>
             </Link>
             <Link to="/tools/valuation" style={{ textDecoration: "none" }}>
-              <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "12px", padding: "20px", cursor: "pointer" }}>
+              <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px", cursor: "pointer" }}>
                 <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#10B981", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
-                <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#fff", margin: "10px 0 6px" }}>Startup Valuation Calculator</h3>
-                <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", margin: 0 }}>VC Method, Revenue Multiples, and Berkus for pre-seed to Series A.</p>
+                <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)", margin: "10px 0 6px" }}>Startup Valuation Calculator</h3>
+                <p style={{ fontSize: "13px", color: "var(--muted-foreground)", margin: 0 }}>VC Method, Revenue Multiples, and Berkus for pre-seed to Series A.</p>
               </div>
             </Link>
           </div>
@@ -782,24 +782,24 @@ Calculate yours at hockystick.app/tools/runway`;
       </section>
 
       {/* S7 — CTA */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", background: "#111114", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", background: "var(--card)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "560px", margin: "0 auto", textAlign: "center" }}>
           <h3 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 30px)", letterSpacing: "-0.02em", marginBottom: "16px" }}>
             Runway is how long you have. Hockystick is how fast you move.
           </h3>
-          <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, marginBottom: "28px" }}>
+          <p style={{ fontSize: "15px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "28px" }}>
             Get your verified profile in front of investors who are actively deploying capital in your sector.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link
               to="/sign-up"
-              style={{ display: "inline-flex", alignItems: "center", background: "#7C3AED", color: "#fff", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}
+              style={{ display: "inline-flex", alignItems: "center", background: "var(--gradient-brand)", color: "#fff", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}
             >
               Create your profile
             </Link>
             <Link
               to="/trust"
-              style={{ display: "inline-flex", alignItems: "center", background: "transparent", color: "rgba(255,255,255,0.5)", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 500, textDecoration: "none", border: "1px solid rgba(255,255,255,0.12)" }}
+              style={{ display: "inline-flex", alignItems: "center", background: "transparent", color: "var(--muted-foreground)", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 500, textDecoration: "none", border: "1px solid var(--border)" }}
             >
               See how verification works
             </Link>

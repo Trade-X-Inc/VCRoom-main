@@ -99,8 +99,8 @@ function SignUp() {
       <div className="w-full max-w-md bg-card border border-border rounded-2xl p-10">
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center">
-              <span className="text-white text-sm font-bold">H</span>
+            <div className="w-8 h-8 rounded-lg hs-gradient-static flex items-center justify-center">
+              <span className="text-foreground text-sm font-bold">H</span>
             </div>
             <span className="font-semibold text-foreground">Hockystick</span>
           </div>
@@ -115,7 +115,7 @@ function SignUp() {
               onClick={() => setRole(r)}
               className={`p-4 rounded-xl border-2 text-left transition-all ${
                 role === r
-                  ? 'border-purple-500 bg-purple-500/10'
+                  ? 'border-brand bg-accent'
                   : 'border-border bg-background hover:border-border/80'
               }`}
             >
@@ -191,7 +191,7 @@ function SignUp() {
               <button
                 type="submit"
                 disabled={loading || !turnstileToken}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="w-full py-3 rounded-xl hs-gradient text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
               >
                 {loading ? 'Creating account...' : `Create ${role} account →`}
               </button>

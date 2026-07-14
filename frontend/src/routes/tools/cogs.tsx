@@ -60,7 +60,7 @@ const MODEL_LABELS: Record<Model, string> = {
   ecommerce: "E-commerce",
 };
 
-const BAR_COLORS = ["#7C3AED", "#10B981", "#F59E0B", "#6366F1", "#EC4899"];
+const BAR_COLORS = ["var(--brand)", "#10B981", "#F59E0B", "#6366F1", "#EC4899"];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -84,31 +84,31 @@ function NumInput({
 }) {
   return (
     <div style={{ marginBottom: "14px" }}>
-      <label style={{ display: "block", fontSize: "12px", color: "rgba(255,255,255,0.6)", marginBottom: "5px" }}>
+      <label style={{ display: "block", fontSize: "12px", color: "var(--muted-foreground)", marginBottom: "5px" }}>
         {label}
       </label>
-      <div style={{ display: "flex", alignItems: "center", background: "#1a1a1f", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", overflow: "hidden" }}>
+      <div style={{ display: "flex", alignItems: "center", background: "#1a1a1f", border: "1px solid var(--border)", borderRadius: "8px", overflow: "hidden" }}>
         {prefix && (
-          <span style={{ padding: "9px 10px", fontSize: "12px", color: "rgba(255,255,255,0.35)", borderRight: "1px solid rgba(255,255,255,0.08)", whiteSpace: "nowrap" }}>{prefix}</span>
+          <span style={{ padding: "9px 10px", fontSize: "12px", color: "var(--faint)", borderRight: "1px solid var(--border)", whiteSpace: "nowrap" }}>{prefix}</span>
         )}
         <input
           type="number" value={value || ""}
           onChange={(e) => onChange(Number(e.target.value) || 0)}
-          style={{ flex: 1, background: "transparent", border: "none", outline: "none", padding: "9px 10px", fontSize: "13px", color: "#fff" }}
+          style={{ flex: 1, background: "transparent", border: "none", outline: "none", padding: "9px 10px", fontSize: "13px", color: "var(--foreground)" }}
         />
         {suffix && (
-          <span style={{ padding: "9px 10px", fontSize: "12px", color: "rgba(255,255,255,0.35)", borderLeft: "1px solid rgba(255,255,255,0.08)" }}>{suffix}</span>
+          <span style={{ padding: "9px 10px", fontSize: "12px", color: "var(--faint)", borderLeft: "1px solid var(--border)" }}>{suffix}</span>
         )}
       </div>
       {autoValue && <p style={{ fontSize: "11px", color: "#a78bfa", marginTop: "3px" }}>{autoValue}</p>}
-      {hint && <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "3px", lineHeight: 1.5 }}>{hint}</p>}
+      {hint && <p style={{ fontSize: "11px", color: "var(--faint)", marginTop: "3px", lineHeight: 1.5 }}>{hint}</p>}
     </div>
   );
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", color: "rgba(255,255,255,0.3)", textTransform: "uppercase", margin: "20px 0 12px" }}>
+    <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", color: "var(--faint)", textTransform: "uppercase", margin: "20px 0 12px" }}>
       {children}
     </p>
   );
@@ -117,13 +117,13 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 function Accordion({ title, children }: { title: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
-    <div style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+    <div style={{ borderBottom: "1px solid var(--border)" }}>
       <button
         onClick={() => setOpen((v) => !v)}
         style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "18px 0", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}
       >
-        <span style={{ fontSize: "15px", fontWeight: 600, color: "#fff" }}>{title}</span>
-        {open ? <ChevronUp size={16} style={{ color: "#7C3AED", flexShrink: 0 }} /> : <ChevronDown size={16} style={{ color: "rgba(255,255,255,0.4)", flexShrink: 0 }} />}
+        <span style={{ fontSize: "15px", fontWeight: 600, color: "var(--foreground)" }}>{title}</span>
+        {open ? <ChevronUp size={16} style={{ color: "var(--brand)", flexShrink: 0 }} /> : <ChevronDown size={16} style={{ color: "var(--muted-foreground)", flexShrink: 0 }} />}
       </button>
       {open && <div style={{ paddingBottom: "20px" }}>{children}</div>}
     </div>
@@ -150,7 +150,7 @@ function SaasInputs({ s, set }: { s: SaasState; set: (v: SaasState) => void }) {
       <SectionLabel>Revenue</SectionLabel>
       <NumInput label="Monthly Recurring Revenue (MRR)" value={s.mrr} onChange={(v) => up("mrr", v)} />
       <NumInput label="One-time / services revenue" value={s.oneTime} onChange={(v) => up("oneTime", v)} />
-      <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)", marginBottom: "8px" }}>
+      <p style={{ fontSize: "11px", color: "var(--faint)", marginBottom: "8px" }}>
         Total revenue: {fmt(s.mrr + s.oneTime)}
       </p>
 
@@ -309,7 +309,7 @@ function HardwareInputs({ s, set }: { s: HardwareState; set: (v: HardwareState) 
       <SectionLabel>Revenue</SectionLabel>
       <NumInput label="Revenue per unit" value={s.revenuePerUnit} onChange={(v) => up("revenuePerUnit", v)} />
       {s.revenuePerUnit > 0 && s.units > 0 && (
-        <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)", marginBottom: "8px" }}>
+        <p style={{ fontSize: "11px", color: "var(--faint)", marginBottom: "8px" }}>
           Total revenue: {fmt(s.revenuePerUnit * s.units)}
         </p>
       )}
@@ -362,7 +362,7 @@ function EcomInputs({ s, set }: { s: EcomState; set: (v: EcomState) => void }) {
       <SectionLabel>Revenue</SectionLabel>
       <NumInput label="Monthly revenue" value={s.revenue} onChange={(v) => up("revenue", v)} />
       <NumInput label="Average order value" value={s.aov} onChange={(v) => up("aov", v)} />
-      {orders > 0 && <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)", marginBottom: "8px" }}>Orders per month: ~{orders.toLocaleString()}</p>}
+      {orders > 0 && <p style={{ fontSize: "11px", color: "var(--faint)", marginBottom: "8px" }}>Orders per month: ~{orders.toLocaleString()}</p>}
 
       <SectionLabel>Product Costs</SectionLabel>
       <NumInput label="Product / inventory cost ($/mo)" value={s.inventory} onChange={(v) => up("inventory", v)} hint="Total spend on purchasing inventory this month." />
@@ -425,30 +425,30 @@ function OutputPanel({ result, model, copied, onCopy }: {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
       {/* COGS */}
-      <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "20px" }}>
-        <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", marginBottom: "8px" }}>Total Monthly COGS</p>
-        <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(24px, 3.5vw, 34px)", color: "#fff", margin: "0 0 4px" }}>{fmt(result.totalCogs)}</p>
-        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)", margin: 0 }}>Revenue: {fmt(result.totalRevenue)}</p>
+      <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px" }}>
+        <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "var(--muted-foreground)", textTransform: "uppercase", marginBottom: "8px" }}>Total Monthly COGS</p>
+        <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(24px, 3.5vw, 34px)", color: "var(--foreground)", margin: "0 0 4px" }}>{fmt(result.totalCogs)}</p>
+        <p style={{ fontSize: "12px", color: "var(--faint)", margin: 0 }}>Revenue: {fmt(result.totalRevenue)}</p>
       </div>
 
       {/* Gross Profit */}
-      <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "20px" }}>
-        <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", marginBottom: "8px" }}>Gross Profit</p>
+      <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px" }}>
+        <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "var(--muted-foreground)", textTransform: "uppercase", marginBottom: "8px" }}>Gross Profit</p>
         <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(24px, 3.5vw, 34px)", color: result.grossProfit >= 0 ? "#10B981" : "#EF4444", margin: "0 0 4px" }}>
           {result.grossProfit >= 0 ? fmt(result.grossProfit) : `-${fmt(Math.abs(result.grossProfit))}`}
         </p>
-        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)", margin: 0 }}>After direct costs</p>
+        <p style={{ fontSize: "12px", color: "var(--faint)", margin: 0 }}>After direct costs</p>
       </div>
 
       {/* Gross Margin */}
-      <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "20px" }}>
-        <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", marginBottom: "8px" }}>Gross Margin</p>
+      <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px" }}>
+        <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "var(--muted-foreground)", textTransform: "uppercase", marginBottom: "8px" }}>Gross Margin</p>
         <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(24px, 3.5vw, 34px)", color: marginColor, margin: "0 0 12px" }}>
           {pct(margin)}
         </p>
 
         {/* Benchmark block */}
-        <p style={{ fontSize: "11px", fontWeight: 600, color: "rgba(255,255,255,0.35)", marginBottom: "10px" }}>
+        <p style={{ fontSize: "11px", fontWeight: 600, color: "var(--faint)", marginBottom: "10px" }}>
           Industry benchmarks — {bm.name}
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: "5px", marginBottom: "14px" }}>
@@ -458,7 +458,7 @@ function OutputPanel({ result, model, copied, onCopy }: {
             { label: "Needs attention", range: `<${bm.low}%`, color: "#EF4444" },
           ].map((row) => (
             <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)" }}>{row.label}</span>
+              <span style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>{row.label}</span>
               <span style={{ fontSize: "12px", fontWeight: 600, color: row.color }}>{row.range}</span>
             </div>
           ))}
@@ -467,7 +467,7 @@ function OutputPanel({ result, model, copied, onCopy }: {
         {/* Margin range bar */}
         <div style={{ position: "relative", marginBottom: "4px" }}>
           {/* Background track */}
-          <div style={{ height: "6px", borderRadius: "99px", background: "rgba(255,255,255,0.08)", position: "relative", overflow: "visible" }}>
+          <div style={{ height: "6px", borderRadius: "99px", background: "var(--accent)", position: "relative", overflow: "visible" }}>
             {/* Healthy zone */}
             <div style={{
               position: "absolute", left: `${lowPct}%`, width: `${highPct - lowPct}%`,
@@ -483,21 +483,21 @@ function OutputPanel({ result, model, copied, onCopy }: {
               position: "absolute", left: `${Math.max(0, Math.min(100, dotPct))}%`,
               top: "50%", transform: "translate(-50%, -50%)",
               width: "12px", height: "12px", borderRadius: "50%",
-              background: marginColor, border: "2px solid #0A0A0B",
+              background: marginColor, border: "2px solid var(--background)",
               transition: "left 0.3s",
             }} />
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
-            <span style={{ fontSize: "9px", color: "rgba(255,255,255,0.2)" }}>0%</span>
-            <span style={{ fontSize: "9px", color: "rgba(255,255,255,0.2)" }}>90%</span>
+            <span style={{ fontSize: "9px", color: "var(--faint)" }}>0%</span>
+            <span style={{ fontSize: "9px", color: "var(--faint)" }}>90%</span>
           </div>
         </div>
       </div>
 
       {/* Breakdown stacked bar */}
       {top5.length >= 3 && barTotal > 0 && (
-        <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "20px" }}>
-          <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", marginBottom: "12px" }}>
+        <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px" }}>
+          <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "var(--muted-foreground)", textTransform: "uppercase", marginBottom: "12px" }}>
             Where your COGS goes
           </p>
           <div style={{ display: "flex", height: "8px", borderRadius: "6px", overflow: "hidden", marginBottom: "12px" }}>
@@ -510,11 +510,11 @@ function OutputPanel({ result, model, copied, onCopy }: {
               <div key={cat.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
                   <div style={{ width: "8px", height: "8px", borderRadius: "2px", background: BAR_COLORS[i], flexShrink: 0 }} />
-                  <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.55)" }}>{cat.label}</span>
+                  <span style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>{cat.label}</span>
                 </div>
                 <div style={{ display: "flex", gap: "10px" }}>
-                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>{(cat.value / barTotal * 100).toFixed(0)}%</span>
-                  <span style={{ fontSize: "11px", fontWeight: 600, color: "rgba(255,255,255,0.55)", minWidth: "50px", textAlign: "right" }}>{fmt(cat.value)}</span>
+                  <span style={{ fontSize: "11px", color: "var(--faint)" }}>{(cat.value / barTotal * 100).toFixed(0)}%</span>
+                  <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--muted-foreground)", minWidth: "50px", textAlign: "right" }}>{fmt(cat.value)}</span>
                 </div>
               </div>
             ))}
@@ -524,18 +524,18 @@ function OutputPanel({ result, model, copied, onCopy }: {
 
       {/* Unit economics */}
       {result.perUnitCogs !== undefined && result.perUnitRevenue !== undefined && (
-        <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "20px" }}>
-          <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", marginBottom: "12px" }}>
+        <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px" }}>
+          <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "var(--muted-foreground)", textTransform: "uppercase", marginBottom: "12px" }}>
             Unit economics — per {result.unitLabel}
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
             {[
-              { label: "COGS", value: fmt(result.perUnitCogs!), color: "#fff" },
-              { label: "Revenue", value: fmt(result.perUnitRevenue!), color: "#fff" },
+              { label: "COGS", value: fmt(result.perUnitCogs!), color: "var(--foreground)" },
+              { label: "Revenue", value: fmt(result.perUnitRevenue!), color: "var(--foreground)" },
               { label: "Gross profit", value: fmt(result.perUnitProfit!), color: (result.perUnitProfit ?? 0) >= 0 ? "#10B981" : "#EF4444" },
             ].map((m) => (
               <div key={m.label} style={{ textAlign: "center" }}>
-                <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", marginBottom: "4px" }}>{m.label}</div>
+                <div style={{ fontSize: "10px", color: "var(--muted-foreground)", marginBottom: "4px" }}>{m.label}</div>
                 <div style={{ fontSize: "15px", fontWeight: 700, color: m.color }}>{m.value}</div>
               </div>
             ))}
@@ -659,25 +659,25 @@ Calculate yours at hockystick.app/tools/cogs`;
   };
 
   return (
-    <div style={{ background: "#0A0A0B", minHeight: "100vh", color: "#fff" }}>
+    <div style={{ background: "var(--background)", minHeight: "100vh", color: "var(--foreground)" }}>
       <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <div className="tool-no-print"><SiteHeader /></div>
 
       {/* S1 — Hero */}
       <section style={{ ...pw, padding: "56px 24px 48px" }}>
-        <nav style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)", marginBottom: "20px" }}>
-          <Link to="/tools" style={{ color: "rgba(255,255,255,0.35)", textDecoration: "none" }}>Tools</Link>
+        <nav style={{ fontSize: "12px", color: "var(--faint)", marginBottom: "20px" }}>
+          <Link to="/tools" style={{ color: "var(--faint)", textDecoration: "none" }}>Tools</Link>
           <span style={{ margin: "0 6px" }}>→</span>
-          <span style={{ color: "rgba(255,255,255,0.7)" }}>COGS Calculator</span>
+          <span style={{ color: "var(--muted-foreground)" }}>COGS Calculator</span>
         </nav>
         <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(28px, 5vw, 46px)", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "16px" }}>
           COGS Calculator
         </h1>
-        <p style={{ fontSize: "16px", color: "rgba(255,255,255,0.55)", lineHeight: 1.6, maxWidth: "560px", marginBottom: "12px" }}>
+        <p style={{ fontSize: "16px", color: "var(--muted-foreground)", lineHeight: 1.6, maxWidth: "560px", marginBottom: "12px" }}>
           Calculate your cost of goods sold, gross margin, and unit economics — broken down by business model. Know where your margins stand before investors ask.
         </p>
-        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>
+        <p style={{ fontSize: "12px", color: "var(--faint)" }}>
           Used by founders preparing financial models for fundraising
         </p>
       </section>
@@ -686,7 +686,7 @@ Calculate yours at hockystick.app/tools/cogs`;
       <section style={{ ...pw, paddingBottom: "80px" }}>
         {/* Model selector */}
         <div style={{ marginBottom: "28px" }}>
-          <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.35)", textTransform: "uppercase", marginBottom: "10px" }}>
+          <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", color: "var(--faint)", textTransform: "uppercase", marginBottom: "10px" }}>
             Business model
           </p>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
@@ -697,9 +697,9 @@ Calculate yours at hockystick.app/tools/cogs`;
                 style={{
                   padding: "8px 16px", borderRadius: "8px", fontSize: "13px", fontWeight: 600,
                   cursor: "pointer", transition: "all 0.15s",
-                  background: model === m ? "#7C3AED" : "transparent",
-                  border: `1px solid ${model === m ? "#7C3AED" : "rgba(255,255,255,0.15)"}`,
-                  color: model === m ? "#fff" : "rgba(255,255,255,0.5)",
+                  background: model === m ? "var(--gradient-brand)" : "transparent",
+                  border: `1px solid ${model === m ? "var(--brand)" : "var(--border)"}`,
+                  color: model === m ? "#fff" : "var(--muted-foreground)",
                 }}
               >
                 {MODEL_LABELS[m]}
@@ -713,7 +713,7 @@ Calculate yours at hockystick.app/tools/cogs`;
           <style>{`.cogs-grid { } @media (max-width: 640px) { .cogs-grid { grid-template-columns: 1fr !important; } }`}</style>
 
           {/* Inputs */}
-          <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "24px" }}>
+          <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "24px" }}>
             {model === "saas" && <SaasInputs s={saas} set={setSaas} />}
             {model === "marketplace" && <MarketplaceInputs s={mp} set={setMp} />}
             {model === "hardware" && <HardwareInputs s={hw} set={setHw} />}
@@ -728,7 +728,7 @@ Calculate yours at hockystick.app/tools/cogs`;
       </section>
 
       {/* S3 — How to use */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>
             How to use this calculator
@@ -741,8 +741,8 @@ Calculate yours at hockystick.app/tools/cogs`;
             ].map((step) => (
               <div key={step.n}>
                 <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "32px", color: "rgba(124,58,237,0.3)", marginBottom: "12px" }}>{step.n}</div>
-                <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#fff", marginBottom: "8px" }}>{step.title}</h3>
-                <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", lineHeight: 1.7 }}>{step.body}</p>
+                <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--foreground)", marginBottom: "8px" }}>{step.title}</h3>
+                <p style={{ fontSize: "13px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>{step.body}</p>
               </div>
             ))}
           </div>
@@ -750,13 +750,13 @@ Calculate yours at hockystick.app/tools/cogs`;
       </section>
 
       {/* S4 — Methodology */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>
             How these calculations work
           </h2>
           <Accordion title="What counts as COGS (and what doesn't)">
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: "16px" }}>
+            <p style={{ fontSize: "14px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "16px" }}>
               COGS is the direct cost of delivering your product or service to a customer. For SaaS, that is hosting, APIs, and customer support — not sales, marketing, or R&D. Including sales salaries in COGS is the most common mistake founders make. It overstates cost and understates margin.
             </p>
             <div style={{ background: "#0d0d10", borderRadius: "8px", padding: "12px 16px", fontFamily: "monospace", fontSize: "13px", color: "#a78bfa", lineHeight: 1.9 }}>
@@ -765,17 +765,17 @@ Calculate yours at hockystick.app/tools/cogs`;
             </div>
           </Accordion>
           <Accordion title="SaaS COGS explained">
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>
+            <p style={{ fontSize: "14px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>
               For software companies, COGS includes infrastructure that scales with customers, not with your team. AWS bills go in. Engineer salaries building new features go in operating expenses. The distinction matters because investors evaluate SaaS companies on gross margin expansion — the ability to grow revenue faster than COGS.
             </p>
           </Accordion>
           <Accordion title="Hardware COGS and landed cost">
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>
+            <p style={{ fontSize: "14px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>
               Hardware COGS starts with your Bill of Materials but the real number includes manufacturing, quality control, packaging, inbound freight, and import duties. In GCC markets, the standard import duty is 5% on most goods. Medical devices, electronics, and industrial equipment may carry different rates. Your landed cost per unit is what the calculator uses as the COGS baseline.
             </p>
           </Accordion>
           <Accordion title="Marketplace COGS and take rate">
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>
+            <p style={{ fontSize: "14px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>
               Marketplace gross margin is calculated against net revenue (your take rate), not gross merchandise value. If GMV is $1M and your take rate is 10%, your revenue is $100K — and COGS should be measured against that $100K. Payment processing at 2.5% of GMV eats 25% of your net revenue if you're not careful.
             </p>
           </Accordion>
@@ -783,7 +783,7 @@ Calculate yours at hockystick.app/tools/cogs`;
       </section>
 
       {/* S5 — FAQ */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>
             Frequently asked questions
@@ -796,14 +796,14 @@ Calculate yours at hockystick.app/tools/cogs`;
             { q: "Why does gross margin matter to investors?", a: "Gross margin determines how much of each dollar of revenue remains to cover operating expenses and eventually generate profit. A SaaS company at 80% gross margin can spend aggressively on sales and marketing and still have room to become profitable. A hardware company at 20% gross margin has almost no room for error. Investors use gross margin to model what the business looks like at scale." },
           ].map(({ q, a }) => (
             <Accordion key={q} title={q}>
-              <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>{a}</p>
+              <p style={{ fontSize: "14px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>{a}</p>
             </Accordion>
           ))}
         </div>
       </section>
 
       {/* S6 — Related tools */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "22px", marginBottom: "24px", letterSpacing: "-0.02em" }}>
             Related tools
@@ -815,10 +815,10 @@ Calculate yours at hockystick.app/tools/cogs`;
               { to: "/tools/burn-rate", title: "Burn Rate & Runway Calculator", desc: "Monthly gross/net burn and cash-out date across three scenarios." },
             ].map((t) => (
               <Link key={t.to} to={t.to as any} style={{ textDecoration: "none" }}>
-                <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "12px", padding: "20px", cursor: "pointer" }}>
+                <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px", cursor: "pointer" }}>
                   <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#10B981", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
-                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#fff", margin: "10px 0 6px" }}>{t.title}</h3>
-                  <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", margin: 0 }}>{t.desc}</p>
+                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)", margin: "10px 0 6px" }}>{t.title}</h3>
+                  <p style={{ fontSize: "13px", color: "var(--muted-foreground)", margin: 0 }}>{t.desc}</p>
                 </div>
               </Link>
             ))}
@@ -827,21 +827,21 @@ Calculate yours at hockystick.app/tools/cogs`;
       </section>
 
       {/* S7 — CTA */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", background: "#111114", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", background: "var(--card)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "560px", margin: "0 auto", textAlign: "center" }}>
           <h3 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 30px)", letterSpacing: "-0.02em", marginBottom: "16px" }}>
             Investors will calculate your margins before you do.
           </h3>
-          <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, marginBottom: "28px" }}>
+          <p style={{ fontSize: "15px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "28px" }}>
             Put your financials in front of verified investors on Hockystick — before they find gaps in your numbers.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link to="/sign-up" search={{ role: "founder" } as any}
-              style={{ display: "inline-flex", alignItems: "center", background: "#7C3AED", color: "#fff", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>
+              style={{ display: "inline-flex", alignItems: "center", background: "var(--gradient-brand)", color: "#fff", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>
               Create your profile
             </Link>
             <Link to="/trust"
-              style={{ display: "inline-flex", alignItems: "center", background: "transparent", color: "rgba(255,255,255,0.5)", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 500, textDecoration: "none", border: "1px solid rgba(255,255,255,0.12)" }}>
+              style={{ display: "inline-flex", alignItems: "center", background: "transparent", color: "var(--muted-foreground)", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 500, textDecoration: "none", border: "1px solid var(--border)" }}>
               See how verification works
             </Link>
           </div>

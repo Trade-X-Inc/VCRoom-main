@@ -65,8 +65,8 @@ function SignIn() {
             <ChevronLeft className="h-3.5 w-3.5" /> Back to home
           </Link>
           <Link to="/" className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center">
-              <span className="text-white text-sm font-bold">H</span>
+            <div className="w-8 h-8 rounded-lg hs-gradient-static flex items-center justify-center">
+              <span className="text-foreground text-sm font-bold">H</span>
             </div>
             <span className="font-semibold text-foreground">Hockystick</span>
           </Link>
@@ -125,7 +125,7 @@ function SignIn() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="w-full py-3 rounded-xl hs-gradient text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {loading ? 'Signing in...' : 'Sign in →'}
           </button>
@@ -135,7 +135,7 @@ function SignIn() {
           <Link to="/forgot-password" className="text-muted-foreground hover:text-foreground">
             Forgot password?
           </Link>
-          <Link to="/sign-up" className="text-purple-500 hover:text-purple-400">
+          <Link to="/sign-up" className="text-purple-500 hover:text-brand">
             Create account →
           </Link>
         </div>

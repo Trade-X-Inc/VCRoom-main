@@ -101,8 +101,8 @@ const TOOLS: Tool[] = [
 
 function ToolCard({ tool }: { tool: Tool }) {
   const cardStyle: React.CSSProperties = {
-    background: "#111114",
-    border: `1px solid ${tool.active ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.06)"}`,
+    background: "var(--card)",
+    border: `1px solid ${tool.active ? "var(--border)" : "var(--accent)"}`,
     borderRadius: "12px",
     padding: "24px",
     opacity: tool.active ? 1 : 0.4,
@@ -114,7 +114,7 @@ function ToolCard({ tool }: { tool: Tool }) {
   };
 
   const inner = (
-    <div style={cardStyle} className={tool.active ? "group hover:border-[#7C3AED]" : ""}>
+    <div style={cardStyle} className={tool.active ? "group hover:border-brand" : ""}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
         <span
           style={{
@@ -124,7 +124,7 @@ function ToolCard({ tool }: { tool: Tool }) {
             padding: "2px 8px",
             borderRadius: "4px",
             background: tool.tagStyle === "active" ? "rgba(16,185,129,0.15)" : "rgba(124,58,237,0.15)",
-            color: tool.tagStyle === "active" ? "#10B981" : "#7C3AED",
+            color: tool.tagStyle === "active" ? "#10B981" : "var(--brand)",
           }}
         >
           {tool.tag}
@@ -146,7 +146,7 @@ function ToolCard({ tool }: { tool: Tool }) {
       <p
         style={{
           fontSize: "14px",
-          color: "rgba(255,255,255,0.5)",
+          color: "var(--muted-foreground)",
           lineHeight: 1.6,
           margin: 0,
           flexGrow: 1,
@@ -159,7 +159,7 @@ function ToolCard({ tool }: { tool: Tool }) {
         style={{
           fontSize: "14px",
           fontWeight: 600,
-          color: "#7C3AED",
+          color: "var(--brand)",
           marginTop: "4px",
         }}
       >
@@ -179,7 +179,7 @@ function ToolCard({ tool }: { tool: Tool }) {
 
 function ToolsIndex() {
   return (
-    <div style={{ background: "#0A0A0B", minHeight: "100vh" }}>
+    <div style={{ background: "var(--background)", minHeight: "100vh" }}>
       <SiteHeader />
 
       {/* Hero */}
@@ -196,7 +196,7 @@ function ToolsIndex() {
             fontSize: "11px",
             fontWeight: 700,
             letterSpacing: "0.18em",
-            color: "#7C3AED",
+            color: "var(--brand)",
             textTransform: "uppercase",
             marginBottom: "20px",
           }}
@@ -219,7 +219,7 @@ function ToolsIndex() {
         <p
           style={{
             fontSize: "16px",
-            color: "rgba(255,255,255,0.5)",
+            color: "var(--muted-foreground)",
             lineHeight: 1.6,
             maxWidth: "480px",
             margin: "0 auto",
@@ -248,7 +248,7 @@ function ToolsIndex() {
       {/* Bottom CTA */}
       <section
         style={{
-          borderTop: "1px solid rgba(255,255,255,0.06)",
+          borderTop: "1px solid var(--border)",
           padding: "56px 24px",
           textAlign: "center",
         }}
@@ -256,7 +256,7 @@ function ToolsIndex() {
         <p
           style={{
             fontSize: "16px",
-            color: "rgba(255,255,255,0.5)",
+            color: "var(--muted-foreground)",
             marginBottom: "24px",
             maxWidth: "480px",
             margin: "0 auto 24px",
@@ -272,7 +272,7 @@ function ToolsIndex() {
             display: "inline-flex",
             alignItems: "center",
             gap: "8px",
-            background: "#7C3AED",
+            background: "var(--gradient-brand)",
             color: "#ffffff",
             borderRadius: "10px",
             padding: "12px 24px",

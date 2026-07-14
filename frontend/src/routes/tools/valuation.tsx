@@ -102,17 +102,17 @@ function Slider({
   return (
     <div style={{ marginBottom: "20px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-        <label style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)" }}>{label}</label>
-        <span style={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>
+        <label style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>{label}</label>
+        <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>
           {value}{unit}
         </span>
       </div>
       <input
         type="range" min={min} max={max} step={step} value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        style={{ width: "100%", accentColor: "#7C3AED", cursor: "pointer" }}
+        style={{ width: "100%", accentColor: "var(--brand)", cursor: "pointer" }}
       />
-      {hint && <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>{hint}</p>}
+      {hint && <p style={{ fontSize: "11px", color: "var(--faint)", marginTop: "4px" }}>{hint}</p>}
     </div>
   );
 }
@@ -124,18 +124,18 @@ function NumberInput({
 }) {
   return (
     <div style={{ marginBottom: "20px" }}>
-      <label style={{ display: "block", fontSize: "13px", color: "rgba(255,255,255,0.7)", marginBottom: "6px" }}>
+      <label style={{ display: "block", fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "6px" }}>
         {label}
       </label>
-      <div style={{ display: "flex", alignItems: "center", background: "#1a1a1f", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", overflow: "hidden" }}>
-        <span style={{ padding: "10px 12px", fontSize: "13px", color: "rgba(255,255,255,0.4)", borderRight: "1px solid rgba(255,255,255,0.08)" }}>{prefix}</span>
+      <div style={{ display: "flex", alignItems: "center", background: "#1a1a1f", border: "1px solid var(--border)", borderRadius: "8px", overflow: "hidden" }}>
+        <span style={{ padding: "10px 12px", fontSize: "13px", color: "var(--muted-foreground)", borderRight: "1px solid var(--border)" }}>{prefix}</span>
         <input
           type="number" value={value || ""}
           onChange={(e) => onChange(Number(e.target.value))}
-          style={{ flex: 1, background: "transparent", border: "none", outline: "none", padding: "10px 12px", fontSize: "14px", color: "#fff" }}
+          style={{ flex: 1, background: "transparent", border: "none", outline: "none", padding: "10px 12px", fontSize: "14px", color: "var(--foreground)" }}
         />
       </div>
-      {hint && <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>{hint}</p>}
+      {hint && <p style={{ fontSize: "11px", color: "var(--faint)", marginTop: "4px" }}>{hint}</p>}
     </div>
   );
 }
@@ -147,13 +147,13 @@ function Select({
 }) {
   return (
     <div style={{ marginBottom: "20px" }}>
-      <label style={{ display: "block", fontSize: "13px", color: "rgba(255,255,255,0.7)", marginBottom: "6px" }}>{label}</label>
+      <label style={{ display: "block", fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "6px" }}>{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
         style={{
-          width: "100%", background: "#1a1a1f", border: "1px solid rgba(255,255,255,0.1)",
-          borderRadius: "8px", padding: "10px 12px", fontSize: "14px", color: "#fff",
+          width: "100%", background: "#1a1a1f", border: "1px solid var(--border)",
+          borderRadius: "8px", padding: "10px 12px", fontSize: "14px", color: "var(--foreground)",
           outline: "none", cursor: "pointer",
         }}
       >
@@ -190,25 +190,25 @@ function BerkusCalculator({ onChange }: { onChange: (r: ValuationResult) => void
 
   return (
     <div>
-      <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", marginBottom: "24px" }}>
+      <p style={{ fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "24px" }}>
         Rate each factor 0–100. Each factor is worth up to $500K. Max total: $2.5M.
       </p>
       {BERKUS_FACTORS.map((label, i) => (
         <div key={label} style={{ marginBottom: "20px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-            <label style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)" }}>{label}</label>
-            <span style={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>{fmt(values[i])}</span>
+            <label style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>{label}</label>
+            <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>{fmt(values[i])}</span>
           </div>
           <input
             type="range" min={0} max={100} value={factors[i]}
             onChange={(e) => update(i, Number(e.target.value))}
-            style={{ width: "100%", accentColor: "#7C3AED", cursor: "pointer" }}
+            style={{ width: "100%", accentColor: "var(--brand)", cursor: "pointer" }}
           />
         </div>
       ))}
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "16px", display: "flex", justifyContent: "space-between" }}>
-        <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)" }}>Running total</span>
-        <span style={{ fontSize: "15px", fontWeight: 700, color: "#7C3AED" }}>{fmt(total)}</span>
+      <div style={{ borderTop: "1px solid var(--border)", paddingTop: "16px", display: "flex", justifyContent: "space-between" }}>
+        <span style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>Running total</span>
+        <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--brand)" }}>{fmt(total)}</span>
       </div>
     </div>
   );
@@ -265,29 +265,29 @@ function ScorecardCalculator({ onChange }: { onChange: (r: ValuationResult) => v
         options={Object.entries(SCORECARD_REGION_MEDIANS).map(([k, v]) => ({ label: `${k}: ${fmt(v)}`, value: k }))}
         onChange={updateRegion}
       />
-      <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", marginBottom: "20px" }}>
+      <p style={{ fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "20px" }}>
         Rate your startup vs. the average startup at your stage in each category.
       </p>
       {SCORECARD_FACTORS.map((f, i) => (
         <div key={f.label} style={{ marginBottom: "20px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-            <label style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)" }}>
-              {f.label} <span style={{ color: "rgba(255,255,255,0.3)" }}>({f.defaultWeight}%)</span>
+            <label style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>
+              {f.label} <span style={{ color: "var(--faint)" }}>({f.defaultWeight}%)</span>
             </label>
-            <span style={{ fontSize: "12px", color: comparisons[i] > 0 ? "#10B981" : comparisons[i] < 0 ? "#ef4444" : "rgba(255,255,255,0.5)" }}>
+            <span style={{ fontSize: "12px", color: comparisons[i] > 0 ? "#10B981" : comparisons[i] < 0 ? "#ef4444" : "var(--muted-foreground)" }}>
               {COMP_LABELS[comparisons[i]] ?? comparisons[i]}
             </span>
           </div>
           <input
             type="range" min={-2} max={2} step={1} value={comparisons[i]}
             onChange={(e) => updateComp(i, Number(e.target.value))}
-            style={{ width: "100%", accentColor: "#7C3AED", cursor: "pointer" }}
+            style={{ width: "100%", accentColor: "var(--brand)", cursor: "pointer" }}
           />
         </div>
       ))}
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "16px", display: "flex", justifyContent: "space-between" }}>
-        <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)" }}>Score multiplier × regional median</span>
-        <span style={{ fontSize: "14px", fontWeight: 600, color: "#7C3AED" }}>{multiplier.toFixed(2)}x × {fmt(median)}</span>
+      <div style={{ borderTop: "1px solid var(--border)", paddingTop: "16px", display: "flex", justifyContent: "space-between" }}>
+        <span style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>Score multiplier × regional median</span>
+        <span style={{ fontSize: "14px", fontWeight: 600, color: "var(--brand)" }}>{multiplier.toFixed(2)}x × {fmt(median)}</span>
       </div>
     </div>
   );
@@ -342,8 +342,8 @@ function VCCalculator({ onChange }: { onChange: (r: ValuationResult) => void }) 
           { label: "Implied ownership", value: `${(ownership * 100).toFixed(1)}%` },
         ].map((s) => (
           <div key={s.label} style={{ textAlign: "center" }}>
-            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "4px" }}>{s.label}</div>
-            <div style={{ fontSize: "15px", fontWeight: 700, color: "#fff" }}>{s.value}</div>
+            <div style={{ fontSize: "11px", color: "var(--muted-foreground)", marginBottom: "4px" }}>{s.label}</div>
+            <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--foreground)" }}>{s.value}</div>
           </div>
         ))}
       </div>
@@ -392,7 +392,7 @@ function RevenueCalculator({ onChange }: { onChange: (r: ValuationResult) => voi
         onChange={(v) => { setRegion(v as Region); compute(mrr, growth, industry, v as Region); }}
       />
       <div style={{ background: "#0d0d10", borderRadius: "8px", padding: "16px", marginTop: "8px" }}>
-        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "8px" }}>
+        <div style={{ fontSize: "11px", color: "var(--muted-foreground)", marginBottom: "8px" }}>
           {industry} · {region} · ARR {fmt(arr)} · {low}x / {mid}x / {high}x multiples
           {growth > 0 && <span> · {growth}% MoM growth bonus</span>}
         </div>
@@ -403,8 +403,8 @@ function RevenueCalculator({ onChange }: { onChange: (r: ValuationResult) => voi
             { label: "Optimistic", value: fmt(arr * high * growthBonus) },
           ].map((s) => (
             <div key={s.label} style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", marginBottom: "4px" }}>{s.label}</div>
-              <div style={{ fontSize: "14px", fontWeight: 700, color: "#fff" }}>{s.value}</div>
+              <div style={{ fontSize: "10px", color: "var(--muted-foreground)", marginBottom: "4px" }}>{s.label}</div>
+              <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)" }}>{s.value}</div>
             </div>
           ))}
         </div>
@@ -434,26 +434,26 @@ Calculate yours at hockystick.app/tools/valuation`;
   const realisticPct = range > 0 ? ((result.realistic - result.conservative) / range) * 100 : 50;
 
   return (
-    <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "28px" }}>
-      <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", marginBottom: "20px" }}>
+    <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "28px" }}>
+      <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", color: "var(--muted-foreground)", textTransform: "uppercase", marginBottom: "20px" }}>
         Your estimated valuation range
       </p>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px", marginBottom: "24px" }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "6px" }}>Conservative</div>
-          <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(20px, 3vw, 28px)", color: "rgba(255,255,255,0.6)" }}>
+          <div style={{ fontSize: "11px", color: "var(--muted-foreground)", marginBottom: "6px" }}>Conservative</div>
+          <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(20px, 3vw, 28px)", color: "var(--muted-foreground)" }}>
             {fmt(result.conservative)}
           </div>
         </div>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "6px" }}>Realistic</div>
+          <div style={{ fontSize: "11px", color: "var(--muted-foreground)", marginBottom: "6px" }}>Realistic</div>
           <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(24px, 4vw, 36px)", color: "#ffffff" }}>
             {fmt(result.realistic)}
           </div>
         </div>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "6px" }}>Optimistic</div>
+          <div style={{ fontSize: "11px", color: "var(--muted-foreground)", marginBottom: "6px" }}>Optimistic</div>
           <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(20px, 3vw, 28px)", color: "#10B981" }}>
             {fmt(result.optimistic)}
           </div>
@@ -461,16 +461,16 @@ Calculate yours at hockystick.app/tools/valuation`;
       </div>
 
       {/* Range bar */}
-      <div style={{ position: "relative", height: "6px", borderRadius: "99px", background: "linear-gradient(90deg, #7C3AED, #10B981)", marginBottom: "24px" }}>
+      <div style={{ position: "relative", height: "6px", borderRadius: "99px", background: "var(--gradient-brand)", marginBottom: "24px" }}>
         <div style={{
           position: "absolute", top: "50%", left: `${realisticPct}%`,
           transform: "translate(-50%, -50%)",
           width: "14px", height: "14px", borderRadius: "50%",
-          background: "#fff", border: "2px solid #7C3AED",
+          background: "#fff", border: "2px solid var(--brand)",
         }} />
       </div>
 
-      <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)", marginBottom: "20px" }}>
+      <p style={{ fontSize: "12px", color: "var(--faint)", marginBottom: "20px" }}>
         Range based on {result.methodName}. Actual investor offers will vary based on deal terms, market conditions, and investor thesis.
       </p>
 
@@ -503,8 +503,8 @@ Calculate yours at hockystick.app/tools/valuation`;
           search={{ role: "founder" } as any}
           style={{
             display: "inline-flex", alignItems: "center", gap: "6px",
-            background: "#7C3AED", borderRadius: "8px", padding: "10px 16px",
-            fontSize: "13px", fontWeight: 600, color: "#fff", textDecoration: "none",
+            background: "var(--gradient-brand)", borderRadius: "8px", padding: "10px 16px",
+            fontSize: "13px", fontWeight: 600, color: "var(--foreground)", textDecoration: "none",
           }}
         >
           Build your Hockystick profile →
@@ -519,7 +519,7 @@ Calculate yours at hockystick.app/tools/valuation`;
 function Accordion({ title, children }: { title: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
-    <div style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+    <div style={{ borderBottom: "1px solid var(--border)" }}>
       <button
         onClick={() => setOpen((v) => !v)}
         style={{
@@ -527,10 +527,10 @@ function Accordion({ title, children }: { title: string; children: React.ReactNo
           padding: "18px 0", background: "none", border: "none", cursor: "pointer", textAlign: "left",
         }}
       >
-        <span style={{ fontSize: "15px", fontWeight: 600, color: "#fff" }}>{title}</span>
+        <span style={{ fontSize: "15px", fontWeight: 600, color: "var(--foreground)" }}>{title}</span>
         {open
-          ? <ChevronUp size={16} style={{ color: "#7C3AED", flexShrink: 0 }} />
-          : <ChevronDown size={16} style={{ color: "rgba(255,255,255,0.4)", flexShrink: 0 }} />
+          ? <ChevronUp size={16} style={{ color: "var(--brand)", flexShrink: 0 }} />
+          : <ChevronDown size={16} style={{ color: "var(--muted-foreground)", flexShrink: 0 }} />
         }
       </button>
       {open && (
@@ -560,7 +560,7 @@ function ValuationPage() {
 
   const availableMethods = STAGE_METHODS[stage];
 
-  const s: React.CSSProperties = { background: "#0A0A0B", minHeight: "100vh", color: "#fff" };
+  const s: React.CSSProperties = { background: "var(--background)", minHeight: "100vh", color: "var(--foreground)" };
   const maxW = { maxWidth: "860px", margin: "0 auto", padding: "0 24px" };
 
   const handlePrint = () => {
@@ -625,18 +625,18 @@ function ValuationPage() {
 
       {/* ── S1: Hero ──────────────────────────────────────────────── */}
       <section style={{ ...maxW, padding: "56px 24px 48px" }}>
-        <nav style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)", marginBottom: "20px" }}>
-          <Link to="/tools" style={{ color: "rgba(255,255,255,0.35)", textDecoration: "none" }}>Tools</Link>
+        <nav style={{ fontSize: "12px", color: "var(--faint)", marginBottom: "20px" }}>
+          <Link to="/tools" style={{ color: "var(--faint)", textDecoration: "none" }}>Tools</Link>
           <span style={{ margin: "0 6px" }}>→</span>
-          <span style={{ color: "rgba(255,255,255,0.7)" }}>Startup Valuation Calculator</span>
+          <span style={{ color: "var(--muted-foreground)" }}>Startup Valuation Calculator</span>
         </nav>
         <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(28px, 5vw, 46px)", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "16px" }}>
           Startup Valuation Calculator
         </h1>
-        <p style={{ fontSize: "16px", color: "rgba(255,255,255,0.55)", lineHeight: 1.6, maxWidth: "560px", marginBottom: "12px" }}>
+        <p style={{ fontSize: "16px", color: "var(--muted-foreground)", lineHeight: 1.6, maxWidth: "560px", marginBottom: "12px" }}>
           Get a realistic valuation range using the same methods investors use at your funding stage. No signup required.
         </p>
-        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>
+        <p style={{ fontSize: "12px", color: "var(--faint)" }}>
           Used by founders raising pre-seed to Series A
         </p>
       </section>
@@ -646,7 +646,7 @@ function ValuationPage() {
 
         {/* Stage selector */}
         <div style={{ marginBottom: "32px" }}>
-          <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginBottom: "10px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>
+          <p style={{ fontSize: "12px", color: "var(--muted-foreground)", marginBottom: "10px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>
             Step 1 — Funding stage
           </p>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
@@ -657,9 +657,9 @@ function ValuationPage() {
                 style={{
                   padding: "8px 16px", borderRadius: "8px", fontSize: "13px", fontWeight: 600,
                   cursor: "pointer", transition: "all 0.15s",
-                  background: stage === s ? "#7C3AED" : "transparent",
-                  border: `1px solid ${stage === s ? "#7C3AED" : "rgba(255,255,255,0.15)"}`,
-                  color: stage === s ? "#fff" : "rgba(255,255,255,0.5)",
+                  background: stage === s ? "var(--gradient-brand)" : "transparent",
+                  border: `1px solid ${stage === s ? "var(--brand)" : "var(--border)"}`,
+                  color: stage === s ? "#fff" : "var(--muted-foreground)",
                 }}
               >
                 {s === "pre-revenue" ? "Pre-revenue" : s === "pre-seed" ? "Pre-seed" : s === "seed" ? "Seed" : "Series A"}
@@ -670,10 +670,10 @@ function ValuationPage() {
 
         {/* Method tabs */}
         <div style={{ marginBottom: "32px" }}>
-          <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginBottom: "10px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>
+          <p style={{ fontSize: "12px", color: "var(--muted-foreground)", marginBottom: "10px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>
             Step 2 — Valuation method
           </p>
-          <div style={{ display: "flex", gap: "0", borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: "0" }}>
+          <div style={{ display: "flex", gap: "0", borderBottom: "1px solid var(--border)", marginBottom: "0" }}>
             {availableMethods.map((m) => {
               const isDefault = m === STAGE_DEFAULT_METHOD[stage];
               const isActive = m === method;
@@ -683,9 +683,9 @@ function ValuationPage() {
                   onClick={() => setMethod(m)}
                   style={{
                     padding: "10px 16px", background: "none", border: "none",
-                    borderBottom: `2px solid ${isActive ? "#7C3AED" : "transparent"}`,
+                    borderBottom: `2px solid ${isActive ? "var(--brand)" : "transparent"}`,
                     cursor: "pointer", fontSize: "13px", fontWeight: isActive ? 600 : 400,
-                    color: isActive ? "#fff" : "rgba(255,255,255,0.45)",
+                    color: isActive ? "#fff" : "var(--muted-foreground)",
                     display: "inline-flex", alignItems: "center", gap: "6px",
                     marginBottom: "-1px", transition: "all 0.15s",
                   }}
@@ -707,7 +707,7 @@ function ValuationPage() {
           <style>{`@media (max-width: 640px) { .calc-grid { grid-template-columns: 1fr !important; } }`}</style>
 
           {/* Inputs */}
-          <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "24px" }}>
+          <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "24px" }}>
             {method === "berkus" && <BerkusCalculator onChange={setResult} />}
             {method === "scorecard" && <ScorecardCalculator onChange={setResult} />}
             {method === "vc" && <VCCalculator onChange={setResult} />}
@@ -717,9 +717,9 @@ function ValuationPage() {
           {/* Output */}
           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             <ValuationOutput result={result} stage={stage} method={method} />
-            <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "12px", padding: "16px" }}>
-              <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)", lineHeight: 1.7, margin: 0 }}>
-                <strong style={{ color: "rgba(255,255,255,0.6)" }}>Tip:</strong> Run all methods available for your stage. The realistic value across methods gives you a defensible range to bring into investor conversations.
+            <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "16px" }}>
+              <p style={{ fontSize: "12px", color: "var(--faint)", lineHeight: 1.7, margin: 0 }}>
+                <strong style={{ color: "var(--muted-foreground)" }}>Tip:</strong> Run all methods available for your stage. The realistic value across methods gives you a defensible range to bring into investor conversations.
               </p>
             </div>
           </div>
@@ -727,7 +727,7 @@ function ValuationPage() {
       </section>
 
       {/* ── S3: How to use ────────────────────────────────────────── */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>
             How to use this calculator
@@ -754,8 +754,8 @@ function ValuationPage() {
                 <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "32px", color: "rgba(124,58,237,0.3)", marginBottom: "12px" }}>
                   {step.n}
                 </div>
-                <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#fff", marginBottom: "8px" }}>{step.title}</h3>
-                <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", lineHeight: 1.7 }}>{step.body}</p>
+                <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--foreground)", marginBottom: "8px" }}>{step.title}</h3>
+                <p style={{ fontSize: "13px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>{step.body}</p>
               </div>
             ))}
           </div>
@@ -763,13 +763,13 @@ function ValuationPage() {
       </section>
 
       {/* ── S4: Methodology ───────────────────────────────────────── */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>
             How each method works
           </h2>
           <Accordion title="VC Method">
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: "16px" }}>
+            <p style={{ fontSize: "14px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "16px" }}>
               The VC Method works backwards from your exit. An investor buying in today expects a specific return in 5–7 years. The calculator finds the entry price that makes that return possible.
             </p>
             <div style={{ background: "#0d0d10", borderRadius: "8px", padding: "12px 16px", fontFamily: "monospace", fontSize: "13px", color: "#a78bfa" }}>
@@ -777,20 +777,20 @@ function ValuationPage() {
             </div>
           </Accordion>
           <Accordion title="Revenue Multiple">
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: "12px" }}>
+            <p style={{ fontSize: "14px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "12px" }}>
               Public SaaS companies trade at 6–12x ARR. Early-stage startups get a discount for risk. The multiple your startup commands depends on growth rate, sector, and geography.
             </p>
-            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.35)", lineHeight: 1.7, fontStyle: "italic" }}>
+            <p style={{ fontSize: "13px", color: "var(--faint)", lineHeight: 1.7, fontStyle: "italic" }}>
               GCC/MENA multiples run 30–40% below US benchmarks due to smaller exit markets and fewer institutional buyers. This changes as the ecosystem matures.
             </p>
           </Accordion>
           <Accordion title="Berkus Method">
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>
+            <p style={{ fontSize: "14px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>
               Developed for pre-revenue startups where there's no financial data to model. Five factors, each worth up to $500K, cap at $2.5M total. Used by angel investors, not institutional VCs.
             </p>
           </Accordion>
           <Accordion title="Scorecard Method">
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>
+            <p style={{ fontSize: "14px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>
               Adjusts a regional median pre-money valuation based on how your startup compares to the average at your stage. Management team carries the most weight at 30% — the oldest rule in venture.
             </p>
           </Accordion>
@@ -798,7 +798,7 @@ function ValuationPage() {
       </section>
 
       {/* ── S5: FAQ ───────────────────────────────────────────────── */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>
             Frequently asked questions
@@ -826,14 +826,14 @@ function ValuationPage() {
             },
           ].map(({ q, a }) => (
             <Accordion key={q} title={q}>
-              <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>{a}</p>
+              <p style={{ fontSize: "14px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>{a}</p>
             </Accordion>
           ))}
         </div>
       </section>
 
       {/* ── S6: Related tools ─────────────────────────────────────── */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "22px", marginBottom: "24px", letterSpacing: "-0.02em" }}>
             Related tools
@@ -845,10 +845,10 @@ function ValuationPage() {
               { to: "/tools/cap-table", title: "Cap Table Calculator", desc: "Model equity distribution across founders and rounds." },
             ].map((t) => (
               <Link key={t.to} to={t.to as any} style={{ textDecoration: "none" }}>
-                <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "12px", padding: "20px" }}>
+                <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px" }}>
                   <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#10B981", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
-                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#fff", margin: "10px 0 6px" }}>{t.title}</h3>
-                  <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", margin: 0 }}>{t.desc}</p>
+                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)", margin: "10px 0 6px" }}>{t.title}</h3>
+                  <p style={{ fontSize: "13px", color: "var(--muted-foreground)", margin: 0 }}>{t.desc}</p>
                 </div>
               </Link>
             ))}
@@ -857,12 +857,12 @@ function ValuationPage() {
       </section>
 
       {/* ── S7: Hockystick CTA ────────────────────────────────────── */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", background: "#111114", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", background: "var(--card)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "560px", margin: "0 auto", textAlign: "center" }}>
           <h3 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 30px)", letterSpacing: "-0.02em", marginBottom: "16px" }}>
             Knowing your valuation is step one.
           </h3>
-          <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, marginBottom: "28px" }}>
+          <p style={{ fontSize: "15px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "28px" }}>
             Step two is getting it in front of investors who are actively looking. Hockystick puts your verified profile in front of verified investors — no cold email required.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
@@ -871,7 +871,7 @@ function ValuationPage() {
               search={{ role: "founder" } as any}
               style={{
                 display: "inline-flex", alignItems: "center",
-                background: "#7C3AED", color: "#fff", borderRadius: "10px",
+                background: "var(--gradient-brand)", color: "#fff", borderRadius: "10px",
                 padding: "12px 24px", fontSize: "14px", fontWeight: 600,
                 textDecoration: "none",
               }}
@@ -882,10 +882,10 @@ function ValuationPage() {
               to="/trust"
               style={{
                 display: "inline-flex", alignItems: "center",
-                background: "transparent", color: "rgba(255,255,255,0.5)",
+                background: "transparent", color: "var(--muted-foreground)",
                 borderRadius: "10px", padding: "12px 24px", fontSize: "14px",
                 fontWeight: 500, textDecoration: "none",
-                border: "1px solid rgba(255,255,255,0.12)",
+                border: "1px solid var(--border)",
               }}
             >
               See how verification works

@@ -34,14 +34,14 @@ export const Route = createFileRoute("/")({
 });
 
 /* ─── SHARED TOKENS ─────────────────────────────────────────────────────── */
-const PURPLE = "#7C3AED";
+const PURPLE = "var(--brand)";
 const PURPLE_DARK = "#6d28d9";
 const SYNE = "Syne, sans-serif";
 const DM = "DM Sans, sans-serif";
-const W60 = "rgba(255,255,255,0.6)";
-const W70 = "rgba(255,255,255,0.7)";
-const W40 = "rgba(255,255,255,0.4)";
-const W08 = "rgba(255,255,255,0.08)";
+const W60 = "var(--muted-foreground)";
+const W70 = "var(--muted-foreground)";
+const W40 = "var(--muted-foreground)";
+const W08 = "var(--accent)";
 
 /* ─── ROOT ───────────────────────────────────────────────────────────────── */
 // Landing page is always light — dark adaptive sections are no longer used
@@ -69,7 +69,7 @@ function Landing() {
     };
   }, []);
   return (
-    <div style={{ background: "#0A0A0B" }}>
+    <div style={{ background: "var(--background)" }}>
       {/* SoftwareApplication structured data — what AI crawlers and search
           engines read when asked what Hockystick is. */}
       <script
@@ -157,7 +157,7 @@ function DealRoomCard() {
     >
       <span className="text-base shrink-0">{icon}</span>
       <div className="flex-1 min-w-0">
-        <div className="text-white text-xs font-medium truncate" style={{ fontFamily: SYNE }}>{name}</div>
+        <div className="text-foreground text-xs font-medium truncate" style={{ fontFamily: SYNE }}>{name}</div>
         <div className="text-[10px] truncate" style={{ color: W40, fontFamily: DM }}>{sub}</div>
       </div>
       {badge(badgeLabel, badgeColor, badgeBg)}
@@ -195,17 +195,17 @@ function DealRoomCard() {
         {/* Top bar */}
         <div
           className="flex items-center justify-between px-4 py-3"
-          style={{ background: "#0A0A0B", borderBottom: `1px solid ${W08}` }}
+          style={{ background: "var(--background)", borderBottom: `1px solid ${W08}` }}
         >
           <div className="flex items-center gap-2.5">
             <div
-              className="h-7 w-7 rounded-md flex items-center justify-center text-white text-[10px] font-bold"
+              className="h-7 w-7 rounded-md flex items-center justify-center text-foreground text-[10px] font-bold"
               style={{ background: PURPLE, fontFamily: SYNE }}
             >
               ML
             </div>
             <div>
-              <div className="text-white text-xs font-bold tracking-wide" style={{ fontFamily: SYNE }}>
+              <div className="text-foreground text-xs font-bold tracking-wide" style={{ fontFamily: SYNE }}>
                 MERIDIAN LOGISTICS
               </div>
               <div className="text-[10px]" style={{ color: W40, fontFamily: DM }}>
@@ -237,13 +237,13 @@ function DealRoomCard() {
         {/* Document rows */}
         {docRow("📄", "Pitch Deck", "Opened 3× this week", "↓ Viewed", "#A855F7", "rgba(168,85,247,0.12)")}
         {docRow("📊", "Financial Model", "First opened 2 days ago", "⟳ Reviewing", "#F59E0B", "rgba(245,158,11,0.12)")}
-        {docRow("📋", "Cap Table", "Awaiting access request", "🔒 Locked", "rgba(255,255,255,0.35)", "rgba(255,255,255,0.06)")}
+        {docRow("📋", "Cap Table", "Awaiting access request", "🔒 Locked", "var(--faint)", "var(--accent)")}
 
         {/* Investor row */}
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
             <div
-              className="h-6 w-6 rounded-full flex items-center justify-center text-white text-[9px] font-bold shrink-0"
+              className="h-6 w-6 rounded-full flex items-center justify-center text-foreground text-[9px] font-bold shrink-0"
               style={{ background: "rgba(124,58,237,0.3)", fontFamily: SYNE }}
             >
               SR
@@ -280,7 +280,7 @@ function Hero() {
     <section
       data-testid="hero-section"
       className="relative w-full overflow-hidden"
-      style={{ minHeight: "88vh", background: "#0A0A0B" }}
+      style={{ minHeight: "88vh", background: "var(--background)" }}
     >
       {/* Purple radial glow — behind content */}
       <div
@@ -316,7 +316,7 @@ function Hero() {
             fontWeight: 800,
             fontSize: "clamp(38px, 6.5vw, 68px)",
             letterSpacing: "-2px",
-            color: "#FFFFFF",
+            color: "var(--foreground)",
           }}
         >
           The fundraising infrastructure
@@ -331,7 +331,7 @@ function Hero() {
             fontFamily: DM,
             fontWeight: 300,
             fontSize: "clamp(16px, 2.5vw, 22px)",
-            color: "rgba(250,250,250,0.65)",
+            color: "var(--muted-foreground)",
             maxWidth: "640px",
           }}
         >
@@ -345,7 +345,7 @@ function Hero() {
           <Link
             to="/sign-up"
             search={{ role: "founder" } as any}
-            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold text-white transition-colors"
+            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold text-foreground transition-colors"
             style={{ background: PURPLE, padding: "14px 32px", fontSize: "16px", fontFamily: SYNE }}
             onMouseEnter={(e) => { e.currentTarget.style.background = PURPLE_DARK; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = PURPLE; }}
@@ -355,9 +355,9 @@ function Hero() {
           <Link
             to="/sign-up"
             search={{ role: "investor" } as any}
-            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold text-white transition-colors"
-            style={{ border: "1px solid rgba(255,255,255,0.3)", padding: "14px 32px", fontSize: "16px", fontFamily: SYNE }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}
+            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold text-foreground transition-colors"
+            style={{ border: "1px solid var(--border)", padding: "14px 32px", fontSize: "16px", fontFamily: SYNE }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--accent)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
           >
             Review verified deals
@@ -395,7 +395,7 @@ function SocialProofBar() {
           <span className="text-xs" style={{ color: W40, fontFamily: DM }}>
             Founders raising across
           </span>
-          <span className="text-sm font-medium text-white" style={{ fontFamily: DM }}>
+          <span className="text-sm font-medium text-foreground" style={{ fontFamily: DM }}>
             🌍 GCC & MENA & Beyond
           </span>
         </div>
@@ -408,7 +408,7 @@ function SocialProofBar() {
    SECTION 3 — PROBLEM
 ═══════════════════════════════════════════════════════════════════════════ */
 function ProblemSection({ dark }: { dark: boolean }) {
-  const bg = dark ? "#0A0A0B" : "#F9FAFB";
+  const bg = dark ? "var(--background)" : "#F9FAFB";
   const cardBg = dark ? "#111113" : "#FFFFFF";
   const headingColor = dark ? "#FFFFFF" : "#111827";
   const bodyColor = dark ? W60 : "#4B5563";
@@ -517,10 +517,10 @@ const HOW_STEPS = [
 ];
 
 function HowItWorks({ dark }: { dark: boolean }) {
-  const bg = dark ? "#0A0A0B" : "#FFFFFF";
+  const bg = dark ? "var(--background)" : "#FFFFFF";
   const headingColor = dark ? "#FFFFFF" : "#111827";
   const bodyColor = dark ? W60 : "#4B5563";
-  const gridDivider = dark ? "rgba(255,255,255,0.06)" : "#E5E7EB";
+  const gridDivider = dark ? "var(--accent)" : "#E5E7EB";
 
   return (
     <section id="how-it-works" className="w-full py-24" style={{ background: bg }}>
@@ -600,9 +600,9 @@ function ReadinessMockup() {
       {/* Header */}
       <div
         className="px-5 py-4"
-        style={{ borderBottom: `1px solid ${W08}`, background: "#0A0A0B" }}
+        style={{ borderBottom: `1px solid ${W08}`, background: "var(--background)" }}
       >
-        <div className="text-xs font-semibold text-white" style={{ fontFamily: SYNE }}>
+        <div className="text-xs font-semibold text-foreground" style={{ fontFamily: SYNE }}>
           Readiness Score
         </div>
       </div>
@@ -610,12 +610,12 @@ function ReadinessMockup() {
       <div className="px-5 pt-5 pb-4">
         <div
           className="mb-1"
-          style={{ fontFamily: SYNE, fontWeight: 800, fontSize: "48px", color: "#FFFFFF" }}
+          style={{ fontFamily: SYNE, fontWeight: 800, fontSize: "48px", color: "var(--foreground)" }}
         >
           74 <span style={{ fontSize: "20px", color: W40, fontWeight: 400 }}>/ 100</span>
         </div>
         {/* Progress bar */}
-        <div className="h-2 rounded-full mb-5" style={{ background: "rgba(255,255,255,0.08)" }}>
+        <div className="h-2 rounded-full mb-5" style={{ background: "var(--accent)" }}>
           <div className="h-2 rounded-full" style={{ width: "74%", background: PURPLE }} />
         </div>
         {/* Gap items */}
@@ -721,7 +721,7 @@ function ForFounders({ dark }: { dark: boolean }) {
             <Link
               to="/sign-up"
               search={{ role: "founder" } as any}
-              className="inline-flex items-center gap-2 rounded-lg font-semibold text-white transition-colors"
+              className="inline-flex items-center gap-2 rounded-lg font-semibold text-foreground transition-colors"
               style={{ background: PURPLE, padding: "12px 24px", fontSize: "14px", fontFamily: SYNE }}
               onMouseEnter={(e) => { e.currentTarget.style.background = PURPLE_DARK; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = PURPLE; }}
@@ -753,17 +753,17 @@ function InvestorCardMockup() {
       {/* Header */}
       <div
         className="px-5 py-4 flex items-center justify-between"
-        style={{ borderBottom: `1px solid ${W08}`, background: "#0A0A0B" }}
+        style={{ borderBottom: `1px solid ${W08}`, background: "var(--background)" }}
       >
         <div className="flex items-center gap-2.5">
           <div
-            className="h-8 w-8 rounded-md flex items-center justify-center text-white text-[10px] font-bold"
+            className="h-8 w-8 rounded-md flex items-center justify-center text-foreground text-[10px] font-bold"
             style={{ background: PURPLE, fontFamily: SYNE }}
           >
             ML
           </div>
           <div>
-            <div className="text-white text-xs font-bold tracking-wide" style={{ fontFamily: SYNE }}>
+            <div className="text-foreground text-xs font-bold tracking-wide" style={{ fontFamily: SYNE }}>
               MERIDIAN LOGISTICS
             </div>
             <div className="text-[10px]" style={{ color: W40, fontFamily: DM }}>Seed · Logistics Tech · GCC</div>
@@ -835,12 +835,12 @@ const INVESTOR_FEATS = [
 ];
 
 function ForInvestors({ dark }: { dark: boolean }) {
-  const bg = dark ? "#0A0A0B" : "#FFFFFF";
+  const bg = dark ? "var(--background)" : "#FFFFFF";
   const headingColor = dark ? "#FFFFFF" : "#111827";
   const featureColor = dark ? W70 : "#374151";
-  const btnBorder = dark ? "1px solid rgba(255,255,255,0.3)" : "1px solid #7C3AED";
+  const btnBorder = dark ? "1px solid var(--border)" : "1px solid var(--brand)";
   const btnColor = dark ? "#FFFFFF" : PURPLE;
-  const btnHoverBg = dark ? "rgba(255,255,255,0.05)" : "rgba(124,58,237,0.06)";
+  const btnHoverBg = dark ? "var(--accent)" : "rgba(124,58,237,0.06)";
 
   return (
     <section
@@ -925,8 +925,8 @@ function WhoThisIsFor({ dark }: { dark: boolean }) {
   const headingColor = dark ? "#FFFFFF" : "#111827";
   const itemColor = dark ? W70 : "#374151";
   const notColor = dark ? W40 : "#6B7280";
-  const cardBg = dark ? "#0A0A0B" : "#FFFFFF";
-  const cardBorder = dark ? "1px solid rgba(255,255,255,0.08)" : "1px solid #E5E7EB";
+  const cardBg = dark ? "var(--background)" : "#FFFFFF";
+  const cardBorder = dark ? "1px solid var(--border)" : "1px solid #E5E7EB";
 
   return (
     <section className="w-full py-24" style={{ background: bg }}>
@@ -995,7 +995,7 @@ function UpcomingRoastsRail({ dark }: { dark: boolean }) {
   return (
     <section
       className="w-full py-16"
-      style={{ background: dark ? "#0A0A0B" : "#FAFAFA" }}
+      style={{ background: dark ? "var(--background)" : "#FAFAFA" }}
     >
       <div className="max-w-[1100px] mx-auto px-6">
         <div className="text-center mb-8">
@@ -1027,7 +1027,7 @@ function UpcomingRoastsRail({ dark }: { dark: boolean }) {
               fontFamily: DM,
               fontWeight: 300,
               fontSize: 16,
-              color: dark ? "rgba(255,255,255,0.6)" : "#6B7280",
+              color: dark ? "var(--muted-foreground)" : "#6B7280",
               maxWidth: 520,
             }}
           >
@@ -1042,8 +1042,8 @@ function UpcomingRoastsRail({ dark }: { dark: boolean }) {
               href={`/roast/${r.id}`}
               className="rounded-xl border p-5 transition-transform hover:-translate-y-0.5"
               style={{
-                background: dark ? "#111114" : "#FFFFFF",
-                borderColor: dark ? "rgba(255,255,255,0.08)" : "#E5E7EB",
+                background: dark ? "var(--card)" : "#FFFFFF",
+                borderColor: dark ? "var(--border)" : "#E5E7EB",
               }}
             >
               <div
@@ -1069,7 +1069,7 @@ function UpcomingRoastsRail({ dark }: { dark: boolean }) {
                   style={{
                     fontFamily: DM,
                     fontSize: 13,
-                    color: dark ? "rgba(255,255,255,0.5)" : "#6B7280",
+                    color: dark ? "var(--muted-foreground)" : "#6B7280",
                   }}
                 >
                   {r.tagline}
@@ -1080,7 +1080,7 @@ function UpcomingRoastsRail({ dark }: { dark: boolean }) {
                   fontFamily: DM,
                   fontSize: 13,
                   fontWeight: 500,
-                  color: dark ? "rgba(255,255,255,0.7)" : "#374151",
+                  color: dark ? "var(--muted-foreground)" : "#374151",
                 }}
               >
                 {new Date(r.scheduled_at).toLocaleString("en-GB", {
@@ -1108,13 +1108,13 @@ function TrustSection() {
         <div className="text-center mb-12">
           <h2
             className="mb-4"
-            style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: "#FFFFFF" }}
+            style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: "var(--foreground)" }}
           >
             The full stack. One subscription.
           </h2>
           <p
             className="mx-auto leading-relaxed"
-            style={{ fontFamily: DM, fontWeight: 300, fontSize: "18px", color: "rgba(255,255,255,0.8)", maxWidth: "560px" }}
+            style={{ fontFamily: DM, fontWeight: 300, fontSize: "18px", color: "var(--muted-foreground)", maxWidth: "560px" }}
           >
             Most platforms check whether founders exist.
             We check whether they&rsquo;re ready — and whether investors are serious.
@@ -1129,7 +1129,7 @@ function TrustSection() {
         {/* Bottom line */}
         <p
           className="text-center mt-10 text-base"
-          style={{ color: "rgba(255,255,255,0.85)", fontFamily: DM, fontWeight: 400 }}
+          style={{ color: "var(--muted-foreground)", fontFamily: DM, fontWeight: 400 }}
         >
           Competitors verify founders only.&nbsp;&nbsp;Hockystick verifies both.
         </p>
@@ -1144,7 +1144,7 @@ function TrustSection() {
    When real founder quotes exist, replace this section with them.
 ═══════════════════════════════════════════════════════════════════════════ */
 function EarlyAccessSection({ dark }: { dark: boolean }) {
-  const bg = dark ? "#0A0A0B" : "#FFFFFF";
+  const bg = dark ? "var(--background)" : "#FFFFFF";
   const headingColor = dark ? "#FFFFFF" : "#111827";
   const bodyColor = dark ? W60 : "#4B5563";
 
@@ -1200,16 +1200,16 @@ const INVESTOR_PLAN = [
 
 function PricingSection({ dark }: { dark: boolean }) {
   const bg = dark ? "#111113" : "#F9FAFB";
-  const cardBgPrimary = dark ? "#0A0A0B" : "#FFFFFF";
-  const cardBgSecondary = dark ? "#0A0A0B" : "#FFFFFF";
+  const cardBgPrimary = dark ? "var(--background)" : "#FFFFFF";
+  const cardBgSecondary = dark ? "var(--background)" : "#FFFFFF";
   const headingColor = dark ? "#FFFFFF" : "#111827";
   const subColor = dark ? W60 : "#4B5563";
   const labelColor = dark ? W40 : "#6B7280";
   const priceColor = dark ? "#FFFFFF" : "#111827";
-  const cardSecondaryBorder = dark ? "1px solid rgba(255,255,255,0.1)" : "1px solid #E5E7EB";
-  const investorBtnBorder = dark ? "1px solid rgba(255,255,255,0.25)" : "1px solid #7C3AED";
+  const cardSecondaryBorder = dark ? "1px solid var(--border)" : "1px solid #E5E7EB";
+  const investorBtnBorder = dark ? "1px solid var(--border)" : "1px solid var(--brand)";
   const investorBtnColor = dark ? "#FFFFFF" : PURPLE;
-  const investorBtnHover = dark ? "rgba(255,255,255,0.05)" : "rgba(124,58,237,0.06)";
+  const investorBtnHover = dark ? "var(--accent)" : "rgba(124,58,237,0.06)";
 
   const tick = (text: string) => (
     <li key={text} className="flex gap-2.5">
@@ -1244,7 +1244,7 @@ function PricingSection({ dark }: { dark: boolean }) {
             style={{ background: cardBgPrimary, border: `2px solid ${PURPLE}`, boxShadow: dark ? "none" : "0 2px 12px rgba(124,58,237,0.1)" }}
           >
             <div
-              className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-semibold text-white"
+              className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-semibold text-foreground"
               style={{ background: PURPLE, fontFamily: SYNE }}
             >
               Most popular
@@ -1271,7 +1271,7 @@ function PricingSection({ dark }: { dark: boolean }) {
             <Link
               to="/sign-up"
               search={{ role: "founder" } as any}
-              className="block w-full text-center rounded-lg font-semibold text-white transition-colors"
+              className="block w-full text-center rounded-lg font-semibold text-foreground transition-colors"
               style={{ background: PURPLE, padding: "12px 0", fontFamily: SYNE }}
               onMouseEnter={(e) => { e.currentTarget.style.background = PURPLE_DARK; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = PURPLE; }}
@@ -1333,7 +1333,7 @@ function FinalCTA() {
             fontFamily: SYNE,
             fontWeight: 700,
             fontSize: "clamp(32px, 5vw, 48px)",
-            color: "#FFFFFF",
+            color: "var(--foreground)",
           }}
         >
           Ready to raise differently?
@@ -1344,7 +1344,7 @@ function FinalCTA() {
             fontFamily: DM,
             fontWeight: 300,
             fontSize: "18px",
-            color: "rgba(255,255,255,0.8)",
+            color: "var(--muted-foreground)",
             maxWidth: "480px",
           }}
         >
@@ -1366,9 +1366,9 @@ function FinalCTA() {
           <Link
             to="/sign-up"
             search={{ role: "investor" } as any}
-            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold text-white transition-colors"
-            style={{ border: "1px solid rgba(255,255,255,0.45)", padding: "14px 32px", fontSize: "15px", fontFamily: SYNE }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
+            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold text-foreground transition-colors"
+            style={{ border: "1px solid var(--border)", padding: "14px 32px", fontSize: "15px", fontFamily: SYNE }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--accent)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
           >
             I&rsquo;m an investor

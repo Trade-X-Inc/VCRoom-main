@@ -138,7 +138,7 @@ function AuthCallback() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
-      <div className="w-10 h-10 rounded-full border-4 border-purple-600/30 border-t-purple-600 animate-spin" />
+      <div className="w-10 h-10 rounded-full border-4 border-border border-t-brand animate-spin" />
       <p className="text-muted-foreground text-sm">{msg}</p>
     </div>
   )

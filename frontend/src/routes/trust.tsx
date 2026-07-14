@@ -29,11 +29,11 @@ export const Route = createFileRoute("/trust")({
 
 // ── Tier display config ───────────────────────────────────────────────────────
 const TIER_CONFIG: Record<number, { color: string; borderColor: string; badgeBg: string; badgeText: string }> = {
-  0: { color: "rgba(255,255,255,0.25)",  borderColor: "rgba(255,255,255,0.08)", badgeBg: "rgba(255,255,255,0.06)",  badgeText: "rgba(255,255,255,0.4)" },
+  0: { color: "var(--faint)",  borderColor: "var(--border)", badgeBg: "var(--border)",  badgeText: "var(--border)" },
   1: { color: "#3B82F6",                 borderColor: "rgba(59,130,246,0.2)",   badgeBg: "rgba(59,130,246,0.1)",   badgeText: "#3B82F6" },
   2: { color: "#10B981",                 borderColor: "rgba(16,185,129,0.2)",   badgeBg: "rgba(16,185,129,0.1)",   badgeText: "#10B981" },
   3: { color: "#F59E0B",                 borderColor: "rgba(245,158,11,0.2)",   badgeBg: "rgba(245,158,11,0.1)",   badgeText: "#F59E0B" },
-  4: { color: "#7C3AED",                 borderColor: "rgba(124,58,237,0.2)",   badgeBg: "rgba(124,58,237,0.1)",   badgeText: "#A855F7" },
+  4: { color: "var(--brand)",                 borderColor: "rgba(124,58,237,0.2)",   badgeBg: "rgba(124,58,237,0.1)",   badgeText: "#A855F7" },
 };
 
 const APPLIES_TO_LABEL: Record<string, string> = {
@@ -52,21 +52,21 @@ function TrustPage() {
   const tiers = data?.tiers ?? [];
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B] text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
       {/* Hero */}
       <section className="pt-16 sm:pt-24 pb-12 text-center px-4 sm:px-6">
-        <p className="text-xs uppercase tracking-[0.2em] mb-4" style={{ color: "#7C3AED" }}>
+        <p className="text-xs uppercase tracking-[0.2em] mb-4" style={{ color: "var(--brand)" }}>
           Verification system
         </p>
         <h1
-          className="font-bold text-3xl md:text-4xl lg:text-5xl text-white leading-tight mb-6 max-w-3xl mx-auto"
+          className="font-bold text-3xl md:text-4xl lg:text-5xl text-foreground leading-tight mb-6 max-w-3xl mx-auto"
           style={{ fontFamily: "Syne, sans-serif" }}
         >
           How verification works
         </h1>
-        <p className="text-white/60 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mb-6">
+        <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mb-6">
           Five tiers. Each badge means something specific and verifiable. This page shows exactly
           what we check and what we never claim.
         </p>
@@ -76,8 +76,8 @@ function TrustPage() {
           className="inline-block max-w-xl mx-auto rounded-xl px-6 py-4 text-left"
           style={{ background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)" }}
         >
-          <p className="text-sm text-white/80 leading-relaxed">
-            <span className="text-white font-medium">Every account is fully accepted from day one.</span>{" "}
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            <span className="text-foreground font-medium">Every account is fully accepted from day one.</span>{" "}
             Badges show how much has been independently verified — they never gate access.
             You can use every feature on the platform regardless of your verification tier.
           </p>
@@ -89,7 +89,7 @@ function TrustPage() {
         {isLoading ? (
           <div className="space-y-4">
             {[0,1,2,3,4].map((i) => (
-              <div key={i} className="h-32 rounded-xl animate-pulse" style={{ background: "rgba(255,255,255,0.04)" }} />
+              <div key={i} className="h-32 rounded-xl animate-pulse" style={{ background: "var(--accent)" }} />
             ))}
           </div>
         ) : (
@@ -103,7 +103,7 @@ function TrustPage() {
                 <div
                   key={tier.id}
                   className="rounded-xl p-6"
-                  style={{ background: "#111114", border: `1px solid ${cfg.borderColor}` }}
+                  style={{ background: "var(--card)", border: `1px solid ${cfg.borderColor}` }}
                 >
                   {/* Header row */}
                   <div className="flex items-start gap-4 mb-4">
@@ -115,17 +115,17 @@ function TrustPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                        <h2 className="text-base font-semibold text-white" style={{ fontFamily: "Syne, sans-serif" }}>
+                        <h2 className="text-base font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
                           {tier.tier_name}
                         </h2>
                         <span
                           className="text-[10px] font-medium px-2 py-0.5 rounded-full"
-                          style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" }}
+                          style={{ background: "var(--accent)", color: "var(--muted-foreground)" }}
                         >
                           {appliesToLabel}
                         </span>
                       </div>
-                      <p className="text-sm text-white/50 leading-relaxed">{tier.description}</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{tier.description}</p>
                     </div>
                   </div>
 
@@ -136,9 +136,9 @@ function TrustPage() {
                         <div key={i} className="flex items-start gap-2">
                           <CheckCircle2 className="h-3.5 w-3.5 shrink-0 mt-0.5" style={{ color: cfg.color }} />
                           <div className="min-w-0">
-                            <span className="text-xs text-white/70">{req.label}</span>
+                            <span className="text-xs text-muted-foreground">{req.label}</span>
                             {req.detail && (
-                              <p className="text-xs text-white/35 mt-0.5 leading-relaxed">{req.detail}</p>
+                              <p className="text-xs text-faint mt-0.5 leading-relaxed">{req.detail}</p>
                             )}
                           </div>
                         </div>
@@ -147,7 +147,7 @@ function TrustPage() {
                   )}
 
                   {requirements.length === 0 && (
-                    <p className="text-xs text-white/30 ml-14 italic">No requirements — automatic on account creation.</p>
+                    <p className="text-xs text-faint ml-14 italic">No requirements — automatic on account creation.</p>
                   )}
 
                   {/* Inline notes for Tier 3 — dual paths: Capital Verified (investors) + Operationally Verified (founders) */}
@@ -157,8 +157,8 @@ function TrustPage() {
                         className="rounded-lg px-4 py-3"
                         style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)" }}
                       >
-                        <p className="text-xs text-white/60 font-medium mb-1.5">Capital Verified — for investors</p>
-                        <p className="text-xs text-white/40 leading-relaxed">
+                        <p className="text-xs text-muted-foreground font-medium mb-1.5">Capital Verified — for investors</p>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
                           Three independent documents: fund formation instrument, capital commitment letter or board resolution, AUM confirmation.
                           Accepted: Limited Partnership Agreement, Articles of Association, Board Resolution with capital commitment,
                           Bank statement or custodian letter (dated within 12 months).
@@ -169,8 +169,8 @@ function TrustPage() {
                         className="rounded-lg px-4 py-3"
                         style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.15)" }}
                       >
-                        <p className="text-xs text-white/60 font-medium mb-1.5">Operationally Verified — for founders</p>
-                        <p className="text-xs text-white/40 leading-relaxed">
+                        <p className="text-xs text-muted-foreground font-medium mb-1.5">Operationally Verified — for founders</p>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
                           Three independent documents: financial activity record, customer or contract evidence, team employment record.
                           Accepted: bank statements or revenue records (dated within 6 months), signed contracts or purchase orders naming an external party,
                           payroll records, employment contracts, offer letters, or org charts naming individuals with titles.
@@ -190,9 +190,9 @@ function TrustPage() {
       <section className="py-8 px-4 sm:px-6 max-w-3xl mx-auto">
         <div
           className="rounded-xl p-6"
-          style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)" }}
+          style={{ background: "var(--card)", border: "1px solid var(--border)" }}
         >
-          <h3 className="text-sm font-semibold text-white mb-4" style={{ fontFamily: "Syne, sans-serif" }}>
+          <h3 className="text-sm font-semibold text-foreground mb-4" style={{ fontFamily: "Syne, sans-serif" }}>
             What we never do
           </h3>
           <div className="space-y-3">
@@ -203,8 +203,8 @@ function TrustPage() {
               "Let a verified badge drift from what was actually checked. The requirements on this page are the exact same requirements enforced by the system.",
             ].map((text, i) => (
               <div key={i} className="flex items-start gap-2">
-                <span className="text-xs text-white/25 shrink-0 mt-0.5">○</span>
-                <p className="text-xs text-white/50 leading-relaxed">{text}</p>
+                <span className="text-xs text-faint shrink-0 mt-0.5">○</span>
+                <p className="text-xs text-muted-foreground leading-relaxed">{text}</p>
               </div>
             ))}
           </div>
@@ -217,8 +217,8 @@ function TrustPage() {
           <Link
             to="/sign-up"
             search={{ role: "founder" } as any}
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-colors"
-            style={{ background: "#7C3AED" }}
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-sm font-medium text-foreground transition-colors"
+            style={{ background: "var(--gradient-brand)" }}
           >
             Start as a founder
             <ChevronRight className="h-3.5 w-3.5" />
@@ -227,7 +227,7 @@ function TrustPage() {
             to="/sign-up"
             search={{ role: "investor" } as any}
             className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors"
-            style={{ border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}
+            style={{ border: "1px solid var(--border)", color: "var(--muted-foreground)" }}
           >
             Invest on Hockystick
             <ChevronRight className="h-3.5 w-3.5" />

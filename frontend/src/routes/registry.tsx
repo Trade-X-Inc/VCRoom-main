@@ -94,29 +94,29 @@ function Registry() {
   const dropdownCls = "block rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors";
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B]">
+    <div className="min-h-screen bg-background">
       <SiteHeader />
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
 
         {/* Back link */}
         <a
           href="/"
-          className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors mb-12"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-12"
         >
           ← Back to Hockystick
         </a>
 
         {/* Header */}
-        <p className="text-xs text-[#7C3AED] uppercase tracking-[0.2em] mb-4">
+        <p className="text-xs text-brand uppercase tracking-[0.2em] mb-4">
           Company Registry
         </p>
         <h1
-          className="font-bold text-3xl sm:text-4xl text-white mb-3 leading-tight"
+          className="font-bold text-3xl sm:text-4xl text-foreground mb-3 leading-tight"
           style={{ fontFamily: "Syne, sans-serif" }}
         >
           Check if a company is registered
         </h1>
-        <p className="text-white/50 text-sm leading-relaxed mb-10">
+        <p className="text-muted-foreground text-sm leading-relaxed mb-10">
           Search across OpenCorporates (140+ jurisdictions including UAE, UK, US, Saudi Arabia,
           Bahrain, Qatar) and UK Companies House via direct API, plus a best-effort DIFC
           web search — simultaneously. Free. No account required.
@@ -130,12 +130,12 @@ function Registry() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="e.g. Revolut, Careem, Tabby..."
-            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-white/25 focus:border-[#7C3AED]/50 outline-none transition-colors"
+            className="flex-1 bg-accent border border-border rounded-xl px-4 py-3.5 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors"
           />
           <button
             onClick={handleSearch}
             disabled={loading || query.trim().length < 2}
-            className="px-6 py-3.5 bg-[#7C3AED] text-white rounded-xl text-sm font-medium hover:bg-[#6d28d9] disabled:opacity-40 transition-colors shrink-0"
+            className="px-6 py-3.5 hs-gradient text-foreground rounded-xl text-sm font-medium hover:bg-[#6d28d9] disabled:opacity-40 transition-colors shrink-0"
           >
             {loading ? "⟳ Searching..." : "Search"}
           </button>
@@ -146,8 +146,8 @@ function Registry() {
           {["OpenCorporates (140+ jurisdictions)", "UK Companies House", "DIFC (best-effort web search)"].map((r) => (
             <span
               key={r}
-              className="text-xs text-white/30 border border-white/8 px-3 py-1 rounded-full"
-              style={{ background: "rgba(255,255,255,0.04)" }}
+              className="text-xs text-faint border border-border px-3 py-1 rounded-full"
+              style={{ background: "var(--accent)" }}
             >
               {r}
             </span>
@@ -161,7 +161,7 @@ function Registry() {
               <div
                 key={i}
                 className="h-20 rounded-xl animate-pulse"
-                style={{ background: "rgba(255,255,255,0.04)" }}
+                style={{ background: "var(--accent)" }}
               />
             ))}
           </div>
@@ -175,24 +175,24 @@ function Registry() {
             <div
               className="p-5 rounded-xl mb-6"
               style={{
-                background: results.verified ? "rgba(16,185,129,0.08)" : "rgba(255,255,255,0.03)",
-                border: results.verified ? "1px solid rgba(16,185,129,0.2)" : "1px solid rgba(255,255,255,0.08)",
+                background: results.verified ? "rgba(16,185,129,0.08)" : "var(--accent)",
+                border: results.verified ? "1px solid rgba(16,185,129,0.2)" : "1px solid var(--border)",
               }}
             >
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-lg">{results.verified ? "✓" : "○"}</span>
-                <p className="text-sm font-semibold text-white">
+                <p className="text-sm font-semibold text-foreground">
                   {results.verified
                     ? `Registration signal found — ${results.confidence}% confidence`
                     : "No registration found in checked registries"}
                 </p>
               </div>
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
+              <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
                 {results.summary}
               </p>
             </div>
 
-            <p className="text-xs text-white/30 uppercase tracking-wider mb-3">
+            <p className="text-xs text-faint uppercase tracking-wider mb-3">
               Registry breakdown
             </p>
 
@@ -200,36 +200,36 @@ function Registry() {
             <div
               className="p-4 rounded-xl"
               style={{
-                background: results.opencorporates.found ? "rgba(124,58,237,0.07)" : "rgba(255,255,255,0.02)",
-                border: results.opencorporates.found ? "1px solid rgba(124,58,237,0.2)" : "1px solid rgba(255,255,255,0.06)",
+                background: results.opencorporates.found ? "rgba(124,58,237,0.07)" : "var(--accent)",
+                border: results.opencorporates.found ? "1px solid rgba(124,58,237,0.2)" : "1px solid var(--border)",
               }}
             >
               <div className="flex items-center justify-between mb-1">
-                <p className="text-sm font-medium text-white">OpenCorporates</p>
+                <p className="text-sm font-medium text-foreground">OpenCorporates</p>
                 <span
                   className="text-xs font-semibold"
-                  style={{ color: results.opencorporates.found ? "#a78bfa" : "rgba(255,255,255,0.2)" }}
+                  style={{ color: results.opencorporates.found ? "#a78bfa" : "var(--faint)" }}
                 >
                   {results.opencorporates.found ? "✓ Found" : "○ Not found"}
                 </span>
               </div>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
+              <p className="text-xs" style={{ color: "var(--faint)" }}>
                 140+ jurisdictions including UAE, UK, US, Saudi Arabia, Bahrain, Qatar
               </p>
               {results.opencorporates.found && (
                 <div className="mt-2 space-y-0.5">
                   {results.opencorporates.jurisdiction && (
-                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
+                    <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
                       Jurisdiction: {results.opencorporates.jurisdiction.toUpperCase()}
                     </p>
                   )}
                   {results.opencorporates.status && (
-                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
+                    <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
                       Status: {results.opencorporates.status}
                     </p>
                   )}
                   {results.opencorporates.registeredDate && (
-                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
+                    <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
                       Incorporated: {results.opencorporates.registeredDate}
                     </p>
                   )}
@@ -239,7 +239,7 @@ function Registry() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs hover:underline block mt-1"
-                      style={{ color: "#7C3AED" }}
+                      style={{ color: "var(--brand)" }}
                     >
                       ↗ View on OpenCorporates
                     </a>
@@ -252,31 +252,31 @@ function Registry() {
             <div
               className="p-4 rounded-xl"
               style={{
-                background: results.companies_house.found ? "rgba(124,58,237,0.07)" : "rgba(255,255,255,0.02)",
-                border: results.companies_house.found ? "1px solid rgba(124,58,237,0.2)" : "1px solid rgba(255,255,255,0.06)",
+                background: results.companies_house.found ? "rgba(124,58,237,0.07)" : "var(--accent)",
+                border: results.companies_house.found ? "1px solid rgba(124,58,237,0.2)" : "1px solid var(--border)",
               }}
             >
               <div className="flex items-center justify-between mb-1">
-                <p className="text-sm font-medium text-white">UK Companies House</p>
+                <p className="text-sm font-medium text-foreground">UK Companies House</p>
                 <span
                   className="text-xs font-semibold"
-                  style={{ color: results.companies_house.found ? "#a78bfa" : "rgba(255,255,255,0.2)" }}
+                  style={{ color: results.companies_house.found ? "#a78bfa" : "var(--faint)" }}
                 >
                   {results.companies_house.found ? "✓ Found" : "○ Not found"}
                 </span>
               </div>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
+              <p className="text-xs" style={{ color: "var(--faint)" }}>
                 Official UK government company register
               </p>
               {results.companies_house.found && (
                 <div className="mt-2 space-y-0.5">
                   {results.companies_house.number && (
-                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
+                    <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
                       Company number: {results.companies_house.number}
                     </p>
                   )}
                   {results.companies_house.status && (
-                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
+                    <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
                       Status: {results.companies_house.status}
                     </p>
                   )}
@@ -286,7 +286,7 @@ function Registry() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs hover:underline block mt-1"
-                      style={{ color: "#7C3AED" }}
+                      style={{ color: "var(--brand)" }}
                     >
                       ↗ View on Companies House
                     </a>
@@ -299,13 +299,13 @@ function Registry() {
             <div
               className="p-4 rounded-xl"
               style={{
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(255,255,255,0.07)",
+                background: "var(--accent)",
+                border: "1px solid var(--border)",
               }}
             >
               <div className="flex items-center justify-between mb-1">
                 <div>
-                  <p className="text-sm font-medium text-white">DIFC (UAE)</p>
+                  <p className="text-sm font-medium text-foreground">DIFC (UAE)</p>
                   <p className="text-[11px] mt-0.5" style={{ color: "rgba(245,158,11,0.7)" }}>
                     Best-effort match — not a direct registry connection
                   </p>
@@ -313,7 +313,7 @@ function Registry() {
                 <span
                   className="text-xs font-semibold"
                   style={{
-                    color: results.difc.found ? "#10B981" : "rgba(255,255,255,0.2)",
+                    color: results.difc.found ? "#10B981" : "var(--faint)",
                   }}
                 >
                   {results.difc.found
@@ -323,10 +323,10 @@ function Registry() {
                     : "○ No match found"}
                 </span>
               </div>
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.3)" }}>
+              <p className="text-xs leading-relaxed" style={{ color: "var(--faint)" }}>
                 AI-assisted search of the DIFC public register page. No direct API access exists.
                 {results.difc.confidenceLabel && results.difc.found && (
-                  <> Confidence: <strong className="text-white/50">{results.difc.confidenceLabel}</strong>.</>
+                  <> Confidence: <strong className="text-muted-foreground">{results.difc.confidenceLabel}</strong>.</>
                 )}
               </p>
               {results.difc.found && results.difc.sourceUrl && (
@@ -335,7 +335,7 @@ function Registry() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs hover:underline block mt-2"
-                  style={{ color: "#7C3AED" }}
+                  style={{ color: "var(--brand)" }}
                 >
                   ↗ Verify on difc.ae (check the AI's work)
                 </a>
@@ -354,7 +354,7 @@ function Registry() {
             </div>
 
             {/* Disclaimer */}
-            <p className="text-xs mt-4 leading-relaxed" style={{ color: "rgba(255,255,255,0.2)" }}>
+            <p className="text-xs mt-4 leading-relaxed" style={{ color: "var(--faint)" }}>
               Results are sourced from public registries and are not manually confirmed. A "not found"
               result does not confirm non-existence — registries may be incomplete or use different
               name formats. Always verify directly with the relevant authority.
@@ -365,15 +365,15 @@ function Registry() {
               className="mt-8 p-5 rounded-xl"
               style={{ background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)" }}
             >
-              <p className="text-sm font-semibold text-white mb-1">Raising capital?</p>
-              <p className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.5)" }}>
+              <p className="text-sm font-semibold text-foreground mb-1">Raising capital?</p>
+              <p className="text-xs mb-3" style={{ color: "var(--muted-foreground)" }}>
                 Hockystick automatically runs registry checks on all founder profiles — plus
                 LinkedIn verification, AI document review, and investor matching. Free during beta.
               </p>
               <a
                 href="/sign-up"
                 className="text-xs font-medium px-4 py-2 rounded-lg inline-block transition-colors"
-                style={{ background: "#7C3AED", color: "#fff" }}
+                style={{ background: "var(--gradient-brand)", color: "#fff" }}
               >
                 Build your verified profile →
               </a>
@@ -384,7 +384,7 @@ function Registry() {
         {/* Error / no results */}
         {searched && !results && !loading && (
           <div className="text-center py-12">
-            <p className="text-white/30 text-sm">Something went wrong. Try again.</p>
+            <p className="text-faint text-sm">Something went wrong. Try again.</p>
           </div>
         )}
 

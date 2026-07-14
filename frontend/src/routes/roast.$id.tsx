@@ -139,11 +139,11 @@ function RaceButton({
   if (state === "won" && result) {
     return (
       <div className="rounded-2xl p-6 text-center" style={{ background: "#059669" }}>
-        <div className="text-2xl font-extrabold text-white" style={{ fontFamily: SYNE }}>
+        <div className="text-2xl font-extrabold text-foreground" style={{ fontFamily: SYNE }}>
           ⚡ You're in — Rank {result.rank}!
         </div>
-        <div className="mt-3 rounded-lg bg-white/15 px-4 py-3 text-sm text-white/95">"{myQuestion.text}"</div>
-        <div className="mt-2 text-xs text-white/70">Your question is live. The founder answers it on camera.</div>
+        <div className="mt-3 rounded-lg bg-accent px-4 py-3 text-sm text-muted-foreground">"{myQuestion.text}"</div>
+        <div className="mt-2 text-xs text-muted-foreground">Your question is live. The founder answers it on camera.</div>
       </div>
     );
   }
@@ -167,7 +167,7 @@ function RaceButton({
         onClick={click}
         disabled={state === "submitting"}
         data-testid="race-button-active"
-        className="w-full rounded-2xl py-8 text-3xl font-extrabold text-white transition-transform active:scale-95"
+        className="w-full rounded-2xl py-8 text-3xl font-extrabold text-foreground transition-transform active:scale-95"
         style={{
           fontFamily: SYNE,
           background: "#EF4444",
@@ -439,7 +439,7 @@ function RoastPage() {
         <div className="mx-auto max-w-xl px-6 py-32 text-center">
           <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: SYNE }}>Roast not found</h1>
           <p className="mt-2 text-sm text-gray-600">This session doesn't exist or isn't public.</p>
-          <Link to="/" className="mt-6 inline-block rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white">Back to Hockystick</Link>
+          <Link to="/" className="mt-6 inline-block rounded-lg hs-gradient px-5 py-2.5 text-sm font-semibold text-white">Back to Hockystick</Link>
         </div>
         <SiteFooter />
       </div>
@@ -482,7 +482,7 @@ function RoastPage() {
         {/* Header — always visible */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="grid h-12 w-12 place-items-center rounded-xl bg-purple-600 text-lg font-bold text-white" style={{ fontFamily: SYNE }}>
+            <div className="grid h-12 w-12 place-items-center rounded-xl hs-gradient text-lg font-bold text-white" style={{ fontFamily: SYNE }}>
               {(st?.company_name ?? "?").slice(0, 2).toUpperCase()}
             </div>
             <div>
@@ -516,7 +516,7 @@ function RoastPage() {
                   <button
                     onClick={join}
                     disabled={joining}
-                    className="rounded-xl bg-purple-600 px-6 py-3 text-sm font-bold text-white hover:bg-purple-700 disabled:opacity-60"
+                    className="rounded-xl hs-gradient px-6 py-3 text-sm font-bold text-white hover:hs-gradient disabled:opacity-60"
                   >
                     {joining ? "Joining…" : "Join as challenger"}
                   </button>
@@ -541,7 +541,7 @@ function RoastPage() {
                 ["3", "Race to ask", `Every ${Math.round(s.race_interval_seconds / 60)} minutes a red button arms. First ${s.race_winners_per_round} clicks put their questions to the founder live. Everything unasked must be answered in writing within 48 hours — or the badge is lost.`],
               ].map(([n, title, body]) => (
                 <div key={n as string} className="rounded-xl border border-gray-200 p-5">
-                  <div className="grid h-8 w-8 place-items-center rounded-full bg-purple-600 text-sm font-bold text-white">{n}</div>
+                  <div className="grid h-8 w-8 place-items-center rounded-full hs-gradient text-sm font-bold text-white">{n}</div>
                   <div className="mt-3 text-sm font-semibold" style={{ fontFamily: SYNE }}>{title}</div>
                   <div className="mt-1 text-xs leading-relaxed text-gray-500">{body}</div>
                 </div>
@@ -559,7 +559,7 @@ function RoastPage() {
             {s.status === "pitch_phase" && (
               <div className="rounded-2xl bg-gray-900 p-8 text-center">
                 <div className="text-xs font-semibold uppercase tracking-widest text-red-400">The pitch — mic cuts at zero</div>
-                <div className="mt-2 text-7xl font-extrabold text-white tabular-nums" style={{ fontFamily: SYNE }}>
+                <div className="mt-2 text-7xl font-extrabold text-foreground tabular-nums" style={{ fontFamily: SYNE }}>
                   {deadlineMs != null ? fmtClock(deadlineMs) : "1:00"}
                 </div>
                 {!isFounder && <div className="mt-3 text-sm text-gray-400">Listen carefully — question writing opens the moment this hits 0:00.</div>}
@@ -585,11 +585,11 @@ function RoastPage() {
                       onChange={(e) => setMyQuestionText(e.target.value.slice(0, 500))}
                       rows={3}
                       placeholder="One sharp, specific question. It stays hidden until it's asked or answered."
-                      className="mt-3 w-full rounded-xl border border-purple-200 bg-white px-4 py-3 text-base text-gray-900 focus:border-purple-500 focus:outline-none"
+                      className="mt-3 w-full rounded-xl border border-purple-200 bg-white px-4 py-3 text-base text-gray-900 focus:border-brand focus:outline-none"
                     />
                     <div className="mt-2 flex items-center justify-between">
                       <span className="text-xs text-gray-500">{state.questions.length} questions locked in</span>
-                      <button onClick={saveQuestion} className="rounded-lg bg-purple-600 px-5 py-2 text-sm font-bold text-white hover:bg-purple-700">
+                      <button onClick={saveQuestion} className="rounded-lg hs-gradient px-5 py-2 text-sm font-bold text-white hover:hs-gradient">
                         {savedQuestion ? "Update question" : "Lock in question"}
                       </button>
                     </div>
@@ -672,8 +672,8 @@ function RoastPage() {
             {/* CLOSING */}
             {s.status === "closing" && (
               <div className="rounded-2xl bg-gray-900 p-8 text-center">
-                <div className="text-xs font-semibold uppercase tracking-widest text-purple-400">Closing statement</div>
-                <div className="mt-2 text-4xl font-extrabold text-white tabular-nums" style={{ fontFamily: SYNE }}>
+                <div className="text-xs font-semibold uppercase tracking-widest text-brand">Closing statement</div>
+                <div className="mt-2 text-4xl font-extrabold text-foreground tabular-nums" style={{ fontFamily: SYNE }}>
                   {deadlineMs != null ? fmtClock(deadlineMs) : "2:00"}
                 </div>
                 <div className="mt-4 flex justify-center gap-8 text-sm">

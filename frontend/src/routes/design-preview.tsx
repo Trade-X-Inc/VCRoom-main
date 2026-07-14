@@ -8,7 +8,7 @@ export const Route = createFileRoute("/design-preview")({
 
 function Preview() {
   return (
-    <div style={{ background: "#fff", minHeight: "100vh", padding: 48, color: "#0A0A0B" }}>
+    <div style={{ background: "#fff", minHeight: "100vh", padding: 48, color: "var(--background)" }}>
       <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 18, fontWeight: 700, letterSpacing: "-0.5px" }}>
         Design system
       </h1>

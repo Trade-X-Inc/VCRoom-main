@@ -114,31 +114,31 @@ function NumInput({ label, value, onChange, hint, prefix = "$", suffix }: {
 }) {
   return (
     <div style={{ marginBottom: "14px" }}>
-      <label style={{ display: "block", fontSize: "12px", color: "rgba(255,255,255,0.6)", marginBottom: "5px" }}>{label}</label>
-      <div style={{ display: "flex", alignItems: "center", background: "#1a1a1f", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", overflow: "hidden" }}>
-        {prefix && <span style={{ padding: "9px 10px", fontSize: "12px", color: "rgba(255,255,255,0.35)", borderRight: "1px solid rgba(255,255,255,0.08)", whiteSpace: "nowrap" }}>{prefix}</span>}
+      <label style={{ display: "block", fontSize: "12px", color: "var(--muted-foreground)", marginBottom: "5px" }}>{label}</label>
+      <div style={{ display: "flex", alignItems: "center", background: "#1a1a1f", border: "1px solid var(--border)", borderRadius: "8px", overflow: "hidden" }}>
+        {prefix && <span style={{ padding: "9px 10px", fontSize: "12px", color: "var(--faint)", borderRight: "1px solid var(--border)", whiteSpace: "nowrap" }}>{prefix}</span>}
         <input type="number" value={value || ""}
           onChange={(e) => onChange(Number(e.target.value) || 0)}
-          style={{ flex: 1, background: "transparent", border: "none", outline: "none", padding: "9px 10px", fontSize: "13px", color: "#fff" }} />
-        {suffix && <span style={{ padding: "9px 10px", fontSize: "12px", color: "rgba(255,255,255,0.35)", borderLeft: "1px solid rgba(255,255,255,0.08)" }}>{suffix}</span>}
+          style={{ flex: 1, background: "transparent", border: "none", outline: "none", padding: "9px 10px", fontSize: "13px", color: "var(--foreground)" }} />
+        {suffix && <span style={{ padding: "9px 10px", fontSize: "12px", color: "var(--faint)", borderLeft: "1px solid var(--border)" }}>{suffix}</span>}
       </div>
-      {hint && <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "3px", lineHeight: 1.5 }}>{hint}</p>}
+      {hint && <p style={{ fontSize: "11px", color: "var(--faint)", marginTop: "3px", lineHeight: 1.5 }}>{hint}</p>}
     </div>
   );
 }
 
 function SLabel({ children }: { children: React.ReactNode }) {
-  return <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", color: "rgba(255,255,255,0.3)", textTransform: "uppercase", margin: "18px 0 10px" }}>{children}</p>;
+  return <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", color: "var(--faint)", textTransform: "uppercase", margin: "18px 0 10px" }}>{children}</p>;
 }
 
 function Accordion({ title, children }: { title: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
-    <div style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+    <div style={{ borderBottom: "1px solid var(--border)" }}>
       <button onClick={() => setOpen((v) => !v)}
         style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "18px 0", background: "none", border: "none", cursor: "pointer" }}>
-        <span style={{ fontSize: "15px", fontWeight: 600, color: "#fff" }}>{title}</span>
-        {open ? <ChevronUp size={16} style={{ color: "#7C3AED", flexShrink: 0 }} /> : <ChevronDown size={16} style={{ color: "rgba(255,255,255,0.4)", flexShrink: 0 }} />}
+        <span style={{ fontSize: "15px", fontWeight: 600, color: "var(--foreground)" }}>{title}</span>
+        {open ? <ChevronUp size={16} style={{ color: "var(--brand)", flexShrink: 0 }} /> : <ChevronDown size={16} style={{ color: "var(--muted-foreground)", flexShrink: 0 }} />}
       </button>
       {open && <div style={{ paddingBottom: "20px" }}>{children}</div>}
     </div>
@@ -152,9 +152,9 @@ function Mono({ children }: { children: React.ReactNode }) {
 // ─── Scenario block ───────────────────────────────────────────────────────────
 
 const SCENARIO_COLORS: Record<ActiveScenario, string> = {
-  cap: "#7C3AED",
+  cap: "var(--brand)",
   discount: "#10B981",
-  round: "rgba(255,255,255,0.15)",
+  round: "var(--accent)",
 };
 
 const SCENARIO_LABELS: Record<ActiveScenario, string> = {
@@ -174,13 +174,13 @@ function ScenarioBlock({
   return (
     <div style={{
       background: "#0d0d10",
-      border: `1.5px solid ${isActive ? color : "rgba(255,255,255,0.06)"}`,
+      border: `1.5px solid ${isActive ? color : "var(--border)"}`,
       borderRadius: "10px", padding: "16px",
       opacity: isActive ? 1 : 0.5,
       transition: "border-color 0.2s, opacity 0.2s",
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-        <span style={{ fontSize: "11px", fontWeight: 700, color: isActive ? color : "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</span>
+        <span style={{ fontSize: "11px", fontWeight: 700, color: isActive ? color : "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</span>
         {isActive && <span style={{ fontSize: "10px", background: `${color}22`, color, padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Active</span>}
       </div>
       {[
@@ -190,13 +190,13 @@ function ScenarioBlock({
         { label: "Effective valuation", value: fmt$(effectiveVal) },
       ].map(({ label: l, value: v }) => (
         <div key={l} style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}>
-          <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>{l}</span>
-          <span style={{ fontSize: "12px", fontWeight: 600, color: "rgba(255,255,255,0.8)", fontVariantNumeric: "tabular-nums" }}>{v}</span>
+          <span style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>{l}</span>
+          <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--muted-foreground)", fontVariantNumeric: "tabular-nums" }}>{v}</span>
         </div>
       ))}
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "8px", paddingTop: "8px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>Savings vs round price</span>
-        <span style={{ fontSize: "12px", fontWeight: 600, color: savings > 0 ? "#10B981" : "rgba(255,255,255,0.3)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "8px", paddingTop: "8px", borderTop: "1px solid var(--border)" }}>
+        <span style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>Savings vs round price</span>
+        <span style={{ fontSize: "12px", fontWeight: 600, color: savings > 0 ? "#10B981" : "var(--faint)" }}>
           {savings > 0 ? `+${fmt$(savings)}` : "No discount applied"}
         </span>
       </div>
@@ -267,7 +267,7 @@ Model yours at hockystick.app/tools/safe-note`;
   const pw = { maxWidth: "900px", margin: "0 auto", padding: "0 24px" };
 
   const InputPanel = (
-    <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "24px" }}>
+    <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "24px" }}>
       <SLabel>The SAFE</SLabel>
       <NumInput label="SAFE investment amount" value={safeInvestment} onChange={setSafeInvestment} />
       <NumInput label="Valuation cap" value={valuationCap} onChange={setValuationCap}
@@ -276,10 +276,10 @@ Model yours at hockystick.app/tools/safe-note`;
         hint="You receive shares at this % below the round price. Applies only if the discount price is lower than the cap price." />
       <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", marginTop: "4px", marginBottom: "4px" }}>
         <input type="checkbox" id="mfn" checked={mfn} onChange={(e) => setMfn(e.target.checked)}
-          style={{ width: "14px", height: "14px", accentColor: "#7C3AED", flexShrink: 0, marginTop: "2px", cursor: "pointer" }} />
+          style={{ width: "14px", height: "14px", accentColor: "var(--brand)", flexShrink: 0, marginTop: "2px", cursor: "pointer" }} />
         <div>
-          <label htmlFor="mfn" style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)", cursor: "pointer" }}>MFN (Most Favored Nation) clause</label>
-          <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "3px", lineHeight: 1.5 }}>
+          <label htmlFor="mfn" style={{ fontSize: "12px", color: "var(--muted-foreground)", cursor: "pointer" }}>MFN (Most Favored Nation) clause</label>
+          <p style={{ fontSize: "11px", color: "var(--faint)", marginTop: "3px", lineHeight: 1.5 }}>
             If checked, this SAFE automatically adopts better terms from any future SAFE issued before conversion. Common in pre-seed YC SAFEs.
           </p>
         </div>
@@ -291,8 +291,8 @@ Model yours at hockystick.app/tools/safe-note`;
         hint="Total shares before the new round is issued. Include option pool in this number." />
       <NumInput label="Round size (total new investment)" value={roundSize} onChange={setRoundSize} />
 
-      <div style={{ marginTop: "14px", padding: "10px 12px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)" }}>
-        <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)", lineHeight: 1.7, margin: 0, fontFamily: "monospace" }}>
+      <div style={{ marginTop: "14px", padding: "10px 12px", background: "var(--accent)", borderRadius: "8px", border: "1px solid var(--border)" }}>
+        <p style={{ fontSize: "11px", color: "var(--faint)", lineHeight: 1.7, margin: 0, fontFamily: "monospace" }}>
           Round price = {totalSharesPre > 0 ? fmtPrice(preMoney / totalSharesPre) : "—"}<br />
           Cap price = {totalSharesPre > 0 ? fmtPrice(valuationCap / totalSharesPre) : "—"}<br />
           Discounted price = {totalSharesPre > 0 ? fmtPrice((preMoney / totalSharesPre) * (1 - discountRate / 100)) : "—"}<br />
@@ -350,34 +350,34 @@ Model yours at hockystick.app/tools/safe-note`;
   };
 
   return (
-    <div style={{ background: "#0A0A0B", minHeight: "100vh", color: "#fff" }}>
+    <div style={{ background: "var(--background)", minHeight: "100vh", color: "var(--foreground)" }}>
       <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <div className="tool-no-print"><SiteHeader /></div>
 
       {/* S1 — Hero */}
       <section style={{ ...pw, padding: "56px 24px 48px" }}>
-        <nav style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)", marginBottom: "20px" }}>
-          <Link to="/tools" style={{ color: "rgba(255,255,255,0.35)", textDecoration: "none" }}>Tools</Link>
+        <nav style={{ fontSize: "12px", color: "var(--faint)", marginBottom: "20px" }}>
+          <Link to="/tools" style={{ color: "var(--faint)", textDecoration: "none" }}>Tools</Link>
           <span style={{ margin: "0 6px" }}>→</span>
-          <span style={{ color: "rgba(255,255,255,0.7)" }}>SAFE Note Calculator</span>
+          <span style={{ color: "var(--muted-foreground)" }}>SAFE Note Calculator</span>
         </nav>
         <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(28px, 5vw, 46px)", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "16px" }}>
           SAFE Note Calculator
         </h1>
-        <p style={{ fontSize: "16px", color: "rgba(255,255,255,0.55)", lineHeight: 1.6, maxWidth: "560px", marginBottom: "12px" }}>
+        <p style={{ fontSize: "16px", color: "var(--muted-foreground)", lineHeight: 1.6, maxWidth: "560px", marginBottom: "12px" }}>
           Model exactly how your SAFE converts at the next priced round. Compare cap and discount scenarios before you negotiate terms.
         </p>
-        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>Used by founders and early investors modeling pre-seed instruments</p>
+        <p style={{ fontSize: "12px", color: "var(--faint)" }}>Used by founders and early investors modeling pre-seed instruments</p>
       </section>
 
       {/* S2 — Calculator */}
       <section style={{ ...pw, paddingBottom: "80px" }}>
         {/* View tabs */}
-        <div style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: "28px", display: "flex" }}>
+        <div style={{ borderBottom: "1px solid var(--border)", marginBottom: "28px", display: "flex" }}>
           {(["investor", "founder"] as const).map((t) => (
             <button key={t} onClick={() => setTab(t)}
-              style={{ padding: "10px 20px", background: "none", border: "none", borderBottom: `2px solid ${tab === t ? "#7C3AED" : "transparent"}`, marginBottom: "-1px", cursor: "pointer", fontSize: "14px", fontWeight: tab === t ? 600 : 400, color: tab === t ? "#fff" : "rgba(255,255,255,0.45)", transition: "all 0.15s" }}>
+              style={{ padding: "10px 20px", background: "none", border: "none", borderBottom: `2px solid ${tab === t ? "var(--brand)" : "transparent"}`, marginBottom: "-1px", cursor: "pointer", fontSize: "14px", fontWeight: tab === t ? 600 : 400, color: tab === t ? "#fff" : "var(--muted-foreground)", transition: "all 0.15s" }}>
               {t === "investor" ? "Investor view" : "Founder view"}
             </button>
           ))}
@@ -395,7 +395,7 @@ Model yours at hockystick.app/tools/safe-note`;
             {tab === "investor" ? (
               <>
                 {/* Active scenario indicator */}
-                <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", padding: "14px 18px" }}>
+                <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "10px", padding: "14px 18px" }}>
                   <p style={{ fontSize: "13px", margin: 0 }}>
                     Based on your inputs, the{" "}
                     <span style={{ fontWeight: 700, color: activeColor }}>{activeLabel}</span>{" "}
@@ -423,8 +423,8 @@ Model yours at hockystick.app/tools/safe-note`;
                   savings={0} isActive={result.activeScenario === "round"} result={result} />
 
                 {/* Post-conversion summary */}
-                <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", padding: "16px" }}>
-                  <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.35)", textTransform: "uppercase", marginBottom: "10px" }}>Post-conversion summary</p>
+                <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "10px", padding: "16px" }}>
+                  <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "var(--faint)", textTransform: "uppercase", marginBottom: "10px" }}>Post-conversion summary</p>
                   {[
                     { label: "Your shares", value: fmtShares(result.safeShares) },
                     { label: "New round shares", value: fmtShares(result.newRoundShares) },
@@ -433,8 +433,8 @@ Model yours at hockystick.app/tools/safe-note`;
                     { label: "Post-money valuation", value: fmt$(result.postMoney) },
                   ].map(({ label, value }) => (
                     <div key={label} style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-                      <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>{label}</span>
-                      <span style={{ fontSize: "12px", fontWeight: 600, color: "rgba(255,255,255,0.8)", fontVariantNumeric: "tabular-nums" }}>{value}</span>
+                      <span style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>{label}</span>
+                      <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--muted-foreground)", fontVariantNumeric: "tabular-nums" }}>{value}</span>
                     </div>
                   ))}
                 </div>
@@ -461,7 +461,7 @@ Model yours at hockystick.app/tools/safe-note`;
                     <span style={{ fontSize: "16px", flexShrink: 0 }}>⚑</span>
                     <div>
                       <p style={{ fontSize: "13px", fontWeight: 600, color: "#F59E0B", marginBottom: "4px" }}>MFN clause active</p>
-                      <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", lineHeight: 1.6, margin: 0 }}>
+                      <p style={{ fontSize: "12px", color: "var(--muted-foreground)", lineHeight: 1.6, margin: 0 }}>
                         This SAFE has an MFN clause. If you issue future SAFEs on better terms (lower cap or higher discount) before conversion, this investor automatically receives those better terms.
                       </p>
                     </div>
@@ -469,32 +469,32 @@ Model yours at hockystick.app/tools/safe-note`;
                 )}
 
                 {/* Block 1 — Dilution */}
-                <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", padding: "18px" }}>
-                  <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.35)", textTransform: "uppercase", marginBottom: "12px" }}>Dilution from this SAFE</p>
+                <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "10px", padding: "18px" }}>
+                  <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "var(--faint)", textTransform: "uppercase", marginBottom: "12px" }}>Dilution from this SAFE</p>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-                    <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.55)" }}>Shares issued to SAFE investor</span>
-                    <span style={{ fontSize: "13px", fontWeight: 600, color: "#fff", fontVariantNumeric: "tabular-nums" }}>{fmtShares(result.safeShares)}</span>
+                    <span style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>Shares issued to SAFE investor</span>
+                    <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)", fontVariantNumeric: "tabular-nums" }}>{fmtShares(result.safeShares)}</span>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "14px" }}>
-                    <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.55)" }}>Your dilution from this SAFE</span>
+                    <span style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>Your dilution from this SAFE</span>
                     <span style={{ fontSize: "13px", fontWeight: 700, color: "#F87171" }}>−{fmtPct(founderDilution)}</span>
                   </div>
-                  <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", lineHeight: 1.6, marginBottom: "10px" }}>
+                  <p style={{ fontSize: "11px", color: "var(--faint)", lineHeight: 1.6, marginBottom: "10px" }}>
                     Actual dilution depends on your full cap table. Use the Cap Table Calculator for a complete picture.
                   </p>
-                  <Link to="/tools/cap-table" style={{ fontSize: "12px", color: "#7C3AED", textDecoration: "none" }}>→ Cap Table Calculator</Link>
+                  <Link to="/tools/cap-table" style={{ fontSize: "12px", color: "var(--brand)", textDecoration: "none" }}>→ Cap Table Calculator</Link>
                 </div>
 
                 {/* Block 2 — Effective cost */}
-                <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", padding: "18px" }}>
-                  <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.35)", textTransform: "uppercase", marginBottom: "12px" }}>Effective cost of this SAFE</p>
+                <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "10px", padding: "18px" }}>
+                  <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "var(--faint)", textTransform: "uppercase", marginBottom: "12px" }}>Effective cost of this SAFE</p>
                   <div style={{ marginBottom: "16px" }}>
-                    <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)", marginBottom: "4px" }}>Effective valuation you're selling at</p>
+                    <p style={{ fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "4px" }}>Effective valuation you're selling at</p>
                     <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "26px", color: result.activeScenario === "cap" ? "#F59E0B" : "#fff", margin: 0 }}>
                       {fmt$(result.effectiveValuation)}
                     </p>
                     {result.activeScenario === "cap" && (
-                      <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "3px" }}>
+                      <p style={{ fontSize: "11px", color: "var(--faint)", marginTop: "3px" }}>
                         Cap binds — lower than your round valuation of {fmt$(preMoney)}
                       </p>
                     )}
@@ -504,17 +504,17 @@ Model yours at hockystick.app/tools/safe-note`;
                   <div style={{ marginBottom: "14px" }}>
                     <div style={{ display: "flex", gap: "8px", alignItems: "flex-end", marginBottom: "6px" }}>
                       <div style={{ flex: 1 }}>
-                        <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", marginBottom: "4px" }}>SAFE investor effective valuation</p>
-                        <div style={{ height: "8px", borderRadius: "4px", background: "#7C3AED", width: `${Math.min((result.effectiveValuation / Math.max(preMoney, result.effectiveValuation)) * 100, 100)}%`, minWidth: "4px", transition: "width 0.3s" }} />
+                        <p style={{ fontSize: "10px", color: "var(--faint)", marginBottom: "4px" }}>SAFE investor effective valuation</p>
+                        <div style={{ height: "8px", borderRadius: "4px", background: "var(--gradient-brand)", width: `${Math.min((result.effectiveValuation / Math.max(preMoney, result.effectiveValuation)) * 100, 100)}%`, minWidth: "4px", transition: "width 0.3s" }} />
                         <p style={{ fontSize: "11px", color: "#a78bfa", marginTop: "3px", fontVariantNumeric: "tabular-nums" }}>{fmt$(result.effectiveValuation)}</p>
                       </div>
                       <div style={{ flex: 1 }}>
-                        <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", marginBottom: "4px" }}>Round investor valuation</p>
+                        <p style={{ fontSize: "10px", color: "var(--faint)", marginBottom: "4px" }}>Round investor valuation</p>
                         <div style={{ height: "8px", borderRadius: "4px", background: "#10B981", width: `${Math.min((preMoney / Math.max(preMoney, result.effectiveValuation)) * 100, 100)}%`, minWidth: "4px", transition: "width 0.3s" }} />
                         <p style={{ fontSize: "11px", color: "#34D399", marginTop: "3px", fontVariantNumeric: "tabular-nums" }}>{fmt$(preMoney)}</p>
                       </div>
                     </div>
-                    <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", lineHeight: 1.6 }}>
+                    <p style={{ fontSize: "11px", color: "var(--faint)", lineHeight: 1.6 }}>
                       The valuation cap is the price ceiling the SAFE investor paid for taking early risk. A lower cap = cheaper entry = more dilution for you.
                     </p>
                   </div>
@@ -526,7 +526,7 @@ Model yours at hockystick.app/tools/safe-note`;
       </section>
 
       {/* S3 — How to use */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>How to use this calculator</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "24px" }}>
@@ -537,8 +537,8 @@ Model yours at hockystick.app/tools/safe-note`;
             ].map((step) => (
               <div key={step.n}>
                 <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "32px", color: "rgba(124,58,237,0.3)", marginBottom: "12px" }}>{step.n}</div>
-                <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#fff", marginBottom: "8px" }}>{step.title}</h3>
-                <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", lineHeight: 1.7 }}>{step.body}</p>
+                <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--foreground)", marginBottom: "8px" }}>{step.title}</h3>
+                <p style={{ fontSize: "13px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>{step.body}</p>
               </div>
             ))}
           </div>
@@ -546,11 +546,11 @@ Model yours at hockystick.app/tools/safe-note`;
       </section>
 
       {/* S4 — Methodology */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>How SAFE conversion works</h2>
           <Accordion title="The three conversion scenarios">
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>
+            <p style={{ fontSize: "14px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>
               A SAFE converts at whichever price benefits the investor most: the valuation cap price, the discount price, or the round price. In practice, either the cap or the discount binds — SAFE investors rarely convert at the full round price, which would mean they received no benefit for their early risk.
             </p>
             <Mono>
@@ -561,12 +561,12 @@ Model yours at hockystick.app/tools/safe-note`;
             </Mono>
           </Accordion>
           <Accordion title="Valuation cap vs discount rate">
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>
+            <p style={{ fontSize: "14px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>
               These are two separate mechanisms protecting the investor. The cap says: even if the company raises at a high valuation, the SAFE investor converts as if the valuation were the cap. The discount says: the SAFE investor buys shares at X% below whatever the new investors pay. The investor gets whichever is better.
             </p>
           </Accordion>
           <Accordion title="MFN clause">
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>
+            <p style={{ fontSize: "14px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>
               Most Favored Nation means this investor is entitled to the best terms you issue to any SAFE before the conversion round. If you issue a future SAFE at a $3M cap and this SAFE has a $5M cap with MFN, this investor automatically moves to $3M. MFN protects investors when founders issue multiple SAFE tranches over time.
             </p>
           </Accordion>
@@ -574,7 +574,7 @@ Model yours at hockystick.app/tools/safe-note`;
       </section>
 
       {/* S5 — FAQ */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 32px)", marginBottom: "40px", letterSpacing: "-0.02em" }}>Frequently asked questions</h2>
           {[
@@ -584,13 +584,13 @@ Model yours at hockystick.app/tools/safe-note`;
             { q: "What happens if I never raise a priced round?", a: "The SAFE remains unconverted. It has no maturity date and no repayment obligation. In an acquisition, the SAFE typically converts at the cap or receives a return based on the terms. Read the SAFE agreement for the change of control clause." },
             { q: "Should I offer a cap or a discount or both?", a: "Standard practice: offer both, with the cap as the primary protection. Most SAFE investors expect a cap. A discount alone (no cap) is unusual and can be problematic at high-valuation rounds where the discount is too small to matter." },
           ].map(({ q, a }) => (
-            <Accordion key={q} title={q}><p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>{a}</p></Accordion>
+            <Accordion key={q} title={q}><p style={{ fontSize: "14px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>{a}</p></Accordion>
           ))}
         </div>
       </section>
 
       {/* S6 — Related tools */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "22px", marginBottom: "24px", letterSpacing: "-0.02em" }}>Related tools</h2>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }} className="rel-grid">
@@ -600,10 +600,10 @@ Model yours at hockystick.app/tools/safe-note`;
               { to: "/tools/dilution", title: "Dilution Calculator", desc: "See how each round reduces your ownership percentage." },
             ].map((t) => (
               <Link key={t.to} to={t.to as any} style={{ textDecoration: "none" }}>
-                <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "12px", padding: "20px" }}>
+                <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px" }}>
                   <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#10B981", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
-                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "#fff", margin: "10px 0 6px" }}>{t.title}</h3>
-                  <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", margin: 0 }}>{t.desc}</p>
+                  <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)", margin: "10px 0 6px" }}>{t.title}</h3>
+                  <p style={{ fontSize: "13px", color: "var(--muted-foreground)", margin: 0 }}>{t.desc}</p>
                 </div>
               </Link>
             ))}
@@ -612,19 +612,19 @@ Model yours at hockystick.app/tools/safe-note`;
       </section>
 
       {/* S7 — CTA */}
-      <section className="tool-no-print" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", background: "#111114", padding: "72px 24px" }}>
+      <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", background: "var(--card)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "560px", margin: "0 auto", textAlign: "center" }}>
           <h3 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 30px)", letterSpacing: "-0.02em", marginBottom: "16px" }}>Know your terms before you sign.</h3>
-          <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, marginBottom: "28px" }}>
+          <p style={{ fontSize: "15px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "28px" }}>
             Investors who use Hockystick come in with verified track records. You should come in with verified financials.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link to="/sign-up" search={{ role: "founder" } as any}
-              style={{ display: "inline-flex", alignItems: "center", background: "#7C3AED", color: "#fff", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>
+              style={{ display: "inline-flex", alignItems: "center", background: "var(--gradient-brand)", color: "#fff", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>
               Create your profile
             </Link>
             <Link to="/trust"
-              style={{ display: "inline-flex", alignItems: "center", background: "transparent", color: "rgba(255,255,255,0.5)", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 500, textDecoration: "none", border: "1px solid rgba(255,255,255,0.12)" }}>
+              style={{ display: "inline-flex", alignItems: "center", background: "transparent", color: "var(--muted-foreground)", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 500, textDecoration: "none", border: "1px solid var(--border)" }}>
               See how verification works
             </Link>
           </div>

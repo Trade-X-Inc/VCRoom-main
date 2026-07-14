@@ -76,7 +76,7 @@ function PublicCVPage() {
           onClick={() => window.print()}
           style={{
             display: "inline-flex", alignItems: "center", gap: 6,
-            background: "#7C3AED", color: "#fff", border: "none",
+            background: "var(--gradient-brand)", color: "#fff", border: "none",
             borderRadius: 8, padding: "9px 16px", fontSize: 13,
             fontWeight: 500, cursor: "pointer", boxShadow: "0 4px 12px rgba(124,58,237,0.3)",
           }}
@@ -92,8 +92,8 @@ function PublicCVPage() {
           <div style={{ background: "#0a0a0b", padding: "32px 36px", display: "flex", alignItems: "center", gap: 20 }}>
             <div style={{
               width: 72, height: 72, borderRadius: "50%", flexShrink: 0,
-              background: "#7C3AED", display: "flex", alignItems: "center",
-              justifyContent: "center", fontSize: 26, fontWeight: 700, color: "#fff",
+              background: "var(--gradient-brand)", display: "flex", alignItems: "center",
+              justifyContent: "center", fontSize: 26, fontWeight: 700, color: "var(--foreground)",
               overflow: "hidden",
             }}>
               {profile.avatar_url
@@ -101,7 +101,7 @@ function PublicCVPage() {
                 : initials}
             </div>
             <div>
-              <h1 style={{ fontSize: 26, fontWeight: 700, color: "#fff", margin: 0, letterSpacing: "-0.03em" }}>{fullName}</h1>
+              <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--foreground)", margin: 0, letterSpacing: "-0.03em" }}>{fullName}</h1>
               {profile.title && (
                 <div style={{ fontSize: 14, color: "#a1a1aa", marginTop: 4 }}>{profile.title}</div>
               )}
@@ -180,7 +180,7 @@ function PublicCVPage() {
               <CVSection title="Achievements">
                 {profile.achievements.map((ach: any, i: number) => (
                   <div key={i} style={{ marginBottom: i < profile.achievements.length - 1 ? 14 : 0, display: "flex", gap: 10 }}>
-                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#7C3AED", marginTop: 5, flexShrink: 0 }} />
+                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--gradient-brand)", marginTop: 5, flexShrink: 0 }} />
                     <div>
                       <span style={{ fontSize: 14, fontWeight: 600, color: "#111" }}>{ach.title}</span>
                       {ach.year && <span style={{ fontSize: 12, color: "#9ca3af", marginLeft: 8 }}>{ach.year}</span>}
@@ -213,7 +213,7 @@ function PublicCVPage() {
           {/* Footer */}
           <div style={{ padding: "16px 36px", background: "#fafafa", borderTop: "1px solid #e5e7eb", textAlign: "center" }}>
             <span style={{ fontSize: 11, color: "#9ca3af" }}>Built on </span>
-            <a href="https://hockystick.app" style={{ fontSize: 11, color: "#7C3AED", textDecoration: "none", fontWeight: 600 }}>Hockystick</a>
+            <a href="https://hockystick.app" style={{ fontSize: 11, color: "var(--brand)", textDecoration: "none", fontWeight: 600 }}>Hockystick</a>
           </div>
         </div>
       </div>
@@ -224,7 +224,7 @@ function PublicCVPage() {
 function CVSection({ title, children, last = false }: { title: string; children: React.ReactNode; last?: boolean }) {
   return (
     <div style={{ marginBottom: last ? 0 : 28, paddingBottom: last ? 0 : 28, borderBottom: last ? "none" : "1px solid #f3f4f6" }}>
-      <h2 style={{ fontSize: 11, fontWeight: 700, color: "#7C3AED", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 14, margin: "0 0 14px" }}>
+      <h2 style={{ fontSize: 11, fontWeight: 700, color: "var(--brand)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 14, margin: "0 0 14px" }}>
         {title}
       </h2>
       {children}

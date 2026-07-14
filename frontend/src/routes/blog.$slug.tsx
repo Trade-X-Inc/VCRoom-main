@@ -55,7 +55,7 @@ function BlogArticle() {
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-4 sm:px-6 py-16 md:py-24">
         {/* Back */}
-        <Link to="/blog" className="inline-flex items-center gap-1.5 text-sm text-purple-600 hover:text-purple-700 font-medium mb-10 transition-colors">
+        <Link to="/blog" className="inline-flex items-center gap-1.5 text-sm text-brand hover:opacity-80 font-medium mb-10 transition-colors">
           <ArrowLeft className="h-3.5 w-3.5" /> All articles
         </Link>
 
@@ -107,9 +107,9 @@ function BlogArticle() {
             prose-h1:text-4xl prose-h2:text-2xl prose-h2:mt-10 prose-h3:text-xl
             prose-p:text-gray-700 prose-p:leading-relaxed
             prose-li:text-gray-700
-            prose-a:text-purple-600 prose-a:no-underline hover:prose-a:underline
+            prose-a:text-brand prose-a:no-underline hover:prose-a:underline
             prose-strong:text-gray-900
-            prose-blockquote:border-purple-400 prose-blockquote:text-gray-600
+            prose-blockquote:border-brand prose-blockquote:text-gray-600
             prose-code:text-purple-700 prose-code:bg-purple-50 prose-code:before:content-none prose-code:after:content-none
             prose-pre:bg-gray-950 prose-pre:text-gray-100
             prose-hr:border-gray-200

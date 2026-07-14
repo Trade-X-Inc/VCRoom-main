@@ -54,7 +54,7 @@ function BlogIndex() {
                 key={post.slug}
                 to="/blog/$slug"
                 params={{ slug: post.slug }}
-                className="rounded-xl border border-gray-100 bg-white shadow-sm p-4 sm:p-6 hover:shadow-md hover:border-[#7C3AED]/30 transition-all group flex flex-col dark:border-border/60 dark:bg-card"
+                className="rounded-xl border border-gray-100 bg-white shadow-sm p-4 sm:p-6 hover:shadow-md hover:border-brand/30 transition-all group flex flex-col dark:border-border/60 dark:bg-card"
               >
                 {post.coverImage && (
                   <img
@@ -67,7 +67,7 @@ function BlogIndex() {
 
                 <div className="flex items-start justify-between gap-2 mb-3">
                   {post.tags[0] && (
-                    <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#7C3AED]/10 text-[#7C3AED] text-xs font-semibold">
+                    <span className="inline-block px-2.5 py-0.5 rounded-full bg-accent text-brand text-xs font-semibold">
                       {post.tags[0]}
                     </span>
                   )}
@@ -76,7 +76,7 @@ function BlogIndex() {
                   </span>
                 </div>
 
-                <h2 className="text-base font-semibold mb-2 group-hover:text-[#7C3AED] transition-colors line-clamp-2">
+                <h2 className="text-base font-semibold mb-2 group-hover:text-brand transition-colors line-clamp-2">
                   {post.title}
                 </h2>
 
@@ -96,7 +96,7 @@ function BlogIndex() {
         )}
 
         {/* CTA */}
-        <div className="mt-16 bg-gradient-to-r from-purple-600/10 to-indigo-600/10 border border-purple-500/20 rounded-xl p-12 text-center">
+        <div className="mt-16 bg-accent border border-border rounded-xl p-12 text-center">
           <h2 className="text-2xl font-semibold mb-3">Stay updated</h2>
           <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
             Get the latest insights on fundraising and venture capital delivered to your inbox.

@@ -36,15 +36,15 @@ interface LinkInfo {
 
 type PageState = "loading" | "invalid" | "valid" | "authed";
 
-const dark = "#0A0A0B";
-const card = { background: "#111114", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 16 };
+const dark = "var(--background)";
+const card = { background: "var(--card)", border: "1px solid var(--border)", borderRadius: 16 };
 const inputStyle: React.CSSProperties = {
-  width: "100%", background: "#18181C", border: "1px solid rgba(255,255,255,0.10)",
+  width: "100%", background: "var(--accent)", border: "1px solid var(--border)",
   borderRadius: 8, padding: "10px 14px", fontSize: 14, color: "#FAFAFA",
   outline: "none", boxSizing: "border-box",
 };
 const btnPrimary: React.CSSProperties = {
-  width: "100%", background: "#7C3AED", color: "#fff", border: "none",
+  width: "100%", background: "var(--gradient-brand)", color: "#fff", border: "none",
   borderRadius: 8, padding: "11px 0", fontSize: 14, fontWeight: 600, cursor: "pointer",
 };
 
@@ -132,25 +132,25 @@ function JoinViaInviteLinkPage() {
     <div style={{ minHeight: "100vh", background: dark, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
       {/* Logo */}
       <div style={{ marginBottom: 32, textAlign: "center" }}>
-        <div style={{ fontSize: 22, fontWeight: 800, color: "#fff", fontFamily: "Syne, sans-serif", letterSpacing: "-0.5px" }}>
-          Hocky<span style={{ color: "#7C3AED" }}>stick</span>
+        <div style={{ fontSize: 22, fontWeight: 800, color: "var(--foreground)", fontFamily: "Syne, sans-serif", letterSpacing: "-0.5px" }}>
+          Hocky<span style={{ color: "var(--brand)" }}>stick</span>
         </div>
-        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", marginTop: 4 }}>Where deals get done</div>
+        <div style={{ fontSize: 12, color: "var(--faint)", marginTop: 4 }}>Where deals get done</div>
       </div>
 
       <div style={{ ...card, padding: 32, width: "100%", maxWidth: 420 }}>
         {pageState === "loading" && (
           <div style={{ textAlign: "center", padding: "24px 0" }}>
-            <Loader2 className="h-6 w-6 animate-spin mx-auto" style={{ color: "#7C3AED" }} />
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 12 }}>Verifying invite link…</p>
+            <Loader2 className="h-6 w-6 animate-spin mx-auto" style={{ color: "var(--brand)" }} />
+            <p style={{ color: "var(--muted-foreground)", fontSize: 13, marginTop: 12 }}>Verifying invite link…</p>
           </div>
         )}
 
         {pageState === "invalid" && (
           <div style={{ textAlign: "center", padding: "24px 0" }}>
             <AlertTriangle className="h-8 w-8 mx-auto" style={{ color: "#F59E0B" }} />
-            <div style={{ color: "#fff", fontWeight: 600, marginTop: 12, fontFamily: "Syne, sans-serif" }}>Link not valid</div>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 8, lineHeight: 1.6 }}>
+            <div style={{ color: "var(--foreground)", fontWeight: 600, marginTop: 12, fontFamily: "Syne, sans-serif" }}>Link not valid</div>
+            <p style={{ color: "var(--muted-foreground)", fontSize: 13, marginTop: 8, lineHeight: 1.6 }}>
               This invite link may have expired or already been used. Ask your contact to send a fresh link.
             </p>
           </div>
@@ -159,8 +159,8 @@ function JoinViaInviteLinkPage() {
         {pageState === "authed" && (
           <div style={{ textAlign: "center", padding: "24px 0" }}>
             <Check className="h-8 w-8 mx-auto" style={{ color: "#10B981" }} />
-            <div style={{ color: "#fff", fontWeight: 600, marginTop: 12, fontFamily: "Syne, sans-serif" }}>Connected</div>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 8 }}>Redirecting to your dashboard…</p>
+            <div style={{ color: "var(--foreground)", fontWeight: 600, marginTop: 12, fontFamily: "Syne, sans-serif" }}>Connected</div>
+            <p style={{ color: "var(--muted-foreground)", fontSize: 13, marginTop: 8 }}>Redirecting to your dashboard…</p>
           </div>
         )}
 
@@ -171,10 +171,10 @@ function JoinViaInviteLinkPage() {
               <div style={{ background: "rgba(124,58,237,0.07)", border: "1px solid rgba(124,58,237,0.18)", borderRadius: 10, padding: "12px 14px", marginBottom: 24, display: "flex", gap: 10 }}>
                 <Building2 className="h-4 w-4 mt-0.5 shrink-0" style={{ color: "#A855F7" }} />
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)" }}>
                     {linkInfo.fund_name ?? "An investor"} invited you
                   </div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 2, lineHeight: 1.5 }}>
+                  <div style={{ fontSize: 12, color: "var(--muted-foreground)", marginTop: 2, lineHeight: 1.5 }}>
                     Create your founder profile to connect and manage your fundraising in one place.
                   </div>
                 </div>
@@ -185,8 +185,8 @@ function JoinViaInviteLinkPage() {
               {(["signup", "signin"] as const).map((mode) => (
                 <button key={mode} onClick={() => setAuthMode(mode)}
                   style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer",
-                    background: authMode === mode ? "#7C3AED" : "rgba(255,255,255,0.05)",
-                    color: authMode === mode ? "#fff" : "rgba(255,255,255,0.4)" }}>
+                    background: authMode === mode ? "var(--gradient-brand)" : "var(--accent)",
+                    color: authMode === mode ? "#fff" : "var(--muted-foreground)" }}>
                   {mode === "signup" ? "Create account" : "Sign in"}
                 </button>
               ))}
@@ -212,7 +212,7 @@ function JoinViaInviteLinkPage() {
             </form>
 
             <div style={{ marginTop: 16, textAlign: "center" }}>
-              <a href="/auth/google" style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, textDecoration: "none" }}>
+              <a href="/auth/google" style={{ color: "var(--muted-foreground)", fontSize: 12, textDecoration: "none" }}>
                 Or continue with Google →
               </a>
             </div>
@@ -220,7 +220,7 @@ function JoinViaInviteLinkPage() {
         )}
       </div>
 
-      <p style={{ color: "rgba(255,255,255,0.2)", fontSize: 11, marginTop: 20, textAlign: "center" }}>
+      <p style={{ color: "var(--faint)", fontSize: 11, marginTop: 20, textAlign: "center" }}>
         By joining, you agree to Hockystick's terms of service.
       </p>
     </div>

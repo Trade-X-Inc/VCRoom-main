@@ -52,7 +52,7 @@ function Feedback() {
       <SiteHeader />
 
       <div className="bg-[#0a0a0b] py-16 px-6 text-center">
-        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
+        <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
           Share your feedback.
         </h1>
         <p className="mt-3 text-gray-400 max-w-lg mx-auto">
@@ -92,7 +92,7 @@ function Feedback() {
                 {[1, 2, 3, 4, 5].map((v) => (
                   <button key={v} type="button" onClick={() => setForm((f) => ({ ...f, rating: v }))}
                     className="transition-transform hover:scale-110">
-                    <Star className={`h-7 w-7 transition-colors ${v <= form.rating ? "fill-[#7C3AED] text-[#7C3AED]" : "text-gray-300"}`} />
+                    <Star className={`h-7 w-7 transition-colors ${v <= form.rating ? "fill-brand text-brand" : "text-gray-300"}`} />
                   </button>
                 ))}
               </div>
@@ -103,7 +103,7 @@ function Feedback() {
                 placeholder="Tell us what you think..." className="min-h-28" />
             </div>
             <button type="submit" disabled={loading}
-              className="w-full py-3 rounded-lg bg-[#7C3AED] text-white font-semibold text-sm hover:bg-[#6d28d9] transition-colors disabled:opacity-50">
+              className="w-full py-3 rounded-lg hs-gradient text-foreground font-semibold text-sm hover:bg-[#6d28d9] transition-colors disabled:opacity-50">
               {loading ? "Sending..." : "Send feedback"}
             </button>
           </form>

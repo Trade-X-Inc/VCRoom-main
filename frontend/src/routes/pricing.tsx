@@ -193,7 +193,7 @@ function PricingPage() {
                 aria-selected={audience === a}
                 onClick={() => setAudience(a)}
                 className={`rounded-full px-6 py-2 text-sm font-semibold transition-colors ${
-                  audience === a ? "bg-purple-600 text-white" : "text-gray-600 hover:text-gray-900"
+                  audience === a ? "hs-gradient text-white" : "text-gray-600 hover:text-gray-900"
                 }`}
               >
                 {a === "founder" ? "Founders" : "Investors"}
@@ -216,7 +216,7 @@ function PricingPage() {
             <Link
               to="/sign-up"
               search={{ role: "investor" } as any}
-              className="mt-4 inline-block rounded-xl bg-purple-600 px-6 py-3 text-sm font-semibold text-white hover:bg-purple-700"
+              className="mt-4 inline-block rounded-xl hs-gradient px-6 py-3 text-sm font-semibold text-white hover:hs-gradient"
             >
               Apply for investor access →
             </Link>
@@ -234,7 +234,7 @@ function PricingPage() {
               <div
                 key={p.plan_id}
                 className={`relative flex flex-col rounded-2xl border bg-white p-7 ${
-                  copy?.popular ? "border-purple-400 shadow-lg shadow-purple-100" : "border-gray-200"
+                  copy?.popular ? "border-brand shadow-lg shadow-purple-100" : "border-gray-200"
                 }`}
               >
                 {isCurrent ? (
@@ -242,7 +242,7 @@ function PricingPage() {
                     Your current plan
                   </span>
                 ) : copy?.popular ? (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-purple-600 px-3 py-1 text-xs font-semibold text-white whitespace-nowrap">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full hs-gradient px-3 py-1 text-xs font-semibold text-white whitespace-nowrap">
                     Most popular
                   </span>
                 ) : null}
@@ -281,7 +281,7 @@ function PricingPage() {
                   ) : user ? (
                     <Link
                       to={"/app/settings/billing" as any}
-                      className="block w-full rounded-xl bg-purple-600 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-purple-700"
+                      className="block w-full rounded-xl hs-gradient px-4 py-3 text-center text-sm font-semibold text-white hover:hs-gradient"
                     >
                       Upgrade
                     </Link>
@@ -289,7 +289,7 @@ function PricingPage() {
                     <Link
                       to={"/sign-up" as any}
                       search={{ plan: p.plan_id, role: p.user_type } as any}
-                      className="block w-full rounded-xl bg-purple-600 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-purple-700"
+                      className="block w-full rounded-xl hs-gradient px-4 py-3 text-center text-sm font-semibold text-white hover:hs-gradient"
                     >
                       Start free trial
                     </Link>
@@ -370,7 +370,7 @@ function PricingPage() {
           </p>
           <a
             href="mailto:hello@hockystick.app?subject=Enterprise%20contract"
-            className="mt-3 inline-block rounded-xl bg-purple-600 px-6 py-3 text-sm font-semibold text-white hover:bg-purple-700"
+            className="mt-3 inline-block rounded-xl hs-gradient px-6 py-3 text-sm font-semibold text-white hover:hs-gradient"
           >
             Contact us →
           </a>

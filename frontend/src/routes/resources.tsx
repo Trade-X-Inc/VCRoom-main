@@ -99,7 +99,7 @@ const regionColors: Record<string, { bg: string; color: string }> = {
   NA:     { bg: "rgba(16,185,129,0.12)", color: "#6ee7b7" },
   SEA:    { bg: "rgba(245,158,11,0.12)", color: "#fcd34d" },
   Africa: { bg: "rgba(239,68,68,0.12)",  color: "#fca5a5" },
-  Global: { bg: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" },
+  Global: { bg: "var(--accent)", color: "var(--muted-foreground)" },
 };
 
 function RegionBadge({ region }: { region: string }) {
@@ -120,22 +120,22 @@ function AcceleratorCard({ item }: { item: typeof accelerators[0] }) {
   return (
     <div
       className="rounded-xl p-5 flex flex-col gap-3"
-      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+      style={{ background: "var(--accent)", border: "1px solid var(--border)" }}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="text-sm font-semibold text-white leading-tight">{item.name}</p>
+        <p className="text-sm font-semibold text-foreground leading-tight">{item.name}</p>
         <RegionBadge region={item.region} />
       </div>
-      <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>{item.country}</p>
+      <p className="text-xs" style={{ color: "var(--faint)" }}>{item.country}</p>
       <div className="space-y-1">
-        <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
-          <span style={{ color: "rgba(255,255,255,0.25)" }}>Focus: </span>{item.focus}
+        <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+          <span style={{ color: "var(--faint)" }}>Focus: </span>{item.focus}
         </p>
-        <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
-          <span style={{ color: "rgba(255,255,255,0.25)" }}>Stage: </span>{item.stage}
+        <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+          <span style={{ color: "var(--faint)" }}>Stage: </span>{item.stage}
         </p>
-        <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
-          <span style={{ color: "rgba(255,255,255,0.25)" }}>Offer: </span>{item.offer}
+        <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+          <span style={{ color: "var(--faint)" }}>Offer: </span>{item.offer}
         </p>
       </div>
       <a
@@ -155,23 +155,23 @@ function GrantCard({ item }: { item: typeof grants[0] }) {
   return (
     <div
       className="rounded-xl p-5 flex flex-col gap-3"
-      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+      style={{ background: "var(--accent)", border: "1px solid var(--border)" }}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="text-sm font-semibold text-white leading-tight">{item.name}</p>
+        <p className="text-sm font-semibold text-foreground leading-tight">{item.name}</p>
         <RegionBadge region={item.region} />
       </div>
-      <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>{item.country}</p>
+      <p className="text-xs" style={{ color: "var(--faint)" }}>{item.country}</p>
       <div className="space-y-1">
-        <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
-          <span style={{ color: "rgba(255,255,255,0.25)" }}>Amount: </span>
+        <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+          <span style={{ color: "var(--faint)" }}>Amount: </span>
           <span style={{ color: "#10B981" }}>{item.amount}</span>
         </p>
-        <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
-          <span style={{ color: "rgba(255,255,255,0.25)" }}>Focus: </span>{item.focus}
+        <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+          <span style={{ color: "var(--faint)" }}>Focus: </span>{item.focus}
         </p>
-        <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
-          <span style={{ color: "rgba(255,255,255,0.25)" }}>Eligibility: </span>{item.eligibility}
+        <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+          <span style={{ color: "var(--faint)" }}>Eligibility: </span>{item.eligibility}
         </p>
       </div>
       <a
@@ -191,26 +191,26 @@ function VCCard({ item }: { item: typeof vcFunds[0] }) {
   return (
     <div
       className="rounded-xl p-5 flex flex-col gap-3"
-      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+      style={{ background: "var(--accent)", border: "1px solid var(--border)" }}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="text-sm font-semibold text-white leading-tight">{item.name}</p>
+        <p className="text-sm font-semibold text-foreground leading-tight">{item.name}</p>
         <RegionBadge region={item.region} />
       </div>
-      <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>{item.country}</p>
+      <p className="text-xs" style={{ color: "var(--faint)" }}>{item.country}</p>
       <div className="space-y-1">
-        <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
-          <span style={{ color: "rgba(255,255,255,0.25)" }}>Focus: </span>{item.focus}
+        <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+          <span style={{ color: "var(--faint)" }}>Focus: </span>{item.focus}
         </p>
-        <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
-          <span style={{ color: "rgba(255,255,255,0.25)" }}>Stage: </span>{item.stage}
+        <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+          <span style={{ color: "var(--faint)" }}>Stage: </span>{item.stage}
         </p>
-        <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
-          <span style={{ color: "rgba(255,255,255,0.25)" }}>Check: </span>
+        <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+          <span style={{ color: "var(--faint)" }}>Check: </span>
           <span style={{ color: "#a78bfa" }}>{item.checkSize}</span>
         </p>
-        <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
-          <span style={{ color: "rgba(255,255,255,0.25)" }}>Portfolio: </span>{item.portfolio}
+        <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+          <span style={{ color: "var(--faint)" }}>Portfolio: </span>{item.portfolio}
         </p>
       </div>
       <a
@@ -230,22 +230,22 @@ function ProgramCard({ item }: { item: typeof programs[0] }) {
   return (
     <div
       className="rounded-xl p-5 flex flex-col gap-3"
-      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+      style={{ background: "var(--accent)", border: "1px solid var(--border)" }}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="text-sm font-semibold text-white leading-tight">{item.name}</p>
+        <p className="text-sm font-semibold text-foreground leading-tight">{item.name}</p>
         <RegionBadge region={item.region} />
       </div>
-      <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>{item.country}</p>
+      <p className="text-xs" style={{ color: "var(--faint)" }}>{item.country}</p>
       <div className="space-y-1">
-        <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
-          <span style={{ color: "rgba(255,255,255,0.25)" }}>Focus: </span>{item.focus}
+        <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+          <span style={{ color: "var(--faint)" }}>Focus: </span>{item.focus}
         </p>
-        <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
-          <span style={{ color: "rgba(255,255,255,0.25)" }}>Stage: </span>{item.stage}
+        <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+          <span style={{ color: "var(--faint)" }}>Stage: </span>{item.stage}
         </p>
-        <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
-          <span style={{ color: "rgba(255,255,255,0.25)" }}>Offer: </span>{item.offer}
+        <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+          <span style={{ color: "var(--faint)" }}>Offer: </span>{item.offer}
         </p>
       </div>
       <a
@@ -253,7 +253,7 @@ function ProgramCard({ item }: { item: typeof programs[0] }) {
         target="_blank"
         rel="noopener noreferrer"
         className="mt-auto text-xs font-medium px-3 py-1.5 rounded-lg w-fit transition-colors"
-        style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)" }}
+        style={{ background: "var(--accent)", border: "1px solid var(--border)", color: "var(--muted-foreground)" }}
       >
         Learn more →
       </a>
@@ -293,21 +293,21 @@ function Resources() {
     visiblePrograms.length;
 
   return (
-    <div className="min-h-screen" style={{ background: "#0A0A0B" }}>
+    <div className="min-h-screen" style={{ background: "var(--background)" }}>
       <SiteHeader />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
 
         {/* Back */}
-        <a href="/" className="inline-flex items-center gap-2 text-sm transition-colors mb-12" style={{ color: "rgba(255,255,255,0.4)" }}
+        <a href="/" className="inline-flex items-center gap-2 text-sm transition-colors mb-12" style={{ color: "var(--muted-foreground)" }}
           onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.4)")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted-foreground)")}
         >
           ← Back to Hockystick
         </a>
 
         {/* Hero */}
         <div className="mb-12">
-          <p className="text-xs uppercase tracking-[0.2em] mb-4" style={{ color: "#7C3AED" }}>
+          <p className="text-xs uppercase tracking-[0.2em] mb-4" style={{ color: "var(--brand)" }}>
             Startup Resources
           </p>
           <h1
@@ -316,7 +316,7 @@ function Resources() {
           >
             Everything you need to fund your startup
           </h1>
-          <p className="text-sm leading-relaxed max-w-2xl" style={{ color: "rgba(255,255,255,0.5)" }}>
+          <p className="text-sm leading-relaxed max-w-2xl" style={{ color: "var(--muted-foreground)" }}>
             Accelerators, grants, VC funds, and programs from GCC, MENA, EU, NA, SEA, and Africa.
             Updated regularly. Verify all terms directly with each organization.
           </p>
@@ -325,7 +325,7 @@ function Resources() {
         {/* Tabs */}
         <div
           className="flex gap-1 p-1 rounded-xl mb-6 w-fit"
-          style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
+          style={{ background: "var(--accent)", border: "1px solid var(--border)" }}
         >
           {tabs.map((t) => (
             <button
@@ -334,8 +334,8 @@ function Resources() {
               className="px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
               style={
                 tab === t.id
-                  ? { background: "#7C3AED", color: "#fff" }
-                  : { color: "rgba(255,255,255,0.45)" }
+                  ? { background: "var(--gradient-brand)", color: "#fff" }
+                  : { color: "var(--muted-foreground)" }
               }
             >
               {t.label}
@@ -343,8 +343,8 @@ function Resources() {
                 className="text-xs px-1.5 py-0.5 rounded-full"
                 style={
                   tab === t.id
-                    ? { background: "rgba(255,255,255,0.2)", color: "#fff" }
-                    : { background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.3)" }
+                    ? { background: "var(--accent)", color: "var(--foreground)" }
+                    : { background: "var(--accent)", color: "var(--faint)" }
                 }
               >
                 {t.count}
@@ -363,14 +363,14 @@ function Resources() {
               style={
                 region === r
                   ? { background: "rgba(124,58,237,0.25)", border: "1px solid rgba(124,58,237,0.5)", color: "#a78bfa" }
-                  : { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)" }
+                  : { background: "var(--accent)", border: "1px solid var(--border)", color: "var(--muted-foreground)" }
               }
             >
               {r}
             </button>
           ))}
           {currentCount > 0 && (
-            <span className="text-xs self-center ml-2" style={{ color: "rgba(255,255,255,0.2)" }}>
+            <span className="text-xs self-center ml-2" style={{ color: "var(--faint)" }}>
               {currentCount} result{currentCount !== 1 ? "s" : ""}
             </span>
           )}
@@ -407,7 +407,7 @@ function Resources() {
         )}
 
         {/* Disclaimer */}
-        <p className="text-xs mt-12 leading-relaxed max-w-2xl" style={{ color: "rgba(255,255,255,0.2)" }}>
+        <p className="text-xs mt-12 leading-relaxed max-w-2xl" style={{ color: "var(--faint)" }}>
           ⚠ Program details change frequently. Verify all terms directly with each organization before
           applying. Hockystick is not affiliated with any of these programs.
         </p>
@@ -417,15 +417,15 @@ function Resources() {
           className="mt-8 p-6 rounded-xl max-w-2xl"
           style={{ background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)" }}
         >
-          <p className="text-sm font-semibold text-white mb-1">Ready to raise?</p>
-          <p className="text-xs mb-4" style={{ color: "rgba(255,255,255,0.5)" }}>
+          <p className="text-sm font-semibold text-foreground mb-1">Ready to raise?</p>
+          <p className="text-xs mb-4" style={{ color: "var(--muted-foreground)" }}>
             Build a verified founder profile on Hockystick and get matched with investors aligned
             to your sector, stage, and region. Free during beta.
           </p>
           <a
             href="/sign-up"
             className="text-xs font-medium px-4 py-2 rounded-lg inline-block transition-colors"
-            style={{ background: "#7C3AED", color: "#fff" }}
+            style={{ background: "var(--gradient-brand)", color: "#fff" }}
           >
             Build your verified profile →
           </a>
@@ -440,7 +440,7 @@ function Resources() {
 function EmptyState({ region }: { region: string }) {
   return (
     <div className="py-16 text-center">
-      <p className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>
+      <p className="text-sm" style={{ color: "var(--faint)" }}>
         No results for region "{region}". Try "All" or another region.
       </p>
     </div>

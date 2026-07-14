@@ -8,21 +8,21 @@ export const Route = createFileRoute('/about')({
 
 function About() {
   return (
-    <div className="min-h-screen bg-[#0A0A0B]">
+    <div className="min-h-screen bg-background">
       <SiteHeader />
       <main className="max-w-3xl mx-auto px-6 py-24">
-        <a href="/" className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors mb-12 block">
+        <a href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-12 block">
           ← Back to Hockystick
         </a>
 
-        <p className="text-xs text-[#7C3AED] uppercase tracking-[0.2em] mb-4">
+        <p className="text-xs text-brand uppercase tracking-[0.2em] mb-4">
           About
         </p>
-        <h1 className="font-syne font-bold text-4xl text-white mb-6 leading-tight">
+        <h1 className="font-syne font-bold text-4xl text-foreground mb-6 leading-tight">
           Built in the GCC.<br />
           For the founders who don't know the right people.
         </h1>
-        <p className="text-white/60 text-lg leading-relaxed mb-12">
+        <p className="text-muted-foreground text-lg leading-relaxed mb-12">
           Most fundraising platforms are built for Silicon Valley.
           They assume you have a warm network, a Stanford alumni
           connection, or a prior exit. Most founders across GCC & MENA have
@@ -31,10 +31,10 @@ function About() {
 
         <div className="space-y-8 mb-16">
           <div>
-            <h2 className="font-syne font-bold text-xl text-white mb-3">
+            <h2 className="font-syne font-bold text-xl text-foreground mb-3">
               The problem we're solving
             </h2>
-            <p className="text-white/60 leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed">
               The GCC has a structural trust gap between founders and
               investors. Founders can't get meetings without warm intros.
               Investors receive hundreds of pitch decks with no way to
@@ -44,10 +44,10 @@ function About() {
           </div>
 
           <div>
-            <h2 className="font-syne font-bold text-xl text-white mb-3">
+            <h2 className="font-syne font-bold text-xl text-foreground mb-3">
               What Hockystick does
             </h2>
-            <p className="text-white/60 leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed">
               Hockystick replaces the pitch deck with a verified founder
               profile. Investors browse structured, AI-reviewed profiles
               with staged access to documents — from public overview to
@@ -59,10 +59,10 @@ function About() {
           </div>
 
           <div>
-            <h2 className="font-syne font-bold text-xl text-white mb-3">
+            <h2 className="font-syne font-bold text-xl text-foreground mb-3">
               Where we're based
             </h2>
-            <p className="text-white/60 leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed">
               Hockystick is based at DIFC FinTech Hive, Dubai —
               the region's leading financial technology hub.
               We are GCC & MENA focused and global by design. Our platform
@@ -72,7 +72,7 @@ function About() {
           </div>
 
           <div>
-            <h2 className="font-syne font-bold text-xl text-white mb-3">
+            <h2 className="font-syne font-bold text-xl text-foreground mb-3">
               Our principles
             </h2>
             <div className="space-y-3">
@@ -83,18 +83,18 @@ function About() {
                 'No warm intros required. Merit replaces connections.',
               ].map((p, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  <span className="text-[#7C3AED] mt-0.5">✦</span>
-                  <p className="text-white/60 text-sm leading-relaxed">{p}</p>
+                  <span className="text-brand mt-0.5">✦</span>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{p}</p>
                 </div>
               ))}
             </div>
           </div>
 
           <div>
-            <h2 className="font-syne font-bold text-xl text-white mb-3">
+            <h2 className="font-syne font-bold text-xl text-foreground mb-3">
               Who built this
             </h2>
-            <p className="text-white/60 leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed">
               Hockystick is built by a small team operating from DIFC FinTech Hive,
               Dubai. We are in beta, and we say so. Every number on our site is a real
               platform figure, every verification check runs against live registries,
@@ -108,11 +108,11 @@ function About() {
 
         <div className="flex flex-col sm:flex-row gap-4">
           <a href="/trust"
-            className="px-6 py-3 border border-white/15 rounded-xl text-sm text-white/70 hover:border-white/30 hover:text-white transition-colors text-center">
+            className="px-6 py-3 border border-border rounded-xl text-sm text-muted-foreground hover:border-border hover:text-foreground transition-colors text-center">
             How our verification works →
           </a>
           <a href="/contact"
-            className="px-6 py-3 bg-[#7C3AED] rounded-xl text-sm text-white hover:bg-[#6d28d9] transition-colors text-center">
+            className="px-6 py-3 hs-gradient rounded-xl text-sm text-foreground hover:bg-[#6d28d9] transition-colors text-center">
             Get in touch →
           </a>
         </div>

@@ -52,10 +52,10 @@ function Waitlist() {
 
       {/* Dark hero */}
       <div className="bg-[#0a0a0b] py-20 px-6 text-center">
-        <div className="inline-block px-3 py-1 rounded-full border border-[#7C3AED]/30 bg-[#7C3AED]/10 mb-5">
-          <span className="text-sm text-[#7C3AED] font-medium">Free during beta</span>
+        <div className="inline-block px-3 py-1 rounded-full border border-brand/30 bg-accent mb-5">
+          <span className="text-sm text-brand font-medium">Free during beta</span>
         </div>
-        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
+        <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
           Join the Hockystick waitlist.
         </h1>
         <p className="mt-4 text-lg text-gray-400 max-w-xl mx-auto">
@@ -99,7 +99,7 @@ function Waitlist() {
                 placeholder="Tell us about your challenge..." className="min-h-28" />
             </div>
             <button type="submit" disabled={loading}
-              className="w-full py-3 rounded-lg bg-[#7C3AED] text-white font-semibold text-sm hover:bg-[#6d28d9] transition-colors disabled:opacity-50">
+              className="w-full py-3 rounded-lg hs-gradient text-foreground font-semibold text-sm hover:bg-[#6d28d9] transition-colors disabled:opacity-50">
               {loading ? "Joining..." : "Join the waitlist"}
             </button>
           </form>

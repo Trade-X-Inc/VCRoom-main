@@ -26,7 +26,7 @@ function NotFoundComponent() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#0A0A0B',
+      background: 'var(--background)',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -35,7 +35,7 @@ function NotFoundComponent() {
       fontFamily: 'DM Sans, sans-serif',
     }}>
       <p style={{
-        color: '#7C3AED',
+        color: 'var(--brand)',
         fontSize: 12,
         fontWeight: 600,
         letterSpacing: '0.1em',
@@ -55,7 +55,7 @@ function NotFoundComponent() {
         This page doesn't exist
       </h1>
       <p style={{
-        color: 'rgba(255,255,255,0.4)',
+        color: 'var(--muted-foreground)',
         fontSize: 16,
         marginBottom: 32,
         textAlign: 'center',
@@ -65,7 +65,7 @@ function NotFoundComponent() {
       </p>
       <div style={{ display: 'flex', gap: 12 }}>
         <a href="/" style={{
-          background: '#7C3AED',
+          background: 'var(--gradient-brand)',
           color: '#ffffff',
           padding: '10px 24px',
           borderRadius: 8,
@@ -76,7 +76,7 @@ function NotFoundComponent() {
           Go home
         </a>
         <a href="/tools" style={{
-          background: 'rgba(255,255,255,0.06)',
+          background: 'var(--accent)',
           color: '#ffffff',
           padding: '10px 24px',
           borderRadius: 8,

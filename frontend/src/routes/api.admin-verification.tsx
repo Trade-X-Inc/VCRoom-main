@@ -198,7 +198,7 @@ export const Route = createFileRoute("/api/admin-verification")({
   component: AdminVerificationPage,
 });
 
-const box: React.CSSProperties = { background: "#111114", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: 18, marginBottom: 14 };
+const box: React.CSSProperties = { background: "var(--card)", border: "1px solid var(--border)", borderRadius: 10, padding: 18, marginBottom: 14 };
 const btn: React.CSSProperties = { border: "none", borderRadius: 7, padding: "7px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "#fff" };
 
 function AdminVerificationPage() {
@@ -225,7 +225,7 @@ function AdminVerificationPage() {
   return (
     <div style={{ background: "#0a0a0b", minHeight: "100vh", padding: 24, fontFamily: "system-ui", color: "#fff" }}>
       <h1 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>Verification review queue</h1>
-      <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 8 }}>
+      <p style={{ fontSize: 12, color: "var(--muted-foreground)", marginBottom: 8 }}>
         Tier 3 approval requires your manual spot-check of the three documents below — the AI verdicts are the first pass, you are the second.
       </p>
       <div style={{ marginBottom: 18 }}>
@@ -233,18 +233,18 @@ function AdminVerificationPage() {
           value={reviewer}
           onChange={(e) => setReviewer(e.target.value)}
           placeholder="Your name (required for Tier 4 sign-off)"
-          style={{ background: "#18181c", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 7, padding: "7px 12px", fontSize: 12, color: "#fff", width: 300 }}
+          style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: 7, padding: "7px 12px", fontSize: 12, color: "var(--foreground)", width: 300 }}
         />
       </div>
       {status && <div style={{ marginBottom: 14, fontSize: 12, color: "#F59E0B" }}>{status}</div>}
-      {reviews.length === 0 && <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>No startups awaiting review.</div>}
+      {reviews.length === 0 && <div style={{ fontSize: 13, color: "var(--muted-foreground)" }}>No startups awaiting review.</div>}
 
       {reviews.map((r) => (
         <div key={r.startup_id} style={box}>
           <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
             <div>
               <div style={{ fontSize: 14, fontWeight: 700 }}>{r.company_name}</div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
+              <div style={{ fontSize: 11, color: "var(--muted-foreground)" }}>
                 Tier {r.current_tier} · {r.verified_claims} verified claims · {r.founder_email ?? "no email"}
                 {r.review_requested_at && <> · review requested {new Date(r.review_requested_at).toLocaleDateString()}</>}
               </div>
@@ -271,7 +271,7 @@ function AdminVerificationPage() {
               )}
               {r.tier3_passed && !r.tier4_passed && (
                 <button
-                  style={{ ...btn, background: "#7C3AED" }}
+                  style={{ ...btn, background: "var(--gradient-brand)" }}
                   onClick={() => act(() => approveTier4({ data: { key, startup_id: r.startup_id, reviewer_name: reviewer } }), `Sign off Tier 4 (${r.company_name})`)}
                 >
                   Sign off Tier 4 (video review done)
@@ -282,14 +282,14 @@ function AdminVerificationPage() {
           </div>
           <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
             {r.slots.map((s) => (
-              <div key={s.slot} style={{ background: "#18181c", borderRadius: 8, padding: 12, border: `1px solid ${s.verified ? "rgba(16,185,129,0.3)" : "rgba(255,255,255,0.08)"}` }}>
+              <div key={s.slot} style={{ background: "var(--accent)", borderRadius: 8, padding: 12, border: `1px solid ${s.verified ? "rgba(16,185,129,0.3)" : "var(--border)"}` }}>
                 <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 4 }}>
-                  {s.label} — <span style={{ color: s.verified ? "#10B981" : s.uploaded_at ? "#EF4444" : "rgba(255,255,255,0.3)" }}>
+                  {s.label} — <span style={{ color: s.verified ? "#10B981" : s.uploaded_at ? "#EF4444" : "var(--faint)" }}>
                     {s.verified ? "AI confirmed" : s.uploaded_at ? "AI rejected" : "not submitted"}
                   </span>
                 </div>
-                {s.uploaded_at && <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginBottom: 4 }}>Uploaded {new Date(s.uploaded_at).toLocaleDateString()}</div>}
-                {s.ai?.explanation && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", lineHeight: 1.5 }}>{s.ai.explanation}</div>}
+                {s.uploaded_at && <div style={{ fontSize: 10, color: "var(--faint)", marginBottom: 4 }}>Uploaded {new Date(s.uploaded_at).toLocaleDateString()}</div>}
+                {s.ai?.explanation && <div style={{ fontSize: 11, color: "var(--muted-foreground)", lineHeight: 1.5 }}>{s.ai.explanation}</div>}
                 {s.ai?.issues && <div style={{ fontSize: 11, color: "#F59E0B", lineHeight: 1.5, marginTop: 3 }}>Issues: {s.ai.issues}</div>}
               </div>
             ))}

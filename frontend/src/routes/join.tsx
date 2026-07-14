@@ -184,22 +184,22 @@ function JoinTeamPage() {
           <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(16,185,129,0.15)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
             <Check size={24} style={{ color: "#10B981" }} />
           </div>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 8 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--foreground)", marginBottom: 8 }}>
             Welcome to {companyName}!
           </h2>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 24, lineHeight: 1.6 }}>
-            You've joined as <strong style={{ color: "#fff" }}>{roleLabel}</strong>. Complete your team profile to get started.
+          <p style={{ fontSize: 13, color: "var(--muted-foreground)", marginBottom: 24, lineHeight: 1.6 }}>
+            You've joined as <strong style={{ color: "var(--foreground)" }}>{roleLabel}</strong>. Complete your team profile to get started.
           </p>
           <button
             onClick={() => navigate({ to: "/app/member-profile" as any })}
-            style={{ background: "#7C3AED", color: "#fff", border: "none", borderRadius: 8, padding: "11px 24px", fontSize: 14, fontWeight: 500, cursor: "pointer" }}
+            style={{ background: "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 8, padding: "11px 24px", fontSize: 14, fontWeight: 500, cursor: "pointer" }}
           >
             Complete my profile →
           </button>
           <div style={{ marginTop: 12 }}>
             <button
               onClick={() => navigate({ to: "/app" as any })}
-              style={{ background: "transparent", border: "none", color: "rgba(255,255,255,0.4)", fontSize: 13, cursor: "pointer" }}
+              style={{ background: "transparent", border: "none", color: "var(--muted-foreground)", fontSize: 13, cursor: "pointer" }}
             >
               Go to dashboard
             </button>
@@ -213,7 +213,7 @@ function JoinTeamPage() {
     return (
       <PublicShell>
         <div style={{ textAlign: "center", padding: "48px 0" }}>
-          <Loader2 size={28} style={{ color: "#7C3AED", animation: "spin 1s linear infinite", margin: "0 auto" }} />
+          <Loader2 size={28} style={{ color: "var(--brand)", animation: "spin 1s linear infinite", margin: "0 auto" }} />
         </div>
       </PublicShell>
     );
@@ -260,28 +260,28 @@ function JoinTeamPage() {
     <PublicShell>
       <div style={{ maxWidth: 420, margin: "0 auto" }}>
         {/* Invite card */}
-        <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: 28, marginBottom: 20 }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
+        <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 16, padding: 28, marginBottom: 20 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: "var(--faint)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
             Team invitation
           </div>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 6 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--foreground)", marginBottom: 6 }}>
             Join {companyName}
           </h2>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.6, marginBottom: 16 }}>
+          <p style={{ fontSize: 13, color: "var(--muted-foreground)", lineHeight: 1.6, marginBottom: 16 }}>
             {inviterName} invited you to join{" "}
-            <strong style={{ color: "#fff" }}>{companyName}</strong> as a{" "}
-            <strong style={{ color: "#7C3AED" }}>{roleLabel}</strong> on Hockystick.
+            <strong style={{ color: "var(--foreground)" }}>{companyName}</strong> as a{" "}
+            <strong style={{ color: "var(--brand)" }}>{roleLabel}</strong> on Hockystick.
           </p>
-          <div style={{ background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.15)", borderRadius: 8, padding: "10px 14px", fontSize: 12, color: "rgba(255,255,255,0.5)", lineHeight: 1.5 }}>
-            Invite sent to <strong style={{ color: "#fff" }}>{invite?.email}</strong>
+          <div style={{ background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.15)", borderRadius: 8, padding: "10px 14px", fontSize: 12, color: "var(--muted-foreground)", lineHeight: 1.5 }}>
+            Invite sent to <strong style={{ color: "var(--foreground)" }}>{invite?.email}</strong>
           </div>
         </div>
 
         {/* Auth / Accept */}
         {user ? (
-          <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: 24, textAlign: "center" }}>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 16 }}>
-              Signed in as <strong style={{ color: "#fff" }}>{user.email}</strong>
+          <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 16, padding: 24, textAlign: "center" }}>
+            <div style={{ fontSize: 13, color: "var(--muted-foreground)", marginBottom: 16 }}>
+              Signed in as <strong style={{ color: "var(--foreground)" }}>{user.email}</strong>
             </div>
             {/* Block self-acceptance — same account as the sender */}
             {user.id === invite?.invited_by ? (
@@ -300,7 +300,7 @@ function JoinTeamPage() {
                   onClick={handleAccept}
                   disabled={accepting}
                   style={{
-                    width: "100%", background: "#7C3AED", color: "#fff", border: "none",
+                    width: "100%", background: "var(--gradient-brand)", color: "#fff", border: "none",
                     borderRadius: 8, padding: "12px 24px", fontSize: 14, fontWeight: 600,
                     cursor: accepting ? "not-allowed" : "pointer", opacity: accepting ? 0.7 : 1,
                     display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
@@ -313,8 +313,8 @@ function JoinTeamPage() {
             )}
           </div>
         ) : (
-          <div style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: 24 }}>
-            <div style={{ display: "flex", gap: 4, marginBottom: 20, background: "rgba(255,255,255,0.04)", borderRadius: 8, padding: 3 }}>
+          <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 16, padding: 24 }}>
+            <div style={{ display: "flex", gap: 4, marginBottom: 20, background: "var(--accent)", borderRadius: 8, padding: 3 }}>
               {(["signup", "signin"] as const).map((m) => (
                 <button
                   key={m}
@@ -322,8 +322,8 @@ function JoinTeamPage() {
                   style={{
                     flex: 1, padding: "7px 0", fontSize: 12, fontWeight: 500, borderRadius: 6,
                     border: "none", cursor: "pointer",
-                    background: authMode === m ? "#7C3AED" : "transparent",
-                    color: authMode === m ? "#fff" : "rgba(255,255,255,0.4)",
+                    background: authMode === m ? "var(--gradient-brand)" : "transparent",
+                    color: authMode === m ? "#fff" : "var(--muted-foreground)",
                   }}
                 >
                   {m === "signup" ? "Create account" : "Sign in"}
@@ -372,7 +372,7 @@ function JoinTeamPage() {
               onClick={handleAuth}
               disabled={authing}
               style={{
-                width: "100%", background: "#7C3AED", color: "#fff", border: "none",
+                width: "100%", background: "var(--gradient-brand)", color: "#fff", border: "none",
                 borderRadius: 8, padding: "11px 24px", fontSize: 13, fontWeight: 600,
                 cursor: authing ? "not-allowed" : "pointer", opacity: authing ? 0.7 : 1,
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
@@ -389,26 +389,26 @@ function JoinTeamPage() {
 }
 
 const labelStyle: React.CSSProperties = {
-  fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.4)",
+  fontSize: 11, fontWeight: 600, color: "var(--muted-foreground)",
   textTransform: "uppercase", letterSpacing: "0.06em",
   display: "block", marginBottom: 6,
 };
 
 const inputStyle: React.CSSProperties = {
-  width: "100%", background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
-  padding: "10px 12px", fontSize: 13, color: "#fff",
+  width: "100%", background: "var(--accent)",
+  border: "1px solid var(--border)", borderRadius: 8,
+  padding: "10px 12px", fontSize: 13, color: "var(--foreground)",
   outline: "none", boxSizing: "border-box",
 };
 
 function PublicShell({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ minHeight: "100vh", background: "#0A0A0B", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
+    <div style={{ minHeight: "100vh", background: "var(--background)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <div style={{ marginBottom: 32 }}>
         <Logo withWordmark />
       </div>
       {children}
-      <div style={{ marginTop: 32, fontSize: 11, color: "rgba(255,255,255,0.2)" }}>
+      <div style={{ marginTop: 32, fontSize: 11, color: "var(--faint)" }}>
         Hockystick · Where deals get done
       </div>
     </div>
@@ -431,11 +431,11 @@ function ErrorCard({
           ? <Check size={22} style={{ color: "#10B981" }} />
           : <AlertTriangle size={22} style={{ color: "#EF4444" }} />}
       </div>
-      <h2 style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 8 }}>{title}</h2>
-      <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.6, marginBottom: 24 }}>{message}</p>
+      <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--foreground)", marginBottom: 8 }}>{title}</h2>
+      <p style={{ fontSize: 13, color: "var(--muted-foreground)", lineHeight: 1.6, marginBottom: 24 }}>{message}</p>
       <a
         href={cta.href}
-        style={{ display: "inline-block", background: "#7C3AED", color: "#fff", textDecoration: "none", borderRadius: 8, padding: "11px 24px", fontSize: 13, fontWeight: 500 }}
+        style={{ display: "inline-block", background: "var(--gradient-brand)", color: "#fff", textDecoration: "none", borderRadius: 8, padding: "11px 24px", fontSize: 13, fontWeight: 500 }}
       >
         {cta.label}
       </a>
