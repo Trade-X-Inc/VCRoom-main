@@ -98,127 +98,122 @@ Every feature needs a clear monetization path before it gets built — either it
 
 ---
 
-## 9. Dashboard Design System (production UI/UX reference)
+## 9. Design System — WHITE REDESIGN (July 2026, replaces the dark dashboard entirely)
 
-This section exists because dashboard UI bugs (light backgrounds leaking into dark pages, inconsistent card styles, ad-hoc spacing) kept recurring across sessions. The brand system already exists and is documented in full in `/brand-guidelines.html` and `/brand-assets-reference.html` in the project — this section is the dashboard-specific subset every Claude Code build prompt must follow without re-deriving it.
+**The dark dashboard is dead.** In July 2026 the founder ordered a full redesign: one pure-white
+theme everywhere, purple only as a gradient, Japanese-minimalist whitespace, minimal text,
+institutional type. If you find a page that still looks dark, it is UNMIGRATED LEGACY —
+never "fix" a white page back to dark. Tokens live in `frontend/src/lib/design-tokens.ts`
+and primitives in `frontend/src/components/system/`. If a value isn't in design-tokens.ts,
+it isn't in the system.
 
-**This is not a request for creative reinterpretation.** Unlike a marketing page or landing page (where the `frontend-design` skill's instruction to "take one aesthetic risk" applies), the dashboard is a production product with an established system. The job here is consistent execution of fixed tokens, not fresh creative direction per page.
+**This is not a request for creative reinterpretation.** The job is consistent execution of
+these fixed rules, not fresh creative direction per page.
 
-### 9.1 Color tokens (hard rules, no substitutions)
+### 9.0 The vision (founder's words, verbatim — this is the law)
 
-```
---black:         #0A0A0B   (dashboard page background — never white/gray here)
---white:         #FAFAFA   (public/marketing page background only)
---purple-deep:   #3B0764
---purple-core:   #7C3AED   (primary brand color — buttons, active states, links)
---purple-mid:    #A855F7   (secondary accent, gradients)
---purple-light:  #D8B4FE   (rarely used, light-on-dark accents)
---purple-pale:   #F5F3FF   (light theme only — callout backgrounds)
---green-accent:  #10B981   (success, positive states, "verified" badges, checkmarks)
---gray-900:      #111827
---gray-700:      #374151
---gray-500:      #6B7280
---gray-300:      #D1D5DB
---gray-100:      #F3F4F6
+> "Pure white and pure black. Purple as gradient, not raw.
+> Black and white website with small side letters, white space,
+> silent aesthetic, Japanese minimalism but elegant touch.
+> Very clear and simple. One word says one essay. Users read less.
+> Beautiful error states with character illustrations.
+> Everything builds trust and engages."
 
-Dashboard-specific surface colors (not in brand doc, established in-app):
---card-bg:        #111114   (card/panel background on dark dashboard)
---card-bg-hover:  #18181C
---card-border:    rgba(255,255,255,0.08)
---card-border-hover: rgba(124,58,237,0.3)
---text-primary:   #FFFFFF
---text-secondary: rgba(255,255,255,0.5)
---text-muted:     rgba(255,255,255,0.25)
---warning-amber:  #F59E0B   (missing field warnings, limit-reached states)
---error-red:      #EF4444
-```
+### 9.1 One theme — pure white
 
-**The rule that gets violated most often:** every page inside `/app/*` (AdminShell or MemberShell) uses `--black` (#0A0A0B) as its root background. Every page outside the dashboard that needs a dark theme (e.g. `/join`, `/cv/$slug`) must explicitly set `background: #0A0A0B` since it renders outside AppShell and has no inherited background — it will default to white otherwise. This exact bug has shipped more than once. Before any new page ships, confirm which category it's in and that its background matches.
+- The app is white. Period. No exceptions inside `/app/*`. Public pages are white too.
+- There is no dark mode, no theme toggle, no `dark:` variants, no `.dark` CSS block.
+- **Sanctioned exception:** `/roast/*` PUBLIC pages keep their event styling, including the
+  full-red race button (`#EF4444`) — it is a game mechanic, not a UI button. Roast
+  *management* pages inside `/app/*` follow the white system fully.
 
-### 9.2 Typography
+### 9.2 Purple is a gradient — never flat
 
 ```
-Display font: 'Syne', sans-serif       — weights 400/500/600/700/800
-Body font:    'DM Sans', sans-serif    — weights 300/400/500, italic 300
-
-Usage:
-- Syne 800: page titles, hero numbers, logo wordmark
-- Syne 700: card headers, section titles
-- Syne 600: small labels, badges, eyebrow text (uppercase, letter-spacing 0.1-0.15em)
-- DM Sans 400: body text, descriptions
-- DM Sans 300: secondary/muted text, subtitles
-- DM Sans 500: button labels, emphasized inline text
+background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%)
+hover:      linear-gradient(135deg, #6D28D9 0%, #4F46E5 100%)
 ```
+- Applied to: primary buttons, active nav indicators, the logo mark. Nothing else.
+- Text on gradient: always white. Flat `#7C3AED` is banned everywhere.
+- Use the `.hs-gradient` / `.hs-gradient-text` utilities or `gradient` from design-tokens.ts.
 
-Never substitute a different font pairing for dashboard pages. Syne/DM Sans is fixed brand identity, not a per-page creative choice.
+### 9.3 Whitespace is the design — ma (間)
 
-### 9.3 Component patterns already established (reuse, don't reinvent)
-
-**Card:**
-```css
-background: #111114;
-border: 1px solid rgba(255,255,255,0.08);
-border-radius: 12px;
-padding: 20px 24px;
-/* hover state, if interactive: */
-border-color: rgba(124,58,237,0.3);
-background: #18181C;
 ```
-
-**Primary button:**
-```css
-background: #7C3AED;
-color: #fff;
-border-radius: 8px;
-padding: 10px 24px;
-font-weight: 600;
-font-size: 14px;
+Page padding:     48px desktop / 24px mobile
+Between sections: 48px
+Card padding:     24px
+Between cards:    16px
 ```
+The whitespace IS the aesthetic. Don't fill it. Everything sits on an 8px grid.
 
-**Locked/restricted feature state** (established pattern, reuse exactly):
+### 9.4 Text is minimal — one word says one essay
+
+- Label: max 2 words · Description: max 1 sentence · Button: max 3 words · Error: max 1 sentence.
+- If you need more words, you need a better design.
+- WRONG: "Upload your pitch deck document to share with investors" → RIGHT: "Add pitch deck"
+- WRONG: "No deal rooms have been created yet. Create your first…" → RIGHT: "No deal rooms yet" + [Create]
+- Plus the standing voice rules: no exclamation marks, no passive voice, active-verb
+  symmetry ("Save changes" → "Changes saved"), name things by what the person controls,
+  errors state what happened and how to fix it, never apologize.
+
+### 9.5 Typography — small, precise, quiet
+
 ```
-40x40 icon box, background rgba(124,58,237,0.1), border-radius 8px, lock icon
-Title: white, 600 weight, 14px
-Subtext: rgba(255,255,255,0.4), 13px, explains what role/plan unlocks it
+Heading: Syne, 18px, 700, letter-spacing -0.5px, #0A0A0B
+Label:   Inter, 11px, 500, uppercase, tracking 0.08em, rgba(0,0,0,0.35)
+Body:    Inter, 13px, 400, #0A0A0B
+Value:   Inter, 13px, 600, #0A0A0B
+Muted:   Inter, 12px, 400, rgba(0,0,0,0.35)
 ```
+Everything is smaller than you think it should be. Small text = institutional.
+Fonts are self-hosted via @fontsource (Syne 700/800, Inter 400/500/600) — imported in
+styles.css. DM Sans is retired from the app; Inter replaces it.
 
-**Badge/status pill colors:**
+### 9.6 Cards — borderless, whitespace-separated
+
+- No borders, no shadows, no rounded corners on cards. The content IS the card;
+  the space around it defines it.
+- If grouping is unavoidable: one hairline divider — `1px solid rgba(0,0,0,0.06)`
+  (`.hs-hairline-t` / `.hs-hairline-b`).
+- Dense data tables MAY use hairline row dividers — that is what hairlines are for.
+
+### 9.7 Buttons — three types only (`HsButton` in components/system)
+
 ```
-Success / verified / strong fit:  background rgba(16,185,129,0.12), text #10B981
-Warning / limit reached / amber:  background rgba(245,158,11,0.12), text #F59E0B
-Neutral / muted / low fit:        background rgba(255,255,255,0.06), text rgba(255,255,255,0.4)
-Error / declined:                 background rgba(239,68,68,0.12), text #EF4444
+primary: gradient purple bg, white text, no border, radius 8px
+ghost:   transparent, ink text, 1px rgba(0,0,0,0.08) border, radius 8px
+text:    no chrome, gradient text, underline on hover
 ```
+No amber, green, or red buttons exist anywhere (Roast public race button excepted, §9.1).
 
-**Callout/info box** (used for "one thing to do," tips, warnings):
-```css
-background: rgba(124,58,237,0.06);  /* or matching color at 6% opacity */
-border: 1px solid rgba(124,58,237,0.2);
-border-radius: 8px;
-padding: 16px 20px;
+### 9.8 Status — the dot system (`StatusDot` in components/system)
+
+Status is never a colored pill background. It is a 6px colored dot + 11px uppercase ink label:
 ```
+positive #10B981 · warning #F59E0B · negative #EF4444 · neutral rgba(0,0,0,0.25)
+```
+These are the only semantic colors in the app, and they appear only as 6px dots.
 
-### 9.4 Imagery and iconography rules (from brand-guidelines.html)
+### 9.9 Errors have personality (`EmptyState` / `Illustration` in components/system)
 
-- Icon set: Lucide icons only, for consistency with the rest of the app — never mix icon libraries
-- No stock photo clichés, no clipart, no cartoon illustrations anywhere in-product
-- Charts: dark background, purple as primary data color, green for positive signals, never pie charts — bar or line only
-- Gradients: purple radial only, max 2 colors, max 30% opacity — never rainbow or off-brand colors
-- Screenshots used anywhere in-product (onboarding, empty states, marketing): always dark mode, never light mode
+Every empty/error/loading/no-results state uses the line-art characters
+(64×64, 2px stroke, ink only): empty = figure on box edge · loading = walking figure
+(NO spinners exist) · error = gentle shrug · no-results = binoculars.
+Copy under them: max 1 short sentence ("Nothing here yet", "Something went wrong", "No matches").
 
-### 9.5 Voice and copy rules (from brand-guidelines.html, applies to UI copy too)
+### 9.10 Imagery and iconography
 
-- No exclamation marks, no passive voice, sentences under 20 words, no buzzwords
-- Active voice: a button that says "Save changes" produces a result that says "Changes saved" — same verb throughout the flow
-- Name things by what the person controls, not by how the system is built ("Team members," not "RBAC accounts")
-- Errors state what happened and how to fix it, never apologize, never vague
-- Empty states are an invitation to act, not just an absence notice ("No team members yet — invite someone to get started," not just "No data")
+- Lucide icons only — never mix icon libraries.
+- The line-art characters are the ONLY illustrations. No stock photos, no clipart.
+- Charts: white background, gradient purple as primary series, green for positive — never pie charts.
+- Screenshots used in-product or marketing: always the white theme.
 
-### 9.6 What every future Claude Code UI prompt should include
+### 9.11 What every future UI prompt must include
 
-Reference this section explicitly: "Follow the dashboard design system in CLAUDE.md Section 9 — do not invent new colors, spacing, or component patterns. Reuse the existing card/button/badge/locked-feature patterns exactly as documented." This single line prevents the majority of styling drift and theme-mismatch bugs seen so far in this project.
-
----
+"Follow the white design system in CLAUDE.md Section 9 — use design-tokens.ts and the
+components/system primitives. Do not invent colors, spacing, or component patterns.
+Purple only as gradient. No dark styling anywhere."
 
 ## 10. Project Identity
 
@@ -243,8 +238,8 @@ TanStack Start + Vite 7 + React 19 + TypeScript + Tailwind CSS v4 + Supabase + C
 5. ALWAYS run npm run build before committing
 6. ALWAYS use existing design tokens (no inline styles or hardcoded hex)
 7. ALWAYS add enabled: !!user?.id to useQuery hooks
-8. NEVER use bg-white or text-black inside dark dashboard routes (/app/*)
-9. NEVER use prose-invert on public pages (light mode)
+8. NEVER add dark styling anywhere — the app is white-only (see Section 9); /roast/* public pages are the one sanctioned exception
+9. NEVER use prose-invert anywhere
 10. ALWAYS read secrets server-side via cfEnv, never client-side
 
 ## 13. Environment Variables
@@ -290,6 +285,8 @@ src/lib/ai-secure-fn.ts             — Document AI summary + thesis alignment (
 src/lib/profile-builder-fn.ts       — Profile builder AI extraction + interview server fns
 src/lib/intake-fn.ts                — Investor intake parser server fn (parseIntakeBatch)
 src/lib/roles.ts                    — FOUNDER_PERMISSIONS, INVESTOR_PERMISSIONS, PERMISSION_LABELS
+src/lib/design-tokens.ts            — Design system source of truth (Section 9)
+src/components/system/              — HsButton, StatusDot, SectionLabel, EmptyState, Illustration
 src/lib/email/resend.ts             — sendEmail() function
 src/lib/email/templates.ts          — Email templates
 src/lib/email/triggers.ts           — Email trigger server functions
@@ -323,42 +320,28 @@ public/_redirects                   — Cloudflare Pages redirects (301s for rem
 - app.reports.tsx — Reports → redirects to /app
 - app.leads.tsx / app.accelerators.tsx — redirects to /app
 
-## 15. Design System
+## 15. Design System (quick reference — full law in Section 9)
 
 ### Theme
-- Dashboard (/app/*): DARK MODE — black backgrounds, white text
-- Public pages (/blog, /, /pricing): LIGHT MODE — white backgrounds, dark text
+- EVERYTHING is white: /app/*, public pages, all of it. One theme. No toggle.
+- Sanctioned exception: /roast/* public event pages (red race button stays).
 
 ### Colors
-Primary brand: #7C3AED (purple-600)
-Brand hover: #6D28D9 (purple-700)
+- Ink #0A0A0B on white #FFFFFF. Hairline rgba(0,0,0,0.06).
+- Purple ONLY as gradient: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%)
+  via .hs-gradient / .hs-gradient-text. Flat #7C3AED is banned.
+- Semantic color exists only as 6px StatusDot dots.
 
-### Tailwind tokens (ALWAYS use these, never hardcode hex)
-- bg-brand, text-brand — purple primary
-- bg-card, border-border/60 — dark card surfaces
-- text-foreground — primary text
-- text-muted-foreground — secondary text
-- bg-accent — hover/secondary surface
-
-### Dashboard cards (dark)
-```
-className="bg-card border border-border/60 rounded-xl"
-```
-
-### Public page cards (light)
-```
-className="bg-white border border-gray-200 rounded-xl"
-```
-
-### Buttons
-Primary: bg-purple-600 hover:bg-purple-700 text-white
-Secondary: border border-border/60 text-muted-foreground hover:text-foreground
+### Components (frontend/src/components/system/)
+- HsButton (primary gradient / ghost / text) — the only three buttons
+- StatusDot, SectionLabel, EmptyState, Illustration (4 characters)
+- Cards: no border, no shadow, no radius — whitespace separates; hairlines for tables
 
 ### Typography
-Headings: font-family: "Syne, sans-serif"
-Body: DM Sans or system-ui
+- Syne 18/700/-0.5px headings · Inter 11/500 uppercase labels · Inter 13 body
+- Loaded via @fontsource in styles.css. DM Sans is retired.
 
-### Blog/article prose (light mode ONLY)
+### Blog/article prose
 ```
 className="prose prose-lg max-w-none
   prose-headings:text-gray-900
@@ -366,7 +349,7 @@ className="prose prose-lg max-w-none
   prose-a:text-purple-600
   prose-strong:text-gray-900"
 ```
-NEVER use prose-invert on public pages.
+NEVER use prose-invert.
 
 ## 16. Architecture Patterns
 
