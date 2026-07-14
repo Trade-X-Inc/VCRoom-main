@@ -1,3 +1,4 @@
+import { DealFlowHome } from "@/components/app/DealFlowHome";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -24,8 +25,10 @@ import {
   type InvestorProfile,
 } from "@/lib/profileCompleteness";
 
+// P5: /app/investor is the 4-step deal-flow home; the chat moved to
+// /app/investor/assistant.
 export const Route = createFileRoute("/app/investor/")({
-  component: InvestorChat,
+  component: DealFlowHome,
 });
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -342,7 +345,7 @@ function extractCompanyFromMessage(text: string, watchlist: InvestorContext["wat
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-function InvestorChat() {
+export function InvestorChat() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();

@@ -165,7 +165,7 @@ function AccordionBlock({
 
 // ── Main page ─────────────────────────────────────────────────────
 
-function InvestorProfilePage() {
+export function InvestorProfilePage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const search = useSearch({ strict: false }) as { tour?: string };

@@ -15,3 +15,11 @@
 /app/claims       /app/prepare#claims         301
 /app/badges       /app/prepare#badges         301
 /app/overview     /app                        301
+/app/investor/overview    /app/investor                            301
+/app/investor/startups    /app/investor/source#watchlist           301
+/app/investor/intake      /app/investor/source#intake              301
+/app/investor/deal-rooms  /app/investor/evaluate#deal-rooms        301
+/app/investor/diligence   /app/investor/evaluate#diligence         301
+/app/investor/analysis    /app/investor/evaluate#analysis          301
+/app/investor/decisions   /app/investor/decide#decisions           301
+/app/investor/portfolio   /app/investor/decide#portfolio           301

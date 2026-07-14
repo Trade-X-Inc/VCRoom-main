@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { Briefcase, Clock, Shield, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -7,6 +7,10 @@ import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/investor/deal-rooms")({
+  // P5: consolidated into the deal-flow steps — old links keep resolving.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/investor/evaluate", hash: "deal-rooms", replace: true });
+  },
   component: DealRoomsPage,
 });
 
@@ -27,7 +31,7 @@ const STAGE_TO_LABEL: Record<string, { label: string; cls: string }> = {
   closing:           { label: "Closing",     cls: "bg-success/10 text-success" },
 };
 
-function DealRoomsPage() {
+export function DealRoomsPage() {
   const { user } = useAuth();
 
   const { data: rooms = [], isLoading, isError } = useQuery({

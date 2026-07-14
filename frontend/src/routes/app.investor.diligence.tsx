@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -8,10 +8,14 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/app/investor/diligence")({
+  // P5: consolidated into the deal-flow steps — old links keep resolving.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/investor/evaluate", hash: "diligence", replace: true });
+  },
   component: DiligencePage,
 });
 
-function DiligencePage() {
+export function DiligencePage() {
   const { user } = useAuth();
 
   const { data: summary, isLoading: summaryLoading } = useQuery({

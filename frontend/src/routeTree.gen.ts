@@ -101,19 +101,24 @@ import { Route as AppSettingsSecurityRouteImport } from './routes/app.settings.s
 import { Route as AppSettingsNotificationsRouteImport } from './routes/app.settings.notifications'
 import { Route as AppSettingsDomainRouteImport } from './routes/app.settings.domain'
 import { Route as AppSettingsBillingRouteImport } from './routes/app.settings.billing'
+import { Route as AppInvestorThesisRouteImport } from './routes/app.investor.thesis'
 import { Route as AppInvestorTeamRouteImport } from './routes/app.investor.team'
 import { Route as AppInvestorStartupsRouteImport } from './routes/app.investor.startups'
+import { Route as AppInvestorSourceRouteImport } from './routes/app.investor.source'
 import { Route as AppInvestorSettingsRouteImport } from './routes/app.investor.settings'
 import { Route as AppInvestorProfileRouteImport } from './routes/app.investor.profile'
 import { Route as AppInvestorPortfolioRouteImport } from './routes/app.investor.portfolio'
 import { Route as AppInvestorOverviewRouteImport } from './routes/app.investor.overview'
 import { Route as AppInvestorIntakeRouteImport } from './routes/app.investor.intake'
+import { Route as AppInvestorEvaluateRouteImport } from './routes/app.investor.evaluate'
 import { Route as AppInvestorDiligenceRouteImport } from './routes/app.investor.diligence'
 import { Route as AppInvestorDeskRouteImport } from './routes/app.investor.desk'
 import { Route as AppInvestorDecisionsRouteImport } from './routes/app.investor.decisions'
+import { Route as AppInvestorDecideRouteImport } from './routes/app.investor.decide'
 import { Route as AppInvestorDealRoomsRouteImport } from './routes/app.investor.deal-rooms'
 import { Route as AppInvestorDealFlowRouteImport } from './routes/app.investor.deal-flow'
 import { Route as AppInvestorConnectionsRouteImport } from './routes/app.investor.connections'
+import { Route as AppInvestorAssistantRouteImport } from './routes/app.investor.assistant'
 import { Route as AppInvestorAnalysisRouteImport } from './routes/app.investor.analysis'
 import { Route as AppInvestorAdvisorRouteImport } from './routes/app.investor.advisor'
 import { Route as AppDealRoomIdRouteImport } from './routes/app.deal-room.$id'
@@ -585,6 +590,11 @@ const AppSettingsBillingRoute = AppSettingsBillingRouteImport.update({
   path: '/billing',
   getParentRoute: () => AppSettingsRoute,
 } as any)
+const AppInvestorThesisRoute = AppInvestorThesisRouteImport.update({
+  id: '/thesis',
+  path: '/thesis',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
 const AppInvestorTeamRoute = AppInvestorTeamRouteImport.update({
   id: '/team',
   path: '/team',
@@ -593,6 +603,11 @@ const AppInvestorTeamRoute = AppInvestorTeamRouteImport.update({
 const AppInvestorStartupsRoute = AppInvestorStartupsRouteImport.update({
   id: '/startups',
   path: '/startups',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppInvestorSourceRoute = AppInvestorSourceRouteImport.update({
+  id: '/source',
+  path: '/source',
   getParentRoute: () => AppInvestorRoute,
 } as any)
 const AppInvestorSettingsRoute = AppInvestorSettingsRouteImport.update({
@@ -620,6 +635,11 @@ const AppInvestorIntakeRoute = AppInvestorIntakeRouteImport.update({
   path: '/intake',
   getParentRoute: () => AppInvestorRoute,
 } as any)
+const AppInvestorEvaluateRoute = AppInvestorEvaluateRouteImport.update({
+  id: '/evaluate',
+  path: '/evaluate',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
 const AppInvestorDiligenceRoute = AppInvestorDiligenceRouteImport.update({
   id: '/diligence',
   path: '/diligence',
@@ -635,6 +655,11 @@ const AppInvestorDecisionsRoute = AppInvestorDecisionsRouteImport.update({
   path: '/decisions',
   getParentRoute: () => AppInvestorRoute,
 } as any)
+const AppInvestorDecideRoute = AppInvestorDecideRouteImport.update({
+  id: '/decide',
+  path: '/decide',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
 const AppInvestorDealRoomsRoute = AppInvestorDealRoomsRouteImport.update({
   id: '/deal-rooms',
   path: '/deal-rooms',
@@ -648,6 +673,11 @@ const AppInvestorDealFlowRoute = AppInvestorDealFlowRouteImport.update({
 const AppInvestorConnectionsRoute = AppInvestorConnectionsRouteImport.update({
   id: '/connections',
   path: '/connections',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppInvestorAssistantRoute = AppInvestorAssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
   getParentRoute: () => AppInvestorRoute,
 } as any)
 const AppInvestorAnalysisRoute = AppInvestorAnalysisRouteImport.update({
@@ -781,19 +811,24 @@ export interface FileRoutesByFullPath {
   '/app/deal-room/$id': typeof AppDealRoomIdRoute
   '/app/investor/advisor': typeof AppInvestorAdvisorRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
+  '/app/investor/assistant': typeof AppInvestorAssistantRoute
   '/app/investor/connections': typeof AppInvestorConnectionsRoute
   '/app/investor/deal-flow': typeof AppInvestorDealFlowRoute
   '/app/investor/deal-rooms': typeof AppInvestorDealRoomsRoute
+  '/app/investor/decide': typeof AppInvestorDecideRoute
   '/app/investor/decisions': typeof AppInvestorDecisionsRoute
   '/app/investor/desk': typeof AppInvestorDeskRoute
   '/app/investor/diligence': typeof AppInvestorDiligenceRoute
+  '/app/investor/evaluate': typeof AppInvestorEvaluateRoute
   '/app/investor/intake': typeof AppInvestorIntakeRoute
   '/app/investor/overview': typeof AppInvestorOverviewRoute
   '/app/investor/portfolio': typeof AppInvestorPortfolioRoute
   '/app/investor/profile': typeof AppInvestorProfileRoute
   '/app/investor/settings': typeof AppInvestorSettingsRoute
+  '/app/investor/source': typeof AppInvestorSourceRoute
   '/app/investor/startups': typeof AppInvestorStartupsRoute
   '/app/investor/team': typeof AppInvestorTeamRoute
+  '/app/investor/thesis': typeof AppInvestorThesisRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
@@ -892,19 +927,24 @@ export interface FileRoutesByTo {
   '/app/deal-room/$id': typeof AppDealRoomIdRoute
   '/app/investor/advisor': typeof AppInvestorAdvisorRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
+  '/app/investor/assistant': typeof AppInvestorAssistantRoute
   '/app/investor/connections': typeof AppInvestorConnectionsRoute
   '/app/investor/deal-flow': typeof AppInvestorDealFlowRoute
   '/app/investor/deal-rooms': typeof AppInvestorDealRoomsRoute
+  '/app/investor/decide': typeof AppInvestorDecideRoute
   '/app/investor/decisions': typeof AppInvestorDecisionsRoute
   '/app/investor/desk': typeof AppInvestorDeskRoute
   '/app/investor/diligence': typeof AppInvestorDiligenceRoute
+  '/app/investor/evaluate': typeof AppInvestorEvaluateRoute
   '/app/investor/intake': typeof AppInvestorIntakeRoute
   '/app/investor/overview': typeof AppInvestorOverviewRoute
   '/app/investor/portfolio': typeof AppInvestorPortfolioRoute
   '/app/investor/profile': typeof AppInvestorProfileRoute
   '/app/investor/settings': typeof AppInvestorSettingsRoute
+  '/app/investor/source': typeof AppInvestorSourceRoute
   '/app/investor/startups': typeof AppInvestorStartupsRoute
   '/app/investor/team': typeof AppInvestorTeamRoute
+  '/app/investor/thesis': typeof AppInvestorThesisRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
@@ -1008,19 +1048,24 @@ export interface FileRoutesById {
   '/app/deal-room/$id': typeof AppDealRoomIdRoute
   '/app/investor/advisor': typeof AppInvestorAdvisorRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
+  '/app/investor/assistant': typeof AppInvestorAssistantRoute
   '/app/investor/connections': typeof AppInvestorConnectionsRoute
   '/app/investor/deal-flow': typeof AppInvestorDealFlowRoute
   '/app/investor/deal-rooms': typeof AppInvestorDealRoomsRoute
+  '/app/investor/decide': typeof AppInvestorDecideRoute
   '/app/investor/decisions': typeof AppInvestorDecisionsRoute
   '/app/investor/desk': typeof AppInvestorDeskRoute
   '/app/investor/diligence': typeof AppInvestorDiligenceRoute
+  '/app/investor/evaluate': typeof AppInvestorEvaluateRoute
   '/app/investor/intake': typeof AppInvestorIntakeRoute
   '/app/investor/overview': typeof AppInvestorOverviewRoute
   '/app/investor/portfolio': typeof AppInvestorPortfolioRoute
   '/app/investor/profile': typeof AppInvestorProfileRoute
   '/app/investor/settings': typeof AppInvestorSettingsRoute
+  '/app/investor/source': typeof AppInvestorSourceRoute
   '/app/investor/startups': typeof AppInvestorStartupsRoute
   '/app/investor/team': typeof AppInvestorTeamRoute
+  '/app/investor/thesis': typeof AppInvestorThesisRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
@@ -1125,19 +1170,24 @@ export interface FileRouteTypes {
     | '/app/deal-room/$id'
     | '/app/investor/advisor'
     | '/app/investor/analysis'
+    | '/app/investor/assistant'
     | '/app/investor/connections'
     | '/app/investor/deal-flow'
     | '/app/investor/deal-rooms'
+    | '/app/investor/decide'
     | '/app/investor/decisions'
     | '/app/investor/desk'
     | '/app/investor/diligence'
+    | '/app/investor/evaluate'
     | '/app/investor/intake'
     | '/app/investor/overview'
     | '/app/investor/portfolio'
     | '/app/investor/profile'
     | '/app/investor/settings'
+    | '/app/investor/source'
     | '/app/investor/startups'
     | '/app/investor/team'
+    | '/app/investor/thesis'
     | '/app/settings/billing'
     | '/app/settings/domain'
     | '/app/settings/notifications'
@@ -1236,19 +1286,24 @@ export interface FileRouteTypes {
     | '/app/deal-room/$id'
     | '/app/investor/advisor'
     | '/app/investor/analysis'
+    | '/app/investor/assistant'
     | '/app/investor/connections'
     | '/app/investor/deal-flow'
     | '/app/investor/deal-rooms'
+    | '/app/investor/decide'
     | '/app/investor/decisions'
     | '/app/investor/desk'
     | '/app/investor/diligence'
+    | '/app/investor/evaluate'
     | '/app/investor/intake'
     | '/app/investor/overview'
     | '/app/investor/portfolio'
     | '/app/investor/profile'
     | '/app/investor/settings'
+    | '/app/investor/source'
     | '/app/investor/startups'
     | '/app/investor/team'
+    | '/app/investor/thesis'
     | '/app/settings/billing'
     | '/app/settings/domain'
     | '/app/settings/notifications'
@@ -1351,19 +1406,24 @@ export interface FileRouteTypes {
     | '/app/deal-room/$id'
     | '/app/investor/advisor'
     | '/app/investor/analysis'
+    | '/app/investor/assistant'
     | '/app/investor/connections'
     | '/app/investor/deal-flow'
     | '/app/investor/deal-rooms'
+    | '/app/investor/decide'
     | '/app/investor/decisions'
     | '/app/investor/desk'
     | '/app/investor/diligence'
+    | '/app/investor/evaluate'
     | '/app/investor/intake'
     | '/app/investor/overview'
     | '/app/investor/portfolio'
     | '/app/investor/profile'
     | '/app/investor/settings'
+    | '/app/investor/source'
     | '/app/investor/startups'
     | '/app/investor/team'
+    | '/app/investor/thesis'
     | '/app/settings/billing'
     | '/app/settings/domain'
     | '/app/settings/notifications'
@@ -2078,6 +2138,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsBillingRouteImport
       parentRoute: typeof AppSettingsRoute
     }
+    '/app/investor/thesis': {
+      id: '/app/investor/thesis'
+      path: '/thesis'
+      fullPath: '/app/investor/thesis'
+      preLoaderRoute: typeof AppInvestorThesisRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
     '/app/investor/team': {
       id: '/app/investor/team'
       path: '/team'
@@ -2090,6 +2157,13 @@ declare module '@tanstack/react-router' {
       path: '/startups'
       fullPath: '/app/investor/startups'
       preLoaderRoute: typeof AppInvestorStartupsRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/source': {
+      id: '/app/investor/source'
+      path: '/source'
+      fullPath: '/app/investor/source'
+      preLoaderRoute: typeof AppInvestorSourceRouteImport
       parentRoute: typeof AppInvestorRoute
     }
     '/app/investor/settings': {
@@ -2127,6 +2201,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorIntakeRouteImport
       parentRoute: typeof AppInvestorRoute
     }
+    '/app/investor/evaluate': {
+      id: '/app/investor/evaluate'
+      path: '/evaluate'
+      fullPath: '/app/investor/evaluate'
+      preLoaderRoute: typeof AppInvestorEvaluateRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
     '/app/investor/diligence': {
       id: '/app/investor/diligence'
       path: '/diligence'
@@ -2148,6 +2229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorDecisionsRouteImport
       parentRoute: typeof AppInvestorRoute
     }
+    '/app/investor/decide': {
+      id: '/app/investor/decide'
+      path: '/decide'
+      fullPath: '/app/investor/decide'
+      preLoaderRoute: typeof AppInvestorDecideRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
     '/app/investor/deal-rooms': {
       id: '/app/investor/deal-rooms'
       path: '/deal-rooms'
@@ -2167,6 +2255,13 @@ declare module '@tanstack/react-router' {
       path: '/connections'
       fullPath: '/app/investor/connections'
       preLoaderRoute: typeof AppInvestorConnectionsRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/assistant': {
+      id: '/app/investor/assistant'
+      path: '/assistant'
+      fullPath: '/app/investor/assistant'
+      preLoaderRoute: typeof AppInvestorAssistantRouteImport
       parentRoute: typeof AppInvestorRoute
     }
     '/app/investor/analysis': {
@@ -2231,38 +2326,48 @@ declare module '@tanstack/react-router' {
 interface AppInvestorRouteChildren {
   AppInvestorAdvisorRoute: typeof AppInvestorAdvisorRoute
   AppInvestorAnalysisRoute: typeof AppInvestorAnalysisRoute
+  AppInvestorAssistantRoute: typeof AppInvestorAssistantRoute
   AppInvestorConnectionsRoute: typeof AppInvestorConnectionsRoute
   AppInvestorDealFlowRoute: typeof AppInvestorDealFlowRoute
   AppInvestorDealRoomsRoute: typeof AppInvestorDealRoomsRoute
+  AppInvestorDecideRoute: typeof AppInvestorDecideRoute
   AppInvestorDecisionsRoute: typeof AppInvestorDecisionsRoute
   AppInvestorDeskRoute: typeof AppInvestorDeskRoute
   AppInvestorDiligenceRoute: typeof AppInvestorDiligenceRoute
+  AppInvestorEvaluateRoute: typeof AppInvestorEvaluateRoute
   AppInvestorIntakeRoute: typeof AppInvestorIntakeRoute
   AppInvestorOverviewRoute: typeof AppInvestorOverviewRoute
   AppInvestorPortfolioRoute: typeof AppInvestorPortfolioRoute
   AppInvestorProfileRoute: typeof AppInvestorProfileRoute
   AppInvestorSettingsRoute: typeof AppInvestorSettingsRoute
+  AppInvestorSourceRoute: typeof AppInvestorSourceRoute
   AppInvestorStartupsRoute: typeof AppInvestorStartupsRoute
   AppInvestorTeamRoute: typeof AppInvestorTeamRoute
+  AppInvestorThesisRoute: typeof AppInvestorThesisRoute
   AppInvestorIndexRoute: typeof AppInvestorIndexRoute
 }
 
 const AppInvestorRouteChildren: AppInvestorRouteChildren = {
   AppInvestorAdvisorRoute: AppInvestorAdvisorRoute,
   AppInvestorAnalysisRoute: AppInvestorAnalysisRoute,
+  AppInvestorAssistantRoute: AppInvestorAssistantRoute,
   AppInvestorConnectionsRoute: AppInvestorConnectionsRoute,
   AppInvestorDealFlowRoute: AppInvestorDealFlowRoute,
   AppInvestorDealRoomsRoute: AppInvestorDealRoomsRoute,
+  AppInvestorDecideRoute: AppInvestorDecideRoute,
   AppInvestorDecisionsRoute: AppInvestorDecisionsRoute,
   AppInvestorDeskRoute: AppInvestorDeskRoute,
   AppInvestorDiligenceRoute: AppInvestorDiligenceRoute,
+  AppInvestorEvaluateRoute: AppInvestorEvaluateRoute,
   AppInvestorIntakeRoute: AppInvestorIntakeRoute,
   AppInvestorOverviewRoute: AppInvestorOverviewRoute,
   AppInvestorPortfolioRoute: AppInvestorPortfolioRoute,
   AppInvestorProfileRoute: AppInvestorProfileRoute,
   AppInvestorSettingsRoute: AppInvestorSettingsRoute,
+  AppInvestorSourceRoute: AppInvestorSourceRoute,
   AppInvestorStartupsRoute: AppInvestorStartupsRoute,
   AppInvestorTeamRoute: AppInvestorTeamRoute,
+  AppInvestorThesisRoute: AppInvestorThesisRoute,
   AppInvestorIndexRoute: AppInvestorIndexRoute,
 }
 

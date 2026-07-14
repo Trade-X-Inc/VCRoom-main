@@ -428,7 +428,7 @@ function WaitlistModal({ onClose, defaultRole }: { onClose: () => void; defaultR
   );
 }
 
-function Directory() {
+export function Directory() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();

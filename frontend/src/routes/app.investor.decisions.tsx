@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState, useMemo, useCallback } from "react";
 import {
   LayoutGrid, List, Columns3, Search,
@@ -11,6 +11,10 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/investor/decisions")({
+  // P5: consolidated into the deal-flow steps — old links keep resolving.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/investor/decide", hash: "decisions", replace: true });
+  },
   component: DecisionsPage,
 });
 
@@ -132,7 +136,7 @@ function actionBtn(color: string): React.CSSProperties {
 
 // ── Main Page ──────────────────────────────────────────────────────────────────
 
-function DecisionsPage() {
+export function DecisionsPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
 

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { PieChart, TrendingUp, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -6,10 +6,14 @@ import { supabase } from "@/lib/supabase";
 import { formatDistanceToNow } from "date-fns";
 
 export const Route = createFileRoute("/app/investor/portfolio")({
+  // P5: consolidated into the deal-flow steps — old links keep resolving.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/investor/decide", hash: "portfolio", replace: true });
+  },
   component: PortfolioPage,
 });
 
-function PortfolioPage() {
+export function PortfolioPage() {
   const { user } = useAuth();
 
   // Fetch room IDs user is member of

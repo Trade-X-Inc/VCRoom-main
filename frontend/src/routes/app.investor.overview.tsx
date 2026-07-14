@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { CheckCircle2, Sparkles, Inbox, Briefcase, Clock, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -13,6 +13,10 @@ import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { OnboardingTour } from "@/components/app/OnboardingTour";
 
 export const Route = createFileRoute("/app/investor/overview")({
+  // P5: consolidated into the deal-flow steps — old links keep resolving.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/investor", replace: true });
+  },
   component: InvestorDashboard,
 });
 

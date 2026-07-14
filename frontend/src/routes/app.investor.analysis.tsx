@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Brain, Loader2, Download, CheckCircle2, AlertTriangle, Lightbulb,
@@ -15,10 +15,14 @@ import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimed
 import { Markdown } from "@/components/shared/LazyMarkdown";
 
 export const Route = createFileRoute("/app/investor/analysis")({
+  // P5: consolidated into the deal-flow steps — old links keep resolving.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/investor/evaluate", hash: "analysis", replace: true });
+  },
   component: AnalysisPage,
 });
 
-function AnalysisPage() {
+export function AnalysisPage() {
   const { user } = useAuth();
   const [selectedId, setSelectedId] = useState("");
   const [analysis, setAnalysis] = useState<any | null>(null);

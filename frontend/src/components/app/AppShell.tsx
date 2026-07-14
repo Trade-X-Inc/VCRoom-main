@@ -25,6 +25,7 @@ import { UserMenu } from "@/components/app/UserMenu";
 import { useAuth } from "@/lib/auth";
 import { useProfile } from "@/lib/store";
 import { useRaiseProgress } from "@/hooks/useRaiseProgress";
+import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
 
 interface NavItem { to: string; label: string; icon: any; badge?: string; step?: string; section?: string; }
 
@@ -51,19 +52,13 @@ const founderNav: NavItem[] = [
 ];
 
 const investorNav: NavItem[] = [
-  { to: "/app/investor/overview", label: "Overview", icon: LayoutGrid },
-  { to: "/app/investor/intake", label: "Deal Intake", icon: FileInput },
-  { to: "/app/investor/connections", label: "Connections", icon: Users },
-  { to: "/app/investor/deal-rooms", label: "Deal Rooms", icon: Briefcase },
-  { to: "/app/investor/diligence", label: "Due Diligence", icon: ClipboardCheck },
-  { to: "/app/investor/analysis", label: "AI Analysis", icon: Brain },
-  { to: "/app/investor/decisions", label: "Decisions", icon: Gavel },
-  { to: "/app/investor/portfolio", label: "Portfolio", icon: PieChart },
+  { to: "/app/investor/thesis", label: "Thesis", icon: Brain, step: "\u2460", section: "Deal flow" },
+  { to: "/app/investor/source", label: "Source", icon: FileInput, step: "\u2461" },
+  { to: "/app/investor/evaluate", label: "Evaluate", icon: ClipboardCheck, step: "\u2462" },
+  { to: "/app/investor/decide", label: "Decide", icon: Gavel, step: "\u2463" },
+  { to: "/app/investor/assistant", label: "AI Advisor", icon: MessageSquare, section: "Tools" },
   { to: "/app/meetings", label: "Meetings", icon: Calendar },
-  { to: "/app/messages", label: "Team Chat", icon: MessageSquare },
-  { to: "/app/directory", label: "Directory", icon: Globe },
-  { to: "/app/wall", label: "The Wall", icon: Trophy },
-  { to: "/app/referrals", label: "Referrals", icon: Gift },
+  { to: "/app/investor/team", label: "Team", icon: Users },
 ];
 
 const workspaceNavFounder: NavItem[] = [
@@ -73,9 +68,6 @@ const workspaceNavFounder: NavItem[] = [
 const memberProfileNav: NavItem = { to: "/app/member-profile", label: "My Profile", icon: UserCircle2 };
 
 const workspaceNavInvestor: NavItem[] = [
-  { to: "/app/investor/profile", label: "Profile", icon: UserCircle2 },
-  { to: "/app/investor/team", label: "Team", icon: Users },
-  // Feedback button is injected inline after Team (index 1)
   { to: "/app/investor/settings", label: "Settings", icon: Settings },
 ];
 
@@ -114,6 +106,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
 
   const isInvestor = user?.role === "investor";
   const { data: raise } = useRaiseProgress();
+  const { data: flow } = useDealFlowProgress();
   const nav = isInvestor ? investorNav : founderNav;
   const workspaceNav = isInvestor ? workspaceNavInvestor : workspaceNavFounder;
 
@@ -419,11 +412,6 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
         )}
 
         <nav className="flex-1 px-2 space-y-0.5 overflow-y-auto">
-          {showExpanded && isInvestor && (
-            <div className="px-2 pt-3 pb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-              Investor
-            </div>
-          )}
           {nav.map((n, index) => {
             const active = path === n.to || path === n.to + "/" || (n.to !== "/app" && n.to !== "/app/overview" && n.to !== "/app/investor" && path.startsWith(n.to));
             const badge = (() => {
@@ -433,7 +421,13 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                 return raise?.activeRooms
                   ? String(raise.activeRooms)
                   : dealRoomCount && dealRoomCount > 0 ? String(dealRoomCount) : undefined;
-              if (n.to === "/app/investor/connections") return investorDealCount && investorDealCount > 0 ? String(investorDealCount) : undefined;
+              if (n.to === "/app/investor/thesis" && flow?.thesisSet) return "\u2713";
+              if (n.to === "/app/investor/source" && flow?.watchlistCount)
+                return String(flow.watchlistCount);
+              if (n.to === "/app/investor/evaluate" && flow?.activeRooms)
+                return String(flow.activeRooms);
+              if (n.to === "/app/investor/decide" && flow?.pendingDecisions)
+                return String(flow.pendingDecisions);
               return n.badge;
             })();
 
@@ -450,16 +444,9 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
               return null;
             })();
 
-            // Investor community label (legacy layout — restructured in P5)
-            const showCommunityLabel = isInvestor && n.to === "/app/directory" && showExpanded;
 
             return (
               <div key={n.to}>
-                {showCommunityLabel && (
-                  <div className="px-2 pt-4 pb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                    Community
-                  </div>
-                )}
                 {n.section && showExpanded && (
                   <div
                     className="px-2 pb-1.5 font-medium uppercase"
@@ -521,13 +508,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
 
           {showExpanded && (
             <>
-              {isInvestor ? (
-                <div className="px-2 pt-4 pb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                  Admin
-                </div>
-              ) : (
-                <div className="mx-2 mt-5 mb-2 hs-hairline-t" />
-              )}
+              <div className="mx-2 mt-5 mb-2 hs-hairline-t" />
               {/* Render workspace nav items, injecting Feedback button after "Team".
                   Badges is founder-owner only — excluded for investors (not in
                   workspaceNavInvestor) and for team members (filtered here). */}
@@ -549,7 +530,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                       <span>{n.label}</span>
                     </Link>
                     {/* Inject Feedback right after the "Team" item, wherever it lands */}
-                    {n.to === (isInvestor ? "/app/investor/team" : "/app/users") && (
+                    {n.to.endsWith("/settings") && (
                       <Link
                         to={"/app/feedback" as any}
                         onClick={() => setMobileOpen(false)}

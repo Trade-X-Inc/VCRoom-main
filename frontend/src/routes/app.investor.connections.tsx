@@ -500,7 +500,7 @@ function SentRequestsPanel({ investorUserId }: { investorUserId: string }) {
   );
 }
 
-function ConnectionsPage() {
+export function ConnectionsPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [activeTab, setActiveTab] = useState<TabKey>("all");
