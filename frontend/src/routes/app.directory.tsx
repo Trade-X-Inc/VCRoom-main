@@ -9,6 +9,7 @@ import { Search, Building2, Users, ArrowRight, Globe, X, Loader2 } from "lucide-
 import { VerificationBadge } from "@/components/shared/VerificationBadge";
 import { toast } from "sonner";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/directory")({
   head: () => ({ meta: [{ title: "Directory — Hockystick" }] }),
@@ -663,16 +664,12 @@ export function Directory() {
 
       {/* Grid */}
       {isLoading ? (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => <div key={i} className="rounded-xl border border-border/60 bg-card p-5 animate-pulse h-48" />)}
-        </div>
+        <EmptyState kind="loading" title="Loading" />
       ) : count === 0 ? (
-        <div className="text-center py-20">
-          {type === "founders" ? <Building2 className="h-10 w-10 mx-auto mb-3 text-muted-foreground/20" /> : <Users className="h-10 w-10 mx-auto mb-3 text-muted-foreground/20" />}
-          <p className="text-sm text-muted-foreground">
-            {search || stage ? `No ${type} match your filters.` : type === "founders" ? "No founders yet." : `No ${type} in your network yet.`}
-          </p>
-        </div>
+        <EmptyState
+          kind={search || stage ? "no-results" : "empty"}
+          title={search || stage ? "No matches" : `No ${type}`}
+        />
       ) : type === "founders" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filteredStartups.map((s: any) => {

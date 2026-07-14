@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/messages")({
   component: WorkspacePage,
@@ -298,10 +299,7 @@ function ChatSection({ startupId, userId, userName, channels, onChannelCreated }
       {/* Messages scroll area */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3" style={{ background: "var(--hs-bg-primary)" }} data-testid="message-list">
         {topMessages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full gap-3">
-            <MessageSquare className="h-8 w-8" style={{ color: "var(--faint)" }} />
-            <div className="text-sm" style={{ color: "var(--hs-text-muted)" }}>No messages yet — say hello!</div>
-          </div>
+          <EmptyState kind="empty" title="No messages" />
         )}
         {topMessages.map((msg) => {
           const replies = threadReplies(msg.id);
@@ -745,7 +743,7 @@ function TasksSection({ startupId, userId, teamMembers }: { startupId: string; u
                 );
               })}
               {tasks.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-10 text-center text-sm" style={{ color: "var(--hs-text-muted)" }}>No tasks yet — add one to get started</td></tr>
+                <tr><td colSpan={6} className="px-4 py-10 text-center text-sm" style={{ color: "var(--hs-text-muted)" }}>No tasks</td></tr>
               )}
             </tbody>
           </table>
@@ -873,7 +871,7 @@ function NotesSection({ startupId, userId, userName }: { startupId: string; user
             </button>
           ))}
           {filteredNotes.length === 0 && (
-            <div className="px-4 py-8 text-center text-xs" style={{ color: "var(--hs-text-muted)" }}>No notes yet</div>
+            <div className="px-4 py-8 text-center text-xs" style={{ color: "var(--hs-text-muted)" }}>No notes</div>
           )}
         </div>
         <div className="px-3 py-3" style={{ borderTop: "1px solid var(--hs-border)" }}>
@@ -965,14 +963,9 @@ function ActivitySection({ startupId, userId, isInvestor }: { startupId: string;
   return (
     <div className="flex-1 overflow-y-auto p-5" style={{ background: "var(--hs-bg-primary)" }} data-testid="activity-feed">
       {isLoading ? (
-        <div className="flex justify-center py-12"><Loader2 className="h-5 w-5 animate-spin" style={{ color: "var(--hs-text-muted)" }} /></div>
+        <EmptyState kind="loading" title="Loading" />
       ) : entries.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-60 gap-3">
-          <Activity className="h-8 w-8" style={{ color: "var(--faint)" }} />
-          <div className="text-sm text-center" style={{ color: "var(--hs-text-muted)" }}>
-            No activity yet. Actions in deal rooms and the platform will appear here.
-          </div>
-        </div>
+        <EmptyState kind="empty" title="No activity" />
       ) : (
         <div className="space-y-6">
           {Array.from(grouped.entries()).map(([dateLabel, items]) => (

@@ -402,7 +402,7 @@ export function IntakePage() {
         </div>
         {intakeRuns.length === 0 ? (
           <div className="rounded-xl border border-border/60 bg-card px-5 py-4 text-sm text-muted-foreground">
-            No intake runs yet — parse your first batch below.
+            No intake runs
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>

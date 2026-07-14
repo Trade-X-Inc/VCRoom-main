@@ -11,11 +11,14 @@ import { HsButton } from "./Button";
 export function EmptyState({
   kind,
   title,
+  description,
   action,
   className,
 }: {
   kind: IllustrationName;
   title: string;
+  /** Max 1 sentence. Only include if it adds real information. */
+  description?: string;
   action?: { label: string; onClick?: () => void; href?: string };
   className?: string;
 }) {
@@ -32,15 +35,30 @@ export function EmptyState({
       }}
     >
       <Illustration name={kind} />
-      <div
-        style={{
-          fontFamily: "'Inter', ui-sans-serif, system-ui, sans-serif",
-          fontSize: 13,
-          fontWeight: 400,
-          color: "rgba(0,0,0,0.35)",
-        }}
-      >
-        {title}
+      <div>
+        <div
+          style={{
+            fontFamily: "'Inter', ui-sans-serif, system-ui, sans-serif",
+            fontSize: 13,
+            fontWeight: 400,
+            color: "rgba(0,0,0,0.35)",
+          }}
+        >
+          {title}
+        </div>
+        {description && (
+          <div
+            style={{
+              fontFamily: "'Inter', ui-sans-serif, system-ui, sans-serif",
+              fontSize: 12,
+              fontWeight: 400,
+              color: "rgba(0,0,0,0.25)",
+              marginTop: 4,
+            }}
+          >
+            {description}
+          </div>
+        )}
       </div>
       {action &&
         (action.href ? (

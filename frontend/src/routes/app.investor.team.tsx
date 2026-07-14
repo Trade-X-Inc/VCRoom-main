@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { triggerStartupTeamInvite } from "@/lib/email/triggers";
 import { INVESTOR_ROLES, INVESTOR_PERMISSIONS, PERMISSION_LABELS } from "@/lib/roles";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/team")({
   component: InvestorTeamPage,
@@ -277,13 +278,9 @@ function InvestorTeamPage() {
         </div>
 
         {loadingMembers ? (
-          <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12 }}>
-            {[1, 2].map((i) => <div key={i} style={{ height: 48, borderRadius: 8, background: "var(--color-muted)" }} />)}
-          </div>
+          <EmptyState kind="loading" title="Loading" />
         ) : members.length === 0 ? (
-          <div style={{ padding: "24px 20px", textAlign: "center", color: "var(--color-muted-foreground)", fontSize: 13 }}>
-            No team members yet — invite someone to collaborate.
-          </div>
+          <EmptyState kind="empty" title="No team members" />
         ) : (
           members.map((m) => {
             const profileFirst = m.team_member_profiles?.first_name ?? "";

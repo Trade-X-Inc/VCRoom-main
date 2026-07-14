@@ -13,6 +13,7 @@ import { PageGuide } from "@/components/app/PageGuide";
 import { generateInvestorMemo } from "@/lib/investor-memo-fn";
 import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 import { Markdown } from "@/components/shared/LazyMarkdown";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/analysis")({
   // P5: consolidated into the deal-flow steps — old links keep resolving.
@@ -363,12 +364,13 @@ Return this exact JSON shape:
             </div>
           )}
 
-          {/* Generating spinner */}
+          {/* Generating */}
           {generating && (
-            <div className="rounded-2xl border border-border/60 bg-card p-12 flex flex-col items-center gap-4">
-              <Loader2 className="h-8 w-8 animate-spin text-brand" />
-              <div className="text-sm text-muted-foreground">{analysisStillWorking ? "Still working — this may take a moment…" : `Analysing ${selectedName} against your thesis…`}</div>
-            </div>
+            <EmptyState
+              kind="loading"
+              title="Analysing"
+              description={analysisStillWorking ? "Still working" : undefined}
+            />
           )}
 
           {/* Analysis error */}
@@ -532,10 +534,11 @@ Return this exact JSON shape:
                 <div className="px-5 py-3 text-sm text-destructive">{memoError}</div>
               )}
               {generatingMemo && !memoText && (
-                <div className="p-10 flex flex-col items-center gap-3">
-                  <Loader2 className="h-7 w-7 animate-spin text-brand" />
-                  <div className="text-sm text-muted-foreground">{memoStillWorking ? "Still working — this may take a moment…" : `Writing investment memo for ${selectedName}…`}</div>
-                </div>
+                <EmptyState
+                  kind="loading"
+                  title="Writing memo"
+                  description={memoStillWorking ? "Still working" : undefined}
+                />
               )}
               {memoText && (
                 <div>

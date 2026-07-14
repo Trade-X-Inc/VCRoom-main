@@ -11,6 +11,7 @@ import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { sendInviteEmail } from "@/lib/invite-fn";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/deal-rooms")({
   component: DealRooms,
@@ -178,11 +179,7 @@ function DealRooms() {
   }
 
   if (isLoading) {
-    return (
-      <div className="p-8 flex items-center justify-center min-h-64">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <EmptyState kind="loading" title="Loading" />;
   }
 
   return (
@@ -395,35 +392,28 @@ function DealRooms() {
         })}
 
         {!!startup?.id && !roomsLoading && sortedRooms.length === 0 && (
-          <div className="col-span-2 rounded-xl border border-dashed border-border/60 p-12 text-center">
-            <Briefcase className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-            <div className="text-sm font-medium">
-              {filter === "all" ? "No deal rooms yet" : `No ${filter} deal rooms`}
-            </div>
-            <div className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto leading-relaxed">
-              {filter === "all"
-                ? "Share your profile link and investors can request access directly — a deal room opens automatically when you approve. Or create one manually for an investor you're already talking to."
-                : `Try a different filter or create a new deal room.`}
-            </div>
+          <div className="col-span-2">
+            <EmptyState
+              kind={filter === "all" ? "empty" : "no-results"}
+              title={filter === "all" ? "No deal rooms" : `No ${filter} rooms`}
+              action={
+                filter === "all"
+                  ? { label: "Create room", onClick: () => setOpen(true) }
+                  : undefined
+              }
+            />
             {filter === "all" && startup?.profile_slug && (
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(`https://hockystick.app/p/${startup.profile_slug}`);
-                  toast.success(startup.profile_published ? "Profile link copied" : "Link copied — publish your profile so investors can open it");
-                }}
-                className="mt-4 mr-2 inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-semibold text-foreground hover:opacity-90"
-                style={{ background: "var(--gradient-brand)" }}
-              >
-                Copy profile link
-              </button>
-            )}
-            {filter === "all" && (
-              <button
-                onClick={() => setOpen(true)}
-                className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent"
-              >
-                <Plus className="h-4 w-4" /> Create deal room
-              </button>
+              <div className="text-center -mt-2">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(`https://hockystick.app/p/${startup.profile_slug}`);
+                    toast.success(startup.profile_published ? "Profile link copied" : "Link copied — publish your profile so investors can open it");
+                  }}
+                  className="hs-gradient-text text-sm font-medium hover:underline"
+                >
+                  Copy profile link
+                </button>
+              </div>
             )}
           </div>
         )}

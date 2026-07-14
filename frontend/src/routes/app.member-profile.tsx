@@ -492,7 +492,7 @@ function MemberProfilePage() {
       <Card title="Experience" style={{ marginTop: 16 }}
         action={<AddBtn onClick={addExperience} label="Add position" />}>
         {experience.length === 0 ? (
-          <EmptyHint text="No positions yet. Click 'Add position' to start." />
+          <EmptyHint text="No positions" />
         ) : (
           experience.map((exp) => (
             <ExpCard key={exp.id} exp={exp} onChange={(p) => updateExp(exp.id, p)} onRemove={() => removeExp(exp.id)} />
@@ -504,7 +504,7 @@ function MemberProfilePage() {
       <Card title="Education" style={{ marginTop: 16 }}
         action={<AddBtn onClick={addEducation} label="Add" />}>
         {education.length === 0 ? (
-          <EmptyHint text="No education entries yet." />
+          <EmptyHint text="No education entries" />
         ) : (
           education.map((edu) => (
             <EduCard key={edu.id} edu={edu} onChange={(p) => updateEdu(edu.id, p)} onRemove={() => removeEdu(edu.id)} />
@@ -516,7 +516,7 @@ function MemberProfilePage() {
       <Card title="Achievements" style={{ marginTop: 16 }}
         action={<AddBtn onClick={addAchievement} label="Add" />}>
         {achievements.length === 0 ? (
-          <EmptyHint text="No achievements yet." />
+          <EmptyHint text="No achievements" />
         ) : (
           achievements.map((ach) => (
             <AchCard key={ach.id} ach={ach} onChange={(p) => updateAch(ach.id, p)} onRemove={() => removeAch(ach.id)} />

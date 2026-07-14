@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { formatDistanceToNow, format } from "date-fns";
 import type { AgentDealBrief } from "@/lib/deal-brief-fn";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/deal-flow")({
   component: DealFlowPage,
@@ -58,7 +59,7 @@ function DealBriefPanel({ startupId, investorId, dealRoomId }: { startupId: stri
         className="flex items-center justify-between gap-3"
       >
         <span className="text-xs" style={{ color: "var(--faint)" }}>
-          No deal brief yet
+          No deal brief
         </span>
         <button
           data-testid="generate-brief-btn"
@@ -317,25 +318,15 @@ function DealFlowPage() {
 
       <div className="mt-5">
         {isLoading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="rounded-2xl border border-border/60 bg-card h-44 animate-pulse" />
-            ))}
-          </div>
+          <EmptyState kind="loading" title="Loading" />
         ) : isError ? (
-          <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground">
-            Could not load data. Please refresh.
-          </div>
+          <EmptyState
+            kind="error"
+            title="Something went wrong"
+            action={{ label: "Try again", onClick: () => window.location.reload() }}
+          />
         ) : filtered.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center">
-            <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
-              <Inbox className="h-6 w-6" />
-            </div>
-            <h3 className="mt-4 text-lg font-semibold">No deals yet</h3>
-            <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
-              {q ? "No deals match your search." : "Deal rooms will appear here when founders invite you to their data room."}
-            </p>
-          </div>
+          <EmptyState kind={q ? "no-results" : "empty"} title={q ? "No matches" : "No deals"} />
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map((room) => (

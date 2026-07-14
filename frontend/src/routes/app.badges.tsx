@@ -170,7 +170,7 @@ export function BadgesPage() {
           {earned.length > 0 ? (
             <BadgeDisplay badges={earned} size="lg" showCategory context="profile" />
           ) : (
-            <p className="text-sm text-muted-foreground">Nothing yet — every badge below lists exactly what it takes.</p>
+            <p className="text-sm text-muted-foreground">No badges yet</p>
           )}
         </div>
 

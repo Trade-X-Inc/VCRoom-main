@@ -76,15 +76,14 @@ export function BadgesSection({ startupId, compact = false }: { startupId: strin
         <BadgeDisplay badges={earned} size="md" context="profile" />
       ) : (
         <div className="text-xs text-muted-foreground">
-          No badges yet. Badges unlock from real verification and deal activity — start with the
-          identity check on your <Link to={"/app/advisor" as any} className="text-brand hover:underline">verification page</Link>.
+          No badges — <Link to={"/app/prepare" as any} hash="verification" className="text-brand hover:underline">run identity check</Link>
         </div>
       )}
 
       {!compact && locked.length > 0 && (
         <div className="border-t border-border/60 pt-3">
           <div className="mb-2 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
-            Not yet earned
+            Locked
           </div>
           <div className="space-y-1.5">
             {locked.map((d: any) => (

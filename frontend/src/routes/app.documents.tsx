@@ -11,6 +11,7 @@ import { useAuth } from "@/lib/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/system";
 
 const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","xlsx","xls","docx","doc","csv","png","jpg","jpeg"]);
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
@@ -482,10 +483,7 @@ export function Documents() {
         <div className="w-full sm:col-span-9">
           <div className="space-y-3">
             {filteredDocs.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-border/60 bg-card py-12 text-center">
-                <FileText className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
-                <p className="text-sm font-medium text-muted-foreground">No documents in this category</p>
-              </div>
+              <EmptyState kind="empty" title="No documents" />
             ) : (
               filteredDocs.map(template => {
                 const doc = template.founderDoc;
@@ -786,7 +784,7 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
         <div className="px-6 py-6 space-y-5 max-h-[calc(100vh-200px)] overflow-y-auto">
           {fields.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-sm text-muted-foreground">No fields configured for this template yet.</p>
+              <p className="text-sm text-muted-foreground">No fields</p>
             </div>
           ) : (
             fields.map(field => (

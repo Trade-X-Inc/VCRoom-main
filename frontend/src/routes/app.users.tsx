@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { triggerStartupTeamInvite } from "@/lib/email/triggers";
 import { FOUNDER_ROLES, FOUNDER_PERMISSIONS, PERMISSION_LABELS } from "@/lib/roles";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/users")({
   component: UsersPage,
@@ -297,15 +298,9 @@ function UsersPage() {
           )}
         </div>
         {loadingTeam ? (
-          <div className="p-6 space-y-3">
-            {[1, 2].map((i) => <div key={i} className="h-12 rounded-lg bg-muted/40 animate-pulse" />)}
-          </div>
+          <EmptyState kind="loading" title="Loading" />
         ) : teamAccounts.length === 0 ? (
-          <div className="py-10 text-center text-muted-foreground">
-            <Users className="h-7 w-7 mx-auto mb-3 opacity-30" />
-            <div className="text-sm font-medium mb-1">No team members yet</div>
-            <div className="text-xs">Invite someone to get started.</div>
-          </div>
+          <EmptyState kind="empty" title="No team members" />
         ) : (
           teamAccounts.map((m) => {
             const profileFirst = m.team_member_profiles?.first_name ?? "";

@@ -11,6 +11,7 @@ import { supabase } from "@/lib/supabase";
 import { useAccountContext } from "@/hooks/useAccountContext";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/audit")({
   component: AuditPage,
@@ -164,18 +165,12 @@ function AuditPage() {
 
       {/* Log list */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-20 text-muted-foreground gap-2 text-sm">
-          <Loader2 className="h-4 w-4 animate-spin" /> Loading…
-        </div>
+        <EmptyState kind="loading" title="Loading" />
       ) : filtered.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center">
-          <Activity className="h-8 w-8 text-muted-foreground/30 mx-auto mb-3" />
-          <p className="text-sm font-medium text-muted-foreground">
-            {logs.length === 0
-              ? "No activity logged yet — actions you take across your workspace will appear here"
-              : `No ${category !== "All" ? category.toLowerCase() : ""} activity matching these filters`}
-          </p>
-        </div>
+        <EmptyState
+          kind={logs.length === 0 ? "empty" : "no-results"}
+          title={logs.length === 0 ? "No activity" : "No matches"}
+        />
       ) : (
         <div className="rounded-2xl border border-border/60 bg-card overflow-hidden shadow-card">
           <div className="divide-y divide-border/60">

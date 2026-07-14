@@ -156,8 +156,7 @@ export function NotificationBell() {
             {items.length === 0 && (
               <div className="py-10 text-center">
                 <Bell className="mx-auto h-8 w-8 text-muted-foreground/30 mb-2" />
-                <div className="text-xs text-muted-foreground">No notifications yet.</div>
-                <div className="text-[11px] text-muted-foreground/50 mt-1">Thesis matches and deal activity will appear here.</div>
+                <div className="text-xs text-muted-foreground">No notifications</div>
               </div>
             )}
             {items.slice(0, 30).map((n) => {

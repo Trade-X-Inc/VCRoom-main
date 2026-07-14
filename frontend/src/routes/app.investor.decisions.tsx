@@ -9,6 +9,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/decisions")({
   // P5: consolidated into the deal-flow steps — old links keep resolving.
@@ -357,12 +358,15 @@ export function DecisionsPage() {
 
       {/* Empty state */}
       {entries.length === 0 && (
-        <div style={{ textAlign: "center", padding: "64px 24px" }}>
-          <Gavel size={32} style={{ color: "var(--color-muted-foreground)", margin: "0 auto 12px" }} />
-          <p style={{ color: "var(--color-muted-foreground)", fontSize: 14 }}>
-            {rawEntries.length === 0 ? "No companies in your pipeline yet. Add from your watchlist." : "No companies match the current filters."}
-          </p>
-        </div>
+        <EmptyState
+          kind={rawEntries.length === 0 ? "empty" : "no-results"}
+          title={rawEntries.length === 0 ? "No companies" : "No matches"}
+          action={
+            rawEntries.length === 0
+              ? { label: "Watchlist", href: "/app/investor/source#watchlist" }
+              : undefined
+          }
+        />
       )}
 
       {/* Views */}

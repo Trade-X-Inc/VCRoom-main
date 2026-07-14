@@ -6,6 +6,7 @@ import { getDDSummaryForInvestor } from "@/lib/dd-fn";
 import {
   CheckCircle2, ClipboardCheck, Loader2, ArrowRight, Building2, ExternalLink,
 } from "lucide-react";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/diligence")({
   // P5: consolidated into the deal-flow steps — old links keep resolving.
@@ -58,11 +59,7 @@ export function DiligencePage() {
   const dealRooms = summary?.dealRooms ?? [];
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <EmptyState kind="loading" title="Loading" />;
   }
 
   return (
@@ -127,7 +124,7 @@ export function DiligencePage() {
                       </div>
                     </>
                   ) : (
-                    <span className="text-xs text-muted-foreground">No checklist items yet</span>
+                    <span className="text-xs text-muted-foreground">No checklist items</span>
                   )}
                 </div>
 
@@ -145,13 +142,7 @@ export function DiligencePage() {
           })}
         </div>
       ) : (
-        <div className="rounded-xl border border-border/60 bg-card p-8 text-center">
-          <ClipboardCheck className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
-          <p className="text-sm font-medium">No deal rooms yet</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            You are not a member of any deal rooms. Deal rooms are created when founders invite you.
-          </p>
-        </div>
+        <EmptyState kind="empty" title="No deal rooms" />
       )}
 
       {/* Watchlist entries in Diligence with no deal room */}
@@ -202,13 +193,7 @@ export function DiligencePage() {
       )}
 
       {dealRooms.length === 0 && watchlistDiligence.length === 0 && !isLoading && (
-        <div className="rounded-xl border border-border/60 bg-card p-8 text-center">
-          <CheckCircle2 className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
-          <p className="text-sm font-medium">Nothing in diligence yet</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Move companies to Diligence in your watchlist to track them here.
-          </p>
-        </div>
+        <EmptyState kind="empty" title="Nothing in diligence" />
       )}
     </div>
   );

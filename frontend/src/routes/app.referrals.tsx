@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { generateReferralCode, getReferralStats } from "@/lib/referral";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/referrals")({
   head: () => ({ meta: [{ title: "Referrals — Hockystick" }] }),
@@ -100,10 +101,7 @@ function Referrals() {
       <div className="rounded-xl border border-border/60 bg-card p-5">
         <h3 className="text-sm font-semibold mb-4">People you've invited</h3>
         {(referrals as any[]).length === 0 ? (
-          <div className="text-center py-8">
-            <Users className="h-8 w-8 mx-auto mb-3 text-muted-foreground/30" />
-            <p className="text-sm text-muted-foreground">No invites sent yet.</p>
-          </div>
+          <EmptyState kind="empty" title="No invites sent" />
         ) : (
           <table className="w-full text-sm">
             <thead>

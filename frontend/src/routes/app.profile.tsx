@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/system";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { OnboardingTour } from "@/components/app/OnboardingTour";
 import { getFounderProfileCompleteness } from "@/lib/profileCompleteness";
@@ -1723,11 +1724,7 @@ export function Profile() {
               </div>
 
               {totalViews === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-faint text-4xl mb-3">◎</p>
-                  <p className="text-muted-foreground text-sm">No views yet</p>
-                  <p className="text-faint text-xs mt-1">Share your profile link to start tracking views</p>
-                </div>
+                <EmptyState kind="empty" title="No views yet" />
               ) : (
                 <div className="grid lg:grid-cols-2 gap-6">
                   {/* Traffic sources */}
@@ -2739,7 +2736,7 @@ function CapTableSection({ startupId }: { startupId: string }) {
       )}
 
       {rows.length === 0 && !showForm && (
-        <p className="text-xs text-muted-foreground">No shareholders added yet. Add shareholders to document your cap table.</p>
+        <p className="text-xs text-muted-foreground">No shareholders</p>
       )}
 
       {showForm && (
@@ -3063,15 +3060,9 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
       )}
 
       {isLoading ? (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {[1, 2, 3].map((i) => <div key={i} className="rounded-xl border border-border/60 bg-card p-4 h-24 animate-pulse" />)}
-        </div>
+        <EmptyState kind="loading" title="Loading" />
       ) : members.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border/60 bg-card p-8 text-center">
-          <Users className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
-          <div className="text-sm font-medium">No team members yet</div>
-          <div className="text-xs text-muted-foreground mt-1">Add your co-founders, advisors and key hires.</div>
-        </div>
+        <EmptyState kind="empty" title="No team members" />
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {members.map((m) => {

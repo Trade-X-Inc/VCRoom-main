@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/notifications")({
   component: NotificationsPage,
@@ -179,23 +180,12 @@ function NotificationsPage() {
       {/* Content */}
       <div className="mt-5 rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
         {isLoading ? (
-          <div className="flex items-center justify-center gap-2 py-12 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> Loading notifications…
-          </div>
+          <EmptyState kind="loading" title="Loading" />
         ) : list.length === 0 ? (
-          <div className="py-14 text-center">
-            <div className="grid h-12 w-12 place-items-center rounded-xl bg-muted mx-auto mb-3">
-              <Bell className="h-5 w-5 text-muted-foreground/40" />
-            </div>
-            <p className="text-sm font-medium">
-              {filter === "all" && !q ? "No notifications yet" : "No notifications match"}
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              {filter === "all" && !q
-                ? "When investors request documents or update due diligence, you'll see it here."
-                : "Try a different filter or search term."}
-            </p>
-          </div>
+          <EmptyState
+            kind={filter === "all" && !q ? "empty" : "no-results"}
+            title={filter === "all" && !q ? "No notifications" : "No matches"}
+          />
         ) : (
           <div className="divide-y divide-border/60">
             {list.map((n) => {

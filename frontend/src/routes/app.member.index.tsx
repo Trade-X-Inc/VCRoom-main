@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { useAccountContext } from "@/hooks/useAccountContext";
 import { ROLE_LABELS, ROLE_DESCRIPTIONS } from "@/lib/roles";
 import { supabase } from "@/lib/supabase";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/member/")({
   component: MemberOverview,
@@ -97,13 +98,7 @@ function MemberOverview() {
         {isLoading ? (
           <div style={{ height: 80, borderRadius: 10, background: "var(--accent)" }} />
         ) : assignedRooms.length === 0 ? (
-          <div style={{
-            background: "var(--card)", border: "1px solid var(--border)",
-            borderRadius: 12, padding: "24px", textAlign: "center",
-            color: "var(--faint)", fontSize: 13,
-          }}>
-            No deal rooms assigned yet — your admin will assign you when ready.
-          </div>
+          <EmptyState kind="empty" title="No deal rooms" />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {assignedRooms.map((r) => {

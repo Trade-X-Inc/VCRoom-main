@@ -33,6 +33,7 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/startups")({
   // P5: consolidated into the deal-flow steps — old links keep resolving.
@@ -528,11 +529,7 @@ export function StartupsPage() {
 
             {/* Content — loading skeleton, empty state, or cards */}
             {platformLoading ? (
-              <div className="grid md:grid-cols-2 gap-4">
-                {[1, 2].map((i) => (
-                  <div key={i} className="rounded-2xl border border-border/60 bg-card h-40 animate-pulse" />
-                ))}
-              </div>
+              <EmptyState kind="loading" title="Loading" />
             ) : (() => {
               const filteredLeads = platformLeads.filter((l: any) => {
                 if (regionFilter === "All") return true;
@@ -540,17 +537,10 @@ export function StartupsPage() {
               });
               if (filteredLeads.length === 0) {
                 return (
-                  <div className="rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center">
-                    <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
-                      <Building2 className="h-6 w-6" />
-                    </div>
-                    <h3 className="mt-4 text-lg font-semibold">
-                      {regionFilter !== "All" ? `No ${regionFilter} startups on Hockystick yet.` : "No platform leads yet"}
-                    </h3>
-                    <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
-                      {regionFilter !== "All" ? "Try a different region filter." : "Connect with founders from the Directory to generate platform leads."}
-                    </p>
-                  </div>
+                  <EmptyState
+                    kind={regionFilter !== "All" ? "no-results" : "empty"}
+                    title={regionFilter !== "All" ? `No ${regionFilter} startups` : "No platform leads"}
+                  />
                 );
               }
               return (
@@ -622,27 +612,13 @@ export function StartupsPage() {
         )}
 
         {isLoading ? (
-          <div className="grid md:grid-cols-2 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="rounded-2xl border border-border/60 bg-card h-40 animate-pulse" />
-            ))}
-          </div>
+          <EmptyState kind="loading" title="Loading" />
         ) : filteredWatchlist.length === 0 && (activeTab !== "All" || dealRoomStartups.length === 0) ? (
-          <div className="rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center">
-            <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
-              <Building2 className="h-6 w-6" />
-            </div>
-            <h3 className="mt-4 text-lg font-semibold">No companies in {activeTab.toLowerCase()}</h3>
-            <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
-              Add a company you're tracking and move it through your pipeline.
-            </p>
-            <button
-              onClick={() => setShowAdd(true)}
-              className="mt-4 inline-flex items-center gap-1.5 rounded-[10px] hs-gradient px-3 py-1.5 text-sm font-medium text-white"
-            >
-              <Plus className="h-4 w-4" /> Add company
-            </button>
-          </div>
+          <EmptyState
+            kind="empty"
+            title={`No ${activeTab.toLowerCase()} companies`}
+            action={{ label: "Add company", onClick: () => setShowAdd(true) }}
+          />
         ) : viewMode === "list" ? (
           /* ── LIST VIEW ── */
           <div className="rounded-xl border border-border/60 overflow-hidden">

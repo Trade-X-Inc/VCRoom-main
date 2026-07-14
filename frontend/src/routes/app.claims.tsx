@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import type { StartupClaim, ClaimCategory, ClaimVerdict } from "@/lib/claims-fn";
 import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/claims")({
   // P4: consolidated into /app/prepare — old links must keep resolving.
@@ -174,9 +175,7 @@ export function ClaimsPage() {
 
         {/* Claims list */}
         {claims.length === 0 ? (
-          <div className="bg-card border border-dashed border-border/60 rounded-xl py-10 text-center text-sm text-muted-foreground">
-            No claims yet — add your first specific, checkable claim above.
-          </div>
+          <EmptyState kind="empty" title="No claims" />
         ) : (
           <div className="space-y-3">
             {claims.map((claim) => {
@@ -213,7 +212,7 @@ export function ClaimsPage() {
                         </div>
                       ) : (
                         <p className="text-xs text-muted-foreground mt-1.5">
-                          No evidence attached yet — this claim is unverified and shows as such to investors.
+                          Unverified — no evidence attached
                         </p>
                       )}
                     </div>

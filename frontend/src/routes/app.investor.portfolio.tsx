@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { formatDistanceToNow } from "date-fns";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/portfolio")({
   // P5: consolidated into the deal-flow steps — old links keep resolving.
@@ -117,23 +118,15 @@ export function PortfolioPage() {
 
       <div className="mt-6">
         {isLoading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => <div key={i} className="rounded-2xl border border-border/60 bg-card h-48 animate-pulse" />)}
-          </div>
+          <EmptyState kind="loading" title="Loading" />
         ) : isError ? (
-          <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground">
-            Could not load data. Please refresh.
-          </div>
+          <EmptyState
+            kind="error"
+            title="Something went wrong"
+            action={{ label: "Try again", onClick: () => window.location.reload() }}
+          />
         ) : invested.length === 0 && watchlistInvested.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center">
-            <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
-              <PieChart className="h-6 w-6" />
-            </div>
-            <h3 className="mt-4 text-lg font-semibold">No portfolio companies yet</h3>
-            <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
-              Companies appear here after you mark a deal as Invested in the Decision Board or watchlist.
-            </p>
-          </div>
+          <EmptyState kind="empty" title="No portfolio companies" />
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {invested.map((c) => (

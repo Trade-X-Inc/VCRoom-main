@@ -11,6 +11,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import Papa from "papaparse";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/connections")({
   component: ConnectionsPage,
@@ -809,33 +810,17 @@ function ConnectionsPage() {
           {/* Rows */}
           <div className="flex-1 overflow-y-auto" data-testid="connections-table">
             {isLoading ? (
-              <div className="flex items-center justify-center h-40">
-                <Loader2 className="h-5 w-5 animate-spin" style={{ color: "var(--hs-text-muted)" }} />
-              </div>
+              <EmptyState kind="loading" title="Loading" />
             ) : filtered.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-60 gap-4">
-                <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(124,58,237,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Users className="h-6 w-6" style={{ color: "#A855F7" }} />
-                </div>
-                <div className="text-center">
-                  <div className="text-sm font-semibold" style={{ color: "var(--hs-text-primary)" }}>
-                    {search || statusFilter !== "all" ? "No investors match your filters" : "No investors tracked yet"}
-                  </div>
-                  <div className="text-xs mt-1" style={{ color: "var(--hs-text-muted)" }}>
-                    {search || statusFilter !== "all" ? "Try adjusting your search or filter" : "Add an investor or import a CSV to get started"}
-                  </div>
-                </div>
-                {!search && statusFilter === "all" && (
-                  <button
-                    onClick={() => setShowAdd(true)}
-                    className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium"
-                    style={{ background: "var(--gradient-brand)", color: "#fff" }}
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    Add your first investor
-                  </button>
-                )}
-              </div>
+              <EmptyState
+                kind={search || statusFilter !== "all" ? "no-results" : "empty"}
+                title={search || statusFilter !== "all" ? "No matches" : "No investors"}
+                action={
+                  !search && statusFilter === "all"
+                    ? { label: "Add investor", onClick: () => setShowAdd(true) }
+                    : undefined
+                }
+              />
             ) : (
               filtered.map((lead) => {
                 const cfg = STATUS_CONFIG[lead.status] ?? STATUS_CONFIG["New"];

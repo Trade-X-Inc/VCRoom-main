@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/deal-rooms")({
   // P5: consolidated into the deal-flow steps — old links keep resolving.
@@ -82,31 +83,19 @@ export function DealRoomsPage() {
 
       <div className="mt-6">
         {isLoading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="rounded-2xl border border-border/60 bg-card h-48 animate-pulse" />
-            ))}
-          </div>
+          <EmptyState kind="loading" title="Loading" />
         ) : isError ? (
-          <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center text-sm text-muted-foreground">
-            Could not load data. Please refresh.
-          </div>
+          <EmptyState
+            kind="error"
+            title="Something went wrong"
+            action={{ label: "Try again", onClick: () => window.location.reload() }}
+          />
         ) : rooms.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border/60 bg-card p-12 text-center">
-            <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
-              <Briefcase className="h-6 w-6" />
-            </div>
-            <h3 className="mt-4 text-lg font-semibold">No deal rooms yet</h3>
-            <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
-              When a founder invites you to their data room, it'll appear here. Browse startups to discover deals to invest in.
-            </p>
-            <Link
-              to="/app/investor/startups"
-              className="mt-5 inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm font-medium shadow-glow"
-            >
-              Browse startups <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
+          <EmptyState
+            kind="empty"
+            title="No deal rooms"
+            action={{ label: "Browse startups", href: "/app/investor/startups" }}
+          />
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {rooms.map((room) => {
