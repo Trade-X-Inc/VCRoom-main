@@ -29,7 +29,7 @@ export function CostComparisonTable({ variant, compact }: { variant: "dark" | "l
   return (
     <div>
       <div
-        className="rounded-xl overflow-x-auto"
+        className="rounded-none overflow-x-auto"
         style={{ background: cardBg, border: `1px solid ${border}` }}
       >
         <table className="w-full" style={{ minWidth: 560, borderCollapse: "collapse" }}>

@@ -427,7 +427,7 @@ function DealRoom() {
     <div className="flex flex-col h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] relative">
       {/* ── Top header bar ─────────────────────────────────────── */}
       <header
-        className="shrink-0 border-b bg-white border-gray-200 "
+        className="shrink-0 border-b bg-white border-[rgba(0,0,0,0.08)] "
         data-testid="deal-stage-bar"
       >
         <div className="flex items-center gap-3 px-4 py-3">
@@ -506,7 +506,7 @@ function DealRoom() {
         {/* Stage approval banner — shown to the approver whenever a pending transition exists */}
         {isApprover && pendingTransition && (
           <div
-            className="mx-6 mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"
+            className="mx-6 mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3"
             data-testid="stage-approval-banner"
           >
             <div className="text-sm text-amber-900 ">
@@ -579,10 +579,10 @@ function DealRoom() {
         <>
           <div className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm" onClick={() => setActivityOpen(false)} />
           <aside
-            className="fixed top-0 bottom-0 right-0 z-40 w-full sm:w-[420px] border-l border-gray-200 flex flex-col bg-white "
+            className="fixed top-0 bottom-0 right-0 z-40 w-full sm:w-[420px] border-l border-[rgba(0,0,0,0.08)] flex flex-col bg-white "
             data-testid="activity-drawer"
           >
-            <div className="h-14 border-b border-gray-200 flex items-center justify-between px-4">
+            <div className="h-14 border-b border-[rgba(0,0,0,0.08)] flex items-center justify-between px-4">
               <div className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Activity</div>
               <button onClick={() => setActivityOpen(false)} className="grid h-8 w-8 place-items-center rounded-md text-gray-500 hover:bg-accent hover:text-foreground"><X className="h-4 w-4" /></button>
             </div>
@@ -597,8 +597,8 @@ function DealRoom() {
       {aiOpen && (
         <>
           <div className="fixed inset-0 z-30 bg-foreground/20 backdrop-blur-sm" onClick={() => setAiOpen(false)} />
-          <aside className="fixed top-16 bottom-0 right-0 z-40 w-full sm:w-[440px] border-l border-gray-200 bg-white shadow-xl flex flex-col" data-testid="ai-panel">
-            <div className="h-14 border-b border-gray-200 flex items-center justify-between px-4">
+          <aside className="fixed top-16 bottom-0 right-0 z-40 w-full sm:w-[440px] border-l border-[rgba(0,0,0,0.08)] bg-white shadow-xl flex flex-col" data-testid="ai-panel">
+            <div className="h-14 border-b border-[rgba(0,0,0,0.08)] flex items-center justify-between px-4">
               <div className="flex items-center gap-2">
                 <div className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-brand text-brand-foreground"><Sparkles className="h-3.5 w-3.5" /></div>
                 <div>
@@ -696,7 +696,7 @@ function StageBar({
 
   return (
     <div className="relative min-w-0 flex-1" data-testid="stage-pills">
-      <nav ref={scrollRef} className="flex flex-nowrap overflow-x-auto border-b border-gray-200 bg-white ">
+      <nav ref={scrollRef} className="flex flex-nowrap overflow-x-auto border-b border-[rgba(0,0,0,0.08)] bg-white ">
         {STAGES.map((stage) => {
           const active = stage.key === "overview" ? showOverview : !showOverview && activeStageKey === stage.key;
           const accessible = canAccess(stage.key);
@@ -750,13 +750,13 @@ function StageBar({
 }
 
 // ── Reusable dark UI atoms ─────────────────────────────────────────
-const CARD_CLASSES = "bg-white border border-gray-200 rounded-xl";
+const CARD_CLASSES = "bg-white border border-[rgba(0,0,0,0.08)] rounded-none";
 const CARD: React.CSSProperties = {
   borderRadius: 12,
 };
 function DarkCard({ children, className = "", style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
   return (
-    <div className={`bg-white border border-gray-200 rounded-xl ${className}`} style={{ padding: "20px 24px", ...style }}>
+    <div className={`bg-white border border-[rgba(0,0,0,0.08)] rounded-none ${className}`} style={{ padding: "20px 24px", ...style }}>
       {children}
     </div>
   );
@@ -921,8 +921,8 @@ function PassModal({ dealRoomId, userId, onClose }: { dealRoomId: string; userId
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl" style={{ padding: 0 }} onClick={(e) => e.stopPropagation()} data-testid="pass-modal">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 ">
+      <div className="w-full max-w-md bg-white border border-[rgba(0,0,0,0.08)] rounded-2xl" style={{ padding: 0 }} onClick={(e) => e.stopPropagation()} data-testid="pass-modal">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(0,0,0,0.08)] ">
           <div className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Pass on this deal</div>
           <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md text-gray-500 hover:bg-accent hover:text-foreground"><X className="h-4 w-4" /></button>
         </div>
@@ -932,7 +932,7 @@ function PassModal({ dealRoomId, userId, onClose }: { dealRoomId: string; userId
             <select
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full rounded-lg px-3 py-2.5 text-sm text-gray-900 outline-none bg-muted border border-gray-200 "
+              className="w-full rounded-lg px-3 py-2.5 text-sm text-gray-900 outline-none bg-muted border border-[rgba(0,0,0,0.08)] "
               data-testid="pass-reason"
             >
               {PASS_REASONS.map((r) => <option key={r} value={r} style={{ background: "var(--color-card)" }}>{r}</option>)}
@@ -981,7 +981,7 @@ function PassModal({ dealRoomId, userId, onClose }: { dealRoomId: string; userId
 function ConfirmModal({ title, body, confirmLabel, onConfirm, onClose, testid, busy }: { title: string; body: string; confirmLabel: string; onConfirm: () => void; onClose: () => void; testid?: string; busy?: boolean }) {
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-sm bg-white border border-gray-200 rounded-2xl" style={{ padding: 0 }} onClick={(e) => e.stopPropagation()} data-testid={testid}>
+      <div className="w-full max-w-sm bg-white border border-[rgba(0,0,0,0.08)] rounded-2xl" style={{ padding: 0 }} onClick={(e) => e.stopPropagation()} data-testid={testid}>
         <div className="px-5 py-4 border-b" style={{ borderColor: "var(--color-border)" }}>
           <div className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{title}</div>
         </div>
@@ -1252,7 +1252,7 @@ function InformationVaultPanel({
 
       {/* ── Roast record ─────────────────────────────────────────── */}
       {roastRecord.length > 0 && (
-        <div className="rounded-xl border border-border/60 bg-card p-5">
+        <div className="rounded-none border border-border/60 bg-card p-5">
           <div className="text-sm font-semibold mb-2" style={{ fontFamily: "Syne, sans-serif" }}>
             🔥 Roast record
           </div>
@@ -1290,10 +1290,10 @@ function InformationVaultPanel({
       {/* ── PINNED: NDA Document ─────────────────────────────────── */}
       <div
         className={cn(
-          "rounded-xl border overflow-hidden",
+          "rounded-none border overflow-hidden",
           vaultNdaDoc
             ? "bg-white border-[rgba(16,185,129,0.3)]"
-            : "bg-white border-gray-200 ",
+            : "bg-white border-[rgba(0,0,0,0.08)] ",
         )}
       >
         <div className="flex items-center justify-between px-5 py-4">
@@ -1302,7 +1302,7 @@ function InformationVaultPanel({
               "h-9 w-9 rounded-lg flex items-center justify-center shrink-0",
               vaultNdaDoc
                 ? "bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.2)]"
-                : "bg-gray-100 border border-gray-200 ",
+                : "bg-gray-100 border border-[rgba(0,0,0,0.08)] ",
             )}>
               <Shield className={cn("h-4 w-4", vaultNdaDoc ? "text-[#10B981]" : "text-gray-400 ")} />
             </div>
@@ -1330,13 +1330,13 @@ function InformationVaultPanel({
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => setVaultNdaModalOpen(true)}
-                className="text-xs text-gray-500 hover:text-gray-900 border border-gray-200 rounded-lg px-3 py-1.5 transition-colors"
+                className="text-xs text-gray-500 hover:text-gray-900 border border-[rgba(0,0,0,0.08)] rounded-lg px-3 py-1.5 transition-colors"
               >
                 View NDA
               </button>
               <button
                 onClick={() => window.print()}
-                className="inline-flex items-center gap-1.5 text-xs border border-gray-200 rounded-lg px-3 py-1.5 text-gray-500 hover:text-gray-900 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs border border-[rgba(0,0,0,0.08)] rounded-lg px-3 py-1.5 text-gray-500 hover:text-gray-900 transition-colors"
               >
                 <Download className="h-3.5 w-3.5" /> PDF
               </button>
@@ -1347,7 +1347,7 @@ function InformationVaultPanel({
         {vaultNdaDoc && vaultNdaSigners.length > 0 && (
           <div className="px-5 pb-4 flex flex-wrap gap-2">
             {(vaultNdaSigners as any[]).map((s, i) => (
-              <div key={i} className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 border border-gray-100 px-3 py-1 text-xs">
+              <div key={i} className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 border border-[rgba(0,0,0,0.08)] px-3 py-1 text-xs">
                 <CheckCircle2 className="h-3 w-3 text-[#10B981] shrink-0" />
                 <span className="font-medium text-gray-900 ">{s.signer_full_name}</span>
                 <span className="text-gray-400 ">· {s.role}</span>
@@ -1411,7 +1411,7 @@ function InformationVaultPanel({
         const isOpen = qaReportModalOpen === report.id;
 
         return (
-          <div key={report.id} className="rounded-xl border border-[rgba(16,185,129,0.3)] bg-white overflow-hidden">
+          <div key={report.id} className="rounded-none border border-[rgba(16,185,129,0.3)] bg-white overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4">
               <div className="flex items-center gap-3">
                 <div className="h-9 w-9 rounded-lg bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.2)] flex items-center justify-center shrink-0">
@@ -1431,7 +1431,7 @@ function InformationVaultPanel({
               </div>
               <button
                 onClick={() => setQaReportModalOpen(isOpen ? null : report.id)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 "
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 "
               >
                 <Eye className="h-3.5 w-3.5" /> View report
               </button>
@@ -1487,7 +1487,7 @@ function InformationVaultPanel({
       })}
 
       {/* ── SECTION 1: Digital Profiles ── */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
         <button
           onClick={() => setProfilesOpen((o) => !o)}
           className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition-colors"
@@ -1509,11 +1509,11 @@ function InformationVaultPanel({
         </button>
 
         {profilesOpen && (
-          <div className="px-6 pb-6 border-t border-gray-100 ">
+          <div className="px-6 pb-6 border-t border-[rgba(0,0,0,0.08)] ">
             {(profileSections as any[]).length === 0 ? (
               <div className="mt-4 space-y-2">
                 {DEFAULT_PROFILE_SECTIONS.map((s) => (
-                  <div key={s.key} className="flex items-center justify-between rounded-lg border border-gray-100 px-4 py-3">
+                  <div key={s.key} className="flex items-center justify-between rounded-lg border border-[rgba(0,0,0,0.08)] px-4 py-3">
                     <span className="text-sm font-medium text-gray-400 ">{s.label}</span>
                     <span className="text-xs text-gray-300 italic">Not added</span>
                   </div>
@@ -1527,7 +1527,7 @@ function InformationVaultPanel({
             ) : (
               <div className="mt-4 space-y-3">
                 {(profileSections as any[]).map((sec: any) => (
-                  <div key={sec.id} className="rounded-lg border border-gray-100 px-4 py-3">
+                  <div key={sec.id} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-4 py-3">
                     <div className="flex items-center justify-between gap-2 mb-2">
                       <span className="text-sm font-semibold text-gray-900 ">{sec.section_label}</span>
                       <div className="flex items-center gap-2">
@@ -1571,8 +1571,8 @@ function InformationVaultPanel({
       </div>
 
       {/* ── SECTION 2: Document Requests ── */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 ">
+      <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(0,0,0,0.08)] ">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-gray-900 ">Document Requests</span>
             {(docRequests as any[]).length > 0 && (
@@ -1594,7 +1594,7 @@ function InformationVaultPanel({
         </div>
 
         {showReqForm && (
-          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 space-y-3">
+          <div className="px-6 py-4 border-b border-[rgba(0,0,0,0.08)] bg-gray-50 space-y-3">
             <input
               value={reqName}
               onChange={(e) => setReqName(e.target.value)}
@@ -1620,7 +1620,7 @@ function InformationVaultPanel({
               ))}
             </select>
             <div className="flex items-center justify-end gap-2">
-              <button onClick={() => { setShowReqForm(false); setReqName(""); setReqDesc(""); }} className="rounded-lg px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 border border-gray-200 ">
+              <button onClick={() => { setShowReqForm(false); setReqName(""); setReqDesc(""); }} className="rounded-lg px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 border border-[rgba(0,0,0,0.08)] ">
                 Cancel
               </button>
               <button
@@ -1676,7 +1676,7 @@ function InformationVaultPanel({
 
                   {canFounderRespond && declineMode !== req.id && (
                     <div className="mt-3 flex items-center gap-2">
-                      <label className="inline-flex items-center gap-1.5 cursor-pointer rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 ">
+                      <label className="inline-flex items-center gap-1.5 cursor-pointer rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 ">
                         <Upload className="h-3.5 w-3.5" />
                         Upload
                         <input type="file" className="sr-only" onChange={() => console.log("upload — Claude Code will wire")} />
@@ -1700,7 +1700,7 @@ function InformationVaultPanel({
                         className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-xs text-gray-900 placeholder:text-gray-400 outline-none resize-none"
                       />
                       <div className="flex gap-2">
-                        <button onClick={() => setDeclineMode(null)} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-500 ">Cancel</button>
+                        <button onClick={() => setDeclineMode(null)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-xs text-gray-500 ">Cancel</button>
                         <button
                           onClick={() => declineRequest(req.id)}
                           disabled={!declineReason.trim() || respondingReqId === req.id}
@@ -1720,8 +1720,8 @@ function InformationVaultPanel({
       </div>
 
       {/* ── SECTION 3: Documents & Links ── */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 ">
+      <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
+        <div className="px-6 py-4 border-b border-[rgba(0,0,0,0.08)] ">
           <span className="text-sm font-semibold text-gray-900 ">Documents & Links</span>
         </div>
         <div className="px-0 py-0">
@@ -1737,8 +1737,8 @@ function InformationVaultPanel({
 
       {/* ── SECTION 4: Notes ── */}
       {isInvestor && (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 ">
+        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(0,0,0,0.08)] ">
             <span className="text-sm font-semibold text-gray-900 ">My Notes</span>
             <button
               onClick={() => setShowNoteForm((v) => !v)}
@@ -1751,7 +1751,7 @@ function InformationVaultPanel({
           </div>
 
           {showNoteForm && (
-            <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 space-y-3">
+            <div className="px-6 py-4 border-b border-[rgba(0,0,0,0.08)] bg-gray-50 space-y-3">
               <input
                 value={noteTitle}
                 onChange={(e) => setNoteTitle(e.target.value)}
@@ -1781,7 +1781,7 @@ function InformationVaultPanel({
                   <Sparkles className="h-3.5 w-3.5" /> Generate with AI
                 </button>
                 <div className="ml-auto flex items-center gap-2">
-                  <button onClick={() => setShowNoteForm(false)} className="rounded-lg border border-gray-200 px-3 py-2 text-xs text-gray-500 ">Cancel</button>
+                  <button onClick={() => setShowNoteForm(false)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-2 text-xs text-gray-500 ">Cancel</button>
                   <button
                     onClick={saveNote}
                     disabled={!noteContent.trim() || noteSaving}
@@ -1844,8 +1844,8 @@ function InformationVaultPanel({
       )}
 
       {isFounder && (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 ">
+        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
+          <div className="px-6 py-4 border-b border-[rgba(0,0,0,0.08)] ">
             <span className="text-sm font-semibold text-gray-900 ">Notes from investor</span>
           </div>
           <div className="divide-y divide-gray-100 ">
@@ -1867,7 +1867,7 @@ function InformationVaultPanel({
       )}
 
       {/* ── SECTION 5: Next Stage / Decision ── */}
-      <div className="bg-white border border-gray-200 rounded-xl px-6 py-5">
+      <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none px-6 py-5">
         {showDecisionForm ? (
           <div className="space-y-3">
             <div className="text-sm font-semibold text-gray-900 ">Submit a decision</div>
@@ -1886,7 +1886,7 @@ function InformationVaultPanel({
               className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none resize-none"
             />
             <div className="flex items-center gap-2">
-              <button onClick={() => setShowDecisionForm(false)} className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-500 ">Cancel</button>
+              <button onClick={() => setShowDecisionForm(false)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-4 py-2 text-sm text-gray-500 ">Cancel</button>
               <button
                 onClick={submitDecision}
                 disabled={!decisionReason.trim()}
@@ -2215,7 +2215,7 @@ function QAPanel({
     <div className="space-y-6">
       {/* ── Completion banner ── */}
       {isCompleted && (
-        <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-card px-5 py-3">
+        <div className="flex items-center gap-3 rounded-none border border-border/60 bg-card px-5 py-3">
           <CheckCircle2 className="h-4 w-4 text-[#10B981] shrink-0" />
           <span className="text-sm text-muted-foreground">
             Q&A marked complete on {new Date(roomData!.qa_completed_at!).toLocaleDateString()}. Report saved to Information Vault.
@@ -2230,7 +2230,7 @@ function QAPanel({
         <div className="flex flex-col gap-4 sm:order-2 sm:w-72 shrink-0">
 
           {/* Status card */}
-          <div className="rounded-xl border border-border/60 bg-card px-5 py-4 space-y-4">
+          <div className="rounded-none border border-border/60 bg-card px-5 py-4 space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Status</span>
               {isInvestor && !isCompleted && (
@@ -2280,7 +2280,7 @@ function QAPanel({
 
           {/* AI Suggestions (investor only) */}
           {isInvestor && (
-            <div className="rounded-xl border border-border/60 bg-card px-5 py-4 space-y-3">
+            <div className="rounded-none border border-border/60 bg-card px-5 py-4 space-y-3">
               <div>
                 <div className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Suggested questions</div>
                 <div className="text-xs text-muted-foreground mt-0.5">Generated from {companyName}'s documents</div>
@@ -2319,7 +2319,7 @@ function QAPanel({
             <button
               onClick={generateSummary}
               disabled={summarising || rows.length === 0}
-              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border/60 bg-card px-4 py-3 text-xs font-medium text-foreground hover:bg-accent disabled:opacity-40"
+              className="inline-flex items-center justify-center gap-1.5 rounded-none border border-border/60 bg-card px-4 py-3 text-xs font-medium text-foreground hover:bg-accent disabled:opacity-40"
               data-testid="qa-ai-summary-btn"
             >
               {summarising ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
@@ -2333,7 +2333,7 @@ function QAPanel({
 
           {/* Investor ask bar */}
           {isInvestor && !isCompleted && (
-            <div className="rounded-xl border border-border/60 bg-card px-4 py-3 space-y-2">
+            <div className="rounded-none border border-border/60 bg-card px-4 py-3 space-y-2">
               <textarea
                 value={suggestionInput || askText}
                 onChange={(e) => {
@@ -2383,7 +2383,7 @@ function QAPanel({
                 <div
                   key={q.id}
                   className={cn(
-                    "rounded-xl border bg-card",
+                    "rounded-none border bg-card",
                     isAnswered
                       ? "border-border/60"
                       : "border-border",
@@ -2925,7 +2925,7 @@ function DueDiligencePanel({
     return (
       <div className="space-y-6">
         {fGoals.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-xl px-6 py-12 text-center">
+          <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none px-6 py-12 text-center">
             <ClipboardList className="h-12 w-12 text-gray-200 mx-auto mb-4" />
             <p className="text-sm font-semibold text-gray-900 mb-1">Due diligence not started</p>
             <p className="text-sm text-gray-500 ">You will see their diligence goals and progress here once they begin.</p>
@@ -2939,7 +2939,7 @@ function DueDiligencePanel({
             </div>
 
             {/* Progress summary */}
-            <div className="bg-white border border-gray-200 rounded-xl px-6 py-5">
+            <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none px-6 py-5">
               <div className="flex items-center gap-4 flex-wrap mb-4">
                 <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 ">{fTotal} total goals</span>
                 <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700 ">{fCompleted} complete</span>
@@ -2955,8 +2955,8 @@ function DueDiligencePanel({
             {fCategories.map((cat) => {
               const catGoals = fGoals.filter((g: any) => g.category === cat);
               return (
-                <div key={cat} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-                  <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 ">
+                <div key={cat} className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
+                  <div className="flex items-center justify-between px-5 py-3 border-b border-[rgba(0,0,0,0.08)] ">
                     <span className="text-sm font-semibold text-gray-900 " style={{ fontFamily: "Syne, sans-serif" }}>{cat}</span>
                     <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", DD_CATEGORY_COLORS[cat] ?? "bg-gray-100 text-gray-600  ")}>{catGoals.length}</span>
                   </div>
@@ -2974,7 +2974,7 @@ function DueDiligencePanel({
             })}
 
             {/* AI Analysis */}
-            <div className="bg-white border border-gray-200 rounded-xl px-6 py-5">
+            <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none px-6 py-5">
               <div className="text-sm font-semibold text-gray-900 mb-1" style={{ fontFamily: "Syne, sans-serif" }}>AI Analysis</div>
               {analysisShared && ddAnalysisParsed ? (
                 <div className="space-y-4">
@@ -3014,8 +3014,8 @@ function DueDiligencePanel({
 
       {/* ── SECTION A: Onboarding card ── */}
       {showOnboarding && (
-        <div className="bg-white border border-brand/20 rounded-xl px-6 py-6 text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl" style={{ background: "rgba(124,58,237,0.08)" }}>
+        <div className="bg-white border border-brand/20 rounded-none px-6 py-6 text-center">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg" style={{ background: "rgba(124,58,237,0.08)" }}>
             <ClipboardList className="h-6 w-6 text-brand" />
           </div>
           <h3 className="text-base font-bold text-gray-900 mb-1" style={{ fontFamily: "Syne, sans-serif" }}>Set up your diligence goals</h3>
@@ -3035,7 +3035,7 @@ function DueDiligencePanel({
             </button>
             <button
               onClick={() => { setOnboardingDone(true); setShowOnboarding(false); }}
-              className="rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 "
+              className="rounded-lg border border-[rgba(0,0,0,0.08)] px-5 py-2.5 text-sm font-medium text-gray-700 "
             >
               Start from scratch
             </button>
@@ -3045,9 +3045,9 @@ function DueDiligencePanel({
 
       {/* ── SECTION B: Goal Workstation (shown when goals exist or onboarding dismissed) ── */}
       {(!showOnboarding || onboardingDone) && (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
           {/* Category tabs */}
-          <div className="flex items-center gap-0 border-b border-gray-100 overflow-x-auto px-4 pt-3">
+          <div className="flex items-center gap-0 border-b border-[rgba(0,0,0,0.08)] overflow-x-auto px-4 pt-3">
             {categories.map((cat) => (
               <button
                 key={cat}
@@ -3086,7 +3086,7 @@ function DueDiligencePanel({
             {filteredGoals.map((goal: any) => {
               const isExpanded = expandedGoalId === goal.id;
               return (
-                <div key={goal.id} className="bg-white border border-gray-200 rounded-xl p-4">
+                <div key={goal.id} className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4">
                   <div className="flex items-start gap-3">
                     {/* Status circle (clickable) */}
                     <button
@@ -3173,7 +3173,7 @@ function DueDiligencePanel({
 
             {/* Add custom goal */}
             {addGoalOpen ? (
-              <div className="rounded-xl border border-brand/20 bg-accent p-4 space-y-3">
+              <div className="rounded-lg border border-brand/20 bg-accent p-4 space-y-3">
                 <div className="grid grid-cols-3 gap-2">
                   <select
                     value={newGoalCategory}
@@ -3193,7 +3193,7 @@ function DueDiligencePanel({
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setAddGoalOpen(false)} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-500">Cancel</button>
+                  <button onClick={() => setAddGoalOpen(false)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-xs text-gray-500">Cancel</button>
                   <button
                     onClick={addCustomGoal}
                     disabled={!newGoalText.trim() || addingGoal}
@@ -3208,7 +3208,7 @@ function DueDiligencePanel({
             ) : (
               <button
                 onClick={() => setAddGoalOpen(true)}
-                className="w-full rounded-xl border border-dashed border-gray-300 py-3 text-sm text-gray-500 hover:border-brand hover:text-brand flex items-center justify-center gap-2"
+                className="w-full rounded-none border border-dashed border-gray-300 py-3 text-sm text-gray-500 hover:border-brand hover:text-brand flex items-center justify-center gap-2"
                 data-testid="dd-add-goal-btn"
               >
                 <Plus className="h-4 w-4" /> Add custom goal
@@ -3219,7 +3219,7 @@ function DueDiligencePanel({
       )}
 
       {/* ── SECTION C: AI Analysis ── */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
         <button
           onClick={() => setAnalysisOpen((v) => !v)}
           className="w-full flex items-center justify-between px-5 py-4"
@@ -3243,7 +3243,7 @@ function DueDiligencePanel({
         </button>
 
         {analysisOpen && (
-          <div className="border-t border-gray-100 px-5 py-5">
+          <div className="border-t border-[rgba(0,0,0,0.08)] px-5 py-5">
             {!analysisResult && !runningAnalysis && (
               <p className="text-sm text-gray-400 text-center py-4">Click "Run analysis" to generate an AI diligence report based on your goals and Q&A thread.</p>
             )}
@@ -3307,7 +3307,7 @@ function DueDiligencePanel({
         <div className="text-sm font-semibold text-gray-500 uppercase tracking-wider text-xs" style={{ fontFamily: "Syne, sans-serif" }}>Research from previous stages</div>
 
         {/* Q&A Summary */}
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
           <button
             onClick={() => setQaSummaryOpen((v) => !v)}
             className="w-full flex items-center justify-between px-5 py-4"
@@ -3316,7 +3316,7 @@ function DueDiligencePanel({
             {qaSummaryOpen ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
           </button>
           {qaSummaryOpen && (
-            <div className="border-t border-gray-100 px-5 py-4">
+            <div className="border-t border-[rgba(0,0,0,0.08)] px-5 py-4">
               {qaSummaryNote ? (
                 <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{qaSummaryNote.content}</p>
               ) : (
@@ -3327,7 +3327,7 @@ function DueDiligencePanel({
         </div>
 
         {/* Vault notes */}
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
           <button
             onClick={() => setVaultNotesOpen((v) => !v)}
             className="w-full flex items-center justify-between px-5 py-4"
@@ -3336,7 +3336,7 @@ function DueDiligencePanel({
             {vaultNotesOpen ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
           </button>
           {vaultNotesOpen && (
-            <div className="border-t border-gray-100 divide-y divide-gray-100 ">
+            <div className="border-t border-[rgba(0,0,0,0.08)] divide-y divide-gray-100 ">
               {(vaultNotes as any[]).length === 0 ? (
                 <p className="px-5 py-4 text-sm text-gray-400">No notes</p>
               ) : (
@@ -3354,7 +3354,7 @@ function DueDiligencePanel({
       </div>
 
       {/* ── Next Stage / Decision ── */}
-      <div className="bg-white border border-gray-200 rounded-xl px-6 py-5">
+      <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none px-6 py-5">
         {showDecision ? (
           <div className="space-y-3">
             <div className="text-sm font-semibold text-gray-900 ">Submit a decision</div>
@@ -3373,7 +3373,7 @@ function DueDiligencePanel({
               className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
             />
             <div className="flex items-center gap-2">
-              <button onClick={() => setShowDecision(false)} className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-500 ">Cancel</button>
+              <button onClick={() => setShowDecision(false)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-4 py-2 text-sm text-gray-500 ">Cancel</button>
               <button
                 onClick={() => { console.log("submitDecision dd:", decisionOutcome, decisionReason); setShowDecision(false); setDecisionReason(""); }}
                 disabled={!decisionReason.trim()}
@@ -3461,7 +3461,7 @@ function NdaStagePanel({ dealRoomId, room, memberList, isInvestor, isFounder }: 
         <DarkCard>
           <Eyebrow>Startup</Eyebrow>
           <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-xl overflow-hidden text-foreground font-bold" style={{ background: "var(--gradient-brand)" }}>
+            <div className="grid h-11 w-11 place-items-center rounded-lg overflow-hidden text-foreground font-bold" style={{ background: "var(--gradient-brand)" }}>
               {startup?.logo_url ? <img src={startup.logo_url} alt="" className="h-full w-full object-cover" /> : (startup?.company_name?.[0] ?? "S")}
             </div>
             <div className="min-w-0">
@@ -3476,7 +3476,7 @@ function NdaStagePanel({ dealRoomId, room, memberList, isInvestor, isFounder }: 
         <DarkCard>
           <Eyebrow>Investor</Eyebrow>
           <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-xl text-foreground font-bold" style={{ background: "rgba(16,185,129,0.18)", color: "#10B981" }}>
+            <div className="grid h-11 w-11 place-items-center rounded-lg text-foreground font-bold" style={{ background: "rgba(16,185,129,0.18)", color: "#10B981" }}>
               {((room as any)?.investor_company || (room as any)?.investor_name || investorRow?.users?.full_name || "V")[0]}
             </div>
             <div className="min-w-0">
@@ -3725,8 +3725,8 @@ function NewTermSheetPanel({
 
       {/* ── Editor ── */}
       {editorOpen && isInvestor && (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 ">
+        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(0,0,0,0.08)] ">
             <h3 className="text-sm font-bold text-gray-900 " style={{ fontFamily: "Syne, sans-serif" }}>
               Term Sheet v{editingVersion ? editingVersion.version : nextVersion}
             </h3>
@@ -3784,7 +3784,7 @@ function NewTermSheetPanel({
               <button
                 onClick={saveDraft}
                 disabled={savingDraft}
-                className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 disabled:opacity-50"
+                className="rounded-lg border border-[rgba(0,0,0,0.08)] px-4 py-2 text-sm font-medium text-gray-700 disabled:opacity-50"
               >
                 {savingDraft ? "Saving…" : "Save draft"}
               </button>
@@ -3805,8 +3805,8 @@ function NewTermSheetPanel({
 
       {/* ── Onboarding (investor, no sheets yet) ── */}
       {isInvestor && !editorOpen && allSheets.length === 0 && (
-        <div className="bg-white border border-brand/20 rounded-xl px-6 py-10 text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl" style={{ background: "rgba(124,58,237,0.08)" }}>
+        <div className="bg-white border border-brand/20 rounded-none px-6 py-10 text-center">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg" style={{ background: "rgba(124,58,237,0.08)" }}>
             <FileText className="h-6 w-6 text-brand" />
           </div>
           <h3 className="text-base font-bold text-gray-900 mb-1" style={{ fontFamily: "Syne, sans-serif" }}>Draft a term sheet</h3>
@@ -3833,7 +3833,7 @@ function NewTermSheetPanel({
           </div>
           <div className="space-y-3">
             {allSheets.map((sheet: any) => (
-              <div key={sheet.id} className="bg-white border border-gray-200 rounded-xl p-5">
+              <div key={sheet.id} className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-5">
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div>
                     <div className="flex items-center gap-2">
@@ -3845,7 +3845,7 @@ function NewTermSheetPanel({
                     {sheet.sent_at && <p className="text-xs text-gray-400 mt-0.5">Sent {formatDistanceToNow(new Date(sheet.sent_at), { addSuffix: true })}</p>}
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <button onClick={() => openEditor(sheet)} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 ">View / Edit</button>
+                    <button onClick={() => openEditor(sheet)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-xs font-medium text-gray-700 ">View / Edit</button>
                     {sheet.status === "sent" && (
                       <>
                         <button
@@ -3896,8 +3896,8 @@ function NewTermSheetPanel({
                   ["conditions_precedent", "Conditions precedent"],
                 ];
                 return (
-                  <div key={sheet.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-                    <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 ">
+                  <div key={sheet.id} className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
+                    <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(0,0,0,0.08)] ">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-bold text-gray-900 ">Term Sheet v{sheet.version}</span>
                         <span className={cn("rounded-full px-2.5 py-0.5 text-[10px] font-semibold", TS_STATUS_COLORS[sheet.status] ?? "bg-gray-100 text-gray-600  ")}>
@@ -3938,7 +3938,7 @@ function NewTermSheetPanel({
                               className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
                             />
                             <div className="flex gap-2">
-                              <button onClick={() => { setCounterOpen(null); setCounterText(""); }} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-500">Cancel</button>
+                              <button onClick={() => { setCounterOpen(null); setCounterText(""); }} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-xs text-gray-500">Cancel</button>
                               <button
                                 onClick={() => submitCounter(sheet.id, sheet.version)}
                                 disabled={!counterText.trim() || respondingId === sheet.id}
@@ -3994,7 +3994,7 @@ function NewTermSheetPanel({
 
       {/* Investor: advance to Closing */}
       {isInvestor && (
-        <div className="bg-white border border-gray-200 rounded-xl p-5 flex items-center justify-between gap-4">
+        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-5 flex items-center justify-between gap-4">
           <div>
             <div className="text-sm font-semibold text-gray-900 ">Ready to close?</div>
             <div className="text-xs text-gray-500 mt-0.5">Request to advance to the Closing stage when terms are agreed.</div>
@@ -4015,11 +4015,11 @@ function NewTermSheetPanel({
       {/* Accept confirm dialog */}
       {acceptConfirmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-xl border border-gray-200 p-6 max-w-sm w-full mx-4 space-y-4">
+          <div className="bg-white rounded-none border border-[rgba(0,0,0,0.08)] p-6 max-w-sm w-full mx-4 space-y-4">
             <h3 className="text-base font-bold text-gray-900 ">Accept this term sheet?</h3>
             <p className="text-sm text-gray-500">Review with a lawyer before accepting.</p>
             <div className="flex gap-2">
-              <button onClick={() => setAcceptConfirmId(null)} className="flex-1 rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-500">Cancel</button>
+              <button onClick={() => setAcceptConfirmId(null)} className="flex-1 rounded-lg border border-[rgba(0,0,0,0.08)] px-4 py-2 text-sm text-gray-500">Cancel</button>
               <button
                 onClick={async () => { await updateStatus(acceptConfirmId, "accepted"); setAcceptConfirmId(null); }}
                 className="flex-1 rounded-lg px-4 py-2 text-sm font-semibold text-foreground"
@@ -4266,7 +4266,7 @@ function NewClosingPanel({
 
   if (dealClosed || exitDone) {
     return (
-      <div className="bg-white border border-gray-200 rounded-xl px-6 py-12 text-center">
+      <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none px-6 py-12 text-center">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full" style={{ background: dealClosed ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)" }}>
           <CheckCircle2 className={cn("h-7 w-7", dealClosed ? "text-green-500" : "text-red-400")} />
         </div>
@@ -4284,8 +4284,8 @@ function NewClosingPanel({
     <div className="space-y-6">
 
       {/* ── SECTION 1: Closing Checklist ── */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 ">
+      <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(0,0,0,0.08)] ">
           <h3 className="text-sm font-bold text-gray-900 " style={{ fontFamily: "Syne, sans-serif" }}>Closing Checklist</h3>
           {items.length === 0 && (
             <button
@@ -4330,7 +4330,7 @@ function NewClosingPanel({
                       const isExpanded = expandedItemId === item.id;
                       const currentStatus = itemStatuses[item.id] ?? item.status;
                       return (
-                        <div key={item.id} className="bg-white border border-gray-200 rounded-lg p-3">
+                        <div key={item.id} className="bg-white border border-[rgba(0,0,0,0.08)] rounded-lg p-3">
                           <div className="flex items-start gap-3">
                             <button onClick={() => cycleItemStatus(item)} className="mt-0.5 focus:outline-none" title="Click to cycle status">
                               <ItemStatusCircle status={currentStatus} />
@@ -4398,7 +4398,7 @@ function NewClosingPanel({
       </div>
 
       {/* ── SECTION 2: Deal Summary ── */}
-      <div className="bg-white border border-gray-200 rounded-xl px-5 py-5">
+      <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none px-5 py-5">
         <h3 className="text-sm font-bold text-gray-900 mb-4" style={{ fontFamily: "Syne, sans-serif" }}>Deal Summary</h3>
         {!acceptedTS ? (
           <p className="text-sm text-gray-500">No accepted term sheet</p>
@@ -4421,7 +4421,7 @@ function NewClosingPanel({
 
       {/* ── SECTION 3: Close Deal (investor only) ── */}
       {isInvestor && (
-        <div className="bg-white border border-gray-200 rounded-xl px-5 py-5">
+        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none px-5 py-5">
           <h3 className="text-sm font-bold text-gray-900 mb-3" style={{ fontFamily: "Syne, sans-serif" }}>Close this deal</h3>
 
           {!closeDealOpen ? (
@@ -4473,7 +4473,7 @@ function NewClosingPanel({
                 className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
               />
               <div className="flex gap-2">
-                <button onClick={() => setCloseDealOpen(false)} className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-500">Cancel</button>
+                <button onClick={() => setCloseDealOpen(false)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-4 py-2 text-sm text-gray-500">Cancel</button>
                 <button
                   onClick={closeDeal}
                   disabled={closingDeal}
@@ -4501,7 +4501,7 @@ function NewClosingPanel({
             Exit deal →
           </button>
         ) : (
-          <div className="bg-white border border-red-200 rounded-xl px-5 py-5 space-y-3">
+          <div className="bg-white border border-red-200 rounded-none px-5 py-5 space-y-3">
             <h3 className="text-sm font-semibold text-gray-900 ">Exit this deal</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
@@ -4534,7 +4534,7 @@ function NewClosingPanel({
               className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
             />
             <div className="flex gap-2">
-              <button onClick={() => setExitOpen(false)} className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-500">Cancel</button>
+              <button onClick={() => setExitOpen(false)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-4 py-2 text-sm text-gray-500">Cancel</button>
               <button
                 onClick={exitDeal}
                 disabled={exiting}
@@ -5067,7 +5067,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
               <div className="space-y-2">
                 {platformDocsSplit.stage1.map((doc: any) => (
                   <div key={doc.id}
-                    className="flex items-center justify-between p-4 rounded-xl border border-border bg-white/[0.02] hover:bg-accent transition-colors">
+                    className="flex items-center justify-between p-4 rounded-none border border-border bg-white/[0.02] hover:bg-accent transition-colors">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-brand text-sm shrink-0">≡</div>
                       <div className="min-w-0">
@@ -5106,7 +5106,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
               <div className="space-y-2">
                 {platformDocsSplit.stage2.map((doc: any) => (
                   <div key={doc.id}
-                    className="flex items-center justify-between p-4 rounded-xl border border-border bg-white/[0.02] hover:bg-accent transition-colors">
+                    className="flex items-center justify-between p-4 rounded-none border border-border bg-white/[0.02] hover:bg-accent transition-colors">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-brand text-sm shrink-0">≡</div>
                       <div className="min-w-0">
@@ -5143,7 +5143,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
           <div className="space-y-2">
             {(platformDocs as any[]).map((doc: any) => (
               <div key={doc.id}
-                className="flex items-center justify-between p-4 rounded-xl border border-border bg-white/[0.02] hover:bg-accent transition-colors">
+                className="flex items-center justify-between p-4 rounded-none border border-border bg-white/[0.02] hover:bg-accent transition-colors">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-brand text-sm shrink-0">≡</div>
                   <div className="min-w-0">
@@ -5192,7 +5192,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
 
       {isFounder && (
         <div className="mt-5 space-y-3">
-          <div className="rounded-lg bg-gray-100/40 border border-gray-200 px-4 py-3 text-xs text-gray-500 space-y-1">
+          <div className="rounded-lg bg-gray-100/40 border border-[rgba(0,0,0,0.08)] px-4 py-3 text-xs text-gray-500 space-y-1">
             <div>💡 <strong>Documents shared here are visible to the investor</strong> and appear in their Workstation automatically.</div>
             <div className="flex flex-wrap gap-1.5 mt-1.5">
               {[
@@ -5246,7 +5246,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
       )}
 
       {/* Category tabs with count badges */}
-      <div className="flex gap-1 mt-5 pb-2 overflow-x-auto border-b border-gray-200 ">
+      <div className="flex gap-1 mt-5 pb-2 overflow-x-auto border-b border-[rgba(0,0,0,0.08)] ">
         {DOC_CATEGORIES.map((cat) => {
           const count = cat === "All" ? (docs as any[]).length : (catCounts[cat] ?? 0);
           return (
@@ -5257,7 +5257,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                 "shrink-0 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs transition-colors",
                 activeDocTab === cat
                   ? "hs-gradient text-brand-foreground"
-                  : "border border-gray-200 hover:bg-gray-100 "
+                  : "border border-[rgba(0,0,0,0.08)] hover:bg-gray-100 "
               )}
             >
               {cat}
@@ -5278,10 +5278,10 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
           onClick={() => setShowLibrary(false)}
         >
           <div
-            className="w-full max-w-lg rounded-2xl border border-gray-200 bg-card shadow-elev"
+            className="w-full max-w-lg rounded-2xl border border-[rgba(0,0,0,0.08)] bg-card shadow-elev"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-5 border-b border-gray-200 ">
+            <div className="flex items-center justify-between p-5 border-b border-[rgba(0,0,0,0.08)] ">
               <div className="text-sm font-semibold">Add from document library</div>
               <button
                 onClick={() => setShowLibrary(false)}
@@ -5327,7 +5327,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
       {ndaDocs.length > 0 && (
         <div className="mt-5">
           <div className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-2">System generated</div>
-          <div className="rounded-xl border border-gray-200 bg-card shadow-card divide-y divide-border/60">
+          <div className="rounded-none border border-[rgba(0,0,0,0.08)] bg-card shadow-card divide-y divide-border/60">
             {ndaDocs.map((d) => (
               <div key={d.name} className="flex items-center gap-3 px-5 py-3">
                 <div className="grid h-8 w-8 place-items-center rounded-md bg-success/10"><Shield className="h-4 w-4 text-success" /></div>
@@ -5362,7 +5362,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
               <div
                 key={doc.id}
                 className={cn(
-                  "rounded-xl bg-card shadow-card overflow-hidden border border-gray-200 border-l-4",
+                  "rounded-none bg-card overflow-hidden border border-[rgba(0,0,0,0.08)] border-l-4",
                   catBorder
                 )}
               >
@@ -5422,7 +5422,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
 
                 {/* AI Summary section — only for text-based files */}
                 {supportsAI && (
-                  <div className="border-t border-gray-200 ">
+                  <div className="border-t border-[rgba(0,0,0,0.08)] ">
                     {hasSummary ? (
                       <div className="px-4 py-2.5">
                         <button
@@ -5449,12 +5449,12 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                                   value={summaryEdits[doc.id] ?? ""}
                                   onChange={(e) => setSummaryEdits((s) => ({ ...s, [doc.id]: e.target.value }))}
                                   rows={4}
-                                  className="w-full rounded-md border border-gray-200 bg-background px-3 py-2 text-xs resize-none focus:outline-none focus:border-brand/50"
+                                  className="w-full rounded-md border border-[rgba(0,0,0,0.08)] bg-background px-3 py-2 text-xs resize-none focus:outline-none focus:border-brand/50"
                                 />
                                 <div className="flex gap-2">
                                   <button
                                     onClick={() => setEditingSummaryId(null)}
-                                    className="text-[10px] border border-gray-200 rounded px-2 py-1 hover:bg-gray-100 "
+                                    className="text-[10px] border border-[rgba(0,0,0,0.08)] rounded px-2 py-1 hover:bg-gray-100 "
                                   >
                                     Cancel
                                   </button>
@@ -5487,7 +5487,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                                   <button
                                     onClick={() => generateSummary(doc)}
                                     disabled={isGenerating}
-                                    className="text-[10px] text-gray-500 hover:text-foreground border border-gray-200 rounded px-2 py-0.5 hover:bg-accent disabled:opacity-50"
+                                    className="text-[10px] text-gray-500 hover:text-foreground border border-[rgba(0,0,0,0.08)] rounded px-2 py-0.5 hover:bg-accent disabled:opacity-50"
                                   >
                                     {isGenerating ? "Regenerating…" : "Regenerate"}
                                   </button>
@@ -5497,7 +5497,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                                         setEditingSummaryId(doc.id);
                                         setSummaryEdits((s) => ({ ...s, [doc.id]: doc.ai_summary! }));
                                       }}
-                                      className="text-[10px] text-gray-500 hover:text-foreground border border-gray-200 rounded px-2 py-0.5 hover:bg-gray-100 "
+                                      className="text-[10px] text-gray-500 hover:text-foreground border border-[rgba(0,0,0,0.08)] rounded px-2 py-0.5 hover:bg-gray-100 "
                                     >
                                       Edit
                                     </button>
@@ -5597,7 +5597,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
           <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-4">
             Recommended for this category
           </div>
-          <div className="rounded-xl border border-dashed border-gray-200 divide-y divide-border/40 overflow-hidden">
+          <div className="rounded-none border border-dashed border-[rgba(0,0,0,0.08)] divide-y divide-border/40 overflow-hidden">
             {expectedForTab.map((expected) => (
               <div key={expected.name} className="flex items-center gap-3 px-4 py-3 bg-gray-100/20 ">
                 <div className="grid h-8 w-8 place-items-center rounded-lg bg-muted shrink-0">
@@ -5697,7 +5697,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
 
           {/* Investor doc list */}
           {visibleInvestorDocs.length === 0 && isInvestor && (
-            <div className="rounded-xl border border-dashed border-gray-200 p-8 text-center">
+            <div className="rounded-none border border-dashed border-[rgba(0,0,0,0.08)] p-8 text-center">
               <FileText className="h-8 w-8 mx-auto mb-2 text-gray-300 " />
               <p className="text-sm text-gray-500">No investor documents</p>
             </div>
@@ -5712,7 +5712,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
               const currentVisibility = investorDocVisibility[doc.id] ?? doc.visibility ?? "shared";
 
               return (
-                <div key={doc.id} className="flex items-center gap-3 rounded-xl border border-gray-200 bg-card px-4 py-3 shadow-card border-l-4 border-l-success/60">
+                <div key={doc.id} className="flex items-center gap-3 rounded-none border border-[rgba(0,0,0,0.08)] bg-card px-4 py-3 shadow-card border-l-4 border-l-success/60">
                   <div className={cn("grid h-9 w-9 place-items-center rounded-lg shrink-0", iconBg)}>
                     <FileIcon className={cn("h-4 w-4", iconColor)} />
                   </div>
@@ -5778,7 +5778,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
       {activeVaultTab === "links" && (
         <div className="mt-5 space-y-3">
           {(dealRoomLinks as any[]).length === 0 && (
-            <div className="rounded-xl border border-dashed border-gray-200 p-10 text-center">
+            <div className="rounded-none border border-dashed border-[rgba(0,0,0,0.08)] p-10 text-center">
               <LinkIcon className="h-8 w-8 mx-auto mb-2 text-gray-300 " />
               <p className="text-sm font-medium">No links</p>
               <p className="text-xs text-gray-500 mt-1">Add product videos, Loom recordings, external documents, or any URL</p>
@@ -5791,7 +5791,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
             </div>
           )}
           {(dealRoomLinks as any[]).map((link: any) => (
-            <div key={link.id} className="flex items-center gap-3 rounded-xl border border-gray-200 bg-card px-4 py-3 shadow-card">
+            <div key={link.id} className="flex items-center gap-3 rounded-none border border-[rgba(0,0,0,0.08)] bg-card px-4 py-3 shadow-card">
               <div className="grid h-9 w-9 place-items-center rounded-lg bg-accent shrink-0">
                 <LinkIcon className="h-4 w-4 text-brand" />
               </div>
@@ -5831,10 +5831,10 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
           onClick={() => setShowAddLink(false)}
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-gray-200 bg-card shadow-elev"
+            className="w-full max-w-md rounded-2xl border border-[rgba(0,0,0,0.08)] bg-card shadow-elev"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-5 border-b border-gray-200 ">
+            <div className="flex items-center justify-between p-5 border-b border-[rgba(0,0,0,0.08)] ">
               <div className="text-sm font-semibold">Add a link</div>
               <button onClick={() => setShowAddLink(false)} className="grid h-8 w-8 place-items-center rounded-md text-gray-500 hover:bg-gray-100 ">
                 <X className="h-4 w-4" />
@@ -5847,7 +5847,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                   value={linkName}
                   onChange={(e) => setLinkName(e.target.value)}
                   placeholder="e.g. Product Demo Video, Financial Model..."
-                  className="w-full rounded-md border border-gray-200 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                  className="w-full rounded-md border border-[rgba(0,0,0,0.08)] bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
                 />
               </div>
               <div>
@@ -5857,11 +5857,11 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                   onChange={(e) => setLinkUrl(e.target.value)}
                   placeholder="https://..."
                   type="url"
-                  className="w-full rounded-md border border-gray-200 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                  className="w-full rounded-md border border-[rgba(0,0,0,0.08)] bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-1">
-                <button onClick={() => setShowAddLink(false)} className="px-4 py-2 rounded-md border border-gray-200 text-sm hover:bg-gray-100 ">
+                <button onClick={() => setShowAddLink(false)} className="px-4 py-2 rounded-md border border-[rgba(0,0,0,0.08)] text-sm hover:bg-gray-100 ">
                   Cancel
                 </button>
                 <button
@@ -5954,10 +5954,10 @@ function DocPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-4xl rounded-2xl border border-gray-200 bg-card shadow-elev overflow-hidden"
+        className="w-full max-w-4xl rounded-2xl border border-[rgba(0,0,0,0.08)] bg-card shadow-elev overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 ">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(0,0,0,0.08)] ">
           <div className="text-sm font-semibold truncate">{displayName}</div>
           <button
             onClick={onClose}
@@ -5976,13 +5976,13 @@ function DocPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
           ) : isPdf ? (
             <iframe
               src={url}
-              className="w-full h-[70vh] rounded-lg border border-gray-200 "
+              className="w-full h-[70vh] rounded-lg border border-[rgba(0,0,0,0.08)] "
               title={displayName}
             />
           ) : isOffice ? (
             <iframe
               src={`https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`}
-              className="w-full h-[70vh] rounded-lg border border-gray-200 "
+              className="w-full h-[70vh] rounded-lg border border-[rgba(0,0,0,0.08)] "
               title={displayName}
             />
           ) : (
@@ -6015,7 +6015,7 @@ function ParticipantsSection({ dealRoomId }: { dealRoomId: string }) {
       : "bg-warning/10 text-warning";
   return (
     <div className="px-8 pb-10 max-w-5xl mx-auto">
-      <div className="rounded-xl border border-gray-200 bg-card shadow-card p-5">
+      <div className="rounded-none border border-[rgba(0,0,0,0.08)] bg-card shadow-card p-5">
         <div className="flex items-center justify-between">
           <div className="text-sm font-semibold inline-flex items-center gap-2"><Users className="h-4 w-4 text-brand" /> Participants</div>
           <button className="text-xs inline-flex items-center gap-1 text-gray-500 hover:text-foreground"><UserPlus className="h-3.5 w-3.5" /> Invite</button>
@@ -6107,7 +6107,7 @@ function InviteModal({
       <div className="fixed inset-0 z-50 bg-foreground/40 backdrop-blur-sm" onClick={onClose} />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
-          className="pointer-events-auto w-full max-w-md rounded-2xl border border-gray-200 bg-card shadow-elev p-6"
+          className="pointer-events-auto w-full max-w-md rounded-2xl border border-[rgba(0,0,0,0.08)] bg-card shadow-elev p-6"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between mb-4">
@@ -6132,11 +6132,11 @@ function InviteModal({
                   <input
                     readOnly
                     value={sentLink}
-                    className="flex-1 rounded-md border border-gray-200 bg-background px-3 py-1.5 text-xs font-mono text-gray-500 focus:outline-none min-w-0"
+                    className="flex-1 rounded-md border border-[rgba(0,0,0,0.08)] bg-background px-3 py-1.5 text-xs font-mono text-gray-500 focus:outline-none min-w-0"
                   />
                   <button
                     onClick={copyLink}
-                    className="shrink-0 inline-flex items-center gap-1.5 rounded-md border border-gray-200 px-3 py-1.5 text-xs hover:bg-gray-100 "
+                    className="shrink-0 inline-flex items-center gap-1.5 rounded-md border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-xs hover:bg-gray-100 "
                   >
                     {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
                     {copied ? "Copied" : "Copy"}
@@ -6160,7 +6160,7 @@ function InviteModal({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="investor@firm.com"
-                  className="mt-1 w-full rounded-md border border-gray-200 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                  className="mt-1 w-full rounded-md border border-[rgba(0,0,0,0.08)] bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
                 />
               </div>
               <div>
@@ -6170,7 +6170,7 @@ function InviteModal({
                   onChange={(e) => setMessage(e.target.value)}
                   rows={3}
                   placeholder="Hi, I'd love to share our deal room with you…"
-                  className="mt-1 w-full rounded-md border border-gray-200 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
+                  className="mt-1 w-full rounded-md border border-[rgba(0,0,0,0.08)] bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
                 />
               </div>
               {error && <p className="text-xs text-destructive">{error}</p>}
@@ -6178,7 +6178,7 @@ function InviteModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 rounded-md border border-gray-200 px-4 py-2 text-sm hover:bg-gray-100 "
+                  className="flex-1 rounded-md border border-[rgba(0,0,0,0.08)] px-4 py-2 text-sm hover:bg-gray-100 "
                 >
                   Cancel
                 </button>
@@ -6251,13 +6251,13 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
     <div className="p-8 max-w-3xl mx-auto">
       <h2 className="text-lg font-bold tracking-tight">Notes</h2>
 
-      <form onSubmit={submit} className="mt-5 rounded-xl border border-gray-200 bg-card p-4 shadow-card space-y-3">
+      <form onSubmit={submit} className="mt-5 rounded-none border border-[rgba(0,0,0,0.08)] bg-card p-4 shadow-card space-y-3">
         <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
           placeholder="Write a note…"
           rows={3}
-          className="w-full rounded-md border border-gray-200 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
+          className="w-full rounded-md border border-[rgba(0,0,0,0.08)] bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
         />
         <div className="flex items-center justify-between">
           <label className="flex items-center gap-2 cursor-pointer">
@@ -6298,7 +6298,7 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
 
       <div className="mt-5 grid gap-3">
         {(notes as any[]).map((n) => (
-          <div key={n.id} className={`rounded-xl border border-gray-200 p-4 shadow-card ${n.private ? "bg-warning/5 border-warning/30" : "bg-white "}`}>
+          <div key={n.id} className={`rounded-none border border-[rgba(0,0,0,0.08)] p-4 ${n.private ? "bg-warning/5 border-warning/30" : "bg-white "}`}>
             <div className="flex items-center gap-2 text-xs">
               <span className="font-medium">{n.author_id === userId ? "You" : (n.users?.full_name ?? "Unknown")}</span>
               <span className="text-gray-500 ">{formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}</span>
@@ -6586,14 +6586,14 @@ function QA({
           )}
         </div>
 
-        <section className="rounded-xl border border-gray-200 bg-card shadow-card">
-          <div className="border-b border-gray-200 p-5">
+        <section className="rounded-none border border-[rgba(0,0,0,0.08)] bg-card shadow-card">
+          <div className="border-b border-[rgba(0,0,0,0.08)] p-5">
             <div className="text-sm font-semibold">Structured Q&amp;A</div>
             <div className="mt-1 text-xs text-gray-500 ">Investor questions and founder answers, organized as expandable cards.</div>
           </div>
 
           {isInvestor && (
-            <div className="border-b border-gray-200 p-5">
+            <div className="border-b border-[rgba(0,0,0,0.08)] p-5">
               <textarea
                 id="ask-question-box"
                 value={question}
@@ -6606,7 +6606,7 @@ function QA({
                 }}
                 rows={3}
                 placeholder="Ask a diligence question for the founder..."
-                className="w-full resize-none rounded-md border border-gray-200 bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
+                className="w-full resize-none rounded-md border border-[rgba(0,0,0,0.08)] bg-background px-3 py-2 text-sm outline-none focus:border-brand/50"
               />
               {suggestions.length > 0 && (
                 <div className="mt-2">
@@ -6684,7 +6684,7 @@ function QA({
                     </div>
                   </button>
                   {open && (
-                    <div className="border-t border-gray-200 bg-background/60 px-5 py-4">
+                    <div className="border-t border-[rgba(0,0,0,0.08)] bg-background/60 px-5 py-4">
                       {answer ? (
                         <div>
                           <div className="mb-2 flex items-center justify-between gap-3 text-xs text-gray-500 ">
@@ -6705,7 +6705,7 @@ function QA({
                             onChange={(e) => setAnswerDrafts((drafts) => ({ ...drafts, [item.id]: e.target.value }))}
                             rows={4}
                             placeholder="Answer this question..."
-                            className="w-full resize-none rounded-md border border-gray-200 bg-card px-3 py-2 text-sm outline-none focus:border-brand/50"
+                            className="w-full resize-none rounded-md border border-[rgba(0,0,0,0.08)] bg-card px-3 py-2 text-sm outline-none focus:border-brand/50"
                           />
                           <div className="mt-3 flex items-center justify-between gap-2">
                             <span className="text-xs text-gray-500 ">{countWords(answerDrafts[item.id] ?? "")} words</span>
@@ -6759,8 +6759,8 @@ function QA({
           </div>
         </section>
 
-        <section className="rounded-xl border border-gray-200 bg-card shadow-card">
-          <div className="border-b border-gray-200 p-5">
+        <section className="rounded-none border border-[rgba(0,0,0,0.08)] bg-card shadow-card">
+          <div className="border-b border-[rgba(0,0,0,0.08)] p-5">
             <div className="text-sm font-semibold">Live discussion</div>
             <div className="mt-1 text-xs text-gray-500 ">Informal back-and-forth for quick clarifications.</div>
           </div>
@@ -6799,8 +6799,8 @@ function QA({
             })}
           </div>
 
-          <div className="border-t border-gray-200 bg-background px-5 py-4">
-            <div className="flex items-end gap-2 rounded-xl border border-gray-200 bg-card px-3 py-2 transition focus-within:border-brand/50 focus-within:ring-2 focus-within:ring-brand/10">
+          <div className="border-t border-[rgba(0,0,0,0.08)] bg-background px-5 py-4">
+            <div className="flex items-end gap-2 rounded-none border border-[rgba(0,0,0,0.08)] bg-card px-3 py-2 transition focus-within:border-brand/50 focus-within:ring-2 focus-within:ring-brand/10">
               <textarea
                 rows={1}
                 value={input}
@@ -6985,7 +6985,7 @@ function OverviewPanel({
 
   return (
     <div className="w-full px-6 py-6">
-      <section className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+      <section className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4 mb-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex min-w-0 items-start gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full hs-gradient text-sm font-bold text-foreground">
@@ -7031,7 +7031,7 @@ function OverviewPanel({
         </section>
       )}
 
-      <section className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+      <section className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4 mb-4">
         <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-2">TRACTION METRICS</h3>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {[
@@ -7048,7 +7048,7 @@ function OverviewPanel({
         </div>
       </section>
 
-      <section className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+      <section className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4 mb-4">
         <div className="flex items-center justify-between gap-3 mb-1">
           <h3 className="text-xs uppercase tracking-wider text-gray-500 ">DEAL BRIEF</h3>
           <button
@@ -7113,7 +7113,7 @@ function OverviewPanel({
       {/* ── NDA & Confidentiality card ─────────────────────────────── */}
       <section className="mb-4">
         <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-2">NDA &amp; CONFIDENTIALITY</h3>
-        <div className="bg-card border border-border/60 rounded-xl p-5">
+        <div className="bg-card border border-border/60 rounded-none p-5">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.2)]">
@@ -7251,7 +7251,7 @@ function OverviewPanel({
         ) : (
           <div className="flex gap-4 overflow-x-auto pb-2">
             {(teamMembers as any[]).map((member) => (
-              <article key={member.id ?? member.name} className="min-w-[180px] bg-white border border-gray-200 rounded-xl p-4">
+              <article key={member.id ?? member.name} className="min-w-[180px] bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4">
                 {member.photo_url ? (
                   <img src={member.photo_url} alt="" className="w-12 h-12 rounded-full object-cover mb-2" />
                 ) : (
@@ -7274,7 +7274,7 @@ function OverviewPanel({
       </section>
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 mb-4">
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
+        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4">
           <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand">FOUNDER</div>
           <div className="font-semibold text-gray-900 ">{companyName}</div>
           {startup?.country && <div className="mt-1 text-sm text-gray-500 ">{startup.country}</div>}
@@ -7285,7 +7285,7 @@ function OverviewPanel({
           {startup?.description && <p className="mt-3 line-clamp-3 text-sm text-gray-600 ">{startup.description}</p>}
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
+        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4">
           <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand">INVESTOR</div>
           {dealRoom?.investor_name ? (
             <>
@@ -7308,7 +7308,7 @@ function OverviewPanel({
         </div>
       </section>
 
-      <section className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+      <section className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4 mb-4">
         <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-4">RECENT ACTIVITY</h3>
         {recentActivity.length === 0 ? (
           <p className="text-gray-400 text-sm">No activity</p>
@@ -7330,7 +7330,7 @@ function OverviewPanel({
         )}
       </section>
 
-      <section className="bg-white border border-gray-200 rounded-xl p-4" data-testid="stage-progress-bar">
+      <section className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4" data-testid="stage-progress-bar">
         <div className="flex items-start">
           {progressStages.map((stage, index) => {
             const rank = UI_STAGE_ORDER.indexOf(stage.key);

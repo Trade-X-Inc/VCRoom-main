@@ -315,7 +315,7 @@ Return this exact JSON shape:
             <div className="rounded-2xl border border-border/60 bg-card p-5">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div className="flex items-center gap-3">
-                  <div className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-brand text-brand-foreground text-lg font-bold shrink-0">
+                  <div className="grid h-12 w-12 place-items-center rounded-lg bg-gradient-brand text-brand-foreground text-lg font-bold shrink-0">
                     {(selectedCompany.company_name ?? "?")[0]}
                   </div>
                   <div>
@@ -542,7 +542,7 @@ Return this exact JSON shape:
               )}
               {memoText && (
                 <div>
-                  <div className="p-6 prose prose-sm prose-neutral dark:prose-invert max-w-none text-sm leading-relaxed">
+                  <div className="p-6 prose prose-sm prose-neutral max-w-none text-sm leading-relaxed">
                     <Markdown>{memoText}</Markdown>
                   </div>
                   {memoGeneratedAt && (

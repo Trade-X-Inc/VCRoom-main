@@ -34,7 +34,7 @@ function BillingSettings() {
 
   return (
     <div className="space-y-4 max-w-2xl">
-      <div className="bg-card border border-border/60 rounded-xl p-6 space-y-4">
+      <div className="bg-card border border-border/60 rounded-none p-6 space-y-4">
         <div className="flex items-center gap-2.5">
           <CreditCard className="h-4 w-4 text-brand" />
           <h2 className="text-sm font-semibold">Billing</h2>
@@ -143,7 +143,7 @@ function BillingSettings() {
 
       {/* Plan limits summary */}
       {limits && (
-        <div className="bg-card border border-border/60 rounded-xl p-6">
+        <div className="bg-card border border-border/60 rounded-none p-6">
           <h3 className="text-sm font-semibold mb-3">What your plan includes</h3>
           <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-muted-foreground">
             <div>Deal rooms: <span className="text-foreground">{limits.deal_room_limit >= 999 ? "Unlimited" : limits.deal_room_limit}</span></div>

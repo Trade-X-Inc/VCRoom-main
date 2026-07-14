@@ -62,7 +62,7 @@ function Referrals() {
       </div>
 
       {/* Referral link */}
-      <div className="rounded-xl border border-brand/20 bg-accent p-6">
+      <div className="rounded-lg border border-brand/20 bg-accent p-6">
         <h2 className="text-sm font-semibold mb-1">Your referral link</h2>
         <p className="text-xs text-muted-foreground mb-4">
           Share this link. Every 3 people who join = 1 extra deal room for you.
@@ -79,15 +79,15 @@ function Referrals() {
 
       {/* Stats */}
       <div className="grid sm:grid-cols-3 gap-4">
-        <div className="rounded-xl border border-border/60 bg-card p-5">
+        <div className="rounded-none border border-border/60 bg-card p-5">
           <div className="text-xs text-muted-foreground mb-1">People invited</div>
           <div className="text-3xl font-bold text-brand">{stats?.invited ?? 0}</div>
         </div>
-        <div className="rounded-xl border border-border/60 bg-card p-5">
+        <div className="rounded-none border border-border/60 bg-card p-5">
           <div className="text-xs text-muted-foreground mb-1">Joined</div>
           <div className="text-3xl font-bold text-brand">{stats?.converted ?? 0}</div>
         </div>
-        <div className="rounded-xl border border-brand/20 bg-accent p-5">
+        <div className="rounded-lg border border-brand/20 bg-accent p-5">
           <div className="flex items-center gap-1.5 mb-1">
             <Gift className="h-3.5 w-3.5 text-brand" />
             <span className="text-xs font-semibold text-brand">Bonus unlocked</span>
@@ -98,7 +98,7 @@ function Referrals() {
       </div>
 
       {/* Referrals table */}
-      <div className="rounded-xl border border-border/60 bg-card p-5">
+      <div className="rounded-none border border-border/60 bg-card p-5">
         <h3 className="text-sm font-semibold mb-4">People you've invited</h3>
         {(referrals as any[]).length === 0 ? (
           <EmptyState kind="empty" title="No invites sent" />

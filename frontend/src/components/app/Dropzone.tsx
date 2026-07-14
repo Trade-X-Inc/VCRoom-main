@@ -45,7 +45,7 @@ function MismatchDialog({
       onClick={onCancel}
     >
       <div
-        className="bg-card border border-border/60 rounded-xl p-6 max-w-sm w-full shadow-xl"
+        className="bg-card border border-border/60 rounded-none p-6 max-w-sm w-full shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start gap-3 mb-4">
@@ -227,7 +227,7 @@ export function Dropzone({
           onDrop={onDrop}
           onClick={() => inputRef.current?.click()}
           className={cn(
-            "relative rounded-xl border-2 border-dashed p-8 text-center cursor-pointer transition-all",
+            "relative rounded-none border border-dashed p-8 text-center cursor-pointer transition-all",
             isOver ? "border-brand bg-accent" : "border-border bg-muted/30 hover:border-brand/50 hover:bg-accent/40"
           )}
         >
@@ -247,7 +247,7 @@ export function Dropzone({
         </div>
 
         {files.length > 0 && (
-          <div className="rounded-xl border border-border/60 bg-card shadow-card divide-y divide-border/60 overflow-hidden">
+          <div className="rounded-none border border-border/60 bg-card shadow-card divide-y divide-border/60 overflow-hidden">
             {files.map((f) => (
               <div key={f.id} className="flex items-center gap-3 px-4 py-3">
                 <div className="grid h-8 w-8 place-items-center rounded-md bg-accent shrink-0">

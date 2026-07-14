@@ -115,7 +115,7 @@ function FeedbackPage() {
 
       <div className="space-y-6">
         {/* Star rating */}
-        <div className="rounded-xl border border-border/60 bg-card p-6 shadow-card">
+        <div className="rounded-none border border-border/60 bg-card p-6 shadow-card">
           <div className="text-sm font-semibold mb-1">Overall experience</div>
           <div className="text-xs text-muted-foreground mb-4">How would you rate Hockystick so far?</div>
           <div className="flex items-center gap-2">
@@ -147,7 +147,7 @@ function FeedbackPage() {
         </div>
 
         {/* What worked */}
-        <div className="rounded-xl border border-border/60 bg-card p-6 shadow-card">
+        <div className="rounded-none border border-border/60 bg-card p-6 shadow-card">
           <label className="block text-sm font-semibold mb-1">What's working well?</label>
           <p className="text-xs text-muted-foreground mb-3">What should we keep doing or double down on?</p>
           <textarea
@@ -160,7 +160,7 @@ function FeedbackPage() {
         </div>
 
         {/* What to improve */}
-        <div className="rounded-xl border border-border/60 bg-card p-6 shadow-card">
+        <div className="rounded-none border border-border/60 bg-card p-6 shadow-card">
           <label className="block text-sm font-semibold mb-1">What needs improvement?</label>
           <p className="text-xs text-muted-foreground mb-3">Be specific — where did you get stuck or frustrated?</p>
           <textarea
@@ -173,7 +173,7 @@ function FeedbackPage() {
         </div>
 
         {/* Feature checkboxes */}
-        <div className="rounded-xl border border-border/60 bg-card p-6 shadow-card">
+        <div className="rounded-none border border-border/60 bg-card p-6 shadow-card">
           <div className="text-sm font-semibold mb-1">Which features are you using?</div>
           <p className="text-xs text-muted-foreground mb-4">Select all that apply.</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -196,7 +196,7 @@ function FeedbackPage() {
         </div>
 
         {/* Free text */}
-        <div className="rounded-xl border border-border/60 bg-card p-6 shadow-card">
+        <div className="rounded-none border border-border/60 bg-card p-6 shadow-card">
           <label className="block text-sm font-semibold mb-1">Anything else?</label>
           <p className="text-xs text-muted-foreground mb-3">Feature requests, bug reports, or anything on your mind.</p>
           <textarea

@@ -85,7 +85,7 @@ export function DiligencePage() {
             return (
               <div
                 key={room.id}
-                className="rounded-xl border border-border/60 bg-card flex flex-col sm:flex-row sm:items-center gap-4 p-5"
+                className="rounded-none border border-border/60 bg-card flex flex-col sm:flex-row sm:items-center gap-4 p-5"
               >
                 {/* Company info */}
                 <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -159,7 +159,7 @@ export function DiligencePage() {
           {watchlistDiligence.map((entry: any) => (
             <div
               key={entry.id}
-              className="rounded-xl border border-border/60 bg-card flex items-center gap-4 p-5"
+              className="rounded-none border border-border/60 bg-card flex items-center gap-4 p-5"
             >
               <div className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0"
                 style={{ background: "var(--color-muted)", border: "1px solid var(--color-border)" }}>

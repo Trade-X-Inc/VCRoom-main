@@ -97,7 +97,7 @@ function SettingsLayout() {
 // ── Shared card wrapper ───────────────────────────────────────────────────────
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border border-border/60 bg-card p-5 space-y-4">
+    <section className="rounded-none border border-border/60 bg-card p-5 space-y-4">
       <h2 className="text-sm font-semibold text-foreground">{title}</h2>
       {children}
     </section>
@@ -454,7 +454,7 @@ function ProfileSettings() {
 
       {/* Verification section — founders and investors */}
       {user?.id && (isInvestor ? true : !!startup?.id) && (
-        <section className="rounded-xl border border-border/60 bg-card p-5 space-y-4">
+        <section className="rounded-none border border-border/60 bg-card p-5 space-y-4">
           <VerificationSection
             entityType={isInvestor ? "investor" : "founder"}
             entityId={isInvestor ? user.id : startup!.id}

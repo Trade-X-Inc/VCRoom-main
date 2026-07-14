@@ -50,7 +50,7 @@ function Invite() {
       <main className="mx-auto max-w-4xl px-6 py-16">
         <div className="grid md:grid-cols-3 gap-5 mb-10">
           {benefits.map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="rounded-xl border border-gray-100 bg-white shadow-sm p-6">
+            <div key={title} className="border border-[rgba(0,0,0,0.08)] bg-white p-6">
               <div className="h-10 w-10 rounded-lg bg-accent flex items-center justify-center mb-4">
                 <Icon className="h-5 w-5 text-brand" />
               </div>

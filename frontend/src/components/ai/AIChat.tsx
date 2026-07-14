@@ -99,7 +99,7 @@ export function AIChat({ userId, scope, starters, initialAssistant, className = 
               </div>
               <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.role === "user" ? "bg-gradient-brand text-brand-foreground" : "bg-card border border-border/60 shadow-card"}`}>
                 {m.role === "assistant" ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0">
+                  <div className="prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0">
                     <Markdown>{m.content}</Markdown>
                   </div>
                 ) : m.content}
@@ -119,7 +119,7 @@ export function AIChat({ userId, scope, starters, initialAssistant, className = 
           {showStarters && (
             <div className="grid sm:grid-cols-2 gap-2 pt-2">
               {starters!.map((s) => (
-                <button key={s} onClick={() => send(s)} className="text-left rounded-xl border border-border/60 bg-card p-3 text-sm hover:border-brand/40 hover:bg-accent transition-colors shadow-card">
+                <button key={s} onClick={() => send(s)} className="text-left rounded-none border border-border/60 bg-card p-3 text-sm hover:border-brand/40 hover:bg-accent transition-colors shadow-card">
                   <Sparkles className="h-3.5 w-3.5 text-brand mb-1.5" />
                   <div>{s}</div>
                 </button>
@@ -135,7 +135,7 @@ export function AIChat({ userId, scope, starters, initialAssistant, className = 
         <div className={`mx-auto ${compact ? "max-w-full px-4" : "max-w-3xl px-6"} py-3.5`}>
           <form
             onSubmit={(e) => { e.preventDefault(); send(input); }}
-            className="flex items-end gap-2 rounded-xl border border-border/60 bg-card p-2 shadow-card focus-within:border-brand/40 focus-within:ring-2 focus-within:ring-brand/10"
+            className="flex items-end gap-2 rounded-none border border-border/60 bg-card p-2 shadow-card focus-within:border-brand/40 focus-within:ring-2 focus-within:ring-brand/10"
           >
             <textarea
               value={input}

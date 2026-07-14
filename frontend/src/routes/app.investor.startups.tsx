@@ -621,7 +621,7 @@ export function StartupsPage() {
           />
         ) : viewMode === "list" ? (
           /* ── LIST VIEW ── */
-          <div className="rounded-xl border border-border/60 overflow-hidden">
+          <div className="rounded-none border border-border/60 overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-muted/40 border-b border-border/60">
@@ -706,7 +706,7 @@ export function StartupsPage() {
             {filteredWatchlist.map((c: any) => (
               <div
                 key={c.id}
-                className="rounded-xl border border-border/60 bg-card p-4 text-left hover:shadow-card hover:border-brand/30 transition-all group flex flex-col items-center text-center gap-2"
+                className="rounded-none border border-border/60 bg-card p-4 text-left hover:shadow-card hover:border-brand/30 transition-all group flex flex-col items-center text-center gap-2"
               >
                 <button
                   onClick={() => c.profile_slug ? navigate({ to: "/p/$slug", params: { slug: c.profile_slug } }) : setSelectedWatchlist(c)}
@@ -1313,7 +1313,7 @@ function StartupCsvImportModal({
           {!mapped && (
             <div
               onClick={() => fileRef.current?.click()}
-              className="rounded-xl border-2 border-dashed border-border/60 bg-muted/30 hover:bg-accent/40 hover:border-brand/50 p-10 text-center cursor-pointer transition-all"
+              className="rounded-none border border-dashed border-border/60 bg-muted/30 hover:bg-accent/40 hover:border-brand/50 p-10 text-center cursor-pointer transition-all"
             >
               <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-3" />
               <p className="text-sm font-medium">Click to select a CSV file</p>
@@ -1333,7 +1333,7 @@ function StartupCsvImportModal({
                   Choose different file
                 </button>
               </div>
-              <div className="rounded-xl border border-border/60 overflow-hidden">
+              <div className="rounded-none border border-border/60 overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead>

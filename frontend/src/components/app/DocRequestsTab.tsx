@@ -214,7 +214,7 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
 
       {/* Request form — investor only */}
       {isInvestor && showForm && (
-        <div className="rounded-xl border border-brand/30 bg-accent p-4 space-y-3">
+        <div className="rounded-lg border border-brand/30 bg-accent p-4 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold">New document request</span>
             <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground">
@@ -276,8 +276,8 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
 
       {/* Empty state */}
       {!isLoading && requests.length === 0 && (
-        <div className="rounded-xl border border-dashed border-border/60 bg-card py-14 text-center">
-          <div className="grid h-12 w-12 place-items-center rounded-xl bg-muted mx-auto mb-3">
+        <div className="rounded-none border border-dashed border-border/60 bg-card py-14 text-center">
+          <div className="grid h-12 w-12 place-items-center rounded-lg bg-muted mx-auto mb-3">
             <ClipboardList className="h-5 w-5 text-muted-foreground/50" />
           </div>
           <p className="text-sm font-medium">No document requests yet</p>
@@ -375,7 +375,7 @@ function RequestCard({
 
   return (
     <div className={cn(
-      "rounded-xl border bg-card overflow-hidden transition-all",
+      "rounded-none border bg-card overflow-hidden transition-all",
       req.status === "pending" ? "border-border/60" : "border-border/40 opacity-80",
     )}>
       <div className="flex items-start gap-3 px-4 py-3.5">

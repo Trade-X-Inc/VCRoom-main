@@ -108,11 +108,11 @@ function About() {
 
         <div className="flex flex-col sm:flex-row gap-4">
           <a href="/trust"
-            className="px-6 py-3 border border-border rounded-xl text-sm text-muted-foreground hover:border-border hover:text-foreground transition-colors text-center">
+            className="px-6 py-3 border border-border rounded-lg text-sm text-muted-foreground hover:border-border hover:text-foreground transition-colors text-center">
             How our verification works →
           </a>
           <a href="/contact"
-            className="px-6 py-3 hs-gradient rounded-xl text-sm text-foreground hover:bg-[#6d28d9] transition-colors text-center">
+            className="px-6 py-3 hs-gradient rounded-lg text-sm text-foreground hover:bg-[#6d28d9] transition-colors text-center">
             Get in touch →
           </a>
         </div>

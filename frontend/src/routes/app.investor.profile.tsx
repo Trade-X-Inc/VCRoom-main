@@ -579,7 +579,7 @@ export function InvestorProfilePage() {
           <AccordionBlock id="thesis" open={open.has("thesis")} onToggle={toggleSection}
             icon={Lightbulb} title="Investment thesis" description="Your one-sentence thesis, bullet points, and what makes your conviction different">
             {/* Thesis statement — hero field */}
-            <div className="rounded-xl border border-brand/20 bg-accent p-4 space-y-2">
+            <div className="rounded-lg border border-brand/20 bg-accent p-4 space-y-2">
               <div className="flex items-center gap-1.5 text-xs font-semibold text-brand">
                 <Lightbulb className="h-3.5 w-3.5" /> Thesis statement
               </div>
@@ -898,7 +898,7 @@ function PortfolioSection({ profileId }: { profileId: string }) {
       )}
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="rounded-xl border border-border/60 bg-background p-4 space-y-3">
+        <form onSubmit={handleSubmit} className="rounded-none border border-border/60 bg-background p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{editingId ? "Edit company" : "New company"}</div>
             <button type="button" onClick={closeForm} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
@@ -930,7 +930,7 @@ function PortfolioSection({ profileId }: { profileId: string }) {
       {isLoading ? (
         <div className="text-center py-6 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin mx-auto" /></div>
       ) : isError ? (
-        <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-center">
+        <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-center">
           <p className="text-sm text-muted-foreground">Couldn't load portfolio — try refreshing the page.</p>
         </div>
       ) : entries.length === 0 ? (
@@ -938,7 +938,7 @@ function PortfolioSection({ profileId }: { profileId: string }) {
       ) : (
         <div className="grid sm:grid-cols-2 gap-3">
           {entries.map((e) => (
-            <div key={e.id} className="rounded-xl border border-border/60 bg-background p-4 flex items-start gap-3 group">
+            <div key={e.id} className="rounded-none border border-border/60 bg-background p-4 flex items-start gap-3 group">
               <div className="h-10 w-10 rounded-lg overflow-hidden bg-gradient-brand flex items-center justify-center text-brand-foreground text-sm font-bold shrink-0">
                 {e.logo_url ? <img src={e.logo_url} alt={e.company_name} className="h-full w-full object-cover" /> : <span>{e.company_name.charAt(0).toUpperCase()}</span>}
               </div>
@@ -1145,7 +1145,7 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
       )}
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="rounded-xl border border-border/60 bg-background p-4 space-y-3">
+        <form onSubmit={handleSubmit} className="rounded-none border border-border/60 bg-background p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{editingId ? "Edit member" : "New member"}</div>
             <button type="button" onClick={closeForm} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
@@ -1192,7 +1192,7 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
        : (
         <div className="space-y-2">
           {members.map((m) => (
-            <div key={m.id} className="flex items-center gap-3 rounded-xl border border-border/60 bg-background p-3 hover:bg-accent/30 group">
+            <div key={m.id} className="flex items-center gap-3 rounded-none border border-border/60 bg-background p-3 hover:bg-accent/30 group">
               <div className="h-9 w-9 rounded-full overflow-hidden bg-gradient-brand flex items-center justify-center text-brand-foreground text-xs font-semibold shrink-0">
                 {m.avatar_url ? <img src={m.avatar_url} alt={m.name} className="h-full w-full object-cover" /> : <span>{m.name.charAt(0).toUpperCase()}</span>}
               </div>
@@ -1226,7 +1226,7 @@ class SectionErrorBoundary extends Component<{ children: ReactNode }, { error: E
   render() {
     if (this.state.error) {
       return (
-        <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-center">
+        <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-center">
           <p className="text-sm text-muted-foreground">Couldn't load this section — try refreshing the page.</p>
           <button
             className="mt-2 text-xs text-brand hover:underline"

@@ -423,7 +423,7 @@ export function Documents() {
       )}
 
       {/* How it works — collapsible */}
-      <div className="mb-6 border border-border rounded-xl p-5 bg-white/[0.02]">
+      <div className="mb-6 border border-border rounded-none p-5 bg-white/[0.02]">
         <div
           className="flex items-center justify-between cursor-pointer"
           onClick={() => setShowInstructions(prev => !prev)}
@@ -452,7 +452,7 @@ export function Documents() {
       </div>
 
       {/* Stage guidance */}
-      <div className="mb-6 p-4 rounded-xl border border-brand/20 bg-accent">
+      <div className="mb-6 p-4 rounded-lg border border-brand/20 bg-accent">
         <p className="text-brand text-xs font-semibold uppercase tracking-wider mb-1">Stage guidance — {selectedStage}</p>
         <p className="text-brand/80 text-sm mt-1">{STAGE_GUIDANCE[selectedStage]}</p>
       </div>
@@ -504,7 +504,7 @@ export function Documents() {
                   <div
                     key={template.id}
                     className={cn(
-                      "rounded-xl border border-border/60 bg-card p-5 hover:border-border transition-all border-l-2",
+                      "rounded-none border border-border/60 bg-card p-5 hover:border-border transition-all border-l-2",
                       getStatusBorderColor(status)
                     )}
                   >
@@ -845,7 +845,7 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
         {/* AI Feedback */}
         {reviewFeedback && (
           <div className="mx-6 mb-6 space-y-4">
-            <div className="flex items-center justify-between p-4 rounded-xl bg-accent border border-border">
+            <div className="flex items-center justify-between p-4 rounded-lg bg-accent border border-border">
               <div className="flex-1 min-w-0 pr-4">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">AI Review</p>
                 <p className="text-sm text-foreground leading-relaxed">{reviewFeedback.summary}</p>

@@ -16,7 +16,7 @@ function Accordion({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="rounded-xl border border-border/60 overflow-hidden mb-3">
+    <div className="rounded-none border border-border/60 overflow-hidden mb-3">
       <button
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between px-4 py-3 bg-card hover:bg-accent/50 transition-colors text-left"
@@ -488,7 +488,7 @@ export function AboutSection() {
 
       {/* Two-col info grid */}
       <div className="grid sm:grid-cols-2 gap-4 mb-8">
-        <div className="rounded-xl border border-border/60 bg-card p-5">
+        <div className="rounded-none border border-border/60 bg-card p-5">
           <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">Platform</h3>
           <div className="space-y-2.5">
             {[
@@ -504,7 +504,7 @@ export function AboutSection() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border/60 bg-card p-5">
+        <div className="rounded-none border border-border/60 bg-card p-5">
           <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">Contact</h3>
           <div className="space-y-2.5">
             {[

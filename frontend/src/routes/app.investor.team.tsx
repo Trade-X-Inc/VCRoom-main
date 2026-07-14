@@ -219,7 +219,7 @@ function InvestorTeamPage() {
 
       {/* Free plan paywall */}
       {isFreePlan && (
-        <div className="bg-card border border-brand/30 rounded-xl p-6 text-center mb-6">
+        <div className="bg-card border border-brand/30 rounded-none p-6 text-center mb-6">
           <p className="text-base font-semibold text-foreground mb-2">Team collaboration is a paid feature</p>
           <p className="text-sm text-muted-foreground mb-5 max-w-md mx-auto leading-relaxed">
             Upgrade to Starter to invite 1 team member, or Pro to invite up to 4.
@@ -243,7 +243,7 @@ function InvestorTeamPage() {
       )}
 
       {/* Members section */}
-      <div className="bg-card border border-border/60 rounded-xl overflow-hidden">
+      <div className="bg-card border border-border/60 rounded-none overflow-hidden">
         <div className="px-5 py-4 border-b border-border/60 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-foreground">Members</span>
@@ -306,7 +306,7 @@ function InvestorTeamPage() {
       </div>
 
       {/* Pending invites */}
-      <div className="bg-card border border-border/60 rounded-xl overflow-hidden mt-6">
+      <div className="bg-card border border-border/60 rounded-none overflow-hidden mt-6">
         <div className="px-5 py-4 border-b border-border/60 flex items-center gap-2">
           <span className="text-sm font-semibold text-foreground">Pending invites</span>
           <span className="text-xs text-muted-foreground bg-accent rounded-full px-2 py-px">

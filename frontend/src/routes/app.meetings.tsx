@@ -133,7 +133,7 @@ function Meetings() {
         <div className="h-8 w-48 rounded-lg bg-muted animate-pulse mb-2" />
         <div className="h-4 w-72 rounded bg-muted/60 animate-pulse mb-6" />
         <div className="space-y-3">
-          {[1, 2, 3].map((i) => <div key={i} className="h-24 rounded-xl bg-muted/40 animate-pulse" />)}
+          {[1, 2, 3].map((i) => <div key={i} className="h-24 rounded-none bg-muted/40 animate-pulse" />)}
         </div>
       </div>
     );
@@ -158,7 +158,7 @@ function Meetings() {
 
       {/* Schedule form */}
       {showForm && (
-        <form onSubmit={submit} className="mb-6 rounded-xl border border-border/60 bg-card p-5 shadow-card space-y-3">
+        <form onSubmit={submit} className="mb-6 rounded-none border border-border/60 bg-card p-5 shadow-card space-y-3">
           <div className="text-sm font-semibold mb-1">New meeting</div>
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
@@ -356,7 +356,7 @@ function MeetingRow({
   return (
     <div
       className={cn(
-        "rounded-xl border border-border/60 bg-card shadow-card p-4",
+        "rounded-none border border-border/60 bg-card p-4",
         variant === "today" && "border-l-4 border-l-warning",
       )}
     >

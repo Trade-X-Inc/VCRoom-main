@@ -3,7 +3,7 @@ import { Logo } from "@/components/brand/Logo";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 
-const NAV_LINK = "text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors px-1";
+const NAV_LINK = "text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-1";
 
 export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -36,7 +36,7 @@ export function SiteHeader() {
         {/* Right — Controls */}
         <div className="flex items-center gap-2 shrink-0">
           <Link to="/sign-in" search={{ redirect: "/app" }}
-            className="hidden sm:inline-flex text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors px-3 py-1.5">
+            className="hidden sm:inline-flex text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-3 py-1.5">
             Sign in
           </Link>
           <Link to="/sign-up" search={{ role: "founder" } as any}

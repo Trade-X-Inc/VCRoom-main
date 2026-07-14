@@ -101,7 +101,7 @@ export function ClaimsPage() {
     <div className="flex flex-col flex-1 min-h-0">
       <div className="border-b border-border/60 bg-background/80 backdrop-blur-xl px-6 py-4 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-brand text-brand-foreground shrink-0">
+          <div className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-brand text-brand-foreground shrink-0">
             <BadgeCheck className="h-4 w-4" />
           </div>
           <div>
@@ -117,7 +117,7 @@ export function ClaimsPage() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] items-start">
         <div className="min-w-0 space-y-4">
         {/* Gate status */}
-        <div className="bg-card border border-border/60 rounded-xl px-5 py-4 flex items-center justify-between flex-wrap gap-3">
+        <div className="bg-card border border-border/60 rounded-none px-5 py-4 flex items-center justify-between flex-wrap gap-3">
           <div className="text-sm">
             <span className={gateMet ? "text-foreground font-medium" : "text-muted-foreground"}>
               {verifiedClaims.length} claim{verifiedClaims.length === 1 ? "" : "s"} verified
@@ -139,7 +139,7 @@ export function ClaimsPage() {
         </div>
 
         {/* Add claim */}
-        <div className="bg-card border border-border/60 rounded-xl p-5 space-y-3">
+        <div className="bg-card border border-border/60 rounded-none p-5 space-y-3">
           <div className="text-sm font-semibold">Add a claim</div>
           <div className="text-xs text-muted-foreground leading-relaxed">
             State one specific, checkable fact — "$42K MRR as of June 2026", "DIFC registered entity",
@@ -181,7 +181,7 @@ export function ClaimsPage() {
             {claims.map((claim) => {
               const verdict = claim.ai_verdict ? VERDICT_STYLE[claim.ai_verdict] : null;
               return (
-                <div key={claim.id} className="bg-card border border-border/60 rounded-xl p-5">
+                <div key={claim.id} className="bg-card border border-border/60 rounded-none p-5">
                   <div className="flex items-start justify-between gap-3 flex-wrap">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -251,7 +251,7 @@ export function ClaimsPage() {
 
         {/* Right panel — example verified claims */}
         <aside className="space-y-4 lg:sticky lg:top-6">
-          <div className="bg-card border border-border/60 rounded-xl p-5">
+          <div className="bg-card border border-border/60 rounded-none p-5">
             <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
               What good claims look like
             </div>
@@ -277,7 +277,7 @@ export function ClaimsPage() {
               Vague claims ("strong growth") can't be verified.
             </p>
           </div>
-          <div className="rounded-xl p-5" style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)" }}>
+          <div className="rounded-lg p-5" style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)" }}>
             <div className="text-sm font-semibold mb-1.5">Two minutes per claim</div>
             <p className="text-xs text-muted-foreground leading-relaxed">
               Type the claim, attach the document, and the AI returns a verdict immediately.
@@ -377,7 +377,7 @@ function VerifyClaimModal({
               </select>
             </div>
 
-            <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border/60 px-4 py-6 cursor-pointer mb-4">
+            <label className="flex flex-col items-center justify-center gap-2 rounded-none border border-dashed border-border/60 px-4 py-6 cursor-pointer mb-4">
               <Paperclip className="h-5 w-5 text-muted-foreground/50" />
               <span className="text-xs text-muted-foreground text-center">
                 {file ? file.name : "Select the ONE document that proves this claim — PDF, DOCX, XLSX, CSV"}

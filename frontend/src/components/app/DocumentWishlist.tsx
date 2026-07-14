@@ -156,7 +156,7 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
   if (requests.length === 0 && !isInvestor) return null;
 
   return (
-    <div className="mb-5 rounded-xl border border-brand/25 bg-accent overflow-hidden">
+    <div className="mb-5 rounded-lg border border-brand/25 bg-accent overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-brand/15">
         <button className="flex items-center gap-2 flex-1 text-left" onClick={() => setCollapsed((v) => !v)}>

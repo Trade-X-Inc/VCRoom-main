@@ -19,7 +19,7 @@ export function ProfileCompletionBanner({ variant, percent }: ProfileCompletionB
 
   return (
     <div
-      className="rounded-xl border px-4 py-3 mb-4 flex items-center justify-between gap-3"
+      className="rounded-none border px-4 py-3 mb-4 flex items-center justify-between gap-3"
       style={
         isFounder
           ? { background: "rgba(245,158,11,0.12)", borderColor: "rgba(245,158,11,0.3)" }

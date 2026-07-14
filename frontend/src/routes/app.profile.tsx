@@ -958,14 +958,14 @@ export function Profile() {
           </div>
 
           {filled(form.description) && (
-            <div className="mt-4 rounded-xl border border-border/60 bg-card p-5 shadow-card print-card">
+            <div className="mt-4 rounded-none border border-border/60 bg-card p-5 shadow-card print-card">
               <div className="text-sm font-semibold mb-2">About</div>
               <p className="text-sm text-muted-foreground leading-relaxed">{form.description}</p>
             </div>
           )}
 
           {pairs.length > 0 && (
-            <div className="mt-4 rounded-xl border border-border/60 bg-card p-5 shadow-card print-card">
+            <div className="mt-4 rounded-none border border-border/60 bg-card p-5 shadow-card print-card">
               <div className="text-sm font-semibold mb-3">Key details</div>
               <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2.5">
                 {pairs.map(([label, val]) => {
@@ -1004,13 +1004,13 @@ export function Profile() {
           {(filled(form.problem) || filled(form.solution)) && (
             <div className="mt-4 grid sm:grid-cols-2 gap-4">
               {filled(form.problem) && (
-                <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card print-card">
+                <div className="rounded-none border border-border/60 bg-card p-5 shadow-card print-card">
                   <div className="text-sm font-semibold mb-2">Problem</div>
                   <p className="text-sm text-muted-foreground leading-relaxed">{form.problem}</p>
                 </div>
               )}
               {filled(form.solution) && (
-                <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card print-card">
+                <div className="rounded-none border border-border/60 bg-card p-5 shadow-card print-card">
                   <div className="text-sm font-semibold mb-2">Solution</div>
                   <p className="text-sm text-muted-foreground leading-relaxed">{form.solution}</p>
                 </div>
@@ -1027,7 +1027,7 @@ export function Profile() {
                 ["Why now?", form.why_now],
                 ["Competitive advantage", form.competitive_advantage],
               ].filter(([, v]) => filled(v)).map(([label, val]) => (
-                <div key={label as string} className="rounded-xl border border-border/60 bg-card p-5 shadow-card print-card">
+                <div key={label as string} className="rounded-none border border-border/60 bg-card p-5 shadow-card print-card">
                   <div className="text-sm font-semibold mb-2">{label}</div>
                   <p className="text-sm text-muted-foreground leading-relaxed">{val}</p>
                 </div>
@@ -1036,7 +1036,7 @@ export function Profile() {
           )}
 
           {(filled(form.founder_name) || filled(form.founder_email)) && (
-            <div className="mt-4 rounded-xl border border-border/60 bg-card p-5 shadow-card print-card">
+            <div className="mt-4 rounded-none border border-border/60 bg-card p-5 shadow-card print-card">
               <div className="text-sm font-semibold mb-3">Contact</div>
               <div className="grid sm:grid-cols-2 gap-3">
                 {[
@@ -1139,7 +1139,7 @@ export function Profile() {
           />
         )}
         {completenessScore < 80 && (
-          <div className="mt-4 rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning">
+          <div className="mt-4 rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning">
             <span className="font-semibold">Your profile is not yet visible in the directory.</span> Complete at least 80% to go live.
           </div>
         )}
@@ -1157,7 +1157,7 @@ export function Profile() {
       </div>
 
       {startup && !form.company_name.trim() && (
-        <div className="mt-4 flex items-start gap-3 rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning">
+        <div className="mt-4 flex items-start gap-3 rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning">
           <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
           <span>
             <span className="font-semibold">Company name is missing.</span>{" "}
@@ -1260,7 +1260,7 @@ export function Profile() {
       </div>
 
       {extractionError && (
-        <div className="mt-4 flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <div className="mt-4 flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
           <span>{extractionError}</span>
           <button onClick={() => setExtractionError(null)} className="ml-auto text-destructive/60 hover:text-destructive"><X className="h-4 w-4" /></button>
@@ -1355,7 +1355,7 @@ export function Profile() {
                   value={form.legal_entity_name ?? ""}
                   onChange={(e) => setForm((prev) => ({ ...prev, legal_entity_name: e.target.value }))}
                   placeholder="Full registered legal name (if different from trading name)"
-                  className="w-full bg-accent border border-border rounded-xl px-4 py-3 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors"
+                  className="w-full bg-accent border border-border rounded-lg px-4 py-3 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors"
                 />
               </div>
               <div>
@@ -1368,14 +1368,14 @@ export function Profile() {
                   value={form.registration_number ?? ""}
                   onChange={(e) => setForm((prev) => ({ ...prev, registration_number: e.target.value }))}
                   placeholder="e.g. 0001234 (Companies House), CL1234 (DIFC)"
-                  className="w-full bg-accent border border-border rounded-xl px-4 py-3 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors"
+                  className="w-full bg-accent border border-border rounded-lg px-4 py-3 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors"
                 />
                 <p className="text-xs text-faint mt-1">Optional but improves registry verification accuracy</p>
               </div>
 
               {/* Registry verification section */}
               {registryCheck ? (
-                <div className="p-4 rounded-xl border mt-2" style={{
+                <div className="p-4 rounded-lg border mt-2" style={{
                   background: registryCheck.verified ? "rgba(16,185,129,0.07)" : "var(--accent)",
                   border: registryCheck.verified ? "1px solid rgba(16,185,129,0.2)" : "1px solid var(--border)",
                 }}>
@@ -1433,7 +1433,7 @@ export function Profile() {
                   </p>
                 </div>
               ) : (
-                <div className="p-4 rounded-xl border mt-2" style={{ background: "var(--accent)", border: "1px solid var(--border)" }}>
+                <div className="p-4 rounded-lg border mt-2" style={{ background: "var(--accent)", border: "1px solid var(--border)" }}>
                   <p className="text-xs text-faint">
                     Registry check runs automatically when your profile is published. Checks OpenCorporates (140+ jurisdictions), UK Companies House, and DIFC (best-effort web search).
                   </p>
@@ -1696,7 +1696,7 @@ export function Profile() {
       ) : tab === "analytics" ? (
         <div className="mt-4 space-y-6">
           {!startup?.profile_slug ? (
-            <div className="rounded-xl border border-border/60 bg-card p-8 text-center">
+            <div className="rounded-none border border-border/60 bg-card p-8 text-center">
               <BarChart3 className="h-8 w-8 text-muted-foreground/30 mx-auto mb-3" />
               <p className="text-sm font-medium text-foreground mb-1">Publish your profile first to start tracking views</p>
               <p className="text-xs text-muted-foreground mb-3">Go to Full Details, fill at least 80% of fields, then click "Go live"</p>
@@ -1715,7 +1715,7 @@ export function Profile() {
                     { label: "Avg duration", value: avgDuration > 0 ? `${avgDuration}s` : "0s" },
                     { label: "Last 7 days", value: String(last7Days) },
                   ].map(({ label, value }) => (
-                    <div key={label} className="bg-accent border border-border rounded-xl p-5">
+                    <div key={label} className="bg-accent border border-border rounded-lg p-5">
                       <p className="text-3xl font-bold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{value}</p>
                       <p className="text-xs text-muted-foreground uppercase tracking-wider mt-1">{label}</p>
                     </div>
@@ -1728,7 +1728,7 @@ export function Profile() {
               ) : (
                 <div className="grid lg:grid-cols-2 gap-6">
                   {/* Traffic sources */}
-                  <div className="rounded-xl border border-border/60 bg-card p-5">
+                  <div className="rounded-none border border-border/60 bg-card p-5">
                     <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-4">Traffic sources</p>
                     <div className="space-y-3">
                       {Object.entries(sourceBreakdown).sort(([, a], [, b]) => (b as number) - (a as number)).map(([source, count]) => (
@@ -1744,7 +1744,7 @@ export function Profile() {
                   </div>
 
                   {/* View history */}
-                  <div className="rounded-xl border border-border/60 bg-card p-5">
+                  <div className="rounded-none border border-border/60 bg-card p-5">
                     <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-4">View history</p>
                     <div>
                       {profileViews.map((view: any) => {
@@ -1803,7 +1803,7 @@ export function Profile() {
               )}
 
               {/* Share link */}
-              <div className="p-4 rounded-xl border border-border bg-white/[0.02]">
+              <div className="p-4 rounded-none border border-border bg-white/[0.02]">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Your shareable profile link</p>
                 <div className="flex items-center gap-2">
                   <span className="flex-1 text-sm text-muted-foreground font-mono truncate">hockystick.app/p/{startup.profile_slug}</span>
@@ -1951,14 +1951,14 @@ export function Profile() {
       )}
 
       {!startup?.id && !isLoading && tab !== "analytics" && (
-        <div className="mt-6 rounded-xl border border-dashed border-border/60 bg-card p-6 text-center text-sm text-muted-foreground">
+        <div className="mt-6 rounded-none border border-dashed border-border/60 bg-card p-6 text-center text-sm text-muted-foreground">
           Save your profile first to add team members.
         </div>
       )}
 
       {/* ── Investor criteria / Founder thesis ───────────────────────── */}
       {startup?.id && tab !== "analytics" && (
-        <div className="mt-8 rounded-xl border border-border/60 bg-card p-5 shadow-card space-y-5">
+        <div className="mt-8 rounded-none border border-border/60 bg-card p-5 shadow-card space-y-5">
           {/* Section header */}
           <div className="flex items-start gap-3">
             <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
@@ -2288,7 +2288,7 @@ function PrivacyTab({
 
   return (
     <div className="mt-4 space-y-4">
-      <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+      <div className="rounded-none border border-border/60 bg-card p-5 shadow-card">
         <div className="flex items-start gap-3 mb-6">
           <div className="grid h-9 w-9 place-items-center rounded-lg bg-accent shrink-0 mt-0.5">
             <Shield className="h-5 w-5 text-brand" />
@@ -2307,7 +2307,7 @@ function PrivacyTab({
             return (
               <div
                 key={section.key}
-                className="rounded-xl border border-border/60 bg-background/40 p-5"
+                className="rounded-none border border-border/60 bg-background/40 p-5"
               >
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   {/* Left: label + fields */}
@@ -2394,13 +2394,13 @@ function RightCol({ form, deckName, deckUploading, isExtracting, onDeckUpload, s
 }) {
   return (
     <>
-      <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+      <div className="rounded-none border border-border/60 bg-card p-5 shadow-card">
         <div className="flex items-center gap-1.5 mb-3">
           <div className="text-sm font-semibold">Pitch deck</div>
           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-accent text-brand font-medium">AI</span>
         </div>
         {isExtracting ? (
-          <div className="rounded-xl border border-brand/20 bg-accent p-5 text-center">
+          <div className="rounded-lg border border-brand/20 bg-accent p-5 text-center">
             <Loader2 className="h-6 w-6 text-brand mx-auto animate-spin" />
             <div className="text-sm font-medium mt-3 text-foreground">Analysing pitch deck…</div>
             <div className="text-xs text-muted-foreground mt-1">This takes 10–20 seconds</div>
@@ -2415,7 +2415,7 @@ function RightCol({ form, deckName, deckUploading, isExtracting, onDeckUpload, s
             </label>
           </div>
         ) : (
-          <label className="rounded-xl border-2 border-dashed border-border/80 bg-card p-5 text-center cursor-pointer hover:border-brand/50 hover:bg-accent/20 transition-colors block">
+          <label className="rounded-none border border-dashed border-border/80 bg-card p-5 text-center cursor-pointer hover:border-brand/50 hover:bg-accent/20 transition-colors block">
             <Upload className="h-5 w-5 text-muted-foreground mx-auto" />
             <div className="text-sm font-medium mt-2">Upload pitch deck</div>
             <div className="text-xs text-muted-foreground mt-0.5">PDF or PPTX · Max 10MB</div>
@@ -2425,7 +2425,7 @@ function RightCol({ form, deckName, deckUploading, isExtracting, onDeckUpload, s
         )}
       </div>
 
-      <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+      <div className="rounded-none border border-border/60 bg-card p-5 shadow-card">
         <div className="text-sm font-semibold mb-3">Overview</div>
         <div className="space-y-2.5">
           {([
@@ -2454,7 +2454,7 @@ function RightCol({ form, deckName, deckUploading, isExtracting, onDeckUpload, s
         </div>
       </div>
       {showVisibility && sectionVisibility && onVisibilityChange && (
-        <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+        <div className="rounded-none border border-border/60 bg-card p-5 shadow-card">
           <div className="text-sm font-semibold mb-3">Section visibility</div>
           <div className="space-y-4">
             {([
@@ -2651,7 +2651,7 @@ function CapTableSection({ startupId }: { startupId: string }) {
   const inputCls = "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50";
 
   return (
-    <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+    <div className="rounded-none border border-border/60 bg-card p-5 shadow-card">
       <div className="flex items-center justify-between mb-4">
         <div>
           <div className="text-sm font-semibold">Cap Table</div>
@@ -2793,7 +2793,7 @@ function CapTableSection({ startupId }: { startupId: string }) {
 
 function FormSection({ title, badge, children }: { title: string; badge?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+    <div className="rounded-none border border-border/60 bg-card p-5 shadow-card">
       <div className="flex items-center gap-2 mb-4">
         <div className="text-sm font-semibold">{title}</div>
         {badge}
@@ -2989,7 +2989,7 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
       </div>
 
       {!readOnly && showForm && (
-        <div className="mb-5 rounded-xl border border-brand/30 bg-card p-5 shadow-card">
+        <div className="mb-5 rounded-none border border-brand/30 bg-card p-5 shadow-card">
           <div className="flex items-center justify-between mb-4">
             <div className="text-sm font-semibold">{editingId ? "Edit team member" : "New team member"}</div>
             <button onClick={closeForm} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
@@ -3068,7 +3068,7 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
           {members.map((m) => {
             const inits = (m.name ?? "?").split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
             return (
-              <div key={m.id} className="rounded-xl border border-border/60 bg-card p-4 shadow-card">
+              <div key={m.id} className="rounded-none border border-border/60 bg-card p-4 shadow-card">
                 <div className="flex items-start gap-3">
                   <div className="grid h-10 w-10 place-items-center rounded-full bg-accent border border-border/60 overflow-hidden text-xs font-semibold shrink-0">
                     {m.photo_url ? <img src={m.photo_url} alt={m.name ?? ""} className="h-full w-full object-cover" /> : inits}

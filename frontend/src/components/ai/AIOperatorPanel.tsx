@@ -189,12 +189,12 @@ function MessageBubble({
           style={{ background: "var(--ai-bubble-bg, #f3f4f6)", border: "1px solid rgba(124,58,237,0.4)" }}
           data-testid="ai-message"
         >
-          <div className="font-semibold mb-1 text-gray-900 dark:text-foreground">About to: {card.action}</div>
-          <div className="text-xs mb-3 text-gray-500 dark:text-gray-400">{card.description}</div>
+          <div className="font-semibold mb-1 text-gray-900 ">About to: {card.action}</div>
+          <div className="text-xs mb-3 text-gray-500 ">{card.description}</div>
           <div className="flex gap-2">
             <button
               onClick={onCancel}
-              className="rounded px-3 py-1 text-sm border border-gray-300 dark:border-zinc-600 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-foreground transition-colors"
+              className="rounded px-3 py-1 text-sm border border-gray-300 text-gray-500 hover:text-gray-900 transition-colors"
             >
               Cancel
             </button>
@@ -207,7 +207,7 @@ function MessageBubble({
             </button>
           </div>
         </div>
-        <span className="text-[11px] pl-1 text-gray-400 dark:text-gray-500">
+        <span className="text-[11px] pl-1 text-gray-400 ">
           {formatTime(msg.timestamp)}
         </span>
       </div>
@@ -217,13 +217,13 @@ function MessageBubble({
   return (
     <div className="flex flex-col items-start gap-1">
       <div
-        className="max-w-[85%] rounded-[0_12px_12px_12px] px-3 py-2.5 text-sm leading-relaxed text-gray-900 dark:text-foreground"
+        className="max-w-[85%] rounded-[0_12px_12px_12px] px-3 py-2.5 text-sm leading-relaxed text-gray-900 "
         style={{ background: "var(--ai-bubble-bg, #f3f4f6)" }}
         data-testid="ai-message"
       >
         {msg.content}
       </div>
-      <span className="text-[11px] pl-1 text-gray-400 dark:text-gray-500">
+      <span className="text-[11px] pl-1 text-gray-400 ">
         {formatTime(msg.timestamp)}
       </span>
     </div>
@@ -566,7 +566,7 @@ export function AIOperatorPanel({
 
       <div
         data-testid="ai-panel"
-        className="relative flex shrink-0 flex-col max-md:fixed max-md:inset-0 max-md:z-50 max-md:w-full max-md:max-w-none max-md:min-w-0 bg-white dark:bg-[#111113]"
+        className="relative flex shrink-0 flex-col max-md:fixed max-md:inset-0 max-md:z-50 max-md:w-full max-md:max-w-none max-md:min-w-0 bg-white "
         style={{
           width: isMobile ? undefined : panelWidth,
           minWidth: isMobile ? undefined : 280,
@@ -589,14 +589,14 @@ export function AIOperatorPanel({
 
         {/* Header */}
         <div
-          className="flex shrink-0 items-center justify-between pl-5 pr-2 bg-gray-50 dark:bg-zinc-900"
+          className="flex shrink-0 items-center justify-between pl-5 pr-2 bg-gray-50 "
           style={{ height: 56, borderBottom: "1px solid", borderColor: "rgba(229,231,235,1)" }}
         >
           <div className="flex items-center gap-1.5 min-w-0">
             <span className="text-base leading-none" style={{ color: "var(--brand)" }}>✦</span>
-            <span className="text-sm font-semibold text-gray-900 dark:text-foreground">AI</span>
+            <span className="text-sm font-semibold text-gray-900 ">AI</span>
             <span className="text-sm text-gray-400">·</span>
-            <span className="text-sm text-gray-500 dark:text-gray-400 truncate">{pageContext.pageName}</span>
+            <span className="text-sm text-gray-500 truncate">{pageContext.pageName}</span>
           </div>
 
           <div className="flex items-center gap-0.5 shrink-0">
@@ -618,7 +618,7 @@ export function AIOperatorPanel({
             <button
               onClick={() => setIsOpen(false)}
               data-testid="ai-panel-close"
-              className="grid h-8 w-8 place-items-center rounded-lg text-gray-500 hover:text-gray-900 dark:hover:text-foreground transition-colors text-lg leading-none"
+              className="grid h-8 w-8 place-items-center rounded-lg text-gray-500 hover:text-gray-900 transition-colors text-lg leading-none"
               aria-label="Close AI panel"
             >
               <X className="h-4 w-4" />
@@ -630,7 +630,7 @@ export function AIOperatorPanel({
         {isGated ? (
           <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col items-center justify-center gap-4 text-center">
             <div className="text-4xl" style={{ color: "var(--brand)" }}>✦</div>
-            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed max-w-xs">
+            <p className="text-sm text-gray-700 leading-relaxed max-w-xs">
               Your profile is {completenessPercent}% complete. I can give better guidance once you have a company description, at least one document, and your funding stage set.
             </p>
             <Link
@@ -650,8 +650,8 @@ export function AIOperatorPanel({
             <div className="flex flex-col items-center justify-center h-full gap-5 pb-8 select-none">
               <div>
                 <div className="text-4xl text-center mb-3" style={{ color: "var(--brand)" }}>✦</div>
-                <div className="text-sm font-semibold text-gray-900 dark:text-foreground text-center">AI Advisor</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400 text-center mt-1">
+                <div className="text-sm font-semibold text-gray-900 text-center">AI Advisor</div>
+                <div className="text-sm text-gray-500 text-center mt-1">
                   Ask about your raise, profile, or next steps.
                 </div>
               </div>
@@ -692,7 +692,7 @@ export function AIOperatorPanel({
 
         {/* Input bar */}
         <div
-          className="shrink-0 px-3 py-3 bg-white dark:bg-[#111113]"
+          className="shrink-0 px-3 py-3 bg-white "
           style={{ borderTop: "1px solid rgba(229,231,235,1)" }}
         >
           <div className="relative">
@@ -705,7 +705,7 @@ export function AIOperatorPanel({
               disabled={isLoading}
               rows={1}
               data-testid="ai-panel-input"
-              className="w-full resize-none rounded-xl pr-12 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder-gray-400 focus:outline-none disabled:opacity-50 transition-colors"
+              className="w-full resize-none rounded-lg pr-12 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none disabled:opacity-50 transition-colors"
               style={{
                 minHeight: 40,
                 maxHeight: 96,

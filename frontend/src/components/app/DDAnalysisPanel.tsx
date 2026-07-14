@@ -93,17 +93,17 @@ export function DDAnalysisPanel({
     .filter((g) => g.items.length > 0);
 
   return (
-    <div className="mt-6 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-5">
+    <div className="mt-6 rounded-none border border-[rgba(0,0,0,0.08)] bg-white p-5">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2.5">
           <div className="grid h-9 w-9 place-items-center rounded-lg" style={{ background: "rgba(124,58,237,0.12)" }}>
             <Microscope className="h-4 w-4" style={{ color: "var(--brand)" }} />
           </div>
           <div>
-            <div className="text-sm font-semibold text-gray-900 dark:text-foreground">
+            <div className="text-sm font-semibold text-gray-900 ">
               AI Analysis{findings.length > 0 ? ` — ${findings.length} finding${findings.length !== 1 ? "s" : ""}` : ""}
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="text-xs text-gray-500 ">
               Contradictions, gaps and red flags across every document and claim — not a summary.
             </div>
           </div>
@@ -123,7 +123,7 @@ export function DDAnalysisPanel({
       </div>
 
       {!analysis && !running && (
-        <p className="mt-3 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+        <p className="mt-3 text-xs text-gray-500 leading-relaxed">
           {isInvestor
             ? "The AI reads the actual document contents and cross-checks them against every stated claim and metric. Findings cite specific evidence and suggest the exact question to ask."
             : "The investor can run a deep AI cross-check of documents against stated claims. Findings appear here for both parties."}
@@ -132,7 +132,7 @@ export function DDAnalysisPanel({
 
       {analysis && (
         <div className="mt-4 space-y-4">
-          <div className="text-[11px] text-gray-500 dark:text-gray-400">
+          <div className="text-[11px] text-gray-500 ">
             {analysis.documents_analysed} document{analysis.documents_analysed !== 1 ? "s" : ""} analysed ·{" "}
             {analysis.claims_checked} claim{analysis.claims_checked !== 1 ? "s" : ""} checked ·{" "}
             {formatDistanceToNow(new Date(analysis.run_at), { addSuffix: true })}
@@ -141,7 +141,7 @@ export function DDAnalysisPanel({
           {analysis.no_contradictions_reasoning && (
             <div className="rounded-lg px-3.5 py-3 text-xs leading-relaxed" style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.25)", color: "#10B981" }}>
               <span className="font-semibold">No contradictions found.</span>{" "}
-              <span className="text-gray-600 dark:text-gray-300">{analysis.no_contradictions_reasoning}</span>
+              <span className="text-gray-600 ">{analysis.no_contradictions_reasoning}</span>
             </div>
           )}
 
@@ -159,30 +159,30 @@ export function DDAnalysisPanel({
                     const id = `${type}-${i}`;
                     const open = openId === id;
                     return (
-                      <div key={id} className="rounded-lg border border-gray-200 dark:border-zinc-700">
+                      <div key={id} className="rounded-lg border border-[rgba(0,0,0,0.08)] ">
                         <button
                           onClick={() => setOpenId(open ? null : id)}
                           className="flex w-full items-center justify-between gap-3 px-3.5 py-2.5 text-left"
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
                             <span className="h-2 w-2 rounded-full shrink-0" style={{ background: SEVERITY_COLOR[f.severity] ?? "#6B7280" }} title={f.severity} />
-                            <span className="text-sm font-medium text-gray-900 dark:text-foreground truncate">{f.title}</span>
+                            <span className="text-sm font-medium text-gray-900 truncate">{f.title}</span>
                           </div>
                           {open ? <ChevronUp className="h-4 w-4 text-gray-400 shrink-0" /> : <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />}
                         </button>
                         {open && (
-                          <div className="px-3.5 pb-3.5 space-y-2.5 border-t border-gray-100 dark:border-zinc-800 pt-2.5">
+                          <div className="px-3.5 pb-3.5 space-y-2.5 border-t border-[rgba(0,0,0,0.08)] pt-2.5">
                             <div>
                               <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Evidence</div>
-                              <div className="text-xs text-gray-700 dark:text-gray-300 mt-0.5 leading-relaxed">{f.evidence}</div>
+                              <div className="text-xs text-gray-700 mt-0.5 leading-relaxed">{f.evidence}</div>
                             </div>
                             <div>
                               <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Question to ask</div>
-                              <div className="text-xs text-gray-700 dark:text-gray-300 mt-0.5 leading-relaxed">{f.question_to_ask}</div>
+                              <div className="text-xs text-gray-700 mt-0.5 leading-relaxed">{f.question_to_ask}</div>
                             </div>
                             <div>
                               <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">What a good answer includes</div>
-                              <div className="text-xs text-gray-700 dark:text-gray-300 mt-0.5 leading-relaxed">{f.what_good_looks_like}</div>
+                              <div className="text-xs text-gray-700 mt-0.5 leading-relaxed">{f.what_good_looks_like}</div>
                             </div>
                             {isInvestor && (
                               <button

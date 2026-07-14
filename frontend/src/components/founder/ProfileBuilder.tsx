@@ -37,9 +37,9 @@ const VISIBILITY_LABELS: Record<string, string> = {
 };
 
 const VISIBILITY_CLASSES: Record<string, string> = {
-  private: "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400",
-  deal_room: "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-brand",
-  public: "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400",
+  private: "bg-gray-100 text-gray-600  ",
+  deal_room: "bg-purple-50 text-purple-700  ",
+  public: "bg-green-50 text-green-700  ",
 };
 
 // ── Input atoms ───────────────────────────────────────────────────
@@ -50,13 +50,13 @@ function Field({ label, value, onChange, placeholder, type = "text" }: {
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{label}</label>
+      <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
+        className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
       />
     </div>
   );
@@ -68,13 +68,13 @@ function TextArea({ label, value, onChange, placeholder, rows = 3 }: {
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{label}</label>
+      <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}
-        className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
+        className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
       />
     </div>
   );
@@ -106,9 +106,9 @@ function TeamEditor({ content, onChange }: { content: any; onChange: (c: any) =>
   return (
     <div className="space-y-4">
       {members.map((m, idx) => (
-        <div key={idx} className="rounded-lg border border-gray-200 dark:border-zinc-700 p-3 space-y-2">
+        <div key={idx} className="rounded-lg border border-[rgba(0,0,0,0.08)] p-3 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Member {idx + 1}</span>
+            <span className="text-xs font-medium text-gray-500 ">Member {idx + 1}</span>
             <button onClick={() => remove(idx)} className="text-gray-400 hover:text-red-500"><Trash2 className="h-3.5 w-3.5" /></button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -121,7 +121,7 @@ function TeamEditor({ content, onChange }: { content: any; onChange: (c: any) =>
       ))}
       <button
         onClick={add}
-        className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-gray-300 dark:border-zinc-600 px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:border-brand hover:text-brand"
+        className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-500 hover:border-brand hover:text-brand"
       >
         <Plus className="h-3.5 w-3.5" /> Add team member
       </button>
@@ -168,11 +168,11 @@ function RevenueModelEditor({ content, onChange }: { content: any; onChange: (c:
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Revenue type</label>
+        <label className="block text-xs font-medium text-gray-500 mb-1">Revenue type</label>
         <select
           value={content.type ?? "SaaS"}
           onChange={(e) => onChange({ ...content, type: e.target.value })}
-          className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground outline-none"
+          className="rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none"
         >
           {["SaaS", "Marketplace", "Transactional", "Subscription", "Other"].map((o) => <option key={o}>{o}</option>)}
         </select>
@@ -237,11 +237,11 @@ function ProductEditor({ content, onChange }: { content: any; onChange: (c: any)
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Stage</label>
+        <label className="block text-xs font-medium text-gray-500 mb-1">Stage</label>
         <select
           value={content.stage ?? "Idea"}
           onChange={(e) => onChange({ ...content, stage: e.target.value })}
-          className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground outline-none"
+          className="rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none"
         >
           {["Idea", "Prototype", "MVP", "Beta", "Live", "Scaling"].map((o) => <option key={o}>{o}</option>)}
         </select>
@@ -263,7 +263,7 @@ function CompetitiveLandscapeEditor({ content, onChange }: { content: any; onCha
     <div className="space-y-3">
       <TextArea label="Who are your main competitors and how are you different?" value={content.overview ?? ""} onChange={(v) => onChange({ ...content, overview: v })} rows={3} />
       {competitors.map((c, idx) => (
-        <div key={idx} className="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-lg border border-gray-200 dark:border-zinc-700 p-3">
+        <div key={idx} className="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-lg border border-[rgba(0,0,0,0.08)] p-3">
           <Field label="Competitor name" value={c.name ?? ""} onChange={(v) => updateComp(idx, "name", v)} />
           <div className="relative">
             <Field label="How you're different" value={c.differentiator ?? ""} onChange={(v) => updateComp(idx, "differentiator", v)} />
@@ -271,7 +271,7 @@ function CompetitiveLandscapeEditor({ content, onChange }: { content: any; onCha
           </div>
         </div>
       ))}
-      <button onClick={addComp} className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-gray-300 dark:border-zinc-600 px-4 py-2 text-sm text-gray-500 hover:border-brand hover:text-brand">
+      <button onClick={addComp} className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-500 hover:border-brand hover:text-brand">
         <Plus className="h-3.5 w-3.5" /> Add competitor
       </button>
     </div>
@@ -470,24 +470,24 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
   };
 
   return (
-    <div className="mb-6 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
+    <div className="mb-6 bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
       {/* Header */}
       <button
-        className="w-full flex items-start justify-between px-5 py-4 text-left hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors"
+        className="w-full flex items-start justify-between px-5 py-4 text-left hover:bg-gray-50 transition-colors"
         onClick={() => setPanelOpen((v) => !v)}
         data-testid="profile-builder-header"
       >
         <div>
-          <div className="text-sm font-bold text-gray-900 dark:text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Digital Profile</div>
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Build your investor-ready profile</div>
+          <div className="text-sm font-bold text-gray-900 " style={{ fontFamily: "Syne, sans-serif" }}>Digital Profile</div>
+          <div className="text-xs text-gray-500 mt-0.5">Build your investor-ready profile</div>
         </div>
         <div className="flex items-center gap-3 shrink-0 mt-0.5">
           {allSections.length > 0 && (
             <span className={cn(
               "rounded-full px-2.5 py-0.5 text-[10px] font-semibold",
               completedCount === allSections.length
-                ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
-                : "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400",
+                ? "bg-green-50 text-green-700  "
+                : "bg-gray-100 text-gray-600  ",
             )}>
               {completedCount} / {allSections.length} sections complete
             </span>
@@ -497,11 +497,11 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
       </button>
 
       {panelOpen && (
-        <div className="border-t border-gray-100 dark:border-zinc-800">
+        <div className="border-t border-[rgba(0,0,0,0.08)] ">
           {seeding ? (
             <div className="px-5 py-8 text-center text-sm text-gray-400">Setting up your profile sections…</div>
           ) : (
-            <div className="divide-y divide-gray-100 dark:divide-zinc-800">
+            <div className="divide-y divide-gray-100 ">
               {allSections.map((section: any) => {
                 const key = section.section_key;
                 const isExpanded = expandedKey === key;
@@ -512,14 +512,14 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                 return (
                   <div key={section.id}>
                     {/* Section header row */}
-                    <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-zinc-800/40">
-                      <GripVertical className="h-4 w-4 text-gray-300 dark:text-gray-600 shrink-0" />
+                    <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 ">
+                      <GripVertical className="h-4 w-4 text-gray-300 shrink-0" />
 
                       <button
                         className="flex-1 text-left min-w-0"
                         onClick={() => setExpandedKey(isExpanded ? null : key)}
                       >
-                        <span className="text-sm font-medium text-gray-900 dark:text-foreground truncate">{section.section_label}</span>
+                        <span className="text-sm font-medium text-gray-900 truncate">{section.section_label}</span>
                       </button>
 
                       <div className="flex items-center gap-2 shrink-0">
@@ -533,7 +533,7 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                             {VISIBILITY_LABELS[section.visibility] ?? VISIBILITY_LABELS.private}
                           </button>
                           {showVisibilityWarning && (
-                            <div className="absolute top-full left-0 mt-1 z-10 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/40 px-3 py-2 text-xs text-red-700 dark:text-red-400 whitespace-nowrap flex items-center gap-1.5">
+                            <div className="absolute top-full left-0 mt-1 z-10 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700 whitespace-nowrap flex items-center gap-1.5">
                               <AlertTriangle className="h-3 w-3 shrink-0" />
                               Cannot be made public — financial data
                             </div>
@@ -541,7 +541,7 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                         </div>
 
                         {/* Content status */}
-                        <span className={cn("text-[10px] font-medium", empty ? "text-gray-400 dark:text-gray-500" : "text-green-600 dark:text-green-400")}>
+                        <span className={cn("text-[10px] font-medium", empty ? "text-gray-400 " : "text-green-600 ")}>
                           {empty ? "Empty" : "✓ Complete"}
                         </span>
 
@@ -553,7 +553,7 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
 
                     {/* Expanded editor */}
                     {isExpanded && (
-                      <div className="px-5 pb-5 pt-2 bg-gray-50/50 dark:bg-zinc-800/20">
+                      <div className="px-5 pb-5 pt-2 bg-gray-50/50 ">
                         <SectionEditor
                           sectionKey={key}
                           content={content}
@@ -601,13 +601,13 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                         value={newSectionName}
                         onChange={(e) => setNewSectionName(e.target.value)}
                         placeholder="Section name"
-                        className="col-span-2 rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
+                        className="col-span-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
                         onKeyDown={(e) => { if (e.key === "Enter") addCustomSection(); }}
                       />
                       <select
                         value={newSectionVisibility}
                         onChange={(e) => setNewSectionVisibility(e.target.value as any)}
-                        className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground outline-none"
+                        className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none"
                       >
                         <option value="private">Private</option>
                         <option value="deal_room">Deal Room</option>
@@ -615,7 +615,7 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                       </select>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => setAddSectionOpen(false)} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-3 py-1.5 text-xs text-gray-500">Cancel</button>
+                      <button onClick={() => setAddSectionOpen(false)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-xs text-gray-500">Cancel</button>
                       <button
                         onClick={addCustomSection}
                         disabled={!newSectionName.trim() || addingSec}
@@ -630,7 +630,7 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                 ) : (
                   <button
                     onClick={() => setAddSectionOpen(true)}
-                    className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-brand"
+                    className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand "
                     data-testid="add-custom-section-open-btn"
                   >
                     <Plus className="h-4 w-4" /> Add custom section

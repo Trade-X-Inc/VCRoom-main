@@ -246,7 +246,7 @@ function StartupCard({
   return (
     <div
       onClick={onOpen}
-      className="rounded-xl border border-border/60 bg-card p-5 min-h-[200px] hover:border-brand/70 hover:bg-accent/20 transition-all flex flex-col cursor-pointer"
+      className="rounded-none border border-border/60 bg-card p-5 min-h-[200px] hover:border-brand/70 hover:bg-accent/20 transition-all flex flex-col cursor-pointer"
     >
       <div className="flex items-start gap-3 mb-4">
         <div className="h-10 w-10 rounded-lg bg-gradient-brand flex items-center justify-center text-brand-foreground font-bold text-sm shrink-0">{initials}</div>
@@ -311,7 +311,7 @@ function InvestorCard({ inv }: { inv: any }) {
     : typeof inv.sectors === "string" ? inv.sectors.split(",").map((s: string) => s.trim()) : [];
   const checkRange = [inv.check_size_min, inv.check_size_max].filter(Boolean).join(" – ");
   return (
-    <div className="rounded-xl border border-border/60 bg-card p-5 min-h-[200px] hover:border-brand/30 hover:bg-accent/20 transition-all flex flex-col">
+    <div className="rounded-none border border-border/60 bg-card p-5 min-h-[200px] hover:border-brand/30 hover:bg-accent/20 transition-all flex flex-col">
       <div className="flex items-start gap-3 mb-4">
         <div className="h-10 w-10 rounded-full bg-accent flex items-center justify-center text-foreground font-bold text-sm shrink-0 overflow-hidden">
           {u.avatar_url ? <img src={u.avatar_url} alt="" className="h-full w-full object-cover" /> : initials}
@@ -628,7 +628,7 @@ export function Directory() {
         )}
       </div>
 
-      <div className="mb-4 px-4 py-3 rounded-xl bg-accent border border-brand/20 text-sm text-brand">
+      <div className="mb-4 px-4 py-3 rounded-lg bg-accent border border-brand/20 text-sm text-brand">
         🚀 Full features and founder discovery across VC circles available after public launch.
         <button onClick={() => setWaitlistOpen(true)} className="underline ml-1 hover:opacity-80">
           {isInvestor ? "Join early access →" : "Get early access →"}
@@ -636,7 +636,7 @@ export function Directory() {
       </div>
 
       {isIncomplete && (
-        <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3 rounded-xl bg-warning/10 border border-warning/20 text-sm text-warning">
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3 rounded-lg bg-warning/10 border border-warning/20 text-sm text-warning">
           <span>Your profile is incomplete — investors can see it but missing fields reduce visibility.</span>
           <button
             onClick={() => navigate({ to: "/app/profile" })}
@@ -649,7 +649,7 @@ export function Directory() {
 
       {/* Thesis matches banner — investors only */}
       {isInvestor && myAlerts && myAlerts.length > 0 && type === "founders" && (
-        <div data-tour="thesis-matches-banner" className="mb-6 p-4 rounded-xl border border-brand/20 bg-accent">
+        <div data-tour="thesis-matches-banner" className="mb-6 p-4 rounded-lg border border-brand/20 bg-accent">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-brand">✦</span>
             <p className="text-sm font-semibold text-foreground">

@@ -102,7 +102,7 @@ export function ProfileChecklist({
   if (!checklist) {
     if (compact) return null;
     return (
-      <div className="rounded-xl border border-border/60 bg-card p-5">
+      <div className="rounded-none border border-border/60 bg-card p-5">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-2.5">
             <Sparkles className="h-4 w-4 text-brand" />
@@ -135,7 +135,7 @@ export function ProfileChecklist({
   const shownGaps = compact ? gaps.slice(0, 3) : gaps;
 
   return (
-    <div className="rounded-xl border border-border/60 bg-card p-5">
+    <div className="rounded-none border border-border/60 bg-card p-5">
       {/* Header */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3">

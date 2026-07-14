@@ -131,7 +131,7 @@ function InvestorAdvisor() {
       <div className="border-b border-border/60 bg-background/80 backdrop-blur-xl px-6 lg:px-8 py-4 shrink-0">
         <div className="max-w-3xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-brand text-brand-foreground shadow-glow shrink-0">
+            <div className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-brand text-brand-foreground shadow-glow shrink-0">
               <Sparkles className="h-4 w-4" />
             </div>
             <div>
@@ -203,7 +203,7 @@ function InvestorAdvisor() {
                 <button
                   key={s}
                   onClick={() => send(s)}
-                  className="text-left rounded-xl border border-border/60 bg-card p-3 text-sm hover:border-brand/40 hover:bg-accent transition-colors shadow-card"
+                  className="text-left rounded-none border border-border/60 bg-card p-3 text-sm hover:border-brand/40 hover:bg-accent transition-colors shadow-card"
                 >
                   <Sparkles className="h-3.5 w-3.5 text-brand mb-1.5" />
                   <div>{s}</div>
@@ -220,7 +220,7 @@ function InvestorAdvisor() {
         <div className="max-w-3xl mx-auto px-6 py-3.5">
           <form
             onSubmit={(e) => { e.preventDefault(); send(input); }}
-            className="flex items-end gap-2 rounded-xl border border-border/60 bg-card p-2 shadow-card focus-within:border-brand/40 focus-within:ring-2 focus-within:ring-brand/10"
+            className="flex items-end gap-2 rounded-none border border-border/60 bg-card p-2 shadow-card focus-within:border-brand/40 focus-within:ring-2 focus-within:ring-brand/10"
           >
             <textarea
               ref={textareaRef}

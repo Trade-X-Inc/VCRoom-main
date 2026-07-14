@@ -410,7 +410,7 @@ function DecisionZone({
   onDecision: (type: DecisionStatus, extra?: DecisionExtra) => Promise<void>;
 }) {
   return (
-    <div className="rounded-2xl border-2 border-dashed border-destructive/40 bg-destructive/5 p-6 space-y-5">
+    <div className="rounded-none border border-dashed border-destructive/40 bg-destructive/5 p-6 space-y-5">
       <div className="flex items-center gap-2">
         <AlertTriangle className="h-5 w-5 text-destructive" />
         <div>
@@ -734,7 +734,7 @@ function FounderReview({ dealRoomId }: { dealRoomId: string }) {
 
       {/* Investor decision banner */}
       {roomCloser?.decision && (
-        <div className={cn("p-4 rounded-xl border", {
+        <div className={cn("p-4 rounded-lg border", {
           "bg-green-500/10 border-green-500/20": roomCloser.decision === "invest",
           "bg-amber-500/10 border-amber-500/20": roomCloser.decision === "hold",
           "bg-accent border-border": roomCloser.decision === "pass",
@@ -756,7 +756,7 @@ function FounderReview({ dealRoomId }: { dealRoomId: string }) {
 
       {/* Term sheet card */}
       {termSheetData && (
-        <div className="rounded-xl border border-brand/20 bg-accent p-5">
+        <div className="rounded-lg border border-brand/20 bg-accent p-5">
           <p className="text-sm font-semibold text-foreground mb-3">Term Sheet — {termSheetData.status === "draft" ? "Draft" : "Proposed"}</p>
           <div className="grid sm:grid-cols-3 gap-3 text-sm">
             {termSheetData.investment_amount && (

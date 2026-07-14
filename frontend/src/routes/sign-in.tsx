@@ -82,7 +82,7 @@ function SignIn() {
 
         <button
           onClick={handleGoogle}
-          className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-border bg-background hover:bg-accent transition-colors mb-4 text-foreground text-sm font-medium"
+          className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-none border border-border bg-background hover:bg-accent transition-colors mb-4 text-foreground text-sm font-medium"
         >
           <svg width="18" height="18" viewBox="0 0 18 18">
             <path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/>
@@ -125,7 +125,7 @@ function SignIn() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl hs-gradient text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="w-full py-3 rounded-lg hs-gradient text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {loading ? 'Signing in...' : 'Sign in →'}
           </button>

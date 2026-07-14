@@ -163,7 +163,7 @@ function OnboardingStep({
   return (
     <div
       className={cn(
-        "rounded-xl border border-border/60 bg-card p-6 shadow-card flex flex-col gap-3",
+        "rounded-none border border-border/60 bg-card p-6 flex flex-col gap-3",
         disabled && "opacity-50",
       )}
     >
@@ -248,7 +248,7 @@ function FounderOnboarding({
   const pct = Math.round((completed / steps.length) * 100);
 
   return (
-    <div className="rounded-xl border border-border/60 bg-card shadow-card p-5 mb-6">
+    <div className="rounded-none border border-border/60 bg-card shadow-card p-5 mb-6">
       <div className="flex items-center justify-between mb-3">
         <div>
           <div className="text-sm font-semibold">Get started with Hockystick</div>
@@ -316,7 +316,7 @@ function Stat({
   comingSoon?: boolean;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-xl border border-border/60 bg-card p-5 shadow-card">
+    <div className="relative overflow-hidden rounded-none border border-border/60 bg-card p-5 shadow-card">
       <div className="text-xs text-muted-foreground">{label}</div>
       <div className="mt-1.5 flex items-baseline gap-2">
         <span
@@ -411,7 +411,7 @@ function AccessRequestsPanel({ startupId, companyName, profileSlug }: {
   };
 
   return (
-    <div className="rounded-xl border border-border/60 bg-card shadow-card mb-6">
+    <div className="rounded-none border border-border/60 bg-card shadow-card mb-6">
       <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
         <div className="flex items-center gap-2">
           <ShieldCheck className="h-4 w-4 text-brand" />
@@ -761,7 +761,7 @@ function Overview() {
         </div>
 
         {/* The ONE thing to do next */}
-        <div className="rounded-xl border-2 p-6 mb-4" style={{ borderColor: "rgba(124,58,237,0.5)", background: "rgba(124,58,237,0.06)" }}>
+        <div className="rounded-lg border-2 p-6 mb-4" style={{ borderColor: "rgba(124,58,237,0.5)", background: "rgba(124,58,237,0.06)" }}>
           <div className="text-xs font-semibold uppercase tracking-widest text-brand mb-2">
             Your next step · {current.time}
           </div>
@@ -778,7 +778,7 @@ function Overview() {
         </div>
 
         {/* The full path, compact */}
-        <div className="rounded-xl border border-border/60 bg-card divide-y divide-border/60">
+        <div className="rounded-none border border-border/60 bg-card divide-y divide-border/60">
           {journeySteps.map((s, i) => (
             <div key={s.key} className={cn("flex items-center gap-3 px-4 py-3", i === currentIdx && "hs-gradient/[0.04]")}>
               {s.done ? (
@@ -879,7 +879,7 @@ function Overview() {
           </div>
           <div className="space-y-2">
             {[...highPriorityTasks, ...normalPriorityTasks].slice(0, 5).map((t: any) => (
-              <div key={t.id} className="rounded-xl border border-border/60 bg-card px-4 py-3 flex items-center gap-3">
+              <div key={t.id} className="rounded-none border border-border/60 bg-card px-4 py-3 flex items-center gap-3">
                 <span className="h-2 w-2 rounded-full shrink-0" style={{ background: t.priority === "high" ? "#EF4444" : t.priority === "normal" ? "#F59E0B" : "var(--faint)" }} />
                 <span className="text-sm flex-1 truncate">{t.title}</span>
                 {t.priority === "high" && (
@@ -924,7 +924,7 @@ function Overview() {
 
       {/* Live-in-directory confirmation */}
       {startup?.profile_published && startup?.profile_slug && (
-        <div className="flex items-center justify-between flex-wrap gap-3 rounded-xl px-4 py-3" style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)" }}>
+        <div className="flex items-center justify-between flex-wrap gap-3 rounded-lg px-4 py-3" style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)" }}>
           <div className="flex items-center gap-2.5 text-sm">
             <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "#10B981" }} />
             <span className="text-foreground font-medium">Your profile is live in the directory.</span>
@@ -1006,7 +1006,7 @@ function Overview() {
 
         if (actions.length === 0) {
           return (
-            <div className="mt-6 rounded-xl border border-success/30 bg-success/5 px-5 py-3.5 flex items-center gap-3">
+            <div className="mt-6 rounded-lg border border-success/30 bg-success/5 px-5 py-3.5 flex items-center gap-3">
               <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
               <span className="text-sm font-medium text-success">You're all caught up</span>
             </div>
@@ -1023,7 +1023,7 @@ function Overview() {
                 <div
                   key={a.key}
                   className={cn(
-                    "rounded-xl border border-border/60 bg-card px-4 py-3 border-l-4 shadow-card flex items-center justify-between gap-4",
+                    "rounded-none border border-border/60 bg-card px-4 py-3 border-l-4 flex items-center justify-between gap-4",
                     a.border,
                   )}
                 >
@@ -1126,7 +1126,7 @@ function Overview() {
 
       <div className="mt-6 grid lg:grid-cols-3 gap-4">
         {/* Pipeline at a glance */}
-        <div className="lg:col-span-2 rounded-xl border border-border/60 bg-card shadow-card">
+        <div className="lg:col-span-2 rounded-none border border-border/60 bg-card shadow-card">
           <div className="flex items-center justify-between p-5 border-b border-border/60">
             <div>
               <div className="text-sm font-semibold">Pipeline at a glance</div>
@@ -1164,7 +1164,7 @@ function Overview() {
         </div>
 
         {/* AI Advisor */}
-        <div className="rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
+        <div className="rounded-none border border-border/60 bg-card shadow-card overflow-hidden">
           <div className="p-5 border-b border-border/60 flex items-center gap-2">
             <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-brand text-brand-foreground">
               <Sparkles className="h-3.5 w-3.5" />
@@ -1194,7 +1194,7 @@ function Overview() {
 
       <div className="mt-6 grid lg:grid-cols-2 gap-4">
         {/* Recent activity */}
-        <div className="rounded-xl border border-border/60 bg-card shadow-card">
+        <div className="rounded-none border border-border/60 bg-card shadow-card">
           <div className="p-5 border-b border-border/60 flex items-center justify-between">
             <div className="text-sm font-semibold">Recent activity</div>
             <span className="text-xs text-muted-foreground">Live</span>
@@ -1224,7 +1224,7 @@ function Overview() {
         </div>
 
         {/* Hot deal rooms */}
-        <div className="rounded-xl border border-border/60 bg-card shadow-card">
+        <div className="rounded-none border border-border/60 bg-card shadow-card">
           <div className="p-5 border-b border-border/60 flex items-center justify-between">
             <div className="text-sm font-semibold">Hot deal rooms</div>
             <Link to={"/app/deal-rooms" as any} className="text-xs text-brand">

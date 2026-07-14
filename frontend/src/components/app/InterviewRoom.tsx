@@ -49,7 +49,7 @@ export function InterviewRoom({ dealRoomId, isInvestor, userName, onAddQuestion,
         </button>
       </div>
 
-      <div className="mt-5 rounded-xl border border-warning/40 bg-warning/5 p-4">
+      <div className="mt-5 rounded-lg border border-warning/40 bg-warning/5 p-4">
         <div className="flex items-start gap-3">
           <AlertTriangle className="h-4 w-4 text-warning mt-0.5 shrink-0" />
           <div className="text-xs text-foreground/80 leading-relaxed">
@@ -126,7 +126,7 @@ function SidePanel({
   return (
     <div className="mt-5 space-y-3">
       {questions.length === 0 && (
-        <div className="rounded-xl border border-dashed border-border/80 bg-card p-8 text-center text-sm text-muted-foreground">
+        <div className="rounded-none border border-dashed border-border/80 bg-card p-8 text-center text-sm text-muted-foreground">
           No questions yet. {userIsAsker ? "Start the interview below." : "Waiting for questions."}
         </div>
       )}
@@ -136,7 +136,7 @@ function SidePanel({
       ))}
 
       {userIsAsker && (
-        <div className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+        <div className="rounded-none border border-border/60 bg-card p-5 shadow-card">
           <div className="flex items-center justify-between">
             <div className="text-sm font-semibold">Add a new question ({askerRole})</div>
             <div className="text-xs text-muted-foreground">{remaining} of {MAX_QUESTIONS} remaining</div>
@@ -202,7 +202,7 @@ function QACard({
   const isOwnQuestion = q.authorName === userName && userIsAsker;
 
   return (
-    <div className="rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
+    <div className="rounded-none border border-border/60 bg-card shadow-card overflow-hidden">
       <button onClick={() => setOpen((v) => !v)} className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-accent/30">
         <div className="grid h-8 w-8 place-items-center rounded-full bg-accent text-[11px] font-semibold shrink-0">{q.authorName.split(" ").map((s) => s[0]).slice(0, 2).join("")}</div>
         <div className="flex-1 min-w-0">

@@ -86,14 +86,14 @@ function CheckRow({
 }) {
   return (
     <div className="flex items-start gap-3 py-3 border-b border-border/60 last:border-0">
-      <span className="mt-0.5 text-muted-foreground dark:text-faint shrink-0">{icon}</span>
+      <span className="mt-0.5 text-muted-foreground shrink-0">{icon}</span>
       <div className="flex-1 min-w-0">
-        <span className="text-sm text-foreground/70 dark:text-muted-foreground">{label}</span>
-        {note && <p className="text-xs text-muted-foreground dark:text-faint mt-0.5 leading-relaxed truncate" title={note}>{note}</p>}
+        <span className="text-sm text-foreground/70 ">{label}</span>
+        {note && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed truncate" title={note}>{note}</p>}
       </div>
       <div className="shrink-0">
         {passed === null ? (
-          <span className="text-xs text-muted-foreground dark:text-faint">Not checked</span>
+          <span className="text-xs text-muted-foreground ">Not checked</span>
         ) : passed ? (
           <span className="flex items-center gap-1 text-xs" style={{ color: "#10B981" }}>
             <CheckCircle2 className="h-3.5 w-3.5" /> Pass
@@ -319,7 +319,7 @@ function VerificationCard({
           {!neverRun && (
             <div>
               {verifLoading ? (
-                <div className="flex items-center gap-2 py-4 text-sm text-muted-foreground dark:text-faint">
+                <div className="flex items-center gap-2 py-4 text-sm text-muted-foreground ">
                   <Loader2 className="h-4 w-4 animate-spin" /> Loading…
                 </div>
               ) : (
@@ -379,7 +379,7 @@ function VerificationCard({
           {/* Claims subsection */}
           <div className="border-t border-border/40 pt-4" style={{ marginTop: neverRun ? 16 : 0 }}>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-foreground/60 dark:text-muted-foreground uppercase tracking-wider" style={{ letterSpacing: "0.1em" }}>
+              <span className="text-xs font-semibold text-foreground/60 uppercase tracking-wider" style={{ letterSpacing: "0.1em" }}>
                 Claims
               </span>
               <span
@@ -425,8 +425,8 @@ function VerificationCard({
                       style={{ background: "var(--accent)", border: "var(--color-border)" }}
                     >
                       <div className="flex-1 min-w-0">
-                        <span className="text-sm text-foreground/70 dark:text-muted-foreground truncate block">{claim.claim_label}</span>
-                        <span className="text-xs text-muted-foreground dark:text-faint truncate block">{claim.claim_value}</span>
+                        <span className="text-sm text-foreground/70 truncate block">{claim.claim_label}</span>
+                        <span className="text-xs text-muted-foreground truncate block">{claim.claim_value}</span>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <span
@@ -461,7 +461,7 @@ function VerificationCard({
           {/* Cap table subsection */}
           <div className="border-t border-border/40 pt-4 mt-4">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-foreground/60 dark:text-muted-foreground uppercase tracking-wider" style={{ letterSpacing: "0.1em" }}>
+              <span className="text-xs font-semibold text-foreground/60 uppercase tracking-wider" style={{ letterSpacing: "0.1em" }}>
                 Cap Table
               </span>
               <span
@@ -585,17 +585,17 @@ function ConfirmDialog({
       onClick={onCancel}
     >
       <div
-        className="bg-card border border-border/60 rounded-xl p-7 w-full max-w-sm"
+        className="bg-card border border-border/60 rounded-none p-7 w-full max-w-sm"
         onClick={(e) => e.stopPropagation()}
       >
         <p className="text-sm text-foreground leading-relaxed mb-5">{message}</p>
         <div className="flex justify-end gap-2">
-          <button onClick={onCancel} className="px-4 py-2 text-xs text-muted-foreground hover:text-foreground/70 dark:text-muted-foreground transition-colors">
+          <button onClick={onCancel} className="px-4 py-2 text-xs text-muted-foreground hover:text-foreground/70 transition-colors">
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 text-xs font-medium rounded-lg text-foreground dark:text-foreground transition-colors"
+            className="px-4 py-2 text-xs font-medium rounded-lg text-foreground transition-colors"
             style={{ background: confirmDanger ? "#EF4444" : "var(--gradient-brand)" }}
           >
             {confirmLabel}
@@ -706,7 +706,7 @@ function ReadinessCard({
       {/* Body */}
       <div style={{ padding: "20px 24px" }}>
         {isLoading ? (
-          <div className="flex items-center gap-2 text-muted-foreground dark:text-faint">
+          <div className="flex items-center gap-2 text-muted-foreground ">
             <Loader2 className="h-4 w-4 animate-spin" />
             <span className="text-sm">Computing readiness…</span>
           </div>
@@ -720,7 +720,7 @@ function ReadinessCard({
               >
                 {score}
               </span>
-              <span className="text-lg text-muted-foreground dark:text-faint mb-1">/100</span>
+              <span className="text-lg text-muted-foreground mb-1">/100</span>
               {passed && (
                 <span className="mb-2 text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(16,185,129,0.15)", color: "#10B981" }}>
                   Ready for outreach
@@ -755,7 +755,7 @@ function ReadinessCard({
                   className="rounded-lg px-3 py-2 text-xs"
                   style={{ background: "var(--accent)", border: "1px solid var(--border)" }}
                 >
-                  <div className="font-medium text-foreground/60 dark:text-muted-foreground">{label} <span className="text-muted-foreground dark:text-faint">({weight})</span></div>
+                  <div className="font-medium text-foreground/60 ">{label} <span className="text-muted-foreground ">({weight})</span></div>
                   <div className="font-semibold mt-0.5" style={{ color: na ? "var(--color-muted-foreground)" : value >= 60 ? "#10B981" : value >= 30 ? "#F59E0B" : "#EF4444" }}>
                     {na ? "Not run" : `${value}/100`}
                   </div>
@@ -766,7 +766,7 @@ function ReadinessCard({
             {/* Passed state */}
             {passed && (
               <div
-                className="rounded-xl px-4 py-3.5"
+                className="rounded-lg px-4 py-3.5"
                 style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)" }}
               >
                 <div className="flex items-center gap-2 mb-1">
@@ -791,7 +791,7 @@ function ReadinessCard({
                   <a
                     key={i}
                     href={b.action_url}
-                    className="flex items-start gap-3 rounded-xl px-4 py-3 transition-colors group"
+                    className="flex items-start gap-3 rounded-lg px-4 py-3 transition-colors group"
                     style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)", textDecoration: "none" }}
                   >
                     <span className="mt-0.5 shrink-0" style={{ color: "#F59E0B" }}>
@@ -990,14 +990,14 @@ function DealActivityCard({
 
         <div style={{ padding: "20px 24px" }} className="space-y-4">
           {reqLoading && (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground dark:text-faint">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground ">
               <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading requests…
             </div>
           )}
 
           {!reqLoading && requests.length > 0 && (
             <div>
-              <div className="text-xs font-semibold text-foreground/60 dark:text-muted-foreground uppercase tracking-wider mb-2" style={{ letterSpacing: "0.1em" }}>
+              <div className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-2" style={{ letterSpacing: "0.1em" }}>
                 Pending access requests
               </div>
               <div className="space-y-2">
@@ -1020,7 +1020,7 @@ function DealActivityCard({
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
                         {isActing ? (
-                          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground dark:text-faint" />
+                          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground " />
                         ) : (
                           <>
                             <button
@@ -1059,7 +1059,7 @@ function DealActivityCard({
             dealRooms.length > 0 && (
               <div>
                 {requests.length > 0 && (
-                  <div className="text-xs font-semibold text-foreground/60 dark:text-muted-foreground uppercase tracking-wider mb-2" style={{ letterSpacing: "0.1em" }}>
+                  <div className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-2" style={{ letterSpacing: "0.1em" }}>
                     Deal rooms
                   </div>
                 )}
@@ -1189,7 +1189,7 @@ function ScoreAuditCard({
   };
 
   return (
-    <div className="rounded-xl border border-border/60 bg-card p-5 mt-4" data-testid="score-audit-card">
+    <div className="rounded-none border border-border/60 bg-card p-5 mt-4" data-testid="score-audit-card">
       {/* Header row */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -1454,7 +1454,7 @@ function InvestorSimCard({
     : [];
 
   return (
-    <div className="rounded-xl border border-border/60 bg-card p-5 mt-4" data-testid="investor-sim-card">
+    <div className="rounded-none border border-border/60 bg-card p-5 mt-4" data-testid="investor-sim-card">
       {/* Header row */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -1605,7 +1605,7 @@ function CoachingCard({
   };
 
   return (
-    <div className="rounded-xl border border-border/60 bg-card p-5 mt-4" data-testid="coaching-card">
+    <div className="rounded-none border border-border/60 bg-card p-5 mt-4" data-testid="coaching-card">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -1825,7 +1825,7 @@ export function FounderHome() {
   if (isLoading) {
     return (
       <div className="p-8 flex items-center justify-center">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground dark:text-faint" />
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground " />
       </div>
     );
   }
@@ -1833,8 +1833,8 @@ export function FounderHome() {
   if (!startup) {
     return (
       <div className="p-6 lg:p-8 max-w-3xl mx-auto">
-        <div className="rounded-xl border border-dashed border-border/60 bg-card p-8 text-center">
-          <Building2 className="h-8 w-8 text-muted-foreground dark:text-faint mx-auto mb-3" />
+        <div className="rounded-none border border-dashed border-border/60 bg-card p-8 text-center">
+          <Building2 className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
           <div className="text-sm font-medium mb-1">No company profile yet</div>
           <div className="text-xs text-muted-foreground mb-4">
             Build your profile to start verification, claim proof, and track investor activity.

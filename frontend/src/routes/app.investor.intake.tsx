@@ -401,7 +401,7 @@ export function IntakePage() {
           </span>
         </div>
         {intakeRuns.length === 0 ? (
-          <div className="rounded-xl border border-border/60 bg-card px-5 py-4 text-sm text-muted-foreground">
+          <div className="rounded-none border border-border/60 bg-card px-5 py-4 text-sm text-muted-foreground">
             No intake runs
           </div>
         ) : (
@@ -801,7 +801,7 @@ function ExtractedCard({
 
   return (
     <div
-      className="bg-card border border-border/60 rounded-xl"
+      className="bg-card border border-border/60 rounded-none"
       style={{ padding: "16px 20px" }}
       data-testid="extracted-card"
     >
@@ -945,7 +945,7 @@ function FailedCard({ result: r }: { result: IntakeFileResult }) {
   if (removed) return null;
   return (
     <div
-      className="bg-card border border-border/60 rounded-xl"
+      className="bg-card border border-border/60 rounded-none"
       style={{ padding: "14px 18px", display: "flex", alignItems: "flex-start", gap: 12 }}
       data-testid="failed-card"
     >

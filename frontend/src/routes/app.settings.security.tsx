@@ -80,7 +80,7 @@ function SecuritySettings() {
   return (
     <div className="space-y-5">
       {/* Change password */}
-      <section className="rounded-xl border border-border/60 bg-card p-5 space-y-4">
+      <section className="rounded-none border border-border/60 bg-card p-5 space-y-4">
         <div className="flex items-center gap-2">
           <Shield className="h-4 w-4 text-brand" />
           <h2 className="text-sm font-semibold">Change password</h2>
@@ -132,7 +132,7 @@ function SecuritySettings() {
       </section>
 
       {/* Active session */}
-      <section className="rounded-xl border border-border/60 bg-card p-5 space-y-3">
+      <section className="rounded-none border border-border/60 bg-card p-5 space-y-3">
         <h2 className="text-sm font-semibold">Current session</h2>
         <div className="flex items-center justify-between">
           <div>
@@ -152,7 +152,7 @@ function SecuritySettings() {
       </section>
 
       {/* Danger zone */}
-      <section className="rounded-xl border border-destructive/30 bg-destructive/5 p-5 space-y-3">
+      <section className="rounded-lg border border-destructive/30 bg-destructive/5 p-5 space-y-3">
         <div className="flex items-center gap-2 text-destructive">
           <AlertTriangle className="h-4 w-4" />
           <h2 className="text-sm font-semibold">Danger zone</h2>
@@ -177,7 +177,7 @@ function SecuritySettings() {
       {/* Delete confirm modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
-          <div className="bg-card border border-border/60 rounded-xl p-6 max-w-sm w-full shadow-xl space-y-4">
+          <div className="bg-card border border-border/60 rounded-none p-6 max-w-sm w-full shadow-xl space-y-4">
             <div className="flex items-center gap-2 text-destructive">
               <AlertTriangle className="h-5 w-5" />
               <h3 className="font-semibold">Delete your account?</h3>

@@ -41,7 +41,7 @@ export function NdaGate({ dealRoomId, dealRoomName, participantName, companyName
       <div className="w-full max-w-xl rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden">
         <div className="bg-gradient-mesh h-20 relative">
           <div className="absolute inset-0 grid place-items-center">
-            <div className="grid h-12 w-12 place-items-center rounded-xl bg-background border border-border/60 shadow-card">
+            <div className="grid h-12 w-12 place-items-center rounded-lg bg-background border border-border/60 shadow-card">
               <Shield className="h-6 w-6 text-brand" />
             </div>
           </div>

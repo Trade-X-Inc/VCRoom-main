@@ -27,7 +27,7 @@ function DomainEmail() {
 
   return (
     <div className="space-y-5">
-      <section className="rounded-xl border border-border/60 bg-card shadow-card p-5">
+      <section className="rounded-none border border-border/60 bg-card shadow-card p-5">
         <h2 className="text-sm font-semibold inline-flex items-center gap-2"><Globe className="h-4 w-4 text-brand" /> Custom domains</h2>
         <p className="text-xs text-muted-foreground mt-1">Connect your own domain to host deal rooms and outbound emails.</p>
 
@@ -69,7 +69,7 @@ function DomainEmail() {
         </div>
       </section>
 
-      <section className="rounded-xl border border-border/60 bg-card shadow-card p-5 space-y-3">
+      <section className="rounded-none border border-border/60 bg-card shadow-card p-5 space-y-3">
         <h2 className="text-sm font-semibold inline-flex items-center gap-2"><Mail className="h-4 w-4 text-brand" /> Email configuration</h2>
         <div>
           <label className="text-xs text-muted-foreground">Default "From" address</label>

@@ -32,7 +32,7 @@ export function PromoteProfileCard() {
   }
 
   return (
-    <div className="rounded-xl border border-border/60 bg-card shadow-card p-5">
+    <div className="rounded-none border border-border/60 bg-card shadow-card p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
           <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-accent">

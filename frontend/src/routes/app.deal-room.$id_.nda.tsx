@@ -264,7 +264,7 @@ function NdaPage() {
 
         <div className="rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden">
           <div className="px-8 py-6 border-b border-border/60 flex items-center gap-4">
-            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-accent border border-brand/20">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-accent border border-brand/20">
               <Shield className="h-6 w-6 text-brand" />
             </div>
             <div>
@@ -295,7 +295,7 @@ function NdaPage() {
               <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">
                 Agreement text
               </div>
-              <div className="h-64 overflow-y-auto rounded-xl border border-border/60 bg-background p-5 text-xs leading-relaxed text-muted-foreground whitespace-pre-wrap">
+              <div className="h-64 overflow-y-auto rounded-none border border-border/60 bg-background p-5 text-xs leading-relaxed text-muted-foreground whitespace-pre-wrap">
                 {ndaPreviewText}
               </div>
             </div>
@@ -318,7 +318,7 @@ function NdaPage() {
             <button
               onClick={handleAccept}
               disabled={!agreed || accepting || !user?.id}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-brand text-brand-foreground py-3 text-sm font-medium shadow-glow disabled:opacity-50 disabled:shadow-none transition-all hover:scale-[1.01]"
+              className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-brand text-brand-foreground py-3 text-sm font-medium disabled:opacity-50 transition-all hover:scale-[1.01]"
             >
               {accepting ? (
                 <>

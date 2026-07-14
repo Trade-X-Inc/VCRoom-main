@@ -73,7 +73,7 @@ function TrustPage() {
 
         {/* The principle — in a callout box, not buried */}
         <div
-          className="inline-block max-w-xl mx-auto rounded-xl px-6 py-4 text-left"
+          className="inline-block max-w-xl mx-auto rounded-lg px-6 py-4 text-left"
           style={{ background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)" }}
         >
           <p className="text-sm text-muted-foreground leading-relaxed">
@@ -89,7 +89,7 @@ function TrustPage() {
         {isLoading ? (
           <div className="space-y-4">
             {[0,1,2,3,4].map((i) => (
-              <div key={i} className="h-32 rounded-xl animate-pulse" style={{ background: "var(--accent)" }} />
+              <div key={i} className="h-32 rounded-none animate-pulse" style={{ background: "var(--accent)" }} />
             ))}
           </div>
         ) : (
@@ -102,7 +102,7 @@ function TrustPage() {
               return (
                 <div
                   key={tier.id}
-                  className="rounded-xl p-6"
+                  className="rounded-none p-6"
                   style={{ background: "var(--card)", border: `1px solid ${cfg.borderColor}` }}
                 >
                   {/* Header row */}
@@ -189,7 +189,7 @@ function TrustPage() {
       {/* Key guarantees */}
       <section className="py-8 px-4 sm:px-6 max-w-3xl mx-auto">
         <div
-          className="rounded-xl p-6"
+          className="rounded-none p-6"
           style={{ background: "var(--card)", border: "1px solid var(--border)" }}
         >
           <h3 className="text-sm font-semibold text-foreground mb-4" style={{ fontFamily: "Syne, sans-serif" }}>

@@ -127,7 +127,7 @@ export function BadgesPage() {
       <div className="border-b border-border/60 bg-background/80 backdrop-blur-xl px-6 py-4 shrink-0">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-brand text-brand-foreground shrink-0">
+            <div className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-brand text-brand-foreground shrink-0">
               <Award className="h-4 w-4" />
             </div>
             <div>
@@ -153,7 +153,7 @@ export function BadgesPage() {
 
         {/* Identity gate notice */}
         {progress && !progress.tier1Passed && (
-          <div className="rounded-xl px-4 py-3 text-sm" style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)" }}>
+          <div className="rounded-lg px-4 py-3 text-sm" style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)" }}>
             <span className="font-medium" style={{ color: "#F59E0B" }}>No badge without confirmed identity.</span>{" "}
             <span className="text-muted-foreground">
               All badges — including readiness — require the Tier 1 identity check first ({progress.tier1Checks}/4 checks passing).{" "}
@@ -163,7 +163,7 @@ export function BadgesPage() {
         )}
 
         {/* Earned */}
-        <div className="bg-card border border-border/60 rounded-xl p-5">
+        <div className="bg-card border border-border/60 rounded-none p-5">
           <div className="text-sm font-semibold mb-3" style={{ fontFamily: "Syne, sans-serif" }}>
             Earned ({earned.length})
           </div>
@@ -176,7 +176,7 @@ export function BadgesPage() {
 
         {/* Progress */}
         {progress && (
-          <div className="bg-card border border-border/60 rounded-xl p-5 space-y-2.5">
+          <div className="bg-card border border-border/60 rounded-none p-5 space-y-2.5">
             <div className="text-sm font-semibold mb-1" style={{ fontFamily: "Syne, sans-serif" }}>Progress</div>
             <ProgressBar label="Identity checks (Identity Confirmed)" current={progress.tier1Checks} target={4} />
             <ProgressBar label="Verified claims (Claims Verified)" current={progress.verifiedClaims} target={3} />
@@ -188,7 +188,7 @@ export function BadgesPage() {
 
         {/* Available */}
         {available.length > 0 && (
-          <div className="bg-card border border-border/60 rounded-xl p-5">
+          <div className="bg-card border border-border/60 rounded-none p-5">
             <div className="text-sm font-semibold mb-3" style={{ fontFamily: "Syne, sans-serif" }}>
               Available — earned automatically when the criteria are met
             </div>
@@ -208,7 +208,7 @@ export function BadgesPage() {
 
         {/* Locked (payment or admin) */}
         {locked.length > 0 && (
-          <div className="bg-card border border-border/60 rounded-xl p-5">
+          <div className="bg-card border border-border/60 rounded-none p-5">
             <div className="text-sm font-semibold mb-3" style={{ fontFamily: "Syne, sans-serif" }}>
               Locked — payment or review required
             </div>
@@ -232,7 +232,7 @@ export function BadgesPage() {
         )}
 
         {/* Philosophy */}
-        <div className="bg-card border border-border/60 rounded-xl p-5">
+        <div className="bg-card border border-border/60 rounded-none p-5">
           <button
             onClick={() => setPhilosophyOpen((o) => !o)}
             className="flex w-full items-center justify-between text-sm font-semibold"

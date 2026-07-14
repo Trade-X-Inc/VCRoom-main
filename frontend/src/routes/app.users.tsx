@@ -212,7 +212,7 @@ function UsersPage() {
     return (
       <div className="p-6 lg:p-8 space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-20 rounded-xl bg-muted/40 animate-pulse" />
+          <div key={i} className="h-20 rounded-none bg-muted/40 animate-pulse" />
         ))}
       </div>
     );
@@ -250,7 +250,7 @@ function UsersPage() {
 
       {/* Free plan paywall */}
       {isFreePlan && (
-        <div className="rounded-xl border border-brand/30 bg-accent p-6 text-center mb-6">
+        <div className="rounded-lg border border-brand/30 bg-accent p-6 text-center mb-6">
           <p className="text-sm font-semibold mb-2">Team collaboration is a paid feature</p>
           <p className="text-xs text-muted-foreground mb-5 max-w-sm mx-auto leading-relaxed">
             Upgrade to Starter to invite 1 team member, or Pro to invite up to 4.
@@ -277,7 +277,7 @@ function UsersPage() {
       )}
 
       {/* Active members */}
-      <div className="rounded-xl border border-border/60 bg-card shadow-card overflow-hidden mb-6" data-testid="active-members-section">
+      <div className="rounded-none border border-border/60 bg-card shadow-card overflow-hidden mb-6" data-testid="active-members-section">
         <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -328,7 +328,7 @@ function UsersPage() {
       </div>
 
       {/* Pending invites */}
-      <div className="rounded-xl border border-border/60 bg-card shadow-card overflow-hidden mb-6" data-testid="pending-invites-section">
+      <div className="rounded-none border border-border/60 bg-card shadow-card overflow-hidden mb-6" data-testid="pending-invites-section">
         <div className="flex items-center gap-2 px-5 py-4 border-b border-border/60">
           <Mail className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-semibold">Pending invites</span>
@@ -357,7 +357,7 @@ function UsersPage() {
       </div>
 
       {/* Role permissions reference */}
-      <div className="rounded-xl border border-border/60 bg-card shadow-card overflow-hidden" data-testid="role-permissions-section">
+      <div className="rounded-none border border-border/60 bg-card shadow-card overflow-hidden" data-testid="role-permissions-section">
         <div className="flex items-center gap-2 px-5 py-4 border-b border-border/60">
           <span className="text-sm font-semibold">Role permissions</span>
         </div>

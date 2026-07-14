@@ -244,7 +244,7 @@ function DealRooms() {
           return (
             <div
               key={r.id}
-              className="rounded-xl border border-border/60 bg-card p-5 shadow-card hover:shadow-elev transition-shadow flex flex-col gap-4"
+              className="rounded-none border border-border/60 bg-card p-5 shadow-card hover:shadow-elev transition-shadow flex flex-col gap-4"
               onClick={() => { if (menuOpenId === r.id) setMenuOpenId(null); }}
             >
               <div className="flex items-start justify-between">
@@ -703,7 +703,7 @@ function CreateRoomForm({
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="flex items-center gap-3 rounded-xl bg-success/10 border border-success/20 p-4">
+            <div className="flex items-center gap-3 rounded-lg bg-success/10 border border-success/20 p-4">
               <CheckCircle2 className="h-6 w-6 text-success shrink-0" />
               <div>
                 <div className="text-sm font-medium text-success">

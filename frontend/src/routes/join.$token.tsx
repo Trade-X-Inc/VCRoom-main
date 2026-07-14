@@ -232,7 +232,7 @@ function JoinFlow() {
               </div>
               <h2 className="mt-3 text-2xl font-semibold tracking-tight">Sign the NDA</h2>
               <p className="mt-1 text-sm text-muted-foreground">Auto-filled with the details you just provided.</p>
-              <div className="mt-5 rounded-xl border border-border/60 bg-card p-5 max-h-[280px] overflow-y-auto text-xs leading-relaxed text-muted-foreground">
+              <div className="mt-5 rounded-none border border-border/60 bg-card p-5 max-h-[280px] overflow-y-auto text-xs leading-relaxed text-muted-foreground">
                 <p className="text-foreground font-medium mb-2">Mutual Non-Disclosure Agreement</p>
                 <p>
                   This Agreement is entered into between{" "}

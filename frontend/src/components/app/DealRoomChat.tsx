@@ -148,9 +148,9 @@ export function DealRoomChat({ dealRoomId, userId, userName }: Props) {
 
       {/* Privacy notice — shown once at top of empty chat */}
       {!loading && msgs.length === 0 && (
-        <div className="mx-5 mt-5 rounded-xl border border-brand/20 bg-accent p-4">
+        <div className="mx-5 mt-5 rounded-lg border border-brand/20 bg-accent p-4">
           <div className="flex items-start gap-3">
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-accent">
+            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-accent">
               <Lock className="h-4 w-4 text-brand" />
             </div>
             <div>
@@ -251,7 +251,7 @@ export function DealRoomChat({ dealRoomId, userId, userName }: Props) {
       {/* Composer */}
       <div className="px-4 pb-4 pt-2 border-t border-border/60 bg-card/50 shrink-0">
         <div className={cn(
-          "flex items-end gap-2 rounded-xl border bg-background px-3 py-2 transition-all",
+          "flex items-end gap-2 rounded-lg border bg-background px-3 py-2 transition-all",
           draft ? "border-brand/50 ring-2 ring-brand/10" : "border-border/60"
         )}>
           <button className="text-muted-foreground hover:text-foreground shrink-0 mb-1" title="Emoji">

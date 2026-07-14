@@ -126,7 +126,7 @@ export function DDChecklist({ dealRoomId, userId }: { dealRoomId: string; userId
       )}
 
       {tasks.length > 0 && (
-        <div className="mt-5 rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
+        <div className="mt-5 rounded-none border border-border/60 bg-card shadow-card overflow-hidden">
           <div className="divide-y divide-border/60">
             {(tasks as any[]).map((task) => {
               const status: TaskStatus = task.completed ? "done" : "todo";

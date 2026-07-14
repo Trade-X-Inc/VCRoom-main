@@ -92,7 +92,7 @@ function InvestorOnboarding({
   const pct = Math.round((completed / steps.length) * 100);
 
   return (
-    <div className="rounded-xl border border-border/60 bg-card shadow-card p-5">
+    <div className="rounded-none border border-border/60 bg-card shadow-card p-5">
       <div className="flex items-center justify-between mb-3">
         <div>
           <div className="text-sm font-semibold">Get started with Hockystick</div>

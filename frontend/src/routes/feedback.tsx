@@ -68,7 +68,7 @@ function Feedback() {
             <p className="text-muted-foreground">We appreciate your feedback and will review it soon.</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-gray-100 bg-white shadow-lg p-8">
+          <form onSubmit={handleSubmit} className="space-y-5 border border-[rgba(0,0,0,0.08)] bg-white p-8">
             <div>
               <label className="block text-sm font-medium mb-1.5">Name</label>
               <Input name="name" value={form.name} onChange={set} placeholder="Your name (optional)" />

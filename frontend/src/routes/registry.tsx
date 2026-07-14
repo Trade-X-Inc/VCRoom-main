@@ -130,12 +130,12 @@ function Registry() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="e.g. Revolut, Careem, Tabby..."
-            className="flex-1 bg-accent border border-border rounded-xl px-4 py-3.5 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors"
+            className="flex-1 bg-accent border border-border rounded-lg px-4 py-3.5 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors"
           />
           <button
             onClick={handleSearch}
             disabled={loading || query.trim().length < 2}
-            className="px-6 py-3.5 hs-gradient text-foreground rounded-xl text-sm font-medium hover:bg-[#6d28d9] disabled:opacity-40 transition-colors shrink-0"
+            className="px-6 py-3.5 hs-gradient text-foreground rounded-lg text-sm font-medium hover:bg-[#6d28d9] disabled:opacity-40 transition-colors shrink-0"
           >
             {loading ? "⟳ Searching..." : "Search"}
           </button>
@@ -160,7 +160,7 @@ function Registry() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-20 rounded-xl animate-pulse"
+                className="h-20 rounded-none animate-pulse"
                 style={{ background: "var(--accent)" }}
               />
             ))}
@@ -173,7 +173,7 @@ function Registry() {
 
             {/* Overall verdict */}
             <div
-              className="p-5 rounded-xl mb-6"
+              className="p-5 rounded-lg mb-6"
               style={{
                 background: results.verified ? "rgba(16,185,129,0.08)" : "var(--accent)",
                 border: results.verified ? "1px solid rgba(16,185,129,0.2)" : "1px solid var(--border)",
@@ -198,7 +198,7 @@ function Registry() {
 
             {/* OpenCorporates */}
             <div
-              className="p-4 rounded-xl"
+              className="p-4 rounded-lg"
               style={{
                 background: results.opencorporates.found ? "rgba(124,58,237,0.07)" : "var(--accent)",
                 border: results.opencorporates.found ? "1px solid rgba(124,58,237,0.2)" : "1px solid var(--border)",
@@ -250,7 +250,7 @@ function Registry() {
 
             {/* UK Companies House */}
             <div
-              className="p-4 rounded-xl"
+              className="p-4 rounded-lg"
               style={{
                 background: results.companies_house.found ? "rgba(124,58,237,0.07)" : "var(--accent)",
                 border: results.companies_house.found ? "1px solid rgba(124,58,237,0.2)" : "1px solid var(--border)",
@@ -297,7 +297,7 @@ function Registry() {
 
             {/* DIFC — always shown as best-effort, never equal to structured checks */}
             <div
-              className="p-4 rounded-xl"
+              className="p-4 rounded-lg"
               style={{
                 background: "var(--accent)",
                 border: "1px solid var(--border)",
@@ -362,7 +362,7 @@ function Registry() {
 
             {/* CTA */}
             <div
-              className="mt-8 p-5 rounded-xl"
+              className="mt-8 p-5 rounded-lg"
               style={{ background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)" }}
             >
               <p className="text-sm font-semibold text-foreground mb-1">Raising capital?</p>

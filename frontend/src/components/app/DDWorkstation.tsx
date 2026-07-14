@@ -438,7 +438,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
               const { icon: CatIcon, color } = CAT_CONFIG[cat];
               return (
                 <div key={cat} className={cn(
-                  "rounded-xl border p-3 space-y-2",
+                  "rounded-lg border p-3 space-y-2",
                   status === "Red Flag" ? "border-destructive/30 bg-destructive/5" :
                   status === "Complete" ? "border-success/30 bg-success/5" :
                   "border-border/60 bg-background"
@@ -623,7 +623,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
           className="w-full flex items-center justify-between px-5 py-4 hover:bg-accent/40 transition-colors"
         >
           <div className="flex items-center gap-3">
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-muted shrink-0">
+            <div className="grid h-9 w-9 place-items-center rounded-lg bg-muted shrink-0">
               <FileText className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="text-left">
@@ -716,7 +716,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                         <div className="px-4 pb-4 space-y-3 bg-muted/10">
                           {/* AI Summary — show if exists, otherwise nudge but don't block thesis */}
                           {doc.ai_summary ? (
-                            <div className="rounded-xl border border-border/60 bg-card p-4">
+                            <div className="rounded-none border border-border/60 bg-card p-4">
                               <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
                                 <Sparkles className="h-3 w-3" /> AI Summary
                               </div>
@@ -731,7 +731,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
 
                           {/* Thesis Alignment — investor only, NOT gated on ai_summary */}
                           {isInvestor && (
-                            <div className="rounded-xl border border-brand/25 bg-accent p-4">
+                            <div className="rounded-lg border border-brand/25 bg-accent p-4">
                               <div className="flex items-center justify-between mb-3">
                                 <div className="text-xs font-semibold text-brand uppercase tracking-wider flex items-center gap-1.5">
                                   <Sparkles className="h-3.5 w-3.5" /> Thesis Alignment
@@ -1005,7 +1005,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
               className="w-full flex items-center justify-between px-5 py-4 hover:bg-accent/40 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="grid h-9 w-9 place-items-center rounded-xl bg-accent shrink-0">
+                <div className="grid h-9 w-9 place-items-center rounded-lg bg-accent shrink-0">
                   <Star className="h-4 w-4 text-brand" />
                 </div>
                 <div className="text-left">
@@ -1059,7 +1059,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                   ))}
                 </div>
                 {scores.length >= 3 && verdict && (
-                  <div className={cn("rounded-xl border p-4 flex items-center justify-between", verdict.c)}>
+                  <div className={cn("rounded-lg border p-4 flex items-center justify-between", verdict.c)}>
                     <div>
                       <div className="text-xs opacity-70 mb-0.5">Overall verdict · {scores.length}/6 scored</div>
                       <div className="text-xl font-bold">{verdict.l}</div>
@@ -1096,7 +1096,7 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                 onClick={() => setExpandedCat(isExpanded ? null : cat)}
                 className="w-full flex items-center gap-4 px-5 py-4 hover:bg-accent/40 transition-colors text-left"
               >
-                <div className={cn("grid h-9 w-9 place-items-center rounded-xl bg-muted shrink-0", color)}>
+                <div className={cn("grid h-9 w-9 place-items-center rounded-lg bg-muted shrink-0", color)}>
                   <CatIcon className="h-4 w-4" />
                 </div>
                 <div className="flex-1 min-w-0">

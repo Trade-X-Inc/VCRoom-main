@@ -53,7 +53,7 @@ export function BadgesSection({ startupId, compact = false }: { startupId: strin
   };
 
   return (
-    <div className="bg-card border border-border/60 rounded-xl p-5 space-y-4">
+    <div className="bg-card border border-border/60 rounded-none p-5 space-y-4">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <div className="text-sm font-semibold" style={{ fontFamily: "Syne, sans-serif" }}>Your badges</div>

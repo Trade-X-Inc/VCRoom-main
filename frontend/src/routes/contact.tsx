@@ -56,7 +56,7 @@ function Contact() {
         </p>
 
         {submitted ? (
-          <div className="p-6 rounded-xl border border-brand/30 bg-accent text-center">
+          <div className="p-6 rounded-lg border border-brand/30 bg-accent text-center">
             <p className="text-foreground font-semibold mb-1">Message received</p>
             <p className="text-muted-foreground text-sm">
               We'll get back to you within 24 hours.
@@ -71,7 +71,7 @@ function Contact() {
                 value={name}
                 onChange={e => setName(e.target.value)}
                 placeholder="Your name"
-                className="w-full bg-accent border border-border rounded-xl px-4 py-3 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors"
+                className="w-full bg-accent border border-border rounded-lg px-4 py-3 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors"
               />
             </div>
 
@@ -82,7 +82,7 @@ function Contact() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="w-full bg-accent border border-border rounded-xl px-4 py-3 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors"
+                className="w-full bg-accent border border-border rounded-lg px-4 py-3 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors"
               />
             </div>
 
@@ -91,7 +91,7 @@ function Contact() {
               <select
                 value={role}
                 onChange={e => setRole(e.target.value)}
-                className="w-full bg-accent border border-border rounded-xl px-4 py-3 text-foreground text-sm focus:border-brand/50 outline-none transition-colors"
+                className="w-full bg-accent border border-border rounded-lg px-4 py-3 text-foreground text-sm focus:border-brand/50 outline-none transition-colors"
               >
                 <option value="founder">Founder</option>
                 <option value="investor">Investor</option>
@@ -109,7 +109,7 @@ function Contact() {
                 onChange={e => setMessage(e.target.value)}
                 rows={5}
                 placeholder="How can we help?"
-                className="w-full bg-accent border border-border rounded-xl px-4 py-3 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors resize-none"
+                className="w-full bg-accent border border-border rounded-lg px-4 py-3 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors resize-none"
               />
             </div>
 
@@ -120,7 +120,7 @@ function Contact() {
             <button
               onClick={handleSubmit}
               disabled={submitting}
-              className="w-full py-3.5 hs-gradient text-foreground rounded-xl font-medium text-sm hover:bg-[#6d28d9] disabled:opacity-50 transition-colors"
+              className="w-full py-3.5 hs-gradient text-foreground rounded-lg font-medium text-sm hover:bg-[#6d28d9] disabled:opacity-50 transition-colors"
             >
               {submitting ? 'Sending...' : 'Send message'}
             </button>

@@ -151,14 +151,14 @@ function BadgePill({ badge, size, expandable }: { badge: BadgeRow; size: "sm" | 
           className="mt-1.5 rounded-lg px-3 py-2.5 text-xs leading-relaxed"
           style={{ background: "var(--accent)", border: "1px solid var(--border)", maxWidth: 340 }}
         >
-          <div className="text-foreground/80 dark:text-muted-foreground">{badge.description}</div>
+          <div className="text-foreground/80 ">{badge.description}</div>
           {badge.issued_at && (
-            <div className="mt-1 text-muted-foreground dark:text-muted-foreground">
+            <div className="mt-1 text-muted-foreground ">
               Earned {new Date(badge.issued_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
             </div>
           )}
           {lines.length > 0 && (
-            <div className="mt-1 text-muted-foreground dark:text-faint">
+            <div className="mt-1 text-muted-foreground ">
               {lines.map((l) => <div key={l}>{l}</div>)}
             </div>
           )}
@@ -196,7 +196,7 @@ export function BadgeDisplay({
       <div className="space-y-3">
         {[...groups.entries()].map(([cat, rows]) => (
           <div key={cat}>
-            <div className="mb-1.5 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground dark:text-faint">
+            <div className="mb-1.5 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground ">
               {CATEGORY_LABELS[cat]}
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -218,7 +218,7 @@ export function BadgeDisplay({
         <button
           type="button"
           onClick={() => setShowAll(true)}
-          className="rounded-full px-2 py-0.5 text-[11px] text-muted-foreground dark:text-muted-foreground hover:text-foreground"
+          className="rounded-full px-2 py-0.5 text-[11px] text-muted-foreground hover:text-foreground"
           style={{ border: "1px solid var(--border)" }}
         >
           +{hidden} more

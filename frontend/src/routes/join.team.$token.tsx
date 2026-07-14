@@ -175,7 +175,7 @@ function JoinTeamFlow() {
                 <Users className="h-3.5 w-3.5 text-brand" /> Team invite
               </div>
               <h2 className="mt-3 text-2xl font-semibold tracking-tight">Wrong account</h2>
-              <div className="mt-4 rounded-xl border border-warning/40 bg-warning/5 p-4 text-sm text-warning-foreground">
+              <div className="mt-4 rounded-lg border border-warning/40 bg-warning/5 p-4 text-sm text-warning-foreground">
                 This invite was sent to <span className="font-semibold">{invite.email}</span>.<br />
                 You're signed in as <span className="font-semibold">{user.email}</span>.<br />
                 Please sign in with the invited account to accept.
@@ -226,7 +226,7 @@ function JoinTeamFlow() {
               <p className="mt-2 text-sm text-muted-foreground">
                 Accept this invitation to collaborate with {invite.companyName} on Hockystick.
               </p>
-              <div className="mt-6 rounded-xl border border-border/60 bg-card p-4 text-sm space-y-2">
+              <div className="mt-6 rounded-none border border-border/60 bg-card p-4 text-sm space-y-2">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Team</span>
                   <span className="font-medium">{invite.companyName}</span>

@@ -180,7 +180,7 @@ export function FounderProfilePanel({
                 href={startup.profile_slug ? `/p/${startup.profile_slug}` : "/app/directory"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-xl bg-success text-success-foreground px-4 py-3 text-sm font-semibold hover:bg-success/90 transition-colors"
+                className="inline-flex items-center justify-center rounded-lg bg-success text-success-foreground px-4 py-3 text-sm font-semibold hover:bg-success/90 transition-colors"
               >
                 Detail pack approved — view full profile →
               </a>
@@ -191,7 +191,7 @@ export function FounderProfilePanel({
             ) : (
               <button
                 onClick={handleRequestDetailPack}
-                className="inline-flex items-center justify-center rounded-xl hs-gradient text-foreground px-4 py-3 text-sm font-semibold hover:bg-[#6d28d9] transition-colors"
+                className="inline-flex items-center justify-center rounded-lg hs-gradient text-foreground px-4 py-3 text-sm font-semibold hover:bg-[#6d28d9] transition-colors"
               >
                 Request detail pack →
               </button>
@@ -256,7 +256,7 @@ export function FounderProfilePanel({
       return (
         <button
           onClick={onClose}
-          className="w-full inline-flex items-center justify-center gap-2 rounded-xl hs-gradient text-foreground px-4 py-3 text-sm font-semibold hover:bg-[#6d28d9] transition-colors"
+          className="w-full inline-flex items-center justify-center gap-2 rounded-lg hs-gradient text-foreground px-4 py-3 text-sm font-semibold hover:bg-[#6d28d9] transition-colors"
         >
           Edit Profile →
         </button>
@@ -267,7 +267,7 @@ export function FounderProfilePanel({
       return (
         <button
           onClick={() => onConnect(startup.id)}
-          className="w-full inline-flex items-center justify-center gap-2 rounded-xl hs-gradient text-foreground px-4 py-3 text-sm font-semibold hover:bg-[#6d28d9] transition-colors"
+          className="w-full inline-flex items-center justify-center gap-2 rounded-lg hs-gradient text-foreground px-4 py-3 text-sm font-semibold hover:bg-[#6d28d9] transition-colors"
         >
           Connect
         </button>
@@ -277,12 +277,12 @@ export function FounderProfilePanel({
     if (requestStatus === "pending") {
       return (
         <div className="flex gap-2">
-          <button disabled className="flex-1 rounded-xl border border-border/60 bg-accent px-4 py-3 text-sm font-semibold text-muted-foreground opacity-80 cursor-not-allowed">
+          <button disabled className="flex-1 rounded-lg border border-border/60 bg-accent px-4 py-3 text-sm font-semibold text-muted-foreground opacity-80 cursor-not-allowed">
             Pending →
           </button>
           <button
             onClick={() => onCancel(startup.id)}
-            className="px-4 py-3 rounded-xl text-sm bg-accent text-muted-foreground hover:bg-red-500/10 hover:text-red-400 transition-colors"
+            className="px-4 py-3 rounded-lg text-sm bg-accent text-muted-foreground hover:bg-red-500/10 hover:text-red-400 transition-colors"
           >
             Cancel
           </button>
@@ -295,19 +295,19 @@ export function FounderProfilePanel({
         <Link
           to="/app/deal-room/$id"
           params={{ id: roomId }}
-          className="w-full inline-flex items-center justify-center gap-2 rounded-xl hs-gradient text-foreground px-4 py-3 text-sm font-semibold hover:bg-[#6d28d9] transition-colors"
+          className="w-full inline-flex items-center justify-center gap-2 rounded-lg hs-gradient text-foreground px-4 py-3 text-sm font-semibold hover:bg-[#6d28d9] transition-colors"
         >
           View Deal Room
         </Link>
       ) : (
-        <button disabled className="w-full rounded-xl border border-border/60 bg-accent px-4 py-3 text-sm font-semibold text-muted-foreground opacity-80 cursor-not-allowed">
+        <button disabled className="w-full rounded-lg border border-border/60 bg-accent px-4 py-3 text-sm font-semibold text-muted-foreground opacity-80 cursor-not-allowed">
           Approved
         </button>
       );
     }
 
     return (
-      <button disabled className="w-full rounded-xl border border-border/60 bg-accent px-4 py-3 text-sm font-semibold text-muted-foreground opacity-80 cursor-not-allowed">
+      <button disabled className="w-full rounded-lg border border-border/60 bg-accent px-4 py-3 text-sm font-semibold text-muted-foreground opacity-80 cursor-not-allowed">
         {requestStatus}
       </button>
     );
@@ -337,7 +337,7 @@ export function FounderProfilePanel({
 
             {/* Deal Brief — investors only */}
             {currentUserRole === "investor" && (
-              <div className="mb-5 rounded-xl p-4" style={{ background: '#1a1035', border: '1px solid #4c1d95' }}>
+              <div className="mb-5 rounded-lg p-4" style={{ background: '#1a1035', border: '1px solid #4c1d95' }}>
                 <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
                   <div>
                     <div className="flex items-center gap-2">

@@ -53,7 +53,7 @@ function Wall() {
         <p className="text-muted-foreground text-sm mt-1">Milestones worth celebrating.</p>
       </div>
 
-      <div className="mb-6 px-4 py-3 rounded-xl bg-accent border border-brand/20 text-sm text-brand text-center">
+      <div className="mb-6 px-4 py-3 rounded-lg bg-accent border border-brand/20 text-sm text-brand text-center">
         🏆 The Achievement Wall goes live at public launch. Founders share milestones, investors celebrate wins.
       </div>
 
@@ -90,7 +90,7 @@ function Wall() {
         </div>
         <div className="space-y-3">
           {SAMPLES.map((s) => (
-            <div key={s.name} className="rounded-xl border border-border/60 bg-card p-5">
+            <div key={s.name} className="rounded-none border border-border/60 bg-card p-5">
               <div className="flex items-start gap-4">
                 <div className={`h-10 w-10 rounded-full bg-gradient-to-br ${s.gradient} shrink-0`} />
                 <div className="flex-1">

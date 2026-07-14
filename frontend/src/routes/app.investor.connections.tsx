@@ -312,7 +312,7 @@ function ListView({ rows, search }: { rows: WatchlistRow[]; search: string }) {
       {filtered.map((r) => {
         const statusStyle = STATUS_COLORS[r.status] ?? STATUS_COLORS.Watching;
         return (
-          <div key={r.id} className="flex items-center gap-3 rounded-xl px-4 py-3 transition-colors"
+          <div key={r.id} className="flex items-center gap-3 rounded-none px-4 py-3 transition-colors"
             style={{ background: "var(--hs-bg-secondary)", border: "1px solid var(--hs-border)" }}>
             <div style={{ width: 36, height: 36, borderRadius: 8, background: "rgba(124,58,237,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <span className="text-sm font-bold" style={{ color: "#A855F7" }}>{r.company_name[0]?.toUpperCase()}</span>
@@ -356,7 +356,7 @@ function CardView({ rows, search }: { rows: WatchlistRow[]; search: string }) {
       {filtered.map((r) => {
         const statusStyle = STATUS_COLORS[r.status] ?? STATUS_COLORS.Watching;
         return (
-          <div key={r.id} className="rounded-xl p-5 flex flex-col gap-3"
+          <div key={r.id} className="rounded-none p-5 flex flex-col gap-3"
             style={{ background: "var(--hs-bg-secondary)", border: "1px solid var(--hs-border)" }}>
             <div className="flex items-start justify-between">
               <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(124,58,237,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -406,7 +406,7 @@ function KanbanView({ rows }: { rows: WatchlistRow[] }) {
               {cards.map((r) => {
                 const statusStyle = STATUS_COLORS[r.status] ?? STATUS_COLORS.Watching;
                 return (
-                  <div key={r.id} className="rounded-xl p-3 space-y-2"
+                  <div key={r.id} className="rounded-none p-3 space-y-2"
                     style={{ background: "var(--hs-bg-secondary)", border: "1px solid var(--hs-border)" }}>
                     <div className="text-sm font-semibold" style={{ color: "var(--hs-text-primary)" }}>{r.company_name}</div>
                     <div className="flex items-center gap-1.5 flex-wrap">
@@ -707,7 +707,7 @@ export function ConnectionsPage() {
 
   // ── Render ──────────────────────────────────────────────────────────────
 
-  const card = "bg-card border border-border/60 rounded-xl p-5";
+  const card = "bg-card border border-border/60 rounded-none p-5";
 
   const VIEW_BUTTONS: { mode: ViewMode; icon: (props: any) => JSX.Element; label: string; testid: string }[] = [
     { mode: "pipeline", icon: Table2,   label: "Table",   testid: "view-pipeline" },

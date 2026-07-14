@@ -54,7 +54,7 @@ function BlogIndex() {
                 key={post.slug}
                 to="/blog/$slug"
                 params={{ slug: post.slug }}
-                className="rounded-xl border border-gray-100 bg-white shadow-sm p-4 sm:p-6 hover:shadow-md hover:border-brand/30 transition-all group flex flex-col dark:border-border/60 dark:bg-card"
+                className="border border-[rgba(0,0,0,0.08)] bg-white p-4 sm:p-6 hover:border-brand/30 transition-all group flex flex-col"
               >
                 {post.coverImage && (
                   <img
@@ -96,7 +96,7 @@ function BlogIndex() {
         )}
 
         {/* CTA */}
-        <div className="mt-16 bg-accent border border-border rounded-xl p-12 text-center">
+        <div className="mt-16 bg-accent border border-border rounded-lg p-12 text-center">
           <h2 className="text-2xl font-semibold mb-3">Stay updated</h2>
           <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
             Get the latest insights on fundraising and venture capital delivered to your inbox.

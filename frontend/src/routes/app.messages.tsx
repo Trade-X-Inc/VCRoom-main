@@ -379,7 +379,7 @@ function ChatSection({ startupId, userId, userName, channels, onChannelCreated }
 
       {/* Send bar */}
       <div className="px-4 py-3" style={{ borderTop: "1px solid var(--hs-border)", background: "var(--hs-bg-secondary)" }}>
-        <div className="flex items-end gap-2 rounded-xl px-3 py-2" style={{ background: "var(--hs-bg-primary)", border: "1px solid var(--hs-border)" }}>
+        <div className="flex items-end gap-2 rounded-lg px-3 py-2" style={{ background: "var(--hs-bg-primary)", border: "1px solid var(--hs-border)" }}>
           <textarea
             ref={textareaRef}
             data-testid="message-input"
@@ -424,7 +424,7 @@ function TaskCard({ task, onDragStart, onClick }: {
       draggable
       onDragStart={onDragStart}
       onClick={onClick}
-      className="rounded-xl p-3 cursor-grab active:cursor-grabbing transition-colors hover:border-border"
+      className="rounded-none p-3 cursor-grab active:cursor-grabbing transition-colors hover:border-border"
       style={{ background: "var(--hs-bg-secondary)", border: "1px solid var(--hs-border)" }}
     >
       <div className="text-sm font-medium mb-2" style={{ color: "var(--hs-text-primary)" }}>{task.title}</div>
@@ -688,7 +688,7 @@ function TasksSection({ startupId, userId, teamMembers }: { startupId: string; u
                     />
                   ))}
                   {colTasks.length === 0 && (
-                    <div className="rounded-xl py-6 text-center" style={{ border: "1px dashed var(--border)" }}>
+                    <div className="rounded-none py-6 text-center" style={{ border: "1px dashed var(--border)" }}>
                       <p className="text-xs" style={{ color: "var(--hs-text-muted)" }}>No tasks</p>
                     </div>
                   )}

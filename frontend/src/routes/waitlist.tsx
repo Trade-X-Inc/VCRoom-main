@@ -71,7 +71,7 @@ function Waitlist() {
             <p className="text-muted-foreground">We'll be in touch. Keep an eye on your inbox.</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-gray-100 bg-white shadow-lg p-8">
+          <form onSubmit={handleSubmit} className="space-y-5 border border-[rgba(0,0,0,0.08)] bg-white p-8">
             <div>
               <label className="block text-sm font-medium mb-1.5">Full name</label>
               <Input name="fullName" value={form.fullName} onChange={set} required placeholder="Your name" />

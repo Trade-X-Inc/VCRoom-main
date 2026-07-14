@@ -185,7 +185,7 @@ function PricingPage() {
           <p className="mt-3 text-lg text-gray-600">30-day free trial. No credit card required.</p>
 
           {/* Audience toggle */}
-          <div className="mt-8 inline-flex rounded-full border border-gray-200 bg-gray-50 p-1" role="tablist">
+          <div className="mt-8 inline-flex rounded-full border border-[rgba(0,0,0,0.08)] bg-gray-50 p-1" role="tablist">
             {(["founder", "investor"] as const).map((a) => (
               <button
                 key={a}
@@ -216,7 +216,7 @@ function PricingPage() {
             <Link
               to="/sign-up"
               search={{ role: "investor" } as any}
-              className="mt-4 inline-block rounded-xl hs-gradient px-6 py-3 text-sm font-semibold text-white hover:hs-gradient"
+              className="mt-4 inline-block rounded-lg hs-gradient px-6 py-3 text-sm font-semibold text-white hover:hs-gradient"
             >
               Apply for investor access →
             </Link>
@@ -233,8 +233,8 @@ function PricingPage() {
             return (
               <div
                 key={p.plan_id}
-                className={`relative flex flex-col rounded-2xl border bg-white p-7 ${
-                  copy?.popular ? "border-brand shadow-lg shadow-purple-100" : "border-gray-200"
+                className={`relative flex flex-col border bg-white p-7 ${
+                  copy?.popular ? "border-brand" : "border-[rgba(0,0,0,0.08)]"
                 }`}
               >
                 {isCurrent ? (
@@ -268,20 +268,20 @@ function PricingPage() {
 
                 <div className="mt-7">
                   {isCurrent ? (
-                    <div className="w-full rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-center text-sm font-semibold text-emerald-700">
+                    <div className="w-full rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-center text-sm font-semibold text-emerald-700">
                       You're on this plan
                     </div>
                   ) : isEnterprise ? (
                     <a
                       href="mailto:hello@hockystick.app?subject=Enterprise%20plan"
-                      className="block w-full rounded-xl border border-gray-300 px-4 py-3 text-center text-sm font-semibold text-gray-900 hover:bg-gray-50"
+                      className="block w-full rounded-lg border border-gray-300 px-4 py-3 text-center text-sm font-semibold text-gray-900 hover:bg-gray-50"
                     >
                       Contact us
                     </a>
                   ) : user ? (
                     <Link
                       to={"/app/settings/billing" as any}
-                      className="block w-full rounded-xl hs-gradient px-4 py-3 text-center text-sm font-semibold text-white hover:hs-gradient"
+                      className="block w-full rounded-lg hs-gradient px-4 py-3 text-center text-sm font-semibold text-white hover:hs-gradient"
                     >
                       Upgrade
                     </Link>
@@ -289,7 +289,7 @@ function PricingPage() {
                     <Link
                       to={"/sign-up" as any}
                       search={{ plan: p.plan_id, role: p.user_type } as any}
-                      className="block w-full rounded-xl hs-gradient px-4 py-3 text-center text-sm font-semibold text-white hover:hs-gradient"
+                      className="block w-full rounded-lg hs-gradient px-4 py-3 text-center text-sm font-semibold text-white hover:hs-gradient"
                     >
                       Start free trial
                     </Link>
@@ -301,7 +301,7 @@ function PricingPage() {
         </div>
 
         {/* Add-ons */}
-        <div className="mt-16 rounded-2xl border border-gray-200 bg-gray-50 p-8">
+        <div className="mt-16 rounded-2xl border border-[rgba(0,0,0,0.08)] bg-gray-50 p-8">
           <h2 className="text-xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>Need more? Pay as you go.</h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
@@ -310,7 +310,7 @@ function PricingPage() {
               ["Onboarding lawyer consultation", "$40 flat"],
               ["Success fee on closed rounds", "1.5% (min $500, max $15,000)"],
             ].map(([label, price]) => (
-              <div key={label} className="rounded-xl border border-gray-200 bg-white px-4 py-3.5">
+              <div key={label} className="rounded-none border border-[rgba(0,0,0,0.08)] bg-white px-4 py-3.5">
                 <div className="text-sm font-medium text-gray-900">{label}</div>
                 <div className="mt-0.5 text-sm text-purple-700 font-semibold">{price}</div>
               </div>
@@ -319,7 +319,7 @@ function PricingPage() {
         </div>
 
         {/* Why we charge founders */}
-        <div className="mx-auto mt-16 max-w-2xl rounded-2xl border border-gray-200 bg-gray-50 p-8 text-center">
+        <div className="mx-auto mt-16 max-w-2xl rounded-2xl border border-[rgba(0,0,0,0.08)] bg-gray-50 p-8 text-center">
           <h2 className="text-xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>
             Why we charge founders
           </h2>
@@ -345,7 +345,7 @@ function PricingPage() {
         {/* FAQ */}
         <div className="mx-auto mt-16 max-w-2xl">
           <h2 className="text-center text-xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>Questions</h2>
-          <div className="mt-6 divide-y divide-gray-200 rounded-2xl border border-gray-200">
+          <div className="mt-6 divide-y divide-gray-200 rounded-2xl border border-[rgba(0,0,0,0.08)]">
             {FAQS.map((f, i) => (
               <div key={f.q}>
                 <button
@@ -370,7 +370,7 @@ function PricingPage() {
           </p>
           <a
             href="mailto:hello@hockystick.app?subject=Enterprise%20contract"
-            className="mt-3 inline-block rounded-xl hs-gradient px-6 py-3 text-sm font-semibold text-white hover:hs-gradient"
+            className="mt-3 inline-block rounded-lg hs-gradient px-6 py-3 text-sm font-semibold text-white hover:hs-gradient"
           >
             Contact us →
           </a>

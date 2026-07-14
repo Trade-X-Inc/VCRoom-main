@@ -276,7 +276,7 @@ function CSVImportModal({ founderId, onClose, onImported }: { founderId: string;
           {rows.length === 0 ? (
             <>
               <div
-                className="rounded-xl border-2 border-dashed flex flex-col items-center justify-center py-10 cursor-pointer transition-colors hover:border-brand"
+                className="rounded-none border border-dashed flex flex-col items-center justify-center py-10 cursor-pointer transition-colors hover:border-brand"
                 style={{ borderColor: "rgba(124,58,237,0.3)", background: "rgba(124,58,237,0.04)" }}
                 onClick={() => fileRef.current?.click()}
                 onDragOver={(e) => e.preventDefault()}
@@ -296,7 +296,7 @@ function CSVImportModal({ founderId, onClose, onImported }: { founderId: string;
               <div className="text-sm font-medium" style={{ color: "var(--hs-text-primary)" }}>
                 {rows.length} investors found — preview:
               </div>
-              <div className="rounded-xl overflow-hidden" style={{ border: "1px solid var(--hs-border)", maxHeight: 240, overflowY: "auto" }}>
+              <div className="rounded-none overflow-hidden" style={{ border: "1px solid var(--hs-border)", maxHeight: 240, overflowY: "auto" }}>
                 <table className="w-full text-xs">
                   <thead>
                     <tr style={{ background: "var(--hs-bg-primary)" }}>
@@ -460,7 +460,7 @@ function DetailPanel({ lead, onClose, onStatusChange }: { lead: VCLead; onClose:
 
         {/* Notes */}
         {lead.notes && (
-          <div className="rounded-xl p-4" style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.15)" }}>
+          <div className="rounded-lg p-4" style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.15)" }}>
             <div className="text-[10px] uppercase tracking-wider font-medium mb-2" style={{ color: "#A855F7" }}>Notes</div>
             <div className="text-xs whitespace-pre-wrap" style={{ color: "var(--hs-text-secondary)" }}>{lead.notes}</div>
           </div>
@@ -468,7 +468,7 @@ function DetailPanel({ lead, onClose, onStatusChange }: { lead: VCLead; onClose:
 
         {/* Next action */}
         {lead.next_action && (
-          <div className="rounded-xl p-4 flex items-start gap-3" style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)" }}>
+          <div className="rounded-lg p-4 flex items-start gap-3" style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)" }}>
             <Clock className="h-4 w-4 flex-shrink-0 mt-0.5" style={{ color: "#F59E0B" }} />
             <div>
               <div className="text-[10px] uppercase tracking-wider font-medium mb-1" style={{ color: "#F59E0B" }}>Next action</div>
@@ -598,7 +598,7 @@ function IncomingRequests() {
             r.profile?.check_size_min ? `$${r.profile.check_size_min}${r.profile?.check_size_max ? `–$${r.profile.check_size_max}` : "+"}` : null,
           ].filter(Boolean).join(" · ");
           return (
-            <div key={r.id} className="rounded-xl border border-border/60 bg-card p-4">
+            <div key={r.id} className="rounded-none border border-border/60 bg-card p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="text-sm font-semibold truncate" style={{ color: "var(--hs-text-primary)" }}>

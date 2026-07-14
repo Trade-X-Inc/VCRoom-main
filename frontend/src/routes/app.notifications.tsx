@@ -178,7 +178,7 @@ function NotificationsPage() {
       </div>
 
       {/* Content */}
-      <div className="mt-5 rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
+      <div className="mt-5 rounded-none border border-border/60 bg-card shadow-card overflow-hidden">
         {isLoading ? (
           <EmptyState kind="loading" title="Loading" />
         ) : list.length === 0 ? (

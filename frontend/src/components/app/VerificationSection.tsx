@@ -89,7 +89,7 @@ function TierBlock({
     : "bg-accent text-faint";
 
   return (
-    <div className={`rounded-xl border ${borderColor} p-5`} style={{ background: "var(--card)" }}>
+    <div className={`rounded-none border ${borderColor} p-5`} style={{ background: "var(--card)" }}>
       <div className="flex items-start gap-4">
         <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${iconBg}`}
           style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: 14 }}>

@@ -115,7 +115,7 @@ export function DealTermsCard({ dealRoomId, isFounder, isInvestor }: Props) {
   const keyMetrics: Record<string, string> = terms?.key_metrics ?? {};
 
   return (
-    <section className="rounded-xl border border-border/60 bg-card p-5 shadow-card">
+    <section className="rounded-none border border-border/60 bg-card p-5 shadow-card">
       <div className="flex items-center justify-between mb-4">
         <div className="text-sm font-semibold inline-flex items-center gap-2">
           <DollarSign className="h-4 w-4 text-brand" /> Funding Terms

@@ -189,7 +189,7 @@ function InvestorNotificationsPanel() {
 
   return (
     <div className="space-y-5">
-      <section className="rounded-xl border border-border/60 bg-card p-5">
+      <section className="rounded-none border border-border/60 bg-card p-5">
         <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Email preferences</h2>
         <p className="text-sm text-muted-foreground mb-4">Control which emails Hockystick sends you.</p>
 
@@ -255,7 +255,7 @@ function InvestorSecurityPanel() {
 
   return (
     <div className="space-y-5">
-      <section className="rounded-xl border border-border/60 bg-card p-5">
+      <section className="rounded-none border border-border/60 bg-card p-5">
         <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">Account</h2>
 
         <div className="flex items-center justify-between gap-4 pb-4 border-b border-border/40 mb-4">

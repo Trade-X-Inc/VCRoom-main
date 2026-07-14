@@ -101,7 +101,7 @@ function NotificationsSettings() {
   }
 
   return (
-    <section className="rounded-xl border border-border/60 bg-card p-5 space-y-5">
+    <section className="rounded-none border border-border/60 bg-card p-5 space-y-5">
       <div className="flex items-center gap-2">
         <Bell className="h-4 w-4 text-brand" />
         <h2 className="text-sm font-semibold">Email notifications</h2>

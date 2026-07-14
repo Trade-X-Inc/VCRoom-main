@@ -411,7 +411,7 @@ export function OnboardingChat({
             </p>
           )}
           {limitReached ? (
-            <div className="text-center p-4 rounded-xl border border-border bg-accent">
+            <div className="text-center p-4 rounded-lg border border-border bg-accent">
               <p className="text-sm text-muted-foreground mb-3">You've used all 10 questions.</p>
               <a
                 href="/sign-up"
@@ -421,7 +421,7 @@ export function OnboardingChat({
               </a>
             </div>
           ) : (
-            <div className={cn("flex items-center gap-2 rounded-xl border px-3 py-2 transition-colors", inputWrap)}>
+            <div className={cn("flex items-center gap-2 rounded-lg border px-3 py-2 transition-colors", inputWrap)}>
               <input
                 ref={inputRef}
                 value={input}

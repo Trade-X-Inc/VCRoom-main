@@ -502,7 +502,7 @@ function CompanyCard({ entry, compact = false, onAdvance, onDecision, advancing 
   return (
     <div
       data-testid={`company-card-${entry.id}`}
-      className="bg-card rounded-xl flex flex-col gap-2.5"
+      className="bg-card rounded-none flex flex-col gap-2.5"
       style={{
         border: `1px solid ${stale ? "rgba(245,158,11,0.4)" : "var(--hs-border)"}`,
         borderLeft: stale ? "3px solid #F59E0B" : undefined,

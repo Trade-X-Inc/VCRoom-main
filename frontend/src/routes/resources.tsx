@@ -119,7 +119,7 @@ function RegionBadge({ region }: { region: string }) {
 function AcceleratorCard({ item }: { item: typeof accelerators[0] }) {
   return (
     <div
-      className="rounded-xl p-5 flex flex-col gap-3"
+      className="rounded-none p-5 flex flex-col gap-3"
       style={{ background: "var(--accent)", border: "1px solid var(--border)" }}
     >
       <div className="flex items-start justify-between gap-2">
@@ -154,7 +154,7 @@ function AcceleratorCard({ item }: { item: typeof accelerators[0] }) {
 function GrantCard({ item }: { item: typeof grants[0] }) {
   return (
     <div
-      className="rounded-xl p-5 flex flex-col gap-3"
+      className="rounded-none p-5 flex flex-col gap-3"
       style={{ background: "var(--accent)", border: "1px solid var(--border)" }}
     >
       <div className="flex items-start justify-between gap-2">
@@ -190,7 +190,7 @@ function GrantCard({ item }: { item: typeof grants[0] }) {
 function VCCard({ item }: { item: typeof vcFunds[0] }) {
   return (
     <div
-      className="rounded-xl p-5 flex flex-col gap-3"
+      className="rounded-none p-5 flex flex-col gap-3"
       style={{ background: "var(--accent)", border: "1px solid var(--border)" }}
     >
       <div className="flex items-start justify-between gap-2">
@@ -229,7 +229,7 @@ function VCCard({ item }: { item: typeof vcFunds[0] }) {
 function ProgramCard({ item }: { item: typeof programs[0] }) {
   return (
     <div
-      className="rounded-xl p-5 flex flex-col gap-3"
+      className="rounded-none p-5 flex flex-col gap-3"
       style={{ background: "var(--accent)", border: "1px solid var(--border)" }}
     >
       <div className="flex items-start justify-between gap-2">
@@ -414,7 +414,7 @@ function Resources() {
 
         {/* CTA */}
         <div
-          className="mt-8 p-6 rounded-xl max-w-2xl"
+          className="mt-8 p-6 rounded-lg max-w-2xl"
           style={{ background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)" }}
         >
           <p className="text-sm font-semibold text-foreground mb-1">Ready to raise?</p>
