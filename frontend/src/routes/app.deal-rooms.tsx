@@ -19,7 +19,7 @@ export const Route = createFileRoute("/app/deal-rooms")({
 // ── Helpers ────────────────────────────────────────────────────────
 
 const STATUS_COLOR: Record<string, string> = {
-  new: "bg-brand/15 text-brand",
+  new: "bg-accent text-brand",
   pending: "bg-warning/15 text-warning",
   active: "bg-success/15 text-success",
   closed: "bg-muted/60 text-muted-foreground",
@@ -166,11 +166,11 @@ function DealRooms() {
 
   if (loadError) {
     return (
-      <div style={{ textAlign: 'center', padding: '48px 24px', color: 'rgba(255,255,255,0.5)' }}>
+      <div style={{ textAlign: 'center', padding: '48px 24px', color: 'var(--muted-foreground)' }}>
         <p style={{ color: '#ffffff', marginBottom: 8 }}>Failed to load</p>
         <p style={{ fontSize: 14, marginBottom: 24 }}>There was a problem connecting. Please refresh the page.</p>
         <button onClick={() => window.location.reload()}
-          style={{ background: '#7C3AED', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: 8, cursor: 'pointer' }}>
+          style={{ background: 'var(--gradient-brand)', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: 8, cursor: 'pointer' }}>
           Refresh
         </button>
       </div>
@@ -212,7 +212,7 @@ function DealRooms() {
               onClick={() => setFilter(f)}
               className={cn(
                 "rounded-md px-3 py-1 text-xs font-medium capitalize transition-colors",
-                filter === f ? "bg-brand text-brand-foreground" : "text-muted-foreground hover:text-foreground",
+                filter === f ? "hs-gradient text-brand-foreground" : "text-muted-foreground hover:text-foreground",
               )}
             >
               {f}
@@ -411,8 +411,8 @@ function DealRooms() {
                   navigator.clipboard.writeText(`https://hockystick.app/p/${startup.profile_slug}`);
                   toast.success(startup.profile_published ? "Profile link copied" : "Link copied — publish your profile so investors can open it");
                 }}
-                className="mt-4 mr-2 inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-semibold text-white hover:opacity-90"
-                style={{ background: "#7C3AED" }}
+                className="mt-4 mr-2 inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-semibold text-foreground hover:opacity-90"
+                style={{ background: "var(--gradient-brand)" }}
               >
                 Copy profile link
               </button>
@@ -498,7 +498,7 @@ function DealRooms() {
                   <button
                     onClick={() => handleDelete(deleteModal.id)}
                     disabled={deleteConfirmText !== "DELETE" || deletingId === deleteModal.id}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-md bg-destructive text-white px-3 py-2 text-sm disabled:opacity-50"
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-md bg-destructive text-foreground px-3 py-2 text-sm disabled:opacity-50"
                   >
                     {deletingId === deleteModal.id
                       ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Deleting…</>

@@ -264,7 +264,7 @@ function NdaPage() {
 
         <div className="rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden">
           <div className="px-8 py-6 border-b border-border/60 flex items-center gap-4">
-            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-brand/10 border border-brand/20">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-accent border border-brand/20">
               <Shield className="h-6 w-6 text-brand" />
             </div>
             <div>

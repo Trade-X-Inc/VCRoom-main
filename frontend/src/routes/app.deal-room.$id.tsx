@@ -439,12 +439,12 @@ function DealRoom() {
             >
               <ArrowLeft className="h-4 w-4" />
             </Link>
-            <div className="grid h-8 w-8 place-items-center rounded-lg shrink-0 font-semibold text-white"
-              style={{ background: "#7C3AED" }}>
+            <div className="grid h-8 w-8 place-items-center rounded-lg shrink-0 font-semibold text-foreground"
+              style={{ background: "var(--gradient-brand)" }}>
               {companyName[0] ?? "D"}
             </div>
             <div className="min-w-0 hidden sm:block">
-              <div className="text-sm font-semibold text-gray-900 dark:text-white truncate" style={{ fontFamily: "Syne, sans-serif" }}>{companyName}</div>
+              <div className="text-sm font-semibold text-gray-900 dark:text-foreground truncate" style={{ fontFamily: "Syne, sans-serif" }}>{companyName}</div>
               <div className="text-[10px] text-gray-500 dark:text-gray-400">
                 {isInvestor ? "Founder · Deal Room" : "Investor · Deal Room"}
                 {connectionOrigin && (
@@ -490,8 +490,8 @@ function DealRoom() {
             </button>
             <button
               onClick={() => setAiOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-white"
-              style={{ background: "#7C3AED" }}
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-foreground"
+              style={{ background: "var(--gradient-brand)" }}
               data-testid="open-ai"
             >
               <Sparkles className="h-4 w-4" /> <span className="hidden sm:inline">Ask AI</span>
@@ -501,7 +501,7 @@ function DealRoom() {
       </header>
 
       {/* ── Main content (full width) ──────────────────────────── */}
-      <main key={showOverview ? "overview" : activeStage} className="flex-1 overflow-y-auto min-h-0 bg-gray-50 dark:bg-[#0A0A0B]">
+      <main key={showOverview ? "overview" : activeStage} className="flex-1 overflow-y-auto min-h-0 bg-gray-50 dark:bg-background">
         {/* Stage approval banner — shown to the approver whenever a pending transition exists */}
         {isApprover && pendingTransition && (
           <div
@@ -524,7 +524,7 @@ function DealRoom() {
               <button
                 onClick={() => doApproveTransition(pendingTransition.id)}
                 disabled={stageApproving}
-                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-foreground disabled:opacity-50"
                 style={{ background: "#10B981" }}
                 data-testid="stage-approve-btn"
               >
@@ -700,7 +700,7 @@ function StageBar({
           const active = stage.key === "overview" ? showOverview : !showOverview && activeStageKey === stage.key;
           const accessible = canAccess(stage.key);
           const className = active
-            ? "bg-[#7C3AED] text-white rounded-t-lg px-4 py-2 text-sm font-medium whitespace-nowrap"
+            ? "hs-gradient text-white rounded-t-lg px-4 py-2 text-sm font-medium whitespace-nowrap"
             : accessible
               ? "text-gray-600 dark:text-gray-400 px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-t-lg whitespace-nowrap"
               : "text-gray-300 dark:text-gray-600 px-4 py-2 text-sm cursor-not-allowed whitespace-nowrap";
@@ -767,7 +767,7 @@ function PrimaryButton({ children, onClick, disabled, testid, className = "" }: 
       disabled={disabled}
       data-testid={testid}
       className={cn("inline-flex items-center justify-center gap-2 rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-50", className)}
-      style={{ background: "#7C3AED" }}
+      style={{ background: "var(--gradient-brand)" }}
     >
       {children}
     </button>
@@ -931,7 +931,7 @@ function PassModal({ dealRoomId, userId, onClose }: { dealRoomId: string; userId
             <select
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full rounded-lg px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none bg-muted border border-gray-200 dark:border-zinc-700"
+              className="w-full rounded-lg px-3 py-2.5 text-sm text-gray-900 dark:text-foreground outline-none bg-muted border border-gray-200 dark:border-zinc-700"
               data-testid="pass-reason"
             >
               {PASS_REASONS.map((r) => <option key={r} value={r} style={{ background: "var(--color-card)" }}>{r}</option>)}
@@ -944,7 +944,7 @@ function PassModal({ dealRoomId, userId, onClose }: { dealRoomId: string; userId
               onChange={(e) => setContext(e.target.value)}
               rows={2}
               placeholder="One or two sentences the founder will see."
-              className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none resize-none placeholder:text-gray-500 dark:text-gray-400"
+              className="w-full rounded-lg px-3 py-2.5 text-sm text-foreground outline-none resize-none placeholder:text-gray-500 dark:text-gray-400"
               style={{ background: "var(--color-muted)", border: "1px solid var(--color-border)" }}
             />
           </div>
@@ -954,18 +954,18 @@ function PassModal({ dealRoomId, userId, onClose }: { dealRoomId: string; userId
               value={reconsider}
               onChange={(e) => setReconsider(e.target.value)}
               placeholder="e.g. you reach $50K MRR"
-              className="w-full rounded-lg px-3 py-2.5 text-sm text-white outline-none placeholder:text-gray-500 dark:text-gray-400"
+              className="w-full rounded-lg px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-gray-500 dark:text-gray-400"
               style={{ background: "var(--color-muted)", border: "1px solid var(--color-border)" }}
             />
           </div>
         </div>
         <div className="flex justify-end gap-2 px-5 pb-5">
-          <button onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-white/60 hover:text-foreground" style={{ border: "1px solid var(--color-border)" }}>Cancel</button>
+          <button onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-muted-foreground hover:text-foreground" style={{ border: "1px solid var(--color-border)" }}>Cancel</button>
           <button
             onClick={confirm}
             disabled={saving}
             data-testid="pass-confirm"
-            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-50"
             style={{ background: "#EF4444" }}
           >
             {saving && <Loader2 className="h-4 w-4 animate-spin" />} Confirm pass
@@ -982,11 +982,11 @@ function ConfirmModal({ title, body, confirmLabel, onConfirm, onClose, testid, b
     <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
       <div className="w-full max-w-sm bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-2xl" style={{ padding: 0 }} onClick={(e) => e.stopPropagation()} data-testid={testid}>
         <div className="px-5 py-4 border-b" style={{ borderColor: "var(--color-border)" }}>
-          <div className="text-sm font-semibold text-white" style={{ fontFamily: "Syne, sans-serif" }}>{title}</div>
+          <div className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{title}</div>
         </div>
         <div className="p-5 text-sm" style={{ color: "var(--color-foreground)" }}>{body}</div>
         <div className="flex justify-end gap-2 px-5 pb-5">
-          <button onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-white/60 hover:text-foreground" style={{ border: "1px solid var(--color-border)" }}>Cancel</button>
+          <button onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-muted-foreground hover:text-foreground" style={{ border: "1px solid var(--color-border)" }}>Cancel</button>
           <PrimaryButton onClick={onConfirm} disabled={busy} testid={testid ? `${testid}-confirm` : undefined} className="!px-4 !py-2">
             {busy && <Loader2 className="h-4 w-4 animate-spin" />} {confirmLabel}
           </PrimaryButton>
@@ -1307,13 +1307,13 @@ function InformationVaultPanel({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">Non-Disclosure Agreement</span>
+                <span className="text-sm font-semibold text-gray-900 dark:text-foreground">Non-Disclosure Agreement</span>
                 {vaultNdaDoc ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(16,185,129,0.12)] text-[#10B981] text-[10px] font-semibold px-2 py-0.5">
                     <CheckCircle2 className="h-3 w-3" /> Signed
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(255,255,255,0.06)] text-gray-400 dark:text-gray-500 text-[10px] font-semibold px-2 py-0.5">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-accent text-muted-foreground text-[10px] font-semibold px-2 py-0.5">
                     <Clock className="h-3 w-3" /> Pending
                   </span>
                 )}
@@ -1329,13 +1329,13 @@ function InformationVaultPanel({
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => setVaultNdaModalOpen(true)}
-                className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-zinc-700 rounded-lg px-3 py-1.5 transition-colors"
+                className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-foreground border border-gray-200 dark:border-zinc-700 rounded-lg px-3 py-1.5 transition-colors"
               >
                 View NDA
               </button>
               <button
                 onClick={() => window.print()}
-                className="inline-flex items-center gap-1.5 text-xs border border-gray-200 dark:border-zinc-700 rounded-lg px-3 py-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs border border-gray-200 dark:border-zinc-700 rounded-lg px-3 py-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-foreground transition-colors"
               >
                 <Download className="h-3.5 w-3.5" /> PDF
               </button>
@@ -1348,7 +1348,7 @@ function InformationVaultPanel({
             {(vaultNdaSigners as any[]).map((s, i) => (
               <div key={i} className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700 px-3 py-1 text-xs">
                 <CheckCircle2 className="h-3 w-3 text-[#10B981] shrink-0" />
-                <span className="font-medium text-gray-900 dark:text-white">{s.signer_full_name}</span>
+                <span className="font-medium text-gray-900 dark:text-foreground">{s.signer_full_name}</span>
                 <span className="text-gray-400 dark:text-gray-500">· {s.role}</span>
               </div>
             ))}
@@ -1379,7 +1379,7 @@ function InformationVaultPanel({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => window.print()}
-                  className="inline-flex items-center gap-1.5 text-xs bg-brand/10 hover:bg-brand/20 text-brand border border-brand/20 rounded-lg px-3 py-1.5 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs bg-accent hover:bg-accent text-brand border border-brand/20 rounded-lg px-3 py-1.5 transition-colors"
                 >
                   <Download className="h-3.5 w-3.5" /> Download PDF
                 </button>
@@ -1418,7 +1418,7 @@ function InformationVaultPanel({
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">Q&amp;A Report</span>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-foreground">Q&amp;A Report</span>
                     <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(16,185,129,0.12)] text-[#10B981] text-[10px] font-semibold px-2 py-0.5">
                       <CheckCircle2 className="h-3 w-3" /> Complete
                     </span>
@@ -1457,7 +1457,7 @@ function InformationVaultPanel({
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => window.print()}
-                        className="inline-flex items-center gap-1.5 text-xs bg-brand/10 hover:bg-brand/20 text-brand border border-brand/20 rounded-lg px-3 py-1.5 transition-colors qa-report-print-trigger"
+                        className="inline-flex items-center gap-1.5 text-xs bg-accent hover:bg-accent text-brand border border-brand/20 rounded-lg px-3 py-1.5 transition-colors qa-report-print-trigger"
                       >
                         <Download className="h-3.5 w-3.5" /> Download PDF
                       </button>
@@ -1492,11 +1492,11 @@ function InformationVaultPanel({
           className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
         >
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-[#7C3AED]/10 flex items-center justify-center">
-              <Building2 className="h-4 w-4 text-[#7C3AED]" />
+            <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center">
+              <Building2 className="h-4 w-4 text-brand" />
             </div>
             <div>
-              <div className="text-sm font-semibold text-gray-900 dark:text-white">Digital Profiles</div>
+              <div className="text-sm font-semibold text-gray-900 dark:text-foreground">Digital Profiles</div>
               {!profilesOpen && (
                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                   {startup?.company_name ?? "—"} {startup?.tagline ? `· ${startup.tagline}` : ""}
@@ -1519,7 +1519,7 @@ function InformationVaultPanel({
                 ))}
                 {isFounder && (
                   <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
-                    Add profile sections in your <Link to="/app/documents" className="text-[#7C3AED] hover:underline">Documents page</Link>.
+                    Add profile sections in your <Link to="/app/documents" className="text-brand hover:underline">Documents page</Link>.
                   </p>
                 )}
               </div>
@@ -1528,13 +1528,13 @@ function InformationVaultPanel({
                 {(profileSections as any[]).map((sec: any) => (
                   <div key={sec.id} className="rounded-lg border border-gray-100 dark:border-zinc-800 px-4 py-3">
                     <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="text-sm font-semibold text-gray-900 dark:text-white">{sec.section_label}</span>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-foreground">{sec.section_label}</span>
                       <div className="flex items-center gap-2">
                         <span className={cn(
                           "text-[10px] font-medium rounded-full px-2 py-0.5",
                           sec.visibility === "public"
                             ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
-                            : "bg-[#7C3AED]/10 text-[#7C3AED]"
+                            : "bg-accent text-brand"
                         )}>
                           {sec.visibility === "public" ? "Public" : "Deal Room"}
                         </span>
@@ -1573,7 +1573,7 @@ function InformationVaultPanel({
       <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">Document Requests</span>
+            <span className="text-sm font-semibold text-gray-900 dark:text-foreground">Document Requests</span>
             {(docRequests as any[]).length > 0 && (
               <span className="rounded-full bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 text-xs font-medium text-gray-600 dark:text-gray-400">
                 {(docRequests as any[]).length}
@@ -1583,8 +1583,8 @@ function InformationVaultPanel({
           {isInvestor && (
             <button
               onClick={() => setShowReqForm((v) => !v)}
-              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white"
-              style={{ background: "#7C3AED" }}
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-foreground"
+              style={{ background: "var(--gradient-brand)" }}
               data-testid="iv-new-request-btn"
             >
               <Plus className="h-3.5 w-3.5" /> New request
@@ -1598,7 +1598,7 @@ function InformationVaultPanel({
               value={reqName}
               onChange={(e) => setReqName(e.target.value)}
               placeholder="Document name (e.g. Cap table, Bank statement)"
-              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none focus:border-[#7C3AED]"
+              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
               data-testid="iv-req-name"
             />
             <textarea
@@ -1606,12 +1606,12 @@ function InformationVaultPanel({
               onChange={(e) => setReqDesc(e.target.value)}
               rows={2}
               placeholder="Why you need this document (optional)"
-              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none resize-none focus:border-[#7C3AED]"
+              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none resize-none focus:border-brand"
             />
             <select
               value={reqCategory}
               onChange={(e) => setReqCategory(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none"
+              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground outline-none"
               data-testid="iv-req-category"
             >
               {["Financial", "Legal", "Team", "Product", "Other"].map((c) => (
@@ -1625,8 +1625,8 @@ function InformationVaultPanel({
               <button
                 onClick={submitDocRequest}
                 disabled={!reqName.trim() || reqCreating}
-                className="inline-flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-medium text-white disabled:opacity-50"
-                style={{ background: "#7C3AED" }}
+                className="inline-flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-medium text-foreground disabled:opacity-50"
+                style={{ background: "var(--gradient-brand)" }}
                 data-testid="iv-req-submit"
               >
                 {reqCreating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Submit"}
@@ -1658,7 +1658,7 @@ function InformationVaultPanel({
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-semibold text-gray-900 dark:text-white">{req.document_name}</span>
+                        <span className="text-sm font-semibold text-gray-900 dark:text-foreground">{req.document_name}</span>
                         {req.category && (
                           <span className="rounded-full bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400">
                             {req.category}
@@ -1700,14 +1700,14 @@ function InformationVaultPanel({
                         onChange={(e) => setDeclineReason(e.target.value)}
                         rows={2}
                         placeholder="Reason for declining"
-                        className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-xs text-gray-900 dark:text-white placeholder:text-gray-400 outline-none resize-none"
+                        className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-xs text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none resize-none"
                       />
                       <div className="flex gap-2">
                         <button onClick={() => setDeclineMode(null)} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400">Cancel</button>
                         <button
                           onClick={() => declineRequest(req.id)}
                           disabled={!declineReason.trim() || respondingReqId === req.id}
-                          className="rounded-lg px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+                          className="rounded-lg px-3 py-1.5 text-xs font-medium text-foreground disabled:opacity-50"
                           style={{ background: "#EF4444" }}
                         >
                           {respondingReqId === req.id ? <Loader2 className="inline h-3.5 w-3.5 animate-spin" /> : "Submit"}
@@ -1725,7 +1725,7 @@ function InformationVaultPanel({
       {/* ── SECTION 3: Documents & Links ── */}
       <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-zinc-800">
-          <span className="text-sm font-semibold text-gray-900 dark:text-white">Documents & Links</span>
+          <span className="text-sm font-semibold text-gray-900 dark:text-foreground">Documents & Links</span>
         </div>
         <div className="px-0 py-0">
           <Documents
@@ -1742,11 +1742,11 @@ function InformationVaultPanel({
       {isInvestor && (
         <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800">
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">My Notes</span>
+            <span className="text-sm font-semibold text-gray-900 dark:text-foreground">My Notes</span>
             <button
               onClick={() => setShowNoteForm((v) => !v)}
-              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white"
-              style={{ background: "#7C3AED" }}
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-foreground"
+              style={{ background: "var(--gradient-brand)" }}
               data-testid="iv-add-note-btn"
             >
               <Plus className="h-3.5 w-3.5" /> Add note
@@ -1759,27 +1759,27 @@ function InformationVaultPanel({
                 value={noteTitle}
                 onChange={(e) => setNoteTitle(e.target.value)}
                 placeholder="Note title"
-                className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none focus:border-[#7C3AED]"
+                className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
               />
               <textarea
                 value={noteContent}
                 onChange={(e) => setNoteContent(e.target.value)}
                 rows={4}
                 placeholder="Write your notes here..."
-                className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none resize-none focus:border-[#7C3AED]"
+                className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none resize-none focus:border-brand"
               />
               <div className="flex items-center gap-3 flex-wrap">
                 <select
                   value={noteVisibility}
                   onChange={(e) => setNoteVisibility(e.target.value as "private" | "shared")}
-                  className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-white outline-none"
+                  className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground outline-none"
                 >
                   <option value="private">Private (only me)</option>
                   <option value="shared">Share with founder</option>
                 </select>
                 <button
                   onClick={() => console.log("AI note generation — Claude Code will wire")}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-[#7C3AED]/30 px-3 py-2 text-xs font-medium text-[#7C3AED] hover:bg-[#7C3AED]/5"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-brand/30 px-3 py-2 text-xs font-medium text-brand hover:bg-accent"
                 >
                   <Sparkles className="h-3.5 w-3.5" /> Generate with AI
                 </button>
@@ -1788,8 +1788,8 @@ function InformationVaultPanel({
                   <button
                     onClick={saveNote}
                     disabled={!noteContent.trim() || noteSaving}
-                    className="rounded-lg px-4 py-2 text-xs font-medium text-white disabled:opacity-50"
-                    style={{ background: "#7C3AED" }}
+                    className="rounded-lg px-4 py-2 text-xs font-medium text-foreground disabled:opacity-50"
+                    style={{ background: "var(--gradient-brand)" }}
                     data-testid="iv-save-note-btn"
                   >
                     {noteSaving ? <Loader2 className="inline h-3.5 w-3.5 animate-spin" /> : "Save"}
@@ -1811,14 +1811,14 @@ function InformationVaultPanel({
                 <div key={note.id} className="px-6 py-4 group">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      {note.title && <div className="text-sm font-semibold text-gray-900 dark:text-white mb-1">{note.title}</div>}
+                      {note.title && <div className="text-sm font-semibold text-gray-900 dark:text-foreground mb-1">{note.title}</div>}
                       <p className={cn("text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap", expandedNoteId !== note.id && "line-clamp-2")}>
                         {note.content}
                       </p>
                       {note.content?.length > 120 && (
                         <button
                           onClick={() => setExpandedNoteId(expandedNoteId === note.id ? null : note.id)}
-                          className="text-xs text-[#7C3AED] mt-1 hover:underline"
+                          className="text-xs text-brand mt-1 hover:underline"
                         >
                           {expandedNoteId === note.id ? "Show less" : "Show more"}
                         </button>
@@ -1853,7 +1853,7 @@ function InformationVaultPanel({
       {isFounder && (
         <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100 dark:border-zinc-800">
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">Notes from investor</span>
+            <span className="text-sm font-semibold text-gray-900 dark:text-foreground">Notes from investor</span>
           </div>
           <div className="divide-y divide-gray-100 dark:divide-zinc-800">
             {(notes as any[]).length === 0 ? (
@@ -1864,7 +1864,7 @@ function InformationVaultPanel({
             ) : (
               (notes as any[]).map((note: any) => (
                 <div key={note.id} className="px-6 py-4">
-                  {note.title && <div className="text-sm font-semibold text-gray-900 dark:text-white mb-1">{note.title}</div>}
+                  {note.title && <div className="text-sm font-semibold text-gray-900 dark:text-foreground mb-1">{note.title}</div>}
                   <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 whitespace-pre-wrap">{note.content}</p>
                   <div className="mt-2 text-[10px] text-gray-400 dark:text-gray-500">
                     {formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}
@@ -1880,11 +1880,11 @@ function InformationVaultPanel({
       <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-6 py-5">
         {showDecisionForm ? (
           <div className="space-y-3">
-            <div className="text-sm font-semibold text-gray-900 dark:text-white">Submit a decision</div>
+            <div className="text-sm font-semibold text-gray-900 dark:text-foreground">Submit a decision</div>
             <select
               value={decisionOutcome}
               onChange={(e) => setDecisionOutcome(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none"
+              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground outline-none"
             >
               {["Pass", "Withdraw", "Pause"].map((o) => <option key={o} value={o}>{o}</option>)}
             </select>
@@ -1893,14 +1893,14 @@ function InformationVaultPanel({
               onChange={(e) => setDecisionReason(e.target.value)}
               rows={3}
               placeholder="Reason (required)"
-              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none resize-none"
+              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none resize-none"
             />
             <div className="flex items-center gap-2">
               <button onClick={() => setShowDecisionForm(false)} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-4 py-2 text-sm text-gray-500 dark:text-gray-400">Cancel</button>
               <button
                 onClick={submitDecision}
                 disabled={!decisionReason.trim()}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-foreground disabled:opacity-50"
                 style={{ background: "#EF4444" }}
               >
                 Submit decision
@@ -1918,8 +1918,8 @@ function InformationVaultPanel({
             <button
               onClick={onRequestNextStage}
               disabled={stageRequesting}
-              className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
-              style={{ background: "#7C3AED" }}
+              className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-60"
+              style={{ background: "var(--gradient-brand)" }}
               data-testid="info-vault-next-stage"
             >
               {stageRequesting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
@@ -2247,7 +2247,7 @@ function QAPanel({
                 <button
                   onClick={() => setShowCompleteConfirm(true)}
                   disabled={completingQA}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 rounded-lg hs-gradient px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
                   data-testid="qa-mark-complete-btn"
                 >
                   {completingQA ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3" />}
@@ -2264,7 +2264,7 @@ function QAPanel({
               </div>
               <div className="h-1.5 w-full rounded-full bg-border/40 overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-brand transition-all"
+                  className="h-full rounded-full hs-gradient transition-all"
                   style={{ width: `${(questionCount / MAX_QUESTIONS) * 100}%` }}
                 />
               </div>
@@ -2367,7 +2367,7 @@ function QAPanel({
                 <button
                   onClick={() => sendQuestion(suggestionInput || askText)}
                   disabled={!(suggestionInput || askText).trim() || sending || isAtLimit}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
+                  className="inline-flex items-center gap-1.5 rounded-lg hs-gradient px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
                   data-testid="qa-send-btn"
                 >
                   {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
@@ -2407,7 +2407,7 @@ function QAPanel({
                   {/* Question header */}
                   <div className="px-4 py-3 flex items-start gap-3">
                     {/* Avatar */}
-                    <div className="h-8 w-8 rounded-full bg-brand/10 border border-brand/20 flex items-center justify-center text-xs font-bold text-brand shrink-0">
+                    <div className="h-8 w-8 rounded-full bg-accent border border-brand/20 flex items-center justify-center text-xs font-bold text-brand shrink-0">
                       {(q.sender_name ?? "I").charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -2480,7 +2480,7 @@ function QAPanel({
                         <button
                           onClick={() => sendAnswer(q.id)}
                           disabled={!draft.trim() || answerSending[q.id]}
-                          className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
+                          className="inline-flex items-center gap-1.5 rounded-lg hs-gradient px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
                         >
                           {answerSending[q.id] ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
                           Send answer
@@ -2525,7 +2525,7 @@ function QAPanel({
               <button
                 onClick={triggerCompletion}
                 disabled={completingQA}
-                className="inline-flex items-center gap-2 rounded-lg bg-brand px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-lg hs-gradient px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
               >
                 {completingQA ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 Confirm
@@ -2540,7 +2540,7 @@ function QAPanel({
         <button
           onClick={onRequestNextStage}
           disabled={stageRequesting}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          className="inline-flex items-center gap-1.5 rounded-lg hs-gradient px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
           data-testid="qa-next-stage"
         >
           {stageRequesting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
@@ -2557,7 +2557,7 @@ function QAPanel({
 const DD_CATEGORY_COLORS: Record<string, string> = {
   Team: "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
   Market: "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400",
-  Financials: "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400",
+  Financials: "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-brand",
   Legal: "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400",
   Product: "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400",
   Traction: "bg-pink-50 text-pink-700 dark:bg-pink-900/20 dark:text-pink-400",
@@ -2902,7 +2902,7 @@ function DueDiligencePanel({
   const StatusCircle = ({ status }: { status: string }) => {
     if (status === "complete") return (
       <div className="h-6 w-6 rounded-full bg-green-500 flex items-center justify-center shrink-0">
-        <Check className="h-3.5 w-3.5 text-white" />
+        <Check className="h-3.5 w-3.5 text-foreground" />
       </div>
     );
     if (status === "in_progress") return (
@@ -2910,7 +2910,7 @@ function DueDiligencePanel({
     );
     if (status === "flagged") return (
       <div className="h-6 w-6 rounded-full bg-red-500 flex items-center justify-center shrink-0">
-        <AlertCircle className="h-3.5 w-3.5 text-white" />
+        <AlertCircle className="h-3.5 w-3.5 text-foreground" />
       </div>
     );
     return <div className="h-6 w-6 rounded-full border-2 border-gray-300 dark:border-zinc-600 shrink-0" />;
@@ -2942,14 +2942,14 @@ function DueDiligencePanel({
         {fGoals.length === 0 ? (
           <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-6 py-12 text-center">
             <ClipboardList className="h-12 w-12 text-gray-200 dark:text-zinc-700 mx-auto mb-4" />
-            <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">The investor has not started due diligence yet</p>
+            <p className="text-sm font-semibold text-gray-900 dark:text-foreground mb-1">The investor has not started due diligence yet</p>
             <p className="text-sm text-gray-500 dark:text-gray-400">You will see their diligence goals and progress here once they begin.</p>
           </div>
         ) : (
           <>
             {/* Header */}
             <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white" style={{ fontFamily: "Syne, sans-serif" }}>Diligence Report</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Diligence Report</h2>
               {lastUpdated && <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Updated by investor · {lastUpdated}</p>}
             </div>
 
@@ -2961,7 +2961,7 @@ function DueDiligencePanel({
                 {fFlagged > 0 && <span className="rounded-full bg-red-50 dark:bg-red-900/20 px-3 py-1 text-xs font-medium text-red-700 dark:text-red-400">{fFlagged} flagged</span>}
               </div>
               <div className="h-2 rounded-full bg-gray-200 dark:bg-zinc-700 overflow-hidden">
-                <div className="h-2 rounded-full transition-all" style={{ width: `${fPct}%`, background: "#7C3AED" }} />
+                <div className="h-2 rounded-full transition-all" style={{ width: `${fPct}%`, background: "var(--gradient-brand)" }} />
               </div>
               <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">{fPct}% complete</p>
             </div>
@@ -2972,7 +2972,7 @@ function DueDiligencePanel({
               return (
                 <div key={cat} className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
                   <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 dark:border-zinc-800">
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white" style={{ fontFamily: "Syne, sans-serif" }}>{cat}</span>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{cat}</span>
                     <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", DD_CATEGORY_COLORS[cat] ?? "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400")}>{catGoals.length}</span>
                   </div>
                   <div className="divide-y divide-gray-100 dark:divide-zinc-800">
@@ -2990,7 +2990,7 @@ function DueDiligencePanel({
 
             {/* AI Analysis */}
             <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-6 py-5">
-              <div className="text-sm font-semibold text-gray-900 dark:text-white mb-1" style={{ fontFamily: "Syne, sans-serif" }}>AI Analysis</div>
+              <div className="text-sm font-semibold text-gray-900 dark:text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>AI Analysis</div>
               {analysisShared && ddAnalysisParsed ? (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
@@ -3003,7 +3003,7 @@ function DueDiligencePanel({
                     </span>
                   </div>
                   <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{ddAnalysisParsed.summary}</p>
-                  <div style={{ borderLeft: "3px solid #7C3AED" }} className="pl-4 py-1">
+                  <div style={{ borderLeft: "3px solid var(--brand)" }} className="pl-4 py-1">
                     <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Recommendation</div>
                     <p className="text-sm text-gray-800 dark:text-gray-200">{ddAnalysisParsed.recommendation}</p>
                   </div>
@@ -3029,11 +3029,11 @@ function DueDiligencePanel({
 
       {/* ── SECTION A: Onboarding card ── */}
       {showOnboarding && (
-        <div className="bg-white dark:bg-zinc-900 border border-[#7C3AED]/20 rounded-xl px-6 py-6 text-center">
+        <div className="bg-white dark:bg-zinc-900 border border-brand/20 rounded-xl px-6 py-6 text-center">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl" style={{ background: "rgba(124,58,237,0.08)" }}>
-            <ClipboardList className="h-6 w-6 text-[#7C3AED]" />
+            <ClipboardList className="h-6 w-6 text-brand" />
           </div>
-          <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1" style={{ fontFamily: "Syne, sans-serif" }}>Set up your diligence goals</h3>
+          <h3 className="text-base font-bold text-gray-900 dark:text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>Set up your diligence goals</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-5">
             Choose from standard goals or add your own. Goals guide your diligence and generate a structured report.
           </p>
@@ -3041,8 +3041,8 @@ function DueDiligencePanel({
             <button
               onClick={seedStandardGoals}
               disabled={seedingStandard}
-              className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
-              style={{ background: "#7C3AED" }}
+              className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-foreground disabled:opacity-50"
+              style={{ background: "var(--gradient-brand)" }}
               data-testid="dd-use-standard-goals-btn"
             >
               {seedingStandard ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
@@ -3070,7 +3070,7 @@ function DueDiligencePanel({
                 className={cn(
                   "px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors",
                   activeCategory === cat
-                    ? "border-[#7C3AED] text-[#7C3AED]"
+                    ? "border-brand text-brand"
                     : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white",
                 )}
               >
@@ -3084,10 +3084,10 @@ function DueDiligencePanel({
             <div className="px-5 pt-4 pb-2">
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs text-gray-500 dark:text-gray-400">{completedCount} / {totalCount} goals complete</span>
-                <span className="text-xs font-semibold text-[#7C3AED]">{progressPct}%</span>
+                <span className="text-xs font-semibold text-brand">{progressPct}%</span>
               </div>
               <div className="h-1.5 rounded-full bg-gray-200 dark:bg-zinc-700 overflow-hidden">
-                <div className="h-1.5 rounded-full transition-all" style={{ width: `${progressPct}%`, background: "#7C3AED" }} />
+                <div className="h-1.5 rounded-full transition-all" style={{ width: `${progressPct}%`, background: "var(--gradient-brand)" }} />
               </div>
             </div>
           )}
@@ -3140,7 +3140,7 @@ function DueDiligencePanel({
                             onBlur={(e) => saveNote(goal.id, e.target.value)}
                             rows={3}
                             placeholder="Notes..."
-                            className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none focus:border-[#7C3AED]"
+                            className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
                           />
                           {savingNoteId === goal.id && <span className="text-[10px] text-gray-400 dark:text-zinc-500">Saving…</span>}
                           <div className="flex items-center gap-2">
@@ -3150,13 +3150,13 @@ function DueDiligencePanel({
                               value={goalDueDates[goal.id] ?? ""}
                               onChange={(e) => setGoalDueDates((prev) => ({ ...prev, [goal.id]: e.target.value }))}
                               onBlur={(e) => saveDueDate(goal.id, e.target.value)}
-                              className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-1.5 text-sm text-gray-900 dark:text-white outline-none"
+                              className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-1.5 text-sm text-gray-900 dark:text-foreground outline-none"
                             />
                           </div>
                           {goal.status !== "complete" && (
                             <button
                               onClick={() => markComplete(goal.id)}
-                              className="rounded-lg px-4 py-2 text-sm font-medium text-white"
+                              className="rounded-lg px-4 py-2 text-sm font-medium text-foreground"
                               style={{ background: "#10B981" }}
                             >
                               Mark complete
@@ -3190,7 +3190,7 @@ function DueDiligencePanel({
 
             {/* Add custom goal */}
             {addGoalOpen ? (
-              <div className="rounded-xl border border-[#7C3AED]/20 bg-[#7C3AED]/3 p-4 space-y-3">
+              <div className="rounded-xl border border-brand/20 bg-accent p-4 space-y-3">
                 <div className="grid grid-cols-3 gap-2">
                   <select
                     value={newGoalCategory}
@@ -3205,7 +3205,7 @@ function DueDiligencePanel({
                     value={newGoalText}
                     onChange={(e) => setNewGoalText(e.target.value)}
                     placeholder="Describe the goal..."
-                    className="col-span-2 rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none focus:border-[#7C3AED]"
+                    className="col-span-2 rounded-lg border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
                     onKeyDown={(e) => { if (e.key === "Enter") addCustomGoal(); }}
                   />
                 </div>
@@ -3214,8 +3214,8 @@ function DueDiligencePanel({
                   <button
                     onClick={addCustomGoal}
                     disabled={!newGoalText.trim() || addingGoal}
-                    className="rounded-lg px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
-                    style={{ background: "#7C3AED" }}
+                    className="rounded-lg px-4 py-1.5 text-xs font-semibold text-foreground disabled:opacity-50"
+                    style={{ background: "var(--gradient-brand)" }}
                     data-testid="dd-add-goal-confirm-btn"
                   >
                     {addingGoal ? "Adding…" : "Add goal"}
@@ -3225,7 +3225,7 @@ function DueDiligencePanel({
             ) : (
               <button
                 onClick={() => setAddGoalOpen(true)}
-                className="w-full rounded-xl border border-dashed border-gray-300 dark:border-zinc-600 py-3 text-sm text-gray-500 dark:text-gray-400 hover:border-[#7C3AED] hover:text-[#7C3AED] flex items-center justify-center gap-2"
+                className="w-full rounded-xl border border-dashed border-gray-300 dark:border-zinc-600 py-3 text-sm text-gray-500 dark:text-gray-400 hover:border-brand hover:text-brand flex items-center justify-center gap-2"
                 data-testid="dd-add-goal-btn"
               >
                 <Plus className="h-4 w-4" /> Add custom goal
@@ -3242,14 +3242,14 @@ function DueDiligencePanel({
           className="w-full flex items-center justify-between px-5 py-4"
         >
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-[#7C3AED]" />
-            <span className="text-sm font-semibold text-gray-900 dark:text-white" style={{ fontFamily: "Syne, sans-serif" }}>AI Analysis</span>
+            <Sparkles className="h-4 w-4 text-brand" />
+            <span className="text-sm font-semibold text-gray-900 dark:text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>AI Analysis</span>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={(e) => { e.stopPropagation(); runAnalysis(); }}
               disabled={runningAnalysis || allGoals.length === 0}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#7C3AED]/30 px-3 py-1.5 text-xs font-medium text-[#7C3AED] hover:bg-[#7C3AED]/5 disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-brand/30 px-3 py-1.5 text-xs font-medium text-brand hover:bg-accent disabled:opacity-40"
               data-testid="dd-run-analysis-btn"
             >
               {runningAnalysis ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
@@ -3266,7 +3266,7 @@ function DueDiligencePanel({
             )}
             {runningAnalysis && (
               <div className="flex items-center justify-center gap-2 py-6">
-                <Loader2 className="h-5 w-5 animate-spin text-[#7C3AED]" />
+                <Loader2 className="h-5 w-5 animate-spin text-brand" />
                 <span className="text-sm text-gray-500 dark:text-gray-400">Analysing…</span>
               </div>
             )}
@@ -3309,7 +3309,7 @@ function DueDiligencePanel({
                   ))}
                 </div>
                 {/* Recommendation */}
-                <div style={{ borderLeft: "3px solid #7C3AED" }} className="pl-4 py-1">
+                <div style={{ borderLeft: "3px solid var(--brand)" }} className="pl-4 py-1">
                   <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">Recommendation</div>
                   <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">{analysisResult.recommendation}</p>
                 </div>
@@ -3329,7 +3329,7 @@ function DueDiligencePanel({
             onClick={() => setQaSummaryOpen((v) => !v)}
             className="w-full flex items-center justify-between px-5 py-4"
           >
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">Q&A Summary</span>
+            <span className="text-sm font-semibold text-gray-900 dark:text-foreground">Q&A Summary</span>
             {qaSummaryOpen ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
           </button>
           {qaSummaryOpen && (
@@ -3349,7 +3349,7 @@ function DueDiligencePanel({
             onClick={() => setVaultNotesOpen((v) => !v)}
             className="w-full flex items-center justify-between px-5 py-4"
           >
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">Notes from Information Vault</span>
+            <span className="text-sm font-semibold text-gray-900 dark:text-foreground">Notes from Information Vault</span>
             {vaultNotesOpen ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
           </button>
           {vaultNotesOpen && (
@@ -3359,7 +3359,7 @@ function DueDiligencePanel({
               ) : (
                 (vaultNotes as any[]).map((note: any) => (
                   <div key={note.id} className="px-5 py-4">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white mb-0.5">{note.title}</div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-foreground mb-0.5">{note.title}</div>
                     <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">{note.content?.slice(0, 100)}{(note.content?.length ?? 0) > 100 ? "…" : ""}</p>
                     <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">{formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}</p>
                   </div>
@@ -3374,11 +3374,11 @@ function DueDiligencePanel({
       <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-6 py-5">
         {showDecision ? (
           <div className="space-y-3">
-            <div className="text-sm font-semibold text-gray-900 dark:text-white">Submit a decision</div>
+            <div className="text-sm font-semibold text-gray-900 dark:text-foreground">Submit a decision</div>
             <select
               value={decisionOutcome}
               onChange={(e) => setDecisionOutcome(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none"
+              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground outline-none"
             >
               {["Pass", "Withdraw", "Pause"].map((o) => <option key={o}>{o}</option>)}
             </select>
@@ -3387,14 +3387,14 @@ function DueDiligencePanel({
               onChange={(e) => setDecisionReason(e.target.value)}
               rows={3}
               placeholder="Reason (required)"
-              className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none"
+              className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none"
             />
             <div className="flex items-center gap-2">
               <button onClick={() => setShowDecision(false)} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-4 py-2 text-sm text-gray-500 dark:text-gray-400">Cancel</button>
               <button
                 onClick={() => { console.log("submitDecision dd:", decisionOutcome, decisionReason); setShowDecision(false); setDecisionReason(""); }}
                 disabled={!decisionReason.trim()}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-foreground disabled:opacity-50"
                 style={{ background: "#EF4444" }}
               >
                 Submit decision
@@ -3412,8 +3412,8 @@ function DueDiligencePanel({
             <button
               onClick={onRequestNextStage}
               disabled={stageRequesting}
-              className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
-              style={{ background: "#7C3AED" }}
+              className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-60"
+              style={{ background: "var(--gradient-brand)" }}
               data-testid="dd-next-stage"
             >
               {stageRequesting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
@@ -3450,7 +3450,7 @@ function NdaStagePanel({ dealRoomId, room, memberList, isInvestor, isFounder }: 
     <div className="space-y-6">
       <div>
         <Eyebrow>NDA & Profiles</Eyebrow>
-        <h2 className="text-2xl font-semibold tracking-tight text-white" style={{ fontFamily: "Syne, sans-serif" }}>{companyNameOf(room)}</h2>
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{companyNameOf(room)}</h2>
         <p className="mt-1 text-sm" style={{ color: "var(--color-muted-foreground)" }}>Both parties signed the NDA. Profiles are shared.</p>
       </div>
 
@@ -3460,7 +3460,7 @@ function NdaStagePanel({ dealRoomId, room, memberList, isInvestor, isFounder }: 
             <Shield className="h-5 w-5" style={{ color: "#10B981" }} />
           </div>
           <div className="flex-1">
-            <div className="text-sm font-semibold text-white">NDA signed by all parties</div>
+            <div className="text-sm font-semibold text-foreground">NDA signed by all parties</div>
             <div className="text-xs" style={{ color: "var(--color-muted-foreground)" }}>
               {(ndaRows as any[]).length > 0 && (ndaRows as any[])[0].accepted_at
                 ? `First accepted ${new Date((ndaRows as any[])[0].accepted_at).toLocaleDateString()}`
@@ -3478,11 +3478,11 @@ function NdaStagePanel({ dealRoomId, room, memberList, isInvestor, isFounder }: 
         <DarkCard>
           <Eyebrow>Startup</Eyebrow>
           <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-xl overflow-hidden text-white font-bold" style={{ background: "#7C3AED" }}>
+            <div className="grid h-11 w-11 place-items-center rounded-xl overflow-hidden text-foreground font-bold" style={{ background: "var(--gradient-brand)" }}>
               {startup?.logo_url ? <img src={startup.logo_url} alt="" className="h-full w-full object-cover" /> : (startup?.company_name?.[0] ?? "S")}
             </div>
             <div className="min-w-0">
-              <div className="text-sm font-semibold text-white truncate">{startup?.company_name ?? "Company"}</div>
+              <div className="text-sm font-semibold text-foreground truncate">{startup?.company_name ?? "Company"}</div>
               <div className="text-xs" style={{ color: "var(--color-muted-foreground)" }}>{[startup?.stage, startup?.sector].filter(Boolean).join(" · ") || "—"}</div>
             </div>
           </div>
@@ -3493,11 +3493,11 @@ function NdaStagePanel({ dealRoomId, room, memberList, isInvestor, isFounder }: 
         <DarkCard>
           <Eyebrow>Investor</Eyebrow>
           <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-xl text-white font-bold" style={{ background: "rgba(16,185,129,0.18)", color: "#10B981" }}>
+            <div className="grid h-11 w-11 place-items-center rounded-xl text-foreground font-bold" style={{ background: "rgba(16,185,129,0.18)", color: "#10B981" }}>
               {((room as any)?.investor_company || (room as any)?.investor_name || investorRow?.users?.full_name || "V")[0]}
             </div>
             <div className="min-w-0">
-              <div className="text-sm font-semibold text-white truncate">{(room as any)?.investor_company || (room as any)?.investor_name || investorRow?.users?.full_name || "Investor"}</div>
+              <div className="text-sm font-semibold text-foreground truncate">{(room as any)?.investor_company || (room as any)?.investor_name || investorRow?.users?.full_name || "Investor"}</div>
               <div className="text-xs" style={{ color: "var(--color-muted-foreground)" }}>{investorRow?.users?.full_name || (room as any)?.investor_name || "—"}</div>
             </div>
           </div>
@@ -3512,12 +3512,12 @@ function NdaStagePanel({ dealRoomId, room, memberList, isInvestor, isFounder }: 
       <div className="rounded-lg px-4 py-4" style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)" }}>
         {isFounder ? (
           <div className="text-sm" style={{ color: "var(--color-foreground)" }}>
-            <div className="font-semibold text-white">Upload your Stage 1 documents</div>
+            <div className="font-semibold text-foreground">Upload your Stage 1 documents</div>
             <p className="mt-1 text-xs" style={{ color: "var(--color-muted-foreground)" }}>Add your deck and key materials. They appear in the investor's Stage 1 review when the investor opens it.</p>
           </div>
         ) : (
           <div className="text-sm" style={{ color: "var(--color-foreground)" }}>
-            <div className="font-semibold text-white">Waiting on the founder</div>
+            <div className="font-semibold text-foreground">Waiting on the founder</div>
             <p className="mt-1 text-xs" style={{ color: "var(--color-muted-foreground)" }}>Stage 1 review opens once the founder shares their documents.</p>
           </div>
         )}
@@ -3719,7 +3719,7 @@ function NewTermSheetPanel({
         value={tsForm[field]}
         onChange={(e) => setTsForm((p) => ({ ...p, [field]: e.target.value }))}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none focus:border-[#7C3AED]"
+        className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
       />
     </div>
   );
@@ -3730,7 +3730,7 @@ function NewTermSheetPanel({
       <select
         value={tsForm[field]}
         onChange={(e) => setTsForm((p) => ({ ...p, [field]: e.target.value }))}
-        className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none"
+        className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground outline-none"
       >
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
       </select>
@@ -3744,14 +3744,14 @@ function NewTermSheetPanel({
       {editorOpen && isInvestor && (
         <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
-            <h3 className="text-sm font-bold text-gray-900 dark:text-white" style={{ fontFamily: "Syne, sans-serif" }}>
+            <h3 className="text-sm font-bold text-gray-900 dark:text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
               Term Sheet v{editingVersion ? editingVersion.version : nextVersion}
             </h3>
             <div className="flex items-center gap-2">
               <button
                 onClick={aiDraftTerms}
                 disabled={aiDrafting}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[#7C3AED]/30 px-3 py-1.5 text-xs font-medium text-[#7C3AED] hover:bg-[#7C3AED]/5 disabled:opacity-40"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-brand/30 px-3 py-1.5 text-xs font-medium text-brand hover:bg-accent disabled:opacity-40"
                 data-testid="ai-draft-term-sheet-btn"
               >
                 {aiDrafting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
@@ -3783,7 +3783,7 @@ function NewTermSheetPanel({
                 onChange={(e) => setTsForm((p) => ({ ...p, conditions_precedent: e.target.value }))}
                 rows={2}
                 placeholder="e.g. Completion of legal audit..."
-                className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none focus:border-[#7C3AED]"
+                className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
               />
             </div>
             <div>
@@ -3793,7 +3793,7 @@ function NewTermSheetPanel({
                 onChange={(e) => setTsNotes(e.target.value)}
                 rows={2}
                 placeholder="Any other terms or conditions..."
-                className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none focus:border-[#7C3AED]"
+                className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none focus:border-brand"
               />
             </div>
 
@@ -3808,8 +3808,8 @@ function NewTermSheetPanel({
               <button
                 onClick={sendToFounder}
                 disabled={sending}
-                className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-                style={{ background: "#7C3AED" }}
+                className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-50"
+                style={{ background: "var(--gradient-brand)" }}
                 data-testid="send-term-sheet-btn"
               >
                 {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
@@ -3822,16 +3822,16 @@ function NewTermSheetPanel({
 
       {/* ── Onboarding (investor, no sheets yet) ── */}
       {isInvestor && !editorOpen && allSheets.length === 0 && (
-        <div className="bg-white dark:bg-zinc-900 border border-[#7C3AED]/20 rounded-xl px-6 py-10 text-center">
+        <div className="bg-white dark:bg-zinc-900 border border-brand/20 rounded-xl px-6 py-10 text-center">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl" style={{ background: "rgba(124,58,237,0.08)" }}>
-            <FileText className="h-6 w-6 text-[#7C3AED]" />
+            <FileText className="h-6 w-6 text-brand" />
           </div>
-          <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1" style={{ fontFamily: "Syne, sans-serif" }}>Draft a term sheet</h3>
+          <h3 className="text-base font-bold text-gray-900 dark:text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>Draft a term sheet</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-5">Create the investment terms to share with the founder. You can save a draft before sending.</p>
           <button
             onClick={() => openEditor()}
-            className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white"
-            style={{ background: "#7C3AED" }}
+            className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-foreground"
+            style={{ background: "var(--gradient-brand)" }}
             data-testid="draft-term-sheet-btn"
           >
             <Plus className="h-4 w-4" /> Draft term sheet
@@ -3843,8 +3843,8 @@ function NewTermSheetPanel({
       {isInvestor && !editorOpen && allSheets.length > 0 && (
         <>
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-gray-900 dark:text-white" style={{ fontFamily: "Syne, sans-serif" }}>Term sheets</h3>
-            <button onClick={() => openEditor()} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white" style={{ background: "#7C3AED" }}>
+            <h3 className="text-sm font-bold text-gray-900 dark:text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Term sheets</h3>
+            <button onClick={() => openEditor()} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-foreground" style={{ background: "var(--gradient-brand)" }}>
               <Plus className="h-3.5 w-3.5" /> New version
             </button>
           </div>
@@ -3854,7 +3854,7 @@ function NewTermSheetPanel({
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-gray-900 dark:text-white">Term Sheet v{sheet.version}</span>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-foreground">Term Sheet v{sheet.version}</span>
                       <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold", TS_STATUS_COLORS[sheet.status] ?? "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400")}>
                         {sheet.status?.replace(/_/g, " ")}
                       </span>
@@ -3868,7 +3868,7 @@ function NewTermSheetPanel({
                         <button
                           onClick={() => updateStatus(sheet.id, "accepted")}
                           disabled={respondingId === sheet.id}
-                          className="rounded-lg px-3 py-1.5 text-xs font-medium text-white"
+                          className="rounded-lg px-3 py-1.5 text-xs font-medium text-foreground"
                           style={{ background: "#10B981" }}
                         >
                           Mark accepted
@@ -3896,7 +3896,7 @@ function NewTermSheetPanel({
           {visibleSheets.length === 0 ? (
             <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-6 py-10 text-center">
               <FileText className="h-10 w-10 text-gray-200 dark:text-zinc-700 mx-auto mb-3" />
-              <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">No term sheet received yet</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-foreground mb-1">No term sheet received yet</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">The investor will send one when ready.</p>
             </div>
           ) : (
@@ -3920,7 +3920,7 @@ function NewTermSheetPanel({
                   <div key={sheet.id} className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
                     <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-gray-900 dark:text-white">Term Sheet v{sheet.version}</span>
+                        <span className="text-sm font-bold text-gray-900 dark:text-foreground">Term Sheet v{sheet.version}</span>
                         <span className={cn("rounded-full px-2.5 py-0.5 text-[10px] font-semibold", TS_STATUS_COLORS[sheet.status] ?? "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400")}>
                           {sheet.status?.replace(/_/g, " ")}
                         </span>
@@ -3932,7 +3932,7 @@ function NewTermSheetPanel({
                       {TERM_LABELS.filter(([k]) => terms[k]).map(([k, label]) => (
                         <div key={k} className="flex items-start justify-between gap-2">
                           <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">{label}</span>
-                          <span className="text-sm text-gray-900 dark:text-white text-right">{String(terms[k])}</span>
+                          <span className="text-sm text-gray-900 dark:text-foreground text-right">{String(terms[k])}</span>
                         </div>
                       ))}
                     </div>
@@ -3956,15 +3956,15 @@ function NewTermSheetPanel({
                               onChange={(e) => setCounterText(e.target.value)}
                               rows={3}
                               placeholder="Describe your counter-offer terms in plain language..."
-                              className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none"
+                              className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none"
                             />
                             <div className="flex gap-2">
                               <button onClick={() => { setCounterOpen(null); setCounterText(""); }} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-3 py-1.5 text-xs text-gray-500">Cancel</button>
                               <button
                                 onClick={() => submitCounter(sheet.id, sheet.version)}
                                 disabled={!counterText.trim() || respondingId === sheet.id}
-                                className="rounded-lg px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
-                                style={{ background: "#7C3AED" }}
+                                className="rounded-lg px-4 py-1.5 text-xs font-semibold text-foreground disabled:opacity-50"
+                                style={{ background: "var(--gradient-brand)" }}
                                 data-testid="counter-offer-btn"
                               >
                                 Send counter-offer
@@ -3982,7 +3982,7 @@ function NewTermSheetPanel({
                             </button>
                             <button
                               onClick={() => setAcceptConfirmId(sheet.id)}
-                              className="rounded-lg px-4 py-2 text-sm font-semibold text-white"
+                              className="rounded-lg px-4 py-2 text-sm font-semibold text-foreground"
                               style={{ background: "#10B981" }}
                               data-testid="accept-term-sheet-btn"
                             >
@@ -3997,7 +3997,7 @@ function NewTermSheetPanel({
                       <div className="px-5 pb-5">
                         <button
                           onClick={() => setAcceptConfirmId(sheet.id)}
-                          className="rounded-lg px-4 py-2 text-sm font-semibold text-white"
+                          className="rounded-lg px-4 py-2 text-sm font-semibold text-foreground"
                           style={{ background: "#10B981" }}
                           data-testid="accept-term-sheet-btn"
                         >
@@ -4017,14 +4017,14 @@ function NewTermSheetPanel({
       {isInvestor && (
         <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-5 flex items-center justify-between gap-4">
           <div>
-            <div className="text-sm font-semibold text-gray-900 dark:text-white">Ready to close?</div>
+            <div className="text-sm font-semibold text-gray-900 dark:text-foreground">Ready to close?</div>
             <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Request to advance to the Closing stage when terms are agreed.</div>
           </div>
           <button
             onClick={onRequestNextStage}
             disabled={stageRequesting}
-            className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60 shrink-0"
-            style={{ background: "#7C3AED" }}
+            className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-60 shrink-0"
+            style={{ background: "var(--gradient-brand)" }}
             data-testid="term-sheet-next-stage"
           >
             {stageRequesting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
@@ -4037,13 +4037,13 @@ function NewTermSheetPanel({
       {acceptConfirmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-700 p-6 max-w-sm w-full mx-4 space-y-4">
-            <h3 className="text-base font-bold text-gray-900 dark:text-white">Accept this term sheet?</h3>
+            <h3 className="text-base font-bold text-gray-900 dark:text-foreground">Accept this term sheet?</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">This will mark the term sheet as accepted. The investor will be notified. Review with a lawyer before accepting.</p>
             <div className="flex gap-2">
               <button onClick={() => setAcceptConfirmId(null)} className="flex-1 rounded-lg border border-gray-200 dark:border-zinc-700 px-4 py-2 text-sm text-gray-500">Cancel</button>
               <button
                 onClick={async () => { await updateStatus(acceptConfirmId, "accepted"); setAcceptConfirmId(null); }}
-                className="flex-1 rounded-lg px-4 py-2 text-sm font-semibold text-white"
+                className="flex-1 rounded-lg px-4 py-2 text-sm font-semibold text-foreground"
                 style={{ background: "#10B981" }}
               >
                 Confirm accept
@@ -4066,7 +4066,7 @@ const CLOSING_STATUS_CYCLE: Record<string, string> = {
 };
 
 const CLOSING_OWNER_COLORS: Record<string, string> = {
-  founder: "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400",
+  founder: "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-brand",
   investor: "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
   both: "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-400",
   lawyer: "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400",
@@ -4273,13 +4273,13 @@ function NewClosingPanel({
   const ItemStatusCircle = ({ status }: { status: string }) => {
     if (status === "complete") return (
       <div className="h-5 w-5 rounded-full bg-green-500 flex items-center justify-center shrink-0">
-        <Check className="h-3 w-3 text-white" />
+        <Check className="h-3 w-3 text-foreground" />
       </div>
     );
     if (status === "in_progress") return <div className="h-5 w-5 rounded-full border-2 border-amber-400 bg-amber-50 dark:bg-amber-900/20 shrink-0" />;
     if (status === "blocked") return (
       <div className="h-5 w-5 rounded-full bg-red-500 flex items-center justify-center shrink-0">
-        <X className="h-3 w-3 text-white" />
+        <X className="h-3 w-3 text-foreground" />
       </div>
     );
     return <div className="h-5 w-5 rounded-full border-2 border-gray-300 dark:border-zinc-600 shrink-0" />;
@@ -4291,7 +4291,7 @@ function NewClosingPanel({
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full" style={{ background: dealClosed ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)" }}>
           <CheckCircle2 className={cn("h-7 w-7", dealClosed ? "text-green-500" : "text-red-400")} />
         </div>
-        <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
+        <h3 className="text-base font-bold text-gray-900 dark:text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
           {dealClosed ? "Deal closed successfully" : "Deal room closed"}
         </h3>
         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -4307,13 +4307,13 @@ function NewClosingPanel({
       {/* ── SECTION 1: Closing Checklist ── */}
       <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-white" style={{ fontFamily: "Syne, sans-serif" }}>Closing Checklist</h3>
+          <h3 className="text-sm font-bold text-gray-900 dark:text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Closing Checklist</h3>
           {items.length === 0 && (
             <button
               onClick={seedChecklist}
               disabled={seedingChecklist}
-              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
-              style={{ background: "#7C3AED" }}
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-foreground disabled:opacity-50"
+              style={{ background: "var(--gradient-brand)" }}
               data-testid="load-closing-checklist-btn"
             >
               {seedingChecklist ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
@@ -4373,7 +4373,7 @@ function NewClosingPanel({
                                 <select
                                   value={currentStatus}
                                   onChange={(e) => changeItemStatus(item.id, e.target.value)}
-                                  className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-white outline-none"
+                                  className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground outline-none"
                                 >
                                   {["pending", "in_progress", "complete", "blocked"].map((s) => <option key={s} value={s}>{s.replace(/_/g, " ")}</option>)}
                                 </select>
@@ -4384,7 +4384,7 @@ function NewClosingPanel({
                                 onBlur={(e) => saveItemNote(item.id, e.target.value)}
                                 rows={2}
                                 placeholder="Notes..."
-                                className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none"
+                                className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none"
                               />
                               <div className="flex items-center gap-2">
                                 <label className="text-xs text-gray-500 dark:text-gray-400">Due date</label>
@@ -4393,13 +4393,13 @@ function NewClosingPanel({
                                   value={itemDueDates[item.id] ?? ""}
                                   onChange={(e) => setItemDueDates((p) => ({ ...p, [item.id]: e.target.value }))}
                                   onBlur={(e) => saveItemDueDate(item.id, e.target.value)}
-                                  className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-white outline-none"
+                                  className="rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground outline-none"
                                 />
                               </div>
                               {currentStatus !== "complete" && (
                                 <button
                                   onClick={() => markItemComplete(item.id)}
-                                  className="rounded-lg px-4 py-2 text-sm font-medium text-white"
+                                  className="rounded-lg px-4 py-2 text-sm font-medium text-foreground"
                                   style={{ background: "#10B981" }}
                                 >
                                   Mark complete
@@ -4420,7 +4420,7 @@ function NewClosingPanel({
 
       {/* ── SECTION 2: Deal Summary ── */}
       <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-5 py-5">
-        <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4" style={{ fontFamily: "Syne, sans-serif" }}>Deal Summary</h3>
+        <h3 className="text-sm font-bold text-gray-900 dark:text-foreground mb-4" style={{ fontFamily: "Syne, sans-serif" }}>Deal Summary</h3>
         {!acceptedTS ? (
           <p className="text-sm text-gray-500 dark:text-gray-400">No accepted term sheet yet. Complete the Term Sheet stage first.</p>
         ) : (
@@ -4433,7 +4433,7 @@ function NewClosingPanel({
             ] as [string, string][]).map(([label, value]) => (
               <div key={label} className="rounded-lg bg-gray-50 dark:bg-zinc-800 px-3 py-3">
                 <div className="text-[10px] uppercase tracking-wider font-semibold text-gray-400 dark:text-gray-500 mb-1">{label}</div>
-                <div className="text-sm font-semibold text-gray-900 dark:text-white">{value || "—"}</div>
+                <div className="text-sm font-semibold text-gray-900 dark:text-foreground">{value || "—"}</div>
               </div>
             ))}
           </div>
@@ -4443,7 +4443,7 @@ function NewClosingPanel({
       {/* ── SECTION 3: Close Deal (investor only) ── */}
       {isInvestor && (
         <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-5 py-5">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3" style={{ fontFamily: "Syne, sans-serif" }}>Close this deal</h3>
+          <h3 className="text-sm font-bold text-gray-900 dark:text-foreground mb-3" style={{ fontFamily: "Syne, sans-serif" }}>Close this deal</h3>
 
           {!closeDealOpen ? (
             <div className="space-y-3">
@@ -4455,7 +4455,7 @@ function NewClosingPanel({
               <button
                 onClick={() => setCloseDealOpen(true)}
                 disabled={!allComplete && !overrideClose && items.length > 0}
-                className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-40"
+                className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-foreground disabled:opacity-40"
                 style={{ background: "#10B981" }}
               >
                 <CheckCircle2 className="h-4 w-4" /> Close this deal
@@ -4473,7 +4473,7 @@ function NewClosingPanel({
                       <p className="text-sm text-red-700 dark:text-red-400">{totalCount - completedCount} items still pending. Proceed anyway?</p>
                       <button
                         onClick={() => setCloseDealOpen(true)}
-                        className="mt-2 rounded-lg px-4 py-1.5 text-sm font-medium text-white"
+                        className="mt-2 rounded-lg px-4 py-1.5 text-sm font-medium text-foreground"
                         style={{ background: "#EF4444" }}
                       >
                         Yes, close anyway
@@ -4491,14 +4491,14 @@ function NewClosingPanel({
                 onChange={(e) => setFinalNotes(e.target.value)}
                 rows={3}
                 placeholder="Final notes (optional)..."
-                className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none"
+                className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none"
               />
               <div className="flex gap-2">
                 <button onClick={() => setCloseDealOpen(false)} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-4 py-2 text-sm text-gray-500">Cancel</button>
                 <button
                   onClick={closeDeal}
                   disabled={closingDeal}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 rounded-lg px-5 py-2 text-sm font-semibold text-foreground disabled:opacity-50"
                   style={{ background: "#10B981" }}
                   data-testid="confirm-close-deal-btn"
                 >
@@ -4523,14 +4523,14 @@ function NewClosingPanel({
           </button>
         ) : (
           <div className="bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-900/30 rounded-xl px-5 py-5 space-y-3">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Exit this deal</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-foreground">Exit this deal</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Outcome</label>
                 <select
                   value={exitOutcome}
                   onChange={(e) => setExitOutcome(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-white outline-none"
+                  className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground outline-none"
                 >
                   <option>Pass</option>
                   <option>Withdraw</option>
@@ -4541,7 +4541,7 @@ function NewClosingPanel({
                 <select
                   value={exitReasonCat}
                   onChange={(e) => setExitReasonCat(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-white outline-none"
+                  className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2 text-sm text-gray-900 dark:text-foreground outline-none"
                 >
                   {EXIT_REASON_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
                 </select>
@@ -4552,14 +4552,14 @@ function NewClosingPanel({
               onChange={(e) => setExitReasonDetail(e.target.value)}
               rows={2}
               placeholder="Reason detail..."
-              className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none"
+              className="w-full resize-none rounded-lg border border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-800 px-3 py-2.5 text-sm text-gray-900 dark:text-foreground placeholder:text-gray-400 outline-none"
             />
             <div className="flex gap-2">
               <button onClick={() => setExitOpen(false)} className="rounded-lg border border-gray-200 dark:border-zinc-700 px-4 py-2 text-sm text-gray-500">Cancel</button>
               <button
                 onClick={exitDeal}
                 disabled={exiting}
-                className="rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                className="rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-50"
                 style={{ background: "#EF4444" }}
               >
                 {exiting ? "Submitting…" : "Submit and close room"}
@@ -4575,11 +4575,11 @@ function NewClosingPanel({
 
 // ── Documents ─────────────────────────────────────────────────────
 const CATEGORY_COLORS: Record<string, string> = {
-  "Pitch Deck": "bg-brand/10 text-brand",
+  "Pitch Deck": "bg-accent text-brand",
   "Financials": "bg-success/10 text-success",
   "Legal": "bg-violet/10 text-violet",
   "Market Research": "bg-warning/10 text-warning",
-  "Team": "bg-brand/10 text-brand",
+  "Team": "bg-accent text-brand",
   "Product": "bg-violet/10 text-violet",
   "Other": "bg-accent text-gray-500 dark:text-gray-400",
 };
@@ -4591,7 +4591,7 @@ function getFileTypeStyle(ext: string): { bg: string; color: string; Icon: any }
   if (["docx", "doc"].includes(ext)) return { bg: "bg-blue-500/10", color: "text-blue-500", Icon: FileText };
   if (["xlsx", "xls", "csv"].includes(ext)) return { bg: "bg-green-500/10", color: "text-green-500", Icon: FileText };
   if (["pptx", "ppt"].includes(ext)) return { bg: "bg-orange-500/10", color: "text-orange-500", Icon: FileText };
-  if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) return { bg: "bg-purple-500/10", color: "text-purple-500", Icon: Image };
+  if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) return { bg: "bg-accent", color: "text-purple-500", Icon: Image };
   if (["mp4", "mov", "avi", "webm"].includes(ext)) return { bg: "bg-orange-500/10", color: "text-orange-500", Icon: Film };
   return { bg: "bg-accent", color: "text-gray-500 dark:text-gray-400", Icon: FileText };
 }
@@ -5031,7 +5031,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
             onClick={() => setActiveVaultTab("documents")}
             className={cn(
               "px-4 py-1.5 rounded-lg text-sm font-medium transition-colors",
-              activeVaultTab === "documents" ? "bg-brand text-brand-foreground shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-foreground"
+              activeVaultTab === "documents" ? "hs-gradient text-brand-foreground shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-foreground"
             )}
           >
             📁 Documents
@@ -5041,7 +5041,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
             onClick={() => setActiveVaultTab("links")}
             className={cn(
               "px-4 py-1.5 rounded-lg text-sm font-medium transition-colors",
-              activeVaultTab === "links" ? "bg-brand text-brand-foreground shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-foreground"
+              activeVaultTab === "links" ? "hs-gradient text-brand-foreground shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-foreground"
             )}
           >
             🔗 Links
@@ -5052,7 +5052,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
           {activeVaultTab === "documents" && isFounder && (
             <button
               onClick={() => setShowLibrary(true)}
-              className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 text-brand px-3 py-1.5 text-sm hover:bg-brand/10"
+              className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-accent text-brand px-3 py-1.5 text-sm hover:bg-accent"
             >
               <Plus className="h-4 w-4" /> Add from library
             </button>
@@ -5075,7 +5075,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
         <div className="mt-5 mb-6">
           <div className="flex items-center gap-2 mb-3">
             <h3 className="text-sm font-semibold text-foreground">Platform Documents</h3>
-            <span className="text-xs bg-[#7C3AED]/15 text-[#7C3AED] px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-accent text-brand px-2 py-0.5 rounded-full">
               {(platformDocs as any[]).length} structured
             </span>
           </div>
@@ -5088,11 +5088,11 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
               <div className="space-y-2">
                 {platformDocsSplit.stage1.map((doc: any) => (
                   <div key={doc.id}
-                    className="flex items-center justify-between p-4 rounded-xl border border-white/8 bg-white/[0.02] hover:bg-accent transition-colors">
+                    className="flex items-center justify-between p-4 rounded-xl border border-border bg-white/[0.02] hover:bg-accent transition-colors">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-8 h-8 rounded-lg bg-[#7C3AED]/15 flex items-center justify-center text-[#7C3AED] text-sm shrink-0">≡</div>
+                      <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-brand text-sm shrink-0">≡</div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{doc.title}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-foreground truncate">{doc.title}</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                           {doc.document_templates?.category
                             ? doc.document_templates.category.charAt(0).toUpperCase() + doc.document_templates.category.slice(1)
@@ -5111,7 +5111,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                           setViewingDoc(doc);
                           trackDocumentView({ founderDocumentId: doc.id });
                         }}
-                        className="text-xs px-3 py-1.5 rounded-lg bg-[#7C3AED]/15 text-[#7C3AED] hover:bg-[#7C3AED]/25 transition-colors">
+                        className="text-xs px-3 py-1.5 rounded-lg bg-accent text-brand hover:bg-accent transition-colors">
                         View
                       </button>
                     </div>
@@ -5127,11 +5127,11 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
               <div className="space-y-2">
                 {platformDocsSplit.stage2.map((doc: any) => (
                   <div key={doc.id}
-                    className="flex items-center justify-between p-4 rounded-xl border border-white/8 bg-white/[0.02] hover:bg-accent transition-colors">
+                    className="flex items-center justify-between p-4 rounded-xl border border-border bg-white/[0.02] hover:bg-accent transition-colors">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-8 h-8 rounded-lg bg-[#7C3AED]/15 flex items-center justify-center text-[#7C3AED] text-sm shrink-0">≡</div>
+                      <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-brand text-sm shrink-0">≡</div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{doc.title}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-foreground truncate">{doc.title}</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                           {doc.document_templates?.category
                             ? doc.document_templates.category.charAt(0).toUpperCase() + doc.document_templates.category.slice(1)
@@ -5150,7 +5150,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                           setViewingDoc(doc);
                           trackDocumentView({ founderDocumentId: doc.id });
                         }}
-                        className="text-xs px-3 py-1.5 rounded-lg bg-[#7C3AED]/15 text-[#7C3AED] hover:bg-[#7C3AED]/25 transition-colors">
+                        className="text-xs px-3 py-1.5 rounded-lg bg-accent text-brand hover:bg-accent transition-colors">
                         View
                       </button>
                     </div>
@@ -5164,11 +5164,11 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
           <div className="space-y-2">
             {(platformDocs as any[]).map((doc: any) => (
               <div key={doc.id}
-                className="flex items-center justify-between p-4 rounded-xl border border-white/8 bg-white/[0.02] hover:bg-accent transition-colors">
+                className="flex items-center justify-between p-4 rounded-xl border border-border bg-white/[0.02] hover:bg-accent transition-colors">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-[#7C3AED]/15 flex items-center justify-center text-[#7C3AED] text-sm shrink-0">≡</div>
+                  <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-brand text-sm shrink-0">≡</div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{doc.title}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-foreground truncate">{doc.title}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                       {doc.document_templates?.category
                         ? doc.document_templates.category.charAt(0).toUpperCase() + doc.document_templates.category.slice(1)
@@ -5176,7 +5176,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                       {" · "}Updated {formatRelativeTime(doc.updated_at)}
                       {doc.completeness_score > 0 && <> · {doc.completeness_score}% complete</>}
                       {" · "}
-                      <span className="font-medium text-[#7C3AED]">
+                      <span className="font-medium text-brand">
                         Stage {(doc.deal_room_stage ?? 1) === 2 ? "2 — Full diligence" : "1 — Initial review"}
                       </span>
                     </p>
@@ -5191,7 +5191,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                       setViewingDoc(doc);
                       trackDocumentView({ founderDocumentId: doc.id });
                     }}
-                    className="text-xs px-3 py-1.5 rounded-lg bg-[#7C3AED]/15 text-[#7C3AED] hover:bg-[#7C3AED]/25 transition-colors">
+                    className="text-xs px-3 py-1.5 rounded-lg bg-accent text-brand hover:bg-accent transition-colors">
                     View
                   </button>
                 </div>
@@ -5222,7 +5222,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                 { ext: "DOCX", color: "text-blue-600 bg-blue-500/10" },
                 { ext: "XLSX", color: "text-green-600 bg-green-500/10" },
                 { ext: "CSV",  color: "text-green-600 bg-green-500/10" },
-                { ext: "PNG/JPG", color: "text-purple-600 bg-purple-500/10" },
+                { ext: "PNG/JPG", color: "text-brand bg-accent" },
               ].map(({ ext, color }) => (
                 <span key={ext} className={cn("rounded px-1.5 py-0.5 text-[9px] font-bold uppercase", color)}>{ext}</span>
               ))}
@@ -5277,7 +5277,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
               className={cn(
                 "shrink-0 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs transition-colors",
                 activeDocTab === cat
-                  ? "bg-brand text-brand-foreground"
+                  ? "hs-gradient text-brand-foreground"
                   : "border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800"
               )}
             >
@@ -5396,7 +5396,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-medium truncate">{displayName}</span>
                       {activeDocTab === "All" && pitchDeckDoc?.id === doc.id && (
-                        <span className="shrink-0 text-[9px] font-bold bg-brand/20 text-brand px-1.5 py-0.5 rounded-full">📌 PINNED</span>
+                        <span className="shrink-0 text-[9px] font-bold bg-accent text-brand px-1.5 py-0.5 rounded-full">📌 PINNED</span>
                       )}
                       {doc.category && (
                         <span className={cn("shrink-0 text-[10px] px-1.5 py-0.5 rounded-full font-medium", catColor)}>
@@ -5454,7 +5454,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                           <span className="flex-1">AI Summary</span>
                           <span className={cn(
                             "px-1.5 py-0.5 rounded text-[9px] font-medium",
-                            doc.summary_edited ? "bg-brand/10 text-brand" : "bg-muted/60 text-gray-500 dark:text-gray-400"
+                            doc.summary_edited ? "bg-accent text-brand" : "bg-muted/60 text-gray-500 dark:text-gray-400"
                           )}>
                             {doc.summary_edited ? "Edited" : "AI"}
                           </span>
@@ -5501,7 +5501,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                               </div>
                             ) : (
                               <>
-                                <p className="text-sm text-gray-900 dark:text-white/90 leading-relaxed whitespace-pre-line">
+                                <p className="text-sm text-gray-900 dark:text-muted-foreground leading-relaxed whitespace-pre-line">
                                   {doc.ai_summary}
                                 </p>
                                 <div className="flex gap-2 mt-2">
@@ -5538,7 +5538,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                         <button
                           onClick={() => generateSummary(doc)}
                           disabled={isGenerating}
-                          className="inline-flex items-center gap-1 rounded-md bg-brand text-brand-foreground px-2.5 py-1 text-xs font-medium shadow-sm disabled:opacity-50"
+                          className="inline-flex items-center gap-1 rounded-md hs-gradient text-brand-foreground px-2.5 py-1 text-xs font-medium shadow-sm disabled:opacity-50"
                         >
                           {isGenerating
                             ? <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</>
@@ -5566,7 +5566,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
               : "The founder hasn't shared any documents yet."}
           </p>
           {isFounder && (
-            <label className="inline-flex items-center gap-1.5 rounded-md bg-brand text-brand-foreground px-4 py-2 text-sm cursor-pointer shadow-sm">
+            <label className="inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-4 py-2 text-sm cursor-pointer shadow-sm">
               <Upload className="h-4 w-4" /> Upload first document
               <input
                 type="file"
@@ -5637,7 +5637,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                   <div className="text-[10px] text-gray-500 dark:text-gray-400/60 mt-0.5">Not uploaded yet</div>
                 </div>
                 {isFounder && (
-                  <label className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 text-brand px-3 py-1.5 text-xs cursor-pointer hover:bg-brand/5 transition-colors shrink-0">
+                  <label className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 text-brand px-3 py-1.5 text-xs cursor-pointer hover:bg-accent transition-colors shrink-0">
                     <Upload className="h-3 w-3" /> Upload
                     <input
                       type="file"
@@ -5821,7 +5821,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
           )}
           {(dealRoomLinks as any[]).map((link: any) => (
             <div key={link.id} className="flex items-center gap-3 rounded-xl border border-gray-200 dark:border-zinc-700 bg-card px-4 py-3 shadow-card">
-              <div className="grid h-9 w-9 place-items-center rounded-lg bg-brand/10 shrink-0">
+              <div className="grid h-9 w-9 place-items-center rounded-lg bg-accent shrink-0">
                 <LinkIcon className="h-4 w-4 text-brand" />
               </div>
               <div className="flex-1 min-w-0">
@@ -5915,11 +5915,11 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
       {viewingDoc && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4"
           onClick={() => setViewingDoc(null)}>
-          <div className="bg-[#111118] border border-white/10 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col"
+          <div className="bg-[#111118] border border-border rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-6 border-b border-white/8">
+            <div className="flex items-center justify-between p-6 border-b border-border">
               <div>
-                <h2 className="text-lg font-bold text-white" style={{ fontFamily: "Syne, sans-serif" }}>{viewingDoc.title}</h2>
+                <h2 className="text-lg font-bold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{viewingDoc.title}</h2>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   {viewingDoc.completeness_score}% complete · Updated {formatRelativeTime(viewingDoc.updated_at)}
                 </p>
@@ -5932,7 +5932,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                 .map(([key, value]) => (
                   <div key={key}>
                     <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">{key.replace(/_/g, " ")}</p>
-                    <p className="text-sm text-white/80 leading-relaxed whitespace-pre-wrap">{String(value)}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{String(value)}</p>
                   </div>
                 ))
               }
@@ -5941,7 +5941,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
               )}
             </div>
             {viewingDoc.ai_feedback && (viewingDoc.ai_feedback as Record<string, unknown>).overall_score && (
-              <div className="border-t border-white/8 p-4 flex items-center gap-3 bg-white/[0.02]">
+              <div className="border-t border-border p-4 flex items-center gap-3 bg-white/[0.02]">
                 <div className={cn(
                   "w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold shrink-0",
                   (viewingDoc.ai_feedback as Record<string, unknown>).signal === "strong"
@@ -6040,7 +6040,7 @@ function ParticipantsSection({ dealRoomId }: { dealRoomId: string }) {
   const list = all.filter((p) => p.dealRoomId === dealRoomId);
   const statusColor = (s: string) =>
     s === "NDA Accepted" || s === "Active" ? "bg-success/10 text-success"
-      : s === "Joined" ? "bg-brand/10 text-brand"
+      : s === "Joined" ? "bg-accent text-brand"
       : "bg-warning/10 text-warning";
   return (
     <div className="px-8 pb-10 max-w-5xl mx-auto">
@@ -6300,7 +6300,7 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
                     "px-2.5 py-1 rounded-md text-xs font-medium transition-colors",
                     noteVisibility === v
                       ? v === "public"
-                        ? "bg-brand text-brand-foreground shadow-sm"
+                        ? "hs-gradient text-brand-foreground shadow-sm"
                         : v === "team"
                         ? "bg-blue-500 text-gray-900 dark:text-white shadow-sm"
                         : "bg-warning text-warning-foreground shadow-sm"
@@ -6335,7 +6335,7 @@ function Notes({ dealRoomId, userId }: { dealRoomId: string; userId: string | un
                       <span className="ml-auto text-[10px] uppercase tracking-wider text-warning bg-warning/10 px-1.5 py-0.5 rounded-full">🔒 Private</span>
                     )}
                     {n.visibility === "team" && !n.private && (
-                      <span className="ml-auto text-[10px] uppercase tracking-wider text-brand bg-brand/10 px-1.5 py-0.5 rounded-full">👥 Team</span>
+                      <span className="ml-auto text-[10px] uppercase tracking-wider text-brand bg-accent px-1.5 py-0.5 rounded-full">👥 Team</span>
                     )}
             </div>
             <div className="mt-2 text-sm">{n.body}</div>
@@ -6384,8 +6384,8 @@ function Timeline({ dealRoomId }: { dealRoomId: string }) {
           <div className="absolute left-2 top-2 bottom-2 w-px bg-border" />
           {(events as any[]).map((e) => (
             <div key={e.id} className="relative pb-6 last:pb-0">
-              <div className="absolute -left-[18px] top-1.5 h-3 w-3 rounded-full bg-brand ring-4 ring-white dark:ring-zinc-900" />
-              <div className="text-sm font-medium text-gray-900 dark:text-white">{e.action_type ?? e.target_label ?? "Activity"}</div>
+              <div className="absolute -left-[18px] top-1.5 h-3 w-3 rounded-full hs-gradient ring-4 ring-white dark:ring-zinc-900" />
+              <div className="text-sm font-medium text-gray-900 dark:text-foreground">{e.action_type ?? e.target_label ?? "Activity"}</div>
               <div className="text-xs text-gray-500 dark:text-gray-400 inline-flex items-center gap-1 mt-0.5">
                 <Clock className="h-3 w-3" />
                 {e.actor_name ? `${e.actor_name} · ` : ""}
@@ -6652,7 +6652,7 @@ function QA({
                           if (suggestionsTimerRef.current) clearTimeout(suggestionsTimerRef.current);
                           document.getElementById("ask-question-box")?.focus();
                         }}
-                        className="inline-flex items-center gap-1 rounded-full border border-brand/30 bg-brand/5 text-brand px-3 py-1 text-xs hover:bg-brand/10 transition-colors"
+                        className="inline-flex items-center gap-1 rounded-full border border-brand/30 bg-accent text-brand px-3 py-1 text-xs hover:bg-accent transition-colors"
                       >
                         <HelpCircle className="h-3 w-3 shrink-0" /> {s}
                       </button>
@@ -6690,7 +6690,7 @@ function QA({
                     onClick={() => setOpenQaId(open ? null : item.id)}
                     className="flex w-full items-start gap-3 p-5 text-left hover:bg-accent/40"
                   >
-                    <div className={cn("mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full", answer ? "bg-success/10 text-success" : "bg-brand/10 text-brand")}>
+                    <div className={cn("mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full", answer ? "bg-success/10 text-success" : "bg-accent text-brand")}>
                       {answer ? <CheckCircle2 className="h-4 w-4" /> : <HelpCircle className="h-4 w-4" />}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -6755,7 +6755,7 @@ function QA({
                                   }
                                 }}
                                 disabled={draftingAiReplyId === item.id}
-                                className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 text-brand px-3 py-2 text-sm font-medium hover:bg-brand/5 disabled:opacity-50"
+                                className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 text-brand px-3 py-2 text-sm font-medium hover:bg-accent disabled:opacity-50"
                               >
                                 {draftingAiReplyId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                                 AI Draft
@@ -7011,14 +7011,14 @@ function OverviewPanel({
       <section className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-4 mb-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex min-w-0 items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#7C3AED] text-sm font-bold text-white">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full hs-gradient text-sm font-bold text-foreground">
               {companyInitial}
             </div>
             <div className="min-w-0">
-              <h2 className="truncate text-xl font-semibold text-gray-900 dark:text-white">{companyName.toUpperCase()}</h2>
+              <h2 className="truncate text-xl font-semibold text-gray-900 dark:text-foreground">{companyName.toUpperCase()}</h2>
               <div className="mt-1 flex flex-wrap items-center gap-2">
                 {startup?.stage && (
-                  <span className="rounded-full bg-[#7C3AED]/10 px-2 py-0.5 text-xs font-medium text-[#7C3AED]">
+                  <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-brand">
                     {startup.stage}
                   </span>
                 )}
@@ -7035,7 +7035,7 @@ function OverviewPanel({
               ].map(([label, value]) => (
                 <div key={label} className="min-w-[92px]">
                   <div className="text-xs text-gray-500 dark:text-gray-400">{label}</div>
-                  <div className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">{value}</div>
+                  <div className="mt-1 text-lg font-semibold text-gray-900 dark:text-foreground">{value}</div>
                 </div>
               ))}
             </div>
@@ -7065,7 +7065,7 @@ function OverviewPanel({
           ].map(([label, value]) => (
             <div key={label}>
               <div className="text-xs text-gray-500 dark:text-gray-400">{label}</div>
-              <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{value}</div>
+              <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-foreground">{value}</div>
             </div>
           ))}
         </div>
@@ -7079,7 +7079,7 @@ function OverviewPanel({
             data-testid="generate-brief-btn"
             onClick={handleGenerateBrief}
             disabled={generatingBrief || !dealRoom?.investor_user_id}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-[#7C3AED] px-3 py-1.5 text-xs font-medium text-white transition-colors disabled:cursor-not-allowed disabled:bg-[#7C3AED]/40"
+            className="inline-flex items-center gap-1.5 rounded-lg hs-gradient px-3 py-1.5 text-xs font-medium text-foreground transition-colors disabled:cursor-not-allowed disabled:bg-accent"
           >
             {generatingBrief ? (
               <>
@@ -7118,7 +7118,7 @@ function OverviewPanel({
                 {dealBrief.match_score}/100
               </span>
               {dealBrief.headline && (
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">{dealBrief.headline}</span>
+                <span className="text-sm font-semibold text-gray-900 dark:text-foreground">{dealBrief.headline}</span>
               )}
             </div>
             {dealBrief.investment_thesis && (
@@ -7156,7 +7156,7 @@ function OverviewPanel({
                   </div>
                 ) : (
                   <div className="mt-0.5">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.4)] text-[11px] font-semibold px-2 py-0.5">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-accent text-muted-foreground text-[11px] font-semibold px-2 py-0.5">
                       <Clock className="h-3 w-3" /> Pending
                     </span>
                   </div>
@@ -7230,7 +7230,7 @@ function OverviewPanel({
               <div className="flex items-center gap-2">
                 <button
                   onClick={handlePrintNda}
-                  className="inline-flex items-center gap-1.5 text-xs bg-brand/10 hover:bg-brand/20 text-brand border border-brand/20 rounded-lg px-3 py-1.5 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs bg-accent hover:bg-accent text-brand border border-brand/20 rounded-lg px-3 py-1.5 transition-colors"
                 >
                   <Download className="h-3.5 w-3.5" /> Download PDF
                 </button>
@@ -7278,15 +7278,15 @@ function OverviewPanel({
                 {member.photo_url ? (
                   <img src={member.photo_url} alt="" className="w-12 h-12 rounded-full object-cover mb-2" />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-[#7C3AED] text-white flex items-center justify-center text-lg font-bold mb-2">
+                  <div className="w-12 h-12 rounded-full hs-gradient text-foreground flex items-center justify-center text-lg font-bold mb-2">
                     {initials(member.name)}
                   </div>
                 )}
-                <div className="text-sm font-semibold text-gray-900 dark:text-white">{member.name ?? "Team member"}</div>
+                <div className="text-sm font-semibold text-gray-900 dark:text-foreground">{member.name ?? "Team member"}</div>
                 {member.title && <div className="text-xs text-gray-500 dark:text-gray-400">{member.title}</div>}
                 {member.bio && <p className="mt-2 text-xs text-gray-600 dark:text-gray-300 line-clamp-2">{member.bio}</p>}
                 {member.linkedin_url && (
-                  <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex text-gray-500 hover:text-[#7C3AED] dark:text-gray-400">
+                  <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex text-gray-500 hover:text-brand dark:text-gray-400">
                     <ExternalLink className="h-3.5 w-3.5" />
                   </a>
                 )}
@@ -7298,8 +7298,8 @@ function OverviewPanel({
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 mb-4">
         <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-4">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#7C3AED]">FOUNDER</div>
-          <div className="font-semibold text-gray-900 dark:text-white">{companyName}</div>
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand">FOUNDER</div>
+          <div className="font-semibold text-gray-900 dark:text-foreground">{companyName}</div>
           {startup?.country && <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">{startup.country}</div>}
           <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
             <span>Founded: {formatValue(startup?.founded_year)}</span>
@@ -7309,10 +7309,10 @@ function OverviewPanel({
         </div>
 
         <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl p-4">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#7C3AED]">INVESTOR</div>
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand">INVESTOR</div>
           {dealRoom?.investor_name ? (
             <>
-              <div className="font-semibold text-gray-900 dark:text-white">{dealRoom.investor_name}</div>
+              <div className="font-semibold text-gray-900 dark:text-foreground">{dealRoom.investor_name}</div>
               {dealRoom?.investor_company && <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">{dealRoom.investor_company}</div>}
               {investorProfile?.thesis && <p className="mt-3 text-sm line-clamp-2 text-gray-600 dark:text-gray-300">{investorProfile.thesis}</p>}
               {investorProfile?.thesis_statement && !investorProfile?.thesis && (
@@ -7321,7 +7321,7 @@ function OverviewPanel({
               {sectors && <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">{sectors}</div>}
               {dealBrief?.match_score !== undefined && (
                 <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">
-                  Match score: <span className="font-semibold text-gray-900 dark:text-white">{dealBrief.match_score}</span>
+                  Match score: <span className="font-semibold text-gray-900 dark:text-foreground">{dealBrief.match_score}</span>
                 </div>
               )}
             </>
@@ -7339,9 +7339,9 @@ function OverviewPanel({
           <div className="space-y-3">
             {(recentActivity as any[]).map((activity) => (
               <div key={activity.id} className="flex items-start gap-3">
-                <div className="w-2 h-2 rounded-full bg-[#7C3AED] mt-1.5 flex-shrink-0" />
+                <div className="w-2 h-2 rounded-full hs-gradient mt-1.5 flex-shrink-0" />
                 <div className="min-w-0 text-sm text-gray-700 dark:text-gray-300">
-                  <span className="font-semibold text-gray-900 dark:text-white">{activity.actor_name ?? "Someone"}</span>
+                  <span className="font-semibold text-gray-900 dark:text-foreground">{activity.actor_name ?? "Someone"}</span>
                   <span> · {activity.action_type ?? activity.target_label ?? "Activity"}</span>
                 </div>
                 <div className="ml-auto whitespace-nowrap text-xs text-gray-400 dark:text-zinc-500">
@@ -7360,7 +7360,7 @@ function OverviewPanel({
             const isCurrent = rank === workflowRank;
             const isComplete = rank < workflowRank;
             const dotClass = isCurrent
-              ? "bg-[#7C3AED] text-white"
+              ? "hs-gradient text-white"
               : isComplete
                 ? "bg-green-500 text-white"
                 : "bg-gray-300 text-gray-500 dark:bg-zinc-700 dark:text-gray-400";
@@ -7384,7 +7384,7 @@ function OverviewPanel({
               <button
                 onClick={onRequestNextStage}
                 disabled={stageRequesting}
-                className="inline-flex items-center gap-1.5 bg-[#7C3AED] text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-60"
+                className="inline-flex items-center gap-1.5 hs-gradient text-foreground px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-60"
                 data-testid="request-next-stage"
               >
                 {stageRequesting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
