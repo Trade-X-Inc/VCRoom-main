@@ -119,6 +119,7 @@ import { Route as AppInvestorDealRoomsRouteImport } from './routes/app.investor.
 import { Route as AppInvestorDealFlowRouteImport } from './routes/app.investor.deal-flow'
 import { Route as AppInvestorConnectionsRouteImport } from './routes/app.investor.connections'
 import { Route as AppInvestorAssistantRouteImport } from './routes/app.investor.assistant'
+import { Route as AppInvestorAnalyticsRouteImport } from './routes/app.investor.analytics'
 import { Route as AppInvestorAnalysisRouteImport } from './routes/app.investor.analysis'
 import { Route as AppInvestorAdvisorRouteImport } from './routes/app.investor.advisor'
 import { Route as AppDealRoomsIdRouteImport } from './routes/app.deal-rooms.$id'
@@ -688,6 +689,11 @@ const AppInvestorAssistantRoute = AppInvestorAssistantRouteImport.update({
   path: '/assistant',
   getParentRoute: () => AppInvestorRoute,
 } as any)
+const AppInvestorAnalyticsRoute = AppInvestorAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
 const AppInvestorAnalysisRoute = AppInvestorAnalysisRouteImport.update({
   id: '/analysis',
   path: '/analysis',
@@ -861,6 +867,7 @@ export interface FileRoutesByFullPath {
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/investor/advisor': typeof AppInvestorAdvisorRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
+  '/app/investor/analytics': typeof AppInvestorAnalyticsRoute
   '/app/investor/assistant': typeof AppInvestorAssistantRoute
   '/app/investor/connections': typeof AppInvestorConnectionsRoute
   '/app/investor/deal-flow': typeof AppInvestorDealFlowRoute
@@ -985,6 +992,7 @@ export interface FileRoutesByTo {
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/investor/advisor': typeof AppInvestorAdvisorRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
+  '/app/investor/analytics': typeof AppInvestorAnalyticsRoute
   '/app/investor/assistant': typeof AppInvestorAssistantRoute
   '/app/investor/connections': typeof AppInvestorConnectionsRoute
   '/app/investor/deal-flow': typeof AppInvestorDealFlowRoute
@@ -1114,6 +1122,7 @@ export interface FileRoutesById {
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/investor/advisor': typeof AppInvestorAdvisorRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
+  '/app/investor/analytics': typeof AppInvestorAnalyticsRoute
   '/app/investor/assistant': typeof AppInvestorAssistantRoute
   '/app/investor/connections': typeof AppInvestorConnectionsRoute
   '/app/investor/deal-flow': typeof AppInvestorDealFlowRoute
@@ -1244,6 +1253,7 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/$id'
     | '/app/investor/advisor'
     | '/app/investor/analysis'
+    | '/app/investor/analytics'
     | '/app/investor/assistant'
     | '/app/investor/connections'
     | '/app/investor/deal-flow'
@@ -1368,6 +1378,7 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/$id'
     | '/app/investor/advisor'
     | '/app/investor/analysis'
+    | '/app/investor/analytics'
     | '/app/investor/assistant'
     | '/app/investor/connections'
     | '/app/investor/deal-flow'
@@ -1496,6 +1507,7 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/$id'
     | '/app/investor/advisor'
     | '/app/investor/analysis'
+    | '/app/investor/analytics'
     | '/app/investor/assistant'
     | '/app/investor/connections'
     | '/app/investor/deal-flow'
@@ -2362,6 +2374,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorAssistantRouteImport
       parentRoute: typeof AppInvestorRoute
     }
+    '/app/investor/analytics': {
+      id: '/app/investor/analytics'
+      path: '/analytics'
+      fullPath: '/app/investor/analytics'
+      preLoaderRoute: typeof AppInvestorAnalyticsRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
     '/app/investor/analysis': {
       id: '/app/investor/analysis'
       path: '/analysis'
@@ -2480,6 +2499,7 @@ declare module '@tanstack/react-router' {
 interface AppInvestorRouteChildren {
   AppInvestorAdvisorRoute: typeof AppInvestorAdvisorRoute
   AppInvestorAnalysisRoute: typeof AppInvestorAnalysisRoute
+  AppInvestorAnalyticsRoute: typeof AppInvestorAnalyticsRoute
   AppInvestorAssistantRoute: typeof AppInvestorAssistantRoute
   AppInvestorConnectionsRoute: typeof AppInvestorConnectionsRoute
   AppInvestorDealFlowRoute: typeof AppInvestorDealFlowRoute
@@ -2503,6 +2523,7 @@ interface AppInvestorRouteChildren {
 const AppInvestorRouteChildren: AppInvestorRouteChildren = {
   AppInvestorAdvisorRoute: AppInvestorAdvisorRoute,
   AppInvestorAnalysisRoute: AppInvestorAnalysisRoute,
+  AppInvestorAnalyticsRoute: AppInvestorAnalyticsRoute,
   AppInvestorAssistantRoute: AppInvestorAssistantRoute,
   AppInvestorConnectionsRoute: AppInvestorConnectionsRoute,
   AppInvestorDealFlowRoute: AppInvestorDealFlowRoute,
