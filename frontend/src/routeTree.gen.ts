@@ -83,6 +83,7 @@ import { Route as AppClaimsRouteImport } from './routes/app.claims'
 import { Route as AppBadgesRouteImport } from './routes/app.badges'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
 import { Route as AppAssistantRouteImport } from './routes/app.assistant'
+import { Route as AppAnalyticsRouteImport } from './routes/app.analytics'
 import { Route as AppAdvisorRouteImport } from './routes/app.advisor'
 import { Route as ApiTestAiRouteImport } from './routes/api.test-ai'
 import { Route as ApiHubspotSyncRouteImport } from './routes/api.hubspot-sync'
@@ -506,6 +507,11 @@ const AppAssistantRoute = AppAssistantRouteImport.update({
   path: '/assistant',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAdvisorRoute = AppAdvisorRouteImport.update({
   id: '/advisor',
   path: '/advisor',
@@ -797,6 +803,7 @@ export interface FileRoutesByFullPath {
   '/api/hubspot-sync': typeof ApiHubspotSyncRoute
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
+  '/app/analytics': typeof AppAnalyticsRoute
   '/app/assistant': typeof AppAssistantRoute
   '/app/audit': typeof AppAuditRoute
   '/app/badges': typeof AppBadgesRoute
@@ -921,6 +928,7 @@ export interface FileRoutesByTo {
   '/api/hubspot-sync': typeof ApiHubspotSyncRoute
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
+  '/app/analytics': typeof AppAnalyticsRoute
   '/app/assistant': typeof AppAssistantRoute
   '/app/audit': typeof AppAuditRoute
   '/app/badges': typeof AppBadgesRoute
@@ -1048,6 +1056,7 @@ export interface FileRoutesById {
   '/api/hubspot-sync': typeof ApiHubspotSyncRoute
   '/api/test-ai': typeof ApiTestAiRoute
   '/app/advisor': typeof AppAdvisorRoute
+  '/app/analytics': typeof AppAnalyticsRoute
   '/app/assistant': typeof AppAssistantRoute
   '/app/audit': typeof AppAuditRoute
   '/app/badges': typeof AppBadgesRoute
@@ -1177,6 +1186,7 @@ export interface FileRouteTypes {
     | '/api/hubspot-sync'
     | '/api/test-ai'
     | '/app/advisor'
+    | '/app/analytics'
     | '/app/assistant'
     | '/app/audit'
     | '/app/badges'
@@ -1301,6 +1311,7 @@ export interface FileRouteTypes {
     | '/api/hubspot-sync'
     | '/api/test-ai'
     | '/app/advisor'
+    | '/app/analytics'
     | '/app/assistant'
     | '/app/audit'
     | '/app/badges'
@@ -1427,6 +1438,7 @@ export interface FileRouteTypes {
     | '/api/hubspot-sync'
     | '/api/test-ai'
     | '/app/advisor'
+    | '/app/analytics'
     | '/app/assistant'
     | '/app/audit'
     | '/app/badges'
@@ -2098,6 +2110,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAssistantRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/analytics': {
+      id: '/app/analytics'
+      path: '/analytics'
+      fullPath: '/app/analytics'
+      preLoaderRoute: typeof AppAnalyticsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/advisor': {
       id: '/app/advisor'
       path: '/advisor'
@@ -2556,6 +2575,7 @@ const AppDealRoomsIdRouteWithChildren = AppDealRoomsIdRoute._addFileChildren(
 
 interface AppRouteChildren {
   AppAdvisorRoute: typeof AppAdvisorRoute
+  AppAnalyticsRoute: typeof AppAnalyticsRoute
   AppAssistantRoute: typeof AppAssistantRoute
   AppAuditRoute: typeof AppAuditRoute
   AppBadgesRoute: typeof AppBadgesRoute
@@ -2593,6 +2613,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppAdvisorRoute: AppAdvisorRoute,
+  AppAnalyticsRoute: AppAnalyticsRoute,
   AppAssistantRoute: AppAssistantRoute,
   AppAuditRoute: AppAuditRoute,
   AppBadgesRoute: AppBadgesRoute,
