@@ -44,7 +44,7 @@ function MemberOverview() {
       if (!roomIds.length) return [];
       const { data } = await supabase
         .from("deal_room_documents")
-        .select("id, name, created_at, deal_room_id")
+        .select("id, deal_room_id")
         .in("deal_room_id", roomIds)
         .order("created_at", { ascending: false })
         .limit(5);

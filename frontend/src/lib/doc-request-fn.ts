@@ -81,7 +81,8 @@ export const createDocRequest = createServerFn({ method: "POST" })
         user_id: data.forUserId,
         kind: "document_request",
         title: "Document requested",
-        body: `An investor requested: "${data.title}"`,
+        body: `An investor requested a document.`,
+        action_url: `/app/deal-room/${data.dealRoomId}`,
         meta: { deal_room_id: data.dealRoomId, request_id: req.id },
       });
       if (n1) console.error("[doc-request] founder notification failed:", n1.message);
@@ -128,7 +129,8 @@ export const fulfillDocRequest = createServerFn({ method: "POST" })
         user_id: data.requestedBy,
         kind: "document_request",
         title: "Document uploaded",
-        body: `The founder uploaded: "${data.title}"`,
+        body: `The founder uploaded a document.`,
+        action_url: `/app/deal-room/${data.dealRoomId}`,
         meta: { deal_room_id: data.dealRoomId, request_id: data.requestId },
       });
       if (n2) console.error("[doc-request] investor notification failed:", n2.message);

@@ -704,7 +704,7 @@ function StageBar({
             ? "hs-gradient text-white rounded-t-lg px-4 py-2 text-sm font-medium whitespace-nowrap"
             : accessible
               ? "text-gray-600 px-4 py-2 text-sm hover:bg-gray-50 rounded-t-lg whitespace-nowrap"
-              : "text-gray-300 px-4 py-2 text-sm cursor-not-allowed whitespace-nowrap";
+              : "text-[#71717A] px-4 py-2 text-sm cursor-not-allowed whitespace-nowrap";
           return (
             <button
               key={stage.key}
@@ -1304,7 +1304,7 @@ function InformationVaultPanel({
                 ? "bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.2)]"
                 : "bg-gray-100 border border-[rgba(0,0,0,0.08)] ",
             )}>
-              <Shield className={cn("h-4 w-4", vaultNdaDoc ? "text-[#10B981]" : "text-gray-400 ")} />
+              <Shield className={cn("h-4 w-4", vaultNdaDoc ? "text-[#10B981]" : "text-[#71717A] ")} />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -1350,7 +1350,7 @@ function InformationVaultPanel({
               <div key={i} className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 border border-[rgba(0,0,0,0.08)] px-3 py-1 text-xs">
                 <CheckCircle2 className="h-3 w-3 text-[#10B981] shrink-0" />
                 <span className="font-medium text-gray-900 ">{s.signer_full_name}</span>
-                <span className="text-gray-400 ">· {s.role}</span>
+                <span className="text-[#71717A] ">· {s.role}</span>
               </div>
             ))}
           </div>
@@ -1505,7 +1505,7 @@ function InformationVaultPanel({
               )}
             </div>
           </div>
-          {profilesOpen ? <ChevronUp className="h-4 w-4 text-gray-400 " /> : <ChevronDown className="h-4 w-4 text-gray-400 " />}
+          {profilesOpen ? <ChevronUp className="h-4 w-4 text-[#71717A] " /> : <ChevronDown className="h-4 w-4 text-[#71717A] " />}
         </button>
 
         {profilesOpen && (
@@ -1514,12 +1514,12 @@ function InformationVaultPanel({
               <div className="mt-4 space-y-2">
                 {DEFAULT_PROFILE_SECTIONS.map((s) => (
                   <div key={s.key} className="flex items-center justify-between rounded-lg border border-[rgba(0,0,0,0.08)] px-4 py-3">
-                    <span className="text-sm font-medium text-gray-400 ">{s.label}</span>
-                    <span className="text-xs text-gray-300 italic">Not added</span>
+                    <span className="text-sm font-medium text-[#71717A] ">{s.label}</span>
+                    <span className="text-xs text-[#71717A] italic">Not added</span>
                   </div>
                 ))}
                 {isFounder && (
-                  <p className="text-xs text-gray-400 mt-3">
+                  <p className="text-xs text-[#71717A] mt-3">
                     Add profile sections in your <Link to="/app/documents" className="text-brand hover:underline">Documents page</Link>.
                   </p>
                 )}
@@ -1540,7 +1540,7 @@ function InformationVaultPanel({
                           {sec.visibility === "public" ? "Public" : "Deal Room"}
                         </span>
                         {isFounder && (
-                          <button className="grid h-6 w-6 place-items-center rounded text-gray-400 hover:text-gray-600 " onClick={() => console.log("edit section — Claude Code will wire")}>
+                          <button className="grid h-6 w-6 place-items-center rounded text-[#71717A] hover:text-gray-600 " onClick={() => console.log("edit section — Claude Code will wire")}>
                             <Pencil className="h-3 w-3" />
                           </button>
                         )}
@@ -1599,7 +1599,7 @@ function InformationVaultPanel({
               value={reqName}
               onChange={(e) => setReqName(e.target.value)}
               placeholder="Document name (e.g. Cap table, Bank statement)"
-              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
+              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none focus:border-brand"
               data-testid="iv-req-name"
             />
             <textarea
@@ -1607,7 +1607,7 @@ function InformationVaultPanel({
               onChange={(e) => setReqDesc(e.target.value)}
               rows={2}
               placeholder="Why you need this document (optional)"
-              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none resize-none focus:border-brand"
+              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none resize-none focus:border-brand"
             />
             <select
               value={reqCategory}
@@ -1697,7 +1697,7 @@ function InformationVaultPanel({
                         onChange={(e) => setDeclineReason(e.target.value)}
                         rows={2}
                         placeholder="Reason for declining"
-                        className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-xs text-gray-900 placeholder:text-gray-400 outline-none resize-none"
+                        className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-xs text-gray-900 placeholder:text-[#71717A] outline-none resize-none"
                       />
                       <div className="flex gap-2">
                         <button onClick={() => setDeclineMode(null)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-xs text-gray-500 ">Cancel</button>
@@ -1756,14 +1756,14 @@ function InformationVaultPanel({
                 value={noteTitle}
                 onChange={(e) => setNoteTitle(e.target.value)}
                 placeholder="Note title"
-                className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
+                className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none focus:border-brand"
               />
               <textarea
                 value={noteContent}
                 onChange={(e) => setNoteContent(e.target.value)}
                 rows={4}
                 placeholder="Write your notes here..."
-                className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none resize-none focus:border-brand"
+                className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none resize-none focus:border-brand"
               />
               <div className="flex items-center gap-3 flex-wrap">
                 <select
@@ -1824,14 +1824,14 @@ function InformationVaultPanel({
                         )}>
                           {note.visibility === "shared" ? "Shared" : "Private"}
                         </span>
-                        <span className="text-[10px] text-gray-400 ">
+                        <span className="text-[10px] text-[#71717A] ">
                           {formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}
                         </span>
                       </div>
                     </div>
                     <button
                       onClick={() => deleteNote(note.id)}
-                      className="hidden group-hover:grid h-7 w-7 place-items-center rounded text-gray-400 hover:text-red-500"
+                      className="hidden group-hover:grid h-7 w-7 place-items-center rounded text-[#71717A] hover:text-red-500"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -1856,7 +1856,7 @@ function InformationVaultPanel({
                 <div key={note.id} className="px-6 py-4">
                   {note.title && <div className="text-sm font-semibold text-gray-900 mb-1">{note.title}</div>}
                   <p className="text-sm text-gray-600 line-clamp-2 whitespace-pre-wrap">{note.content}</p>
-                  <div className="mt-2 text-[10px] text-gray-400 ">
+                  <div className="mt-2 text-[10px] text-[#71717A] ">
                     {formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}
                   </div>
                 </div>
@@ -1883,7 +1883,7 @@ function InformationVaultPanel({
               onChange={(e) => setDecisionReason(e.target.value)}
               rows={3}
               placeholder="Reason (required)"
-              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none resize-none"
+              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none resize-none"
             />
             <div className="flex items-center gap-2">
               <button onClick={() => setShowDecisionForm(false)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-4 py-2 text-sm text-gray-500 ">Cancel</button>
@@ -2964,7 +2964,7 @@ function DueDiligencePanel({
                     {catGoals.map((g: any) => (
                       <div key={g.id} className="flex items-center gap-3 px-5 py-3">
                         <StatusCircle status={g.status} />
-                        <span className={cn("text-sm flex-1", g.status === "complete" ? "line-through text-gray-400 " : "text-gray-900 ")}>{g.goal_text}</span>
+                        <span className={cn("text-sm flex-1", g.status === "complete" ? "line-through text-[#71717A] " : "text-gray-900 ")}>{g.goal_text}</span>
                         {g.status === "flagged" && <span className="text-[10px] rounded-full bg-red-50 px-2 py-0.5 text-red-600 font-medium">Flagged</span>}
                       </div>
                     ))}
@@ -2996,7 +2996,7 @@ function DueDiligencePanel({
               ) : (
                 <div>
                   <p className="text-sm text-gray-500">Not shared</p>
-                  <p className="text-xs text-gray-400 mt-1">Investors can choose to share their analysis with you.</p>
+                  <p className="text-xs text-[#71717A] mt-1">Investors can choose to share their analysis with you.</p>
                 </div>
               )}
             </div>
@@ -3107,9 +3107,9 @@ function DueDiligencePanel({
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className={cn("text-sm font-medium", DD_CATEGORY_COLORS[goal.category] ?? "bg-gray-100 text-gray-600  ", "rounded-full px-2 py-0.5 text-[10px]")}>{goal.category}</span>
                           {goal.is_standard && <span className="text-[10px] rounded-full bg-gray-100 px-2 py-0.5 text-gray-500 ">Standard</span>}
-                          {goal.due_by && <span className="text-[10px] text-gray-400 ">Due {format(new Date(goal.due_by), "MMM d")}</span>}
+                          {goal.due_by && <span className="text-[10px] text-[#71717A] ">Due {format(new Date(goal.due_by), "MMM d")}</span>}
                         </div>
-                        <p className={cn("mt-1 text-sm", goal.status === "complete" ? "line-through text-gray-400 " : "text-gray-900 ")}>
+                        <p className={cn("mt-1 text-sm", goal.status === "complete" ? "line-through text-[#71717A] " : "text-gray-900 ")}>
                           {goal.goal_text}
                         </p>
                       </button>
@@ -3123,9 +3123,9 @@ function DueDiligencePanel({
                             onBlur={(e) => saveNote(goal.id, e.target.value)}
                             rows={3}
                             placeholder="Notes..."
-                            className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
+                            className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none focus:border-brand"
                           />
-                          {savingNoteId === goal.id && <span className="text-[10px] text-gray-400 ">Saving…</span>}
+                          {savingNoteId === goal.id && <span className="text-[10px] text-[#71717A] ">Saving…</span>}
                           <div className="flex items-center gap-2">
                             <label className="text-xs text-gray-500 ">Due date</label>
                             <input
@@ -3154,13 +3154,13 @@ function DueDiligencePanel({
                       <button
                         onClick={() => flagGoal(goal)}
                         title="Flag"
-                        className="rounded-lg p-1.5 text-gray-400 hover:text-red-500"
+                        className="rounded-lg p-1.5 text-[#71717A] hover:text-red-500"
                       >
                         <AlertTriangle className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => deleteGoal(goal.id)}
-                        className="rounded-lg p-1.5 text-gray-400 hover:text-red-500"
+                        className="rounded-lg p-1.5 text-[#71717A] hover:text-red-500"
                         title="Delete"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -3188,7 +3188,7 @@ function DueDiligencePanel({
                     value={newGoalText}
                     onChange={(e) => setNewGoalText(e.target.value)}
                     placeholder="Describe the goal..."
-                    className="col-span-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
+                    className="col-span-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-[#71717A] outline-none focus:border-brand"
                     onKeyDown={(e) => { if (e.key === "Enter") addCustomGoal(); }}
                   />
                 </div>
@@ -3238,14 +3238,14 @@ function DueDiligencePanel({
               {runningAnalysis ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
               Run analysis
             </button>
-            {analysisOpen ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
+            {analysisOpen ? <ChevronUp className="h-4 w-4 text-[#71717A]" /> : <ChevronDown className="h-4 w-4 text-[#71717A]" />}
           </div>
         </button>
 
         {analysisOpen && (
           <div className="border-t border-[rgba(0,0,0,0.08)] px-5 py-5">
             {!analysisResult && !runningAnalysis && (
-              <p className="text-sm text-gray-400 text-center py-4">Click "Run analysis" to generate an AI diligence report based on your goals and Q&A thread.</p>
+              <p className="text-sm text-[#71717A] text-center py-4">Click "Run analysis" to generate an AI diligence report based on your goals and Q&A thread.</p>
             )}
             {runningAnalysis && (
               <div className="flex items-center justify-center gap-2 py-6">
@@ -3277,7 +3277,7 @@ function DueDiligencePanel({
                     <div key={label}>
                       <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">{label}</div>
                       {(items as string[]).length === 0 ? (
-                        <p className="text-xs text-gray-400 italic">None identified</p>
+                        <p className="text-xs text-[#71717A] italic">None identified</p>
                       ) : (
                         <ul className="space-y-1.5">
                           {(items as string[]).map((item, i) => (
@@ -3313,14 +3313,14 @@ function DueDiligencePanel({
             className="w-full flex items-center justify-between px-5 py-4"
           >
             <span className="text-sm font-semibold text-gray-900 ">Q&A Summary</span>
-            {qaSummaryOpen ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
+            {qaSummaryOpen ? <ChevronUp className="h-4 w-4 text-[#71717A]" /> : <ChevronDown className="h-4 w-4 text-[#71717A]" />}
           </button>
           {qaSummaryOpen && (
             <div className="border-t border-[rgba(0,0,0,0.08)] px-5 py-4">
               {qaSummaryNote ? (
                 <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{qaSummaryNote.content}</p>
               ) : (
-                <p className="text-sm text-gray-400">Not generated</p>
+                <p className="text-sm text-[#71717A]">Not generated</p>
               )}
             </div>
           )}
@@ -3333,18 +3333,18 @@ function DueDiligencePanel({
             className="w-full flex items-center justify-between px-5 py-4"
           >
             <span className="text-sm font-semibold text-gray-900 ">Notes from Information Vault</span>
-            {vaultNotesOpen ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
+            {vaultNotesOpen ? <ChevronUp className="h-4 w-4 text-[#71717A]" /> : <ChevronDown className="h-4 w-4 text-[#71717A]" />}
           </button>
           {vaultNotesOpen && (
             <div className="border-t border-[rgba(0,0,0,0.08)] divide-y divide-gray-100 ">
               {(vaultNotes as any[]).length === 0 ? (
-                <p className="px-5 py-4 text-sm text-gray-400">No notes</p>
+                <p className="px-5 py-4 text-sm text-[#71717A]">No notes</p>
               ) : (
                 (vaultNotes as any[]).map((note: any) => (
                   <div key={note.id} className="px-5 py-4">
                     <div className="text-sm font-medium text-gray-900 mb-0.5">{note.title}</div>
                     <p className="text-xs text-gray-500 line-clamp-2">{note.content?.slice(0, 100)}{(note.content?.length ?? 0) > 100 ? "…" : ""}</p>
-                    <p className="text-[10px] text-gray-400 mt-1">{formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}</p>
+                    <p className="text-[10px] text-[#71717A] mt-1">{formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}</p>
                   </div>
                 ))
               )}
@@ -3370,7 +3370,7 @@ function DueDiligencePanel({
               onChange={(e) => setDecisionReason(e.target.value)}
               rows={3}
               placeholder="Reason (required)"
-              className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
+              className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none"
             />
             <div className="flex items-center gap-2">
               <button onClick={() => setShowDecision(false)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-4 py-2 text-sm text-gray-500 ">Cancel</button>
@@ -3702,7 +3702,7 @@ function NewTermSheetPanel({
         value={tsForm[field]}
         onChange={(e) => setTsForm((p) => ({ ...p, [field]: e.target.value }))}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
+        className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none focus:border-brand"
       />
     </div>
   );
@@ -3740,7 +3740,7 @@ function NewTermSheetPanel({
                 {aiDrafting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
                 Generate with AI
               </button>
-              <button onClick={() => setEditorOpen(false)} className="rounded-lg p-1.5 text-gray-400 hover:text-gray-600">
+              <button onClick={() => setEditorOpen(false)} className="rounded-lg p-1.5 text-[#71717A] hover:text-gray-600">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -3766,7 +3766,7 @@ function NewTermSheetPanel({
                 onChange={(e) => setTsForm((p) => ({ ...p, conditions_precedent: e.target.value }))}
                 rows={2}
                 placeholder="e.g. Completion of legal audit..."
-                className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
+                className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none focus:border-brand"
               />
             </div>
             <div>
@@ -3776,7 +3776,7 @@ function NewTermSheetPanel({
                 onChange={(e) => setTsNotes(e.target.value)}
                 rows={2}
                 placeholder="Any other terms or conditions..."
-                className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
+                className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none focus:border-brand"
               />
             </div>
 
@@ -3842,7 +3842,7 @@ function NewTermSheetPanel({
                         {sheet.status?.replace(/_/g, " ")}
                       </span>
                     </div>
-                    {sheet.sent_at && <p className="text-xs text-gray-400 mt-0.5">Sent {formatDistanceToNow(new Date(sheet.sent_at), { addSuffix: true })}</p>}
+                    {sheet.sent_at && <p className="text-xs text-[#71717A] mt-0.5">Sent {formatDistanceToNow(new Date(sheet.sent_at), { addSuffix: true })}</p>}
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <button onClick={() => openEditor(sheet)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-xs font-medium text-gray-700 ">View / Edit</button>
@@ -3904,7 +3904,7 @@ function NewTermSheetPanel({
                           {sheet.status?.replace(/_/g, " ")}
                         </span>
                       </div>
-                      {sheet.sent_at && <span className="text-xs text-gray-400 ">{formatDistanceToNow(new Date(sheet.sent_at), { addSuffix: true })}</span>}
+                      {sheet.sent_at && <span className="text-xs text-[#71717A] ">{formatDistanceToNow(new Date(sheet.sent_at), { addSuffix: true })}</span>}
                     </div>
 
                     <div className="px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
@@ -3935,7 +3935,7 @@ function NewTermSheetPanel({
                               onChange={(e) => setCounterText(e.target.value)}
                               rows={3}
                               placeholder="Describe your counter-offer terms in plain language..."
-                              className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
+                              className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none"
                             />
                             <div className="flex gap-2">
                               <button onClick={() => { setCounterOpen(null); setCounterText(""); }} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-xs text-gray-500">Cancel</button>
@@ -4324,7 +4324,7 @@ function NewClosingPanel({
               const catItems = items.filter((i: any) => i.category === cat);
               return (
                 <div key={cat}>
-                  <div className="text-[10px] uppercase tracking-wider font-semibold text-gray-400 mb-2">{cat}</div>
+                  <div className="text-[10px] uppercase tracking-wider font-semibold text-[#71717A] mb-2">{cat}</div>
                   <div className="space-y-2">
                     {catItems.map((item: any) => {
                       const isExpanded = expandedItemId === item.id;
@@ -4336,7 +4336,7 @@ function NewClosingPanel({
                               <ItemStatusCircle status={currentStatus} />
                             </button>
                             <button onClick={() => setExpandedItemId(isExpanded ? null : item.id)} className="flex-1 text-left">
-                              <span className={cn("text-sm", currentStatus === "complete" ? "line-through text-gray-400 " : "text-gray-900 ")}>
+                              <span className={cn("text-sm", currentStatus === "complete" ? "line-through text-[#71717A] " : "text-gray-900 ")}>
                                 {item.item_text}
                               </span>
                             </button>
@@ -4363,7 +4363,7 @@ function NewClosingPanel({
                                 onBlur={(e) => saveItemNote(item.id, e.target.value)}
                                 rows={2}
                                 placeholder="Notes..."
-                                className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
+                                className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 placeholder:text-[#71717A] outline-none"
                               />
                               <div className="flex items-center gap-2">
                                 <label className="text-xs text-gray-500 ">Due date</label>
@@ -4411,7 +4411,7 @@ function NewClosingPanel({
               ["Instrument", (acceptedTS as any).terms?.investment_type],
             ] as [string, string][]).map(([label, value]) => (
               <div key={label} className="rounded-lg bg-gray-50 px-3 py-3">
-                <div className="text-[10px] uppercase tracking-wider font-semibold text-gray-400 mb-1">{label}</div>
+                <div className="text-[10px] uppercase tracking-wider font-semibold text-[#71717A] mb-1">{label}</div>
                 <div className="text-sm font-semibold text-gray-900 ">{value || "—"}</div>
               </div>
             ))}
@@ -4443,7 +4443,7 @@ function NewClosingPanel({
                 <div>
                   <button
                     onClick={() => setOverrideClose(true)}
-                    className="text-sm text-gray-400 hover:text-red-500 "
+                    className="text-sm text-[#71717A] hover:text-red-500 "
                   >
                     Close deal anyway →
                   </button>
@@ -4470,7 +4470,7 @@ function NewClosingPanel({
                 onChange={(e) => setFinalNotes(e.target.value)}
                 rows={3}
                 placeholder="Final notes (optional)..."
-                className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
+                className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none"
               />
               <div className="flex gap-2">
                 <button onClick={() => setCloseDealOpen(false)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-4 py-2 text-sm text-gray-500">Cancel</button>
@@ -4495,7 +4495,7 @@ function NewClosingPanel({
         {!exitOpen ? (
           <button
             onClick={() => setExitOpen(true)}
-            className="text-sm text-gray-400 hover:text-red-500 "
+            className="text-sm text-[#71717A] hover:text-red-500 "
             data-testid="exit-deal-btn"
           >
             Exit deal →
@@ -4531,7 +4531,7 @@ function NewClosingPanel({
               onChange={(e) => setExitReasonDetail(e.target.value)}
               rows={2}
               placeholder="Reason detail..."
-              className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
+              className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none"
             />
             <div className="flex gap-2">
               <button onClick={() => setExitOpen(false)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-4 py-2 text-sm text-gray-500">Cancel</button>
@@ -5229,9 +5229,9 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                           user_id: m.user_id,
                           kind: "deal_activity",
                           title: "New document in this deal room",
-                          body: `"${fileName}" has been shared with you for review.`,
+                          body: `A document was shared with you in this deal room.`,
                           read: false,
-                          action_url: `/app/investor/deal-rooms`,
+                          action_url: `/app/deal-room/${dealRoomId}`,
                           meta: { deal_room_id: dealRoomId },
                         }))
                       ).then(({ error: nErr }) => {
@@ -5294,7 +5294,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
               {libLoading && <div className="text-sm text-gray-500 p-3 animate-pulse">Loading…</div>}
               {!libLoading && (libraryDocs as any[]).length === 0 && (
                 <div className="text-sm text-gray-500 p-3 text-center py-6">
-                  <FileText className="h-8 w-8 mx-auto mb-2 text-gray-300 " />
+                  <FileText className="h-8 w-8 mx-auto mb-2 text-[#71717A] " />
                   No documents to add. Upload documents from the main Documents page first.
                 </div>
               )}
@@ -5575,9 +5575,9 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                         user_id: m.user_id,
                         kind: "deal_activity",
                         title: "New document in this deal room",
-                        body: `"${file.name}" has been shared with you for review.`,
+                        body: `A document was shared with you in this deal room.`,
                         read: false,
-                        action_url: `/app/investor/deal-rooms`,
+                        action_url: `/app/deal-room/${dealRoomId}`,
                         meta: { deal_room_id: dealRoomId },
                       }))
                     ).then(({ error: nErr }) => {
@@ -5646,9 +5646,9 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
                               user_id: m.user_id,
                               kind: "deal_activity",
                               title: "New document in this deal room",
-                              body: `"${file.name}" has been shared with you for review.`,
+                              body: `A document was shared with you in this deal room.`,
                               read: false,
-                              action_url: `/app/investor/deal-rooms`,
+                              action_url: `/app/deal-room/${dealRoomId}`,
                               meta: { deal_room_id: dealRoomId },
                             }))
                           ).then(({ error: nErr }) => {
@@ -5698,7 +5698,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
           {/* Investor doc list */}
           {visibleInvestorDocs.length === 0 && isInvestor && (
             <div className="rounded-none border border-dashed border-[rgba(0,0,0,0.08)] p-8 text-center">
-              <FileText className="h-8 w-8 mx-auto mb-2 text-gray-300 " />
+              <FileText className="h-8 w-8 mx-auto mb-2 text-[#71717A] " />
               <p className="text-sm text-gray-500">No investor documents</p>
             </div>
           )}
@@ -5779,7 +5779,7 @@ function Documents({ dealRoomId, isFounder, isInvestor, userId, startupId }: { d
         <div className="mt-5 space-y-3">
           {(dealRoomLinks as any[]).length === 0 && (
             <div className="rounded-none border border-dashed border-[rgba(0,0,0,0.08)] p-10 text-center">
-              <LinkIcon className="h-8 w-8 mx-auto mb-2 text-gray-300 " />
+              <LinkIcon className="h-8 w-8 mx-auto mb-2 text-[#71717A] " />
               <p className="text-sm font-medium">No links</p>
               <p className="text-xs text-gray-500 mt-1">Add product videos, Loom recordings, external documents, or any URL</p>
               <button
@@ -7076,9 +7076,9 @@ function OverviewPanel({
         </div>
 
         {!dealRoom?.investor_user_id ? (
-          <p className="text-sm text-gray-400">No investor assigned</p>
+          <p className="text-sm text-[#71717A]">No investor assigned</p>
         ) : !dealBrief ? (
-          <p className="text-sm text-gray-400">No brief</p>
+          <p className="text-sm text-[#71717A]">No brief</p>
         ) : (
           <div>
             <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -7101,7 +7101,7 @@ function OverviewPanel({
             {dealBrief.investment_thesis && (
               <p className="mt-2 text-sm text-gray-600 line-clamp-2">{dealBrief.investment_thesis}</p>
             )}
-            <p className="mt-3 text-xs text-gray-400 ">
+            <p className="mt-3 text-xs text-[#71717A] ">
               {dealBrief.generated_at
                 ? `Generated ${formatDistanceToNow(new Date(dealBrief.generated_at), { addSuffix: true })}`
                 : null}
@@ -7247,7 +7247,7 @@ function OverviewPanel({
       <section className="mb-4">
         <h3 className="mb-2 text-xs uppercase tracking-wider text-gray-500 ">TEAM</h3>
         {teamMembers.length === 0 ? (
-          <p className="text-gray-400 text-sm">No team members</p>
+          <p className="text-[#71717A] text-sm">No team members</p>
         ) : (
           <div className="flex gap-4 overflow-x-auto pb-2">
             {(teamMembers as any[]).map((member) => (
@@ -7311,7 +7311,7 @@ function OverviewPanel({
       <section className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4 mb-4">
         <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-4">RECENT ACTIVITY</h3>
         {recentActivity.length === 0 ? (
-          <p className="text-gray-400 text-sm">No activity</p>
+          <p className="text-[#71717A] text-sm">No activity</p>
         ) : (
           <div className="space-y-3">
             {(recentActivity as any[]).map((activity) => (
@@ -7321,7 +7321,7 @@ function OverviewPanel({
                   <span className="font-semibold text-gray-900 ">{activity.actor_name ?? "Someone"}</span>
                   <span> · {activity.action_type ?? activity.target_label ?? "Activity"}</span>
                 </div>
-                <div className="ml-auto whitespace-nowrap text-xs text-gray-400 ">
+                <div className="ml-auto whitespace-nowrap text-xs text-[#71717A] ">
                   {activity.created_at ? new Date(activity.created_at).toLocaleDateString() : ""}
                 </div>
               </div>

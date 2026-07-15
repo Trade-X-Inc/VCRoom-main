@@ -1,4 +1,4 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { PieChart, TrendingUp, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -7,10 +7,6 @@ import { formatDistanceToNow } from "date-fns";
 import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/portfolio")({
-  // P5: consolidated into the deal-flow steps — old links keep resolving.
-  beforeLoad: () => {
-    throw redirect({ to: "/app/investor/decide", hash: "portfolio", replace: true });
-  },
   component: PortfolioPage,
 });
 
@@ -39,7 +35,7 @@ export function PortfolioPage() {
       const { data, error } = await supabase
         .from("decisions")
         .select(`
-          id, status, created_at, deal_room_id, notes,
+          id, status, created_at, deal_room_id,
           deal_rooms(
             id, updated_at,
             startups(company_name, sector, stage, funding_target, revenue, traction)
@@ -62,7 +58,6 @@ export function PortfolioPage() {
           id: d.deal_room_id,
           decisionId: d.id,
           status: d.status,
-          notes: d.notes,
           decisionAt: d.created_at,
           updatedAt: d.deal_rooms?.updated_at,
           company: d.deal_rooms?.startups?.company_name ?? "Unnamed",
@@ -157,7 +152,6 @@ export function PortfolioPage() {
                 {c.fundingTarget && (
                   <div className="mt-1 text-xs text-brand font-medium">{c.fundingTarget}</div>
                 )}
-                {c.notes && <p className="mt-2 text-xs text-muted-foreground line-clamp-2">{c.notes}</p>}
                 {c.decisionAt && (
                   <div className="mt-3 flex items-center gap-1 text-[10px] text-muted-foreground border-t border-border/60 pt-3">
                     <Clock className="h-2.5 w-2.5" />

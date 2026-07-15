@@ -13,6 +13,11 @@ import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { OnboardingTour } from "@/components/app/OnboardingTour";
 
 export const Route = createFileRoute("/app/investor/overview")({
+  // TODO(R5): auth.callback.tsx redirects returning investors here after
+  // login — this is the real, live post-login landing target today, not
+  // dead legacy code, even though it immediately bounces to /app/investor.
+  // Do not delete or fold into the de-shim pass. This is the page to build
+  // out as the real /home per the target route map; until then leave in place.
   // P5: consolidated into the deal-flow steps — old links keep resolving.
   beforeLoad: () => {
     throw redirect({ to: "/app/investor", replace: true });
@@ -21,6 +26,33 @@ export const Route = createFileRoute("/app/investor/overview")({
 });
 
 const STAGES = ["Sourced", "Reviewing", "Diligence", "Partner", "Term Sheet", "Closed"] as const;
+
+// `activities.action` is a short category string for most writers, but at
+// least one write path (deal room creation) stores a full free-text sentence
+// with investor name / firm / deal terms. This page renders outside any
+// deal-room boundary, so only the known-safe short forms are allowed through
+// — anything else is deal content and must not leak here (CLAUDE.md §9.6).
+const SAFE_ACTIVITY_ACTIONS = new Set([
+  "Uploaded a document",
+  "Added a note",
+  "Signed the NDA",
+  "Sent a term sheet",
+  "Requested a document",
+  "Investor passed on deal",
+  "Granted section access",
+  "Revoked section access",
+  "Asked a structured Q&A question",
+  "Answered a structured Q&A question",
+  "Decision: Under Review",
+  "Decision: Request More Info",
+  "Decision: Move to Partner Review",
+  "Decision: Term Sheet Ready",
+  "Decision: Not Proceeding",
+  "Decision: Exit",
+]);
+function safeActivityLabel(action: string): string {
+  return SAFE_ACTIVITY_ACTIONS.has(action) ? action : "Room activity";
+}
 
 const DB_STATUS_TO_STAGE: Record<string, string> = {
   under_review: "Reviewing",
@@ -312,7 +344,7 @@ function InvestorDashboard() {
     attentionItems.push({
       id: `act-${act.id}`,
       level: "info",
-      title: `Founder activity: ${act.action}`,
+      title: `Founder activity: ${safeActivityLabel(act.action)}`,
       href: `/app/deal-room/${act.deal_room_id}`,
     });
   }
