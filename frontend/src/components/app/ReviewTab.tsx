@@ -233,7 +233,7 @@ function InvestorReview({ dealRoomId, startupId }: { dealRoomId: string; startup
           title: `Deal update: ${type}`,
           body: extra?.message ?? `An investor updated your deal status to "${type}".`,
           kind: "decision",
-          actionUrl: `/app/deal-room/${dealRoomId}`,
+          actionUrl: `/app/deal-rooms/${dealRoomId}`,
         });
       }
     }

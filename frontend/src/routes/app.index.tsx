@@ -1106,7 +1106,7 @@ function DealActivityCard({
                           </div>
                         </div>
                         <Link
-                          to="/app/deal-room/$id"
+                          to="/app/deal-rooms/$id"
                           params={{ id: room.id }}
                           className="inline-flex items-center gap-1 text-xs font-medium shrink-0 transition-colors"
                           style={{ color: "rgba(124,58,237,0.8)" }}

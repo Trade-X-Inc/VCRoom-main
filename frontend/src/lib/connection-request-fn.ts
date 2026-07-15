@@ -249,7 +249,7 @@ export const approveConnectionRequest = createServerFn({ method: "POST" })
       kind: "deal_room",
       title: `${startup.company_name} approved your connection request`,
       body: "Your deal room is ready. Sign the NDA to access the Information Vault.",
-      action_url: `/app/deal-room/${dealRoomId}`,
+      action_url: `/app/deal-rooms/${dealRoomId}`,
       meta: { deal_room_id: dealRoomId, request_id: data.requestId },
     });
 

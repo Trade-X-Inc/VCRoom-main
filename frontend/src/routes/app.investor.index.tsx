@@ -179,7 +179,7 @@ function DealRoomsCard({ rooms }: { rooms: InvestorContext["activeDealRooms"] })
           <div key={r.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: 13, fontWeight: 500, color: "var(--foreground)" }}>{r.companyName}</span>
             <a
-              href={`/app/deal-room/${r.id}`}
+              href={`/app/deal-rooms/${r.id}`}
               style={{ fontSize: 11, color: "#A855F7", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 3 }}
             >
               Open <ChevronRight size={10} />

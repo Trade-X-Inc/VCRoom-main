@@ -156,7 +156,7 @@ export function useStageTransition({
               : `The founder has requested to move to the next stage: ${stageLabel(next)}`,
             read: false,
             meta: { deal_room_id: dealRoomId, transition_id: inserted.id },
-            action_url: `/app/deal-room/${dealRoomId}`,
+            action_url: `/app/deal-rooms/${dealRoomId}`,
           });
           if (notifErr) console.error("[stage] request notification failed:", notifErr);
         }
@@ -208,7 +208,7 @@ export function useStageTransition({
           body: `Your request to advance to ${stageLabel(transition.to_stage)} has been approved.`,
           read: false,
           meta: { deal_room_id: dealRoomId, transition_id: transitionId },
-          action_url: `/app/deal-room/${dealRoomId}`,
+          action_url: `/app/deal-rooms/${dealRoomId}`,
         });
         if (apprNotifErr) console.error("[stage] approval notification failed:", apprNotifErr);
       }
@@ -250,7 +250,7 @@ export function useStageTransition({
           body: `Your request to advance to ${stageLabel(transition.to_stage)} was declined.`,
           read: false,
           meta: { deal_room_id: dealRoomId, transition_id: transitionId },
-          action_url: `/app/deal-room/${dealRoomId}`,
+          action_url: `/app/deal-rooms/${dealRoomId}`,
         });
         if (declNotifErr) console.error("[stage] decline notification failed:", declNotifErr);
       }

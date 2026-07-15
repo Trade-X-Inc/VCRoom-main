@@ -206,7 +206,7 @@ function DealBriefPanel({ startupId, investorId, dealRoomId }: { startupId: stri
           {brief.viewed_at ? ` · Viewed ${format(new Date(brief.viewed_at), "d MMM")}` : ""}
         </span>
         <Link
-          to="/app/deal-room/$id"
+          to="/app/deal-rooms/$id"
           params={{ id: dealRoomId }}
           className="inline-flex items-center gap-1 text-[11px] font-medium transition-colors"
           style={{ color: "rgba(124,58,237,0.8)" }}
@@ -332,7 +332,7 @@ function DealFlowPage() {
             {filtered.map((room) => (
               <div key={room.id} className="rounded-2xl border border-border/60 bg-card hover:shadow-card transition-shadow group flex flex-col">
                 <Link
-                  to="/app/deal-room/$id"
+                  to="/app/deal-rooms/$id"
                   params={{ id: room.id }}
                   className="flex-1 block p-5"
                 >
@@ -373,7 +373,7 @@ function DealFlowPage() {
                       Watchlist
                     </button>
                     <button
-                      onClick={(e) => { e.stopPropagation(); void navigate({ to: "/app/deal-room/$id", params: { id: room.id } }); }}
+                      onClick={(e) => { e.stopPropagation(); void navigate({ to: "/app/deal-rooms/$id", params: { id: room.id } }); }}
                       className="inline-flex items-center gap-1 rounded-md bg-accent text-brand px-2 py-0.5 text-[10px] font-medium hover:bg-accent"
                     >
                       Open <ArrowRight className="h-2.5 w-2.5" />

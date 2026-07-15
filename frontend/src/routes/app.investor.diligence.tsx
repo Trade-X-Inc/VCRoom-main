@@ -127,7 +127,7 @@ export function DiligencePage() {
 
                 {/* Action */}
                 <Link
-                  to="/app/deal-room/$id"
+                  to="/app/deal-rooms/$id"
                   params={{ id: room.id }}
                   className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium shrink-0 transition-colors"
                   style={{ background: "rgba(124,58,237,0.1)", color: "#A855F7", border: "1px solid rgba(124,58,237,0.2)" }}

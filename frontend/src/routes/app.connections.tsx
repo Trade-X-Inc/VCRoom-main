@@ -534,7 +534,7 @@ function IncomingRequests() {
         toast.success("Deal room created — investor notified");
         qc.invalidateQueries({ queryKey: ["incoming-connection-requests", user?.id] });
         qc.invalidateQueries({ queryKey: ["vc-leads", user?.id] });
-        navigate({ to: "/app/deal-room/$id", params: { id: result.dealRoomId } });
+        navigate({ to: "/app/deal-rooms/$id", params: { id: result.dealRoomId } });
       } else {
         toast.error("Could not create deal room. Please try again.");
       }

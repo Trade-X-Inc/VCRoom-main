@@ -529,7 +529,7 @@ function CompanyCard({ entry, compact = false, onAdvance, onDecision, advancing 
           {stale ? `Stale ${days}d` : `${days}d in stage`}
         </span>
         {entry.deal_room_id && (
-          <a href={`/app/deal-room/${entry.deal_room_id}`} style={{ fontSize: 11, color: "var(--brand)", display: "flex", alignItems: "center", gap: 3 }}>
+          <a href={`/app/deal-rooms/${entry.deal_room_id}`} style={{ fontSize: 11, color: "var(--brand)", display: "flex", alignItems: "center", gap: 3 }}>
             <ExternalLink size={10} />Open DD
           </a>
         )}
@@ -632,7 +632,7 @@ function ListView({ entries, advancing, onAdvance, onDecision }: {
               <tr key={e.id} style={{ borderLeft: stale ? "3px solid #F59E0B" : "3px solid transparent", borderBottom: "1px solid var(--border)" }}>
                 <td style={{ padding: "10px 12px" }}>
                   <div style={{ fontWeight: 600, fontSize: 13, color: "var(--color-foreground)" }}>{e.company_name}</div>
-                  {e.deal_room_id && <a href={`/app/deal-room/${e.deal_room_id}`} style={{ fontSize: 10, color: "var(--brand)", display: "flex", alignItems: "center", gap: 3, marginTop: 2 }}><ExternalLink size={9} />Open DD</a>}
+                  {e.deal_room_id && <a href={`/app/deal-rooms/${e.deal_room_id}`} style={{ fontSize: 10, color: "var(--brand)", display: "flex", alignItems: "center", gap: 3, marginTop: 2 }}><ExternalLink size={9} />Open DD</a>}
                 </td>
                 <td style={{ padding: "10px 12px" }}><StageBadge status={e.status} /></td>
                 <td style={{ padding: "10px 12px", fontSize: 12, color: stale ? "#F59E0B" : "var(--color-muted-foreground)", whiteSpace: "nowrap" as const }}>

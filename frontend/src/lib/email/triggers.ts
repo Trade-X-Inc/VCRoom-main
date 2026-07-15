@@ -93,7 +93,7 @@ export const triggerNdaSigned = createServerFn({ method: "POST" })
       investorName: data.investorName,
       investorEmail: data.investorEmail,
       companyName: data.companyName,
-      dealRoomUrl: `${APP_URL}/app/deal-room/${data.dealRoomId}`,
+      dealRoomUrl: `${APP_URL}/app/deal-rooms/${data.dealRoomId}`,
     });
     return sendEmail({
       to: data.founderEmail,
@@ -121,7 +121,7 @@ export const triggerDecision = createServerFn({ method: "POST" })
       investorName: data.investorName,
       companyName: data.companyName,
       decision: data.decision,
-      dealRoomUrl: `${APP_URL}/app/deal-room/${data.dealRoomId}`,
+      dealRoomUrl: `${APP_URL}/app/deal-rooms/${data.dealRoomId}`,
       note: data.note,
     });
     return sendEmail({
@@ -149,7 +149,7 @@ export const triggerDocumentUploaded = createServerFn({ method: "POST" })
       founderName: data.founderName,
       companyName: data.companyName,
       documentName: data.documentName,
-      dealRoomUrl: `${APP_URL}/app/deal-room/${data.dealRoomId}`,
+      dealRoomUrl: `${APP_URL}/app/deal-rooms/${data.dealRoomId}`,
     });
     return sendEmail({
       to: data.investorEmail,
@@ -180,7 +180,7 @@ export const triggerMeetingScheduled = createServerFn({ method: "POST" })
       meetingTitle: data.meetingTitle,
       meetingDate: data.meetingDate,
       meetingLink: data.meetingLink,
-      dealRoomUrl: `${APP_URL}/app/deal-room/${data.dealRoomId}`,
+      dealRoomUrl: `${APP_URL}/app/deal-rooms/${data.dealRoomId}`,
     });
     return sendEmail({
       to: data.recipientEmail,
@@ -225,7 +225,7 @@ export const triggerNdaSignedEmail = createServerFn({ method: "POST" })
         investorName: (investor as any)?.full_name ?? "An investor",
         investorEmail: (investor as any)?.email ?? "",
         companyName: (room as any)?.startups?.company_name ?? "the startup",
-        dealRoomUrl: `${APP_URL}/app/deal-room/${data.dealRoomId}`,
+        dealRoomUrl: `${APP_URL}/app/deal-rooms/${data.dealRoomId}`,
       });
       return sendEmail({ to: founder.users.email, subject, html, tags: [{ name: "type", value: "nda-signed" }] });
     } catch (e) { console.error("[triggers] NDA email failed:", e); return null; }
@@ -250,7 +250,7 @@ export const triggerDecisionEmail = createServerFn({ method: "POST" })
         investorName: (investor as any)?.full_name ?? "An investor",
         companyName: (room as any)?.startups?.company_name ?? "the startup",
         decision: data.decision,
-        dealRoomUrl: `${APP_URL}/app/deal-room/${data.dealRoomId}`,
+        dealRoomUrl: `${APP_URL}/app/deal-rooms/${data.dealRoomId}`,
         note: data.note,
       });
       return sendEmail({ to: founder.users.email, subject, html, tags: [{ name: "type", value: "decision" }, { name: "decision", value: data.decision }] });
@@ -277,7 +277,7 @@ export const triggerMeetingEmail = createServerFn({ method: "POST" })
           meetingTitle: data.meetingTitle,
           meetingDate: data.meetingDate,
           meetingLink: data.meetingLink,
-          dealRoomUrl: `${APP_URL}/app/deal-room/${data.dealRoomId}`,
+          dealRoomUrl: `${APP_URL}/app/deal-rooms/${data.dealRoomId}`,
         });
         return sendEmail({ to: m.users.email, subject, html, tags: [{ name: "type", value: "meeting-scheduled" }] });
       }));
@@ -328,7 +328,7 @@ export const triggerDocumentUploadedEmail = createServerFn({ method: "POST" })
           founderName,
           companyName: (room as any)?.startups?.company_name ?? "the startup",
           documentName: data.documentName,
-          dealRoomUrl: `${APP_URL}/app/deal-room/${data.dealRoomId}`,
+          dealRoomUrl: `${APP_URL}/app/deal-rooms/${data.dealRoomId}`,
         });
         return sendEmail({ to: inv.users.email, subject, html, tags: [{ name: "type", value: "document-uploaded" }] });
       }));

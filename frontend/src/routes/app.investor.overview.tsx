@@ -336,7 +336,7 @@ function InvestorDashboard() {
         id: `overdue-${room.id}`,
         level: "urgent",
         title: `${name}: no decision update in 7+ days`,
-        href: `/app/deal-room/${room.id}`,
+        href: `/app/deal-rooms/${room.id}`,
       });
     }
   }
@@ -345,7 +345,7 @@ function InvestorDashboard() {
       id: `act-${act.id}`,
       level: "info",
       title: `Founder activity: ${safeActivityLabel(act.action)}`,
-      href: `/app/deal-room/${act.deal_room_id}`,
+      href: `/app/deal-rooms/${act.deal_room_id}`,
     });
   }
 
@@ -517,7 +517,7 @@ function InvestorDashboard() {
                     {stage}
                   </span>
                   <Link
-                    to="/app/deal-room/$id"
+                    to="/app/deal-rooms/$id"
                     params={{ id: room.id }}
                     className="shrink-0 rounded-md border border-border/60 px-2.5 py-1 text-xs hover:bg-accent transition-colors"
                   >
@@ -587,7 +587,7 @@ function InvestorDashboard() {
         data={aiBriefData}
         onClose={() => setSelectedRoomId(null)}
         onOpenDealRoom={() => {
-          if (selectedRoomId) window.location.href = `/app/deal-room/${selectedRoomId}`;
+          if (selectedRoomId) window.location.href = `/app/deal-rooms/${selectedRoomId}`;
         }}
       />
     </div>

@@ -105,7 +105,7 @@ export function DealRoomsPage() {
               return (
                 <Link
                   key={room.id}
-                  to="/app/deal-room/$id"
+                  to="/app/deal-rooms/$id"
                   params={{ id: room.id }}
                   className="block rounded-2xl border border-border/60 bg-card p-5 hover:shadow-card transition-shadow group"
                   data-testid={`deal-room-card-${room.id}`}

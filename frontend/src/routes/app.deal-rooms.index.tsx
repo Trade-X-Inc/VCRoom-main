@@ -13,7 +13,7 @@ import { sendInviteEmail } from "@/lib/invite-fn";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { EmptyState } from "@/components/system";
 
-export const Route = createFileRoute("/app/deal-rooms")({
+export const Route = createFileRoute("/app/deal-rooms/")({
   component: DealRooms,
 });
 
@@ -304,7 +304,7 @@ function DealRooms() {
                   ) : "No email on file"}
                 </div>
                 <Link
-                  to={"/app/deal-room/$id" as any}
+                  to={"/app/deal-rooms/$id" as any}
                   params={{ id: r.id } as any}
                   className="inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-2.5 py-1.5 text-xs shadow-glow hover:opacity-90 transition-opacity"
                   onClick={(e) => e.stopPropagation()}
@@ -745,7 +745,7 @@ function CreateRoomForm({
                 Close
               </button>
               <button
-                onClick={() => navigate({ to: "/app/deal-room/$id" as any, params: { id: createdRoom.id } as any })}
+                onClick={() => navigate({ to: "/app/deal-rooms/$id" as any, params: { id: createdRoom.id } as any })}
                 className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"
               >
                 Go to deal room <ArrowUpRight className="h-3.5 w-3.5" />

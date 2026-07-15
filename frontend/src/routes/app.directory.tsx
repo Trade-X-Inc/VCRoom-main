@@ -221,7 +221,7 @@ function StartupCard({
     if (requestStatus === "approved") {
       return roomId ? (
         <Link
-          to="/app/deal-room/$id"
+          to="/app/deal-rooms/$id"
           params={{ id: roomId }}
           onClick={(e) => e.stopPropagation()}
           className="flex-1 text-center text-xs py-1.5 rounded-lg hs-gradient text-brand-foreground hover:bg-accent transition-colors"

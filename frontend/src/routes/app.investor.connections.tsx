@@ -459,7 +459,7 @@ function SentRequestsPanel({ investorUserId }: { investorUserId: string }) {
     if (r.status === "deal_room_created" && r.deal_room_id) {
       return (
         <Link
-          to="/app/deal-room/$id"
+          to="/app/deal-rooms/$id"
           params={{ id: r.deal_room_id }}
           className="text-[11px] font-semibold px-2 py-0.5 rounded-full hover:opacity-80"
           style={{ background: "rgba(16,185,129,0.12)", color: "#10B981" }}

@@ -8,7 +8,7 @@ import { Logo } from "@/components/brand/Logo";
 import { triggerNdaSignedEmail } from "@/lib/email/triggers";
 import { generateNdaDocument } from "@/lib/nda-fn";
 
-export const Route = createFileRoute("/app/deal-room/$id_/nda")({
+export const Route = createFileRoute("/app/deal-rooms/$id/nda")({
   component: NdaPage,
 });
 
@@ -126,7 +126,7 @@ function NdaPage() {
 
   useEffect(() => {
     if (!checkingNda && existingAcceptance) {
-      navigate({ to: "/app/deal-room/$id" as any, params: { id: dealRoomId } });
+      navigate({ to: "/app/deal-rooms/$id", params: { id: dealRoomId } });
     }
   }, [checkingNda, existingAcceptance, navigate, dealRoomId]);
 
@@ -240,7 +240,7 @@ function NdaPage() {
         ["nda-acceptance", dealRoomId, user.id],
         { id: "accepted", accepted_at: new Date().toISOString() },
       );
-      navigate({ to: "/app/deal-room/$id" as any, params: { id: dealRoomId } });
+      navigate({ to: "/app/deal-rooms/$id", params: { id: dealRoomId } });
     } catch {
       setError("Could not save your acceptance. Please try again.");
       setAccepting(false);

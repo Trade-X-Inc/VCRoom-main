@@ -422,7 +422,7 @@ export function StartupsPage() {
             {dealRoomStartups.map((c: any) => (
               <Link
                 key={c.id}
-                to="/app/deal-room/$id"
+                to="/app/deal-rooms/$id"
                 params={{ id: c.dealRoomId }}
                 className="block rounded-2xl border border-border/60 bg-card p-5 hover:shadow-card transition-shadow group"
               >

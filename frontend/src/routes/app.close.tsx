@@ -27,7 +27,7 @@ function RoomList({ rooms }: { rooms: RoomRow[] }) {
       {rooms.map((r) => (
         <Link
           key={r.id}
-          to="/app/deal-room/$id"
+          to="/app/deal-rooms/$id"
           params={{ id: r.id }}
           className="flex items-center justify-between gap-4 py-4 hover:bg-accent/50 transition-colors"
         >

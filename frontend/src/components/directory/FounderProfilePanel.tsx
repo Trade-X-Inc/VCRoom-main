@@ -293,7 +293,7 @@ export function FounderProfilePanel({
     if (requestStatus === "approved") {
       return roomId ? (
         <Link
-          to="/app/deal-room/$id"
+          to="/app/deal-rooms/$id"
           params={{ id: roomId }}
           className="w-full inline-flex items-center justify-center gap-2 rounded-lg hs-gradient text-foreground px-4 py-3 text-sm font-semibold hover:bg-[#6d28d9] transition-colors"
         >

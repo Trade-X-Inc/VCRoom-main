@@ -106,7 +106,7 @@ function MemberOverview() {
               return (
                 <Link
                   key={r.deal_room_id}
-                  to={"/app/deal-room/$id" as any}
+                  to={"/app/deal-rooms/$id" as any}
                   params={{ id: r.deal_room_id }}
                   style={{
                     display: "flex", alignItems: "center", justifyContent: "space-between",

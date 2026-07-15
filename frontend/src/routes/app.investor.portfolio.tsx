@@ -128,7 +128,7 @@ export function PortfolioPage() {
             {invested.map((c) => (
               <Link
                 key={c.id}
-                to="/app/deal-room/$id"
+                to="/app/deal-rooms/$id"
                 params={{ id: c.id }}
                 className="block rounded-2xl border border-border/60 bg-card p-5 hover:shadow-card transition-shadow group"
               >

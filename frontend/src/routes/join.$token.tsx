@@ -281,7 +281,7 @@ function JoinFlow() {
               <button
                 onClick={() =>
                   navigate({
-                    to: "/app/deal-room/$id" as any,
+                    to: "/app/deal-rooms/$id" as any,
                     params: { id: invite!.deal_room_id } as any,
                   })
                 }
