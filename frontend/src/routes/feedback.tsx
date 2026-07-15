@@ -55,7 +55,7 @@ function Feedback() {
         <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
           Share your feedback.
         </h1>
-        <p className="mt-3 text-gray-400 max-w-lg mx-auto">
+        <p className="mt-3 text-[#71717A] max-w-lg mx-auto">
           Help us build a better product. We read every response personally.
         </p>
       </div>

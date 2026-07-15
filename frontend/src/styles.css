@@ -2,12 +2,11 @@
 @source "../src";
 @import "tw-animate-css";
 /* Brand webfonts — self-hosted, no third-party requests.
-   Inter 400/500/600 (body/label/value) · Syne 700/800 (headings/wordmark) */
-@import "@fontsource/inter/400.css";
-@import "@fontsource/inter/500.css";
-@import "@fontsource/inter/600.css";
+   DM Sans 400/500 (UI/body) · Syne 600/700 (display/headings) */
+@import "@fontsource/dm-sans/400.css";
+@import "@fontsource/dm-sans/500.css";
+@import "@fontsource/syne/600.css";
 @import "@fontsource/syne/700.css";
-@import "@fontsource/syne/800.css";
 @plugin "@tailwindcss/typography";
 
 /* ── Mobile globals ──────────────────────────────────────────────── */
@@ -19,12 +18,16 @@ img { max-width: 100%; height: auto; }
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  /* 0px structural, per CLAUDE.md §9.0. --radius-control is the one
+     exception (buttons/inputs/chips, max 2px) — use it explicitly, don't
+     reach for -sm/-md/-lg/-xl on structural elements. */
+  --radius-sm: 0px;
+  --radius-md: 0px;
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-control: 2px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -60,10 +63,9 @@ img { max-width: 100%; height: auto; }
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Syne", ui-sans-serif, system-ui, sans-serif;
-  /* Institutional type scale (CLAUDE.md §9.5): body 13px, small 12px.
-     Small text = institutional. */
+  /* Institutional type scale (CLAUDE.md §9.1): body 14px min, tables 13px min. */
   --text-sm: 0.8125rem;
   --text-sm--line-height: 1.25rem;
   --text-base: 0.875rem;
@@ -71,33 +73,34 @@ img { max-width: 100%; height: auto; }
 }
 
 :root {
-  --radius: 0.5rem;
+  --radius: 0px;
 
-  /* Pure white, pure black. One theme. (CLAUDE.md §9) */
-  --background: #FFFFFF;
+  /* App canvas / card surfaces. One theme. (CLAUDE.md §9) */
+  --background: #FAFAFA;
   --foreground: #0A0A0B;
   --card: #FFFFFF;
   --card-foreground: #0A0A0B;
   --popover: #FFFFFF;
   --popover-foreground: #0A0A0B;
 
-  /* Primary — ink. Brand actions use the gradient, not this. */
+  /* Primary — ink. Brand actions use --brand, not this. */
   --primary: #0A0A0B;
   --primary-foreground: #FFFFFF;
 
-  --secondary: rgba(0, 0, 0, 0.03);
+  --secondary: #FAFAFA;
   --secondary-foreground: #0A0A0B;
 
-  --muted: rgba(0, 0, 0, 0.03);
-  --muted-foreground: rgba(0, 0, 0, 0.45);
+  --muted: #FAFAFA;
+  --muted-foreground: #71717A;
 
-  --accent: rgba(0, 0, 0, 0.03);
+  --accent: #FAFAFA;
   --accent-foreground: #0A0A0B;
 
-  /* Brand — Hockystick purple (gradient 'from' stop; flat use is banned
-     in components — always route through this token or the gradient) */
+  /* Brand — Hockystick violet. Flat, per CLAUDE.md §9.0: primary buttons,
+     active nav indicator, links, focus rings, key data accents only. */
   --brand: #7C3AED;
   --brand-foreground: #FFFFFF;
+  --brand-hover: #6D28D9;
   --violet: #6366F1;
 
   --destructive: #EF4444;
@@ -107,34 +110,28 @@ img { max-width: 100%; height: auto; }
   --warning: #F59E0B;
   --warning-foreground: #0A0A0B;
 
-  /* Hairline — the only border in the system */
-  --border: rgba(0, 0, 0, 0.06);
-  --input: rgba(0, 0, 0, 0.08);
-  --faint: rgba(0, 0, 0, 0.25);
-  --ring: rgba(0, 0, 0, 0.2);
+  /* Border — the only divider style, per CLAUDE.md §9.0. */
+  --border: #E4E4E7;
+  --input: #E4E4E7;
+  --faint: #71717A;
+  --ring: #7C3AED;
 
   --sidebar: #FFFFFF;
   --sidebar-foreground: #0A0A0B;
   --sidebar-primary: #0A0A0B;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: rgba(0, 0, 0, 0.03);
+  --sidebar-accent: #FAFAFA;
   --sidebar-accent-foreground: #0A0A0B;
-  --sidebar-border: rgba(0, 0, 0, 0.06);
-  --sidebar-ring: rgba(0, 0, 0, 0.2);
+  --sidebar-border: #E4E4E7;
+  --sidebar-ring: #7C3AED;
 
-  /* Gradients & shadows */
-  --gradient-brand: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
-  --gradient-soft: linear-gradient(180deg, oklch(0.99 0.005 270), oklch(0.96 0.008 270));
-  --gradient-hero: radial-gradient(ellipse 80% 60% at 50% 0%, color-mix(in oklab, var(--brand) 18%, transparent), transparent 70%);
-  --gradient-mesh: radial-gradient(at 20% 20%, color-mix(in oklab, var(--brand) 22%, transparent) 0%, transparent 50%),
-                   radial-gradient(at 80% 30%, color-mix(in oklab, var(--violet) 22%, transparent) 0%, transparent 50%),
-                   radial-gradient(at 50% 90%, color-mix(in oklab, var(--brand) 15%, transparent) 0%, transparent 50%);
-
-  --shadow-xs: 0 1px 2px 0 oklch(0.15 0.01 270 / 0.04);
-  --shadow-sm: 0 1px 3px 0 oklch(0.15 0.01 270 / 0.06), 0 1px 2px -1px oklch(0.15 0.01 270 / 0.04);
-  --shadow-md: 0 4px 12px -2px oklch(0.15 0.01 270 / 0.08), 0 2px 6px -2px oklch(0.15 0.01 270 / 0.04);
-  --shadow-lg: 0 16px 40px -8px oklch(0.15 0.01 270 / 0.14), 0 8px 16px -8px oklch(0.15 0.01 270 / 0.06);
-  --shadow-glow: 0 0 60px -10px color-mix(in oklab, var(--brand) 40%, transparent);
+  /* Shadows — none or 0 1px 2px rgba(0,0,0,0.04) max, per CLAUDE.md §9.0.
+     Borders define hierarchy, not shadows. */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-glow: none;
   --shadow-card: none;
 }
 
@@ -160,17 +157,20 @@ img { max-width: 100%; height: auto; }
 
 @layer utilities {
   .text-gradient-brand {
-    background: var(--gradient-brand);
+    background: var(--brand);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
-  .bg-gradient-brand { background: var(--gradient-brand); }
-  .bg-gradient-hero { background: var(--gradient-hero); }
-  .bg-gradient-mesh { background: var(--gradient-mesh); }
-  .bg-gradient-soft { background: var(--gradient-soft); }
+  /* Flat brand fill, per CLAUDE.md §9.0 — these utility classes are kept so
+     the 50+ existing call sites don't break; the gradient they used to paint
+     is retired. Call sites migrate to plain bg-[--brand] over time. */
+  .bg-gradient-brand { background: var(--brand); }
+  .bg-gradient-hero { background: var(--brand); }
+  .bg-gradient-mesh { background: var(--brand); }
+  .bg-gradient-soft { background: var(--background); }
   .shadow-card { box-shadow: var(--shadow-card); }
-  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .shadow-glow { box-shadow: none; }
   .shadow-elev { box-shadow: var(--shadow-lg); }
   .grid-bg {
     background-image:
@@ -265,30 +265,27 @@ img { max-width: 100%; height: auto; }
   }
 }
 
-/* ── Hockystick design system (P1) — see src/lib/design-tokens.ts ─────────
-   The purple is a gradient, never flat. These utilities are the only
-   sanctioned way to paint it. */
+/* ── Hockystick design system — see src/lib/design-tokens.ts ──────────────
+   CLAUDE.md §9.0: brand is flat #7C3AED, used sparingly (buttons, active
+   nav, links, focus rings, key accents). These utilities are kept so
+   existing call sites don't break; they now paint flat, not a gradient. */
 .hs-gradient {
-  background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
+  background: #7C3AED;
   color: #fff;
 }
 .hs-gradient:hover {
-  background: linear-gradient(135deg, #6D28D9 0%, #4F46E5 100%);
+  background: #6D28D9;
 }
 .hs-gradient-static {
-  background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
+  background: #7C3AED;
   color: #fff;
 }
 .hs-gradient-text {
-  background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  color: #7C3AED;
 }
-.hs-hairline { border-color: rgba(0, 0, 0, 0.06); }
-.hs-hairline-t { border-top: 1px solid rgba(0, 0, 0, 0.06); }
-.hs-hairline-b { border-bottom: 1px solid rgba(0, 0, 0, 0.06); }
+.hs-hairline { border-color: #E4E4E7; }
+.hs-hairline-t { border-top: 1px solid #E4E4E7; }
+.hs-hairline-b { border-bottom: 1px solid #E4E4E7; }
 
 /* Illustrated loading figure — a slow walk, never a spinner. */
 @keyframes hs-walk-a { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }

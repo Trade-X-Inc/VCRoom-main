@@ -38,10 +38,10 @@ export function EmptyState({
       <div>
         <div
           style={{
-            fontFamily: "'Inter', ui-sans-serif, system-ui, sans-serif",
-            fontSize: 13,
+            fontFamily: "'DM Sans', ui-sans-serif, system-ui, sans-serif",
+            fontSize: 14,
             fontWeight: 400,
-            color: "rgba(0,0,0,0.35)",
+            color: "#52525B",
           }}
         >
           {title}
@@ -49,10 +49,10 @@ export function EmptyState({
         {description && (
           <div
             style={{
-              fontFamily: "'Inter', ui-sans-serif, system-ui, sans-serif",
-              fontSize: 12,
+              fontFamily: "'DM Sans', ui-sans-serif, system-ui, sans-serif",
+              fontSize: 13,
               fontWeight: 400,
-              color: "rgba(0,0,0,0.25)",
+              color: "#71717A",
               marginTop: 4,
             }}
           >

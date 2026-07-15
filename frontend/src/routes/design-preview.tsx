@@ -56,7 +56,7 @@ function Preview() {
           <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 18, fontWeight: 700, letterSpacing: "-0.5px" }}>Heading — Syne 18 · 700</div>
           <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, fontWeight: 400 }}>Body — Inter 13 · 400. One word says one essay.</div>
           <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, fontWeight: 600 }}>$2.4M — value, Inter 13 · 600</div>
-          <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, fontWeight: 400, color: "rgba(0,0,0,0.35)" }}>Muted — Inter 12 · 400</div>
+          <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, fontWeight: 400, color: "#71717A" }}>Muted — Inter 12 · 400</div>
           <span className="hs-gradient-text" style={{ fontSize: 13, fontWeight: 600, width: "fit-content" }}>Gradient text</span>
         </div>
       </div>

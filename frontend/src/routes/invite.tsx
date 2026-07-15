@@ -42,7 +42,7 @@ function Invite() {
         <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tight max-w-2xl mx-auto" style={{ fontFamily: "Syne, sans-serif" }}>
           You're invited to Hockystick.
         </h1>
-        <p className="mt-4 text-lg text-gray-400 max-w-xl mx-auto">
+        <p className="mt-4 text-lg text-[#71717A] max-w-xl mx-auto">
           Unlock exclusive benefits reserved for founding members.
         </p>
       </div>

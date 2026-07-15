@@ -1,124 +1,147 @@
 /**
  * Hockystick design tokens — the single source of truth.
  *
- * Design law (see CLAUDE.md §9): pure white, one theme, purple only as a
- * gradient, whitespace as the design, minimal text, small institutional type.
+ * Design law (see CLAUDE.md §9, "the Design Constitution"): flat brand violet
+ * used sparingly, 0px radius on structural elements, borders over shadows,
+ * dense institutional layout (Cloudflare/Stripe/Linear reference).
  * If a value isn't in this file, it isn't in the design system.
  */
 
 // ── Color ─────────────────────────────────────────────────────────────────────
 
 export const color = {
-  /** Page background. The only background inside /app/*. */
+  /** App canvas background. */
+  canvas: "#FAFAFA",
+  /** Card/panel background. */
   white: "#FFFFFF",
   /** Primary text. Near-black ink. */
   ink: "#0A0A0B",
-  /** Secondary text — labels, muted copy. */
-  ink35: "rgba(0,0,0,0.35)",
-  /** Tertiary text — placeholders, disabled. */
-  ink25: "rgba(0,0,0,0.25)",
-  /** Hairline dividers. The only allowed border color. */
-  hairline: "rgba(0,0,0,0.06)",
-  /** Ghost-button border. */
-  inkBorder: "rgba(0,0,0,0.08)",
-  /** Hover wash for interactive rows. */
-  wash: "rgba(0,0,0,0.02)",
+  /** Secondary text — never lighter than this for body copy. */
+  inkSecondary: "#52525B",
+  /** Tertiary text — labels, captions. WCAG AA floor; never go lighter on white. */
+  inkTertiary: "#71717A",
+  /** The ONLY divider style. 1px solid. */
+  border: "#E4E4E7",
 } as const;
 
 /**
- * THE Hockystick purple. Never flat — always this gradient.
- * Flat #7C3AED is banned everywhere except the gradient stops themselves.
+ * THE Hockystick brand color. Flat, not a gradient.
+ * Used ONLY for: primary buttons, active nav indicator, links, focus rings,
+ * key data accents. Never as a section background inside the app.
  */
-export const gradient = {
-  brand: "linear-gradient(135deg, #7C3AED 0%, #6366F1 100%)",
-  /** Hover state: same hue, slightly deepened. */
-  brandHover: "linear-gradient(135deg, #6D28D9 0%, #4F46E5 100%)",
-  /** Stops, for SVG defs and canvas contexts that can't take CSS gradients. */
-  from: "#7C3AED",
-  to: "#6366F1",
+export const brand = {
+  flat: "#7C3AED",
+  /** Hover state. */
+  hover: "#6D28D9",
 } as const;
 
 /**
- * Status is never a colored pill background — it is a 6px dot next to an
- * 11px uppercase ink label (the dot system). These are the only semantic
- * colors in the app. Buttons never use them.
+ * Status chips: 2px radius, 12px text, AA-compliant contrast.
+ * Replaces the old dot-only system — chips are the sanctioned pattern now.
  */
 export const status = {
   positive: "#10B981", // verified, complete, live
   warning: "#F59E0B", // pending, flagged, expiring
   negative: "#EF4444", // failed, declined, expired
-  neutral: "rgba(0,0,0,0.25)", // inactive, draft, empty
+  neutral: "#71717A", // inactive, draft, empty
 } as const;
 
-// ── Typography — small, precise, quiet ───────────────────────────────────────
+// ── Typography — Syne display, DM Sans UI/body ────────────────────────────────
 
 export const font = {
   display: "'Syne', sans-serif",
-  body: "'Inter', ui-sans-serif, system-ui, sans-serif",
+  body: "'DM Sans', ui-sans-serif, system-ui, sans-serif",
 } as const;
 
 export const type = {
-  /** Page/section headings. Everything is smaller than you think. */
+  /** Page H1. */
   heading: {
     fontFamily: font.display,
-    fontSize: "18px",
+    fontSize: "28px",
     fontWeight: 700,
-    letterSpacing: "-0.5px",
     color: color.ink,
   },
-  /** Section labels — 11px uppercase, wide tracking, muted. */
+  /** Section labels. */
   label: {
     fontFamily: font.body,
-    fontSize: "11px",
+    fontSize: "12px",
     fontWeight: 500,
     textTransform: "uppercase" as const,
-    letterSpacing: "0.08em",
-    color: color.ink35,
+    letterSpacing: "0.04em",
+    color: color.inkTertiary,
   },
   body: {
     fontFamily: font.body,
-    fontSize: "13px",
+    fontSize: "14px",
     fontWeight: 400,
     color: color.ink,
   },
   /** Data values — same size as body, heavier. */
   value: {
     fontFamily: font.body,
-    fontSize: "13px",
+    fontSize: "14px",
     fontWeight: 600,
     color: color.ink,
   },
-  muted: {
+  /** Secondary/description copy — never lighter than this. */
+  secondary: {
     fontFamily: font.body,
-    fontSize: "12px",
+    fontSize: "13px",
     fontWeight: 400,
-    color: color.ink35,
+    color: color.inkSecondary,
+  },
+  /** Table cell text — 13px floor per §9.1. */
+  tableCell: {
+    fontFamily: font.body,
+    fontSize: "13px",
+    fontWeight: 400,
+    color: color.ink,
   },
 } as const;
 
-// ── Space — ma (間). The whitespace IS the aesthetic. ────────────────────────
+// ── Space ─────────────────────────────────────────────────────────────────────
 
 export const space = {
-  /** Page padding: 48 desktop / 24 mobile. */
-  page: 48,
-  pageMobile: 24,
-  /** Between major sections. */
+  /** App content padding, minimum. */
+  page: 32,
+  /** Between blocks. */
+  block: 24,
+  /** Between sections. */
   section: 48,
-  /** Card internal padding. */
-  card: 24,
-  /** Between cards. */
-  gap: 16,
+  /** Content area max-width. */
+  contentMaxWidth: 1360,
 } as const;
 
 // ── Shape ─────────────────────────────────────────────────────────────────────
 
 export const radius = {
-  /** Buttons and inputs only. */
-  control: 8,
-  /** Cards have no radius, no border, no shadow — whitespace defines them. */
-  card: 0,
+  /** 0px on all structural elements — cards, panels, containers. */
+  structural: 0,
+  /** Buttons, inputs, chips. Max 2px. */
+  control: 2,
+} as const;
+
+// ── Elevation — borders define hierarchy, not shadows ─────────────────────────
+
+export const elevation = {
+  none: "none",
+  /** Max allowed shadow, for floating elements only (dropdowns/popovers). */
+  max: "0 1px 2px rgba(0,0,0,0.04)",
+} as const;
+
+// ── Table ─────────────────────────────────────────────────────────────────────
+
+export const table = {
+  rowHeight: 44,
+  rowBorder: `1px solid ${color.border}`,
+} as const;
+
+// ── Button ────────────────────────────────────────────────────────────────────
+
+export const button = {
+  height: 36,
 } as const;
 
 // ── Copy rules (enforced by review, encoded here for reference) ──────────────
-// Label: max 2 words · Description: max 1 sentence · Button: max 3 words ·
-// Error: max 1 sentence. If you need more words, you need a better design.
+// Label: short and specific · Description: one sentence · Button: max 3 words ·
+// Error: one sentence stating what happened and how to fix it.

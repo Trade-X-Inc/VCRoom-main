@@ -85,7 +85,7 @@ export function PrepareSection({
               fontWeight: 500,
               letterSpacing: "0.08em",
               textTransform: "uppercase",
-              color: "rgba(0,0,0,0.35)",
+              color: "#71717A",
             }}
           >
             {label}
@@ -99,7 +99,7 @@ export function PrepareSection({
           <ChevronDown
             className="h-3.5 w-3.5 transition-transform"
             style={{
-              color: "rgba(0,0,0,0.35)",
+              color: "#71717A",
               transform: open ? "rotate(180deg)" : undefined,
             }}
           />

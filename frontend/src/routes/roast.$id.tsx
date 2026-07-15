@@ -155,7 +155,7 @@ function RaceButton({
         <div className="text-lg font-bold text-gray-500" style={{ fontFamily: SYNE }}>
           {result ? `#${result.rank} — just missed it` : "You raced this round"}
         </div>
-        <div className="mt-1 text-sm text-gray-400">Next race in {fmtClock(msToOpen > 0 ? msToOpen : 0)}</div>
+        <div className="mt-1 text-sm text-[#71717A]">Next race in {fmtClock(msToOpen > 0 ? msToOpen : 0)}</div>
       </div>
     );
   }
@@ -247,7 +247,7 @@ function QARecord({ state }: { state: PublicState }) {
             <div key={q.id} id={`q-${i + 1}`} className="rounded-xl border border-gray-200 bg-white p-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="text-sm font-semibold text-gray-900">{q.question_text}</div>
-                <span className="shrink-0 text-[11px] text-gray-400">Q{i + 1}{q.phase === "live" ? " · live" : ""}</span>
+                <span className="shrink-0 text-[11px] text-[#71717A]">Q{i + 1}{q.phase === "live" ? " · live" : ""}</span>
               </div>
               <div className="mt-1 text-xs text-gray-500">
                 Asked by {q.asker_name}
@@ -267,21 +267,21 @@ function QARecord({ state }: { state: PublicState }) {
       )}
       {unanswered.length > 0 && (
         <div>
-          <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-400">
+          <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-[#71717A]">
             Awaiting written answers ({unanswered.length})
           </div>
           <div className="space-y-1.5">
             {unanswered.map((q) => (
               <div key={q.id} className="flex items-center justify-between rounded-lg border border-dashed border-gray-200 px-4 py-2.5 text-sm">
                 <span className="text-gray-500">Question from {q.asker_name}</span>
-                <span className="text-[11px] text-gray-400">hidden until answered</span>
+                <span className="text-[11px] text-[#71717A]">hidden until answered</span>
               </div>
             ))}
           </div>
         </div>
       )}
       {state.removedCount > 0 && (
-        <div className="text-xs text-gray-400">
+        <div className="text-xs text-[#71717A]">
           {state.removedCount} question{state.removedCount !== 1 ? "s" : ""} removed by platform moderation. Founders cannot remove questions.
         </div>
       )}
@@ -629,7 +629,7 @@ function RoastPage() {
                               </div>
                             </>
                           ) : (
-                            <div className="grid h-full place-items-center text-xs text-gray-400">Slot {slot + 1} — won by the race</div>
+                            <div className="grid h-full place-items-center text-xs text-[#71717A]">Slot {slot + 1} — won by the race</div>
                           )}
                         </div>
                       );

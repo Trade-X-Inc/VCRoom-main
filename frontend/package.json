@@ -16,6 +16,7 @@
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",
     "@daily-co/daily-js": "^0.91.0",
+    "@fontsource/dm-sans": "^5.2.8",
     "@fontsource/inter": "^5.2.8",
     "@fontsource/syne": "^5.2.7",
     "@hookform/resolvers": "^5.2.2",

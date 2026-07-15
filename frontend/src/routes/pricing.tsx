@@ -353,7 +353,7 @@ function PricingPage() {
                   className="flex w-full items-center justify-between px-5 py-4 text-left text-sm font-semibold text-gray-900"
                 >
                   {f.q}
-                  <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${openFaq === i ? "rotate-180" : ""}`} />
+                  <ChevronDown className={`h-4 w-4 text-[#71717A] transition-transform ${openFaq === i ? "rotate-180" : ""}`} />
                 </button>
                 {openFaq === i && (
                   <p className="px-5 pb-4 text-sm leading-relaxed text-gray-600">{f.a}</p>

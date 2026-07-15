@@ -207,7 +207,7 @@ function MessageBubble({
             </button>
           </div>
         </div>
-        <span className="text-[11px] pl-1 text-gray-400 ">
+        <span className="text-[11px] pl-1 text-[#71717A] ">
           {formatTime(msg.timestamp)}
         </span>
       </div>
@@ -223,7 +223,7 @@ function MessageBubble({
       >
         {msg.content}
       </div>
-      <span className="text-[11px] pl-1 text-gray-400 ">
+      <span className="text-[11px] pl-1 text-[#71717A] ">
         {formatTime(msg.timestamp)}
       </span>
     </div>
@@ -595,7 +595,7 @@ export function AIOperatorPanel({
           <div className="flex items-center gap-1.5 min-w-0">
             <span className="text-base leading-none" style={{ color: "var(--brand)" }}>✦</span>
             <span className="text-sm font-semibold text-gray-900 ">AI</span>
-            <span className="text-sm text-gray-400">·</span>
+            <span className="text-sm text-[#71717A]">·</span>
             <span className="text-sm text-gray-500 truncate">{pageContext.pageName}</span>
           </div>
 

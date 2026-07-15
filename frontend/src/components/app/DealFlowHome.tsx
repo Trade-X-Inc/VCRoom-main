@@ -51,7 +51,7 @@ export function DealFlowHome() {
           fontWeight: 500,
           letterSpacing: "0.08em",
           textTransform: "uppercase",
-          color: "rgba(0,0,0,0.35)",
+          color: "#71717A",
         }}
       >
         Investor

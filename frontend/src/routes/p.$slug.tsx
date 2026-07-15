@@ -820,7 +820,7 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
               placeholder="Why you're interested, your fund's thesis fit…"
               className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none resize-none"
             />
-            <div className="mt-1 text-right text-[11px] text-gray-400">{connectMessage.length}/200</div>
+            <div className="mt-1 text-right text-[11px] text-[#71717A]">{connectMessage.length}/200</div>
             <div className="mt-4 flex gap-3">
               <button
                 onClick={submitConnectRequest}

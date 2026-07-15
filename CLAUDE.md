@@ -98,122 +98,108 @@ Every feature needs a clear monetization path before it gets built — either it
 
 ---
 
-## 9. Design System — WHITE REDESIGN (July 2026, replaces the dark dashboard entirely)
+## 9. Design System — THE DESIGN CONSTITUTION (July 2026, supersedes the white/gradient redesign)
 
-**The dark dashboard is dead.** In July 2026 the founder ordered a full redesign: one pure-white
-theme everywhere, purple only as a gradient, Japanese-minimalist whitespace, minimal text,
-institutional type. If you find a page that still looks dark, it is UNMIGRATED LEGACY —
-never "fix" a white page back to dark. Tokens live in `frontend/src/lib/design-tokens.ts`
-and primitives in `frontend/src/components/system/`. If a value isn't in design-tokens.ts,
-it isn't in the system.
+**The gradient-purple whitespace system is dead.** In July 2026 the founder reversed the
+earlier white-redesign direction and ordered a sharp, dense, institutional system modeled on
+Cloudflare Dashboard, Stripe Dashboard, and Linear — flat brand color used sparingly, hard
+0px radius, tables over cards, borders over whitespace-as-hierarchy. If you find a page still
+using `.hs-gradient`, `rounded-xl`/`rounded-lg` cards, DM Sans, or the old `rgba(0,0,0,0.35)`
+muted token, it is UNMIGRATED LEGACY — never "fix" a migrated page back to the old system.
+Tokens live in `frontend/src/lib/design-tokens.ts`. If a value isn't in design-tokens.ts, it
+isn't in the system.
 
 **This is not a request for creative reinterpretation.** The job is consistent execution of
 these fixed rules, not fresh creative direction per page.
 
-### 9.0 The vision (founder's words, verbatim — this is the law)
+### 9.0 Brand
 
-> "Pure white and pure black. Purple as gradient, not raw.
-> Black and white website with small side letters, white space,
-> silent aesthetic, Japanese minimalism but elegant touch.
-> Very clear and simple. One word says one essay. Users read less.
-> Beautiful error states with character illustrations.
-> Everything builds trust and engages."
+- Primary: `#7C3AED` (violet) — used flat, ONLY for: primary buttons, active nav indicator,
+  links, focus rings, key data accents. Never as a section background inside the app.
+- Ink (primary text): `#0A0A0B`.
+- Background: `#FAFAFA` (app canvas), `#FFFFFF` (cards/panels).
+- Border: `#E4E4E7`, 1px solid — the ONLY divider style.
+- Fonts: Syne (display/headings, 600–700), DM Sans (UI/body, 400–500).
+- Radius: 0px on ALL structural elements. Buttons max 2px.
+- Shadows: none, or `0 1px 2px rgba(0,0,0,0.04)` max. Borders define hierarchy, not shadows.
 
-### 9.1 One theme — pure white
+### 9.1 Text contrast — WCAG AA, hard rules
 
-- The app is white. Period. No exceptions inside `/app/*`. Public pages are white too.
-- There is no dark mode, no theme toggle, no `dark:` variants, no `.dark` CSS block.
+```
+Primary text:    #0A0A0B
+Secondary text:  #52525B (never lighter than this for body copy)
+Tertiary/labels: #71717A minimum, 12px+
+```
+Any text lighter than `#71717A` on white is FORBIDDEN. Minimum body size 14px, tables 13px.
+
+### 9.2 Layout
+
+- App content area: max-width 1360px, minimum padding 32px. No centered 600px columns.
+- Page pattern: `[Breadcrumb 12px]` → `[H1 Syne 28px + one-line description #52525B]` →
+  `[primary action top-right]` → `[content]`.
+- 24px between blocks, 48px between sections. Pages end within 48px of the last content —
+  no trailing white space.
+- Density target: Cloudflare/Stripe dashboard, not a marketing page. Tables over cards for
+  lists; cards are reserved for summary stats only.
+
+### 9.3 Components
+
+- **Tables**: full-width, 1px `#E4E4E7` row borders, 44px rows, numbers right-aligned.
+- **Status chips**: 2px radius, 12px text, AA-compliant contrast. (This replaces the old
+  6px-dot-only status system — chips are now allowed, provided they pass contrast.)
+- **Buttons**: Primary `#7C3AED` background / white text; Secondary white + 1px border +
+  ink text. 36px height, radius max 2px.
+- No accordions or dropdowns for primary content — FAQ/help content only. If a page's main
+  content is currently gated behind an accordion, that is a migration debt, not a pattern
+  to repeat.
+- **Empty states**: icon + one sentence + one action. Max 200px tall.
+
+### 9.4 One theme — no dark mode
+
+- No dark mode, no theme toggle, no `dark:` variants, no `.dark` CSS block, in or out of `/app/*`.
 - **Sanctioned exception:** `/roast/*` PUBLIC pages keep their event styling, including the
   full-red race button (`#EF4444`) — it is a game mechanic, not a UI button. Roast
-  *management* pages inside `/app/*` follow the white system fully.
+  *management* pages inside `/app/*` follow this system fully.
 
-### 9.2 Purple is a gradient — never flat
+### 9.5 Voice — still minimal, but not a hard word ceiling
 
-```
-background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%)
-hover:      linear-gradient(135deg, #6D28D9 0%, #4F46E5 100%)
-```
-- Applied to: primary buttons, active nav indicators, the logo mark. Nothing else.
-- Text on gradient: always white. Flat `#7C3AED` is banned everywhere.
-- Use the `.hs-gradient` / `.hs-gradient-text` utilities or `gradient` from design-tokens.ts.
-
-### 9.3 Whitespace is the design — ma (間)
-
-```
-Page padding:     48px desktop / 24px mobile
-Between sections: 48px
-Card padding:     24px
-Between cards:    16px
-```
-The whitespace IS the aesthetic. Don't fill it. Everything sits on an 8px grid.
-
-### 9.4 Text is minimal — one word says one essay
-
-- Label: max 2 words · Description: max 1 sentence · Button: max 3 words · Error: max 1 sentence.
-- If you need more words, you need a better design.
+- Label: short and specific · Description: one sentence · Button: max 3 words · Error: one
+  sentence stating what happened and how to fix it.
+- No exclamation marks, no passive voice, active-verb symmetry ("Save changes" → "Changes
+  saved"), name things by what the person controls, never apologize.
 - WRONG: "Upload your pitch deck document to share with investors" → RIGHT: "Add pitch deck"
-- WRONG: "No deal rooms have been created yet. Create your first…" → RIGHT: "No deal rooms yet" + [Create]
-- Plus the standing voice rules: no exclamation marks, no passive voice, active-verb
-  symmetry ("Save changes" → "Changes saved"), name things by what the person controls,
-  errors state what happened and how to fix it, never apologize.
 
-### 9.5 Typography — small, precise, quiet
+### 9.6 Security rendering rules (enforce in every prompt touching deal content)
 
-```
-Heading: Syne, 18px, 700, letter-spacing -0.5px, #0A0A0B
-Label:   Inter, 11px, 500, uppercase, tracking 0.08em, rgba(0,0,0,0.35)
-Body:    Inter, 13px, 400, #0A0A0B
-Value:   Inter, 13px, 600, #0A0A0B
-Muted:   Inter, 12px, 400, rgba(0,0,0,0.35)
-```
-Everything is smaller than you think it should be. Small text = institutional.
-Fonts are self-hosted via @fontsource (Syne 700/800, Inter 400/500/600) — imported in
-styles.css. DM Sans is retired from the app; Inter replaces it.
+- Deal content (documents, Q&A, term sheets, closing status, decision drafts) renders ONLY
+  under `/deal-rooms/:id/*` routes.
+- Top-level pages may render: room name, counterparty name, stage chip, last-activity
+  timestamp. Nothing else from inside a room — no document names, no Q&A text, no term sheet
+  figures, no decision notes, on any page outside the room.
+- `/reports` renders CLOSED deals only — no live/in-progress deal data.
+- Investor private profile fields render only inside a deal room at INFORMATION stage or later.
 
-### 9.6 Cards — borderless, whitespace-separated
+### 9.7 Errors have personality (`EmptyState` / `Illustration` in components/system)
 
-- No borders, no shadows, no rounded corners on cards. The content IS the card;
-  the space around it defines it.
-- If grouping is unavoidable: one hairline divider — `1px solid rgba(0,0,0,0.06)`
-  (`.hs-hairline-t` / `.hs-hairline-b`).
-- Dense data tables MAY use hairline row dividers — that is what hairlines are for.
+Empty/error/loading/no-results states may still use the line-art characters (64×64, 2px
+stroke, ink only) where they fit within the 200px-tall empty-state budget in §9.3 — this is
+a carryover from the prior system that is not itself in conflict with the new one. No spinners.
 
-### 9.7 Buttons — three types only (`HsButton` in components/system)
-
-```
-primary: gradient purple bg, white text, no border, radius 8px
-ghost:   transparent, ink text, 1px rgba(0,0,0,0.08) border, radius 8px
-text:    no chrome, gradient text, underline on hover
-```
-No amber, green, or red buttons exist anywhere (Roast public race button excepted, §9.1).
-
-### 9.8 Status — the dot system (`StatusDot` in components/system)
-
-Status is never a colored pill background. It is a 6px colored dot + 11px uppercase ink label:
-```
-positive #10B981 · warning #F59E0B · negative #EF4444 · neutral rgba(0,0,0,0.25)
-```
-These are the only semantic colors in the app, and they appear only as 6px dots.
-
-### 9.9 Errors have personality (`EmptyState` / `Illustration` in components/system)
-
-Every empty/error/loading/no-results state uses the line-art characters
-(64×64, 2px stroke, ink only): empty = figure on box edge · loading = walking figure
-(NO spinners exist) · error = gentle shrug · no-results = binoculars.
-Copy under them: max 1 short sentence ("Nothing here yet", "Something went wrong", "No matches").
-
-### 9.10 Imagery and iconography
+### 9.8 Imagery and iconography
 
 - Lucide icons only — never mix icon libraries.
-- The line-art characters are the ONLY illustrations. No stock photos, no clipart.
-- Charts: white background, gradient purple as primary series, green for positive — never pie charts.
-- Screenshots used in-product or marketing: always the white theme.
+- Charts: white background, `#7C3AED` as primary series, green for positive — never pie charts.
+- Screenshots used in-product or marketing: match whatever this system currently renders.
 
-### 9.11 What every future UI prompt must include
+### 9.9 What every future UI prompt must include
 
-"Follow the white design system in CLAUDE.md Section 9 — use design-tokens.ts and the
-components/system primitives. Do not invent colors, spacing, or component patterns.
-Purple only as gradient. No dark styling anywhere."
+"Follow the Design Constitution in CLAUDE.md Section 9 — use design-tokens.ts. Do not invent
+colors, spacing, or component patterns. Flat `#7C3AED` only, per §9.0's limited list of uses.
+0px radius on structural elements. No dark styling anywhere. No accordions for primary content."
+
+### 9.10 Reference
+
+Cloudflare Dashboard, Stripe Dashboard, Linear. Sharp, dense, institutional.
 
 ## 10. Project Identity
 
@@ -238,7 +224,7 @@ TanStack Start + Vite 7 + React 19 + TypeScript + Tailwind CSS v4 + Supabase + C
 5. ALWAYS run npm run build before committing
 6. ALWAYS use existing design tokens (no inline styles or hardcoded hex)
 7. ALWAYS add enabled: !!user?.id to useQuery hooks
-8. NEVER add dark styling anywhere — the app is white-only (see Section 9); /roast/* public pages are the one sanctioned exception
+8. NEVER add dark styling anywhere — one theme, no dark mode (see Section 9); /roast/* public pages are the one sanctioned exception
 9. NEVER use prose-invert anywhere
 10. ALWAYS read secrets server-side via cfEnv, never client-side
 

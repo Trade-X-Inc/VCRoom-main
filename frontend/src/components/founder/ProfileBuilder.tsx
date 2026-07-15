@@ -109,7 +109,7 @@ function TeamEditor({ content, onChange }: { content: any; onChange: (c: any) =>
         <div key={idx} className="rounded-lg border border-[rgba(0,0,0,0.08)] p-3 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-gray-500 ">Member {idx + 1}</span>
-            <button onClick={() => remove(idx)} className="text-gray-400 hover:text-red-500"><Trash2 className="h-3.5 w-3.5" /></button>
+            <button onClick={() => remove(idx)} className="text-[#71717A] hover:text-red-500"><Trash2 className="h-3.5 w-3.5" /></button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <Field label="Name" value={m.name ?? ""} onChange={(v) => update(idx, "name", v)} placeholder="Full name" />
@@ -267,7 +267,7 @@ function CompetitiveLandscapeEditor({ content, onChange }: { content: any; onCha
           <Field label="Competitor name" value={c.name ?? ""} onChange={(v) => updateComp(idx, "name", v)} />
           <div className="relative">
             <Field label="How you're different" value={c.differentiator ?? ""} onChange={(v) => updateComp(idx, "differentiator", v)} />
-            <button onClick={() => removeComp(idx)} className="absolute top-0 right-0 text-gray-400 hover:text-red-500"><Trash2 className="h-3.5 w-3.5" /></button>
+            <button onClick={() => removeComp(idx)} className="absolute top-0 right-0 text-[#71717A] hover:text-red-500"><Trash2 className="h-3.5 w-3.5" /></button>
           </div>
         </div>
       ))}
@@ -492,14 +492,14 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
               {completedCount} / {allSections.length} sections complete
             </span>
           )}
-          {panelOpen ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
+          {panelOpen ? <ChevronUp className="h-4 w-4 text-[#71717A]" /> : <ChevronDown className="h-4 w-4 text-[#71717A]" />}
         </div>
       </button>
 
       {panelOpen && (
         <div className="border-t border-[rgba(0,0,0,0.08)] ">
           {seeding ? (
-            <div className="px-5 py-8 text-center text-sm text-gray-400">Setting up your profile sections…</div>
+            <div className="px-5 py-8 text-center text-sm text-[#71717A]">Setting up your profile sections…</div>
           ) : (
             <div className="divide-y divide-gray-100 ">
               {allSections.map((section: any) => {
@@ -513,7 +513,7 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                   <div key={section.id}>
                     {/* Section header row */}
                     <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 ">
-                      <GripVertical className="h-4 w-4 text-gray-300 shrink-0" />
+                      <GripVertical className="h-4 w-4 text-[#71717A] shrink-0" />
 
                       <button
                         className="flex-1 text-left min-w-0"
@@ -541,12 +541,12 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                         </div>
 
                         {/* Content status */}
-                        <span className={cn("text-[10px] font-medium", empty ? "text-gray-400 " : "text-green-600 ")}>
+                        <span className={cn("text-[10px] font-medium", empty ? "text-[#71717A] " : "text-green-600 ")}>
                           {empty ? "Empty" : "✓ Complete"}
                         </span>
 
                         <button onClick={() => setExpandedKey(isExpanded ? null : key)}>
-                          {isExpanded ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
+                          {isExpanded ? <ChevronUp className="h-4 w-4 text-[#71717A]" /> : <ChevronDown className="h-4 w-4 text-[#71717A]" />}
                         </button>
                       </div>
                     </div>

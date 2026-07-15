@@ -168,20 +168,20 @@ export function DDAnalysisPanel({
                             <span className="h-2 w-2 rounded-full shrink-0" style={{ background: SEVERITY_COLOR[f.severity] ?? "#6B7280" }} title={f.severity} />
                             <span className="text-sm font-medium text-gray-900 truncate">{f.title}</span>
                           </div>
-                          {open ? <ChevronUp className="h-4 w-4 text-gray-400 shrink-0" /> : <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />}
+                          {open ? <ChevronUp className="h-4 w-4 text-[#71717A] shrink-0" /> : <ChevronDown className="h-4 w-4 text-[#71717A] shrink-0" />}
                         </button>
                         {open && (
                           <div className="px-3.5 pb-3.5 space-y-2.5 border-t border-[rgba(0,0,0,0.08)] pt-2.5">
                             <div>
-                              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Evidence</div>
+                              <div className="text-[10px] font-bold uppercase tracking-wider text-[#71717A]">Evidence</div>
                               <div className="text-xs text-gray-700 mt-0.5 leading-relaxed">{f.evidence}</div>
                             </div>
                             <div>
-                              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Question to ask</div>
+                              <div className="text-[10px] font-bold uppercase tracking-wider text-[#71717A]">Question to ask</div>
                               <div className="text-xs text-gray-700 mt-0.5 leading-relaxed">{f.question_to_ask}</div>
                             </div>
                             <div>
-                              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">What a good answer includes</div>
+                              <div className="text-[10px] font-bold uppercase tracking-wider text-[#71717A]">What a good answer includes</div>
                               <div className="text-xs text-gray-700 mt-0.5 leading-relaxed">{f.what_good_looks_like}</div>
                             </div>
                             {isInvestor && (
