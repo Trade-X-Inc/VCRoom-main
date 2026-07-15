@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
+import { PageFrame } from "@/components/system";
 import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
 
 // ③ Evaluate — rooms, diligence, analysis. All three are real standalone
@@ -35,26 +36,10 @@ function SectionLinkRow({
 function EvaluatePage() {
   const { data: p } = useDealFlowProgress();
   return (
-    <div className="p-6 lg:p-12 max-w-5xl mx-auto">
-      <div
-        style={{
-          fontFamily: "'Inter', sans-serif",
-          fontSize: 11,
-          fontWeight: 500,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: "#71717A",
-        }}
-      >
-        Deal flow · Step 3
-      </div>
-      <h1
-        className="text-lg font-bold tracking-tight mt-1 mb-12"
-        style={{ fontFamily: "'Syne', sans-serif" }}
-      >
-        Evaluate
-      </h1>
-
+    <PageFrame
+      breadcrumb={[{ label: "Deal flow" }, { label: "Evaluate" }]}
+      title="Evaluate"
+    >
       <div className="bg-card border border-border/60 rounded-none px-6">
         <SectionLinkRow
           to="/app/investor/deal-rooms"
@@ -64,6 +49,6 @@ function EvaluatePage() {
         <SectionLinkRow to="/app/investor/diligence" label="Due diligence" />
         <SectionLinkRow to="/app/investor/analysis" label="AI analysis" />
       </div>
-    </div>
+    </PageFrame>
   );
 }

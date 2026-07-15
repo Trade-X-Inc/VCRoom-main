@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
+import { PageFrame } from "@/components/system";
 import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
 
 // ④ Decide — the decision board and the book. Decisions has a canonical
@@ -36,26 +37,10 @@ function SectionLinkRow({
 function DecidePage() {
   const { data: p } = useDealFlowProgress();
   return (
-    <div className="p-6 lg:p-12 max-w-5xl mx-auto">
-      <div
-        style={{
-          fontFamily: "'Inter', sans-serif",
-          fontSize: 11,
-          fontWeight: 500,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: "#71717A",
-        }}
-      >
-        Deal flow · Step 4
-      </div>
-      <h1
-        className="text-lg font-bold tracking-tight mt-1 mb-12"
-        style={{ fontFamily: "'Syne', sans-serif" }}
-      >
-        Decide
-      </h1>
-
+    <PageFrame
+      breadcrumb={[{ label: "Deal flow" }, { label: "Decide" }]}
+      title="Decide"
+    >
       <Link
         to={"/app/investor/decisions" as any}
         className="block bg-card border border-border/60 rounded-none p-6 mb-6 hover:bg-accent/40 transition-colors"
@@ -80,6 +65,6 @@ function DecidePage() {
           summary={p ? `${p.portfolioCount} invested` : undefined}
         />
       </div>
-    </div>
+    </PageFrame>
   );
 }

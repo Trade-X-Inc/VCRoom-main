@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
+import { PageFrame } from "@/components/system";
 import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
 
 // ② Source — find and import deals. Watchlist, Deal intake, Directory, and
@@ -35,26 +36,10 @@ function SectionLinkRow({
 function SourcePage() {
   const { data: p } = useDealFlowProgress();
   return (
-    <div className="p-6 lg:p-12 max-w-5xl mx-auto">
-      <div
-        style={{
-          fontFamily: "'Inter', sans-serif",
-          fontSize: 11,
-          fontWeight: 500,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: "#71717A",
-        }}
-      >
-        Deal flow · Step 2
-      </div>
-      <h1
-        className="text-lg font-bold tracking-tight mt-1 mb-12"
-        style={{ fontFamily: "'Syne', sans-serif" }}
-      >
-        Source
-      </h1>
-
+    <PageFrame
+      breadcrumb={[{ label: "Deal flow" }, { label: "Source" }]}
+      title="Source"
+    >
       <div className="bg-card border border-border/60 rounded-none px-6">
         <SectionLinkRow
           to="/app/investor/startups"
@@ -65,6 +50,6 @@ function SourcePage() {
         <SectionLinkRow to="/app/directory" label="Directory" summary="Verified founders" />
         <SectionLinkRow to="/app/investor/connections" label="Connections" summary="Requests sent" />
       </div>
-    </div>
+    </PageFrame>
   );
 }

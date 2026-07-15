@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
+import { PageFrame } from "@/components/system";
 import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
 
 // ① Thesis — the investor identity. Canonical editor lives at
@@ -12,26 +13,10 @@ export const Route = createFileRoute("/app/investor/thesis")({
 function ThesisPage() {
   const { data: p } = useDealFlowProgress();
   return (
-    <div className="p-6 lg:p-12 max-w-4xl mx-auto">
-      <div
-        style={{
-          fontFamily: "'Inter', sans-serif",
-          fontSize: 11,
-          fontWeight: 500,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: "#71717A",
-        }}
-      >
-        Deal flow · Step 1
-      </div>
-      <h1
-        className="text-lg font-bold tracking-tight mt-1 mb-12"
-        style={{ fontFamily: "'Syne', sans-serif" }}
-      >
-        Thesis
-      </h1>
-
+    <PageFrame
+      breadcrumb={[{ label: "Deal flow" }, { label: "Thesis" }]}
+      title="Thesis"
+    >
       <Link
         to={"/app/investor/profile" as any}
         className="block bg-card border border-border/60 rounded-none p-6 hover:bg-accent/40 transition-colors"
@@ -48,6 +33,6 @@ function ThesisPage() {
           </span>
         </div>
       </Link>
-    </div>
+    </PageFrame>
   );
 }

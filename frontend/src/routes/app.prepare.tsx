@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { lazy } from "react";
 import { ArrowRight } from "lucide-react";
 import { PrepareSection } from "@/components/app/PrepareSection";
-import { HsButton, StatusDot } from "@/components/system";
+import { HsButton, StatusDot, PageFrame } from "@/components/system";
 import {
   useRaiseProgress,
   nextIncomplete,
@@ -70,51 +70,26 @@ function PreparePage() {
   const next = nextIncomplete(p);
 
   return (
-    <div className="p-6 lg:p-12 max-w-4xl mx-auto">
-      <div
-        style={{
-          fontFamily: "'Inter', sans-serif",
-          fontSize: 11,
-          fontWeight: 500,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: "#71717A",
-        }}
-      >
-        Your raise · Step 1
-      </div>
-      <h1
-        className="text-lg font-bold tracking-tight mt-1"
-        style={{ fontFamily: "'Syne', sans-serif" }}
-      >
-        Prepare
-      </h1>
-
-      {/* Progress spine */}
-      <div className="mt-6 mb-12 flex items-center justify-between gap-6 flex-wrap">
-        <div>
-          <div className="text-[13px] font-semibold" data-testid="prepare-progress">
-            {p ? `${p.prepareDone} of ${p.prepareTotal} complete` : "—"}
-          </div>
-          {next && (
-            <div className="text-xs text-muted-foreground mt-0.5">
-              Next: {SECTION_LABELS[next]}
-            </div>
-          )}
-        </div>
-        {next && (
+    <PageFrame
+      breadcrumb={[{ label: "Your raise" }, { label: "Prepare" }]}
+      title="Prepare"
+      description={p ? `${p.prepareDone} of ${p.prepareTotal} complete${next ? ` — next: ${SECTION_LABELS[next]}` : ""}` : undefined}
+      actions={
+        next && (
           <a href={`#${next === "verification" ? "verification" : next}`}>
             <HsButton>Continue</HsButton>
           </a>
-        )}
-        <div className="w-full h-1 rounded-full bg-accent overflow-hidden">
-          <div
-            className="h-full hs-gradient-static rounded-full transition-all"
-            style={{
-              width: p ? `${(p.prepareDone / p.prepareTotal) * 100}%` : "0%",
-            }}
-          />
-        </div>
+        )
+      }
+    >
+      <div className="w-full h-1 rounded-full bg-accent overflow-hidden mb-6">
+        <div
+          className="h-full hs-gradient-static rounded-full transition-all"
+          style={{
+            width: p ? `${(p.prepareDone / p.prepareTotal) * 100}%` : "0%",
+          }}
+          data-testid="prepare-progress"
+        />
       </div>
 
       {/* Profile — canonical route is /app/profile; summary card here since
@@ -150,6 +125,6 @@ function PreparePage() {
       >
         <ReadinessSection startupId={p?.startupId ?? null} />
       </PrepareSection>
-    </div>
+    </PageFrame>
   );
 }
