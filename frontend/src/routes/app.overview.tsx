@@ -386,12 +386,11 @@ function AccessRequestsPanel({ startupId, companyName, profileSlug }: {
       return;
     }
 
-    // Fetch investor profiles separately — no FK from discovery_requests to investor_profiles
+    // Fetch investor profiles separately — no FK from discovery_requests to investor_profiles.
+    // investor_profiles has no bare peer-read RLS anymore — whitelist-filtered
+    // batch RPC only (your_name/fund_name/role are all in the default whitelist).
     const investorIds = reqs.map((r: any) => r.investor_id);
-    const { data: profiles } = await supabase
-      .from("investor_profiles")
-      .select("user_id, your_name, fund_name, role")
-      .in("user_id", investorIds);
+    const { data: profiles } = await supabase.rpc("get_public_investor_profiles_by_user_ids", { p_user_ids: investorIds });
 
     const profileMap = Object.fromEntries(
       (profiles ?? []).map((p: any) => [p.user_id, p])

@@ -510,11 +510,13 @@ function IncomingRequests() {
         .order("created_at", { ascending: false });
       if (!reqs?.length) return [];
 
-      const { data: profiles } = await supabase
-        .from("investor_profiles")
-        .select("user_id, your_name, fund_name, sectors, stages, check_size_min, check_size_max")
-        .in("user_id", reqs.map((r: any) => r.investor_id));
-      const pmap = Object.fromEntries((profiles ?? []).map((p: any) => [p.user_id, p]));
+      // investor_profiles has no bare peer-read RLS anymore — whitelist-filtered
+      // batch RPC only. check_size_min/max only appear if that investor has
+      // whitelisted them under Public visibility.
+      const { data: profiles } = await supabase.rpc("get_public_investor_profiles_by_user_ids", {
+        p_user_ids: reqs.map((r: any) => r.investor_id),
+      });
+      const pmap = Object.fromEntries(((profiles ?? []) as any[]).map((p) => [p.user_id, p]));
       return reqs.map((r: any) => ({ ...r, profile: pmap[r.investor_id] ?? null }));
     },
   });

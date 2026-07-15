@@ -863,13 +863,12 @@ function DealActivityCard({
 
     if (!reqs || reqs.length === 0) { setRequests([]); setReqLoading(false); return; }
 
+    // investor_profiles has no bare peer-read RLS anymore — whitelist-filtered
+    // batch RPC only (your_name/fund_name are both in the default whitelist).
     const investorIds = reqs.map((r: any) => r.investor_id);
-    const { data: profiles } = await supabase
-      .from("investor_profiles")
-      .select("user_id, your_name, fund_name")
-      .in("user_id", investorIds);
+    const { data: profiles } = await supabase.rpc("get_public_investor_profiles_by_user_ids", { p_user_ids: investorIds });
 
-    const pm = Object.fromEntries((profiles ?? []).map((p: any) => [p.user_id, p]));
+    const pm = Object.fromEntries(((profiles ?? []) as any[]).map((p) => [p.user_id, p]));
     setRequests(reqs.map((r: any) => ({ ...r, investor_profiles: pm[r.investor_id] ?? null })));
     setReqLoading(false);
   };

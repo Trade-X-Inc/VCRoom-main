@@ -47,17 +47,21 @@ export function useDealRoomContext(dealRoomId: string) {
     },
   });
 
+  // Public-whitelist fields only (name/fund/thesis/sectors) — this is the
+  // always-visible summary shown from nda_signed onward on every deal-room
+  // tab, not the gated mutual-disclosure data. investor_profiles has no
+  // bare peer-read policy anymore (see deal_room_profile_disclosures
+  // migration), so this goes through the same whitelist RPC the public
+  // /i/:slug page uses, just looked up by user_id instead of slug.
   const { data: investorProfile } = useQuery({
-    queryKey: ["deal-room-investor-profile", (room as any)?.investor_user_id],
+    queryKey: ["deal-room-investor-profile-public", (room as any)?.investor_user_id],
     enabled: !!(room as any)?.investor_user_id,
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("investor_profiles")
-        .select("your_name, fund_name, thesis, thesis_statement, sectors")
-        .eq("user_id", (room as any).investor_user_id)
-        .maybeSingle();
-      return data;
+      const { data } = await supabase.rpc("get_public_investor_profile_by_user_id", {
+        p_user_id: (room as any).investor_user_id,
+      });
+      return data as { your_name?: string; fund_name?: string; thesis?: string; thesis_statement?: string; sectors?: string } | null;
     },
   });
 

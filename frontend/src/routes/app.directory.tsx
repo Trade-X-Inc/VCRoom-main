@@ -129,11 +129,14 @@ function useDirectoryData() {
         .from("deal_room_members").select("user_id").in("deal_room_id", myRoomIds).neq("user_id", user?.id ?? "");
       const userIds = [...new Set((members ?? []).map((m: any) => m.user_id))];
       if (!userIds.length) return [];
-      const { data } = await supabase
-        .from("investor_profiles")
-        .select("id, user_id, fund_name, sectors, stages, check_size_min, check_size_max, geography, thesis, website, verification_tier, users(id, full_name, avatar_url)")
-        .in("user_id", userIds);
-      return data ?? [];
+      // investor_profiles has no bare peer-read RLS anymore (see
+      // deal_room_profile_disclosures migration) — whitelist-filtered batch
+      // RPC only. check_size_min/max/thesis only appear here if that
+      // investor has whitelisted them under Public visibility.
+      const { data: profiles } = await supabase.rpc("get_public_investor_profiles_by_user_ids", { p_user_ids: userIds });
+      const { data: users } = await supabase.from("users").select("id, full_name, avatar_url").in("id", userIds);
+      const usersById = new Map((users ?? []).map((u: any) => [u.id, u]));
+      return ((profiles ?? []) as any[]).map((p) => ({ ...p, users: usersById.get(p.user_id) ? [usersById.get(p.user_id)] : [] }));
     },
   });
 

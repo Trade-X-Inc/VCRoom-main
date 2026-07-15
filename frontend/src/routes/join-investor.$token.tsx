@@ -75,12 +75,12 @@ function JoinViaInviteLinkPage() {
 
       if (!link) { setPageState("invalid"); return; }
 
-      // Fetch investor name/fund
-      const { data: profile } = await supabase
-        .from("investor_profiles")
-        .select("fund_name, your_name")
-        .eq("user_id", link.investor_id)
-        .maybeSingle();
+      // Fetch investor name/fund — anon-callable whitelist RPC, since this
+      // page can be viewed by an unauthenticated visitor before signup.
+      // investor_profiles has no bare peer-read RLS anymore.
+      const { data: profile } = await supabase.rpc("get_public_investor_profile_by_user_id", {
+        p_user_id: link.investor_id,
+      });
 
       setLinkInfo({
         ...link,

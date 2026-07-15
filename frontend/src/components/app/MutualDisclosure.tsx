@@ -54,20 +54,21 @@ export function MutualDisclosure() {
     },
   });
 
-  // Full investor profile — only ever fetched when unlocked. RLS backs this
-  // up independently: even if this query ran while locked, the DB-level
-  // deal_room_information_unlocked() gate on investor_profiles means it
-  // would return zero rows, not an error and not partial data.
+  // Full investor profile — room-scoped RPC only. investor_profiles has no
+  // peer-read RLS policy at all anymore (see deal_room_profile_disclosures
+  // migration) — a bare select here would always return zero rows for a
+  // counterparty. get_investor_profile_in_room() checks a disclosure row
+  // scoped to THIS exact dealRoomId, so it can't be satisfied by some other
+  // unlocked room the same two users happen to also share.
   const { data: investorPrivate } = useQuery({
-    queryKey: ["mutual-disclosure-investor-private", investorUserId, unlocked],
+    queryKey: ["mutual-disclosure-investor-private", dealRoomId, investorUserId, unlocked],
     enabled: !!investorUserId && unlocked && isFounder,
     staleTime: 60 * 1000,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("investor_profiles")
-        .select("*")
-        .eq("user_id", investorUserId!)
-        .maybeSingle();
+      const { data } = await supabase.rpc("get_investor_profile_in_room", {
+        p_deal_room_id: dealRoomId,
+        p_investor_user_id: investorUserId!,
+      });
       return data;
     },
   });
