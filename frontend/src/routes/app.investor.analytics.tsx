@@ -103,10 +103,14 @@ function InvestorAnalytics() {
   const passedCount = (watchlist as any[]).filter((w) => w.status === "Passed").length;
 
   // ── Avg days in stage (created_at -> stage_entered_at for entries that
-  //    have moved past Sourcing at least once) ──
+  //    have moved forward at least once). Only counts samples where
+  //    stage_entered_at is actually after created_at — some seed/legacy
+  //    rows have an earlier stage_entered_at than created_at (backfilled
+  //    data), which would otherwise show as a nonsensical negative average. ──
   const daysInStageSamples = (watchlist as any[])
-    .filter((w) => w.stage_entered_at && w.created_at && w.stage_entered_at !== w.created_at)
-    .map((w) => (new Date(w.stage_entered_at).getTime() - new Date(w.created_at).getTime()) / 86400000);
+    .filter((w) => w.stage_entered_at && w.created_at)
+    .map((w) => (new Date(w.stage_entered_at).getTime() - new Date(w.created_at).getTime()) / 86400000)
+    .filter((days) => days > 0);
   const avgDaysInStage = daysInStageSamples.length > 0
     ? Math.round(daysInStageSamples.reduce((a, b) => a + b, 0) / daysInStageSamples.length)
     : null;
