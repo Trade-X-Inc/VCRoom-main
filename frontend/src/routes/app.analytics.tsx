@@ -95,11 +95,19 @@ function FounderAnalytics() {
     },
   });
 
+  // Founder's own uploads only — a shared room can also contain documents
+  // the investor side uploaded (uploaded_by_role = "investor"), and this
+  // page must never show that counterparty content's filename, even though
+  // the founder is a legitimate member of the room (CLAUDE.md §9.6).
   const { data: documents = [] } = useQuery({
-    queryKey: ["analytics-documents", roomIds.join(",")],
-    enabled: roomIds.length > 0,
+    queryKey: ["analytics-documents", roomIds.join(","), user?.id],
+    enabled: roomIds.length > 0 && !!user?.id,
     queryFn: async () => {
-      const { data } = await supabase.from("documents").select("id, file_name, deal_room_id").in("deal_room_id", roomIds);
+      const { data } = await supabase
+        .from("documents")
+        .select("id, file_name, deal_room_id")
+        .in("deal_room_id", roomIds)
+        .eq("uploader_id", user!.id);
       return data ?? [];
     },
   });
