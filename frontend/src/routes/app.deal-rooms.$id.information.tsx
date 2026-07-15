@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { EmptyState } from "@/components/system";
 import { useDealRoom } from "@/hooks/useDealRoom";
+import { MutualDisclosure } from "@/components/app/MutualDisclosure";
 
 export const Route = createFileRoute("/app/deal-rooms/$id/information")({
   component: InformationPage,
@@ -249,6 +250,8 @@ function InformationPage() {
 
   return (
     <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-6">
+      <MutualDisclosure />
+
       {roastRecord.length > 0 && (
         <div className="rounded-none border border-border/60 bg-card p-5">
           <div className="text-sm font-semibold mb-2" style={{ fontFamily: "Syne, sans-serif" }}>
