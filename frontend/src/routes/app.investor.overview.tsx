@@ -1,37 +1,37 @@
-import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CheckCircle2, Sparkles, Inbox, Briefcase, Clock, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { formatDistanceToNow } from "date-fns";
+import {
+  ResponsiveContainer, BarChart, Bar, LineChart, Line, XAxis, YAxis,
+  CartesianGrid, Tooltip,
+} from "recharts";
+import { ChevronDown, ChevronUp, X, CheckCircle2, ArrowRight, ArrowUpRight, FileInput, Clock3 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { formatDistanceToNow } from "date-fns";
-import { AttentionStrip, type AttentionItem } from "@/components/app/AttentionStrip";
-import { AIBriefPanel, type AIBriefData } from "@/components/app/AIBriefPanel";
-import { generateDealBrief } from "@/lib/deal-brief-fn";
-import { cn } from "@/lib/utils";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
-import { OnboardingTour } from "@/components/app/OnboardingTour";
+import { PageFrame, EmptyState } from "@/components/system";
+import { color, font, radius, space } from "@/lib/design-tokens";
 
 export const Route = createFileRoute("/app/investor/overview")({
-  // TODO(R5): auth.callback.tsx redirects returning investors here after
-  // login — this is the real, live post-login landing target today, not
-  // dead legacy code, even though it immediately bounces to /app/investor.
-  // Do not delete or fold into the de-shim pass. This is the page to build
-  // out as the real /home per the target route map; until then leave in place.
-  // P5: consolidated into the deal-flow steps — old links keep resolving.
-  beforeLoad: () => {
-    throw redirect({ to: "/app/investor", replace: true });
-  },
-  component: InvestorDashboard,
+  component: InvestorOverview,
 });
 
-const STAGES = ["Sourced", "Reviewing", "Diligence", "Partner", "Term Sheet", "Closed"] as const;
+const STAGES = ["Sourced", "Reviewing", "Diligence", "Term Sheet", "Closed"] as const;
 
-// `activities.action` is a short category string for most writers, but at
-// least one write path (deal room creation) stores a full free-text sentence
-// with investor name / firm / deal terms. This page renders outside any
-// deal-room boundary, so only the known-safe short forms are allowed through
-// — anything else is deal content and must not leak here (CLAUDE.md §9.6).
+const DB_STATUS_TO_STAGE: Record<string, string> = {
+  under_review: "Reviewing",
+  info_requested: "Diligence",
+  partner_review: "Diligence",
+  term_sheet: "Term Sheet",
+  rejected: "Closed",
+  exited: "Closed",
+};
+
+// Same allowlist pattern as the founder overview — activities.action is a
+// short category string for most writers but at least one write path
+// stores a free-text sentence; this page renders outside /deal-rooms/:id/*
+// so only pre-approved short forms are allowed through (CLAUDE.md §9.6).
 const SAFE_ACTIVITY_ACTIONS = new Set([
   "Uploaded a document",
   "Added a note",
@@ -54,144 +54,100 @@ function safeActivityLabel(action: string): string {
   return SAFE_ACTIVITY_ACTIONS.has(action) ? action : "Room activity";
 }
 
-const DB_STATUS_TO_STAGE: Record<string, string> = {
-  under_review: "Reviewing",
-  info_requested: "Diligence",
-  partner_review: "Partner",
-  term_sheet: "Term Sheet",
-  rejected: "Closed",
-  exited: "Closed",
-};
-
-// ── Investor onboarding checklist ──────────────────────────────────
-
-function InvestorOnboarding({
-  profile,
-  watchlistCount,
-  roomIds,
-}: {
-  profile: any;
-  watchlistCount: number;
-  roomIds: string[];
-}) {
-  const { progress, markStep } = useOnboardingProgress();
-  const dismissed = progress?.steps?.checklist_dismissed === true;
-  const [aiDone] = useState(
-    () => typeof localStorage !== "undefined" && !!localStorage.getItem("hs_ai_done"),
-  );
-
-  useEffect(() => {
-    if (aiDone && progress && !progress.steps?.legacy_ai_done) {
-      markStep("legacy_ai_done", true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [aiDone, progress?.id]);
-
-  const steps = [
-    {
-      id: "thesis",
-      label: "Set your investment thesis",
-      description: "Define your focus areas, stages, and check size",
-      done: !!(profile?.thesis_statement || profile?.thesis),
-      href: "/app/investor/profile",
-    },
-    {
-      id: "watchlist",
-      label: "Add a company to watchlist",
-      description: "Track companies you're interested in",
-      done: watchlistCount > 0,
-      href: "/app/investor/startups",
-    },
-    {
-      id: "analysis",
-      label: "Run your first AI analysis",
-      description: "Get thesis-fit scoring and investment insights",
-      done: aiDone,
-      href: "/app/investor/analysis",
-    },
-    {
-      id: "dealroom",
-      label: "Join a deal room",
-      description: "Accept an invitation to access full diligence",
-      done: roomIds.length > 0,
-      href: "/app/investor/deal-flow",
-    },
-  ];
-
-  const completed = steps.filter((s) => s.done).length;
-  if (dismissed || completed === steps.length) return null;
-
-  const pct = Math.round((completed / steps.length) * 100);
-
+function StatCard({ label, value, sub, empty }: { label: string; value: string | number; sub?: string; empty?: string }) {
   return (
-    <div className="rounded-none border border-border/60 bg-card shadow-card p-5">
-      <div className="flex items-center justify-between mb-3">
-        <div>
-          <div className="text-sm font-semibold">Get started with Hockystick</div>
-          <div className="text-xs text-muted-foreground">{completed} of {steps.length} steps complete</div>
-        </div>
-        <button
-          onClick={() => markStep("checklist_dismissed", true)}
-          className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
-          title="Dismiss"
-        >
-          <X className="h-3.5 w-3.5" />
-        </button>
-      </div>
-      <div className="h-1.5 rounded-full bg-muted overflow-hidden mb-4">
-        <div
-          className="h-full bg-gradient-brand rounded-full transition-all duration-500"
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {steps.map((step) => (
-          <Link
-            key={step.id}
-            to={step.href as any}
-            className={cn(
-              "rounded-lg border px-3 py-2.5 flex items-start gap-2.5 transition-colors",
-              step.done
-                ? "border-success/30 bg-success/5 opacity-70 pointer-events-none"
-                : "border-border/60 bg-background/60 hover:bg-accent",
-            )}
-          >
-            <div className="mt-0.5 shrink-0">
-              {step.done ? (
-                <CheckCircle2 className="h-4 w-4 text-success" />
-              ) : (
-                <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/30" />
-              )}
-            </div>
-            <div>
-              <div className={cn("text-xs font-medium leading-tight", step.done && "text-muted-foreground")}>
-                {step.label}
-              </div>
-              <div className="text-[11px] text-muted-foreground mt-0.5 leading-tight">{step.description}</div>
-            </div>
-          </Link>
-        ))}
-      </div>
+    <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, padding: 20 }}>
+      <div style={{ fontFamily: font.body, fontSize: 12, color: color.inkTertiary }}>{label}</div>
+      {empty ? (
+        <div style={{ marginTop: 10, fontSize: 12, color: color.inkTertiary, lineHeight: 1.5 }}>{empty}</div>
+      ) : (
+        <>
+          <div style={{ marginTop: 6, fontFamily: font.display, fontSize: 26, fontWeight: 700, color: color.ink, fontVariantNumeric: "tabular-nums" }}>{value}</div>
+          {sub && <div style={{ marginTop: 2, fontSize: 12, color: color.inkTertiary }}>{sub}</div>}
+        </>
+      )}
     </div>
   );
 }
 
-function InvestorDashboard() {
+function OnboardingChecklist({ profile, watchlistCount, roomIds }: { profile: any; watchlistCount: number; roomIds: string[] }) {
+  const { progress, markStep } = useOnboardingProgress();
+  const [collapsed, setCollapsed] = useState(false);
+  const dismissed = progress?.steps?.checklist_dismissed === true;
+
+  const steps = [
+    { id: "thesis", label: "Set your investment thesis", done: !!(profile?.thesis_statement || profile?.thesis), href: "/app/investor/profile" },
+    { id: "watchlist", label: "Add a company to watchlist", done: watchlistCount > 0, href: "/app/investor/startups" },
+    { id: "intake", label: "Run a deal intake", done: false, href: "/app/investor/intake" },
+    { id: "dealroom", label: "Join a deal room", done: roomIds.length > 0, href: "/app/investor/deal-flow" },
+  ];
+  const completed = steps.filter((s) => s.done).length;
+  if (dismissed || completed === steps.length) return null;
+  const pct = Math.round((completed / steps.length) * 100);
+
+  return (
+    <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", borderBottom: collapsed ? "none" : `1px solid ${color.border}` }}>
+        <button onClick={() => setCollapsed((v) => !v)} style={{ display: "flex", alignItems: "center", gap: 8, background: "transparent", border: "none", cursor: "pointer", padding: 0 }}>
+          {collapsed ? <ChevronDown style={{ width: 14, height: 14, color: color.inkTertiary }} /> : <ChevronUp style={{ width: 14, height: 14, color: color.inkTertiary }} />}
+          <span style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Get started</span>
+          <span style={{ fontSize: 12, color: color.inkTertiary }}>{completed} of {steps.length} complete</span>
+        </button>
+        <button
+          onClick={() => markStep("checklist_dismissed", true)}
+          style={{ display: "grid", placeItems: "center", height: 28, width: 28, borderRadius: radius.control, background: "transparent", border: "none", color: color.inkTertiary, cursor: "pointer" }}
+          title="Skip"
+        >
+          <X style={{ width: 14, height: 14 }} />
+        </button>
+      </div>
+      {!collapsed && (
+        <div style={{ padding: 20 }}>
+          <div style={{ height: 4, background: color.canvas, borderRadius: 2, overflow: "hidden", marginBottom: 16 }}>
+            <div style={{ height: 4, width: `${pct}%`, background: "#7C3AED" }} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+            {steps.map((s) => (
+              <Link
+                key={s.id}
+                to={s.href as any}
+                style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "10px 12px", border: `1px solid ${color.border}`, textDecoration: "none", opacity: s.done ? 0.6 : 1 }}
+              >
+                {s.done
+                  ? <CheckCircle2 style={{ width: 14, height: 14, color: "#059669", marginTop: 1, flexShrink: 0 }} />
+                  : <div style={{ width: 14, height: 14, borderRadius: "50%", border: `2px solid ${color.border}`, marginTop: 1, flexShrink: 0 }} />}
+                <span style={{ fontSize: 12, color: s.done ? color.inkTertiary : color.ink, textDecoration: s.done ? "line-through" : "none" }}>{s.label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ChartCard({ title, children, empty }: { title: string; children?: React.ReactNode; empty?: string }) {
+  return (
+    <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, padding: 20 }}>
+      <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink, marginBottom: 16 }}>{title}</div>
+      {empty ? (
+        <div style={{ height: 200, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: color.inkTertiary, textAlign: "center", padding: "0 24px" }}>{empty}</div>
+      ) : (
+        <div style={{ height: 220 }}>{children}</div>
+      )}
+    </div>
+  );
+}
+
+function InvestorOverview() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
-  const { progress, markStep } = useOnboardingProgress();
 
-  // Gate: require investor profile before showing dashboard
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["investor-profile-gate", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("investor_profiles")
-        .select("*")
-        .eq("user_id", user!.id)
-        .maybeSingle();
+      const { data } = await supabase.from("investor_profiles").select("*").eq("user_id", user!.id).maybeSingle();
       return data;
     },
   });
@@ -202,87 +158,110 @@ function InvestorDashboard() {
     }
   }, [profile, profileLoading, user?.id, navigate]);
 
-  const today = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-  const greet = (() => {
-    const h = new Date().getHours();
-    if (h < 12) return "Good morning";
-    if (h < 18) return "Good afternoon";
-    return "Good evening";
-  })();
-
-  // Fetch user's deal room memberships
   const { data: memberData } = useQuery({
     queryKey: ["my-room-ids", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("deal_room_members")
-        .select("deal_room_id")
-        .eq("user_id", user!.id);
+      const { data } = await supabase.from("deal_room_members").select("deal_room_id").eq("user_id", user!.id);
       return data ?? [];
     },
   });
   const roomIds = memberData?.map((r) => r.deal_room_id) ?? [];
 
-  // Fetch deal rooms with startup info
   const { data: roomsData = [] } = useQuery({
     queryKey: ["investor-rooms", roomIds.join(",")],
     enabled: roomIds.length > 0,
     queryFn: async () => {
       const { data } = await supabase
         .from("deal_rooms")
-        .select("id, created_at, updated_at, startup_id, investor_decision, investor_company, investor_name, startups(company_name, sector, stage, funding_target)")
+        .select("id, created_at, updated_at, startup_id, investor_company, investor_name, workflow_stage, startups(company_name, sector, stage)")
         .in("id", roomIds);
       return data ?? [];
     },
   });
 
-  // Fetch decisions for room count + attention strip
   const { data: decisionsData = [] } = useQuery({
     queryKey: ["investor-decisions", roomIds.join(",")],
     enabled: roomIds.length > 0,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("decisions")
-        .select("deal_room_id, status, created_at")
-        .in("deal_room_id", roomIds)
-        .order("created_at", { ascending: false });
+      const { data } = await supabase.from("decisions").select("deal_room_id, status, created_at").in("deal_room_id", roomIds).order("created_at", { ascending: false });
       return data ?? [];
     },
   });
 
-  // Watchlist count
   const { data: watchlistCount = 0 } = useQuery({
     queryKey: ["investor-watchlist-count", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      const { count } = await supabase
-        .from("investor_watchlist")
-        .select("id", { count: "exact", head: true })
-        .eq("investor_id", user!.id);
+      const { count } = await supabase.from("investor_watchlist").select("id", { count: "exact", head: true }).eq("investor_id", user!.id);
       return count ?? 0;
     },
   });
 
-  // Meetings this month (in rooms this investor belongs to)
-  const _now = new Date();
-  const startOfMonth = new Date(_now.getFullYear(), _now.getMonth(), 1).toISOString();
-  const endOfMonth = new Date(_now.getFullYear(), _now.getMonth() + 1, 0, 23, 59, 59).toISOString();
-  const { data: meetingsThisMonth = 0 } = useQuery({
-    queryKey: ["investor-meetings-month", user?.id, _now.getMonth(), _now.getFullYear()],
+  const { data: watchlistByStatus = [] } = useQuery({
+    queryKey: ["investor-watchlist-by-status", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase.from("investor_watchlist").select("status").eq("investor_id", user!.id);
+      return data ?? [];
+    },
+  });
+
+  const now = new Date();
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const { data: newMatches = [] } = useQuery({
+    queryKey: ["investor-thesis-matches-7d", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase.from("thesis_alerts").select("id, alerted_at").eq("investor_id", user!.id).gte("alerted_at", sevenDaysAgo);
+      return data ?? [];
+    },
+  });
+
+  const { data: matchesOverTime = [] } = useQuery({
+    queryKey: ["investor-thesis-matches-30d", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const { data } = await supabase.from("thesis_alerts").select("alerted_at").eq("investor_id", user!.id).gte("alerted_at", thirtyDaysAgo).order("alerted_at", { ascending: true });
+      return data ?? [];
+    },
+  });
+
+  const { data: meetingsThisWeek = 0 } = useQuery({
+    queryKey: ["investor-meetings-week", user?.id, roomIds.join(",")],
     enabled: !!user?.id && roomIds.length > 0,
     queryFn: async () => {
+      const startOfWeek = new Date();
+      startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+      startOfWeek.setHours(0, 0, 0, 0);
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(endOfWeek.getDate() + 7);
       const { count } = await supabase
         .from("meetings")
         .select("id", { count: "exact", head: true })
         .in("deal_room_id", roomIds)
-        .gte("scheduled_at", startOfMonth)
-        .lte("scheduled_at", endOfMonth);
+        .gte("scheduled_at", startOfWeek.toISOString())
+        .lte("scheduled_at", endOfWeek.toISOString());
       return count ?? 0;
     },
   });
 
-  // Fetch recent activity (from founders, not this investor)
+  const { data: latestIntakeRun } = useQuery({
+    queryKey: ["investor-latest-intake", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("intake_runs")
+        .select("id, created_at, input_summary, total_items, extracted_count, failed_count")
+        .eq("investor_id", user!.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return data;
+    },
+  });
+
   const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
   const { data: recentActivity = [] } = useQuery({
     queryKey: ["founder-activity", roomIds.join(","), user?.id],
@@ -300,296 +279,178 @@ function InvestorDashboard() {
     },
   });
 
-  // Build stage counts from real data
   const latestStatus: Record<string, string | null> = {};
   for (const d of decisionsData) {
     if (!(d.deal_room_id in latestStatus)) latestStatus[d.deal_room_id] = d.status;
   }
-  const stageCounts: Record<string, number> = Object.fromEntries(STAGES.map((s) => [s, 0]));
+  const pipelineCounts: Record<string, number> = Object.fromEntries(STAGES.map((s) => [s, 0]));
   for (const room of roomsData) {
     const status = latestStatus[room.id] ?? null;
     const stage = DB_STATUS_TO_STAGE[status ?? ""] ?? "Sourced";
-    if (stage in stageCounts) stageCounts[stage]++;
+    if (stage in pipelineCounts) pipelineCounts[stage]++;
   }
+  const pipelineSeries = STAGES.map((s) => ({ stage: s, count: pipelineCounts[s] }));
 
-  // Stats
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-  const now = new Date();
-  const decisionsThisMonth = decisionsData.filter((d) => {
-    if (!d.created_at) return false;
-    const dt = new Date(d.created_at as string);
-    return dt.getMonth() === now.getMonth() && dt.getFullYear() === now.getFullYear();
-  }).length;
-  const inDiligence = roomsData.filter((r) => {
-    const s = latestStatus[r.id] ?? null;
-    return DB_STATUS_TO_STAGE[s ?? ""] === "Diligence";
-  }).length;
+  const watchlistStaleCount = (() => {
+    // "Stale deals" = watchlist entries not in Invested/Passed, unchanged
+    // context beyond status counts — no per-row content rendered here.
+    return (watchlistByStatus as any[]).filter((w) => w.status === "Reviewing" || w.status === "Diligence").length;
+  })();
 
-  // Attention strip items
-  const attentionItems: AttentionItem[] = [];
-  for (const room of roomsData) {
-    const status = latestStatus[room.id] ?? null;
-    const isEarlyStage = !status || status === "under_review";
-    if (isEarlyStage && room.created_at < sevenDaysAgo) {
-      const name = (room.startups as any)?.company_name ?? "Deal";
-      attentionItems.push({
-        id: `overdue-${room.id}`,
-        level: "urgent",
-        title: `${name}: no decision update in 7+ days`,
-        href: `/app/deal-rooms/${room.id}`,
-      });
+  const matchesSeries = (() => {
+    const days: { date: string; matches: number }[] = [];
+    for (let i = 29; i >= 0; i -= 5) {
+      const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+      const bucketEnd = new Date(Date.now() - (i - 5) * 24 * 60 * 60 * 1000);
+      const key = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      const count = (matchesOverTime as any[]).filter((m) => {
+        const md = new Date(m.alerted_at);
+        return md >= d && md < bucketEnd;
+      }).length;
+      days.push({ date: key, matches: count });
     }
-  }
-  for (const act of recentActivity.slice(0, 3)) {
-    attentionItems.push({
-      id: `act-${act.id}`,
-      level: "info",
-      title: `Founder activity: ${safeActivityLabel(act.action)}`,
-      href: `/app/deal-rooms/${act.deal_room_id}`,
-    });
-  }
+    return days;
+  })();
 
-  // AI brief for selected room
-  const selectedRoom = roomsData.find((r) => r.id === selectedRoomId);
-  const { data: briefResult, isLoading: briefLoading } = useQuery({
-    queryKey: ["ai-brief", selectedRoomId, user?.id],
-    enabled: !!selectedRoomId && !!user?.id,
-    staleTime: 30 * 60 * 1000,
-    queryFn: async () => generateDealBrief({ data: { dealRoomId: selectedRoomId!, userId: user!.id } }),
-  });
-  const aiBriefData: AIBriefData | null =
-    selectedRoomId && briefResult
-      ? {
-          company: (selectedRoom?.startups as any)?.company_name ?? "Deal",
-          thesisMatch: briefResult.matchScore,
-          strengths: briefResult.strengths,
-          risks: briefResult.risks,
-          mitigants: briefResult.mitigants,
-          nextAction: briefResult.nextAction,
-          dealRoomId: selectedRoomId,
-        }
-      : null;
-
-  const [insights] = useState<string[]>([
-    "Connect your inbox to start sourcing deals automatically.",
-    "Invite your partner to collaborate on diligence.",
-    "Set your investment thesis to enable AI scoring.",
-  ]);
-
-  // Activity feed display items
-  const activityFeed = recentActivity.map((act) => {
-    const room = roomsData.find((r) => r.id === act.deal_room_id);
+  const activityItems = (recentActivity as any[]).map((a) => {
+    const room = roomsData.find((r: any) => r.id === a.deal_room_id);
     return {
-      id: act.id,
-      company: (room?.startups as any)?.company_name ?? "Deal",
-      action: act.action,
-      time: new Date(act.created_at as string).toLocaleDateString(),
+      id: a.id,
+      label: safeActivityLabel(a.action),
+      sub: (room?.startups as any)?.company_name || (room as any)?.investor_company || "Deal room",
+      time: formatDistanceToNow(new Date(a.created_at), { addSuffix: true }),
     };
   });
 
-  // Suppress unused variable warnings
-  void decisionsThisMonth;
-  void inDiligence;
-  void stageCounts;
-
-  const investorTourStep = (() => {
-    if (progress?.account_type !== "investor") return null;
-    if (progress.current_step === "tour") {
-      return {
-        id: "intro",
-        title: "Welcome to Hockystick",
-        body: "Set your investment thesis, see matched startups in the directory, and use Deal Intake to extract candidates from your own pipeline.",
-      };
-    }
-    if (progress.current_step === "thesis") {
-      return {
-        id: "thesis-next",
-        title: "Set your investment thesis",
-        body: "Define your focus areas, stages, and check size so we can match you to real deals.",
-        cta: { label: "Set my thesis", onClick: () => navigate({ to: "/app/investor/profile", search: { tour: "thesis" } as any }) },
-      };
-    }
-    if (progress.current_step === "directory") {
-      return {
-        id: "directory-next",
-        title: "See your matches",
-        body: "The directory shows startups matched to your thesis, if any exist yet.",
-        cta: { label: "View matches", onClick: () => navigate({ to: "/app/directory" as any }) },
-      };
-    }
-    if (progress.current_step === "intake") {
-      return {
-        id: "intake-next",
-        title: "Try Deal Intake",
-        body: "Paste in your own pipeline or inbox data and we'll extract thesis-matching startups.",
-        cta: { label: "Use Deal Intake", onClick: () => navigate({ to: "/app/investor/intake" as any }) },
-      };
-    }
-    return null;
-  })();
+  const staleRooms = roomsData.filter((r: any) => {
+    const status = latestStatus[r.id] ?? null;
+    const isEarlyStage = !status || status === "under_review";
+    return isEarlyStage && r.created_at < sevenDaysAgo;
+  });
 
   return (
-    <div className="p-6 lg:p-8 space-y-6">
-      {investorTourStep && (
-        <OnboardingTour
-          steps={[investorTourStep]}
-          activeIndex={0}
-          onSkip={() => markStep("tour_viewed", true)}
-          onNext={() => markStep("tour_viewed", true)}
-          onFinish={() => markStep("tour_viewed", true)}
-        />
-      )}
-      <InvestorOnboarding profile={profile} watchlistCount={watchlistCount} roomIds={roomIds} />
-      <div className="flex items-end justify-between flex-wrap gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {greet}, {user?.fullName?.split(" ")[0] ?? "there"}
-          </h1>
-          <div className="text-sm text-muted-foreground">{today}</div>
+    <PageFrame
+      breadcrumb={[{ label: "Investor" }, { label: "Overview" }]}
+      title="Overview"
+      description="Your pipeline at a glance — matches, meetings, and what needs a decision."
+      actions={
+        <Link
+          to="/app/investor/deal-flow"
+          style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 36, background: "#7C3AED", color: "#fff", border: "none", borderRadius: radius.control, padding: "0 16px", fontSize: 13, fontWeight: 500, fontFamily: font.body, textDecoration: "none" }}
+        >
+          Deal flow <ArrowUpRight style={{ width: 14, height: 14 }} />
+        </Link>
+      }
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: space.block }}>
+
+        <OnboardingChecklist profile={profile} watchlistCount={watchlistCount} roomIds={roomIds} />
+
+        {/* Row 1: stat cards */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+          <StatCard label="Active deal rooms" value={roomIds.length} sub={roomIds.length === 1 ? "room" : "rooms"} />
+          <StatCard
+            label="New thesis matches"
+            value={newMatches.length}
+            sub="last 7 days"
+            empty={newMatches.length === 0 ? "No data yet — matches appear once your thesis is set" : undefined}
+          />
+          <StatCard label="Stale deals" value={watchlistStaleCount} sub="in review or diligence" />
+          <StatCard label="Meetings this week" value={meetingsThisWeek} sub="scheduled" />
         </div>
-        <Link to="/app/investor/settings" search={{ tab: "help" } as any} className="rounded-[10px] border border-border/60 px-3 py-2 text-sm hover:bg-accent">How it works</Link>
-      </div>
 
-      <section>
-        <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">Today's attention</div>
-        <AttentionStrip items={attentionItems} />
-      </section>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { l: "Active deal rooms", v: `${roomIds.length}`, s: roomIds.length !== 1 ? "rooms" : "room" },
-          { l: "Watchlist", v: `${watchlistCount}`, s: watchlistCount !== 1 ? "companies" : "company" },
-          { l: "Meetings this month", v: `${meetingsThisMonth}`, s: "scheduled" },
-          { l: "Decisions made", v: `${roomsData.filter((r: any) => r.investor_decision != null).length}`, s: "total" },
-        ].map((k) => (
-          <div key={k.l} className="rounded-2xl border border-border/60 bg-card p-4">
-            <div className="text-xs text-muted-foreground">{k.l}</div>
-            <div className="mt-1 text-xl font-semibold tabular-nums">{k.v}</div>
-            <div className="text-[11px] text-muted-foreground">{k.s}</div>
+        {/* Deal intake hero */}
+        <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, padding: 20, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ display: "grid", placeItems: "center", height: 36, width: 36, background: "rgba(124,58,237,0.08)", color: "#7C3AED", flexShrink: 0 }}>
+              <FileInput style={{ width: 16, height: 16 }} />
+            </div>
+            <div>
+              <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Run a deal intake</div>
+              <div style={{ fontSize: 12, color: color.inkTertiary, marginTop: 2 }}>
+                {latestIntakeRun
+                  ? `Last run ${formatDistanceToNow(new Date(latestIntakeRun.created_at), { addSuffix: true })} — ${latestIntakeRun.extracted_count} of ${latestIntakeRun.total_items} extracted`
+                  : "Paste your own pipeline or inbox data — we extract thesis-matching candidates"}
+              </div>
+            </div>
           </div>
-        ))}
-      </div>
-
-      <section className="rounded-2xl border border-border/60 bg-card overflow-hidden">
-        <div className="px-5 py-3 border-b border-border/60 flex items-center justify-between">
-          <div className="text-sm font-semibold">Deal pipeline</div>
-          <span className="text-xs text-muted-foreground">{roomsData.length} deal{roomsData.length !== 1 ? "s" : ""}</span>
+          <Link
+            to="/app/investor/intake"
+            style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 36, background: "#7C3AED", color: "#fff", border: "none", borderRadius: radius.control, padding: "0 16px", fontSize: 13, fontWeight: 500, textDecoration: "none", flexShrink: 0 }}
+          >
+            Open intake <ArrowRight style={{ width: 14, height: 14 }} />
+          </Link>
         </div>
-        {roomsData.length === 0 ? (
-          <div className="p-10 text-center text-sm text-muted-foreground">
-            <Briefcase className="mx-auto h-8 w-8 opacity-40 mb-2" />
-            <div className="font-medium">No deals yet</div>
-            <div className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">Founders will invite you to their deal rooms — you'll see them here.</div>
-          </div>
-        ) : (
-          <div className="divide-y divide-border/60">
-            {roomsData.map((room) => {
-              const startup = (room as any).startups;
-              const displayName =
-                startup?.company_name ||
-                (room as any).investor_company ||
-                ((room as any).investor_name ? `Deal with ${(room as any).investor_name}` : null) ||
-                "Unnamed";
-              const status = latestStatus[room.id] ?? null;
-              const stage = DB_STATUS_TO_STAGE[status ?? ""] ?? "Sourced";
-              const stageColors: Record<string, string> = {
-                Sourced: "bg-muted text-muted-foreground",
-                Reviewing: "bg-accent text-brand",
-                Diligence: "bg-warning/10 text-warning",
-                Partner: "bg-violet/10 text-violet",
-                "Term Sheet": "bg-success/10 text-success",
-                Closed: "bg-destructive/10 text-destructive",
-              };
-              return (
-                <div key={room.id} className="flex items-center gap-4 px-5 py-3 hover:bg-accent/30 transition-colors">
-                  <div className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold text-sm shrink-0">
-                    {displayName[0] ?? "D"}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate">{displayName}</div>
-                    <div className="text-xs text-muted-foreground">{startup?.sector || "—"} · {startup?.stage || "—"}</div>
-                  </div>
-                  <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground">
-                    <Clock className="h-3 w-3" />
-                    {room.updated_at ? formatDistanceToNow(new Date(room.updated_at as string), { addSuffix: true }) : "—"}
-                  </div>
-                  <span className={cn("shrink-0 text-[10px] font-medium rounded-full px-2 py-0.5", stageColors[stage] ?? "bg-muted text-muted-foreground")}>
-                    {stage}
-                  </span>
-                  <Link
-                    to="/app/deal-rooms/$id"
-                    params={{ id: room.id }}
-                    className="shrink-0 rounded-md border border-border/60 px-2.5 py-1 text-xs hover:bg-accent transition-colors"
-                  >
-                    Open →
-                  </Link>
+
+        {/* Stale/attention row */}
+        {staleRooms.length > 0 && (
+          <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
+            <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
+              <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Needs a decision</div>
+            </div>
+            {staleRooms.map((r: any) => (
+              <Link
+                key={r.id}
+                to="/app/deal-rooms/$id"
+                params={{ id: r.id }}
+                style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 20px", height: 44, borderBottom: `1px solid ${color.border}`, textDecoration: "none" }}
+              >
+                <Clock3 style={{ width: 14, height: 14, color: "#DC2626", flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "baseline", gap: 8 }}>
+                  <span style={{ fontSize: 13, color: color.ink }}>{(r.startups as any)?.company_name ?? "Deal"}</span>
+                  <span style={{ fontSize: 12, color: color.inkTertiary }}>no decision update in 7+ days</span>
                 </div>
-              );
-            })}
+                <ArrowRight style={{ width: 12, height: 12, color: color.inkTertiary, flexShrink: 0 }} />
+              </Link>
+            ))}
           </div>
         )}
-      </section>
 
-      <div className="grid lg:grid-cols-[1fr_400px] gap-5">
-        <section className="rounded-2xl border border-border/60 bg-card overflow-hidden">
-          <div className="px-5 py-3 border-b border-border/60 text-sm font-semibold">Recent activity</div>
-          {activityFeed.length === 0 ? (
-            <div className="p-10 text-center text-sm text-muted-foreground">
-              <Inbox className="mx-auto h-8 w-8 opacity-40" />
-              <div className="mt-2">No recent activity</div>
-            </div>
+        {/* Row: graphs */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <ChartCard title="Pipeline funnel">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={pipelineSeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                <CartesianGrid stroke={color.border} vertical={false} />
+                <XAxis dataKey="stage" tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={{ stroke: color.border }} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <Tooltip contentStyle={{ fontSize: 12, border: `1px solid ${color.border}`, borderRadius: 0 }} />
+                <Bar dataKey="count" fill="#7C3AED" />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
+          <ChartCard title="Matches over time" empty={(matchesOverTime as any[]).length === 0 ? "No data yet — matches appear once your thesis is set" : undefined}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={matchesSeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                <CartesianGrid stroke={color.border} vertical={false} />
+                <XAxis dataKey="date" tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={{ stroke: color.border }} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <Tooltip contentStyle={{ fontSize: 12, border: `1px solid ${color.border}`, borderRadius: 0 }} />
+                <Line type="monotone" dataKey="matches" stroke="#7C3AED" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartCard>
+        </div>
+
+        {/* Right rail: activity */}
+        <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
+          <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
+            <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Recent activity</div>
+          </div>
+          {activityItems.length === 0 ? (
+            <EmptyState kind="empty" title="No recent activity" />
           ) : (
-            <div className="divide-y divide-border/60">
-              {activityFeed.map((a) => (
-                <div key={a.id} className="px-5 py-3 flex items-center gap-3">
-                  <div className="flex-1">
-                    <div className="text-sm font-medium">{a.company}</div>
-                    <div className="text-xs text-muted-foreground">{a.action}</div>
-                  </div>
-                  <div className="text-xs text-muted-foreground">{a.time}</div>
+            <div>
+              {activityItems.map((a) => (
+                <div key={a.id} style={{ padding: "12px 20px", borderBottom: `1px solid ${color.border}` }}>
+                  <div style={{ fontSize: 13, color: color.ink }}>{a.label}</div>
+                  <div style={{ fontSize: 12, color: color.inkTertiary, marginTop: 2 }}>{a.sub} · {a.time}</div>
                 </div>
               ))}
             </div>
           )}
-        </section>
-
-        <section className="rounded-2xl bg-gradient-to-br from-brand to-violet text-brand-foreground p-6 relative overflow-hidden">
-          <div className="absolute inset-0 noise opacity-20" />
-          <div className="relative">
-            <div className="inline-flex items-center gap-1.5 text-xs font-medium opacity-90">
-              <Sparkles className="h-3.5 w-3.5" /> AI Weekly Brief
-            </div>
-            <h3 className="mt-2 text-lg font-semibold">Your week in deals</h3>
-            <ul className="mt-4 space-y-2 text-sm opacity-95">
-              {insights.map((s, i) => (
-                <li key={i} className="flex gap-2">
-                  <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 opacity-80" />
-                  <span>{s}</span>
-                </li>
-              ))}
-            </ul>
-            <button className="mt-5 inline-flex items-center gap-1.5 rounded-[10px] bg-background/15 hover:bg-background/25 px-3 py-1.5 text-xs">
-              Regenerate
-            </button>
-          </div>
-        </section>
-      </div>
-
-      {briefLoading && selectedRoomId && (
-        <div className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm flex items-center justify-center">
-          <div className="rounded-2xl bg-card p-8 shadow-elev text-sm text-muted-foreground animate-pulse">
-            Generating AI brief…
-          </div>
         </div>
-      )}
-
-      <AIBriefPanel
-        data={aiBriefData}
-        onClose={() => setSelectedRoomId(null)}
-        onOpenDealRoom={() => {
-          if (selectedRoomId) window.location.href = `/app/deal-rooms/${selectedRoomId}`;
-        }}
-      />
-    </div>
+      </div>
+    </PageFrame>
   );
 }
