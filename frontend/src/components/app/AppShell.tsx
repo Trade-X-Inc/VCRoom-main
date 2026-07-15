@@ -27,7 +27,8 @@ import { useProfile } from "@/lib/store";
 import { useRaiseProgress } from "@/hooks/useRaiseProgress";
 import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
 
-interface NavItem { to: string; label: string; icon: any; badge?: string; step?: string; section?: string; }
+interface NavChild { to: string; label: string; }
+interface NavItem { to: string; label: string; icon: any; badge?: string; step?: string; section?: string; children?: NavChild[]; }
 
 interface SearchResult {
   id: string;
@@ -42,20 +43,52 @@ interface SearchResult {
 }
 
 const founderNav: NavItem[] = [
-  { to: "/app/prepare", label: "Prepare", icon: ClipboardCheck, step: "\u2460", section: "Your raise" },
+  {
+    to: "/app/prepare", label: "Prepare", icon: ClipboardCheck, step: "\u2460", section: "Your raise",
+    children: [
+      { to: "/app/profile", label: "Profile" },
+      { to: "/app/documents", label: "Documents" },
+      { to: "/app/verification", label: "Verification" },
+      { to: "/app/claims", label: "Claims" },
+      { to: "/app/prepare#readiness", label: "Readiness" },
+      { to: "/app/badges", label: "Badges" },
+    ],
+  },
   { to: "/app/go-live", label: "Go live", icon: Globe, step: "\u2461" },
   { to: "/app/deal-rooms", label: "Deal rooms", icon: Briefcase, step: "\u2462" },
   { to: "/app/close", label: "Close", icon: Gavel, step: "\u2463" },
   { to: "/app/assistant", label: "Workstation", icon: Brain, section: "Tools" },
+  { to: "/app/connections", label: "Contacts", icon: UserCircle2 },
   { to: "/app/meetings", label: "Meetings", icon: Calendar },
   { to: "/app/users", label: "Team", icon: Users },
 ];
 
 const investorNav: NavItem[] = [
   { to: "/app/investor/thesis", label: "Thesis", icon: Brain, step: "\u2460", section: "Deal flow" },
-  { to: "/app/investor/source", label: "Source", icon: FileInput, step: "\u2461" },
-  { to: "/app/investor/evaluate", label: "Evaluate", icon: ClipboardCheck, step: "\u2462" },
-  { to: "/app/investor/decide", label: "Decide", icon: Gavel, step: "\u2463" },
+  {
+    to: "/app/investor/source", label: "Source", icon: FileInput, step: "\u2461",
+    children: [
+      { to: "/app/investor/startups", label: "Watchlist" },
+      { to: "/app/investor/intake", label: "Deal intake" },
+      { to: "/app/directory", label: "Directory" },
+      { to: "/app/investor/connections", label: "Connections" },
+    ],
+  },
+  {
+    to: "/app/investor/evaluate", label: "Evaluate", icon: ClipboardCheck, step: "\u2462",
+    children: [
+      { to: "/app/investor/deal-rooms", label: "Deal rooms" },
+      { to: "/app/investor/diligence", label: "Diligence" },
+      { to: "/app/investor/analysis", label: "Analysis" },
+    ],
+  },
+  {
+    to: "/app/investor/decide", label: "Decide", icon: Gavel, step: "\u2463",
+    children: [
+      { to: "/app/investor/decisions", label: "Decisions" },
+      { to: "/app/investor/portfolio", label: "Portfolio" },
+    ],
+  },
   { to: "/app/investor/assistant", label: "AI Advisor", icon: MessageSquare, section: "Tools" },
   { to: "/app/meetings", label: "Meetings", icon: Calendar },
   { to: "/app/investor/team", label: "Team", icon: Users },
@@ -505,6 +538,31 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                     </span>
                   )}
                 </Link>
+                {/* Children expand in place under the active parent — Cloudflare
+                    pattern, not a dropdown that leaves the page. */}
+                {n.children && active && showExpanded && (
+                  <div className="ml-[26px] pl-2.5 border-l border-border/60 space-y-0.5 mt-0.5 mb-1">
+                    {n.children.map((c) => {
+                      const childActive = path === c.to || path.startsWith(c.to + "/") || path === c.to.split("#")[0];
+                      return (
+                        <Link
+                          key={c.to}
+                          to={c.to as any}
+                          preload="intent"
+                          onClick={() => setMobileOpen(false)}
+                          className={cn(
+                            "block rounded-md px-2 py-1.5 text-[13px] transition-colors",
+                            childActive
+                              ? "text-brand font-medium"
+                              : "text-muted-foreground hover:text-foreground hover:bg-accent/60",
+                          )}
+                        >
+                          {c.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             );
           })}
