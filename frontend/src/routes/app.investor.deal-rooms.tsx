@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
-import { EmptyState } from "@/components/system";
+import { EmptyState, PageBreadcrumb } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/deal-rooms")({
   component: DealRoomsPage,
@@ -70,6 +70,7 @@ export function DealRoomsPage() {
 
   return (
     <div className="p-6 lg:p-8 max-w-[1400px] mx-auto">
+      <PageBreadcrumb items={[{ label: "Deal flow", to: "/app/investor/evaluate" }, { label: "Deal rooms" }]} />
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Deal Rooms</h1>
         <div className="text-sm text-muted-foreground">

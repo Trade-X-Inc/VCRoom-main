@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
-import { EmptyState } from "@/components/system";
+import { EmptyState, PageBreadcrumb } from "@/components/system";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { OnboardingTour } from "@/components/app/OnboardingTour";
 import { getFounderProfileCompleteness } from "@/lib/profileCompleteness";
@@ -883,7 +883,8 @@ export function Profile() {
           }
         `}</style>
 
-        <div className="p-6 lg:p-8 max-w-5xl mx-auto">
+        <div className="p-6 lg:p-8">
+          <PageBreadcrumb items={[{ label: "Your raise", to: "/app/prepare" }, { label: "Profile" }]} />
           <div className="flex items-center justify-between flex-wrap gap-3 mb-6 no-print">
             <div>
               <h1 className="text-lg font-bold tracking-tight">Company Profile</h1>
@@ -1078,7 +1079,8 @@ export function Profile() {
   );
 
   return (
-    <div className="p-6 lg:p-8 max-w-5xl mx-auto">
+    <div className="p-6 lg:p-8">
+      <PageBreadcrumb items={[{ label: "Your raise", to: "/app/prepare" }, { label: "Profile" }]} />
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-lg font-bold tracking-tight">{startup ? "Edit profile" : "Create your profile"}</h1>

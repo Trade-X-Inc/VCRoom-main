@@ -13,7 +13,7 @@ import { PageGuide } from "@/components/app/PageGuide";
 import { generateInvestorMemo } from "@/lib/investor-memo-fn";
 import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 import { Markdown } from "@/components/shared/LazyMarkdown";
-import { EmptyState } from "@/components/system";
+import { EmptyState, PageBreadcrumb } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/analysis")({
   component: AnalysisPage,
@@ -232,6 +232,7 @@ Return this exact JSON shape:
 
   return (
     <div className="p-6 lg:p-8">
+      <PageBreadcrumb items={[{ label: "Deal flow", to: "/app/investor/evaluate" }, { label: "AI analysis" }]} />
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">AI Analysis</h1>

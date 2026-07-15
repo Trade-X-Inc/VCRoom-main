@@ -6,7 +6,7 @@ import { getDDSummaryForInvestor } from "@/lib/dd-fn";
 import {
   CheckCircle2, ClipboardCheck, Loader2, ArrowRight, Building2, ExternalLink,
 } from "lucide-react";
-import { EmptyState } from "@/components/system";
+import { EmptyState, PageBreadcrumb } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/diligence")({
   component: DiligencePage,
@@ -62,6 +62,7 @@ export function DiligencePage() {
     <div className="p-6 lg:p-8 space-y-8">
       {/* Header */}
       <div>
+        <PageBreadcrumb items={[{ label: "Deal flow", to: "/app/investor/evaluate" }, { label: "Due diligence" }]} />
         <h1 className="text-2xl font-semibold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
           Due Diligence
         </h1>

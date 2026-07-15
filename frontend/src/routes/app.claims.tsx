@@ -10,7 +10,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import type { StartupClaim, ClaimCategory, ClaimVerdict } from "@/lib/claims-fn";
 import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
-import { EmptyState } from "@/components/system";
+import { EmptyState, PageBreadcrumb } from "@/components/system";
 
 export const Route = createFileRoute("/app/claims")({
   component: ClaimsPage,
@@ -96,6 +96,7 @@ export function ClaimsPage() {
   return (
     <div className="flex flex-col flex-1 min-h-0">
       <div className="border-b border-border/60 bg-background/80 backdrop-blur-xl px-6 py-4 shrink-0">
+        <PageBreadcrumb items={[{ label: "Your raise", to: "/app/prepare" }, { label: "Claims" }]} />
         <div className="flex items-center gap-3">
           <div className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-brand text-brand-foreground shrink-0">
             <BadgeCheck className="h-4 w-4" />

@@ -8,4 +8,4 @@ export { StatusDot, type StatusTone } from "./StatusDot";
 export { SectionLabel } from "./SectionLabel";
 export { EmptyState } from "./EmptyState";
 export { Illustration, type IllustrationName } from "./Illustration";
-export { PageFrame, type PageFrameCrumb } from "./PageFrame";
+export { PageFrame, PageBreadcrumb, type PageFrameCrumb } from "./PageFrame";

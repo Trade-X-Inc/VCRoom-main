@@ -11,7 +11,7 @@ import { useAuth } from "@/lib/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { EmptyState } from "@/components/system";
+import { EmptyState, PageBreadcrumb } from "@/components/system";
 
 const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","xlsx","xls","docx","doc","csv","png","jpg","jpeg"]);
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
@@ -390,6 +390,7 @@ export function Documents() {
     <div className="flex flex-col h-full overflow-hidden">
     <div className="flex-1 overflow-y-auto p-6 lg:p-8">
       {/* Header */}
+      <PageBreadcrumb items={[{ label: "Your raise", to: "/app/prepare" }, { label: "Documents" }]} />
       <div className="flex items-start justify-between gap-6 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>Documents</h1>

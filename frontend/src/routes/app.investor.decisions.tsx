@@ -9,7 +9,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
-import { EmptyState } from "@/components/system";
+import { EmptyState, PageBreadcrumb } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/decisions")({
   component: DecisionsPage,
@@ -312,8 +312,9 @@ export function DecisionsPage() {
   const staleCount = rawEntries.filter(isStale).length;
 
   return (
-    <div style={{ paddingBottom: 40, paddingLeft: 24, paddingRight: 24 }}>
+    <div style={{ paddingTop: 24, paddingBottom: 40, paddingLeft: 24, paddingRight: 24 }}>
       {/* Header */}
+      <PageBreadcrumb items={[{ label: "Deal flow", to: "/app/investor/decide" }, { label: "Decisions" }]} />
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 20 }}>
         <div>
           <h1 style={{ fontFamily: "Syne, sans-serif", fontSize: 24, fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>Decision Board</h1>

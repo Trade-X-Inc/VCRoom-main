@@ -13,6 +13,42 @@ export interface PageFrameCrumb {
   to?: string;
 }
 
+/**
+ * Breadcrumb strip alone — for pages with their own header/scroll
+ * architecture that can't adopt the full PageFrame wrapper. Drop this
+ * above the page's existing header instead.
+ */
+export function PageBreadcrumb({ items }: { items: PageFrameCrumb[] }) {
+  if (!items.length) return null;
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        fontFamily: font.body,
+        fontSize: 12,
+        fontWeight: 500,
+        color: color.inkTertiary,
+        marginBottom: 12,
+      }}
+    >
+      {items.map((crumb, i) => (
+        <span key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          {i > 0 && <ChevronRight style={{ width: 12, height: 12 }} />}
+          {crumb.to ? (
+            <Link to={crumb.to as any} style={{ color: color.inkTertiary }} className="hover:underline">
+              {crumb.label}
+            </Link>
+          ) : (
+            <span>{crumb.label}</span>
+          )}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function PageFrame({
   breadcrumb,
   title,
@@ -35,33 +71,7 @@ export function PageFrame({
         padding: space.page,
       }}
     >
-      {breadcrumb && breadcrumb.length > 0 && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            fontFamily: font.body,
-            fontSize: 12,
-            fontWeight: 500,
-            color: color.inkTertiary,
-            marginBottom: 12,
-          }}
-        >
-          {breadcrumb.map((crumb, i) => (
-            <span key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              {i > 0 && <ChevronRight style={{ width: 12, height: 12 }} />}
-              {crumb.to ? (
-                <Link to={crumb.to as any} style={{ color: color.inkTertiary }} className="hover:underline">
-                  {crumb.label}
-                </Link>
-              ) : (
-                <span>{crumb.label}</span>
-              )}
-            </span>
-          ))}
-        </div>
-      )}
+      {breadcrumb && <PageBreadcrumb items={breadcrumb} />}
 
       <div
         style={{

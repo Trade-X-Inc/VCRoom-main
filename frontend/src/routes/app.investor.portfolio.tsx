@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { formatDistanceToNow } from "date-fns";
-import { EmptyState } from "@/components/system";
+import { EmptyState, PageBreadcrumb } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/portfolio")({
   component: PortfolioPage,
@@ -92,6 +92,7 @@ export function PortfolioPage() {
 
   return (
     <div className="p-6 lg:p-8">
+      <PageBreadcrumb items={[{ label: "Deal flow", to: "/app/investor/decide" }, { label: "Portfolio" }]} />
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Portfolio</h1>
         <div className="text-sm text-muted-foreground">Companies you've committed to invest in</div>

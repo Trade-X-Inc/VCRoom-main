@@ -7,7 +7,7 @@ import { VerificationBadge } from "@/components/shared/VerificationBadge";
 import { fetchVerificationStatus } from "@/lib/verification-fn";
 import { useState } from "react";
 import { toast } from "sonner";
-import { StatusDot } from "@/components/system";
+import { StatusDot, PageBreadcrumb } from "@/components/system";
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -121,11 +121,17 @@ export function VerificationPage() {
   return (
     <div className="flex flex-col flex-1 min-h-0">
       <div className="border-b border-border/60 bg-background/80 backdrop-blur-xl px-6 py-4 shrink-0">
+        <PageBreadcrumb items={[{ label: "Your raise", to: "/app/prepare" }, { label: "Verification" }]} />
         <div className="flex items-center gap-3">
           <div className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-brand text-brand-foreground shrink-0">
             <ShieldCheck className="h-4 w-4" />
           </div>
-          <h1 className="text-lg font-semibold tracking-tight">Verification</h1>
+          <div>
+            <h1 className="text-lg font-semibold tracking-tight">Verification</h1>
+            <div className="text-xs text-muted-foreground">
+              Confirm your identity so investors can trust what they see.
+            </div>
+          </div>
         </div>
       </div>
 

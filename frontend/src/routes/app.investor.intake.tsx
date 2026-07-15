@@ -16,6 +16,7 @@ import { supabase } from "@/lib/supabase";
 import type { IntakeCandidate } from "@/lib/intake-fn";
 import type { IntakeFileResult } from "@/lib/document-extractor";
 import { PageGuide } from "@/components/app/PageGuide";
+import { PageBreadcrumb } from "@/components/system";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 
 export const Route = createFileRoute("/app/investor/intake")({
@@ -369,6 +370,7 @@ export function IntakePage() {
 
   return (
     <div className="p-6 lg:p-8">
+      <PageBreadcrumb items={[{ label: "Deal flow", to: "/app/investor/source" }, { label: "Deal intake" }]} />
 
       {/* Header */}
       <div data-tour="intake-header" className="mb-7 flex items-start gap-3">
