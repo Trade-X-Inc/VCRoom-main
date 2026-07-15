@@ -4,9 +4,9 @@ import type { ReactNode, ErrorInfo } from "react";
 import {
   Loader2, Save, Plus, X, Pencil, Trash2,
   Globe, Users, Linkedin, UserCircle2, Mail, Upload,
-  Paperclip, CheckCircle2, XCircle, Clock, Lightbulb, Sparkles,
+  Paperclip, CheckCircle2, XCircle, Clock, Sparkles,
   ChevronDown, Link as LinkIcon, Copy, Eye, EyeOff,
-  Trophy, Briefcase, Settings2, Building2,
+  Trophy, Briefcase, Building2, FileText, ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -22,12 +22,21 @@ import { CapitalVerificationSection } from "./app.investor.profile.capital";
 import { BadgeDisplay, useBadges } from "@/components/app/BadgeDisplay";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { OnboardingTour } from "@/components/app/OnboardingTour";
+import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
+import { PageFrame, EmptyState } from "@/components/system";
+import { color, font, space, radius } from "@/lib/design-tokens";
 
 export const Route = createFileRoute("/app/investor/profile")({
   component: InvestorProfilePage,
 });
 
 // ── Types ─────────────────────────────────────────────────────────
+
+interface TrackRecordItem {
+  label: string;
+  detail: string;
+  verified: boolean;
+}
 
 interface ProfileForm {
   fund_name: string;
@@ -48,8 +57,10 @@ interface ProfileForm {
   key_metrics: string;
   thesis_bullets: string[];
   achievements: string[];
+  track_record: TrackRecordItem[];
   profile_slug: string;
   profile_published: boolean;
+  public_fields: string[];
 }
 
 interface TeamMember {
@@ -81,6 +92,23 @@ const ROLES = ["Partner", "General Partner", "Managing Partner", "Principal", "A
 const STAGES = ["Pre-seed", "Seed", "Series A", "Series B", "Series C", "Growth"];
 const SOCIAL_PLATFORMS = ["LinkedIn", "X / Twitter", "Website", "AngelList", "Crunchbase", "Other"];
 
+const PUBLIC_FIELD_OPTIONS: { key: string; label: string }[] = [
+  { key: "fund_name", label: "Fund name" },
+  { key: "your_name", label: "Your name" },
+  { key: "role", label: "Role" },
+  { key: "fund_size", label: "Fund size" },
+  { key: "thesis_statement", label: "Thesis statement" },
+  { key: "sectors", label: "Sectors" },
+  { key: "stages", label: "Stages" },
+  { key: "geography", label: "Geography" },
+  { key: "check_size_min", label: "Cheque size (min/max)" },
+  { key: "verification_tier", label: "Verification tier" },
+  { key: "achievements", label: "Achievements" },
+  { key: "track_record", label: "Track record" },
+  { key: "avatar_url", label: "Photo" },
+  { key: "social_links", label: "Social links" },
+];
+
 const EMPTY_FORM: ProfileForm = {
   fund_name: "", your_name: "", role: "Partner", fund_size: "",
   social_links: [],
@@ -88,16 +116,83 @@ const EMPTY_FORM: ProfileForm = {
   sectors: "", stages: [], check_size_min: "",
   check_size_max: "", geography: "", portfolio_companies: "",
   red_flags: "", key_metrics: "",
-  thesis_bullets: [], achievements: [],
+  thesis_bullets: [], achievements: [], track_record: [],
   profile_slug: "", profile_published: false,
+  public_fields: PUBLIC_FIELD_OPTIONS.map((f) => f.key).filter((k) => k !== "check_size_min"),
 };
 
 // ── Helpers ───────────────────────────────────────────────────────
 
-const input = "w-full rounded-[10px] border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50";
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  border: `1px solid ${color.border}`,
+  borderRadius: radius.control,
+  background: color.white,
+  padding: "8px 12px",
+  fontSize: 14,
+  fontFamily: font.body,
+  color: color.ink,
+  outline: "none",
+};
 
 function slugify(str: string): string {
   return str.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+}
+
+function computeCompleteness(f: ProfileForm): number {
+  const checks: boolean[] = [
+    !!f.fund_name.trim(),
+    !!f.your_name.trim(),
+    !!f.thesis_statement.trim(),
+    !!f.sectors.trim(),
+    f.stages.length > 0,
+    !!f.check_size_min.trim() || !!f.check_size_max.trim(),
+    !!f.geography.trim(),
+    f.achievements.length > 0,
+    f.track_record.length > 0,
+    f.social_links.length > 0,
+  ];
+  const passed = checks.filter(Boolean).length;
+  return Math.round((passed / checks.length) * 100);
+}
+
+function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+  return (
+    <div
+      style={{
+        border: `1px solid ${color.border}`,
+        borderRadius: radius.structural,
+        background: color.white,
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function SectionHeader({ icon: Icon, title, description }: { icon: React.ElementType; title: string; description: string }) {
+  return (
+    <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "16px 20px", borderBottom: `1px solid ${color.border}` }}>
+      <Icon style={{ width: 16, height: 16, color: color.inkTertiary, marginTop: 2, flexShrink: 0 }} />
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>{title}</div>
+        <div style={{ fontFamily: font.body, fontSize: 12, color: color.inkTertiary, marginTop: 2 }}>{description}</div>
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, badge, children }: { label: string; badge?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+        <label style={{ fontFamily: font.body, fontSize: 12, color: color.inkTertiary }}>{label}</label>
+        {badge}
+      </div>
+      {children}
+    </div>
+  );
 }
 
 function BulletEditor({ bullets, onChange, placeholder }: { bullets: string[]; onChange: (b: string[]) => void; placeholder: string }) {
@@ -105,60 +200,21 @@ function BulletEditor({ bullets, onChange, placeholder }: { bullets: string[]; o
   const update = (i: number, v: string) => { const next = [...bullets]; next[i] = v; onChange(next); };
   const remove = (i: number) => onChange(bullets.filter((_, idx) => idx !== i));
   return (
-    <div className="space-y-2">
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       {bullets.map((b, i) => (
-        <div key={i} className="flex items-start gap-2">
-          <span className="mt-2.5 h-1.5 w-1.5 rounded-full bg-accent shrink-0" />
-          <input value={b} onChange={(e) => update(i, e.target.value)}
-            className={cn(input, "flex-1")} placeholder={placeholder} />
+        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+          <span style={{ marginTop: 12, width: 4, height: 4, borderRadius: "50%", background: color.inkTertiary, flexShrink: 0 }} />
+          <input value={b} onChange={(e) => update(i, e.target.value)} style={{ ...inputStyle, flex: 1 }} placeholder={placeholder} />
           <button type="button" onClick={() => remove(i)}
-            className="mt-1.5 grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0">
-            <X className="h-3.5 w-3.5" />
+            style={{ marginTop: 4, display: "grid", placeItems: "center", height: 28, width: 28, borderRadius: radius.control, color: color.inkTertiary, background: "transparent", border: "none", cursor: "pointer", flexShrink: 0 }}>
+            <X style={{ width: 14, height: 14 }} />
           </button>
         </div>
       ))}
       <button type="button" onClick={add}
-        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground border border-dashed border-border/60 rounded-lg px-3 py-1.5 w-full justify-center hover:bg-accent transition-colors">
-        <Plus className="h-3.5 w-3.5" /> Add bullet
+        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontSize: 12, color: color.inkTertiary, border: `1px dashed ${color.border}`, borderRadius: radius.control, padding: "8px 12px", background: "transparent", cursor: "pointer" }}>
+        <Plus style={{ width: 14, height: 14 }} /> Add bullet
       </button>
-    </div>
-  );
-}
-
-type AccordionSection = "setup" | "thesis" | "achievements" | "team" | "portfolio" | "sharing";
-
-function AccordionBlock({
-  id, open, onToggle, icon: Icon, title, description, children,
-}: {
-  id: AccordionSection;
-  open: boolean;
-  onToggle: (id: AccordionSection) => void;
-  icon: React.ElementType;
-  title: string;
-  description: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div data-tour={id === "thesis" ? "thesis-accordion" : undefined} className="rounded-2xl border border-border/60 bg-card overflow-hidden">
-      <button
-        type="button"
-        onClick={() => onToggle(id)}
-        className="w-full flex items-center gap-3 px-6 py-5 text-left hover:bg-accent/40 transition-colors"
-      >
-        <div className="grid h-9 w-9 place-items-center rounded-lg bg-accent text-brand shrink-0">
-          <Icon className="h-4 w-4" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-sm font-semibold">{title}</div>
-          <div className="text-xs text-muted-foreground mt-0.5">{description}</div>
-        </div>
-        <ChevronDown className={cn("h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-200", open && "rotate-180")} />
-      </button>
-      {open && (
-        <div className="px-6 pb-6 pt-1 border-t border-border/40 space-y-4">
-          {children}
-        </div>
-      )}
     </div>
   );
 }
@@ -170,21 +226,17 @@ export function InvestorProfilePage() {
   const qc = useQueryClient();
   const search = useSearch({ strict: false }) as { tour?: string };
   const { progress, markStep, setCurrentStep } = useOnboardingProgress();
+  const { run: runAI, isWorking: aiWorking, stillWorking: aiStillWorking } = useTimedAI();
   const [form, setForm] = useState<ProfileForm>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [attachingClaim, setAttachingClaim] = useState<{ type: string; label: string; value: string } | null>(null);
-  const [open, setOpen] = useState<Set<AccordionSection>>(new Set(["setup", "thesis", "achievements", "team", "portfolio"]));
-
-  const toggleSection = (id: AccordionSection) => {
-    setOpen((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  };
+  const [previewTab, setPreviewTab] = useState<"public" | "dealroom">("public");
+  const [deckExtracting, setDeckExtracting] = useState(false);
+  const [deckDraft, setDeckDraft] = useState<Record<string, unknown> | null>(null);
+  const [deckMissing, setDeckMissing] = useState<string[]>([]);
 
   useEffect(() => { prewarmClassificationCache(); }, []);
 
@@ -238,7 +290,6 @@ export function InvestorProfilePage() {
       if (user?.fullName) setForm((f) => ({ ...f, your_name: user.fullName }));
       return;
     }
-    // Build default thesis_bullets from structured fields if none saved
     let tBullets: string[] = Array.isArray(existing.thesis_bullets) ? existing.thesis_bullets : [];
     if (tBullets.length === 0) {
       const defaults: string[] = [];
@@ -252,7 +303,6 @@ export function InvestorProfilePage() {
       tBullets = defaults;
     }
 
-    // Parse social_links from DB or build from legacy fields
     let socialLinks: Array<{ platform: string; url: string }> = [];
     if (Array.isArray(existing.social_links)) {
       socialLinks = existing.social_links;
@@ -280,8 +330,12 @@ export function InvestorProfilePage() {
       key_metrics: existing.key_metrics ?? "",
       thesis_bullets: tBullets,
       achievements: Array.isArray(existing.achievements) ? existing.achievements : [],
+      track_record: Array.isArray(existing.track_record) ? existing.track_record : [],
       profile_slug: existing.profile_slug ?? slugify(existing.fund_name ?? ""),
       profile_published: existing.profile_published ?? false,
+      public_fields: Array.isArray(existing.public_fields) && existing.public_fields.length > 0
+        ? existing.public_fields
+        : EMPTY_FORM.public_fields,
     });
     setAvatarUrl(existing.avatar_url ?? null);
   }, [existing, user?.fullName]);
@@ -293,6 +347,12 @@ export function InvestorProfilePage() {
     setForm((f) => ({
       ...f,
       stages: f.stages.includes(stage) ? f.stages.filter((s) => s !== stage) : [...f.stages, stage],
+    }));
+
+  const togglePublicField = (key: string) =>
+    setForm((f) => ({
+      ...f,
+      public_fields: f.public_fields.includes(key) ? f.public_fields.filter((k) => k !== key) : [...f.public_fields, key],
     }));
 
   const handleAvatarUpload = async (file: File) => {
@@ -319,7 +379,6 @@ export function InvestorProfilePage() {
     }
   };
 
-  // Auto-generate slug from fund name if slug is empty
   const prevFundName = useRef("");
   useEffect(() => {
     if (form.fund_name !== prevFundName.current) {
@@ -330,6 +389,67 @@ export function InvestorProfilePage() {
     }
   }, [form.fund_name]);
 
+  // ── AI fund-deck extraction → draft prefill (confirm-before-publish) ──
+  const handleDeckUpload = async (file: File) => {
+    if (!user?.id) return;
+    setDeckExtracting(true);
+    setDeckDraft(null);
+    try {
+      const { extractDocumentText } = await import("@/lib/document-extractor");
+      const text = await extractDocumentText(file, file.name);
+      if (!text || text.length < 50) {
+        toast.error("Could not extract readable text from this file.");
+        return;
+      }
+      const { extractInvestorProfileFromDeck } = await import("@/lib/investor-profile-builder-fn");
+      type DeckExtractResult = { data: Record<string, unknown> | null; missing_fields: string[]; error: string | null };
+      const result = await runAI(() =>
+        extractInvestorProfileFromDeck({ data: { userId: user.id, documentText: text, fileName: file.name } }) as Promise<DeckExtractResult>,
+      );
+      if (result.error) { toast.error(result.error); return; }
+      if (!result.data) { toast.error("Extraction returned no data."); return; }
+      setDeckDraft(result.data);
+      setDeckMissing(result.missing_fields ?? []);
+      toast.success("Draft extracted — review before applying");
+    } catch (err) {
+      toast.error(err instanceof AITimeoutError ? AI_TIMEOUT_MESSAGE : "Extraction failed");
+    } finally {
+      setDeckExtracting(false);
+    }
+  };
+
+  const applyDeckDraft = () => {
+    if (!deckDraft) return;
+    setForm((f) => ({
+      ...f,
+      fund_name: (deckDraft.fund_name as string) || f.fund_name,
+      your_name: (deckDraft.your_name as string) || f.your_name,
+      role: (deckDraft.role as string) || f.role,
+      fund_size: (deckDraft.fund_size as string) || f.fund_size,
+      thesis_statement: (deckDraft.thesis_statement as string) || f.thesis_statement,
+      sectors: (deckDraft.sectors as string) || f.sectors,
+      stages: Array.isArray(deckDraft.stages) && deckDraft.stages.length > 0 ? deckDraft.stages as string[] : f.stages,
+      check_size_min: (deckDraft.check_size_min as string) || f.check_size_min,
+      check_size_max: (deckDraft.check_size_max as string) || f.check_size_max,
+      geography: (deckDraft.geography as string) || f.geography,
+      track_record: Array.isArray(deckDraft.track_record)
+        ? [...f.track_record, ...(deckDraft.track_record as { label: string; detail: string }[]).map((t) => ({ ...t, verified: false }))]
+        : f.track_record,
+    }));
+    setDeckDraft(null);
+    toast.success("Draft applied — verify unverified claims below, then save");
+  };
+
+  const discardDeckDraft = () => setDeckDraft(null);
+
+  // ── Track record item helpers ──
+  const addTrackRecordItem = () =>
+    set("track_record", [...form.track_record, { label: "", detail: "", verified: false }]);
+  const updateTrackRecordItem = (i: number, patch: Partial<TrackRecordItem>) =>
+    set("track_record", form.track_record.map((t, idx) => (idx === i ? { ...t, ...patch } : t)));
+  const removeTrackRecordItem = (i: number) =>
+    set("track_record", form.track_record.filter((_, idx) => idx !== i));
+
   const handleSave = async (e?: React.SyntheticEvent) => {
     e?.preventDefault();
     if (!user?.id) return;
@@ -339,9 +459,9 @@ export function InvestorProfilePage() {
     }
     setSaving(true);
     try {
-      // Derive linkedin_url and website from social_links for backwards compat
       const linkedinEntry = form.social_links.find((l) => l.platform === "LinkedIn");
       const websiteEntry = form.social_links.find((l) => l.platform === "Website");
+      const completeness = computeCompleteness(form);
 
       const { error } = await supabase.from("investor_profiles").upsert({
         user_id: user.id,
@@ -365,8 +485,11 @@ export function InvestorProfilePage() {
         key_metrics: form.key_metrics,
         thesis_bullets: form.thesis_bullets,
         achievements: form.achievements,
+        track_record: form.track_record,
         profile_slug: form.profile_slug || slugify(form.fund_name),
         profile_published: form.profile_published,
+        public_fields: form.public_fields,
+        profile_completeness: completeness,
         updated_at: new Date().toISOString(),
         last_active_at: new Date().toISOString(),
       }, { onConflict: "user_id" });
@@ -377,9 +500,7 @@ export function InvestorProfilePage() {
         try {
           await markStep("thesis_set", true);
           await setCurrentStep("directory");
-        } catch {
-          // Non-fatal — onboarding progress is best-effort, never blocks saving.
-        }
+        } catch { /* best-effort */ }
       }
 
       if (existing?.id) {
@@ -405,13 +526,17 @@ export function InvestorProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="w-full p-6 lg:p-8 max-w-7xl mx-auto space-y-4">
-        {[1, 2, 3].map((n) => <div key={n} className="h-24 rounded-2xl bg-muted animate-pulse" />)}
-      </div>
+      <PageFrame title="Investor profile">
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {[1, 2, 3].map((n) => (
+            <div key={n} style={{ height: 96, border: `1px solid ${color.border}`, background: color.canvas }} />
+          ))}
+        </div>
+      </PageFrame>
     );
   }
 
-  const verificationScore = tier1Passed ? 75 : null;
+  const completeness = computeCompleteness(form);
   const profileUrl = `${import.meta.env.VITE_APP_URL || "https://hockystick.app"}/i/${form.profile_slug}`;
 
   const showThesisSpotlight =
@@ -420,7 +545,24 @@ export function InvestorProfilePage() {
     progress.current_step === "thesis";
 
   return (
-    <div className="w-full p-6 lg:p-8 max-w-7xl mx-auto">
+    <PageFrame
+      breadcrumb={[{ label: "Investor" }, { label: "Profile" }]}
+      title="Investor profile"
+      description="Your fund's digital profile — shown publicly and inside unlocked deal rooms."
+      actions={
+        <button type="button" onClick={handleSave} disabled={saving}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 6, height: 36,
+            background: color.ink === "#0A0A0B" ? "#7C3AED" : "#7C3AED", color: "#fff",
+            border: "none", borderRadius: radius.control, padding: "0 16px",
+            fontSize: 13, fontWeight: 500, fontFamily: font.body, cursor: saving ? "default" : "pointer",
+            opacity: saving ? 0.6 : 1,
+          }}>
+          {saving ? <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" /> : <Save style={{ width: 14, height: 14 }} />}
+          {saved ? "Saved" : existing ? "Save changes" : "Save & continue"}
+        </button>
+      }
+    >
       {showThesisSpotlight && (
         <OnboardingTour
           steps={[{
@@ -436,334 +578,423 @@ export function InvestorProfilePage() {
         />
       )}
 
-      {/* ── HERO CARD ──────────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-border/60 bg-card p-6 mb-8">
-        <div className="flex items-start gap-5">
-          <label className="relative cursor-pointer group shrink-0">
-            <div className="h-16 w-16 rounded-full overflow-hidden bg-gradient-brand flex items-center justify-center text-brand-foreground text-2xl font-bold">
-              {avatarUploading
-                ? <Loader2 className="h-5 w-5 animate-spin" />
-                : avatarUrl
-                ? <img src={avatarUrl} alt="avatar" className="h-full w-full object-cover" />
-                : <span>{(form.your_name || user?.fullName || "?").split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()}</span>}
-            </div>
-            <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <Upload className="h-4 w-4 text-foreground" />
-            </div>
-            <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])} />
-          </label>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-semibold tracking-tight truncate">
-              {form.your_name || "Your name"}
-            </h1>
-            <div className="flex items-center gap-2 mt-1 flex-wrap">
-              <span className="text-sm text-muted-foreground">
-                {form.role || "Partner"}{form.fund_name ? ` · ${form.fund_name}` : ""}
-              </span>
-              {form.fund_size && (
-                <span className="text-[11px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full">{form.fund_size} fund</span>
-              )}
-            </div>
-            <div className="mt-2 flex items-center gap-2 flex-wrap">
-              {verificationScore !== null
-                ? <span className="inline-flex items-center gap-1.5 text-[11px] bg-success/10 text-success border border-success/20 rounded-full px-2.5 py-1 font-medium">
-                    <CheckCircle2 className="h-3 w-3" /> Hockystick Checked · {verificationScore}/100
-                  </span>
-                : <span className="inline-flex items-center gap-1.5 text-[11px] bg-muted text-muted-foreground border border-border/60 rounded-full px-2.5 py-1">
-                    <Clock className="h-3 w-3" /> Not yet verified
-                  </span>
-              }
-              {form.profile_published
-                ? <span className="inline-flex items-center gap-1.5 text-[11px] bg-accent text-brand border border-brand/20 rounded-full px-2.5 py-1 font-medium">
-                    <Eye className="h-3 w-3" /> Profile public
-                  </span>
-                : <span className="inline-flex items-center gap-1.5 text-[11px] bg-muted text-muted-foreground border border-border/60 rounded-full px-2.5 py-1">
-                    <EyeOff className="h-3 w-3" /> Profile private
-                  </span>
-              }
-            </div>
-          </div>
-          <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
-            {form.social_links.map((l, i) => {
-              const url = l.url.startsWith("http") ? l.url : `https://${l.url}`;
-              return (
-                <a key={i} href={url} target="_blank" rel="noopener noreferrer"
-                  className="grid h-8 w-8 place-items-center rounded-md bg-muted text-muted-foreground hover:text-foreground hover:bg-accent"
-                  title={l.platform}>
-                  {l.platform === "LinkedIn" ? <Linkedin className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
-                </a>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: space.block, alignItems: "flex-start" }}>
 
-      {/* ── TWO-COLUMN LAYOUT ──────────────────────────────────────── */}
-      <div className="grid lg:grid-cols-[1fr_380px] gap-8 items-start">
+        {/* ── LEFT: form sections ─────────────────────────────────── */}
+        <div style={{ display: "flex", flexDirection: "column", gap: space.block, minWidth: 0 }}>
 
-        {/* ── LEFT: accordion sections ─────────────────────────────── */}
-        <div className="space-y-4">
-
-          {/* 1. Quick setup */}
-          <AccordionBlock id="setup" open={open.has("setup")} onToggle={toggleSection}
-            icon={Settings2} title="Quick setup" description="Fund name, your name, role, and social links">
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="Fund name *">
-                <input value={form.fund_name} onChange={(e) => set("fund_name", e.target.value)}
-                  required className={input} placeholder="Acme Ventures" />
-              </Field>
-              <Field label="Your name *">
-                <input value={form.your_name} onChange={(e) => set("your_name", e.target.value)}
-                  required className={input} placeholder="Jane Doe" />
-              </Field>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="Role">
-                <select value={form.role} onChange={(e) => set("role", e.target.value)} className={input}>
-                  {ROLES.map((r) => <option key={r}>{r}</option>)}
-                </select>
-              </Field>
-              <Field label="Fund size" badge={<FieldVerificationBadge profileType="investor" fieldName="fund_size"
-                  claimStatus={claimByType("fund_size")?.proof_status}
-                  onAttachProof={user?.id ? () => setAttachingClaim({ type: "fund_size", label: "Fund size", value: form.fund_size }) : undefined} compact />}>
-                <input value={form.fund_size} onChange={(e) => set("fund_size", e.target.value)}
-                  className={input} placeholder="$50M" />
-              </Field>
-            </div>
-
-            {/* Flexible social links */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-xs text-muted-foreground">Social links</label>
+          {/* Identity & Fund */}
+          <Card>
+            <SectionHeader icon={Building2} title="Identity & fund" description="Fund name, your name, role, photo, and social links" />
+            <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 16 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <label style={{ position: "relative", cursor: "pointer", flexShrink: 0 }}>
+                  <div style={{ height: 56, width: 56, borderRadius: "50%", overflow: "hidden", background: "#7C3AED", display: "grid", placeItems: "center", color: "#fff", fontSize: 20, fontWeight: 700 }}>
+                    {avatarUploading
+                      ? <Loader2 style={{ width: 18, height: 18 }} className="animate-spin" />
+                      : avatarUrl
+                      ? <img src={avatarUrl} alt="avatar" style={{ height: "100%", width: "100%", objectFit: "cover" }} />
+                      : <span>{(form.your_name || user?.fullName || "?").split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()}</span>}
+                  </div>
+                  <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])} />
+                </label>
+                <div style={{ fontSize: 12, color: color.inkTertiary }}>Photo, max 2MB</div>
               </div>
-              <div className="space-y-2">
-                {form.social_links.map((link, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <select
-                      value={link.platform}
-                      onChange={(e) => {
-                        const next = [...form.social_links];
-                        next[i] = { ...next[i], platform: e.target.value };
-                        set("social_links", next);
-                      }}
-                      className="rounded-[10px] border border-border/60 bg-background px-2 py-2 text-xs focus:outline-none focus:border-brand/50 w-36 shrink-0"
-                    >
-                      {SOCIAL_PLATFORMS.map((p) => <option key={p}>{p}</option>)}
-                    </select>
-                    <input
-                      value={link.url}
-                      onChange={(e) => {
-                        const next = [...form.social_links];
-                        next[i] = { ...next[i], url: e.target.value };
-                        set("social_links", next);
-                      }}
-                      className={cn(input, "flex-1")}
-                      placeholder="https://…"
-                    />
-                    <button type="button" onClick={() => set("social_links", form.social_links.filter((_, idx) => idx !== i))}
-                      className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0">
-                      <X className="h-3.5 w-3.5" />
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <Field label="Fund name *">
+                  <input value={form.fund_name} onChange={(e) => set("fund_name", e.target.value)} required style={inputStyle} placeholder="Acme Ventures" />
+                </Field>
+                <Field label="Your name *">
+                  <input value={form.your_name} onChange={(e) => set("your_name", e.target.value)} required style={inputStyle} placeholder="Jane Doe" />
+                </Field>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <Field label="Role">
+                  <select value={form.role} onChange={(e) => set("role", e.target.value)} style={inputStyle}>
+                    {ROLES.map((r) => <option key={r}>{r}</option>)}
+                  </select>
+                </Field>
+                <Field label="Fund size" badge={<FieldVerificationBadge profileType="investor" fieldName="fund_size"
+                    claimStatus={claimByType("fund_size")?.proof_status}
+                    onAttachProof={user?.id ? () => setAttachingClaim({ type: "fund_size", label: "Fund size", value: form.fund_size }) : undefined} compact />}>
+                  <input value={form.fund_size} onChange={(e) => set("fund_size", e.target.value)} style={inputStyle} placeholder="$50M" />
+                </Field>
+              </div>
+
+              <div>
+                <label style={{ fontSize: 12, color: color.inkTertiary, display: "block", marginBottom: 8 }}>Social links</label>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {form.social_links.map((link, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <select
+                        value={link.platform}
+                        onChange={(e) => {
+                          const next = [...form.social_links];
+                          next[i] = { ...next[i], platform: e.target.value };
+                          set("social_links", next);
+                        }}
+                        style={{ ...inputStyle, width: 144, flexShrink: 0, fontSize: 12 }}
+                      >
+                        {SOCIAL_PLATFORMS.map((p) => <option key={p}>{p}</option>)}
+                      </select>
+                      <input
+                        value={link.url}
+                        onChange={(e) => {
+                          const next = [...form.social_links];
+                          next[i] = { ...next[i], url: e.target.value };
+                          set("social_links", next);
+                        }}
+                        style={{ ...inputStyle, flex: 1 }}
+                        placeholder="https://…"
+                      />
+                      <button type="button" onClick={() => set("social_links", form.social_links.filter((_, idx) => idx !== i))}
+                        style={{ display: "grid", placeItems: "center", height: 32, width: 32, borderRadius: radius.control, color: color.inkTertiary, background: "transparent", border: "none", cursor: "pointer", flexShrink: 0 }}>
+                        <X style={{ width: 14, height: 14 }} />
+                      </button>
+                    </div>
+                  ))}
+                  <button type="button"
+                    onClick={() => set("social_links", [...form.social_links, { platform: "LinkedIn", url: "" }])}
+                    style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontSize: 12, color: color.inkTertiary, border: `1px dashed ${color.border}`, borderRadius: radius.control, padding: "8px 12px", background: "transparent", cursor: "pointer" }}>
+                    <Plus style={{ width: 14, height: 14 }} /> Add link
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* AI: Upload fund deck */}
+          <Card>
+            <SectionHeader icon={Sparkles} title="Upload fund deck" description="AI drafts your profile from a deck — you confirm before anything is applied" />
+            <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
+              {!deckDraft ? (
+                <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: `1px dashed ${color.border}`, borderRadius: radius.structural, padding: "28px 16px", cursor: deckExtracting ? "default" : "pointer", gap: 8 }}>
+                  {deckExtracting
+                    ? <Loader2 style={{ width: 18, height: 18, color: color.inkTertiary }} className="animate-spin" />
+                    : <Upload style={{ width: 18, height: 18, color: color.inkTertiary }} />}
+                  <span style={{ fontSize: 12, color: color.inkTertiary, textAlign: "center" }}>
+                    {deckExtracting
+                      ? (aiStillWorking ? "Still working — this may take a moment." : "Reading document…")
+                      : "Click to select PDF, DOCX, or PPTX"}
+                  </span>
+                  <input type="file" accept=".pdf,.docx,.doc,.pptx,.ppt" style={{ display: "none" }} disabled={deckExtracting}
+                    onChange={(e) => e.target.files?.[0] && handleDeckUpload(e.target.files[0])} />
+                </label>
+              ) : (
+                <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 16, display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div style={{ fontSize: 12, fontWeight: 500, color: color.ink }}>Draft extracted — review before applying</div>
+                  <div style={{ fontSize: 12, color: color.inkSecondary, lineHeight: 1.6 }}>
+                    {["fund_name", "your_name", "thesis_statement", "sectors", "geography"].map((k) => {
+                      const v = deckDraft[k];
+                      if (!v) return null;
+                      return <div key={k}><strong>{k.replace(/_/g, " ")}:</strong> {String(v).slice(0, 120)}</div>;
+                    })}
+                    {Array.isArray(deckDraft.track_record) && (deckDraft.track_record as any[]).length > 0 && (
+                      <div><strong>Track record:</strong> {(deckDraft.track_record as any[]).length} item(s) found — will be added as unverified</div>
+                    )}
+                  </div>
+                  {deckMissing.length > 0 && (
+                    <div style={{ fontSize: 11, color: color.inkTertiary }}>Not found: {deckMissing.join(", ")}</div>
+                  )}
+                  <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                    <button type="button" onClick={discardDeckDraft}
+                      style={{ border: `1px solid ${color.border}`, borderRadius: radius.control, padding: "6px 12px", fontSize: 12, background: "transparent", color: color.inkSecondary, cursor: "pointer" }}>
+                      Discard
+                    </button>
+                    <button type="button" onClick={applyDeckDraft}
+                      style={{ border: "none", borderRadius: radius.control, padding: "6px 12px", fontSize: 12, background: "#7C3AED", color: "#fff", cursor: "pointer" }}>
+                      Apply to form
                     </button>
                   </div>
-                ))}
-                <button type="button"
-                  onClick={() => set("social_links", [...form.social_links, { platform: "LinkedIn", url: "" }])}
-                  className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground border border-dashed border-border/60 rounded-lg px-3 py-1.5 w-full justify-center hover:bg-accent transition-colors">
-                  <Plus className="h-3.5 w-3.5" /> Add link
-                </button>
-              </div>
-            </div>
-          </AccordionBlock>
-
-          {/* 2. Investment thesis */}
-          <AccordionBlock id="thesis" open={open.has("thesis")} onToggle={toggleSection}
-            icon={Lightbulb} title="Investment thesis" description="Your one-sentence thesis, bullet points, and what makes your conviction different">
-            {/* Thesis statement — hero field */}
-            <div className="rounded-lg border border-brand/20 bg-accent p-4 space-y-2">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-brand">
-                <Lightbulb className="h-3.5 w-3.5" /> Thesis statement
-              </div>
-              <p className="text-[11px] text-muted-foreground leading-relaxed">
-                One sentence formula: <em>[Fund] is a [$ size] [stage] fund in [geography] backing [sector] companies with [edge].</em>
+                </div>
+              )}
+              <p style={{ fontSize: 11, color: color.inkTertiary, lineHeight: 1.5 }}>
+                Extracted values are draft only — nothing is saved or published until you review and click Save changes. Track-record items always start Unverified until you attach evidence.
               </p>
-              <textarea value={form.thesis_statement} onChange={(e) => set("thesis_statement", e.target.value)}
-                rows={3} className="w-full rounded-[10px] border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
-                placeholder="Acme Ventures is a $50M seed fund in North America backing developer-tools companies, leveraging our team's 20 years of engineering leadership at Google and Stripe." />
             </div>
+          </Card>
 
-            {/* Thesis bullets */}
-            <Field label="Thesis">
-              <BulletEditor bullets={form.thesis_bullets} onChange={(b) => set("thesis_bullets", b)}
-                placeholder="e.g. Sectors: DevTools, AI/ML, B2B SaaS" />
-            </Field>
+          {/* Thesis summary */}
+          <Card data-tour="thesis-accordion">
+            <SectionHeader icon={Sparkles} title="Thesis summary" description="Your one-sentence thesis, bullet points, sectors, stages, and cheque size" />
+            <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 16 }}>
+              <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ fontSize: 12, fontWeight: 500, color: "#7C3AED" }}>Thesis statement</div>
+                <p style={{ fontSize: 11, color: color.inkTertiary, lineHeight: 1.5, margin: 0 }}>
+                  One sentence formula: <em>[Fund] is a [$ size] [stage] fund in [geography] backing [sector] companies with [edge].</em>
+                </p>
+                <textarea value={form.thesis_statement} onChange={(e) => set("thesis_statement", e.target.value)}
+                  rows={3} style={{ ...inputStyle, resize: "none" }}
+                  placeholder="Acme Ventures is a $50M seed fund in North America backing developer-tools companies, leveraging our team's 20 years of engineering leadership at Google and Stripe." />
+              </div>
 
-            {/* Underlying structured fields — hidden but saved, used by matching */}
-            <details className="group">
-              <summary className="text-xs text-muted-foreground cursor-pointer select-none hover:text-foreground list-none flex items-center gap-1">
-                <ChevronDown className="h-3 w-3 group-open:rotate-180 transition-transform" />
-                Matching fields
-              </summary>
-              <div className="mt-3 space-y-3">
-                <div className="grid sm:grid-cols-2 gap-3">
-                  <Field label="Sectors">
-                    <input value={form.sectors} onChange={(e) => set("sectors", e.target.value)} className={input} placeholder="DevTools, AI/ML, Fintech" />
-                  </Field>
-                  <Field label="Geography">
-                    <input value={form.geography} onChange={(e) => set("geography", e.target.value)} className={input} placeholder="North America, Europe" />
-                  </Field>
+              <Field label="Thesis bullets">
+                <BulletEditor bullets={form.thesis_bullets} onChange={(b) => set("thesis_bullets", b)}
+                  placeholder="e.g. Sectors: DevTools, AI/ML, B2B SaaS" />
+              </Field>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <Field label="Sectors">
+                  <input value={form.sectors} onChange={(e) => set("sectors", e.target.value)} style={inputStyle} placeholder="DevTools, AI/ML, Fintech" />
+                </Field>
+                <Field label="Geography">
+                  <input value={form.geography} onChange={(e) => set("geography", e.target.value)} style={inputStyle} placeholder="North America, Europe" />
+                </Field>
+              </div>
+              <Field label="Stages">
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
+                  {STAGES.map((s) => {
+                    const active = form.stages.includes(s);
+                    return (
+                      <button key={s} type="button" onClick={() => toggleStage(s)}
+                        style={{
+                          padding: "6px 12px", borderRadius: radius.control, fontSize: 12,
+                          border: active ? "1px solid #7C3AED" : `1px solid ${color.border}`,
+                          background: active ? "#7C3AED" : color.white,
+                          color: active ? "#fff" : color.ink,
+                          cursor: "pointer",
+                        }}>
+                        {s}
+                      </button>
+                    );
+                  })}
                 </div>
-                <Field label="Stages">
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {STAGES.map((s) => {
-                      const active = form.stages.includes(s);
-                      return (
-                        <button key={s} type="button" onClick={() => toggleStage(s)}
-                          className={cn("px-3 py-1.5 rounded-full text-xs border transition-colors",
-                            active ? "bg-gradient-brand text-brand-foreground border-transparent shadow-glow" : "border-border/60 bg-background hover:bg-accent")}>
-                          {s}
-                        </button>
-                      );
-                    })}
+              </Field>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <Field label="Cheque min" badge={<FieldVerificationBadge profileType="investor" fieldName="check_size_min" claimStatus={claimByType("check_size_min")?.proof_status} onAttachProof={user?.id ? () => setAttachingClaim({ type: "check_size_min", label: "Min cheque", value: form.check_size_min }) : undefined} compact />}>
+                  <input value={form.check_size_min} onChange={(e) => set("check_size_min", e.target.value)} style={inputStyle} placeholder="$250K" />
+                </Field>
+                <Field label="Cheque max" badge={<FieldVerificationBadge profileType="investor" fieldName="check_size_max" claimStatus={claimByType("check_size_max")?.proof_status} onAttachProof={user?.id ? () => setAttachingClaim({ type: "check_size_max", label: "Max cheque", value: form.check_size_max }) : undefined} compact />}>
+                  <input value={form.check_size_max} onChange={(e) => set("check_size_max", e.target.value)} style={inputStyle} placeholder="$2M" />
+                </Field>
+              </div>
+              <Field label="Exclusions">
+                <textarea value={form.red_flags} onChange={(e) => set("red_flags", e.target.value)} rows={2} style={{ ...inputStyle, resize: "none" }} placeholder="No crypto, no consumer apps…" />
+              </Field>
+              <Field label="Edge">
+                <textarea value={form.secret_sauce} onChange={(e) => set("secret_sauce", e.target.value)}
+                  rows={2} style={{ ...inputStyle, resize: "none" }}
+                  placeholder="Deep engineering network at FAANG, 3 unicorn exits as an operator, active board seat pattern from day one." />
+              </Field>
+            </div>
+          </Card>
+
+          {/* Track record */}
+          <Card>
+            <SectionHeader icon={Trophy} title="Track record" description="Named investments and outcomes — unverified until you attach evidence" />
+            <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
+              {form.track_record.length === 0 && (
+                <p style={{ fontSize: 13, color: color.inkTertiary }}>No track record items yet.</p>
+              )}
+              {form.track_record.map((item, i) => {
+                const claimType = `track_record_${i}`;
+                const claim = claimByType(claimType);
+                return (
+                  <div key={i} style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <input value={item.label} onChange={(e) => updateTrackRecordItem(i, { label: e.target.value })}
+                        style={{ ...inputStyle, flex: 1 }} placeholder="Company or exit name" />
+                      <button type="button" onClick={() => removeTrackRecordItem(i)}
+                        style={{ display: "grid", placeItems: "center", height: 36, width: 36, borderRadius: radius.control, color: color.inkTertiary, background: "transparent", border: "none", cursor: "pointer", flexShrink: 0 }}>
+                        <X style={{ width: 14, height: 14 }} />
+                      </button>
+                    </div>
+                    <input value={item.detail} onChange={(e) => updateTrackRecordItem(i, { detail: e.target.value })}
+                      style={inputStyle} placeholder="Round led, outcome, return multiple…" />
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      {item.verified ? (
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, color: "#10B981" }}>
+                          <ShieldCheck style={{ width: 12, height: 12 }} /> Verified
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: 11, color: color.inkTertiary }}>
+                          {claim?.proof_status === "ai_confirmed" ? "AI confirmed — pending publish" : claim?.proof_status === "pending_review" ? "Pending review" : "Unverified"}
+                        </span>
+                      )}
+                      <button type="button"
+                        onClick={() => setAttachingClaim({ type: claimType, label: item.label || "Track record item", value: item.detail })}
+                        style={{ fontSize: 11, color: "#7C3AED", background: "transparent", border: "none", cursor: "pointer", textDecoration: "underline" }}>
+                        Attach proof
+                      </button>
+                    </div>
                   </div>
-                </Field>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  <Field label="Check min" badge={<FieldVerificationBadge profileType="investor" fieldName="check_size_min" claimStatus={claimByType("check_size_min")?.proof_status} onAttachProof={user?.id ? () => setAttachingClaim({ type: "check_size_min", label: "Min check", value: form.check_size_min }) : undefined} compact />}>
-                    <input value={form.check_size_min} onChange={(e) => set("check_size_min", e.target.value)} className={input} placeholder="$250K" />
-                  </Field>
-                  <Field label="Check max" badge={<FieldVerificationBadge profileType="investor" fieldName="check_size_max" claimStatus={claimByType("check_size_max")?.proof_status} onAttachProof={user?.id ? () => setAttachingClaim({ type: "check_size_max", label: "Max check", value: form.check_size_max }) : undefined} compact />}>
-                    <input value={form.check_size_max} onChange={(e) => set("check_size_max", e.target.value)} className={input} placeholder="$2M" />
-                  </Field>
-                </div>
-                <Field label="Exclusions">
-                  <textarea value={form.red_flags} onChange={(e) => set("red_flags", e.target.value)} rows={2} className={cn(input, "resize-none")} placeholder="No crypto, no consumer apps…" />
-                </Field>
-              </div>
-            </details>
-
-            <Field label="Edge">
-              <textarea value={form.secret_sauce} onChange={(e) => set("secret_sauce", e.target.value)}
-                rows={2} className={cn(input, "resize-none")}
-                placeholder="Deep engineering network at FAANG, 3 unicorn exits as an operator, active board seat pattern from day one." />
-            </Field>
-          </AccordionBlock>
-
-          {/* 3. Achievements */}
-          <AccordionBlock id="achievements" open={open.has("achievements")} onToggle={toggleSection}
-            icon={Trophy} title="Achievements" description="Track record, exits, recognitions — bullet points shown on your public profile">
-            <BulletEditor bullets={form.achievements} onChange={(b) => set("achievements", b)}
-              placeholder="e.g. Led Series A in Stripe (2016), returned 12x" />
-          </AccordionBlock>
-
-          {/* 4. Team */}
-          <AccordionBlock id="team" open={open.has("team")} onToggle={toggleSection}
-            icon={Users} title="Team" description="Partners and associates visible to founders in your deal rooms">
-            {existing?.id ? (
-              <InvestorTeamSection
-                profileId={existing.id}
-                investorUserId={user?.id ?? ""}
-                investorName={form.your_name || user?.email || "Investor"}
-                fundName={form.fund_name}
-              />
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">Save your profile first to add team members.</p>
-            )}
-          </AccordionBlock>
-
-          {/* 5. Portfolio */}
-          <AccordionBlock id="portfolio" open={open.has("portfolio")} onToggle={toggleSection}
-            icon={Briefcase} title="Portfolio showcase" description="Companies you've invested in — curated showcase, separate from your active pipeline">
-            {existing?.id ? (
-              <SectionErrorBoundary>
-                <PortfolioSection profileId={existing.id} />
-              </SectionErrorBoundary>
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">Save your profile first to add portfolio companies.</p>
-            )}
-          </AccordionBlock>
-
-          {/* Save */}
-          <div className="flex items-center justify-end gap-3 pt-2">
-            <button type="button" onClick={handleSave} disabled={saving}
-              className="inline-flex items-center gap-1.5 rounded-[10px] bg-gradient-brand px-5 py-2.5 text-sm font-medium text-brand-foreground shadow-glow disabled:opacity-60">
-              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-              {saved ? "Saved ✓" : existing ? "Save changes" : "Save & continue"}
-            </button>
-          </div>
-        </div>
-
-        {/* ── RIGHT: sidebar ──────────────────────────────────────── */}
-        <div className="space-y-5 self-start lg:sticky lg:top-6">
-
-          {/* Shareable profile card */}
-          <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-card space-y-4">
-            <div className="flex items-center gap-2">
-              <Globe className="h-4 w-4 text-brand" />
-              <div className="text-sm font-semibold">Shareable profile</div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="min-w-0">
-                <div className="text-sm font-medium">{form.profile_published ? "Public" : "Private"}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">
-                  {form.profile_published
-                    ? "Anyone with the link can view your profile"
-                    : "Only founders you've connected with can see your profile"}
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => set("profile_published", !form.profile_published)}
-                className={cn("h-6 w-11 rounded-full transition-colors relative shrink-0", form.profile_published ? "hs-gradient" : "bg-muted")}
-              >
-                <div className={cn("absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform", form.profile_published ? "translate-x-5" : "translate-x-0.5")} />
+                );
+              })}
+              <button type="button" onClick={addTrackRecordItem}
+                style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontSize: 12, color: color.inkTertiary, border: `1px dashed ${color.border}`, borderRadius: radius.control, padding: "8px 12px", background: "transparent", cursor: "pointer" }}>
+                <Plus style={{ width: 14, height: 14 }} /> Add track record item
               </button>
             </div>
+          </Card>
 
-            <Field label="Profile URL slug">
-              <div className="flex items-center gap-1">
-                <span className="text-xs text-muted-foreground shrink-0 pl-1">/i/</span>
-                <input
-                  value={form.profile_slug}
-                  onChange={(e) => set("profile_slug", slugify(e.target.value))}
-                  className={cn(input, "flex-1")}
-                  placeholder="acme-ventures"
+          {/* Achievements */}
+          <Card>
+            <SectionHeader icon={Trophy} title="Achievements" description="Recognitions and highlights shown on your public profile" />
+            <div style={{ padding: 20 }}>
+              <BulletEditor bullets={form.achievements} onChange={(b) => set("achievements", b)}
+                placeholder="e.g. Led Series A in Stripe (2016), returned 12x" />
+            </div>
+          </Card>
+
+          {/* Team */}
+          <Card>
+            <SectionHeader icon={Users} title="Team" description="Partners and associates visible to founders in your deal rooms" />
+            <div style={{ padding: 20 }}>
+              {existing?.id ? (
+                <InvestorTeamSection
+                  profileId={existing.id}
+                  investorUserId={user?.id ?? ""}
+                  investorName={form.your_name || user?.email || "Investor"}
+                  fundName={form.fund_name}
                 />
+              ) : (
+                <p style={{ fontSize: 13, color: color.inkTertiary, textAlign: "center", padding: "16px 0" }}>Save your profile first to add team members.</p>
+              )}
+            </div>
+          </Card>
+
+          {/* Documents / portfolio */}
+          <Card>
+            <SectionHeader icon={Briefcase} title="Portfolio showcase" description="Companies you've invested in — curated, separate from your active pipeline" />
+            <div style={{ padding: 20 }}>
+              {existing?.id ? (
+                <SectionErrorBoundary>
+                  <PortfolioSection profileId={existing.id} />
+                </SectionErrorBoundary>
+              ) : (
+                <p style={{ fontSize: 13, color: color.inkTertiary, textAlign: "center", padding: "16px 0" }}>Save your profile first to add portfolio companies.</p>
+              )}
+            </div>
+          </Card>
+
+          {/* Public fields whitelist */}
+          <Card>
+            <SectionHeader icon={Eye} title="Public visibility" description="Choose which fields appear on your public profile at /i/:slug" />
+            <div style={{ padding: 20 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                {PUBLIC_FIELD_OPTIONS.map((opt) => {
+                  const active = form.public_fields.includes(opt.key);
+                  return (
+                    <label key={opt.key} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
+                      <input type="checkbox" checked={active} onChange={() => togglePublicField(opt.key)} />
+                      {opt.label}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* ── RIGHT: sticky preview rail ──────────────────────────── */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16, position: "sticky", top: 24 }}>
+
+          {/* Completeness */}
+          <Card style={{ padding: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, fontFamily: font.display }}>Profile completeness</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#7C3AED" }}>{completeness}%</div>
+            </div>
+            <div style={{ height: 4, background: color.canvas, borderRadius: 2, overflow: "hidden" }}>
+              <div style={{ height: 4, width: `${completeness}%`, background: "#7C3AED" }} />
+            </div>
+          </Card>
+
+          {/* Preview tabs */}
+          <Card>
+            <div style={{ display: "flex", borderBottom: `1px solid ${color.border}` }}>
+              {(["public", "dealroom"] as const).map((tab) => (
+                <button key={tab} type="button" onClick={() => setPreviewTab(tab)}
+                  style={{
+                    flex: 1, padding: "10px 0", fontSize: 12, fontWeight: 500, cursor: "pointer",
+                    background: "transparent", border: "none",
+                    color: previewTab === tab ? color.ink : color.inkTertiary,
+                    borderBottom: previewTab === tab ? "2px solid #7C3AED" : "2px solid transparent",
+                  }}>
+                  {tab === "public" ? "Public view" : "Deal room view"}
+                </button>
+              ))}
+            </div>
+            <div style={{ padding: 16, fontSize: 12, color: color.inkSecondary, lineHeight: 1.6 }}>
+              {previewTab === "public" ? (
+                <>
+                  <div style={{ fontWeight: 600, color: color.ink }}>{form.your_name || "Your name"}</div>
+                  <div>{form.role} {form.fund_name && `· ${form.fund_name}`}</div>
+                  {form.public_fields.includes("thesis_statement") && form.thesis_statement && (
+                    <p style={{ marginTop: 8 }}>{form.thesis_statement.slice(0, 140)}</p>
+                  )}
+                  <div style={{ marginTop: 8, fontSize: 11, color: color.inkTertiary }}>
+                    {form.public_fields.length} of {PUBLIC_FIELD_OPTIONS.length} fields visible
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontWeight: 600, color: color.ink }}>{form.your_name || "Your name"}</div>
+                  <div>{form.role} {form.fund_name && `· ${form.fund_name}`}</div>
+                  <p style={{ marginTop: 8 }}>Cheque: {form.check_size_min || "—"} – {form.check_size_max || "—"}</p>
+                  <p>Track record: {form.track_record.length} item(s)</p>
+                  <div style={{ marginTop: 8, fontSize: 11, color: color.inkTertiary }}>
+                    Full profile — visible only once a deal room reaches the Information stage.
+                  </div>
+                </>
+              )}
+            </div>
+          </Card>
+
+          {/* Shareable profile card */}
+          <Card style={{ padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <Globe style={{ width: 14, height: 14, color: "#7C3AED" }} />
+              <div style={{ fontSize: 13, fontWeight: 700, fontFamily: font.display }}>Shareable profile</div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 500 }}>{form.profile_published ? "Public" : "Private"}</div>
+                <div style={{ fontSize: 11, color: color.inkTertiary, marginTop: 2 }}>
+                  {form.profile_published ? "Anyone with the link can view" : "Only in deal rooms you've unlocked"}
+                </div>
+              </div>
+              <button type="button" onClick={() => set("profile_published", !form.profile_published)}
+                style={{
+                  height: 22, width: 40, borderRadius: 11, position: "relative", flexShrink: 0, border: "none", cursor: "pointer",
+                  background: form.profile_published ? "#7C3AED" : color.border,
+                }}>
+                <div style={{
+                  position: "absolute", top: 2, height: 18, width: 18, borderRadius: "50%", background: "#fff",
+                  transition: "transform 0.15s", transform: form.profile_published ? "translateX(20px)" : "translateX(2px)",
+                }} />
+              </button>
+            </div>
+            <Field label="Profile URL slug">
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <span style={{ fontSize: 12, color: color.inkTertiary, paddingLeft: 4 }}>/i/</span>
+                <input value={form.profile_slug} onChange={(e) => set("profile_slug", slugify(e.target.value))} style={{ ...inputStyle, flex: 1 }} placeholder="acme-ventures" />
               </div>
             </Field>
-
             {form.profile_published && (
-              <div className="rounded-lg border border-border/60 bg-background px-3 py-2 flex items-center gap-2">
-                <LinkIcon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <span className="text-xs text-muted-foreground truncate flex-1">{profileUrl}</span>
-                <button
-                  type="button"
-                  onClick={() => { navigator.clipboard.writeText(profileUrl); toast.success("Link copied"); }}
-                  className="grid h-6 w-6 place-items-center rounded text-muted-foreground hover:text-foreground shrink-0"
-                >
-                  <Copy className="h-3.5 w-3.5" />
+              <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.control, padding: "8px 12px", display: "flex", alignItems: "center", gap: 8 }}>
+                <LinkIcon style={{ width: 14, height: 14, color: color.inkTertiary, flexShrink: 0 }} />
+                <span style={{ fontSize: 12, color: color.inkTertiary, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{profileUrl}</span>
+                <button type="button" onClick={() => { navigator.clipboard.writeText(profileUrl); toast.success("Link copied"); }}
+                  style={{ background: "transparent", border: "none", cursor: "pointer", color: color.inkTertiary, flexShrink: 0 }}>
+                  <Copy style={{ width: 14, height: 14 }} />
                 </button>
               </div>
             )}
-
-            <a
-              href={profileUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-1.5 w-full rounded-lg px-3 py-2 text-xs font-medium transition-colors"
+            <a href={profileUrl} target="_blank" rel="noopener noreferrer"
               style={{
-                background: "rgba(124,58,237,0.10)",
-                border: "1px solid rgba(124,58,237,0.25)",
-                color: "#A855F7",
-              }}
-            >
-              <Eye className="h-3.5 w-3.5" />
-              View public profile ↗
+                display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%",
+                borderRadius: radius.control, padding: "8px 12px", fontSize: 12, fontWeight: 500, textDecoration: "none",
+                background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.25)", color: "#7C3AED",
+              }}>
+              <Eye style={{ width: 14, height: 14 }} /> View public profile
             </a>
-          </div>
+          </Card>
 
-          {/* Verification status */}
+          {/* Verification tier */}
           {user?.id && (
-            <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-card">
+            <Card style={{ padding: 20 }}>
               <VerificationSection
                 entityType="investor"
                 entityId={user.id}
@@ -771,10 +1002,9 @@ export function InvestorProfilePage() {
                 userEmail={user?.email ?? ""}
                 displayName={form.your_name || form.fund_name || "Investor"}
               />
-            </div>
+            </Card>
           )}
 
-          {/* Capital verification — Tier 3 */}
           {user?.id && (
             <CapitalVerificationSection
               investorId={user.id}
@@ -784,46 +1014,28 @@ export function InvestorProfilePage() {
             />
           )}
 
-          {/* Investor badges — activity + founder-facing trust signals */}
           {existing?.id && user?.id && (
             <InvestorBadgesCard profileId={existing.id} userId={user.id} />
           )}
-
-          {/* Fund at a glance */}
-          <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-card space-y-3">
-            <div className="text-sm font-semibold">Fund at a glance</div>
-            {[
-              [Building2, "Fund", form.fund_name],
-              [UserCircle2, "Role", form.role],
-            ].map(([Icon, label, val]: any) => (
-              <div key={label} className="flex items-start gap-2.5 text-sm">
-                <Icon className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-                <div className="min-w-0">
-                  <div className="text-[11px] text-muted-foreground">{label}</div>
-                  <div className="font-medium text-sm truncate">{val || "—"}</div>
-                </div>
-              </div>
-            ))}
-            {form.thesis_statement && (
-              <div className="pt-2 border-t border-border/40">
-                <div className="flex items-center gap-1 text-[11px] text-muted-foreground mb-1"><Sparkles className="h-3 w-3 text-brand" /> Thesis</div>
-                <p className="text-xs text-foreground/80 leading-relaxed line-clamp-4">{form.thesis_statement}</p>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
-      {/* Proof modal */}
       {attachingClaim && user?.id && (
         <AttachInvestorProofModal
           claim={attachingClaim}
           investorId={user.id}
           onClose={() => setAttachingClaim(null)}
-          onDone={() => { refetchInvestorClaims(); setAttachingClaim(null); }}
+          onDone={(status) => {
+            refetchInvestorClaims();
+            if (status === "ai_confirmed" && attachingClaim.type.startsWith("track_record_")) {
+              const idx = parseInt(attachingClaim.type.replace("track_record_", ""), 10);
+              if (!Number.isNaN(idx)) updateTrackRecordItem(idx, { verified: true });
+            }
+            setAttachingClaim(null);
+          }}
         />
       )}
-    </div>
+    </PageFrame>
   );
 }
 
@@ -887,40 +1099,40 @@ function PortfolioSection({ profileId }: { profileId: string }) {
   };
 
   return (
-    <div className="space-y-4">
-      <p className="text-xs text-muted-foreground">Companies you've invested in and want to showcase — separate from your active pipeline in Startups.</p>
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <p style={{ fontSize: 12, color: color.inkTertiary }}>Companies you've invested in and want to showcase — separate from your active pipeline in Startups.</p>
 
       {!showForm && (
         <button onClick={() => setShowForm(true)}
-          className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs shadow-glow">
-          <Plus className="h-3.5 w-3.5" /> Add portfolio company
+          style={{ display: "inline-flex", alignItems: "center", gap: 6, borderRadius: radius.control, background: "#7C3AED", color: "#fff", padding: "8px 12px", fontSize: 12, border: "none", cursor: "pointer", width: "fit-content" }}>
+          <Plus style={{ width: 14, height: 14 }} /> Add portfolio company
         </button>
       )}
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="rounded-none border border-border/60 bg-background p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{editingId ? "Edit company" : "New company"}</div>
-            <button type="button" onClick={closeForm} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
+        <form onSubmit={handleSubmit} style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: color.inkTertiary, textTransform: "uppercase", letterSpacing: "0.04em" }}>{editingId ? "Edit company" : "New company"}</div>
+            <button type="button" onClick={closeForm} style={{ background: "transparent", border: "none", color: color.inkTertiary, cursor: "pointer" }}><X style={{ width: 16, height: 16 }} /></button>
           </div>
-          <div className="grid sm:grid-cols-2 gap-3">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div>
-              <label className="text-xs text-muted-foreground">Company name *</label>
-              <input value={pf.company_name} onChange={(e) => setPf((f) => ({ ...f, company_name: e.target.value }))} required className={cn(input, "mt-1")} placeholder="Stripe" />
+              <label style={{ fontSize: 12, color: color.inkTertiary }}>Company name *</label>
+              <input value={pf.company_name} onChange={(e) => setPf((f) => ({ ...f, company_name: e.target.value }))} required style={{ ...inputStyle, marginTop: 4 }} placeholder="Stripe" />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground">Website</label>
-              <input value={pf.website_url} onChange={(e) => setPf((f) => ({ ...f, website_url: e.target.value }))} className={cn(input, "mt-1")} placeholder="https://stripe.com" />
+              <label style={{ fontSize: 12, color: color.inkTertiary }}>Website</label>
+              <input value={pf.website_url} onChange={(e) => setPf((f) => ({ ...f, website_url: e.target.value }))} style={{ ...inputStyle, marginTop: 4 }} placeholder="https://stripe.com" />
             </div>
           </div>
           <div>
-            <label className="text-xs text-muted-foreground">Description</label>
-            <textarea value={pf.description} onChange={(e) => setPf((f) => ({ ...f, description: e.target.value }))} rows={2} className={cn(input, "mt-1 resize-none")} placeholder="Online payments infrastructure. Led seed round, 8x return at IPO." />
+            <label style={{ fontSize: 12, color: color.inkTertiary }}>Description</label>
+            <textarea value={pf.description} onChange={(e) => setPf((f) => ({ ...f, description: e.target.value }))} rows={2} style={{ ...inputStyle, marginTop: 4, resize: "none" }} placeholder="Online payments infrastructure. Led seed round, 8x return at IPO." />
           </div>
-          <div className="flex gap-2 justify-end">
-            <button type="button" onClick={closeForm} className="rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent">Cancel</button>
-            <button type="submit" disabled={submitting} className="inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs shadow-glow disabled:opacity-50">
-              {submitting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
+          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+            <button type="button" onClick={closeForm} style={{ border: `1px solid ${color.border}`, borderRadius: radius.control, padding: "6px 12px", fontSize: 12, background: "transparent", cursor: "pointer" }}>Cancel</button>
+            <button type="submit" disabled={submitting} style={{ display: "inline-flex", alignItems: "center", gap: 4, borderRadius: radius.control, background: "#7C3AED", color: "#fff", padding: "6px 12px", fontSize: 12, border: "none", cursor: "pointer", opacity: submitting ? 0.6 : 1 }}>
+              {submitting ? <Loader2 style={{ width: 12, height: 12 }} className="animate-spin" /> : <Save style={{ width: 12, height: 12 }} />}
               {editingId ? "Update" : "Add"}
             </button>
           </div>
@@ -928,36 +1140,37 @@ function PortfolioSection({ profileId }: { profileId: string }) {
       )}
 
       {isLoading ? (
-        <div className="text-center py-6 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin mx-auto" /></div>
+        <div style={{ textAlign: "center", padding: "24px 0" }}><Loader2 style={{ width: 16, height: 16 }} className="animate-spin mx-auto" /></div>
       ) : isError ? (
-        <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-center">
-          <p className="text-sm text-muted-foreground">Couldn't load portfolio — try refreshing the page.</p>
+        <div style={{ border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.05)", borderRadius: radius.structural, padding: 16, textAlign: "center" }}>
+          <p style={{ fontSize: 13, color: color.inkTertiary }}>Couldn't load portfolio — try refreshing the page.</p>
         </div>
       ) : entries.length === 0 ? (
-        <div className="text-center py-8 text-sm text-muted-foreground">No portfolio companies added yet.</div>
+        <EmptyState kind="empty" title="No portfolio companies yet" />
       ) : (
-        <div className="grid sm:grid-cols-2 gap-3">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {entries.map((e) => (
-            <div key={e.id} className="rounded-none border border-border/60 bg-background p-4 flex items-start gap-3 group">
-              <div className="h-10 w-10 rounded-lg overflow-hidden bg-gradient-brand flex items-center justify-center text-brand-foreground text-sm font-bold shrink-0">
-                {e.logo_url ? <img src={e.logo_url} alt={e.company_name} className="h-full w-full object-cover" /> : <span>{e.company_name.charAt(0).toUpperCase()}</span>}
+            <div key={e.id} style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 16, display: "flex", alignItems: "flex-start", gap: 12 }}>
+              <div style={{ height: 40, width: 40, borderRadius: radius.control, overflow: "hidden", background: "#7C3AED", display: "grid", placeItems: "center", color: "#fff", fontSize: 14, fontWeight: 700, flexShrink: 0 }}>
+                {e.logo_url ? <img src={e.logo_url} alt={e.company_name} style={{ height: "100%", width: "100%", objectFit: "cover" }} /> : <span>{e.company_name.charAt(0).toUpperCase()}</span>}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium truncate">{e.company_name}</div>
-                {e.description && <div className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{e.description}</div>}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 500 }}>{e.company_name}</div>
+                {e.description && <div style={{ fontSize: 12, color: color.inkTertiary, marginTop: 2 }}>{e.description}</div>}
                 {e.website_url && (
-                  <a href={e.website_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[10px] text-brand hover:underline mt-1">
-                    <Globe className="h-2.5 w-2.5" /> Website
+                  <a href={e.website_url} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, color: "#7C3AED", marginTop: 4, textDecoration: "none" }}>
+                    <Globe style={{ width: 10, height: 10 }} /> Website
                   </a>
                 )}
               </div>
-              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+              <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
                 <button onClick={() => { setPf({ company_name: e.company_name, description: e.description ?? "", website_url: e.website_url ?? "", logo_url: e.logo_url ?? "" }); setEditingId(e.id); setShowForm(true); }}
-                  className="grid h-6 w-6 place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-accent">
-                  <Pencil className="h-3 w-3" />
+                  style={{ display: "grid", placeItems: "center", height: 24, width: 24, borderRadius: radius.control, background: "transparent", border: "none", color: color.inkTertiary, cursor: "pointer" }}>
+                  <Pencil style={{ width: 12, height: 12 }} />
                 </button>
-                <button onClick={() => handleDelete(e.id)} className="grid h-6 w-6 place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10">
-                  <Trash2 className="h-3 w-3" />
+                <button onClick={() => handleDelete(e.id)}
+                  style={{ display: "grid", placeItems: "center", height: 24, width: 24, borderRadius: radius.control, background: "transparent", border: "none", color: color.inkTertiary, cursor: "pointer" }}>
+                  <Trash2 style={{ width: 12, height: 12 }} />
                 </button>
               </div>
             </div>
@@ -974,7 +1187,7 @@ function AttachInvestorProofModal({ claim, investorId, onClose, onDone }: {
   claim: { type: string; label: string; value: string };
   investorId: string;
   onClose: () => void;
-  onDone: () => void;
+  onDone: (status: string) => void;
 }) {
   const [file, setFile] = useState<File | null>(null);
   const [running, setRunning] = useState(false);
@@ -1000,55 +1213,55 @@ function AttachInvestorProofModal({ claim, investorId, onClose, onDone }: {
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }} onClick={onClose}>
-      <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 16, padding: 28, maxWidth: 460, width: "100%" }} onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-start justify-between mb-4">
+    <div style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }} onClick={onClose}>
+      <div style={{ background: color.white, border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 24, maxWidth: 440, width: "100%" }} onClick={(e) => e.stopPropagation()}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
           <div>
-            <div className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Attach proof for claim</div>
-            <div className="text-xs text-muted-foreground mt-1">{claim.label}: <span className="text-muted-foreground">{claim.value}</span></div>
+            <div style={{ fontSize: 13, fontWeight: 700, fontFamily: font.display }}>Attach proof for claim</div>
+            <div style={{ fontSize: 12, color: color.inkTertiary, marginTop: 4 }}>{claim.label}: {claim.value}</div>
           </div>
-          <button onClick={onClose} className="text-faint hover:text-muted-foreground"><X className="h-4 w-4" /></button>
+          <button onClick={onClose} style={{ background: "transparent", border: "none", color: color.inkTertiary, cursor: "pointer" }}><X style={{ width: 16, height: 16 }} /></button>
         </div>
         {!result ? (
           <>
-            <div style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.15)", borderRadius: 8, padding: "12px 16px", marginBottom: 16 }} className="text-xs text-muted-foreground leading-relaxed">
+            <div style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)", borderRadius: radius.control, padding: "10px 14px", marginBottom: 16, fontSize: 12, color: color.inkSecondary, lineHeight: 1.5 }}>
               Upload a document containing evidence for this claim. AI will cross-check it.
             </div>
-            <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: "2px dashed var(--border)", borderRadius: 10, padding: "24px 16px", cursor: "pointer", gap: 8, marginBottom: 16 }}>
-              <Paperclip className="h-5 w-5 text-faint" />
-              <span className="text-xs text-muted-foreground text-center">{file ? file.name : "Click to select PDF, DOCX, XLSX, CSV"}</span>
+            <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: `1px dashed ${color.border}`, borderRadius: radius.structural, padding: "24px 16px", cursor: "pointer", gap: 8, marginBottom: 16 }}>
+              <Paperclip style={{ width: 18, height: 18, color: color.inkTertiary }} />
+              <span style={{ fontSize: 12, color: color.inkTertiary, textAlign: "center" }}>{file ? file.name : "Click to select PDF, DOCX, XLSX, CSV"}</span>
               <input type="file" accept=".pdf,.docx,.doc,.xlsx,.xls,.csv,.txt" style={{ display: "none" }} onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
             </label>
-            <div className="flex gap-2 justify-end">
-              <button onClick={onClose} className="px-4 py-2 text-xs text-muted-foreground hover:text-muted-foreground">Cancel</button>
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <button onClick={onClose} style={{ padding: "8px 16px", fontSize: 12, color: color.inkTertiary, background: "transparent", border: "none", cursor: "pointer" }}>Cancel</button>
               <button onClick={handleAttach} disabled={!file || running}
-                style={{ background: !file || running ? "rgba(124,58,237,0.3)" : "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 12, fontWeight: 600, cursor: !file || running ? "not-allowed" : "pointer" }}>
-                {running ? <span className="flex items-center gap-1.5"><Loader2 className="h-3 w-3 animate-spin" /> Checking…</span> : "Attach & verify"}
+                style={{ background: !file || running ? "rgba(124,58,237,0.4)" : "#7C3AED", color: "#fff", border: "none", borderRadius: radius.control, padding: "8px 16px", fontSize: 12, fontWeight: 500, cursor: !file || running ? "default" : "pointer" }}>
+                {running ? <span style={{ display: "flex", alignItems: "center", gap: 6 }}><Loader2 style={{ width: 12, height: 12 }} className="animate-spin" /> Checking…</span> : "Attach & verify"}
               </button>
             </div>
           </>
         ) : (
           <>
             {result.proof_status === "ai_confirmed" && (
-              <div style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 8, padding: "14px 16px", marginBottom: 16 }}>
-                <div className="flex items-center gap-2 text-[#10B981] text-sm font-medium mb-1"><CheckCircle2 className="h-4 w-4" /> Claim confirmed</div>
-                <p className="text-xs text-muted-foreground">{result.ai_result?.explanation}</p>
+              <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: radius.control, padding: "12px 14px", marginBottom: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#10B981", fontSize: 13, fontWeight: 500, marginBottom: 4 }}><CheckCircle2 style={{ width: 16, height: 16 }} /> Claim confirmed</div>
+                <p style={{ fontSize: 12, color: color.inkTertiary, margin: 0 }}>{result.ai_result?.explanation}</p>
               </div>
             )}
             {result.proof_status === "ai_mismatch" && (
-              <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "14px 16px", marginBottom: 16 }}>
-                <div className="flex items-center gap-2 text-[#EF4444] text-sm font-medium mb-1"><XCircle className="h-4 w-4" /> Claim doesn't match</div>
-                <p className="text-xs text-muted-foreground">{result.ai_result?.explanation}</p>
+              <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: radius.control, padding: "12px 14px", marginBottom: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#EF4444", fontSize: 13, fontWeight: 500, marginBottom: 4 }}><XCircle style={{ width: 16, height: 16 }} /> Claim doesn't match</div>
+                <p style={{ fontSize: 12, color: color.inkTertiary, margin: 0 }}>{result.ai_result?.explanation}</p>
               </div>
             )}
             {result.proof_status === "pending_review" && (
-              <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: 8, padding: "14px 16px", marginBottom: 16 }}>
-                <div className="flex items-center gap-2 text-muted-foreground text-sm font-medium mb-1"><Clock className="h-4 w-4" /> Proof attached</div>
-                <p className="text-xs text-muted-foreground">AI check inconclusive — set to pending review.</p>
+              <div style={{ background: color.canvas, border: `1px solid ${color.border}`, borderRadius: radius.control, padding: "12px 14px", marginBottom: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, color: color.inkSecondary, fontSize: 13, fontWeight: 500, marginBottom: 4 }}><Clock style={{ width: 16, height: 16 }} /> Proof attached</div>
+                <p style={{ fontSize: 12, color: color.inkTertiary, margin: 0 }}>AI check inconclusive — set to pending review.</p>
               </div>
             )}
-            <div className="flex justify-end">
-              <button onClick={onDone} style={{ background: "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Done</button>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <button onClick={() => onDone(result.proof_status)} style={{ background: "#7C3AED", color: "#fff", border: "none", borderRadius: radius.control, padding: "8px 16px", fontSize: 12, fontWeight: 500, cursor: "pointer" }}>Done</button>
             </div>
           </>
         )}
@@ -1137,76 +1350,76 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
   };
 
   return (
-    <div className="space-y-4">
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {!showForm && (
-        <button onClick={() => setShowForm(true)} className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs shadow-glow">
-          <Plus className="h-3.5 w-3.5" /> Add member
+        <button onClick={() => setShowForm(true)}
+          style={{ display: "inline-flex", alignItems: "center", gap: 6, borderRadius: radius.control, background: "#7C3AED", color: "#fff", padding: "8px 12px", fontSize: 12, border: "none", cursor: "pointer", width: "fit-content" }}>
+          <Plus style={{ width: 14, height: 14 }} /> Add member
         </button>
       )}
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="rounded-none border border-border/60 bg-background p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{editingId ? "Edit member" : "New member"}</div>
-            <button type="button" onClick={closeForm} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
+        <form onSubmit={handleSubmit} style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: color.inkTertiary, textTransform: "uppercase", letterSpacing: "0.04em" }}>{editingId ? "Edit member" : "New member"}</div>
+            <button type="button" onClick={closeForm} style={{ background: "transparent", border: "none", color: color.inkTertiary, cursor: "pointer" }}><X style={{ width: 16, height: 16 }} /></button>
           </div>
-          <div className="flex items-center gap-3">
-            <label className="relative cursor-pointer group shrink-0">
-              <div className="h-10 w-10 rounded-full overflow-hidden bg-gradient-brand flex items-center justify-center text-brand-foreground font-bold">
-                {avatarUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : mf.avatar_url ? <img src={mf.avatar_url} alt="" className="h-full w-full object-cover" /> : <span>{(mf.name || "?").charAt(0).toUpperCase()}</span>}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <label style={{ position: "relative", cursor: "pointer", flexShrink: 0 }}>
+              <div style={{ height: 40, width: 40, borderRadius: "50%", overflow: "hidden", background: "#7C3AED", display: "grid", placeItems: "center", color: "#fff", fontWeight: 700 }}>
+                {avatarUploading ? <Loader2 style={{ width: 16, height: 16 }} className="animate-spin" /> : mf.avatar_url ? <img src={mf.avatar_url} alt="" style={{ height: "100%", width: "100%", objectFit: "cover" }} /> : <span>{(mf.name || "?").charAt(0).toUpperCase()}</span>}
               </div>
-              <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><Upload className="h-3 w-3 text-foreground" /></div>
               <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])} />
             </label>
-            <div className="text-xs text-muted-foreground">Photo (optional, max 2MB)</div>
+            <div style={{ fontSize: 12, color: color.inkTertiary }}>Photo (optional, max 2MB)</div>
           </div>
-          <div className="grid sm:grid-cols-2 gap-3">
-            <div><label className="text-xs text-muted-foreground">Full name *</label><input value={mf.name} onChange={(e) => setMf((f) => ({ ...f, name: e.target.value }))} required className={cn(input, "mt-1")} placeholder="Jane Doe" /></div>
-            <div><label className="text-xs text-muted-foreground">Designation</label><input value={mf.designation} onChange={(e) => setMf((f) => ({ ...f, designation: e.target.value }))} className={cn(input, "mt-1")} placeholder="General Partner" /></div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div><label style={{ fontSize: 12, color: color.inkTertiary }}>Full name *</label><input value={mf.name} onChange={(e) => setMf((f) => ({ ...f, name: e.target.value }))} required style={{ ...inputStyle, marginTop: 4 }} placeholder="Jane Doe" /></div>
+            <div><label style={{ fontSize: 12, color: color.inkTertiary }}>Designation</label><input value={mf.designation} onChange={(e) => setMf((f) => ({ ...f, designation: e.target.value }))} style={{ ...inputStyle, marginTop: 4 }} placeholder="General Partner" /></div>
           </div>
-          <div className="grid sm:grid-cols-2 gap-3">
-            <div><label className="text-xs text-muted-foreground">Role *</label><input value={mf.role} onChange={(e) => setMf((f) => ({ ...f, role: e.target.value }))} required className={cn(input, "mt-1")} placeholder="Partner" /></div>
-            <div className="flex items-end pb-2">
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <div className={cn("h-4 w-8 rounded-full relative transition-colors", mf.is_admin ? "hs-gradient" : "bg-muted")} onClick={() => setMf((f) => ({ ...f, is_admin: !f.is_admin }))}>
-                  <div className={cn("absolute top-0.5 h-3 w-3 rounded-full bg-white transition-transform", mf.is_admin ? "translate-x-4" : "translate-x-0.5")} />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div><label style={{ fontSize: 12, color: color.inkTertiary }}>Role *</label><input value={mf.role} onChange={(e) => setMf((f) => ({ ...f, role: e.target.value }))} required style={{ ...inputStyle, marginTop: 4 }} placeholder="Partner" /></div>
+            <div style={{ display: "flex", alignItems: "flex-end", paddingBottom: 8 }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                <div style={{ height: 16, width: 32, borderRadius: 8, position: "relative", background: mf.is_admin ? "#7C3AED" : color.border }} onClick={() => setMf((f) => ({ ...f, is_admin: !f.is_admin }))}>
+                  <div style={{ position: "absolute", top: 2, height: 12, width: 12, borderRadius: "50%", background: "#fff", transform: mf.is_admin ? "translateX(18px)" : "translateX(2px)", transition: "transform 0.15s" }} />
                 </div>
-                <span className="text-xs text-muted-foreground">Fund admin</span>
+                <span style={{ fontSize: 12, color: color.inkTertiary }}>Fund admin</span>
               </label>
             </div>
           </div>
-          <div><label className="text-xs text-muted-foreground">LinkedIn URL</label><input value={mf.linkedin_url} onChange={(e) => setMf((f) => ({ ...f, linkedin_url: e.target.value }))} className={cn(input, "mt-1")} placeholder="https://linkedin.com/in/…" /></div>
-          {!editingId && <div><label className="text-xs text-muted-foreground flex items-center gap-1"><Mail className="h-3 w-3" /> Email (optional — sends invite)</label><input type="email" value={mf.email} onChange={(e) => setMf((f) => ({ ...f, email: e.target.value }))} className={cn(input, "mt-1")} placeholder="partner@fund.com" /></div>}
-          <div><label className="text-xs text-muted-foreground">Short bio</label><textarea value={mf.bio} onChange={(e) => setMf((f) => ({ ...f, bio: e.target.value }))} rows={2} className={cn(input, "mt-1 resize-none")} placeholder="Former operator turned investor." /></div>
-          <div className="flex gap-2 justify-end">
-            <button type="button" onClick={closeForm} className="rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent">Cancel</button>
-            <button type="submit" disabled={submitting} className="inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs shadow-glow disabled:opacity-50">
-              {submitting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />} {editingId ? "Update" : "Add"}
+          <div><label style={{ fontSize: 12, color: color.inkTertiary }}>LinkedIn URL</label><input value={mf.linkedin_url} onChange={(e) => setMf((f) => ({ ...f, linkedin_url: e.target.value }))} style={{ ...inputStyle, marginTop: 4 }} placeholder="https://linkedin.com/in/…" /></div>
+          {!editingId && <div><label style={{ fontSize: 12, color: color.inkTertiary, display: "flex", alignItems: "center", gap: 4 }}><Mail style={{ width: 12, height: 12 }} /> Email (optional — sends invite)</label><input type="email" value={mf.email} onChange={(e) => setMf((f) => ({ ...f, email: e.target.value }))} style={{ ...inputStyle, marginTop: 4 }} placeholder="partner@fund.com" /></div>}
+          <div><label style={{ fontSize: 12, color: color.inkTertiary }}>Short bio</label><textarea value={mf.bio} onChange={(e) => setMf((f) => ({ ...f, bio: e.target.value }))} rows={2} style={{ ...inputStyle, marginTop: 4, resize: "none" }} placeholder="Former operator turned investor." /></div>
+          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+            <button type="button" onClick={closeForm} style={{ border: `1px solid ${color.border}`, borderRadius: radius.control, padding: "6px 12px", fontSize: 12, background: "transparent", cursor: "pointer" }}>Cancel</button>
+            <button type="submit" disabled={submitting} style={{ display: "inline-flex", alignItems: "center", gap: 4, borderRadius: radius.control, background: "#7C3AED", color: "#fff", padding: "6px 12px", fontSize: 12, border: "none", cursor: "pointer", opacity: submitting ? 0.6 : 1 }}>
+              {submitting ? <Loader2 style={{ width: 12, height: 12 }} className="animate-spin" /> : <Save style={{ width: 12, height: 12 }} />} {editingId ? "Update" : "Add"}
             </button>
           </div>
         </form>
       )}
 
-      {isLoading ? <div className="py-6 text-center"><Loader2 className="h-4 w-4 animate-spin mx-auto" /></div>
-       : members.length === 0 && !showForm ? <div className="py-8 text-center text-sm text-muted-foreground">No team members yet — add partners and associates visible to founders.</div>
+      {isLoading ? <div style={{ textAlign: "center", padding: "24px 0" }}><Loader2 style={{ width: 16, height: 16 }} className="animate-spin mx-auto" /></div>
+       : members.length === 0 && !showForm ? <EmptyState kind="empty" title="No team members yet" />
        : (
-        <div className="space-y-2">
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {members.map((m) => (
-            <div key={m.id} className="flex items-center gap-3 rounded-none border border-border/60 bg-background p-3 hover:bg-accent/30 group">
-              <div className="h-9 w-9 rounded-full overflow-hidden bg-gradient-brand flex items-center justify-center text-brand-foreground text-xs font-semibold shrink-0">
-                {m.avatar_url ? <img src={m.avatar_url} alt={m.name} className="h-full w-full object-cover" /> : <span>{m.name.charAt(0).toUpperCase()}</span>}
+            <div key={m.id} style={{ display: "flex", alignItems: "center", gap: 12, border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 12 }}>
+              <div style={{ height: 36, width: 36, borderRadius: "50%", overflow: "hidden", background: "#7C3AED", display: "grid", placeItems: "center", color: "#fff", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+                {m.avatar_url ? <img src={m.avatar_url} alt={m.name} style={{ height: "100%", width: "100%", objectFit: "cover" }} /> : <span>{m.name.charAt(0).toUpperCase()}</span>}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-sm font-medium">{m.name}</span>
-                  {m.designation && <span className="text-[10px] bg-accent text-brand px-1.5 py-0.5 rounded-full font-medium">{m.designation}</span>}
-                  {m.role && m.role !== m.designation && <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full">{m.role}</span>}
-                  {m.is_admin && <span className="text-[9px] bg-success/10 text-success px-1.5 py-0.5 rounded-full font-semibold uppercase">Admin</span>}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 13, fontWeight: 500 }}>{m.name}</span>
+                  {m.designation && <span style={{ fontSize: 10, background: "rgba(124,58,237,0.08)", color: "#7C3AED", padding: "2px 6px", borderRadius: 2, fontWeight: 500 }}>{m.designation}</span>}
+                  {m.role && m.role !== m.designation && <span style={{ fontSize: 10, background: color.canvas, color: color.inkTertiary, padding: "2px 6px", borderRadius: 2 }}>{m.role}</span>}
+                  {m.is_admin && <span style={{ fontSize: 9, background: "rgba(16,185,129,0.1)", color: "#10B981", padding: "2px 6px", borderRadius: 2, fontWeight: 700, textTransform: "uppercase" }}>Admin</span>}
                 </div>
               </div>
-              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 shrink-0">
-                <button onClick={() => openEdit(m)} className="grid h-7 w-7 place-items-center rounded-md hover:bg-accent text-muted-foreground hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>
-                <button onClick={() => handleDelete(m.id)} className={cn("grid h-7 w-7 place-items-center rounded-md transition-colors", deletingId === m.id ? "text-destructive bg-destructive/10" : "text-muted-foreground hover:text-destructive hover:bg-destructive/10")}><Trash2 className="h-3.5 w-3.5" /></button>
+              <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
+                <button onClick={() => openEdit(m)} style={{ display: "grid", placeItems: "center", height: 28, width: 28, borderRadius: radius.control, background: "transparent", border: "none", color: color.inkTertiary, cursor: "pointer" }}><Pencil style={{ width: 14, height: 14 }} /></button>
+                <button onClick={() => handleDelete(m.id)} style={{ display: "grid", placeItems: "center", height: 28, width: 28, borderRadius: radius.control, background: deletingId === m.id ? "rgba(239,68,68,0.08)" : "transparent", border: "none", color: deletingId === m.id ? "#EF4444" : color.inkTertiary, cursor: "pointer" }}><Trash2 style={{ width: 14, height: 14 }} /></button>
               </div>
             </div>
           ))}
@@ -1217,7 +1430,6 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
 }
 
 // ── Section error boundary ────────────────────────────────────────
-// Prevents a failed section query from blanking the entire page.
 
 class SectionErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
   state = { error: null };
@@ -1226,12 +1438,10 @@ class SectionErrorBoundary extends Component<{ children: ReactNode }, { error: E
   render() {
     if (this.state.error) {
       return (
-        <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-center">
-          <p className="text-sm text-muted-foreground">Couldn't load this section — try refreshing the page.</p>
-          <button
-            className="mt-2 text-xs text-brand hover:underline"
-            onClick={() => this.setState({ error: null })}
-          >
+        <div style={{ border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.05)", borderRadius: radius.structural, padding: 16, textAlign: "center" }}>
+          <p style={{ fontSize: 13, color: color.inkTertiary }}>Couldn't load this section — try refreshing the page.</p>
+          <button style={{ marginTop: 8, fontSize: 12, color: "#7C3AED", background: "transparent", border: "none", cursor: "pointer", textDecoration: "underline" }}
+            onClick={() => this.setState({ error: null })}>
             Retry
           </button>
         </div>
@@ -1241,21 +1451,7 @@ class SectionErrorBoundary extends Component<{ children: ReactNode }, { error: E
   }
 }
 
-// ── Field helper ──────────────────────────────────────────────────
-
-function Field({ label, badge, children }: { label: string; badge?: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-1.5">
-        <label className="block text-xs text-muted-foreground">{label}</label>
-        {badge}
-      </div>
-      {children}
-    </div>
-  );
-}
-
-// ── Investor badges card — earned badges + manual evaluation ─────────────────
+// ── Investor badges card ───────────────────────────────────────────
 
 function InvestorBadgesCard({ profileId, userId }: { profileId: string; userId: string }) {
   const qc = useQueryClient();
@@ -1284,25 +1480,22 @@ function InvestorBadgesCard({ profileId, userId }: { profileId: string; userId: 
   };
 
   return (
-    <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-card space-y-3">
-      <div className="flex items-center justify-between gap-2">
-        <div className="text-sm font-semibold">Your badges</div>
-        <button
-          onClick={runEvaluation}
-          disabled={evaluating}
-          className="text-xs text-muted-foreground hover:text-foreground disabled:opacity-50"
-        >
+    <Card style={{ padding: 20 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, fontFamily: font.display }}>Your badges</div>
+        <button onClick={runEvaluation} disabled={evaluating}
+          style={{ fontSize: 12, color: color.inkTertiary, background: "transparent", border: "none", cursor: "pointer", opacity: evaluating ? 0.6 : 1 }}>
           {evaluating ? "Evaluating…" : "Re-check"}
         </button>
       </div>
       {badges.length > 0 ? (
         <BadgeDisplay badges={badges} size="md" context="profile" />
       ) : (
-        <p className="text-xs text-muted-foreground leading-relaxed">
+        <p style={{ fontSize: 12, color: color.inkTertiary, lineHeight: 1.5 }}>
           No badges yet. Investor badges are earned from real behavior founders care about —
           deciding quickly, never ghosting, and giving reasons on every pass.
         </p>
       )}
-    </div>
+    </Card>
   );
 }
