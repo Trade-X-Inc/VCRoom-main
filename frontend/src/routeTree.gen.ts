@@ -58,6 +58,7 @@ import { Route as CvSlugRouteImport } from './routes/cv.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AppWallRouteImport } from './routes/app.wall'
+import { Route as AppVerificationRouteImport } from './routes/app.verification'
 import { Route as AppUsersRouteImport } from './routes/app.users'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppReferralsRouteImport } from './routes/app.referrals'
@@ -76,7 +77,6 @@ import { Route as AppFeedbackRouteImport } from './routes/app.feedback'
 import { Route as AppEmailRouteImport } from './routes/app.email'
 import { Route as AppDocumentsRouteImport } from './routes/app.documents'
 import { Route as AppDirectoryRouteImport } from './routes/app.directory'
-import { Route as AppDeskRouteImport } from './routes/app.desk'
 import { Route as AppDealRoomsRouteImport } from './routes/app.deal-rooms'
 import { Route as AppConnectionsRouteImport } from './routes/app.connections'
 import { Route as AppCloseRouteImport } from './routes/app.close'
@@ -112,7 +112,6 @@ import { Route as AppInvestorOverviewRouteImport } from './routes/app.investor.o
 import { Route as AppInvestorIntakeRouteImport } from './routes/app.investor.intake'
 import { Route as AppInvestorEvaluateRouteImport } from './routes/app.investor.evaluate'
 import { Route as AppInvestorDiligenceRouteImport } from './routes/app.investor.diligence'
-import { Route as AppInvestorDeskRouteImport } from './routes/app.investor.desk'
 import { Route as AppInvestorDecisionsRouteImport } from './routes/app.investor.decisions'
 import { Route as AppInvestorDecideRouteImport } from './routes/app.investor.decide'
 import { Route as AppInvestorDealRoomsRouteImport } from './routes/app.investor.deal-rooms'
@@ -374,6 +373,11 @@ const AppWallRoute = AppWallRouteImport.update({
   path: '/wall',
   getParentRoute: () => AppRoute,
 } as any)
+const AppVerificationRoute = AppVerificationRouteImport.update({
+  id: '/verification',
+  path: '/verification',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppUsersRoute = AppUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -462,11 +466,6 @@ const AppDocumentsRoute = AppDocumentsRouteImport.update({
 const AppDirectoryRoute = AppDirectoryRouteImport.update({
   id: '/directory',
   path: '/directory',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppDeskRoute = AppDeskRouteImport.update({
-  id: '/desk',
-  path: '/desk',
   getParentRoute: () => AppRoute,
 } as any)
 const AppDealRoomsRoute = AppDealRoomsRouteImport.update({
@@ -645,11 +644,6 @@ const AppInvestorDiligenceRoute = AppInvestorDiligenceRouteImport.update({
   path: '/diligence',
   getParentRoute: () => AppInvestorRoute,
 } as any)
-const AppInvestorDeskRoute = AppInvestorDeskRouteImport.update({
-  id: '/desk',
-  path: '/desk',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
 const AppInvestorDecisionsRoute = AppInvestorDecisionsRouteImport.update({
   id: '/decisions',
   path: '/decisions',
@@ -760,7 +754,6 @@ export interface FileRoutesByFullPath {
   '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
-  '/app/desk': typeof AppDeskRoute
   '/app/directory': typeof AppDirectoryRoute
   '/app/documents': typeof AppDocumentsRoute
   '/app/email': typeof AppEmailRoute
@@ -779,6 +772,7 @@ export interface FileRoutesByFullPath {
   '/app/referrals': typeof AppReferralsRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/users': typeof AppUsersRoute
+  '/app/verification': typeof AppVerificationRoute
   '/app/wall': typeof AppWallRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -817,7 +811,6 @@ export interface FileRoutesByFullPath {
   '/app/investor/deal-rooms': typeof AppInvestorDealRoomsRoute
   '/app/investor/decide': typeof AppInvestorDecideRoute
   '/app/investor/decisions': typeof AppInvestorDecisionsRoute
-  '/app/investor/desk': typeof AppInvestorDeskRoute
   '/app/investor/diligence': typeof AppInvestorDiligenceRoute
   '/app/investor/evaluate': typeof AppInvestorEvaluateRoute
   '/app/investor/intake': typeof AppInvestorIntakeRoute
@@ -877,7 +870,6 @@ export interface FileRoutesByTo {
   '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
-  '/app/desk': typeof AppDeskRoute
   '/app/directory': typeof AppDirectoryRoute
   '/app/documents': typeof AppDocumentsRoute
   '/app/email': typeof AppEmailRoute
@@ -895,6 +887,7 @@ export interface FileRoutesByTo {
   '/app/referrals': typeof AppReferralsRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/users': typeof AppUsersRoute
+  '/app/verification': typeof AppVerificationRoute
   '/app/wall': typeof AppWallRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -933,7 +926,6 @@ export interface FileRoutesByTo {
   '/app/investor/deal-rooms': typeof AppInvestorDealRoomsRoute
   '/app/investor/decide': typeof AppInvestorDecideRoute
   '/app/investor/decisions': typeof AppInvestorDecisionsRoute
-  '/app/investor/desk': typeof AppInvestorDeskRoute
   '/app/investor/diligence': typeof AppInvestorDiligenceRoute
   '/app/investor/evaluate': typeof AppInvestorEvaluateRoute
   '/app/investor/intake': typeof AppInvestorIntakeRoute
@@ -997,7 +989,6 @@ export interface FileRoutesById {
   '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/deal-rooms': typeof AppDealRoomsRoute
-  '/app/desk': typeof AppDeskRoute
   '/app/directory': typeof AppDirectoryRoute
   '/app/documents': typeof AppDocumentsRoute
   '/app/email': typeof AppEmailRoute
@@ -1016,6 +1007,7 @@ export interface FileRoutesById {
   '/app/referrals': typeof AppReferralsRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/users': typeof AppUsersRoute
+  '/app/verification': typeof AppVerificationRoute
   '/app/wall': typeof AppWallRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -1054,7 +1046,6 @@ export interface FileRoutesById {
   '/app/investor/deal-rooms': typeof AppInvestorDealRoomsRoute
   '/app/investor/decide': typeof AppInvestorDecideRoute
   '/app/investor/decisions': typeof AppInvestorDecisionsRoute
-  '/app/investor/desk': typeof AppInvestorDeskRoute
   '/app/investor/diligence': typeof AppInvestorDiligenceRoute
   '/app/investor/evaluate': typeof AppInvestorEvaluateRoute
   '/app/investor/intake': typeof AppInvestorIntakeRoute
@@ -1119,7 +1110,6 @@ export interface FileRouteTypes {
     | '/app/close'
     | '/app/connections'
     | '/app/deal-rooms'
-    | '/app/desk'
     | '/app/directory'
     | '/app/documents'
     | '/app/email'
@@ -1138,6 +1128,7 @@ export interface FileRouteTypes {
     | '/app/referrals'
     | '/app/settings'
     | '/app/users'
+    | '/app/verification'
     | '/app/wall'
     | '/auth/callback'
     | '/blog/$slug'
@@ -1176,7 +1167,6 @@ export interface FileRouteTypes {
     | '/app/investor/deal-rooms'
     | '/app/investor/decide'
     | '/app/investor/decisions'
-    | '/app/investor/desk'
     | '/app/investor/diligence'
     | '/app/investor/evaluate'
     | '/app/investor/intake'
@@ -1236,7 +1226,6 @@ export interface FileRouteTypes {
     | '/app/close'
     | '/app/connections'
     | '/app/deal-rooms'
-    | '/app/desk'
     | '/app/directory'
     | '/app/documents'
     | '/app/email'
@@ -1254,6 +1243,7 @@ export interface FileRouteTypes {
     | '/app/referrals'
     | '/app/settings'
     | '/app/users'
+    | '/app/verification'
     | '/app/wall'
     | '/auth/callback'
     | '/blog/$slug'
@@ -1292,7 +1282,6 @@ export interface FileRouteTypes {
     | '/app/investor/deal-rooms'
     | '/app/investor/decide'
     | '/app/investor/decisions'
-    | '/app/investor/desk'
     | '/app/investor/diligence'
     | '/app/investor/evaluate'
     | '/app/investor/intake'
@@ -1355,7 +1344,6 @@ export interface FileRouteTypes {
     | '/app/close'
     | '/app/connections'
     | '/app/deal-rooms'
-    | '/app/desk'
     | '/app/directory'
     | '/app/documents'
     | '/app/email'
@@ -1374,6 +1362,7 @@ export interface FileRouteTypes {
     | '/app/referrals'
     | '/app/settings'
     | '/app/users'
+    | '/app/verification'
     | '/app/wall'
     | '/auth/callback'
     | '/blog/$slug'
@@ -1412,7 +1401,6 @@ export interface FileRouteTypes {
     | '/app/investor/deal-rooms'
     | '/app/investor/decide'
     | '/app/investor/decisions'
-    | '/app/investor/desk'
     | '/app/investor/diligence'
     | '/app/investor/evaluate'
     | '/app/investor/intake'
@@ -1837,6 +1825,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWallRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/verification': {
+      id: '/app/verification'
+      path: '/verification'
+      fullPath: '/app/verification'
+      preLoaderRoute: typeof AppVerificationRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/users': {
       id: '/app/users'
       path: '/users'
@@ -1961,13 +1956,6 @@ declare module '@tanstack/react-router' {
       path: '/directory'
       fullPath: '/app/directory'
       preLoaderRoute: typeof AppDirectoryRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/desk': {
-      id: '/app/desk'
-      path: '/desk'
-      fullPath: '/app/desk'
-      preLoaderRoute: typeof AppDeskRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/deal-rooms': {
@@ -2215,13 +2203,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorDiligenceRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/investor/desk': {
-      id: '/app/investor/desk'
-      path: '/desk'
-      fullPath: '/app/investor/desk'
-      preLoaderRoute: typeof AppInvestorDeskRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
     '/app/investor/decisions': {
       id: '/app/investor/decisions'
       path: '/decisions'
@@ -2332,7 +2313,6 @@ interface AppInvestorRouteChildren {
   AppInvestorDealRoomsRoute: typeof AppInvestorDealRoomsRoute
   AppInvestorDecideRoute: typeof AppInvestorDecideRoute
   AppInvestorDecisionsRoute: typeof AppInvestorDecisionsRoute
-  AppInvestorDeskRoute: typeof AppInvestorDeskRoute
   AppInvestorDiligenceRoute: typeof AppInvestorDiligenceRoute
   AppInvestorEvaluateRoute: typeof AppInvestorEvaluateRoute
   AppInvestorIntakeRoute: typeof AppInvestorIntakeRoute
@@ -2356,7 +2336,6 @@ const AppInvestorRouteChildren: AppInvestorRouteChildren = {
   AppInvestorDealRoomsRoute: AppInvestorDealRoomsRoute,
   AppInvestorDecideRoute: AppInvestorDecideRoute,
   AppInvestorDecisionsRoute: AppInvestorDecisionsRoute,
-  AppInvestorDeskRoute: AppInvestorDeskRoute,
   AppInvestorDiligenceRoute: AppInvestorDiligenceRoute,
   AppInvestorEvaluateRoute: AppInvestorEvaluateRoute,
   AppInvestorIntakeRoute: AppInvestorIntakeRoute,
@@ -2402,7 +2381,6 @@ interface AppRouteChildren {
   AppCloseRoute: typeof AppCloseRoute
   AppConnectionsRoute: typeof AppConnectionsRoute
   AppDealRoomsRoute: typeof AppDealRoomsRoute
-  AppDeskRoute: typeof AppDeskRoute
   AppDirectoryRoute: typeof AppDirectoryRoute
   AppDocumentsRoute: typeof AppDocumentsRoute
   AppEmailRoute: typeof AppEmailRoute
@@ -2421,6 +2399,7 @@ interface AppRouteChildren {
   AppReferralsRoute: typeof AppReferralsRoute
   AppSettingsRoute: typeof AppSettingsRouteWithChildren
   AppUsersRoute: typeof AppUsersRoute
+  AppVerificationRoute: typeof AppVerificationRoute
   AppWallRoute: typeof AppWallRoute
   AppIndexRoute: typeof AppIndexRoute
   AppDealRoomIdRoute: typeof AppDealRoomIdRoute
@@ -2440,7 +2419,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppCloseRoute: AppCloseRoute,
   AppConnectionsRoute: AppConnectionsRoute,
   AppDealRoomsRoute: AppDealRoomsRoute,
-  AppDeskRoute: AppDeskRoute,
   AppDirectoryRoute: AppDirectoryRoute,
   AppDocumentsRoute: AppDocumentsRoute,
   AppEmailRoute: AppEmailRoute,
@@ -2459,6 +2437,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppReferralsRoute: AppReferralsRoute,
   AppSettingsRoute: AppSettingsRouteWithChildren,
   AppUsersRoute: AppUsersRoute,
+  AppVerificationRoute: AppVerificationRoute,
   AppWallRoute: AppWallRoute,
   AppIndexRoute: AppIndexRoute,
   AppDealRoomIdRoute: AppDealRoomIdRoute,

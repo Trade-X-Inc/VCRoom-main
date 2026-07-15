@@ -18,6 +18,11 @@ import { ProfileChecklist } from "@/components/app/ProfileChecklist";
 import { PromoteProfileCard } from "@/components/app/PromoteProfileCard";
 
 export const Route = createFileRoute("/app/overview")({
+  // TODO(R5): auth.callback.tsx redirects returning founders here after
+  // login — this is the real, live post-login landing target today, not
+  // dead legacy code, even though it immediately bounces to /app. Do not
+  // delete or fold into the de-shim pass. This is the page to build out
+  // as the real /home per the target route map; until then leave in place.
   // P4: the 4-step Home at /app IS the overview now.
   beforeLoad: () => {
     throw redirect({ to: "/app", replace: true });

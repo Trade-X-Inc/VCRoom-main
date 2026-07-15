@@ -2,11 +2,14 @@ import { Link } from "@tanstack/react-router";
 import { Logo } from "@/components/brand/Logo";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/lib/auth";
 
 const NAV_LINK = "text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-1";
 
 export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user } = useAuth();
+  const dashboardUrl = user?.role === "investor" ? "/app/investor" : "/app";
 
   useEffect(() => {
     const handler = () => { if (window.innerWidth >= 768) setMobileMenuOpen(false); };
@@ -35,14 +38,23 @@ export function SiteHeader() {
 
         {/* Right — Controls */}
         <div className="flex items-center gap-2 shrink-0">
-          <Link to="/sign-in" search={{ redirect: "/app" }}
-            className="hidden sm:inline-flex text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-3 py-1.5">
-            Sign in
-          </Link>
-          <Link to="/sign-up" search={{ role: "founder" } as any}
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-lg hs-gradient text-foreground px-4 py-2 text-sm font-semibold hover:bg-[#6d28d9] transition-colors">
-            Get started <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
+          {user ? (
+            <Link to={dashboardUrl as any}
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-lg hs-gradient text-foreground px-4 py-2 text-sm font-semibold hover:bg-[#6d28d9] transition-colors">
+              Open dashboard <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          ) : (
+            <>
+              <Link to="/sign-in" search={{ redirect: "/app" }}
+                className="hidden sm:inline-flex text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-3 py-1.5">
+                Sign in
+              </Link>
+              <Link to="/sign-up" search={{ role: "founder" } as any}
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-lg hs-gradient text-foreground px-4 py-2 text-sm font-semibold hover:bg-[#6d28d9] transition-colors">
+                Get started <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </>
+          )}
           {/* Hamburger — mobile only */}
           <button
             onClick={() => setMobileMenuOpen((v) => !v)}
@@ -78,14 +90,23 @@ export function SiteHeader() {
             Tools
           </Link>
           <div className="pt-3 border-t border-border/60 flex flex-col gap-2">
-            <Link to="/sign-in" search={{ redirect: "/app" }} onClick={close}
-              className="block rounded-lg px-3 py-2.5 text-sm font-medium text-center border border-border/60 hover:bg-accent transition-colors">
-              Sign in
-            </Link>
-            <Link to="/sign-up" search={{ role: "founder" } as any} onClick={close}
-              className="block rounded-lg px-3 py-2.5 text-sm font-semibold text-center hs-gradient text-foreground hover:bg-[#6d28d9] transition-colors">
-              Get started free
-            </Link>
+            {user ? (
+              <Link to={dashboardUrl as any} onClick={close}
+                className="block rounded-lg px-3 py-2.5 text-sm font-semibold text-center hs-gradient text-foreground hover:bg-[#6d28d9] transition-colors">
+                Open dashboard
+              </Link>
+            ) : (
+              <>
+                <Link to="/sign-in" search={{ redirect: "/app" }} onClick={close}
+                  className="block rounded-lg px-3 py-2.5 text-sm font-medium text-center border border-border/60 hover:bg-accent transition-colors">
+                  Sign in
+                </Link>
+                <Link to="/sign-up" search={{ role: "founder" } as any} onClick={close}
+                  className="block rounded-lg px-3 py-2.5 text-sm font-semibold text-center hs-gradient text-foreground hover:bg-[#6d28d9] transition-colors">
+                  Get started free
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo, useCallback } from "react";
 import {
   LayoutGrid, List, Columns3, Search,
@@ -12,10 +12,6 @@ import { toast } from "sonner";
 import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/decisions")({
-  // P5: consolidated into the deal-flow steps — old links keep resolving.
-  beforeLoad: () => {
-    throw redirect({ to: "/app/investor/decide", hash: "decisions", replace: true });
-  },
   component: DecisionsPage,
 });
 

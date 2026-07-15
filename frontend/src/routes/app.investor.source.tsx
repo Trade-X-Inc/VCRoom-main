@@ -1,26 +1,36 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { lazy } from "react";
-import { PrepareSection } from "@/components/app/PrepareSection";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
 
-// ② Source — find and import deals.
+// ② Source — find and import deals. Watchlist, Deal intake, Directory, and
+// Connections are real standalone routes — this page links out to them.
 
 export const Route = createFileRoute("/app/investor/source")({
   component: SourcePage,
 });
 
-const Intake = lazy(() =>
-  import("./app.investor.intake").then((m) => ({ default: m.IntakePage })),
-);
-const Watchlist = lazy(() =>
-  import("./app.investor.startups").then((m) => ({ default: m.StartupsPage })),
-);
-const Directory = lazy(() =>
-  import("./app.directory").then((m) => ({ default: m.Directory })),
-);
-const Connections = lazy(() =>
-  import("./app.investor.connections").then((m) => ({ default: m.ConnectionsPage })),
-);
+function SectionLinkRow({
+  to,
+  label,
+  summary,
+}: {
+  to: string;
+  label: string;
+  summary?: string;
+}) {
+  return (
+    <Link
+      to={to as any}
+      className="flex items-center justify-between gap-4 py-4 border-b border-border/60 last:border-b-0 hover:bg-accent/40 -mx-2 px-2 transition-colors"
+    >
+      <span className="text-sm font-medium">{label}</span>
+      <span className="flex items-center gap-3 shrink-0">
+        {summary && <span className="text-xs text-muted-foreground">{summary}</span>}
+        <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+      </span>
+    </Link>
+  );
+}
 
 function SourcePage() {
   const { data: p } = useDealFlowProgress();
@@ -33,7 +43,7 @@ function SourcePage() {
           fontWeight: 500,
           letterSpacing: "0.08em",
           textTransform: "uppercase",
-          color: "rgba(0,0,0,0.35)",
+          color: "#71717A",
         }}
       >
         Deal flow · Step 2
@@ -45,23 +55,16 @@ function SourcePage() {
         Source
       </h1>
 
-      <PrepareSection
-        id="watchlist"
-        label="Watchlist"
-        status={p?.watchlistCount ? "in-progress" : "not-started"}
-        summary={p ? `${p.watchlistCount} companies` : undefined}
-      >
-        <Watchlist />
-      </PrepareSection>
-      <PrepareSection id="intake" label="Deal intake" status="not-started" summary="Paste, parse, score">
-        <Intake />
-      </PrepareSection>
-      <PrepareSection id="directory" label="Directory" status="not-started" summary="Verified founders">
-        <Directory />
-      </PrepareSection>
-      <PrepareSection id="connections" label="Connections" status="not-started" summary="Requests sent">
-        <Connections />
-      </PrepareSection>
+      <div className="bg-card border border-border/60 rounded-none px-6">
+        <SectionLinkRow
+          to="/app/investor/startups"
+          label="Watchlist"
+          summary={p ? `${p.watchlistCount} companies` : undefined}
+        />
+        <SectionLinkRow to="/app/investor/intake" label="Deal intake" summary="Paste, parse, score" />
+        <SectionLinkRow to="/app/directory" label="Directory" summary="Verified founders" />
+        <SectionLinkRow to="/app/investor/connections" label="Connections" summary="Requests sent" />
+      </div>
     </div>
   );
 }

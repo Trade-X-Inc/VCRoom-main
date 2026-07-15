@@ -1,5 +1,5 @@
 import React from "react";
-import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -19,10 +19,6 @@ import { PageGuide } from "@/components/app/PageGuide";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 
 export const Route = createFileRoute("/app/investor/intake")({
-  // P5: consolidated into the deal-flow steps — old links keep resolving.
-  beforeLoad: () => {
-    throw redirect({ to: "/app/investor/source", hash: "intake", replace: true });
-  },
   component: IntakePage,
 });
 

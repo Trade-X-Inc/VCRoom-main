@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 
 const GCC_COUNTRIES = ["UAE", "Saudi Arabia", "Qatar", "Kuwait", "Bahrain", "Oman"];
@@ -36,10 +36,6 @@ import { cn } from "@/lib/utils";
 import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/startups")({
-  // P5: consolidated into the deal-flow steps — old links keep resolving.
-  beforeLoad: () => {
-    throw redirect({ to: "/app/investor/source", hash: "watchlist", replace: true });
-  },
   component: StartupsPage,
 });
 

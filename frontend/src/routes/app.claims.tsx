@@ -1,4 +1,4 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import {
@@ -13,10 +13,6 @@ import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimed
 import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/claims")({
-  // P4: consolidated into /app/prepare — old links must keep resolving.
-  beforeLoad: () => {
-    throw redirect({ to: "/app/prepare", hash: "claims", replace: true });
-  },
   component: ClaimsPage,
 });
 

@@ -128,7 +128,7 @@ export function MemberShell({ children }: { children?: React.ReactNode }) {
     { to: "/app/member", label: "Overview", icon: LayoutGrid },
     { to: "/app/deal-rooms", label: "My Deal Rooms", icon: Briefcase, badge: assignedCount > 0 ? String(assignedCount) : undefined },
     { to: "/app/documents", label: "Documents", icon: FileText },
-    ...(canUseAI ? [{ to: "/app/advisor", label: "AI Advisor", icon: Sparkles }] : []),
+    ...(canUseAI ? [{ to: "/app/assistant", label: "Workstation", icon: Sparkles }] : []),
     { to: "/app/messages", label: "Team Chat", icon: MessageSquare },
   ];
 
@@ -156,7 +156,9 @@ export function MemberShell({ children }: { children?: React.ReactNode }) {
       )}>
         {/* Logo */}
         <div className="h-14 md:h-16 flex items-center px-4 border-b border-border/60 shrink-0">
-          <Link to="/" className="flex-1"><Logo withWordmark /></Link>
+          {/* Logo is an in-app home affordance while signed in — never the
+              public marketing page (CLAUDE.md §9 logo auth branch). */}
+          <Link to={"/app/member" as any} className="flex-1"><Logo withWordmark /></Link>
           <button onClick={() => setMobileOpen(false)} className="md:hidden text-muted-foreground hover:text-foreground">
             <X className="h-4 w-4" />
           </button>

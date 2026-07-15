@@ -38,7 +38,7 @@ const FIX_LINKS: Record<string, { to: string; label: string }> = {
   product: { to: "/app/profile", label: "Update your profile" },
   market: { to: "/app/profile", label: "Update your profile" },
   team: { to: "/app/profile", label: "Add team details" },
-  legal: { to: "/app/advisor", label: "Run verification" },
+  legal: { to: "/app/verification", label: "Run verification" },
 };
 
 function scoreColor(score: number): string {

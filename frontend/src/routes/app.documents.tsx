@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   FileText, CheckCircle2, AlertCircle, Zap,
   ArrowRight, ChevronDown, Loader2, X, Upload,
@@ -17,10 +17,6 @@ const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","xlsx","xls","docx","doc"
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
 export const Route = createFileRoute("/app/documents")({
-  // P4: consolidated into /app/prepare — old links must keep resolving.
-  beforeLoad: () => {
-    throw redirect({ to: "/app/prepare", hash: "documents", replace: true });
-  },
   component: Documents,
 });
 

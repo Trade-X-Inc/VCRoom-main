@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -24,10 +24,6 @@ import { OnboardingTour } from "@/components/app/OnboardingTour";
 import { getFounderProfileCompleteness } from "@/lib/profileCompleteness";
 
 export const Route = createFileRoute("/app/profile")({
-  // P4: consolidated into /app/prepare — old links must keep resolving.
-  beforeLoad: () => {
-    throw redirect({ to: "/app/prepare", hash: "profile", replace: true });
-  },
   component: Profile,
 });
 

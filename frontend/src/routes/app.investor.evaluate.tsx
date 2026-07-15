@@ -1,23 +1,36 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { lazy } from "react";
-import { PrepareSection } from "@/components/app/PrepareSection";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
 
-// ③ Evaluate — rooms, diligence, analysis.
+// ③ Evaluate — rooms, diligence, analysis. All three are real standalone
+// routes — this page links out to them.
 
 export const Route = createFileRoute("/app/investor/evaluate")({
   component: EvaluatePage,
 });
 
-const Rooms = lazy(() =>
-  import("./app.investor.deal-rooms").then((m) => ({ default: m.DealRoomsPage })),
-);
-const Diligence = lazy(() =>
-  import("./app.investor.diligence").then((m) => ({ default: m.DiligencePage })),
-);
-const Analysis = lazy(() =>
-  import("./app.investor.analysis").then((m) => ({ default: m.AnalysisPage })),
-);
+function SectionLinkRow({
+  to,
+  label,
+  summary,
+}: {
+  to: string;
+  label: string;
+  summary?: string;
+}) {
+  return (
+    <Link
+      to={to as any}
+      className="flex items-center justify-between gap-4 py-4 border-b border-border/60 last:border-b-0 hover:bg-accent/40 -mx-2 px-2 transition-colors"
+    >
+      <span className="text-sm font-medium">{label}</span>
+      <span className="flex items-center gap-3 shrink-0">
+        {summary && <span className="text-xs text-muted-foreground">{summary}</span>}
+        <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+      </span>
+    </Link>
+  );
+}
 
 function EvaluatePage() {
   const { data: p } = useDealFlowProgress();
@@ -30,7 +43,7 @@ function EvaluatePage() {
           fontWeight: 500,
           letterSpacing: "0.08em",
           textTransform: "uppercase",
-          color: "rgba(0,0,0,0.35)",
+          color: "#71717A",
         }}
       >
         Deal flow · Step 3
@@ -42,20 +55,15 @@ function EvaluatePage() {
         Evaluate
       </h1>
 
-      <PrepareSection
-        id="deal-rooms"
-        label="Deal rooms"
-        status={p?.activeRooms ? "in-progress" : "not-started"}
-        summary={p ? `${p.activeRooms} active` : undefined}
-      >
-        <Rooms />
-      </PrepareSection>
-      <PrepareSection id="diligence" label="Due diligence" status="not-started">
-        <Diligence />
-      </PrepareSection>
-      <PrepareSection id="analysis" label="AI analysis" status="not-started">
-        <Analysis />
-      </PrepareSection>
+      <div className="bg-card border border-border/60 rounded-none px-6">
+        <SectionLinkRow
+          to="/app/investor/deal-rooms"
+          label="Deal rooms"
+          summary={p ? `${p.activeRooms} active` : undefined}
+        />
+        <SectionLinkRow to="/app/investor/diligence" label="Due diligence" />
+        <SectionLinkRow to="/app/investor/analysis" label="AI analysis" />
+      </div>
     </div>
   );
 }

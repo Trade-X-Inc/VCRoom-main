@@ -1,4 +1,4 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Award, ChevronDown, Lock, RefreshCw, Loader2, CheckCircle2 } from "lucide-react";
@@ -8,10 +8,6 @@ import { supabase } from "@/lib/supabase";
 import { BadgeDisplay, useBadges } from "@/components/app/BadgeDisplay";
 
 export const Route = createFileRoute("/app/badges")({
-  // P4: consolidated into /app/prepare — old links must keep resolving.
-  beforeLoad: () => {
-    throw redirect({ to: "/app/prepare", hash: "badges", replace: true });
-  },
   component: BadgesPage,
 });
 
@@ -157,7 +153,7 @@ export function BadgesPage() {
             <span className="font-medium" style={{ color: "#F59E0B" }}>No badge without confirmed identity.</span>{" "}
             <span className="text-muted-foreground">
               All badges — including readiness — require the Tier 1 identity check first ({progress.tier1Checks}/4 checks passing).{" "}
-              <Link to={"/app/advisor" as any} className="text-brand hover:underline">Run the identity check →</Link>
+              <Link to={"/app/verification" as any} className="text-brand hover:underline">Run the identity check →</Link>
             </span>
           </div>
         )}

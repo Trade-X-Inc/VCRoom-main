@@ -756,7 +756,7 @@ function ProfileBuilder() {
           Four automatic checks, about two minutes.
         </p>
         <button
-          onClick={() => navigate({ to: "/app/advisor" as any })}
+          onClick={() => navigate({ to: "/app/verification" as any })}
           data-testid="pb-done-verify-cta"
           style={{ background: "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "Syne, sans-serif" }}
         >

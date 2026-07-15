@@ -46,7 +46,7 @@ const founderNav: NavItem[] = [
   { to: "/app/go-live", label: "Go live", icon: Globe, step: "\u2461" },
   { to: "/app/deal-rooms", label: "Deal rooms", icon: Briefcase, step: "\u2462" },
   { to: "/app/close", label: "Close", icon: Gavel, step: "\u2463" },
-  { to: "/app/assistant", label: "AI Advisor", icon: Brain, section: "Tools" },
+  { to: "/app/assistant", label: "Workstation", icon: Brain, section: "Tools" },
   { to: "/app/meetings", label: "Meetings", icon: Calendar },
   { to: "/app/users", label: "Team", icon: Users },
 ];
@@ -235,6 +235,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       !path.startsWith("/app/investor") &&
       !workspaceNavInvestor.some((n) => path.startsWith(n.to)) &&
       path !== "/app/advisor" &&
+      path !== "/app/verification" &&
       !path.startsWith("/app/profile") &&
       !path.startsWith("/app/settings") &&
       !path.startsWith("/app/investor/settings") &&
@@ -336,7 +337,9 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
         mobileOpen && "!flex fixed inset-y-0 left-0 w-[248px] shadow-xl",
       )}>
         <div className="h-14 md:h-16 flex items-center px-4 border-b border-border/60 shrink-0">
-          <Link to="/" className="flex-1"><Logo withWordmark={showExpanded} /></Link>
+          {/* Logo is an in-app home affordance while signed in — never the
+              public marketing page (CLAUDE.md §9 logo auth branch). */}
+          <Link to={(isInvestor ? "/app/investor" : "/app") as any} className="flex-1"><Logo withWordmark={showExpanded} /></Link>
           {/* Desktop collapse button */}
           {!collapsed && (
             <button onClick={() => setCollapsed(true)} className="hidden md:block text-muted-foreground hover:text-foreground">
@@ -454,7 +457,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                       paddingTop: index === 0 ? 12 : 20,
                       fontSize: 10,
                       letterSpacing: "0.1em",
-                      color: "rgba(0,0,0,0.35)",
+                      color: "#71717A",
                     }}
                   >
                     {n.section}
