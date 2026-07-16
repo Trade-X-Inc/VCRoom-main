@@ -1,10 +1,13 @@
 import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Logo } from "@/components/brand/Logo";
 import {
-  LayoutGrid, Users, Building2, FileText, Briefcase,
-  MessageSquare, MessageCircle, Calendar, Search, Settings, ChevronsLeft, Plus, Gavel,
-  PieChart, Brain, ClipboardCheck, ShieldCheck, UserCog, UserCircle2, Gift, Globe, Trophy, Menu, X, FileInput, LayoutDashboard, Award, BadgeCheck, Flame,
+  MessageCircle, Search, Settings, ChevronsLeft, ChevronDown, ChevronRight,
+  ArrowLeft, Sparkles, UserCircle2, Menu, X,
 } from "lucide-react";
+import {
+  founderSections, investorSections, activeSectionFor, overviewPathFor,
+  isGroup, firstLeafOf, allLeavesOf, type L2Section, type L3Item,
+} from "@/lib/nav-structure";
 import { AIOperatorPanel } from "@/components/ai/AIOperatorPanel";
 import { useSubscription } from "@/hooks/useSubscription";
 import {
@@ -24,11 +27,6 @@ import { NotificationBell } from "@/components/app/NotificationBell";
 import { UserMenu } from "@/components/app/UserMenu";
 import { useAuth } from "@/lib/auth";
 import { useProfile } from "@/lib/store";
-import { useRaiseProgress } from "@/hooks/useRaiseProgress";
-import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
-
-interface NavChild { to: string; label: string; }
-interface NavItem { to: string; label: string; icon: any; badge?: string; step?: string; section?: string; children?: NavChild[]; }
 
 interface SearchResult {
   id: string;
@@ -42,71 +40,9 @@ interface SearchResult {
   rank: number;
 }
 
-const founderNav: NavItem[] = [
-  {
-    to: "/app/prepare", label: "Prepare", icon: ClipboardCheck, step: "\u2460", section: "Your raise",
-    children: [
-      { to: "/app/profile", label: "Profile" },
-      { to: "/app/documents", label: "Documents" },
-      { to: "/app/verification", label: "Verification" },
-      { to: "/app/claims", label: "Claims" },
-      { to: "/app/prepare#readiness", label: "Readiness" },
-      { to: "/app/badges", label: "Badges" },
-    ],
-  },
-  { to: "/app/go-live", label: "Go live", icon: Globe, step: "\u2461" },
-  { to: "/app/deal-rooms", label: "Deal rooms", icon: Briefcase, step: "\u2462" },
-  { to: "/app/close", label: "Close", icon: Gavel, step: "\u2463" },
-  { to: "/app/overview", label: "Overview", icon: LayoutDashboard, section: "Tools" },
-  { to: "/app/analytics", label: "Analytics", icon: PieChart },
-  { to: "/app/assistant", label: "Workstation", icon: Brain },
-  { to: "/app/connections", label: "Contacts", icon: UserCircle2 },
-  { to: "/app/meetings", label: "Meetings", icon: Calendar },
-  { to: "/app/users", label: "Team", icon: Users },
-];
-
-const investorNav: NavItem[] = [
-  { to: "/app/investor/thesis", label: "Thesis", icon: Brain, step: "\u2460", section: "Deal flow" },
-  {
-    to: "/app/investor/source", label: "Source", icon: FileInput, step: "\u2461",
-    children: [
-      { to: "/app/investor/startups", label: "Watchlist" },
-      { to: "/app/investor/intake", label: "Deal intake" },
-      { to: "/app/directory", label: "Directory" },
-      { to: "/app/investor/connections", label: "Connections" },
-    ],
-  },
-  {
-    to: "/app/investor/evaluate", label: "Evaluate", icon: ClipboardCheck, step: "\u2462",
-    children: [
-      { to: "/app/investor/deal-rooms", label: "Deal rooms" },
-      { to: "/app/investor/diligence", label: "Diligence" },
-      { to: "/app/investor/analysis", label: "Analysis" },
-    ],
-  },
-  {
-    to: "/app/investor/decide", label: "Decide", icon: Gavel, step: "\u2463",
-    children: [
-      { to: "/app/investor/decisions", label: "Decisions" },
-      { to: "/app/investor/portfolio", label: "Portfolio" },
-    ],
-  },
-  { to: "/app/investor/overview", label: "Overview", icon: LayoutDashboard, section: "Tools" },
-  { to: "/app/investor/analytics", label: "Analytics", icon: PieChart },
-  { to: "/app/investor/assistant", label: "AI Advisor", icon: MessageSquare },
-  { to: "/app/meetings", label: "Meetings", icon: Calendar },
-  { to: "/app/investor/team", label: "Team", icon: Users },
-];
-
-const workspaceNavFounder: NavItem[] = [
-  { to: "/app/settings", label: "Settings", icon: Settings },
-];
-
-const memberProfileNav: NavItem = { to: "/app/member-profile", label: "My Profile", icon: UserCircle2 };
-
-const workspaceNavInvestor: NavItem[] = [
-  { to: "/app/investor/settings", label: "Settings", icon: Settings },
-];
+// R9: the L2/L3/L4 hierarchy lives in src/lib/nav-structure.ts \u2014 this file
+// only renders it (L2 list \u27f7 section L3 list, the single sidebar swap).
+const memberProfileNav = { to: "/app/member-profile", label: "My Profile", icon: UserCircle2 };
 
 const SIDEBAR_KEY = "hs_sidebar_expanded";
 
@@ -142,10 +78,32 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   const profile = useProfile();
 
   const isInvestor = user?.role === "investor";
-  const { data: raise } = useRaiseProgress();
-  const { data: flow } = useDealFlowProgress();
-  const nav = isInvestor ? investorNav : founderNav;
-  const workspaceNav = isInvestor ? workspaceNavInvestor : workspaceNavFounder;
+
+  // R9 contextual navigation: L2 list by default; inside a group section the
+  // sidebar swaps (the ONLY swap) to that section's L3 list.
+  const sections = isInvestor ? investorSections : founderSections;
+  const activeSection = activeSectionFor(path, sections);
+  const overviewPath = overviewPathFor(isInvestor);
+  const [manuallyToggledGroups, setManuallyToggledGroups] = useState<Set<string>>(new Set());
+  // Longest-matching leaf wins active state — "Deal Room" (/app/deal-rooms)
+  // must not light up while a sibling like /app/deal-rooms/prep-notes is open.
+  const bestMatch = (() => {
+    if (!activeSection) return null;
+    let best: string | null = null;
+    for (const leaf of allLeavesOf(activeSection)) {
+      if (path === leaf.to || path.startsWith(leaf.to + "/")) {
+        if (!best || leaf.to.length > best.length) best = leaf.to;
+      }
+    }
+    return best;
+  })();
+  useEffect(() => {
+    setManuallyToggledGroups(new Set());
+  }, [activeSection?.key]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Ask AI panel — trigger lives in the header (right corner, next to profile).
+  const [aiOpen, setAiOpen] = useState<boolean>(
+    () => typeof localStorage !== "undefined" && localStorage.getItem("hs_ai_panel_open") === "true",
+  );
 
   // Company name + profile-completeness fields from startups table (founder only)
   const { data: startupData } = useQuery({
@@ -166,19 +124,6 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
     },
   });
 
-  // Deal room count (founder only)
-  const { data: dealRoomCount } = useQuery({
-    queryKey: ["shell-deal-room-count", startupData?.id],
-    enabled: !!startupData?.id && !isInvestor,
-    queryFn: async () => {
-      const { count } = await supabase
-        .from("deal_rooms")
-        .select("*", { count: "exact", head: true })
-        .eq("startup_id", startupData!.id);
-      return count ?? 0;
-    },
-  });
-
   // Team membership check (shows "My Profile" nav item)
   const { data: isTeamMember } = useQuery({
     queryKey: ["is-team-member", user?.id],
@@ -191,29 +136,6 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
         .eq("user_id", user!.id)
         .eq("status", "active");
       return (count ?? 0) > 0;
-    },
-  });
-
-  // Connections badge — unseen auto-added entries (red dot priority) else active count
-  const { data: investorDealCount } = useQuery({
-    queryKey: ["shell-investor-deal-count", user?.id],
-    enabled: !!user?.id && isInvestor,
-    queryFn: async () => {
-      // Prioritise unseen auto-added rows (founders who joined via invite link)
-      const { count: unseen } = await supabase
-        .from("investor_watchlist")
-        .select("*", { count: "exact", head: true })
-        .eq("investor_id", user!.id)
-        .eq("auto_added", true)
-        .eq("seen_by_investor", false);
-      if ((unseen ?? 0) > 0) return unseen ?? 0;
-      // Fall back to total active count
-      const { count } = await supabase
-        .from("investor_watchlist")
-        .select("*", { count: "exact", head: true })
-        .eq("investor_id", user!.id)
-        .not("status", "in", '("Invested","Passed")');
-      return count ?? 0;
     },
   });
 
@@ -270,7 +192,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
     const investorOutOfBounds =
       isInvestor &&
       !path.startsWith("/app/investor") &&
-      !workspaceNavInvestor.some((n) => path.startsWith(n.to)) &&
+      !path.startsWith("/app/team-chat") &&
       path !== "/app/advisor" &&
       path !== "/app/verification" &&
       !path.startsWith("/app/profile") &&
@@ -451,164 +373,159 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
           </div>
         )}
 
-        <nav className="flex-1 px-2 space-y-0.5 overflow-y-auto">
-          {nav.map((n, index) => {
-            const active = path === n.to || path === n.to + "/" || (n.to !== "/app" && n.to !== "/app/overview" && n.to !== "/app/investor" && path.startsWith(n.to));
-            const badge = (() => {
-              if (!isInvestor && n.to === "/app/prepare" && raise)
-                return `${raise.prepareDone}/${raise.prepareTotal}`;
-              if (n.to === "/app/deal-rooms")
-                return raise?.activeRooms
-                  ? String(raise.activeRooms)
-                  : dealRoomCount && dealRoomCount > 0 ? String(dealRoomCount) : undefined;
-              if (n.to === "/app/investor/thesis" && flow?.thesisSet) return "\u2713";
-              if (n.to === "/app/investor/source" && flow?.watchlistCount)
-                return String(flow.watchlistCount);
-              if (n.to === "/app/investor/evaluate" && flow?.activeRooms)
-                return String(flow.activeRooms);
-              if (n.to === "/app/investor/decide" && flow?.pendingDecisions)
-                return String(flow.pendingDecisions);
-              return n.badge;
-            })();
-
-            // Soft locks — grey + tooltip, never a hard block.
-            const lock = (() => {
-              if (isInvestor || !raise) return null;
-              if (n.to === "/app/go-live" && !raise.prepareUnlocked && !raise.goLiveDone)
-                return "Complete Prepare first";
-              if (
-                n.to === "/app/close" &&
-                raise.closingRooms === 0 && raise.closedRooms === 0 && raise.termSheetRooms === 0
-              )
-                return "No rooms at closing yet";
-              return null;
-            })();
-
-
-            return (
-              <div key={n.to}>
-                {n.section && showExpanded && (
-                  <div
-                    className="px-2 pb-1.5 font-medium uppercase"
-                    style={{
-                      paddingTop: index === 0 ? 12 : 20,
-                      fontSize: 10,
-                      letterSpacing: "0.1em",
-                      color: "#71717A",
-                    }}
-                  >
-                    {n.section}
-                  </div>
+        <nav className="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto">
+          {activeSection ? (
+            /* ── L3 sidebar — the single swap. Back always → L2 Overview. ── */
+            <>
+              <Link
+                to={overviewPath as any}
+                onClick={() => setMobileOpen(false)}
+                data-testid="back-to-dashboard"
+                className={cn(
+                  "flex items-center gap-2 rounded-md px-2.5 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors",
+                  !showExpanded && "justify-center px-0",
                 )}
+              >
+                <ArrowLeft className="h-4 w-4" />
+                {showExpanded && <span>Back to Dashboard</span>}
+              </Link>
+              {showExpanded && (
+                <div
+                  className="px-2.5 pt-4 pb-1.5 font-semibold"
+                  style={{ fontFamily: "'Syne', sans-serif", fontSize: 13, color: "var(--foreground)" }}
+                >
+                  {activeSection.label}
+                </div>
+              )}
+              {showExpanded && (activeSection.children ?? []).map((item: L3Item) => {
+                if (isGroup(item)) {
+                  // L3 group label — expand/collapse only, never a page.
+                  const containsActive = item.children.some(
+                    (c) => bestMatch === c.to,
+                  );
+                  const expanded = manuallyToggledGroups.has(item.label) !== containsActive;
+                  return (
+                    <div key={item.label}>
+                      <button
+                        type="button"
+                        onClick={() => setManuallyToggledGroups((prev) => {
+                          const next = new Set(prev);
+                          next.has(item.label) ? next.delete(item.label) : next.add(item.label);
+                          return next;
+                        })}
+                        data-testid={`l3-group-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+                        className="w-full flex items-center gap-2 rounded-md px-2.5 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors text-left"
+                      >
+                        {expanded
+                          ? <ChevronDown className="h-3.5 w-3.5 shrink-0" />
+                          : <ChevronRight className="h-3.5 w-3.5 shrink-0" />}
+                        <span className="flex-1">{item.label}</span>
+                      </button>
+                      {expanded && (
+                        <div className="ml-[13px] pl-3 border-l border-border/60 space-y-0.5 mt-0.5 mb-1">
+                          {item.children.map((leaf) => {
+                            const leafActive = bestMatch === leaf.to;
+                            return (
+                              <Link
+                                key={leaf.to}
+                                to={leaf.to as any}
+                                preload="intent"
+                                onClick={() => setMobileOpen(false)}
+                                className={cn(
+                                  "block rounded-md px-2 py-1.5 text-[13px] transition-colors",
+                                  leafActive
+                                    ? "text-brand font-medium"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-accent/60",
+                                )}
+                              >
+                                {leaf.label}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+                // L3 leaf — a real page.
+                const leafActive = bestMatch === item.to;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to as any}
+                    preload="intent"
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      "relative flex items-center gap-2 rounded-md px-2.5 py-2 text-sm transition-colors",
+                      leafActive
+                        ? "text-foreground font-medium"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent/60",
+                    )}
+                  >
+                    {leafActive && (
+                      <span aria-hidden className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-full hs-gradient-static" />
+                    )}
+                    <span className="flex-1">{item.label}</span>
+                  </Link>
+                );
+              })}
+            </>
+          ) : (
+            /* ── L2 list — the shell's default sidebar. ── */
+            sections.map((s: L2Section) => {
+              const target = s.to ?? firstLeafOf(s);
+              const active = !!s.to && (path === s.to || path.startsWith(s.to + "/"));
+              return (
                 <Link
-                  to={n.to as any}
+                  key={s.key}
+                  to={target as any}
                   preload="intent"
                   onClick={() => setMobileOpen(false)}
-                  aria-label={n.label}
-                  title={lock ?? undefined}
+                  aria-label={s.label}
+                  data-testid={`l2-${s.key}`}
                   className={cn(
-                    "relative flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors group",
+                    "relative flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
                     active
                       ? "text-foreground font-medium"
-                      : lock
-                        ? "text-faint hover:text-muted-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-accent/60",
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/60",
                     !showExpanded && "justify-center px-0",
                   )}
                 >
                   {active && (
-                    <span
-                      aria-hidden
-                      className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-full hs-gradient-static"
-                    />
+                    <span aria-hidden className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-full hs-gradient-static" />
                   )}
-                  {n.step && showExpanded ? (
-                    <span
-                      className={cn("w-4 text-center", active ? "hs-gradient-text" : undefined)}
-                      style={{ fontFamily: "'Syne', sans-serif", fontSize: 13, fontWeight: 700 }}
-                    >
-                      {n.step}
-                    </span>
-                  ) : (
-                    <n.icon className={cn("h-4 w-4", active && "text-brand")} />
-                  )}
-                  {showExpanded && <span className="flex-1">{n.label}</span>}
-                  {showExpanded && badge && !lock && (
-                    <span
-                      className="rounded-full px-1.5 py-0.5 text-muted-foreground tabular-nums"
-                      style={{ fontSize: 11, background: "rgba(0,0,0,0.04)" }}
-                    >
-                      {badge}
-                    </span>
+                  <s.icon className={cn("h-4 w-4", active && "text-brand")} />
+                  {showExpanded && <span className="flex-1">{s.label}</span>}
+                  {showExpanded && s.children && (
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
                   )}
                 </Link>
-                {/* Children expand in place under the active parent — Cloudflare
-                    pattern, not a dropdown that leaves the page. */}
-                {n.children && active && showExpanded && (
-                  <div className="ml-[26px] pl-2.5 border-l border-border/60 space-y-0.5 mt-0.5 mb-1">
-                    {n.children.map((c) => {
-                      const childActive = path === c.to || path.startsWith(c.to + "/") || path === c.to.split("#")[0];
-                      return (
-                        <Link
-                          key={c.to}
-                          to={c.to as any}
-                          preload="intent"
-                          onClick={() => setMobileOpen(false)}
-                          className={cn(
-                            "block rounded-md px-2 py-1.5 text-[13px] transition-colors",
-                            childActive
-                              ? "text-brand font-medium"
-                              : "text-muted-foreground hover:text-foreground hover:bg-accent/60",
-                          )}
-                        >
-                          {c.label}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+              );
+            })
+          )}
 
           {showExpanded && (
             <>
               <div className="mx-2 mt-5 mb-2 hs-hairline-t" />
-              {/* Render workspace nav items, injecting Feedback button after "Team".
-                  Badges is founder-owner only — excluded for investors (not in
-                  workspaceNavInvestor) and for team members (filtered here). */}
-              {[...workspaceNav.filter((n) => !(n.to === "/app/badges" && isTeamMember)), ...(isTeamMember ? [memberProfileNav] : [])].map((n) => {
-                const active = path === n.to || path.startsWith(n.to + "/");
-                return (
-                  <div key={n.to}>
-                    <Link
-                      to={n.to as any}
-                      preload="intent"
-                      onClick={() => setMobileOpen(false)}
-                      aria-label={n.label}
-                      className={cn(
-                        "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
-                        active ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
-                      )}
-                    >
-                      <n.icon className={cn("h-4 w-4", active && "text-brand")} />
-                      <span>{n.label}</span>
-                    </Link>
-                    {/* Inject Feedback right after the "Team" item, wherever it lands */}
-                    {n.to.endsWith("/settings") && (
-                      <Link
-                        to={"/app/feedback" as any}
-                        onClick={() => setMobileOpen(false)}
-                        aria-label="Feedback"
-                        className="w-full flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors text-muted-foreground hover:bg-accent/60 hover:text-foreground"
-                      >
-                        <MessageCircle className="h-4 w-4" />
-                        <span>Feedback</span>
-                      </Link>
-                    )}
-                  </div>
-                );
-              })}
+              {isTeamMember && (
+                <Link
+                  to={memberProfileNav.to as any}
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+                >
+                  <memberProfileNav.icon className="h-4 w-4" />
+                  <span>{memberProfileNav.label}</span>
+                </Link>
+              )}
+              <Link
+                to={"/app/feedback" as any}
+                onClick={() => setMobileOpen(false)}
+                aria-label="Feedback"
+                className="w-full flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span>Feedback</span>
+              </Link>
             </>
           )}
         </nav>
@@ -676,8 +593,16 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
             </div>
 
             <div className="ml-auto flex items-center gap-1.5 md:gap-2">
-              <button className="hidden md:grid h-9 w-9 place-items-center rounded-md border border-border/60 hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
-                <Plus className="h-4 w-4" />
+              {/* Ask AI — the panel's trigger lives here now (R9 decision),
+                  not on a right-edge rail. */}
+              <button
+                onClick={() => setAiOpen(true)}
+                data-testid="header-ask-ai"
+                aria-label="Ask AI"
+                className="inline-flex items-center gap-1.5 h-9 rounded-md px-3 text-sm font-medium text-white hs-gradient transition-opacity hover:opacity-90"
+              >
+                <Sparkles className="h-4 w-4" />
+                <span className="hidden md:inline">Ask AI</span>
               </button>
               <NotificationBell />
               <UserMenu />
@@ -702,6 +627,8 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
           <AIOperatorPanel
             userRole={isInvestor ? "investor" : "founder"}
             userId={user.id}
+            open={aiOpen}
+            onOpenChange={setAiOpen}
             pageContext={
               !isInvestor && startupData
                 ? {

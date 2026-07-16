@@ -246,10 +246,15 @@ export function AIOperatorPanel({
   userRole,
   userId,
   pageContext: _pageContextProp,
+  open: controlledOpen,
+  onOpenChange,
 }: {
   userRole: "founder" | "investor";
   userId: string;
   pageContext?: PageContext;
+  /** R9: the shell header owns the trigger — pass both to control the panel. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
@@ -263,12 +268,17 @@ export function AIOperatorPanel({
     relevantData: _pageContextProp?.relevantData,
   };
 
-  const [isOpen, setIsOpen] = useState(() => {
+  const [internalOpen, setInternalOpen] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("hs_ai_panel_open") === "true";
     }
     return false;
   });
+  const isOpen = controlledOpen ?? internalOpen;
+  const setIsOpen = (v: boolean) => {
+    setInternalOpen(v);
+    onOpenChange?.(v);
+  };
 
   const [panelWidth, setPanelWidth] = useState(() => {
     if (typeof window !== "undefined") {
@@ -502,46 +512,9 @@ export function AIOperatorPanel({
   const completenessPercent = pageContext.relevantData?.completenessPercent as number | undefined;
   const isGated = userRole === "founder" && typeof completenessPercent === "number" && completenessPercent < 40;
 
-  // ── Pull tab (closed) ──────────────────────────────────────────────────────
-  if (!isOpen) {
-    return (
-      <div
-        className="fixed right-0 top-1/2 z-40 -translate-y-1/2"
-        data-testid="ai-panel-tab"
-        style={{ width: 24 }}
-      >
-        <button
-          onClick={() => setIsOpen(true)}
-          aria-label="Open AI panel"
-          data-testid="ai-panel-toggle"
-          className="relative flex flex-col items-center justify-center transition-colors"
-          style={{
-            width: 24,
-            height: 72,
-            background: "var(--gradient-brand)",
-            borderRadius: "8px 0 0 8px",
-            cursor: "pointer",
-          }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "#6D28D9"; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--gradient-brand)"; }}
-        >
-          <span
-            className="text-foreground font-bold text-[10px] select-none"
-            style={{ writingMode: "vertical-rl", transform: "rotate(-90deg)", letterSpacing: "0.05em" }}
-          >
-            AI
-          </span>
-          {unreadCount > 0 && (
-            <span
-              className="absolute top-1.5 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full"
-              style={{ background: "#EF4444" }}
-              data-testid="ai-panel-badge"
-            />
-          )}
-        </button>
-      </div>
-    );
-  }
+  // R9: the closed-state pull tab is gone — the shell header's Ask AI
+  // button (data-testid header-ask-ai) is the panel's only trigger.
+  if (!isOpen) return null;
 
   // ── Open panel ─────────────────────────────────────────────────────────────
   return (
