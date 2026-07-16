@@ -88,7 +88,23 @@ Status legend:
 
 Founder: 9 × (a) · 20 × (b) · 4 × (c) — Investor: 12 × (a) · 13 × (b) · 8 × (c)
 
-## Open questions (need decisions before step 1)
+## Decisions (from review, 2026-07-17)
+
+1. **AI chat**: stays a slide-over panel, NOT a sitemap page. Its trigger moves to the header right corner next to the profile button — "Ask AI" with an AI icon. Modest UI polish of the panel in this pass; the full agentic-operator chat is explicitly later.
+2. **Founder Achievements**: NOT app.wall.tsx. It's an achievements *editor* — add individual/team/company achievements that display on the digital profile and in deal rooms. Status (c), minimal build writing to `startup_profile_sections` (which already renders in the deal room's Digital Profiles section and carries visibility control). `app.wall.tsx` stays at `/app/wall`, unlisted.
+3. **Orphans**:
+   - `app.close.tsx` — confirmed superseded (it's a rooms-at-closing link list, no content of its own; per-room closing lives in R3's `/deal-rooms/:id/close`). **Delete**, redirect `/app/close` → `/app/deal-rooms`. Do not resurrect as /reports.
+   - `app.investor.portfolio.tsx` — becomes investor **Deal Rooms › Portfolio** LEAF (status a).
+   - `app.investor.analysis.tsx` — becomes investor **CRM › Deal Analysis** LEAF (status a).
+   - `app.email.tsx` — confirmed CRM outreach tool → founder **CRM › Email Outreach** LEAF (status a).
+   - `app.referrals.tsx` — new **Referrals** L2 entry above Settings, both roles (status a).
+   - `app.audit.tsx` — folds into **Settings** as an Activity tab (Settings keeps internal tab structure per spec).
+   - `app.profile-builder.tsx` — confirmed DIFFERENT from the sitemap's "Profile Builder" group (it's the AI onboarding wizard entered from auth.callback.tsx). Untouched, route stays alive.
+   - Hub pages (`prepare`, `go-live`, `source`, `evaluate`, `decide`, `thesis`) — dissolve with redirects to nearest new section.
+4. **Deal Prep Notes** — reframed: these are the user's OWN notes taken outside rooms (team-visible, prep for tracking multiple deals), NOT `deal_room_notes` content. No §9.6 conflict — user-authored content. Minimal build.
+   **Reports Vault** — record box for closure reports of CLOSED rooms (allowed per §9.6's /reports rule), same page shape both roles, with explanatory text until the user has a closed-deal report. Minimal build.
+
+## Open questions (resolved above — kept for history)
 
 1. **The AI Advisor chat has no home in the target sitemap.** Today's `/app` (`app.index.tsx` FounderHome = chat + readiness cards) and `/app/assistant` ("Workstation" chat) are the founder's main AI surface; investor equivalents are `app.investor.assistant.tsx`/`app.investor.advisor.tsx`. The sitemap's "Workstation" is a pure group label with only Verifications + Claims children. Where does the chat live — an unlisted route kept as-is, or somewhere in this hierarchy?
 2. **Founder "Achievements" → `app.wall.tsx`?** The Achievement Wall is the closest existing feature; if "Achievements" means editable profile bullets instead (like the investor side has), it's (c) not (a).
