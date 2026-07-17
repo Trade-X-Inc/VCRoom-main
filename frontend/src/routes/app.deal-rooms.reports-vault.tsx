@@ -19,7 +19,6 @@ interface ClosureReport {
   outcome: string;
   reason_category: string | null;
   reason_detail: string | null;
-  ai_summary: string | null;
   created_at: string;
   deal_rooms: { investor_name: string | null; status: string } | null;
 }
@@ -42,7 +41,7 @@ function FounderReportsVault() {
     queryFn: async () => {
       const { data } = await supabase
         .from("deal_room_closure_reports")
-        .select("id, deal_room_id, outcome, reason_category, reason_detail, ai_summary, created_at, deal_rooms!inner(investor_name, status, startup_id)")
+        .select("id, deal_room_id, outcome, reason_category, reason_detail, created_at, deal_rooms!inner(investor_name, status, startup_id)")
         .eq("deal_rooms.startup_id", startup!.id)
         .eq("deal_rooms.status", "closed")
         .order("created_at", { ascending: false });

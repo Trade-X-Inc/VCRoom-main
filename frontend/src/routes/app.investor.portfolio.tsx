@@ -42,7 +42,7 @@ export function PortfolioPage() {
           id, status, created_at, deal_room_id,
           deal_rooms(
             id, updated_at,
-            startups(company_name, sector, stage, funding_target, revenue, traction)
+            startups(company_name, sector, stage)
           )
         `)
         .in("deal_room_id", roomIds)
@@ -67,9 +67,6 @@ export function PortfolioPage() {
           company: d.deal_rooms?.startups?.company_name ?? "Unnamed",
           sector: d.deal_rooms?.startups?.sector,
           stage: d.deal_rooms?.startups?.stage,
-          fundingTarget: d.deal_rooms?.startups?.funding_target,
-          revenue: d.deal_rooms?.startups?.revenue,
-          traction: d.deal_rooms?.startups?.traction,
         }));
     },
   });
@@ -148,15 +145,6 @@ export function PortfolioPage() {
                     {statusLabel[c.status] ?? c.status}
                   </span>
                 </div>
-                {(c.revenue || c.traction) && (
-                  <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <TrendingUp className="h-3.5 w-3.5 text-success" />
-                    {c.revenue || c.traction}
-                  </div>
-                )}
-                {c.fundingTarget && (
-                  <div className="mt-1 text-xs text-brand font-medium">{c.fundingTarget}</div>
-                )}
                 {c.decisionAt && (
                   <div className="mt-3 flex items-center gap-1 text-[10px] text-muted-foreground border-t border-border/60 pt-3">
                     <Clock className="h-2.5 w-2.5" />

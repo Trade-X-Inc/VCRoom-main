@@ -149,6 +149,7 @@ import { Route as AppPrepareProfileBuilderTeamCardsRouteImport } from './routes/
 import { Route as AppPrepareProfileBuilderQuickSetupRouteImport } from './routes/app.prepare.profile-builder.quick-setup'
 import { Route as AppPrepareProfileBuilderFundraisingThesisRouteImport } from './routes/app.prepare.profile-builder.fundraising-thesis'
 import { Route as AppPrepareProfileBuilderFullProfileRouteImport } from './routes/app.prepare.profile-builder.full-profile'
+import { Route as AppPrepareProfileBuilderAchievementsRouteImport } from './routes/app.prepare.profile-builder.achievements'
 import { Route as AppPrepareIpVaultSourceFilesRouteImport } from './routes/app.prepare.ip-vault.source-files'
 import { Route as AppPrepareIpVaultPrivacySettingsRouteImport } from './routes/app.prepare.ip-vault.privacy-settings'
 import { Route as AppPrepareIpVaultDocumentIntakeRouteImport } from './routes/app.prepare.ip-vault.document-intake'
@@ -918,6 +919,12 @@ const AppPrepareProfileBuilderFullProfileRoute =
     path: '/prepare/profile-builder/full-profile',
     getParentRoute: () => AppRoute,
   } as any)
+const AppPrepareProfileBuilderAchievementsRoute =
+  AppPrepareProfileBuilderAchievementsRouteImport.update({
+    id: '/prepare/profile-builder/achievements',
+    path: '/prepare/profile-builder/achievements',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppPrepareIpVaultSourceFilesRoute =
   AppPrepareIpVaultSourceFilesRouteImport.update({
     id: '/prepare/ip-vault/source-files',
@@ -1400,6 +1407,7 @@ export interface FileRoutesByFullPath {
   '/app/prepare/ip-vault/document-intake': typeof AppPrepareIpVaultDocumentIntakeRoute
   '/app/prepare/ip-vault/privacy-settings': typeof AppPrepareIpVaultPrivacySettingsRoute
   '/app/prepare/ip-vault/source-files': typeof AppPrepareIpVaultSourceFilesRoute
+  '/app/prepare/profile-builder/achievements': typeof AppPrepareProfileBuilderAchievementsRoute
   '/app/prepare/profile-builder/full-profile': typeof AppPrepareProfileBuilderFullProfileRoute
   '/app/prepare/profile-builder/fundraising-thesis': typeof AppPrepareProfileBuilderFundraisingThesisRoute
   '/app/prepare/profile-builder/quick-setup': typeof AppPrepareProfileBuilderQuickSetupRoute
@@ -1592,6 +1600,7 @@ export interface FileRoutesByTo {
   '/app/prepare/ip-vault/document-intake': typeof AppPrepareIpVaultDocumentIntakeRoute
   '/app/prepare/ip-vault/privacy-settings': typeof AppPrepareIpVaultPrivacySettingsRoute
   '/app/prepare/ip-vault/source-files': typeof AppPrepareIpVaultSourceFilesRoute
+  '/app/prepare/profile-builder/achievements': typeof AppPrepareProfileBuilderAchievementsRoute
   '/app/prepare/profile-builder/full-profile': typeof AppPrepareProfileBuilderFullProfileRoute
   '/app/prepare/profile-builder/fundraising-thesis': typeof AppPrepareProfileBuilderFundraisingThesisRoute
   '/app/prepare/profile-builder/quick-setup': typeof AppPrepareProfileBuilderQuickSetupRoute
@@ -1789,6 +1798,7 @@ export interface FileRoutesById {
   '/app/prepare/ip-vault/document-intake': typeof AppPrepareIpVaultDocumentIntakeRoute
   '/app/prepare/ip-vault/privacy-settings': typeof AppPrepareIpVaultPrivacySettingsRoute
   '/app/prepare/ip-vault/source-files': typeof AppPrepareIpVaultSourceFilesRoute
+  '/app/prepare/profile-builder/achievements': typeof AppPrepareProfileBuilderAchievementsRoute
   '/app/prepare/profile-builder/full-profile': typeof AppPrepareProfileBuilderFullProfileRoute
   '/app/prepare/profile-builder/fundraising-thesis': typeof AppPrepareProfileBuilderFundraisingThesisRoute
   '/app/prepare/profile-builder/quick-setup': typeof AppPrepareProfileBuilderQuickSetupRoute
@@ -1987,6 +1997,7 @@ export interface FileRouteTypes {
     | '/app/prepare/ip-vault/document-intake'
     | '/app/prepare/ip-vault/privacy-settings'
     | '/app/prepare/ip-vault/source-files'
+    | '/app/prepare/profile-builder/achievements'
     | '/app/prepare/profile-builder/full-profile'
     | '/app/prepare/profile-builder/fundraising-thesis'
     | '/app/prepare/profile-builder/quick-setup'
@@ -2179,6 +2190,7 @@ export interface FileRouteTypes {
     | '/app/prepare/ip-vault/document-intake'
     | '/app/prepare/ip-vault/privacy-settings'
     | '/app/prepare/ip-vault/source-files'
+    | '/app/prepare/profile-builder/achievements'
     | '/app/prepare/profile-builder/full-profile'
     | '/app/prepare/profile-builder/fundraising-thesis'
     | '/app/prepare/profile-builder/quick-setup'
@@ -2375,6 +2387,7 @@ export interface FileRouteTypes {
     | '/app/prepare/ip-vault/document-intake'
     | '/app/prepare/ip-vault/privacy-settings'
     | '/app/prepare/ip-vault/source-files'
+    | '/app/prepare/profile-builder/achievements'
     | '/app/prepare/profile-builder/full-profile'
     | '/app/prepare/profile-builder/fundraising-thesis'
     | '/app/prepare/profile-builder/quick-setup'
@@ -3443,6 +3456,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPrepareProfileBuilderFullProfileRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/prepare/profile-builder/achievements': {
+      id: '/app/prepare/profile-builder/achievements'
+      path: '/prepare/profile-builder/achievements'
+      fullPath: '/app/prepare/profile-builder/achievements'
+      preLoaderRoute: typeof AppPrepareProfileBuilderAchievementsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/prepare/ip-vault/source-files': {
       id: '/app/prepare/ip-vault/source-files'
       path: '/prepare/ip-vault/source-files'
@@ -4069,6 +4089,7 @@ interface AppRouteChildren {
   AppPrepareIpVaultDocumentIntakeRoute: typeof AppPrepareIpVaultDocumentIntakeRoute
   AppPrepareIpVaultPrivacySettingsRoute: typeof AppPrepareIpVaultPrivacySettingsRoute
   AppPrepareIpVaultSourceFilesRoute: typeof AppPrepareIpVaultSourceFilesRoute
+  AppPrepareProfileBuilderAchievementsRoute: typeof AppPrepareProfileBuilderAchievementsRoute
   AppPrepareProfileBuilderFullProfileRoute: typeof AppPrepareProfileBuilderFullProfileRoute
   AppPrepareProfileBuilderFundraisingThesisRoute: typeof AppPrepareProfileBuilderFundraisingThesisRoute
   AppPrepareProfileBuilderQuickSetupRoute: typeof AppPrepareProfileBuilderQuickSetupRoute
@@ -4147,6 +4168,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppPrepareIpVaultDocumentIntakeRoute: AppPrepareIpVaultDocumentIntakeRoute,
   AppPrepareIpVaultPrivacySettingsRoute: AppPrepareIpVaultPrivacySettingsRoute,
   AppPrepareIpVaultSourceFilesRoute: AppPrepareIpVaultSourceFilesRoute,
+  AppPrepareProfileBuilderAchievementsRoute:
+    AppPrepareProfileBuilderAchievementsRoute,
   AppPrepareProfileBuilderFullProfileRoute:
     AppPrepareProfileBuilderFullProfileRoute,
   AppPrepareProfileBuilderFundraisingThesisRoute:
