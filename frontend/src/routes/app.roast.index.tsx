@@ -9,6 +9,9 @@ import {
   ExternalLink,
   AlertTriangle,
   CheckCircle2,
+  Video,
+  MessageSquareWarning,
+  ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
@@ -287,6 +290,64 @@ export function RoastManagement({ view }: { view?: "reports" } = {}) {
             company profile
           </Link>{" "}
           first — the Roast is attached to it.
+        </div>
+      )}
+
+      {/* R10 step 7: overview + how-it-works — first-time context before
+          the schedule action, shown until the founder has run a Roast. */}
+      {view !== "reports" && startup?.id && sessions.length === 0 && (
+        <div className="mb-6 space-y-4">
+          <div className="rounded-xl border border-border/60 bg-card p-6">
+            <div className="flex items-start gap-3">
+              <div
+                className="grid h-9 w-9 place-items-center rounded-lg shrink-0"
+                style={{ background: "rgba(239,68,68,0.1)" }}
+              >
+                <Flame className="h-4 w-4" style={{ color: "#EF4444" }} />
+              </div>
+              <div>
+                <div className="text-sm font-semibold" style={{ fontFamily: "Syne, sans-serif" }}>
+                  What is a Founder Roast?
+                </div>
+                <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
+                  A live, public Q&A where investors and other founders challenge your pitch on the record.
+                  Every question gets answered — live or in writing within 48 hours — and nothing is ever
+                  deleted or hidden. It's the strongest trust signal a founder can earn on Hockystick: completing
+                  one earns a verified Roast badge that stays on your profile.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-border/60 bg-card p-6">
+            <div className="text-sm font-semibold mb-4" style={{ fontFamily: "Syne, sans-serif" }}>
+              How it works
+            </div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {[
+                { icon: Calendar, title: "1. Schedule", body: "Pick a level and a time. We generate a public link — share it to fill the room." },
+                { icon: Video, title: "2. Go live", body: "Pitch, then take questions from anyone who joined. Answer on camera in real time." },
+                { icon: MessageSquareWarning, title: "3. Close the loop", body: "Anything unanswered live must get a written answer within 48 hours, or the session is marked incomplete." },
+              ].map(({ icon: Icon, title, body }) => (
+                <div key={title} className="rounded-lg border border-border/60 p-4">
+                  <Icon className="h-4 w-4 mb-2" style={{ color: "#EF4444" }} />
+                  <div className="text-sm font-medium text-foreground">{title}</div>
+                  <div className="text-xs text-muted-foreground mt-1 leading-relaxed">{body}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div
+            className="rounded-xl p-4 flex items-start gap-2.5"
+            style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)" }}
+          >
+            <ShieldCheck className="h-4 w-4 shrink-0 mt-0.5" style={{ color: "#10B981" }} />
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Completing a Roast at any level earns a verified badge — the only badge investors know can't
+              be gamed, because the whole thing happened in public.
+            </p>
+          </div>
         </div>
       )}
 
