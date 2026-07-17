@@ -1555,14 +1555,19 @@ const EFFORT_STYLES: Record<string, { bg: string; color: string }> = {
   high: { bg: "rgba(239,68,68,0.12)", color: "#EF4444" },
 };
 
+// R9: `view` splits this card into its two Founder Coaching leaves —
+// "check" = stage guide + financial/legal readiness, "report" = rejection
+// debrief + action plan. Unset renders the full card (workstation behavior).
 function CoachingCard({
   startupId,
   userId,
   stage,
+  view,
 }: {
   startupId: string;
   userId: string;
   stage: string | null;
+  view?: "check" | "report";
 }) {
   const qc = useQueryClient();
   const [running, setRunning] = useState(false);
@@ -1660,6 +1665,7 @@ function CoachingCard({
         <div className="space-y-4" data-testid="coaching-sections">
 
           {/* Section 1 — Stage guide */}
+          {(!view || view === "check") && (
           <div data-testid="coaching-stage-guide">
             <div
               className="text-xs font-semibold uppercase tracking-wider mb-2"
@@ -1671,8 +1677,10 @@ function CoachingCard({
               <div className="text-sm text-foreground leading-relaxed">{session.stage_guide}</div>
             </div>
           </div>
+          )}
 
           {/* Section 2 — Financial & Legal */}
+          {(!view || view === "check") && (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div
               className="rounded-lg px-3 py-3"
@@ -1701,9 +1709,10 @@ function CoachingCard({
               <div className="text-sm text-foreground leading-relaxed">{session.legal}</div>
             </div>
           </div>
+          )}
 
           {/* Section 3 — Rejection debrief (conditional) */}
-          {session.rejection_debrief && (
+          {(!view || view === "report") && session.rejection_debrief && (
             <div
               className="rounded-lg px-4 py-3"
               style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.18)" }}
@@ -1720,6 +1729,7 @@ function CoachingCard({
           )}
 
           {/* Section 4 — Action plan */}
+          {(!view || view === "report") && (
           <div data-testid="coaching-action-plan">
             <div
               className="text-xs font-semibold uppercase tracking-wider mb-3"
@@ -1761,6 +1771,7 @@ function CoachingCard({
               })}
             </div>
           </div>
+          )}
         </div>
       )}
     </div>
@@ -1924,6 +1935,112 @@ export function FounderHome() {
         stage={(startup as any).stage ?? null}
       />
 
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// R9 extraction — each Investment Readiness / Founder Coaching leaf renders one
+// of the workstation cards above under its own route; card logic untouched.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type FounderReadinessCard =
+  | "investor-simulation"
+  | "investment-audit"
+  | "coaching-check"
+  | "coaching-report";
+
+const READINESS_LEAF_COPY: Record<FounderReadinessCard, { title: string; description: string }> = {
+  "investor-simulation": {
+    title: "Investor Simulation",
+    description: "Simulate a first-pass investor review of your profile.",
+  },
+  "investment-audit": {
+    title: "Investment Audit",
+    description: "AI-scored investor readiness with factor breakdown and gaps.",
+  },
+  "coaching-check": {
+    title: "Full Profile & Documents Check",
+    description: "Stage-specific guidance on your financial and legal readiness.",
+  },
+  "coaching-report": {
+    title: "Full Report & Flags",
+    description: "Your prioritized action plan and flagged risks.",
+  },
+};
+
+export function FounderReadinessLeaf({ card }: { card: FounderReadinessCard }) {
+  const { user } = useAuth();
+
+  const { data: startup, isLoading } = useQuery({
+    queryKey: ["home-startup", user?.id],
+    enabled: !!user?.id && typeof window !== "undefined",
+    staleTime: 0,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("startups")
+        .select("id, company_name, profile_slug, stage, sector, completeness_score")
+        .eq("founder_id", user!.id)
+        .maybeSingle();
+      return data ?? null;
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="p-8 flex items-center justify-center">
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground " />
+      </div>
+    );
+  }
+
+  if (!startup) {
+    return (
+      <div className="p-6 lg:p-8 max-w-3xl mx-auto">
+        <div className="rounded-none border border-dashed border-border/60 bg-card p-8 text-center">
+          <Building2 className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
+          <div className="text-sm font-medium mb-1">No company profile yet</div>
+          <div className="text-xs text-muted-foreground mb-4">
+            Build your profile first — these tools analyze it.
+          </div>
+          <Link
+            to="/app/prepare/profile-builder/quick-setup"
+            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-foreground"
+            style={{ background: "var(--gradient-brand)" }}
+          >
+            Build my profile
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const copy = READINESS_LEAF_COPY[card];
+
+  return (
+    <div className="p-6 lg:p-8">
+      <div className="mb-2">
+        <h1
+          className="text-lg font-bold tracking-tight text-foreground"
+          style={{ fontFamily: "Syne, sans-serif" }}
+        >
+          {copy.title}
+        </h1>
+        <p className="text-sm mt-1 text-muted-foreground">{copy.description}</p>
+      </div>
+
+      {card === "investor-simulation" && (
+        <InvestorSimCard startupId={startup.id} userId={user!.id} />
+      )}
+      {card === "investment-audit" && (
+        <ScoreAuditCard startupId={startup.id} userId={user!.id} />
+      )}
+      {card === "coaching-check" && (
+        <CoachingCard startupId={startup.id} userId={user!.id} stage={(startup as any).stage ?? null} view="check" />
+      )}
+      {card === "coaching-report" && (
+        <CoachingCard startupId={startup.id} userId={user!.id} stage={(startup as any).stage ?? null} view="report" />
+      )}
     </div>
   );
 }
