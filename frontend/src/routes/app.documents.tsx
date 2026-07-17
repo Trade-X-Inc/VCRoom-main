@@ -4,7 +4,6 @@ import {
   ArrowRight, ChevronDown, Loader2, X, Upload,
 } from "lucide-react";
 import { PageGuide } from "@/components/app/PageGuide";
-import { ProfileBuilder } from "@/components/founder/ProfileBuilder";
 import { useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
@@ -266,6 +265,10 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
   const [editingDoc, setEditingDoc] = useState<FounderDocument | null>(null);
   const [showInstructions, setShowInstructions] = useState(true);
   const [uploading, setUploading] = useState<string | null>(null);
+  const [showCustomUpload, setShowCustomUpload] = useState(false);
+  const [customTitle, setCustomTitle] = useState("");
+  const [customFile, setCustomFile] = useState<File | null>(null);
+  const [customUploading, setCustomUploading] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch startup
@@ -403,6 +406,67 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
     }
   }
 
+  // R10 step 3: Custom Document — upload any file (not tied to a pre-built
+  // template) + AI extract, alongside the existing template list.
+  async function handleCustomDocumentUpload() {
+    if (!startup?.id || !user?.id || !customFile || !customTitle.trim()) return;
+    const file = customFile;
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+    if (!ALLOWED_EXTENSIONS.has(ext)) { toast.error(`${file.name}: file type not allowed`); return; }
+    if (file.size > MAX_FILE_SIZE) { toast.error(`${file.name}: exceeds 50 MB limit`); return; }
+    setCustomUploading(true);
+    try {
+      const slug = `custom-${customTitle.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}-${Date.now()}`;
+      const filePath = `founder-docs/${startup.id}/${slug}/${file.name}`;
+      const { error: uploadError } = await supabase.storage.from("documents").upload(filePath, file, { upsert: true });
+      if (uploadError) throw uploadError;
+
+      const { extractDocumentText } = await import("@/lib/document-extractor");
+      const text = await extractDocumentText(file, file.name);
+      const { classifyDocument, generateDocSummary } = await import("@/lib/ai-secure-fn");
+      const classification = await classifyDocument({ data: { fileName: file.name, textSample: text.slice(0, 3000) } }).catch(() => null);
+      const summary = await generateDocSummary({
+        data: { userId: user.id, documentContent: text.slice(0, 12000), fileName: file.name, category: classification?.category },
+      }).catch(() => null);
+
+      const { error: upsertError } = await supabase.from("founder_documents").upsert({
+        startup_id: startup.id,
+        template_id: null,
+        template_slug: slug,
+        title: customTitle.trim(),
+        status: "ai_extracted",
+        file_path: filePath,
+        file_name: file.name,
+        file_size: file.size,
+        content: { ai_summary: summary?.reply ?? "", classification: classification?.category ?? null },
+        completeness_score: 100,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "startup_id,template_slug" });
+      if (upsertError) throw upsertError;
+
+      toast.success(`${customTitle.trim()} uploaded`);
+      import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { startup_id: startup?.id } })).catch(() => {});
+      refetchFounderDocs();
+      const { logActivity } = await import("@/lib/activity-log-fn");
+      logActivity({
+        account_type: "founder",
+        account_id: startup.id,
+        actor_user_id: user.id,
+        actor_name: user.fullName || user.email || "Founder",
+        action_type: "document_uploaded",
+        target_label: customTitle.trim(),
+        detail: `Uploaded ${file.name}`,
+      });
+      setShowCustomUpload(false);
+      setCustomTitle("");
+      setCustomFile(null);
+    } catch (e: any) {
+      toast.error(e.message || "Upload failed");
+    } finally {
+      setCustomUploading(false);
+    }
+  }
+
   if (user?.role === "investor") {
     return (
       <div className="p-6 lg:p-8 max-w-2xl mx-auto text-center py-20">
@@ -453,10 +517,11 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
         </div>
       </div>
 
-      {/* Digital Profile — ProfileBuilder */}
-      {startup?.id && user?.id && (
-        <ProfileBuilder startupId={startup.id} userId={user.id} />
-      )}
+      {/* R10 step 3: ProfileBuilder (Digital Profile summary) removed from
+          Document Intake — redundant now that the cover/profile UI lives
+          only on Go Live > Full Digital Profile View (R10 step 1). Source
+          Files, Digital Document Vault, and Document Privacy Settings each
+          get their own distinct content per R10 steps 4-6. */}
 
       {/* How it works — collapsible */}
       <div className="mb-6 border border-border rounded-none p-5 bg-white/[0.02]">
@@ -518,6 +583,22 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
         {/* Documents list */}
         <div className="w-full sm:col-span-9">
           <div className="space-y-3">
+            {/* R10 step 3: Custom Document — upload anything, alongside the
+                pre-built templates. Only on Document Intake. */}
+            {(!view || view === "document-intake") && (
+              <button
+                onClick={() => setShowCustomUpload(true)}
+                className="w-full rounded-none border border-dashed border-border bg-card p-5 text-left hover:border-brand/50 hover:bg-accent/20 transition-colors flex items-center gap-3"
+              >
+                <div className="grid h-9 w-9 place-items-center rounded-none bg-accent shrink-0">
+                  <Upload className="h-4 w-4 text-brand" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-foreground">Add a custom document</div>
+                  <div className="text-xs text-muted-foreground">Upload any file not covered by a template — AI extracts a summary automatically.</div>
+                </div>
+              </button>
+            )}
             {filteredDocs.length === 0 ? (
               <EmptyState kind="empty" title="No documents" />
             ) : (
@@ -690,6 +771,48 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
             setEditingDoc(null);
           }}
         />
+      )}
+
+      {/* Custom Document upload modal */}
+      {showCustomUpload && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => !customUploading && setShowCustomUpload(false)}>
+          <div className="w-full max-w-md rounded-none border border-border bg-white p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold" style={{ fontFamily: "Syne, sans-serif" }}>Add a custom document</h3>
+              <button onClick={() => !customUploading && setShowCustomUpload(false)} className="text-muted-foreground hover:text-foreground">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-medium block mb-1.5" style={{ color: "#52525B" }}>Document title</label>
+                <input
+                  value={customTitle}
+                  onChange={(e) => setCustomTitle(e.target.value)}
+                  placeholder="e.g. Letter of Intent — Acme Corp"
+                  className="w-full rounded-none border border-border bg-white px-3 py-2 text-sm outline-none focus:border-brand/50"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium block mb-1.5" style={{ color: "#52525B" }}>File</label>
+                <label className="rounded-none border border-dashed border-border p-5 text-center cursor-pointer hover:border-brand/50 hover:bg-accent/20 transition-colors block">
+                  <Upload className="h-5 w-5 text-muted-foreground mx-auto" />
+                  <div className="text-sm font-medium mt-2">{customFile ? customFile.name : "Choose a file"}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">PDF, DOCX, PPTX, XLSX, CSV · Max 50MB</div>
+                  <input type="file" accept=".pdf,.pptx,.ppt,.xlsx,.xls,.docx,.doc,.csv" className="sr-only" onChange={(e) => e.target.files?.[0] && setCustomFile(e.target.files[0])} />
+                </label>
+              </div>
+              <button
+                onClick={handleCustomDocumentUpload}
+                disabled={customUploading || !customFile || !customTitle.trim()}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-none hs-gradient text-brand-foreground px-4 py-2.5 text-sm font-medium disabled:opacity-50"
+              >
+                {customUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                {customUploading ? "Uploading & extracting…" : "Upload & extract"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
     </div>
