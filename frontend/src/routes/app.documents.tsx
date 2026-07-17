@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import {
   FileText, CheckCircle2, AlertCircle, Zap,
-  ArrowRight, ChevronDown, Loader2, X, Upload,
+  ArrowRight, ChevronDown, Loader2, X, Upload, Trash2,
 } from "lucide-react";
 import { PageGuide } from "@/components/app/PageGuide";
 import { useMemo, useState } from "react";
@@ -581,6 +581,47 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
     }
   }
 
+  // R11 step 3: delete a Source File original. Extracted data lives in the
+  // same row's `content` field (the Digital Document Vault reads from it) —
+  // deleting the file only clears the physical original and its Storage
+  // object, keeping the row (and the vault entry) if extraction already
+  // succeeded. If nothing was ever extracted, there's nothing left to keep,
+  // so the whole row is removed.
+  const [deletingDocId, setDeletingDocId] = useState<string | null>(null);
+  async function handleDeleteSourceFile(doc: FounderDocument) {
+    if (!doc.file_path) return;
+    if (!confirm(`Delete "${doc.file_name}"? This removes the original file only.`)) return;
+    setDeletingDocId(doc.id);
+    try {
+      const { error: storageError } = await supabase.storage.from("documents").remove([doc.file_path]);
+      if (storageError) throw storageError;
+
+      const extractionError = (doc.content as any)?.extraction_error;
+      const hasExtractedContent = !extractionError && Object.keys(doc.content ?? {}).length > 0;
+
+      if (hasExtractedContent) {
+        // Extracted content already lives in this row — keep it (the
+        // Digital Document Vault entry survives), just clear the file
+        // reference so Source Files no longer lists an original.
+        const { error } = await supabase.from("founder_documents").update({
+          file_path: null, file_name: null, file_size: null, updated_at: new Date().toISOString(),
+        }).eq("id", doc.id);
+        if (error) throw error;
+      } else {
+        // Nothing extracted — nothing left to keep.
+        const { error } = await supabase.from("founder_documents").delete().eq("id", doc.id);
+        if (error) throw error;
+      }
+
+      toast.success("File deleted");
+      if (startup?.id) queryClient.invalidateQueries({ queryKey: ["founder-documents", startup.id] });
+    } catch (e: any) {
+      toast.error(e.message || "Could not delete file");
+    } finally {
+      setDeletingDocId(null);
+    }
+  }
+
   if (user?.role === "investor") {
     return (
       <div className="p-6 lg:p-8 max-w-2xl mx-auto text-center py-20">
@@ -630,6 +671,19 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
           </div>
         </div>
       </div>
+
+      {/* R11 step 3: permanent explainer — Source Files' role in the
+          lifecycle, stated plainly so founders never wonder why this page
+          exists once documents are extracted. */}
+      {view === "source-files" && (
+        <div className="mb-6 rounded-none border border-border bg-[#FAFAFA] px-5 py-4">
+          <p className="text-sm" style={{ color: "#52525B" }}>
+            Original files you uploaded. Once information is extracted into your Digital Document Vault,
+            these originals serve one purpose. Attachment into a deal room if an investor requests the
+            physical document. They are never public. You may delete them after extraction.
+          </p>
+        </div>
+      )}
 
       {/* R10 step 3: ProfileBuilder (Digital Profile summary) removed from
           Document Intake — redundant now that the cover/profile UI lives
@@ -913,39 +967,67 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
           {filteredDocs.length === 0 ? (
             <EmptyState kind="empty" title="No files uploaded yet" />
           ) : (
-            filteredDocs.map((template) => {
+            filteredDocs.map((template, i) => {
+              const showCategoryHeader = i === 0 || filteredDocs[i - 1].category !== template.category;
               const doc = template.founderDoc!;
               const attached = doc.visibility === "deal_room";
+              const extractionError = (doc.content as any)?.extraction_error as string | undefined;
+              const extracted = !extractionError && (Object.keys(doc.content ?? {}).length > 0 || ["ai_extracted", "complete"].includes(doc.status));
               return (
-                <div key={template.id} className="rounded-none border border-border bg-white p-5 flex items-center justify-between gap-4">
+                <div key={template.id}>
+                {showCategoryHeader && (
+                  <div className={cn("text-xs font-semibold uppercase tracking-wider text-muted-foreground", i === 0 ? "mb-2" : "mt-5 mb-2")}>
+                    {CATEGORY_LABELS[template.category] ?? template.category}
+                  </div>
+                )}
+                <div className="rounded-none border border-border bg-white p-5 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="grid h-10 w-10 place-items-center rounded-none bg-accent shrink-0">
                       <FileText className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div className="min-w-0">
                       <div className="text-sm font-medium text-foreground truncate">{doc.file_name ?? template.name}</div>
-                      <div className="text-xs mt-0.5" style={{ color: "#71717A" }}>
-                        {template.name} · {formatFileSize(doc.file_size)} · Updated {new Date(doc.updated_at).toLocaleDateString()}
+                      <div className="text-xs mt-0.5 flex items-center gap-1.5 flex-wrap" style={{ color: "#71717A" }}>
+                        <span>{template.name} · {formatFileSize(doc.file_size)} · Uploaded {new Date(doc.updated_at).toLocaleDateString()}</span>
+                        <span className={cn(
+                          "inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded-full",
+                          extractionError ? "bg-amber-500/10 text-amber-600"
+                            : extracted ? "bg-green-500/10 text-green-600"
+                            : "bg-accent text-muted-foreground",
+                        )}>
+                          {extractionError ? "Extraction failed" : extracted ? "Extracted" : "Not yet extracted"}
+                        </span>
                       </div>
                     </div>
                   </div>
-                  <button
-                    onClick={async () => {
-                      const newVisibility = attached ? "stage2" : "deal_room";
-                      const { error } = await supabase.from("founder_documents").update({ visibility: newVisibility }).eq("id", doc.id);
-                      if (error) { toast.error("Could not update."); return; }
-                      refetchFounderDocs();
-                    }}
-                    className={cn(
-                      "shrink-0 inline-flex items-center gap-1.5 rounded-none border px-3 py-1.5 text-xs font-medium transition-colors",
-                      attached
-                        ? "border-brand bg-accent text-brand"
-                        : "border-border text-muted-foreground hover:bg-accent",
-                    )}
-                  >
-                    {attached ? <CheckCircle2 className="h-3.5 w-3.5" /> : null}
-                    {attached ? "Ready to attach" : "Attach to deal room"}
-                  </button>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={async () => {
+                        const newVisibility = attached ? "stage2" : "deal_room";
+                        const { error } = await supabase.from("founder_documents").update({ visibility: newVisibility }).eq("id", doc.id);
+                        if (error) { toast.error("Could not update."); return; }
+                        if (startup?.id) queryClient.invalidateQueries({ queryKey: ["founder-documents", startup.id] });
+                      }}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 rounded-none border px-3 py-1.5 text-xs font-medium transition-colors",
+                        attached
+                          ? "border-brand bg-accent text-brand"
+                          : "border-border text-muted-foreground hover:bg-accent",
+                      )}
+                    >
+                      {attached ? <CheckCircle2 className="h-3.5 w-3.5" /> : null}
+                      {attached ? "Ready to attach" : "Attach to deal room"}
+                    </button>
+                    <button
+                      onClick={() => handleDeleteSourceFile(doc)}
+                      disabled={deletingDocId === doc.id}
+                      title="Delete original file"
+                      className="inline-flex items-center gap-1 rounded-none border border-border px-2.5 py-1.5 text-xs text-muted-foreground hover:border-red-500/40 hover:text-red-500 transition-colors disabled:opacity-50"
+                    >
+                      {deletingDocId === doc.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                    </button>
+                  </div>
+                </div>
                 </div>
               );
             })
