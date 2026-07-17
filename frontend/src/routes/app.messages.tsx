@@ -927,10 +927,15 @@ function NotesSection({ startupId, userId, userName }: { startupId: string; user
           </>
         ) : (
           <div className="flex flex-col items-center justify-center h-full gap-3">
-            <FileText className="h-8 w-8" style={{ color: "var(--faint)" }} />
-            <div className="text-sm" style={{ color: "var(--hs-text-muted)" }}>Select a note or create a new one</div>
-            <button onClick={newNote} className="text-xs flex items-center gap-1.5 rounded-lg px-3 py-2" style={{ background: "var(--gradient-brand)", color: "#fff" }}>
-              <Plus className="h-3 w-3" /> New note
+            <FileText className="h-8 w-8" style={{ color: "var(--hs-text-muted)" }} />
+            <div className="text-sm" style={{ color: "var(--hs-text-secondary)" }}>Select a note or create a new one</div>
+            <button
+              onClick={newNote}
+              data-testid="empty-state-new-note-btn"
+              className="text-sm font-medium flex items-center gap-1.5 rounded px-4 py-2"
+              style={{ background: "#7C3AED", color: "#fff" }}
+            >
+              <Plus className="h-3.5 w-3.5" /> New note
             </button>
           </div>
         )}

@@ -212,15 +212,21 @@ img { max-width: 100%; height: auto; }
   50% { width: 60% }
 }
 
-/* Additional semantic CSS variables (used by AI panel and shell) */
+/* Additional semantic CSS variables (used by AI panel and shell).
+   R10 step 12: --hs-text-muted and --hs-border were legacy hexes slightly
+   off the Design Constitution's tokens (#6B7280 vs the #71717A tertiary
+   floor, #E5E7EB vs the #E4E4E7 border) — aligned exactly so every page
+   using these variables (Team Chat, Connections, Deal Intake, Decisions)
+   inherits the fix. --hs-text-secondary (#374151) already exceeds the
+   #52525B floor, so it's left as-is — darker than the minimum is fine. */
 :root {
   --hs-bg-primary: #FAFAFA;
   --hs-bg-secondary: #F3F4F6;
   --hs-bg-surface: #FFFFFF;
   --hs-text-primary: #0A0A0B;
   --hs-text-secondary: #374151;
-  --hs-text-muted: #6B7280;
-  --hs-border: #E5E7EB;
+  --hs-text-muted: #71717A;
+  --hs-border: #E4E4E7;
   --hs-purple: #7C3AED;
   --hs-purple-light: #EDE9FE;
   --hs-purple-text: #6D28D9;
