@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState, useRef } from "react";
 import {
   Plus, Upload, X, Search, ChevronRight, ExternalLink,
@@ -14,7 +14,10 @@ import Papa from "papaparse";
 import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/connections")({
-  component: ConnectionsPage,
+  // R9: relocated to CRM — old URL redirects to the Connections leaf.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/crm/connections" as any, replace: true });
+  },
 });
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -668,7 +671,10 @@ function IncomingRequests() {
   );
 }
 
-function ConnectionsPage() {
+// R9: `view` splits this page into its two CRM leaves — "list" is the
+// Connections table (default), "pipeline" renders the same vc_leads grouped
+// by PIPELINE_STEPS. Same data, same DetailPanel, same status updates.
+export function ConnectionsPage({ view = "list" }: { view?: "list" | "pipeline" } = {}) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [showAdd, setShowAdd] = useState(false);
@@ -721,7 +727,7 @@ function ConnectionsPage() {
       <div className="flex items-center justify-between px-6 py-5 flex-wrap gap-4" style={{ borderBottom: "1px solid var(--hs-border)" }}>
         <div>
           <h1 className="text-lg font-bold tracking-tight" style={{ fontFamily: "Syne, sans-serif", color: "var(--hs-text-primary)" }}>
-            Connections
+            {view === "pipeline" ? "Pipeline Manager" : "Connections"}
           </h1>
           <p className="text-sm mt-0.5" style={{ color: "var(--hs-text-muted)" }}>
             {leads.length === 0 ? "Track every investor relationship in one place" : `${activeCount} active ${activeCount === 1 ? "investor" : "investors"} in your pipeline`}
@@ -752,8 +758,8 @@ function ConnectionsPage() {
       {/* ── Incoming connection requests */}
       <IncomingRequests />
 
-      {/* ── Summary strip */}
-      {leads.length > 0 && (
+      {/* ── Summary strip (list view only — pipeline columns carry their own counts) */}
+      {view === "list" && leads.length > 0 && (
         <div className="flex items-center gap-4 px-6 py-3 overflow-x-auto" style={{ borderBottom: "1px solid var(--hs-border)", background: "var(--hs-bg-secondary)" }}>
           <button
             onClick={() => setStatusFilter("all")}
@@ -785,7 +791,57 @@ function ConnectionsPage() {
 
       {/* ── Two-panel layout */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
-        {/* LEFT: table */}
+        {/* LEFT: pipeline board (pipeline view) */}
+        {view === "pipeline" && (
+          <div className={cn("flex-1 min-w-0 overflow-x-auto", selected ? "hidden lg:block" : "block")} data-testid="pipeline-board">
+            {isLoading ? (
+              <EmptyState kind="loading" title="Loading" />
+            ) : leads.length === 0 ? (
+              <EmptyState
+                kind="empty"
+                title="No investors"
+                action={{ label: "Add investor", onClick: () => setShowAdd(true) }}
+              />
+            ) : (
+              <div className="flex gap-0 h-full min-w-max">
+                {PIPELINE_STEPS.map((step) => {
+                  const cfg = STATUS_CONFIG[step];
+                  const stepLeads = leads.filter((l) => l.status === step);
+                  return (
+                    <div key={step} className="w-56 flex-shrink-0 flex flex-col" style={{ borderRight: "1px solid var(--hs-border)" }}>
+                      <div className="flex items-center gap-1.5 px-3 py-2.5" style={{ borderBottom: "1px solid var(--hs-border)", background: "var(--hs-bg-secondary)" }}>
+                        <Circle className="h-1.5 w-1.5" style={{ fill: cfg.text, color: cfg.text }} />
+                        <span className="text-[10px] uppercase tracking-wider font-semibold" style={{ color: "var(--hs-text-muted)" }}>
+                          {step} ({stepLeads.length})
+                        </span>
+                      </div>
+                      <div className="flex-1 overflow-y-auto p-2 space-y-2">
+                        {stepLeads.map((lead) => (
+                          <button
+                            key={lead.id}
+                            onClick={() => setSelected(selected?.id === lead.id ? null : lead)}
+                            className="w-full text-left px-3 py-2.5 transition-colors"
+                            style={{
+                              border: "1px solid var(--hs-border)",
+                              background: selected?.id === lead.id ? "rgba(124,58,237,0.06)" : "var(--hs-bg-secondary)",
+                            }}
+                            data-testid="pipeline-card"
+                          >
+                            <div className="text-sm font-medium truncate" style={{ color: "var(--hs-text-primary)" }}>{lead.investor_name}</div>
+                            {lead.firm_name && <div className="text-xs truncate mt-0.5" style={{ color: "var(--hs-text-muted)" }}>{lead.firm_name}</div>}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* LEFT: table (list view) */}
+        {view === "list" && (
         <div className={cn("flex flex-col min-w-0 flex-1 overflow-hidden", selected ? "hidden lg:flex" : "flex")}>
           {/* Search bar */}
           <div className="px-6 py-3" style={{ borderBottom: "1px solid var(--hs-border)" }}>
@@ -880,6 +936,7 @@ function ConnectionsPage() {
             )}
           </div>
         </div>
+        )}
 
         {/* RIGHT: detail panel */}
         {selected && (

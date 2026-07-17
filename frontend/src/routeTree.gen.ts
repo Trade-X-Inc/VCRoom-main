@@ -125,8 +125,10 @@ import { Route as AppInvestorAdvisorRouteImport } from './routes/app.investor.ad
 import { Route as AppGoLiveProfileAnalyticsRouteImport } from './routes/app.go-live.profile-analytics'
 import { Route as AppGoLiveDirectoryRouteImport } from './routes/app.go-live.directory'
 import { Route as AppDealRoomsIdRouteImport } from './routes/app.deal-rooms.$id'
+import { Route as AppCrmPipelineManagerRouteImport } from './routes/app.crm.pipeline-manager'
 import { Route as AppCrmMeetingsRouteImport } from './routes/app.crm.meetings'
 import { Route as AppCrmEmailOutreachRouteImport } from './routes/app.crm.email-outreach'
+import { Route as AppCrmConnectionsRouteImport } from './routes/app.crm.connections'
 import { Route as ApiInternalEmailTestRouteImport } from './routes/api.internal.email-test'
 import { Route as ApiInternalDataRouteImport } from './routes/api.internal.data'
 import { Route as AppInvestorThesisIndexRouteImport } from './routes/app.investor.thesis.index'
@@ -755,6 +757,11 @@ const AppDealRoomsIdRoute = AppDealRoomsIdRouteImport.update({
   path: '/deal-rooms/$id',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCrmPipelineManagerRoute = AppCrmPipelineManagerRouteImport.update({
+  id: '/crm/pipeline-manager',
+  path: '/crm/pipeline-manager',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCrmMeetingsRoute = AppCrmMeetingsRouteImport.update({
   id: '/crm/meetings',
   path: '/crm/meetings',
@@ -763,6 +770,11 @@ const AppCrmMeetingsRoute = AppCrmMeetingsRouteImport.update({
 const AppCrmEmailOutreachRoute = AppCrmEmailOutreachRouteImport.update({
   id: '/crm/email-outreach',
   path: '/crm/email-outreach',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCrmConnectionsRoute = AppCrmConnectionsRouteImport.update({
+  id: '/crm/connections',
+  path: '/crm/connections',
   getParentRoute: () => AppRoute,
 } as any)
 const ApiInternalEmailTestRoute = ApiInternalEmailTestRouteImport.update({
@@ -1103,8 +1115,10 @@ export interface FileRoutesByFullPath {
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
+  '/app/crm/connections': typeof AppCrmConnectionsRoute
   '/app/crm/email-outreach': typeof AppCrmEmailOutreachRoute
   '/app/crm/meetings': typeof AppCrmMeetingsRoute
+  '/app/crm/pipeline-manager': typeof AppCrmPipelineManagerRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
@@ -1263,8 +1277,10 @@ export interface FileRoutesByTo {
   '/tools': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
+  '/app/crm/connections': typeof AppCrmConnectionsRoute
   '/app/crm/email-outreach': typeof AppCrmEmailOutreachRoute
   '/app/crm/meetings': typeof AppCrmMeetingsRoute
+  '/app/crm/pipeline-manager': typeof AppCrmPipelineManagerRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
@@ -1428,8 +1444,10 @@ export interface FileRoutesById {
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
+  '/app/crm/connections': typeof AppCrmConnectionsRoute
   '/app/crm/email-outreach': typeof AppCrmEmailOutreachRoute
   '/app/crm/meetings': typeof AppCrmMeetingsRoute
+  '/app/crm/pipeline-manager': typeof AppCrmPipelineManagerRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
@@ -1594,8 +1612,10 @@ export interface FileRouteTypes {
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
+    | '/app/crm/connections'
     | '/app/crm/email-outreach'
     | '/app/crm/meetings'
+    | '/app/crm/pipeline-manager'
     | '/app/deal-rooms/$id'
     | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
@@ -1754,8 +1774,10 @@ export interface FileRouteTypes {
     | '/tools'
     | '/api/internal/data'
     | '/api/internal/email-test'
+    | '/app/crm/connections'
     | '/app/crm/email-outreach'
     | '/app/crm/meetings'
+    | '/app/crm/pipeline-manager'
     | '/app/deal-rooms/$id'
     | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
@@ -1918,8 +1940,10 @@ export interface FileRouteTypes {
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
+    | '/app/crm/connections'
     | '/app/crm/email-outreach'
     | '/app/crm/meetings'
+    | '/app/crm/pipeline-manager'
     | '/app/deal-rooms/$id'
     | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
@@ -2866,6 +2890,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDealRoomsIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/crm/pipeline-manager': {
+      id: '/app/crm/pipeline-manager'
+      path: '/crm/pipeline-manager'
+      fullPath: '/app/crm/pipeline-manager'
+      preLoaderRoute: typeof AppCrmPipelineManagerRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/crm/meetings': {
       id: '/app/crm/meetings'
       path: '/crm/meetings'
@@ -2878,6 +2909,13 @@ declare module '@tanstack/react-router' {
       path: '/crm/email-outreach'
       fullPath: '/app/crm/email-outreach'
       preLoaderRoute: typeof AppCrmEmailOutreachRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/crm/connections': {
+      id: '/app/crm/connections'
+      path: '/crm/connections'
+      fullPath: '/app/crm/connections'
+      preLoaderRoute: typeof AppCrmConnectionsRouteImport
       parentRoute: typeof AppRoute
     }
     '/api/internal/email-test': {
@@ -3341,8 +3379,10 @@ interface AppRouteChildren {
   AppVerificationRoute: typeof AppVerificationRoute
   AppWallRoute: typeof AppWallRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppCrmConnectionsRoute: typeof AppCrmConnectionsRoute
   AppCrmEmailOutreachRoute: typeof AppCrmEmailOutreachRoute
   AppCrmMeetingsRoute: typeof AppCrmMeetingsRoute
+  AppCrmPipelineManagerRoute: typeof AppCrmPipelineManagerRoute
   AppDealRoomsIdRoute: typeof AppDealRoomsIdRouteWithChildren
   AppGoLiveDirectoryRoute: typeof AppGoLiveDirectoryRoute
   AppGoLiveProfileAnalyticsRoute: typeof AppGoLiveProfileAnalyticsRoute
@@ -3403,8 +3443,10 @@ const AppRouteChildren: AppRouteChildren = {
   AppVerificationRoute: AppVerificationRoute,
   AppWallRoute: AppWallRoute,
   AppIndexRoute: AppIndexRoute,
+  AppCrmConnectionsRoute: AppCrmConnectionsRoute,
   AppCrmEmailOutreachRoute: AppCrmEmailOutreachRoute,
   AppCrmMeetingsRoute: AppCrmMeetingsRoute,
+  AppCrmPipelineManagerRoute: AppCrmPipelineManagerRoute,
   AppDealRoomsIdRoute: AppDealRoomsIdRouteWithChildren,
   AppGoLiveDirectoryRoute: AppGoLiveDirectoryRoute,
   AppGoLiveProfileAnalyticsRoute: AppGoLiveProfileAnalyticsRoute,
