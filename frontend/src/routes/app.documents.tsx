@@ -38,6 +38,11 @@ const CATEGORY_LABELS: Record<string, string> = {
   All: "All", market: "Market", financials: "Financials",
   team: "Team", product: "Product", legal: "Legal",
 };
+// R11 step 2: fixed display order for category-organized lists (Document
+// Intake, Digital Document Vault) — Market, Financials, Team, Product, Legal.
+const CATEGORY_SORT_ORDER: Record<string, number> = {
+  market: 0, financials: 1, team: 2, product: 3, legal: 4,
+};
 
 type TemplateCategory = (typeof TEMPLATE_CATEGORIES)[number];
 
@@ -381,7 +386,11 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       // every managed document, for its visibility control
       filtered = filtered.filter(t => !!t.founderDoc);
     }
-    return filtered;
+    // R11 step 2: sort into the fixed 5-category order so the list reads as
+    // organized sections (Market, Financials, Team, Product, Legal) rather
+    // than an unsorted flat list — applies whenever "All" categories show.
+    const categoryOrder = CATEGORY_SORT_ORDER;
+    return [...filtered].sort((a, b) => (categoryOrder[a.category] ?? 99) - (categoryOrder[b.category] ?? 99));
   }, [documentsWithStatus, stageKey, selectedCategory, view]);
 
   async function handleFileUpload(templateSlug: string, templateName: string, templateId: string, file: File) {
@@ -713,7 +722,8 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
             {filteredDocs.length === 0 ? (
               <EmptyState kind="empty" title="No documents" />
             ) : (
-              filteredDocs.map(template => {
+              filteredDocs.map((template, i) => {
+                const showCategoryHeader = selectedCategory === "All" && (i === 0 || filteredDocs[i - 1].category !== template.category);
                 const doc = template.founderDoc;
                 const status = doc?.status ?? "empty";
                 const { Icon: StatusIcon, color: statusColor } = getStatusIcon(status);
@@ -730,8 +740,13 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                 const extractionError = (doc?.content as any)?.extraction_error as string | undefined;
 
                 return (
+                  <div key={template.id}>
+                  {showCategoryHeader && (
+                    <div className={cn("text-xs font-semibold uppercase tracking-wider text-muted-foreground", i === 0 ? "mb-2" : "mt-5 mb-2")}>
+                      {CATEGORY_LABELS[template.category] ?? template.category}
+                    </div>
+                  )}
                   <div
-                    key={template.id}
                     className={cn(
                       "rounded-none border border-border/60 bg-card p-5 hover:border-border transition-all border-l-2",
                       getStatusBorderColor(status)
@@ -880,6 +895,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                       </div>
                     </div>
                   </div>
+                  </div>
                 );
               })
             )}
@@ -945,14 +961,27 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
           {filteredDocs.length === 0 ? (
             <EmptyState kind="empty" title="No processed documents yet" />
           ) : (
-            filteredDocs.map((template) => {
+            filteredDocs.map((template, i) => {
+              const showCategoryHeader = i === 0 || filteredDocs[i - 1].category !== template.category;
               const doc = template.founderDoc!;
               const attached = doc.visibility === "deal_room";
-              const contentEntries = Object.entries(doc.content ?? {}).filter(([, v]) => v);
+              const content = (doc.content ?? {}) as Record<string, any>;
+              // R11 step 2: structured custom-doc fields (funding_ask,
+              // use_of_funds, projections, key_metrics, highlights) render
+              // distinctly from raw template key-value pairs.
+              const structuredKeys = ["suggested_category", "category", "highlights", "funding_ask", "use_of_funds", "projections", "key_metrics", "ai_summary", "classification"];
+              const contentEntries = Object.entries(content).filter(([k, v]) => v && !structuredKeys.includes(k));
               const fields = TEMPLATE_FIELDS[template.slug] ?? [];
               const labelFor = (key: string) => fields.find((f) => f.key === key)?.label ?? key.replace(/_/g, " ");
+              const isCustomDoc = !template.id || !TEMPLATE_FIELDS[template.slug];
               return (
-                <div key={template.id} className="rounded-none border border-border bg-white overflow-hidden">
+                <div key={template.id}>
+                {showCategoryHeader && (
+                  <div className={cn("text-xs font-semibold uppercase tracking-wider text-muted-foreground", i === 0 ? "mb-2" : "mt-5 mb-2")}>
+                    {CATEGORY_LABELS[template.category] ?? template.category}
+                  </div>
+                )}
+                <div className="rounded-none border border-border bg-white overflow-hidden">
                   <div className="px-5 py-4 border-b border-border flex items-center justify-between gap-4">
                     <div>
                       <div className="text-sm font-semibold text-foreground">{template.name}</div>
@@ -975,22 +1004,73 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                       {attached ? "Ready to attach" : "Attach to deal room"}
                     </button>
                   </div>
-                  <div className="p-5">
-                    {doc.content?.ai_summary ? (
+                  <div className="p-5 space-y-4">
+                    {doc.content?.ai_summary && (
                       <p className="text-sm leading-relaxed" style={{ color: "#52525B" }}>{String(doc.content.ai_summary)}</p>
-                    ) : contentEntries.length === 0 ? (
-                      <p className="text-sm" style={{ color: "#71717A" }}>No structured data extracted yet.</p>
-                    ) : (
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        {contentEntries.map(([key, val]) => (
-                          <div key={key}>
-                            <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>{labelFor(key)}</div>
-                            <div className="mt-1 text-sm text-foreground">{String(val)}</div>
-                          </div>
-                        ))}
+                    )}
+                    {isCustomDoc && Array.isArray(content.highlights) && content.highlights.length > 0 && (
+                      <div>
+                        <div className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#71717A" }}>Highlights</div>
+                        <ul className="space-y-1.5">
+                          {content.highlights.map((h: string, idx: number) => (
+                            <li key={idx} className="text-sm flex gap-2" style={{ color: "#52525B" }}>
+                              <span className="text-brand shrink-0">✦</span>{h}
+                            </li>
+                          ))}
+                        </ul>
                       </div>
                     )}
+                    {isCustomDoc && (content.funding_ask || content.use_of_funds || content.projections) && (
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {content.funding_ask && (
+                          <div>
+                            <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Funding ask</div>
+                            <div className="mt-1 text-sm text-foreground">{content.funding_ask}</div>
+                          </div>
+                        )}
+                        {content.use_of_funds && (
+                          <div>
+                            <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Use of funds</div>
+                            <div className="mt-1 text-sm text-foreground">{content.use_of_funds}</div>
+                          </div>
+                        )}
+                        {content.projections && (
+                          <div className="sm:col-span-2">
+                            <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Projections</div>
+                            <div className="mt-1 text-sm text-foreground">{content.projections}</div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {isCustomDoc && Array.isArray(content.key_metrics) && content.key_metrics.length > 0 && (
+                      <div>
+                        <div className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#71717A" }}>Key metrics</div>
+                        <div className="grid gap-3 sm:grid-cols-3">
+                          {content.key_metrics.map((m: { label: string; value: string }, idx: number) => (
+                            <div key={idx} className="rounded-none border border-border bg-[#FAFAFA] p-3">
+                              <div className="text-xs" style={{ color: "#71717A" }}>{m.label}</div>
+                              <div className="mt-1 text-sm font-medium text-foreground">{m.value}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {!isCustomDoc && (
+                      contentEntries.length === 0 ? (
+                        <p className="text-sm" style={{ color: "#71717A" }}>No structured data extracted yet.</p>
+                      ) : (
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          {contentEntries.map(([key, val]) => (
+                            <div key={key}>
+                              <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>{labelFor(key)}</div>
+                              <div className="mt-1 text-sm text-foreground">{String(val)}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    )}
                   </div>
+                </div>
                 </div>
               );
             })
