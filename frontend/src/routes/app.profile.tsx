@@ -10,7 +10,6 @@ import {
 import type { StartupClaim, ClaimStatus } from "@/lib/claims-fn";
 import type { FounderThesis } from "@/lib/founder-thesis-fn";
 import { AttachProofModal } from "@/components/app/AttachProofModal";
-import { BadgesSection } from "@/components/app/BadgesSection";
 import { OperationalVerificationSection } from "./app.profile.operational";
 import { PageGuide } from "@/components/app/PageGuide";
 import { FieldVerificationBadge, prewarmClassificationCache } from "@/components/app/FieldVerificationBadge";
@@ -207,6 +206,8 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [profilePublishing, setProfilePublishing] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
+  const [coverUploading, setCoverUploading] = useState(false);
   const [deckName, setDeckName] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [logoUploading, setLogoUploading] = useState(false);
@@ -422,6 +423,7 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
     if (startup) {
       setForm(fromStartup(startup));
       setLogoUrl(startup.logo_url ?? null);
+      setCoverUrl((startup as any).cover_image_url ?? null);
       setAvatarUrl((startup as any).founder_avatar_url ?? null);
       setSocialLinks(startup.social_links ?? []);
       if (startup.pitch_deck_url) {
@@ -708,6 +710,32 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
       toast.error(e.message ?? "Upload failed");
     } finally {
       setLogoUploading(false);
+    }
+  };
+
+  const handleCoverUpload = async (file: File) => {
+    if (!user?.id) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+    if (!file.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
+    setCoverUploading(true);
+    try {
+      const ext = file.name.split(".").pop() ?? "jpg";
+      const path = `startups/${user.id}/cover.${ext}`;
+      const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+      const url = `${data.publicUrl}?t=${Date.now()}`;
+      setCoverUrl(url);
+      if (startup?.id) {
+        const { error: coverErr } = await supabase.from("startups").update({ cover_image_url: url }).eq("id", startup.id);
+        if (coverErr) throw coverErr;
+        queryClient.invalidateQueries({ queryKey: ["my-startup", user.id] });
+      }
+      toast.success("Cover image updated");
+    } catch (e: any) {
+      toast.error(e.message ?? "Upload failed");
+    } finally {
+      setCoverUploading(false);
     }
   };
 
@@ -1176,49 +1204,71 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
         </div>
       )}
 
-      {/* Hero card */}
-      <div className="mt-6 rounded-2xl border border-border/60 bg-card shadow-card overflow-hidden">
-        <div className="h-32 bg-gradient-mesh relative">
-          <div className="absolute inset-0 noise opacity-40" />
-        </div>
-        <div className="px-6 pb-6 -mt-10">
+      {/* Hero card — R10: restricted to the Full Digital Profile View leaf
+          (view === "preview") and the standalone (!view) case only. Every
+          other Profile leaf (Quick Setup, Full Profile, Team Cards,
+          Fundraising Thesis, Privacy Settings) no longer renders this. */}
+      {(!view || view === "preview") && (
+      <div className="mt-6 rounded-none border border-border bg-white shadow-card overflow-hidden">
+        <label className="relative h-40 block cursor-pointer group overflow-hidden">
+          {coverUrl ? (
+            <img src={coverUrl} alt="Cover" className="h-full w-full object-cover" />
+          ) : (
+            <div className="h-full w-full bg-gradient-mesh relative">
+              <div className="absolute inset-0 noise opacity-40" />
+            </div>
+          )}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+            {coverUploading ? (
+              <Loader2 className="h-5 w-5 animate-spin text-white" />
+            ) : (
+              <span className="opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1.5 rounded-md bg-white/90 px-3 py-1.5 text-xs font-medium text-foreground">
+                <Upload className="h-3.5 w-3.5" /> {coverUrl ? "Replace cover" : "Add cover image"}
+              </span>
+            )}
+          </div>
+          <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleCoverUpload(e.target.files[0])} />
+        </label>
+        <div className="px-6 pb-6 -mt-10 relative">
           <div className="flex items-end gap-4">
             <label className="relative cursor-pointer group shrink-0">
-              <div className="grid h-20 w-20 place-items-center rounded-2xl bg-gradient-brand text-brand-foreground text-lg font-bold border-4 border-background shadow-elev overflow-hidden">
+              <div className="grid h-20 w-20 place-items-center rounded-none bg-gradient-brand text-brand-foreground text-lg font-bold border-4 border-white shadow-elev overflow-hidden">
                 {logoUploading
                   ? <Loader2 className="h-6 w-6 animate-spin text-brand-foreground" />
                   : logoUrl
                   ? <img src={logoUrl} alt="logo" className="h-full w-full object-cover" />
                   : <span>{initials}</span>}
               </div>
-              <div className="absolute inset-0 rounded-2xl bg-black/40 grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <Upload className="h-5 w-5 text-foreground" />
+              <div className="absolute inset-0 rounded-none bg-black/40 grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <Upload className="h-5 w-5 text-white" />
               </div>
               <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleLogoUpload(e.target.files[0])} />
             </label>
-            <div className="pb-1">
-              <div className="text-xl font-semibold">{form.company_name || "Your Company"}</div>
-              <div className="text-sm text-muted-foreground">{form.tagline || form.description || "Add a tagline below"}</div>
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                <span>Your profile link:</span>
-                <span className="rounded-full bg-accent px-2 py-1 text-[11px] font-medium text-foreground">hockystick.app/p/{profileSlug || "your-slug"}</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (profileSlug) {
-                      navigator.clipboard.writeText(`https://hockystick.app/p/${profileSlug}`);
-                      toast.success("Profile URL copied");
-                    }
-                  }}
-                  className="inline-flex items-center gap-1 rounded-md border border-border/60 bg-accent px-2 py-1 text-xs text-muted-foreground hover:bg-accent transition-colors"
-                >
-                  <Copy className="h-3.5 w-3.5" /> Copy
-                </button>
-              </div>
+          </div>
+          <div className="mt-4">
+            <div className="text-xl font-semibold" style={{ fontFamily: "Syne, sans-serif" }}>{form.company_name || "Your Company"}</div>
+            <div className="text-sm mt-1" style={{ color: "#52525B" }}>{form.tagline || form.description || "Add a tagline below"}</div>
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs" style={{ color: "#71717A" }}>
+              <span>Your profile link:</span>
+              <span className="rounded-none border border-border bg-white px-2 py-1 text-[11px] font-medium text-foreground">hockystick.app/p/{profileSlug || "your-slug"}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  if (profileSlug) {
+                    navigator.clipboard.writeText(`https://hockystick.app/p/${profileSlug}`);
+                    toast.success("Profile URL copied");
+                  }
+                }}
+                className="inline-flex items-center gap-1 rounded-none border border-border bg-white px-2 py-1 text-xs hover:bg-accent transition-colors"
+                style={{ color: "#52525B" }}
+              >
+                <Copy className="h-3.5 w-3.5" /> Copy
+              </button>
             </div>
           </div>
         </div>
       </div>
+      )}
 
       {/* STEP 6: Quick setup / Full details tabs — hidden under R9 route
           control, where the swapped sidebar owns navigation between slices */}
@@ -1836,84 +1886,66 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
           )}
         </div>
       ) : (
+        // R10 step 1: preview tab redesigned — the Hero card above already
+        // carries name/tagline/logo/cover, so this starts straight at the
+        // stat row. Every stat cell fixed from bg-[#111118] (unmigrated
+        // legacy dark box) to a white bordered cell per the Constitution.
         <div className="mt-4 space-y-6">
-          <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">
-            <div className="flex flex-col gap-4">
-              <div>
-                <div className="text-sm uppercase tracking-[0.24em] text-muted-foreground">Profile preview</div>
-                <h2 className="mt-3 text-2xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>{form.company_name || "Your company"}</h2>
-                <p className="mt-2 text-sm text-muted-foreground">{form.tagline || "Your headline goes here."}</p>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl bg-[#111118] p-4">
-                  <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Stage</div>
-                  <div className="mt-2 text-sm text-foreground">{form.stage || "—"}</div>
+          <div className="rounded-none border border-border bg-white p-6 shadow-card">
+            <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Overview</div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {([
+                ["Stage", form.stage], ["Sector", form.sector],
+                ["Country", form.country], ["Founded", form.founded_year],
+              ] as [string, string][]).map(([label, val]) => (
+                <div key={label} className="rounded-none border border-border bg-[#FAFAFA] p-4">
+                  <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>{label}</div>
+                  <div className="mt-2 text-sm font-medium text-foreground">{val || "—"}</div>
                 </div>
-                <div className="rounded-2xl bg-[#111118] p-4">
-                  <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Sector</div>
-                  <div className="mt-2 text-sm text-foreground">{form.sector || "—"}</div>
-                </div>
-                <div className="rounded-2xl bg-[#111118] p-4">
-                  <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Country</div>
-                  <div className="mt-2 text-sm text-foreground">{form.country || "—"}</div>
-                </div>
-                <div className="rounded-2xl bg-[#111118] p-4">
-                  <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Founded</div>
-                  <div className="mt-2 text-sm text-foreground">{form.founded_year || "—"}</div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">
-              <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">About</div>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{form.description || "Your company description appears here."}</p>
+            <div className="rounded-none border border-border bg-white p-6 shadow-card">
+              <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>About</div>
+              <p className="mt-3 text-sm leading-relaxed" style={{ color: "#52525B" }}>{form.description || "Your company description appears here."}</p>
             </div>
-            <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">
-              <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Key metrics</div>
+            <div className="rounded-none border border-border bg-white p-6 shadow-card">
+              <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Key metrics</div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl bg-[#111118] p-4">
-                  <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Raising</div>
-                  <div className="mt-2 text-sm text-foreground">{form.funding_target || "—"}</div>
-                </div>
-                <div className="rounded-2xl bg-[#111118] p-4">
-                  <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Valuation</div>
-                  <div className="mt-2 text-sm text-foreground">{form.valuation || "—"}</div>
-                </div>
-                <div className="rounded-2xl bg-[#111118] p-4">
-                  <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Revenue</div>
-                  <div className="mt-2 text-sm text-foreground">{form.revenue || "—"}</div>
-                </div>
+                {([
+                  ["Raising", form.funding_target], ["Valuation", form.valuation], ["Revenue", form.revenue],
+                ] as [string, string][]).map(([label, val]) => (
+                  <div key={label} className="rounded-none border border-border bg-[#FAFAFA] p-4">
+                    <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>{label}</div>
+                    <div className="mt-2 text-sm font-medium text-foreground">{val || "—"}</div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
           <div className="grid gap-4">
-            <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">
-              <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Problem</div>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{form.problem || "Describe the customer problem."}</p>
-            </div>
-            <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">
-              <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Solution</div>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{form.solution || "Explain how you solve it."}</p>
-            </div>
-            <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">
-              <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Why us</div>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{form.why_us || "Why is your team uniquely positioned?"}</p>
-            </div>
-            <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">
-              <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Why now</div>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{form.why_now || "Why is now the right moment?"}</p>
-            </div>
+            {([
+              ["Problem", form.problem, "Describe the customer problem."],
+              ["Solution", form.solution, "Explain how you solve it."],
+              ["Why us", form.why_us, "Why is your team uniquely positioned?"],
+              ["Why now", form.why_now, "Why is now the right moment?"],
+            ] as [string, string, string][]).map(([label, val, placeholder]) => (
+              <div key={label} className="rounded-none border border-border bg-white p-6 shadow-card">
+                <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>{label}</div>
+                <p className="mt-3 text-sm leading-relaxed" style={{ color: "#52525B" }}>{val || placeholder}</p>
+              </div>
+            ))}
           </div>
 
           {(form.tam || form.sam || form.target_customer || form.revenue_model || form.pricing || form.unit_economics || form.burn_rate || form.runway_months || form.advisors || form.competitors || form.milestones || form.intro_video_url || form.product_video_url || form.moat) && (
             <div className="mt-4 grid gap-4 lg:grid-cols-2">
               {(form.tam || form.sam || form.target_customer) && (
-                <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">
-                  <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Market opportunity</div>
-                  <div className="mt-3 space-y-2 text-sm text-muted-foreground">
+                <div className="rounded-none border border-border bg-white p-6 shadow-card">
+                  <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Market opportunity</div>
+                  <div className="mt-3 space-y-2 text-sm" style={{ color: "#52525B" }}>
                     {form.tam && <div><span className="font-semibold text-foreground">TAM:</span> {form.tam}</div>}
                     {form.sam && <div><span className="font-semibold text-foreground">SAM:</span> {form.sam}</div>}
                     {form.target_customer && <div><span className="font-semibold text-foreground">Target customer:</span> {form.target_customer}</div>}
@@ -1921,9 +1953,9 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
                 </div>
               )}
               {(form.revenue_model || form.pricing || form.unit_economics) && (
-                <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">
-                  <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Business model</div>
-                  <div className="mt-3 space-y-2 text-sm text-muted-foreground">
+                <div className="rounded-none border border-border bg-white p-6 shadow-card">
+                  <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Business model</div>
+                  <div className="mt-3 space-y-2 text-sm" style={{ color: "#52525B" }}>
                     {form.revenue_model && <div><span className="font-semibold text-foreground">Revenue model:</span> {form.revenue_model}</div>}
                     {form.pricing && <div><span className="font-semibold text-foreground">Pricing:</span> {form.pricing}</div>}
                     {form.unit_economics && <div><span className="font-semibold text-foreground">Unit economics:</span> {form.unit_economics}</div>}
@@ -1931,18 +1963,18 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
                 </div>
               )}
               {(form.burn_rate || form.runway_months) && (
-                <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">
-                  <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Runway</div>
-                  <div className="mt-3 space-y-2 text-sm text-muted-foreground">
+                <div className="rounded-none border border-border bg-white p-6 shadow-card">
+                  <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Runway</div>
+                  <div className="mt-3 space-y-2 text-sm" style={{ color: "#52525B" }}>
                     {form.burn_rate && <div><span className="font-semibold text-foreground">Burn rate:</span> {form.burn_rate}</div>}
                     {form.runway_months && <div><span className="font-semibold text-foreground">Runway:</span> {form.runway_months} months</div>}
                   </div>
                 </div>
               )}
               {(form.advisors || form.competitors || form.milestones || form.moat || form.intro_video_url || form.product_video_url) && (
-                <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-card">
-                  <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Differentiators</div>
-                  <div className="mt-3 space-y-2 text-sm text-muted-foreground">
+                <div className="rounded-none border border-border bg-white p-6 shadow-card">
+                  <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Differentiators</div>
+                  <div className="mt-3 space-y-2 text-sm" style={{ color: "#52525B" }}>
                     {form.moat && <div><span className="font-semibold text-foreground">Moat:</span> {form.moat}</div>}
                     {form.competitors && <div><span className="font-semibold text-foreground">Competitors:</span> {form.competitors}</div>}
                     {form.milestones && <div><span className="font-semibold text-foreground">Milestones:</span> {form.milestones}</div>}
@@ -2177,12 +2209,9 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
         </div>
       )}
 
-      {/* Badges — earned + locked criteria, below the verification area */}
-      {startup?.id && tab !== "analytics" && (
-        <div className="mt-8">
-          <BadgesSection startupId={startup.id} />
-        </div>
-      )}
+      {/* R10 step 2: BadgesSection removed from every Profile leaf — it
+          duplicated the real Badge Overview & Guide page (app.badges.tsx),
+          which already owns "Run badge evaluation" as its one correct home. */}
 
       {/* Operational Verified — Tier 3 */}
       {startup?.id && tab !== "analytics" && (
