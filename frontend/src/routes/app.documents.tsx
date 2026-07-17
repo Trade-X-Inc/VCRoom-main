@@ -221,6 +221,12 @@ const TEMPLATE_FIELDS: Record<string, Array<{
   ],
 };
 
+function formatFileSize(bytes?: number): string {
+  if (!bytes) return "—";
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 function getStatusBorderColor(status?: string) {
   switch (status) {
     case "draft": return "border-l-amber-500/60";
@@ -523,6 +529,12 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
           Files, Digital Document Vault, and Document Privacy Settings each
           get their own distinct content per R10 steps 4-6. */}
 
+      {/* R10 steps 4-6: Source Files, Digital Document Vault, and Document
+          Privacy Settings each get dedicated content below instead of the
+          shared template-card grid — that grid (fill/upload flow, stage
+          guidance, categories) stays specific to Document Intake. */}
+      {(!view || view === "document-intake") && (
+      <>
       {/* How it works — collapsible */}
       <div className="mb-6 border border-border rounded-none p-5 bg-white/[0.02]">
         <div
@@ -758,6 +770,180 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
           </div>
         </div>
       </div>
+      </>
+      )}
+
+      {/* R10 step 4 — Source Files: the actual original uploaded files,
+          each with a clear "ready to attach in deal room" state/action
+          reusing the existing visibility toggle logic. */}
+      {view === "source-files" && (
+        <div className="space-y-3">
+          {filteredDocs.length === 0 ? (
+            <EmptyState kind="empty" title="No files uploaded yet" />
+          ) : (
+            filteredDocs.map((template) => {
+              const doc = template.founderDoc!;
+              const attached = doc.visibility === "deal_room";
+              return (
+                <div key={template.id} className="rounded-none border border-border bg-white p-5 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="grid h-10 w-10 place-items-center rounded-none bg-accent shrink-0">
+                      <FileText className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-foreground truncate">{doc.file_name ?? template.name}</div>
+                      <div className="text-xs mt-0.5" style={{ color: "#71717A" }}>
+                        {template.name} · {formatFileSize(doc.file_size)} · Updated {new Date(doc.updated_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={async () => {
+                      const newVisibility = attached ? "stage2" : "deal_room";
+                      const { error } = await supabase.from("founder_documents").update({ visibility: newVisibility }).eq("id", doc.id);
+                      if (error) { toast.error("Could not update."); return; }
+                      refetchFounderDocs();
+                    }}
+                    className={cn(
+                      "shrink-0 inline-flex items-center gap-1.5 rounded-none border px-3 py-1.5 text-xs font-medium transition-colors",
+                      attached
+                        ? "border-brand bg-accent text-brand"
+                        : "border-border text-muted-foreground hover:bg-accent",
+                    )}
+                  >
+                    {attached ? <CheckCircle2 className="h-3.5 w-3.5" /> : null}
+                    {attached ? "Ready to attach" : "Attach to deal room"}
+                  </button>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+
+      {/* R10 step 5 — Digital Document Vault: the Hockystick-processed
+          counterpart to the Digital Profile — structured AI-extracted
+          detail per document, ready to attach when a deal room exists. */}
+      {view === "digital-document-vault" && (
+        <div className="space-y-4">
+          {filteredDocs.length === 0 ? (
+            <EmptyState kind="empty" title="No processed documents yet" />
+          ) : (
+            filteredDocs.map((template) => {
+              const doc = template.founderDoc!;
+              const attached = doc.visibility === "deal_room";
+              const contentEntries = Object.entries(doc.content ?? {}).filter(([, v]) => v);
+              const fields = TEMPLATE_FIELDS[template.slug] ?? [];
+              const labelFor = (key: string) => fields.find((f) => f.key === key)?.label ?? key.replace(/_/g, " ");
+              return (
+                <div key={template.id} className="rounded-none border border-border bg-white overflow-hidden">
+                  <div className="px-5 py-4 border-b border-border flex items-center justify-between gap-4">
+                    <div>
+                      <div className="text-sm font-semibold text-foreground">{template.name}</div>
+                      <div className="text-xs mt-0.5" style={{ color: "#71717A" }}>
+                        {doc.completeness_score}% complete · Updated {new Date(doc.updated_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        const newVisibility = attached ? "stage2" : "deal_room";
+                        const { error } = await supabase.from("founder_documents").update({ visibility: newVisibility }).eq("id", doc.id);
+                        if (error) { toast.error("Could not update."); return; }
+                        refetchFounderDocs();
+                      }}
+                      className={cn(
+                        "shrink-0 inline-flex items-center gap-1.5 rounded-none border px-3 py-1.5 text-xs font-medium transition-colors",
+                        attached ? "border-brand bg-accent text-brand" : "border-border text-muted-foreground hover:bg-accent",
+                      )}
+                    >
+                      {attached ? "Ready to attach" : "Attach to deal room"}
+                    </button>
+                  </div>
+                  <div className="p-5">
+                    {doc.content?.ai_summary ? (
+                      <p className="text-sm leading-relaxed" style={{ color: "#52525B" }}>{String(doc.content.ai_summary)}</p>
+                    ) : contentEntries.length === 0 ? (
+                      <p className="text-sm" style={{ color: "#71717A" }}>No structured data extracted yet.</p>
+                    ) : (
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {contentEntries.map(([key, val]) => (
+                          <div key={key}>
+                            <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>{labelFor(key)}</div>
+                            <div className="mt-1 text-sm text-foreground">{String(val)}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+
+      {/* R10 step 6 — Document Privacy Settings: two distinct control
+          sections (Source Files, Digital Document Vault), not one shared
+          block. Each lists its own documents with independent visibility
+          toggles. */}
+      {view === "privacy-settings" && (
+        <div className="space-y-8">
+          {[
+            { key: "source-files" as const, label: "Source Files privacy", description: "Control which of your original uploaded files are visible in a deal room." },
+            { key: "digital-document-vault" as const, label: "Digital Document Vault privacy", description: "Control which Hockystick-processed documents are visible in a deal room." },
+          ].map(({ key, label, description }) => {
+            const docsForSection = key === "source-files"
+              ? documentsWithStatus.filter((t) => !!t.founderDoc?.file_path)
+              : documentsWithStatus.filter((t) =>
+                  !!t.founderDoc &&
+                  (Object.keys(t.founderDoc.content ?? {}).length > 0 ||
+                    ["ai_extracted", "complete", "needs_review"].includes(t.founderDoc.status)));
+            return (
+              <div key={key}>
+                <div className="text-sm font-semibold text-foreground">{label}</div>
+                <p className="text-xs mt-1 mb-3" style={{ color: "#71717A" }}>{description}</p>
+                {docsForSection.length === 0 ? (
+                  <EmptyState kind="empty" title="Nothing here yet" />
+                ) : (
+                  <div className="rounded-none border border-border bg-white divide-y divide-border">
+                    {docsForSection.map((template) => {
+                      const doc = template.founderDoc!;
+                      const attached = doc.visibility === "deal_room";
+                      return (
+                        <div key={template.id} className="flex items-center justify-between gap-4 px-5 py-3.5">
+                          <div className="min-w-0">
+                            <div className="text-sm font-medium text-foreground truncate">{template.name}</div>
+                            <div className="text-xs" style={{ color: "#71717A" }}>{doc.file_name ?? doc.title}</div>
+                          </div>
+                          <button
+                            onClick={async () => {
+                              const newVisibility = attached ? "stage2" : "deal_room";
+                              const { error } = await supabase.from("founder_documents").update({ visibility: newVisibility }).eq("id", doc.id);
+                              if (error) { toast.error("Could not update."); return; }
+                              refetchFounderDocs();
+                            }}
+                            role="switch"
+                            aria-checked={attached}
+                            className={cn(
+                              "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
+                              attached ? "bg-brand" : "bg-accent",
+                            )}
+                          >
+                            <span className={cn(
+                              "pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transition-transform",
+                              attached ? "translate-x-5" : "translate-x-0",
+                            )} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Document Editor Modal */}
       {editingDoc && (
