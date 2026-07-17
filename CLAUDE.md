@@ -571,3 +571,113 @@ Multiple rounds of "should be fixed" claims in June 2026 turned out to need manu
 1. Nested `<form>` elements — portfolio Add button submitted the outer profile form instead of the inner portfolio form (full page reload on submit)
 2. RLS WITH CHECK using `auth.uid()` inside a subquery — silent INSERT rejection with no error returned to client
 3. `investorOutOfBounds` guard in AppShell missing `/app/audit` in its whitelist — caused Activity Log link to redirect to AI Advisor
+
+## 26. THE DOCUMENT LIFECYCLE MODEL (established R11, July 2026) — product law
+
+This is not a suggestion or a UI convention. Every future feature touching founder
+documents, extraction, or the IP Vault must be built to this model. If a change would
+violate it, stop and revise the plan rather than the model.
+
+### 26.0 The four stages
+
+1. **DOCUMENT INTAKE** (`/app/prepare/ip-vault/document-intake`) — the single entry
+   point. A founder uploads a pre-built template document OR a custom document. AI
+   extracts structured information from whichever it is. There is no other way for a
+   document to enter the system.
+2. **DIGITAL DOCUMENT VAULT** (`/app/prepare/ip-vault/digital-document-vault`) — where
+   extracted information lives. Hockystick's standardized, stage-based document model,
+   organized by the 5 fixed categories: **Market, Financials, Team, Product, Legal**.
+   This is the curated, verified-claim-ready data investors ultimately see. It holds
+   *extracted structured content*, never raw files.
+3. **SOURCE FILES** (`/app/prepare/ip-vault/source-files`) — the original uploaded file,
+   stored and listed. Its only remaining purpose after extraction is attachment into a
+   deal room if an investor requests the physical/original document. A founder may
+   delete an original after extraction — the row (and its Digital Document Vault entry)
+   survives; only the file reference is cleared. If nothing was ever extracted, deleting
+   removes the row entirely, since nothing else exists to keep.
+4. **DOCUMENT PRIVACY SETTINGS** (`/app/prepare/ip-vault/privacy-settings`) — per-document
+   visibility control, always shown as two genuinely separate sections (Source Files
+   privacy, Digital Document Vault privacy). Never merge these into one shared block —
+   a founder controls exposure of the original file and the extracted data independently.
+
+A single `founder_documents` row carries a document through all four stages: it is
+created at Intake, its `content` populates the Digital Document Vault view, its
+`file_path`/`file_name`/`file_size` populate the Source Files view, and its `visibility`
+column is what Privacy Settings edits. Custom (non-template) documents get a synthetic
+virtual template card built from their own stored `category` so they render in every
+IP Vault view exactly like a pre-built template — a document must never be invisible in
+the UI just because it has no matching `document_templates` row.
+
+### 26.1 Category sorting
+
+Document Intake's template list and the Digital Document Vault are both organized by
+the 5 fixed categories in this exact order: **Market, Financials, Team, Product, Legal**.
+A custom upload is categorized at upload time — the founder picks a category, AI
+suggests one as a default via `suggested_category` once extraction completes. Category
+section headers render whenever the "All" filter is active; the category chip filter
+still narrows to a single category on its own.
+
+### 26.2 Honest extraction — never a silent empty result
+
+If extraction succeeds, `founder_documents.status = 'ai_extracted'` and `content` holds
+real structured data. If it fails for any reason — AI provider error, geographic API
+restriction, empty response, parse failure — the row still saves (the file isn't lost),
+but `status = 'needs_review'` and `content.extraction_error` holds the actual failure
+reason. **Never store an error string as if it were content, and never silently default
+a classification/category on a caught error without surfacing that something went
+wrong.** The UI must show an explicit "Could not extract — document stored in Source
+Files, retry or fill manually" state with a one-click retry (re-downloads the already-
+stored original; never requires re-upload). This is a Constitution-level honesty rule,
+not just an implementation detail of the document feature — it generalizes to every AI
+extraction/generation surface in the app.
+
+### 26.3 The privacy boundary (absolute)
+
+Nothing in the IP Vault (Document Intake, Source Files, Digital Document Vault, Privacy
+Settings) is EVER publicly accessible. IP Vault content is never public and never
+readable without explicit founder approval — via an approved detail-pack request
+(`discovery_requests.detail_pack_approved`, unlocking `stage2`-visible documents) or
+deal-room membership (`deal_room`-visible documents, once a deal room exists). The ONLY
+founder data that goes public is what flows through Profile Builder → Go Live digital
+profile (`startup_profile_sections` with `visibility = 'public'`) — a completely
+separate table and system from IP Vault. Never let these two systems merge or let an
+IP Vault document leak into the public-profile render path.
+
+This boundary is enforced at the **database and storage layer**, not just the UI:
+- `founder_documents` table RLS: owner-only for all writes; investor reads gated by
+  the detail-pack/deal-room rule above.
+- **`documents` Supabase Storage bucket**: object-level policies must independently
+  enforce the same rule as the table RLS above them — a correctly-scoped table policy
+  sitting on top of an unscoped storage bucket is not real security (this was a live,
+  severe bug found and fixed in R11: see `can_access_founder_doc_path()` /
+  `can_access_deal_room_doc_path()` in `supabase/migrations/20260718000000_*`). When
+  adding any new storage-backed feature, write the bucket-object policy in the same pass
+  as the table policy, and derive it from the same rule — never let the two drift apart.
+- A stage-3 template (financial-model, cap-table, incorporation-docs,
+  shareholder-agreements, bank-statements, customer-references) must never be exposed
+  via detail-pack/pre-deal-room approval regardless of what its `visibility` column
+  says — the UI's stage-2/stage-3 distinction is a display convention only and is not
+  itself enforced by the `visibility` toggle, so any RLS/storage rule referencing
+  `visibility = 'stage2'` must also exclude the stage-3 slug list explicitly.
+
+## 27. REAL-TIME UI RULE (established R11, July 2026) — app-wide, not feature-specific
+
+**Every mutation must leave the UI reflecting the change immediately, without a page
+reload.** This is a hard rule for all future code, not a one-off fix:
+
+- After any Supabase write (`insert`/`update`/`upsert`/`delete`) or mutating server
+  function call, either call `queryClient.invalidateQueries({ queryKey: [...] })` for
+  every query key that renders the affected data, or `refetch()` the specific query
+  observer if only one view is affected.
+- **When a mutation's result renders in more than one place** (e.g. a document upload
+  that affects Document Intake, Source Files, and the Digital Document Vault
+  simultaneously — three separate route mounts of the same underlying query), invalidate
+  every affected query key, not just the one belonging to the currently-mounted view.
+  `refetch()` only updates the currently-active observer; `invalidateQueries()` updates
+  the shared cache entry so every mount (current or future) sees fresh data.
+- Never pass a concatenated array like `["key-a", "key-b"]` intending it to match two
+  separate query keys — React Query treats this as ONE key. To invalidate two different
+  queries, call `invalidateQueries()` twice, once per real key.
+- A `staleTime` on the global QueryClient (see `src/routes/__root.tsx`) does not excuse
+  skipping invalidation — it only controls background refetch timing for the *same*
+  cache entry across remounts, not whether a mutation's result reaches the cache at all.
