@@ -126,6 +126,7 @@ import { Route as AppInvestorAdvisorRouteImport } from './routes/app.investor.ad
 import { Route as AppGoLiveProfileAnalyticsRouteImport } from './routes/app.go-live.profile-analytics'
 import { Route as AppGoLiveDirectoryRouteImport } from './routes/app.go-live.directory'
 import { Route as AppDealRoomsTeamAssignmentsRouteImport } from './routes/app.deal-rooms.team-assignments'
+import { Route as AppDealRoomsReportsVaultRouteImport } from './routes/app.deal-rooms.reports-vault'
 import { Route as AppDealRoomsPrepNotesRouteImport } from './routes/app.deal-rooms.prep-notes'
 import { Route as AppDealRoomsMeetingsCalendarRouteImport } from './routes/app.deal-rooms.meetings-calendar'
 import { Route as AppDealRoomsIdRouteImport } from './routes/app.deal-rooms.$id'
@@ -164,6 +165,7 @@ import { Route as AppInvestorDiscoverWatchlistRouteImport } from './routes/app.i
 import { Route as AppInvestorDiscoverDealIntakeRouteImport } from './routes/app.investor.discover.deal-intake'
 import { Route as AppInvestorDiscoverDealFlowRouteImport } from './routes/app.investor.discover.deal-flow'
 import { Route as AppInvestorDealRoomsTeamAssignmentsRouteImport } from './routes/app.investor.deal-rooms.team-assignments'
+import { Route as AppInvestorDealRoomsReportsVaultRouteImport } from './routes/app.investor.deal-rooms.reports-vault'
 import { Route as AppInvestorDealRoomsPrepNotesRouteImport } from './routes/app.investor.deal-rooms.prep-notes'
 import { Route as AppInvestorDealRoomsPortfolioRouteImport } from './routes/app.investor.deal-rooms.portfolio'
 import { Route as AppInvestorDealRoomsMeetingsCalendarRouteImport } from './routes/app.investor.deal-rooms.meetings-calendar'
@@ -192,7 +194,10 @@ import { Route as AppInvestorThesisProfileBuilderQuickSetupRouteImport } from '.
 import { Route as AppInvestorThesisProfileBuilderInvestmentThesisRouteImport } from './routes/app.investor.thesis.profile-builder.investment-thesis'
 import { Route as AppInvestorThesisProfileBuilderFullProfileRouteImport } from './routes/app.investor.thesis.profile-builder.full-profile'
 import { Route as AppInvestorThesisFundVaultSourceFilesRouteImport } from './routes/app.investor.thesis.fund-vault.source-files'
+import { Route as AppInvestorThesisFundVaultPrivacySettingsRouteImport } from './routes/app.investor.thesis.fund-vault.privacy-settings'
+import { Route as AppInvestorThesisFundVaultDigitalDocumentVaultRouteImport } from './routes/app.investor.thesis.fund-vault.digital-document-vault'
 import { Route as AppInvestorThesisCapitalReadinessChequeSizeRouteImport } from './routes/app.investor.thesis.capital-readiness.cheque-size'
+import { Route as AppInvestorThesisCapitalReadinessCapacityAuditRouteImport } from './routes/app.investor.thesis.capital-readiness.capacity-audit'
 import { Route as AppInvestorThesisBadgesTierStatusRouteImport } from './routes/app.investor.thesis.badges.tier-status'
 import { Route as AppInvestorThesisBadgesOverviewRouteImport } from './routes/app.investor.thesis.badges.overview'
 import { Route as AppInvestorThesisBadgesApplyRouteImport } from './routes/app.investor.thesis.badges.apply'
@@ -788,6 +793,12 @@ const AppDealRoomsTeamAssignmentsRoute =
     path: '/deal-rooms/team-assignments',
     getParentRoute: () => AppRoute,
   } as any)
+const AppDealRoomsReportsVaultRoute =
+  AppDealRoomsReportsVaultRouteImport.update({
+    id: '/deal-rooms/reports-vault',
+    path: '/deal-rooms/reports-vault',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppDealRoomsPrepNotesRoute = AppDealRoomsPrepNotesRouteImport.update({
   id: '/deal-rooms/prep-notes',
   path: '/deal-rooms/prep-notes',
@@ -1002,6 +1013,12 @@ const AppInvestorDealRoomsTeamAssignmentsRoute =
     path: '/deal-rooms/team-assignments',
     getParentRoute: () => AppInvestorRoute,
   } as any)
+const AppInvestorDealRoomsReportsVaultRoute =
+  AppInvestorDealRoomsReportsVaultRouteImport.update({
+    id: '/deal-rooms/reports-vault',
+    path: '/deal-rooms/reports-vault',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
 const AppInvestorDealRoomsPrepNotesRoute =
   AppInvestorDealRoomsPrepNotesRouteImport.update({
     id: '/deal-rooms/prep-notes',
@@ -1162,10 +1179,28 @@ const AppInvestorThesisFundVaultSourceFilesRoute =
     path: '/thesis/fund-vault/source-files',
     getParentRoute: () => AppInvestorRoute,
   } as any)
+const AppInvestorThesisFundVaultPrivacySettingsRoute =
+  AppInvestorThesisFundVaultPrivacySettingsRouteImport.update({
+    id: '/thesis/fund-vault/privacy-settings',
+    path: '/thesis/fund-vault/privacy-settings',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisFundVaultDigitalDocumentVaultRoute =
+  AppInvestorThesisFundVaultDigitalDocumentVaultRouteImport.update({
+    id: '/thesis/fund-vault/digital-document-vault',
+    path: '/thesis/fund-vault/digital-document-vault',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
 const AppInvestorThesisCapitalReadinessChequeSizeRoute =
   AppInvestorThesisCapitalReadinessChequeSizeRouteImport.update({
     id: '/thesis/capital-readiness/cheque-size',
     path: '/thesis/capital-readiness/cheque-size',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisCapitalReadinessCapacityAuditRoute =
+  AppInvestorThesisCapitalReadinessCapacityAuditRouteImport.update({
+    id: '/thesis/capital-readiness/capacity-audit',
+    path: '/thesis/capital-readiness/capacity-audit',
     getParentRoute: () => AppInvestorRoute,
   } as any)
 const AppInvestorThesisBadgesTierStatusRoute =
@@ -1293,6 +1328,7 @@ export interface FileRoutesByFullPath {
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/deal-rooms/meetings-calendar': typeof AppDealRoomsMeetingsCalendarRoute
   '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
+  '/app/deal-rooms/reports-vault': typeof AppDealRoomsReportsVaultRoute
   '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
   '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
@@ -1347,6 +1383,7 @@ export interface FileRoutesByFullPath {
   '/app/investor/deal-rooms/meetings-calendar': typeof AppInvestorDealRoomsMeetingsCalendarRoute
   '/app/investor/deal-rooms/portfolio': typeof AppInvestorDealRoomsPortfolioRoute
   '/app/investor/deal-rooms/prep-notes': typeof AppInvestorDealRoomsPrepNotesRoute
+  '/app/investor/deal-rooms/reports-vault': typeof AppInvestorDealRoomsReportsVaultRoute
   '/app/investor/deal-rooms/team-assignments': typeof AppInvestorDealRoomsTeamAssignmentsRoute
   '/app/investor/discover/deal-flow': typeof AppInvestorDiscoverDealFlowRoute
   '/app/investor/discover/deal-intake': typeof AppInvestorDiscoverDealIntakeRoute
@@ -1380,7 +1417,10 @@ export interface FileRoutesByFullPath {
   '/app/investor/thesis/badges/apply': typeof AppInvestorThesisBadgesApplyRoute
   '/app/investor/thesis/badges/overview': typeof AppInvestorThesisBadgesOverviewRoute
   '/app/investor/thesis/badges/tier-status': typeof AppInvestorThesisBadgesTierStatusRoute
+  '/app/investor/thesis/capital-readiness/capacity-audit': typeof AppInvestorThesisCapitalReadinessCapacityAuditRoute
   '/app/investor/thesis/capital-readiness/cheque-size': typeof AppInvestorThesisCapitalReadinessChequeSizeRoute
+  '/app/investor/thesis/fund-vault/digital-document-vault': typeof AppInvestorThesisFundVaultDigitalDocumentVaultRoute
+  '/app/investor/thesis/fund-vault/privacy-settings': typeof AppInvestorThesisFundVaultPrivacySettingsRoute
   '/app/investor/thesis/fund-vault/source-files': typeof AppInvestorThesisFundVaultSourceFilesRoute
   '/app/investor/thesis/profile-builder/full-profile': typeof AppInvestorThesisProfileBuilderFullProfileRoute
   '/app/investor/thesis/profile-builder/investment-thesis': typeof AppInvestorThesisProfileBuilderInvestmentThesisRoute
@@ -1480,6 +1520,7 @@ export interface FileRoutesByTo {
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/deal-rooms/meetings-calendar': typeof AppDealRoomsMeetingsCalendarRoute
   '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
+  '/app/deal-rooms/reports-vault': typeof AppDealRoomsReportsVaultRoute
   '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
   '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
@@ -1534,6 +1575,7 @@ export interface FileRoutesByTo {
   '/app/investor/deal-rooms/meetings-calendar': typeof AppInvestorDealRoomsMeetingsCalendarRoute
   '/app/investor/deal-rooms/portfolio': typeof AppInvestorDealRoomsPortfolioRoute
   '/app/investor/deal-rooms/prep-notes': typeof AppInvestorDealRoomsPrepNotesRoute
+  '/app/investor/deal-rooms/reports-vault': typeof AppInvestorDealRoomsReportsVaultRoute
   '/app/investor/deal-rooms/team-assignments': typeof AppInvestorDealRoomsTeamAssignmentsRoute
   '/app/investor/discover/deal-flow': typeof AppInvestorDiscoverDealFlowRoute
   '/app/investor/discover/deal-intake': typeof AppInvestorDiscoverDealIntakeRoute
@@ -1567,7 +1609,10 @@ export interface FileRoutesByTo {
   '/app/investor/thesis/badges/apply': typeof AppInvestorThesisBadgesApplyRoute
   '/app/investor/thesis/badges/overview': typeof AppInvestorThesisBadgesOverviewRoute
   '/app/investor/thesis/badges/tier-status': typeof AppInvestorThesisBadgesTierStatusRoute
+  '/app/investor/thesis/capital-readiness/capacity-audit': typeof AppInvestorThesisCapitalReadinessCapacityAuditRoute
   '/app/investor/thesis/capital-readiness/cheque-size': typeof AppInvestorThesisCapitalReadinessChequeSizeRoute
+  '/app/investor/thesis/fund-vault/digital-document-vault': typeof AppInvestorThesisFundVaultDigitalDocumentVaultRoute
+  '/app/investor/thesis/fund-vault/privacy-settings': typeof AppInvestorThesisFundVaultPrivacySettingsRoute
   '/app/investor/thesis/fund-vault/source-files': typeof AppInvestorThesisFundVaultSourceFilesRoute
   '/app/investor/thesis/profile-builder/full-profile': typeof AppInvestorThesisProfileBuilderFullProfileRoute
   '/app/investor/thesis/profile-builder/investment-thesis': typeof AppInvestorThesisProfileBuilderInvestmentThesisRoute
@@ -1672,6 +1717,7 @@ export interface FileRoutesById {
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/deal-rooms/meetings-calendar': typeof AppDealRoomsMeetingsCalendarRoute
   '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
+  '/app/deal-rooms/reports-vault': typeof AppDealRoomsReportsVaultRoute
   '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
   '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
@@ -1726,6 +1772,7 @@ export interface FileRoutesById {
   '/app/investor/deal-rooms/meetings-calendar': typeof AppInvestorDealRoomsMeetingsCalendarRoute
   '/app/investor/deal-rooms/portfolio': typeof AppInvestorDealRoomsPortfolioRoute
   '/app/investor/deal-rooms/prep-notes': typeof AppInvestorDealRoomsPrepNotesRoute
+  '/app/investor/deal-rooms/reports-vault': typeof AppInvestorDealRoomsReportsVaultRoute
   '/app/investor/deal-rooms/team-assignments': typeof AppInvestorDealRoomsTeamAssignmentsRoute
   '/app/investor/discover/deal-flow': typeof AppInvestorDiscoverDealFlowRoute
   '/app/investor/discover/deal-intake': typeof AppInvestorDiscoverDealIntakeRoute
@@ -1759,7 +1806,10 @@ export interface FileRoutesById {
   '/app/investor/thesis/badges/apply': typeof AppInvestorThesisBadgesApplyRoute
   '/app/investor/thesis/badges/overview': typeof AppInvestorThesisBadgesOverviewRoute
   '/app/investor/thesis/badges/tier-status': typeof AppInvestorThesisBadgesTierStatusRoute
+  '/app/investor/thesis/capital-readiness/capacity-audit': typeof AppInvestorThesisCapitalReadinessCapacityAuditRoute
   '/app/investor/thesis/capital-readiness/cheque-size': typeof AppInvestorThesisCapitalReadinessChequeSizeRoute
+  '/app/investor/thesis/fund-vault/digital-document-vault': typeof AppInvestorThesisFundVaultDigitalDocumentVaultRoute
+  '/app/investor/thesis/fund-vault/privacy-settings': typeof AppInvestorThesisFundVaultPrivacySettingsRoute
   '/app/investor/thesis/fund-vault/source-files': typeof AppInvestorThesisFundVaultSourceFilesRoute
   '/app/investor/thesis/profile-builder/full-profile': typeof AppInvestorThesisProfileBuilderFullProfileRoute
   '/app/investor/thesis/profile-builder/investment-thesis': typeof AppInvestorThesisProfileBuilderInvestmentThesisRoute
@@ -1865,6 +1915,7 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/$id'
     | '/app/deal-rooms/meetings-calendar'
     | '/app/deal-rooms/prep-notes'
+    | '/app/deal-rooms/reports-vault'
     | '/app/deal-rooms/team-assignments'
     | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
@@ -1919,6 +1970,7 @@ export interface FileRouteTypes {
     | '/app/investor/deal-rooms/meetings-calendar'
     | '/app/investor/deal-rooms/portfolio'
     | '/app/investor/deal-rooms/prep-notes'
+    | '/app/investor/deal-rooms/reports-vault'
     | '/app/investor/deal-rooms/team-assignments'
     | '/app/investor/discover/deal-flow'
     | '/app/investor/discover/deal-intake'
@@ -1952,7 +2004,10 @@ export interface FileRouteTypes {
     | '/app/investor/thesis/badges/apply'
     | '/app/investor/thesis/badges/overview'
     | '/app/investor/thesis/badges/tier-status'
+    | '/app/investor/thesis/capital-readiness/capacity-audit'
     | '/app/investor/thesis/capital-readiness/cheque-size'
+    | '/app/investor/thesis/fund-vault/digital-document-vault'
+    | '/app/investor/thesis/fund-vault/privacy-settings'
     | '/app/investor/thesis/fund-vault/source-files'
     | '/app/investor/thesis/profile-builder/full-profile'
     | '/app/investor/thesis/profile-builder/investment-thesis'
@@ -2052,6 +2107,7 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/$id'
     | '/app/deal-rooms/meetings-calendar'
     | '/app/deal-rooms/prep-notes'
+    | '/app/deal-rooms/reports-vault'
     | '/app/deal-rooms/team-assignments'
     | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
@@ -2106,6 +2162,7 @@ export interface FileRouteTypes {
     | '/app/investor/deal-rooms/meetings-calendar'
     | '/app/investor/deal-rooms/portfolio'
     | '/app/investor/deal-rooms/prep-notes'
+    | '/app/investor/deal-rooms/reports-vault'
     | '/app/investor/deal-rooms/team-assignments'
     | '/app/investor/discover/deal-flow'
     | '/app/investor/discover/deal-intake'
@@ -2139,7 +2196,10 @@ export interface FileRouteTypes {
     | '/app/investor/thesis/badges/apply'
     | '/app/investor/thesis/badges/overview'
     | '/app/investor/thesis/badges/tier-status'
+    | '/app/investor/thesis/capital-readiness/capacity-audit'
     | '/app/investor/thesis/capital-readiness/cheque-size'
+    | '/app/investor/thesis/fund-vault/digital-document-vault'
+    | '/app/investor/thesis/fund-vault/privacy-settings'
     | '/app/investor/thesis/fund-vault/source-files'
     | '/app/investor/thesis/profile-builder/full-profile'
     | '/app/investor/thesis/profile-builder/investment-thesis'
@@ -2243,6 +2303,7 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/$id'
     | '/app/deal-rooms/meetings-calendar'
     | '/app/deal-rooms/prep-notes'
+    | '/app/deal-rooms/reports-vault'
     | '/app/deal-rooms/team-assignments'
     | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
@@ -2297,6 +2358,7 @@ export interface FileRouteTypes {
     | '/app/investor/deal-rooms/meetings-calendar'
     | '/app/investor/deal-rooms/portfolio'
     | '/app/investor/deal-rooms/prep-notes'
+    | '/app/investor/deal-rooms/reports-vault'
     | '/app/investor/deal-rooms/team-assignments'
     | '/app/investor/discover/deal-flow'
     | '/app/investor/discover/deal-intake'
@@ -2330,7 +2392,10 @@ export interface FileRouteTypes {
     | '/app/investor/thesis/badges/apply'
     | '/app/investor/thesis/badges/overview'
     | '/app/investor/thesis/badges/tier-status'
+    | '/app/investor/thesis/capital-readiness/capacity-audit'
     | '/app/investor/thesis/capital-readiness/cheque-size'
+    | '/app/investor/thesis/fund-vault/digital-document-vault'
+    | '/app/investor/thesis/fund-vault/privacy-settings'
     | '/app/investor/thesis/fund-vault/source-files'
     | '/app/investor/thesis/profile-builder/full-profile'
     | '/app/investor/thesis/profile-builder/investment-thesis'
@@ -3217,6 +3282,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDealRoomsTeamAssignmentsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/deal-rooms/reports-vault': {
+      id: '/app/deal-rooms/reports-vault'
+      path: '/deal-rooms/reports-vault'
+      fullPath: '/app/deal-rooms/reports-vault'
+      preLoaderRoute: typeof AppDealRoomsReportsVaultRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/deal-rooms/prep-notes': {
       id: '/app/deal-rooms/prep-notes'
       path: '/deal-rooms/prep-notes'
@@ -3483,6 +3555,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorDealRoomsTeamAssignmentsRouteImport
       parentRoute: typeof AppInvestorRoute
     }
+    '/app/investor/deal-rooms/reports-vault': {
+      id: '/app/investor/deal-rooms/reports-vault'
+      path: '/deal-rooms/reports-vault'
+      fullPath: '/app/investor/deal-rooms/reports-vault'
+      preLoaderRoute: typeof AppInvestorDealRoomsReportsVaultRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
     '/app/investor/deal-rooms/prep-notes': {
       id: '/app/investor/deal-rooms/prep-notes'
       path: '/deal-rooms/prep-notes'
@@ -3679,11 +3758,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorThesisFundVaultSourceFilesRouteImport
       parentRoute: typeof AppInvestorRoute
     }
+    '/app/investor/thesis/fund-vault/privacy-settings': {
+      id: '/app/investor/thesis/fund-vault/privacy-settings'
+      path: '/thesis/fund-vault/privacy-settings'
+      fullPath: '/app/investor/thesis/fund-vault/privacy-settings'
+      preLoaderRoute: typeof AppInvestorThesisFundVaultPrivacySettingsRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/fund-vault/digital-document-vault': {
+      id: '/app/investor/thesis/fund-vault/digital-document-vault'
+      path: '/thesis/fund-vault/digital-document-vault'
+      fullPath: '/app/investor/thesis/fund-vault/digital-document-vault'
+      preLoaderRoute: typeof AppInvestorThesisFundVaultDigitalDocumentVaultRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
     '/app/investor/thesis/capital-readiness/cheque-size': {
       id: '/app/investor/thesis/capital-readiness/cheque-size'
       path: '/thesis/capital-readiness/cheque-size'
       fullPath: '/app/investor/thesis/capital-readiness/cheque-size'
       preLoaderRoute: typeof AppInvestorThesisCapitalReadinessChequeSizeRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/capital-readiness/capacity-audit': {
+      id: '/app/investor/thesis/capital-readiness/capacity-audit'
+      path: '/thesis/capital-readiness/capacity-audit'
+      fullPath: '/app/investor/thesis/capital-readiness/capacity-audit'
+      preLoaderRoute: typeof AppInvestorThesisCapitalReadinessCapacityAuditRouteImport
       parentRoute: typeof AppInvestorRoute
     }
     '/app/investor/thesis/badges/tier-status': {
@@ -3753,6 +3853,7 @@ interface AppInvestorRouteChildren {
   AppInvestorDealRoomsMeetingsCalendarRoute: typeof AppInvestorDealRoomsMeetingsCalendarRoute
   AppInvestorDealRoomsPortfolioRoute: typeof AppInvestorDealRoomsPortfolioRoute
   AppInvestorDealRoomsPrepNotesRoute: typeof AppInvestorDealRoomsPrepNotesRoute
+  AppInvestorDealRoomsReportsVaultRoute: typeof AppInvestorDealRoomsReportsVaultRoute
   AppInvestorDealRoomsTeamAssignmentsRoute: typeof AppInvestorDealRoomsTeamAssignmentsRoute
   AppInvestorDiscoverDealFlowRoute: typeof AppInvestorDiscoverDealFlowRoute
   AppInvestorDiscoverDealIntakeRoute: typeof AppInvestorDiscoverDealIntakeRoute
@@ -3766,7 +3867,10 @@ interface AppInvestorRouteChildren {
   AppInvestorThesisBadgesApplyRoute: typeof AppInvestorThesisBadgesApplyRoute
   AppInvestorThesisBadgesOverviewRoute: typeof AppInvestorThesisBadgesOverviewRoute
   AppInvestorThesisBadgesTierStatusRoute: typeof AppInvestorThesisBadgesTierStatusRoute
+  AppInvestorThesisCapitalReadinessCapacityAuditRoute: typeof AppInvestorThesisCapitalReadinessCapacityAuditRoute
   AppInvestorThesisCapitalReadinessChequeSizeRoute: typeof AppInvestorThesisCapitalReadinessChequeSizeRoute
+  AppInvestorThesisFundVaultDigitalDocumentVaultRoute: typeof AppInvestorThesisFundVaultDigitalDocumentVaultRoute
+  AppInvestorThesisFundVaultPrivacySettingsRoute: typeof AppInvestorThesisFundVaultPrivacySettingsRoute
   AppInvestorThesisFundVaultSourceFilesRoute: typeof AppInvestorThesisFundVaultSourceFilesRoute
   AppInvestorThesisProfileBuilderFullProfileRoute: typeof AppInvestorThesisProfileBuilderFullProfileRoute
   AppInvestorThesisProfileBuilderInvestmentThesisRoute: typeof AppInvestorThesisProfileBuilderInvestmentThesisRoute
@@ -3808,6 +3912,7 @@ const AppInvestorRouteChildren: AppInvestorRouteChildren = {
     AppInvestorDealRoomsMeetingsCalendarRoute,
   AppInvestorDealRoomsPortfolioRoute: AppInvestorDealRoomsPortfolioRoute,
   AppInvestorDealRoomsPrepNotesRoute: AppInvestorDealRoomsPrepNotesRoute,
+  AppInvestorDealRoomsReportsVaultRoute: AppInvestorDealRoomsReportsVaultRoute,
   AppInvestorDealRoomsTeamAssignmentsRoute:
     AppInvestorDealRoomsTeamAssignmentsRoute,
   AppInvestorDiscoverDealFlowRoute: AppInvestorDiscoverDealFlowRoute,
@@ -3825,8 +3930,14 @@ const AppInvestorRouteChildren: AppInvestorRouteChildren = {
   AppInvestorThesisBadgesOverviewRoute: AppInvestorThesisBadgesOverviewRoute,
   AppInvestorThesisBadgesTierStatusRoute:
     AppInvestorThesisBadgesTierStatusRoute,
+  AppInvestorThesisCapitalReadinessCapacityAuditRoute:
+    AppInvestorThesisCapitalReadinessCapacityAuditRoute,
   AppInvestorThesisCapitalReadinessChequeSizeRoute:
     AppInvestorThesisCapitalReadinessChequeSizeRoute,
+  AppInvestorThesisFundVaultDigitalDocumentVaultRoute:
+    AppInvestorThesisFundVaultDigitalDocumentVaultRoute,
+  AppInvestorThesisFundVaultPrivacySettingsRoute:
+    AppInvestorThesisFundVaultPrivacySettingsRoute,
   AppInvestorThesisFundVaultSourceFilesRoute:
     AppInvestorThesisFundVaultSourceFilesRoute,
   AppInvestorThesisProfileBuilderFullProfileRoute:
@@ -3934,6 +4045,7 @@ interface AppRouteChildren {
   AppDealRoomsIdRoute: typeof AppDealRoomsIdRouteWithChildren
   AppDealRoomsMeetingsCalendarRoute: typeof AppDealRoomsMeetingsCalendarRoute
   AppDealRoomsPrepNotesRoute: typeof AppDealRoomsPrepNotesRoute
+  AppDealRoomsReportsVaultRoute: typeof AppDealRoomsReportsVaultRoute
   AppDealRoomsTeamAssignmentsRoute: typeof AppDealRoomsTeamAssignmentsRoute
   AppGoLiveDirectoryRoute: typeof AppGoLiveDirectoryRoute
   AppGoLiveProfileAnalyticsRoute: typeof AppGoLiveProfileAnalyticsRoute
@@ -4004,6 +4116,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDealRoomsIdRoute: AppDealRoomsIdRouteWithChildren,
   AppDealRoomsMeetingsCalendarRoute: AppDealRoomsMeetingsCalendarRoute,
   AppDealRoomsPrepNotesRoute: AppDealRoomsPrepNotesRoute,
+  AppDealRoomsReportsVaultRoute: AppDealRoomsReportsVaultRoute,
   AppDealRoomsTeamAssignmentsRoute: AppDealRoomsTeamAssignmentsRoute,
   AppGoLiveDirectoryRoute: AppGoLiveDirectoryRoute,
   AppGoLiveProfileAnalyticsRoute: AppGoLiveProfileAnalyticsRoute,
