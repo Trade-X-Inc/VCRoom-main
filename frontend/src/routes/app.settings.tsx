@@ -290,7 +290,13 @@ function ProfileSettings() {
           });
         }
       }
-      qc.invalidateQueries({ queryKey: ["settings-startup", "settings-investor-profile"] });
+      // R11 step 4: these were mistakenly concatenated into one query key
+      // ["settings-startup", "settings-investor-profile"] — neither matches
+      // the real keys (["settings-startup", user.id] /
+      // ["settings-investor-profile", user.id]), so the investor-profile
+      // cache was never actually invalidated after saving fund details.
+      qc.invalidateQueries({ queryKey: ["settings-startup", user.id] });
+      qc.invalidateQueries({ queryKey: ["settings-investor-profile", user.id] });
       toast.success("Saved");
     } catch (err: any) {
       toast.error(err.message || "Failed to save");

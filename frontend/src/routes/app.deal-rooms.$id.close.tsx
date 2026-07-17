@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Check, X, CheckCircle2, ClipboardList, Loader2, Plus } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -51,6 +51,7 @@ function ItemStatusCircle({ status }: { status: string }) {
 
 function ClosePage() {
   const { dealRoomId, isInvestor, userId } = useDealRoom();
+  const queryClient = useQueryClient();
 
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
   const [itemNotes, setItemNotes] = useState<Record<string, string>>({});
@@ -169,12 +170,14 @@ function ClosePage() {
 
   const saveItemNote = async (itemId: string, value: string) => {
     const { error } = await supabase.from("deal_room_closing_items").update({ notes: value }).eq("id", itemId);
-    if (error) { console.error("[closing] note save failed:", error); toast.error("Could not save note."); }
+    if (error) { console.error("[closing] note save failed:", error); toast.error("Could not save note."); return; }
+    await refetchItems();
   };
 
   const saveItemDueDate = async (itemId: string, value: string) => {
     const { error } = await supabase.from("deal_room_closing_items").update({ due_by: value || null }).eq("id", itemId);
-    if (error) { console.error("[closing] due date save failed:", error); toast.error("Could not save due date."); }
+    if (error) { console.error("[closing] due date save failed:", error); toast.error("Could not save due date."); return; }
+    await refetchItems();
   };
 
   const changeItemStatus = async (itemId: string, status: string) => {
@@ -197,6 +200,10 @@ function ClosePage() {
       if (closeErr) throw closeErr;
       import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { deal_room_id: dealRoomId } })).catch(() => {});
       console.log("Email closing report to both parties — Claude Code will wire email");
+      // R11 step 4: the shared deal-room shell (status badge, tab gating)
+      // reads from useDealRoomContext's ["deal-room", dealRoomId] query —
+      // without this it kept showing the room as open until a hard reload.
+      queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
       setDealClosed(true);
       setCloseDealOpen(false);
       toast.success("Deal closed successfully");
@@ -219,6 +226,7 @@ function ClosePage() {
       const { error: closeErr } = await supabase.from("deal_rooms").update({ status: "closed" }).eq("id", dealRoomId);
       if (closeErr) throw closeErr;
       import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { deal_room_id: dealRoomId } })).catch(() => {});
+      queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
       setExitDone(true);
       setExitOpen(false);
     } catch { toast.error("Could not close deal room"); }

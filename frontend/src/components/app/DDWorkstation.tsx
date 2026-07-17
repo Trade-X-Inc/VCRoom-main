@@ -889,7 +889,8 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                                     const { error } = await supabase.from("deal_rooms")
                                       .update({ pitch_deck_url: e.target.value || null })
                                       .eq("id", dealRoomId);
-                                    if (error) { console.error("[dd] pitch deck url save failed:", error); toast.error("Could not save link."); }
+                                    if (error) { console.error("[dd] pitch deck url save failed:", error); toast.error("Could not save link."); return; }
+                                    qc.invalidateQueries({ queryKey: ["room-media", dealRoomId] });
                                   }}
                                   className="w-full rounded-md border border-border/60 bg-background px-3 py-1.5 text-xs focus:outline-none focus:border-brand/50"
                                 />
@@ -921,7 +922,8 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                               const { error } = await supabase.from("deal_rooms")
                                 .update({ product_video_url: e.target.value || null })
                                 .eq("id", dealRoomId);
-                              if (error) { console.error("[dd] product video url save failed:", error); toast.error("Could not save link."); }
+                              if (error) { console.error("[dd] product video url save failed:", error); toast.error("Could not save link."); return; }
+                              qc.invalidateQueries({ queryKey: ["room-media", dealRoomId] });
                             }}
                             className="w-full rounded-md border border-border/60 bg-background px-3 py-1.5 text-xs focus:outline-none focus:border-brand/50"
                           />
