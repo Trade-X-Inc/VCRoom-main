@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { PageFrame, EmptyState } from "@/components/system";
+import { PermissionGate } from "@/components/app/PermissionGate";
 
 // R9 (c) — Prepare › Profile Builder › Achievements. Per user decision: an
 // editor for individual/team/company achievements, distinct from
@@ -14,7 +15,11 @@ import { PageFrame, EmptyState } from "@/components/system";
 // already reads (section_key = "achievements"), with the same
 // private/deal_room/public visibility model used by ProfileBuilder.tsx.
 export const Route = createFileRoute("/app/prepare/profile-builder/achievements")({
-  component: AchievementsEditor,
+  component: () => (
+    <PermissionGate permission="edit_profile">
+      <AchievementsEditor />
+    </PermissionGate>
+  ),
 });
 
 const VISIBILITY_CYCLE: Record<string, string> = {

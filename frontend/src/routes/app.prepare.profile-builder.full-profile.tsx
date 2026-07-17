@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Profile } from "./app.profile";
+import { PermissionGate } from "@/components/app/PermissionGate";
 
 // R9 extraction — Prepare › Profile Builder › Full Profile. Renders the existing Profile
 // page's "full" slice under route control; logic untouched.
@@ -8,5 +9,9 @@ function Page() {
 }
 
 export const Route = createFileRoute("/app/prepare/profile-builder/full-profile")({
-  component: Page,
+  component: () => (
+    <PermissionGate permission="edit_profile">
+      <Page />
+    </PermissionGate>
+  ),
 });

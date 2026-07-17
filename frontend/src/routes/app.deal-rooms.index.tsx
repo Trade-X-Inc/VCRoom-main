@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 import { sendInviteEmail } from "@/lib/invite-fn";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { EmptyState } from "@/components/system";
+import { useAccountContext } from "@/hooks/useAccountContext";
+import { FOUNDER_PERMISSIONS } from "@/lib/roles";
 
 export const Route = createFileRoute("/app/deal-rooms/")({
   component: DealRooms,
@@ -52,6 +54,8 @@ export function DealRooms({ view }: { view?: "team-assignments" } = {}) {
   const queryClient = useQueryClient();
   const search = useSearch({ strict: false }) as { create?: string };
   const { markStep: markOnboardingStep } = useOnboardingProgress();
+  const accountCtx = useAccountContext();
+  const canCreateRoom = accountCtx.isOwner || (FOUNDER_PERMISSIONS[accountCtx.role]?.create_deal_room ?? false);
 
   useEffect(() => {
     if (search.create === "1") setOpen(true);
@@ -252,8 +256,10 @@ export function DealRooms({ view }: { view?: "team-assignments" } = {}) {
         <div className="flex items-center gap-2">
           <PageGuide pageId="deal-rooms" />
           <button
-            onClick={() => setOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"
+            onClick={() => canCreateRoom && setOpen(true)}
+            disabled={!canCreateRoom}
+            title={canCreateRoom ? undefined : "Your role does not include creating deal rooms."}
+            className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Plus className="h-4 w-4" /> Create new deal room
           </button>
@@ -457,7 +463,7 @@ export function DealRooms({ view }: { view?: "team-assignments" } = {}) {
               kind={filter === "all" ? "empty" : "no-results"}
               title={filter === "all" ? "No deal rooms" : `No ${filter} rooms`}
               action={
-                filter === "all"
+                filter === "all" && canCreateRoom
                   ? { label: "Create room", onClick: () => setOpen(true) }
                   : undefined
               }
