@@ -2,9 +2,11 @@ import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
 import { useState } from "react";
 import { LogOut, Settings, User, Users, Activity } from "lucide-react";
+import { useAccountContext } from "@/hooks/useAccountContext";
 
 export function UserMenu() {
   const { user, signOut } = useAuth();
+  const ctx = useAccountContext();
   const [open, setOpen] = useState(false);
 
   if (!user) return null;
@@ -15,15 +17,18 @@ export function UserMenu() {
     ? user.fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
     : user.email.slice(0, 2).toUpperCase();
 
+  // "Team" appoints/removes members and assigns roles — admin-only surface
+  // (CLAUDE.md R12 step 3). Hidden here rather than disabled-with-tooltip
+  // because it's a whole page, not a single action.
   const menuItems = isInvestor
     ? [
         { icon: User, label: "Account", to: "/app/investor/profile" as const },
-        { icon: Users, label: "Team", to: "/app/investor/team" as const },
+        ...(ctx.canManageTeam ? [{ icon: Users, label: "Team", to: "/app/investor/team" as const }] : []),
         { icon: Settings, label: "Settings", to: "/app/investor/settings" as const },
       ]
     : [
         { icon: User, label: "Account", to: "/app/profile" as const },
-        { icon: Users, label: "Team & users", to: "/app/users" as const },
+        ...(ctx.canManageTeam ? [{ icon: Users, label: "Team & users", to: "/app/users" as const }] : []),
         { icon: Settings, label: "Settings", to: "/app/settings" as const },
       ];
 

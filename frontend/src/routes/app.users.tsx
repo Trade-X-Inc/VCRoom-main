@@ -9,9 +9,14 @@ import { supabase } from "@/lib/supabase";
 import { triggerStartupTeamInvite } from "@/lib/email/triggers";
 import { FOUNDER_ROLES, FOUNDER_PERMISSIONS, PERMISSION_LABELS } from "@/lib/roles";
 import { EmptyState } from "@/components/system";
+import { PermissionGate } from "@/components/app/PermissionGate";
 
 export const Route = createFileRoute("/app/users")({
-  component: UsersPage,
+  component: () => (
+    <PermissionGate permission="manage_team">
+      <UsersPage />
+    </PermissionGate>
+  ),
 });
 
 type FounderRole = "admin" | "manager" | "analyst" | "viewer";

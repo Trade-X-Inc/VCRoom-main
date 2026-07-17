@@ -9,9 +9,14 @@ import { formatDistanceToNow } from "date-fns";
 import { triggerStartupTeamInvite } from "@/lib/email/triggers";
 import { INVESTOR_ROLES, INVESTOR_PERMISSIONS, PERMISSION_LABELS } from "@/lib/roles";
 import { EmptyState } from "@/components/system";
+import { PermissionGate } from "@/components/app/PermissionGate";
 
 export const Route = createFileRoute("/app/investor/team")({
-  component: InvestorTeamPage,
+  component: () => (
+    <PermissionGate permission="manage_team">
+      <InvestorTeamPage />
+    </PermissionGate>
+  ),
 });
 
 type InvestorRole = "admin" | "associate" | "analyst" | "external";
