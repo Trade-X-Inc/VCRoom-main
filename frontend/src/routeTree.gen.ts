@@ -141,6 +141,10 @@ import { Route as AppPrepareProfileBuilderTeamCardsRouteImport } from './routes/
 import { Route as AppPrepareProfileBuilderQuickSetupRouteImport } from './routes/app.prepare.profile-builder.quick-setup'
 import { Route as AppPrepareProfileBuilderFundraisingThesisRouteImport } from './routes/app.prepare.profile-builder.fundraising-thesis'
 import { Route as AppPrepareProfileBuilderFullProfileRouteImport } from './routes/app.prepare.profile-builder.full-profile'
+import { Route as AppPrepareIpVaultSourceFilesRouteImport } from './routes/app.prepare.ip-vault.source-files'
+import { Route as AppPrepareIpVaultPrivacySettingsRouteImport } from './routes/app.prepare.ip-vault.privacy-settings'
+import { Route as AppPrepareIpVaultDocumentIntakeRouteImport } from './routes/app.prepare.ip-vault.document-intake'
+import { Route as AppPrepareIpVaultDigitalDocumentVaultRouteImport } from './routes/app.prepare.ip-vault.digital-document-vault'
 import { Route as AppPrepareBadgesOverviewRouteImport } from './routes/app.prepare.badges.overview'
 import { Route as AppPrepareBadgesFounderRoastRouteImport } from './routes/app.prepare.badges.founder-roast'
 import { Route as AppInvestorDiscoverWatchlistRouteImport } from './routes/app.investor.discover.watchlist'
@@ -835,6 +839,30 @@ const AppPrepareProfileBuilderFullProfileRoute =
     path: '/prepare/profile-builder/full-profile',
     getParentRoute: () => AppRoute,
   } as any)
+const AppPrepareIpVaultSourceFilesRoute =
+  AppPrepareIpVaultSourceFilesRouteImport.update({
+    id: '/prepare/ip-vault/source-files',
+    path: '/prepare/ip-vault/source-files',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppPrepareIpVaultPrivacySettingsRoute =
+  AppPrepareIpVaultPrivacySettingsRouteImport.update({
+    id: '/prepare/ip-vault/privacy-settings',
+    path: '/prepare/ip-vault/privacy-settings',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppPrepareIpVaultDocumentIntakeRoute =
+  AppPrepareIpVaultDocumentIntakeRouteImport.update({
+    id: '/prepare/ip-vault/document-intake',
+    path: '/prepare/ip-vault/document-intake',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppPrepareIpVaultDigitalDocumentVaultRoute =
+  AppPrepareIpVaultDigitalDocumentVaultRouteImport.update({
+    id: '/prepare/ip-vault/digital-document-vault',
+    path: '/prepare/ip-vault/digital-document-vault',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppPrepareBadgesOverviewRoute =
   AppPrepareBadgesOverviewRouteImport.update({
     id: '/prepare/badges/overview',
@@ -1104,6 +1132,10 @@ export interface FileRoutesByFullPath {
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
   '/app/prepare/badges/overview': typeof AppPrepareBadgesOverviewRoute
+  '/app/prepare/ip-vault/digital-document-vault': typeof AppPrepareIpVaultDigitalDocumentVaultRoute
+  '/app/prepare/ip-vault/document-intake': typeof AppPrepareIpVaultDocumentIntakeRoute
+  '/app/prepare/ip-vault/privacy-settings': typeof AppPrepareIpVaultPrivacySettingsRoute
+  '/app/prepare/ip-vault/source-files': typeof AppPrepareIpVaultSourceFilesRoute
   '/app/prepare/profile-builder/full-profile': typeof AppPrepareProfileBuilderFullProfileRoute
   '/app/prepare/profile-builder/fundraising-thesis': typeof AppPrepareProfileBuilderFundraisingThesisRoute
   '/app/prepare/profile-builder/quick-setup': typeof AppPrepareProfileBuilderQuickSetupRoute
@@ -1256,6 +1288,10 @@ export interface FileRoutesByTo {
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
   '/app/prepare/badges/overview': typeof AppPrepareBadgesOverviewRoute
+  '/app/prepare/ip-vault/digital-document-vault': typeof AppPrepareIpVaultDigitalDocumentVaultRoute
+  '/app/prepare/ip-vault/document-intake': typeof AppPrepareIpVaultDocumentIntakeRoute
+  '/app/prepare/ip-vault/privacy-settings': typeof AppPrepareIpVaultPrivacySettingsRoute
+  '/app/prepare/ip-vault/source-files': typeof AppPrepareIpVaultSourceFilesRoute
   '/app/prepare/profile-builder/full-profile': typeof AppPrepareProfileBuilderFullProfileRoute
   '/app/prepare/profile-builder/fundraising-thesis': typeof AppPrepareProfileBuilderFundraisingThesisRoute
   '/app/prepare/profile-builder/quick-setup': typeof AppPrepareProfileBuilderQuickSetupRoute
@@ -1413,6 +1449,10 @@ export interface FileRoutesById {
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
   '/app/prepare/badges/overview': typeof AppPrepareBadgesOverviewRoute
+  '/app/prepare/ip-vault/digital-document-vault': typeof AppPrepareIpVaultDigitalDocumentVaultRoute
+  '/app/prepare/ip-vault/document-intake': typeof AppPrepareIpVaultDocumentIntakeRoute
+  '/app/prepare/ip-vault/privacy-settings': typeof AppPrepareIpVaultPrivacySettingsRoute
+  '/app/prepare/ip-vault/source-files': typeof AppPrepareIpVaultSourceFilesRoute
   '/app/prepare/profile-builder/full-profile': typeof AppPrepareProfileBuilderFullProfileRoute
   '/app/prepare/profile-builder/fundraising-thesis': typeof AppPrepareProfileBuilderFundraisingThesisRoute
   '/app/prepare/profile-builder/quick-setup': typeof AppPrepareProfileBuilderQuickSetupRoute
@@ -1571,6 +1611,10 @@ export interface FileRouteTypes {
     | '/app/investor/discover/watchlist'
     | '/app/prepare/badges/founder-roast'
     | '/app/prepare/badges/overview'
+    | '/app/prepare/ip-vault/digital-document-vault'
+    | '/app/prepare/ip-vault/document-intake'
+    | '/app/prepare/ip-vault/privacy-settings'
+    | '/app/prepare/ip-vault/source-files'
     | '/app/prepare/profile-builder/full-profile'
     | '/app/prepare/profile-builder/fundraising-thesis'
     | '/app/prepare/profile-builder/quick-setup'
@@ -1723,6 +1767,10 @@ export interface FileRouteTypes {
     | '/app/investor/discover/watchlist'
     | '/app/prepare/badges/founder-roast'
     | '/app/prepare/badges/overview'
+    | '/app/prepare/ip-vault/digital-document-vault'
+    | '/app/prepare/ip-vault/document-intake'
+    | '/app/prepare/ip-vault/privacy-settings'
+    | '/app/prepare/ip-vault/source-files'
     | '/app/prepare/profile-builder/full-profile'
     | '/app/prepare/profile-builder/fundraising-thesis'
     | '/app/prepare/profile-builder/quick-setup'
@@ -1879,6 +1927,10 @@ export interface FileRouteTypes {
     | '/app/investor/discover/watchlist'
     | '/app/prepare/badges/founder-roast'
     | '/app/prepare/badges/overview'
+    | '/app/prepare/ip-vault/digital-document-vault'
+    | '/app/prepare/ip-vault/document-intake'
+    | '/app/prepare/ip-vault/privacy-settings'
+    | '/app/prepare/ip-vault/source-files'
     | '/app/prepare/profile-builder/full-profile'
     | '/app/prepare/profile-builder/fundraising-thesis'
     | '/app/prepare/profile-builder/quick-setup'
@@ -2874,6 +2926,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPrepareProfileBuilderFullProfileRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/prepare/ip-vault/source-files': {
+      id: '/app/prepare/ip-vault/source-files'
+      path: '/prepare/ip-vault/source-files'
+      fullPath: '/app/prepare/ip-vault/source-files'
+      preLoaderRoute: typeof AppPrepareIpVaultSourceFilesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/prepare/ip-vault/privacy-settings': {
+      id: '/app/prepare/ip-vault/privacy-settings'
+      path: '/prepare/ip-vault/privacy-settings'
+      fullPath: '/app/prepare/ip-vault/privacy-settings'
+      preLoaderRoute: typeof AppPrepareIpVaultPrivacySettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/prepare/ip-vault/document-intake': {
+      id: '/app/prepare/ip-vault/document-intake'
+      path: '/prepare/ip-vault/document-intake'
+      fullPath: '/app/prepare/ip-vault/document-intake'
+      preLoaderRoute: typeof AppPrepareIpVaultDocumentIntakeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/prepare/ip-vault/digital-document-vault': {
+      id: '/app/prepare/ip-vault/digital-document-vault'
+      path: '/prepare/ip-vault/digital-document-vault'
+      fullPath: '/app/prepare/ip-vault/digital-document-vault'
+      preLoaderRoute: typeof AppPrepareIpVaultDigitalDocumentVaultRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/prepare/badges/overview': {
       id: '/app/prepare/badges/overview'
       path: '/prepare/badges/overview'
@@ -3196,6 +3276,10 @@ interface AppRouteChildren {
   AppGoLiveDigitalProfileProfileViewRoute: typeof AppGoLiveDigitalProfileProfileViewRoute
   AppPrepareBadgesFounderRoastRoute: typeof AppPrepareBadgesFounderRoastRoute
   AppPrepareBadgesOverviewRoute: typeof AppPrepareBadgesOverviewRoute
+  AppPrepareIpVaultDigitalDocumentVaultRoute: typeof AppPrepareIpVaultDigitalDocumentVaultRoute
+  AppPrepareIpVaultDocumentIntakeRoute: typeof AppPrepareIpVaultDocumentIntakeRoute
+  AppPrepareIpVaultPrivacySettingsRoute: typeof AppPrepareIpVaultPrivacySettingsRoute
+  AppPrepareIpVaultSourceFilesRoute: typeof AppPrepareIpVaultSourceFilesRoute
   AppPrepareProfileBuilderFullProfileRoute: typeof AppPrepareProfileBuilderFullProfileRoute
   AppPrepareProfileBuilderFundraisingThesisRoute: typeof AppPrepareProfileBuilderFundraisingThesisRoute
   AppPrepareProfileBuilderQuickSetupRoute: typeof AppPrepareProfileBuilderQuickSetupRoute
@@ -3252,6 +3336,11 @@ const AppRouteChildren: AppRouteChildren = {
     AppGoLiveDigitalProfileProfileViewRoute,
   AppPrepareBadgesFounderRoastRoute: AppPrepareBadgesFounderRoastRoute,
   AppPrepareBadgesOverviewRoute: AppPrepareBadgesOverviewRoute,
+  AppPrepareIpVaultDigitalDocumentVaultRoute:
+    AppPrepareIpVaultDigitalDocumentVaultRoute,
+  AppPrepareIpVaultDocumentIntakeRoute: AppPrepareIpVaultDocumentIntakeRoute,
+  AppPrepareIpVaultPrivacySettingsRoute: AppPrepareIpVaultPrivacySettingsRoute,
+  AppPrepareIpVaultSourceFilesRoute: AppPrepareIpVaultSourceFilesRoute,
   AppPrepareProfileBuilderFullProfileRoute:
     AppPrepareProfileBuilderFullProfileRoute,
   AppPrepareProfileBuilderFundraisingThesisRoute:

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import {
   FileText, CheckCircle2, AlertCircle, Zap,
   ArrowRight, ChevronDown, Loader2, X, Upload,
@@ -17,7 +17,10 @@ const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","xlsx","xls","docx","doc"
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
 export const Route = createFileRoute("/app/documents")({
-  component: Documents,
+  // R9: relocated to Prepare › IP Vault — old URL redirects to the default leaf.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/prepare/ip-vault/document-intake", replace: true });
+  },
 });
 
 const STAGE_OPTIONS = ["Pre-seed", "Seed", "Series A", "Series B"] as const;
@@ -250,7 +253,13 @@ const STAGE2_SLUGS = new Set(["competitive-landscape", "product-roadmap", "tech-
 const STAGE3_SLUGS = new Set(["financial-model", "cap-table", "incorporation-docs", "shareholder-agreements", "bank-statements", "customer-references"]);
 
 
-export function Documents() {
+export type DocumentsView = "document-intake" | "source-files" | "digital-document-vault" | "privacy-settings";
+
+// R9: `view` renders one IP Vault leaf's slice of this workspace under route
+// control. Source Files = physical uploads (file_path set); Digital Document
+// Vault = Hockystick-processed documents (structured content) — deliberately
+// distinct concepts, never merged (R9 step 6).
+export function Documents({ view }: { view?: DocumentsView } = {}) {
   const { user } = useAuth();
   const [selectedStage, setSelectedStage] = useState<Stage>("Seed");
   const [selectedCategory, setSelectedCategory] = useState<TemplateCategory>("All");
@@ -317,8 +326,26 @@ export function Documents() {
     if (selectedCategory !== "All") {
       filtered = filtered.filter(t => t.category === selectedCategory);
     }
+    // R9 leaf slices over the same template cards:
+    if (view === "document-intake") {
+      // still to add — no doc yet, or only an empty/draft shell
+      filtered = filtered.filter(t => !t.founderDoc || ["empty", "draft"].includes(t.founderDoc.status));
+    } else if (view === "source-files") {
+      // physical uploads only
+      filtered = filtered.filter(t => !!t.founderDoc?.file_path);
+    } else if (view === "digital-document-vault") {
+      // Hockystick-processed documents (structured content exists)
+      filtered = filtered.filter(t =>
+        !!t.founderDoc &&
+        (Object.keys(t.founderDoc.content ?? {}).length > 0 ||
+          ["ai_extracted", "complete", "needs_review"].includes(t.founderDoc.status)),
+      );
+    } else if (view === "privacy-settings") {
+      // every managed document, for its visibility control
+      filtered = filtered.filter(t => !!t.founderDoc);
+    }
     return filtered;
-  }, [documentsWithStatus, stageKey, selectedCategory]);
+  }, [documentsWithStatus, stageKey, selectedCategory, view]);
 
   async function handleFileUpload(templateSlug: string, templateName: string, templateId: string, file: File) {
     if (!startup?.id) return;
@@ -393,8 +420,20 @@ export function Documents() {
       <PageBreadcrumb items={[{ label: "Your raise", to: "/app/prepare" }, { label: "Documents" }]} />
       <div className="flex items-start justify-between gap-6 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>Documents</h1>
-          <p className="text-sm text-muted-foreground">Your document workspace — guided by AI</p>
+          <h1 className="text-3xl font-bold text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
+            {view === "document-intake" ? "Document Intake"
+              : view === "source-files" ? "Source Files"
+              : view === "digital-document-vault" ? "Digital Document Vault"
+              : view === "privacy-settings" ? "Document Privacy Settings"
+              : "Documents"}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {view === "document-intake" ? "Add the documents investors expect for your stage."
+              : view === "source-files" ? "The original files you uploaded."
+              : view === "digital-document-vault" ? "Your Hockystick-processed documents."
+              : view === "privacy-settings" ? "Control which documents each stage can see."
+              : "Your document workspace — guided by AI"}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <PageGuide pageId="documents" />
