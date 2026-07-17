@@ -173,6 +173,19 @@ import { Route as AppDealRoomsIdDocumentsRouteImport } from './routes/app.deal-r
 import { Route as AppDealRoomsIdDiligenceRouteImport } from './routes/app.deal-rooms.$id.diligence'
 import { Route as AppDealRoomsIdCloseRouteImport } from './routes/app.deal-rooms.$id.close'
 import { Route as AppDealRoomsIdActivityRouteImport } from './routes/app.deal-rooms.$id.activity'
+import { Route as AppInvestorThesisVerificationVerificationsRouteImport } from './routes/app.investor.thesis.verification.verifications'
+import { Route as AppInvestorThesisVerificationClaimsRouteImport } from './routes/app.investor.thesis.verification.claims'
+import { Route as AppInvestorThesisProfileBuilderTrackRecordRouteImport } from './routes/app.investor.thesis.profile-builder.track-record'
+import { Route as AppInvestorThesisProfileBuilderTeamCardsRouteImport } from './routes/app.investor.thesis.profile-builder.team-cards'
+import { Route as AppInvestorThesisProfileBuilderQuickSetupRouteImport } from './routes/app.investor.thesis.profile-builder.quick-setup'
+import { Route as AppInvestorThesisProfileBuilderInvestmentThesisRouteImport } from './routes/app.investor.thesis.profile-builder.investment-thesis'
+import { Route as AppInvestorThesisProfileBuilderFullProfileRouteImport } from './routes/app.investor.thesis.profile-builder.full-profile'
+import { Route as AppInvestorThesisFundVaultSourceFilesRouteImport } from './routes/app.investor.thesis.fund-vault.source-files'
+import { Route as AppInvestorThesisCapitalReadinessChequeSizeRouteImport } from './routes/app.investor.thesis.capital-readiness.cheque-size'
+import { Route as AppInvestorThesisBadgesTierStatusRouteImport } from './routes/app.investor.thesis.badges.tier-status'
+import { Route as AppInvestorThesisBadgesOverviewRouteImport } from './routes/app.investor.thesis.badges.overview'
+import { Route as AppInvestorDiscoverPublicProfileProfileViewRouteImport } from './routes/app.investor.discover.public-profile.profile-view'
+import { Route as AppInvestorDiscoverPublicProfilePrivacySettingsRouteImport } from './routes/app.investor.discover.public-profile.privacy-settings'
 
 const WaitlistRoute = WaitlistRouteImport.update({
   id: '/waitlist',
@@ -1028,6 +1041,84 @@ const AppDealRoomsIdActivityRoute = AppDealRoomsIdActivityRouteImport.update({
   path: '/activity',
   getParentRoute: () => AppDealRoomsIdRoute,
 } as any)
+const AppInvestorThesisVerificationVerificationsRoute =
+  AppInvestorThesisVerificationVerificationsRouteImport.update({
+    id: '/thesis/verification/verifications',
+    path: '/thesis/verification/verifications',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisVerificationClaimsRoute =
+  AppInvestorThesisVerificationClaimsRouteImport.update({
+    id: '/thesis/verification/claims',
+    path: '/thesis/verification/claims',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisProfileBuilderTrackRecordRoute =
+  AppInvestorThesisProfileBuilderTrackRecordRouteImport.update({
+    id: '/thesis/profile-builder/track-record',
+    path: '/thesis/profile-builder/track-record',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisProfileBuilderTeamCardsRoute =
+  AppInvestorThesisProfileBuilderTeamCardsRouteImport.update({
+    id: '/thesis/profile-builder/team-cards',
+    path: '/thesis/profile-builder/team-cards',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisProfileBuilderQuickSetupRoute =
+  AppInvestorThesisProfileBuilderQuickSetupRouteImport.update({
+    id: '/thesis/profile-builder/quick-setup',
+    path: '/thesis/profile-builder/quick-setup',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisProfileBuilderInvestmentThesisRoute =
+  AppInvestorThesisProfileBuilderInvestmentThesisRouteImport.update({
+    id: '/thesis/profile-builder/investment-thesis',
+    path: '/thesis/profile-builder/investment-thesis',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisProfileBuilderFullProfileRoute =
+  AppInvestorThesisProfileBuilderFullProfileRouteImport.update({
+    id: '/thesis/profile-builder/full-profile',
+    path: '/thesis/profile-builder/full-profile',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisFundVaultSourceFilesRoute =
+  AppInvestorThesisFundVaultSourceFilesRouteImport.update({
+    id: '/thesis/fund-vault/source-files',
+    path: '/thesis/fund-vault/source-files',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisCapitalReadinessChequeSizeRoute =
+  AppInvestorThesisCapitalReadinessChequeSizeRouteImport.update({
+    id: '/thesis/capital-readiness/cheque-size',
+    path: '/thesis/capital-readiness/cheque-size',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisBadgesTierStatusRoute =
+  AppInvestorThesisBadgesTierStatusRouteImport.update({
+    id: '/thesis/badges/tier-status',
+    path: '/thesis/badges/tier-status',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisBadgesOverviewRoute =
+  AppInvestorThesisBadgesOverviewRouteImport.update({
+    id: '/thesis/badges/overview',
+    path: '/thesis/badges/overview',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorDiscoverPublicProfileProfileViewRoute =
+  AppInvestorDiscoverPublicProfileProfileViewRouteImport.update({
+    id: '/discover/public-profile/profile-view',
+    path: '/discover/public-profile/profile-view',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorDiscoverPublicProfilePrivacySettingsRoute =
+  AppInvestorDiscoverPublicProfilePrivacySettingsRouteImport.update({
+    id: '/discover/public-profile/privacy-settings',
+    path: '/discover/public-profile/privacy-settings',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -1194,6 +1285,19 @@ export interface FileRoutesByFullPath {
   '/app/investor/deal-rooms/': typeof AppInvestorDealRoomsIndexRoute
   '/app/investor/discover/': typeof AppInvestorDiscoverIndexRoute
   '/app/investor/thesis/': typeof AppInvestorThesisIndexRoute
+  '/app/investor/discover/public-profile/privacy-settings': typeof AppInvestorDiscoverPublicProfilePrivacySettingsRoute
+  '/app/investor/discover/public-profile/profile-view': typeof AppInvestorDiscoverPublicProfileProfileViewRoute
+  '/app/investor/thesis/badges/overview': typeof AppInvestorThesisBadgesOverviewRoute
+  '/app/investor/thesis/badges/tier-status': typeof AppInvestorThesisBadgesTierStatusRoute
+  '/app/investor/thesis/capital-readiness/cheque-size': typeof AppInvestorThesisCapitalReadinessChequeSizeRoute
+  '/app/investor/thesis/fund-vault/source-files': typeof AppInvestorThesisFundVaultSourceFilesRoute
+  '/app/investor/thesis/profile-builder/full-profile': typeof AppInvestorThesisProfileBuilderFullProfileRoute
+  '/app/investor/thesis/profile-builder/investment-thesis': typeof AppInvestorThesisProfileBuilderInvestmentThesisRoute
+  '/app/investor/thesis/profile-builder/quick-setup': typeof AppInvestorThesisProfileBuilderQuickSetupRoute
+  '/app/investor/thesis/profile-builder/team-cards': typeof AppInvestorThesisProfileBuilderTeamCardsRoute
+  '/app/investor/thesis/profile-builder/track-record': typeof AppInvestorThesisProfileBuilderTrackRecordRoute
+  '/app/investor/thesis/verification/claims': typeof AppInvestorThesisVerificationClaimsRoute
+  '/app/investor/thesis/verification/verifications': typeof AppInvestorThesisVerificationVerificationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -1356,6 +1460,19 @@ export interface FileRoutesByTo {
   '/app/investor/deal-rooms': typeof AppInvestorDealRoomsIndexRoute
   '/app/investor/discover': typeof AppInvestorDiscoverIndexRoute
   '/app/investor/thesis': typeof AppInvestorThesisIndexRoute
+  '/app/investor/discover/public-profile/privacy-settings': typeof AppInvestorDiscoverPublicProfilePrivacySettingsRoute
+  '/app/investor/discover/public-profile/profile-view': typeof AppInvestorDiscoverPublicProfileProfileViewRoute
+  '/app/investor/thesis/badges/overview': typeof AppInvestorThesisBadgesOverviewRoute
+  '/app/investor/thesis/badges/tier-status': typeof AppInvestorThesisBadgesTierStatusRoute
+  '/app/investor/thesis/capital-readiness/cheque-size': typeof AppInvestorThesisCapitalReadinessChequeSizeRoute
+  '/app/investor/thesis/fund-vault/source-files': typeof AppInvestorThesisFundVaultSourceFilesRoute
+  '/app/investor/thesis/profile-builder/full-profile': typeof AppInvestorThesisProfileBuilderFullProfileRoute
+  '/app/investor/thesis/profile-builder/investment-thesis': typeof AppInvestorThesisProfileBuilderInvestmentThesisRoute
+  '/app/investor/thesis/profile-builder/quick-setup': typeof AppInvestorThesisProfileBuilderQuickSetupRoute
+  '/app/investor/thesis/profile-builder/team-cards': typeof AppInvestorThesisProfileBuilderTeamCardsRoute
+  '/app/investor/thesis/profile-builder/track-record': typeof AppInvestorThesisProfileBuilderTrackRecordRoute
+  '/app/investor/thesis/verification/claims': typeof AppInvestorThesisVerificationClaimsRoute
+  '/app/investor/thesis/verification/verifications': typeof AppInvestorThesisVerificationVerificationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1523,6 +1640,19 @@ export interface FileRoutesById {
   '/app/investor/deal-rooms/': typeof AppInvestorDealRoomsIndexRoute
   '/app/investor/discover/': typeof AppInvestorDiscoverIndexRoute
   '/app/investor/thesis/': typeof AppInvestorThesisIndexRoute
+  '/app/investor/discover/public-profile/privacy-settings': typeof AppInvestorDiscoverPublicProfilePrivacySettingsRoute
+  '/app/investor/discover/public-profile/profile-view': typeof AppInvestorDiscoverPublicProfileProfileViewRoute
+  '/app/investor/thesis/badges/overview': typeof AppInvestorThesisBadgesOverviewRoute
+  '/app/investor/thesis/badges/tier-status': typeof AppInvestorThesisBadgesTierStatusRoute
+  '/app/investor/thesis/capital-readiness/cheque-size': typeof AppInvestorThesisCapitalReadinessChequeSizeRoute
+  '/app/investor/thesis/fund-vault/source-files': typeof AppInvestorThesisFundVaultSourceFilesRoute
+  '/app/investor/thesis/profile-builder/full-profile': typeof AppInvestorThesisProfileBuilderFullProfileRoute
+  '/app/investor/thesis/profile-builder/investment-thesis': typeof AppInvestorThesisProfileBuilderInvestmentThesisRoute
+  '/app/investor/thesis/profile-builder/quick-setup': typeof AppInvestorThesisProfileBuilderQuickSetupRoute
+  '/app/investor/thesis/profile-builder/team-cards': typeof AppInvestorThesisProfileBuilderTeamCardsRoute
+  '/app/investor/thesis/profile-builder/track-record': typeof AppInvestorThesisProfileBuilderTrackRecordRoute
+  '/app/investor/thesis/verification/claims': typeof AppInvestorThesisVerificationClaimsRoute
+  '/app/investor/thesis/verification/verifications': typeof AppInvestorThesisVerificationVerificationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1691,6 +1821,19 @@ export interface FileRouteTypes {
     | '/app/investor/deal-rooms/'
     | '/app/investor/discover/'
     | '/app/investor/thesis/'
+    | '/app/investor/discover/public-profile/privacy-settings'
+    | '/app/investor/discover/public-profile/profile-view'
+    | '/app/investor/thesis/badges/overview'
+    | '/app/investor/thesis/badges/tier-status'
+    | '/app/investor/thesis/capital-readiness/cheque-size'
+    | '/app/investor/thesis/fund-vault/source-files'
+    | '/app/investor/thesis/profile-builder/full-profile'
+    | '/app/investor/thesis/profile-builder/investment-thesis'
+    | '/app/investor/thesis/profile-builder/quick-setup'
+    | '/app/investor/thesis/profile-builder/team-cards'
+    | '/app/investor/thesis/profile-builder/track-record'
+    | '/app/investor/thesis/verification/claims'
+    | '/app/investor/thesis/verification/verifications'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1853,6 +1996,19 @@ export interface FileRouteTypes {
     | '/app/investor/deal-rooms'
     | '/app/investor/discover'
     | '/app/investor/thesis'
+    | '/app/investor/discover/public-profile/privacy-settings'
+    | '/app/investor/discover/public-profile/profile-view'
+    | '/app/investor/thesis/badges/overview'
+    | '/app/investor/thesis/badges/tier-status'
+    | '/app/investor/thesis/capital-readiness/cheque-size'
+    | '/app/investor/thesis/fund-vault/source-files'
+    | '/app/investor/thesis/profile-builder/full-profile'
+    | '/app/investor/thesis/profile-builder/investment-thesis'
+    | '/app/investor/thesis/profile-builder/quick-setup'
+    | '/app/investor/thesis/profile-builder/team-cards'
+    | '/app/investor/thesis/profile-builder/track-record'
+    | '/app/investor/thesis/verification/claims'
+    | '/app/investor/thesis/verification/verifications'
   id:
     | '__root__'
     | '/'
@@ -2019,6 +2175,19 @@ export interface FileRouteTypes {
     | '/app/investor/deal-rooms/'
     | '/app/investor/discover/'
     | '/app/investor/thesis/'
+    | '/app/investor/discover/public-profile/privacy-settings'
+    | '/app/investor/discover/public-profile/profile-view'
+    | '/app/investor/thesis/badges/overview'
+    | '/app/investor/thesis/badges/tier-status'
+    | '/app/investor/thesis/capital-readiness/cheque-size'
+    | '/app/investor/thesis/fund-vault/source-files'
+    | '/app/investor/thesis/profile-builder/full-profile'
+    | '/app/investor/thesis/profile-builder/investment-thesis'
+    | '/app/investor/thesis/profile-builder/quick-setup'
+    | '/app/investor/thesis/profile-builder/team-cards'
+    | '/app/investor/thesis/profile-builder/track-record'
+    | '/app/investor/thesis/verification/claims'
+    | '/app/investor/thesis/verification/verifications'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -3226,6 +3395,97 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDealRoomsIdActivityRouteImport
       parentRoute: typeof AppDealRoomsIdRoute
     }
+    '/app/investor/thesis/verification/verifications': {
+      id: '/app/investor/thesis/verification/verifications'
+      path: '/thesis/verification/verifications'
+      fullPath: '/app/investor/thesis/verification/verifications'
+      preLoaderRoute: typeof AppInvestorThesisVerificationVerificationsRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/verification/claims': {
+      id: '/app/investor/thesis/verification/claims'
+      path: '/thesis/verification/claims'
+      fullPath: '/app/investor/thesis/verification/claims'
+      preLoaderRoute: typeof AppInvestorThesisVerificationClaimsRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/profile-builder/track-record': {
+      id: '/app/investor/thesis/profile-builder/track-record'
+      path: '/thesis/profile-builder/track-record'
+      fullPath: '/app/investor/thesis/profile-builder/track-record'
+      preLoaderRoute: typeof AppInvestorThesisProfileBuilderTrackRecordRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/profile-builder/team-cards': {
+      id: '/app/investor/thesis/profile-builder/team-cards'
+      path: '/thesis/profile-builder/team-cards'
+      fullPath: '/app/investor/thesis/profile-builder/team-cards'
+      preLoaderRoute: typeof AppInvestorThesisProfileBuilderTeamCardsRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/profile-builder/quick-setup': {
+      id: '/app/investor/thesis/profile-builder/quick-setup'
+      path: '/thesis/profile-builder/quick-setup'
+      fullPath: '/app/investor/thesis/profile-builder/quick-setup'
+      preLoaderRoute: typeof AppInvestorThesisProfileBuilderQuickSetupRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/profile-builder/investment-thesis': {
+      id: '/app/investor/thesis/profile-builder/investment-thesis'
+      path: '/thesis/profile-builder/investment-thesis'
+      fullPath: '/app/investor/thesis/profile-builder/investment-thesis'
+      preLoaderRoute: typeof AppInvestorThesisProfileBuilderInvestmentThesisRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/profile-builder/full-profile': {
+      id: '/app/investor/thesis/profile-builder/full-profile'
+      path: '/thesis/profile-builder/full-profile'
+      fullPath: '/app/investor/thesis/profile-builder/full-profile'
+      preLoaderRoute: typeof AppInvestorThesisProfileBuilderFullProfileRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/fund-vault/source-files': {
+      id: '/app/investor/thesis/fund-vault/source-files'
+      path: '/thesis/fund-vault/source-files'
+      fullPath: '/app/investor/thesis/fund-vault/source-files'
+      preLoaderRoute: typeof AppInvestorThesisFundVaultSourceFilesRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/capital-readiness/cheque-size': {
+      id: '/app/investor/thesis/capital-readiness/cheque-size'
+      path: '/thesis/capital-readiness/cheque-size'
+      fullPath: '/app/investor/thesis/capital-readiness/cheque-size'
+      preLoaderRoute: typeof AppInvestorThesisCapitalReadinessChequeSizeRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/badges/tier-status': {
+      id: '/app/investor/thesis/badges/tier-status'
+      path: '/thesis/badges/tier-status'
+      fullPath: '/app/investor/thesis/badges/tier-status'
+      preLoaderRoute: typeof AppInvestorThesisBadgesTierStatusRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/badges/overview': {
+      id: '/app/investor/thesis/badges/overview'
+      path: '/thesis/badges/overview'
+      fullPath: '/app/investor/thesis/badges/overview'
+      preLoaderRoute: typeof AppInvestorThesisBadgesOverviewRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/discover/public-profile/profile-view': {
+      id: '/app/investor/discover/public-profile/profile-view'
+      path: '/discover/public-profile/profile-view'
+      fullPath: '/app/investor/discover/public-profile/profile-view'
+      preLoaderRoute: typeof AppInvestorDiscoverPublicProfileProfileViewRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/discover/public-profile/privacy-settings': {
+      id: '/app/investor/discover/public-profile/privacy-settings'
+      path: '/discover/public-profile/privacy-settings'
+      fullPath: '/app/investor/discover/public-profile/privacy-settings'
+      preLoaderRoute: typeof AppInvestorDiscoverPublicProfilePrivacySettingsRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
   }
 }
 
@@ -3262,6 +3522,19 @@ interface AppInvestorRouteChildren {
   AppInvestorDealRoomsIndexRoute: typeof AppInvestorDealRoomsIndexRoute
   AppInvestorDiscoverIndexRoute: typeof AppInvestorDiscoverIndexRoute
   AppInvestorThesisIndexRoute: typeof AppInvestorThesisIndexRoute
+  AppInvestorDiscoverPublicProfilePrivacySettingsRoute: typeof AppInvestorDiscoverPublicProfilePrivacySettingsRoute
+  AppInvestorDiscoverPublicProfileProfileViewRoute: typeof AppInvestorDiscoverPublicProfileProfileViewRoute
+  AppInvestorThesisBadgesOverviewRoute: typeof AppInvestorThesisBadgesOverviewRoute
+  AppInvestorThesisBadgesTierStatusRoute: typeof AppInvestorThesisBadgesTierStatusRoute
+  AppInvestorThesisCapitalReadinessChequeSizeRoute: typeof AppInvestorThesisCapitalReadinessChequeSizeRoute
+  AppInvestorThesisFundVaultSourceFilesRoute: typeof AppInvestorThesisFundVaultSourceFilesRoute
+  AppInvestorThesisProfileBuilderFullProfileRoute: typeof AppInvestorThesisProfileBuilderFullProfileRoute
+  AppInvestorThesisProfileBuilderInvestmentThesisRoute: typeof AppInvestorThesisProfileBuilderInvestmentThesisRoute
+  AppInvestorThesisProfileBuilderQuickSetupRoute: typeof AppInvestorThesisProfileBuilderQuickSetupRoute
+  AppInvestorThesisProfileBuilderTeamCardsRoute: typeof AppInvestorThesisProfileBuilderTeamCardsRoute
+  AppInvestorThesisProfileBuilderTrackRecordRoute: typeof AppInvestorThesisProfileBuilderTrackRecordRoute
+  AppInvestorThesisVerificationClaimsRoute: typeof AppInvestorThesisVerificationClaimsRoute
+  AppInvestorThesisVerificationVerificationsRoute: typeof AppInvestorThesisVerificationVerificationsRoute
 }
 
 const AppInvestorRouteChildren: AppInvestorRouteChildren = {
@@ -3298,6 +3571,31 @@ const AppInvestorRouteChildren: AppInvestorRouteChildren = {
   AppInvestorDealRoomsIndexRoute: AppInvestorDealRoomsIndexRoute,
   AppInvestorDiscoverIndexRoute: AppInvestorDiscoverIndexRoute,
   AppInvestorThesisIndexRoute: AppInvestorThesisIndexRoute,
+  AppInvestorDiscoverPublicProfilePrivacySettingsRoute:
+    AppInvestorDiscoverPublicProfilePrivacySettingsRoute,
+  AppInvestorDiscoverPublicProfileProfileViewRoute:
+    AppInvestorDiscoverPublicProfileProfileViewRoute,
+  AppInvestorThesisBadgesOverviewRoute: AppInvestorThesisBadgesOverviewRoute,
+  AppInvestorThesisBadgesTierStatusRoute:
+    AppInvestorThesisBadgesTierStatusRoute,
+  AppInvestorThesisCapitalReadinessChequeSizeRoute:
+    AppInvestorThesisCapitalReadinessChequeSizeRoute,
+  AppInvestorThesisFundVaultSourceFilesRoute:
+    AppInvestorThesisFundVaultSourceFilesRoute,
+  AppInvestorThesisProfileBuilderFullProfileRoute:
+    AppInvestorThesisProfileBuilderFullProfileRoute,
+  AppInvestorThesisProfileBuilderInvestmentThesisRoute:
+    AppInvestorThesisProfileBuilderInvestmentThesisRoute,
+  AppInvestorThesisProfileBuilderQuickSetupRoute:
+    AppInvestorThesisProfileBuilderQuickSetupRoute,
+  AppInvestorThesisProfileBuilderTeamCardsRoute:
+    AppInvestorThesisProfileBuilderTeamCardsRoute,
+  AppInvestorThesisProfileBuilderTrackRecordRoute:
+    AppInvestorThesisProfileBuilderTrackRecordRoute,
+  AppInvestorThesisVerificationClaimsRoute:
+    AppInvestorThesisVerificationClaimsRoute,
+  AppInvestorThesisVerificationVerificationsRoute:
+    AppInvestorThesisVerificationVerificationsRoute,
 }
 
 const AppInvestorRouteWithChildren = AppInvestorRoute._addFileChildren(

@@ -1,4 +1,4 @@
-import { createFileRoute, useSearch } from "@tanstack/react-router";
+import { createFileRoute, redirect, useSearch } from "@tanstack/react-router";
 import { useEffect, useState, useRef, Component } from "react";
 import type { ReactNode, ErrorInfo } from "react";
 import {
@@ -27,7 +27,15 @@ import { PageFrame, EmptyState } from "@/components/system";
 import { color, font, space, radius } from "@/lib/design-tokens";
 
 export const Route = createFileRoute("/app/investor/profile")({
-  component: InvestorProfilePage,
+  // R9: relocated to Thesis › Investor Profile Builder — old URL redirects to
+  // the Full Profile leaf, carrying search params (onboarding ?tour=thesis).
+  beforeLoad: ({ search }) => {
+    throw redirect({
+      to: "/app/investor/thesis/profile-builder/full-profile" as any,
+      search: search as any,
+      replace: true,
+    });
+  },
 });
 
 // ── Types ─────────────────────────────────────────────────────────
@@ -221,7 +229,49 @@ function BulletEditor({ bullets, onChange, placeholder }: { bullets: string[]; o
 
 // ── Main page ─────────────────────────────────────────────────────
 
-export function InvestorProfilePage() {
+// R9: each investor Thesis/Discover leaf renders a slice of this page under
+// route control via `view`. Unset renders the full R4B page.
+export type InvestorProfileView =
+  | "quick-setup" | "full-profile" | "team-cards" | "track-record" | "investment-thesis"
+  | "source-files" | "verifications" | "claims" | "badges-overview" | "tier-status"
+  | "cheque-size" | "profile-view" | "privacy-settings";
+
+// Card keys: left column = identity, deck, thesis, track, achievements, team,
+// portfolio, visibility · rail = completeness, preview, share, verification,
+// capital, badges
+const ALL_CARDS = ["identity", "deck", "thesis", "track", "achievements", "team", "portfolio", "visibility", "completeness", "preview", "share", "verification", "capital", "badges"];
+const VIEW_CARDS: Record<InvestorProfileView, string[]> = {
+  "quick-setup": ["identity", "completeness"],
+  "full-profile": ALL_CARDS,
+  "team-cards": ["team"],
+  "track-record": ["track"],
+  "investment-thesis": ["thesis"],
+  "source-files": ["deck"],
+  "verifications": ["verification"],
+  "claims": ["track"],
+  "badges-overview": ["badges"],
+  "tier-status": ["verification"],
+  "cheque-size": ["capital"],
+  "profile-view": ["preview", "share"],
+  "privacy-settings": ["visibility", "share"],
+};
+const VIEW_COPY: Record<InvestorProfileView, { title: string; description: string }> = {
+  "quick-setup": { title: "Quick Setup", description: "Fund name, your name, role, photo, and social links." },
+  "full-profile": { title: "Full Profile", description: "Your fund's digital profile — shown publicly and inside unlocked deal rooms." },
+  "team-cards": { title: "Team Cards", description: "Partners and associates visible to founders in your deal rooms." },
+  "track-record": { title: "Track Record", description: "Named investments and outcomes — unverified until you attach evidence." },
+  "investment-thesis": { title: "Investment Thesis", description: "Your thesis statement, sectors, stages, and cheque size." },
+  "source-files": { title: "Source Files", description: "Upload your fund deck — AI drafts your profile, you confirm before anything is applied." },
+  "verifications": { title: "Verifications", description: "Your identity and fund verification checks." },
+  "claims": { title: "Claims", description: "Attach proof to your track-record claims." },
+  "badges-overview": { title: "Badge Overview & Guide", description: "Badges you hold and how each one is earned." },
+  "tier-status": { title: "Verification Tier Status", description: "Your current verification tier and what unlocks the next one." },
+  "cheque-size": { title: "Cheque Size Confirmation", description: "Verify your capital capacity and cheque size." },
+  "profile-view": { title: "Full Digital Profile View", description: "How your profile appears publicly and inside deal rooms." },
+  "privacy-settings": { title: "Profile Privacy Settings", description: "Control which fields appear on your public profile." },
+};
+
+export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {}) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const search = useSearch({ strict: false }) as { tour?: string };
@@ -539,6 +589,12 @@ export function InvestorProfilePage() {
   const completeness = computeCompleteness(form);
   const profileUrl = `${import.meta.env.VITE_APP_URL || "https://hockystick.app"}/i/${form.profile_slug}`;
 
+  // R9 view gating — which cards this leaf renders
+  const show = (card: string) => (view ? VIEW_CARDS[view].includes(card) : true);
+  const hasLeft = ["identity", "deck", "thesis", "track", "achievements", "team", "portfolio", "visibility"].some(show);
+  const hasRail = ["completeness", "preview", "share", "verification", "capital", "badges"].some(show);
+  const copy = view ? VIEW_COPY[view] : null;
+
   const showThesisSpotlight =
     search.tour === "thesis" &&
     progress?.account_type === "investor" &&
@@ -546,9 +602,9 @@ export function InvestorProfilePage() {
 
   return (
     <PageFrame
-      breadcrumb={[{ label: "Investor" }, { label: "Profile" }]}
-      title="Investor profile"
-      description="Your fund's digital profile — shown publicly and inside unlocked deal rooms."
+      breadcrumb={[{ label: "Investor" }, { label: copy ? copy.title : "Profile" }]}
+      title={copy ? copy.title : "Investor profile"}
+      description={copy ? copy.description : "Your fund's digital profile — shown publicly and inside unlocked deal rooms."}
       actions={
         <button type="button" onClick={handleSave} disabled={saving}
           style={{
@@ -578,12 +634,14 @@ export function InvestorProfilePage() {
         />
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: space.block, alignItems: "flex-start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: hasLeft && hasRail ? "1fr 380px" : "1fr", gap: space.block, alignItems: "flex-start" }}>
 
         {/* ── LEFT: form sections ─────────────────────────────────── */}
+        {hasLeft && (
         <div style={{ display: "flex", flexDirection: "column", gap: space.block, minWidth: 0 }}>
 
           {/* Identity & Fund */}
+          {show("identity") && (
           <Card>
             <SectionHeader icon={Building2} title="Identity & fund" description="Fund name, your name, role, photo, and social links" />
             <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 16 }}>
@@ -663,8 +721,10 @@ export function InvestorProfilePage() {
               </div>
             </div>
           </Card>
+          )}
 
           {/* AI: Upload fund deck */}
+          {show("deck") && (
           <Card>
             <SectionHeader icon={Sparkles} title="Upload fund deck" description="AI drafts your profile from a deck — you confirm before anything is applied" />
             <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
@@ -714,8 +774,10 @@ export function InvestorProfilePage() {
               </p>
             </div>
           </Card>
+          )}
 
           {/* Thesis summary */}
+          {show("thesis") && (
           <Card data-tour="thesis-accordion">
             <SectionHeader icon={Sparkles} title="Thesis summary" description="Your one-sentence thesis, bullet points, sectors, stages, and cheque size" />
             <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 16 }}>
@@ -779,8 +841,10 @@ export function InvestorProfilePage() {
               </Field>
             </div>
           </Card>
+          )}
 
           {/* Track record */}
+          {show("track") && (
           <Card>
             <SectionHeader icon={Trophy} title="Track record" description="Named investments and outcomes — unverified until you attach evidence" />
             <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
@@ -827,8 +891,10 @@ export function InvestorProfilePage() {
               </button>
             </div>
           </Card>
+          )}
 
           {/* Achievements */}
+          {show("achievements") && (
           <Card>
             <SectionHeader icon={Trophy} title="Achievements" description="Recognitions and highlights shown on your public profile" />
             <div style={{ padding: 20 }}>
@@ -836,8 +902,10 @@ export function InvestorProfilePage() {
                 placeholder="e.g. Led Series A in Stripe (2016), returned 12x" />
             </div>
           </Card>
+          )}
 
           {/* Team */}
+          {show("team") && (
           <Card>
             <SectionHeader icon={Users} title="Team" description="Partners and associates visible to founders in your deal rooms" />
             <div style={{ padding: 20 }}>
@@ -853,8 +921,10 @@ export function InvestorProfilePage() {
               )}
             </div>
           </Card>
+          )}
 
           {/* Documents / portfolio */}
+          {show("portfolio") && (
           <Card>
             <SectionHeader icon={Briefcase} title="Portfolio showcase" description="Companies you've invested in — curated, separate from your active pipeline" />
             <div style={{ padding: 20 }}>
@@ -867,8 +937,10 @@ export function InvestorProfilePage() {
               )}
             </div>
           </Card>
+          )}
 
           {/* Public fields whitelist */}
+          {show("visibility") && (
           <Card>
             <SectionHeader icon={Eye} title="Public visibility" description="Choose which fields appear on your public profile at /i/:slug" />
             <div style={{ padding: 20 }}>
@@ -885,12 +957,16 @@ export function InvestorProfilePage() {
               </div>
             </div>
           </Card>
+          )}
         </div>
+        )}
 
         {/* ── RIGHT: sticky preview rail ──────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, position: "sticky", top: 24 }}>
+        {hasRail && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16, position: hasLeft ? "sticky" : "static", top: 24 }}>
 
           {/* Completeness */}
+          {show("completeness") && (
           <Card style={{ padding: 20 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
               <div style={{ fontSize: 13, fontWeight: 700, fontFamily: font.display }}>Profile completeness</div>
@@ -900,8 +976,10 @@ export function InvestorProfilePage() {
               <div style={{ height: 4, width: `${completeness}%`, background: "#7C3AED" }} />
             </div>
           </Card>
+          )}
 
           {/* Preview tabs */}
+          {show("preview") && (
           <Card>
             <div style={{ display: "flex", borderBottom: `1px solid ${color.border}` }}>
               {(["public", "dealroom"] as const).map((tab) => (
@@ -941,8 +1019,10 @@ export function InvestorProfilePage() {
               )}
             </div>
           </Card>
+          )}
 
           {/* Shareable profile card */}
+          {show("share") && (
           <Card style={{ padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <Globe style={{ width: 14, height: 14, color: "#7C3AED" }} />
@@ -991,9 +1071,10 @@ export function InvestorProfilePage() {
               <Eye style={{ width: 14, height: 14 }} /> View public profile
             </a>
           </Card>
+          )}
 
           {/* Verification tier */}
-          {user?.id && (
+          {show("verification") && user?.id && (
             <Card style={{ padding: 20 }}>
               <VerificationSection
                 entityType="investor"
@@ -1005,7 +1086,7 @@ export function InvestorProfilePage() {
             </Card>
           )}
 
-          {user?.id && (
+          {show("capital") && user?.id && (
             <CapitalVerificationSection
               investorId={user.id}
               fundName={form.fund_name}
@@ -1014,10 +1095,11 @@ export function InvestorProfilePage() {
             />
           )}
 
-          {existing?.id && user?.id && (
+          {show("badges") && existing?.id && user?.id && (
             <InvestorBadgesCard profileId={existing.id} userId={user.id} />
           )}
         </div>
+        )}
       </div>
 
       {attachingClaim && user?.id && (
