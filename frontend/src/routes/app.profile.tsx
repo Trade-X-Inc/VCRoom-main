@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -24,6 +24,10 @@ import { OnboardingTour } from "@/components/app/OnboardingTour";
 import { getFounderProfileCompleteness } from "@/lib/profileCompleteness";
 
 export const Route = createFileRoute("/app/profile")({
+  // R9 relocation: the profile now lives as Prepare › Profile Builder leaves.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/prepare/profile-builder/quick-setup" as any, replace: true });
+  },
   component: Profile,
 });
 
@@ -185,13 +189,21 @@ function formatRelativeTime(dateStr: string): string {
 
 // ── Component ──────────────────────────────────────────────────────
 
-export function Profile() {
+export type ProfileView = "quick" | "full" | "privacy" | "preview" | "analytics" | "team-cards" | "fundraising-thesis";
+
+// R9: `view` renders a single leaf's slice of this page under route control
+// (the swapped sidebar owns navigation between slices). Omitted = original
+// standalone behavior with the internal tab bar.
+export function Profile({ view }: { view?: ProfileView } = {}) {
+  const isTabView = !view || !["team-cards", "fundraising-thesis"].includes(view);
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { progress, markStep, setCurrentStep } = useOnboardingProgress();
 
   const [mode, setMode] = useState<"edit" | "view">("edit");
-  const [tab, setTab] = useState<"quick" | "full" | "privacy" | "preview" | "analytics">("quick");
+  const [tab, setTab] = useState<"quick" | "full" | "privacy" | "preview" | "analytics">(
+    view && view !== "team-cards" && view !== "fundraising-thesis" ? view : "quick",
+  );
   const [form, setForm] = useState<FormState>(emptyForm);
   const [profilePublishing, setProfilePublishing] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
@@ -1208,7 +1220,9 @@ export function Profile() {
         </div>
       </div>
 
-      {/* STEP 6: Quick setup / Full details tabs */}
+      {/* STEP 6: Quick setup / Full details tabs — hidden under R9 route
+          control, where the swapped sidebar owns navigation between slices */}
+      {!view && (
       <div className="mt-5 flex items-center gap-1 rounded-lg border border-border/60 bg-muted/30 p-1 w-fit">
         <button
           onClick={() => setTab("quick")}
@@ -1256,6 +1270,7 @@ export function Profile() {
           <BarChart3 className="h-3.5 w-3.5" /> Analytics{totalViews > 0 ? ` (${totalViews})` : ""}
         </button>
       </div>
+      )}
 
       {extractionError && (
         <div className="mt-4 flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
@@ -1306,7 +1321,7 @@ export function Profile() {
         </div>
       )}
 
-      {tab === "quick" ? (
+      {isTabView && (tab === "quick" ? (
         // QUICK SETUP: 5 fields
         <div className="mt-4 grid lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2">
@@ -1940,22 +1955,22 @@ export function Profile() {
             </div>
           )}
         </div>
-      )}
+      ))}
 
-      {startup?.id && tab !== "analytics" && (
+      {startup?.id && (view === "team-cards" || (!view && tab !== "analytics")) && (
         <div className="mt-8">
           <TeamMembersSection startupId={startup.id} />
         </div>
       )}
 
-      {!startup?.id && !isLoading && tab !== "analytics" && (
+      {!startup?.id && !isLoading && (view === "team-cards" || (!view && tab !== "analytics")) && (
         <div className="mt-6 rounded-none border border-dashed border-border/60 bg-card p-6 text-center text-sm text-muted-foreground">
           Save your profile first to add team members.
         </div>
       )}
 
       {/* ── Investor criteria / Founder thesis ───────────────────────── */}
-      {startup?.id && tab !== "analytics" && (
+      {startup?.id && (view === "fundraising-thesis" || (!view && tab !== "analytics")) && (
         <div className="mt-8 rounded-none border border-border/60 bg-card p-5 shadow-card space-y-5">
           {/* Section header */}
           <div className="flex items-start gap-3">
