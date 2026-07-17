@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ShieldCheck, RefreshCw, CheckCircle2, XCircle, FileUp, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
@@ -19,6 +19,10 @@ function fileToDataUrl(file: File): Promise<string> {
 }
 
 export const Route = createFileRoute("/app/verification")({
+  // R9 relocation: this URL's content moved — see nav-structure.ts.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/prepare/workstation/verifications" as any, replace: true });
+  },
   component: VerificationPage,
 });
 

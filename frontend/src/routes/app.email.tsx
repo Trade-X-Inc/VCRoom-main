@@ -1,7 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Sparkles, Send, Copy, RotateCw } from "lucide-react";
 import { useState } from "react";
 export const Route = createFileRoute("/app/email")({
+  // R9 relocation: this URL's content moved — see nav-structure.ts.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/crm/email-outreach" as any, replace: true });
+  },
   component: EmailComposer,
 });
 
@@ -14,7 +18,7 @@ const templates = [
 
 const sample = "";
 
-function EmailComposer() {
+export function EmailComposer() {
   const [tab, setTab] = useState("cold");
   const [to, setTo] = useState("");
   const [body, setBody] = useState(sample);

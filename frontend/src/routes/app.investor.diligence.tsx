@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -9,6 +9,10 @@ import {
 import { EmptyState, PageBreadcrumb } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/diligence")({
+  // R9 relocation: this URL's content moved — see nav-structure.ts.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/investor/deal-rooms/diligence-notes" as any, replace: true });
+  },
   component: DiligencePage,
 });
 

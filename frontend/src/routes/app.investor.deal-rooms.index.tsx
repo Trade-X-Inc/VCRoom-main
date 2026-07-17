@@ -7,7 +7,7 @@ import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { EmptyState, PageBreadcrumb } from "@/components/system";
 
-export const Route = createFileRoute("/app/investor/deal-rooms")({
+export const Route = createFileRoute("/app/investor/deal-rooms/")({
   component: DealRoomsPage,
 });
 

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { PageFrame } from "@/components/system";
 import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
@@ -7,6 +7,10 @@ import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
 // routes — this page links out to them.
 
 export const Route = createFileRoute("/app/investor/evaluate")({
+  // R9 relocation: this URL's content moved — see nav-structure.ts.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/investor/deal-rooms" as any, replace: true });
+  },
   component: EvaluatePage,
 });
 

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { PageFrame } from "@/components/system";
 import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
@@ -8,6 +8,10 @@ import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
 // plain standalone route now — link row.
 
 export const Route = createFileRoute("/app/investor/decide")({
+  // R9 relocation: this URL's content moved — see nav-structure.ts.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/investor/crm/pipeline-manager" as any, replace: true });
+  },
   component: DecidePage,
 });
 

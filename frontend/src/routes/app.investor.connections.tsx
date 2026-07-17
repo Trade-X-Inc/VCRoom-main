@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Plus, Copy, Check, Loader2, ChevronRight,
@@ -13,6 +13,10 @@ import { cn } from "@/lib/utils";
 import { logActivity } from "@/lib/activity-log-fn";
 
 export const Route = createFileRoute("/app/investor/connections")({
+  // R9 relocation: this URL's content moved — see nav-structure.ts.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/investor/crm/connections" as any, replace: true });
+  },
   component: ConnectionsPage,
 });
 

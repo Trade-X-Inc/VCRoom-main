@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { PieChart, TrendingUp, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -7,6 +7,10 @@ import { formatDistanceToNow } from "date-fns";
 import { EmptyState, PageBreadcrumb } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/portfolio")({
+  // R9 relocation: this URL's content moved — see nav-structure.ts.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/investor/deal-rooms/portfolio" as any, replace: true });
+  },
   component: PortfolioPage,
 });
 

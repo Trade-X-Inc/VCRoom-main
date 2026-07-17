@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Award, ChevronDown, Lock, RefreshCw, Loader2, CheckCircle2 } from "lucide-react";
@@ -9,6 +9,10 @@ import { BadgeDisplay, useBadges } from "@/components/app/BadgeDisplay";
 import { PageBreadcrumb } from "@/components/system";
 
 export const Route = createFileRoute("/app/badges")({
+  // R9 relocation: this URL's content moved — see nav-structure.ts.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/prepare/badges/overview" as any, replace: true });
+  },
   component: BadgesPage,
 });
 

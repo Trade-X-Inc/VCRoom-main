@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Inbox, Search, Clock, Plus, Loader2, ArrowRight, FileText, TrendingUp, AlertTriangle, HelpCircle, CheckCircle2 } from "lucide-react";
 import { PageGuide } from "@/components/app/PageGuide";
@@ -11,6 +11,10 @@ import type { AgentDealBrief } from "@/lib/deal-brief-fn";
 import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/deal-flow")({
+  // R9 relocation: this URL's content moved — see nav-structure.ts.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/investor/discover/deal-flow" as any, replace: true });
+  },
   component: DealFlowPage,
 });
 
@@ -218,7 +222,7 @@ function DealBriefPanel({ startupId, investorId, dealRoomId }: { startupId: stri
   );
 }
 
-function DealFlowPage() {
+export function DealFlowPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();

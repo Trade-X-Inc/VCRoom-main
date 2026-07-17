@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -15,6 +15,10 @@ import { toast } from "sonner";
 import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/messages")({
+  // R9 relocation: this URL's content moved — see nav-structure.ts.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/team-chat" as any, replace: true });
+  },
   component: WorkspacePage,
 });
 
@@ -1059,7 +1063,7 @@ function InvestorWorkspaceContent({ userId, section }: { userId: string; section
 
 // ── Main Page ─────────────────────────────────────────────────────────────
 
-function WorkspacePage() {
+export function WorkspacePage() {
   const { user } = useAuth();
   const [section, setSection] = useState<Section>("chat");
 

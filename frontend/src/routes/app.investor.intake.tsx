@@ -1,5 +1,5 @@
 import React from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -20,6 +20,10 @@ import { PageBreadcrumb } from "@/components/system";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 
 export const Route = createFileRoute("/app/investor/intake")({
+  // R9 relocation: this URL's content moved — see nav-structure.ts.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/investor/discover/deal-intake" as any, replace: true });
+  },
   component: IntakePage,
 });
 

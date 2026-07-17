@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -16,6 +16,10 @@ import { useAuth } from "@/lib/auth";
 import { createRoastSession, controlRoast, ROAST_LEVELS } from "@/lib/roast-fn";
 
 export const Route = createFileRoute("/app/roast/")({
+  // R9 relocation: this URL's content moved — see nav-structure.ts.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/prepare/badges/founder-roast" as any, replace: true });
+  },
   component: RoastManagement,
 });
 
@@ -77,7 +81,7 @@ interface RoastSessionRow {
   written_deadline_at: string | null;
 }
 
-function RoastManagement() {
+export function RoastManagement() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [showSchedule, setShowSchedule] = useState(false);

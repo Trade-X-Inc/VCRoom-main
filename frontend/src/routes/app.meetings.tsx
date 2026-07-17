@@ -37,7 +37,7 @@ type Meeting = {
 
 type VCLeadOption = { id: string; investor_name: string; firm_name: string | null };
 
-function Meetings() {
+export function Meetings() {
   const { user } = useAuth();
   const isInvestor = user?.role === "investor";
   const queryClient = useQueryClient();
