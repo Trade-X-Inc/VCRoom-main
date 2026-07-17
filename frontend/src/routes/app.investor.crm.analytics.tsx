@@ -51,17 +51,20 @@ function InvestorCrmAnalyticsPage() {
   ).sort((a, b) => b[1] - a[1]);
   const sourcePieData = bySource.map(([name, value], i) => ({ name, value, fill: BRAND_SHADES[i % BRAND_SHADES.length] }));
 
-  // Watchlist entries added, weekly buckets over the last 12 weeks
+  // Watchlist entries added, weekly buckets over the last 12 weeks. Each
+  // bucket is the 7-day window ending at its labeled date.
   const weeklySeries = (() => {
     const weeks: { week: string; count: number }[] = [];
+    const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
     for (let i = 11; i >= 0; i--) {
-      const start = new Date(Date.now() - i * 7 * 24 * 60 * 60 * 1000);
-      const label = start.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      const bucketEnd = now - i * oneWeekMs;
+      const bucketStart = bucketEnd - oneWeekMs;
+      const label = new Date(bucketEnd).toLocaleDateString("en-US", { month: "short", day: "numeric" });
       const count = entries.filter((e: any) => {
         if (!e.created_at) return false;
-        const created = new Date(e.created_at);
-        const diffWeeks = Math.floor((start.getTime() - created.getTime()) / (7 * 24 * 60 * 60 * 1000));
-        return diffWeeks === 0 && created <= start;
+        const created = new Date(e.created_at).getTime();
+        return created > bucketStart && created <= bucketEnd;
       }).length;
       weeks.push({ week: label, count });
     }
@@ -88,10 +91,10 @@ function InvestorCrmAnalyticsPage() {
             ) : (
               <div style={{ height: 260 }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <FunnelChart>
+                  <FunnelChart margin={{ top: 8, right: 110, bottom: 8, left: 8 }}>
                     <Tooltip contentStyle={{ fontSize: 12, border: "1px solid #E4E4E7", borderRadius: 0 }} />
                     <Funnel dataKey="value" data={funnelData} isAnimationActive={false}>
-                      <LabelList position="right" dataKey="name" fill="#0A0A0B" fontSize={12} />
+                      <LabelList position="right" dataKey="name" fill="#0A0A0B" fontSize={12} width={100} />
                       {funnelData.map((d) => <Cell key={d.name} fill={d.fill} />)}
                     </Funnel>
                   </FunnelChart>
@@ -106,15 +109,13 @@ function InvestorCrmAnalyticsPage() {
               <p className="text-sm" style={{ color: "#71717A" }}>No source data yet.</p>
             ) : (
               <div className="flex items-center gap-6">
-                <div style={{ width: 160, height: 160 }} className="shrink-0">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={sourcePieData} dataKey="value" nameKey="name" innerRadius={45} outerRadius={72} strokeWidth={2} stroke="#FFFFFF">
-                        {sourcePieData.map((d) => <Cell key={d.name} fill={d.fill} />)}
-                      </Pie>
-                      <Tooltip contentStyle={{ fontSize: 12, border: "1px solid #E4E4E7", borderRadius: 0 }} />
-                    </PieChart>
-                  </ResponsiveContainer>
+                <div className="shrink-0">
+                  <PieChart width={160} height={160}>
+                    <Pie data={sourcePieData} dataKey="value" nameKey="name" innerRadius={45} outerRadius={72} strokeWidth={2} stroke="#FFFFFF" isAnimationActive={false}>
+                      {sourcePieData.map((d) => <Cell key={d.name} fill={d.fill} />)}
+                    </Pie>
+                    <Tooltip contentStyle={{ fontSize: 12, border: "1px solid #E4E4E7", borderRadius: 0 }} />
+                  </PieChart>
                 </div>
                 <div className="flex-1 space-y-2 min-w-0">
                   {sourcePieData.map((d) => (
