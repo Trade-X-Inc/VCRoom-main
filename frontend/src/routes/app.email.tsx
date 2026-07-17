@@ -31,7 +31,9 @@ export function EmailComposer() {
     setStatus("Opened in your email client.");
   };
   return (
-    <div className="p-6 lg:p-8 max-w-6xl mx-auto">
+    // R10 step 10: full-width PageFrame-consistent container — was
+    // max-w-6xl mx-auto, leaving large empty margins on wider screens.
+    <div className="p-6 lg:p-8" style={{ maxWidth: 1360, margin: "0 auto" }}>
       <div>
         <h1 className="text-lg font-bold tracking-tight">AI Email Assistant</h1>
         <div className="text-sm text-muted-foreground">Drafts that sound like you. Approved by you.</div>
