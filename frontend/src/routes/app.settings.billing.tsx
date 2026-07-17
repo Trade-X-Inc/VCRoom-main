@@ -33,11 +33,16 @@ function BillingSettings() {
   }
 
   return (
-    <div className="space-y-4 max-w-2xl">
-      <div className="bg-card border border-border/60 rounded-none p-6 space-y-4">
+    // R10 step 13: spacing/hierarchy cleanup — was max-w-2xl, an ad-hoc
+    // width cap inconsistent with its sibling ProfileSettings tab (no
+    // max-w-*, just space-y-5 within the settings panel's own flex-1
+    // column). Also fixed rounded-lg buttons and the legacy bg-card token.
+    // Content and billing logic untouched.
+    <div className="space-y-5">
+      <div className="border border-border bg-white p-6 space-y-4">
         <div className="flex items-center gap-2.5">
           <CreditCard className="h-4 w-4 text-brand" />
-          <h2 className="text-sm font-semibold">Billing</h2>
+          <h2 className="text-sm font-semibold" style={{ fontFamily: "Syne, sans-serif" }}>Billing</h2>
         </div>
 
         {/* ── Trial ── */}
@@ -62,7 +67,7 @@ function BillingSettings() {
                 <Link
                   key={p.name}
                   to={"/pricing" as any}
-                  className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold text-foreground hover:opacity-90"
+                  className="inline-flex items-center rounded px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
                   style={{ background: "var(--gradient-brand)" }}
                 >
                   {p.name} ${p.price}/mo
@@ -93,7 +98,7 @@ function BillingSettings() {
               <button
                 disabled
                 title="Stripe integration coming soon — email hello@hockystick.app to change your plan"
-                className="inline-flex items-center rounded-lg border border-border/60 px-4 py-2 text-sm font-medium text-muted-foreground opacity-60 cursor-not-allowed"
+                className="inline-flex items-center rounded border border-border px-4 py-2 text-sm font-medium opacity-60 cursor-not-allowed" style={{ color: "#71717A" }}
               >
                 Manage subscription →
               </button>
@@ -115,7 +120,7 @@ function BillingSettings() {
             </p>
             <Link
               to={"/pricing" as any}
-              className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold text-foreground hover:opacity-90"
+              className="inline-flex items-center rounded px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
               style={{ background: "var(--gradient-brand)" }}
             >
               Update payment →
@@ -132,7 +137,7 @@ function BillingSettings() {
             </div>
             <Link
               to={"/pricing" as any}
-              className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold text-foreground hover:opacity-90"
+              className="inline-flex items-center rounded px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
               style={{ background: "var(--gradient-brand)" }}
             >
               Reactivate →
@@ -143,7 +148,7 @@ function BillingSettings() {
 
       {/* Plan limits summary */}
       {limits && (
-        <div className="bg-card border border-border/60 rounded-none p-6">
+        <div className="border border-border bg-white p-6">
           <h3 className="text-sm font-semibold mb-3">What your plan includes</h3>
           <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-muted-foreground">
             <div>Deal rooms: <span className="text-foreground">{limits.deal_room_limit >= 999 ? "Unlimited" : limits.deal_room_limit}</span></div>
