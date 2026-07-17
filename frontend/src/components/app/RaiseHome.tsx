@@ -16,7 +16,7 @@ const STEPS = [
   { n: "①", to: "/app/prepare", label: "Prepare" },
   { n: "②", to: "/app/go-live", label: "Go live" },
   { n: "③", to: "/app/deal-rooms", label: "Deal rooms" },
-  { n: "④", to: "/app/close", label: "Close" },
+  { n: "④", to: "/app/deal-rooms", label: "Close" },
 ] as const;
 
 export function RaiseHome() {
@@ -24,10 +24,10 @@ export function RaiseHome() {
   const { data: p } = useRaiseProgress();
   const next = nextIncomplete(p);
 
-  const stepMeta = (to: string) => {
+  const stepMeta = (n: string) => {
     if (!p) return { metric: "", tone: "neutral" as const, status: "" };
-    switch (to) {
-      case "/app/prepare":
+    switch (n) {
+      case "①":
         return {
           metric: `${p.prepareDone}/${p.prepareTotal}`,
           tone:
@@ -41,13 +41,13 @@ export function RaiseHome() {
                 ? `Next: ${SECTION_LABELS[next]}`
                 : "In progress",
         };
-      case "/app/go-live":
+      case "②":
         return p.goLiveDone
           ? { metric: "Live", tone: "positive" as const, status: "Published" }
           : p.prepareUnlocked
             ? { metric: "", tone: "warning" as const, status: "Ready to publish" }
             : { metric: "", tone: "neutral" as const, status: "Finish Prepare first" };
-      case "/app/deal-rooms":
+      case "③":
         return {
           metric: String(p.activeRooms),
           tone: p.activeRooms > 0 ? ("positive" as const) : ("neutral" as const),
@@ -56,7 +56,7 @@ export function RaiseHome() {
               ? `${p.activeRooms} active`
               : "No rooms yet",
         };
-      case "/app/close":
+      case "④":
         return p.closedRooms > 0
           ? { metric: String(p.closedRooms), tone: "positive" as const, status: "Closed" }
           : p.closingRooms > 0
@@ -92,10 +92,10 @@ export function RaiseHome() {
 
       <div>
         {STEPS.map((s) => {
-          const m = stepMeta(s.to);
+          const m = stepMeta(s.n);
           return (
             <Link
-              key={s.to}
+              key={s.n}
               to={s.to}
               className="hs-hairline-t flex items-center justify-between gap-6 py-8 group"
               data-testid={`home-step-${s.label.toLowerCase().replace(" ", "-")}`}
