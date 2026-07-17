@@ -126,6 +126,8 @@ import { Route as AppInvestorAdvisorRouteImport } from './routes/app.investor.ad
 import { Route as AppGoLiveProfileAnalyticsRouteImport } from './routes/app.go-live.profile-analytics'
 import { Route as AppGoLiveDirectoryRouteImport } from './routes/app.go-live.directory'
 import { Route as AppDealRoomsTeamAssignmentsRouteImport } from './routes/app.deal-rooms.team-assignments'
+import { Route as AppDealRoomsPrepNotesRouteImport } from './routes/app.deal-rooms.prep-notes'
+import { Route as AppDealRoomsMeetingsCalendarRouteImport } from './routes/app.deal-rooms.meetings-calendar'
 import { Route as AppDealRoomsIdRouteImport } from './routes/app.deal-rooms.$id'
 import { Route as AppCrmPipelineManagerRouteImport } from './routes/app.crm.pipeline-manager'
 import { Route as AppCrmMeetingsRouteImport } from './routes/app.crm.meetings'
@@ -161,7 +163,10 @@ import { Route as AppPrepareBadgesApplyRouteImport } from './routes/app.prepare.
 import { Route as AppInvestorDiscoverWatchlistRouteImport } from './routes/app.investor.discover.watchlist'
 import { Route as AppInvestorDiscoverDealIntakeRouteImport } from './routes/app.investor.discover.deal-intake'
 import { Route as AppInvestorDiscoverDealFlowRouteImport } from './routes/app.investor.discover.deal-flow'
+import { Route as AppInvestorDealRoomsTeamAssignmentsRouteImport } from './routes/app.investor.deal-rooms.team-assignments'
+import { Route as AppInvestorDealRoomsPrepNotesRouteImport } from './routes/app.investor.deal-rooms.prep-notes'
 import { Route as AppInvestorDealRoomsPortfolioRouteImport } from './routes/app.investor.deal-rooms.portfolio'
+import { Route as AppInvestorDealRoomsMeetingsCalendarRouteImport } from './routes/app.investor.deal-rooms.meetings-calendar'
 import { Route as AppInvestorDealRoomsDiligenceNotesRouteImport } from './routes/app.investor.deal-rooms.diligence-notes'
 import { Route as AppInvestorCrmPipelineManagerRouteImport } from './routes/app.investor.crm.pipeline-manager'
 import { Route as AppInvestorCrmFounderMeetingsRouteImport } from './routes/app.investor.crm.founder-meetings'
@@ -783,6 +788,17 @@ const AppDealRoomsTeamAssignmentsRoute =
     path: '/deal-rooms/team-assignments',
     getParentRoute: () => AppRoute,
   } as any)
+const AppDealRoomsPrepNotesRoute = AppDealRoomsPrepNotesRouteImport.update({
+  id: '/deal-rooms/prep-notes',
+  path: '/deal-rooms/prep-notes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDealRoomsMeetingsCalendarRoute =
+  AppDealRoomsMeetingsCalendarRouteImport.update({
+    id: '/deal-rooms/meetings-calendar',
+    path: '/deal-rooms/meetings-calendar',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppDealRoomsIdRoute = AppDealRoomsIdRouteImport.update({
   id: '/deal-rooms/$id',
   path: '/deal-rooms/$id',
@@ -980,10 +996,28 @@ const AppInvestorDiscoverDealFlowRoute =
     path: '/discover/deal-flow',
     getParentRoute: () => AppInvestorRoute,
   } as any)
+const AppInvestorDealRoomsTeamAssignmentsRoute =
+  AppInvestorDealRoomsTeamAssignmentsRouteImport.update({
+    id: '/deal-rooms/team-assignments',
+    path: '/deal-rooms/team-assignments',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorDealRoomsPrepNotesRoute =
+  AppInvestorDealRoomsPrepNotesRouteImport.update({
+    id: '/deal-rooms/prep-notes',
+    path: '/deal-rooms/prep-notes',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
 const AppInvestorDealRoomsPortfolioRoute =
   AppInvestorDealRoomsPortfolioRouteImport.update({
     id: '/deal-rooms/portfolio',
     path: '/deal-rooms/portfolio',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorDealRoomsMeetingsCalendarRoute =
+  AppInvestorDealRoomsMeetingsCalendarRouteImport.update({
+    id: '/deal-rooms/meetings-calendar',
+    path: '/deal-rooms/meetings-calendar',
     getParentRoute: () => AppInvestorRoute,
   } as any)
 const AppInvestorDealRoomsDiligenceNotesRoute =
@@ -1257,6 +1291,8 @@ export interface FileRoutesByFullPath {
   '/app/crm/meetings': typeof AppCrmMeetingsRoute
   '/app/crm/pipeline-manager': typeof AppCrmPipelineManagerRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
+  '/app/deal-rooms/meetings-calendar': typeof AppDealRoomsMeetingsCalendarRoute
+  '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
   '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
   '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
@@ -1308,7 +1344,10 @@ export interface FileRoutesByFullPath {
   '/app/investor/crm/founder-meetings': typeof AppInvestorCrmFounderMeetingsRoute
   '/app/investor/crm/pipeline-manager': typeof AppInvestorCrmPipelineManagerRoute
   '/app/investor/deal-rooms/diligence-notes': typeof AppInvestorDealRoomsDiligenceNotesRoute
+  '/app/investor/deal-rooms/meetings-calendar': typeof AppInvestorDealRoomsMeetingsCalendarRoute
   '/app/investor/deal-rooms/portfolio': typeof AppInvestorDealRoomsPortfolioRoute
+  '/app/investor/deal-rooms/prep-notes': typeof AppInvestorDealRoomsPrepNotesRoute
+  '/app/investor/deal-rooms/team-assignments': typeof AppInvestorDealRoomsTeamAssignmentsRoute
   '/app/investor/discover/deal-flow': typeof AppInvestorDiscoverDealFlowRoute
   '/app/investor/discover/deal-intake': typeof AppInvestorDiscoverDealIntakeRoute
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
@@ -1439,6 +1478,8 @@ export interface FileRoutesByTo {
   '/app/crm/meetings': typeof AppCrmMeetingsRoute
   '/app/crm/pipeline-manager': typeof AppCrmPipelineManagerRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
+  '/app/deal-rooms/meetings-calendar': typeof AppDealRoomsMeetingsCalendarRoute
+  '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
   '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
   '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
@@ -1490,7 +1531,10 @@ export interface FileRoutesByTo {
   '/app/investor/crm/founder-meetings': typeof AppInvestorCrmFounderMeetingsRoute
   '/app/investor/crm/pipeline-manager': typeof AppInvestorCrmPipelineManagerRoute
   '/app/investor/deal-rooms/diligence-notes': typeof AppInvestorDealRoomsDiligenceNotesRoute
+  '/app/investor/deal-rooms/meetings-calendar': typeof AppInvestorDealRoomsMeetingsCalendarRoute
   '/app/investor/deal-rooms/portfolio': typeof AppInvestorDealRoomsPortfolioRoute
+  '/app/investor/deal-rooms/prep-notes': typeof AppInvestorDealRoomsPrepNotesRoute
+  '/app/investor/deal-rooms/team-assignments': typeof AppInvestorDealRoomsTeamAssignmentsRoute
   '/app/investor/discover/deal-flow': typeof AppInvestorDiscoverDealFlowRoute
   '/app/investor/discover/deal-intake': typeof AppInvestorDiscoverDealIntakeRoute
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
@@ -1626,6 +1670,8 @@ export interface FileRoutesById {
   '/app/crm/meetings': typeof AppCrmMeetingsRoute
   '/app/crm/pipeline-manager': typeof AppCrmPipelineManagerRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
+  '/app/deal-rooms/meetings-calendar': typeof AppDealRoomsMeetingsCalendarRoute
+  '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
   '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
   '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
@@ -1677,7 +1723,10 @@ export interface FileRoutesById {
   '/app/investor/crm/founder-meetings': typeof AppInvestorCrmFounderMeetingsRoute
   '/app/investor/crm/pipeline-manager': typeof AppInvestorCrmPipelineManagerRoute
   '/app/investor/deal-rooms/diligence-notes': typeof AppInvestorDealRoomsDiligenceNotesRoute
+  '/app/investor/deal-rooms/meetings-calendar': typeof AppInvestorDealRoomsMeetingsCalendarRoute
   '/app/investor/deal-rooms/portfolio': typeof AppInvestorDealRoomsPortfolioRoute
+  '/app/investor/deal-rooms/prep-notes': typeof AppInvestorDealRoomsPrepNotesRoute
+  '/app/investor/deal-rooms/team-assignments': typeof AppInvestorDealRoomsTeamAssignmentsRoute
   '/app/investor/discover/deal-flow': typeof AppInvestorDiscoverDealFlowRoute
   '/app/investor/discover/deal-intake': typeof AppInvestorDiscoverDealIntakeRoute
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
@@ -1814,6 +1863,8 @@ export interface FileRouteTypes {
     | '/app/crm/meetings'
     | '/app/crm/pipeline-manager'
     | '/app/deal-rooms/$id'
+    | '/app/deal-rooms/meetings-calendar'
+    | '/app/deal-rooms/prep-notes'
     | '/app/deal-rooms/team-assignments'
     | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
@@ -1865,7 +1916,10 @@ export interface FileRouteTypes {
     | '/app/investor/crm/founder-meetings'
     | '/app/investor/crm/pipeline-manager'
     | '/app/investor/deal-rooms/diligence-notes'
+    | '/app/investor/deal-rooms/meetings-calendar'
     | '/app/investor/deal-rooms/portfolio'
+    | '/app/investor/deal-rooms/prep-notes'
+    | '/app/investor/deal-rooms/team-assignments'
     | '/app/investor/discover/deal-flow'
     | '/app/investor/discover/deal-intake'
     | '/app/investor/discover/watchlist'
@@ -1996,6 +2050,8 @@ export interface FileRouteTypes {
     | '/app/crm/meetings'
     | '/app/crm/pipeline-manager'
     | '/app/deal-rooms/$id'
+    | '/app/deal-rooms/meetings-calendar'
+    | '/app/deal-rooms/prep-notes'
     | '/app/deal-rooms/team-assignments'
     | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
@@ -2047,7 +2103,10 @@ export interface FileRouteTypes {
     | '/app/investor/crm/founder-meetings'
     | '/app/investor/crm/pipeline-manager'
     | '/app/investor/deal-rooms/diligence-notes'
+    | '/app/investor/deal-rooms/meetings-calendar'
     | '/app/investor/deal-rooms/portfolio'
+    | '/app/investor/deal-rooms/prep-notes'
+    | '/app/investor/deal-rooms/team-assignments'
     | '/app/investor/discover/deal-flow'
     | '/app/investor/discover/deal-intake'
     | '/app/investor/discover/watchlist'
@@ -2182,6 +2241,8 @@ export interface FileRouteTypes {
     | '/app/crm/meetings'
     | '/app/crm/pipeline-manager'
     | '/app/deal-rooms/$id'
+    | '/app/deal-rooms/meetings-calendar'
+    | '/app/deal-rooms/prep-notes'
     | '/app/deal-rooms/team-assignments'
     | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
@@ -2233,7 +2294,10 @@ export interface FileRouteTypes {
     | '/app/investor/crm/founder-meetings'
     | '/app/investor/crm/pipeline-manager'
     | '/app/investor/deal-rooms/diligence-notes'
+    | '/app/investor/deal-rooms/meetings-calendar'
     | '/app/investor/deal-rooms/portfolio'
+    | '/app/investor/deal-rooms/prep-notes'
+    | '/app/investor/deal-rooms/team-assignments'
     | '/app/investor/discover/deal-flow'
     | '/app/investor/discover/deal-intake'
     | '/app/investor/discover/watchlist'
@@ -3153,6 +3217,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDealRoomsTeamAssignmentsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/deal-rooms/prep-notes': {
+      id: '/app/deal-rooms/prep-notes'
+      path: '/deal-rooms/prep-notes'
+      fullPath: '/app/deal-rooms/prep-notes'
+      preLoaderRoute: typeof AppDealRoomsPrepNotesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/deal-rooms/meetings-calendar': {
+      id: '/app/deal-rooms/meetings-calendar'
+      path: '/deal-rooms/meetings-calendar'
+      fullPath: '/app/deal-rooms/meetings-calendar'
+      preLoaderRoute: typeof AppDealRoomsMeetingsCalendarRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/deal-rooms/$id': {
       id: '/app/deal-rooms/$id'
       path: '/deal-rooms/$id'
@@ -3398,11 +3476,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorDiscoverDealFlowRouteImport
       parentRoute: typeof AppInvestorRoute
     }
+    '/app/investor/deal-rooms/team-assignments': {
+      id: '/app/investor/deal-rooms/team-assignments'
+      path: '/deal-rooms/team-assignments'
+      fullPath: '/app/investor/deal-rooms/team-assignments'
+      preLoaderRoute: typeof AppInvestorDealRoomsTeamAssignmentsRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/deal-rooms/prep-notes': {
+      id: '/app/investor/deal-rooms/prep-notes'
+      path: '/deal-rooms/prep-notes'
+      fullPath: '/app/investor/deal-rooms/prep-notes'
+      preLoaderRoute: typeof AppInvestorDealRoomsPrepNotesRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
     '/app/investor/deal-rooms/portfolio': {
       id: '/app/investor/deal-rooms/portfolio'
       path: '/deal-rooms/portfolio'
       fullPath: '/app/investor/deal-rooms/portfolio'
       preLoaderRoute: typeof AppInvestorDealRoomsPortfolioRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/deal-rooms/meetings-calendar': {
+      id: '/app/investor/deal-rooms/meetings-calendar'
+      path: '/deal-rooms/meetings-calendar'
+      fullPath: '/app/investor/deal-rooms/meetings-calendar'
+      preLoaderRoute: typeof AppInvestorDealRoomsMeetingsCalendarRouteImport
       parentRoute: typeof AppInvestorRoute
     }
     '/app/investor/deal-rooms/diligence-notes': {
@@ -3651,7 +3750,10 @@ interface AppInvestorRouteChildren {
   AppInvestorCrmFounderMeetingsRoute: typeof AppInvestorCrmFounderMeetingsRoute
   AppInvestorCrmPipelineManagerRoute: typeof AppInvestorCrmPipelineManagerRoute
   AppInvestorDealRoomsDiligenceNotesRoute: typeof AppInvestorDealRoomsDiligenceNotesRoute
+  AppInvestorDealRoomsMeetingsCalendarRoute: typeof AppInvestorDealRoomsMeetingsCalendarRoute
   AppInvestorDealRoomsPortfolioRoute: typeof AppInvestorDealRoomsPortfolioRoute
+  AppInvestorDealRoomsPrepNotesRoute: typeof AppInvestorDealRoomsPrepNotesRoute
+  AppInvestorDealRoomsTeamAssignmentsRoute: typeof AppInvestorDealRoomsTeamAssignmentsRoute
   AppInvestorDiscoverDealFlowRoute: typeof AppInvestorDiscoverDealFlowRoute
   AppInvestorDiscoverDealIntakeRoute: typeof AppInvestorDiscoverDealIntakeRoute
   AppInvestorDiscoverWatchlistRoute: typeof AppInvestorDiscoverWatchlistRoute
@@ -3702,7 +3804,12 @@ const AppInvestorRouteChildren: AppInvestorRouteChildren = {
   AppInvestorCrmPipelineManagerRoute: AppInvestorCrmPipelineManagerRoute,
   AppInvestorDealRoomsDiligenceNotesRoute:
     AppInvestorDealRoomsDiligenceNotesRoute,
+  AppInvestorDealRoomsMeetingsCalendarRoute:
+    AppInvestorDealRoomsMeetingsCalendarRoute,
   AppInvestorDealRoomsPortfolioRoute: AppInvestorDealRoomsPortfolioRoute,
+  AppInvestorDealRoomsPrepNotesRoute: AppInvestorDealRoomsPrepNotesRoute,
+  AppInvestorDealRoomsTeamAssignmentsRoute:
+    AppInvestorDealRoomsTeamAssignmentsRoute,
   AppInvestorDiscoverDealFlowRoute: AppInvestorDiscoverDealFlowRoute,
   AppInvestorDiscoverDealIntakeRoute: AppInvestorDiscoverDealIntakeRoute,
   AppInvestorDiscoverWatchlistRoute: AppInvestorDiscoverWatchlistRoute,
@@ -3825,6 +3932,8 @@ interface AppRouteChildren {
   AppCrmMeetingsRoute: typeof AppCrmMeetingsRoute
   AppCrmPipelineManagerRoute: typeof AppCrmPipelineManagerRoute
   AppDealRoomsIdRoute: typeof AppDealRoomsIdRouteWithChildren
+  AppDealRoomsMeetingsCalendarRoute: typeof AppDealRoomsMeetingsCalendarRoute
+  AppDealRoomsPrepNotesRoute: typeof AppDealRoomsPrepNotesRoute
   AppDealRoomsTeamAssignmentsRoute: typeof AppDealRoomsTeamAssignmentsRoute
   AppGoLiveDirectoryRoute: typeof AppGoLiveDirectoryRoute
   AppGoLiveProfileAnalyticsRoute: typeof AppGoLiveProfileAnalyticsRoute
@@ -3893,6 +4002,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppCrmMeetingsRoute: AppCrmMeetingsRoute,
   AppCrmPipelineManagerRoute: AppCrmPipelineManagerRoute,
   AppDealRoomsIdRoute: AppDealRoomsIdRouteWithChildren,
+  AppDealRoomsMeetingsCalendarRoute: AppDealRoomsMeetingsCalendarRoute,
+  AppDealRoomsPrepNotesRoute: AppDealRoomsPrepNotesRoute,
   AppDealRoomsTeamAssignmentsRoute: AppDealRoomsTeamAssignmentsRoute,
   AppGoLiveDirectoryRoute: AppGoLiveDirectoryRoute,
   AppGoLiveProfileAnalyticsRoute: AppGoLiveProfileAnalyticsRoute,
