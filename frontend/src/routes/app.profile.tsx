@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import {
   Building2, Globe, Users, Upload, Pencil, Trash2, Plus, X, Loader2, Check,
   Eye, Edit3, Download, Zap, AlignLeft, AlertTriangle, Copy, Sparkles, BarChart3,
@@ -418,6 +419,19 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
     acc[src] = (acc[src] ?? 0) + 1;
     return acc;
   }, {});
+
+  // R10 step 9: 30-day time series — matches the ChartCard/AreaChart pattern
+  // already used by app.analytics.tsx's document-view analytics.
+  const viewsSeries = (() => {
+    const days: { date: string; views: number }[] = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+      const key = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      const count = profileViews.filter((v: any) => new Date(v.created_at).toDateString() === d.toDateString()).length;
+      days.push({ date: key, views: count });
+    }
+    return days;
+  })();
 
   useEffect(() => {
     if (startup) {
@@ -1767,10 +1781,11 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
             </div>
           ) : (
             <>
-              {/* Stats */}
+              {/* Stats — R10 step 9: restyled to white bordered cells,
+                  matching app.analytics.tsx's ChartCard convention */}
               <div>
                 <p className="text-sm font-semibold text-foreground mb-1">Profile Analytics</p>
-                <p className="text-xs text-muted-foreground mb-4">Tracking views of hockystick.app/p/{startup.profile_slug}</p>
+                <p className="text-xs mb-4" style={{ color: "#71717A" }}>Tracking views of hockystick.app/p/{startup.profile_slug}</p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
                     { label: "Total views", value: String(totalViews) },
@@ -1778,12 +1793,32 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
                     { label: "Avg duration", value: avgDuration > 0 ? `${avgDuration}s` : "0s" },
                     { label: "Last 7 days", value: String(last7Days) },
                   ].map(({ label, value }) => (
-                    <div key={label} className="bg-accent border border-border rounded-lg p-5">
+                    <div key={label} className="rounded-none border border-border bg-white p-5">
                       <p className="text-3xl font-bold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{value}</p>
-                      <p className="text-xs text-muted-foreground uppercase tracking-wider mt-1">{label}</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider mt-1" style={{ color: "#71717A" }}>{label}</p>
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* Views over time — 30-day area chart */}
+              <div className="rounded-none border border-border bg-white p-5">
+                <p className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: "#71717A" }}>Profile views (30 days)</p>
+                {totalViews === 0 ? (
+                  <p className="text-sm" style={{ color: "#71717A" }}>No data yet — publish your profile to start tracking views.</p>
+                ) : (
+                  <div style={{ height: 220 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={viewsSeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                        <CartesianGrid stroke="#E4E4E7" vertical={false} />
+                        <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#71717A" }} axisLine={{ stroke: "#E4E4E7" }} tickLine={false} interval={4} />
+                        <YAxis tick={{ fontSize: 11, fill: "#71717A" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                        <Tooltip contentStyle={{ fontSize: 12, border: "1px solid #E4E4E7", borderRadius: 0 }} />
+                        <Area type="monotone" dataKey="views" stroke="#7C3AED" fill="#7C3AED" fillOpacity={0.08} strokeWidth={2} />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
               </div>
 
               {totalViews === 0 ? (
@@ -1791,24 +1826,24 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
               ) : (
                 <div className="grid lg:grid-cols-2 gap-6">
                   {/* Traffic sources */}
-                  <div className="rounded-none border border-border/60 bg-card p-5">
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-4">Traffic sources</p>
+                  <div className="rounded-none border border-border bg-white p-5">
+                    <p className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: "#71717A" }}>Traffic sources</p>
                     <div className="space-y-3">
                       {Object.entries(sourceBreakdown).sort(([, a], [, b]) => (b as number) - (a as number)).map(([source, count]) => (
                         <div key={source} className="flex items-center gap-3">
-                          <span className="text-sm text-muted-foreground w-20 shrink-0">{source}</span>
-                          <div className="flex-1 h-1.5 bg-accent rounded-full overflow-hidden">
-                            <div className="h-full hs-gradient rounded-full" style={{ width: `${((count as number) / totalViews) * 100}%` }} />
+                          <span className="text-sm w-20 shrink-0" style={{ color: "#52525B" }}>{source}</span>
+                          <div className="flex-1 h-1.5 bg-[#FAFAFA] border border-border rounded-none overflow-hidden">
+                            <div className="h-full" style={{ width: `${((count as number) / totalViews) * 100}%`, background: "#7C3AED" }} />
                           </div>
-                          <span className="text-sm text-muted-foreground w-6 text-right tabular-nums">{count as number}</span>
+                          <span className="text-sm w-6 text-right tabular-nums" style={{ color: "#52525B" }}>{count as number}</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {/* View history */}
-                  <div className="rounded-none border border-border/60 bg-card p-5">
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-4">View history</p>
+                  <div className="rounded-none border border-border bg-white p-5">
+                    <p className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: "#71717A" }}>View history</p>
                     <div>
                       {profileViews.map((view: any) => {
                         const namedInvestor = view.viewer_role === "investor" && view.viewer_name;
@@ -1827,7 +1862,7 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
                         return (
                         <div key={view.id} className={cn(
                           "flex items-center justify-between py-3 border-b border-border last:border-0",
-                          namedInvestor && "bg-accent rounded-lg px-3 -mx-3 border-l-2 border-l-brand/40"
+                          namedInvestor && "bg-accent px-3 -mx-3 border-l-2 border-l-brand"
                         )}>
                           <div className="flex items-center gap-3 min-w-0">
                             {avatarLetter ? (
@@ -1835,7 +1870,7 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
                                 {avatarLetter}
                               </div>
                             ) : (
-                              <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-faint shrink-0">?</div>
+                              <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center shrink-0" style={{ color: "#71717A" }}>?</div>
                             )}
                             <div className="min-w-0">
                               <p className="text-sm text-foreground truncate flex items-center gap-1.5">
@@ -1844,18 +1879,18 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
                                   <span className="text-xs bg-accent text-brand px-1.5 py-0.5 rounded">Investor</span>
                                 )}
                               </p>
-                              <p className="text-xs text-muted-foreground truncate">
+                              <p className="text-xs truncate" style={{ color: "#71717A" }}>
                                 {view.source || (view.referrer?.includes("linkedin") ? "via LinkedIn" : view.referrer?.includes("x.com") ? "via X" : view.referrer ? `via ${(() => { try { return new URL(view.referrer).hostname; } catch { return view.referrer; } })()}` : "Direct link")}
                               </p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2 shrink-0 ml-4">
                             {view.duration_seconds > 0 && (
-                              <span className="text-xs text-faint tabular-nums">
+                              <span className="text-xs tabular-nums" style={{ color: "#71717A" }}>
                                 {view.duration_seconds < 60 ? `${view.duration_seconds}s` : `${Math.floor(view.duration_seconds / 60)}m ${view.duration_seconds % 60}s`}
                               </span>
                             )}
-                            <p className="text-xs text-muted-foreground tabular-nums">{formatRelativeTime(view.created_at)}</p>
+                            <p className="text-xs tabular-nums" style={{ color: "#71717A" }}>{formatRelativeTime(view.created_at)}</p>
                           </div>
                         </div>
                         );
@@ -1866,19 +1901,20 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
               )}
 
               {/* Share link */}
-              <div className="p-4 rounded-none border border-border bg-white/[0.02]">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Your shareable profile link</p>
+              <div className="p-4 rounded-none border border-border bg-white">
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#71717A" }}>Your shareable profile link</p>
                 <div className="flex items-center gap-2">
-                  <span className="flex-1 text-sm text-muted-foreground font-mono truncate">hockystick.app/p/{startup.profile_slug}</span>
+                  <span className="flex-1 text-sm font-mono truncate" style={{ color: "#52525B" }}>hockystick.app/p/{startup.profile_slug}</span>
                   <button
                     onClick={() => { navigator.clipboard.writeText(`https://hockystick.app/p/${startup.profile_slug}`); toast.success("Copied!"); }}
-                    className="px-3 py-1.5 text-xs bg-accent border border-border rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                    className="px-3 py-1.5 text-xs bg-accent border border-border rounded-none hover:bg-accent transition-colors"
+                    style={{ color: "#52525B" }}
                   >Copy</button>
                   <a
                     href={`https://hockystick.app/p/${startup.profile_slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1.5 text-xs bg-accent border border-brand/30 rounded-lg text-brand hover:bg-accent transition-colors"
+                    className="px-3 py-1.5 text-xs bg-accent border border-brand/30 rounded-none text-brand hover:bg-accent transition-colors"
                   >Open →</a>
                 </div>
               </div>
