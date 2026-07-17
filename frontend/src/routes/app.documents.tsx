@@ -275,6 +275,8 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
   const [customTitle, setCustomTitle] = useState("");
   const [customFile, setCustomFile] = useState<File | null>(null);
   const [customUploading, setCustomUploading] = useState(false);
+  const [customCategory, setCustomCategory] = useState<Exclude<TemplateCategory, "All"> | null>(null);
+  const [customExtractError, setCustomExtractError] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   // Fetch startup
@@ -317,12 +319,29 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
     },
   });
 
-  // Merge templates with founder documents
+  // Merge templates with founder documents. R11 fix: custom documents
+  // (template_id === null) have no matching row in `templates` — without a
+  // synthetic template entry here, they never rendered anywhere in the IP
+  // Vault (Intake, Source Files, Digital Document Vault, Privacy Settings
+  // all iterate this list). Each custom doc gets a one-off virtual template
+  // built from its own stored category/title.
   const documentsWithStatus = useMemo(() => {
-    return templates.map(template => ({
+    const templateCards = templates.map(template => ({
       ...template,
       founderDoc: founderDocs.find(d => d.template_slug === template.slug) ?? null,
     }));
+    const customDocs = founderDocs.filter(d => !d.template_id);
+    const customCards = customDocs.map(doc => ({
+      id: doc.id,
+      slug: doc.template_slug,
+      name: doc.title,
+      category: (doc.content as any)?.category ?? "product",
+      is_required: false,
+      stage_relevance: STAGE_OPTIONS.map(s => s.toLowerCase().replace(/\s+/g, "-")),
+      sort_order: 9999,
+      founderDoc: doc,
+    }));
+    return [...templateCards, ...customCards];
   }, [templates, founderDocs]);
 
   // Normalise stage to DB format: "Series A" → "series-a"
@@ -337,15 +356,24 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
     }
     // R9 leaf slices over the same template cards:
     if (view === "document-intake") {
-      // still to add — no doc yet, or only an empty/draft shell
-      filtered = filtered.filter(t => !t.founderDoc || ["empty", "draft"].includes(t.founderDoc.status));
+      // still to add — no doc yet, only an empty/draft shell, or extraction
+      // failed and needs attention (R11: a failed custom-doc extraction has
+      // a real file but no usable content — it stays actionable in Intake).
+      filtered = filtered.filter(t =>
+        !t.founderDoc ||
+        ["empty", "draft"].includes(t.founderDoc.status) ||
+        (t.founderDoc.status === "needs_review" && !!(t.founderDoc.content as any)?.extraction_error),
+      );
     } else if (view === "source-files") {
       // physical uploads only
       filtered = filtered.filter(t => !!t.founderDoc?.file_path);
     } else if (view === "digital-document-vault") {
-      // Hockystick-processed documents (structured content exists)
+      // Hockystick-processed documents — genuinely extracted structured
+      // content only. A stored extraction_error means nothing was actually
+      // extracted, so it's excluded here even though status is non-empty.
       filtered = filtered.filter(t =>
         !!t.founderDoc &&
+        !(t.founderDoc.content as any)?.extraction_error &&
         (Object.keys(t.founderDoc.content ?? {}).length > 0 ||
           ["ai_extracted", "complete", "needs_review"].includes(t.founderDoc.status)),
       );
@@ -412,15 +440,22 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
     }
   }
 
-  // R10 step 3: Custom Document — upload any file (not tied to a pre-built
-  // template) + AI extract, alongside the existing template list.
+  // R11 step 1: Custom Document — upload any file (not tied to a pre-built
+  // template), extract structured data via extractCustomDocument() (the
+  // same JSON-schema extraction pattern profile builder uses — replaces
+  // the prose-only generateDocSummary(), which produced no structured
+  // fields and used a category enum that never matched this app's 5
+  // categories). Extraction failure is stored honestly, never silently as
+  // if it were content — the row always saves (so the file isn't lost),
+  // but its status reflects what actually happened.
   async function handleCustomDocumentUpload() {
-    if (!startup?.id || !user?.id || !customFile || !customTitle.trim()) return;
+    if (!startup?.id || !user?.id || !customFile || !customTitle.trim() || !customCategory) return;
     const file = customFile;
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
     if (!ALLOWED_EXTENSIONS.has(ext)) { toast.error(`${file.name}: file type not allowed`); return; }
     if (file.size > MAX_FILE_SIZE) { toast.error(`${file.name}: exceeds 50 MB limit`); return; }
     setCustomUploading(true);
+    setCustomExtractError(null);
     try {
       const slug = `custom-${customTitle.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}-${Date.now()}`;
       const filePath = `founder-docs/${startup.id}/${slug}/${file.name}`;
@@ -429,30 +464,47 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
 
       const { extractDocumentText } = await import("@/lib/document-extractor");
       const text = await extractDocumentText(file, file.name);
-      const { classifyDocument, generateDocSummary } = await import("@/lib/ai-secure-fn");
-      const classification = await classifyDocument({ data: { fileName: file.name, textSample: text.slice(0, 3000) } }).catch(() => null);
-      const summary = await generateDocSummary({
-        data: { userId: user.id, documentContent: text.slice(0, 12000), fileName: file.name, category: classification?.category },
-      }).catch(() => null);
+      const { extractCustomDocument } = await import("@/lib/profile-builder-fn");
+      const result = await extractCustomDocument({
+        data: { userId: user.id, documentText: text, fileName: file.name },
+      }).catch((e: any): Awaited<ReturnType<typeof extractCustomDocument>> => ({
+        data: null, missing_fields: [], error: e?.message || "Extraction failed",
+      }));
+
+      const extractionSucceeded = !result.error && !!result.data;
+      const category = result.data?.suggested_category ?? customCategory;
 
       const { error: upsertError } = await supabase.from("founder_documents").upsert({
         startup_id: startup.id,
         template_id: null,
         template_slug: slug,
         title: customTitle.trim(),
-        status: "ai_extracted",
+        status: extractionSucceeded ? "ai_extracted" : "needs_review",
         file_path: filePath,
         file_name: file.name,
         file_size: file.size,
-        content: { ai_summary: summary?.reply ?? "", classification: classification?.category ?? null },
-        completeness_score: 100,
+        content: extractionSucceeded
+          ? { ...result.data, category }
+          : { category, extraction_error: result.error || "Could not extract structured data from this document." },
+        completeness_score: extractionSucceeded ? 100 : 0,
         updated_at: new Date().toISOString(),
       }, { onConflict: "startup_id,template_slug" });
       if (upsertError) throw upsertError;
 
-      toast.success(`${customTitle.trim()} uploaded`);
+      if (extractionSucceeded) {
+        toast.success(`${customTitle.trim()} uploaded and extracted`);
+      } else {
+        setCustomExtractError(result.error || "Could not extract structured data.");
+        toast.error("Uploaded, but extraction failed — stored in Source Files. You can retry or fill manually.");
+      }
+
       import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { startup_id: startup?.id } })).catch(() => {});
-      refetchFounderDocs();
+      // R11 step 4: invalidate every view of founder_documents — Intake,
+      // Source Files, Digital Document Vault, and Privacy Settings are
+      // separate route mounts of this same component, each with its own
+      // query observer; a plain refetch() only updates the currently
+      // mounted one.
+      queryClient.invalidateQueries({ queryKey: ["founder-documents", startup.id] });
       const { logActivity } = await import("@/lib/activity-log-fn");
       logActivity({
         account_type: "founder",
@@ -463,13 +515,60 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
         target_label: customTitle.trim(),
         detail: `Uploaded ${file.name}`,
       });
-      setShowCustomUpload(false);
-      setCustomTitle("");
-      setCustomFile(null);
+      if (extractionSucceeded) {
+        setShowCustomUpload(false);
+        setCustomTitle("");
+        setCustomFile(null);
+        setCustomCategory(null);
+      }
     } catch (e: any) {
       toast.error(e.message || "Upload failed");
     } finally {
       setCustomUploading(false);
+    }
+  }
+
+  // R11 step 1: retry extraction for a custom doc whose first attempt
+  // failed — re-downloads the already-stored original, no re-upload needed.
+  const [retryingDocId, setRetryingDocId] = useState<string | null>(null);
+  async function handleRetryExtraction(doc: FounderDocument) {
+    if (!doc.file_path || !user?.id) return;
+    setRetryingDocId(doc.id);
+    try {
+      const { data: blob, error: downloadError } = await supabase.storage.from("documents").download(doc.file_path);
+      if (downloadError || !blob) throw downloadError || new Error("Could not read stored file.");
+      const file = new File([blob], doc.file_name || "document", { type: blob.type });
+
+      const { extractDocumentText } = await import("@/lib/document-extractor");
+      const text = await extractDocumentText(file, file.name);
+      const { extractCustomDocument } = await import("@/lib/profile-builder-fn");
+      const result = await extractCustomDocument({
+        data: { userId: user.id, documentText: text, fileName: file.name },
+      }).catch((e: any): Awaited<ReturnType<typeof extractCustomDocument>> => ({
+        data: null, missing_fields: [], error: e?.message || "Extraction failed",
+      }));
+
+      const extractionSucceeded = !result.error && !!result.data;
+      const priorCategory = (doc.content as any)?.category ?? "product";
+      const category = result.data?.suggested_category ?? priorCategory;
+
+      const { error: updateError } = await supabase.from("founder_documents").update({
+        status: extractionSucceeded ? "ai_extracted" : "needs_review",
+        content: extractionSucceeded
+          ? { ...result.data, category }
+          : { category, extraction_error: result.error || "Could not extract structured data from this document." },
+        completeness_score: extractionSucceeded ? 100 : 0,
+        updated_at: new Date().toISOString(),
+      }).eq("id", doc.id);
+      if (updateError) throw updateError;
+
+      if (extractionSucceeded) toast.success("Extraction succeeded");
+      else toast.error("Extraction failed again — try filling manually.");
+      if (startup?.id) queryClient.invalidateQueries({ queryKey: ["founder-documents", startup.id] });
+    } catch (e: any) {
+      toast.error(e.message || "Retry failed");
+    } finally {
+      setRetryingDocId(null);
     }
   }
 
@@ -599,7 +698,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                 pre-built templates. Only on Document Intake. */}
             {(!view || view === "document-intake") && (
               <button
-                onClick={() => setShowCustomUpload(true)}
+                onClick={() => { setCustomExtractError(null); setShowCustomUpload(true); }}
                 className="w-full rounded-none border border-dashed border-border bg-card p-5 text-left hover:border-brand/50 hover:bg-accent/20 transition-colors flex items-center gap-3"
               >
                 <div className="grid h-9 w-9 place-items-center rounded-none bg-accent shrink-0">
@@ -607,7 +706,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                 </div>
                 <div>
                   <div className="text-sm font-medium text-foreground">Add a custom document</div>
-                  <div className="text-xs text-muted-foreground">Upload any file not covered by a template — AI extracts a summary automatically.</div>
+                  <div className="text-xs text-muted-foreground">Upload any file not covered by a template — AI extracts structured data automatically.</div>
                 </div>
               </button>
             )}
@@ -628,6 +727,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                 const hasFeedback = !!(doc?.ai_feedback && typeof doc.ai_feedback === "object" && Object.keys(doc.ai_feedback).length > 0);
                 const feedbackScore = hasFeedback ? (doc!.ai_feedback as AIFeedback).overall_score : undefined;
                 const feedbackSignal = hasFeedback ? (doc!.ai_feedback as AIFeedback).signal : undefined;
+                const extractionError = (doc?.content as any)?.extraction_error as string | undefined;
 
                 return (
                   <div
@@ -688,6 +788,22 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                               />
                             </div>
                             <span className="text-[10px] text-muted-foreground tabular-nums">{doc.completeness_score}%</span>
+                          </div>
+                        )}
+                        {/* R11: honest extraction-failure state — never a
+                            silent empty result. */}
+                        {extractionError && (
+                          <div className="mt-2 rounded-none border border-amber-500/30 bg-amber-500/5 px-2.5 py-2">
+                            <p className="text-xs font-medium text-amber-600">Could not extract — document stored in Source Files.</p>
+                            <p className="text-xs mt-0.5" style={{ color: "#71717A" }}>{extractionError}</p>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleRetryExtraction(doc!); }}
+                              disabled={retryingDocId === doc?.id}
+                              className="inline-flex items-center gap-1 mt-1.5 text-xs font-medium text-brand hover:underline disabled:opacity-50"
+                            >
+                              {retryingDocId === doc?.id ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+                              {retryingDocId === doc?.id ? "Retrying…" : "Retry extraction"}
+                            </button>
                           </div>
                         )}
                         {/* Per-document coaching hint */}
@@ -896,6 +1012,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
               ? documentsWithStatus.filter((t) => !!t.founderDoc?.file_path)
               : documentsWithStatus.filter((t) =>
                   !!t.founderDoc &&
+                  !(t.founderDoc.content as any)?.extraction_error &&
                   (Object.keys(t.founderDoc.content ?? {}).length > 0 ||
                     ["ai_extracted", "complete", "needs_review"].includes(t.founderDoc.status)));
             return (
@@ -980,6 +1097,25 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                 />
               </div>
               <div>
+                <label className="text-xs font-medium block mb-1.5" style={{ color: "#52525B" }}>Category</label>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {(["market", "financials", "team", "product", "legal"] as const).map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setCustomCategory(cat)}
+                      className={cn(
+                        "rounded-none border px-2 py-1.5 text-xs font-medium capitalize transition-colors",
+                        customCategory === cat ? "border-brand bg-accent text-brand" : "border-border text-muted-foreground hover:bg-accent/40",
+                      )}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs mt-1.5" style={{ color: "#71717A" }}>AI will suggest a category once extracted — you can change it later.</p>
+              </div>
+              <div>
                 <label className="text-xs font-medium block mb-1.5" style={{ color: "#52525B" }}>File</label>
                 <label className="rounded-none border border-dashed border-border p-5 text-center cursor-pointer hover:border-brand/50 hover:bg-accent/20 transition-colors block">
                   <Upload className="h-5 w-5 text-muted-foreground mx-auto" />
@@ -988,13 +1124,20 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                   <input type="file" accept=".pdf,.pptx,.ppt,.xlsx,.xls,.docx,.doc,.csv" className="sr-only" onChange={(e) => e.target.files?.[0] && setCustomFile(e.target.files[0])} />
                 </label>
               </div>
+              {customExtractError && (
+                <div className="rounded-none border border-amber-500/30 bg-amber-500/5 px-3 py-2.5">
+                  <p className="text-xs font-medium text-amber-600">Could not extract this document.</p>
+                  <p className="text-xs mt-0.5" style={{ color: "#71717A" }}>{customExtractError}</p>
+                  <p className="text-xs mt-1" style={{ color: "#71717A" }}>It's stored in Source Files — retry, or fill it in manually.</p>
+                </div>
+              )}
               <button
                 onClick={handleCustomDocumentUpload}
-                disabled={customUploading || !customFile || !customTitle.trim()}
+                disabled={customUploading || !customFile || !customTitle.trim() || !customCategory}
                 className="w-full inline-flex items-center justify-center gap-2 rounded-none hs-gradient text-brand-foreground px-4 py-2.5 text-sm font-medium disabled:opacity-50"
               >
                 {customUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                {customUploading ? "Uploading & extracting…" : "Upload & extract"}
+                {customUploading ? "Uploading & extracting…" : customExtractError ? "Retry" : "Upload & extract"}
               </button>
             </div>
           </div>

@@ -11,6 +11,32 @@ function getOpenAIKey(): string {
   ) as string;
 }
 
+function getEnvVar(key: string): string {
+  return (
+    (typeof process !== "undefined" && process.env[key] ? process.env[key] : "") || ""
+  ) as string;
+}
+
+// Reuses the same rate-limit RPC as every other AI feature (CLAUDE.md: do not rebuild).
+async function checkUsageCap(userId: string, feature: string): Promise<{ allowed: boolean; message?: string }> {
+  if (!userId) return { allowed: true };
+  try {
+    const supabaseUrl = getEnvVar("VITE_SUPABASE_URL") || getEnvVar("SUPABASE_URL");
+    const supabaseKey = getEnvVar("VITE_SUPABASE_ANON_KEY") || getEnvVar("SUPABASE_ANON_KEY");
+    if (!supabaseUrl || !supabaseKey) return { allowed: true };
+    const resp = await fetch(`${supabaseUrl}/rest/v1/rpc/check_and_increment_ai_usage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` },
+      body: JSON.stringify({ p_user_id: userId, p_feature: feature }),
+    });
+    if (!resp.ok) return { allowed: true };
+    const result = await resp.json() as any;
+    return { allowed: result.allowed ?? true, message: result.message };
+  } catch {
+    return { allowed: true };
+  }
+}
+
 const EXTRACTION_SCHEMA = `{
   "company_name": "string or null",
   "tagline": "string or null",
@@ -117,6 +143,95 @@ ${data.documentText.slice(0, 12000)}`;
       }
     } catch (err: any) {
       return { data: null, missing_fields: [], error: err.message };
+    }
+  });
+
+// ── Extract from a custom (non-template) uploaded document ────────────────────
+// R11: structured extraction for Document Intake's Custom Document upload —
+// replaces the prose-summary generateDocSummary(), which produced no
+// structured fields for the Digital Document Vault and whose 5-category
+// classification (Pitch Deck | Financials | ...) never matched the app's
+// actual 5 categories (market | financials | team | product | legal).
+const CUSTOM_DOC_CATEGORIES = ["market", "financials", "team", "product", "legal"] as const;
+export type CustomDocCategory = (typeof CUSTOM_DOC_CATEGORIES)[number];
+
+const CUSTOM_DOC_SCHEMA = `{
+  "suggested_category": "one of: market, financials, team, product, legal",
+  "highlights": ["array of 3-6 short factual bullet strings — the key numbers and claims in the document"],
+  "funding_ask": "string or null — the amount being raised, if this document mentions one",
+  "use_of_funds": "string or null — how raised capital will be spent, if mentioned",
+  "projections": "string or null — forward-looking financial or growth projections, if present",
+  "key_metrics": ["array of {label, value} objects for any concrete numbers found — revenue, growth rate, users, margin, etc."],
+  "missing_fields": ["array of field names above that could not be filled from this document"]
+}`;
+
+type CustomDocExtractInput = {
+  userId: string;
+  documentText: string;
+  fileName: string;
+};
+
+export type CustomDocExtractResult = {
+  data: {
+    suggested_category: CustomDocCategory;
+    highlights: string[];
+    funding_ask: string | null;
+    use_of_funds: string | null;
+    projections: string | null;
+    key_metrics: Array<{ label: string; value: string }>;
+  } | null;
+  missing_fields: string[];
+  error: string | null;
+};
+
+export const extractCustomDocument = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as CustomDocExtractInput)
+  .handler(async ({ data }): Promise<CustomDocExtractResult> => {
+    const usageCheck = await checkUsageCap(data.userId, "document_extraction");
+    if (!usageCheck.allowed) {
+      return { data: null, missing_fields: [], error: usageCheck.message || "Daily AI limit reached." };
+    }
+    const systemPrompt = `You are an expert at extracting structured investor-relevant data from startup documents (financial summaries, decks, memos, term sheets, and similar).
+Return ONLY valid JSON — no markdown, no explanation, no extra text.
+The JSON must exactly match this schema:
+${CUSTOM_DOC_SCHEMA}
+
+Rules:
+- Only fill a field if there is clear textual evidence in the document. Never guess or invent numbers.
+- suggested_category must be exactly one of: market, financials, team, product, legal — pick the closest fit for this document's primary subject.
+- key_metrics: pull every concrete number you can find (revenue, users, growth rate, margin, headcount, valuation, etc.) as {label, value} pairs. Empty array if none found.
+- For any field you cannot find evidence for, set it to null (or [] for arrays) and add its key to missing_fields.`;
+
+    const userMessage = `File name: ${data.fileName}\n\nExtract structured data from this document content:\n\n${data.documentText.slice(0, 12000)}`;
+
+    const attempt = async (prompt: string): Promise<CustomDocExtractResult> => {
+      const raw = await callOpenAI(prompt, userMessage, 1000);
+      const parsed = parseExtractionJSON(raw) as any;
+      const category = CUSTOM_DOC_CATEGORIES.includes(parsed.suggested_category) ? parsed.suggested_category : "product";
+      return {
+        data: {
+          suggested_category: category,
+          highlights: Array.isArray(parsed.highlights) ? parsed.highlights : [],
+          funding_ask: parsed.funding_ask ?? null,
+          use_of_funds: parsed.use_of_funds ?? null,
+          projections: parsed.projections ?? null,
+          key_metrics: Array.isArray(parsed.key_metrics) ? parsed.key_metrics : [],
+        },
+        missing_fields: Array.isArray(parsed.missing_fields) ? parsed.missing_fields : [],
+        error: null,
+      };
+    };
+
+    try {
+      try {
+        return await attempt(systemPrompt);
+      } catch {
+        // Retry with a stricter prompt — same pattern as extractProfileFromDocument
+        return await attempt(systemPrompt + "\n\nCRITICAL: Return ONLY the raw JSON object. No markdown, no backticks, no explanation whatsoever.");
+      }
+    } catch (err: any) {
+      // Honest failure — never store an error string as if it were content.
+      return { data: null, missing_fields: [], error: err.message || "Extraction failed" };
     }
   });
 
