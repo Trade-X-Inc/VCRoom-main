@@ -84,7 +84,16 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   const sections = isInvestor ? investorSections : founderSections;
   const activeSection = activeSectionFor(path, sections);
   const overviewPath = overviewPathFor(isInvestor);
-  const [manuallyToggledGroups, setManuallyToggledGroups] = useState<Set<string>>(new Set());
+  // R12 step 1: ground-truth set of which L3 groups are visibly expanded.
+  // Previously this was computed via an XOR of a "manually toggled" flag
+  // against "does this group contain the active leaf" — which meant
+  // clicking any L4 child (changing which leaf is active) flipped that XOR
+  // and collapsed the group the user was just looking at. Now expansion is
+  // explicit: a group opens when its own toggle is clicked, or the first
+  // time navigation lands inside it, and it only ever closes when the user
+  // clicks that group's own toggle again — never as a side effect of
+  // clicking one of its own children.
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   // Longest-matching leaf wins active state — "Deal Room" (/app/deal-rooms)
   // must not light up while a sibling like /app/deal-rooms/prep-notes is open.
   const bestMatch = (() => {
@@ -97,9 +106,32 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
     }
     return best;
   })();
+  // Fresh L2 section entry ("Back to Dashboard" or clicking a different L2
+  // group) resets to a clean sidebar, auto-opening only the group containing
+  // the section's own active leaf, if any.
   useEffect(() => {
-    setManuallyToggledGroups(new Set());
-  }, [activeSection?.key]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!activeSection) { setExpandedGroups(new Set()); return; }
+    const initial = new Set<string>();
+    for (const item of activeSection.children ?? []) {
+      if (isGroup(item) && item.children.some((c) => path === c.to || path.startsWith(c.to + "/"))) {
+        initial.add(item.label);
+      }
+    }
+    setExpandedGroups(initial);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSection?.key]);
+  // Auto-open (never auto-close) whenever navigation lands inside a group
+  // that isn't already expanded — e.g. following a link from outside the
+  // sidebar directly into an L4 leaf.
+  useEffect(() => {
+    if (!activeSection || !bestMatch) return;
+    for (const item of activeSection.children ?? []) {
+      if (isGroup(item) && item.children.some((c) => c.to === bestMatch) && !expandedGroups.has(item.label)) {
+        setExpandedGroups((prev) => new Set(prev).add(item.label));
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bestMatch]);
   // Ask AI panel — trigger lives in the header (right corner, next to profile).
   const [aiOpen, setAiOpen] = useState<boolean>(
     () => typeof localStorage !== "undefined" && localStorage.getItem("hs_ai_panel_open") === "true",
@@ -400,15 +432,12 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
               {showExpanded && (activeSection.children ?? []).map((item: L3Item) => {
                 if (isGroup(item)) {
                   // L3 group label — expand/collapse only, never a page.
-                  const containsActive = item.children.some(
-                    (c) => bestMatch === c.to,
-                  );
-                  const expanded = manuallyToggledGroups.has(item.label) !== containsActive;
+                  const expanded = expandedGroups.has(item.label);
                   return (
                     <div key={item.label}>
                       <button
                         type="button"
-                        onClick={() => setManuallyToggledGroups((prev) => {
+                        onClick={() => setExpandedGroups((prev) => {
                           const next = new Set(prev);
                           next.has(item.label) ? next.delete(item.label) : next.add(item.label);
                           return next;
