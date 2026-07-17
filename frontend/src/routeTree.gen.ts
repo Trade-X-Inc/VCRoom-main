@@ -124,6 +124,7 @@ import { Route as AppInvestorAnalysisRouteImport } from './routes/app.investor.a
 import { Route as AppInvestorAdvisorRouteImport } from './routes/app.investor.advisor'
 import { Route as AppGoLiveProfileAnalyticsRouteImport } from './routes/app.go-live.profile-analytics'
 import { Route as AppGoLiveDirectoryRouteImport } from './routes/app.go-live.directory'
+import { Route as AppDealRoomsTeamAssignmentsRouteImport } from './routes/app.deal-rooms.team-assignments'
 import { Route as AppDealRoomsIdRouteImport } from './routes/app.deal-rooms.$id'
 import { Route as AppCrmPipelineManagerRouteImport } from './routes/app.crm.pipeline-manager'
 import { Route as AppCrmMeetingsRouteImport } from './routes/app.crm.meetings'
@@ -151,6 +152,7 @@ import { Route as AppPrepareInvestmentReadinessInvestorSimulationRouteImport } f
 import { Route as AppPrepareInvestmentReadinessInvestmentAuditRouteImport } from './routes/app.prepare.investment-readiness.investment-audit'
 import { Route as AppPrepareFounderCoachingReportFlagsRouteImport } from './routes/app.prepare.founder-coaching.report-flags'
 import { Route as AppPrepareFounderCoachingProfileDocumentsCheckRouteImport } from './routes/app.prepare.founder-coaching.profile-documents-check'
+import { Route as AppPrepareBadgesRoastReportsRouteImport } from './routes/app.prepare.badges.roast-reports'
 import { Route as AppPrepareBadgesOverviewRouteImport } from './routes/app.prepare.badges.overview'
 import { Route as AppPrepareBadgesFounderRoastRouteImport } from './routes/app.prepare.badges.founder-roast'
 import { Route as AppInvestorDiscoverWatchlistRouteImport } from './routes/app.investor.discover.watchlist'
@@ -765,6 +767,12 @@ const AppGoLiveDirectoryRoute = AppGoLiveDirectoryRouteImport.update({
   path: '/go-live/directory',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDealRoomsTeamAssignmentsRoute =
+  AppDealRoomsTeamAssignmentsRouteImport.update({
+    id: '/deal-rooms/team-assignments',
+    path: '/deal-rooms/team-assignments',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppDealRoomsIdRoute = AppDealRoomsIdRouteImport.update({
   id: '/deal-rooms/$id',
   path: '/deal-rooms/$id',
@@ -914,6 +922,12 @@ const AppPrepareFounderCoachingProfileDocumentsCheckRoute =
   AppPrepareFounderCoachingProfileDocumentsCheckRouteImport.update({
     id: '/prepare/founder-coaching/profile-documents-check',
     path: '/prepare/founder-coaching/profile-documents-check',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppPrepareBadgesRoastReportsRoute =
+  AppPrepareBadgesRoastReportsRouteImport.update({
+    id: '/prepare/badges/roast-reports',
+    path: '/prepare/badges/roast-reports',
     getParentRoute: () => AppRoute,
   } as any)
 const AppPrepareBadgesOverviewRoute =
@@ -1211,6 +1225,7 @@ export interface FileRoutesByFullPath {
   '/app/crm/meetings': typeof AppCrmMeetingsRoute
   '/app/crm/pipeline-manager': typeof AppCrmPipelineManagerRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
+  '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
   '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
   '/app/investor/advisor': typeof AppInvestorAdvisorRoute
@@ -1265,6 +1280,7 @@ export interface FileRoutesByFullPath {
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
   '/app/prepare/badges/overview': typeof AppPrepareBadgesOverviewRoute
+  '/app/prepare/badges/roast-reports': typeof AppPrepareBadgesRoastReportsRoute
   '/app/prepare/founder-coaching/profile-documents-check': typeof AppPrepareFounderCoachingProfileDocumentsCheckRoute
   '/app/prepare/founder-coaching/report-flags': typeof AppPrepareFounderCoachingReportFlagsRoute
   '/app/prepare/investment-readiness/investment-audit': typeof AppPrepareInvestmentReadinessInvestmentAuditRoute
@@ -1386,6 +1402,7 @@ export interface FileRoutesByTo {
   '/app/crm/meetings': typeof AppCrmMeetingsRoute
   '/app/crm/pipeline-manager': typeof AppCrmPipelineManagerRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
+  '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
   '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
   '/app/investor/advisor': typeof AppInvestorAdvisorRoute
@@ -1440,6 +1457,7 @@ export interface FileRoutesByTo {
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
   '/app/prepare/badges/overview': typeof AppPrepareBadgesOverviewRoute
+  '/app/prepare/badges/roast-reports': typeof AppPrepareBadgesRoastReportsRoute
   '/app/prepare/founder-coaching/profile-documents-check': typeof AppPrepareFounderCoachingProfileDocumentsCheckRoute
   '/app/prepare/founder-coaching/report-flags': typeof AppPrepareFounderCoachingReportFlagsRoute
   '/app/prepare/investment-readiness/investment-audit': typeof AppPrepareInvestmentReadinessInvestmentAuditRoute
@@ -1566,6 +1584,7 @@ export interface FileRoutesById {
   '/app/crm/meetings': typeof AppCrmMeetingsRoute
   '/app/crm/pipeline-manager': typeof AppCrmPipelineManagerRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
+  '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
   '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
   '/app/investor/advisor': typeof AppInvestorAdvisorRoute
@@ -1620,6 +1639,7 @@ export interface FileRoutesById {
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
   '/app/prepare/badges/overview': typeof AppPrepareBadgesOverviewRoute
+  '/app/prepare/badges/roast-reports': typeof AppPrepareBadgesRoastReportsRoute
   '/app/prepare/founder-coaching/profile-documents-check': typeof AppPrepareFounderCoachingProfileDocumentsCheckRoute
   '/app/prepare/founder-coaching/report-flags': typeof AppPrepareFounderCoachingReportFlagsRoute
   '/app/prepare/investment-readiness/investment-audit': typeof AppPrepareInvestmentReadinessInvestmentAuditRoute
@@ -1747,6 +1767,7 @@ export interface FileRouteTypes {
     | '/app/crm/meetings'
     | '/app/crm/pipeline-manager'
     | '/app/deal-rooms/$id'
+    | '/app/deal-rooms/team-assignments'
     | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
     | '/app/investor/advisor'
@@ -1801,6 +1822,7 @@ export interface FileRouteTypes {
     | '/app/investor/discover/watchlist'
     | '/app/prepare/badges/founder-roast'
     | '/app/prepare/badges/overview'
+    | '/app/prepare/badges/roast-reports'
     | '/app/prepare/founder-coaching/profile-documents-check'
     | '/app/prepare/founder-coaching/report-flags'
     | '/app/prepare/investment-readiness/investment-audit'
@@ -1922,6 +1944,7 @@ export interface FileRouteTypes {
     | '/app/crm/meetings'
     | '/app/crm/pipeline-manager'
     | '/app/deal-rooms/$id'
+    | '/app/deal-rooms/team-assignments'
     | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
     | '/app/investor/advisor'
@@ -1976,6 +1999,7 @@ export interface FileRouteTypes {
     | '/app/investor/discover/watchlist'
     | '/app/prepare/badges/founder-roast'
     | '/app/prepare/badges/overview'
+    | '/app/prepare/badges/roast-reports'
     | '/app/prepare/founder-coaching/profile-documents-check'
     | '/app/prepare/founder-coaching/report-flags'
     | '/app/prepare/investment-readiness/investment-audit'
@@ -2101,6 +2125,7 @@ export interface FileRouteTypes {
     | '/app/crm/meetings'
     | '/app/crm/pipeline-manager'
     | '/app/deal-rooms/$id'
+    | '/app/deal-rooms/team-assignments'
     | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
     | '/app/investor/advisor'
@@ -2155,6 +2180,7 @@ export interface FileRouteTypes {
     | '/app/investor/discover/watchlist'
     | '/app/prepare/badges/founder-roast'
     | '/app/prepare/badges/overview'
+    | '/app/prepare/badges/roast-reports'
     | '/app/prepare/founder-coaching/profile-documents-check'
     | '/app/prepare/founder-coaching/report-flags'
     | '/app/prepare/investment-readiness/investment-audit'
@@ -3052,6 +3078,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppGoLiveDirectoryRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/deal-rooms/team-assignments': {
+      id: '/app/deal-rooms/team-assignments'
+      path: '/deal-rooms/team-assignments'
+      fullPath: '/app/deal-rooms/team-assignments'
+      preLoaderRoute: typeof AppDealRoomsTeamAssignmentsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/deal-rooms/$id': {
       id: '/app/deal-rooms/$id'
       path: '/deal-rooms/$id'
@@ -3239,6 +3272,13 @@ declare module '@tanstack/react-router' {
       path: '/prepare/founder-coaching/profile-documents-check'
       fullPath: '/app/prepare/founder-coaching/profile-documents-check'
       preLoaderRoute: typeof AppPrepareFounderCoachingProfileDocumentsCheckRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/prepare/badges/roast-reports': {
+      id: '/app/prepare/badges/roast-reports'
+      path: '/prepare/badges/roast-reports'
+      fullPath: '/app/prepare/badges/roast-reports'
+      preLoaderRoute: typeof AppPrepareBadgesRoastReportsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/prepare/badges/overview': {
@@ -3682,6 +3722,7 @@ interface AppRouteChildren {
   AppCrmMeetingsRoute: typeof AppCrmMeetingsRoute
   AppCrmPipelineManagerRoute: typeof AppCrmPipelineManagerRoute
   AppDealRoomsIdRoute: typeof AppDealRoomsIdRouteWithChildren
+  AppDealRoomsTeamAssignmentsRoute: typeof AppDealRoomsTeamAssignmentsRoute
   AppGoLiveDirectoryRoute: typeof AppGoLiveDirectoryRoute
   AppGoLiveProfileAnalyticsRoute: typeof AppGoLiveProfileAnalyticsRoute
   AppCrmIndexRoute: typeof AppCrmIndexRoute
@@ -3694,6 +3735,7 @@ interface AppRouteChildren {
   AppGoLiveDigitalProfileProfileViewRoute: typeof AppGoLiveDigitalProfileProfileViewRoute
   AppPrepareBadgesFounderRoastRoute: typeof AppPrepareBadgesFounderRoastRoute
   AppPrepareBadgesOverviewRoute: typeof AppPrepareBadgesOverviewRoute
+  AppPrepareBadgesRoastReportsRoute: typeof AppPrepareBadgesRoastReportsRoute
   AppPrepareFounderCoachingProfileDocumentsCheckRoute: typeof AppPrepareFounderCoachingProfileDocumentsCheckRoute
   AppPrepareFounderCoachingReportFlagsRoute: typeof AppPrepareFounderCoachingReportFlagsRoute
   AppPrepareInvestmentReadinessInvestmentAuditRoute: typeof AppPrepareInvestmentReadinessInvestmentAuditRoute
@@ -3746,6 +3788,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCrmMeetingsRoute: AppCrmMeetingsRoute,
   AppCrmPipelineManagerRoute: AppCrmPipelineManagerRoute,
   AppDealRoomsIdRoute: AppDealRoomsIdRouteWithChildren,
+  AppDealRoomsTeamAssignmentsRoute: AppDealRoomsTeamAssignmentsRoute,
   AppGoLiveDirectoryRoute: AppGoLiveDirectoryRoute,
   AppGoLiveProfileAnalyticsRoute: AppGoLiveProfileAnalyticsRoute,
   AppCrmIndexRoute: AppCrmIndexRoute,
@@ -3760,6 +3803,7 @@ const AppRouteChildren: AppRouteChildren = {
     AppGoLiveDigitalProfileProfileViewRoute,
   AppPrepareBadgesFounderRoastRoute: AppPrepareBadgesFounderRoastRoute,
   AppPrepareBadgesOverviewRoute: AppPrepareBadgesOverviewRoute,
+  AppPrepareBadgesRoastReportsRoute: AppPrepareBadgesRoastReportsRoute,
   AppPrepareFounderCoachingProfileDocumentsCheckRoute:
     AppPrepareFounderCoachingProfileDocumentsCheckRoute,
   AppPrepareFounderCoachingReportFlagsRoute:

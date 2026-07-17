@@ -34,7 +34,11 @@ function statusLabel(s: string | null) {
 
 // ── Component ──────────────────────────────────────────────────────
 
-function DealRooms() {
+// R9: `view="team-assignments"` renders a read-only roster of which team
+// members are assigned to which room — reusing the same teamAssignments
+// query already computed for the per-room panel below. No new data, no
+// deal content (room name + assignee list only, per §9.6).
+export function DealRooms({ view }: { view?: "team-assignments" } = {}) {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState<"all" | "active" | "pending" | "closed">("all");
   const [sort, setSort] = useState<"newest" | "oldest" | "active">("newest");
@@ -180,6 +184,62 @@ function DealRooms() {
 
   if (isLoading) {
     return <EmptyState kind="loading" title="Loading" />;
+  }
+
+  if (view === "team-assignments") {
+    return (
+      <div className="p-6 lg:p-8">
+        <div className="mb-2">
+          <h1 className="text-lg font-bold tracking-tight">Team Assignments</h1>
+          <p className="text-sm text-muted-foreground mt-1">Who on your team is assigned to each deal room.</p>
+        </div>
+        <div className="mt-4 flex flex-col gap-3">
+          {sortedRooms.length === 0 ? (
+            <EmptyState kind="empty" title="No deal rooms" />
+          ) : (
+            sortedRooms.map((r: any) => {
+              const investorName = r.investor_name ?? "Pending invite";
+              const roomTeam = (teamAssignments as any[]).filter((a: any) => a.deal_room_id === r.id);
+              return (
+                <div key={r.id} className="rounded-none border border-border/60 bg-card p-5">
+                  <div className="flex items-center justify-between gap-4 flex-wrap">
+                    <div className="min-w-0">
+                      <div className="font-semibold truncate">{investorName}</div>
+                      <div className="text-xs text-muted-foreground">{roomTeam.length} team member{roomTeam.length !== 1 ? "s" : ""} assigned</div>
+                    </div>
+                    <Link
+                      to={"/app/deal-rooms/$id" as any}
+                      params={{ id: r.id } as any}
+                      className="inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-2.5 py-1.5 text-xs shadow-glow hover:opacity-90 transition-opacity"
+                    >
+                      Open <ArrowUpRight className="h-3 w-3" />
+                    </Link>
+                  </div>
+                  {roomTeam.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {roomTeam.map((a: any) => {
+                        const prof = a.startup_team_accounts?.team_member_profiles;
+                        const usr = a.startup_team_accounts?.users;
+                        const name = prof?.first_name
+                          ? `${prof.first_name} ${prof.last_name ?? ""}`.trim()
+                          : (usr?.full_name ?? "Unknown");
+                        const role = a.startup_team_accounts?.role ?? "member";
+                        return (
+                          <span key={a.team_account_id} className="inline-flex items-center gap-1.5 rounded-lg bg-accent/40 px-2.5 py-1.5 text-xs">
+                            <span className="font-medium">{name}</span>
+                            <span className="text-muted-foreground capitalize">· {role}</span>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -81,7 +81,10 @@ interface RoastSessionRow {
   written_deadline_at: string | null;
 }
 
-export function RoastManagement() {
+// R9: `view="reports"` renders only the completed sessions — Founder Roast
+// Reports leaf. Unset renders the full management page (schedule + live +
+// completed), unchanged.
+export function RoastManagement({ view }: { view?: "reports" } = {}) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [showSchedule, setShowSchedule] = useState(false);
@@ -255,14 +258,14 @@ export function RoastManagement() {
             className="text-lg font-bold tracking-tight flex items-center gap-2"
             style={{ fontFamily: "Syne, sans-serif" }}
           >
-            <Flame className="h-6 w-6" style={{ color: "#EF4444" }} /> Founder
-            Roast
+            <Flame className="h-6 w-6" style={{ color: "#EF4444" }} />
+            {view === "reports" ? "Founder Roast Reports" : "Founder Roast"}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Pitch live — answer everything on the record.
+            {view === "reports" ? "Your completed Roast sessions and outcomes." : "Pitch live — answer everything on the record."}
           </p>
         </div>
-        {!activeSession && startup?.id && (
+        {view !== "reports" && !activeSession && startup?.id && (
           <button
             onClick={() => setShowSchedule(true)}
             className="rounded-lg px-4 py-2.5 text-sm font-semibold text-foreground hover:opacity-90"
@@ -288,7 +291,7 @@ export function RoastManagement() {
       )}
 
       {/* Schedule form */}
-      {showSchedule && (
+      {view !== "reports" && showSchedule && (
         <div
           className="mb-6 rounded-xl border-2 bg-card p-6"
           style={{ borderColor: "rgba(239,68,68,0.4)" }}
@@ -451,24 +454,28 @@ export function RoastManagement() {
       )}
 
       {/* Sessions */}
-      {isLoading ? (
+      {(() => {
+        const visibleSessions = view === "reports"
+          ? sessions.filter((s) => ["completed", "expired"].includes(s.status))
+          : sessions;
+        return isLoading ? (
         <div className="rounded-xl border border-border/60 bg-card p-8 text-center">
           <Loader2 className="h-5 w-5 animate-spin mx-auto text-muted-foreground" />
         </div>
-      ) : sessions.length === 0 && startup?.id ? (
+      ) : visibleSessions.length === 0 && startup?.id ? (
         <div className="rounded-xl border border-dashed border-border/60 bg-card p-10 text-center">
           <Flame
             className="h-8 w-8 mx-auto mb-3"
             style={{ color: "rgba(239,68,68,0.4)" }}
           />
-          <div className="text-sm font-medium">No Roasts yet</div>
+          <div className="text-sm font-medium">{view === "reports" ? "No completed Roasts yet" : "No Roasts yet"}</div>
           <div className="text-xs text-muted-foreground mt-1 max-w-md mx-auto leading-relaxed">
             The strongest trust signal a founder can earn.
           </div>
         </div>
       ) : (
         <div className="space-y-3">
-          {sessions.map((s) => {
+          {visibleSessions.map((s) => {
             const pill = STATUS_PILL[s.status] ?? STATUS_PILL.scheduled;
             const qc2 = questionCounts[s.id];
             const isLive = LIVE_STATUSES.includes(s.status);
@@ -601,7 +608,8 @@ export function RoastManagement() {
             );
           })}
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
