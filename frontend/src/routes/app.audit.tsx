@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -14,8 +14,13 @@ import { formatDistanceToNow } from "date-fns";
 import { EmptyState } from "@/components/system";
 
 export const Route = createFileRoute("/app/audit")({
-  component: AuditPage,
+  // R9: folded into Settings as the Activity tab — old URL redirects there.
+  beforeLoad: () => {
+    throw redirect({ to: "/app/settings/activity" as any, replace: true });
+  },
 });
+
+export { AuditPage };
 
 // ── Types ──────────────────────────────────────────────────────────
 

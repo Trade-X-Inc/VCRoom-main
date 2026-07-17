@@ -104,6 +104,7 @@ import { Route as AppSettingsSecurityRouteImport } from './routes/app.settings.s
 import { Route as AppSettingsNotificationsRouteImport } from './routes/app.settings.notifications'
 import { Route as AppSettingsDomainRouteImport } from './routes/app.settings.domain'
 import { Route as AppSettingsBillingRouteImport } from './routes/app.settings.billing'
+import { Route as AppSettingsActivityRouteImport } from './routes/app.settings.activity'
 import { Route as AppInvestorTeamRouteImport } from './routes/app.investor.team'
 import { Route as AppInvestorStartupsRouteImport } from './routes/app.investor.startups'
 import { Route as AppInvestorSourceRouteImport } from './routes/app.investor.source'
@@ -130,6 +131,7 @@ import { Route as AppCrmPipelineManagerRouteImport } from './routes/app.crm.pipe
 import { Route as AppCrmMeetingsRouteImport } from './routes/app.crm.meetings'
 import { Route as AppCrmEmailOutreachRouteImport } from './routes/app.crm.email-outreach'
 import { Route as AppCrmConnectionsRouteImport } from './routes/app.crm.connections'
+import { Route as AppCrmAnalyticsRouteImport } from './routes/app.crm.analytics'
 import { Route as ApiInternalEmailTestRouteImport } from './routes/api.internal.email-test'
 import { Route as ApiInternalDataRouteImport } from './routes/api.internal.data'
 import { Route as AppInvestorThesisIndexRouteImport } from './routes/app.investor.thesis.index'
@@ -155,6 +157,7 @@ import { Route as AppPrepareFounderCoachingProfileDocumentsCheckRouteImport } fr
 import { Route as AppPrepareBadgesRoastReportsRouteImport } from './routes/app.prepare.badges.roast-reports'
 import { Route as AppPrepareBadgesOverviewRouteImport } from './routes/app.prepare.badges.overview'
 import { Route as AppPrepareBadgesFounderRoastRouteImport } from './routes/app.prepare.badges.founder-roast'
+import { Route as AppPrepareBadgesApplyRouteImport } from './routes/app.prepare.badges.apply'
 import { Route as AppInvestorDiscoverWatchlistRouteImport } from './routes/app.investor.discover.watchlist'
 import { Route as AppInvestorDiscoverDealIntakeRouteImport } from './routes/app.investor.discover.deal-intake'
 import { Route as AppInvestorDiscoverDealFlowRouteImport } from './routes/app.investor.discover.deal-flow'
@@ -164,6 +167,7 @@ import { Route as AppInvestorCrmPipelineManagerRouteImport } from './routes/app.
 import { Route as AppInvestorCrmFounderMeetingsRouteImport } from './routes/app.investor.crm.founder-meetings'
 import { Route as AppInvestorCrmDealAnalysisRouteImport } from './routes/app.investor.crm.deal-analysis'
 import { Route as AppInvestorCrmConnectionsRouteImport } from './routes/app.investor.crm.connections'
+import { Route as AppInvestorCrmAnalyticsRouteImport } from './routes/app.investor.crm.analytics'
 import { Route as AppGoLiveDigitalProfileProfileViewRouteImport } from './routes/app.go-live.digital-profile.profile-view'
 import { Route as AppGoLiveDigitalProfilePrivacySettingsRouteImport } from './routes/app.go-live.digital-profile.privacy-settings'
 import { Route as AppDealRoomsIdTermSheetsRouteImport } from './routes/app.deal-rooms.$id.term-sheets'
@@ -186,6 +190,7 @@ import { Route as AppInvestorThesisFundVaultSourceFilesRouteImport } from './rou
 import { Route as AppInvestorThesisCapitalReadinessChequeSizeRouteImport } from './routes/app.investor.thesis.capital-readiness.cheque-size'
 import { Route as AppInvestorThesisBadgesTierStatusRouteImport } from './routes/app.investor.thesis.badges.tier-status'
 import { Route as AppInvestorThesisBadgesOverviewRouteImport } from './routes/app.investor.thesis.badges.overview'
+import { Route as AppInvestorThesisBadgesApplyRouteImport } from './routes/app.investor.thesis.badges.apply'
 import { Route as AppInvestorDiscoverPublicProfileProfileViewRouteImport } from './routes/app.investor.discover.public-profile.profile-view'
 import { Route as AppInvestorDiscoverPublicProfilePrivacySettingsRouteImport } from './routes/app.investor.discover.public-profile.privacy-settings'
 
@@ -666,6 +671,11 @@ const AppSettingsBillingRoute = AppSettingsBillingRouteImport.update({
   path: '/billing',
   getParentRoute: () => AppSettingsRoute,
 } as any)
+const AppSettingsActivityRoute = AppSettingsActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
 const AppInvestorTeamRoute = AppInvestorTeamRouteImport.update({
   id: '/team',
   path: '/team',
@@ -796,6 +806,11 @@ const AppCrmEmailOutreachRoute = AppCrmEmailOutreachRouteImport.update({
 const AppCrmConnectionsRoute = AppCrmConnectionsRouteImport.update({
   id: '/crm/connections',
   path: '/crm/connections',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCrmAnalyticsRoute = AppCrmAnalyticsRouteImport.update({
+  id: '/crm/analytics',
+  path: '/crm/analytics',
   getParentRoute: () => AppRoute,
 } as any)
 const ApiInternalEmailTestRoute = ApiInternalEmailTestRouteImport.update({
@@ -942,6 +957,11 @@ const AppPrepareBadgesFounderRoastRoute =
     path: '/prepare/badges/founder-roast',
     getParentRoute: () => AppRoute,
   } as any)
+const AppPrepareBadgesApplyRoute = AppPrepareBadgesApplyRouteImport.update({
+  id: '/prepare/badges/apply',
+  path: '/prepare/badges/apply',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppInvestorDiscoverWatchlistRoute =
   AppInvestorDiscoverWatchlistRouteImport.update({
     id: '/discover/watchlist',
@@ -996,6 +1016,11 @@ const AppInvestorCrmConnectionsRoute =
     path: '/crm/connections',
     getParentRoute: () => AppInvestorRoute,
   } as any)
+const AppInvestorCrmAnalyticsRoute = AppInvestorCrmAnalyticsRouteImport.update({
+  id: '/crm/analytics',
+  path: '/crm/analytics',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
 const AppGoLiveDigitalProfileProfileViewRoute =
   AppGoLiveDigitalProfileProfileViewRouteImport.update({
     id: '/go-live/digital-profile/profile-view',
@@ -1121,6 +1146,12 @@ const AppInvestorThesisBadgesOverviewRoute =
     path: '/thesis/badges/overview',
     getParentRoute: () => AppInvestorRoute,
   } as any)
+const AppInvestorThesisBadgesApplyRoute =
+  AppInvestorThesisBadgesApplyRouteImport.update({
+    id: '/thesis/badges/apply',
+    path: '/thesis/badges/apply',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
 const AppInvestorDiscoverPublicProfileProfileViewRoute =
   AppInvestorDiscoverPublicProfileProfileViewRouteImport.update({
     id: '/discover/public-profile/profile-view',
@@ -1220,6 +1251,7 @@ export interface FileRoutesByFullPath {
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
+  '/app/crm/analytics': typeof AppCrmAnalyticsRoute
   '/app/crm/connections': typeof AppCrmConnectionsRoute
   '/app/crm/email-outreach': typeof AppCrmEmailOutreachRoute
   '/app/crm/meetings': typeof AppCrmMeetingsRoute
@@ -1246,6 +1278,7 @@ export interface FileRoutesByFullPath {
   '/app/investor/source': typeof AppInvestorSourceRoute
   '/app/investor/startups': typeof AppInvestorStartupsRoute
   '/app/investor/team': typeof AppInvestorTeamRoute
+  '/app/settings/activity': typeof AppSettingsActivityRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
@@ -1269,6 +1302,7 @@ export interface FileRoutesByFullPath {
   '/app/deal-rooms/$id/term-sheets': typeof AppDealRoomsIdTermSheetsRoute
   '/app/go-live/digital-profile/privacy-settings': typeof AppGoLiveDigitalProfilePrivacySettingsRoute
   '/app/go-live/digital-profile/profile-view': typeof AppGoLiveDigitalProfileProfileViewRoute
+  '/app/investor/crm/analytics': typeof AppInvestorCrmAnalyticsRoute
   '/app/investor/crm/connections': typeof AppInvestorCrmConnectionsRoute
   '/app/investor/crm/deal-analysis': typeof AppInvestorCrmDealAnalysisRoute
   '/app/investor/crm/founder-meetings': typeof AppInvestorCrmFounderMeetingsRoute
@@ -1278,6 +1312,7 @@ export interface FileRoutesByFullPath {
   '/app/investor/discover/deal-flow': typeof AppInvestorDiscoverDealFlowRoute
   '/app/investor/discover/deal-intake': typeof AppInvestorDiscoverDealIntakeRoute
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
+  '/app/prepare/badges/apply': typeof AppPrepareBadgesApplyRoute
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
   '/app/prepare/badges/overview': typeof AppPrepareBadgesOverviewRoute
   '/app/prepare/badges/roast-reports': typeof AppPrepareBadgesRoastReportsRoute
@@ -1303,6 +1338,7 @@ export interface FileRoutesByFullPath {
   '/app/investor/thesis/': typeof AppInvestorThesisIndexRoute
   '/app/investor/discover/public-profile/privacy-settings': typeof AppInvestorDiscoverPublicProfilePrivacySettingsRoute
   '/app/investor/discover/public-profile/profile-view': typeof AppInvestorDiscoverPublicProfileProfileViewRoute
+  '/app/investor/thesis/badges/apply': typeof AppInvestorThesisBadgesApplyRoute
   '/app/investor/thesis/badges/overview': typeof AppInvestorThesisBadgesOverviewRoute
   '/app/investor/thesis/badges/tier-status': typeof AppInvestorThesisBadgesTierStatusRoute
   '/app/investor/thesis/capital-readiness/cheque-size': typeof AppInvestorThesisCapitalReadinessChequeSizeRoute
@@ -1397,6 +1433,7 @@ export interface FileRoutesByTo {
   '/tools': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
+  '/app/crm/analytics': typeof AppCrmAnalyticsRoute
   '/app/crm/connections': typeof AppCrmConnectionsRoute
   '/app/crm/email-outreach': typeof AppCrmEmailOutreachRoute
   '/app/crm/meetings': typeof AppCrmMeetingsRoute
@@ -1423,6 +1460,7 @@ export interface FileRoutesByTo {
   '/app/investor/source': typeof AppInvestorSourceRoute
   '/app/investor/startups': typeof AppInvestorStartupsRoute
   '/app/investor/team': typeof AppInvestorTeamRoute
+  '/app/settings/activity': typeof AppSettingsActivityRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
@@ -1446,6 +1484,7 @@ export interface FileRoutesByTo {
   '/app/deal-rooms/$id/term-sheets': typeof AppDealRoomsIdTermSheetsRoute
   '/app/go-live/digital-profile/privacy-settings': typeof AppGoLiveDigitalProfilePrivacySettingsRoute
   '/app/go-live/digital-profile/profile-view': typeof AppGoLiveDigitalProfileProfileViewRoute
+  '/app/investor/crm/analytics': typeof AppInvestorCrmAnalyticsRoute
   '/app/investor/crm/connections': typeof AppInvestorCrmConnectionsRoute
   '/app/investor/crm/deal-analysis': typeof AppInvestorCrmDealAnalysisRoute
   '/app/investor/crm/founder-meetings': typeof AppInvestorCrmFounderMeetingsRoute
@@ -1455,6 +1494,7 @@ export interface FileRoutesByTo {
   '/app/investor/discover/deal-flow': typeof AppInvestorDiscoverDealFlowRoute
   '/app/investor/discover/deal-intake': typeof AppInvestorDiscoverDealIntakeRoute
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
+  '/app/prepare/badges/apply': typeof AppPrepareBadgesApplyRoute
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
   '/app/prepare/badges/overview': typeof AppPrepareBadgesOverviewRoute
   '/app/prepare/badges/roast-reports': typeof AppPrepareBadgesRoastReportsRoute
@@ -1480,6 +1520,7 @@ export interface FileRoutesByTo {
   '/app/investor/thesis': typeof AppInvestorThesisIndexRoute
   '/app/investor/discover/public-profile/privacy-settings': typeof AppInvestorDiscoverPublicProfilePrivacySettingsRoute
   '/app/investor/discover/public-profile/profile-view': typeof AppInvestorDiscoverPublicProfileProfileViewRoute
+  '/app/investor/thesis/badges/apply': typeof AppInvestorThesisBadgesApplyRoute
   '/app/investor/thesis/badges/overview': typeof AppInvestorThesisBadgesOverviewRoute
   '/app/investor/thesis/badges/tier-status': typeof AppInvestorThesisBadgesTierStatusRoute
   '/app/investor/thesis/capital-readiness/cheque-size': typeof AppInvestorThesisCapitalReadinessChequeSizeRoute
@@ -1579,6 +1620,7 @@ export interface FileRoutesById {
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
+  '/app/crm/analytics': typeof AppCrmAnalyticsRoute
   '/app/crm/connections': typeof AppCrmConnectionsRoute
   '/app/crm/email-outreach': typeof AppCrmEmailOutreachRoute
   '/app/crm/meetings': typeof AppCrmMeetingsRoute
@@ -1605,6 +1647,7 @@ export interface FileRoutesById {
   '/app/investor/source': typeof AppInvestorSourceRoute
   '/app/investor/startups': typeof AppInvestorStartupsRoute
   '/app/investor/team': typeof AppInvestorTeamRoute
+  '/app/settings/activity': typeof AppSettingsActivityRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
@@ -1628,6 +1671,7 @@ export interface FileRoutesById {
   '/app/deal-rooms/$id/term-sheets': typeof AppDealRoomsIdTermSheetsRoute
   '/app/go-live/digital-profile/privacy-settings': typeof AppGoLiveDigitalProfilePrivacySettingsRoute
   '/app/go-live/digital-profile/profile-view': typeof AppGoLiveDigitalProfileProfileViewRoute
+  '/app/investor/crm/analytics': typeof AppInvestorCrmAnalyticsRoute
   '/app/investor/crm/connections': typeof AppInvestorCrmConnectionsRoute
   '/app/investor/crm/deal-analysis': typeof AppInvestorCrmDealAnalysisRoute
   '/app/investor/crm/founder-meetings': typeof AppInvestorCrmFounderMeetingsRoute
@@ -1637,6 +1681,7 @@ export interface FileRoutesById {
   '/app/investor/discover/deal-flow': typeof AppInvestorDiscoverDealFlowRoute
   '/app/investor/discover/deal-intake': typeof AppInvestorDiscoverDealIntakeRoute
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
+  '/app/prepare/badges/apply': typeof AppPrepareBadgesApplyRoute
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
   '/app/prepare/badges/overview': typeof AppPrepareBadgesOverviewRoute
   '/app/prepare/badges/roast-reports': typeof AppPrepareBadgesRoastReportsRoute
@@ -1662,6 +1707,7 @@ export interface FileRoutesById {
   '/app/investor/thesis/': typeof AppInvestorThesisIndexRoute
   '/app/investor/discover/public-profile/privacy-settings': typeof AppInvestorDiscoverPublicProfilePrivacySettingsRoute
   '/app/investor/discover/public-profile/profile-view': typeof AppInvestorDiscoverPublicProfileProfileViewRoute
+  '/app/investor/thesis/badges/apply': typeof AppInvestorThesisBadgesApplyRoute
   '/app/investor/thesis/badges/overview': typeof AppInvestorThesisBadgesOverviewRoute
   '/app/investor/thesis/badges/tier-status': typeof AppInvestorThesisBadgesTierStatusRoute
   '/app/investor/thesis/capital-readiness/cheque-size': typeof AppInvestorThesisCapitalReadinessChequeSizeRoute
@@ -1762,6 +1808,7 @@ export interface FileRouteTypes {
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
+    | '/app/crm/analytics'
     | '/app/crm/connections'
     | '/app/crm/email-outreach'
     | '/app/crm/meetings'
@@ -1788,6 +1835,7 @@ export interface FileRouteTypes {
     | '/app/investor/source'
     | '/app/investor/startups'
     | '/app/investor/team'
+    | '/app/settings/activity'
     | '/app/settings/billing'
     | '/app/settings/domain'
     | '/app/settings/notifications'
@@ -1811,6 +1859,7 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/$id/term-sheets'
     | '/app/go-live/digital-profile/privacy-settings'
     | '/app/go-live/digital-profile/profile-view'
+    | '/app/investor/crm/analytics'
     | '/app/investor/crm/connections'
     | '/app/investor/crm/deal-analysis'
     | '/app/investor/crm/founder-meetings'
@@ -1820,6 +1869,7 @@ export interface FileRouteTypes {
     | '/app/investor/discover/deal-flow'
     | '/app/investor/discover/deal-intake'
     | '/app/investor/discover/watchlist'
+    | '/app/prepare/badges/apply'
     | '/app/prepare/badges/founder-roast'
     | '/app/prepare/badges/overview'
     | '/app/prepare/badges/roast-reports'
@@ -1845,6 +1895,7 @@ export interface FileRouteTypes {
     | '/app/investor/thesis/'
     | '/app/investor/discover/public-profile/privacy-settings'
     | '/app/investor/discover/public-profile/profile-view'
+    | '/app/investor/thesis/badges/apply'
     | '/app/investor/thesis/badges/overview'
     | '/app/investor/thesis/badges/tier-status'
     | '/app/investor/thesis/capital-readiness/cheque-size'
@@ -1939,6 +1990,7 @@ export interface FileRouteTypes {
     | '/tools'
     | '/api/internal/data'
     | '/api/internal/email-test'
+    | '/app/crm/analytics'
     | '/app/crm/connections'
     | '/app/crm/email-outreach'
     | '/app/crm/meetings'
@@ -1965,6 +2017,7 @@ export interface FileRouteTypes {
     | '/app/investor/source'
     | '/app/investor/startups'
     | '/app/investor/team'
+    | '/app/settings/activity'
     | '/app/settings/billing'
     | '/app/settings/domain'
     | '/app/settings/notifications'
@@ -1988,6 +2041,7 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/$id/term-sheets'
     | '/app/go-live/digital-profile/privacy-settings'
     | '/app/go-live/digital-profile/profile-view'
+    | '/app/investor/crm/analytics'
     | '/app/investor/crm/connections'
     | '/app/investor/crm/deal-analysis'
     | '/app/investor/crm/founder-meetings'
@@ -1997,6 +2051,7 @@ export interface FileRouteTypes {
     | '/app/investor/discover/deal-flow'
     | '/app/investor/discover/deal-intake'
     | '/app/investor/discover/watchlist'
+    | '/app/prepare/badges/apply'
     | '/app/prepare/badges/founder-roast'
     | '/app/prepare/badges/overview'
     | '/app/prepare/badges/roast-reports'
@@ -2022,6 +2077,7 @@ export interface FileRouteTypes {
     | '/app/investor/thesis'
     | '/app/investor/discover/public-profile/privacy-settings'
     | '/app/investor/discover/public-profile/profile-view'
+    | '/app/investor/thesis/badges/apply'
     | '/app/investor/thesis/badges/overview'
     | '/app/investor/thesis/badges/tier-status'
     | '/app/investor/thesis/capital-readiness/cheque-size'
@@ -2120,6 +2176,7 @@ export interface FileRouteTypes {
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
+    | '/app/crm/analytics'
     | '/app/crm/connections'
     | '/app/crm/email-outreach'
     | '/app/crm/meetings'
@@ -2146,6 +2203,7 @@ export interface FileRouteTypes {
     | '/app/investor/source'
     | '/app/investor/startups'
     | '/app/investor/team'
+    | '/app/settings/activity'
     | '/app/settings/billing'
     | '/app/settings/domain'
     | '/app/settings/notifications'
@@ -2169,6 +2227,7 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/$id/term-sheets'
     | '/app/go-live/digital-profile/privacy-settings'
     | '/app/go-live/digital-profile/profile-view'
+    | '/app/investor/crm/analytics'
     | '/app/investor/crm/connections'
     | '/app/investor/crm/deal-analysis'
     | '/app/investor/crm/founder-meetings'
@@ -2178,6 +2237,7 @@ export interface FileRouteTypes {
     | '/app/investor/discover/deal-flow'
     | '/app/investor/discover/deal-intake'
     | '/app/investor/discover/watchlist'
+    | '/app/prepare/badges/apply'
     | '/app/prepare/badges/founder-roast'
     | '/app/prepare/badges/overview'
     | '/app/prepare/badges/roast-reports'
@@ -2203,6 +2263,7 @@ export interface FileRouteTypes {
     | '/app/investor/thesis/'
     | '/app/investor/discover/public-profile/privacy-settings'
     | '/app/investor/discover/public-profile/profile-view'
+    | '/app/investor/thesis/badges/apply'
     | '/app/investor/thesis/badges/overview'
     | '/app/investor/thesis/badges/tier-status'
     | '/app/investor/thesis/capital-readiness/cheque-size'
@@ -2938,6 +2999,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsBillingRouteImport
       parentRoute: typeof AppSettingsRoute
     }
+    '/app/settings/activity': {
+      id: '/app/settings/activity'
+      path: '/activity'
+      fullPath: '/app/settings/activity'
+      preLoaderRoute: typeof AppSettingsActivityRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
     '/app/investor/team': {
       id: '/app/investor/team'
       path: '/team'
@@ -3120,6 +3188,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCrmConnectionsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/crm/analytics': {
+      id: '/app/crm/analytics'
+      path: '/crm/analytics'
+      fullPath: '/app/crm/analytics'
+      preLoaderRoute: typeof AppCrmAnalyticsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/api/internal/email-test': {
       id: '/api/internal/email-test'
       path: '/api/internal/email-test'
@@ -3295,6 +3370,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPrepareBadgesFounderRoastRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/prepare/badges/apply': {
+      id: '/app/prepare/badges/apply'
+      path: '/prepare/badges/apply'
+      fullPath: '/app/prepare/badges/apply'
+      preLoaderRoute: typeof AppPrepareBadgesApplyRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/investor/discover/watchlist': {
       id: '/app/investor/discover/watchlist'
       path: '/discover/watchlist'
@@ -3356,6 +3438,13 @@ declare module '@tanstack/react-router' {
       path: '/crm/connections'
       fullPath: '/app/investor/crm/connections'
       preLoaderRoute: typeof AppInvestorCrmConnectionsRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/crm/analytics': {
+      id: '/app/investor/crm/analytics'
+      path: '/crm/analytics'
+      fullPath: '/app/investor/crm/analytics'
+      preLoaderRoute: typeof AppInvestorCrmAnalyticsRouteImport
       parentRoute: typeof AppInvestorRoute
     }
     '/app/go-live/digital-profile/profile-view': {
@@ -3512,6 +3601,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorThesisBadgesOverviewRouteImport
       parentRoute: typeof AppInvestorRoute
     }
+    '/app/investor/thesis/badges/apply': {
+      id: '/app/investor/thesis/badges/apply'
+      path: '/thesis/badges/apply'
+      fullPath: '/app/investor/thesis/badges/apply'
+      preLoaderRoute: typeof AppInvestorThesisBadgesApplyRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
     '/app/investor/discover/public-profile/profile-view': {
       id: '/app/investor/discover/public-profile/profile-view'
       path: '/discover/public-profile/profile-view'
@@ -3549,6 +3645,7 @@ interface AppInvestorRouteChildren {
   AppInvestorStartupsRoute: typeof AppInvestorStartupsRoute
   AppInvestorTeamRoute: typeof AppInvestorTeamRoute
   AppInvestorIndexRoute: typeof AppInvestorIndexRoute
+  AppInvestorCrmAnalyticsRoute: typeof AppInvestorCrmAnalyticsRoute
   AppInvestorCrmConnectionsRoute: typeof AppInvestorCrmConnectionsRoute
   AppInvestorCrmDealAnalysisRoute: typeof AppInvestorCrmDealAnalysisRoute
   AppInvestorCrmFounderMeetingsRoute: typeof AppInvestorCrmFounderMeetingsRoute
@@ -3564,6 +3661,7 @@ interface AppInvestorRouteChildren {
   AppInvestorThesisIndexRoute: typeof AppInvestorThesisIndexRoute
   AppInvestorDiscoverPublicProfilePrivacySettingsRoute: typeof AppInvestorDiscoverPublicProfilePrivacySettingsRoute
   AppInvestorDiscoverPublicProfileProfileViewRoute: typeof AppInvestorDiscoverPublicProfileProfileViewRoute
+  AppInvestorThesisBadgesApplyRoute: typeof AppInvestorThesisBadgesApplyRoute
   AppInvestorThesisBadgesOverviewRoute: typeof AppInvestorThesisBadgesOverviewRoute
   AppInvestorThesisBadgesTierStatusRoute: typeof AppInvestorThesisBadgesTierStatusRoute
   AppInvestorThesisCapitalReadinessChequeSizeRoute: typeof AppInvestorThesisCapitalReadinessChequeSizeRoute
@@ -3597,6 +3695,7 @@ const AppInvestorRouteChildren: AppInvestorRouteChildren = {
   AppInvestorStartupsRoute: AppInvestorStartupsRoute,
   AppInvestorTeamRoute: AppInvestorTeamRoute,
   AppInvestorIndexRoute: AppInvestorIndexRoute,
+  AppInvestorCrmAnalyticsRoute: AppInvestorCrmAnalyticsRoute,
   AppInvestorCrmConnectionsRoute: AppInvestorCrmConnectionsRoute,
   AppInvestorCrmDealAnalysisRoute: AppInvestorCrmDealAnalysisRoute,
   AppInvestorCrmFounderMeetingsRoute: AppInvestorCrmFounderMeetingsRoute,
@@ -3615,6 +3714,7 @@ const AppInvestorRouteChildren: AppInvestorRouteChildren = {
     AppInvestorDiscoverPublicProfilePrivacySettingsRoute,
   AppInvestorDiscoverPublicProfileProfileViewRoute:
     AppInvestorDiscoverPublicProfileProfileViewRoute,
+  AppInvestorThesisBadgesApplyRoute: AppInvestorThesisBadgesApplyRoute,
   AppInvestorThesisBadgesOverviewRoute: AppInvestorThesisBadgesOverviewRoute,
   AppInvestorThesisBadgesTierStatusRoute:
     AppInvestorThesisBadgesTierStatusRoute,
@@ -3643,6 +3743,7 @@ const AppInvestorRouteWithChildren = AppInvestorRoute._addFileChildren(
 )
 
 interface AppSettingsRouteChildren {
+  AppSettingsActivityRoute: typeof AppSettingsActivityRoute
   AppSettingsBillingRoute: typeof AppSettingsBillingRoute
   AppSettingsDomainRoute: typeof AppSettingsDomainRoute
   AppSettingsNotificationsRoute: typeof AppSettingsNotificationsRoute
@@ -3650,6 +3751,7 @@ interface AppSettingsRouteChildren {
 }
 
 const AppSettingsRouteChildren: AppSettingsRouteChildren = {
+  AppSettingsActivityRoute: AppSettingsActivityRoute,
   AppSettingsBillingRoute: AppSettingsBillingRoute,
   AppSettingsDomainRoute: AppSettingsDomainRoute,
   AppSettingsNotificationsRoute: AppSettingsNotificationsRoute,
@@ -3717,6 +3819,7 @@ interface AppRouteChildren {
   AppVerificationRoute: typeof AppVerificationRoute
   AppWallRoute: typeof AppWallRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppCrmAnalyticsRoute: typeof AppCrmAnalyticsRoute
   AppCrmConnectionsRoute: typeof AppCrmConnectionsRoute
   AppCrmEmailOutreachRoute: typeof AppCrmEmailOutreachRoute
   AppCrmMeetingsRoute: typeof AppCrmMeetingsRoute
@@ -3733,6 +3836,7 @@ interface AppRouteChildren {
   AppRoastIndexRoute: typeof AppRoastIndexRoute
   AppGoLiveDigitalProfilePrivacySettingsRoute: typeof AppGoLiveDigitalProfilePrivacySettingsRoute
   AppGoLiveDigitalProfileProfileViewRoute: typeof AppGoLiveDigitalProfileProfileViewRoute
+  AppPrepareBadgesApplyRoute: typeof AppPrepareBadgesApplyRoute
   AppPrepareBadgesFounderRoastRoute: typeof AppPrepareBadgesFounderRoastRoute
   AppPrepareBadgesOverviewRoute: typeof AppPrepareBadgesOverviewRoute
   AppPrepareBadgesRoastReportsRoute: typeof AppPrepareBadgesRoastReportsRoute
@@ -3783,6 +3887,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppVerificationRoute: AppVerificationRoute,
   AppWallRoute: AppWallRoute,
   AppIndexRoute: AppIndexRoute,
+  AppCrmAnalyticsRoute: AppCrmAnalyticsRoute,
   AppCrmConnectionsRoute: AppCrmConnectionsRoute,
   AppCrmEmailOutreachRoute: AppCrmEmailOutreachRoute,
   AppCrmMeetingsRoute: AppCrmMeetingsRoute,
@@ -3801,6 +3906,7 @@ const AppRouteChildren: AppRouteChildren = {
     AppGoLiveDigitalProfilePrivacySettingsRoute,
   AppGoLiveDigitalProfileProfileViewRoute:
     AppGoLiveDigitalProfileProfileViewRoute,
+  AppPrepareBadgesApplyRoute: AppPrepareBadgesApplyRoute,
   AppPrepareBadgesFounderRoastRoute: AppPrepareBadgesFounderRoastRoute,
   AppPrepareBadgesOverviewRoute: AppPrepareBadgesOverviewRoute,
   AppPrepareBadgesRoastReportsRoute: AppPrepareBadgesRoastReportsRoute,
