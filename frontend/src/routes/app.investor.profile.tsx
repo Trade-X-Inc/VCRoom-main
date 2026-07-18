@@ -667,6 +667,7 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
       if (isAssociateEditor) {
         await proposeFieldChange("avatar_url", existing?.avatar_url ?? null, url);
         qc.invalidateQueries({ queryKey: ["investor-profile-pending", fundOwnerUserId] });
+        qc.invalidateQueries({ queryKey: ["investor-profile-pending-mine", user.id] });
         toast.success("Photo change submitted for approval");
       } else {
         const { error: avErr } = await supabase.from("investor_profiles").update({ avatar_url: url }).eq("user_id", fundOwnerUserId!);
@@ -834,6 +835,7 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
           await proposeFieldChange(key, (existing as any)?.[key] ?? null, nextValues[key]);
         }
         qc.invalidateQueries({ queryKey: ["investor-profile-pending", fundOwnerUserId] });
+        qc.invalidateQueries({ queryKey: ["investor-profile-pending-mine", user.id] });
         toast.success(`${changedKeys.length} change${changedKeys.length === 1 ? "" : "s"} submitted for approval`);
         setSaving(false);
         return;
