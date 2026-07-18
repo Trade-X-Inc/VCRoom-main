@@ -91,7 +91,8 @@ export function StartupsPage() {
   const [activeTab, setActiveTab] = useState<(typeof TAB_STATUSES)[number]>("All");
   const [showAdd, setShowAdd] = useState(false);
   const [csvOpen, setCsvOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<"list" | "grid" | "icon">("grid");
+  // R14 — table is the default; grid/icon stay available via the toggle.
+  const [viewMode, setViewMode] = useState<"list" | "grid" | "icon">("list");
   const [platformFilter, setPlatformFilter] = useState<"all" | "hockystick">("all");
   const [stageFilter, setStageFilter] = useState<string | null>(null);
   const [regionFilter, setRegionFilter] = useState<RegionFilter>("All");
@@ -663,7 +664,7 @@ export function StartupsPage() {
                     key={c.id}
                     onClick={() => c.profile_slug ? navigate({ to: "/p/$slug", params: { slug: c.profile_slug } }) : setSelectedWatchlist(c)}
                     className="transition-colors group"
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: "pointer", height: 44 }}
                     onMouseEnter={(e) => { (e.currentTarget as HTMLTableRowElement).style.background = c.profile_slug ? "rgba(124,58,237,0.06)" : ""; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLTableRowElement).style.background = ""; }}
                   >

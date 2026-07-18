@@ -141,7 +141,9 @@ export function DecisionsPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
 
-  const [view, setView] = useState<ViewMode>("kanban");
+  // R14 — table is the default; VCs scan tables faster than Kanban columns.
+  // Kanban stays available via the toggle for anyone who prefers it.
+  const [view, setView] = useState<ViewMode>("list");
   const [search, setSearch] = useState("");
   const [stageFilter, setStageFilter] = useState<string[]>([]);
   const [sectorFilter, setSectorFilter] = useState<string[]>([]);
@@ -633,18 +635,18 @@ function ListView({ entries, advancing, onAdvance, onDecision }: {
             const isDecisionStage = e.status === "Decision";
             const isAdv = advancing === e.id;
             return (
-              <tr key={e.id} style={{ borderLeft: stale ? "3px solid #F59E0B" : "3px solid transparent", borderBottom: "1px solid var(--border)" }}>
-                <td style={{ padding: "10px 12px" }}>
+              <tr key={e.id} style={{ height: 44, borderLeft: stale ? "3px solid #F59E0B" : "3px solid transparent", borderBottom: "1px solid var(--border)" }}>
+                <td style={{ padding: "0 12px" }}>
                   <div style={{ fontWeight: 600, fontSize: 13, color: "var(--color-foreground)" }}>{e.company_name}</div>
-                  {e.deal_room_id && <a href={`/app/deal-rooms/${e.deal_room_id}`} style={{ fontSize: 10, color: "var(--brand)", display: "flex", alignItems: "center", gap: 3, marginTop: 2 }}><ExternalLink size={9} />Open DD</a>}
+                  {e.deal_room_id && <a href={`/app/deal-rooms/${e.deal_room_id}`} style={{ fontSize: 11, color: "var(--brand)", display: "flex", alignItems: "center", gap: 3 }}><ExternalLink size={9} />Open DD</a>}
                 </td>
-                <td style={{ padding: "10px 12px" }}><StageBadge status={e.status} /></td>
-                <td style={{ padding: "10px 12px", fontSize: 12, color: stale ? "#F59E0B" : "var(--color-muted-foreground)", whiteSpace: "nowrap" as const }}>
+                <td style={{ padding: "0 12px" }}><StageBadge status={e.status} /></td>
+                <td style={{ padding: "0 12px", fontSize: 13, color: stale ? "#F59E0B" : "var(--color-muted-foreground)", whiteSpace: "nowrap" as const }}>
                   {stale && <AlertTriangle size={10} style={{ display: "inline", marginRight: 3 }} />}{days}d
                 </td>
-                <td style={{ padding: "10px 12px" }}><ScorePill score={e.initial_score} /></td>
-                <td style={{ padding: "10px 12px", fontSize: 12, color: "var(--color-muted-foreground)" }}>{e.sector ?? "—"}</td>
-                <td style={{ padding: "10px 12px" }}>
+                <td style={{ padding: "0 12px" }}><ScorePill score={e.initial_score} /></td>
+                <td style={{ padding: "0 12px", fontSize: 13, color: "var(--color-muted-foreground)" }}>{e.sector ?? "—"}</td>
+                <td style={{ padding: "0 12px" }}>
                   {!isPassed && (
                     <div style={{ display: "flex", gap: 4 }}>
                       {isDecisionStage ? (

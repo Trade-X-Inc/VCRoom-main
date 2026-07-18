@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Inbox, Search, Clock, Plus, Loader2, ArrowRight, FileText, TrendingUp, AlertTriangle, HelpCircle, CheckCircle2 } from "lucide-react";
+import { Inbox, Search, Clock, Plus, Loader2, ArrowRight, FileText, TrendingUp, AlertTriangle, HelpCircle, CheckCircle2, List, LayoutGrid } from "lucide-react";
 import { PageGuide } from "@/components/app/PageGuide";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { formatDistanceToNow, format } from "date-fns";
 import type { AgentDealBrief } from "@/lib/deal-brief-fn";
 import { EmptyState } from "@/components/system";
+import { color, table as tableTokens } from "@/lib/design-tokens";
 
 export const Route = createFileRoute("/app/investor/deal-flow")({
   // R9 relocation: this URL's content moved — see nav-structure.ts.
@@ -228,6 +229,9 @@ export function DealFlowPage() {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [addingWatchlist, setAddingWatchlist] = useState<string | null>(null);
+  // R14 — table is the default; a VC scans more rooms per screen in a
+  // table than a 2-3 col card grid. Cards stay available via the toggle.
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
 
   const handleAddToWatchlist = async (dealRoomId: string, company: string) => {
     if (!user?.id) return;
@@ -318,6 +322,22 @@ export function DealFlowPage() {
             className="w-full rounded-[10px] border border-border/60 bg-background pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-brand/50"
           />
         </div>
+        <div className="flex items-center rounded-lg border border-border/60 bg-muted/40 p-0.5 gap-0.5 shrink-0">
+          <button
+            onClick={() => setViewMode("table")}
+            title="Table view"
+            className={`p-1.5 rounded-md transition-colors ${viewMode === "table" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            <List className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => setViewMode("cards")}
+            title="Card view"
+            className={`p-1.5 rounded-md transition-colors ${viewMode === "cards" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            <LayoutGrid className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </div>
 
       <div className="mt-5">
@@ -331,6 +351,51 @@ export function DealFlowPage() {
           />
         ) : filtered.length === 0 ? (
           <EmptyState kind={q ? "no-results" : "empty"} title={q ? "No matches" : "No deals"} />
+        ) : viewMode === "table" ? (
+          <div style={{ overflowX: "auto", border: `1px solid ${color.border}` }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ borderBottom: `1px solid ${color.border}` }}>
+                  <th style={{ padding: "0 16px", height: 36, textAlign: "left", fontSize: 11, fontWeight: 500, color: color.inkTertiary, textTransform: "uppercase", letterSpacing: "0.04em" }}>Company</th>
+                  <th style={{ padding: "0 16px", height: 36, textAlign: "left", fontSize: 11, fontWeight: 500, color: color.inkTertiary, textTransform: "uppercase", letterSpacing: "0.04em" }}>Sector</th>
+                  <th style={{ padding: "0 16px", height: 36, textAlign: "left", fontSize: 11, fontWeight: 500, color: color.inkTertiary, textTransform: "uppercase", letterSpacing: "0.04em" }}>Stage</th>
+                  <th style={{ padding: "0 16px", height: 36, textAlign: "right", fontSize: 11, fontWeight: 500, color: color.inkTertiary, textTransform: "uppercase", letterSpacing: "0.04em" }}>Target</th>
+                  <th style={{ padding: "0 16px", height: 36, textAlign: "right", fontSize: 11, fontWeight: 500, color: color.inkTertiary, textTransform: "uppercase", letterSpacing: "0.04em" }}>Updated</th>
+                  <th style={{ padding: "0 16px", height: 36 }} />
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((room) => (
+                  <tr
+                    key={room.id}
+                    onClick={() => navigate({ to: "/app/deal-rooms/$id", params: { id: room.id } })}
+                    style={{ height: tableTokens.rowHeight, borderBottom: tableTokens.rowBorder, cursor: "pointer" }}
+                    className="hover:bg-accent/30 transition-colors"
+                  >
+                    <td style={{ padding: "0 16px", fontSize: 13, fontWeight: 600, color: color.ink }}>{room.company}</td>
+                    <td style={{ padding: "0 16px", fontSize: 13, color: color.inkTertiary }}>{room.sector || "—"}</td>
+                    <td style={{ padding: "0 16px", fontSize: 13, color: color.inkTertiary }}>{room.stage || "—"}</td>
+                    <td style={{ padding: "0 16px", fontSize: 13, color: color.ink, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{room.fundingTarget || "—"}</td>
+                    <td style={{ padding: "0 16px", fontSize: 13, color: color.inkTertiary, textAlign: "right", whiteSpace: "nowrap" }}>
+                      {room.updatedAt ? formatDistanceToNow(new Date(room.updatedAt), { addSuffix: true }) : "—"}
+                    </td>
+                    <td style={{ padding: "0 16px", textAlign: "right" }}>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleAddToWatchlist(room.id, room.company); }}
+                        disabled={addingWatchlist === room.id}
+                        className="inline-flex items-center gap-1 rounded-md border border-border/60 px-2 py-0.5 text-[11px] hover:bg-accent disabled:opacity-50"
+                      >
+                        {addingWatchlist === room.id
+                          ? <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                          : <Plus className="h-2.5 w-2.5" />}
+                        Watchlist
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map((room) => (
