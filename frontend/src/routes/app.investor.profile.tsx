@@ -80,7 +80,6 @@ interface TeamMember {
   designation?: string | null;
   is_admin?: boolean;
   avatar_url?: string | null;
-  contact_email?: string | null;
   key_person?: boolean;
   created_at: string;
 }
@@ -88,6 +87,10 @@ interface TeamMember {
 interface InvestorTeamMemberDetail {
   team_member_id: string;
   bio: string | null;
+  // R13B — gated alongside bio, not on the public table: an email address
+  // is directly actionable, closer to "detail" than a name badge, so it
+  // waits for the same Information-stage unlock as everything else here.
+  contact_email: string | null;
 }
 
 interface PortfolioEntry {
@@ -1715,7 +1718,7 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
 
   const openEdit = (m: TeamMember) => {
     const d = detailByMemberId.get(m.id);
-    setMf({ name: m.name, designation: m.designation ?? "", role: m.role, contact_email: m.contact_email ?? "", bio: d?.bio ?? "", email: "", is_admin: m.is_admin ?? false, avatar_url: m.avatar_url ?? "", key_person: m.key_person ?? false });
+    setMf({ name: m.name, designation: m.designation ?? "", role: m.role, contact_email: d?.contact_email ?? "", bio: d?.bio ?? "", email: "", is_admin: m.is_admin ?? false, avatar_url: m.avatar_url ?? "", key_person: m.key_person ?? false });
     setEditingId(m.id); setShowForm(true);
   };
   const closeForm = () => { setShowForm(false); setEditingId(null); setMf(blank); };
@@ -1737,7 +1740,7 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
     e.preventDefault();
     if (!mf.name.trim() || !mf.role.trim()) { toast.error("Name and role are required"); return; }
     setSubmitting(true);
-    const memberData = { name: mf.name.trim(), designation: mf.designation.trim() || null, role: mf.role.trim(), contact_email: mf.contact_email.trim() || null, is_admin: mf.is_admin, avatar_url: mf.avatar_url || null, key_person: mf.key_person };
+    const memberData = { name: mf.name.trim(), designation: mf.designation.trim() || null, role: mf.role.trim(), is_admin: mf.is_admin, avatar_url: mf.avatar_url || null, key_person: mf.key_person };
     try {
       let memberId = editingId;
       if (editingId) {
@@ -1758,7 +1761,7 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
         toast.success("Team member added");
       }
       const { error: detailErr } = await supabase.from("investor_team_member_details")
-        .upsert({ team_member_id: memberId, bio: mf.bio || null, updated_at: new Date().toISOString() }, { onConflict: "team_member_id" });
+        .upsert({ team_member_id: memberId, bio: mf.bio || null, contact_email: mf.contact_email.trim() || null, updated_at: new Date().toISOString() }, { onConflict: "team_member_id" });
       if (detailErr) throw detailErr;
       qc.invalidateQueries({ queryKey: ["investor-team", profileId] });
       qc.invalidateQueries({ queryKey: ["investor-team-details", profileId] });
