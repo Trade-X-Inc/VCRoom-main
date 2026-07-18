@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { format, formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import {
-  FileText, Shield, Clock, CheckCircle2, Download, X, Sparkles, ExternalLink, Loader2,
+  FileText, Shield, Clock, CheckCircle2, Download, X, Sparkles, Loader2,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -52,12 +52,42 @@ function OverviewPage() {
     ? Math.max(0, Math.floor((Date.now() - new Date(dealRoom.created_at).getTime()) / (1000 * 60 * 60 * 24)))
     : "—";
 
-  const { data: teamMembers = [] } = useQuery({
-    queryKey: ["deal-room-overview-team", startup?.id],
+  // Key-person cards only, public fields only (name/title/photo) — visible
+  // from room entry regardless of disclosure stage, per the founder's
+  // decision that a faceless room undermines trust. Full detail (bio,
+  // highlights, social links) is Information-stage content, rendered
+  // separately and gated by RLS on team_member_details.
+  const { data: founderKeyPeople = [] } = useQuery({
+    queryKey: ["deal-room-overview-founder-key-people", startup?.id],
     enabled: !!startup?.id,
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
-      const { data } = await supabase.from("team_members").select("*").eq("startup_id", startup.id);
+      const { data } = await supabase
+        .from("team_members")
+        .select("id, name, title, photo_url, display_order")
+        .eq("startup_id", startup.id)
+        .eq("key_person", true)
+        .order("display_order", { ascending: true });
+      return data ?? [];
+    },
+  });
+
+  const { data: investorKeyPeople = [] } = useQuery({
+    queryKey: ["deal-room-overview-investor-key-people", dealRoom?.investor_user_id],
+    enabled: !!dealRoom?.investor_user_id,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data: profile } = await supabase
+        .from("investor_profiles")
+        .select("id")
+        .eq("user_id", dealRoom.investor_user_id)
+        .maybeSingle();
+      if (!profile?.id) return [];
+      const { data } = await supabase
+        .from("investor_team_members")
+        .select("id, name, designation, avatar_url")
+        .eq("investor_profile_id", profile.id)
+        .eq("key_person", true);
       return data ?? [];
     },
   });
@@ -421,35 +451,6 @@ function OverviewPage() {
         </div>
       </div>
 
-      <section className="mb-4">
-        <h3 className="mb-2 text-xs uppercase tracking-wider text-gray-500">TEAM</h3>
-        {teamMembers.length === 0 ? (
-          <p className="text-[#71717A] text-sm">No team members</p>
-        ) : (
-          <div className="flex gap-4 overflow-x-auto pb-2">
-            {(teamMembers as any[]).map((member) => (
-              <article key={member.id ?? member.name} className="min-w-[180px] bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4">
-                {member.photo_url ? (
-                  <img src={member.photo_url} alt="" className="w-12 h-12 rounded-full object-cover mb-2" />
-                ) : (
-                  <div className="w-12 h-12 rounded-full hs-gradient text-foreground flex items-center justify-center text-lg font-bold mb-2">
-                    {initials(member.name)}
-                  </div>
-                )}
-                <div className="text-sm font-semibold text-gray-900">{member.name ?? "Team member"}</div>
-                {member.title && <div className="text-xs text-gray-500">{member.title}</div>}
-                {member.bio && <p className="mt-2 text-xs text-gray-600 line-clamp-2">{member.bio}</p>}
-                {member.linkedin_url && (
-                  <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex text-gray-500 hover:text-brand">
-                    <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
-                )}
-              </article>
-            ))}
-          </div>
-        )}
-      </section>
-
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 mb-4">
         <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4">
           <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand">FOUNDER</div>
@@ -460,6 +461,26 @@ function OverviewPage() {
             <span>Team: {formatValue(startup?.team_size)}</span>
           </div>
           {startup?.description && <p className="mt-3 line-clamp-3 text-sm text-gray-600">{startup.description}</p>}
+
+          {founderKeyPeople.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-3 border-t border-[rgba(0,0,0,0.08)] pt-3">
+              {(founderKeyPeople as any[]).map((person) => (
+                <div key={person.id} className="flex items-center gap-2 min-w-[140px]">
+                  {person.photo_url ? (
+                    <img src={person.photo_url} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full hs-gradient text-foreground flex items-center justify-center text-xs font-bold shrink-0">
+                      {initials(person.name)}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-gray-900 truncate">{person.name ?? "Team member"}</div>
+                    {person.title && <div className="text-xs text-gray-500 truncate">{person.title}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4">
@@ -476,6 +497,26 @@ function OverviewPage() {
               {dealBrief?.match_score !== undefined && (
                 <div className="mt-3 text-sm text-gray-500">
                   Match score: <span className="font-semibold text-gray-900">{dealBrief.match_score}</span>
+                </div>
+              )}
+
+              {investorKeyPeople.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-3 border-t border-[rgba(0,0,0,0.08)] pt-3">
+                  {(investorKeyPeople as any[]).map((person) => (
+                    <div key={person.id} className="flex items-center gap-2 min-w-[140px]">
+                      {person.avatar_url ? (
+                        <img src={person.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                      ) : (
+                        <div className="w-9 h-9 rounded-full hs-gradient text-foreground flex items-center justify-center text-xs font-bold shrink-0">
+                          {initials(person.name)}
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-gray-900 truncate">{person.name ?? "Team member"}</div>
+                        {person.designation && <div className="text-xs text-gray-500 truncate">{person.designation}</div>}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </>
