@@ -80,9 +80,14 @@ interface TeamMember {
   designation?: string | null;
   is_admin?: boolean;
   avatar_url?: string | null;
-  linkedin_url?: string | null;
-  bio?: string | null;
+  contact_email?: string | null;
+  key_person?: boolean;
   created_at: string;
+}
+
+interface InvestorTeamMemberDetail {
+  team_member_id: string;
+  bio: string | null;
 }
 
 interface PortfolioEntry {
@@ -1680,7 +1685,7 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
-  const blank = { name: "", designation: "", role: "", linkedin_url: "", bio: "", email: "", is_admin: false, avatar_url: "" };
+  const blank = { name: "", designation: "", role: "", contact_email: "", bio: "", email: "", is_admin: false, avatar_url: "", key_person: false };
   const [mf, setMf] = useState(blank);
 
   const { data: members = [], isLoading } = useQuery<TeamMember[]>({
@@ -1692,8 +1697,25 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
     },
   });
 
+  // R13B — bio moved to investor_team_member_details (split from
+  // investor_team_members so a founder counterparty's access is actually
+  // gated by mutual disclosure — see CLAUDE.md §33). The owner always
+  // reads their own via that table's owner RLS policy.
+  const memberIds = members.map((m) => m.id);
+  const { data: details = [] } = useQuery<InvestorTeamMemberDetail[]>({
+    queryKey: ["investor-team-details", profileId, memberIds.join(",")],
+    enabled: memberIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("investor_team_member_details").select("*").in("team_member_id", memberIds);
+      if (error) throw error;
+      return (data ?? []) as InvestorTeamMemberDetail[];
+    },
+  });
+  const detailByMemberId = new Map(details.map((d) => [d.team_member_id, d]));
+
   const openEdit = (m: TeamMember) => {
-    setMf({ name: m.name, designation: m.designation ?? "", role: m.role, linkedin_url: m.linkedin_url ?? "", bio: m.bio ?? "", email: "", is_admin: m.is_admin ?? false, avatar_url: m.avatar_url ?? "" });
+    const d = detailByMemberId.get(m.id);
+    setMf({ name: m.name, designation: m.designation ?? "", role: m.role, contact_email: m.contact_email ?? "", bio: d?.bio ?? "", email: "", is_admin: m.is_admin ?? false, avatar_url: m.avatar_url ?? "", key_person: m.key_person ?? false });
     setEditingId(m.id); setShowForm(true);
   };
   const closeForm = () => { setShowForm(false); setEditingId(null); setMf(blank); };
@@ -1715,15 +1737,17 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
     e.preventDefault();
     if (!mf.name.trim() || !mf.role.trim()) { toast.error("Name and role are required"); return; }
     setSubmitting(true);
-    const memberData = { name: mf.name.trim(), designation: mf.designation.trim() || null, role: mf.role.trim(), linkedin_url: mf.linkedin_url || null, bio: mf.bio || null, is_admin: mf.is_admin, avatar_url: mf.avatar_url || null };
+    const memberData = { name: mf.name.trim(), designation: mf.designation.trim() || null, role: mf.role.trim(), contact_email: mf.contact_email.trim() || null, is_admin: mf.is_admin, avatar_url: mf.avatar_url || null, key_person: mf.key_person };
     try {
+      let memberId = editingId;
       if (editingId) {
         const { error } = await supabase.from("investor_team_members").update(memberData).eq("id", editingId);
         if (error) throw error;
         toast.success("Updated");
       } else {
-        const { error } = await supabase.from("investor_team_members").insert({ investor_profile_id: profileId, ...memberData });
+        const { data, error } = await supabase.from("investor_team_members").insert({ investor_profile_id: profileId, ...memberData }).select("id").single();
         if (error) throw error;
+        memberId = data.id;
         logActivity({ account_type: "investor", account_id: profileId, actor_user_id: investorUserId, actor_name: investorName, action_type: "team_member_added", target_label: mf.name.trim(), detail: `Added ${mf.name.trim()} as ${mf.designation || mf.role}` });
         if (mf.email.trim() && user?.id) {
           try {
@@ -1733,7 +1757,11 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
         }
         toast.success("Team member added");
       }
+      const { error: detailErr } = await supabase.from("investor_team_member_details")
+        .upsert({ team_member_id: memberId, bio: mf.bio || null, updated_at: new Date().toISOString() }, { onConflict: "team_member_id" });
+      if (detailErr) throw detailErr;
       qc.invalidateQueries({ queryKey: ["investor-team", profileId] });
+      qc.invalidateQueries({ queryKey: ["investor-team-details", profileId] });
       closeForm();
     } catch (err: any) { toast.error(err?.message || "Failed to save"); } finally { setSubmitting(false); }
   };
@@ -1743,6 +1771,7 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
     const { error } = await supabase.from("investor_team_members").delete().eq("id", id);
     if (error) { toast.error(error.message); return; }
     qc.invalidateQueries({ queryKey: ["investor-team", profileId] });
+    qc.invalidateQueries({ queryKey: ["investor-team-details", profileId] });
     setDeletingId(null);
     toast.success("Removed");
   };
@@ -1786,8 +1815,20 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
               </label>
             </div>
           </div>
-          <div><label style={{ fontSize: 12, color: color.inkTertiary }}>LinkedIn URL</label><input value={mf.linkedin_url} onChange={(e) => setMf((f) => ({ ...f, linkedin_url: e.target.value }))} style={{ ...inputStyle, marginTop: 4 }} placeholder="https://linkedin.com/in/…" /></div>
-          {!editingId && <div><label style={{ fontSize: 12, color: color.inkTertiary, display: "flex", alignItems: "center", gap: 4 }}><Mail style={{ width: 12, height: 12 }} /> Email (optional — sends invite)</label><input type="email" value={mf.email} onChange={(e) => setMf((f) => ({ ...f, email: e.target.value }))} style={{ ...inputStyle, marginTop: 4 }} placeholder="partner@fund.com" /></div>}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div><label style={{ fontSize: 12, color: color.inkTertiary }}>Contact email</label><input type="email" value={mf.contact_email} onChange={(e) => setMf((f) => ({ ...f, contact_email: e.target.value }))} style={{ ...inputStyle, marginTop: 4 }} placeholder="partner@fund.com" /></div>
+            <div style={{ display: "flex", alignItems: "flex-end", paddingBottom: 8 }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                <input type="checkbox" checked={mf.key_person} onChange={(e) => setMf((f) => ({ ...f, key_person: e.target.checked }))} style={{ height: 14, width: 14 }} />
+                <span style={{ fontSize: 12, fontWeight: 500, color: color.ink }}>Key person</span>
+              </label>
+            </div>
+          </div>
+          <div style={{ fontSize: 11, color: color.inkTertiary, marginTop: -4 }}>
+            Key people appear as a card in every shared deal room from room entry — name, photo, and designation only,
+            until Information stage unlocks the full profile.
+          </div>
+          {!editingId && <div><label style={{ fontSize: 12, color: color.inkTertiary, display: "flex", alignItems: "center", gap: 4 }}><Mail style={{ width: 12, height: 12 }} /> Invite email (optional — sends an invite)</label><input type="email" value={mf.email} onChange={(e) => setMf((f) => ({ ...f, email: e.target.value }))} style={{ ...inputStyle, marginTop: 4 }} placeholder="partner@fund.com" /></div>}
           <div><label style={{ fontSize: 12, color: color.inkTertiary }}>Short bio</label><textarea value={mf.bio} onChange={(e) => setMf((f) => ({ ...f, bio: e.target.value }))} rows={2} style={{ ...inputStyle, marginTop: 4, resize: "none" }} placeholder="Former operator turned investor." /></div>
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
             <button type="button" onClick={closeForm} style={{ border: `1px solid ${color.border}`, borderRadius: radius.control, padding: "6px 12px", fontSize: 12, background: "transparent", cursor: "pointer" }}>Cancel</button>
@@ -1810,6 +1851,7 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                   <span style={{ fontSize: 13, fontWeight: 500 }}>{m.name}</span>
+                  {m.key_person && <span style={{ fontSize: 9, fontWeight: 700, color: "#7C3AED", border: "1px solid rgba(124,58,237,0.3)", borderRadius: 99, padding: "1px 6px" }}>KEY</span>}
                   {m.designation && <span style={{ fontSize: 10, background: "rgba(124,58,237,0.08)", color: "#7C3AED", padding: "2px 6px", borderRadius: 2, fontWeight: 500 }}>{m.designation}</span>}
                   {m.role && m.role !== m.designation && <span style={{ fontSize: 10, background: color.canvas, color: color.inkTertiary, padding: "2px 6px", borderRadius: 2 }}>{m.role}</span>}
                   {m.is_admin && <span style={{ fontSize: 9, background: "rgba(16,185,129,0.1)", color: "#10B981", padding: "2px 6px", borderRadius: 2, fontWeight: 700, textTransform: "uppercase" }}>Admin</span>}
