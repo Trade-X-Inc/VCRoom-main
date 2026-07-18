@@ -868,3 +868,57 @@ incidentally inside an unrelated feature branch. Whatever session becomes the de
 None of these were fixed as part of the R12/R12B/R12C branches that found them — each was
 scoped out on purpose to keep those branches focused, per the standing rule of not
 expanding a feature branch into an unrelated repair.
+
+---
+
+## 32. PAYMENT PLACEHOLDER PATTERN (established R13, July 2026) — the standard for every paid feature until Stripe is wired
+
+Stripe is not built (§22 — deferred until company registration completes; `stripe_customer_id`/
+`stripe_subscription_id`/`stripe_price_id` columns exist on `subscriptions` and stay null).
+Every paid feature between now and real Stripe integration follows this exact pattern —
+**do not invent a different placeholder shape per feature.**
+
+### 32.0 The pattern
+
+1. **The consuming table gets its own `payment_status` column**, not a shared central
+   payments table — `roast_sessions.payment_status` (the original of this pattern, added
+   before R13 and widened in R13 to the shared vocabulary below) is the reference
+   implementation. A new paid feature adds `payment_status text not null default
+   'pending_payment' check (payment_status in ('not_required','pending_payment','paid','waived'))`
+   to its own table.
+2. **Four states, shared vocabulary across every feature:**
+   - `not_required` — this row/feature was never fee-gated (default for non-paid paths).
+   - `pending_payment` — fee owed, not yet confirmed.
+   - `paid` — confirmed via the placeholder (or later, a real Stripe PaymentIntent).
+   - `waived` — comped/free, explicitly granted (e.g. beta access).
+3. **The shared UI is `frontend/src/components/app/PaymentConfirm.tsx`** — fee label,
+   amount, a terms list (feature supplies its own copy), a required checkbox, and a
+   "Confirm payment" button. No card is ever charged; confirming just calls the caller's
+   `onConfirm`, which the feature wires to mark its own row's `payment_status = 'paid'`.
+4. **Every call site MUST carry a `TODO(stripe)` comment** at the exact line that marks
+   `paid` without a real charge, so a future Stripe-integration pass can `grep -rn
+   "TODO(stripe)"` to find every site needing the swap in one search — do not phrase the
+   comment differently per feature.
+5. **Gating a paid action**: the feature's own confirm/submit action checks
+   `payment_status === 'paid'` (or `'waived'`/`'not_required'` where applicable) before
+   proceeding — never let a `pending_payment` row's action complete silently.
+
+### 32.1 Reference implementation — Founder Roast's $40 fee (R13)
+
+`roast_sessions.payment_status` (already existed pre-R13 as `'comp'/'pending'/'paid'`,
+widened in R13's migration `20260719000000_r13_payment_status_pattern.sql` to the shared
+4-state vocabulary — `comp` renamed to `waived`, `pending` renamed to `pending_payment`,
+existing data migrated in the same pass, not left inconsistent). `ROAST_LEVELS` in
+`roast-fn.ts` already carried real `priceUsd` values (Level 1 $40 / Level 2 $50 / Level 3
+$60) that the UI displayed struck-through as "Free during beta" with no actual payment
+step — R13 built the missing step: `PaymentConfirm` renders between the level/date picker
+and the final "Schedule" action, `createRoastSession`'s call site carries the
+`TODO(stripe)` comment at its `payment_status: "paid"` write.
+
+### 32.2 What this is NOT
+
+Not a real payment gateway, not PCI-relevant (no card data ever collected or transmitted),
+not a substitute for actually wiring Stripe — it exists purely so paid features can be
+fully built and shipped now, with the payment step structurally in place, rather than
+half-built and waiting on Stripe. Per the founder's standing rule: paid features get
+fully built and wired to this placeholder, never left partial.
