@@ -905,15 +905,19 @@ Every paid feature between now and real Stripe integration follows this exact pa
 
 ### 32.1 Reference implementation — Founder Roast's $40 fee (R13)
 
-`roast_sessions.payment_status` (already existed pre-R13 as `'comp'/'pending'/'paid'`,
-widened in R13's migration `20260719000000_r13_payment_status_pattern.sql` to the shared
-4-state vocabulary — `comp` renamed to `waived`, `pending` renamed to `pending_payment`,
-existing data migrated in the same pass, not left inconsistent). `ROAST_LEVELS` in
-`roast-fn.ts` already carried real `priceUsd` values (Level 1 $40 / Level 2 $50 / Level 3
-$60) that the UI displayed struck-through as "Free during beta" with no actual payment
-step — R13 built the missing step: `PaymentConfirm` renders between the level/date picker
-and the final "Schedule" action, `createRoastSession`'s call site carries the
-`TODO(stripe)` comment at its `payment_status: "paid"` write.
+`ROAST_LEVELS` in `roast-fn.ts` already carried real `priceUsd` values (Level 1 $40 /
+Level 2 $50 / Level 3 $60) that the UI displayed struck-through as "Free during beta" with
+no actual payment step — R13 built the missing step: `PaymentConfirm` renders between the
+level/date picker and the final "Schedule" action, gated server-side in
+`createRoastSession` (refuses without `paymentConfirmed: true`, same shape as the
+pre-existing `rulesAcknowledged` gate).
+
+`payment_status` started as `roast_sessions.payment_status` (pre-R13:
+`'comp'/'pending'/'paid'`; widened in `20260719000000_r13_payment_status_pattern.sql` to
+the shared 4-state vocabulary below). **It was then moved to its own table,
+`roast_session_payments`, in `20260719020000_r13_split_roast_payment_status.sql`** — see
+§32.3. Do not treat `roast_sessions.payment_status` as current; that column no longer
+exists.
 
 ### 32.2 What this is NOT
 
@@ -922,3 +926,36 @@ not a substitute for actually wiring Stripe — it exists purely so paid feature
 fully built and shipped now, with the payment step structurally in place, rather than
 half-built and waiting on Stripe. Per the founder's standing rule: paid features get
 fully built and wired to this placeholder, never left partial.
+
+### 32.3 HARD RULE — never put `payment_status` on a table that's public-readable or realtime-published (found R13, July 2026)
+
+R13's mandatory security check found `roast_sessions.payment_status` leaking to ANY
+anonymous, unauthenticated visitor of a public roast session — verified live with a real
+Supabase Realtime WebSocket subscription carrying no auth token, which received the
+founder's payment state (`paid`/`pending_payment`/`waived`) in the raw `postgres_changes`
+payload on every session update.
+
+**Why this happens, and why it will happen again if you're not careful:** Postgres RLS —
+and Supabase Realtime on top of it — has **no column-level redaction**. A table's SELECT
+policy is row-level only: once a row is visible to a caller (here, `roast_sessions_public_read`'s
+`is_public = true` branch), **every column** of that row is visible too, including via the
+realtime channel, regardless of what the subscribing client's own JS callback chooses to
+read. Manually stripping a field from a server function's *response* (as the fix first did
+for `getRoastPublicState`) only closes the REST/RPC path — the direct-table realtime path
+is architecturally separate and stays open unless the column itself is removed from the
+public/published table.
+
+**The rule:** any column carrying payment state, internal ops data, or anything not meant
+for the row's full audience must live on a **separate table**, scoped by its own RLS to
+only the parties who should see it, and **not added to `supabase_realtime`** unless every
+party with realtime access to it is also a party who should see every column. Never add a
+`payment_status`-shaped column directly to a table that already has a public or
+broadly-scoped SELECT policy — split it out from the start, don't retrofit after a leak is
+found. `roast_session_payments` (§32.1) is the reference pattern: `session_id` FK,
+founder-only RLS, no realtime publication membership.
+
+**Before adding a payment (or any sensitive-status) column to an existing table, check its
+current RLS policies AND whether it's in `supabase_realtime`** — `select * from
+pg_policies where tablename = '<table>'` and `select * from pg_publication_tables where
+tablename = '<table>'`. If either check comes back broader than "only the owner," the new
+column needs its own table, not a spot on the existing one.
