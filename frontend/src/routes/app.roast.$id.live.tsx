@@ -138,7 +138,10 @@ function RoastLiveControl() {
   const { data: session, isLoading } = useQuery({
     queryKey: ["roast-live-session", id],
     enabled: !!user?.id,
-    refetchInterval: 7_000,
+    // R13 step 7 — realtime confirmed working (tests/r13-roast-realtime-
+    // verify.spec.ts, ~1s observed latency); this interval is now a
+    // safety-net fallback, not the primary delivery mechanism.
+    refetchInterval: 60_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("roast_sessions")
@@ -156,7 +159,7 @@ function RoastLiveControl() {
   const { data: questions = [] } = useQuery({
     queryKey: ["roast-live-questions", id],
     enabled: !!user?.id && !!session,
-    refetchInterval: 7_000,
+    refetchInterval: 60_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("roast_questions")
@@ -194,7 +197,9 @@ function RoastLiveControl() {
   const { data: audienceCount = 0 } = useQuery({
     queryKey: ["roast-live-audience", id],
     enabled: !!session,
-    refetchInterval: 15_000,
+    // R13 step 7 — now covered by the roast_audience subscription added
+    // above; interval widened to a safety-net fallback.
+    refetchInterval: 60_000,
     queryFn: async () => {
       const { count, error } = await supabase
         .from("roast_audience")
@@ -232,6 +237,21 @@ function RoastLiveControl() {
           filter: `session_id=eq.${id}`,
         },
         () => qc.invalidateQueries({ queryKey: ["roast-live-questions", id] }),
+      )
+      // R13 step 7 — roast_audience was already in supabase_realtime (R12B)
+      // but had no subscriber; audienceCount below relied solely on 15s
+      // polling. Added once the session/question channel above was
+      // confirmed live in a real two-session test
+      // (tests/r13-roast-realtime-verify.spec.ts).
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "roast_audience",
+          filter: `session_id=eq.${id}`,
+        },
+        () => qc.invalidateQueries({ queryKey: ["roast-live-audience", id] }),
       )
       .subscribe();
     return () => {
