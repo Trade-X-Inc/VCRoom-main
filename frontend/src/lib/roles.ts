@@ -108,6 +108,7 @@ export const PERMISSION_LABELS: Record<string, string> = {
   submit_decisions: "Submit Invest/Hold/Pass",
   run_ai_analysis: "Run AI document analysis",
   view_settings: "View account settings",
+  approve_profile_changes: "Approve fund profile changes",
 };
 
 export const INVESTOR_PERMISSIONS: Record<string, Record<string, boolean>> = {
@@ -120,6 +121,8 @@ export const INVESTOR_PERMISSIONS: Record<string, Record<string, boolean>> = {
     view_all_deal_rooms: true,
     run_ai_analysis: true,
     view_settings: true,
+    edit_profile: true,
+    approve_profile_changes: true,
   },
   admin: {
     view_discovery: true,
@@ -130,6 +133,8 @@ export const INVESTOR_PERMISSIONS: Record<string, Record<string, boolean>> = {
     view_all_deal_rooms: true,
     run_ai_analysis: true,
     view_settings: true,
+    edit_profile: true,
+    approve_profile_changes: true,
   },
   associate: {
     view_discovery: true,
@@ -140,6 +145,14 @@ export const INVESTOR_PERMISSIONS: Record<string, Record<string, boolean>> = {
     view_all_deal_rooms: true,
     run_ai_analysis: true,
     view_settings: false,
+    // Associate edits are staged as pending changes requiring Owner/Admin
+    // approval before going live — see investor_profile_pending_changes.
+    // edit_profile: true means "can propose an edit," not "edits apply
+    // immediately." PermissionGate/RLS treat both roles' edit_profile the
+    // same at the gate level; the approval branching happens in the save
+    // handler itself (R12C).
+    edit_profile: true,
+    approve_profile_changes: false,
   },
   analyst: {
     view_discovery: true,
@@ -150,6 +163,8 @@ export const INVESTOR_PERMISSIONS: Record<string, Record<string, boolean>> = {
     view_all_deal_rooms: false,
     run_ai_analysis: true,
     view_settings: false,
+    edit_profile: false,
+    approve_profile_changes: false,
   },
   external: {
     view_discovery: false,
@@ -160,5 +175,7 @@ export const INVESTOR_PERMISSIONS: Record<string, Record<string, boolean>> = {
     view_all_deal_rooms: false,
     run_ai_analysis: true,
     view_settings: false,
+    edit_profile: false,
+    approve_profile_changes: false,
   },
 };
