@@ -73,7 +73,11 @@ export function NotificationBell() {
         .limit(30);
       return (data ?? []) as NotifRow[];
     },
-    refetchInterval: 30_000,
+    // R12B: realtime subscription below is now confirmed working (table
+    // added to supabase_realtime, live-tested at ~600ms latency) — this
+    // interval is a safety-net fallback for a dropped WebSocket, not the
+    // primary delivery mechanism, so it no longer needs to be tight.
+    refetchInterval: 5 * 60 * 1000,
   });
 
   // Realtime: prepend new notification rows without full refetch
