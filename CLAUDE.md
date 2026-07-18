@@ -707,11 +707,9 @@ has been a **silent no-op** — each one only appears to work because it sits ne
 propagates to the affected member's open session live — verified with Playwright
 (`tests/r12-realtime-role-change.spec.ts`), no page reload required.
 
-**Left unfixed, on purpose:** every other table backing the channels listed above. If a
-future session needs a feature to feel "live" across two different users' sessions (not
-just multiple views within one user's own session — that's already covered by §27),
-check `pg_publication_tables` first. Don't assume an existing `.channel()` call means
-realtime actually works — verify the table is in the publication before trusting it.
+**Update (R12B, July 2026): the broader gap named above is now fixed for every table
+that had subscription code.** See §29 for the full architecture and what's still
+intentionally out of scope.
 
 **Gotcha if you add more tables to the publication:** `useAccountContext()` is called
 from many components simultaneously (`MemberShell`, `AppShell`, `app.tsx`,
@@ -722,3 +720,71 @@ string as the same channel object — the second mount's `.subscribe()` collides
 first. Fixed with a module-level ref-counted registry (see `useAccountContext.ts`): only
 the first concurrent caller opens the channel, only the last one closes it. Use the same
 pattern for any other hook that's mounted from multiple places at once.
+
+---
+
+## 29. REALTIME ARCHITECTURE — full table (established R12B, July 2026)
+
+R12B added every table backing an existing `.channel().on('postgres_changes')` call to
+`supabase_realtime`, built subscriptions for three deal-room-scoped tables that had none,
+and empirically verified (not assumed) that Realtime's Postgres Changes feature correctly
+enforces each table's RLS SELECT policy on the replication path — a subscribed-but-
+unauthorized client receives zero payloads, confirmed with a real raw WebSocket
+subscription in `tests/r12b-realtime-verify.spec.ts`, not just by reading policy text.
+
+**Before adding any new realtime subscription:** check `select tablename from
+pg_publication_tables where pubname = 'supabase_realtime'` — a working `.channel()` call
+in the code does not mean the table is actually publishing. Add the table via
+`alter publication supabase_realtime add table <name>;` first.
+
+### 29.0 Tables in `supabase_realtime` and what each covers
+
+| Table | Subscriber(s) | Covers | Live-tested latency |
+|---|---|---|---|
+| `startup_team_accounts` | `useAccountContext.ts` | A role change by an admin reaches the affected member's open session (R12) | — |
+| `notifications` | `NotificationBell.tsx` | New notification for the signed-in user | ~577ms |
+| `messages` | `DealRoomChat.tsx` | New deal-room chat message | not directly tested; same shape as `team_messages` |
+| `team_messages` | `app.messages.tsx` | New team chat message in the active channel | ~1035ms |
+| `deal_room_qa` | `app.deal-rooms.$id.qa.tsx` | New Q&A question/answer | ~487ms |
+| `deal_room_stage_transitions` | `useStageTransition.ts` | Deal-room stage-change request/approval | not directly tested; pre-existing code, unchanged |
+| `deal_room_term_sheets` | `app.deal-rooms.$id.term-sheets.tsx` (new, R12B) | Term sheet sent/accepted/countered | not directly tested; same invalidation pattern as verified tables |
+| `deal_room_closing_items` | `app.deal-rooms.$id.close.tsx` (new, R12B) | Closing checklist item status change — anticipates R15's active-closing work | not directly tested |
+| `deal_room_closure_reports` | (publication membership only, no subscriber yet) | — | — |
+| `nda_acceptances` | `app.deal-rooms.$id.overview.tsx` (new, R12B) | Counterparty's NDA acceptance appears in the room-level signer list | not directly tested |
+| `roast_sessions`, `roast_race_events`, `roast_audience` | `roast.$id.tsx` (public) | Live roast event state | not touched — existing 7s poll fallback kept, see §29.2 |
+| `roast_questions` | `app.roast.$id.live.tsx` | Roast host control panel live state | not touched — existing 7-15s poll fallbacks kept, see §29.2 |
+
+### 29.1 Security verification (step 4 result — PASS)
+
+Tested as `test-lawyer@hockystick.app` (External role, confirmed zero `deal_room_members`
+and zero `deal_room_team_assignments` rows for the target room) against `deal_room_qa`:
+
+1. Direct authenticated REST read of the room's `deal_room_qa` rows: **0 rows returned.**
+2. A real raw Supabase Realtime WebSocket subscription, opened with the exact same
+   channel/filter shape the app's own `qa.tsx` uses, while a legitimate member inserted a
+   new row into that room: **0 `postgres_changes` events received**, across an 8-second
+   window (well beyond the ~500ms-1s latency observed for authorized subscribers).
+
+**Conclusion: Realtime's RLS enforcement on the replication path is real, not just a
+table-level RLS flag that happens not to matter.** This was verified empirically per this
+task's explicit instruction — realtime payloads are a historically separate leak vector
+from REST/Storage in Supabase apps (see §26.3's storage-bucket precedent from R11), and
+"RLS is enabled on the table" is not sufficient evidence on its own; verify the actual
+subscription behavior before trusting it, the same standard applied here.
+
+### 29.2 What's still out of scope, on purpose
+
+- **`activity_log` has no working realtime and none was built.** It has no
+  `deal_room_id` column — it's a founder/investor account-level audit trail, not
+  deal-room-scoped. `DealRoomTimeline.tsx`'s query against it (`.eq("deal_room_id",
+  dealRoomId)`) targets a column that doesn't exist on this table — a pre-existing,
+  unrelated frontend bug, not a realtime gap. A future session designing a real
+  deal-room activity feed needs a new table or column, then a subscription — not before.
+- **Roast pages' polling was left untouched.** `roast.$id.tsx` and
+  `app.roast.$id.live.tsx` are live-event infrastructure with several 7-15s
+  `refetchInterval`s. Their tables are now correctly in the publication (so the existing
+  `.channel()` calls in that code are no longer no-ops), but polling wasn't reduced —
+  doing so safely needs an active-roast-session test fixture (race events, live
+  questions) that wasn't built in this branch. Live-test before touching that polling.
+- **`deal_room_closure_reports`** is in the publication (harmless, unused) but has no
+  subscriber — nothing currently needs it to feel live.
