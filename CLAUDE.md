@@ -959,3 +959,34 @@ current RLS policies AND whether it's in `supabase_realtime`** — `select * fro
 pg_policies where tablename = '<table>'` and `select * from pg_publication_tables where
 tablename = '<table>'`. If either check comes back broader than "only the owner," the new
 column needs its own table, not a spot on the existing one.
+
+---
+
+## 33. GENERAL RULE — Postgres RLS is ROW-level, never COLUMN-level (confirmed twice: R13 §32.3, R13B, July 2026)
+
+**Any table where different columns need different audiences must be split into separate
+tables from the start.** There is no RLS policy syntax, no view trick short of an actual
+`SECURITY DEFINER` function or a `SELECT`-only projection view, that lets one policy say
+"this caller sees columns A and B but not C" on a single `SELECT *`-able table. A `SELECT`
+policy is entirely row-level: if a row passes the policy's `USING` clause, every column of
+that row is returned to a direct query, full stop — regardless of whether some other RPC
+or app-layer convention "intends" to hide part of it.
+
+**This has now bitten this codebase twice, in two unrelated features:**
+- §32.3 (R13): `roast_sessions.payment_status` leaked to any anonymous realtime subscriber
+  of a public roast session, because the row was public but the column wasn't meant to be.
+- R13B: `team_members.bio` leaked to any deal-room counterparty via a direct `SELECT *`,
+  confirmed empirically with a real inserted row and a real counterparty session — bio came
+  back in full — despite the founder's explicit decision that only name/photo/title should
+  be visible before the Information-stage unlock. Fixed by splitting `team_members` (public:
+  name, title, photo, key_person flag) from `team_member_details` (gated: bio, highlights,
+  social_links), the same pattern applied to `investor_team_members` /
+  `investor_team_member_details`.
+
+**The check before adding ANY new column to an existing table:** does this column need to
+be visible to a *different* set of callers than the table's other columns? If yes — even if
+"today" every consumer happens to want the same access — split it into its own table with
+its own RLS from the moment it's added. Do not plan to "just be careful about which columns
+the client selects" — a direct `SELECT *`, a realtime payload, or a future consumer that
+forgets the convention will all bypass that immediately. This is not a style preference; it
+is the only mechanism Postgres RLS actually offers for differential column visibility.
