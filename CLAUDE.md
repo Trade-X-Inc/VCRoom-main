@@ -840,3 +840,31 @@ to one canonical target (most likely `.user_id`, matching the newer R12-era conv
 and every dependent policy on the four `team_*` tables, plus a data backfill if any rows
 exist by then. Bigger and riskier than any single feature branch should absorb
 incidentally; do it as its own deliberate migration.
+
+---
+
+## 31. CLEANUP-PASS BACKLOG — not urgent, don't lose these between phases
+
+Three known, real debt items, none blocking, all deliberately deferred rather than fixed
+incidentally inside an unrelated feature branch. Whatever session becomes the dedicated
+"cleanup pass" should start here rather than rediscovering these from scratch:
+
+1. **`investor_profile_id` dual FK meaning** (§30, found R12C) — same column name means
+   `investor_profiles.id` on `team_channels`/`team_messages`/`team_notes`/`team_tasks` but
+   `investor_profiles.user_id` on `startup_team_accounts` and the new R12C tables. Needs a
+   canonical-meaning decision, an FK migration, and a policy migration on four tables.
+2. **`activity_log` has no `deal_room_id` column** (§29.2, found R12B) — it's a founder/
+   investor account-level audit trail, not deal-room-scoped. `DealRoomTimeline.tsx`
+   queries a column that doesn't exist on it and has been silently broken. Needs either a
+   new deal-room-scoped activity table/column, or repointing the Timeline component at
+   whatever the correct source turns out to be.
+3. **`.hs-gradient` / gradient-purple system remnants** (§9, R1-era, superseded July 2026
+   by the Design Constitution) — `app.investor.profile.tsx` (touched extensively in R12C)
+   is a concrete example still running heavy inline `hs-gradient`/flat-`#7C3AED`-as-
+   background styling and non-0px radii. Per §9's own rule, do not "fix" this
+   incidentally while touching the file for unrelated work — migrate it deliberately, as
+   its own pass, checking every card/button/radius against `design-tokens.ts`.
+
+None of these were fixed as part of the R12/R12B/R12C branches that found them — each was
+scoped out on purpose to keep those branches focused, per the standing rule of not
+expanding a feature branch into an unrelated repair.
