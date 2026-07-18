@@ -7,6 +7,7 @@ import {
 } from "recharts";
 import { ArrowRight, ArrowUpRight, FileInput, Clock3 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { useAccountContext } from "@/hooks/useAccountContext";
 import { supabase } from "@/lib/supabase";
 import { PageFrame, EmptyState } from "@/components/system";
 import { color, font, radius, space, table as tableTokens } from "@/lib/design-tokens";
@@ -84,6 +85,24 @@ function ChartCard({ title, children, empty }: { title: string; children?: React
 function InvestorOverview() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const accountCtx = useAccountContext();
+
+  // R14 step 6 — Owners get no signal anywhere that an Associate's profile
+  // edit is waiting on them; the approval queue only shows once they're
+  // already on the Full Profile page. Surfaced here since it's real
+  // whose-move-is-it content.
+  const { data: pendingApprovals = [] } = useQuery({
+    queryKey: ["investor-overview-pending-approvals", user?.id],
+    enabled: !!user?.id && accountCtx.isOwner,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("investor_profile_pending_changes")
+        .select("id")
+        .eq("fund_owner_user_id", user!.id)
+        .eq("status", "pending");
+      return data ?? [];
+    },
+  });
 
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["investor-profile-gate", user?.id],
@@ -282,24 +301,41 @@ function InvestorOverview() {
           <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
             <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Needs a decision</div>
           </div>
-          {staleRooms.length === 0 ? (
+          {staleRooms.length === 0 && pendingApprovals.length === 0 ? (
             <div style={{ padding: "16px 20px", fontSize: 12, color: color.inkTertiary }}>Nothing waiting on you.</div>
           ) : (
-            staleRooms.map((r: any) => (
-              <Link
-                key={r.id}
-                to="/app/deal-rooms/$id"
-                params={{ id: r.id }}
-                style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 20px", height: 44, borderBottom: `1px solid ${color.border}`, textDecoration: "none" }}
-              >
-                <Clock3 style={{ width: 14, height: 14, color: "#DC2626", flexShrink: 0 }} />
-                <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "baseline", gap: 8 }}>
-                  <span style={{ fontSize: 13, color: color.ink }}>{(r.startups as any)?.company_name ?? "Deal"}</span>
-                  <span style={{ fontSize: 12, color: color.inkTertiary }}>no decision update in 7+ days</span>
-                </div>
-                <ArrowRight style={{ width: 12, height: 12, color: color.inkTertiary, flexShrink: 0 }} />
-              </Link>
-            ))
+            <>
+              {pendingApprovals.length > 0 && (
+                <Link
+                  to="/app/investor/thesis/profile-builder/full-profile"
+                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 20px", height: 44, borderBottom: `1px solid ${color.border}`, textDecoration: "none" }}
+                >
+                  <Clock3 style={{ width: 14, height: 14, color: "#DC2626", flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "baseline", gap: 8 }}>
+                    <span style={{ fontSize: 13, color: color.ink }}>Profile changes</span>
+                    <span style={{ fontSize: 12, color: color.inkTertiary }}>
+                      {pendingApprovals.length} {pendingApprovals.length === 1 ? "edit" : "edits"} awaiting approval
+                    </span>
+                  </div>
+                  <ArrowRight style={{ width: 12, height: 12, color: color.inkTertiary, flexShrink: 0 }} />
+                </Link>
+              )}
+              {staleRooms.map((r: any) => (
+                <Link
+                  key={r.id}
+                  to="/app/deal-rooms/$id"
+                  params={{ id: r.id }}
+                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 20px", height: 44, borderBottom: `1px solid ${color.border}`, textDecoration: "none" }}
+                >
+                  <Clock3 style={{ width: 14, height: 14, color: "#DC2626", flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "baseline", gap: 8 }}>
+                    <span style={{ fontSize: 13, color: color.ink }}>{(r.startups as any)?.company_name ?? "Deal"}</span>
+                    <span style={{ fontSize: 12, color: color.inkTertiary }}>no decision update in 7+ days</span>
+                  </div>
+                  <ArrowRight style={{ width: 12, height: 12, color: color.inkTertiary, flexShrink: 0 }} />
+                </Link>
+              ))}
+            </>
           )}
         </div>
 

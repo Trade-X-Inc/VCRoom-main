@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
-import { Settings, Bell, Shield, HelpCircle, Info } from "lucide-react";
+import { Settings, Bell, Shield, HelpCircle, Info, Users } from "lucide-react";
 import { InvestorHelpGuide, AboutSection } from "@/components/app/HelpGuide";
 import { cn } from "@/lib/utils";
 
@@ -103,6 +103,7 @@ const sidebarTabs = [
 ];
 
 function InvestorSettingsPage() {
+  const navigate = useNavigate();
   const search = useSearch({ strict: false }) as { tab?: string };
   const [activeTab, setActiveTab] = useState<string>(
     search?.tab === "help" ? "help" : search?.tab === "about" ? "about" : "notifications"
@@ -134,6 +135,20 @@ function InvestorSettingsPage() {
               {t.label}
             </button>
           ))}
+          {/* R14 step 6 — app.investor.team.tsx (invite teammates, manage_team
+              permission) had no nav path anywhere. This is fund/workspace
+              team administration, distinct from Team Chat (messaging) and
+              Team Cards (public profile). Links out rather than inlining —
+              it's a full page with its own PermissionGate, not a small panel
+              like the other tabs here. */}
+          <button
+            onClick={() => navigate({ to: "/app/investor/team" })}
+            data-testid="settings-tab-team"
+            className="w-full flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors text-left text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+          >
+            <Users className="h-4 w-4" />
+            Team
+          </button>
         </nav>
 
         {/* Content panel */}
