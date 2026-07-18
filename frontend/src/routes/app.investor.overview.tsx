@@ -1,17 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import {
-  ResponsiveContainer, BarChart, Bar, LineChart, Line, XAxis, YAxis,
-  CartesianGrid, Tooltip,
+  ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
 } from "recharts";
-import { ChevronDown, ChevronUp, X, CheckCircle2, ArrowRight, ArrowUpRight, FileInput, Clock3 } from "lucide-react";
+import { ArrowRight, ArrowUpRight, FileInput, Clock3 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { PageFrame, EmptyState } from "@/components/system";
-import { color, font, radius, space } from "@/lib/design-tokens";
+import { color, font, radius, space, table as tableTokens } from "@/lib/design-tokens";
 
 export const Route = createFileRoute("/app/investor/overview")({
   component: InvestorOverview,
@@ -70,62 +68,6 @@ function StatCard({ label, value, sub, empty }: { label: string; value: string |
   );
 }
 
-function OnboardingChecklist({ profile, watchlistCount, roomIds }: { profile: any; watchlistCount: number; roomIds: string[] }) {
-  const { progress, markStep } = useOnboardingProgress();
-  const [collapsed, setCollapsed] = useState(false);
-  const dismissed = progress?.steps?.checklist_dismissed === true;
-
-  const steps = [
-    { id: "thesis", label: "Set your investment thesis", done: !!(profile?.thesis_statement || profile?.thesis), href: "/app/investor/profile" },
-    { id: "watchlist", label: "Add a company to watchlist", done: watchlistCount > 0, href: "/app/investor/startups" },
-    { id: "intake", label: "Run a deal intake", done: false, href: "/app/investor/intake" },
-    { id: "dealroom", label: "Join a deal room", done: roomIds.length > 0, href: "/app/investor/deal-flow" },
-  ];
-  const completed = steps.filter((s) => s.done).length;
-  if (dismissed || completed === steps.length) return null;
-  const pct = Math.round((completed / steps.length) * 100);
-
-  return (
-    <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", borderBottom: collapsed ? "none" : `1px solid ${color.border}` }}>
-        <button onClick={() => setCollapsed((v) => !v)} style={{ display: "flex", alignItems: "center", gap: 8, background: "transparent", border: "none", cursor: "pointer", padding: 0 }}>
-          {collapsed ? <ChevronDown style={{ width: 14, height: 14, color: color.inkTertiary }} /> : <ChevronUp style={{ width: 14, height: 14, color: color.inkTertiary }} />}
-          <span style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Get started</span>
-          <span style={{ fontSize: 12, color: color.inkTertiary }}>{completed} of {steps.length} complete</span>
-        </button>
-        <button
-          onClick={() => markStep("checklist_dismissed", true)}
-          style={{ display: "grid", placeItems: "center", height: 28, width: 28, borderRadius: radius.control, background: "transparent", border: "none", color: color.inkTertiary, cursor: "pointer" }}
-          title="Skip"
-        >
-          <X style={{ width: 14, height: 14 }} />
-        </button>
-      </div>
-      {!collapsed && (
-        <div style={{ padding: 20 }}>
-          <div style={{ height: 4, background: color.canvas, borderRadius: 2, overflow: "hidden", marginBottom: 16 }}>
-            <div style={{ height: 4, width: `${pct}%`, background: "#7C3AED" }} />
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
-            {steps.map((s) => (
-              <Link
-                key={s.id}
-                to={s.href as any}
-                style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "10px 12px", border: `1px solid ${color.border}`, textDecoration: "none", opacity: s.done ? 0.6 : 1 }}
-              >
-                {s.done
-                  ? <CheckCircle2 style={{ width: 14, height: 14, color: "#059669", marginTop: 1, flexShrink: 0 }} />
-                  : <div style={{ width: 14, height: 14, borderRadius: "50%", border: `2px solid ${color.border}`, marginTop: 1, flexShrink: 0 }} />}
-                <span style={{ fontSize: 12, color: s.done ? color.inkTertiary : color.ink, textDecoration: s.done ? "line-through" : "none" }}>{s.label}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function ChartCard({ title, children, empty }: { title: string; children?: React.ReactNode; empty?: string }) {
   return (
     <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, padding: 20 }}>
@@ -154,7 +96,7 @@ function InvestorOverview() {
 
   useEffect(() => {
     if (!profileLoading && user?.id && profile === null) {
-      navigate({ to: "/app/investor/profile", search: {} });
+      navigate({ to: "/app/investor/thesis/profile-builder/quick-setup", search: {} });
     }
   }, [profile, profileLoading, user?.id, navigate]);
 
@@ -186,15 +128,6 @@ function InvestorOverview() {
     queryFn: async () => {
       const { data } = await supabase.from("decisions").select("deal_room_id, status, created_at").in("deal_room_id", roomIds).order("created_at", { ascending: false });
       return data ?? [];
-    },
-  });
-
-  const { data: watchlistCount = 0 } = useQuery({
-    queryKey: ["investor-watchlist-count", user?.id],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const { count } = await supabase.from("investor_watchlist").select("id", { count: "exact", head: true }).eq("investor_id", user!.id);
-      return count ?? 0;
     },
   });
 
@@ -332,10 +265,10 @@ function InvestorOverview() {
     <PageFrame
       breadcrumb={[{ label: "Investor" }, { label: "Overview" }]}
       title="Overview"
-      description="Your pipeline at a glance — matches, meetings, and what needs a decision."
+      description="What needs a decision, pipeline by stage, and recent activity."
       actions={
         <Link
-          to="/app/investor/deal-flow"
+          to="/app/investor/discover/deal-flow"
           style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 36, background: "#7C3AED", color: "#fff", border: "none", borderRadius: radius.control, padding: "0 16px", fontSize: 13, fontWeight: 500, fontFamily: font.body, textDecoration: "none" }}
         >
           Deal flow <ArrowUpRight style={{ width: 14, height: 14 }} />
@@ -344,51 +277,15 @@ function InvestorOverview() {
     >
       <div style={{ display: "flex", flexDirection: "column", gap: space.block }}>
 
-        <OnboardingChecklist profile={profile} watchlistCount={watchlistCount} roomIds={roomIds} />
-
-        {/* Row 1: stat cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
-          <StatCard label="Active deal rooms" value={roomIds.length} sub={roomIds.length === 1 ? "room" : "rooms"} />
-          <StatCard
-            label="New thesis matches"
-            value={newMatches.length}
-            sub="last 7 days"
-            empty={newMatches.length === 0 ? "No data yet — matches appear once your thesis is set" : undefined}
-          />
-          <StatCard label="Stale deals" value={watchlistStaleCount} sub="in review or diligence" />
-          <StatCard label="Meetings this week" value={meetingsThisWeek} sub="scheduled" />
-        </div>
-
-        {/* Deal intake hero */}
-        <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, padding: 20, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ display: "grid", placeItems: "center", height: 36, width: 36, background: "rgba(124,58,237,0.08)", color: "#7C3AED", flexShrink: 0 }}>
-              <FileInput style={{ width: 16, height: 16 }} />
-            </div>
-            <div>
-              <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Run a deal intake</div>
-              <div style={{ fontSize: 12, color: color.inkTertiary, marginTop: 2 }}>
-                {latestIntakeRun
-                  ? `Last run ${formatDistanceToNow(new Date(latestIntakeRun.created_at), { addSuffix: true })} — ${latestIntakeRun.extracted_count} of ${latestIntakeRun.total_items} extracted`
-                  : "Paste your own pipeline or inbox data — we extract thesis-matching candidates"}
-              </div>
-            </div>
+        {/* Whose-move-is-it: stale deals waiting on investor action, first. */}
+        <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
+          <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
+            <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Needs a decision</div>
           </div>
-          <Link
-            to="/app/investor/intake"
-            style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 36, background: "#7C3AED", color: "#fff", border: "none", borderRadius: radius.control, padding: "0 16px", fontSize: 13, fontWeight: 500, textDecoration: "none", flexShrink: 0 }}
-          >
-            Open intake <ArrowRight style={{ width: 14, height: 14 }} />
-          </Link>
-        </div>
-
-        {/* Stale/attention row */}
-        {staleRooms.length > 0 && (
-          <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
-            <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
-              <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Needs a decision</div>
-            </div>
-            {staleRooms.map((r: any) => (
+          {staleRooms.length === 0 ? (
+            <div style={{ padding: "16px 20px", fontSize: 12, color: color.inkTertiary }}>Nothing waiting on you.</div>
+          ) : (
+            staleRooms.map((r: any) => (
               <Link
                 key={r.id}
                 to="/app/deal-rooms/$id"
@@ -402,24 +299,66 @@ function InvestorOverview() {
                 </div>
                 <ArrowRight style={{ width: 12, height: 12, color: color.inkTertiary, flexShrink: 0 }} />
               </Link>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
 
-        {/* Row: graphs */}
+        {/* Pipeline by stage — table, not a chart; a VC scans counts faster than bars. */}
+        <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
+          <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
+            <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Pipeline by stage</div>
+          </div>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <tbody>
+              {pipelineSeries.map((s) => (
+                <tr key={s.stage} style={{ height: tableTokens.rowHeight, borderBottom: tableTokens.rowBorder }}>
+                  <td style={{ padding: "0 20px", fontSize: 13, color: color.ink }}>{s.stage}</td>
+                  <td style={{ padding: "0 20px", fontSize: 13, color: color.ink, textAlign: "right", fontVariantNumeric: "tabular-nums", fontWeight: 600 }}>{s.count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Stat cards: matches, meetings — decision-relevant counts, not vanity metrics. */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+          <StatCard label="Active deal rooms" value={roomIds.length} sub={roomIds.length === 1 ? "room" : "rooms"} />
+          <StatCard
+            label="New thesis matches"
+            value={newMatches.length}
+            sub="last 7 days"
+            empty={newMatches.length === 0 ? "None yet — matches appear once your thesis is set" : undefined}
+          />
+          <StatCard label="Stale deals" value={watchlistStaleCount} sub="in review or diligence" />
+          <StatCard label="Meetings this week" value={meetingsThisWeek} sub="scheduled" />
+        </div>
+
+        {/* Deal intake hero */}
+        <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, padding: 20, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ display: "grid", placeItems: "center", height: 36, width: 36, background: "rgba(124,58,237,0.08)", color: "#7C3AED", flexShrink: 0 }}>
+              <FileInput style={{ width: 16, height: 16 }} />
+            </div>
+            <div>
+              <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Deal intake</div>
+              <div style={{ fontSize: 12, color: color.inkTertiary, marginTop: 2 }}>
+                {latestIntakeRun
+                  ? `Last run ${formatDistanceToNow(new Date(latestIntakeRun.created_at), { addSuffix: true })} — ${latestIntakeRun.extracted_count} of ${latestIntakeRun.total_items} extracted`
+                  : "Paste pipeline or inbox data — extracts thesis-matching candidates"}
+              </div>
+            </div>
+          </div>
+          <Link
+            to="/app/investor/discover/deal-intake"
+            style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 36, background: "#7C3AED", color: "#fff", border: "none", borderRadius: radius.control, padding: "0 16px", fontSize: 13, fontWeight: 500, textDecoration: "none", flexShrink: 0 }}
+          >
+            Open intake <ArrowRight style={{ width: 14, height: 14 }} />
+          </Link>
+        </div>
+
+        {/* Row: matches trend + activity */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          <ChartCard title="Pipeline funnel">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={pipelineSeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                <CartesianGrid stroke={color.border} vertical={false} />
-                <XAxis dataKey="stage" tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={{ stroke: color.border }} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <Tooltip contentStyle={{ fontSize: 12, border: `1px solid ${color.border}`, borderRadius: 0 }} />
-                <Bar dataKey="count" fill="#7C3AED" />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-          <ChartCard title="Matches over time" empty={(matchesOverTime as any[]).length === 0 ? "No data yet — matches appear once your thesis is set" : undefined}>
+          <ChartCard title="Matches over time" empty={(matchesOverTime as any[]).length === 0 ? "None yet — matches appear once your thesis is set" : undefined}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={matchesSeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                 <CartesianGrid stroke={color.border} vertical={false} />
@@ -430,25 +369,24 @@ function InvestorOverview() {
               </LineChart>
             </ResponsiveContainer>
           </ChartCard>
-        </div>
 
-        {/* Right rail: activity */}
-        <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
-          <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
-            <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Recent activity</div>
-          </div>
-          {activityItems.length === 0 ? (
-            <EmptyState kind="empty" title="No recent activity" />
-          ) : (
-            <div>
-              {activityItems.map((a) => (
-                <div key={a.id} style={{ padding: "12px 20px", borderBottom: `1px solid ${color.border}` }}>
-                  <div style={{ fontSize: 13, color: color.ink }}>{a.label}</div>
-                  <div style={{ fontSize: 12, color: color.inkTertiary, marginTop: 2 }}>{a.sub} · {a.time}</div>
-                </div>
-              ))}
+          <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
+            <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
+              <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Recent activity</div>
             </div>
-          )}
+            {activityItems.length === 0 ? (
+              <EmptyState kind="empty" title="No recent activity" />
+            ) : (
+              <div>
+                {activityItems.map((a) => (
+                  <div key={a.id} style={{ padding: "12px 20px", borderBottom: `1px solid ${color.border}` }}>
+                    <div style={{ fontSize: 13, color: color.ink }}>{a.label}</div>
+                    <div style={{ fontSize: 12, color: color.inkTertiary, marginTop: 2 }}>{a.sub} · {a.time}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </PageFrame>
