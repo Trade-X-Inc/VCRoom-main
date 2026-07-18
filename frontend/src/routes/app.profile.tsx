@@ -58,8 +58,15 @@ interface StartupRow {
 
 interface TeamMember {
   id: string; name: string | null; title: string | null;
-  linkedin_url: string | null; bio: string | null; photo_url: string | null;
-  tag: string | null; display_order: number;
+  photo_url: string | null; tag: string | null; display_order: number;
+  key_person: boolean;
+}
+
+interface TeamMemberDetail {
+  team_member_id: string;
+  bio: string | null;
+  highlights: string[];
+  social_links: Array<{ platform: string; url: string }>;
 }
 
 type SectionVisibility = "public" | "on_request" | "deal_room";
@@ -77,6 +84,7 @@ const defaultSectionVisibility: Record<string, SectionVisibility> = {
 
 const STAGES = ["Pre-idea", "Pre-seed", "Seed", "Series A", "Series B", "Growth", "Profitable"];
 const MEMBER_TAGS = ["Founder", "Co-Founder", "Advisor", "Employee", "Board Member"] as const;
+const MEMBER_SOCIAL_PLATFORMS = ["LinkedIn", "X / Twitter", "Website", "AngelList", "Crunchbase", "Other"];
 
 type FormState = {
   company_name: string; sector: string; stage: string; country: string;
@@ -2963,7 +2971,12 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
   const [submitting, setSubmitting] = useState(false);
   const [photoUploading, setPhotoUploading] = useState(false);
 
-  const blankMember = { full_name: "", role: "", email: "", linkedin_url: "", bio: "", tag: "Employee", photo_url: "" };
+  const blankMember = {
+    full_name: "", role: "", tag: "Employee", photo_url: "",
+    key_person: false, bio: "",
+    highlights: [] as string[],
+    social_links: [] as Array<{ platform: string; url: string }>,
+  };
   const [mf, setMf] = useState(blankMember);
 
   const { data: members = [], isLoading } = useQuery<TeamMember[]>({
@@ -2976,15 +2989,37 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
     },
   });
 
+  // R13B — bio/highlights/social_links live in team_member_details now
+  // (split from team_members so the disclosure gate is real — see
+  // CLAUDE.md §33). The founder always reads their own via the owner RLS
+  // policy, same as any other row on their startup.
+  const memberIds = members.map((m) => m.id);
+  const { data: details = [] } = useQuery<TeamMemberDetail[]>({
+    queryKey: ["team-member-details", startupId, memberIds.join(",")],
+    enabled: memberIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("team_member_details").select("*").in("team_member_id", memberIds);
+      if (error) throw error;
+      return (data ?? []) as TeamMemberDetail[];
+    },
+  });
+  const detailByMemberId = new Map(details.map((d) => [d.team_member_id, d]));
+
   const openEdit = (m: TeamMember) => {
-    setMf({ full_name: m.name ?? "", role: m.title ?? "", email: "", linkedin_url: m.linkedin_url ?? "", bio: m.bio ?? "", tag: m.tag ?? "Employee", photo_url: m.photo_url ?? "" });
+    const d = detailByMemberId.get(m.id);
+    setMf({
+      full_name: m.name ?? "", role: m.title ?? "", tag: m.tag ?? "Employee",
+      photo_url: m.photo_url ?? "", key_person: m.key_person,
+      bio: d?.bio ?? "", highlights: d?.highlights ?? [], social_links: d?.social_links ?? [],
+    });
     setEditingId(m.id);
     setShowForm(true);
   };
 
   const closeForm = () => { setShowForm(false); setEditingId(null); setMf(blankMember); };
 
-  const setField = (k: keyof typeof blankMember) =>
+  const setField = (k: "full_name" | "role" | "tag" | "bio") =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
       setMf((f) => ({ ...f, [k]: e.target.value }));
 
@@ -3004,25 +3039,48 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
     }
   };
 
+  const addHighlight = () => setMf((f) => ({ ...f, highlights: [...f.highlights, ""] }));
+  const updateHighlight = (i: number, v: string) => setMf((f) => ({ ...f, highlights: f.highlights.map((h, idx) => (idx === i ? v : h)) }));
+  const removeHighlight = (i: number) => setMf((f) => ({ ...f, highlights: f.highlights.filter((_, idx) => idx !== i) }));
+
+  const addSocialLink = () => setMf((f) => ({ ...f, social_links: [...f.social_links, { platform: MEMBER_SOCIAL_PLATFORMS[0], url: "" }] }));
+  const updateSocialLink = (i: number, patch: Partial<{ platform: string; url: string }>) =>
+    setMf((f) => ({ ...f, social_links: f.social_links.map((l, idx) => (idx === i ? { ...l, ...patch } : l)) }));
+  const removeSocialLink = (i: number) => setMf((f) => ({ ...f, social_links: f.social_links.filter((_, idx) => idx !== i) }));
+
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      // team_members columns are name/title — full_name/role/email do not exist
-      const payload = {
+      const publicPayload = {
         name: mf.full_name, title: mf.role,
-        linkedin_url: mf.linkedin_url || null, bio: mf.bio || null,
         tag: mf.tag || null, photo_url: mf.photo_url || null,
+        key_person: mf.key_person,
       };
+      let memberId = editingId;
       if (editingId) {
-        const { error } = await supabase.from("team_members").update(payload).eq("id", editingId);
+        const { error } = await supabase.from("team_members").update(publicPayload).eq("id", editingId);
         if (error) throw error;
-        toast.success("Team member updated");
       } else {
-        const { error } = await supabase.from("team_members").insert({ ...payload, startup_id: startupId, display_order: members.length });
+        const { data, error } = await supabase.from("team_members")
+          .insert({ ...publicPayload, startup_id: startupId, display_order: members.length })
+          .select("id").single();
         if (error) throw error;
-        toast.success("Team member added");
+        memberId = data.id;
       }
+
+      const detailPayload = {
+        team_member_id: memberId,
+        bio: mf.bio || null,
+        highlights: mf.highlights.filter((h) => h.trim()),
+        social_links: mf.social_links.filter((l) => l.url.trim()),
+        updated_at: new Date().toISOString(),
+      };
+      const { error: detailErr } = await supabase.from("team_member_details").upsert(detailPayload, { onConflict: "team_member_id" });
+      if (detailErr) throw detailErr;
+
+      toast.success(editingId ? "Team member updated" : "Team member added");
       queryClient.invalidateQueries({ queryKey: ["team-members", startupId] });
+      queryClient.invalidateQueries({ queryKey: ["team-member-details", startupId] });
       closeForm();
     } catch (e: any) {
       toast.error(e.message ?? "Failed to save");
@@ -3039,6 +3097,7 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
       if (error) throw error;
       toast.success("Team member removed");
       queryClient.invalidateQueries({ queryKey: ["team-members", startupId] });
+      queryClient.invalidateQueries({ queryKey: ["team-member-details", startupId] });
     } catch (e: any) {
       toast.error(e.message ?? "Delete failed");
     } finally {
@@ -3055,7 +3114,12 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold tracking-tight">Team members</h2>
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight">Team members</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Key people get a full profile — visible as a card in every deal room, full detail unlocks with mutual disclosure.
+          </p>
+        </div>
         {!readOnly && (
           <button
             onClick={() => { closeForm(); setShowForm((v) => !v); }}
@@ -3101,13 +3165,20 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
                   {MEMBER_TAGS.map((t) => <option key={t}>{t}</option>)}
                 </select>
               </div>
-              <div>
-                <label className="text-xs text-muted-foreground">Email</label>
-                <input value={mf.email} onChange={setField("email")} placeholder="jane@company.com" className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
+              <div className="flex items-end pb-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={mf.key_person}
+                    onChange={(e) => setMf((f) => ({ ...f, key_person: e.target.checked }))}
+                    className="h-4 w-4"
+                  />
+                  <span className="text-sm font-medium">Key person</span>
+                </label>
               </div>
-              <div className="sm:col-span-2">
-                <label className="text-xs text-muted-foreground">LinkedIn URL</label>
-                <input value={mf.linkedin_url} onChange={setField("linkedin_url")} placeholder="https://linkedin.com/in/janesmith" className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
+              <div className="sm:col-span-2 text-xs text-muted-foreground -mt-1">
+                Key people appear as a card in every shared deal room from the moment both parties enter — name, photo,
+                and title only, until the room's Information stage unlocks the full profile below.
               </div>
               <div className="sm:col-span-2">
                 <label className="text-xs text-muted-foreground flex items-center justify-between">
@@ -3120,6 +3191,55 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
                   rows={2}
                   className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
                 />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs text-muted-foreground">Highlights</label>
+                <div className="mt-1 space-y-2">
+                  {mf.highlights.map((h, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <input
+                        value={h}
+                        onChange={(e) => updateHighlight(i, e.target.value)}
+                        placeholder="e.g. Led engineering at a $50M ARR startup"
+                        className="flex-1 rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                      />
+                      <button onClick={() => removeHighlight(i)} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent">
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                  <button onClick={addHighlight} className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-border/60 px-3 py-1.5 text-xs text-muted-foreground hover:bg-accent">
+                    <Plus className="h-3 w-3" /> Add highlight
+                  </button>
+                </div>
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs text-muted-foreground">Social links</label>
+                <div className="mt-1 space-y-2">
+                  {mf.social_links.map((l, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <select
+                        value={l.platform}
+                        onChange={(e) => updateSocialLink(i, { platform: e.target.value })}
+                        className="w-36 shrink-0 rounded-md border border-border/60 bg-background px-2 py-2 text-xs focus:outline-none focus:border-brand/50"
+                      >
+                        {MEMBER_SOCIAL_PLATFORMS.map((p) => <option key={p}>{p}</option>)}
+                      </select>
+                      <input
+                        value={l.url}
+                        onChange={(e) => updateSocialLink(i, { url: e.target.value })}
+                        placeholder="https://..."
+                        className="flex-1 rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                      />
+                      <button onClick={() => removeSocialLink(i)} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent">
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                  <button onClick={addSocialLink} className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-border/60 px-3 py-1.5 text-xs text-muted-foreground hover:bg-accent">
+                    <Plus className="h-3 w-3" /> Add link
+                  </button>
+                </div>
               </div>
             </div>
             <div className="flex justify-end gap-2 pt-1">
@@ -3145,6 +3265,7 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {members.map((m) => {
             const inits = (m.name ?? "?").split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+            const d = detailByMemberId.get(m.id);
             return (
               <div key={m.id} className="rounded-none border border-border/60 bg-card p-4 shadow-card">
                 <div className="flex items-start gap-3">
@@ -3152,7 +3273,12 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
                     {m.photo_url ? <img src={m.photo_url} alt={m.name ?? ""} className="h-full w-full object-cover" /> : inits}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold truncate">{m.name}</div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="text-sm font-semibold truncate">{m.name}</div>
+                      {m.key_person && (
+                        <span className="text-[9px] font-semibold text-brand border border-brand/30 rounded-full px-1.5 py-0.5 shrink-0">KEY</span>
+                      )}
+                    </div>
                     <div className="text-xs text-muted-foreground truncate">{m.title}</div>
                     {m.tag && (
                       <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full font-medium mt-1 inline-block", tagColor[m.tag] ?? "bg-muted text-muted-foreground")}>
@@ -3175,7 +3301,7 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
                     </div>
                   )}
                 </div>
-                {m.bio && <div className="mt-2 text-xs text-muted-foreground line-clamp-2">{m.bio}</div>}
+                {d?.bio && <div className="mt-2 text-xs text-muted-foreground line-clamp-2">{d.bio}</div>}
               </div>
             );
           })}
