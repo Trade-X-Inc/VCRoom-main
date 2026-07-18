@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Lock, CheckCircle2, Building2, UserCircle2 } from "lucide-react";
+import { Lock, CheckCircle2, Building2, UserCircle2, ExternalLink } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { color, font, radius } from "@/lib/design-tokens";
 import { useDealRoom } from "@/hooks/useDealRoom";
@@ -115,6 +115,61 @@ export function MutualDisclosure() {
     },
   });
 
+  // Full key-person team detail — bio/highlights/social links (founder) or
+  // bio/contact_email (investor). RLS on team_member_details /
+  // investor_team_member_details is the actual gate (see the R13B
+  // migration's "*_unlocked_room_member"/"*_unlocked_founder" policies,
+  // checking deal_room_profile_disclosures exactly like
+  // get_investor_profile_in_room does) — `unlocked` here only decides what
+  // UI copy to show, same convention as investorPrivate/founderFull above.
+  const { data: founderKeyPeople } = useQuery({
+    queryKey: ["mutual-disclosure-founder-team", startupId, unlocked],
+    enabled: !!startupId && unlocked && isInvestor,
+    staleTime: 60 * 1000,
+    queryFn: async () => {
+      const { data: members } = await supabase
+        .from("team_members")
+        .select("id, name, title, photo_url")
+        .eq("startup_id", startupId!)
+        .eq("key_person", true);
+      if (!members || members.length === 0) return [];
+      const ids = members.map((m) => m.id);
+      const { data: details } = await supabase
+        .from("team_member_details")
+        .select("team_member_id, bio, highlights, social_links")
+        .in("team_member_id", ids);
+      const detailById = new Map((details ?? []).map((d) => [d.team_member_id, d]));
+      return members.map((m) => ({ ...m, detail: detailById.get(m.id) ?? null }));
+    },
+  });
+
+  const { data: investorKeyPeople } = useQuery({
+    queryKey: ["mutual-disclosure-investor-team", dealRoomId, investorUserId, unlocked],
+    enabled: !!investorUserId && unlocked && isFounder,
+    staleTime: 60 * 1000,
+    queryFn: async () => {
+      const { data: profile } = await supabase
+        .from("investor_profiles")
+        .select("id")
+        .eq("user_id", investorUserId!)
+        .maybeSingle();
+      if (!profile?.id) return [];
+      const { data: members } = await supabase
+        .from("investor_team_members")
+        .select("id, name, designation, avatar_url")
+        .eq("investor_profile_id", profile.id)
+        .eq("key_person", true);
+      if (!members || members.length === 0) return [];
+      const ids = members.map((m) => m.id);
+      const { data: details } = await supabase
+        .from("investor_team_member_details")
+        .select("team_member_id, bio, contact_email")
+        .in("team_member_id", ids);
+      const detailById = new Map((details ?? []).map((d) => [d.team_member_id, d]));
+      return members.map((m) => ({ ...m, detail: detailById.get(m.id) ?? null }));
+    },
+  });
+
   return (
     <Card>
       <div style={{ padding: "16px 20px", borderBottom: `1px solid ${color.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -160,6 +215,12 @@ export function MutualDisclosure() {
               <EmptyNote text="Founder hasn't published a public profile yet." />
             )
           )}
+          {unlocked && isFounder && (investorKeyPeople?.length ?? 0) > 0 && (
+            <TeamDetailList people={investorKeyPeople!} kind="investor" />
+          )}
+          {unlocked && isInvestor && (founderKeyPeople?.length ?? 0) > 0 && (
+            <TeamDetailList people={founderKeyPeople!} kind="founder" />
+          )}
         </div>
 
         {/* What they see about you */}
@@ -182,6 +243,49 @@ export function MutualDisclosure() {
         </div>
       </div>
     </Card>
+  );
+}
+
+function TeamDetailList({ people, kind }: { people: any[]; kind: "founder" | "investor" }) {
+  return (
+    <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${color.border}` }}>
+      <div style={{ fontSize: 11, color: color.inkTertiary, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.04em" }}>Team</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {people.map((p) => (
+          <div key={p.id} style={{ display: "flex", gap: 10 }}>
+            {(kind === "founder" ? p.photo_url : p.avatar_url) ? (
+              <img src={kind === "founder" ? p.photo_url : p.avatar_url} alt="" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+            ) : (
+              <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(124,58,237,0.1)", color: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+                {(p.name ?? "?")[0]?.toUpperCase() ?? "?"}
+              </div>
+            )}
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: color.ink }}>{p.name}</div>
+              <div style={{ fontSize: 11, color: color.inkTertiary }}>{kind === "founder" ? p.title : p.designation}</div>
+              {p.detail?.bio && <p style={{ fontSize: 12, color: color.inkTertiary, margin: "4px 0 0" }}>{p.detail.bio}</p>}
+              {kind === "founder" && Array.isArray(p.detail?.highlights) && p.detail.highlights.length > 0 && (
+                <ul style={{ fontSize: 12, color: color.inkTertiary, margin: "4px 0 0", paddingLeft: 16 }}>
+                  {p.detail.highlights.map((h: string, i: number) => <li key={i}>{h}</li>)}
+                </ul>
+              )}
+              {kind === "founder" && Array.isArray(p.detail?.social_links) && p.detail.social_links.length > 0 && (
+                <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+                  {p.detail.social_links.map((s: { platform: string; url: string }, i: number) => (
+                    <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" title={s.platform} style={{ color: color.inkTertiary, display: "inline-flex" }}>
+                      <ExternalLink style={{ width: 12, height: 12 }} />
+                    </a>
+                  ))}
+                </div>
+              )}
+              {kind === "investor" && p.detail?.contact_email && (
+                <div style={{ fontSize: 12, color: color.inkTertiary, marginTop: 4 }}>{p.detail.contact_email}</div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
