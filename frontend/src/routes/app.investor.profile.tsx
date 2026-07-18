@@ -243,6 +243,129 @@ function PendingApprovalBadge({ pendingValue }: { pendingValue?: unknown }) {
   );
 }
 
+// R12C step 4 — Owner/Admin approval queue. Rendered inline on the Full
+// Profile page (not a new top-level route) rather than the Team page,
+// since the data being approved lives here and this page is already the
+// one Associates use to propose edits.
+function PendingChangesQueue({
+  items, fundOwnerUserId, onDecided,
+}: {
+  items: { id: string; field_key: string; old_value: unknown; new_value: unknown; proposed_by: string; created_at: string }[];
+  fundOwnerUserId: string;
+  onDecided: () => void;
+}) {
+  const qc = useQueryClient();
+  const [decidingId, setDecidingId] = useState<string | null>(null);
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
+  const [rejectNote, setRejectNote] = useState("");
+
+  const proposerIds = Array.from(new Set(items.map((i) => i.proposed_by)));
+  const { data: proposerNames = {} } = useQuery({
+    queryKey: ["pending-change-proposers", proposerIds.join(",")],
+    enabled: proposerIds.length > 0,
+    queryFn: async () => {
+      const { data } = await supabase.from("users").select("id, full_name").in("id", proposerIds);
+      const map: Record<string, string> = {};
+      for (const row of data ?? []) map[row.id] = row.full_name ?? "Team member";
+      return map;
+    },
+  });
+
+  const applyDecision = async (item: (typeof items)[number], decision: "approved" | "rejected", note?: string) => {
+    setDecidingId(item.id);
+    try {
+      if (decision === "approved") {
+        const { error: updateErr } = await supabase
+          .from("investor_profiles")
+          .update({ [item.field_key]: item.new_value, updated_at: new Date().toISOString() })
+          .eq("user_id", fundOwnerUserId);
+        if (updateErr) throw updateErr;
+      }
+      const { error } = await supabase
+        .from("investor_profile_pending_changes")
+        .update({ status: decision, decided_at: new Date().toISOString(), decision_note: note ?? null })
+        .eq("id", item.id);
+      if (error) throw error;
+      qc.invalidateQueries({ queryKey: ["investor-profile", fundOwnerUserId] });
+      toast.success(decision === "approved" ? "Change approved and applied" : "Change rejected");
+      onDecided();
+    } catch (err: any) {
+      toast.error(err?.message ?? `Could not ${decision === "approved" ? "approve" : "reject"} change`);
+    } finally {
+      setDecidingId(null);
+      setRejectingId(null);
+      setRejectNote("");
+    }
+  };
+
+  const formatValue = (v: unknown): string => {
+    if (v === null || v === undefined) return "—";
+    if (Array.isArray(v)) return v.length === 0 ? "—" : v.join(", ");
+    if (typeof v === "object") return JSON.stringify(v);
+    return String(v) || "—";
+  };
+
+  return (
+    <Card style={{ marginBottom: space.block, borderColor: "rgba(217,119,6,0.35)" }}>
+      <SectionHeader icon={Clock} title={`Pending changes (${items.length})`} description="Associate edits awaiting your approval before they go live." />
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        {items.map((item) => (
+          <div key={item.id} style={{ padding: "14px 20px", borderTop: `1px solid ${color.border}`, display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+              <div style={{ fontSize: 12, color: color.inkTertiary }}>
+                <strong style={{ color: color.ink }}>{proposerNames[item.proposed_by] ?? "Team member"}</strong>
+                {" proposed a change to "}
+                <strong style={{ color: color.ink }}>{PENDING_CHANGE_FIELD_LABELS[item.field_key] ?? item.field_key}</strong>
+              </div>
+              <div style={{ fontSize: 11, color: color.inkTertiary }}>{new Date(item.created_at).toLocaleDateString()}</div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, fontSize: 12 }}>
+              <div>
+                <div style={{ color: color.inkTertiary, marginBottom: 2 }}>Current</div>
+                <div style={{ color: color.ink }}>{formatValue(item.old_value)}</div>
+              </div>
+              <div>
+                <div style={{ color: color.inkTertiary, marginBottom: 2 }}>Proposed</div>
+                <div style={{ color: "#7C3AED", fontWeight: 500 }}>{formatValue(item.new_value)}</div>
+              </div>
+            </div>
+            {rejectingId === item.id ? (
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <input
+                  value={rejectNote}
+                  onChange={(e) => setRejectNote(e.target.value)}
+                  placeholder="Reason (optional)"
+                  style={{ ...inputStyle, flex: 1, fontSize: 12 }}
+                />
+                <button type="button" onClick={() => applyDecision(item, "rejected", rejectNote.trim() || undefined)}
+                  disabled={decidingId === item.id}
+                  style={{ height: 32, padding: "0 12px", fontSize: 12, fontWeight: 500, color: "#fff", background: "#DC2626", border: "none", borderRadius: radius.control, cursor: "pointer" }}>
+                  Confirm reject
+                </button>
+                <button type="button" onClick={() => { setRejectingId(null); setRejectNote(""); }}
+                  style={{ height: 32, padding: "0 12px", fontSize: 12, color: color.inkTertiary, background: "transparent", border: `1px solid ${color.border}`, borderRadius: radius.control, cursor: "pointer" }}>
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: "flex", gap: 8 }}>
+                <button type="button" onClick={() => applyDecision(item, "approved")} disabled={decidingId === item.id}
+                  style={{ height: 32, padding: "0 14px", fontSize: 12, fontWeight: 500, color: "#fff", background: "#7C3AED", border: "none", borderRadius: radius.control, cursor: decidingId === item.id ? "default" : "pointer", opacity: decidingId === item.id ? 0.6 : 1 }}>
+                  Approve
+                </button>
+                <button type="button" onClick={() => setRejectingId(item.id)} disabled={decidingId === item.id}
+                  style={{ height: 32, padding: "0 14px", fontSize: 12, color: color.ink, background: color.white, border: `1px solid ${color.border}`, borderRadius: radius.control, cursor: "pointer" }}>
+                  Reject
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
 function BulletEditor({ bullets, onChange, placeholder }: { bullets: string[]; onChange: (b: string[]) => void; placeholder: string }) {
   const add = () => onChange([...bullets, ""]);
   const update = (i: number, v: string) => { const next = [...bullets]; next[i] = v; onChange(next); };
@@ -811,6 +934,14 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
           onSkip={() => markStep("tour_viewed", true)}
           onNext={() => markStep("tour_viewed", true)}
           onFinish={() => markStep("tour_viewed", true)}
+        />
+      )}
+
+      {accountCtx.isOwner && pendingQueue.length > 0 && (
+        <PendingChangesQueue
+          items={pendingQueue}
+          fundOwnerUserId={fundOwnerUserId!}
+          onDecided={() => qc.invalidateQueries({ queryKey: ["investor-profile-pending", fundOwnerUserId] })}
         />
       )}
 
