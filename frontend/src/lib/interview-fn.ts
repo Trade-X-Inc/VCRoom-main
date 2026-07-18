@@ -111,11 +111,64 @@ async function fetchMeeting(url: string, key: string, dealRoomId: string, meetin
 
 // Rooms live 3 hours past their scheduled start (roast convention); an
 // unscheduled ad-hoc creation gets 3 hours from now.
-const ROOM_WINDOW_SECONDS = 3 * 3600;
+export const ROOM_WINDOW_SECONDS = 3 * 3600;
 // Tokens are short-lived: 2 hours from mint, never longer.
 const TOKEN_WINDOW_SECONDS = 2 * 3600;
 
-type CreateRoomInput = { userAccessToken: string; dealRoomId: string; meetingNumber: number };
+/**
+ * Reschedule support (plain helper, not a server fn — called from
+ * upsertDealRoomMeeting's service-role handler). A rescheduled meeting
+ * whose Daily room already exists gets the room's exp PATCHed to the new
+ * start + 3h, so the idempotent create in createInterviewRoom never hands
+ * back a room that expired before the meeting begins. PATCH over
+ * delete+recreate keeps daily_room_url stable anywhere it's been shared.
+ */
+export async function syncDailyRoomExpiry(dailyKey: string, roomName: string, startEpochSeconds: number): Promise<boolean> {
+  const resp = await fetch(`https://api.daily.co/v1/rooms/${encodeURIComponent(roomName)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${dailyKey}` },
+    body: JSON.stringify({ properties: { exp: startEpochSeconds + ROOM_WINDOW_SECONDS } }),
+  });
+  if (!resp.ok) {
+    const errText = await resp.text().catch(() => "");
+    console.error("[interview] Daily room exp sync failed:", resp.status, errText);
+    return false;
+  }
+  return true;
+}
+
+/** Best-effort Daily room deletion — 404s (already gone/expired) are fine. */
+export async function deleteDailyRoom(dailyKey: string, roomName: string): Promise<void> {
+  await fetch(`https://api.daily.co/v1/rooms/${encodeURIComponent(roomName)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${dailyKey}` },
+  }).catch(() => {});
+}
+
+/**
+ * Shared private-notes upsert (deal_room_meeting_private_notes) — the one
+ * write path for investor-private meeting notes, used by the meeting
+ * server fns in deal-room-fn.ts / deal-room-workflow-fn.ts after the §33
+ * column split (20260722000000).
+ */
+export async function upsertMeetingPrivateNote(url: string, key: string, meetingId: string, notes: string | null): Promise<void> {
+  const resp = await fetch(`${url}/rest/v1/deal_room_meeting_private_notes?on_conflict=meeting_id`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      Prefer: "resolution=merge-duplicates,return=minimal",
+    },
+    body: JSON.stringify({ meeting_id: meetingId, notes, updated_at: new Date().toISOString() }),
+  });
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => "");
+    throw new Error(`private-note upsert failed (${resp.status}): ${text.slice(0, 200)}`);
+  }
+}
+
+type CreateRoomInput = { userAccessToken: string; dealRoomId: string; meetingNumber: number; forceNew?: boolean };
 
 export const createInterviewRoom = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as CreateRoomInput)
@@ -133,14 +186,24 @@ export const createInterviewRoom = createServerFn({ method: "POST" })
     const meeting = await fetchMeeting(url, key, data.dealRoomId, data.meetingNumber);
     if (!meeting) return { ok: false, error: "meeting_not_found" };
 
-    // Idempotent: one Daily room per meeting stage.
-    if (meeting.daily_room_name && meeting.daily_room_url) {
+    // Idempotent: one Daily room per meeting stage. forceNew is the
+    // join-side regenerate path (expired/missing room): tear the old room
+    // down and mint a fresh one.
+    if (meeting.daily_room_name && meeting.daily_room_url && !data.forceNew) {
       return { ok: true, roomName: meeting.daily_room_name, roomUrl: meeting.daily_room_url };
     }
+    if (meeting.daily_room_name && data.forceNew) {
+      await deleteDailyRoom(dailyKey, meeting.daily_room_name);
+    }
 
-    const startEpoch = meeting.scheduled_at
+    // A room always lives at least ROOM_WINDOW from creation — a meeting
+    // whose scheduled start is already past (running late, or a
+    // regenerate mid-meeting) must not mint an already-expired room.
+    const nowEpoch = Math.floor(Date.now() / 1000);
+    const scheduledEpoch = meeting.scheduled_at
       ? Math.floor(new Date(meeting.scheduled_at).getTime() / 1000)
-      : Math.floor(Date.now() / 1000);
+      : nowEpoch;
+    const startEpoch = Math.max(scheduledEpoch, nowEpoch);
     // Opaque name — no deal-room id leaked into the URL.
     const roomName = `interview-m${data.meetingNumber}-${crypto.randomUUID().slice(0, 12)}`;
 

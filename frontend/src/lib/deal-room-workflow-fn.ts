@@ -101,11 +101,22 @@ export const advanceWorkflowStage = createServerFn({ method: "POST" })
 
 // ── Server fn: create or update a meeting ─────────────────────────────────────
 
+// R14B: the 5-stage interview sequence, in meeting_number order.
+export const INTERVIEW_STAGE_SEQUENCE = [
+  "introduction",
+  "product_demo",
+  "financial_discussion",
+  "terms_discussion",
+  "investment_terms",
+] as const;
+
 type UpsertMeetingInput = {
   deal_room_id: string;
-  meeting_number: 1 | 2 | 3;
+  meeting_number: 1 | 2 | 3 | 4 | 5;
   scheduled_at?: string | null;
   completed_at?: string | null;
+  meeting_type?: string; // 'video' | 'in_person' (or 'skipped' via skipMeeting)
+  // R14B: routed to deal_room_meeting_private_notes — never a column write.
   notes_investor?: string | null;
   notes_shared?: string | null;
   action_items?: string[];
@@ -120,14 +131,14 @@ export const upsertDealRoomMeeting = createServerFn({ method: "POST" })
     const now = new Date().toISOString();
 
     const existing: any[] = await sbFetch(url, key,
-      `deal_room_meetings?deal_room_id=eq.${data.deal_room_id}&meeting_number=eq.${data.meeting_number}&select=id`,
+      `deal_room_meetings?deal_room_id=eq.${data.deal_room_id}&meeting_number=eq.${data.meeting_number}&select=id,daily_room_name,scheduled_at`,
       "GET"
     ).catch(() => []);
 
     const payload: Record<string, unknown> = {};
     if (data.scheduled_at !== undefined) payload.scheduled_at = data.scheduled_at;
     if (data.completed_at !== undefined) payload.completed_at = data.completed_at;
-    if (data.notes_investor !== undefined) payload.notes_investor = data.notes_investor;
+    if (data.meeting_type !== undefined) payload.meeting_type = data.meeting_type;
     if (data.notes_shared !== undefined) payload.notes_shared = data.notes_shared;
     if (data.action_items !== undefined) payload.action_items = data.action_items;
 
@@ -139,13 +150,35 @@ export const upsertDealRoomMeeting = createServerFn({ method: "POST" })
         "PATCH",
         payload
       );
+
+      // Reschedule of a meeting that already has a Daily room: PATCH the
+      // room's exp to the new start + 3h so the idempotent room create
+      // never hands back a room that expires before the meeting starts.
+      if (data.scheduled_at && existing[0].daily_room_name && data.scheduled_at !== existing[0].scheduled_at) {
+        const cfEnv = (globalThis as any).__cf_env || {};
+        const dailyKey = cfEnv.DAILY_API_KEY || "";
+        if (dailyKey) {
+          const { syncDailyRoomExpiry } = await import("@/lib/interview-fn");
+          await syncDailyRoomExpiry(
+            dailyKey,
+            existing[0].daily_room_name,
+            Math.max(Math.floor(new Date(data.scheduled_at).getTime() / 1000), Math.floor(Date.now() / 1000)),
+          ).catch(() => false);
+        }
+      }
     } else {
       const rows = await sbFetch(url, key, "deal_room_meetings", "POST", {
         deal_room_id: data.deal_room_id,
         meeting_number: data.meeting_number,
+        stage_slug: INTERVIEW_STAGE_SEQUENCE[data.meeting_number - 1],
         ...payload,
       });
       id = rows?.[0]?.id;
+    }
+
+    if (data.notes_investor !== undefined && id) {
+      const { upsertMeetingPrivateNote } = await import("@/lib/interview-fn");
+      await upsertMeetingPrivateNote(url, key, id, data.notes_investor ?? null);
     }
 
     // If completing: increment meetings_completed on deal room
@@ -299,11 +332,14 @@ export type WorkflowState = {
   meetings: Array<{
     id: string;
     meeting_number: number;
+    stage_slug: string;
+    meeting_type: string | null;
     scheduled_at: string | null;
     completed_at: string | null;
-    notes_investor: string | null;
     notes_shared: string | null;
     action_items: string[];
+    daily_room_name: string | null;
+    daily_room_url: string | null;
   }>;
 };
 
@@ -318,8 +354,11 @@ export const getDealRoomWorkflow = createServerFn({ method: "POST" })
         `deal_rooms?id=eq.${data.deal_room_id}&select=workflow_stage,stage_entered_at,meetings_completed,meetings_max,stage2_unlocked,stage2_unlocked_at,term_sheet_status,term_sheet_sent_at,term_sheet_accepted_at,term_sheet_valuation,term_sheet_investment_amount,term_sheet_equity_pct,term_sheet_type,term_sheet_pro_rata,term_sheet_board_seat,term_sheet_doc_path,stage1_complete,closed_at_workflow`,
         "GET"
       ).catch(() => []),
+      // R14B: notes_investor removed from the select — the column is gone
+      // (moved to deal_room_meeting_private_notes); with it in the list this
+      // query 400'd and the .catch silently emptied every meetings calendar.
       sbFetch(url, key,
-        `deal_room_meetings?deal_room_id=eq.${data.deal_room_id}&select=id,meeting_number,scheduled_at,completed_at,notes_investor,notes_shared,action_items&order=meeting_number.asc`,
+        `deal_room_meetings?deal_room_id=eq.${data.deal_room_id}&select=id,meeting_number,stage_slug,meeting_type,scheduled_at,completed_at,notes_shared,action_items,daily_room_name,daily_room_url&order=meeting_number.asc`,
         "GET"
       ).catch(() => []),
     ]);

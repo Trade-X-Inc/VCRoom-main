@@ -124,7 +124,19 @@ type SkipMeetingInput = {
   deal_room_id: string;
   meeting_number: number;
   actor_user_id: string;
+  // R14B: skip-with-reason — stored in notes_shared (both parties see why a
+  // stage was skipped) and echoed into the activity log.
+  reason?: string;
 };
+
+// R14B: keep INSERTed rows valid against the NOT NULL stage_slug column.
+const STAGE_SLUG_BY_NUMBER = [
+  "introduction",
+  "product_demo",
+  "financial_discussion",
+  "terms_discussion",
+  "investment_terms",
+] as const;
 
 export const skipMeeting = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as SkipMeetingInput)
@@ -132,6 +144,7 @@ export const skipMeeting = createServerFn({ method: "POST" })
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
     const now = new Date().toISOString();
+    const reason = (data.reason ?? "").trim().slice(0, 300);
 
     const existing: any[] = await sbFetch(
       url,
@@ -140,19 +153,19 @@ export const skipMeeting = createServerFn({ method: "POST" })
       "GET",
     ).catch(() => []);
 
+    const patch: Record<string, unknown> = { meeting_type: "skipped", completed_at: now };
+    if (reason) patch.notes_shared = `Skipped: ${reason}`;
+
     let id: string;
     if (existing?.length) {
       id = existing[0].id;
-      await sbFetch(url, key, `deal_room_meetings?id=eq.${id}`, "PATCH", {
-        meeting_type: "skipped",
-        completed_at: now,
-      });
+      await sbFetch(url, key, `deal_room_meetings?id=eq.${id}`, "PATCH", patch);
     } else {
       const rows = await sbFetch(url, key, "deal_room_meetings", "POST", {
         deal_room_id: data.deal_room_id,
         meeting_number: data.meeting_number,
-        meeting_type: "skipped",
-        completed_at: now,
+        stage_slug: STAGE_SLUG_BY_NUMBER[data.meeting_number - 1] ?? "introduction",
+        ...patch,
       });
       id = rows?.[0]?.id;
     }
@@ -163,7 +176,7 @@ export const skipMeeting = createServerFn({ method: "POST" })
       data.deal_room_id,
       data.actor_user_id,
       `Skipped meeting ${data.meeting_number}`,
-      { meeting_number: data.meeting_number },
+      { meeting_number: data.meeting_number, reason: reason || null },
     );
 
     return { ok: true, id };
@@ -177,10 +190,7 @@ type CompleteMeetingInput = {
   actor_user_id: string;
   meeting_type?: string;
   scheduled_at?: string | null;
-  // TODO(R14B-step3): notes_investor no longer exists on deal_room_meetings
-  // (moved to deal_room_meeting_private_notes in 20260722000000). Writing it
-  // here would 400 on the dropped column — rewire to the new table when the
-  // sequencer UI re-mounts in step 3.
+  // R14B: routed to deal_room_meeting_private_notes — never a column write.
   notes_investor?: string | null;
   notes_shared?: string | null;
 };
@@ -202,8 +212,6 @@ export const completeMeeting = createServerFn({ method: "POST" })
     const payload: Record<string, unknown> = { completed_at: now };
     if (data.meeting_type !== undefined) payload.meeting_type = data.meeting_type;
     if (data.scheduled_at !== undefined) payload.scheduled_at = data.scheduled_at;
-    // TODO(R14B-step3): column dropped — route to deal_room_meeting_private_notes.
-    if (data.notes_investor !== undefined) payload.notes_investor = data.notes_investor;
     if (data.notes_shared !== undefined) payload.notes_shared = data.notes_shared;
 
     let id: string;
@@ -214,9 +222,15 @@ export const completeMeeting = createServerFn({ method: "POST" })
       const rows = await sbFetch(url, key, "deal_room_meetings", "POST", {
         deal_room_id: data.deal_room_id,
         meeting_number: data.meeting_number,
+        stage_slug: STAGE_SLUG_BY_NUMBER[data.meeting_number - 1] ?? "introduction",
         ...payload,
       });
       id = rows?.[0]?.id;
+    }
+
+    if (data.notes_investor !== undefined && id) {
+      const { upsertMeetingPrivateNote } = await import("@/lib/interview-fn");
+      await upsertMeetingPrivateNote(url, key, id, data.notes_investor ?? null);
     }
 
     const rooms: any[] = await sbFetch(
@@ -248,8 +262,7 @@ export const completeMeeting = createServerFn({ method: "POST" })
 type UpdateMeetingNotesInput = {
   deal_room_id: string;
   meeting_number: number;
-  // TODO(R14B-step3): notes_investor moved to deal_room_meeting_private_notes
-  // (see 20260722000000) — rewire in step 3, writing it here would 400.
+  // R14B: routed to deal_room_meeting_private_notes — never a column write.
   notes_investor?: string | null;
   notes_shared?: string | null;
   meeting_type?: string;
@@ -270,8 +283,6 @@ export const updateMeetingNotes = createServerFn({ method: "POST" })
     ).catch(() => []);
 
     const payload: Record<string, unknown> = {};
-    // TODO(R14B-step3): column dropped — route to deal_room_meeting_private_notes.
-    if (data.notes_investor !== undefined) payload.notes_investor = data.notes_investor;
     if (data.notes_shared !== undefined) payload.notes_shared = data.notes_shared;
     if (data.meeting_type !== undefined) payload.meeting_type = data.meeting_type;
     if (data.scheduled_at !== undefined) payload.scheduled_at = data.scheduled_at;
@@ -279,14 +290,22 @@ export const updateMeetingNotes = createServerFn({ method: "POST" })
     let id: string;
     if (existing?.length) {
       id = existing[0].id;
-      await sbFetch(url, key, `deal_room_meetings?id=eq.${id}`, "PATCH", payload);
+      if (Object.keys(payload).length > 0) {
+        await sbFetch(url, key, `deal_room_meetings?id=eq.${id}`, "PATCH", payload);
+      }
     } else {
       const rows = await sbFetch(url, key, "deal_room_meetings", "POST", {
         deal_room_id: data.deal_room_id,
         meeting_number: data.meeting_number,
+        stage_slug: STAGE_SLUG_BY_NUMBER[data.meeting_number - 1] ?? "introduction",
         ...payload,
       });
       id = rows?.[0]?.id;
+    }
+
+    if (data.notes_investor !== undefined && id) {
+      const { upsertMeetingPrivateNote } = await import("@/lib/interview-fn");
+      await upsertMeetingPrivateNote(url, key, id, data.notes_investor ?? null);
     }
     return { ok: true, id };
   });
