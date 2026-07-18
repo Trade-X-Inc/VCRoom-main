@@ -1029,3 +1029,32 @@ never assume a `PermissionGate` wrapper or a component-level `useAccountContext(
 sufficient on its own. Treat this identically to §33's column-visibility rule: the UI check
 improves the experience (an honest disabled state instead of a confusing failure), but the
 RLS policy is what actually stops the write.
+
+---
+
+## 35. THIRD CONFIRMED §33 INSTANCE — `deal_room_meetings.notes_investor` (found R14B, July 2026) — FIXED
+
+Found during R14B's audit of the (unmounted) 3-slot DD meetings pattern:
+`deal_room_meetings` carried `notes_investor` ("investor-private") and `notes_shared` on
+the same row, protected by a single `deal_room_meetings_members` ALL policy scoped to ANY
+room member — so a founder's direct REST `SELECT *` could read the investor's private
+meeting notes. Invisible in the UI because all writes go through service-role server fns
+(`deal-room-fn.ts`) and the panel only renders `notes_shared` — exactly the "the client
+only selects the safe columns" convention §33 forbids treating as a boundary.
+
+**Fixed in `20260722000000_r14b_interview_stages.sql`:** `notes_investor` moved to
+`deal_room_meeting_private_notes` (PK = meeting_id), RLS scoped to room members with
+`role = 'investor'` only. Verified live: founder SELECT returns 0 rows against a real
+inserted note, investor gets the row, uninvolved third party gets nothing; founder still
+reads the meeting row's shared fields normally.
+
+Same migration established the R14B meeting-content tables:
+- `deal_room_meetings` widened to 5 interview stages (`meeting_number` 1–5 + NOT NULL
+  `stage_slug` in introduction/product_demo/financial_discussion/terms_discussion/
+  investment_terms; status stays derived from scheduled_at/completed_at/
+  meeting_type='skipped' — no stored status column, by decision).
+- `deal_room_meeting_records` (recordings/transcripts/AI-extracted notes): SELECT-only
+  policy for room members while `deal_room_id` is non-null; **soft-delete = null the
+  `deal_room_id`** (documents pattern — row survives, RLS stops matching); **no client
+  write policies at all** — ingestion/extraction writes are service-role server fns only,
+  and a room member's direct INSERT was verified to fail with a genuine RLS violation.
