@@ -94,7 +94,7 @@ const GUIDES: Record<PageId, GuideContent> = {
     paragraphs: [
       "The Watchlist is your private tracker for companies you are actively evaluating.",
       "Status pipeline: Sourcing → Reviewing → Diligence → Passed or Invested or Watching. Move a company through stages as your diligence progresses.",
-      "You can add companies manually, bulk-import via CSV, or save companies directly from the Deal Flow discovery feed. The score column shows how well each company matched your thesis at the time you added them.",
+      "Add companies manually or bulk-import via CSV. When a row matches a real Hockystick account by name, a Request access action appears. The score column shows how well each company matched your thesis at the time you added them.",
     ],
     aiSystemContext:
       "The user is on /app/investor/startups — the Investor Watchlist. Status values: Sourcing, Reviewing, Diligence, Passed, Invested, Watching. Companies can be added manually, via CSV, or from the deal flow feed. Score column = thesis match score at add time.",
@@ -104,20 +104,20 @@ const GUIDES: Record<PageId, GuideContent> = {
     paragraphs: [
       "Intake Parser extracts structured data from unformatted inbound deal flow — copy-paste your inbox, CSV exports from AngelList or Notion, or any batch of company descriptions.",
       "The AI parses each entry and scores it against your thesis. Scores above your threshold are highlighted as strong fits. Below threshold entries are listed but not promoted.",
-      "Review the parsed results before acting. The parser can miss or misread fields — always check the extracted data before adding a company to your watchlist.",
+      "Review the parsed results before acting. Candidates matched to a real Hockystick account get a Request access action; everyone else gets a mailto invite to join.",
     ],
     aiSystemContext:
-      "The user is on /app/investor/intake — the Intake Parser. They paste raw inbound deal flow text or upload CSV. The AI extracts company name, sector, stage, and scores against the investor's thesis. Results are read-only until the investor manually saves to watchlist.",
+      "The user is on /app/investor/discover/deal-intake — the Intake Parser. They paste raw inbound deal flow text or upload CSV. The AI extracts company name, sector, stage, and scores against the investor's thesis, and attempts an exact-name match against real startups (matched_startup_id). Matched candidates get Request access (discovery_requests); unmatched candidates get a mailto invite to create a Hockystick account.",
   },
   "investor-deal-flow": {
-    title: "Deal Flow Discovery",
+    title: "Deal Flow",
     paragraphs: [
-      "Deal Flow shows founder profiles that match your stated investment thesis.",
-      "Matches are ranked by thesis alignment score — the AI compares each founder's sector, stage, traction, and claimed metrics against your profile's thesis, sectors, stages, check size, and red flags.",
-      "Click a company to see their verified profile. Use the 'Add to watchlist' button to save them for tracking. Click 'Open deal room' to start a formal diligence process.",
+      "Deal Flow lists every deal room you're already a member of — it does not surface new founders. Rooms appear here automatically once a connection request you sent is approved.",
+      "Sort by most recently active. Search narrows by company or sector. Each row opens straight into the room.",
+      "To reach a new founder, use Request access from Watchlist, Deal Intake, or Directory — approval is what creates the room and brings it here.",
     ],
     aiSystemContext:
-      "The user is on /app/investor/deal-flow — the thesis-matched deal flow discovery feed. Companies are ranked by AI thesis alignment score. Founders with verified profiles show the Hockystick Checked badge. Investors can add to watchlist or open deal rooms from here.",
+      "The user is on /app/investor/discover/deal-flow — the list of deal rooms the investor already belongs to (deal_room_members join, not a discovery feed). New founders are reached via Request access (discovery_requests) from Watchlist, Deal Intake, or Directory; approval creates the room, which then appears here.",
   },
   "investor-analysis": {
     title: "Thesis Analysis",
