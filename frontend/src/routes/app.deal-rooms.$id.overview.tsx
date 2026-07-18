@@ -119,6 +119,21 @@ function OverviewPage() {
     },
   });
 
+  // R12B — the counterparty accepting the NDA must appear in this session
+  // live, without a reload.
+  useEffect(() => {
+    if (!dealRoom?.id) return;
+    const channel = supabase
+      .channel(`nda-acceptances-${dealRoom.id}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "nda_acceptances", filter: `deal_room_id=eq.${dealRoom.id}` },
+        () => { queryClient.invalidateQueries({ queryKey: ["nda-acceptances-overview", dealRoom.id] }); },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [dealRoom?.id, queryClient]);
+
   const handlePrintNda = () => {
     window.print();
   };

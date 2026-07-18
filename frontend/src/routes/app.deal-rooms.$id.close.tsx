@@ -123,6 +123,21 @@ function ClosePage() {
     }
   }, [closingItems]);
 
+  // R12B — the counterparty checking off a checklist item must appear in
+  // this session live, without a reload.
+  useEffect(() => {
+    if (!dealRoomId) return;
+    const channel = supabase
+      .channel(`closing-items-${dealRoomId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "deal_room_closing_items", filter: `deal_room_id=eq.${dealRoomId}` },
+        () => { queryClient.invalidateQueries({ queryKey: ["closing-items", dealRoomId] }); },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [dealRoomId, queryClient]);
+
   const seedChecklist = async () => {
     if (!dealRoomId) return;
     setSeedingChecklist(true);

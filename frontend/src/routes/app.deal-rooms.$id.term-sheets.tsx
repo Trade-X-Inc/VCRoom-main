@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { Loader2, Sparkles, X, FileText, Plus } from "lucide-react";
@@ -53,6 +53,8 @@ function TermSheetsPage() {
   const [counterText, setCounterText] = useState("");
   const [acceptConfirmId, setAcceptConfirmId] = useState<string | null>(null);
 
+  const queryClient = useQueryClient();
+
   const { data: termSheets = [], refetch: refetchTS } = useQuery({
     queryKey: ["term-sheets", dealRoomId],
     enabled: !!dealRoomId,
@@ -65,6 +67,21 @@ function TermSheetsPage() {
       return data ?? [];
     },
   });
+
+  // R12B — the counterparty's status change (sent/accepted/countered) must
+  // appear in this session live, without a reload.
+  useEffect(() => {
+    if (!dealRoomId) return;
+    const channel = supabase
+      .channel(`term-sheets-${dealRoomId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "deal_room_term_sheets", filter: `deal_room_id=eq.${dealRoomId}` },
+        () => { queryClient.invalidateQueries({ queryKey: ["term-sheets", dealRoomId] }); },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [dealRoomId, queryClient]);
 
   const allSheets = termSheets as any[];
   const nextVersion = allSheets.length > 0 ? (allSheets[0].version ?? 0) + 1 : 1;
