@@ -18,6 +18,7 @@ import type { IntakeFileResult } from "@/lib/document-extractor";
 import { PageGuide } from "@/components/app/PageGuide";
 import { PageBreadcrumb } from "@/components/system";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
+import { RequestAccessButton } from "@/components/app/RequestAccessButton";
 
 export const Route = createFileRoute("/app/investor/intake")({
   // R9 relocation: this URL's content moved — see nav-structure.ts.
@@ -904,8 +905,15 @@ function ExtractedCard({
             : <>+ Add to pipeline</>}
         </button>
 
-        {/* Invite via mailto */}
-        {c.contact_email && (
+        {/* Matched to a real Hockystick startup — request access directly,
+            rather than the off-platform mailto below (matched_startup_id
+            comes from intake-fn's exact-name match against startups). */}
+        {c.matched_startup_id && (
+          <RequestAccessButton startupId={c.matched_startup_id} companyName={c.company_name || "this company"} />
+        )}
+
+        {/* Invite via mailto — for candidates with no Hockystick account yet. */}
+        {!c.matched_startup_id && c.contact_email && (
           <button
             onClick={handleInvite}
             data-testid="btn-invite"
@@ -916,7 +924,7 @@ function ExtractedCard({
               color: inviteSent ? "var(--color-success, #10b981)" : "var(--color-muted-foreground)",
             }}
           >
-            {inviteSent ? <><CheckCircle2 size={10} /> Invite sent</> : <><Mail size={10} /> Invite</>}
+            {inviteSent ? <><CheckCircle2 size={10} /> Invite sent</> : <><Mail size={10} /> Invite to join</>}
           </button>
         )}
 

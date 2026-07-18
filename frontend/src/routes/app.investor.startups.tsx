@@ -34,6 +34,7 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { EmptyState, PageBreadcrumb } from "@/components/system";
+import { RequestAccessButton } from "@/components/app/RequestAccessButton";
 
 export const Route = createFileRoute("/app/investor/startups")({
   // R9 relocation: this URL's content moved — see nav-structure.ts.
@@ -161,6 +162,27 @@ export function StartupsPage() {
         .filter((s: any) => !!s.id);
     },
   });
+
+  // R14 — resolve watchlist rows to real Hockystick startups by exact
+  // company name, client-side (investor_watchlist has no startup_id column
+  // at all — same limitation intake-fn.ts's server-side match works around
+  // for Deal Intake candidates; mirrored here rather than adding a schema
+  // column for a plain name-match lookup).
+  const { data: matchableStartups = [] } = useQuery({
+    queryKey: ["startups-for-watchlist-match"],
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("startups").select("id,company_name");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const startupIdByName = useMemo(
+    () => new Map(matchableStartups.map((s: any) => [String(s.company_name ?? "").trim().toLowerCase(), s.id as string])),
+    [matchableStartups],
+  );
+  const matchedStartupId = (companyName: string | null | undefined) =>
+    companyName ? startupIdByName.get(companyName.trim().toLowerCase()) ?? null : null;
 
   const set = <K extends keyof AddForm>(k: K, v: AddForm[K]) => setAddForm((f) => ({ ...f, [k]: v }));
 
@@ -679,6 +701,11 @@ export function StartupsPage() {
                           </a>
                         )}
                         {c.website && <a href={c.website} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-brand hover:underline text-xs flex items-center gap-0.5 mr-1">Site <ExternalLink className="h-3 w-3" /></a>}
+                        {matchedStartupId(c.company_name) && (
+                          <span onClick={(e) => e.stopPropagation()}>
+                            <RequestAccessButton startupId={matchedStartupId(c.company_name)!} companyName={c.company_name} />
+                          </span>
+                        )}
                         <button
                           onClick={(e) => { e.stopPropagation(); openEdit(c); }}
                           className="p-1.5 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
