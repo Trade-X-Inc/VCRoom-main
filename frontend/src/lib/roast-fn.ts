@@ -164,6 +164,7 @@ export const createRoastSession = createServerFn({ method: "POST" })
         level: 1 | 2 | 3;
         scheduledAt: string; // ISO
         rulesAcknowledged: boolean;
+        paymentConfirmed: boolean;
       },
   )
   .handler(
@@ -187,6 +188,13 @@ export const createRoastSession = createServerFn({ method: "POST" })
       // confirm-first step for scheduling a public event.
       if (!data.rulesAcknowledged)
         return { ok: false, error: "rules_not_acknowledged" };
+
+      // R13 step 6 — the $40 fee (CLAUDE.md §32 payment placeholder
+      // pattern) must be confirmed before a slot is confirmed. Server-side
+      // gate, same shape as rulesAcknowledged above — the client can't
+      // schedule around it by skipping the confirm-payment UI step.
+      if (!data.paymentConfirmed)
+        return { ok: false, error: "payment_not_confirmed" };
 
       const level = ([1, 2, 3] as const).includes(data.level)
         ? data.level
@@ -263,7 +271,13 @@ export const createRoastSession = createServerFn({ method: "POST" })
           founder_id: uid,
           level,
           status: "scheduled",
-          payment_status: "comp", // beta: comp access; Stripe gate arrives at creation time later
+          // TODO(stripe): payment_status is set from the placeholder
+          // confirmation (CLAUDE.md §32), not a real charge — the server
+          // already refused above if paymentConfirmed was false, so by
+          // this point the fee has been "paid" via the placeholder flow.
+          // Replace with a real Stripe PaymentIntent confirmation once the
+          // Hockystick entity is registered and Stripe is wired.
+          payment_status: "paid",
           scheduled_at: scheduledAt.toISOString(),
           qa_duration_minutes: cfg.qaMinutes,
           max_audience: cfg.maxAudience,
