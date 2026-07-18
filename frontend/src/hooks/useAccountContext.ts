@@ -1,6 +1,39 @@
-import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
+
+// Ref-counted so the many simultaneous useAccountContext() callers share one
+// underlying Supabase realtime channel per user instead of colliding.
+const accountContextChannels = new Map<string, { channel: RealtimeChannel; refCount: number }>();
+
+function subscribeAccountContextChannel(userId: string, queryClient: QueryClient) {
+  const existing = accountContextChannels.get(userId);
+  if (existing) {
+    existing.refCount += 1;
+    return;
+  }
+  const channel = supabase
+    .channel(`account-context:${userId}`)
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "startup_team_accounts", filter: `user_id=eq.${userId}` },
+      () => { queryClient.invalidateQueries({ queryKey: ["account-context", userId] }); }
+    )
+    .subscribe();
+  accountContextChannels.set(userId, { channel, refCount: 1 });
+}
+
+function unsubscribeAccountContextChannel(userId: string) {
+  const existing = accountContextChannels.get(userId);
+  if (!existing) return;
+  existing.refCount -= 1;
+  if (existing.refCount <= 0) {
+    supabase.removeChannel(existing.channel);
+    accountContextChannels.delete(userId);
+  }
+}
 
 export type AccountContext = {
   accountType:
@@ -37,6 +70,27 @@ const LOADING_CTX: AccountContext = {
 
 export function useAccountContext(): AccountContext {
   const { user, loading: authLoading } = useAuth();
+  const queryClient = useQueryClient();
+
+  // R12 step 4 — a role change by an admin (startup_team_accounts.role)
+  // must take effect on the affected member's next data fetch, not their
+  // next login. staleTime alone (5 min) isn't enough; mirrors the realtime
+  // invalidation pattern already used for notifications
+  // (NotificationBell.tsx) — a channel scoped to the caller's own row,
+  // invalidating this hook's own cache key on any change.
+  //
+  // This hook is called from many components at once (MemberShell,
+  // AppShell, app.tsx, app.audit.tsx, app.member.index.tsx, ...) — a plain
+  // per-mount subscription throws "cannot add postgres_changes callbacks
+  // ... after subscribe()" because the Supabase client treats repeated
+  // .channel() calls with the same topic name as the same channel, and a
+  // second .on().subscribe() collides with the first. Ref-count instead:
+  // only the first mount opens the channel, only the last unmount closes it.
+  useEffect(() => {
+    if (!user?.id) return;
+    subscribeAccountContextChannel(user.id, queryClient);
+    return () => { unsubscribeAccountContextChannel(user.id); };
+  }, [user?.id, queryClient]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["account-context", user?.id],

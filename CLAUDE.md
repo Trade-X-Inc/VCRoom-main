@@ -681,3 +681,44 @@ reload.** This is a hard rule for all future code, not a one-off fix:
 - A `staleTime` on the global QueryClient (see `src/routes/__root.tsx`) does not excuse
   skipping invalidation — it only controls background refetch timing for the *same*
   cache entry across remounts, not whether a mutation's result reaches the cache at all.
+
+---
+
+## 28. CROSS-SESSION REAL-TIME IS A SEPARATE PROBLEM FROM §27 — AND WAS NEVER WIRED UP (found R12, July 2026)
+
+**Section 27's rule only fixes invalidation within one user's own browser/QueryClient.**
+`queryClient.invalidateQueries()` is process-local — it cannot reach a *different* user's
+open tab. When user A's action (e.g. an admin changing user B's role) needs to update
+user B's already-open session, that requires Postgres logical replication pushing the
+change out via Supabase Realtime (`supabase.channel(...).on('postgres_changes', ...)`),
+not React Query invalidation. These are two unrelated mechanisms — don't conflate them.
+
+**R12 discovered that Realtime was never actually wired up for ANY table in this app.**
+`select tablename from pg_publication_tables where pubname = 'supabase_realtime'`
+returned only the internal `realtime.messages_YYYY_MM_DD` partitions — zero application
+tables. This means every existing `.channel().on('postgres_changes', ...)` subscription
+in the codebase (`NotificationBell.tsx`, `DealRoomChat.tsx`, `useStageTransition.ts`,
+`app.deal-rooms.$id.qa.tsx`, `roast.$id.tsx`, `app.messages.tsx`, `app.roast.$id.live.tsx`)
+has been a **silent no-op** — each one only appears to work because it sits next to a
+`refetchInterval` polling fallback that's doing the actual work.
+
+**Fixed in R12:** added `startup_team_accounts` to `supabase_realtime` (migration
+`20260718050000_r12_enable_realtime_startup_team_accounts.sql`) so a role change now
+propagates to the affected member's open session live — verified with Playwright
+(`tests/r12-realtime-role-change.spec.ts`), no page reload required.
+
+**Left unfixed, on purpose:** every other table backing the channels listed above. If a
+future session needs a feature to feel "live" across two different users' sessions (not
+just multiple views within one user's own session — that's already covered by §27),
+check `pg_publication_tables` first. Don't assume an existing `.channel()` call means
+realtime actually works — verify the table is in the publication before trusting it.
+
+**Gotcha if you add more tables to the publication:** `useAccountContext()` is called
+from many components simultaneously (`MemberShell`, `AppShell`, `app.tsx`,
+`app.audit.tsx`, `app.member.index.tsx`). A naive per-mount `.channel(topic).on(...).
+subscribe()` throws `cannot add postgres_changes callbacks ... after subscribe()`
+because Supabase's client treats repeated `.channel()` calls with an identical topic
+string as the same channel object — the second mount's `.subscribe()` collides with the
+first. Fixed with a module-level ref-counted registry (see `useAccountContext.ts`): only
+the first concurrent caller opens the channel, only the last one closes it. Use the same
+pattern for any other hook that's mounted from multiple places at once.

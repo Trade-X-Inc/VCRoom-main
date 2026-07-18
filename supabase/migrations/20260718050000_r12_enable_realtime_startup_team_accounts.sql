@@ -1,0 +1,13 @@
+-- R12 step 4 — role changes must propagate to the affected member's live
+-- session without requiring re-login. useAccountContext.ts subscribes to
+-- postgres_changes on this table, filtered to the caller's own row, but
+-- that subscription is a no-op unless the table is in the Realtime
+-- publication. Investigation found NO app table is currently in
+-- supabase_realtime (only the internal realtime.messages partitions are) —
+-- meaning every existing .channel().on('postgres_changes') subscription in
+-- this codebase (NotificationBell, DealRoomChat, team chat, QA, roast) is
+-- silently a no-op today, saved only by adjacent polling/refetchInterval
+-- fallbacks. That is a broader pre-existing gap, out of scope here — this
+-- migration adds ONLY the one table this task's role-propagation
+-- requirement actually needs. See CLAUDE.md for the full follow-up note.
+alter publication supabase_realtime add table startup_team_accounts;
