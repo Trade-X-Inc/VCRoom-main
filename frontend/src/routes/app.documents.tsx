@@ -282,6 +282,11 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
   const [customUploading, setCustomUploading] = useState(false);
   const [customCategory, setCustomCategory] = useState<Exclude<TemplateCategory, "All"> | null>(null);
   const [customExtractError, setCustomExtractError] = useState<string | null>(null);
+  // R13B step 6 — employee 1-pager upload (non-key-person pipeline).
+  const [showEmployeeUpload, setShowEmployeeUpload] = useState(false);
+  const [employeeFile, setEmployeeFile] = useState<File | null>(null);
+  const [employeeUploading, setEmployeeUploading] = useState(false);
+  const [employeeExtractError, setEmployeeExtractError] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   // Fetch startup
@@ -348,6 +353,15 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
     }));
     return [...templateCards, ...customCards];
   }, [templates, founderDocs]);
+
+  // R13B step 6: compiled "digital employee data" — every employee
+  // 1-pager's extracted fields, read live off founder_documents.content
+  // (kind: "employee_one_pager") rather than duplicated into a separate
+  // table. This is what gets attached to a deal room as one artifact.
+  const employeeOnePagers = useMemo(
+    () => founderDocs.filter(d => (d.content as any)?.kind === "employee_one_pager"),
+    [founderDocs],
+  );
 
   // Normalise stage to DB format: "Series A" → "series-a"
   const stageKey = selectedStage.toLowerCase().replace(/\s+/g, "-");
@@ -534,6 +548,87 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       toast.error(e.message || "Upload failed");
     } finally {
       setCustomUploading(false);
+    }
+  }
+
+  // R13B step 6: employee 1-pager — same upload/extract/store mechanics as
+  // Custom Document, but a deliberately narrower extraction target
+  // (extractEmployeeOnePager, not extractCustomDocument): name,
+  // designation, contact, short_description ONLY, enforced at the prompt
+  // level. content.kind distinguishes these rows from ordinary custom
+  // documents so they can be filtered into the compiled "digital employee
+  // data" list below without a separate table. Category is always "team",
+  // matching where a non-key-person roster belongs in the 5 fixed
+  // categories.
+  async function handleEmployeeOnePagerUpload() {
+    if (!startup?.id || !user?.id || !employeeFile) return;
+    const file = employeeFile;
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+    if (!ALLOWED_EXTENSIONS.has(ext)) { toast.error(`${file.name}: file type not allowed`); return; }
+    if (file.size > MAX_FILE_SIZE) { toast.error(`${file.name}: exceeds 50 MB limit`); return; }
+    setEmployeeUploading(true);
+    setEmployeeExtractError(null);
+    try {
+      const slug = `employee-${file.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}-${Date.now()}`;
+      const filePath = `founder-docs/${startup.id}/${slug}/${file.name}`;
+      const { error: uploadError } = await supabase.storage.from("documents").upload(filePath, file, { upsert: true });
+      if (uploadError) throw uploadError;
+
+      const { extractDocumentText } = await import("@/lib/document-extractor");
+      const text = await extractDocumentText(file, file.name);
+      const { extractEmployeeOnePager } = await import("@/lib/profile-builder-fn");
+      const result = await extractEmployeeOnePager({
+        data: { userId: user.id, documentText: text, fileName: file.name },
+      }).catch((e: any): Awaited<ReturnType<typeof extractEmployeeOnePager>> => ({
+        data: null, missing_fields: [], error: e?.message || "Extraction failed",
+      }));
+
+      const extractionSucceeded = !result.error && !!result.data;
+      const title = result.data?.name ? `${result.data.name} — employee profile` : file.name;
+
+      const { error: upsertError } = await supabase.from("founder_documents").upsert({
+        startup_id: startup.id,
+        template_id: null,
+        template_slug: slug,
+        title,
+        status: extractionSucceeded ? "ai_extracted" : "needs_review",
+        file_path: filePath,
+        file_name: file.name,
+        file_size: file.size,
+        content: extractionSucceeded
+          ? { ...result.data, category: "team", kind: "employee_one_pager" }
+          : { category: "team", kind: "employee_one_pager", extraction_error: result.error || "Could not extract structured data from this document." },
+        completeness_score: extractionSucceeded ? 100 : 0,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "startup_id,template_slug" });
+      if (upsertError) throw upsertError;
+
+      if (extractionSucceeded) {
+        toast.success(`${title} uploaded and extracted`);
+      } else {
+        setEmployeeExtractError(result.error || "Could not extract structured data.");
+        toast.error("Uploaded, but extraction failed — stored in Source Files. You can retry or fill manually.");
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["founder-documents", startup.id] });
+      const { logActivity } = await import("@/lib/activity-log-fn");
+      logActivity({
+        account_type: "founder",
+        account_id: startup.id,
+        actor_user_id: user.id,
+        actor_name: user.fullName || user.email || "Founder",
+        action_type: "document_uploaded",
+        target_label: title,
+        detail: `Uploaded ${file.name}`,
+      });
+      if (extractionSucceeded) {
+        setShowEmployeeUpload(false);
+        setEmployeeFile(null);
+      }
+    } catch (e: any) {
+      toast.error(e.message || "Upload failed");
+    } finally {
+      setEmployeeUploading(false);
     }
   }
 
@@ -770,6 +865,23 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                 <div>
                   <div className="text-sm font-medium text-foreground">Add a custom document</div>
                   <div className="text-xs text-muted-foreground">Upload any file not covered by a template — AI extracts structured data automatically.</div>
+                </div>
+              </button>
+            )}
+            {/* R13B step 6: employee 1-pager — separate, narrower pipeline
+                from a key-person profile (Team Cards). Only on Document
+                Intake, alongside Custom Document. */}
+            {(!view || view === "document-intake") && (
+              <button
+                onClick={() => { setEmployeeExtractError(null); setShowEmployeeUpload(true); }}
+                className="w-full rounded-none border border-dashed border-border bg-card p-5 text-left hover:border-brand/50 hover:bg-accent/20 transition-colors flex items-center gap-3"
+              >
+                <div className="grid h-9 w-9 place-items-center rounded-none bg-accent shrink-0">
+                  <Upload className="h-4 w-4 text-brand" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-foreground">Add employee 1-pager</div>
+                  <div className="text-xs text-muted-foreground">Upload a one-page employee profile — AI extracts name, designation, contact, and a short description.</div>
                 </div>
               </button>
             )}
@@ -1040,6 +1152,53 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
           detail per document, ready to attach when a deal room exists. */}
       {view === "digital-document-vault" && (
         <div className="space-y-4">
+          {employeeOnePagers.length > 0 && (
+            <div className="rounded-none border border-border bg-white overflow-hidden">
+              <div className="px-5 py-4 border-b border-border flex items-center justify-between gap-4">
+                <div>
+                  <div className="text-sm font-semibold text-foreground">Digital employee data</div>
+                  <div className="text-xs mt-0.5" style={{ color: "#71717A" }}>
+                    {employeeOnePagers.length} compiled from employee 1-pagers — name, designation, contact, short description only.
+                  </div>
+                </div>
+                <button
+                  onClick={async () => {
+                    const allAttached = employeeOnePagers.every(d => d.visibility === "deal_room");
+                    const newVisibility = allAttached ? "stage2" : "deal_room";
+                    const { error } = await supabase.from("founder_documents")
+                      .update({ visibility: newVisibility })
+                      .in("id", employeeOnePagers.map(d => d.id));
+                    if (error) { toast.error("Could not update."); return; }
+                    refetchFounderDocs();
+                  }}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-none border px-3 py-1.5 text-xs font-medium transition-colors shrink-0",
+                    employeeOnePagers.every(d => d.visibility === "deal_room")
+                      ? "border-brand bg-accent text-brand"
+                      : "border-border text-muted-foreground hover:bg-accent/40",
+                  )}
+                >
+                  {employeeOnePagers.every(d => d.visibility === "deal_room") ? "Attached to deal room" : "Attach to deal room"}
+                </button>
+              </div>
+              <div className="divide-y divide-border">
+                {employeeOnePagers.map((doc) => {
+                  const c = (doc.content ?? {}) as Record<string, any>;
+                  return (
+                    <div key={doc.id} className="px-5 py-3 flex items-center justify-between gap-4">
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-foreground truncate">{c.name || doc.file_name || "Unnamed"}</div>
+                        <div className="text-xs mt-0.5" style={{ color: "#71717A" }}>
+                          {[c.designation, c.contact].filter(Boolean).join(" · ") || "—"}
+                        </div>
+                        {c.short_description && <div className="text-xs mt-1" style={{ color: "#52525B" }}>{c.short_description}</div>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           {filteredDocs.length === 0 ? (
             <EmptyState kind="empty" title="No processed documents yet" />
           ) : (
@@ -1300,6 +1459,49 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
               >
                 {customUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                 {customUploading ? "Uploading & extracting…" : customExtractError ? "Retry" : "Upload & extract"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Employee 1-pager upload modal — R13B step 6 */}
+      {showEmployeeUpload && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => !employeeUploading && setShowEmployeeUpload(false)}>
+          <div className="w-full max-w-md rounded-none border border-border bg-white p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold" style={{ fontFamily: "Syne, sans-serif" }}>Add employee 1-pager</h3>
+              <button onClick={() => !employeeUploading && setShowEmployeeUpload(false)} className="text-muted-foreground hover:text-foreground">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <p className="text-xs" style={{ color: "#71717A" }}>
+                For team members who aren't key people. AI extracts only name, designation, contact, and a short description — narrower than a key-person profile.
+              </p>
+              <div>
+                <label className="text-xs font-medium block mb-1.5" style={{ color: "#52525B" }}>File</label>
+                <label className="rounded-none border border-dashed border-border p-5 text-center cursor-pointer hover:border-brand/50 hover:bg-accent/20 transition-colors block">
+                  <Upload className="h-5 w-5 text-muted-foreground mx-auto" />
+                  <div className="text-sm font-medium mt-2">{employeeFile ? employeeFile.name : "Choose a file"}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">PDF, DOCX, PPTX · Max 50MB</div>
+                  <input type="file" accept=".pdf,.pptx,.ppt,.docx,.doc" className="sr-only" onChange={(e) => e.target.files?.[0] && setEmployeeFile(e.target.files[0])} />
+                </label>
+              </div>
+              {employeeExtractError && (
+                <div className="rounded-none border border-amber-500/30 bg-amber-500/5 px-3 py-2.5">
+                  <p className="text-xs font-medium text-amber-600">Could not extract this document.</p>
+                  <p className="text-xs mt-0.5" style={{ color: "#71717A" }}>{employeeExtractError}</p>
+                  <p className="text-xs mt-1" style={{ color: "#71717A" }}>It's stored in Source Files — retry, or fill it in manually.</p>
+                </div>
+              )}
+              <button
+                onClick={handleEmployeeOnePagerUpload}
+                disabled={employeeUploading || !employeeFile}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-none hs-gradient text-brand-foreground px-4 py-2.5 text-sm font-medium disabled:opacity-50"
+              >
+                {employeeUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                {employeeUploading ? "Uploading & extracting…" : employeeExtractError ? "Retry" : "Upload & extract"}
               </button>
             </div>
           </div>

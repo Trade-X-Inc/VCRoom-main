@@ -418,6 +418,92 @@ export const detectAndExtractDocument = createServerFn({ method: "POST" })
   });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// R13B step 6 — employee 1-pager extraction (non-key-person pipeline).
+// Deliberately narrower than every extraction target above: a key-person
+// profile (Team Cards) captures bio/highlights/social links, but this
+// pipeline is explicitly scoped to exactly 4 fields at the prompt level —
+// name, designation, contact, short description — per the founder's
+// decision that this is a distinct, narrower category from a key-person
+// profile, not a lightweight version of the same thing.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const EMPLOYEE_ONE_PAGER_SCHEMA = `{
+  "name": "string or null",
+  "designation": "string or null",
+  "contact": "string or null — email, phone, or whatever contact detail is present, verbatim",
+  "short_description": "string or null — one or two sentences maximum, summarizing role/background",
+  "missing_fields": ["array of field names not found: name, designation, contact, short_description"]
+}`;
+
+type EmployeeOnePagerInput = {
+  userId: string;
+  documentText: string;
+  fileName: string;
+};
+
+export type EmployeeOnePagerResult = {
+  data: {
+    name: string | null;
+    designation: string | null;
+    contact: string | null;
+    short_description: string | null;
+  } | null;
+  missing_fields: string[];
+  error: string | null;
+};
+
+export const extractEmployeeOnePager = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as EmployeeOnePagerInput)
+  .handler(async ({ data }): Promise<EmployeeOnePagerResult> => {
+    const usageCheck = await checkUsageCap(data.userId, "document_extraction");
+    if (!usageCheck.allowed) {
+      return { data: null, missing_fields: [], error: usageCheck.message || "Daily AI limit reached." };
+    }
+
+    if (!data.documentText || data.documentText.trim().length < 20) {
+      return { data: null, missing_fields: ["name", "designation", "contact", "short_description"], error: "Could not read enough text from this document — it may be image-based or empty." };
+    }
+
+    const systemPrompt = `You are extracting a minimal contact card from a one-page employee profile document.
+Return ONLY valid JSON — no markdown, no explanation, no extra text.
+The JSON must exactly match this schema:
+${EMPLOYEE_ONE_PAGER_SCHEMA}
+
+Rules:
+- Extract ONLY these four fields. Do not extract or infer anything else — no bio, no highlights, no work history, no social links, even if present in the document. This is a narrower, deliberately minimal extraction target, not a summary.
+- short_description must be one or two sentences maximum. Trim anything longer.
+- Only fill a field if there is clear textual evidence in the document. Never guess or invent.
+- For any field you cannot find evidence for, set it to null and add its key to missing_fields.`;
+
+    const userMessage = `File name: ${data.fileName}\n\nExtract the four fields from this document content:\n\n${data.documentText.slice(0, 8000)}`;
+
+    const attempt = async (prompt: string): Promise<EmployeeOnePagerResult> => {
+      const raw = await callOpenAI(prompt, userMessage, 400);
+      const parsed = parseExtractionJSON(raw) as any;
+      return {
+        data: {
+          name: parsed.name ?? null,
+          designation: parsed.designation ?? null,
+          contact: parsed.contact ?? null,
+          short_description: parsed.short_description ?? null,
+        },
+        missing_fields: Array.isArray(parsed.missing_fields) ? parsed.missing_fields : [],
+        error: null,
+      };
+    };
+
+    try {
+      try {
+        return await attempt(systemPrompt);
+      } catch {
+        return await attempt(systemPrompt + "\n\nCRITICAL: Return ONLY the raw JSON object. No markdown, no backticks, no explanation whatsoever.");
+      }
+    } catch (err: any) {
+      return { data: null, missing_fields: [], error: err.message || "Extraction failed" };
+    }
+  });
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Investor-ready output: one-liner + 3-paragraph narrative + fundraising terms.
 // Generated from what the founder actually said/uploaded — the founder reviews
 // and edits everything before it goes anywhere.
