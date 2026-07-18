@@ -240,7 +240,6 @@ export const investorSections: L2Section[] = [
       { to: "/app/investor/crm/pipeline-manager", label: "Pipeline Manager" },
       { to: "/app/investor/crm/founder-meetings", label: "Founder Meetings" },
       { to: "/app/investor/crm/deal-analysis", label: "Deal Analysis" },
-      { to: "/app/investor/crm/analytics", label: "CRM Analytics" },
     ],
   },
   {

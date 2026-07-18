@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Download } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { PageFrame, EmptyState } from "@/components/system";
 import { color, font, radius, space, table as tableTokens } from "@/lib/design-tokens";
+import { downloadCsv } from "@/lib/csv-export";
 
 export const Route = createFileRoute("/app/investor/analytics")({
   component: InvestorAnalytics,
@@ -44,6 +45,33 @@ function Td({ children, right }: { children: React.ReactNode; right?: boolean })
     <td style={{ textAlign: right ? "right" : "left", fontSize: 13, color: color.ink, padding: "0 20px", height: tableTokens.rowHeight, borderBottom: tableTokens.rowBorder, fontVariantNumeric: right ? "tabular-nums" : undefined }}>
       {children}
     </td>
+  );
+}
+
+function ExportButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: "inline-flex", alignItems: "center", gap: 6, height: 28, padding: "0 10px",
+        background: color.white, color: color.inkTertiary, border: `1px solid ${color.border}`,
+        borderRadius: radius.control, fontSize: 12, fontWeight: 500, cursor: "pointer",
+      }}
+    >
+      <Download style={{ width: 12, height: 12 }} /> CSV
+    </button>
+  );
+}
+
+function TableSection({ title, onExport, children }: { title: string; onExport?: () => void; children: React.ReactNode }) {
+  return (
+    <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
+      <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>{title}</div>
+        {onExport && <ExportButton onClick={onExport} />}
+      </div>
+      {children}
+    </div>
   );
 }
 
@@ -115,6 +143,25 @@ function InvestorAnalytics() {
     ? Math.round(daysInStageSamples.reduce((a, b) => a + b, 0) / daysInStageSamples.length)
     : null;
 
+  // Per-stage breakdown of the same days-in-stage samples, grouped by
+  // current status — one average number hides whether it's Sourcing or
+  // Diligence that's actually slow.
+  const daysInStageByStage: Record<string, number[]> = {};
+  for (const w of watchlist as any[]) {
+    if (!w.stage_entered_at || !w.created_at) continue;
+    const days = (new Date(w.stage_entered_at).getTime() - new Date(w.created_at).getTime()) / 86400000;
+    if (days <= 0) continue;
+    const key = w.status || "Unspecified";
+    (daysInStageByStage[key] ??= []).push(days);
+  }
+  const daysInStageRows = Object.entries(daysInStageByStage)
+    .map(([stage, samples]) => ({
+      stage,
+      count: samples.length,
+      avgDays: Math.round(samples.reduce((a, b) => a + b, 0) / samples.length),
+    }))
+    .sort((a, b) => b.avgDays - a.avgDays);
+
   // ── Source performance ──
   const sourceGroups: Record<string, { total: number; invested: number }> = {};
   for (const w of watchlist as any[]) {
@@ -167,10 +214,10 @@ function InvestorAnalytics() {
         </ChartCard>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
-            <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
-              <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Pass-reason breakdown</div>
-            </div>
+          <TableSection
+            title="Pass-reason breakdown"
+            onExport={passReasonRows.length > 0 ? () => downloadCsv("pass-reason-breakdown", ["Category", "Count"], passReasonRows.map(([cat, count]) => [cat, count])) : undefined}
+          >
             {passReasonRows.length === 0 ? (
               <EmptyState kind="empty" title="No pass reasons recorded yet" />
             ) : (
@@ -191,12 +238,12 @@ function InvestorAnalytics() {
                 </tbody>
               </table>
             )}
-          </div>
+          </TableSection>
 
-          <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
-            <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
-              <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Source performance</div>
-            </div>
+          <TableSection
+            title="Source performance"
+            onExport={sourceRows.length > 0 ? () => downloadCsv("source-performance", ["Source", "Tracked", "Invested", "Rate"], sourceRows.map((s) => [s.source, s.total, s.invested, `${s.rate}%`])) : undefined}
+          >
             {sourceRows.length === 0 ? (
               <EmptyState kind="empty" title="No data yet — add a source when you track a company" />
             ) : (
@@ -221,8 +268,36 @@ function InvestorAnalytics() {
                 </tbody>
               </table>
             )}
-          </div>
+          </TableSection>
         </div>
+
+        <TableSection
+          title="Days in stage, by stage"
+          onExport={daysInStageRows.length > 0 ? () => downloadCsv("days-in-stage", ["Stage", "Count", "Avg days"], daysInStageRows.map((r) => [r.stage, r.count, r.avgDays])) : undefined}
+        >
+          {daysInStageRows.length === 0 ? (
+            <EmptyState kind="empty" title="No data yet — appears once entries move past Sourcing" />
+          ) : (
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr>
+                  <Th>Stage</Th>
+                  <Th right>Count</Th>
+                  <Th right>Avg days</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {daysInStageRows.map((r) => (
+                  <tr key={r.stage}>
+                    <Td>{r.stage}</Td>
+                    <Td right>{r.count}</Td>
+                    <Td right>{r.avgDays}</Td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </TableSection>
       </div>
     </PageFrame>
   );

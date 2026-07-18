@@ -3,13 +3,14 @@ import { useState, useMemo, useCallback } from "react";
 import {
   LayoutGrid, List, Columns3, Search,
   AlertTriangle, Clock, X,
-  CheckCircle2, ExternalLink, ArrowRight, Gavel,
+  CheckCircle2, ExternalLink, ArrowRight, Gavel, Download,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { EmptyState, PageBreadcrumb } from "@/components/system";
+import { downloadCsv } from "@/lib/csv-export";
 
 export const Route = createFileRoute("/app/investor/decisions")({
   // R9 relocation: this URL's content moved — see nav-structure.ts.
@@ -330,23 +331,42 @@ export function DecisionsPage() {
           </p>
         </div>
 
-        {/* View toggle */}
-        <div style={{ display: "flex", gap: 2, background: "var(--hs-bg-secondary)", padding: 3, borderRadius: 8, border: "1px solid var(--hs-border)" }}>
-          {([["kanban", Columns3, "Kanban"], ["list", List, "List"], ["grid", LayoutGrid, "Grid"]] as const).map(([mode, Icon, label]) => (
-            <button
-              key={mode}
-              data-testid={`view-${mode}`}
-              onClick={() => setView(mode)}
-              style={{
-                display: "flex", alignItems: "center", gap: 5, padding: "6px 12px",
-                borderRadius: 6, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600,
-                background: view === mode ? "rgba(124,58,237,0.8)" : "transparent",
-                color: "var(--hs-text-primary)",
-              }}
-            >
-              <Icon size={13} />{label}
-            </button>
-          ))}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <button
+            onClick={() => downloadCsv(
+              "pipeline",
+              ["Company", "Stage", "Days in stage", "Score", "Sector"],
+              entries.map((e) => [e.company_name ?? "", e.status, daysInStage(e), e.initial_score ?? "", e.sector ?? ""]),
+            )}
+            disabled={entries.length === 0}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 6, height: 32, padding: "0 12px",
+              background: "transparent", color: "var(--hs-text-primary)", border: "1px solid var(--hs-border)",
+              borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: entries.length === 0 ? "not-allowed" : "pointer",
+              opacity: entries.length === 0 ? 0.5 : 1,
+            }}
+          >
+            <Download size={13} /> CSV
+          </button>
+
+          {/* View toggle */}
+          <div style={{ display: "flex", gap: 2, background: "var(--hs-bg-secondary)", padding: 3, borderRadius: 8, border: "1px solid var(--hs-border)" }}>
+            {([["kanban", Columns3, "Kanban"], ["list", List, "List"], ["grid", LayoutGrid, "Grid"]] as const).map(([mode, Icon, label]) => (
+              <button
+                key={mode}
+                data-testid={`view-${mode}`}
+                onClick={() => setView(mode)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 5, padding: "6px 12px",
+                  borderRadius: 6, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600,
+                  background: view === mode ? "rgba(124,58,237,0.8)" : "transparent",
+                  color: "var(--hs-text-primary)",
+                }}
+              >
+                <Icon size={13} />{label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
