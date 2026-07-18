@@ -271,13 +271,6 @@ export const createRoastSession = createServerFn({ method: "POST" })
           founder_id: uid,
           level,
           status: "scheduled",
-          // TODO(stripe): payment_status is set from the placeholder
-          // confirmation (CLAUDE.md §32), not a real charge — the server
-          // already refused above if paymentConfirmed was false, so by
-          // this point the fee has been "paid" via the placeholder flow.
-          // Replace with a real Stripe PaymentIntent confirmation once the
-          // Hockystick entity is registered and Stripe is wired.
-          payment_status: "paid",
           scheduled_at: scheduledAt.toISOString(),
           qa_duration_minutes: cfg.qaMinutes,
           max_audience: cfg.maxAudience,
@@ -288,6 +281,24 @@ export const createRoastSession = createServerFn({ method: "POST" })
       );
       const sessionId = inserted?.[0]?.id;
       if (!sessionId) return { ok: false, error: "insert_failed" };
+
+      // R13 step 8 — payment_status lives on its own table
+      // (roast_session_payments), not on roast_sessions, because
+      // roast_sessions is public-readable (and realtime-published) once a
+      // session goes live: a column here would leak the founder's payment
+      // state to any anonymous visitor, verified live via a real
+      // unauthenticated WebSocket subscription. See migration
+      // 20260719020000_r13_split_roast_payment_status.sql.
+      //
+      // TODO(stripe): this write marks 'paid' from the placeholder
+      // confirmation (CLAUDE.md §32), not a real charge — the server
+      // already refused above if paymentConfirmed was false. Replace with
+      // a real Stripe PaymentIntent confirmation once the Hockystick
+      // entity is registered and Stripe is wired.
+      await sbFetch(url, key, "roast_session_payments", "POST", {
+        session_id: sessionId,
+        payment_status: "paid",
+      });
 
       // Founder occupies the founder seat
       const users: any[] = await sbFetch(
@@ -1280,7 +1291,12 @@ export const getRoastPublicState = createServerFn({ method: "POST" })
         };
       });
 
-    // Strip internals the public page has no business seeing
+    // Strip internals the public page has no business seeing. Note:
+    // payment_status used to live on this row and leaked here (R13 step 8
+    // security check, fixed by moving it to roast_session_payments — a
+    // founder-only table not added to supabase_realtime — instead of
+    // trying to redact it column-by-column on a table that's public by
+    // design).
     const { daily_room_name: _n, ...publicSession } = s;
 
     return {
