@@ -177,6 +177,10 @@ type CompleteMeetingInput = {
   actor_user_id: string;
   meeting_type?: string;
   scheduled_at?: string | null;
+  // TODO(R14B-step3): notes_investor no longer exists on deal_room_meetings
+  // (moved to deal_room_meeting_private_notes in 20260722000000). Writing it
+  // here would 400 on the dropped column — rewire to the new table when the
+  // sequencer UI re-mounts in step 3.
   notes_investor?: string | null;
   notes_shared?: string | null;
 };
@@ -198,6 +202,7 @@ export const completeMeeting = createServerFn({ method: "POST" })
     const payload: Record<string, unknown> = { completed_at: now };
     if (data.meeting_type !== undefined) payload.meeting_type = data.meeting_type;
     if (data.scheduled_at !== undefined) payload.scheduled_at = data.scheduled_at;
+    // TODO(R14B-step3): column dropped — route to deal_room_meeting_private_notes.
     if (data.notes_investor !== undefined) payload.notes_investor = data.notes_investor;
     if (data.notes_shared !== undefined) payload.notes_shared = data.notes_shared;
 
@@ -243,6 +248,8 @@ export const completeMeeting = createServerFn({ method: "POST" })
 type UpdateMeetingNotesInput = {
   deal_room_id: string;
   meeting_number: number;
+  // TODO(R14B-step3): notes_investor moved to deal_room_meeting_private_notes
+  // (see 20260722000000) — rewire in step 3, writing it here would 400.
   notes_investor?: string | null;
   notes_shared?: string | null;
   meeting_type?: string;
@@ -263,6 +270,7 @@ export const updateMeetingNotes = createServerFn({ method: "POST" })
     ).catch(() => []);
 
     const payload: Record<string, unknown> = {};
+    // TODO(R14B-step3): column dropped — route to deal_room_meeting_private_notes.
     if (data.notes_investor !== undefined) payload.notes_investor = data.notes_investor;
     if (data.notes_shared !== undefined) payload.notes_shared = data.notes_shared;
     if (data.meeting_type !== undefined) payload.meeting_type = data.meeting_type;
