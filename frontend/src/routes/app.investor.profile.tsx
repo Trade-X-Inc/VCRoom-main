@@ -25,6 +25,7 @@ import { OnboardingTour } from "@/components/app/OnboardingTour";
 import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 import { PageFrame, EmptyState } from "@/components/system";
 import { color, font, space, radius } from "@/lib/design-tokens";
+import { useAccountContext } from "@/hooks/useAccountContext";
 
 export const Route = createFileRoute("/app/investor/profile")({
   // R9: relocated to Thesis › Investor Profile Builder — old URL redirects to
@@ -117,6 +118,25 @@ const PUBLIC_FIELD_OPTIONS: { key: string; label: string }[] = [
   { key: "social_links", label: "Social links" },
 ];
 
+// R12C — labels for the pending-changes UI, covering every field key
+// PROFILE_FIELD_KEYS can propose (superset of PUBLIC_FIELD_OPTIONS, which
+// only lists fields the public-visibility toggle applies to).
+const PENDING_CHANGE_FIELD_LABELS: Record<string, string> = {
+  ...Object.fromEntries(PUBLIC_FIELD_OPTIONS.map((f) => [f.key, f.label])),
+  linkedin_url: "LinkedIn URL",
+  website: "Website",
+  secret_sauce: "Secret sauce",
+  thesis: "Thesis (legacy field)",
+  check_size_max: "Cheque size (min/max)",
+  portfolio_companies: "Portfolio companies",
+  red_flags: "Red flags",
+  key_metrics: "Key metrics",
+  thesis_bullets: "Thesis bullets",
+  profile_slug: "Profile URL",
+  profile_published: "Publish status",
+  public_fields: "Public field visibility",
+};
+
 const EMPTY_FORM: ProfileForm = {
   fund_name: "", your_name: "", role: "Partner", fund_size: "",
   social_links: [],
@@ -203,6 +223,26 @@ function Field({ label, badge, children }: { label: string; badge?: React.ReactN
   );
 }
 
+// R12C — inline marker for an Associate's own pending edit on a field,
+// shown next to the field it affects rather than hidden in a separate
+// page, per the task's explicit instruction.
+function PendingApprovalBadge({ pendingValue }: { pendingValue?: unknown }) {
+  return (
+    <span
+      title={pendingValue !== undefined ? `Proposed: ${typeof pendingValue === "string" ? pendingValue : JSON.stringify(pendingValue)}` : undefined}
+      style={{
+        display: "inline-flex", alignItems: "center", gap: 4,
+        fontSize: 11, fontWeight: 500, color: "#B45309",
+        background: "rgba(217,119,6,0.1)", border: "1px solid rgba(217,119,6,0.25)",
+        borderRadius: 99, padding: "2px 8px",
+      }}
+    >
+      <Clock style={{ width: 10, height: 10 }} />
+      Awaiting approval
+    </span>
+  );
+}
+
 function BulletEditor({ bullets, onChange, placeholder }: { bullets: string[]; onChange: (b: string[]) => void; placeholder: string }) {
   const add = () => onChange([...bullets, ""]);
   const update = (i: number, v: string) => { const next = [...bullets]; next[i] = v; onChange(next); };
@@ -273,6 +313,14 @@ const VIEW_COPY: Record<InvestorProfileView, { title: string; description: strin
 
 export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {}) {
   const { user } = useAuth();
+  const accountCtx = useAccountContext();
+  // R12C — investor_profiles is one row per fund, keyed by the OWNER's
+  // user_id. An Associate team member doesn't own a row, so their session
+  // must resolve the fund's actual owner user_id to load/edit the real
+  // profile — previously this page only ever queried by the caller's own
+  // user.id, meaning an Associate saw an empty form, not the fund's data.
+  const fundOwnerUserId = accountCtx.isOwner ? user?.id : accountCtx.investorProfileId;
+  const isAssociateEditor = !accountCtx.isOwner && !!accountCtx.investorProfileId;
   const qc = useQueryClient();
   const search = useSearch({ strict: false }) as { tour?: string };
   const { progress, markStep, setCurrentStep } = useOnboardingProgress();
@@ -291,17 +339,92 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
   useEffect(() => { prewarmClassificationCache(); }, []);
 
   const { data: existing, isLoading } = useQuery({
-    queryKey: ["investor-profile", user?.id],
-    enabled: !!user?.id,
+    queryKey: ["investor-profile", fundOwnerUserId],
+    enabled: !!fundOwnerUserId,
     queryFn: async () => {
       const { data } = await supabase
         .from("investor_profiles")
         .select("*")
-        .eq("user_id", user!.id)
+        .eq("user_id", fundOwnerUserId!)
         .maybeSingle();
       return data;
     },
   });
+
+  // R12C — Associate's own pending edits, shown inline as "Awaiting
+  // approval" next to the affected field rather than hidden elsewhere.
+  const { data: myPendingChanges = [] } = useQuery({
+    queryKey: ["investor-profile-pending-mine", user?.id],
+    enabled: !!user?.id && isAssociateEditor,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("investor_profile_pending_changes")
+        .select("*")
+        .eq("proposed_by", user!.id)
+        .eq("status", "pending")
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+  });
+
+  const pendingByField = new Map<string, (typeof myPendingChanges)[number]>();
+  for (const change of myPendingChanges) {
+    if (!pendingByField.has(change.field_key)) pendingByField.set(change.field_key, change);
+  }
+
+  // R12C — Owner/Admin approval queue: every pending change across the
+  // whole fund (not just their own, since owners don't propose their own
+  // changes into this table — their edits apply immediately).
+  const { data: pendingQueue = [] } = useQuery({
+    queryKey: ["investor-profile-pending", fundOwnerUserId],
+    enabled: !!fundOwnerUserId && accountCtx.isOwner,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("investor_profile_pending_changes")
+        .select("*")
+        .eq("fund_owner_user_id", fundOwnerUserId!)
+        .eq("status", "pending")
+        .order("created_at", { ascending: true });
+      return data ?? [];
+    },
+  });
+
+  // R12C step 4 — Associate's session reflects an approve/reject decision
+  // live (R12B infrastructure). Scoped to the caller's own proposals.
+  useEffect(() => {
+    if (!user?.id) return;
+    const channel = supabase
+      .channel(`pending-profile-changes:${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "investor_profile_pending_changes", filter: `proposed_by=eq.${user.id}` },
+        (payload: any) => {
+          qc.invalidateQueries({ queryKey: ["investor-profile-pending-mine", user.id] });
+          qc.invalidateQueries({ queryKey: ["investor-profile", fundOwnerUserId] });
+          if (payload.new?.status === "approved") {
+            toast.success(`Your change to "${PENDING_CHANGE_FIELD_LABELS[payload.new.field_key] ?? payload.new.field_key}" was approved`);
+          } else if (payload.new?.status === "rejected") {
+            toast.error(`Your change to "${PENDING_CHANGE_FIELD_LABELS[payload.new.field_key] ?? payload.new.field_key}" was rejected${payload.new.decision_note ? `: ${payload.new.decision_note}` : ""}`);
+          }
+        },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user?.id, fundOwnerUserId, qc]);
+
+  // Owner/Admin: live update to the approval queue when a new change is proposed.
+  useEffect(() => {
+    if (!fundOwnerUserId || !accountCtx.isOwner) return;
+    const channel = supabase
+      .channel(`pending-profile-queue:${fundOwnerUserId}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "investor_profile_pending_changes", filter: `fund_owner_user_id=eq.${fundOwnerUserId}` },
+        () => { qc.invalidateQueries({ queryKey: ["investor-profile-pending", fundOwnerUserId] }); },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [fundOwnerUserId, accountCtx.isOwner, qc]);
 
   const { data: investorVerif } = useQuery({
     queryKey: ["investor-verification-profile", user?.id],
@@ -418,10 +541,16 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
       const { data } = supabase.storage.from("avatars").getPublicUrl(path);
       const url = `${data.publicUrl}?t=${Date.now()}`;
       setAvatarUrl(url);
-      const { error: avErr } = await supabase.from("investor_profiles").update({ avatar_url: url }).eq("user_id", user.id);
-      if (avErr) throw avErr;
-      qc.invalidateQueries({ queryKey: ["investor-profile", user.id] });
-      toast.success("Profile photo updated");
+      if (isAssociateEditor) {
+        await proposeFieldChange("avatar_url", existing?.avatar_url ?? null, url);
+        qc.invalidateQueries({ queryKey: ["investor-profile-pending", fundOwnerUserId] });
+        toast.success("Photo change submitted for approval");
+      } else {
+        const { error: avErr } = await supabase.from("investor_profiles").update({ avatar_url: url }).eq("user_id", fundOwnerUserId!);
+        if (avErr) throw avErr;
+        qc.invalidateQueries({ queryKey: ["investor-profile", fundOwnerUserId] });
+        toast.success("Profile photo updated");
+      }
     } catch (e: any) {
       toast.error(e.message ?? "Upload failed");
     } finally {
@@ -500,9 +629,33 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
   const removeTrackRecordItem = (i: number) =>
     set("track_record", form.track_record.filter((_, idx) => idx !== i));
 
+  // R12C — one row per changed field, storing only the diff against the
+  // last-loaded live value, per the task's explicit "don't duplicate the
+  // whole profile row" instruction.
+  const proposeFieldChange = async (fieldKey: string, oldValue: unknown, newValue: unknown) => {
+    if (!user?.id || !fundOwnerUserId) return;
+    const { error } = await supabase.from("investor_profile_pending_changes").insert({
+      fund_owner_user_id: fundOwnerUserId,
+      proposed_by: user.id,
+      field_key: fieldKey,
+      old_value: oldValue ?? null,
+      new_value: newValue,
+    });
+    if (error) throw error;
+  };
+
+  const PROFILE_FIELD_KEYS = [
+    "fund_name", "your_name", "role", "fund_size", "social_links",
+    "linkedin_url", "website", "thesis_statement", "secret_sauce", "thesis",
+    "sectors", "stages", "check_size_min", "check_size_max", "geography",
+    "portfolio_companies", "red_flags", "key_metrics", "thesis_bullets",
+    "achievements", "track_record", "profile_slug", "profile_published",
+    "public_fields",
+  ] as const;
+
   const handleSave = async (e?: React.SyntheticEvent) => {
     e?.preventDefault();
-    if (!user?.id) return;
+    if (!user?.id || !fundOwnerUserId) return;
     if (!form.fund_name.trim() || !form.your_name.trim()) {
       toast.error("Fund name and your name are required");
       return;
@@ -513,8 +666,7 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
       const websiteEntry = form.social_links.find((l) => l.platform === "Website");
       const completeness = computeCompleteness(form);
 
-      const { error } = await supabase.from("investor_profiles").upsert({
-        user_id: user.id,
+      const nextValues: Record<string, unknown> = {
         fund_name: form.fund_name.trim(),
         your_name: form.your_name.trim(),
         role: form.role,
@@ -539,12 +691,40 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
         profile_slug: form.profile_slug || slugify(form.fund_name),
         profile_published: form.profile_published,
         public_fields: form.public_fields,
+      };
+
+      if (isAssociateEditor) {
+        // Associate: stage a diff per changed field instead of writing
+        // investor_profiles directly (RLS blocks that write anyway — this
+        // mirrors it at the UX level with clear per-field pending state).
+        const changedKeys = PROFILE_FIELD_KEYS.filter((key) => {
+          const before = JSON.stringify((existing as any)?.[key] ?? null);
+          const after = JSON.stringify(nextValues[key] ?? null);
+          return before !== after;
+        });
+        if (changedKeys.length === 0) {
+          toast("No changes to submit");
+          setSaving(false);
+          return;
+        }
+        for (const key of changedKeys) {
+          await proposeFieldChange(key, (existing as any)?.[key] ?? null, nextValues[key]);
+        }
+        qc.invalidateQueries({ queryKey: ["investor-profile-pending", fundOwnerUserId] });
+        toast.success(`${changedKeys.length} change${changedKeys.length === 1 ? "" : "s"} submitted for approval`);
+        setSaving(false);
+        return;
+      }
+
+      const { error } = await supabase.from("investor_profiles").upsert({
+        user_id: fundOwnerUserId,
+        ...nextValues,
         profile_completeness: completeness,
         updated_at: new Date().toISOString(),
         last_active_at: new Date().toISOString(),
       }, { onConflict: "user_id" });
       if (error) throw error;
-      qc.invalidateQueries({ queryKey: ["investor-profile", user.id] });
+      qc.invalidateQueries({ queryKey: ["investor-profile", fundOwnerUserId] });
 
       if (form.thesis_statement.trim()) {
         try {
@@ -660,20 +840,20 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                <Field label="Fund name *">
+                <Field label="Fund name *" badge={pendingByField.has("fund_name") ? <PendingApprovalBadge pendingValue={pendingByField.get("fund_name")!.new_value} /> : undefined}>
                   <input value={form.fund_name} onChange={(e) => set("fund_name", e.target.value)} required style={inputStyle} placeholder="Acme Ventures" />
                 </Field>
-                <Field label="Your name *">
+                <Field label="Your name *" badge={pendingByField.has("your_name") ? <PendingApprovalBadge pendingValue={pendingByField.get("your_name")!.new_value} /> : undefined}>
                   <input value={form.your_name} onChange={(e) => set("your_name", e.target.value)} required style={inputStyle} placeholder="Jane Doe" />
                 </Field>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                <Field label="Role">
+                <Field label="Role" badge={pendingByField.has("role") ? <PendingApprovalBadge pendingValue={pendingByField.get("role")!.new_value} /> : undefined}>
                   <select value={form.role} onChange={(e) => set("role", e.target.value)} style={inputStyle}>
                     {ROLES.map((r) => <option key={r}>{r}</option>)}
                   </select>
                 </Field>
-                <Field label="Fund size" badge={<FieldVerificationBadge profileType="investor" fieldName="fund_size"
+                <Field label="Fund size" badge={pendingByField.has("fund_size") ? <PendingApprovalBadge pendingValue={pendingByField.get("fund_size")!.new_value} /> : <FieldVerificationBadge profileType="investor" fieldName="fund_size"
                     claimStatus={claimByType("fund_size")?.proof_status}
                     onAttachProof={user?.id ? () => setAttachingClaim({ type: "fund_size", label: "Fund size", value: form.fund_size }) : undefined} compact />}>
                   <input value={form.fund_size} onChange={(e) => set("fund_size", e.target.value)} style={inputStyle} placeholder="$50M" />
@@ -782,7 +962,10 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
             <SectionHeader icon={Sparkles} title="Thesis summary" description="Your one-sentence thesis, bullet points, sectors, stages, and cheque size" />
             <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 16 }}>
               <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{ fontSize: 12, fontWeight: 500, color: "#7C3AED" }}>Thesis statement</div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div style={{ fontSize: 12, fontWeight: 500, color: "#7C3AED" }}>Thesis statement</div>
+                  {pendingByField.has("thesis_statement") && <PendingApprovalBadge pendingValue={pendingByField.get("thesis_statement")!.new_value} />}
+                </div>
                 <p style={{ fontSize: 11, color: color.inkTertiary, lineHeight: 1.5, margin: 0 }}>
                   One sentence formula: <em>[Fund] is a [$ size] [stage] fund in [geography] backing [sector] companies with [edge].</em>
                 </p>
@@ -791,20 +974,20 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
                   placeholder="Acme Ventures is a $50M seed fund in North America backing developer-tools companies, leveraging our team's 20 years of engineering leadership at Google and Stripe." />
               </div>
 
-              <Field label="Thesis bullets">
+              <Field label="Thesis bullets" badge={pendingByField.has("thesis_bullets") ? <PendingApprovalBadge pendingValue={pendingByField.get("thesis_bullets")!.new_value} /> : undefined}>
                 <BulletEditor bullets={form.thesis_bullets} onChange={(b) => set("thesis_bullets", b)}
                   placeholder="e.g. Sectors: DevTools, AI/ML, B2B SaaS" />
               </Field>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                <Field label="Sectors">
+                <Field label="Sectors" badge={pendingByField.has("sectors") ? <PendingApprovalBadge pendingValue={pendingByField.get("sectors")!.new_value} /> : undefined}>
                   <input value={form.sectors} onChange={(e) => set("sectors", e.target.value)} style={inputStyle} placeholder="DevTools, AI/ML, Fintech" />
                 </Field>
-                <Field label="Geography">
+                <Field label="Geography" badge={pendingByField.has("geography") ? <PendingApprovalBadge pendingValue={pendingByField.get("geography")!.new_value} /> : undefined}>
                   <input value={form.geography} onChange={(e) => set("geography", e.target.value)} style={inputStyle} placeholder="North America, Europe" />
                 </Field>
               </div>
-              <Field label="Stages">
+              <Field label="Stages" badge={pendingByField.has("stages") ? <PendingApprovalBadge pendingValue={pendingByField.get("stages")!.new_value} /> : undefined}>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
                   {STAGES.map((s) => {
                     const active = form.stages.includes(s);
@@ -824,7 +1007,7 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
                 </div>
               </Field>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                <Field label="Cheque min" badge={<FieldVerificationBadge profileType="investor" fieldName="check_size_min" claimStatus={claimByType("check_size_min")?.proof_status} onAttachProof={user?.id ? () => setAttachingClaim({ type: "check_size_min", label: "Min cheque", value: form.check_size_min }) : undefined} compact />}>
+                <Field label="Cheque min" badge={pendingByField.has("check_size_min") ? <PendingApprovalBadge pendingValue={pendingByField.get("check_size_min")!.new_value} /> : <FieldVerificationBadge profileType="investor" fieldName="check_size_min" claimStatus={claimByType("check_size_min")?.proof_status} onAttachProof={user?.id ? () => setAttachingClaim({ type: "check_size_min", label: "Min cheque", value: form.check_size_min }) : undefined} compact />}>
                   <input value={form.check_size_min} onChange={(e) => set("check_size_min", e.target.value)} style={inputStyle} placeholder="$250K" />
                 </Field>
                 <Field label="Cheque max" badge={<FieldVerificationBadge profileType="investor" fieldName="check_size_max" claimStatus={claimByType("check_size_max")?.proof_status} onAttachProof={user?.id ? () => setAttachingClaim({ type: "check_size_max", label: "Max cheque", value: form.check_size_max }) : undefined} compact />}>
