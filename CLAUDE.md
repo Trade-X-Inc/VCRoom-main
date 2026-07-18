@@ -788,3 +788,55 @@ subscription behavior before trusting it, the same standard applied here.
   questions) that wasn't built in this branch. Live-test before touching that polling.
 - **`deal_room_closure_reports`** is in the publication (harmless, unused) but has no
   subscriber — nothing currently needs it to feel live.
+
+---
+
+## 30. `investor_profile_id` MEANS TWO DIFFERENT THINGS ACROSS THE SCHEMA (found R12C, July 2026) — schema-cleanup item, NOT fixed
+
+A column named `investor_profile_id` exists on five tables, with two different FK targets:
+
+```
+startup_team_accounts.investor_profile_id  -> FK to investor_profiles.user_id
+team_channels.investor_profile_id          -> FK to investor_profiles.id
+team_messages.investor_profile_id          -> FK to investor_profiles.id
+team_notes.investor_profile_id             -> FK to investor_profiles.id
+team_tasks.investor_profile_id             -> FK to investor_profiles.id
+```
+
+This caused two real, live production bugs found and fixed in R12C:
+
+1. **`get_investor_team_role()`** (added R12) had its owner-check comparing the parameter
+   against `investor_profiles.id`, but every real caller — `investor_has_permission()`,
+   `startup_team_accounts.investor_profile_id` itself, R12/R12B's own test fixtures —
+   passes a `.user_id`-shaped value. Confirmed empirically: calling it with the value
+   actually stored in the FK column returned `null` instead of `'owner'`. Fixed by
+   comparing against `.user_id` (correct for this function's actual callers).
+
+2. **`investor_channel_access`/`investor_message_access`/`investor_note_access`/
+   `investor_task_access`** (pre-existing, predate R12) already correctly compared against
+   `investor_profiles.id` — matching THEIR OWN column's real FK target. A first attempt at
+   fixing (1) above incorrectly "fixed" these four in the same pass, assuming all five
+   `investor_profile_id` columns meant the same thing — they don't. Caught before any real
+   data was affected (empirically verified zero rows existed in any of the four tables at
+   the time) and reverted in a same-day follow-up migration
+   (`20260718080000_r12c_correct_investor_profile_id_dual_shape.sql`).
+
+**Lesson: never assume a repeated column name means the same thing across tables — check
+`information_schema.constraint_column_usage` for the actual FK target before writing or
+"fixing" a policy that touches it, even when the column name and a plausible-sounding
+purpose are identical.**
+
+**Current state (intentionally NOT unified further in R12C):** `get_investor_team_role()`
+is the `.user_id`-shaped function — use it for `startup_team_accounts`-adjacent
+permission/role checks. `get_investor_team_role_by_profile_id()` is the new `.id`-shaped
+counterpart — use it for any future policy on `team_channels`/`team_messages`/
+`team_notes`/`team_tasks` that needs team-member (not just owner) role resolution; it
+wasn't wired into those four tables' policies since their existing inline `EXISTS` checks
+only needed the owner case and already worked correctly post-revert.
+
+**Follow-up for a future dedicated session:** standardize `investor_profile_id`'s meaning
+to one canonical target (most likely `.user_id`, matching the newer R12-era convention and
+`startup_team_accounts`) across all five tables — this means migrating the FK constraint
+and every dependent policy on the four `team_*` tables, plus a data backfill if any rows
+exist by then. Bigger and riskier than any single feature branch should absorb
+incidentally; do it as its own deliberate migration.
