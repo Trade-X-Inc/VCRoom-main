@@ -990,3 +990,42 @@ its own RLS from the moment it's added. Do not plan to "just be careful about wh
 the client selects" — a direct `SELECT *`, a realtime payload, or a future consumer that
 forgets the convention will all bypass that immediately. This is not a style preference; it
 is the only mechanism Postgres RLS actually offers for differential column visibility.
+
+---
+
+## 34. GENERAL RULE — a UI permission check is not a security boundary; RLS must enforce role-scoped actions too (found R14, July 2026)
+
+A third instance of the same underlying lesson as §33, but for actions (INSERT/UPDATE),
+not columns: **`FOUNDER_PERMISSIONS`/`INVESTOR_PERMISSIONS` (`roles.ts`) gate what the UI
+shows, never what the database allows.** If a permission like `request_access` is meant to
+distinguish which roles may perform a write, the table's own RLS policy must check that
+role — a `PermissionGate` component or an inline `useAccountContext()` check in a button
+component is UI-layer messaging only, exactly as `PermissionGate.tsx`'s own doc comment
+already says for page-level gating. R14 found this hadn't been applied to a per-row INSERT
+policy: `discovery_requests`' `investor_insert_own` policy checked only
+`investor_id = auth.uid()`, with **no role check at all** — confirmed empirically that an
+`analyst`/`external`-role investor team member (both `request_access: false` in
+`INVESTOR_PERMISSIONS`) could still INSERT a real row via a direct API call, bypassing the
+new `RequestAccessButton` UI gate (and Directory's pre-existing identical Connect flow,
+which shares the same table and had the same gap since it was built, undetected until this
+adversarial pass).
+
+**Fixed** with a `SECURITY DEFINER` helper (`investor_can_request_access`, in
+`20260721000000_r14_discovery_requests_role_check.sql`) mirroring the existing
+`get_investor_team_role()` pattern — owner check against `investor_profiles`, then role
+lookup in `startup_team_accounts` (the real investor team/role table, keyed by `.user_id`
+per §30's documented convention — not `investor_team_members`, which is R13B's key-person
+*profile* table, unrelated to permissions) — added to the policy's `with_check` alongside
+the existing ownership check. Adversarial-verified: an `associate`-role test account (which
+has `request_access: true`) still succeeds; a temporary `analyst`-role fixture inserted and
+tested inside a rolled-back transaction was rejected with a genuine RLS policy violation,
+not just a hidden button.
+
+**The check before shipping any new role-gated write path:** does `INVESTOR_PERMISSIONS` or
+`FOUNDER_PERMISSIONS` distinguish which roles may perform this action? If yes, the table's
+own INSERT/UPDATE/DELETE policy must encode that distinction directly (via a `SECURITY
+DEFINER` helper reusing the established owner/team-role lookup pattern, not a new one) —
+never assume a `PermissionGate` wrapper or a component-level `useAccountContext()` check is
+sufficient on its own. Treat this identically to §33's column-visibility rule: the UI check
+improves the experience (an honest disabled state instead of a confusing failure), but the
+RLS policy is what actually stops the write.

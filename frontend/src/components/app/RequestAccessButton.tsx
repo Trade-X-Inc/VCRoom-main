@@ -3,6 +3,8 @@ import { X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { color, font, radius, brand } from "@/lib/design-tokens";
+import { useAccountContext } from "@/hooks/useAccountContext";
+import { INVESTOR_PERMISSIONS } from "@/lib/roles";
 
 /**
  * R14 — the one request-access surface, reused everywhere a founder
@@ -36,6 +38,15 @@ export function RequestAccessButton({
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
 
+  // RBAC (R12 pattern, roles.ts INVESTOR_PERMISSIONS): analyst and external
+  // roles have request_access: false. This is UI-layer messaging only —
+  // sendConnectionRequest's own INSERT is what's actually protected by
+  // discovery_requests' RLS; this just avoids showing an action the caller
+  // can't complete.
+  const accountCtx = useAccountContext();
+  const isInvestorSide = accountCtx.accountType.startsWith("investor");
+  const canRequestAccess = !isInvestorSide || accountCtx.isOwner || (INVESTOR_PERMISSIONS[accountCtx.role]?.request_access ?? false);
+
   if (existingStatus === "pending") {
     return (
       <span style={{ fontSize: 12, color: color.inkTertiary, whiteSpace: "nowrap" }}>Request pending</span>
@@ -47,9 +58,12 @@ export function RequestAccessButton({
     );
   }
 
-  if (disabled) {
+  if (disabled || !canRequestAccess) {
     return (
-      <span title={disabledReason} style={{ fontSize: 12, color: color.inkTertiary, cursor: "not-allowed" }}>
+      <span
+        title={disabled ? disabledReason : "Your role does not include requesting access"}
+        style={{ fontSize: 12, color: color.inkTertiary, cursor: "not-allowed" }}
+      >
         Request access
       </span>
     );
