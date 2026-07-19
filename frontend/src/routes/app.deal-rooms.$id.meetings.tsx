@@ -3,13 +3,13 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
-  Calendar, CheckCircle2, Video, MapPin, Loader2, X, AlertTriangle,
+  Calendar, CheckCircle2, Video, MapPin, Loader2, X, AlertTriangle, FileAudio, RefreshCw,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useDealRoom } from "@/hooks/useDealRoom";
 import { upsertDealRoomMeeting } from "@/lib/deal-room-workflow-fn";
 import { skipMeeting, updateMeetingNotes } from "@/lib/deal-room-fn";
-import { createInterviewRoom, mintInterviewToken } from "@/lib/interview-fn";
+import { createInterviewRoom, mintInterviewToken, ingestMeetingRecording, type MeetingExtraction } from "@/lib/interview-fn";
 import { LawyerGate, useLawyerGateState } from "@/components/app/LawyerGate";
 
 // R14B step 3 — the interview stage sequencer, re-mounting the old
@@ -38,6 +38,15 @@ type MeetingRow = {
   notes_shared: string | null;
   daily_room_name: string | null;
   daily_room_url: string | null;
+};
+
+type MeetingRecordRow = {
+  meeting_id: string;
+  transcript_status: "pending" | "processing" | "complete" | "failed";
+  transcript_error: string | null;
+  extraction_status: "pending" | "processing" | "complete" | "failed";
+  extraction_error: string | null;
+  extracted_notes: MeetingExtraction | { _transcriptJobId?: string } | null;
 };
 
 function statusOf(m: MeetingRow | undefined): "done" | "skipped" | "scheduled" | "unscheduled" {
@@ -144,9 +153,27 @@ function MeetingsPage() {
   });
   const privateByMeeting = new Map(privateNotes.map((n) => [n.meeting_id, n.notes ?? ""]));
 
+  // Recording/transcript/extraction records — RLS already restricts a
+  // lawyer session to the investment_terms row only (20260723030000), so
+  // no extra client-side filtering is needed here.
+  const { data: records = [] } = useQuery<MeetingRecordRow[]>({
+    queryKey: ["interview-records", dealRoomId, meetingIds.join(",")],
+    enabled: meetingIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("deal_room_meeting_records")
+        .select("meeting_id, transcript_status, transcript_error, extraction_status, extraction_error, extracted_notes")
+        .in("meeting_id", meetingIds);
+      if (error) throw error;
+      return (data ?? []) as MeetingRecordRow[];
+    },
+  });
+  const recordByMeeting = new Map(records.map((r) => [r.meeting_id, r]));
+
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["interview-meetings", dealRoomId] });
     qc.invalidateQueries({ queryKey: ["interview-private-notes", dealRoomId] });
+    qc.invalidateQueries({ queryKey: ["interview-records", dealRoomId] });
     qc.invalidateQueries({ queryKey: ["deal-room-workflow", dealRoomId] });
   };
 
@@ -197,6 +224,32 @@ function MeetingsPage() {
       else toast.error("Could not update");
     } catch { toast.error("Could not update"); }
     finally { setSaving(null); }
+  };
+
+  const [checkingRecording, setCheckingRecording] = useState<number | null>(null);
+  const checkRecording = async (num: 1 | 2 | 3 | 4 | 5) => {
+    setCheckingRecording(num);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { toast.error("Session expired — sign in again"); return; }
+      const r = await ingestMeetingRecording({
+        data: { userAccessToken: session.access_token, dealRoomId, meetingNumber: num },
+      });
+      if (r.ok) {
+        const messages: Record<string, string> = {
+          recording_pending: "Recording still processing on Daily's side — check again shortly.",
+          transcript_submitted: "Transcription started.",
+          transcript_processing: "Transcription still in progress — check again shortly.",
+          transcript_complete: "Transcript ready.",
+          extraction_complete: "Notes extracted.",
+        };
+        toast.success(r.stage ? messages[r.stage] ?? "Checked." : "Checked.");
+        invalidate();
+      } else {
+        toast.error(`Could not check recording (${r.error})`);
+      }
+    } catch { toast.error("Could not check recording"); }
+    finally { setCheckingRecording(null); }
   };
 
   const skip = async (num: 1 | 2 | 3 | 4 | 5) => {
@@ -466,6 +519,98 @@ function MeetingsPage() {
                     </button>
                   </div>
                 )}
+
+                {/* Recording / transcript / AI notes — only for a completed online meeting */}
+                {status === "done" && m?.daily_room_name && (() => {
+                  const rec = recordByMeeting.get(m.id);
+                  const notes = rec?.extracted_notes && "summary" in (rec.extracted_notes as any)
+                    ? (rec.extracted_notes as MeetingExtraction)
+                    : null;
+                  return (
+                    <div className="border-t border-[#E4E4E7] px-4 py-3 space-y-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="inline-flex items-center gap-1.5 text-xs text-[#71717A]">
+                          <FileAudio className="h-3.5 w-3.5" />
+                          {!rec || rec.transcript_status === "pending" ? "Recording not yet checked"
+                            : rec.transcript_status === "processing" ? "Transcription in progress…"
+                            : rec.transcript_status === "failed" ? "Transcription failed"
+                            : rec.extraction_status === "pending" ? "Transcript ready — extraction not yet run"
+                            : rec.extraction_status === "processing" ? "Extracting notes…"
+                            : rec.extraction_status === "failed" ? "Transcript ready — extraction failed"
+                            : "Transcript and notes ready"}
+                        </span>
+                        <button
+                          onClick={() => checkRecording(stage.number)}
+                          disabled={checkingRecording === stage.number}
+                          className="inline-flex h-7 items-center gap-1.5 border border-[#E4E4E7] bg-white px-2.5 text-xs font-medium text-[#0A0A0B] disabled:opacity-60"
+                          style={{ borderRadius: 2 }}
+                        >
+                          {checkingRecording === stage.number ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+                          Check for recording
+                        </button>
+                      </div>
+
+                      {rec?.transcript_status === "failed" && rec.transcript_error && (
+                        <div className="border border-[rgba(239,68,68,0.3)] bg-[rgba(239,68,68,0.06)] px-3 py-2 text-xs text-[#B91C1C]">
+                          {rec.transcript_error}
+                        </div>
+                      )}
+                      {rec?.extraction_status === "failed" && rec.extraction_error && (
+                        <div className="border border-[rgba(239,68,68,0.3)] bg-[rgba(239,68,68,0.06)] px-3 py-2 text-xs text-[#B91C1C]">
+                          Transcript stored successfully; AI extraction failed: {rec.extraction_error}
+                        </div>
+                      )}
+
+                      {notes && (
+                        <div className="space-y-3 pt-1">
+                          <div>
+                            <div className="text-xs font-medium text-[#71717A] mb-1">Summary</div>
+                            <p className="text-sm text-[#0A0A0B]">{notes.summary}</p>
+                          </div>
+                          {notes.topics?.length > 0 && (
+                            <div>
+                              <div className="text-xs font-medium text-[#71717A] mb-1">Discussed</div>
+                              <ul className="space-y-1.5">
+                                {notes.topics.map((t, i) => (
+                                  <li key={i} className="text-sm text-[#0A0A0B]">
+                                    <span className="font-medium">{t.topic}:</span> {t.detail}
+                                    <span className="ml-1.5 text-xs text-[#71717A]">({t.confidence} confidence — "{t.source_quote}")</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {notes.stated_figures?.length > 0 && (
+                            <div>
+                              <div className="text-xs font-medium text-[#71717A] mb-1">Figures mentioned</div>
+                              <ul className="space-y-1.5">
+                                {notes.stated_figures.map((f, i) => (
+                                  <li key={i} className="text-sm text-[#0A0A0B]">
+                                    <span className="font-medium">{f.figure}</span> — stated by {f.stated_by}
+                                    <span className="ml-1.5 text-xs text-[#71717A]">({f.confidence} confidence — "{f.source_quote}")</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {notes.open_items?.length > 0 && (
+                            <div>
+                              <div className="text-xs font-medium text-[#71717A] mb-1">Open items</div>
+                              <ul className="space-y-1.5">
+                                {notes.open_items.map((o, i) => (
+                                  <li key={i} className="text-sm text-[#0A0A0B]">
+                                    {o.item}
+                                    <span className="ml-1.5 text-xs text-[#71717A]">({o.confidence} confidence — "{o.source_quote}")</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
 
                 {/* Skip-with-reason */}
                 {skipOpen === stage.number && (
