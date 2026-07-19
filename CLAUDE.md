@@ -1319,17 +1319,30 @@ join-token re-mint is folded into step 7's join proofs.
   added; R2/Daily/OpenAI values live only in gitignored `.env.local`.
 - **Roast**: `roast-fn.ts` and every roast file are byte-identical to the merge-base.
 
-### 38.6 OPEN — flagged for product decision, nothing chosen
+### 38.6 RESOLVED (product decision) — manual transcription-stop capability REMOVED, not logged
 
-**Founder holds `canAdmin: ["transcription"]` on the interview meeting token.** Audited
-against Daily's permission model: the array form grants ONLY transcription admin — it does
-NOT grant participant-eject (`participants`) or recording control (`streaming`), and
-`is_owner` is false. So the scope is minimal and correct. The one residual capability: the
-founder could, via a crafted Daily SDK/API call, `stopTranscription()` mid-meeting to omit
-subsequent speech from the AI notes. Mitigations already in place: our UI surfaces no stop
-control, and `transcription-stopped` fires for all participants so the §6A3 indicator banner
-disappears — the counterparty *sees* it stop. NOT mitigated: no persistent audit record that
-transcription was stopped/restarted, and control is founder-only (asymmetric). **Product
-decision needed (options, none chosen here): (a) accept as-is given the visibility
-mitigation; (b) also grant the investor transcription-admin for symmetry; (c) add
-server-side audit logging of transcription start/stop events.**
+The step-6 audit found the founder's `canAdmin: ["transcription"]` token let them
+`stopTranscription()` mid-meeting to omit speech from the AI notes. **Product decision: remove
+the capability entirely, don't just log it — transcription must stop only at natural meeting
+end, never via a manual admin action by either party.**
+
+Implemented (`interview-fn.ts` `mintInterviewToken`, `meetings.tsx` `InterviewCall`): tokens
+now carry **`auto_start_transcription: true`** and grant **NO `canAdmin`** at all. The client
+no longer calls `startTranscription()` — transcription auto-starts (server-initiated by Daily
+from the token flag, which bypasses the client admin check). Because no participant holds
+`canAdmin`, no one can manually start OR stop transcription; Daily stops it automatically when
+the room empties. This is a server-enforced prevention via the permission model — there is no
+"detect vs. distinguish meeting-end" problem because manual stops are simply impossible.
+
+**Live-verified (standalone daily-js call-object probe, real Daily join):** with an
+`auto_start_transcription:true` / no-`canAdmin` token, a manual `call.startTranscription()`
+AND `call.stopTranscription()` BOTH fail with Daily's `transcription-error: "must be
+transcription admin to start/stop transcription"`. So the manual-stop path is genuinely
+closed. **Not yet confirmed (no audio in the headless test env):** whether
+`auto_start_transcription` actually fires `transcription-started` — it did not in the
+audio-less probe, expected because Deepgram auto-start waits for an audio track. This is
+confirmed end-to-end in **step 7's real-voice call**. If that call shows auto-start does NOT
+fire, the fallback is: restore `canAdmin` and write a permanent `transcription_stopped_early`
+flag (role + timestamp) onto the meeting record, rendered in the notes UI — not implemented
+now because prevention (the primary path) is the chosen resolution and its enforcement half
+is confirmed.

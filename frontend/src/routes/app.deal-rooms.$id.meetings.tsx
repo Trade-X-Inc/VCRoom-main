@@ -85,8 +85,8 @@ function StatusChip({ status }: { status: string }) {
 // side triggers startTranscription() — Daily transcription is a single
 // per-room instance; a redundant start from a second client errors rather
 // than layering, so a single deterministic owner avoids that.
-function InterviewCall({ roomUrl, token, onLeft, onError, isTranscriptionOwner }: {
-  roomUrl: string; token: string; onLeft: (transcriptText: string) => void; onError: (msg: string) => void; isTranscriptionOwner: boolean;
+function InterviewCall({ roomUrl, token, onLeft, onError }: {
+  roomUrl: string; token: string; onLeft: (transcriptText: string) => void; onError: (msg: string) => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<any>(null);
@@ -127,11 +127,9 @@ function InterviewCall({ roomUrl, token, onLeft, onError, isTranscriptionOwner }
           timestamp: e.timestamp ?? new Date().toISOString(),
         });
       });
-      if (isTranscriptionOwner) {
-        frame.on("joined-meeting", () => {
-          frame.startTranscription();
-        });
-      }
+      // No client startTranscription() call: transcription auto-starts via
+      // the token's auto_start_transcription flag (§6C2), and no token holds
+      // canAdmin, so no participant can manually stop it mid-call.
       frame.join({ url: roomUrl, token }).catch((e: any) => {
         onError(e?.errorMsg || e?.message || "Could not join the meeting room.");
       });
@@ -142,7 +140,7 @@ function InterviewCall({ roomUrl, token, onLeft, onError, isTranscriptionOwner }
       frameRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomUrl, token, isTranscriptionOwner]);
+  }, [roomUrl, token]);
 
   return (
     <div className="relative w-full">
@@ -419,7 +417,6 @@ function MeetingsPage() {
               setJoinError({ meetingNumber: call.meetingNumber, message });
               setCall(null);
             }}
-            isTranscriptionOwner={isFounder}
           />
         </div>
       )}

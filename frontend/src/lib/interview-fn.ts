@@ -336,14 +336,17 @@ export const mintInterviewToken = createServerFn({ method: "POST" })
           eject_at_token_exp: true,
           user_name: userName,
           is_owner: false,
-          // Live-verified requirement: startTranscription() fails with
-          // "must be transcription admin to start transcription" without
-          // this — Daily's default token grants no admin permissions.
-          // Founder is the deterministic transcription-trigger owner (see
-          // the InterviewCall comment in the meetings route); investor/
-          // lawyer tokens don't need it since they never call
-          // startTranscription() themselves.
-          permissions: role === "founder" ? { canAdmin: ["transcription"] } : {},
+          // §6C2 resolution: auto-start transcription via the token flag,
+          // and DELIBERATELY grant NO canAdmin. Consequence: transcription
+          // starts automatically when a participant joins (no client
+          // startTranscription() call, no admin), and because NO participant
+          // holds canAdmin, NO ONE can manually stopTranscription() mid-call
+          // — it stops only at natural meeting end. This removes the
+          // manual-stop / mid-call-censorship capability entirely rather
+          // than merely logging it (product decision, step 6). Set on every
+          // role's token so the first joiner triggers it gap-free; Daily
+          // runs a single room transcription instance.
+          auto_start_transcription: true,
         },
       }),
     });
