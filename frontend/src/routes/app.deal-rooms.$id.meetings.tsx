@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { useDealRoom } from "@/hooks/useDealRoom";
 import { upsertDealRoomMeeting } from "@/lib/deal-room-workflow-fn";
 import { skipMeeting, updateMeetingNotes } from "@/lib/deal-room-fn";
-import { createInterviewRoom, mintInterviewToken, ingestMeetingRecording, type MeetingExtraction } from "@/lib/interview-fn";
+import { createInterviewRoom, mintInterviewToken, saveMeetingTranscript, runMeetingExtraction, type MeetingExtraction } from "@/lib/interview-fn";
 import { LawyerGate, useLawyerGateState } from "@/components/app/LawyerGate";
 
 // R14B step 3 — the interview stage sequencer, re-mounting the old
@@ -42,11 +42,11 @@ type MeetingRow = {
 
 type MeetingRecordRow = {
   meeting_id: string;
-  transcript_status: "pending" | "processing" | "complete" | "failed";
+  transcript_status: "pending" | "processing" | "ready" | "failed";
   transcript_error: string | null;
-  extraction_status: "pending" | "processing" | "complete" | "failed";
+  extraction_status: "pending" | "processing" | "ready" | "failed";
   extraction_error: string | null;
-  extracted_notes: MeetingExtraction | { _transcriptJobId?: string } | null;
+  extracted_notes: MeetingExtraction | null;
 };
 
 function statusOf(m: MeetingRow | undefined): "done" | "skipped" | "scheduled" | "unscheduled" {
@@ -76,11 +76,21 @@ function StatusChip({ status }: { status: string }) {
 }
 
 // ── Embedded Daily call (private room + token) ──────────────────────────────
-function InterviewCall({ roomUrl, token, onLeft, onError }: {
-  roomUrl: string; token: string; onLeft: () => void; onError: (msg: string) => void;
+// R14B step 5 (revised): no recording. Realtime (Deepgram) transcription
+// starts automatically on join — same "auto, not owner-initiated" decision
+// as the original recording plan, for the same reason (a party forgetting
+// to click "start" would silently produce zero notes for a real Investment
+// Terms discussion). Daily's own transcription-active indicator in the
+// call UI satisfies the all-party-awareness requirement. Only the founder
+// side triggers startTranscription() — Daily transcription is a single
+// per-room instance; a redundant start from a second client errors rather
+// than layering, so a single deterministic owner avoids that.
+function InterviewCall({ roomUrl, token, onLeft, onError, isTranscriptionOwner }: {
+  roomUrl: string; token: string; onLeft: (transcriptText: string) => void; onError: (msg: string) => void; isTranscriptionOwner: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<any>(null);
+  const transcriptRef = useRef<{ participantId: string; text: string; timestamp: string }[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -94,8 +104,26 @@ function InterviewCall({ roomUrl, token, onLeft, onError }: {
         showFullscreenButton: true,
       });
       frameRef.current = frame;
-      frame.on("left-meeting", onLeft);
+      frame.on("left-meeting", () => {
+        const text = transcriptRef.current
+          .map((seg) => `[${seg.participantId}] ${seg.text}`)
+          .join("\n");
+        onLeft(text);
+      });
       frame.on("error", (e: any) => onError(e?.errorMsg || "The meeting room is unavailable."));
+      frame.on("transcription-message", (e: any) => {
+        if (!e?.text) return;
+        transcriptRef.current.push({
+          participantId: e.participantId ?? "unknown",
+          text: e.text,
+          timestamp: e.timestamp ?? new Date().toISOString(),
+        });
+      });
+      if (isTranscriptionOwner) {
+        frame.on("joined-meeting", () => {
+          frame.startTranscription();
+        });
+      }
       frame.join({ url: roomUrl, token }).catch((e: any) => {
         onError(e?.errorMsg || e?.message || "Could not join the meeting room.");
       });
@@ -106,7 +134,7 @@ function InterviewCall({ roomUrl, token, onLeft, onError }: {
       frameRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomUrl, token]);
+  }, [roomUrl, token, isTranscriptionOwner]);
 
   return <div ref={containerRef} className="w-full bg-black" style={{ height: 480 }} />;
 }
@@ -232,24 +260,33 @@ function MeetingsPage() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { toast.error("Session expired — sign in again"); return; }
-      const r = await ingestMeetingRecording({
+      const r = await runMeetingExtraction({
         data: { userAccessToken: session.access_token, dealRoomId, meetingNumber: num },
       });
       if (r.ok) {
         const messages: Record<string, string> = {
-          recording_pending: "Recording still processing on Daily's side — check again shortly.",
-          transcript_submitted: "Transcription started.",
-          transcript_processing: "Transcription still in progress — check again shortly.",
-          transcript_complete: "Transcript ready.",
+          no_transcript: "No transcript saved yet for this meeting.",
           extraction_complete: "Notes extracted.",
         };
         toast.success(r.stage ? messages[r.stage] ?? "Checked." : "Checked.");
         invalidate();
       } else {
-        toast.error(`Could not check recording (${r.error})`);
+        toast.error(`Could not run extraction (${r.error})`);
       }
-    } catch { toast.error("Could not check recording"); }
+    } catch { toast.error("Could not run extraction"); }
     finally { setCheckingRecording(null); }
+  };
+
+  const saveTranscript = async (num: 1 | 2 | 3 | 4 | 5, transcriptText: string) => {
+    if (!transcriptText.trim()) return; // nothing spoken/captured — leave the record at its honest "pending" default rather than writing an empty blob that looks like a real (silent) result
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const r = await saveMeetingTranscript({
+        data: { userAccessToken: session.access_token, dealRoomId, meetingNumber: num, transcriptText },
+      });
+      if (r.ok) { toast.success("Transcript saved"); invalidate(); }
+    } catch { /* non-fatal — the meeting still completes normally without a saved transcript */ }
   };
 
   const skip = async (num: 1 | 2 | 3 | 4 | 5) => {
@@ -352,11 +389,15 @@ function MeetingsPage() {
           <InterviewCall
             roomUrl={call.roomUrl}
             token={call.token}
-            onLeft={() => setCall(null)}
+            onLeft={(transcriptText) => {
+              saveTranscript(call.meetingNumber as 1 | 2 | 3 | 4 | 5, transcriptText);
+              setCall(null);
+            }}
             onError={(message) => {
               setJoinError({ meetingNumber: call.meetingNumber, message });
               setCall(null);
             }}
+            isTranscriptionOwner={isFounder}
           />
         </div>
       )}
@@ -520,7 +561,7 @@ function MeetingsPage() {
                   </div>
                 )}
 
-                {/* Recording / transcript / AI notes — only for a completed online meeting */}
+                {/* Transcript / AI notes — only for a completed online meeting */}
                 {status === "done" && m?.daily_room_name && (() => {
                   const rec = recordByMeeting.get(m.id);
                   const notes = rec?.extracted_notes && "summary" in (rec.extracted_notes as any)
@@ -531,12 +572,10 @@ function MeetingsPage() {
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <span className="inline-flex items-center gap-1.5 text-xs text-[#71717A]">
                           <FileAudio className="h-3.5 w-3.5" />
-                          {!rec || rec.transcript_status === "pending" ? "Recording not yet checked"
-                            : rec.transcript_status === "processing" ? "Transcription in progress…"
-                            : rec.transcript_status === "failed" ? "Transcription failed"
-                            : rec.extraction_status === "pending" ? "Transcript ready — extraction not yet run"
-                            : rec.extraction_status === "processing" ? "Extracting notes…"
-                            : rec.extraction_status === "failed" ? "Transcript ready — extraction failed"
+                          {!rec || rec.transcript_status === "pending" ? "No transcript saved — call may have ended without speech captured, or was left before saving"
+                            : rec.transcript_status === "failed" ? "Transcript could not be saved"
+                            : rec.extraction_status === "pending" ? "Transcript saved — extraction not yet run"
+                            : rec.extraction_status === "failed" ? "Transcript saved — extraction failed"
                             : "Transcript and notes ready"}
                         </span>
                         <button
@@ -546,7 +585,7 @@ function MeetingsPage() {
                           style={{ borderRadius: 2 }}
                         >
                           {checkingRecording === stage.number ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
-                          Check for recording
+                          Run extraction
                         </button>
                       </div>
 

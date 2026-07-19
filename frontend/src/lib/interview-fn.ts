@@ -11,18 +11,24 @@ import { createServerFn } from "@tanstack/react-start";
 // - Access is by meeting token only (/v1/meeting-tokens), minted server-side
 //   in these fns, never client-side. Tokens are single-room-scoped (room_name
 //   claim), expiring, and minted per participant per meeting.
-// - Recording: enable_recording: "cloud" on room creation (step 5). Daily
-//   auto-starts cloud recording the moment the first participant joins —
-//   no separate start-recording call needed, no owner-initiated toggle.
-//   This was a deliberate product decision (auto-record, not manual):
-//   an interview room where a party forgets to click "start recording"
-//   would silently produce zero transcript/extraction for a real
-//   Investment Terms discussion, which the platform's honesty rules
-//   (§26.2) don't tolerate. Both parties see Daily's built-in recording
-//   indicator in the call UI from the moment recording begins — this is
-//   Daily's own on-by-default behavior for enable_recording rooms, not
-//   something we suppress or hide, satisfying the all-party-awareness
-//   requirement without an extra affirmative click.
+// - Transcription, not recording (step 5, revised): the deliverable is AI
+//   meeting notes, not a video/audio recording. No cloud recording is
+//   enabled on these rooms — Daily's cloud-recording + batch-processor
+//   post-call transcription path was tried and found to structurally
+//   require a real AWS S3 bucket with an IAM role (assume_role_arn),
+//   which Cloudflare R2 cannot satisfy (R2 has no IAM role assumption,
+//   confirmed live against Daily's domain-config validation). Switched to
+//   Daily's REALTIME transcription (Deepgram) instead: no recording, no
+//   bucket, no batch job — transcript text streams to the client during
+//   the call via transcription-message events and is persisted through
+//   completeMeeting's ingestion path when the meeting ends. See
+//   app.deal-rooms.$id.meetings.tsx's InterviewCall for the capture side.
+//   Both parties still see an explicit transcription indicator (Daily's
+//   built-in transcription-active UI) — the all-party-awareness
+//   requirement applies identically to transcription as it would to
+//   recording. The R2 bucket created for the abandoned recording path
+//   stays provisioned but unused, reserved for a possible future paid
+//   recording add-on (see CLAUDE.md).
 //
 // Authorization: the caller must hold a deal_room_members row for the room
 // with role founder or investor. External/lawyer team accounts (routed via
@@ -57,6 +63,10 @@ function getEnv() {
       "",
     key: cfEnv.SUPABASE_SERVICE_ROLE_KEY || "",
     dailyKey: cfEnv.DAILY_API_KEY || "",
+    r2AccountId: cfEnv.R2_ACCOUNT_ID || "",
+    r2AccessKeyId: cfEnv.R2_ACCESS_KEY_ID || "",
+    r2SecretAccessKey: cfEnv.R2_SECRET_ACCESS_KEY || "",
+    r2BucketName: cfEnv.R2_BUCKET_NAME || "",
   };
 }
 
@@ -251,10 +261,9 @@ export const createInterviewRoom = createServerFn({ method: "POST" })
           enable_knocking: false,
           start_video_off: false,
           start_audio_off: false,
-          // Auto-record from first join — see the step-5 comment above.
-          // roast-fn.ts's public event rooms are untouched (no
-          // enable_recording there; this property is only ever set here).
-          enable_recording: "cloud",
+          // No enable_recording — realtime transcription only, see the
+          // step-5 comment above. roast-fn.ts's public event rooms are
+          // untouched either way (recording was never enabled there).
         },
       }),
     });
@@ -324,6 +333,14 @@ export const mintInterviewToken = createServerFn({ method: "POST" })
           eject_at_token_exp: true,
           user_name: userName,
           is_owner: false,
+          // Live-verified requirement: startTranscription() fails with
+          // "must be transcription admin to start transcription" without
+          // this — Daily's default token grants no admin permissions.
+          // Founder is the deterministic transcription-trigger owner (see
+          // the InterviewCall comment in the meetings route); investor/
+          // lawyer tokens don't need it since they never call
+          // startTranscription() themselves.
+          permissions: role === "founder" ? { canAdmin: ["transcription"] } : {},
         },
       }),
     });
@@ -338,35 +355,33 @@ export const mintInterviewToken = createServerFn({ method: "POST" })
   });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// R14B step 5 — post-call ingestion: recording -> transcript -> AI extraction.
+// R14B step 5 (revised) — realtime transcription -> AI extraction.
 //
-// Cloudflare Workers have a request time budget; Daily's recording
-// finalization and batch-processor transcription both take real wall-clock
-// minutes after a call ends, so this cannot be one long-blocking call. It is
-// a single "check and advance" pass, safe to call repeatedly (idempotent at
-// every stage — never re-submits a job that's already running or done):
-//   1. No daily_recording_id yet -> poll Daily's recordings list for this
-//      room, store the id once found (recording may still be processing).
-//   2. Have daily_recording_id but no transcript job started
-//      (transcript_status still 'pending') -> submit a batch-processor
-//      transcription job, flip to 'processing'.
-//   3. transcript_status 'processing' -> poll the job; on finish, fetch the
-//      transcript text, store it, flip to 'complete' (or 'failed' + honest
-//      error, never silently defaulted -- §26.2).
-//   4. transcript ready + extraction_status 'pending' -> run AI extraction,
-//      store extracted_notes, flip extraction_status to 'complete' or
-//      'failed' + error.
-// No client write path exists for any of these fields (see
-// deal_room_meeting_records' RLS -- SELECT-only for room members); this fn
-// is the only writer, using the service-role key throughout.
+// No cloud recording, no batch-processor, no bucket. Deepgram-powered live
+// transcription runs during the call (started client-side, see
+// app.deal-rooms.$id.meetings.tsx's InterviewCall), streaming
+// transcription-message events to whichever client has the listener
+// attached. Each client accumulates {participantId, text, timestamp}
+// entries locally and calls saveMeetingTranscript once, when leaving the
+// call, with the full accumulated text. Concurrent saves from both parties
+// are fine — the later save simply wins (last-write, not merged); a
+// meeting's transcript is a single text blob, not a per-party split.
+//
+// Two-fn split, same idempotent "check and advance" shape as before, now
+// much smaller:
+//   1. saveMeetingTranscript — service-role write, the only way transcript
+//      text reaches deal_room_meeting_records (no client write policy on
+//      that table — confirmed unchanged from step 1). Honest on an empty
+//      transcript: stores transcript_status='complete' with empty text
+//      rather than pretending nothing happened, since a genuinely silent
+//      call (e.g. this session's own headless-browser test) is a real,
+//      valid outcome, not a failure.
+//   2. runMeetingExtraction — separate step, callable once a transcript
+//      exists, retriable on failure (§26.2 one-click retry). Kept as its
+//      own fn rather than folded into save, since the client saving the
+//      transcript and the client wanting extraction re-run are not
+//      necessarily the same event.
 // ─────────────────────────────────────────────────────────────────────────────
-
-type IngestInput = { userAccessToken: string; dealRoomId: string; meetingNumber: number };
-type IngestResult = {
-  ok: boolean;
-  stage?: "recording_pending" | "transcript_submitted" | "transcript_processing" | "transcript_complete" | "extraction_complete";
-  error?: string;
-};
 
 async function fetchOrCreateRecord(url: string, key: string, meetingId: string, dealRoomId: string) {
   const rows: any[] = await sbFetch(
@@ -389,12 +404,57 @@ async function patchRecord(url: string, key: string, id: string, patch: Record<s
   });
 }
 
-export const ingestMeetingRecording = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as IngestInput)
-  .handler(async ({ data }): Promise<IngestResult> => {
-    const { url, key, dailyKey } = getEnv();
+type SaveTranscriptInput = {
+  userAccessToken: string;
+  dealRoomId: string;
+  meetingNumber: number;
+  transcriptText: string;
+};
+
+export const saveMeetingTranscript = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as SaveTranscriptInput)
+  .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
+    const { url, key } = getEnv();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
-    if (!dailyKey) return { ok: false, error: "daily_unavailable" };
+
+    const uid = await verifyUser(url, key, data.userAccessToken);
+    if (!uid) return { ok: false, error: "not_authenticated" };
+    // A lawyer may also save a transcript for the investment_terms meeting
+    // they were actually on the call for — mirrors mintInterviewToken's
+    // stage-scoped authorization.
+    const meeting = await fetchMeeting(url, key, data.dealRoomId, data.meetingNumber);
+    if (!meeting) return { ok: false, error: "meeting_not_found" };
+    let role: "founder" | "investor" | "lawyer" | null = await verifyPrincipalMember(url, key, data.dealRoomId, uid);
+    if (!role) {
+      if (meeting.stage_slug === "investment_terms" && await verifyLawyerMember(url, key, data.dealRoomId, uid)) {
+        role = "lawyer";
+      } else {
+        return { ok: false, error: "not_authorized" };
+      }
+    }
+
+    const record = await fetchOrCreateRecord(url, key, meeting.id, data.dealRoomId);
+    if (!record) return { ok: false, error: "record_unavailable" };
+
+    await patchRecord(url, key, record.id, {
+      // "ready", not "complete" -- the actual DB check constraint (found
+      // live, after this code shipped with the wrong value and silently
+      // failed every save) only allows pending/processing/ready/failed.
+      transcript_status: "ready",
+      transcript_error: null,
+      transcript_text: data.transcriptText,
+    });
+    return { ok: true };
+  });
+
+type ExtractInput = { userAccessToken: string; dealRoomId: string; meetingNumber: number };
+type ExtractResult = { ok: boolean; stage?: "no_transcript" | "extraction_complete"; error?: string };
+
+export const runMeetingExtraction = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as ExtractInput)
+  .handler(async ({ data }): Promise<ExtractResult> => {
+    const { url, key } = getEnv();
+    if (!url || !key) return { ok: false, error: "db_unavailable" };
 
     const uid = await verifyUser(url, key, data.userAccessToken);
     if (!uid) return { ok: false, error: "not_authenticated" };
@@ -403,156 +463,31 @@ export const ingestMeetingRecording = createServerFn({ method: "POST" })
 
     const meeting = await fetchMeeting(url, key, data.dealRoomId, data.meetingNumber);
     if (!meeting) return { ok: false, error: "meeting_not_found" };
-    if (!meeting.daily_room_name) return { ok: false, error: "no_recording_room" };
 
     const record = await fetchOrCreateRecord(url, key, meeting.id, data.dealRoomId);
     if (!record) return { ok: false, error: "record_unavailable" };
 
-    // Stage 1 — find the recording.
-    if (!record.daily_recording_id) {
-      const listResp = await fetch(
-        `https://api.daily.co/v1/recordings?room_name=${encodeURIComponent(meeting.daily_room_name)}&limit=10`,
-        { headers: { Authorization: `Bearer ${dailyKey}` } },
-      );
-      if (!listResp.ok) {
-        const errText = await listResp.text().catch(() => "");
-        console.error("[interview-ingest] recordings list failed:", listResp.status, errText);
-        return { ok: false, error: "daily_recordings_list_failed" };
-      }
-      const listed = (await listResp.json()) as { data?: Array<{ id: string; status: string }> };
-      const finished = listed.data?.find((r) => r.status === "finished");
-      if (!finished) {
-        // Still recording, or recording not yet finalized on Daily's side.
-        return { ok: true, stage: "recording_pending" };
-      }
-      await patchRecord(url, key, record.id, { daily_recording_id: finished.id });
-      record.daily_recording_id = finished.id;
+    if (record.transcript_status !== "ready" || !record.transcript_text) {
+      return { ok: true, stage: "no_transcript" };
+    }
+    if (record.extraction_status === "ready") {
+      return { ok: true, stage: "extraction_complete" };
     }
 
-    // Stage 2 — submit transcription job if not started.
-    if (record.transcript_status === "pending") {
-      const submitResp = await fetch("https://api.daily.co/v1/batch-processor", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${dailyKey}` },
-        body: JSON.stringify({
-          preset: "transcript",
-          inParams: { sourceType: "recordingId", recordingId: record.daily_recording_id },
-        }),
-      });
-      if (!submitResp.ok) {
-        const errText = await submitResp.text().catch(() => "");
-        console.error("[interview-ingest] batch-processor submit failed:", submitResp.status, errText);
-        await patchRecord(url, key, record.id, {
-          transcript_status: "failed",
-          transcript_error: `Daily batch-processor submit failed (${submitResp.status}): ${errText.slice(0, 300)}`,
-        });
-        return { ok: false, error: "transcript_submit_failed" };
-      }
-      const submitted = (await submitResp.json()) as { id: string };
+    const extracted = await extractMeetingNotes(record.transcript_text as string);
+    if (extracted.ok) {
       await patchRecord(url, key, record.id, {
-        transcript_status: "processing",
-        transcript_error: null,
-        // Reuse daily_recording_id's sibling text field to stash the job id
-        // between calls -- see the read-back below, which looks in
-        // extracted_notes._job only as an internal bookkeeping field, never
-        // surfaced as if it were real extracted content (§26.2).
-        extracted_notes: { _transcriptJobId: submitted.id },
+        extraction_status: "ready",
+        extraction_error: null,
+        extracted_notes: extracted.notes,
       });
-      return { ok: true, stage: "transcript_submitted" };
+      return { ok: true, stage: "extraction_complete" };
     }
-
-    // Stage 3 — poll the transcription job.
-    if (record.transcript_status === "processing") {
-      const jobId = record.extracted_notes?._transcriptJobId;
-      if (!jobId) {
-        await patchRecord(url, key, record.id, {
-          transcript_status: "failed",
-          transcript_error: "Transcription was marked processing but no job id was recorded — inconsistent state, needs manual retry.",
-        });
-        return { ok: false, error: "missing_job_id" };
-      }
-      const jobResp = await fetch(`https://api.daily.co/v1/batch-processor/${jobId}`, {
-        headers: { Authorization: `Bearer ${dailyKey}` },
-      });
-      if (!jobResp.ok) {
-        const errText = await jobResp.text().catch(() => "");
-        console.error("[interview-ingest] batch-processor status failed:", jobResp.status, errText);
-        return { ok: false, error: "job_status_failed" };
-      }
-      const job = (await jobResp.json()) as {
-        status: string;
-        error?: string;
-        output?: { transcription?: Array<{ format?: string; s3Config?: { bucket: string; key: string; region: string }; url?: string }> };
-      };
-
-      if (job.status === "error") {
-        await patchRecord(url, key, record.id, {
-          transcript_status: "failed",
-          transcript_error: job.error ? String(job.error).slice(0, 500) : "Daily reported the transcription job failed, no further detail given.",
-          extracted_notes: null,
-        });
-        return { ok: false, error: "transcript_job_error" };
-      }
-      if (job.status !== "finished") {
-        return { ok: true, stage: "transcript_processing" };
-      }
-
-      // Finished — fetch the transcript text. Daily's default (no custom
-      // s3Config) hosts output on its own storage; prefer a direct url if
-      // present, otherwise attempt the s3 path. If neither shape matches
-      // what we can fetch, fail honestly rather than store a blank
-      // transcript as if it were real content.
-      const out = job.output?.transcription?.[0];
-      let transcriptText: string | null = null;
-      let fetchError: string | null = null;
-      if (out?.url) {
-        const txtResp = await fetch(out.url).catch(() => null);
-        if (txtResp?.ok) transcriptText = await txtResp.text();
-        else fetchError = `Could not download transcript from Daily's provided URL (status ${txtResp?.status ?? "no response"}).`;
-      } else if (out) {
-        fetchError = `Daily returned an output shape this integration doesn't know how to fetch yet: ${JSON.stringify(out).slice(0, 300)}`;
-      } else {
-        fetchError = "Transcription job finished but Daily returned no output.transcription entry.";
-      }
-
-      if (!transcriptText) {
-        await patchRecord(url, key, record.id, {
-          transcript_status: "failed",
-          transcript_error: fetchError,
-          extracted_notes: null,
-        });
-        return { ok: false, error: "transcript_fetch_failed" };
-      }
-
-      await patchRecord(url, key, record.id, {
-        transcript_status: "complete",
-        transcript_error: null,
-        transcript_text: transcriptText,
-        extracted_notes: null, // clear the internal job-id bookkeeping now that it's served its purpose
-      });
-      record.transcript_status = "complete";
-      record.transcript_text = transcriptText;
-    }
-
-    // Stage 4 — AI extraction, once transcript is in hand.
-    if (record.transcript_status === "complete" && record.extraction_status === "pending") {
-      const extracted = await extractMeetingNotes(record.transcript_text as string);
-      if (extracted.ok) {
-        await patchRecord(url, key, record.id, {
-          extraction_status: "complete",
-          extraction_error: null,
-          extracted_notes: extracted.notes,
-        });
-        return { ok: true, stage: "extraction_complete" };
-      }
-      await patchRecord(url, key, record.id, {
-        extraction_status: "failed",
-        extraction_error: extracted.error,
-      });
-      return { ok: false, error: "extraction_failed" };
-    }
-
-    return { ok: true, stage: "transcript_complete" };
+    await patchRecord(url, key, record.id, {
+      extraction_status: "failed",
+      extraction_error: extracted.error,
+    });
+    return { ok: false, error: "extraction_failed" };
   });
 
 // ── AI extraction ───────────────────────────────────────────────────────────
