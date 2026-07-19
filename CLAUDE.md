@@ -1114,3 +1114,111 @@ signs the NDA before the user ever lands on `/deal-rooms/$id`, or possibly it's 
 been noticed. **Needs investigation and a fix as the first item of step 6** (per explicit
 instruction — this must be listed as a step 6 task, not just mentioned in a report). Do not
 assume it's benign just because it predates this branch.
+
+---
+
+## 37. R14B STEP 5 — DAILY BATCH-PROCESSOR TRANSCRIPTION REQUIRES REAL AWS S3 + IAM ROLE; DO NOT RE-ATTEMPT WITH R2 (found R14B, July 2026)
+
+Interview meetings do **not** use Daily cloud recording. This was the original step 5 plan
+("Option A: cloud recording + post-call transcription") and was abandoned after live-verifying
+a structural incompatibility — recorded here so a future session doesn't rediscover this the
+hard way.
+
+**What was tried, in order, each with a real API call and a real error, not assumed from docs:**
+1. `POST /v1/batch-processor` with `outParams` omitted (Daily's docs describe it as fully
+   optional with a fallback to Daily's own "HIPAA-compliant" default storage) → `400
+   "outParams" is required`.
+2. `outParams: {}` → `400 "outParams.s3Config" is required` — the default-storage fallback
+   Daily's docs describe does not exist for this account (confirmed via `GET /v1/`:
+   `batch_processor_bucket: null` at the domain level).
+3. `outParams.s3Config` with a real Cloudflare R2 bucket (`hockystick-meeting-recordings`,
+   created for this purpose) + R2 access-key credentials → `400
+   "outParams.s3Config.bucket_name" is not allowed` — the batch-processor's `s3Config` shape
+   is NOT the same as `transcription_bucket`'s documented shape; only `s3KeyTemplate`/
+   `useReplacement` are accepted per-request.
+4. Domain-level `batch_processor_bucket` config (`POST /v1/` with `properties.
+   batch_processor_bucket`), matching `transcription_bucket`'s documented shape
+   (`bucket_name`/`bucket_region`/`assume_role_arn`/`allow_api_access`) → first
+   `bucket_region` rejected `"auto"` (R2's usual value) for not matching an AWS-region
+   pattern; with a real AWS region string, `400 "assume_role_arn" is not allowed to be
+   empty"` — **`assume_role_arn` is required and non-empty**, meaning Daily's batch-processor
+   storage integration is AWS IAM-role-assumption-based (STS), not access-key-based.
+
+**Conclusion: Cloudflare R2 cannot be used as batch-processor output storage under any
+request shape** — R2 has no IAM role assumption mechanism (access-key-only S3-compatible
+auth). This is a genuine Daily↔R2 incompatibility, not a misconfiguration. Only a real AWS S3
+bucket with an IAM role trusting Daily's AWS principal would work — untested, out of scope,
+and not planned (see below).
+
+**Product decision (locked): interview meetings never use recording.** The deliverable is AI
+meeting notes, not a video/audio archive. `enable_recording` is never set on interview rooms
+(`interview-fn.ts`'s `createInterviewRoom`) — roast rooms were never affected either way
+(recording was never enabled there, confirmed via diff against the branch base). The R2
+bucket (`hockystick-meeting-recordings`, private, ENAM region) and its scoped credentials
+stay provisioned in `.env.local`/Cloudflare secrets, **unused**, reserved for a possible
+future *paid* recording add-on — do not repurpose it for batch-processor transcription; that
+path is confirmed dead per the findings above.
+
+### What's used instead: Daily realtime transcription (Deepgram)
+
+No recording, no bucket, no batch job, no S3 dependency anywhere. `frame.startTranscription()`
+is called client-side (founder session only — see below) once joined; `transcription-message`
+events stream text to whichever client has the listener; on leaving the call, the accumulated
+text is sent to `saveMeetingTranscript` (service-role fn, the only writer to
+`deal_room_meeting_records`).
+
+**Real bug found and fixed: transcription requires an admin permission on the meeting
+token.** `startTranscription()` failed live with `"must be transcription admin to start
+transcription"` — Daily's default meeting token grants no admin rights. Fixed by adding
+`permissions: { canAdmin: ["transcription"] }` to the founder's token in
+`mintInterviewToken` (investor/lawyer tokens don't need it — they never call
+`startTranscription()` themselves, by design, see below).
+
+**Single deterministic transcription owner, not "whoever joins first."** Only the founder
+side's client calls `startTranscription()` (gated by `isTranscriptionOwner` in
+`InterviewCall`). Daily can run multiple concurrent transcription/recording instances if
+`startRecording()`/`startTranscription()` is called by more than one client without a shared
+`instanceId` — a second, redundant start from the investor's client would risk doubling the
+transcription cost for nothing, not merely erroring harmlessly. This mirrors the original
+(now-abandoned) recording plan's same reasoning, carried over unchanged.
+
+### Second real bug found and fixed: `transcript_status`/`extraction_status` value mismatch
+
+The actual Postgres CHECK constraint on `deal_room_meeting_records` only allows
+`'pending' | 'processing' | 'ready' | 'failed'` — **not** `'complete'`. The code (and this
+file's own §26.2 prose, describing "pending → processing → complete/failed") had been using
+`'complete'` throughout; every save using that value would silently violate the constraint.
+Found via a real failed `INSERT` during live testing (Postgres error `23514`), not caught by
+`tsc` since Supabase-js doesn't type-check string literals against DB check constraints.
+Fixed by using `'ready'` everywhere in `interview-fn.ts` and the meetings route's
+`MeetingRecordRow` type. **When touching `transcript_status`/`extraction_status` (or any
+`text` column backed by a CHECK constraint) in future work, verify the actual constraint via
+`pg_get_constraintdef` before writing status-transition code — don't assume a value from
+prose description or a doc's example, including this file's own.**
+
+### Honesty rule applied: no transcript, no record
+
+If a call produces no captured speech (silence, a party never unmutes, or — as in this
+session's own headless-browser live tests, which have no real microphone — no audio device
+at all), `saveMeetingTranscript` is **not called** rather than persisting an empty
+`transcript_text` as if it were a genuine (silent) result. The UI shows an honest "No
+transcript saved — call may have ended without speech captured, or was left before saving"
+state, per §26.2 — a missing record is more honest than a padded one that implies a real
+save attempt happened.
+
+### Live verification performed
+
+Joined a real Daily room as the founder test account; confirmed the transcription-admin
+permission fix resolved the earlier error (no error on retry); left the call; confirmed via
+direct DB query that no `deal_room_meeting_records` row was created (correct — no real
+speech, headless browser has no microphone). Since producing genuine transcribed speech
+isn't possible in this environment, the save→extract→render pipeline was verified with a
+clearly-labeled synthetic transcript inserted directly (never presented as a real call in
+any report or commit): `runMeetingExtraction` produced a real, non-fabricated
+`gpt-4o-mini` extraction — every topic/figure carries a `source_quote` and a `confidence`
+marker, figures are attributed via `stated_by` rather than asserted as fact, matching the
+standing AI honesty rule. Re-ran the step 4c lawyer adversarial check against the real
+records row created for this test: **0 rows returned** for a lawyer session reading a
+`terms_discussion`-stage meeting's records, confirming the stage-scoped RLS restriction
+(`20260723030000_r14b_meetings_lawyer_scope.sql`) still holds correctly with real transcript
+content present, not just against the earlier placeholder rows.
