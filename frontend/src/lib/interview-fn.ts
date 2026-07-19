@@ -109,12 +109,15 @@ async function verifyPrincipalMember(
   dealRoomId: string,
   userId: string,
 ): Promise<"founder" | "investor" | null> {
+  // A backend failure here fails CLOSED (returns [] → null → not_authorized),
+  // which is the safe direction for an authz check — but log it so a real
+  // outage isn't fully silent (§6A2). Never fail open.
   const rows: any[] = await sbFetch(
     url,
     key,
     `deal_room_members?deal_room_id=eq.${dealRoomId}&user_id=eq.${userId}&role=in.(founder,investor)&select=role`,
     "GET",
-  ).catch(() => []);
+  ).catch((e) => { console.error("[interview] verifyPrincipalMember fetch failed (failing closed):", e); return []; });
   const role = rows?.[0]?.role;
   return role === "founder" || role === "investor" ? role : null;
 }
@@ -136,7 +139,7 @@ async function verifyLawyerMember(
     key,
     `deal_room_members?deal_room_id=eq.${dealRoomId}&user_id=eq.${userId}&role=eq.lawyer&select=role`,
     "GET",
-  ).catch(() => []);
+  ).catch((e) => { console.error("[interview] verifyLawyerMember fetch failed (failing closed):", e); return []; });
   return (rows?.length ?? 0) > 0;
 }
 

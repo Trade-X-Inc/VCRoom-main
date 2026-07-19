@@ -31,18 +31,26 @@ export function useDealRoomContext(dealRoomId: string) {
     },
   });
 
-  const { data: memberRow } = useQuery({
+  const { data: memberRow, isError: memberError } = useQuery({
     queryKey: ["deal-room-member", dealRoomId, user?.id],
     enabled: !!user?.id,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("deal_room_members")
         .select("*")
         .eq("deal_room_id", dealRoomId)
         .eq("user_id", user!.id)
         .maybeSingle();
+      // Surface a real backend error rather than swallowing it into null:
+      // this row resolves isLawyer/isInvestor/isFounder, and a silent null
+      // would fall back to the GLOBAL user.role — for a lawyer (global role
+      // "investor") that is a mis-scope/escalation. maybeSingle() returns
+      // error === null for the legitimate "not a member" (zero-rows) case,
+      // so this throws only on an actual failure. The layout fails closed on
+      // memberError (see accessError below). §6A2 silent-catch sweep.
+      if (error) throw error;
       return data;
     },
   });
@@ -65,18 +73,21 @@ export function useDealRoomContext(dealRoomId: string) {
     },
   });
 
-  const { data: ndaAcceptance, isLoading: ndaLoading } = useQuery({
+  const { data: ndaAcceptance, isLoading: ndaLoading, isError: ndaError } = useQuery({
     queryKey: ["nda-acceptance", dealRoomId, user?.id],
     enabled: !!user?.id,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("nda_acceptances")
         .select("id, accepted_at")
         .eq("deal_room_id", dealRoomId)
         .eq("user_id", user!.id)
         .maybeSingle();
+      // Surface real errors — a silent null here reads as "not signed" and
+      // would loop the user to /nda even when they have signed (§6A2).
+      if (error) throw error;
       return data ?? null;
     },
   });
@@ -194,6 +205,10 @@ export function useDealRoomContext(dealRoomId: string) {
     connectionOrigin,
     ndaAcceptance,
     ndaLoading,
+    // Load-bearing access queries errored — the layout must fail closed
+    // (show an error, render no room content) rather than trust a role
+    // resolved from a null memberRow. §6A2.
+    accessError: memberError || ndaError,
     isInvestor,
     isFounder,
     isLawyer: isLawyerMember,

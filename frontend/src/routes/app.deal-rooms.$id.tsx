@@ -34,7 +34,7 @@ function DealRoomLayout() {
   const navigate = useNavigate();
 
   const ctx = useDealRoomContext(dealRoomId);
-  const { room, companyName, isInvestor, isLawyer, isTeamMember, teamAssignment, teamAssignmentLoading, ndaAcceptance, ndaLoading, connectionOrigin } = ctx;
+  const { room, companyName, isInvestor, isLawyer, isTeamMember, teamAssignment, teamAssignmentLoading, ndaAcceptance, ndaLoading, accessError, connectionOrigin } = ctx;
 
   const isNdaRoute = path.endsWith("/nda");
 
@@ -51,6 +51,24 @@ function DealRoomLayout() {
     return (
       <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] items-center justify-center">
         <div className="text-sm text-gray-500 animate-pulse">Verifying access…</div>
+      </div>
+    );
+  }
+
+  // Fail closed: a load-bearing access query (membership or NDA status)
+  // errored. Role can't be trusted from a null memberRow, so render no room
+  // content — an honest error beats silently mis-scoping (§6A2).
+  if (accessError) {
+    return (
+      <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] flex-col items-center justify-center gap-3 p-8 text-center">
+        <div className="font-semibold text-foreground">Couldn't verify your access</div>
+        <div className="text-sm text-gray-500 max-w-sm">
+          We couldn't confirm your access to this deal room. Reload the page, and if this
+          keeps happening, contact support.
+        </div>
+        <Link to="/app/deal-rooms" className="mt-1 text-sm text-brand hover:underline inline-flex items-center gap-1">
+          <ArrowLeft className="h-4 w-4" /> Back to deal rooms
+        </Link>
       </div>
     );
   }
