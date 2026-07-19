@@ -3,13 +3,14 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
-  Calendar, CheckCircle2, Lock, Video, MapPin, Loader2, X, AlertTriangle,
+  Calendar, CheckCircle2, Video, MapPin, Loader2, X, AlertTriangle,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useDealRoom } from "@/hooks/useDealRoom";
 import { upsertDealRoomMeeting } from "@/lib/deal-room-workflow-fn";
 import { skipMeeting, updateMeetingNotes } from "@/lib/deal-room-fn";
 import { createInterviewRoom, mintInterviewToken } from "@/lib/interview-fn";
+import { LawyerGate, useLawyerGateState } from "@/components/app/LawyerGate";
 
 // R14B step 3 — the interview stage sequencer, re-mounting the old
 // (orphaned) Stage3Panel 3-slot pattern as a real route, extended to the
@@ -103,8 +104,9 @@ function InterviewCall({ roomUrl, token, onLeft, onError }: {
 
 function MeetingsPage() {
   const ctx = useDealRoom();
-  const { dealRoomId, isInvestor, userId } = ctx;
+  const { dealRoomId, isInvestor, isFounder, userId, founderUserId, investorUserId, companyName } = ctx;
   const qc = useQueryClient();
+  const { gateOpen } = useLawyerGateState(dealRoomId);
 
   const { data: meetings = [], isLoading } = useQuery<MeetingRow[]>({
     queryKey: ["interview-meetings", dealRoomId],
@@ -342,11 +344,15 @@ function MeetingsPage() {
                   </div>
 
                   {/* Actions */}
-                  {isLawyerStage ? (
-                    <span className="inline-flex items-center gap-1.5 text-xs text-[#71717A]" title="Requires Legal Counsel">
-                      <Lock className="h-3.5 w-3.5" />
-                      Requires Legal Counsel — access not yet enabled
-                    </span>
+                  {isLawyerStage && !gateOpen ? (
+                    <LawyerGate
+                      dealRoomId={dealRoomId}
+                      companyName={companyName}
+                      userId={userId}
+                      isFounder={isFounder}
+                      founderUserId={founderUserId}
+                      investorUserId={investorUserId}
+                    />
                   ) : (
                     <div className="flex items-center gap-2 flex-wrap">
                       {/* Join — both parties, online + scheduled or done-pending */}

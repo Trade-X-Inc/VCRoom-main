@@ -11,6 +11,7 @@ import {
   meetingScheduledEmail,
   feedbackRequestEmail,
   startupTeamInviteEmail,
+  lawyerInviteEmail,
 } from "./templates";
 
 function getServiceClient() {
@@ -307,6 +308,32 @@ export const triggerStartupTeamInvite = createServerFn({ method: "POST" })
       subject,
       html,
       tags: [{ name: "type", value: "startup-team-invite" }],
+    });
+  });
+
+// ── R14B — lawyer / legal counsel invite (room-scoped only) ────────────────
+
+export const triggerLawyerInvite = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as {
+    to: string;
+    inviterName: string;
+    companyName: string;
+    side: "founder" | "investor";
+    token: string;
+  })
+  .handler(async ({ data }) => {
+    const inviteLink = `${APP_URL}/join-room?token=${data.token}`;
+    const { subject, html } = lawyerInviteEmail({
+      inviterName: data.inviterName,
+      companyName: data.companyName,
+      side: data.side,
+      inviteLink,
+    });
+    return sendEmail({
+      to: data.to,
+      subject,
+      html,
+      tags: [{ name: "type", value: "lawyer-invite" }],
     });
   });
 

@@ -425,3 +425,31 @@ export function startupTeamInviteEmail({
     html: baseLayout(content, `${inviterName} invited you to join ${companyName}.`),
   };
 }
+
+// R14B — lawyer / legal counsel invite. Room-scoped only: this account
+// never joins any fund or company's Team page, only this one deal room's
+// Investment Terms stage.
+export function lawyerInviteEmail({
+  inviterName,
+  companyName,
+  side,
+  inviteLink,
+}: {
+  inviterName: string;
+  companyName: string;
+  side: "founder" | "investor";
+  inviteLink: string;
+}) {
+  const content = `
+    <h2>You've been invited as Legal Counsel.</h2>
+    <p>${inviterName} has invited you to represent the ${side === "founder" ? "founder" : "investor"} side of the <strong>${companyName}</strong> deal room on Hockystick.</p>
+    <div class="highlight"><p>Access is scoped to this deal room's Investment Terms stage only — the deal summary, term sheet, the Investment Terms meeting, and its records. You will not see earlier-stage documents, diligence, or private notes.</p></div>
+    <p>You'll be asked to sign the room's NDA when you join, same as any other participant.</p>
+    <div class="center"><a href="${inviteLink}" class="btn">Accept invitation →</a></div>
+    <p class="meta center">This invitation expires in 7 days. If you did not expect this invitation, you can ignore this email.</p>
+  `;
+  return {
+    subject: `${inviterName} invited you as Legal Counsel — ${companyName}`,
+    html: baseLayout(content, `${inviterName} invited you as Legal Counsel for ${companyName}.`),
+  };
+}
