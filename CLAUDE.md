@@ -1319,30 +1319,102 @@ join-token re-mint is folded into step 7's join proofs.
   added; R2/Daily/OpenAI values live only in gitignored `.env.local`.
 - **Roast**: `roast-fn.ts` and every roast file are byte-identical to the merge-base.
 
-### 38.6 RESOLVED (product decision) — manual transcription-stop capability REMOVED, not logged
+### 38.6 RESOLVED (product decision, finalized in step 7) — manual stop flagged, because it can't be removed without losing the ability to START transcription
 
 The step-6 audit found the founder's `canAdmin: ["transcription"]` token let them
-`stopTranscription()` mid-meeting to omit speech from the AI notes. **Product decision: remove
-the capability entirely, don't just log it — transcription must stop only at natural meeting
-end, never via a manual admin action by either party.**
+`stopTranscription()` mid-meeting to omit speech from the AI notes. Product decision was to
+**remove** the manual-stop capability (transcription stops only at natural meeting end). The
+intended clean path was `auto_start_transcription: true` + NO `canAdmin` (nobody can start or
+stop; Daily auto-starts). **Step 7's real-voice test disproved the premise: `auto_start_transcription`
+NEVER fires `transcription-started` on this account, even with real audio (Playwright + Chrome
+`--use-file-for-fake-audio-capture` feeding a spoken WAV).** So transcription MUST be started
+by a `canAdmin` client — and that same permission lets that client stop it. The capability
+can't be removed without losing transcription entirely.
 
-Implemented (`interview-fn.ts` `mintInterviewToken`, `meetings.tsx` `InterviewCall`): tokens
-now carry **`auto_start_transcription: true`** and grant **NO `canAdmin`** at all. The client
-no longer calls `startTranscription()` — transcription auto-starts (server-initiated by Daily
-from the token flag, which bypasses the client admin check). Because no participant holds
-`canAdmin`, no one can manually start OR stop transcription; Daily stops it automatically when
-the room empties. This is a server-enforced prevention via the permission model — there is no
-"detect vs. distinguish meeting-end" problem because manual stops are simply impossible.
+**Final resolution (the pre-authorized fallback): flag every early stop, permanently and
+visibly.** Only the founder token carries `canAdmin` (starts transcription on join, live-voice-
+verified to work and produce a real Deepgram transcript). A founder mid-call stop is detected
+(`transcription-stopped` fires with a truthy `updatedBy` ONLY on a manual stop — a natural
+room-empty end carries none; live-verified) and, while the meeting is still ongoing, writes
+`transcription_stopped_early`/`_by`/`_at` onto the record via `flagTranscriptionStoppedEarly`
+(service-role; the records table is client-locked). It renders as a prominent amber warning in
+the meeting notes UI ("Transcription was stopped early … by … at … — this record may be
+incomplete"), part of the deal-room history. A manual stop attempt WITHOUT `canAdmin` is still
+rejected (`"must be transcription admin"`, step-6-verified), so only the founder can stop and
+every founder stop is flagged. Migration: `20260723050000_r14b_transcription_stopped_early.sql`.
 
-**Live-verified (standalone daily-js call-object probe, real Daily join):** with an
-`auto_start_transcription:true` / no-`canAdmin` token, a manual `call.startTranscription()`
-AND `call.stopTranscription()` BOTH fail with Daily's `transcription-error: "must be
-transcription admin to start/stop transcription"`. So the manual-stop path is genuinely
-closed. **Not yet confirmed (no audio in the headless test env):** whether
-`auto_start_transcription` actually fires `transcription-started` — it did not in the
-audio-less probe, expected because Deepgram auto-start waits for an audio track. This is
-confirmed end-to-end in **step 7's real-voice call**. If that call shows auto-start does NOT
-fire, the fallback is: restore `canAdmin` and write a permanent `transcription_stopped_early`
-flag (role + timestamp) onto the meeting record, rendered in the notes UI — not implemented
-now because prevention (the primary path) is the chosen resolution and its enforcement half
-is confirmed.
+---
+
+## 39. R14B INTERVIEW SYSTEM — FULL CHANGELOG (steps 1–7, the merge summary, July 2026)
+
+The `r14b-interview-system` branch. Merge sequence is `r13b → r14 → r14b`, live-verified
+together, never r14b alone. Every item below was live-verified (real JWTs, real Daily calls,
+rolled-back or cleaned-up fixtures) — see §35–§38 for the deep detail on each finding.
+
+### What it delivers
+A 5-stage structured interview sequence per deal room (Introduction → Product Demo → Financial
+Discussion → Terms Discussion → Investment Terms), each a Daily.co video call with per-stage
+scheduling/skip. Investment Terms is lawyer-gated via a mutual-approval invite flow. Meetings
+are transcribed in real time (Deepgram) and an AI pass extracts source-cited, confidence-scored
+notes. One Daily integration (same account as Roast); Roast is byte-unchanged.
+
+### Schema (migrations, in order)
+- `20260722000000_r14b_interview_stages.sql` — widened `deal_room_meetings` to 5 stages
+  (`meeting_number` 1–5 + `stage_slug`), added `daily_room_name`/`_url`; moved `notes_investor`
+  off that shared row into `deal_room_meeting_private_notes` (investor-only RLS, the §35 §33
+  fix); created `deal_room_meeting_records` (transcripts/AI notes, SELECT-only for room members,
+  soft-delete = null the room ref, no client writes).
+- `20260722010000_r14b_records_role_restrict.sql` — records SELECT restricted to founder/investor.
+- `20260723000000_r14b_lawyer_gate.sql` — `deal_room_lawyer_requests` (mutual invite/waive) +
+  `deal_room_lawyer_invites` (token, one-accepted-per-side unique index) + `get_lawyer_invite_by_token`
+  / `accept_lawyer_invite` RPCs + `deal_rooms.waived_legal_counsel*` cols + records lawyer/
+  investment_terms read scope.
+- `20260723010000` — fixed a missing `WITH CHECK` on the lawyer-requests resolve policy.
+- `20260723020000_r14b_nda_role_lawyer.sql` — widened `nda_acceptances.role` CHECK to include
+  lawyer/analyst/viewer (a lawyer could otherwise never sign the room NDA).
+- `20260723030000_r14b_meetings_lawyer_scope.sql` — split `deal_room_meetings` into per-command
+  policies; lawyer SELECT scoped to `investment_terms` rows only.
+- `20260723040000_r14b_counsel_waiver_integrity.sql` (§6C4) — trigger + `finalize_counsel_waiver`
+  RPC so `waived_legal_counsel` can only be set after a mutually-approved waive request (closes a
+  founder unilateral-waiver bypass).
+- `20260723050000_r14b_transcription_stopped_early.sql` (§6C2/step 7) — early-stop flag columns.
+
+### Key code
+`lib/interview-fn.ts` (Daily private rooms + per-participant single-room tokens, `canAdmin`
+transcription on the founder token, `saveMeetingTranscript` / `runMeetingExtraction` /
+`flagTranscriptionStoppedEarly` service-role fns, `syncDailyRoomExpiry`); `routes/app.deal-rooms.$id.meetings.tsx`
+(the sequencer + embedded call + transcription capture + indicator + notes render);
+`components/app/LawyerGate.tsx` + `LawyerRoomView.tsx` + `routes/join-room.tsx` (room-native
+lawyer invite/accept, scoped Legal Counsel view); `email/templates.ts`+`triggers.ts` (lawyer invite).
+
+### Findings fixed along the way (the recurring bug classes)
+- §33 (RLS is row-level, not column-level) struck twice more: `notes_investor` (§35) and
+  `waived_legal_counsel` (§6C4) — both sensitive columns on broadly-writable tables, both split/
+  gated. **Lesson: a sensitive column on a table whose write/read policy is wider than the
+  column's audience is the bug; split it or gate it behind a SECURITY DEFINER fn from the start.**
+- §34 (UI permission ≠ security boundary): lawyer scope enforced at RLS + a layout-level
+  interception (`LawyerRoomView`), not just hidden buttons — verified via direct-URL nav.
+- Lawyer role-escalation on NDA sign (§38.1): never resolve a room-scoped role from global
+  `user.role`; use `deal_room_members.role`.
+- `/nda` gate unreachability (§36): the layout gated its own signing route behind having signed.
+- Silent-catch class (§6A2): access-query errors now fail closed, not into a default that widens access.
+- Daily quirks: `transcript_status` CHECK is `ready` not `complete` (§37); transcription needs
+  `canAdmin` (start/stop), rejected without it; `auto_start_transcription` does not work on this
+  account (step 7); Daily batch-processor transcription needs AWS S3 + IAM role, incompatible
+  with R2 (§37) — so recordings are NOT captured (transcription-only), R2 bucket reserved unused.
+
+### Step-7 live verification (final walk, all PASS)
+Real spoken audio (Playwright + Chrome fake-audio, headed) → Deepgram realtime → app-captured →
+`saveMeetingTranscript` → `runMeetingExtraction` → rendered notes, for BOTH a non-investment_terms
+stage and investment_terms — extractions are source-cited, confidence-scored, figures attributed
+to "Unidentified speaker" (honest, not fabricated). Transcription indicator shows for both
+participants (2-party call screenshot). 5-stage walk screenshotted as founder/investor/lawyer
+(lawyer restricted to Investment Terms only, with its real extraction visible). Token `r`-claim
+binds to a single room; a room-A token is rejected joining room B. Reschedule syncs the Daily
+room `exp` (`syncDailyRoomExpiry`). tsc 68 (baseline, unchanged across the whole branch);
+production build `_worker.js` gzip **0.98 MB, under the 1 MB CF Pages limit**.
+
+### Daily cost (per the step-2 estimate + step-7 usage)
+Realtime Deepgram transcription ≈ $0.0059/unmuted-participant-min; a full 5-stage room is a few
+dollars. No cloud recording = no recording/storage fees. Step-7 live testing used a handful of
+short (~30s) calls well under the $15 promo credit.
