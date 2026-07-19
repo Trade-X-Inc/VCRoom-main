@@ -16,6 +16,7 @@ function pathToStageKey(pathname: string): DealRoomStageKey {
   if (pathname.endsWith("/overview")) return "overview";
   if (pathname.endsWith("/information")) return "information_vault";
   if (pathname.endsWith("/documents")) return "information_vault"; // Documents lives under the Information Vault stage
+  if (pathname.endsWith("/meetings")) return "meetings";
   if (pathname.endsWith("/qa")) return "qa";
   if (pathname.endsWith("/diligence")) return "due_diligence";
   if (pathname.endsWith("/term-sheets")) return "term_sheet";
@@ -258,6 +259,7 @@ function StageTabBar({
   const canAccess = (stage: DealRoomStageKey) => {
     if (stage === "overview") return true;
     if (stage === "information_vault") return true;
+    if (stage === "meetings") return true;
     if (stage === "qa") return workflowRank >= stageRank("qa");
     if (stage === "due_diligence") return workflowRank >= stageRank("due_diligence");
     if (stage === "term_sheet") return isInvestor && workflowRank >= stageRank("term_sheet");
