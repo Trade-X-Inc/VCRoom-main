@@ -1058,3 +1058,59 @@ Same migration established the R14B meeting-content tables:
   `deal_room_id`** (documents pattern — row survives, RLS stops matching); **no client
   write policies at all** — ingestion/extraction writes are service-role server fns only,
   and a room member's direct INSERT was verified to fail with a genuine RLS violation.
+
+---
+
+## 36. R14B STEP 4 LIVE VERIFICATION — three real gaps found and fixed, one found and DEFERRED
+
+Live adversarial testing of the step 4 lawyer gate (room-native `deal_room_members.role =
+'lawyer'`, see step 4's design) surfaced issues beyond the original scope. Three were fixed
+in the same pass (`81d996c`); one is a genuine pre-existing bug, confirmed real, and
+explicitly left unfixed — do not assume "found" means "fixed" when reading this section.
+
+**Fixed — `useDealRoomContext.ts`'s `isTeamMember` false-positive.** A lawyer's
+`deal_room_members` row is scoped entirely to one room, but `isTeamMember` was computed
+purely from the *global* `startup_team_accounts` table — unrelated to the current room. Any
+account that happens to ALSO be a founder-team member somewhere else (as the
+`test-lawyer@hockystick.app` fixture is, from R12B) got routed into the founder
+team-assignment gate and saw a false "Access restricted" screen. Fixed by excluding
+`memberRow?.role === 'lawyer'` from `isTeamMember`. **Lesson: a role computed from one
+table can collide with unrelated data on the same account in a different table — check the
+room-scoped source of truth (`deal_room_members`) first, not a global membership table,
+when a role's real scope is "this room only."**
+
+**Fixed — shared Overview/Information Vault/Q&A/Due Diligence had no lawyer gating.** These
+routes predate R14B and were built assuming only founder/investor/viewer roles exist. A
+lawyer session could reach traction metrics, deal brief generation, and the stage-transition
+control — none of which are in the locked scope ("deal summary, term sheet area, Investment
+Terms meeting, its records — nothing else"). The underlying data was correctly RLS-blocked
+(verified: `founder_documents` policies don't match a lawyer's `auth.uid()` under either the
+founder or investor branch), so this was a page-content gap, not a data leak — but a real
+one per the locked design. Fixed with a new `LawyerRoomView.tsx`, intercepted at the
+`DealRoomLayout` level in `app.deal-rooms.$id.tsx` **before** `<Outlet/>` — so no shared
+route can render for a lawyer even via direct URL navigation. Adversarially verified against
+`/qa`, `/diligence`, `/information` with real navigation, not assumption.
+
+**Fixed — `deal_room_meetings` RLS leaked stages 1-4 to a lawyer.** The table's single
+`deal_room_meetings_members` policy (`for all`) matched any room member, including a lawyer,
+granting full read access to `notes_shared`/`action_items` on all 5 meeting rows. Per §33
+this can't be column-scoped — split into per-command policies with a stage-scoped SELECT
+restriction (`role <> 'lawyer' OR stage_slug = 'investment_terms'`), mirroring
+`deal_room_meeting_records`'s existing pattern from step 4a. **Verified with a real lawyer
+JWT via direct REST call** (not the UI): 1 row returned (investment_terms), zero for stages
+1-4, confirming the restriction holds independent of what the client requests.
+
+**Found, NOT fixed — `/nda` route is unreachable for its own purpose.** `DealRoomLayout`
+(`app.deal-rooms.$id.tsx`) gates its entire `<Outlet/>` — which includes the `/nda` route
+itself, since it's a child route of `$id.tsx` — behind `ndaAcceptance` being truthy. This
+means a user with no `nda_acceptances` row can never render the NDA-signing page to create
+that row: the `useEffect` redirects them to `/nda`, but the same gate then shows
+"Verifying access…" forever on that page too. Confirmed via `git show` that this logic is
+byte-for-byte unchanged from before R14B (predates this branch entirely) — not something
+introduced by this work. Worked around for this session's live verification by inserting the
+`nda_acceptances` row directly via SQL rather than through the UI. **Unclear why this hasn't
+visibly broken founder/investor onboarding** — possibly a code path exists elsewhere that
+signs the NDA before the user ever lands on `/deal-rooms/$id`, or possibly it's simply never
+been noticed. **Needs investigation and a fix as the first item of step 6** (per explicit
+instruction — this must be listed as a step 6 task, not just mentioned in a report). Do not
+assume it's benign just because it predates this branch.
