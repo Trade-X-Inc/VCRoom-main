@@ -99,6 +99,27 @@ async function verifyPrincipalMember(
   return role === "founder" || role === "investor" ? role : null;
 }
 
+/**
+ * Step 4: a lawyer is a deal_room_members row with role='lawyer' in
+ * exactly this room (never a broader team/External construct — see
+ * 20260723000000's design note). Used only by mintInterviewToken, and
+ * only for the investment_terms stage — a lawyer never creates rooms.
+ */
+async function verifyLawyerMember(
+  url: string,
+  key: string,
+  dealRoomId: string,
+  userId: string,
+): Promise<boolean> {
+  const rows: any[] = await sbFetch(
+    url,
+    key,
+    `deal_room_members?deal_room_id=eq.${dealRoomId}&user_id=eq.${userId}&role=eq.lawyer&select=role`,
+    "GET",
+  ).catch(() => []);
+  return (rows?.length ?? 0) > 0;
+}
+
 async function fetchMeeting(url: string, key: string, dealRoomId: string, meetingNumber: number) {
   const rows: any[] = await sbFetch(
     url,
@@ -250,11 +271,22 @@ export const mintInterviewToken = createServerFn({ method: "POST" })
     const uid = await verifyUser(url, key, data.userAccessToken);
     if (!uid) return { ok: false, error: "not_authenticated" };
 
-    const role = await verifyPrincipalMember(url, key, data.dealRoomId, uid);
-    if (!role) return { ok: false, error: "not_authorized" };
-
     const meeting = await fetchMeeting(url, key, data.dealRoomId, data.meetingNumber);
     if (!meeting) return { ok: false, error: "meeting_not_found" };
+
+    // Step 4: a lawyer only ever authorizes for the investment_terms
+    // meeting — checked before falling back to the principal-member rule,
+    // since a lawyer holds no founder/investor role and would otherwise
+    // just fail verifyPrincipalMember with no stage distinction at all.
+    let role: "founder" | "investor" | "lawyer" | null = await verifyPrincipalMember(url, key, data.dealRoomId, uid);
+    if (!role) {
+      if (meeting.stage_slug === "investment_terms" && await verifyLawyerMember(url, key, data.dealRoomId, uid)) {
+        role = "lawyer";
+      } else {
+        return { ok: false, error: "not_authorized" };
+      }
+    }
+
     if (!meeting.daily_room_name || !meeting.daily_room_url) {
       return { ok: false, error: "room_not_created" };
     }
@@ -265,7 +297,8 @@ export const mintInterviewToken = createServerFn({ method: "POST" })
       `users?id=eq.${uid}&select=full_name,email`,
       "GET",
     ).catch(() => []);
-    const userName = users?.[0]?.full_name || users?.[0]?.email || (role === "founder" ? "Founder" : "Investor");
+    const roleLabel = role === "founder" ? "Founder" : role === "investor" ? "Investor" : "Legal Counsel";
+    const userName = users?.[0]?.full_name || users?.[0]?.email || roleLabel;
 
     const tokenResp = await fetch("https://api.daily.co/v1/meeting-tokens", {
       method: "POST",
