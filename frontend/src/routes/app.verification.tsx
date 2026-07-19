@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { VerificationBadge } from "@/components/shared/VerificationBadge";
 import { fetchVerificationStatus } from "@/lib/verification-fn";
+import { OperationalVerificationSection } from "./app.profile.operational";
 import { useState } from "react";
 import { toast } from "sonner";
 import { StatusDot, PageBreadcrumb } from "@/components/system";
@@ -232,6 +233,21 @@ export function VerificationPage() {
             Manage claims →
           </Link>
         </div>
+
+        {/* Tier 3 — Operationally Verified. Relocated here from the Profile
+            Builder › Team Cards leaf (R9 sitemap: verification-tier content
+            belongs in Workstation › Verifications). Same component, same
+            upload flow and AI document checks — location fix only. */}
+        {startup?.id && (
+          <div className="mt-4">
+            <OperationalVerificationSection
+              startupId={startup.id}
+              companyName={startup.company_name ?? "Your company"}
+              userEmail={user?.email ?? ""}
+              displayName={startup.company_name || "Founder"}
+            />
+          </div>
+        )}
         </div>
 
         {/* Right panel — investor preview */}

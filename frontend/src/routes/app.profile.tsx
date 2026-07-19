@@ -11,7 +11,6 @@ import {
 import type { StartupClaim, ClaimStatus } from "@/lib/claims-fn";
 import type { FounderThesis } from "@/lib/founder-thesis-fn";
 import { AttachProofModal } from "@/components/app/AttachProofModal";
-import { OperationalVerificationSection } from "./app.profile.operational";
 import { PageGuide } from "@/components/app/PageGuide";
 import { FieldVerificationBadge, prewarmClassificationCache } from "@/components/app/FieldVerificationBadge";
 import { toast } from "sonner";
@@ -2257,17 +2256,10 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
           duplicated the real Badge Overview & Guide page (app.badges.tsx),
           which already owns "Run badge evaluation" as its one correct home. */}
 
-      {/* Operational Verified — Tier 3 */}
-      {startup?.id && tab !== "analytics" && (
-        <div className="mt-8">
-          <OperationalVerificationSection
-            startupId={startup.id}
-            companyName={form.company_name}
-            userEmail={user?.email ?? ""}
-            displayName={form.company_name || "Founder"}
-          />
-        </div>
-      )}
+      {/* Operationally Verified — Tier 3 moved to Prepare › Workstation ›
+          Verifications (R9 sitemap: verification-tier content lives in the
+          Workstation group, not on a profile-builder leaf). Same component,
+          same upload flow — see app.verification.tsx. */}
 
       {/* Attach-proof modal — rendered outside the form to avoid nesting */}
       {attachingClaim && startup?.id && (
