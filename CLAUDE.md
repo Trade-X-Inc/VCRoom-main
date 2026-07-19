@@ -1222,3 +1222,114 @@ records row created for this test: **0 rows returned** for a lawyer session read
 `terms_discussion`-stage meeting's records, confirming the stage-scoped RLS restriction
 (`20260723030000_r14b_meetings_lawyer_scope.sql`) still holds correctly with real transcript
 content present, not just against the earlier placeholder rows.
+
+---
+
+## 38. R14B STEP 6 SECURITY PASS — findings, fixes, and one open product decision (July 2026)
+
+A dedicated security pass (fix known-deferred items, regression-prove every prior
+security find, hunt this branch's recurring bug classes). Everything below was
+live-verified with real JWTs / rolled-back or cleaned-up fixtures.
+
+### 38.1 Two real fixes beyond the known /nda item
+
+- **`/nda` gate unreachability (§36) — FIXED.** `DealRoomLayout` gated its own `/nda`
+  child route behind already-having-signed, so an invited-but-unsigned member could never
+  render the signing form. Fixed by exempting `/nda` (renders in a bare shell before the
+  ndaAcceptance gate; only that one route is reachable pre-signature). Verified: unsigned
+  founder AND unsigned lawyer both reach + complete signing.
+
+- **Lawyer role-escalation on NDA sign — FIXED (found while fixing the above).**
+  `nda.tsx`'s `handleAccept` resolved the signer role from the GLOBAL `user.role`, then
+  upserted `deal_room_members` with `onConflict deal_room_id,user_id`. A lawyer arriving
+  via `/join-room` has global `user.role === "investor"` but a `deal_room_members` row with
+  `role === "lawyer"` — so signing REWROTE their membership to `"investor"`, escalating them
+  out of the locked Legal Counsel scope into full investor access. Fixed by resolving the
+  role from the room-scoped `deal_room_members` row (fetched fresh at accept time, §5).
+  **Lesson (again): never resolve a room-scoped role from the global `user.role`; the
+  room-scoped `deal_room_members.role` is authoritative. Global role for a lawyer is
+  whatever their base account is (here investor), which is wrong for every room-scoped
+  decision.**
+
+### 38.2 Fail-closed on load-bearing access-query errors (silent-catch sweep)
+
+`useDealRoomContext`'s `memberRow` query silently coerced a backend error to `null`; since
+that row resolves `isLawyer`/`isInvestor`/`isFounder`, a null fell back to the global role —
+an escalation-on-error for a lawyer. Now the memberRow/ndaAcceptance queries throw on real
+errors (`maybeSingle()` returns `error === null` for the legitimate zero-rows case, so this
+fires only on genuine failure), and `DealRoomLayout` consumes a new `ctx.accessError` to
+**fail closed** with an honest "Couldn't verify your access" screen rather than render room
+content from an untrusted role. **General rule for this codebase: a client query whose
+result feeds a role/access decision must surface its error and the consumer must fail
+closed — never let an error coerce to a default that widens access.**
+
+### 38.3 §33 struck a FOURTH time — `deal_rooms.waived_legal_counsel` — FIXED
+
+Adversarial testing found a **founder could set `deal_rooms.waived_legal_counsel = true`
+via a plain REST PATCH**, unilaterally forcing the deal past the Investment Terms gate
+without legal counsel against the investor's wishes — bypassing the locked "skipping counsel
+requires BOTH parties" mechanic. Root cause is the exact §33 anti-pattern: step 4a added the
+waiver columns onto `deal_rooms`, which already had a broad `is_startup_founder` ALL write
+policy — a sensitive column on a table whose write policy is wider than the column's intended
+audience. (Same table-level broad-write-plus-sensitive-column mistake as §32.3 roast payment
+and §33 team bio.) The investor, conversely, had NO update policy, which also silently broke
+the mutual mechanic whenever the investor was the approver.
+
+**Fixed at the DB for every writer** (`20260723040000_r14b_counsel_waiver_integrity.sql`): a
+BEFORE UPDATE trigger blocks any direct change to the four waiver columns unless inside
+`finalize_counsel_waiver()` (marked by a txn-local GUC); that SECURITY DEFINER RPC is the
+only sanctioned path — it requires an APPROVED `waive_counsel` request to exist (whose own
+resolve policy enforces approver ≠ requester, proving both sides agreed) and works for either
+party, fixing the asymmetry. `LawyerGate` calls the RPC instead of a direct `deal_rooms`
+update. Live-verified: founder direct PATCH → trigger 400; RPC without an approved request →
+`no_approved_waive_request`; RPC as investor after genuine approval → ok with both
+`confirmed_by` recorded; uninvolved → `not_authorized`. **Reinforced lesson: when adding a
+column that must be write-restricted to a subset of a table's writers, the table's existing
+write policy is almost certainly too broad — gate the write behind a SECURITY DEFINER RPC +
+a column-guard trigger, or split the column into its own table. Adding it raw is the bug.**
+
+### 38.4 Regression matrix — all prior finds still hold
+
+Re-ran live (real JWTs, cleaned-up fixtures): §35 `notes_investor` (founder 0 / investor 1 /
+lawyer 0); records role+stage restriction (uninvolved 0, lawyer investment_terms-only, no
+stage-1, investor both); `deal_room_meetings` stage-scoped SELECT (lawyer sees meeting 5
+only); lawyer zero-footprint (0 investor_team_members; the single `startup_team_accounts`
+row is the pre-existing R12B `external` fixture, predates this branch); LawyerRoomView
+interception on `/qa` + `/diligence` (+ `/overview`/`/information` via identical layout
+interception); soft-deleted records invisible to all members; §34 `discovery_requests`
+role-check policy still references `investor_can_request_access` and the helper still
+discriminates. `mintInterviewToken` lawyer/stage authorization is unchanged since step-4's
+decoded-token live verification (only fail-closed logging was added in step 6); its live
+join-token re-mint is folded into step 7's join proofs.
+
+### 38.5 New-surface hunt — attacks attempted, all held
+
+- **Transcript save path**: `deal_room_meeting_records` is client-write-locked — direct REST
+  INSERT → 403 RLS, direct UPDATE of an existing row → 0 rows (value unchanged). The
+  service-role server fns are the only writers and gate on membership of the *claimed*
+  `dealRoomId` (uid comes from the JWT, not a passed id), so no cross-room spoof.
+- **Lawyer invite tokens**: `gen_random_uuid()` (122-bit, unguessable); `accept_lawyer_invite`
+  rejects expired / self-acceptance / invalid / already-accepted (replay by same OR different
+  user); the `one_accepted_lawyer_per_side` partial unique index caps at one accepted lawyer
+  per side and the whole accept rolls back atomically on violation (no stray member row). Note
+  (consistent with the platform's existing team-invite model, not a new defect): acceptance is
+  token-possession auth — it is NOT bound to the invited email, so anyone with the token link
+  (and not the inviter) can accept.
+- **Secrets**: no key material in the branch diff since `b1efa02`; no VITE_-prefixed secret
+  added; R2/Daily/OpenAI values live only in gitignored `.env.local`.
+- **Roast**: `roast-fn.ts` and every roast file are byte-identical to the merge-base.
+
+### 38.6 OPEN — flagged for product decision, nothing chosen
+
+**Founder holds `canAdmin: ["transcription"]` on the interview meeting token.** Audited
+against Daily's permission model: the array form grants ONLY transcription admin — it does
+NOT grant participant-eject (`participants`) or recording control (`streaming`), and
+`is_owner` is false. So the scope is minimal and correct. The one residual capability: the
+founder could, via a crafted Daily SDK/API call, `stopTranscription()` mid-meeting to omit
+subsequent speech from the AI notes. Mitigations already in place: our UI surfaces no stop
+control, and `transcription-stopped` fires for all participants so the §6A3 indicator banner
+disappears — the counterparty *sees* it stop. NOT mitigated: no persistent audit record that
+transcription was stopped/restarted, and control is founder-only (asymmetric). **Product
+decision needed (options, none chosen here): (a) accept as-is given the visibility
+mitigation; (b) also grant the investor transcription-admin for symmetry; (c) add
+server-side audit logging of transcription start/stop events.**
