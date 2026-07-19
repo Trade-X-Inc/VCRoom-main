@@ -18,6 +18,7 @@ import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as RegistryRouteImport } from './routes/registry'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as JoinRoomRouteImport } from './routes/join-room'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as InviteRouteImport } from './routes/invite'
 import { Route as InvestorsRouteImport } from './routes/investors'
@@ -182,6 +183,7 @@ import { Route as AppDealRoomsIdTermSheetsRouteImport } from './routes/app.deal-
 import { Route as AppDealRoomsIdQaRouteImport } from './routes/app.deal-rooms.$id.qa'
 import { Route as AppDealRoomsIdOverviewRouteImport } from './routes/app.deal-rooms.$id.overview'
 import { Route as AppDealRoomsIdNdaRouteImport } from './routes/app.deal-rooms.$id.nda'
+import { Route as AppDealRoomsIdMeetingsRouteImport } from './routes/app.deal-rooms.$id.meetings'
 import { Route as AppDealRoomsIdInformationRouteImport } from './routes/app.deal-rooms.$id.information'
 import { Route as AppDealRoomsIdDocumentsRouteImport } from './routes/app.deal-rooms.$id.documents'
 import { Route as AppDealRoomsIdDiligenceRouteImport } from './routes/app.deal-rooms.$id.diligence'
@@ -248,6 +250,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinRoomRoute = JoinRoomRouteImport.update({
+  id: '/join-room',
+  path: '/join-room',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JoinRoute = JoinRouteImport.update({
@@ -1112,6 +1119,11 @@ const AppDealRoomsIdNdaRoute = AppDealRoomsIdNdaRouteImport.update({
   path: '/nda',
   getParentRoute: () => AppDealRoomsIdRoute,
 } as any)
+const AppDealRoomsIdMeetingsRoute = AppDealRoomsIdMeetingsRouteImport.update({
+  id: '/meetings',
+  path: '/meetings',
+  getParentRoute: () => AppDealRoomsIdRoute,
+} as any)
 const AppDealRoomsIdInformationRoute =
   AppDealRoomsIdInformationRouteImport.update({
     id: '/information',
@@ -1255,6 +1267,7 @@ export interface FileRoutesByFullPath {
   '/investors': typeof InvestorsRoute
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
+  '/join-room': typeof JoinRoomRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/registry': typeof RegistryRoute
@@ -1375,6 +1388,7 @@ export interface FileRoutesByFullPath {
   '/app/deal-rooms/$id/diligence': typeof AppDealRoomsIdDiligenceRoute
   '/app/deal-rooms/$id/documents': typeof AppDealRoomsIdDocumentsRoute
   '/app/deal-rooms/$id/information': typeof AppDealRoomsIdInformationRoute
+  '/app/deal-rooms/$id/meetings': typeof AppDealRoomsIdMeetingsRoute
   '/app/deal-rooms/$id/nda': typeof AppDealRoomsIdNdaRoute
   '/app/deal-rooms/$id/overview': typeof AppDealRoomsIdOverviewRoute
   '/app/deal-rooms/$id/qa': typeof AppDealRoomsIdQaRoute
@@ -1449,6 +1463,7 @@ export interface FileRoutesByTo {
   '/investors': typeof InvestorsRoute
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
+  '/join-room': typeof JoinRoomRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/registry': typeof RegistryRoute
@@ -1568,6 +1583,7 @@ export interface FileRoutesByTo {
   '/app/deal-rooms/$id/diligence': typeof AppDealRoomsIdDiligenceRoute
   '/app/deal-rooms/$id/documents': typeof AppDealRoomsIdDocumentsRoute
   '/app/deal-rooms/$id/information': typeof AppDealRoomsIdInformationRoute
+  '/app/deal-rooms/$id/meetings': typeof AppDealRoomsIdMeetingsRoute
   '/app/deal-rooms/$id/nda': typeof AppDealRoomsIdNdaRoute
   '/app/deal-rooms/$id/overview': typeof AppDealRoomsIdOverviewRoute
   '/app/deal-rooms/$id/qa': typeof AppDealRoomsIdQaRoute
@@ -1646,6 +1662,7 @@ export interface FileRoutesById {
   '/investors': typeof InvestorsRoute
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
+  '/join-room': typeof JoinRoomRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/registry': typeof RegistryRoute
@@ -1766,6 +1783,7 @@ export interface FileRoutesById {
   '/app/deal-rooms/$id/diligence': typeof AppDealRoomsIdDiligenceRoute
   '/app/deal-rooms/$id/documents': typeof AppDealRoomsIdDocumentsRoute
   '/app/deal-rooms/$id/information': typeof AppDealRoomsIdInformationRoute
+  '/app/deal-rooms/$id/meetings': typeof AppDealRoomsIdMeetingsRoute
   '/app/deal-rooms/$id/nda': typeof AppDealRoomsIdNdaRoute
   '/app/deal-rooms/$id/overview': typeof AppDealRoomsIdOverviewRoute
   '/app/deal-rooms/$id/qa': typeof AppDealRoomsIdQaRoute
@@ -1845,6 +1863,7 @@ export interface FileRouteTypes {
     | '/investors'
     | '/invite'
     | '/join'
+    | '/join-room'
     | '/pricing'
     | '/privacy'
     | '/registry'
@@ -1965,6 +1984,7 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/$id/diligence'
     | '/app/deal-rooms/$id/documents'
     | '/app/deal-rooms/$id/information'
+    | '/app/deal-rooms/$id/meetings'
     | '/app/deal-rooms/$id/nda'
     | '/app/deal-rooms/$id/overview'
     | '/app/deal-rooms/$id/qa'
@@ -2039,6 +2059,7 @@ export interface FileRouteTypes {
     | '/investors'
     | '/invite'
     | '/join'
+    | '/join-room'
     | '/pricing'
     | '/privacy'
     | '/registry'
@@ -2158,6 +2179,7 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/$id/diligence'
     | '/app/deal-rooms/$id/documents'
     | '/app/deal-rooms/$id/information'
+    | '/app/deal-rooms/$id/meetings'
     | '/app/deal-rooms/$id/nda'
     | '/app/deal-rooms/$id/overview'
     | '/app/deal-rooms/$id/qa'
@@ -2235,6 +2257,7 @@ export interface FileRouteTypes {
     | '/investors'
     | '/invite'
     | '/join'
+    | '/join-room'
     | '/pricing'
     | '/privacy'
     | '/registry'
@@ -2355,6 +2378,7 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/$id/diligence'
     | '/app/deal-rooms/$id/documents'
     | '/app/deal-rooms/$id/information'
+    | '/app/deal-rooms/$id/meetings'
     | '/app/deal-rooms/$id/nda'
     | '/app/deal-rooms/$id/overview'
     | '/app/deal-rooms/$id/qa'
@@ -2433,6 +2457,7 @@ export interface RootRouteChildren {
   InvestorsRoute: typeof InvestorsRoute
   InviteRoute: typeof InviteRoute
   JoinRoute: typeof JoinRouteWithChildren
+  JoinRoomRoute: typeof JoinRoomRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RegistryRoute: typeof RegistryRoute
@@ -2537,6 +2562,13 @@ declare module '@tanstack/react-router' {
       path: '/pricing'
       fullPath: '/pricing'
       preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join-room': {
+      id: '/join-room'
+      path: '/join-room'
+      fullPath: '/join-room'
+      preLoaderRoute: typeof JoinRoomRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/join': {
@@ -3687,6 +3719,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDealRoomsIdNdaRouteImport
       parentRoute: typeof AppDealRoomsIdRoute
     }
+    '/app/deal-rooms/$id/meetings': {
+      id: '/app/deal-rooms/$id/meetings'
+      path: '/meetings'
+      fullPath: '/app/deal-rooms/$id/meetings'
+      preLoaderRoute: typeof AppDealRoomsIdMeetingsRouteImport
+      parentRoute: typeof AppDealRoomsIdRoute
+    }
     '/app/deal-rooms/$id/information': {
       id: '/app/deal-rooms/$id/information'
       path: '/information'
@@ -4006,6 +4045,7 @@ interface AppDealRoomsIdRouteChildren {
   AppDealRoomsIdDiligenceRoute: typeof AppDealRoomsIdDiligenceRoute
   AppDealRoomsIdDocumentsRoute: typeof AppDealRoomsIdDocumentsRoute
   AppDealRoomsIdInformationRoute: typeof AppDealRoomsIdInformationRoute
+  AppDealRoomsIdMeetingsRoute: typeof AppDealRoomsIdMeetingsRoute
   AppDealRoomsIdNdaRoute: typeof AppDealRoomsIdNdaRoute
   AppDealRoomsIdOverviewRoute: typeof AppDealRoomsIdOverviewRoute
   AppDealRoomsIdQaRoute: typeof AppDealRoomsIdQaRoute
@@ -4018,6 +4058,7 @@ const AppDealRoomsIdRouteChildren: AppDealRoomsIdRouteChildren = {
   AppDealRoomsIdDiligenceRoute: AppDealRoomsIdDiligenceRoute,
   AppDealRoomsIdDocumentsRoute: AppDealRoomsIdDocumentsRoute,
   AppDealRoomsIdInformationRoute: AppDealRoomsIdInformationRoute,
+  AppDealRoomsIdMeetingsRoute: AppDealRoomsIdMeetingsRoute,
   AppDealRoomsIdNdaRoute: AppDealRoomsIdNdaRoute,
   AppDealRoomsIdOverviewRoute: AppDealRoomsIdOverviewRoute,
   AppDealRoomsIdQaRoute: AppDealRoomsIdQaRoute,
@@ -4237,6 +4278,7 @@ const rootRouteChildren: RootRouteChildren = {
   InvestorsRoute: InvestorsRoute,
   InviteRoute: InviteRoute,
   JoinRoute: JoinRouteWithChildren,
+  JoinRoomRoute: JoinRoomRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RegistryRoute: RegistryRoute,

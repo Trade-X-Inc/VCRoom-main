@@ -7,6 +7,7 @@ import { useDealRoomContext, type DealRoomContext } from "@/hooks/useDealRoomCon
 import { DealRoomCtx } from "@/hooks/useDealRoom";
 import { STAGES, STAGE_KEY_TO_PATH, stageRank, type DealRoomStageKey } from "@/lib/deal-room-stages";
 import { Timeline } from "@/components/app/DealRoomTimeline";
+import { LawyerRoomView } from "@/components/app/LawyerRoomView";
 
 export const Route = createFileRoute("/app/deal-rooms/$id")({
   component: DealRoomLayout,
@@ -33,7 +34,7 @@ function DealRoomLayout() {
   const navigate = useNavigate();
 
   const ctx = useDealRoomContext(dealRoomId);
-  const { room, companyName, isInvestor, isTeamMember, teamAssignment, teamAssignmentLoading, ndaAcceptance, ndaLoading, connectionOrigin } = ctx;
+  const { room, companyName, isInvestor, isLawyer, isTeamMember, teamAssignment, teamAssignmentLoading, ndaAcceptance, ndaLoading, connectionOrigin } = ctx;
 
   // ── Redirect to NDA page if not yet signed ───────────────────
   useEffect(() => {
@@ -47,6 +48,51 @@ function DealRoomLayout() {
       <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] items-center justify-center">
         <div className="text-sm text-gray-500 animate-pulse">Verifying access…</div>
       </div>
+    );
+  }
+
+  // Lawyer access — locked scope per R14B step 4: deal summary, term sheet
+  // area, the Investment Terms meeting, and its records. Nothing else.
+  // Intercepted here, before the shared StageTabBar/Outlet render below,
+  // so a lawyer can never reach Overview/Information Vault/Q&A/Diligence
+  // even via direct URL navigation — those routes read startup-wide data
+  // this role is not scoped to, and RLS alone isn't a UI-level guarantee
+  // (see CLAUDE.md §34: RLS is the security boundary, this is the honest
+  // UX to match it, not a substitute for it).
+  if (isLawyer) {
+    return (
+      <DealRoomCtx.Provider value={ctx}>
+        <div className="flex flex-col h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] relative">
+          <header className="shrink-0 border-b bg-white border-[rgba(0,0,0,0.08)]" data-testid="deal-stage-bar">
+            <div className="flex items-center gap-3 px-4 py-3">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Link
+                  to={"/app/deal-rooms" as any}
+                  className="grid h-8 w-8 place-items-center rounded-lg text-gray-500 hover:text-foreground hover:bg-accent shrink-0"
+                  title="All deal rooms"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Link>
+                <div
+                  className="grid h-8 w-8 place-items-center rounded-lg shrink-0 font-semibold text-foreground"
+                  style={{ background: "var(--gradient-brand)" }}
+                >
+                  {companyName[0] ?? "D"}
+                </div>
+                <div className="min-w-0 hidden sm:block">
+                  <div className="text-sm font-semibold text-gray-900 truncate" style={{ fontFamily: "Syne, sans-serif" }}>
+                    {companyName}
+                  </div>
+                  <div className="text-[10px] text-gray-500">Legal Counsel · Investment Terms only</div>
+                </div>
+              </div>
+            </div>
+          </header>
+          <main className="flex-1 overflow-y-auto min-h-0 bg-gray-50">
+            {path.endsWith("/meetings") ? <Outlet /> : <LawyerRoomView />}
+          </main>
+        </div>
+      </DealRoomCtx.Provider>
     );
   }
 

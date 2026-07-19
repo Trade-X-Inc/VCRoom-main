@@ -128,7 +128,15 @@ export function useDealRoomContext(dealRoomId: string) {
   });
 
   const isAdminTeamMember = teamAccountRow?.role === "admin";
-  const isTeamMember = !!teamAccountRow && !isInvestor && !isStartupOwner && !isAdminTeamMember;
+  // A room-native lawyer (deal_room_members.role === "lawyer", see R14B §4)
+  // is scoped entirely by their membership row in THIS room, never by
+  // startup_team_accounts — that table can be unrelated (e.g. a fixture
+  // account that also happens to be an External team member on a different
+  // founder's team). Excluding it here stops the founder-team-assignment
+  // gate below from misfiring for a lawyer whose only real access grant is
+  // the deal_room_members row.
+  const isLawyerMember = memberRow?.role === "lawyer";
+  const isTeamMember = !!teamAccountRow && !isInvestor && !isStartupOwner && !isAdminTeamMember && !isLawyerMember;
 
   const { data: teamAssignment, isLoading: teamAssignmentLoading } = useQuery({
     queryKey: ["team-assignment-gate", dealRoomId, teamAccountRow?.id],
@@ -188,6 +196,7 @@ export function useDealRoomContext(dealRoomId: string) {
     ndaLoading,
     isInvestor,
     isFounder,
+    isLawyer: isLawyerMember,
     isStartupOwner,
     isTeamMember,
     isAdminTeamMember,

@@ -104,9 +104,14 @@ function InterviewCall({ roomUrl, token, onLeft, onError }: {
 
 function MeetingsPage() {
   const ctx = useDealRoom();
-  const { dealRoomId, isInvestor, isFounder, userId, founderUserId, investorUserId, companyName } = ctx;
+  const { dealRoomId, isInvestor, isFounder, isLawyer, userId, founderUserId, investorUserId, companyName } = ctx;
   const qc = useQueryClient();
   const { gateOpen } = useLawyerGateState(dealRoomId);
+  // A lawyer session is scoped to Investment Terms only (locked design,
+  // R14B step 4) — the underlying data is already RLS-restricted, this
+  // also hides the other 4 stages' labels/existence from the UI so the
+  // page reads as "just this one meeting", not "4 locked meetings".
+  const visibleStages = isLawyer ? STAGES.filter((s) => s.slug === "investment_terms") : STAGES;
 
   const { data: meetings = [], isLoading } = useQuery<MeetingRow[]>({
     queryKey: ["interview-meetings", dealRoomId],
@@ -270,7 +275,9 @@ function MeetingsPage() {
           </h1>
         </div>
         <p className="mt-1 text-sm text-[#52525B]">
-          Five structured meeting stages, in sequence. Each stage can be scheduled or skipped.
+          {isLawyer
+            ? "The Investment Terms meeting — the only stage your access covers."
+            : "Five structured meeting stages, in sequence. Each stage can be scheduled or skipped."}
         </p>
       </div>
 
@@ -305,7 +312,7 @@ function MeetingsPage() {
         <div className="border border-[#E4E4E7] bg-white p-6 text-sm text-[#71717A]">Loading meeting stages…</div>
       ) : (
         <div className="flex flex-col gap-3">
-          {STAGES.map((stage) => {
+          {visibleStages.map((stage) => {
             const m = meetings.find((x) => x.meeting_number === stage.number);
             const status = statusOf(m);
             const isLawyerStage = stage.slug === "investment_terms";
