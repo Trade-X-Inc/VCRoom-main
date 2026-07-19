@@ -188,7 +188,20 @@ function NdaPage() {
     setAccepting(true);
     setError("");
     try {
-      const role = user.role ?? "investor";
+      // Role MUST come from the room-scoped deal_room_members row, never the
+      // global user.role. A lawyer arriving via /join-room has global
+      // user.role === "investor", but a deal_room_members row with
+      // role === "lawyer"; using user.role here (and in the upsert below,
+      // which has onConflict deal_room_id,user_id) would REWRITE their
+      // membership to "investor" on signature — a privilege escalation out
+      // of the locked lawyer scope. Fetched fresh at accept time (§5).
+      const { data: memberRow } = await supabase
+        .from("deal_room_members")
+        .select("role")
+        .eq("deal_room_id", dealRoomId)
+        .eq("user_id", user.id)
+        .maybeSingle();
+      const role = (memberRow?.role as string | undefined) ?? user.role ?? "investor";
 
       // Resolve signer_company from live profile data at sign time
       let signerCompany = "";

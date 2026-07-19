@@ -36,14 +36,46 @@ function DealRoomLayout() {
   const ctx = useDealRoomContext(dealRoomId);
   const { room, companyName, isInvestor, isLawyer, isTeamMember, teamAssignment, teamAssignmentLoading, ndaAcceptance, ndaLoading, connectionOrigin } = ctx;
 
+  const isNdaRoute = path.endsWith("/nda");
+
   // ── Redirect to NDA page if not yet signed ───────────────────
+  // Never redirect when already on /nda — that route is the exception below.
   useEffect(() => {
-    if (!ndaLoading && user?.id && !ndaAcceptance) {
+    if (!ndaLoading && user?.id && !ndaAcceptance && !isNdaRoute) {
       navigate({ to: "/app/deal-rooms/$id/nda", params: { id: dealRoomId } });
     }
-  }, [ndaLoading, ndaAcceptance, user?.id, navigate, dealRoomId]);
+  }, [ndaLoading, ndaAcceptance, user?.id, navigate, dealRoomId, isNdaRoute]);
 
-  if (!user?.id || ndaLoading || !ndaAcceptance) {
+  // Auth + NDA-status still resolving — brief spinner, applies to every route.
+  if (!user?.id || ndaLoading) {
+    return (
+      <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] items-center justify-center">
+        <div className="text-sm text-gray-500 animate-pulse">Verifying access…</div>
+      </div>
+    );
+  }
+
+  // The NDA-signing route is the ONE route reachable before signature — it
+  // MUST render even without an nda_acceptances row, otherwise an invited-
+  // but-unsigned member (founder, investor, or a lawyer arriving via
+  // /join-room) can never sign (§36 fix: this layout previously gated its
+  // own /nda child route behind already-having-signed, making it
+  // permanently unreachable). Rendered in a bare shell — no stage bar, no
+  // lawyer/team gates, no DealRoomCtx — so no other room surface leaks
+  // pre-signature. nda.tsx is self-contained (no useDealRoom dependency).
+  if (isNdaRoute) {
+    return (
+      <div className="flex flex-col h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)]">
+        <main className="flex-1 overflow-y-auto min-h-0 bg-gray-50">
+          <Outlet />
+        </main>
+      </div>
+    );
+  }
+
+  // Every other route requires a signed NDA — the useEffect above sends an
+  // unsigned member to /nda (handled by the exception just above).
+  if (!ndaAcceptance) {
     return (
       <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] items-center justify-center">
         <div className="text-sm text-gray-500 animate-pulse">Verifying access…</div>
