@@ -223,19 +223,17 @@ export function LawyerGate({
         }
         toast.success("Approved — invite sent.");
       } else if (approve && request.kind === "waive_counsel") {
-        // Mutual skip: this approval IS the second side's confirmation —
-        // the requester already implicitly agreed by proposing it, so one
-        // counterparty approval is sufficient to finalize (matches the
-        // "mutual" framing: propose = side A confirms, approve = side B
-        // confirms; both are recorded).
-        const patch: Record<string, unknown> = {
-          waived_legal_counsel: true,
-          waived_legal_counsel_at: new Date().toISOString(),
-        };
-        patch[request.side === "founder" ? "waived_legal_counsel_investor_confirmed_by" : "waived_legal_counsel_founder_confirmed_by"] = userId;
-        patch[request.side === "founder" ? "waived_legal_counsel_founder_confirmed_by" : "waived_legal_counsel_investor_confirmed_by"] = request.requested_by;
-        const { error: roomErr } = await supabase.from("deal_rooms").update(patch).eq("id", dealRoomId);
-        if (roomErr) throw roomErr;
+        // Mutual skip: the request row was just flipped to 'approved' above
+        // (its RLS enforces approver <> requester, so this genuinely took
+        // both parties). The waiver flag itself can NOT be set by a direct
+        // deal_rooms update — the enforce_counsel_waiver_write trigger blocks
+        // that (a founder could otherwise waive unilaterally, §6C4). It must
+        // go through finalize_counsel_waiver(), which re-checks that an
+        // approved waive request exists and records both confirmed_by from
+        // it, and works whether the founder OR the investor is the approver.
+        const { data: fin, error: rpcErr } = await supabase.rpc("finalize_counsel_waiver", { p_deal_room_id: dealRoomId });
+        const finRow = Array.isArray(fin) ? fin[0] : fin;
+        if (rpcErr || !finRow?.ok) throw new Error(finRow?.error || rpcErr?.message || "Could not finalize the waiver");
         toast.success("Confirmed — proceeding without counsel.");
       } else {
         toast.success(approve ? "Approved." : "Declined.");
