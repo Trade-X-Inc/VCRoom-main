@@ -336,17 +336,17 @@ export const mintInterviewToken = createServerFn({ method: "POST" })
           eject_at_token_exp: true,
           user_name: userName,
           is_owner: false,
-          // §6C2 resolution: auto-start transcription via the token flag,
-          // and DELIBERATELY grant NO canAdmin. Consequence: transcription
-          // starts automatically when a participant joins (no client
-          // startTranscription() call, no admin), and because NO participant
-          // holds canAdmin, NO ONE can manually stopTranscription() mid-call
-          // — it stops only at natural meeting end. This removes the
-          // manual-stop / mid-call-censorship capability entirely rather
-          // than merely logging it (product decision, step 6). Set on every
-          // role's token so the first joiner triggers it gap-free; Daily
-          // runs a single room transcription instance.
-          auto_start_transcription: true,
+          // §6C2 fallback (step 7): auto_start_transcription was confirmed
+          // NON-FUNCTIONAL in live real-voice testing — it never fires
+          // transcription-started, even with real audio. So transcription
+          // must be started by a canAdmin client. Only the founder gets it
+          // (deterministic single owner; investor/lawyer never start it).
+          // The founder can therefore also stop it mid-call — that early
+          // stop is caught and permanently flagged on the record
+          // (flagTranscriptionStoppedEarly), rendered in the notes UI, since
+          // the capability can't be removed without losing the ability to
+          // start transcription at all.
+          permissions: role === "founder" ? { canAdmin: ["transcription"] } : {},
         },
       }),
     });
@@ -449,6 +449,42 @@ export const saveMeetingTranscript = createServerFn({ method: "POST" })
       transcript_status: "ready",
       transcript_error: null,
       transcript_text: data.transcriptText,
+    });
+    return { ok: true };
+  });
+
+// §6C2 fallback (step 7): permanently flag a mid-meeting transcription stop
+// on the record, so a later reviewer sees the transcript was cut short and
+// by whom. The client detects the early stop (transcription-stopped with a
+// truthy updatedBy while the meeting is ongoing) and calls this; the write
+// goes through the service role since the records table is client-locked.
+// Idempotent: a natural end never calls this, and once flagged it stays.
+type FlagStopInput = { userAccessToken: string; dealRoomId: string; meetingNumber: number; stoppedByRole: string };
+
+export const flagTranscriptionStoppedEarly = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as FlagStopInput)
+  .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
+    const { url, key } = getEnv();
+    if (!url || !key) return { ok: false, error: "db_unavailable" };
+    const uid = await verifyUser(url, key, data.userAccessToken);
+    if (!uid) return { ok: false, error: "not_authenticated" };
+
+    const meeting = await fetchMeeting(url, key, data.dealRoomId, data.meetingNumber);
+    if (!meeting) return { ok: false, error: "meeting_not_found" };
+    let role: "founder" | "investor" | "lawyer" | null = await verifyPrincipalMember(url, key, data.dealRoomId, uid);
+    if (!role) {
+      if (meeting.stage_slug === "investment_terms" && await verifyLawyerMember(url, key, data.dealRoomId, uid)) role = "lawyer";
+      else return { ok: false, error: "not_authorized" };
+    }
+
+    const record = await fetchOrCreateRecord(url, key, meeting.id, data.dealRoomId);
+    if (!record) return { ok: false, error: "record_unavailable" };
+    if (record.transcription_stopped_early) return { ok: true }; // already flagged
+
+    await patchRecord(url, key, record.id, {
+      transcription_stopped_early: true,
+      transcription_stopped_by: (data.stoppedByRole || "unknown").slice(0, 40),
+      transcription_stopped_at: new Date().toISOString(),
     });
     return { ok: true };
   });

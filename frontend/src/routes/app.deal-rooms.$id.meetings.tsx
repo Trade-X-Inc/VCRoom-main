@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { useDealRoom } from "@/hooks/useDealRoom";
 import { upsertDealRoomMeeting } from "@/lib/deal-room-workflow-fn";
 import { skipMeeting, updateMeetingNotes } from "@/lib/deal-room-fn";
-import { createInterviewRoom, mintInterviewToken, saveMeetingTranscript, runMeetingExtraction, type MeetingExtraction } from "@/lib/interview-fn";
+import { createInterviewRoom, mintInterviewToken, saveMeetingTranscript, runMeetingExtraction, flagTranscriptionStoppedEarly, type MeetingExtraction } from "@/lib/interview-fn";
 import { LawyerGate, useLawyerGateState } from "@/components/app/LawyerGate";
 
 // R14B step 3 — the interview stage sequencer, re-mounting the old
@@ -47,6 +47,9 @@ type MeetingRecordRow = {
   extraction_status: "pending" | "processing" | "ready" | "failed";
   extraction_error: string | null;
   extracted_notes: MeetingExtraction | null;
+  transcription_stopped_early: boolean | null;
+  transcription_stopped_by: string | null;
+  transcription_stopped_at: string | null;
 };
 
 function statusOf(m: MeetingRow | undefined): "done" | "skipped" | "scheduled" | "unscheduled" {
@@ -85,12 +88,14 @@ function StatusChip({ status }: { status: string }) {
 // side triggers startTranscription() — Daily transcription is a single
 // per-room instance; a redundant start from a second client errors rather
 // than layering, so a single deterministic owner avoids that.
-function InterviewCall({ roomUrl, token, onLeft, onError }: {
+function InterviewCall({ roomUrl, token, onLeft, onError, isTranscriptionOwner, onEarlyStop }: {
   roomUrl: string; token: string; onLeft: (transcriptText: string) => void; onError: (msg: string) => void;
+  isTranscriptionOwner: boolean; onEarlyStop: (stoppedByRole: string) => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<any>(null);
   const transcriptRef = useRef<{ participantId: string; text: string; timestamp: string }[]>([]);
+  const leavingRef = useRef(false);
   // Transcription-active state, driven by Daily's transcription-started/
   // -stopped events. Both events fire for ALL participants (Daily's model),
   // so both parties independently see the indicator — satisfying the locked
@@ -111,6 +116,7 @@ function InterviewCall({ roomUrl, token, onLeft, onError }: {
       });
       frameRef.current = frame;
       frame.on("left-meeting", () => {
+        leavingRef.current = true;
         const text = transcriptRef.current
           .map((seg) => `[${seg.participantId}] ${seg.text}`)
           .join("\n");
@@ -118,7 +124,23 @@ function InterviewCall({ roomUrl, token, onLeft, onError }: {
       });
       frame.on("error", (e: any) => onError(e?.errorMsg || "The meeting room is unavailable."));
       frame.on("transcription-started", () => setTranscribing(true));
-      frame.on("transcription-stopped", () => setTranscribing(false));
+      frame.on("transcription-stopped", (e: any) => {
+        setTranscribing(false);
+        // §6C2 fallback: a truthy updatedBy means a participant explicitly
+        // stopped transcription (a natural room-empty end carries none,
+        // live-verified). If that happens while the meeting is still ongoing
+        // (we're not leaving, others still present), it's an early stop —
+        // flag it permanently. Resolve the stopper's role from their
+        // user_name (set to the role label when the token was minted).
+        if (!e?.updatedBy || leavingRef.current) return;
+        try {
+          const parts = frame.participants();
+          const remoteCount = Object.keys(parts).filter((k) => k !== "local").length;
+          if (remoteCount < 1) return; // meeting effectively ending
+          const stopper = Object.values(parts).find((p: any) => p?.session_id === e.updatedBy) as any;
+          onEarlyStop(stopper?.user_name || "a participant");
+        } catch { onEarlyStop("a participant"); }
+      });
       frame.on("transcription-message", (e: any) => {
         if (!e?.text) return;
         transcriptRef.current.push({
@@ -127,9 +149,13 @@ function InterviewCall({ roomUrl, token, onLeft, onError }: {
           timestamp: e.timestamp ?? new Date().toISOString(),
         });
       });
-      // No client startTranscription() call: transcription auto-starts via
-      // the token's auto_start_transcription flag (§6C2), and no token holds
-      // canAdmin, so no participant can manually stop it mid-call.
+      // Transcription must be START-ed by a canAdmin client — only the
+      // founder holds canAdmin (§6C2 fallback: auto_start was confirmed
+      // non-functional). Investor/lawyer never start it. A founder stop is
+      // caught above and flagged.
+      if (isTranscriptionOwner) {
+        frame.on("joined-meeting", () => { frame.startTranscription(); });
+      }
       frame.join({ url: roomUrl, token }).catch((e: any) => {
         onError(e?.errorMsg || e?.message || "Could not join the meeting room.");
       });
@@ -140,7 +166,7 @@ function InterviewCall({ roomUrl, token, onLeft, onError }: {
       frameRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomUrl, token]);
+  }, [roomUrl, token, isTranscriptionOwner]);
 
   return (
     <div className="relative w-full">
@@ -210,7 +236,7 @@ function MeetingsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("deal_room_meeting_records")
-        .select("meeting_id, transcript_status, transcript_error, extraction_status, extraction_error, extracted_notes")
+        .select("meeting_id, transcript_status, transcript_error, extraction_status, extraction_error, extracted_notes, transcription_stopped_early, transcription_stopped_by, transcription_stopped_at")
         .in("meeting_id", meetingIds);
       if (error) throw error;
       return (data ?? []) as MeetingRecordRow[];
@@ -307,6 +333,17 @@ function MeetingsPage() {
       });
       if (r.ok) { toast.success("Transcript saved"); invalidate(); }
     } catch { /* non-fatal — the meeting still completes normally without a saved transcript */ }
+  };
+
+  const flagEarlyStop = async (num: 1 | 2 | 3 | 4 | 5, stoppedByRole: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      await flagTranscriptionStoppedEarly({
+        data: { userAccessToken: session.access_token, dealRoomId, meetingNumber: num, stoppedByRole },
+      });
+      invalidate();
+    } catch { /* best-effort — the counterparty's client also attempts this */ }
   };
 
   const skip = async (num: 1 | 2 | 3 | 4 | 5) => {
@@ -417,6 +454,8 @@ function MeetingsPage() {
               setJoinError({ meetingNumber: call.meetingNumber, message });
               setCall(null);
             }}
+            isTranscriptionOwner={isFounder}
+            onEarlyStop={(role) => flagEarlyStop(call.meetingNumber as 1 | 2 | 3 | 4 | 5, role)}
           />
         </div>
       )}
@@ -608,6 +647,15 @@ function MeetingsPage() {
                         </button>
                       </div>
 
+                      {rec?.transcription_stopped_early && (
+                        <div className="flex items-start gap-1.5 border border-[rgba(245,158,11,0.4)] bg-[rgba(245,158,11,0.08)] px-3 py-2 text-xs text-[#92400E]">
+                          <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                          <span>
+                            Transcription was stopped early during this meeting{rec.transcription_stopped_by ? ` by ${rec.transcription_stopped_by}` : ""}
+                            {rec.transcription_stopped_at ? ` at ${new Date(rec.transcription_stopped_at).toLocaleString()}` : ""} — this record may be incomplete.
+                          </span>
+                        </div>
+                      )}
                       {rec?.transcript_status === "failed" && rec.transcript_error && (
                         <div className="border border-[rgba(239,68,68,0.3)] bg-[rgba(239,68,68,0.06)] px-3 py-2 text-xs text-[#B91C1C]">
                           {rec.transcript_error}
