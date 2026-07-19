@@ -91,6 +91,12 @@ function InterviewCall({ roomUrl, token, onLeft, onError, isTranscriptionOwner }
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<any>(null);
   const transcriptRef = useRef<{ participantId: string; text: string; timestamp: string }[]>([]);
+  // Transcription-active state, driven by Daily's transcription-started/
+  // -stopped events. Both events fire for ALL participants (Daily's model),
+  // so both parties independently see the indicator — satisfying the locked
+  // all-party-awareness requirement without relying on Daily's own captions
+  // UI (which is disabled at the domain level). §6A3.
+  const [transcribing, setTranscribing] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -111,6 +117,8 @@ function InterviewCall({ roomUrl, token, onLeft, onError, isTranscriptionOwner }
         onLeft(text);
       });
       frame.on("error", (e: any) => onError(e?.errorMsg || "The meeting room is unavailable."));
+      frame.on("transcription-started", () => setTranscribing(true));
+      frame.on("transcription-stopped", () => setTranscribing(false));
       frame.on("transcription-message", (e: any) => {
         if (!e?.text) return;
         transcriptRef.current.push({
@@ -136,7 +144,21 @@ function InterviewCall({ roomUrl, token, onLeft, onError, isTranscriptionOwner }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomUrl, token, isTranscriptionOwner]);
 
-  return <div ref={containerRef} className="w-full bg-black" style={{ height: 480 }} />;
+  return (
+    <div className="relative w-full">
+      {transcribing && (
+        <div
+          className="absolute left-0 right-0 top-0 z-10 flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-white"
+          style={{ background: "rgba(0,0,0,0.78)" }}
+          data-testid="transcription-indicator"
+        >
+          <span className="inline-block h-2 w-2 rounded-full animate-pulse" style={{ background: "#EF4444" }} />
+          Transcription on — this meeting is being transcribed to generate AI notes. Both parties can see this.
+        </div>
+      )}
+      <div ref={containerRef} className="w-full bg-black" style={{ height: 480 }} />
+    </div>
+  );
 }
 
 function MeetingsPage() {
