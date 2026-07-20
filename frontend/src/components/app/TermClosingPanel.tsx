@@ -95,6 +95,19 @@ export function TermClosingPanel({
     },
   });
 
+  // The designated uploader is the lawyer if a lawyer is a room MEMBER, else the
+  // investor — determined by membership, not by whether an agreement exists yet
+  // (chicken-and-egg: the first upload can't depend on a prior upload).
+  const { data: lawyerPresent } = useQuery({
+    queryKey: ["dr-has-lawyer", dealRoomId],
+    enabled: !!dealRoomId,
+    queryFn: async () => {
+      const { data } = await supabase.from("deal_room_members")
+        .select("user_id").eq("deal_room_id", dealRoomId).eq("role", "lawyer").limit(1).maybeSingle();
+      return !!data;
+    },
+  });
+
   // Realtime — summary/agreement/comment/reopen changes land live.
   useEffect(() => {
     if (!dealRoomId) return;
@@ -125,8 +138,7 @@ export function TermClosingPanel({
   };
 
   const allAgreements = agreements as any[];
-  const hasLawyer = allAgreements.some((a) => a.uploader_role === "lawyer");
-  const uploaderRole: "lawyer" | "investor" = hasLawyer ? "lawyer" : "investor";
+  const uploaderRole: "lawyer" | "investor" = lawyerPresent ? "lawyer" : "investor";
   const currentVersion = allAgreements.find((a) => a.status !== "superseded") ?? allAgreements[0];
   const finalized = allAgreements.some((a) => a.status === "accepted");
   const content = (summary?.content ?? null) as any;
