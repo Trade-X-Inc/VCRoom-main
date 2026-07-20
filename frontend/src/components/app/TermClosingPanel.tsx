@@ -10,6 +10,7 @@ import {
   requestReopen, resolveReopen,
 } from "@/lib/agreement-fn";
 import { regenerateSummary } from "@/lib/summary-fn";
+import { downloadAgreement } from "@/lib/closing-fn";
 
 // R15B — post-lock closing panel: summary (Gate 2) + agreement upload/review
 // (Gate 3) + re-open flow. Rendered inside the deal room for founder, investor,
@@ -30,11 +31,16 @@ async function token() {
 }
 
 export function TermClosingPanel({
-  dealRoomId, role, userId,
+  dealRoomId, role, userId, isClosed = false,
 }: {
   dealRoomId: string;
   role: "founder" | "investor" | "lawyer";
   userId: string;
+  // R15C: when the deal is closed the whole room is a read-only archive — every
+  // editable action here (upload agreement, accept, request changes, re-open) is
+  // hidden. RLS also blocks the writes (dr_is_open), so this is the UI half of
+  // belt-and-suspenders read-only.
+  isClosed?: boolean;
 }) {
   const qc = useQueryClient();
   const [busy, setBusy] = useState<string | null>(null);
@@ -158,9 +164,14 @@ export function TermClosingPanel({
     finally { setBusy(null); }
   };
 
-  const download = async (storagePath: string) => {
-    const { data } = await supabase.storage.from("documents").createSignedUrl(storagePath, 300);
-    if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+  // Agreement files live under the fee-gated agreements/ path (client storage RLS
+  // excludes it — R15C), so downloads go through the server fn: in-review versions
+  // are free for members; the finalized version is served only once the fee is
+  // confirmed.
+  const download = async (agreementId: string) => {
+    const r = await downloadAgreement({ data: { dealRoomId, accessToken: await token(), agreementId } });
+    if (r.ok && r.url) window.open(r.url, "_blank");
+    else toast.error(r.error === "fee_not_confirmed" ? "Available after the platform fee is confirmed" : "Could not download");
   };
 
   const doAccept = async (agreementId: string) => {
@@ -301,7 +312,7 @@ export function TermClosingPanel({
               ? <>You requested to re-open the terms — awaiting counterparty approval.{reopenReq.reason ? ` Reason: "${reopenReq.reason}"` : ""}</>
               : <><strong className="capitalize">{reopenReq.requested_role}</strong> requested to re-open the terms for renegotiation.{reopenReq.reason ? ` Reason: "${reopenReq.reason}"` : ""} Approving unlocks the terms and archives this summary.</>}
           </div>
-          {isPrincipal && reopenReq.requested_by !== userId && (
+          {!isClosed && isPrincipal && reopenReq.requested_by !== userId && (
             <div className="flex items-center gap-2">
               <button onClick={() => doResolveReopen(reopenReq.id, false)} disabled={busy === "reopen-resolve"} className="border px-3 text-xs font-medium" style={{ borderColor: BORDER, color: INK2, height: 32, borderRadius: 2 }}>Decline</button>
               <button onClick={() => doResolveReopen(reopenReq.id, true)} disabled={busy === "reopen-resolve"} className="px-3 text-xs font-medium text-white" style={{ background: "#D97706", height: 32, borderRadius: 2 }}>Approve re-open</button>
@@ -317,7 +328,7 @@ export function TermClosingPanel({
             <h2 className="text-sm font-semibold" style={{ color: INK, fontFamily: "Syne, sans-serif" }}>Agreement</h2>
             {finalized ? (
               <span className="inline-flex items-center gap-1.5 text-[12px] font-medium" style={{ color: "#166534" }}><Lock className="h-3.5 w-3.5" /> Finalized</span>
-            ) : role === uploaderRole && !reopenReq ? (
+            ) : !isClosed && role === uploaderRole && !reopenReq ? (
               <label className="inline-flex cursor-pointer items-center gap-1.5 px-3 text-xs font-medium text-white" style={{ background: BRAND, height: 32, borderRadius: 2 }}>
                 {busy === "upload" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
                 Upload {allAgreements.length > 0 ? "new version" : "agreement"}
@@ -341,7 +352,7 @@ export function TermClosingPanel({
                 const chip = AGR_CHIP[a.status] ?? AGR_CHIP.pending;
                 const isCurrent = a.id === currentVersion?.id;
                 const mineAccepted = role === "founder" ? a.accepted_by_founder : role === "investor" ? a.accepted_by_investor : false;
-                const canReview = isPrincipal && isCurrent && a.status !== "accepted" && a.status !== "superseded" && a.uploaded_by !== userId;
+                const canReview = !isClosed && isPrincipal && isCurrent && a.status !== "accepted" && a.status !== "superseded" && a.uploaded_by !== userId;
                 const cs = commentsFor(a.id);
                 return (
                   <div key={a.id} className="border-b last:border-b-0" style={{ borderColor: BORDER }}>
@@ -357,7 +368,7 @@ export function TermClosingPanel({
                         </div>
                       </div>
                       <div className="flex flex-wrap items-center gap-1.5">
-                        <button onClick={() => download(a.storage_path)} className="inline-flex items-center gap-1 border px-3 text-xs font-medium" style={{ borderColor: BORDER, color: INK2, height: 32, borderRadius: 2 }}>
+                        <button onClick={() => download(a.id)} className="inline-flex items-center gap-1 border px-3 text-xs font-medium" style={{ borderColor: BORDER, color: INK2, height: 32, borderRadius: 2 }}>
                           <Download className="h-3 w-3" /> Download
                         </button>
                         {canReview && !mineAccepted && (
@@ -409,7 +420,7 @@ export function TermClosingPanel({
       )}
 
       {/* Re-open action (principals only; not while a request is pending or finalized-and-locked) */}
-      {content && isPrincipal && !reopenReq && !finalized && (
+      {!isClosed && content && isPrincipal && !reopenReq && !finalized && (
         <div>
           {reopenOpen ? (
             <div className="border bg-white p-4" style={{ borderColor: BORDER, borderRadius: 0 }}>
