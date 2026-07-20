@@ -9,6 +9,7 @@ import {
   uploadAgreement, requestAgreementChanges, acceptAgreement,
   requestReopen, resolveReopen,
 } from "@/lib/agreement-fn";
+import { regenerateSummary } from "@/lib/summary-fn";
 
 // R15B — post-lock closing panel: summary (Gate 2) + agreement upload/review
 // (Gate 3) + re-open flow. Rendered inside the deal room for founder, investor,
@@ -52,6 +53,17 @@ export function TermClosingPanel({
     },
   });
 
+  // Config carries the summary-generation error marker (honest failure state).
+  const { data: cfg } = useQuery({
+    queryKey: ["dr-term-config-summary", dealRoomId],
+    enabled: !!dealRoomId,
+    queryFn: async () => {
+      const { data } = await supabase.from("deal_room_term_config")
+        .select("locked_at, summary_error, summary_error_at").eq("deal_room_id", dealRoomId).maybeSingle();
+      return data;
+    },
+  });
+
   const { data: agreements = [] } = useQuery({
     queryKey: ["dr-agreements", dealRoomId],
     enabled: !!dealRoomId,
@@ -91,8 +103,10 @@ export function TermClosingPanel({
       qc.invalidateQueries({ queryKey: ["dr-agreements", dealRoomId] });
       qc.invalidateQueries({ queryKey: ["dr-agreement-comments", dealRoomId] });
       qc.invalidateQueries({ queryKey: ["dr-reopen", dealRoomId] });
+      qc.invalidateQueries({ queryKey: ["dr-term-config-summary", dealRoomId] });
     };
     const ch = supabase.channel(`dr-closing-${dealRoomId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "deal_room_term_config", filter: `deal_room_id=eq.${dealRoomId}` }, inv)
       .on("postgres_changes", { event: "*", schema: "public", table: "deal_room_summaries", filter: `deal_room_id=eq.${dealRoomId}` }, inv)
       .on("postgres_changes", { event: "*", schema: "public", table: "deal_room_agreements", filter: `deal_room_id=eq.${dealRoomId}` }, inv)
       .on("postgres_changes", { event: "*", schema: "public", table: "deal_room_agreement_comments", filter: `deal_room_id=eq.${dealRoomId}` }, inv)
@@ -186,6 +200,23 @@ export function TermClosingPanel({
   const isPrincipal = role === "founder" || role === "investor";
   const commentsFor = (agreementId: string) => (comments as any[]).filter((c) => c.agreement_id === agreementId);
 
+  // Honest summary state: locked but no active summary. If an error is recorded
+  // it's a genuine failure (show error + retry for principals); otherwise it's a
+  // brief transient during generation.
+  const summaryError = (cfg as any)?.summary_error as string | null | undefined;
+  const summaryFailed = !content && !!summaryError;
+
+  const doRetrySummary = async () => {
+    setBusy("retry-summary");
+    try {
+      const r = await regenerateSummary({ data: { dealRoomId, accessToken: await token() } });
+      if (!r.ok) { toast.error(r.error === "not_authorized" ? "Only a deal party can retry" : "Retry failed — contact support"); return; }
+      toast.success("Summary generated");
+      refresh();
+    } catch { toast.error("Retry failed — contact support"); }
+    finally { setBusy(null); }
+  };
+
   return (
     <div className="space-y-6">
       {/* ── Gate 2: Summary ─────────────────────────────────────────────── */}
@@ -229,9 +260,24 @@ export function TermClosingPanel({
             </p>
           </div>
         </div>
+      ) : summaryFailed ? (
+        <div className="border bg-white px-5 py-5" style={{ borderColor: "#DC2626", borderRadius: 0 }}>
+          <div className="text-sm font-semibold" style={{ color: "#991B1B" }}>Summary generation failed</div>
+          <div className="mt-1 text-[13px]" style={{ color: INK2 }}>
+            The terms are locked, but the agreed-terms summary could not be generated. This does not affect the locked terms.
+            {isPrincipal ? " Retry below, or contact support if it keeps failing." : " A deal party can retry, or contact support."}
+          </div>
+          {isPrincipal && (
+            <button onClick={doRetrySummary} disabled={busy === "retry-summary"}
+              className="mt-3 inline-flex items-center gap-1.5 px-3 text-xs font-medium text-white disabled:opacity-50" style={{ background: BRAND, height: 32, borderRadius: 2 }}>
+              {busy === "retry-summary" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCcw className="h-3.5 w-3.5" />} Retry generation
+            </button>
+          )}
+        </div>
       ) : (
-        <div className="border bg-white px-5 py-6 text-sm" style={{ borderColor: BORDER, borderRadius: 0, color: INK2 }}>
-          Summary is being generated from the locked terms…
+        <div className="flex items-center gap-2 border bg-white px-5 py-6 text-sm" style={{ borderColor: BORDER, borderRadius: 0, color: INK2 }}>
+          <Loader2 className="h-4 w-4 animate-spin" style={{ color: INK3 }} />
+          Generating the agreed-terms summary from the locked terms…
         </div>
       )}
 

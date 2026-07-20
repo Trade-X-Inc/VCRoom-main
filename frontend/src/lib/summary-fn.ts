@@ -58,6 +58,15 @@ export async function buildSummaryForRoom(dealRoomId: string, env?: { url: strin
   const { url, key } = env ?? getEnv();
   if (!url || !key) { console.error("[summary] missing env"); return { ok: false, error: "no_env" }; }
 
+  // Record a failure on the config so the UI can show an honest error+retry
+  // instead of a permanent "generating…". Cleared on success. Best-effort:
+  // if even this write fails we still return the error to the caller.
+  const markError = async (reason: string) => {
+    await sb(url, key, `deal_room_term_config?deal_room_id=eq.${dealRoomId}`, "PATCH",
+      { summary_error: reason, summary_error_at: new Date().toISOString() }).catch(() => {});
+  };
+
+  try {
   // Config must be locked.
   const cfg = (await sb(url, key, `deal_room_term_config?deal_room_id=eq.${dealRoomId}&select=*`))?.[0];
   if (!cfg || !cfg.locked_at) return { ok: false, error: "not_locked" };
@@ -67,7 +76,7 @@ export async function buildSummaryForRoom(dealRoomId: string, env?: { url: strin
   // Locked terms.
   const lockedTerms: any[] = await sb(url, key,
     `deal_room_terms?deal_room_id=eq.${dealRoomId}&status=eq.locked&select=term_key,term_label,value_type,current_value,is_custom`);
-  if (!lockedTerms || lockedTerms.length === 0) return { ok: false, error: "no_locked_terms" };
+  if (!lockedTerms || lockedTerms.length === 0) { await markError("no_locked_terms"); return { ok: false, error: "no_locked_terms" }; }
 
   // Canonical order: template order first, then any custom terms (stable by key).
   const order = new Map<string, number>();
@@ -120,7 +129,17 @@ export async function buildSummaryForRoom(dealRoomId: string, env?: { url: strin
     content, disclaimer: DISCLAIMER, terms_locked_at: cfg.locked_at,
   }, "return=minimal");
 
+  // Success -> clear any prior error marker.
+  await sb(url, key, `deal_room_term_config?deal_room_id=eq.${dealRoomId}`, "PATCH",
+    { summary_error: null, summary_error_at: null }).catch(() => {});
   return { ok: true };
+  } catch (e: any) {
+    // Any unexpected failure (network, provider, parse) -> mark it so the UI
+    // shows an honest error+retry, then surface it to the caller.
+    console.error("[summary] generation threw:", e);
+    await markError(String(e?.message ?? "generation_failed").slice(0, 300));
+    return { ok: false, error: "generation_failed" };
+  }
 }
 
 // Manual re-trigger endpoint (e.g. after a re-open + re-lock, or an admin repair).
