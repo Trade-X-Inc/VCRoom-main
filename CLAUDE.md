@@ -1454,3 +1454,33 @@ to `role IN ('founder','investor')` from the first migration** — via a SECURIT
 (the §34 `investor_can_request_access` / `get_investor_team_role` pattern), never a bare
 `deal_room_members` membership check — so the negotiation engine does not add to the gap set. This
 is verified live in R15A's step-7 security pass (lawyer SELECT → 0 rows).
+
+---
+
+## 41. CF PAGES `_worker.js` BUNDLE-SIZE LEVER — `--external`, NOT code-splitting (proven R15B, July 2026)
+
+**`React.lazy` / dynamic `import()` / TanStack `.lazy.tsx` routes do NOT reduce the CF Pages
+`_worker.js`.** The 1 MB limit is on the TOTAL gzipped `_worker.js` (the SSR compute worker in
+Pages Advanced Mode), and that worker is built by a single-file esbuild `--outfile` step
+(`scripts/patch-wrangler.mjs`) which **inlines every dynamic import back into the one file**. So
+lazy-loading a component splits the *client* bundle but leaves the *worker* unchanged — verified
+empirically: lazy-wrapping `TermClosingPanel` moved 0 bytes out of the worker.
+
+**The only lever that reduces `_worker.js` is `--external` on a package that is never in the SSR
+execution path.** esbuild leaves an externalized import as a runtime `import()` the worker never
+executes server-side, so its code drops out of the bundle. Requirements for a package to qualify:
+1. it must be added to the `--external:` list in `patch-wrangler.mjs` (alongside the existing
+   `pdfjs-dist`, `xlsx`, `papaparse`, `jszip`, `@daily-co/daily-js`, `react-markdown`, `recharts`);
+2. it must have **no static import anywhere in the SSR graph** — every consumer must reach it only
+   through a mount-gated client-only boundary (the `LazyMarkdown.tsx` / `LazyChart.tsx` pattern:
+   render a placeholder until `useEffect` sets mounted, then a dynamic `import()`), or SSR will try
+   to import the externalized (unresolvable) module at runtime and crash.
+
+Splitting the worker into a `_worker.js/` directory with `--splitting` does NOT help either — the
+1 MB limit is the SUM of all worker modules, not per-file.
+
+**Proven in R15B bundle optimization (commit `acd5515`):** externalizing `recharts` (~825 KB
+uncompressed / ~124 KB gz of d3 charting code) after routing all 6 chart consumers through
+`components/shared/LazyChart.tsx` took the worker from **0.99 MB → 0.87 MB gzip**. Before adding
+any large dependency, check whether it runs during SSR; if not, external + mount-gate it from the
+start rather than letting it inflate the worker.
