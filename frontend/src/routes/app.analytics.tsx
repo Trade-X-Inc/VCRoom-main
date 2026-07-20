@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { LazyChart } from "@/components/shared/LazyChart";
 import { ArrowUpRight } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -179,15 +179,17 @@ function FounderAnalytics() {
       <div style={{ display: "flex", flexDirection: "column", gap: space.block }}>
 
         <ChartCard title="Profile views (30 days)" empty={totalViews === 0 ? "No data yet — publish your profile to start tracking views" : undefined}>
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={viewsSeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-              <CartesianGrid stroke={color.border} vertical={false} />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={{ stroke: color.border }} tickLine={false} interval={4} />
-              <YAxis tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={false} tickLine={false} allowDecimals={false} />
-              <Tooltip contentStyle={{ fontSize: 12, border: `1px solid ${color.border}`, borderRadius: 0 }} />
-              <Area type="monotone" dataKey="views" stroke="#7C3AED" fill="#7C3AED" fillOpacity={0.08} strokeWidth={2} />
-            </AreaChart>
-          </ResponsiveContainer>
+          <LazyChart render={(R) => (
+          <R.ResponsiveContainer width="100%" height="100%">
+            <R.AreaChart data={viewsSeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+              <R.CartesianGrid stroke={color.border} vertical={false} />
+              <R.XAxis dataKey="date" tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={{ stroke: color.border }} tickLine={false} interval={4} />
+              <R.YAxis tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <R.Tooltip contentStyle={{ fontSize: 12, border: `1px solid ${color.border}`, borderRadius: 0 }} />
+              <R.Area type="monotone" dataKey="views" stroke="#7C3AED" fill="#7C3AED" fillOpacity={0.08} strokeWidth={2} />
+            </R.AreaChart>
+          </R.ResponsiveContainer>
+          )} />
         </ChartCard>
 
         <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>

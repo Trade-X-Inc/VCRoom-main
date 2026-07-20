@@ -56,6 +56,7 @@ execSync(
     "--external:jszip",
     "--external:@daily-co/daily-js",
     "--external:react-markdown",
+    "--external:recharts",
     "--define:process.env.NODE_ENV='\"production\"'",
     "--define:global.process.env.NODE_ENV='\"production\"'",
     "--conditions=worker,browser",

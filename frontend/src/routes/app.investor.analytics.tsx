@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { LazyChart } from "@/components/shared/LazyChart";
 import { ArrowUpRight, Download } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -202,15 +202,17 @@ function InvestorAnalytics() {
         </div>
 
         <ChartCard title="Conversion funnel" empty={totalTracked === 0 ? "No data yet — add companies to your watchlist to see the funnel" : undefined}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={funnelSeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-              <CartesianGrid stroke={color.border} vertical={false} />
-              <XAxis dataKey="stage" tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={{ stroke: color.border }} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={false} tickLine={false} allowDecimals={false} />
-              <Tooltip contentStyle={{ fontSize: 12, border: `1px solid ${color.border}`, borderRadius: 0 }} />
-              <Bar dataKey="count" fill="#7C3AED" />
-            </BarChart>
-          </ResponsiveContainer>
+          <LazyChart render={(R) => (
+          <R.ResponsiveContainer width="100%" height="100%">
+            <R.BarChart data={funnelSeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+              <R.CartesianGrid stroke={color.border} vertical={false} />
+              <R.XAxis dataKey="stage" tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={{ stroke: color.border }} tickLine={false} />
+              <R.YAxis tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <R.Tooltip contentStyle={{ fontSize: 12, border: `1px solid ${color.border}`, borderRadius: 0 }} />
+              <R.Bar dataKey="count" fill="#7C3AED" />
+            </R.BarChart>
+          </R.ResponsiveContainer>
+          )} />
         </ChartCard>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>

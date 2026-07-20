@@ -2,9 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import {
-  ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-} from "recharts";
+import { LazyChart } from "@/components/shared/LazyChart";
 import { ArrowRight, ArrowUpRight, FileInput, Clock3 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useAccountContext } from "@/hooks/useAccountContext";
@@ -395,15 +393,17 @@ function InvestorOverview() {
         {/* Row: matches trend + activity */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           <ChartCard title="Matches over time" empty={(matchesOverTime as any[]).length === 0 ? "None yet — matches appear once your thesis is set" : undefined}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={matchesSeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                <CartesianGrid stroke={color.border} vertical={false} />
-                <XAxis dataKey="date" tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={{ stroke: color.border }} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <Tooltip contentStyle={{ fontSize: 12, border: `1px solid ${color.border}`, borderRadius: 0 }} />
-                <Line type="monotone" dataKey="matches" stroke="#7C3AED" strokeWidth={2} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
+            <LazyChart render={(R) => (
+            <R.ResponsiveContainer width="100%" height="100%">
+              <R.LineChart data={matchesSeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                <R.CartesianGrid stroke={color.border} vertical={false} />
+                <R.XAxis dataKey="date" tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={{ stroke: color.border }} tickLine={false} />
+                <R.YAxis tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <R.Tooltip contentStyle={{ fontSize: 12, border: `1px solid ${color.border}`, borderRadius: 0 }} />
+                <R.Line type="monotone" dataKey="matches" stroke="#7C3AED" strokeWidth={2} dot={false} />
+              </R.LineChart>
+            </R.ResponsiveContainer>
+            )} />
           </ChartCard>
 
           <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>

@@ -1,9 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import {
-  ResponsiveContainer, FunnelChart, Funnel, LabelList, Tooltip,
-  PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid,
-} from "recharts";
+import { LazyChart } from "@/components/shared/LazyChart";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { PageFrame, EmptyState } from "@/components/system";
@@ -94,15 +91,17 @@ function CrmAnalyticsPage() {
               <p className="text-sm py-8 text-center" style={{ color: "#71717A" }}>No active pipeline yet.</p>
             ) : (
               <div style={{ height: 260 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <FunnelChart margin={{ top: 8, right: 110, bottom: 8, left: 8 }}>
-                    <Tooltip contentStyle={{ fontSize: 12, border: "1px solid #E4E4E7", borderRadius: 0 }} />
-                    <Funnel dataKey="value" data={funnelData} isAnimationActive={false}>
-                      <LabelList position="right" dataKey="name" fill="#0A0A0B" fontSize={12} width={100} />
-                      {funnelData.map((d) => <Cell key={d.name} fill={d.fill} />)}
-                    </Funnel>
-                  </FunnelChart>
-                </ResponsiveContainer>
+                <LazyChart render={(R) => (
+                <R.ResponsiveContainer width="100%" height="100%">
+                  <R.FunnelChart margin={{ top: 8, right: 110, bottom: 8, left: 8 }}>
+                    <R.Tooltip contentStyle={{ fontSize: 12, border: "1px solid #E4E4E7", borderRadius: 0 }} />
+                    <R.Funnel dataKey="value" data={funnelData} isAnimationActive={false}>
+                      <R.LabelList position="right" dataKey="name" fill="#0A0A0B" fontSize={12} width={100} />
+                      {funnelData.map((d) => <R.Cell key={d.name} fill={d.fill} />)}
+                    </R.Funnel>
+                  </R.FunnelChart>
+                </R.ResponsiveContainer>
+                )} />
               </div>
             )}
           </div>
@@ -113,13 +112,15 @@ function CrmAnalyticsPage() {
               <p className="text-sm" style={{ color: "#71717A" }}>No source data yet.</p>
             ) : (
               <div className="flex items-center gap-6">
-                <div className="shrink-0">
-                  <PieChart width={160} height={160}>
-                    <Pie data={sourcePieData} dataKey="value" nameKey="name" innerRadius={45} outerRadius={72} strokeWidth={2} stroke="#FFFFFF" isAnimationActive={false}>
-                      {sourcePieData.map((d) => <Cell key={d.name} fill={d.fill} />)}
-                    </Pie>
-                    <Tooltip contentStyle={{ fontSize: 12, border: "1px solid #E4E4E7", borderRadius: 0 }} />
-                  </PieChart>
+                <div className="shrink-0" style={{ width: 160, height: 160 }}>
+                  <LazyChart height={160} render={(R) => (
+                  <R.PieChart width={160} height={160}>
+                    <R.Pie data={sourcePieData} dataKey="value" nameKey="name" innerRadius={45} outerRadius={72} strokeWidth={2} stroke="#FFFFFF" isAnimationActive={false}>
+                      {sourcePieData.map((d) => <R.Cell key={d.name} fill={d.fill} />)}
+                    </R.Pie>
+                    <R.Tooltip contentStyle={{ fontSize: 12, border: "1px solid #E4E4E7", borderRadius: 0 }} />
+                  </R.PieChart>
+                  )} />
                 </div>
                 <div className="flex-1 space-y-2 min-w-0">
                   {sourcePieData.map((d) => (
@@ -137,15 +138,17 @@ function CrmAnalyticsPage() {
           <div className="rounded-none border border-border bg-white p-5 lg:col-span-2">
             <div className="text-sm font-semibold mb-4">Leads added (12 weeks)</div>
             <div style={{ height: 200 }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={weeklySeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                  <CartesianGrid stroke="#E4E4E7" vertical={false} />
-                  <XAxis dataKey="week" tick={{ fontSize: 11, fill: "#71717A" }} axisLine={{ stroke: "#E4E4E7" }} tickLine={false} interval={1} />
-                  <YAxis tick={{ fontSize: 11, fill: "#71717A" }} axisLine={false} tickLine={false} allowDecimals={false} />
-                  <Tooltip contentStyle={{ fontSize: 12, border: "1px solid #E4E4E7", borderRadius: 0 }} />
-                  <Line type="monotone" dataKey="count" stroke="#7C3AED" strokeWidth={2} dot={{ r: 3, fill: "#7C3AED" }} />
-                </LineChart>
-              </ResponsiveContainer>
+              <LazyChart render={(R) => (
+              <R.ResponsiveContainer width="100%" height="100%">
+                <R.LineChart data={weeklySeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                  <R.CartesianGrid stroke="#E4E4E7" vertical={false} />
+                  <R.XAxis dataKey="week" tick={{ fontSize: 11, fill: "#71717A" }} axisLine={{ stroke: "#E4E4E7" }} tickLine={false} interval={1} />
+                  <R.YAxis tick={{ fontSize: 11, fill: "#71717A" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <R.Tooltip contentStyle={{ fontSize: 12, border: "1px solid #E4E4E7", borderRadius: 0 }} />
+                  <R.Line type="monotone" dataKey="count" stroke="#7C3AED" strokeWidth={2} dot={{ r: 3, fill: "#7C3AED" }} />
+                </R.LineChart>
+              </R.ResponsiveContainer>
+              )} />
             </div>
           </div>
         </div>
