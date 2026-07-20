@@ -106,16 +106,36 @@ async function maybeLockSet(ctx: Ctx, dealRoomId: string) {
   }
 }
 
-// ── selectInstrument — choose or reset the instrument type ───────────────────
-// First selection seeds the template terms and locks the instrument. Changing
-// it later is the mutual-reset escape hatch: it wipes ALL terms and re-seeds,
-// and REQUIRES confirmReset=true (the UI shows a mutual-confirm dialog). Both
-// parties can trigger; there is no unilateral silent change.
+// Seed a room with an instrument's template terms + lock the instrument in
+// config. Shared by first-selection and (post-mutual-approval) reset.
+async function seedInstrument(ctx: Ctx, dealRoomId: string, instrumentType: InstrumentType) {
+  const tmpl = INSTRUMENT_TEMPLATES[instrumentType];
+  await sbFetch(ctx.url, ctx.key, `deal_room_term_config?on_conflict=deal_room_id`, "POST",
+    { deal_room_id: dealRoomId, instrument_type: instrumentType, instrument_locked: true },
+    "return=minimal,resolution=merge-duplicates");
+  const seed = tmpl.terms.map((t) => ({
+    deal_room_id: dealRoomId,
+    instrument_type: instrumentType,
+    term_key: t.term_key,
+    term_label: t.label,
+    value_type: t.value_type,
+    is_custom: false,
+    status: "unset",
+  }));
+  await sbFetch(ctx.url, ctx.key, `deal_room_terms`, "POST", seed, "return=minimal");
+  return seed.length;
+}
+
+// ── selectInstrument — FIRST selection only ──────────────────────────────────
+// Seeds the template terms and locks the instrument. Once terms exist, the
+// instrument can ONLY be changed through the mutual-reset request flow below
+// (requestInstrumentReset -> resolveInstrumentReset) — this fn NEVER wipes
+// terms, so no single party can reset by re-calling it. A re-select of the same
+// (or any) type after terms exist is a no-op.
 type SelectInstrumentInput = {
   dealRoomId: string;
   accessToken: string;
   instrumentType: InstrumentType;
-  confirmReset?: boolean;
 };
 
 export const selectInstrument = createServerFn({ method: "POST" })
@@ -131,36 +151,94 @@ export const selectInstrument = createServerFn({ method: "POST" })
 
     const existingTerms: any[] = await sbFetch(ctx.url, ctx.key,
       `deal_room_terms?deal_room_id=eq.${data.dealRoomId}&select=id`, "GET");
-    const hasTerms = (existingTerms?.length ?? 0) > 0;
-
-    // Instrument is locked once terms exist. Changing it now = a reset, which
-    // orphans every existing term — require explicit mutual confirmation.
-    if (cfg?.instrument_locked && cfg.instrument_type !== data.instrumentType) {
-      if (!data.confirmReset) return { ok: false, error: "reset_confirmation_required" };
-      // Mutual-reset: delete all terms + proposals for this room, then re-seed.
-      await sbFetch(ctx.url, ctx.key, `deal_room_term_proposals?deal_room_id=eq.${data.dealRoomId}`, "DELETE");
-      await sbFetch(ctx.url, ctx.key, `deal_room_terms?deal_room_id=eq.${data.dealRoomId}`, "DELETE");
-    } else if (cfg?.instrument_type === data.instrumentType && hasTerms) {
-      return { ok: true, unchanged: true }; // no-op re-select of the same type
+    // Terms already exist -> instrument change must go through the mutual-reset
+    // request flow. selectInstrument itself is inert here (never deletes).
+    if ((existingTerms?.length ?? 0) > 0) {
+      return { ok: false, error: "instrument_locked_use_reset_request" };
     }
 
-    // Upsert config with the chosen instrument + lock it.
-    await sbFetch(ctx.url, ctx.key, `deal_room_term_config?on_conflict=deal_room_id`, "POST",
-      { deal_room_id: data.dealRoomId, instrument_type: data.instrumentType, instrument_locked: true },
-      "return=minimal,resolution=merge-duplicates");
+    const seeded = await seedInstrument(ctx, data.dealRoomId, data.instrumentType);
+    return { ok: true, seeded };
+  });
 
-    // Seed the template terms (status 'unset' — nobody has proposed a value yet).
-    const seed = tmpl.terms.map((t) => ({
+// ── requestInstrumentReset — party A opens a mutual-reset request ─────────────
+// Wiping all negotiated terms requires BOTH parties. This creates a pending
+// request naming the target instrument; the COUNTERPARTY must approve it via
+// resolveInstrumentReset. A single party can never reset alone — same mechanic
+// as R14B's finalize_counsel_waiver (§38.3). Supersedes any prior pending
+// request from the same room.
+type RequestResetInput = {
+  dealRoomId: string;
+  accessToken: string;
+  targetInstrument: InstrumentType;
+};
+
+export const requestInstrumentReset = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as RequestResetInput)
+  .handler(async ({ data }) => {
+    const ctx = await authorize(data.dealRoomId, data.accessToken);
+    if (!ctx) return { ok: false, error: "not_authorized" };
+    if (!INSTRUMENT_TEMPLATES[data.targetInstrument]) return { ok: false, error: "invalid_instrument" };
+    const cfg = await getConfig(ctx, data.dealRoomId);
+    if (cfg?.locked_at) return { ok: false, error: "term_set_locked" };
+
+    // Clear any stale pending request first, then open a fresh one.
+    await sbFetch(ctx.url, ctx.key,
+      `deal_room_term_reset_requests?deal_room_id=eq.${data.dealRoomId}&status=eq.pending`, "PATCH",
+      { status: "rejected", resolved_at: new Date().toISOString() });
+    await sbFetch(ctx.url, ctx.key, `deal_room_term_reset_requests`, "POST", {
       deal_room_id: data.dealRoomId,
-      instrument_type: data.instrumentType,
-      term_key: t.term_key,
-      term_label: t.label,
-      value_type: t.value_type,
-      is_custom: false,
-      status: "unset",
-    }));
-    await sbFetch(ctx.url, ctx.key, `deal_room_terms`, "POST", seed, "return=minimal");
-    return { ok: true, seeded: seed.length };
+      requested_by: ctx.uid,
+      requested_role: ctx.role,
+      target_instrument: data.targetInstrument,
+      status: "pending",
+    }, "return=minimal");
+    return { ok: true };
+  });
+
+// ── resolveInstrumentReset — party B approves/rejects the reset ───────────────
+// APPROVAL is the only path that wipes terms, and it enforces resolver != the
+// requester (proving both sides agreed). A requester approving their OWN request
+// is rejected (self_approval) — the core anti-bypass check. On approval: delete
+// all terms + proposals, re-seed the target instrument, consume the request.
+type ResolveResetInput = {
+  dealRoomId: string;
+  accessToken: string;
+  requestId: string;
+  approve: boolean;
+};
+
+export const resolveInstrumentReset = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as ResolveResetInput)
+  .handler(async ({ data }) => {
+    const ctx = await authorize(data.dealRoomId, data.accessToken);
+    if (!ctx) return { ok: false, error: "not_authorized" };
+    const cfg = await getConfig(ctx, data.dealRoomId);
+    if (cfg?.locked_at) return { ok: false, error: "term_set_locked" };
+
+    const rows: any[] = await sbFetch(ctx.url, ctx.key,
+      `deal_room_term_reset_requests?id=eq.${data.requestId}&deal_room_id=eq.${data.dealRoomId}&status=eq.pending&select=*`, "GET");
+    const req = rows?.[0];
+    if (!req) return { ok: false, error: "request_not_found" };
+
+    // THE anti-bypass check: the resolver must NOT be the requester. This is
+    // what makes the reset genuinely mutual — one party can't approve their own
+    // request. (Both are principals; only the identity differs.)
+    if (req.requested_by === ctx.uid) return { ok: false, error: "self_approval" };
+
+    if (!data.approve) {
+      await sbFetch(ctx.url, ctx.key, `deal_room_term_reset_requests?id=eq.${data.requestId}`, "PATCH",
+        { status: "rejected", resolved_by: ctx.uid, resolved_role: ctx.role, resolved_at: new Date().toISOString() });
+      return { ok: true, approved: false };
+    }
+
+    // Approved by the counterparty -> perform the reset.
+    await sbFetch(ctx.url, ctx.key, `deal_room_term_proposals?deal_room_id=eq.${data.dealRoomId}`, "DELETE");
+    await sbFetch(ctx.url, ctx.key, `deal_room_terms?deal_room_id=eq.${data.dealRoomId}`, "DELETE");
+    const seeded = await seedInstrument(ctx, data.dealRoomId, req.target_instrument as InstrumentType);
+    await sbFetch(ctx.url, ctx.key, `deal_room_term_reset_requests?id=eq.${data.requestId}`, "PATCH",
+      { status: "consumed", resolved_by: ctx.uid, resolved_role: ctx.role, resolved_at: new Date().toISOString() });
+    return { ok: true, approved: true, seeded };
   });
 
 // ── addCustomTerm — either party adds a term beyond the template ─────────────

@@ -12,6 +12,7 @@ import {
 } from "@/lib/term-templates";
 import {
   selectInstrument, addCustomTerm, proposeTerm, acceptTerm, rejectTerm,
+  requestInstrumentReset, resolveInstrumentReset,
 } from "@/lib/term-negotiation-fn";
 
 // R15A — Term negotiation engine. Sole content of /deal-rooms/:id/term-sheets
@@ -87,6 +88,17 @@ function TermNegotiationPage() {
     },
   });
 
+  const { data: resetRequest } = useQuery({
+    queryKey: ["term-reset-request", dealRoomId],
+    enabled: !!dealRoomId,
+    queryFn: async () => {
+      const { data } = await supabase.from("deal_room_term_reset_requests")
+        .select("*").eq("deal_room_id", dealRoomId).eq("status", "pending")
+        .order("created_at", { ascending: false }).maybeSingle();
+      return data;
+    },
+  });
+
   // Realtime — the counterparty's saved change lands here within seconds, no
   // reload. Single channel per room; invalidate all three query keys on any
   // change (§27: one invalidate per real key). Reuses the verified R12B pattern.
@@ -96,12 +108,14 @@ function TermNegotiationPage() {
       qc.invalidateQueries({ queryKey: ["terms", dealRoomId] });
       qc.invalidateQueries({ queryKey: ["term-config", dealRoomId] });
       qc.invalidateQueries({ queryKey: ["term-proposals", dealRoomId] });
+      qc.invalidateQueries({ queryKey: ["term-reset-request", dealRoomId] });
     };
     const channel = supabase
       .channel(`term-negotiation-${dealRoomId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "deal_room_terms", filter: `deal_room_id=eq.${dealRoomId}` }, invalidate)
       .on("postgres_changes", { event: "*", schema: "public", table: "deal_room_term_config", filter: `deal_room_id=eq.${dealRoomId}` }, invalidate)
       .on("postgres_changes", { event: "*", schema: "public", table: "deal_room_term_proposals", filter: `deal_room_id=eq.${dealRoomId}` }, invalidate)
+      .on("postgres_changes", { event: "*", schema: "public", table: "deal_room_term_reset_requests", filter: `deal_room_id=eq.${dealRoomId}` }, invalidate)
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [dealRoomId, qc]);
@@ -119,20 +133,46 @@ function TermNegotiationPage() {
     qc.invalidateQueries({ queryKey: ["terms", dealRoomId] });
     qc.invalidateQueries({ queryKey: ["term-config", dealRoomId] });
     qc.invalidateQueries({ queryKey: ["term-proposals", dealRoomId] });
+    qc.invalidateQueries({ queryKey: ["term-reset-request", dealRoomId] });
   };
 
-  const doSelectInstrument = async (t: InstrumentType, confirmReset = false) => {
+  // First selection only (no terms yet). Instrument change after terms exist
+  // goes through the mutual-reset request flow below, never here.
+  const doSelectInstrument = async (t: InstrumentType) => {
     setBusy("instrument");
     try {
-      const r = await selectInstrument({ data: { dealRoomId, accessToken: await token(), instrumentType: t, confirmReset } });
-      if (!r.ok) {
-        if (r.error === "reset_confirmation_required") { setResetConfirm(t); return; }
-        toast.error(r.error === "term_set_locked" ? "Terms are finalized" : "Could not set instrument");
-        return;
-      }
-      setResetConfirm(null);
+      const r = await selectInstrument({ data: { dealRoomId, accessToken: await token(), instrumentType: t } });
+      if (!r.ok) { toast.error("Could not set instrument"); return; }
       refresh();
     } catch { toast.error("Could not set instrument"); }
+    finally { setBusy(null); }
+  };
+
+  // Open a mutual-reset request — the COUNTERPARTY must approve before any term
+  // is wiped. One party can never reset alone.
+  const doRequestReset = async (t: InstrumentType) => {
+    setBusy("instrument");
+    try {
+      const r = await requestInstrumentReset({ data: { dealRoomId, accessToken: await token(), targetInstrument: t } });
+      if (!r.ok) { toast.error(r.error === "term_set_locked" ? "Terms are finalized" : "Could not request reset"); return; }
+      setResetConfirm(null);
+      toast.success("Reset requested — awaiting counterparty approval");
+      refresh();
+    } catch { toast.error("Could not request reset"); }
+    finally { setBusy(null); }
+  };
+
+  const doResolveReset = async (requestId: string, approve: boolean) => {
+    setBusy("reset-resolve");
+    try {
+      const r = await resolveInstrumentReset({ data: { dealRoomId, accessToken: await token(), requestId, approve } });
+      if (!r.ok) {
+        toast.error(r.error === "self_approval" ? "You can't approve your own reset request" : "Could not resolve");
+        return;
+      }
+      toast.success(approve ? "Terms reset to the new instrument" : "Reset request declined");
+      refresh();
+    } catch { toast.error("Could not resolve"); }
     finally { setBusy(null); }
   };
 
@@ -249,6 +289,25 @@ function TermNegotiationPage() {
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Pending mutual-reset request — counterparty approves, requester waits */}
+      {!locked && resetRequest && (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border px-4 py-3" style={{ borderColor: "#F59E0B", background: "#FFFBEB", borderRadius: 0 }}>
+          <div className="text-sm" style={{ color: "#92400E" }}>
+            {resetRequest.requested_by === userId
+              ? <>You requested a reset to <strong>{INSTRUMENT_TEMPLATES[resetRequest.target_instrument as InstrumentType]?.label}</strong> — awaiting counterparty approval. All terms will be cleared if approved.</>
+              : <><strong className="capitalize">{resetRequest.requested_role}</strong> requested a reset to <strong>{INSTRUMENT_TEMPLATES[resetRequest.target_instrument as InstrumentType]?.label}</strong>. Approving clears every term and its history.</>}
+          </div>
+          {resetRequest.requested_by !== userId && (
+            <div className="flex items-center gap-2">
+              <button onClick={() => doResolveReset(resetRequest.id, false)} disabled={busy === "reset-resolve"}
+                className="border px-3 text-xs font-medium" style={{ borderColor: BORDER, color: INK2, height: 32, borderRadius: 2 }}>Decline</button>
+              <button onClick={() => doResolveReset(resetRequest.id, true)} disabled={busy === "reset-resolve"}
+                className="px-3 text-xs font-medium text-white" style={{ background: "#D97706", height: 32, borderRadius: 2 }}>Approve reset</button>
+            </div>
+          )}
         </div>
       )}
 
@@ -431,11 +490,14 @@ function TermNegotiationPage() {
             <p className="mt-2 text-sm" style={{ color: INK2 }}>
               Changing the instrument type resets all terms — every proposed value and its history is cleared, and the {INSTRUMENT_TEMPLATES[resetConfirm].label} standard terms replace the current set. This affects both parties.
             </p>
+            <p className="mt-2 text-xs" style={{ color: INK3 }}>
+              This sends a reset request. The counterparty must approve it before any term is cleared — neither side can reset alone.
+            </p>
             <div className="mt-5 flex gap-2">
               <button onClick={() => setResetConfirm(null)} className="flex-1 border px-4 text-sm" style={{ borderColor: BORDER, color: INK2, height: 36, borderRadius: 2 }}>Cancel</button>
-              <button onClick={() => doSelectInstrument(resetConfirm, true)} disabled={busy === "instrument"}
+              <button onClick={() => doRequestReset(resetConfirm)} disabled={busy === "instrument"}
                 className="flex-1 px-4 text-sm font-medium text-white disabled:opacity-50" style={{ background: BRAND, height: 36, borderRadius: 2 }}>
-                Reset and switch
+                Request reset
               </button>
             </div>
           </div>
