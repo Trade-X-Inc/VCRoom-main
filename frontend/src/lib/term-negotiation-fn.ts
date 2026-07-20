@@ -103,6 +103,16 @@ async function maybeLockSet(ctx: Ctx, dealRoomId: string) {
     await sbFetch(ctx.url, ctx.key,
       `deal_room_term_config?deal_room_id=eq.${dealRoomId}`, "PATCH",
       { locked_at: new Date().toISOString(), locked_by: ctx.uid });
+    // R15B: the term set just locked -> auto-generate the summary. Same
+    // service-role context. Failure here must not undo the lock (the lock is the
+    // source of truth; the summary can be re-generated), so it's logged, not thrown.
+    try {
+      const { buildSummaryForRoom } = await import("@/lib/summary-fn");
+      const r = await buildSummaryForRoom(dealRoomId, { url: ctx.url, key: ctx.key });
+      if (!r.ok) console.error("[term-neg] summary generation after lock failed:", r.error);
+    } catch (e) {
+      console.error("[term-neg] summary generation threw after lock (lock stands):", e);
+    }
   }
 }
 
