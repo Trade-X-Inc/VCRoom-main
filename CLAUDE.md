@@ -1418,3 +1418,39 @@ production build `_worker.js` gzip **0.98 MB, under the 1 MB CF Pages limit**.
 Realtime Deepgram transcription ≈ $0.0059/unmuted-participant-min; a full 5-stage room is a few
 dollars. No cloud recording = no recording/storage fees. Step-7 live testing used a handful of
 short (~30s) calls well under the $15 promo credit.
+
+---
+
+## 40. SYSTEMIC LAWYER-RLS GAP — deal_room_* tables are member-scoped, not role-scoped (found R15A audit, July 2026) — KNOWN, NOT FIXED APP-WIDE
+
+R15A's step-0 audit (step c) found a systemic §33/§34-class gap: **almost every `deal_room_*`
+table's RLS is scoped to "any `deal_room_members` row for this room", with NO role restriction** —
+so a **lawyer** member (and, if one ever exists, an `External` member) can **read these tables
+directly at the DB level** via REST/Realtime, bypassing the R14B lawyer scope. The only barrier
+today is the **UI interception** (`LawyerRoomView` in `app.deal-rooms.$id.tsx:112`, which renders
+`LawyerRoomView` instead of the real tab for a lawyer on every route except `/meetings`) — and
+per §34, **a UI check is not a security boundary.**
+
+**Only THREE tables actually gate the lawyer role at RLS** (all R14B, all role-restricted):
+`deal_room_meetings` (SELECT scoped to `role<>'lawyer' OR stage_slug='investment_terms'`),
+`deal_room_meeting_records` (SELECT scoped founder/investor + investment_terms), and
+`deal_room_meeting_private_notes` (investor-only).
+
+**Lawyer-READABLE at the DB level right now (member-scoped, no role restriction — the gap set):**
+`deal_room_term_sheets`, `deal_room_qa`, `deal_room_notes`, `deal_room_closing_items`,
+`deal_room_messages`, `deal_room_dd_analysis`, `deal_room_document_requests`,
+`deal_room_doc_requests`, `deal_room_access_grants`, `deal_room_links`,
+`deal_room_profile_disclosures`, `deal_room_closure_reports`, `deal_room_stage_requests`,
+`deal_room_stage_transitions`, `deal_rooms` (member_read). Empirically confirmed the pattern with
+the `test-lawyer@hockystick.app` fixture (a `lawyer` member of room `11111111-2222-3333-4444-555555555555`).
+
+**Scope decision (locked for R15A):** do NOT fix this app-wide in the R15A branch — it needs a
+dedicated security session that re-scopes each table above to the correct audience (most are
+founder+investor content that a lawyer should not see pre-agreement; a few, like
+`deal_room_stage_transitions`, may legitimately need the lawyer once R15B's lawyer step exists —
+each needs a per-table decision, not a blanket rule). The list above is that session's starting
+point. **But R15A's OWN new tables (`deal_room_terms`, `deal_room_term_proposals`) MUST be scoped
+to `role IN ('founder','investor')` from the first migration** — via a SECURITY DEFINER helper
+(the §34 `investor_can_request_access` / `get_investor_team_role` pattern), never a bare
+`deal_room_members` membership check — so the negotiation engine does not add to the gap set. This
+is verified live in R15A's step-7 security pass (lawyer SELECT → 0 rows).
