@@ -46,7 +46,7 @@ async function token() {
 }
 
 function TermNegotiationPage() {
-  const { dealRoomId, isInvestor, userId } = useDealRoom();
+  const { dealRoomId, isInvestor, userId, isClosed } = useDealRoom();
   const role: "founder" | "investor" = isInvestor ? "investor" : "founder";
   const qc = useQueryClient();
 
@@ -276,7 +276,7 @@ function TermNegotiationPage() {
           sees the same panel via LawyerRoomView. */}
       {locked && userId && (
         <div className="mt-6">
-          <TermClosingPanel dealRoomId={dealRoomId} role={role} userId={userId} />
+          <TermClosingPanel dealRoomId={dealRoomId} role={role} userId={userId} isClosed={isClosed} />
         </div>
       )}
 

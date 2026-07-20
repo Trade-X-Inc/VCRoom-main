@@ -164,6 +164,11 @@ export function useDealRoomContext(dealRoomId: string) {
   });
 
   const companyName = (room as any)?.startups?.company_name ?? "Unknown Company";
+  // R15C: room-wide read-only flag. Once the deal is closed (status='closed'),
+  // every surface in the room renders view-only — consumed everywhere rather than
+  // re-deriving per component. Backed by the same query, so no extra fetch.
+  const isClosed = (room as any)?.status === "closed";
+  const closedAt = (room as any)?.closed_at ?? null;
   const currentStage = ((room as any)?.workflow_stage ?? "nda_signed") as DealStage;
   const currentIndex = DEAL_STAGES.indexOf(currentStage);
   const founderUserId: string | null = (room as any)?.startups?.founder_id ?? null;
@@ -197,6 +202,8 @@ export function useDealRoomContext(dealRoomId: string) {
     startup,
     startupId,
     companyName,
+    isClosed,
+    closedAt,
     currentStage,
     currentIndex,
     founderUserId,
