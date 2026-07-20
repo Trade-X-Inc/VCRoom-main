@@ -1521,3 +1521,26 @@ Either party can abandon at any gate (`ExitDeal`) — nothing deleted, room stay
 
 ### Step-8 live verification (Atlas/Dr Henry room, all PASS)
 Full walk: fee ($6M→$15,000 cap, investor pays) → download inactive → fee confirmed → download active → both signed → payment proof → founder confirmed → **DEAL CLOSED** → 2 invoices (HS-<ref>-F1/I1, full content) → read-only term-sheets (no edit controls) → lawyer sees no R15C. Founder-pays path + exit (with the fee-paid support branch) verified separately. tsc 68; build `_worker.js` gzip **0.88 MB** (recharts optimization §41 gave the headroom).
+
+---
+
+## 43. BEFORE ANY MERGE — verify the committed tree matches the tested tree (found R15C, July 2026)
+
+**Before merging a branch, verify the COMMITTED tree matches the WORKING tree that was
+tested** — run `git status` + `git diff --stat` on the branch tip and confirm it's clean.
+Steps 7–8 (security + live verification) test the **working tree**; if an earlier `git add`
+silently missed files, the **committed branch is a different codebase than what was verified**,
+and merging it ships unverified (or broken) code.
+
+**Caught in the R15C merge (fix commit `fa3acfa`):** the steps-2–6 commit's `git add` missed four
+files because the route path contains a `$` (`app.deal-rooms.$id.close.tsx`) that needs literal
+handling — so the committed branch still had the OLD closing checklist, no `ExitDeal.tsx`, and no
+`isClosed` context flag, while steps 7–8 had verified the working tree with the NEW pipeline. The
+drift check at merge time (`git status` showing modified/untracked R15C files) caught it; the
+verified working-tree state was committed as `fa3acfa` before the ff-merge.
+
+**Concrete guard:** paths with a `$` (TanStack route files `app.deal-rooms.$id.*.tsx`) must be
+single-quoted in `git add` (`git add -- 'frontend/src/routes/app.deal-rooms.$id.close.tsx'`), or the
+shell/glob drops them and the add silently no-ops. After any multi-file commit, re-run
+`git status --porcelain` and confirm nothing R15-relevant is left uncommitted — an empty status is
+the proof the committed tree == the tested tree.
