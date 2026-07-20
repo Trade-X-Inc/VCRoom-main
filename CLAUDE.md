@@ -1484,3 +1484,40 @@ uncompressed / ~124 KB gz of d3 charting code) after routing all 6 chart consume
 `components/shared/LazyChart.tsx` took the worker from **0.99 MB → 0.87 MB gzip**. Before adding
 any large dependency, check whether it runs during SSR; if not, external + mount-gate it from the
 start rather than letting it inflate the worker.
+
+---
+
+## 42. R15 CLOSING PIPELINE — FULL CHANGELOG (A→C, July 2026)
+
+The deal-closing pipeline, built over three branches, all merged to main:
+- **R15A (r15a-term-negotiation)** — per-term negotiation engine → locked term set.
+- **R15B (r15b-summary-and-agreement)** — generated summary + agreement upload/review → finalized agreement.
+- **R15C (r15c-closing-pipeline)** — fee → download gate → signing → payment → mutual close → invoice → archival.
+
+### The closing sequence (Gates 1–7), where each lives
+1–3 (R15A/B): negotiate terms → lock → auto-generate summary → draft/upload agreement → both accept. All on **/deal-rooms/:id/term-sheets** (post-lock state) + LawyerRoomView for the lawyer.
+4–7 (R15C): on **/deal-rooms/:id/close** (the R15C ClosingPipeline supersedes the old closing-checklist; `deal_room_closing_items` stays in schema, unused by the route):
+- **Gate 4** — fee determination: founder confirms deal amount (pre-filled from locked terms) + who-pays; fee = 1.5% / min $500 / max $15,000 (`lib/fee-schedule.ts`); payer confirms via the §32 placeholder (`payment_status='beta_bypass'`, honest "coming soon", `TODO(stripe)`). Agreement download gated on fee.
+- **Gate 5** — both parties download (fee-gated) + upload signed copies.
+- **Gate 6** — investor uploads payment proof (versioned), founder confirms receipt / flags discrepancy.
+- **Gate 7** — mutual close (both confirm deliverable) → auto-generate 2 invoices (structured JSON → downloadable HTML; no PDF lib) → `deal_rooms.status='closed'` + `closed_at` → room becomes a read-only archive.
+
+### Tables (R15C migrations)
+`deal_room_fees`, `deal_room_signed_agreements`, `deal_room_payment_proof` (versioned), `deal_room_close`, `deal_room_invoices` — all **`dr_is_principal` RLS only** (lawyer excluded; verified 0 rows). Fee/close/confirmation columns are **fn-owned** (service-role only, no client write) so amounts/payer/status/close can't be forged. Migrations: `20260726000000` (tables + read-only + close guard), `20260726010000` (finalize_deal_close RPC), `20260726020000` (agreement storage gate).
+
+### The three hard mechanisms (each a §33/§34/§38.3-class defense)
+1. **Room-wide read-only at RLS** — `dr_is_open(room)` (true iff `status<>'closed'`) is AND-ed into every content-write policy (terms, proposals, config, resets, reopens, agreements, comments, Q&A, notes, messages, meetings, stage requests, payment proof). A closed room rejects direct client writes at the DB, not just hidden buttons. `isClosed` on `useDealRoomContext` is the UI half. Service-role fns bypass RLS so they also re-check `status=closed`.
+2. **One-way close guard** — `trg_deal_room_close_guard` on `deal_rooms`: `status→'closed'` only inside `finalize_deal_close()` (GUC `app.deal_close_ctx`=room id, requires BOTH close flags), and `'closed'` is **terminal** (no re-open — unwinding a closed deal is a manual support case). Blocks unilateral close via the broad founder ALL policy.
+3. **Download gate at storage** — `can_access_deal_room_doc_path` excludes `<room>/agreements/` from client storage; the finalized agreement is served only via the `downloadAgreement` fn, which checks fee status. Found in R15C step 7 that the gate was UI-ONLY (an investor fetched the file with no fee confirmed); now enforced at storage.
+
+### Lawyer boundary (R15C)
+The lawyer sees NOTHING in R15C — RLS 0-rows on all 5 tables + `LawyerRoomView` interception (renders the Legal Counsel view for every route except /meetings, has zero R15C references). Verified live: lawyer at /close → Legal Counsel View, no fee/payment/close/invoice, even with a fee row present.
+
+### Stripe
+Not built — every charge site carries `TODO(stripe)`; only `confirmFeePayment`'s body swaps when live (`beta_bypass`→`paid` via a real PaymentIntent). The entire surrounding flow (who-pays, download gate, gates 5–7) stays. `stripe_*` columns on `subscriptions` remain null (§22/§32).
+
+### Exit
+Either party can abandon at any gate (`ExitDeal`) — nothing deleted, room stays accessible (not archived), no fee charged for an unclosed deal. Fee-paid-then-abandoned → honest `hello@hockystick.app` support path, NOT an auto-refund.
+
+### Step-8 live verification (Atlas/Dr Henry room, all PASS)
+Full walk: fee ($6M→$15,000 cap, investor pays) → download inactive → fee confirmed → download active → both signed → payment proof → founder confirmed → **DEAL CLOSED** → 2 invoices (HS-<ref>-F1/I1, full content) → read-only term-sheets (no edit controls) → lawyer sees no R15C. Founder-pays path + exit (with the fee-paid support branch) verified separately. tsc 68; build `_worker.js` gzip **0.88 MB** (recharts optimization §41 gave the headroom).
