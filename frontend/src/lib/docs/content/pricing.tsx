@@ -10,14 +10,14 @@ export const PRICING_PAGES: Record<string, DocPage> = {
       slug: "pricing",
       title: "Pricing & plans",
       description:
-        "The six Hockystick plans, the 1.5% success fee, and what 'by invitation' means for investors. Honest numbers, no hidden tiers.",
+        "The six Hockystick plans, the 1.5% success fee, and how open investor registration works. Honest numbers, no hidden tiers.",
       updated: UPDATED,
       toc: [
         { id: "model", label: "The model" },
         { id: "founder-plans", label: "Founder plans" },
         { id: "investor-plans", label: "Investor plans" },
         { id: "success-fee", label: "The success fee" },
-        { id: "invitation", label: "Investor access by invitation" },
+        { id: "invitation", label: "Investor access" },
       ],
     },
     Body: () => (
@@ -70,16 +70,16 @@ export const PRICING_PAGES: Record<string, DocPage> = {
           the founder's: we only earn meaningfully when you close.
         </P>
 
-        <H2 id="invitation">Investor access by invitation</H2>
+        <H2 id="invitation">Investor access</H2>
         <P>
-          During beta, investor accounts are granted by application rather than open signup. Each
-          applicant's fund, thesis, and active deal mandate are reviewed before access. This is
-          deliberate: founders share sensitive material on Hockystick, and the value of the
-          network to them depends on every investor on it being real and actively deploying.
+          Investor registration is open during beta — no application or approval step. You build a
+          verified investor profile the same way founders do, and founders see your fund, thesis,
+          and verification tier before sharing sensitive material. Trust on the network comes from
+          verification, not from a signup gate.
         </P>
         <Callout>
-          Applying is free and takes minutes — the review is about who you are, not what you pay.
-          Apply from <A href="/pricing">the pricing page</A>.
+          Signing up is free and takes minutes. Create an investor account from{" "}
+          <A href="/pricing">the pricing page</A>.
         </Callout>
       </>
     ),

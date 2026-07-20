@@ -206,19 +206,19 @@ function PricingPage() {
         {audience === "investor" && (
           <div className="mx-auto mb-10 max-w-2xl rounded-2xl border border-purple-200 bg-purple-50 p-6 text-center">
             <div className="text-xs font-bold uppercase tracking-[0.14em] text-purple-700" style={{ fontFamily: "Syne, sans-serif" }}>
-              Investor access — beta invitation
+              Investor access — free during beta
             </div>
             <p className="mt-3 text-sm leading-relaxed text-gray-700">
-              During our beta phase, investor access is by invitation. We verify each
-              investor's fund, thesis, and active deal mandate before granting access.
-              This ensures founders receive only qualified interest.
+              Open registration for investors during beta. Build a verified profile,
+              set your thesis, and get thesis-matched deal flow. Founders see your fund,
+              thesis, and verification tier before they share.
             </p>
             <Link
               to="/sign-up"
               search={{ role: "investor" } as any}
               className="mt-4 inline-block rounded-lg hs-gradient px-6 py-3 text-sm font-semibold text-white hover:hs-gradient"
             >
-              Apply for investor access →
+              Create investor account →
             </Link>
           </div>
         )}

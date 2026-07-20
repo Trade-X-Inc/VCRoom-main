@@ -1295,10 +1295,10 @@ function PricingSection({ dark }: { dark: boolean }) {
               className="mb-1"
               style={{ fontFamily: SYNE, fontWeight: 800, fontSize: "40px", color: priceColor }}
             >
-              By invitation
+              Free during beta
             </div>
             <p className="text-xs mb-6" style={{ color: labelColor, fontFamily: DM }}>
-              During beta, serious investors apply for verified access. We review each application.
+              Open registration. Build a verified investor profile, set your thesis, and get thesis-matched deal flow. Founders see your fund, thesis, and verification tier before sharing.
             </p>
             <ul className="space-y-3 mb-8">
               {INVESTOR_PLAN.map(tick)}
@@ -1311,7 +1311,7 @@ function PricingSection({ dark }: { dark: boolean }) {
               onMouseEnter={(e) => { e.currentTarget.style.background = investorBtnHover; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
             >
-              Apply for investor access →
+              Create investor account →
             </Link>
           </div>
         </div>

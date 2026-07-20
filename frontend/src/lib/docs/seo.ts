@@ -64,7 +64,7 @@ const DOC_FAQS: Record<string, Array<{ q: string; a: string }>> = {
     },
     {
       q: "Is Hockystick suitable for family offices?",
-      a: "Yes — family offices managing 5–50 active deals are a core audience. Investor access is by invitation during beta: each fund's thesis and active mandate are reviewed before access. Deal rooms are NDA-gated (DIFC governing law, DIAC arbitration), documents are access-logged, and the AI deep-analysis engine produces analyst-grade findings without an analyst team.",
+      a: "Yes — family offices managing 5–50 active deals are a core audience. Investor registration is open during beta, with verification tiers that let founders see each fund's thesis and confirmed details before sharing. Deal rooms are NDA-gated (DIFC governing law, DIAC arbitration), documents are access-logged, and the AI deep-analysis engine produces analyst-grade findings without an analyst team.",
     },
     {
       q: "What countries does Hockystick support?",

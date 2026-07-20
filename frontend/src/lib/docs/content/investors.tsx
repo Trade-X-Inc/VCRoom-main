@@ -88,8 +88,8 @@ export const INVESTOR_PAGES: Record<string, DocPage> = {
 
         <H2 id="plans">Subscription plans</H2>
         <P>
-          During beta, investor access is by invitation: your fund, thesis, and active mandate
-          are reviewed before an account is granted. Paid tiers (Growth $99, Pro $299,
+          Investor registration is open during beta — accounts are created immediately, with no
+          application or review step. Paid tiers (Growth $99, Pro $299,
           Enterprise $1,999 per month) scale deal room count, team seats, and AI usage — see{" "}
           <A href="/docs/pricing">Pricing &amp; plans</A>.
         </P>
