@@ -1,9 +1,10 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Scale, Check, FileText } from "lucide-react";
+import { Scale, Check } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useDealRoom } from "@/hooks/useDealRoom";
 import { useLawyerGateState } from "@/components/app/LawyerGate";
+import { TermClosingPanel } from "@/components/app/TermClosingPanel";
 
 // R14B step 4 — locked scope for the room-native lawyer role: deal
 // summary, term sheet area, the Investment Terms meeting slot, and its
@@ -26,7 +27,7 @@ function initials(name?: string | null) {
 
 export function LawyerRoomView() {
   const ctx = useDealRoom();
-  const { dealRoomId, companyName, room } = ctx;
+  const { dealRoomId, companyName } = ctx;
   const path = useRouterState({ select: (s) => s.location.pathname });
   const onMeetings = path.endsWith("/meetings");
 
@@ -45,8 +46,21 @@ export function LawyerRoomView() {
   });
 
   const { waived } = useLawyerGateState(dealRoomId);
-  const workflowStage = (room as any)?.workflow_stage ?? "nda_signed";
-  const termSheetUnlocked = workflowStage === "term_sheet" || workflowStage === "closed";
+  const userId = (ctx as any).userId as string | undefined;
+
+  // R15B: the lawyer sees the generated summary + agreement (dr_is_room_member
+  // RLS). They do NOT see term-negotiation history (R15A tables stay
+  // dr_is_principal / lawyer-blocked). Show the closing panel once a summary
+  // exists (terms locked).
+  const { data: summaryExists } = useQuery({
+    queryKey: ["lawyer-summary-exists", dealRoomId],
+    enabled: !!dealRoomId,
+    queryFn: async () => {
+      const { data } = await supabase.from("deal_room_summaries")
+        .select("id").eq("deal_room_id", dealRoomId).eq("status", "active").maybeSingle();
+      return !!data;
+    },
+  });
 
   if (onMeetings) {
     // The Interviews tab itself already restricts to the Investment Terms
@@ -73,21 +87,18 @@ export function LawyerRoomView() {
         </div>
       </div>
 
-      <div className="mb-6 border border-[#E4E4E7] bg-white p-5">
-        <div className="mb-3 text-xs font-medium uppercase tracking-wide text-[#71717A]">Term Sheet</div>
-        {termSheetUnlocked ? (
-          <Link
-            to={`/app/deal-rooms/$id/term-sheets` as any}
-            params={{ id: dealRoomId } as any}
-            className="inline-flex h-9 items-center gap-2 bg-[#7C3AED] px-3 text-sm font-medium text-white"
-            style={{ borderRadius: 2 }}
-          >
-            <FileText className="h-4 w-4" /> Open term sheet
-          </Link>
-        ) : (
-          <div className="text-sm text-[#52525B]">Not yet available — unlocks once the deal reaches the Term Sheet stage.</div>
-        )}
-      </div>
+      {/* R15B: summary + agreement, inline. Lawyer drafts the agreement from the
+          summary and uploads it here. No term-negotiation history is shown. */}
+      {summaryExists && userId ? (
+        <div className="mb-6">
+          <TermClosingPanel dealRoomId={dealRoomId} role="lawyer" userId={userId} />
+        </div>
+      ) : (
+        <div className="mb-6 border border-[#E4E4E7] bg-white p-5">
+          <div className="mb-3 text-xs font-medium uppercase tracking-wide text-[#71717A]">Agreed terms summary</div>
+          <div className="text-sm text-[#52525B]">Not yet available — the summary is generated once both parties finalize the terms.</div>
+        </div>
+      )}
 
       <div className="mb-6 border border-[#E4E4E7] bg-white p-5">
         <div className="mb-3 text-xs font-medium uppercase tracking-wide text-[#71717A]">Investment Terms meeting</div>

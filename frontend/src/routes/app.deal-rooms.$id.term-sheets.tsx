@@ -14,6 +14,7 @@ import {
   selectInstrument, addCustomTerm, proposeTerm, acceptTerm, rejectTerm,
   requestInstrumentReset, resolveInstrumentReset,
 } from "@/lib/term-negotiation-fn";
+import { TermClosingPanel } from "@/components/app/TermClosingPanel";
 
 // R15A — Term negotiation engine. Sole content of /deal-rooms/:id/term-sheets
 // (the old investor-only blob builder was fully replaced here; see git history).
@@ -267,10 +268,15 @@ function TermNegotiationPage() {
             </div>
             <div className="text-xs" style={{ color: INK2 }}>Every term is accepted by both parties. The term set is locked.</div>
           </div>
-          {/* R15B seam: re-open terms (lawyer flags an issue) is NOT implemented in
-              R15A. When R15B adds it, it clears deal_room_term_config.locked_at and
-              re-opens the affected term(s). Placeholder below, intentionally inert. */}
-          {/* <button data-r15b-reopen-placeholder /> */}
+        </div>
+      )}
+
+      {/* R15B — post-lock closing panel: generated summary + agreement upload/
+          review + re-open flow. Rendered for founder/investor here; the lawyer
+          sees the same panel via LawyerRoomView. */}
+      {locked && userId && (
+        <div className="mt-6">
+          <TermClosingPanel dealRoomId={dealRoomId} role={role} userId={userId} />
         </div>
       )}
 
