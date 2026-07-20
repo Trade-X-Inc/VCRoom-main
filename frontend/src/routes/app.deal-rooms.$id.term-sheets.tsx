@@ -261,7 +261,7 @@ function TermNegotiationPage() {
           const isMyMove = !locked && term.status !== "locked" && (term.awaiting_role === role || term.status === "unset");
           const history = proposalsByTerm[term.id] ?? [];
           return (
-            <div key={term.id} className="border-b last:border-b-0" style={{ borderColor: BORDER }}>
+            <div key={term.id} data-testid={`term-row-${term.term_key}`} data-term-status={term.status} className="border-b last:border-b-0" style={{ borderColor: BORDER }}>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3.5" style={{ minHeight: 44 }}>
                 <div className="min-w-[180px] flex-1">
                   <div className="flex items-center gap-2">
