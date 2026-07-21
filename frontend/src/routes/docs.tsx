@@ -126,14 +126,15 @@ function DocsLayout() {
             Docs
           </Link>
           <div className="ml-auto flex items-center gap-4">
-            <a href="https://hockystick.app" className="hidden text-sm text-gray-600 hover:text-gray-900 sm:block">
-              hockystick.app
-            </a>
-            <Link
-              to={"/sign-in" as any}
-              className="inline-flex items-center min-h-9 rounded-lg hs-gradient px-3.5 py-1.5 text-sm font-medium text-white hover:hs-gradient"
-            >
+            <Link to={"/sign-in" as any} className="hidden text-sm text-gray-600 hover:text-gray-900 sm:block">
               Sign in
+            </Link>
+            <Link
+              to="/sign-up"
+              search={{ role: "founder" } as any}
+              className="inline-flex items-center min-h-9 rounded-[2px] hs-gradient px-3.5 py-1.5 text-sm font-medium text-white hover:hs-gradient"
+            >
+              Get started →
             </Link>
           </div>
         </div>

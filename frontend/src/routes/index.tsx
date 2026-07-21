@@ -1,69 +1,54 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getUpcomingRoasts } from "@/lib/roast-fn";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { CostComparisonTable } from "@/components/site/CostComparisonTable";
-import { CheckCircle2, ArrowRight, Shield, Lock } from "lucide-react";
+import { VaultScrollSequence } from "@/components/site/VaultScrollSequence";
+import {
+  ArrowRight, CheckCircle2, ShieldCheck, FileText, Video,
+  Scale, FileSignature, Plus, Minus,
+} from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Hockystick — Fundraising infrastructure for GCC & MENA founders" },
-      { name: "description", content: "Verified profiles, encrypted deal rooms, AI due diligence. The complete fundraising stack for founders raising from GCC & MENA investors." },
-      { name: "keywords", content: "startup fundraising infrastructure, verified investor platform, founder due diligence, VC deal flow management, deal rooms, GCC & MENA fundraising" },
+      { title: "Hockystick — From first meeting to signed agreement" },
+      { name: "description", content: "The fundraising platform where founders and investors meet, run due diligence, negotiate terms, and close — entirely in-platform. Verified profiles, deal rooms, AI-powered interviews, term negotiation, and closing." },
+      { name: "keywords", content: "fundraising platform, verified investor platform, due diligence, deal rooms, term negotiation, startup fundraising, investor deal flow" },
       { name: "robots", content: "index, follow" },
-      { property: "og:title", content: "Hockystick — Fundraising infrastructure for GCC & MENA founders" },
-      { property: "og:description", content: "Verified profiles. Encrypted deal rooms. AI due diligence. The complete stack for GCC & MENA." },
+      { property: "og:title", content: "Hockystick — From first meeting to signed agreement" },
+      { property: "og:description", content: "Verified profiles. Deal rooms. AI-powered interviews. Term negotiation to signed agreement — entirely in-platform." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://hockystick.app" },
       { property: "og:image", content: "https://hockystick.app/og-image.png" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Hockystick — Fundraising infrastructure for GCC & MENA founders" },
-      { name: "twitter:description", content: "Private deal rooms. Verified founders. Serious investors. Deals that close." },
+      { name: "twitter:title", content: "Hockystick — From first meeting to signed agreement" },
+      { name: "twitter:description", content: "The complete fundraising transaction platform. Verified both sides. Close deals in-platform." },
     ],
     links: [
       { rel: "canonical", href: "https://hockystick.app" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" as const },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" },
     ],
   }),
   component: Landing,
 });
 
-/* ─── SHARED TOKENS ─────────────────────────────────────────────────────── */
-const PURPLE = "var(--brand)";
-const PURPLE_DARK = "#6d28d9";
+/* ─── TOKENS ─────────────────────────────────────────────────────────────── */
 const SYNE = "Syne, sans-serif";
 const DM = "DM Sans, sans-serif";
-// Light-on-dark tokens for the dark #111113 mockup/preview panels. Previously
-// aliased to var(--muted-foreground) (#71717A) — dark-on-dark, failed AA. Now
-// real white-with-opacity so text is legible on the dark panels (R6 contrast).
-const W80 = "rgba(255,255,255,0.86)"; // primary text on dark
-const W60 = "rgba(255,255,255,0.72)"; // secondary on dark (AA at 12px+)
-const W70 = "rgba(255,255,255,0.72)";
-const W40 = "rgba(255,255,255,0.72)"; // was 0.4 — bumped to clear AA on #111113
-const W08 = "rgba(255,255,255,0.08)"; // hairline on dark
+const BRAND = "#7C3AED";
+const INK = "#0A0A0B";
+const SECONDARY = "#52525B";
+const BORDER = "#E4E4E7";
 
 /* ─── ROOT ───────────────────────────────────────────────────────────────── */
-// Landing page is always light — dark adaptive sections are no longer used
-function useDark(): boolean {
-  return false;
-}
-
 function Landing() {
-  const dark = useDark();
-  useEffect(() => { window.scrollTo(0, 0); }, []);
-
-  // Force light theme on the landing page — don't write to localStorage
+  // Landing is always light except the vault hero + the one purple comparison band.
   useEffect(() => {
     const root = document.documentElement;
     const hadDark = root.classList.contains("dark");
     root.classList.remove("dark");
     root.setAttribute("data-theme", "light");
     root.style.colorScheme = "light";
+    window.scrollTo(0, 0);
     return () => {
       if (hadDark) {
         root.classList.add("dark");
@@ -72,10 +57,9 @@ function Landing() {
       }
     };
   }, []);
+
   return (
-    <div style={{ background: "var(--background)" }}>
-      {/* SoftwareApplication structured data — what AI crawlers and search
-          engines read when asked what Hockystick is. */}
+    <div style={{ background: "#FFFFFF" }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -86,659 +70,287 @@ function Landing() {
             applicationCategory: "BusinessApplication",
             operatingSystem: "Web",
             description:
-              "AI-native deal flow platform for founders and investors in GCC & MENA. Verified profiles, NDA-gated deal rooms, structured due diligence, and recorded investment decisions.",
-            offers: {
-              "@type": "Offer",
-              price: "49",
-              priceCurrency: "USD",
-              priceSpecification: {
-                "@type": "RecurringChargeSpecification",
-                billingDuration: "P1M",
-              },
-            },
-            featureList: [
-              "AI-powered founder profile extraction",
-              "Evidence-based 5-tier verification system",
-              "NDA-gated deal rooms with 6-stage workflow",
-              "Confrontational AI due diligence analysis",
-              "Investment memo generation",
-              "Fundraising readiness scoring",
-              "Badge and credential system",
-              "Connection request to deal room automation",
-            ],
-            applicationSubCategory: "Fundraising · Due Diligence · Deal Flow Management",
-            provider: {
-              "@type": "Organization",
-              name: "Hockystick",
-              url: "https://hockystick.app",
-              location: "DIFC, Dubai, UAE",
-            },
+              "A verified fundraising platform where founders and investors meet, run due diligence, hold structured interviews, negotiate terms, and close deals — entirely in-platform.",
+            offers: { "@type": "Offer", price: "49", priceCurrency: "USD" },
+            provider: { "@type": "Organization", name: "Hockystick", url: "https://hockystick.app" },
           }),
         }}
       />
       <SiteHeader />
       <Hero />
-      <SocialProofBar />
-      <ProblemSection dark={dark} />
-      <HowItWorks dark={dark} />
-      <ForFounders dark={dark} />
-      <ForInvestors dark={dark} />
-      <WhoThisIsFor dark={dark} />
-      <TrustSection />
-      <UpcomingRoastsRail dark={dark} />
-      <EarlyAccessSection dark={dark} />
-      <PricingSection dark={dark} />
-      <FinalCTA />
+      <ProblemSection />
+      <ProductBands />
+      <TwoWayTrust />
+      <HowItWorks />
+      <ForFoundersInvestors />
+      <ComparisonBand />
+      <PricingPreview />
+      <FaqSection />
+      <FinalCta />
       <SiteFooter />
     </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   SECTION 1 — HERO
+   SECTION 2 — HERO (over the vault scroll canvas)
 ═══════════════════════════════════════════════════════════════════════════ */
-function DealRoomCard() {
-  const badge = (label: string, color: string, bg: string) => (
-    <span
-      className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full"
-      style={{ color, background: bg, fontFamily: SYNE }}
-    >
-      {label}
-    </span>
-  );
-
-  const docRow = (
-    icon: string,
-    name: string,
-    sub: string,
-    badgeLabel: string,
-    badgeColor: string,
-    badgeBg: string,
-  ) => (
-    <div
-      className="flex items-center gap-3 px-4 py-2.5"
-      style={{ borderBottom: `1px solid ${W08}` }}
-    >
-      <span className="text-base shrink-0">{icon}</span>
-      <div className="flex-1 min-w-0">
-        <div className="text-xs font-medium truncate" style={{ fontFamily: SYNE, color: W80 }}>{name}</div>
-        <div className="text-[10px] truncate" style={{ color: W40, fontFamily: DM }}>{sub}</div>
-      </div>
-      {badge(badgeLabel, badgeColor, badgeBg)}
-    </div>
-  );
-
-  return (
-    <div className="relative w-full" style={{ perspective: "800px" }}>
-      {/* Shadow card (depth) */}
-      <div
-        className="absolute inset-0 rounded-2xl"
-        style={{
-          background: "#111113",
-          border: `1px solid ${W08}`,
-          transform: "rotate(1.5deg) translateY(8px) scale(0.97)",
-          opacity: 0.5,
-        }}
-      />
-      {/* Glow */}
-      <div
-        className="absolute -inset-8 rounded-3xl pointer-events-none"
-        style={{
-          background: "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(124,58,237,0.22), transparent 70%)",
-        }}
-      />
-      {/* Main card */}
-      <div
-        className="relative rounded-2xl overflow-hidden shadow-2xl"
-        style={{
-          background: "#111113",
-          border: `1px solid rgba(124,58,237,0.35)`,
-          transform: "rotate(-1deg)",
-        }}
-      >
-        {/* Top bar */}
-        <div
-          className="flex items-center justify-between px-4 py-3"
-          style={{ background: "var(--background)", borderBottom: `1px solid ${W08}` }}
-        >
-          <div className="flex items-center gap-2.5">
-            <div
-              className="h-7 w-7 rounded-md flex items-center justify-center text-brand-foreground text-[10px] font-bold"
-              style={{ background: PURPLE, fontFamily: SYNE }}
-            >
-              ML
-            </div>
-            <div>
-              <div className="text-xs font-bold tracking-wide" style={{ fontFamily: SYNE, color: W80 }}>
-                MERIDIAN LOGISTICS
-              </div>
-              <div className="text-[10px]" style={{ color: W40, fontFamily: DM }}>
-                Seed · Logistics Tech · GCC
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {badge("Active", "#047857", "rgba(16,185,129,0.16)")}
-          </div>
-        </div>
-
-        {/* Stats row */}
-        <div
-          className="flex items-center gap-4 px-4 py-2"
-          style={{ background: "rgba(124,58,237,0.06)", borderBottom: `1px solid ${W08}` }}
-        >
-          {[
-            { label: "37 days open" },
-            { label: "14 doc views" },
-            { label: "Match score 82/100" },
-          ].map(({ label }) => (
-            <span key={label} className="text-[10px]" style={{ color: W60, fontFamily: DM }}>
-              {label}
-            </span>
-          ))}
-        </div>
-
-        {/* Document rows */}
-        {docRow("📄", "Pitch Deck", "Opened 3× this week", "↓ Viewed", "#C4B5FD", "rgba(168,85,247,0.18)")}
-        {docRow("📊", "Financial Model", "First opened 2 days ago", "⟳ Reviewing", "#F59E0B", "rgba(245,158,11,0.12)")}
-        {docRow("📋", "Cap Table", "Awaiting access request", "🔒 Locked", "var(--faint)", "var(--accent)")}
-
-        {/* Investor row */}
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-2">
-            <div
-              className="h-6 w-6 rounded-full flex items-center justify-center text-brand-foreground text-[9px] font-bold shrink-0"
-              style={{ background: "rgba(124,58,237,0.3)", fontFamily: SYNE }}
-            >
-              SR
-            </div>
-            <span className="text-xs" style={{ color: W60, fontFamily: DM }}>
-              S. Rahman · Crescent Capital
-            </span>
-          </div>
-          <div className="flex items-center gap-1">
-            {["Invest", "Hold", "Pass"].map((v, i) => (
-              <button
-                key={v}
-                className="text-[10px] px-2 py-0.5 rounded border transition-colors"
-                style={{
-                  color: W40,
-                  borderColor: W08,
-                  background: "transparent",
-                  fontFamily: SYNE,
-                  opacity: i === 0 ? 0.8 : 0.4,
-                }}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function Hero() {
   return (
-    <section
-      data-testid="hero-section"
-      className="relative w-full overflow-hidden"
-      style={{ minHeight: "88vh", background: "var(--background)" }}
-    >
-      {/* Purple radial glow — behind content */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: "radial-gradient(ellipse 70% 55% at 50% 0%, rgba(124,58,237,0.25), transparent 65%)",
-        }}
-      />
-
-      <div className="relative max-w-[1100px] mx-auto px-6 pt-24 pb-16 lg:pt-32 lg:pb-20">
-        {/* Eyebrow */}
-        <div className="flex justify-center mb-8">
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold"
-            style={{
-              background: "rgba(124,58,237,0.12)",
-              border: "1px solid rgba(124,58,237,0.3)",
-              color: "#A855F7",
-              fontFamily: SYNE,
-              letterSpacing: "0.06em",
-            }}
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-[#A855F7] animate-pulse" />
-            Private deal rooms for GCC &amp; MENA
-          </div>
-        </div>
-
-        {/* H1 */}
+    <VaultScrollSequence>
+      <div className="mx-auto max-w-4xl px-6 text-center">
         <h1
-          className="text-center mb-6 leading-[1.05]"
-          style={{
-            fontFamily: SYNE,
-            fontWeight: 800,
-            fontSize: "clamp(38px, 6.5vw, 68px)",
-            letterSpacing: "-2px",
-            color: "var(--foreground)",
-          }}
+          className="mx-auto max-w-3xl"
+          style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(40px, 7vw, 68px)", lineHeight: 1.05, letterSpacing: "-0.02em", color: "#FFFFFF" }}
         >
-          The fundraising infrastructure
-          <br />
-          <span style={{ color: PURPLE }}>GCC & MENA founders needed.</span>
+          From first meeting to signed agreement. One platform.
         </h1>
-
-        {/* Subhead */}
         <p
-          className="text-center mx-auto mb-10 leading-relaxed"
-          style={{
-            fontFamily: DM,
-            fontWeight: 300,
-            fontSize: "clamp(16px, 2.5vw, 22px)",
-            color: "var(--muted-foreground)",
-            maxWidth: "640px",
-          }}
+          className="mx-auto mt-6 max-w-2xl"
+          style={{ fontFamily: DM, fontWeight: 400, fontSize: "clamp(16px, 2.2vw, 20px)", lineHeight: 1.5, color: "rgba(255,255,255,0.88)" }}
         >
-          Verified profiles. Encrypted deal rooms. AI due diligence.
-          <br />
-          Built for founders raising capital from GCC & MENA investors — wherever they're based.
+          Verified profiles. Structured due diligence. AI-powered interviews.
+          Term negotiation to signed agreement — entirely in-platform.
         </p>
-
-        {/* CTAs */}
-        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
+        <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
             to="/sign-up"
             search={{ role: "founder" } as any}
-            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold text-brand-foreground transition-colors"
-            style={{ background: PURPLE, padding: "14px 32px", fontSize: "16px", fontFamily: SYNE }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = PURPLE_DARK; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = PURPLE; }}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-[2px] px-6 text-[15px] font-semibold"
+            style={{ background: BRAND, color: "#FFFFFF", fontFamily: SYNE }}
           >
-            Build your deal room <ArrowRight className="h-4 w-4" />
+            Create founder account <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
             to="/sign-up"
             search={{ role: "investor" } as any}
-            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold text-foreground transition-colors"
-            style={{ border: "1px solid var(--border)", padding: "14px 32px", fontSize: "16px", fontFamily: SYNE }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--accent)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-[2px] px-6 text-[15px] font-semibold"
+            style={{ background: "transparent", color: "#FFFFFF", border: "1px solid rgba(255,255,255,0.5)", fontFamily: SYNE }}
           >
-            Review verified deals
+            I&rsquo;m an investor
           </Link>
         </div>
-
-        {/* Social proof line */}
-        <div className="flex justify-center mb-16">
-          <p
-            className="text-xs"
-            style={{ color: W40, fontFamily: DM }}
-          >
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-400 mr-1.5 align-middle" />
-            LIVE &nbsp;·&nbsp; GCC &amp; MENA &nbsp;·&nbsp; NDA-gated deal rooms &nbsp;·&nbsp; Free to start
-          </p>
-        </div>
-
-        {/* Hero visual */}
-        <div className="max-w-lg mx-auto">
-          <DealRoomCard />
-        </div>
+        <p className="mt-6 text-[13px]" style={{ fontFamily: DM, color: "rgba(255,255,255,0.72)" }}>
+          Free during beta · No credit card required · DIFC regulated
+        </p>
       </div>
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   SECTION 2 — SOCIAL PROOF BAR
-═══════════════════════════════════════════════════════════════════════════ */
-function SocialProofBar() {
-  return (
-    <section className="w-full py-4" style={{ background: "#111113" }}>
-      <div className="max-w-[1100px] mx-auto px-6">
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-          <span className="text-xs" style={{ color: W40, fontFamily: DM }}>
-            Founders raising across
-          </span>
-          <span className="text-sm font-medium" style={{ fontFamily: DM, color: W80 }}>
-            🌍 GCC & MENA & Beyond
-          </span>
-        </div>
-      </div>
-    </section>
+    </VaultScrollSequence>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    SECTION 3 — PROBLEM
 ═══════════════════════════════════════════════════════════════════════════ */
-function ProblemSection({ dark }: { dark: boolean }) {
-  const bg = dark ? "var(--background)" : "#F9FAFB";
-  const cardBg = dark ? "#111113" : "#FFFFFF";
-  const headingColor = dark ? "#FFFFFF" : "#111827";
-  const bodyColor = dark ? W60 : "#4B5563";
-  const statColor = dark ? "#FFFFFF" : "#111827";
-
-  // Real platform numbers — keep these honest and update as they grow
-  const stats = [
-    {
-      n: "7",
-      label: "NDAs executed on-platform, DIAC-arbitrated",
-    },
-    {
-      n: "3",
-      label: "encrypted deal rooms live with staged document access",
-    },
-    {
-      n: "1 platform",
-      label: "to manage verified profiles, deal rooms, and decisions",
-    },
-  ];
+function ProblemSection() {
   return (
-    <section className="w-full py-24" style={{ background: bg }}>
-      <div className="max-w-[1100px] mx-auto px-6">
-        <div className="max-w-xl mb-14">
-          <h2
-            className="mb-6 leading-tight"
-            style={{
-              fontFamily: SYNE,
-              fontWeight: 700,
-              fontSize: "clamp(32px, 5vw, 48px)",
-              color: headingColor,
-            }}
-          >
-            The warm intro is the bottleneck.
-          </h2>
-          <p
-            className="leading-relaxed"
-            style={{ fontFamily: DM, fontWeight: 300, fontSize: "18px", color: bodyColor }}
-          >
-            Investors read 200 cold decks a week. They read the ones from founders someone they
-            trust introduced. If you&rsquo;re not in the network, you&rsquo;re invisible.
-            Hockystick is the network you didn&rsquo;t have to be born into.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-4">
-          {stats.map(({ n, label }) => (
-            <div
-              key={n}
-              className="rounded-lg px-6 py-5"
-              style={{
-                background: cardBg,
-                borderLeft: `3px solid ${PURPLE}`,
-                boxShadow: dark ? "none" : "0 1px 4px rgba(0,0,0,0.06)",
-              }}
-            >
-              <div
-                className="mb-2"
-                style={{
-                  fontFamily: SYNE,
-                  fontWeight: 700,
-                  fontSize: "36px",
-                  color: statColor,
-                }}
-              >
-                {n}
-              </div>
-              <p
-                className="leading-snug"
-                style={{ fontFamily: DM, fontSize: "14px", color: bodyColor }}
-              >
-                {label}
-              </p>
-            </div>
-          ))}
-        </div>
+    <section className="w-full" style={{ background: "#FFFFFF", borderBottom: `1px solid ${BORDER}` }}>
+      <div className="mx-auto max-w-[1000px] px-6 py-24 sm:py-28">
+        <p className="mb-5 text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: BRAND, fontFamily: DM }}>
+          The warm intro is broken
+        </p>
+        <p style={{ fontFamily: SYNE, fontWeight: 600, fontSize: "clamp(26px, 3.6vw, 40px)", lineHeight: 1.25, color: INK, letterSpacing: "-0.01em" }}>
+          Founders spend months chasing introductions. Investors waste hours on
+          unverified pitches that go nowhere. Deals stall between scattered emails,
+          shared drives, and a dozen open tabs. Both sides lose time they can&rsquo;t
+          get back.
+        </p>
       </div>
     </section>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   SECTION 4 — HOW IT WORKS
+   SECTION 4 — PRODUCT BANDS (alternating text/screenshot)
 ═══════════════════════════════════════════════════════════════════════════ */
-const HOW_STEPS = [
+type Band = {
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+  eyebrow: string;
+  title: string;
+  bullets: string[];
+  /* TODO(screenshots): replace ShotPlaceholder with a real 2x production capture
+     from hockystick.app using the test accounts. See report for the list. */
+  shotLabel: string;
+};
+
+const BANDS: Band[] = [
   {
-    n: "01",
-    title: "Build your verified profile",
-    body: "Upload documents, complete company details, pass our verification checks. Investors see what was confirmed — and what wasn’t. No inflated claims.",
+    icon: ShieldCheck,
+    eyebrow: "Verification",
+    title: "Verified from day one",
+    bullets: [
+      "Five-tier verification built from real documents, cross-checked by AI",
+      "Both founders and investors are verified — not just one side",
+      "Verification tier is visible before either party requests access",
+      "Badges reflect exactly what was checked — never asserted, always evidenced",
+    ],
+    shotLabel: "Verification tiers — /app profile",
   },
   {
-    n: "02",
-    title: "Get discovered by matched investors",
-    body: "Investors filter by stage, sector, and geography. Your verified profile appears in their feed when you match their thesis. They request access — you approve.",
+    icon: FileText,
+    eyebrow: "Deal rooms",
+    title: "Deal rooms with teeth",
+    bullets: [
+      "Private, NDA-gated spaces scoped to one founder and one investor",
+      "Document vault with role-based access and full access logging",
+      "Structured due-diligence workstation with a shared checklist",
+      "AI document analysis — findings source-cited and confidence-scored",
+    ],
+    shotLabel: "Deal room — Due Diligence workstation",
   },
   {
-    n: "03",
-    title: "Open a deal room",
-    body: "NDA-gated. Encrypted. Three access tiers — public profile, initial data pack, full deal room. You decide what each investor sees.",
+    icon: Video,
+    eyebrow: "Interviews",
+    title: "Structured interviews, AI notes",
+    bullets: [
+      "Five video stages: Introduction, Product Demo, Financials, Terms, Investment Terms",
+      "Live transcription of every meeting",
+      "AI extracts notes cited back to the transcript — no fabricated claims",
+      "Figures attributed to the speaker, never asserted as verified fact",
+    ],
+    shotLabel: "Interview sequence — meeting notes",
   },
   {
-    n: "04",
-    title: "Get a decision, not a ghost",
-    body: "Investors submit Invest, Hold, or Pass in the room. Pass decisions include a reason. No more waiting for a reply that never comes.",
+    icon: Scale,
+    eyebrow: "Negotiation",
+    title: "Negotiate terms, not emails",
+    bullets: [
+      "Four instrument types: SAFE, Equity, Debt, and Company Sale",
+      "Per-term propose, accept, reject, or counter — with a full audit trail",
+      "Both parties see every change in real time",
+      "Agreed terms lock automatically and carry into the agreement",
+    ],
+    shotLabel: "Term negotiation — per-term proposals",
+  },
+  {
+    icon: FileSignature,
+    eyebrow: "Closing",
+    title: "Close the deal. Get the invoice.",
+    bullets: [
+      "Locked terms generate a summary; counsel can draft the agreement",
+      "Both parties sign, payment is confirmed, and the deal closes",
+      "The room becomes a permanent, read-only archive",
+      "Invoices are generated automatically at close",
+    ],
+    shotLabel: "Closing pipeline — signed & invoiced",
   },
 ];
 
-function HowItWorks({ dark }: { dark: boolean }) {
-  const bg = dark ? "var(--background)" : "#FFFFFF";
-  const headingColor = dark ? "#FFFFFF" : "#111827";
-  const bodyColor = dark ? W60 : "#4B5563";
-  const gridDivider = dark ? "var(--accent)" : "#E4E4E7";
-
+function ShotPlaceholder({ label }: { label: string }) {
+  // TODO(screenshots): swap this browser-chrome placeholder for a real 2x capture
+  // from the live app (see report for exact routes). Structure mirrors the app UI.
   return (
-    <section id="how-it-works" className="w-full py-24" style={{ background: bg }}>
-      <div className="max-w-[1100px] mx-auto px-6">
-        {/* Label + heading */}
-        <div className="mb-16">
-          <div
-            className="mb-3 text-xs font-semibold uppercase tracking-[0.14em]"
-            style={{ color: PURPLE, fontFamily: SYNE }}
-          >
-            HOW IT WORKS
-          </div>
-          <h2
-            style={{
-              fontFamily: SYNE,
-              fontWeight: 700,
-              fontSize: "clamp(32px, 5vw, 48px)",
-              color: headingColor,
-            }}
-          >
-            From profile to closed — in one place.
-          </h2>
-        </div>
-
-        {/* 2×2 grid desktop, stack mobile */}
-        <div className="grid md:grid-cols-2 gap-px" style={{ background: gridDivider }}>
-          {HOW_STEPS.map((step, i) => (
-            <div
-              key={step.n}
-              className="p-8"
-              style={{
-                background: dark
-                  ? (i % 2 === 0 ? "#111113" : "#0D0D0F")
-                  : (i % 2 === 0 ? "#F9FAFB" : "#FFFFFF"),
-              }}
-            >
-              <div
-                className="mb-4 text-sm font-bold"
-                style={{ color: PURPLE, fontFamily: SYNE }}
-              >
-                {step.n}
-              </div>
-              <h3
-                className="mb-3"
-                style={{ fontFamily: SYNE, fontWeight: 600, fontSize: "20px", color: headingColor }}
-              >
-                {step.title}
-              </h3>
-              <p
-                className="leading-relaxed"
-                style={{ fontFamily: DM, fontWeight: 300, fontSize: "15px", color: bodyColor }}
-              >
-                {step.body}
-              </p>
-            </div>
-          ))}
-        </div>
+    <div className="w-full overflow-hidden rounded-[2px]" style={{ border: `1px solid ${BORDER}`, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
+      <div className="flex items-center gap-1.5 px-3 py-2.5" style={{ background: "#FAFAFA", borderBottom: `1px solid ${BORDER}` }}>
+        <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#E4E4E7" }} />
+        <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#E4E4E7" }} />
+        <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#E4E4E7" }} />
+        <span className="ml-3 text-[11px]" style={{ color: "#71717A", fontFamily: DM }}>hockystick.app</span>
       </div>
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   SECTION 5 — FOR FOUNDERS
-═══════════════════════════════════════════════════════════════════════════ */
-function ReadinessMockup() {
-  const gaps = [
-    { label: "LinkedIn URL", ok: false, pts: "-8 pts" },
-    { label: "Financial model", ok: false, pts: "-15 pts" },
-    { label: "Pitch deck", ok: true, pts: "+12 pts" },
-  ];
-  return (
-    <div
-      className="rounded-xl overflow-hidden"
-      style={{ background: "#111113", border: `1px solid ${W08}` }}
-    >
-      {/* Header */}
-      <div
-        className="px-5 py-4"
-        style={{ borderBottom: `1px solid ${W08}`, background: "var(--background)" }}
-      >
-        <div className="text-xs font-semibold text-foreground" style={{ fontFamily: SYNE }}>
-          Readiness Score
-        </div>
-      </div>
-      {/* Score */}
-      <div className="px-5 pt-5 pb-4">
-        <div
-          className="mb-1"
-          style={{ fontFamily: SYNE, fontWeight: 800, fontSize: "48px", color: "#FFFFFF" }}
-        >
-          74 <span style={{ fontSize: "20px", color: W60, fontWeight: 400 }}>/ 100</span>
-        </div>
-        {/* Progress bar */}
-        <div className="h-2 rounded-full mb-5" style={{ background: "var(--accent)" }}>
-          <div className="h-2 rounded-full" style={{ width: "74%", background: PURPLE }} />
-        </div>
-        {/* Gap items */}
-        <div className="space-y-2">
-          {gaps.map(({ label, ok, pts }) => (
-            <div key={label} className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span
-                  className="h-4 w-4 rounded-full flex items-center justify-center text-[9px] shrink-0"
-                  style={{
-                    background: ok ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.12)",
-                    color: ok ? "#10B981" : "#EF4444",
-                  }}
-                >
-                  {ok ? "✓" : "✗"}
-                </span>
-                <span className="text-xs" style={{ color: ok ? W70 : W60, fontFamily: DM }}>
-                  {label}
-                </span>
-              </div>
-              <span
-                className="text-[10px] font-semibold"
-                style={{ color: ok ? "#10B981" : "#EF4444", fontFamily: SYNE }}
-              >
-                {pts}
-              </span>
-            </div>
-          ))}
-        </div>
-        {/* Action */}
-        <div
-          className="mt-4 rounded-lg px-3 py-2.5 text-xs leading-snug"
-          style={{
-            background: "rgba(124,58,237,0.08)",
-            border: "1px solid rgba(124,58,237,0.2)",
-            color: W60,
-            fontFamily: DM,
-          }}
-        >
-          <span style={{ color: "#A855F7", fontFamily: SYNE, fontWeight: 600 }}>Top action: </span>
-          Upload your financial model before your next investor call.
-        </div>
+      <div className="flex aspect-[16/10] items-center justify-center" style={{ background: "#FFFFFF" }}>
+        <span className="px-6 text-center text-[13px]" style={{ color: "#71717A", fontFamily: DM }}>{label}</span>
       </div>
     </div>
   );
 }
 
-const FOUNDER_FEATS = [
-  "Build a secure deal room in minutes",
-  "Control exactly what each investor sees — public, NDA, or full access",
-  "Get a readiness score before your first investor call",
-  "Know which investors match your stage, sector, and raise size",
-  "Track every investor: views, time spent, documents opened",
-  "Get structured feedback when investors pass — not silence",
-];
-
-function ForFounders({ dark }: { dark: boolean }) {
-  const bg = dark ? "#111113" : "#F9FAFB";
-  const headingColor = dark ? "#FFFFFF" : "#111827";
-  const featureColor = dark ? W70 : "#374151";
-  const captionColor = dark ? W40 : "#6B7280";
-
+function ProductBands() {
   return (
-    <section
-      id="for-founders"
-      className="w-full py-24"
-      style={{ background: bg }}
-    >
-      <div className="max-w-[1100px] mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
-          {/* Content */}
-          <div>
-            <div
-              className="mb-3 text-xs font-semibold uppercase tracking-[0.14em]"
-              style={{ color: PURPLE, fontFamily: SYNE }}
-            >
-              FOR FOUNDERS
+    <section className="w-full" style={{ background: "#FFFFFF" }}>
+      {BANDS.map((b, i) => {
+        const Icon = b.icon;
+        const imageFirst = i % 2 === 1;
+        return (
+          <div key={b.title} style={{ borderBottom: `1px solid ${BORDER}` }}>
+            <div className="mx-auto grid max-w-[1200px] items-center gap-10 px-6 py-20 sm:py-24 lg:grid-cols-[45fr_55fr]">
+              <div className={imageFirst ? "lg:order-2" : ""}>
+                <div className="mb-4 inline-flex items-center gap-2">
+                  <Icon className="h-4 w-4" style={{ color: BRAND }} />
+                  <span className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: BRAND, fontFamily: DM }}>{b.eyebrow}</span>
+                </div>
+                <h2 style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", lineHeight: 1.15, color: INK, letterSpacing: "-0.01em" }}>
+                  {b.title}
+                </h2>
+                <ul className="mt-6 space-y-3">
+                  {b.bullets.map((t) => (
+                    <li key={t} className="flex items-start gap-2.5">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" style={{ color: BRAND }} />
+                      <span className="text-[15px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.5 }}>{t}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className={imageFirst ? "lg:order-1" : ""}>
+                <ShotPlaceholder label={b.shotLabel} />
+              </div>
             </div>
-            <h2
-              className="mb-5 leading-tight"
-              style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: headingColor }}
-            >
-              Everything an analyst, lawyer, and advisor would prepare.
-              <br />
-              Built in minutes.
-            </h2>
-            <ul className="space-y-3 mb-8">
-              {FOUNDER_FEATS.map((f) => (
-                <li key={f} className="flex gap-3">
-                  <ArrowRight
-                    className="h-4 w-4 shrink-0 mt-0.5"
-                    style={{ color: PURPLE }}
-                  />
-                  <span
-                    className="text-sm leading-relaxed"
-                    style={{ color: featureColor, fontFamily: DM }}
-                  >
-                    {f}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <Link
-              to="/sign-up"
-              search={{ role: "founder" } as any}
-              className="inline-flex items-center gap-2 rounded-lg font-semibold text-brand-foreground transition-colors"
-              style={{ background: PURPLE, padding: "12px 24px", fontSize: "14px", fontFamily: SYNE }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = PURPLE_DARK; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = PURPLE; }}
-            >
-              Start raising <ArrowRight className="h-4 w-4" />
-            </Link>
-            <p className="mt-3 text-xs" style={{ color: captionColor, fontFamily: DM }}>
-              Verified founders, actively raising on Hockystick
-            </p>
           </div>
+        );
+      })}
+    </section>
+  );
+}
 
-          {/* Mockup */}
-          <ReadinessMockup />
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 5 — TWO-WAY TRUST
+═══════════════════════════════════════════════════════════════════════════ */
+function TwoWayTrust() {
+  return (
+    <section className="w-full" style={{ background: "#FAFAFA", borderBottom: `1px solid ${BORDER}` }}>
+      <div className="mx-auto max-w-[1100px] px-6 py-24 text-center">
+        <h2 className="mx-auto max-w-2xl" style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(26px, 3.4vw, 38px)", lineHeight: 1.15, color: INK, letterSpacing: "-0.01em" }}>
+          Competitors verify founders. We verify both.
+        </h2>
+        <p className="mx-auto mt-4 max-w-xl text-[16px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.5 }}>
+          Trust runs both ways. Every founder and every investor builds a verification
+          tier before a single document changes hands.
+        </p>
+        <div className="mx-auto mt-12 grid max-w-3xl gap-4 sm:grid-cols-2">
+          {[
+            { t: "Founders are verified", d: "Incorporation, financials, customers, and team — checked against real documents, not claims." },
+            { t: "Investors are verified", d: "Fund details, thesis, and track record — so founders know who they're talking to before they share." },
+          ].map((c) => (
+            <div key={c.t} className="p-8 text-left rounded-[2px]" style={{ background: "#FFFFFF", border: `1px solid ${BORDER}` }}>
+              <div className="mb-3 inline-flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4" style={{ color: BRAND }} />
+                <h3 style={{ fontFamily: SYNE, fontWeight: 600, fontSize: "18px", color: INK }}>{c.t}</h3>
+              </div>
+              <p className="text-[14px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.5 }}>{c.d}</p>
+            </div>
+          ))}
+        </div>
+        <Link to="/trust" className="mt-8 inline-flex items-center gap-1.5 text-[14px] font-medium" style={{ color: BRAND, fontFamily: DM }}>
+          How verification works <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 6 — HOW IT WORKS
+═══════════════════════════════════════════════════════════════════════════ */
+function HowItWorks() {
+  const steps = [
+    { n: "1", t: "Build your verified profile" },
+    { n: "2", t: "Connect in a deal room" },
+    { n: "3", t: "Negotiate and agree terms" },
+    { n: "4", t: "Close with confidence" },
+  ];
+  return (
+    <section className="w-full" style={{ background: "#FFFFFF", borderBottom: `1px solid ${BORDER}` }}>
+      <div className="mx-auto max-w-[1200px] px-6 py-24">
+        <h2 className="mb-14 text-center" style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", color: INK, letterSpacing: "-0.01em" }}>
+          How it works
+        </h2>
+        <div className="grid gap-px sm:grid-cols-2 lg:grid-cols-4" style={{ background: BORDER, border: `1px solid ${BORDER}` }}>
+          {steps.map((s) => (
+            <div key={s.n} className="flex flex-col gap-4 p-8" style={{ background: "#FFFFFF" }}>
+              <div className="flex h-9 w-9 items-center justify-center rounded-[2px] text-[15px] font-bold" style={{ background: BRAND, color: "#FFFFFF", fontFamily: SYNE }}>
+                {s.n}
+              </div>
+              <p style={{ fontFamily: SYNE, fontWeight: 600, fontSize: "17px", color: INK, lineHeight: 1.25 }}>{s.t}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -746,357 +358,266 @@ function ForFounders({ dark }: { dark: boolean }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   SECTION 6 — FOR INVESTORS
+   SECTION 7 — FOR FOUNDERS / FOR INVESTORS
 ═══════════════════════════════════════════════════════════════════════════ */
-function InvestorCardMockup() {
+function ForFoundersInvestors() {
   return (
-    <div
-      className="rounded-xl overflow-hidden"
-      style={{ background: "#111113", border: `1px solid ${W08}` }}
-    >
-      {/* Header */}
-      <div
-        className="px-5 py-4 flex items-center justify-between"
-        style={{ borderBottom: `1px solid ${W08}`, background: "var(--background)" }}
-      >
-        <div className="flex items-center gap-2.5">
-          <div
-            className="h-8 w-8 rounded-md flex items-center justify-center text-brand-foreground text-[10px] font-bold"
-            style={{ background: PURPLE, fontFamily: SYNE }}
-          >
-            ML
-          </div>
-          <div>
-            <div className="text-xs font-bold tracking-wide" style={{ fontFamily: SYNE, color: W80 }}>
-              MERIDIAN LOGISTICS
-            </div>
-            <div className="text-[10px]" style={{ color: W40, fontFamily: DM }}>Seed · Logistics Tech · GCC</div>
-          </div>
-        </div>
-        <span
-          className="text-[10px] font-bold px-2 py-1 rounded-full"
-          style={{ background: "rgba(16,185,129,0.14)", color: "#047857", fontFamily: SYNE }}
-        >
-          Match: 82/100
-        </span>
-      </div>
-      {/* Body rows */}
-      <div className="px-5 py-4 space-y-3">
-        <div className="flex items-center gap-2">
-          <CheckCircle2 className="h-3.5 w-3.5 shrink-0" style={{ color: "#10B981" }} />
-          <span className="text-xs" style={{ color: W70, fontFamily: DM }}>
-            Verification: Tier 1 · Company registered · Website live
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <CheckCircle2 className="h-3.5 w-3.5 shrink-0" style={{ color: "#10B981" }} />
-          <span className="text-xs" style={{ color: W70, fontFamily: DM }}>
-            Stage: Seed · Sector: Logistics Tech · Raise: $2M
-          </span>
-        </div>
-        <div className="flex items-center justify-between pt-1">
-          <span
-            className="text-[10px] font-semibold px-2 py-1 rounded-full"
-            style={{ background: "rgba(245,158,11,0.12)", color: "#F59E0B", fontFamily: SYNE }}
-          >
-            IN DILIGENCE
-          </span>
-          <div className="flex items-center gap-1.5">
-            {(["Invest", "Hold", "Pass"] as const).map((v, i) => (
-              <button
-                key={v}
-                className="text-[10px] px-2.5 py-1 rounded border"
-                style={{
-                  color: i === 0 ? "#10B981" : i === 1 ? "#F59E0B" : "#EF4444",
-                  borderColor:
-                    i === 0
-                      ? "rgba(16,185,129,0.3)"
-                      : i === 1
-                      ? "rgba(245,158,11,0.3)"
-                      : "rgba(239,68,68,0.3)",
-                  background: "transparent",
-                  fontFamily: SYNE,
-                  fontWeight: 600,
-                }}
-              >
-                {v}
-              </button>
+    <section className="w-full" style={{ background: "#FFFFFF" }}>
+      {/* Founders */}
+      <div style={{ borderBottom: `1px solid ${BORDER}` }}>
+        <div className="mx-auto max-w-[1000px] px-6 py-24">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: BRAND, fontFamily: DM }}>For founders</p>
+          <h2 style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", color: INK, letterSpacing: "-0.01em" }}>
+            Raise on your terms, with your work already verified
+          </h2>
+          <div className="mt-8 grid gap-x-10 gap-y-4 sm:grid-cols-2">
+            {[
+              "A verified profile investors trust before the first conversation",
+              "Private deal rooms — you decide who sees what, and when",
+              "AI document analysis that surfaces gaps before an investor does",
+              "Structured interviews and term negotiation, all in one place",
+              "Close, sign, and archive the deal without leaving the platform",
+              "No fee unless the deal actually closes",
+            ].map((t) => (
+              <div key={t} className="flex items-start gap-2.5">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" style={{ color: BRAND }} />
+                <span className="text-[15px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.5 }}>{t}</span>
+              </div>
             ))}
           </div>
+          <Link to="/sign-up" search={{ role: "founder" } as any} className="mt-9 inline-flex h-9 items-center gap-2 rounded-[2px] px-5 text-[14px] font-semibold" style={{ background: BRAND, color: "#FFFFFF", fontFamily: SYNE }}>
+            Create your verified profile <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
+      {/* Investors */}
+      <div style={{ borderBottom: `1px solid ${BORDER}` }}>
+        <div className="mx-auto max-w-[1000px] px-6 py-24">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: BRAND, fontFamily: DM }}>For investors</p>
+          <h2 style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", color: INK, letterSpacing: "-0.01em" }}>
+            Thesis-matched deal flow you can actually trust
+          </h2>
+          <div className="mt-8 grid gap-x-10 gap-y-4 sm:grid-cols-2">
+            {[
+              "Thesis-matched founders surfaced automatically as they join",
+              "Verification tier visible before you request access",
+              "AI-powered Deal Intake analysis on every opportunity",
+              "Structured due diligence with source-cited findings",
+              "Term negotiation with a full, auditable history",
+              "One workspace from sourcing to signed agreement",
+            ].map((t) => (
+              <div key={t} className="flex items-start gap-2.5">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" style={{ color: BRAND }} />
+                <span className="text-[15px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.5 }}>{t}</span>
+              </div>
+            ))}
+          </div>
+          <Link to="/sign-up" search={{ role: "investor" } as any} className="mt-9 inline-flex h-9 items-center gap-2 rounded-[2px] px-5 text-[14px] font-semibold" style={{ background: BRAND, color: "#FFFFFF", fontFamily: SYNE }}>
+            Start sourcing deal flow <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 8 — COMPARISON BAND (the one dark violet #7C3AED band)
+═══════════════════════════════════════════════════════════════════════════ */
+const COMPARE_ROWS: { feature: string; traditional: string; competitors: string; hockystick: string }[] = [
+  { feature: "Verification", traditional: "None — reputation only", competitors: "Founders only", hockystick: "Both sides, evidence-based" },
+  { feature: "Structured due diligence", traditional: "Ad-hoc, in email", competitors: "Basic checklist", hockystick: "Workstation + AI analysis" },
+  { feature: "AI interviews", traditional: "None", competitors: "None", hockystick: "5 stages, source-cited notes" },
+  { feature: "Term negotiation", traditional: "Lawyers + email", competitors: "Document upload", hockystick: "4 instruments, per-term audit" },
+  { feature: "Agreement + close", traditional: "Offline, weeks", competitors: "Not supported", hockystick: "Sign, pay, close in-platform" },
+  { feature: "Fee transparency", traditional: "Opaque advisory %", competitors: "Subscription only", hockystick: "1.5% at close, capped" },
+];
+
+function ComparisonBand() {
+  return (
+    <section className="w-full" style={{ background: BRAND }}>
+      <div className="mx-auto max-w-[1100px] px-6 py-24">
+        <h2 className="mb-3 text-center" style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(26px, 3.4vw, 38px)", color: "#FFFFFF", letterSpacing: "-0.01em" }}>
+          One platform. The whole transaction.
+        </h2>
+        <p className="mx-auto mb-12 max-w-xl text-center text-[16px]" style={{ color: "rgba(255,255,255,0.88)", fontFamily: DM }}>
+          What fundraising takes today, versus what it takes on Hockystick.
+        </p>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-left" style={{ minWidth: 720 }}>
+            <thead>
+              <tr>
+                {["", "Traditional", "Competitors", "Hockystick"].map((h, i) => (
+                  <th key={h || i} className="px-4 py-3 text-[12px] font-bold uppercase tracking-[0.1em]"
+                    style={{ fontFamily: SYNE, color: i === 3 ? "#FFFFFF" : "rgba(255,255,255,0.90)", background: i === 3 ? "rgba(255,255,255,0.10)" : "transparent", borderBottom: "1px solid rgba(255,255,255,0.2)" }}>
+                    {h || "Feature"}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {COMPARE_ROWS.map((r, ri) => (
+                <tr key={r.feature}>
+                  <td className="px-4 py-3.5 text-[14px] font-medium" style={{ fontFamily: DM, color: "#FFFFFF", borderBottom: ri < COMPARE_ROWS.length - 1 ? "1px solid rgba(255,255,255,0.14)" : "none" }}>{r.feature}</td>
+                  <td className="px-4 py-3.5 text-[14px]" style={{ fontFamily: DM, color: "rgba(255,255,255,0.90)", borderBottom: ri < COMPARE_ROWS.length - 1 ? "1px solid rgba(255,255,255,0.14)" : "none" }}>{r.traditional}</td>
+                  <td className="px-4 py-3.5 text-[14px]" style={{ fontFamily: DM, color: "rgba(255,255,255,0.90)", borderBottom: ri < COMPARE_ROWS.length - 1 ? "1px solid rgba(255,255,255,0.14)" : "none" }}>{r.competitors}</td>
+                  <td className="px-4 py-3.5 text-[14px] font-medium" style={{ fontFamily: DM, color: "#FFFFFF", background: "rgba(255,255,255,0.10)", borderBottom: ri < COMPARE_ROWS.length - 1 ? "1px solid rgba(255,255,255,0.14)" : "none" }}>{r.hockystick}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 9 — PRICING PREVIEW
+═══════════════════════════════════════════════════════════════════════════ */
+function PricingPreview() {
+  const cards = [
+    {
+      role: "Founder", price: "Free during beta", after: "$49/month after launch",
+      points: ["Verified profile & IP vault", "Unlimited deal rooms", "AI due diligence & interviews", "Term negotiation to close"],
+      cta: "Create founder account", search: { role: "founder" },
+    },
+    {
+      role: "Investor", price: "Free during beta", after: "Free at launch",
+      points: ["Verified investor profile", "Thesis-matched deal flow", "AI deal intake & briefs", "Full deal-room access"],
+      cta: "Create investor account", search: { role: "investor" },
+    },
+  ];
+  return (
+    <section className="w-full" style={{ background: "#FAFAFA", borderBottom: `1px solid ${BORDER}` }}>
+      <div className="mx-auto max-w-[1000px] px-6 py-24">
+        <h2 className="mb-3 text-center" style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", color: INK, letterSpacing: "-0.01em" }}>
+          Simple, honest pricing
+        </h2>
+        <p className="mb-12 text-center text-[16px]" style={{ color: SECONDARY, fontFamily: DM }}>
+          Free during beta. A 1.5% success fee on closed deals — minimum $500, maximum $15,000. No fee if the deal doesn&rsquo;t close.
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {cards.map((c) => (
+            <div key={c.role} className="flex flex-col p-8 rounded-[2px]" style={{ background: "#FFFFFF", border: `1px solid ${BORDER}` }}>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: BRAND, fontFamily: DM }}>{c.role}</p>
+              <p className="mt-3" style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "26px", color: INK }}>{c.price}</p>
+              <p className="mt-1 text-[13px]" style={{ color: "#71717A", fontFamily: DM }}>{c.after}</p>
+              <ul className="mt-6 flex-1 space-y-2.5">
+                {c.points.map((p) => (
+                  <li key={p} className="flex items-start gap-2">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" style={{ color: BRAND }} />
+                    <span className="text-[14px]" style={{ color: SECONDARY, fontFamily: DM }}>{p}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link to="/sign-up" search={c.search as any} className="mt-8 inline-flex h-9 items-center justify-center gap-2 rounded-[2px] text-[14px] font-semibold" style={{ background: BRAND, color: "#FFFFFF", fontFamily: SYNE }}>
+                {c.cta} <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          ))}
+        </div>
+        <div className="mt-8 text-center">
+          <Link to="/pricing" className="inline-flex items-center gap-1.5 text-[14px] font-medium" style={{ color: BRAND, fontFamily: DM }}>
+            See full pricing <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 10 — FAQ (accordions allowed here per Constitution §9.3)
+═══════════════════════════════════════════════════════════════════════════ */
+type Faq = { q: string; a: React.ReactNode };
+
+const FAQ_GROUPS: { heading: string; items: Faq[] }[] = [
+  {
+    heading: "For founders",
+    items: [
+      { q: "What is Hockystick?", a: <>A verified fundraising platform where founders and investors meet, negotiate, and close deals — entirely in-platform, from first contact to signed agreement. <FaqLink to="/about">Learn more</FaqLink></> },
+      { q: "How does founder verification work?", a: <>Five tiers — Identity, Claims, Operational, Capital, and Hockystick Verified — each built by uploading real documents that AI cross-checks. Your verification tier is visible to investors before they request access. <FaqLink to="/trust">See verification details</FaqLink></> },
+      { q: "What documents do I need to get started?", a: <>Incorporation documents, bank or revenue statements, customer contracts, and team employment records. Each builds your verification tier — you choose how much to verify. <FaqLink to="/pricing">View pricing & plans</FaqLink></> },
+      { q: "How do deal rooms work?", a: <>Private, NDA-gated spaces where you share documents, run due diligence, hold structured interviews, and negotiate terms with a specific investor. All content stays inside the room.</> },
+      { q: "What happens during due diligence?", a: <>A structured DD checklist with AI-powered document analysis. Findings are source-cited and confidence-scored — never presented as verified fact without backing. <FaqLink to="/docs">Read the docs</FaqLink></> },
+      { q: "How do structured interviews work?", a: <>Five video meeting stages — Introduction, Product Demo, Financial Discussion, Terms Discussion, and Investment Terms — each with AI note extraction. Notes are source-cited to the transcript.</> },
+      { q: "How are terms negotiated?", a: <>Per-term propose, accept, reject, or counter — with a full audit trail. Four instrument types: SAFE, Equity, Debt, and Company Sale. Both parties see updates in real time.</> },
+      { q: "What does the closing process look like?", a: <>Terms lock, the platform generates a summary, a lawyer (optional) drafts the agreement, both parties sign, payment is confirmed, the deal closes, and the room becomes a permanent archive with auto-generated invoices.</> },
+      { q: "How much does Hockystick cost?", a: <>Free during beta. After launch: $49/month for founders, with a 1.5% success fee on closed deals (minimum $500, maximum $15,000). No fee if the deal doesn&rsquo;t close. <FaqLink to="/pricing">See pricing</FaqLink></> },
+      { q: "Is my data secure?", a: <>NDA-gated deal rooms, role-based access control, DIFC governing law, and DIAC arbitration. Documents are access-logged and never shared outside the room. <FaqLink to="/privacy">Privacy policy</FaqLink></> },
+      { q: "Can I use Hockystick from anywhere?", a: <>Yes. Hockystick is a global platform. Founders and investors from any jurisdiction can use it.</> },
+    ],
+  },
+  {
+    heading: "For investors",
+    items: [
+      { q: "How do I find startups on Hockystick?", a: <>Thesis-matched deal flow, a searchable founder directory, and AI-powered Deal Intake analysis. Set your investment thesis and the platform surfaces matching founders automatically.</> },
+      { q: "What investor verification is required?", a: <>The same tier system as founders — fund details, thesis, and track record build your verification tier. Founders see your tier before granting deal-room access.</> },
+      { q: "What can I see before requesting access to a founder?", a: <>Their public profile and verification tier. Full details — documents, financials, team — unlock inside the deal room after mutual disclosure.</> },
+      { q: "How does thesis matching work?", a: <>You set your stage, sector, geography, and cheque-size preferences. The platform matches founders to your thesis and sends alerts when new matches appear.</> },
+      { q: "What AI analysis do I get?", a: <>Deal briefs, DD findings, and meeting note extraction — all source-cited with confidence scores. The AI never asserts claims as verified fact.</> },
+    ],
+  },
+  {
+    heading: "General",
+    items: [
+      { q: "Who built Hockystick?", a: <>Venture Tech LLC, headquartered at DIFC FinTech Hive, Dubai. <FaqLink to="/about">About us</FaqLink></> },
+      { q: "What jurisdictions does Hockystick cover?", a: <>Hockystick is a global platform. DIFC governing law applies to platform terms; deals operate under whatever jurisdiction the parties agree to.</> },
+      { q: "How is the platform fee calculated?", a: <>1.5% of the closed deal amount, with a minimum of $500 and a maximum of $15,000. The fee is charged at closing, never before. If a deal doesn&rsquo;t close, no fee is charged.</> },
+      { q: "What happens after a deal closes?", a: <>The deal room becomes a read-only archive. Both parties retain permanent access to all documents, terms, agreements, signed copies, payment proof, and invoices.</> },
+      { q: "Can I involve my lawyer?", a: <>Yes. Either party can invite legal counsel at the closing stage. Lawyers see the term summary and agreement only — they have zero access to earlier due diligence, negotiation history, or fee details.</> },
+      { q: "What if a deal doesn't close?", a: <>No fee is charged. Either party can exit at any point. All room content is preserved — nothing is deleted.</> },
+    ],
+  },
+];
+
+function FaqLink({ to, children }: { to: string; children: React.ReactNode }) {
+  return (
+    <Link to={to as any} className="font-medium" style={{ color: BRAND }}>
+      {children} →
+    </Link>
+  );
+}
+
+function FaqItem({ item }: { item: Faq }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ borderBottom: `1px solid ${BORDER}` }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center justify-between gap-4 py-4 text-left"
+        aria-expanded={open}
+      >
+        <span className="text-[15px] font-medium" style={{ color: INK, fontFamily: DM }}>{item.q}</span>
+        {open
+          ? <Minus className="h-4 w-4 shrink-0" style={{ color: "#71717A" }} />
+          : <Plus className="h-4 w-4 shrink-0" style={{ color: "#71717A" }} />}
+      </button>
+      {open && (
+        <p className="pb-4 pr-8 text-[14px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.6 }}>
+          {item.a}
+        </p>
+      )}
     </div>
   );
 }
 
-const INVESTOR_FEATS = [
-  "Set your thesis once — get matched deals every day",
-  "See what’s verified before you open a single document",
-  "Deal rooms with NDA, document vault, and DD checklist built in",
-  "Match score tells you thesis fit before you spend 10 minutes reading",
-  "Submit Invest/Hold/Pass in the room — your decisions, tracked",
-  "Pipeline kanban from sourcing to signed term sheet",
-];
-
-function ForInvestors({ dark }: { dark: boolean }) {
-  const bg = dark ? "var(--background)" : "#FFFFFF";
-  const headingColor = dark ? "#FFFFFF" : "#111827";
-  const featureColor = dark ? W70 : "#374151";
-  const btnBorder = dark ? "1px solid var(--border)" : "1px solid var(--brand)";
-  const btnColor = dark ? "#FFFFFF" : PURPLE;
-  const btnHoverBg = dark ? "var(--accent)" : "rgba(124,58,237,0.06)";
-
+function FaqSection() {
   return (
-    <section
-      id="for-investors"
-      className="w-full py-24"
-      style={{ background: bg }}
-    >
-      <div className="max-w-[1100px] mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
-          {/* Mockup — left */}
-          <div className="order-2 lg:order-1">
-            <InvestorCardMockup />
-          </div>
-
-          {/* Content — right */}
-          <div className="order-1 lg:order-2">
-            <div
-              className="mb-3 text-xs font-semibold uppercase tracking-[0.14em]"
-              style={{ color: PURPLE, fontFamily: SYNE }}
-            >
-              FOR INVESTORS
+    <section className="w-full" style={{ background: "#FFFFFF", borderBottom: `1px solid ${BORDER}` }}>
+      <div className="mx-auto max-w-[820px] px-6 py-24">
+        <h2 className="mb-12 text-center" style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", color: INK, letterSpacing: "-0.01em" }}>
+          Frequently asked questions
+        </h2>
+        <div className="space-y-10">
+          {FAQ_GROUPS.map((g) => (
+            <div key={g.heading}>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: BRAND, fontFamily: DM }}>{g.heading}</p>
+              <div style={{ borderTop: `1px solid ${BORDER}` }}>
+                {g.items.map((item) => <FaqItem key={item.q} item={item} />)}
+              </div>
             </div>
-            <h2
-              className="mb-5 leading-tight"
-              style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: headingColor }}
-            >
-              Analyst-grade deal flow.
-              <br />
-              Without the analyst.
-            </h2>
-            <ul className="space-y-3 mb-8">
-              {INVESTOR_FEATS.map((f) => (
-                <li key={f} className="flex gap-3">
-                  <ArrowRight
-                    className="h-4 w-4 shrink-0 mt-0.5"
-                    style={{ color: PURPLE }}
-                  />
-                  <span
-                    className="text-sm leading-relaxed"
-                    style={{ color: featureColor, fontFamily: DM }}
-                  >
-                    {f}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <Link
-              to="/sign-up"
-              search={{ role: "investor" } as any}
-              className="inline-flex items-center gap-2 rounded-lg font-semibold transition-colors"
-              style={{ border: btnBorder, padding: "12px 24px", fontSize: "14px", fontFamily: SYNE, color: btnColor }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = btnHoverBg; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-            >
-              Join as an investor <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   SECTION 6.5 — WHO THIS IS FOR
-═══════════════════════════════════════════════════════════════════════════ */
-const AUDIENCE_FOR = [
-  "Seed and Series A founders raising capital from GCC & MENA investors",
-  "Family offices managing 5–50 active deals",
-  "VC analysts sourcing deal flow without a full team",
-  "Accelerator cohorts preparing portfolio companies for investment",
-];
-
-const AUDIENCE_NOT_FOR = [
-  "Pre-idea stage founders with no product",
-  "Retail investors looking for crowdfunding opportunities",
-  "Companies seeking debt financing or bank loans",
-];
-
-function WhoThisIsFor({ dark }: { dark: boolean }) {
-  const bg = dark ? "#111113" : "#F9FAFB";
-  const headingColor = dark ? "#FFFFFF" : "#111827";
-  const itemColor = dark ? W70 : "#374151";
-  const notColor = dark ? W40 : "#6B7280";
-  const cardBg = dark ? "var(--background)" : "#FFFFFF";
-  const cardBorder = dark ? "1px solid var(--border)" : "1px solid #E4E4E7";
-
-  return (
-    <section className="w-full py-24" style={{ background: bg }}>
-      <div className="max-w-[1100px] mx-auto px-6">
-        <div className="text-center mb-12">
-          <h2
-            style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: headingColor }}
-          >
-            Built for serious capital. On both sides.
-          </h2>
-        </div>
-        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          <div className="rounded-2xl p-8" style={{ background: cardBg, border: cardBorder }}>
-            <h3
-              className="mb-5 text-xs font-bold uppercase tracking-[0.14em]"
-              style={{ color: PURPLE, fontFamily: SYNE }}
-            >
-              This platform is for
-            </h3>
-            <ul className="space-y-3">
-              {AUDIENCE_FOR.map((a) => (
-                <li key={a} className="flex gap-3">
-                  <ArrowRight className="h-4 w-4 shrink-0 mt-0.5" style={{ color: PURPLE }} />
-                  <span className="text-sm leading-relaxed" style={{ color: itemColor, fontFamily: DM }}>
-                    {a}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="rounded-2xl p-8" style={{ background: cardBg, border: cardBorder }}>
-            <h3
-              className="mb-5 text-xs font-bold uppercase tracking-[0.14em]"
-              style={{ color: notColor, fontFamily: SYNE }}
-            >
-              This platform is not for
-            </h3>
-            <ul className="space-y-3">
-              {AUDIENCE_NOT_FOR.map((a) => (
-                <li key={a} className="flex gap-3">
-                  <span className="text-sm shrink-0 mt-0.5" style={{ color: notColor }}>✕</span>
-                  <span className="text-sm leading-relaxed" style={{ color: notColor, fontFamily: DM }}>
-                    {a}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   SECTION 7 — TRUST — always purple
-═══════════════════════════════════════════════════════════════════════════ */
-function UpcomingRoastsRail({ dark }: { dark: boolean }) {
-  const { data } = useQuery({
-    queryKey: ["upcoming-roasts"],
-    staleTime: 2 * 60 * 1000,
-    queryFn: async () => getUpcomingRoasts(),
-  });
-  const roasts = data?.roasts ?? [];
-  if (!roasts.length) return null;
-  return (
-    <section
-      className="w-full py-16"
-      style={{ background: dark ? "var(--background)" : "#FAFAFA" }}
-    >
-      <div className="max-w-[1100px] mx-auto px-6">
-        <div className="text-center mb-8">
-          <div
-            className="uppercase mb-2"
-            style={{
-              fontFamily: SYNE,
-              fontWeight: 600,
-              fontSize: 12,
-              letterSpacing: "0.12em",
-              color: "#EF4444",
-            }}
-          >
-            🔥 Live Founder Roasts
-          </div>
-          <h2
-            style={{
-              fontFamily: SYNE,
-              fontWeight: 700,
-              fontSize: "clamp(24px, 3.5vw, 34px)",
-              color: dark ? "#FFFFFF" : "#111827",
-            }}
-          >
-            Watch founders answer anything, in public
-          </h2>
-          <p
-            className="mx-auto mt-3 leading-relaxed"
-            style={{
-              fontFamily: DM,
-              fontWeight: 300,
-              fontSize: 16,
-              color: dark ? "var(--muted-foreground)" : "#6B7280",
-              maxWidth: 520,
-            }}
-          >
-            A 60-second pitch, then the audience races to ask. Every question
-            gets answered on the record — or the record says so.
-          </p>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 max-w-[900px] mx-auto">
-          {roasts.map((r) => (
-            <a
-              key={r.id}
-              href={`/roast/${r.id}`}
-              className="rounded-xl border p-5 transition-transform hover:-translate-y-0.5"
-              style={{
-                background: dark ? "var(--card)" : "#FFFFFF",
-                borderColor: dark ? "var(--border)" : "#E4E4E7",
-              }}
-            >
-              <div
-                className="text-xs font-bold px-2 py-0.5 rounded-full inline-block mb-3"
-                style={{ background: "rgba(239,68,68,0.12)", color: "#EF4444" }}
-              >
-                Level {r.level}
-              </div>
-              <div
-                className="mb-1"
-                style={{
-                  fontFamily: SYNE,
-                  fontWeight: 700,
-                  fontSize: 16,
-                  color: dark ? "#FFFFFF" : "#111827",
-                }}
-              >
-                {r.company_name ?? "A Hockystick founder"}
-              </div>
-              {r.tagline && (
-                <div
-                  className="mb-3 line-clamp-2"
-                  style={{
-                    fontFamily: DM,
-                    fontSize: 13,
-                    color: dark ? "var(--muted-foreground)" : "#6B7280",
-                  }}
-                >
-                  {r.tagline}
-                </div>
-              )}
-              <div
-                style={{
-                  fontFamily: DM,
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: dark ? "var(--muted-foreground)" : "#374151",
-                }}
-              >
-                {new Date(r.scheduled_at).toLocaleString("en-GB", {
-                  weekday: "short",
-                  day: "numeric",
-                  month: "short",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}{" "}
-                · join as a challenger →
-              </div>
-            </a>
           ))}
         </div>
       </div>
@@ -1104,277 +625,24 @@ function UpcomingRoastsRail({ dark }: { dark: boolean }) {
   );
 }
 
-function TrustSection() {
-  return (
-    <section className="w-full py-20" style={{ background: PURPLE }}>
-      <div className="max-w-[1100px] mx-auto px-6">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h2
-            className="mb-4"
-            style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: "#FFFFFF" }}
-          >
-            The full stack. One subscription.
-          </h2>
-          <p
-            className="mx-auto leading-relaxed"
-            style={{ fontFamily: DM, fontWeight: 300, fontSize: "18px", color: "rgba(255,255,255,0.88)", maxWidth: "560px" }}
-          >
-            Most platforms check whether founders exist.
-            We check whether they&rsquo;re ready — and whether investors are serious.
-          </p>
-        </div>
-
-        {/* Comparison table */}
-        <div className="max-w-3xl mx-auto">
-          <CostComparisonTable variant="dark" />
-        </div>
-
-        {/* Bottom line */}
-        <p
-          className="text-center mt-10 text-base"
-          style={{ color: "rgba(255,255,255,0.88)", fontFamily: DM, fontWeight: 400 }}
-        >
-          Competitors verify founders only.&nbsp;&nbsp;Hockystick verifies both.
-        </p>
-      </div>
-    </section>
-  );
-}
-
 /* ═══════════════════════════════════════════════════════════════════════════
-   SECTION 7.5 — EARLY ACCESS (social proof)
-   No fabricated testimonials — the feedback table is empty as of July 2026.
-   When real founder quotes exist, replace this section with them.
+   SECTION 11 — FINAL CTA
 ═══════════════════════════════════════════════════════════════════════════ */
-function EarlyAccessSection({ dark }: { dark: boolean }) {
-  const bg = dark ? "var(--background)" : "#FFFFFF";
-  const headingColor = dark ? "#FFFFFF" : "#111827";
-  const bodyColor = dark ? W60 : "#4B5563";
-
+function FinalCta() {
   return (
-    <section className="w-full py-20" style={{ background: bg }}>
-      <div className="max-w-[700px] mx-auto px-6 text-center">
-        <div
-          className="mb-3 text-xs font-semibold uppercase tracking-[0.14em]"
-          style={{ color: PURPLE, fontFamily: SYNE }}
-        >
-          EARLY ACCESS
-        </div>
-        <h2
-          className="mb-4"
-          style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(24px, 3.5vw, 32px)", color: headingColor }}
-        >
-          Join our growing community of founders preparing for institutional fundraising.
+    <section className="w-full" style={{ background: "#FFFFFF" }}>
+      <div className="mx-auto max-w-[900px] px-6 py-28 text-center">
+        <h2 style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 44px)", color: INK, letterSpacing: "-0.02em" }}>
+          Start closing deals today.
         </h2>
-        <p
-          className="leading-relaxed"
-          style={{ fontFamily: DM, fontWeight: 300, fontSize: "16px", color: bodyColor }}
-        >
-          Hockystick is in beta with founders raising across the GCC. Every profile is
-          verified, every deal room is NDA-gated, and every claim on this page is a real
-          platform number — not a projection.
+        <p className="mx-auto mt-4 max-w-lg text-[17px]" style={{ color: SECONDARY, fontFamily: DM }}>
+          Free during beta. No credit card required.
         </p>
-      </div>
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   SECTION 8 — PRICING
-═══════════════════════════════════════════════════════════════════════════ */
-const FOUNDER_PLAN = [
-  "Verified profile + verification badge",
-  "Unlimited deal rooms",
-  "Investor pipeline tracking",
-  "NDA-gated document vault",
-  "Readiness score + coaching",
-  "Investor simulation (how a VC sees you)",
-  "Deal room analytics (views, time spent)",
-];
-
-const INVESTOR_PLAN = [
-  "Set investment thesis",
-  "Browse verified founder directory",
-  "Thesis matching (daily updates)",
-  "Deal rooms + DD workstation",
-  "Decision board (kanban pipeline)",
-  "Deal intake (paste any founder data)",
-];
-
-function PricingSection({ dark }: { dark: boolean }) {
-  const bg = dark ? "#111113" : "#F9FAFB";
-  const cardBgPrimary = dark ? "var(--background)" : "#FFFFFF";
-  const cardBgSecondary = dark ? "var(--background)" : "#FFFFFF";
-  const headingColor = dark ? "#FFFFFF" : "#111827";
-  const subColor = dark ? W60 : "#4B5563";
-  const labelColor = dark ? W40 : "#6B7280";
-  const priceColor = dark ? "#FFFFFF" : "#111827";
-  const cardSecondaryBorder = dark ? "1px solid var(--border)" : "1px solid #E4E4E7";
-  const investorBtnBorder = dark ? "1px solid var(--border)" : "1px solid var(--brand)";
-  const investorBtnColor = dark ? "#FFFFFF" : PURPLE;
-  const investorBtnHover = dark ? "var(--accent)" : "rgba(124,58,237,0.06)";
-
-  const tick = (text: string) => (
-    <li key={text} className="flex gap-2.5">
-      <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" style={{ color: "#10B981" }} />
-      <span className="text-sm" style={{ color: dark ? W70 : "#374151", fontFamily: DM }}>
-        {text}
-      </span>
-    </li>
-  );
-
-  return (
-    <section className="w-full py-24" style={{ background: bg }}>
-      <div className="max-w-[1100px] mx-auto px-6">
-        <div className="text-center mb-12">
-          <h2
-            className="mb-3"
-            style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: headingColor }}
-          >
-            Simple pricing.
-            <br />
-            No surprises.
-          </h2>
-          <p style={{ fontFamily: DM, fontWeight: 300, fontSize: "16px", color: subColor }}>
-            Start free. Upgrade when you&rsquo;re ready to get serious.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-          {/* Founder card */}
-          <div
-            className="rounded-2xl p-8 relative"
-            style={{ background: cardBgPrimary, border: `2px solid ${PURPLE}`, boxShadow: dark ? "none" : "0 2px 12px rgba(124,58,237,0.1)" }}
-          >
-            <div
-              className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-semibold text-brand-foreground"
-              style={{ background: PURPLE, fontFamily: SYNE }}
-            >
-              Most popular
-            </div>
-            <div
-              className="text-xs font-semibold uppercase tracking-widest mb-4"
-              style={{ color: labelColor, fontFamily: SYNE }}
-            >
-              Founder Pro
-            </div>
-            <div
-              className="mb-1"
-              style={{ fontFamily: SYNE, fontWeight: 800, fontSize: "40px", color: priceColor }}
-            >
-              $49
-              <span style={{ fontSize: "18px", fontWeight: 400, color: labelColor }}> /month</span>
-            </div>
-            <p className="text-xs mb-6" style={{ color: labelColor, fontFamily: DM }}>
-              7-day free trial. No credit card required.
-            </p>
-            <ul className="space-y-3 mb-8">
-              {FOUNDER_PLAN.map(tick)}
-            </ul>
-            <Link
-              to="/sign-up"
-              search={{ role: "founder" } as any}
-              className="block w-full text-center rounded-lg font-semibold text-brand-foreground transition-colors"
-              style={{ background: PURPLE, padding: "12px 0", fontFamily: SYNE }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = PURPLE_DARK; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = PURPLE; }}
-            >
-              Start for free — upgrade anytime
-            </Link>
-          </div>
-
-          {/* Investor card */}
-          <div
-            className="rounded-2xl p-8"
-            style={{ background: cardBgSecondary, border: cardSecondaryBorder, boxShadow: dark ? "none" : "0 1px 4px rgba(0,0,0,0.06)" }}
-          >
-            <div
-              className="text-xs font-semibold uppercase tracking-widest mb-4"
-              style={{ color: labelColor, fontFamily: SYNE }}
-            >
-              Investor Access
-            </div>
-            <div
-              className="mb-1"
-              style={{ fontFamily: SYNE, fontWeight: 800, fontSize: "40px", color: priceColor }}
-            >
-              Free during beta
-            </div>
-            <p className="text-xs mb-6" style={{ color: labelColor, fontFamily: DM }}>
-              Open registration. Build a verified investor profile, set your thesis, and get thesis-matched deal flow. Founders see your fund, thesis, and verification tier before sharing.
-            </p>
-            <ul className="space-y-3 mb-8">
-              {INVESTOR_PLAN.map(tick)}
-            </ul>
-            <Link
-              to="/sign-up"
-              search={{ role: "investor" } as any}
-              className="block w-full text-center rounded-lg font-semibold transition-colors"
-              style={{ border: investorBtnBorder, padding: "12px 0", fontFamily: SYNE, color: investorBtnColor }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = investorBtnHover; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-            >
-              Create investor account →
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   SECTION 9 — FINAL CTA — always purple
-═══════════════════════════════════════════════════════════════════════════ */
-function FinalCTA() {
-  return (
-    <section className="w-full py-24 text-center" style={{ background: PURPLE }}>
-      <div className="max-w-[1100px] mx-auto px-6">
-        <h2
-          className="mb-4"
-          style={{
-            fontFamily: SYNE,
-            fontWeight: 700,
-            fontSize: "clamp(32px, 5vw, 48px)",
-            color: "#FFFFFF",
-          }}
-        >
-          Ready to raise differently?
-        </h2>
-        <p
-          className="mb-10 mx-auto"
-          style={{
-            fontFamily: DM,
-            fontWeight: 300,
-            fontSize: "18px",
-            color: "rgba(255,255,255,0.88)",
-            maxWidth: "480px",
-          }}
-        >
-          GCC &amp; MENA focused. Global by design.
-          <br />
-          The infrastructure serious founders use to raise.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link
-            to="/sign-up"
-            search={{ role: "founder" } as any}
-            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors"
-            style={{ background: "#FFFFFF", color: PURPLE, padding: "14px 32px", fontSize: "15px", fontFamily: SYNE }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "#f0ecff"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "#FFFFFF"; }}
-          >
-            Start as a founder <ArrowRight className="h-4 w-4" />
+        <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link to="/sign-up" search={{ role: "founder" } as any} className="inline-flex h-11 items-center justify-center gap-2 rounded-[2px] px-6 text-[15px] font-semibold" style={{ background: BRAND, color: "#FFFFFF", fontFamily: SYNE }}>
+            Create founder account <ArrowRight className="h-4 w-4" />
           </Link>
-          <Link
-            to="/sign-up"
-            search={{ role: "investor" } as any}
-            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors"
-            style={{ border: "1px solid rgba(255,255,255,0.4)", color: "#FFFFFF", padding: "14px 32px", fontSize: "15px", fontFamily: SYNE }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.12)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-          >
+          <Link to="/sign-up" search={{ role: "investor" } as any} className="inline-flex h-11 items-center justify-center gap-2 rounded-[2px] px-6 text-[15px] font-semibold" style={{ background: "#FFFFFF", color: INK, border: `1px solid ${BORDER}`, fontFamily: SYNE }}>
             I&rsquo;m an investor
           </Link>
         </div>

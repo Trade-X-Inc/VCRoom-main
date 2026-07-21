@@ -19,14 +19,14 @@ function About() {
           About
         </p>
         <h1 className="font-syne font-bold text-4xl text-foreground mb-6 leading-tight">
-          Built in the GCC.<br />
-          For the founders who don't know the right people.
+          Fundraising, without the warm intro.<br />
+          For founders who don't know the right people.
         </h1>
         <p className="text-muted-foreground text-lg leading-relaxed mb-12">
-          Most fundraising platforms are built for Silicon Valley.
-          They assume you have a warm network, a Stanford alumni
-          connection, or a prior exit. Most founders across GCC & MENA have
-          none of these.
+          Most fundraising still runs on who you know. It assumes a warm
+          network, an alumni connection, or a prior exit. Most founders,
+          almost everywhere, have none of these — and lose deals because
+          of it.
         </p>
 
         <div className="space-y-8 mb-16">
@@ -35,7 +35,7 @@ function About() {
               The problem we're solving
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              The GCC has a structural trust gap between founders and
+              There is a structural trust gap between founders and
               investors. Founders can't get meetings without warm intros.
               Investors receive hundreds of pitch decks with no way to
               verify what's real. Both sides lose. Deals don't close.
@@ -63,11 +63,10 @@ function About() {
               Where we're based
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              Hockystick is based at DIFC FinTech Hive, Dubai —
-              the region's leading financial technology hub.
-              We are GCC & MENA focused and global by design. Our platform
-              is built for founders across GCC & MENA raising from regional and
-              international investors.
+              Hockystick is a global platform, headquartered at DIFC FinTech
+              Hive in Dubai. Founders and investors from any jurisdiction can
+              use it — the platform is built for anyone raising or deploying
+              capital, wherever they are based.
             </p>
           </div>
 
@@ -107,13 +106,14 @@ function About() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4">
-          <a href="/trust"
-            className="px-6 py-3 border border-border rounded-lg text-sm text-muted-foreground hover:border-border hover:text-foreground transition-colors text-center">
-            How our verification works →
+          <a href="/sign-up?role=founder"
+            className="px-6 py-3 rounded-[2px] text-sm font-semibold text-center"
+            style={{ background: "#7C3AED", color: "#FFFFFF" }}>
+            Create your account →
           </a>
-          <a href="/contact"
-            className="px-6 py-3 hs-gradient rounded-lg text-sm text-foreground hover:bg-[#6d28d9] transition-colors text-center">
-            Get in touch →
+          <a href="/pricing"
+            className="px-6 py-3 border border-[#E4E4E7] rounded-[2px] text-sm font-medium text-[#0A0A0B] hover:bg-[#FAFAFA] transition-colors text-center">
+            See what&rsquo;s inside →
           </a>
         </div>
       </main>

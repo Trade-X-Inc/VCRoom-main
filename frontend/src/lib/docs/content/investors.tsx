@@ -442,10 +442,10 @@ export const INVESTOR_PAGES: Record<string, DocPage> = {
 
         <H2 id="external">External DD firms</H2>
         <P>
-          The External Analyst role exists for the common GCC/MENA pattern of outsourced
+          The External Analyst role exists for the common pattern of outsourced
           diligence. An external member sees only the deal rooms they're assigned to — not your
-          watchlist, not your pipeline, not any other deal. Assignment is enforced by Row Level
-          Security, and removal takes effect immediately.
+          watchlist, not your pipeline, not any other deal. Assignment is enforced at the
+          database access layer, and removal takes effect immediately.
         </P>
 
         <H2 id="how">How invites work</H2>
