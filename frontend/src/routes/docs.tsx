@@ -81,7 +81,7 @@ function DocsLayout() {
                     <Link
                       to={(item.slug ? `/docs/${item.slug}` : "/docs") as any}
                       className={cn(
-                        "block rounded-md px-2 py-1.5 text-sm",
+                        "flex items-center min-h-9 rounded-md px-2 py-1.5 text-sm",
                         active
                           ? "bg-purple-50 font-medium text-purple-800"
                           : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
@@ -131,7 +131,7 @@ function DocsLayout() {
             </a>
             <Link
               to={"/sign-in" as any}
-              className="rounded-lg hs-gradient px-3.5 py-1.5 text-sm font-medium text-white hover:hs-gradient"
+              className="inline-flex items-center min-h-9 rounded-lg hs-gradient px-3.5 py-1.5 text-sm font-medium text-white hover:hs-gradient"
             >
               Sign in
             </Link>

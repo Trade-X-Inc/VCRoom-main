@@ -143,7 +143,7 @@ function AcceleratorCard({ item }: { item: typeof accelerators[0] }) {
         href={item.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-auto text-xs font-medium px-3 py-1.5 rounded-lg w-fit transition-colors"
+        className="mt-auto inline-flex items-center min-h-9 text-xs font-medium px-3.5 py-2 rounded-lg w-fit transition-colors"
         style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.25)", color: "#6D28D9" }}
       >
         Apply →
@@ -179,7 +179,7 @@ function GrantCard({ item }: { item: typeof grants[0] }) {
         href={item.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-auto text-xs font-medium px-3 py-1.5 rounded-lg w-fit transition-colors"
+        className="mt-auto inline-flex items-center min-h-9 text-xs font-medium px-3.5 py-2 rounded-lg w-fit transition-colors"
         style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }}
       >
         Learn more →
@@ -218,7 +218,7 @@ function VCCard({ item }: { item: typeof vcFunds[0] }) {
         href={item.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-auto text-xs font-medium px-3 py-1.5 rounded-lg w-fit transition-colors"
+        className="mt-auto inline-flex items-center min-h-9 text-xs font-medium px-3.5 py-2 rounded-lg w-fit transition-colors"
         style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.25)", color: "#6D28D9" }}
       >
         Visit fund →
@@ -253,7 +253,7 @@ function ProgramCard({ item }: { item: typeof programs[0] }) {
         href={item.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-auto text-xs font-medium px-3 py-1.5 rounded-lg w-fit transition-colors"
+        className="mt-auto inline-flex items-center min-h-9 text-xs font-medium px-3.5 py-2 rounded-lg w-fit transition-colors"
         style={{ background: "var(--accent)", border: "1px solid var(--border)", color: "var(--muted-foreground)" }}
       >
         Learn more →
@@ -360,7 +360,7 @@ function Resources() {
             <button
               key={r}
               onClick={() => setRegion(r)}
-              className="text-xs px-3 py-1.5 rounded-full transition-colors"
+              className="inline-flex items-center min-h-9 text-xs px-3.5 py-2 rounded-full transition-colors"
               style={
                 region === r
                   ? { background: "rgba(124,58,237,0.25)", border: "1px solid rgba(124,58,237,0.5)", color: "#6D28D9" }
@@ -425,7 +425,7 @@ function Resources() {
           </p>
           <a
             href="/sign-up"
-            className="text-xs font-medium px-4 py-2 rounded-lg inline-block transition-colors"
+            className="inline-flex items-center min-h-9 text-xs font-medium px-4 py-2 rounded-lg transition-colors"
             style={{ background: "var(--gradient-brand)", color: "#fff" }}
           >
             Build your verified profile →
