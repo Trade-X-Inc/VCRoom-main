@@ -524,7 +524,7 @@ function HowItWorks({ dark }: { dark: boolean }) {
   const bg = dark ? "var(--background)" : "#FFFFFF";
   const headingColor = dark ? "#FFFFFF" : "#111827";
   const bodyColor = dark ? W60 : "#4B5563";
-  const gridDivider = dark ? "var(--accent)" : "#E5E7EB";
+  const gridDivider = dark ? "var(--accent)" : "#E4E4E7";
 
   return (
     <section id="how-it-works" className="w-full py-24" style={{ background: bg }}>
@@ -930,7 +930,7 @@ function WhoThisIsFor({ dark }: { dark: boolean }) {
   const itemColor = dark ? W70 : "#374151";
   const notColor = dark ? W40 : "#6B7280";
   const cardBg = dark ? "var(--background)" : "#FFFFFF";
-  const cardBorder = dark ? "1px solid var(--border)" : "1px solid #E5E7EB";
+  const cardBorder = dark ? "1px solid var(--border)" : "1px solid #E4E4E7";
 
   return (
     <section className="w-full py-24" style={{ background: bg }}>
@@ -1047,7 +1047,7 @@ function UpcomingRoastsRail({ dark }: { dark: boolean }) {
               className="rounded-xl border p-5 transition-transform hover:-translate-y-0.5"
               style={{
                 background: dark ? "var(--card)" : "#FFFFFF",
-                borderColor: dark ? "var(--border)" : "#E5E7EB",
+                borderColor: dark ? "var(--border)" : "#E4E4E7",
               }}
             >
               <div
@@ -1210,7 +1210,7 @@ function PricingSection({ dark }: { dark: boolean }) {
   const subColor = dark ? W60 : "#4B5563";
   const labelColor = dark ? W40 : "#6B7280";
   const priceColor = dark ? "#FFFFFF" : "#111827";
-  const cardSecondaryBorder = dark ? "1px solid var(--border)" : "1px solid #E5E7EB";
+  const cardSecondaryBorder = dark ? "1px solid var(--border)" : "1px solid #E4E4E7";
   const investorBtnBorder = dark ? "1px solid var(--border)" : "1px solid var(--brand)";
   const investorBtnColor = dark ? "#FFFFFF" : PURPLE;
   const investorBtnHover = dark ? "var(--accent)" : "rgba(124,58,237,0.06)";

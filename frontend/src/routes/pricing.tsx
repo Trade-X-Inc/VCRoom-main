@@ -185,7 +185,7 @@ function PricingPage() {
           <p className="mt-3 text-lg text-gray-600">30-day free trial. No credit card required.</p>
 
           {/* Audience toggle */}
-          <div className="mt-8 inline-flex rounded-full border border-[rgba(0,0,0,0.08)] bg-gray-50 p-1" role="tablist">
+          <div className="mt-8 inline-flex rounded-full border border-[#E4E4E7] bg-gray-50 p-1" role="tablist">
             {(["founder", "investor"] as const).map((a) => (
               <button
                 key={a}
@@ -234,7 +234,7 @@ function PricingPage() {
               <div
                 key={p.plan_id}
                 className={`relative flex flex-col border bg-white p-7 ${
-                  copy?.popular ? "border-brand" : "border-[rgba(0,0,0,0.08)]"
+                  copy?.popular ? "border-brand" : "border-[#E4E4E7]"
                 }`}
               >
                 {isCurrent ? (
@@ -274,7 +274,7 @@ function PricingPage() {
                   ) : isEnterprise ? (
                     <a
                       href="mailto:hello@hockystick.app?subject=Enterprise%20plan"
-                      className="block w-full rounded-lg border border-gray-300 px-4 py-3 text-center text-sm font-semibold text-gray-900 hover:bg-gray-50"
+                      className="block w-full rounded-lg border border-[#E4E4E7] px-4 py-3 text-center text-sm font-semibold text-gray-900 hover:bg-gray-50"
                     >
                       Contact us
                     </a>
@@ -301,7 +301,7 @@ function PricingPage() {
         </div>
 
         {/* Add-ons */}
-        <div className="mt-16 rounded-2xl border border-[rgba(0,0,0,0.08)] bg-gray-50 p-8">
+        <div className="mt-16 rounded-2xl border border-[#E4E4E7] bg-gray-50 p-8">
           <h2 className="text-xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>Need more? Pay as you go.</h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
@@ -310,7 +310,7 @@ function PricingPage() {
               ["Onboarding lawyer consultation", "$40 flat"],
               ["Success fee on closed rounds", "1.5% (min $500, max $15,000)"],
             ].map(([label, price]) => (
-              <div key={label} className="rounded-none border border-[rgba(0,0,0,0.08)] bg-white px-4 py-3.5">
+              <div key={label} className="rounded-none border border-[#E4E4E7] bg-white px-4 py-3.5">
                 <div className="text-sm font-medium text-gray-900">{label}</div>
                 <div className="mt-0.5 text-sm text-purple-700 font-semibold">{price}</div>
               </div>
@@ -319,7 +319,7 @@ function PricingPage() {
         </div>
 
         {/* Why we charge founders */}
-        <div className="mx-auto mt-16 max-w-2xl rounded-2xl border border-[rgba(0,0,0,0.08)] bg-gray-50 p-8 text-center">
+        <div className="mx-auto mt-16 max-w-2xl rounded-2xl border border-[#E4E4E7] bg-gray-50 p-8 text-center">
           <h2 className="text-xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>
             Why we charge founders
           </h2>
@@ -345,7 +345,7 @@ function PricingPage() {
         {/* FAQ */}
         <div className="mx-auto mt-16 max-w-2xl">
           <h2 className="text-center text-xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>Questions</h2>
-          <div className="mt-6 divide-y divide-gray-200 rounded-2xl border border-[rgba(0,0,0,0.08)]">
+          <div className="mt-6 divide-y divide-[#E4E4E7] rounded-2xl border border-[#E4E4E7]">
             {FAQS.map((f, i) => (
               <div key={f.q}>
                 <button

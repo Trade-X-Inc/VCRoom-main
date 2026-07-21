@@ -64,7 +64,7 @@ function DocsLayout() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search docs"
-          className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand focus:outline-none"
+          className="w-full rounded-lg border border-[#E4E4E7] bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand focus:outline-none"
         />
       </div>
       <div className="flex-1 space-y-6 overflow-y-auto pb-8">
@@ -106,7 +106,7 @@ function DocsLayout() {
   return (
     <div className="min-h-screen bg-white text-gray-900">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-gray-200 bg-accent backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-[#E4E4E7] bg-accent backdrop-blur">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:px-6">
           <button
             onClick={() => setSidebarOpen(true)}
@@ -163,7 +163,7 @@ function DocsLayout() {
 
       <div className="mx-auto flex max-w-7xl px-4 sm:px-6">
         {/* Desktop sidebar */}
-        <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-64 shrink-0 border-r border-gray-200 py-6 pr-4 lg:block">
+        <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-64 shrink-0 border-r border-[#E4E4E7] py-6 pr-4 lg:block">
           {sidebar}
         </aside>
 
@@ -192,11 +192,11 @@ function DocsLayout() {
 
           {/* Prev / next */}
           {(prev || next) && (
-            <div className="mt-12 grid gap-3 border-t border-gray-200 pt-6 sm:grid-cols-2">
+            <div className="mt-12 grid gap-3 border-t border-[#E4E4E7] pt-6 sm:grid-cols-2">
               {prev ? (
                 <Link
                   to={(prev.slug ? `/docs/${prev.slug}` : "/docs") as any}
-                  className="rounded-lg border border-gray-200 p-4 hover:border-purple-300"
+                  className="rounded-lg border border-[#E4E4E7] p-4 hover:border-purple-300"
                 >
                   <div className="text-xs text-gray-500">Previous</div>
                   <div className="text-sm font-medium text-gray-900">{prev.title}</div>
@@ -207,7 +207,7 @@ function DocsLayout() {
               {next && (
                 <Link
                   to={(next.slug ? `/docs/${next.slug}` : "/docs") as any}
-                  className="rounded-lg border border-gray-200 p-4 text-right hover:border-purple-300 sm:col-start-2"
+                  className="rounded-lg border border-[#E4E4E7] p-4 text-right hover:border-purple-300 sm:col-start-2"
                 >
                   <div className="text-xs text-gray-500">Next</div>
                   <div className="text-sm font-medium text-gray-900">{next.title}</div>
@@ -217,7 +217,7 @@ function DocsLayout() {
           )}
 
           {/* Footer */}
-          <footer className="mt-10 border-t border-gray-200 pt-6 pb-12 text-sm text-gray-500">
+          <footer className="mt-10 border-t border-[#E4E4E7] pt-6 pb-12 text-sm text-gray-500">
             Something wrong on this page? Email{" "}
             <a href="mailto:docs@hockystick.app" className="text-purple-700 underline underline-offset-2">
               docs@hockystick.app
@@ -232,7 +232,7 @@ function DocsLayout() {
             <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
               On this page
             </div>
-            <ul className="space-y-1.5 border-l border-gray-200">
+            <ul className="space-y-1.5 border-l border-[#E4E4E7]">
               {page.meta.toc.map((t) => (
                 <li key={t.id}>
                   <a
