@@ -5,3 +5,5 @@ dist/
 test-results/
 playwright-report/
 .tanstack/
+# Raw vault animation source frames (96MB) — only the converted WebP in public/vault/ is committed
+src/vault-frames/
