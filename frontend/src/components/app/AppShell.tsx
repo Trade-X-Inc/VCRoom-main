@@ -613,7 +613,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
             <div className="hidden md:flex flex-1 max-w-md">
               <button
                 onClick={() => setSearchOpen(true)}
-                className="relative w-full flex items-center rounded-md border border-border/60 bg-background/60 pl-9 pr-12 py-2 text-sm text-muted-foreground/70 hover:border-brand/40 hover:text-muted-foreground transition-colors text-left"
+                className="relative w-full flex items-center rounded-md border border-border/60 bg-background/60 pl-9 pr-12 py-2 text-sm text-muted-foreground hover:border-brand/40 hover:text-foreground transition-colors text-left"
               >
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 Search

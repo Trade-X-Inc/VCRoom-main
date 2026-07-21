@@ -38,10 +38,14 @@ const PURPLE = "var(--brand)";
 const PURPLE_DARK = "#6d28d9";
 const SYNE = "Syne, sans-serif";
 const DM = "DM Sans, sans-serif";
-const W60 = "var(--muted-foreground)";
-const W70 = "var(--muted-foreground)";
-const W40 = "var(--muted-foreground)";
-const W08 = "var(--accent)";
+// Light-on-dark tokens for the dark #111113 mockup/preview panels. Previously
+// aliased to var(--muted-foreground) (#71717A) — dark-on-dark, failed AA. Now
+// real white-with-opacity so text is legible on the dark panels (R6 contrast).
+const W80 = "rgba(255,255,255,0.86)"; // primary text on dark
+const W60 = "rgba(255,255,255,0.72)"; // secondary on dark (AA at 12px+)
+const W70 = "rgba(255,255,255,0.72)";
+const W40 = "rgba(255,255,255,0.72)"; // was 0.4 — bumped to clear AA on #111113
+const W08 = "rgba(255,255,255,0.08)"; // hairline on dark
 
 /* ─── ROOT ───────────────────────────────────────────────────────────────── */
 // Landing page is always light — dark adaptive sections are no longer used
@@ -157,7 +161,7 @@ function DealRoomCard() {
     >
       <span className="text-base shrink-0">{icon}</span>
       <div className="flex-1 min-w-0">
-        <div className="text-foreground text-xs font-medium truncate" style={{ fontFamily: SYNE }}>{name}</div>
+        <div className="text-xs font-medium truncate" style={{ fontFamily: SYNE, color: W80 }}>{name}</div>
         <div className="text-[10px] truncate" style={{ color: W40, fontFamily: DM }}>{sub}</div>
       </div>
       {badge(badgeLabel, badgeColor, badgeBg)}
@@ -199,13 +203,13 @@ function DealRoomCard() {
         >
           <div className="flex items-center gap-2.5">
             <div
-              className="h-7 w-7 rounded-md flex items-center justify-center text-foreground text-[10px] font-bold"
+              className="h-7 w-7 rounded-md flex items-center justify-center text-brand-foreground text-[10px] font-bold"
               style={{ background: PURPLE, fontFamily: SYNE }}
             >
               ML
             </div>
             <div>
-              <div className="text-foreground text-xs font-bold tracking-wide" style={{ fontFamily: SYNE }}>
+              <div className="text-xs font-bold tracking-wide" style={{ fontFamily: SYNE, color: W80 }}>
                 MERIDIAN LOGISTICS
               </div>
               <div className="text-[10px]" style={{ color: W40, fontFamily: DM }}>
@@ -214,7 +218,7 @@ function DealRoomCard() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {badge("Active", "#10B981", "rgba(16,185,129,0.12)")}
+            {badge("Active", "#047857", "rgba(16,185,129,0.16)")}
           </div>
         </div>
 
@@ -235,7 +239,7 @@ function DealRoomCard() {
         </div>
 
         {/* Document rows */}
-        {docRow("📄", "Pitch Deck", "Opened 3× this week", "↓ Viewed", "#A855F7", "rgba(168,85,247,0.12)")}
+        {docRow("📄", "Pitch Deck", "Opened 3× this week", "↓ Viewed", "#C4B5FD", "rgba(168,85,247,0.18)")}
         {docRow("📊", "Financial Model", "First opened 2 days ago", "⟳ Reviewing", "#F59E0B", "rgba(245,158,11,0.12)")}
         {docRow("📋", "Cap Table", "Awaiting access request", "🔒 Locked", "var(--faint)", "var(--accent)")}
 
@@ -243,7 +247,7 @@ function DealRoomCard() {
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
             <div
-              className="h-6 w-6 rounded-full flex items-center justify-center text-foreground text-[9px] font-bold shrink-0"
+              className="h-6 w-6 rounded-full flex items-center justify-center text-brand-foreground text-[9px] font-bold shrink-0"
               style={{ background: "rgba(124,58,237,0.3)", fontFamily: SYNE }}
             >
               SR
@@ -345,7 +349,7 @@ function Hero() {
           <Link
             to="/sign-up"
             search={{ role: "founder" } as any}
-            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold text-foreground transition-colors"
+            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold text-brand-foreground transition-colors"
             style={{ background: PURPLE, padding: "14px 32px", fontSize: "16px", fontFamily: SYNE }}
             onMouseEnter={(e) => { e.currentTarget.style.background = PURPLE_DARK; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = PURPLE; }}
@@ -395,7 +399,7 @@ function SocialProofBar() {
           <span className="text-xs" style={{ color: W40, fontFamily: DM }}>
             Founders raising across
           </span>
-          <span className="text-sm font-medium text-foreground" style={{ fontFamily: DM }}>
+          <span className="text-sm font-medium" style={{ fontFamily: DM, color: W80 }}>
             🌍 GCC & MENA & Beyond
           </span>
         </div>
@@ -610,9 +614,9 @@ function ReadinessMockup() {
       <div className="px-5 pt-5 pb-4">
         <div
           className="mb-1"
-          style={{ fontFamily: SYNE, fontWeight: 800, fontSize: "48px", color: "var(--foreground)" }}
+          style={{ fontFamily: SYNE, fontWeight: 800, fontSize: "48px", color: "#FFFFFF" }}
         >
-          74 <span style={{ fontSize: "20px", color: W40, fontWeight: 400 }}>/ 100</span>
+          74 <span style={{ fontSize: "20px", color: W60, fontWeight: 400 }}>/ 100</span>
         </div>
         {/* Progress bar */}
         <div className="h-2 rounded-full mb-5" style={{ background: "var(--accent)" }}>
@@ -721,7 +725,7 @@ function ForFounders({ dark }: { dark: boolean }) {
             <Link
               to="/sign-up"
               search={{ role: "founder" } as any}
-              className="inline-flex items-center gap-2 rounded-lg font-semibold text-foreground transition-colors"
+              className="inline-flex items-center gap-2 rounded-lg font-semibold text-brand-foreground transition-colors"
               style={{ background: PURPLE, padding: "12px 24px", fontSize: "14px", fontFamily: SYNE }}
               onMouseEnter={(e) => { e.currentTarget.style.background = PURPLE_DARK; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = PURPLE; }}
@@ -757,13 +761,13 @@ function InvestorCardMockup() {
       >
         <div className="flex items-center gap-2.5">
           <div
-            className="h-8 w-8 rounded-md flex items-center justify-center text-foreground text-[10px] font-bold"
+            className="h-8 w-8 rounded-md flex items-center justify-center text-brand-foreground text-[10px] font-bold"
             style={{ background: PURPLE, fontFamily: SYNE }}
           >
             ML
           </div>
           <div>
-            <div className="text-foreground text-xs font-bold tracking-wide" style={{ fontFamily: SYNE }}>
+            <div className="text-xs font-bold tracking-wide" style={{ fontFamily: SYNE, color: W80 }}>
               MERIDIAN LOGISTICS
             </div>
             <div className="text-[10px]" style={{ color: W40, fontFamily: DM }}>Seed · Logistics Tech · GCC</div>
@@ -771,7 +775,7 @@ function InvestorCardMockup() {
         </div>
         <span
           className="text-[10px] font-bold px-2 py-1 rounded-full"
-          style={{ background: "rgba(16,185,129,0.12)", color: "#10B981", fontFamily: SYNE }}
+          style={{ background: "rgba(16,185,129,0.14)", color: "#047857", fontFamily: SYNE }}
         >
           Match: 82/100
         </span>
@@ -1108,13 +1112,13 @@ function TrustSection() {
         <div className="text-center mb-12">
           <h2
             className="mb-4"
-            style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: "var(--foreground)" }}
+            style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: "#FFFFFF" }}
           >
             The full stack. One subscription.
           </h2>
           <p
             className="mx-auto leading-relaxed"
-            style={{ fontFamily: DM, fontWeight: 300, fontSize: "18px", color: "var(--muted-foreground)", maxWidth: "560px" }}
+            style={{ fontFamily: DM, fontWeight: 300, fontSize: "18px", color: "rgba(255,255,255,0.88)", maxWidth: "560px" }}
           >
             Most platforms check whether founders exist.
             We check whether they&rsquo;re ready — and whether investors are serious.
@@ -1129,7 +1133,7 @@ function TrustSection() {
         {/* Bottom line */}
         <p
           className="text-center mt-10 text-base"
-          style={{ color: "var(--muted-foreground)", fontFamily: DM, fontWeight: 400 }}
+          style={{ color: "rgba(255,255,255,0.88)", fontFamily: DM, fontWeight: 400 }}
         >
           Competitors verify founders only.&nbsp;&nbsp;Hockystick verifies both.
         </p>
@@ -1244,7 +1248,7 @@ function PricingSection({ dark }: { dark: boolean }) {
             style={{ background: cardBgPrimary, border: `2px solid ${PURPLE}`, boxShadow: dark ? "none" : "0 2px 12px rgba(124,58,237,0.1)" }}
           >
             <div
-              className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-semibold text-foreground"
+              className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-semibold text-brand-foreground"
               style={{ background: PURPLE, fontFamily: SYNE }}
             >
               Most popular
@@ -1271,7 +1275,7 @@ function PricingSection({ dark }: { dark: boolean }) {
             <Link
               to="/sign-up"
               search={{ role: "founder" } as any}
-              className="block w-full text-center rounded-lg font-semibold text-foreground transition-colors"
+              className="block w-full text-center rounded-lg font-semibold text-brand-foreground transition-colors"
               style={{ background: PURPLE, padding: "12px 0", fontFamily: SYNE }}
               onMouseEnter={(e) => { e.currentTarget.style.background = PURPLE_DARK; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = PURPLE; }}
@@ -1333,7 +1337,7 @@ function FinalCTA() {
             fontFamily: SYNE,
             fontWeight: 700,
             fontSize: "clamp(32px, 5vw, 48px)",
-            color: "var(--foreground)",
+            color: "#FFFFFF",
           }}
         >
           Ready to raise differently?
@@ -1344,7 +1348,7 @@ function FinalCTA() {
             fontFamily: DM,
             fontWeight: 300,
             fontSize: "18px",
-            color: "var(--muted-foreground)",
+            color: "rgba(255,255,255,0.88)",
             maxWidth: "480px",
           }}
         >
@@ -1366,9 +1370,9 @@ function FinalCTA() {
           <Link
             to="/sign-up"
             search={{ role: "investor" } as any}
-            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold text-foreground transition-colors"
-            style={{ border: "1px solid var(--border)", padding: "14px 32px", fontSize: "15px", fontFamily: SYNE }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--accent)"; }}
+            className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors"
+            style={{ border: "1px solid rgba(255,255,255,0.4)", color: "#FFFFFF", padding: "14px 32px", fontSize: "15px", fontFamily: SYNE }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.12)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
           >
             I&rsquo;m an investor

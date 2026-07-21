@@ -76,7 +76,7 @@ function TrustPage() {
           className="inline-block max-w-xl mx-auto rounded-lg px-6 py-4 text-left"
           style={{ background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)" }}
         >
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <p className="text-sm text-[#52525B] leading-relaxed">
             <span className="text-foreground font-medium">Every account is fully accepted from day one.</span>{" "}
             Badges show how much has been independently verified — they never gate access.
             You can use every feature on the platform regardless of your verification tier.
@@ -157,8 +157,8 @@ function TrustPage() {
                         className="rounded-lg px-4 py-3"
                         style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)" }}
                       >
-                        <p className="text-xs text-muted-foreground font-medium mb-1.5">Capital Verified — for investors</p>
-                        <p className="text-xs text-muted-foreground leading-relaxed">
+                        <p className="text-xs text-[#52525B] font-medium mb-1.5">Capital Verified — for investors</p>
+                        <p className="text-xs text-[#52525B] leading-relaxed">
                           Three independent documents: fund formation instrument, capital commitment letter or board resolution, AUM confirmation.
                           Accepted: Limited Partnership Agreement, Articles of Association, Board Resolution with capital commitment,
                           Bank statement or custodian letter (dated within 12 months).
@@ -169,8 +169,8 @@ function TrustPage() {
                         className="rounded-lg px-4 py-3"
                         style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.15)" }}
                       >
-                        <p className="text-xs text-muted-foreground font-medium mb-1.5">Operationally Verified — for founders</p>
-                        <p className="text-xs text-muted-foreground leading-relaxed">
+                        <p className="text-xs text-[#52525B] font-medium mb-1.5">Operationally Verified — for founders</p>
+                        <p className="text-xs text-[#52525B] leading-relaxed">
                           Three independent documents: financial activity record, customer or contract evidence, team employment record.
                           Accepted: bank statements or revenue records (dated within 6 months), signed contracts or purchase orders naming an external party,
                           payroll records, employment contracts, offer letters, or org charts naming individuals with titles.

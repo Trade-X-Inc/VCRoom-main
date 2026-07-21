@@ -58,7 +58,7 @@ function Waitlist() {
         <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
           Join the Hockystick waitlist.
         </h1>
-        <p className="mt-4 text-lg text-[#71717A] max-w-xl mx-auto">
+        <p className="mt-4 text-lg text-[rgba(255,255,255,0.72)] max-w-xl mx-auto">
           Be among the first to access the deal room where trust gets built.
         </p>
       </div>
