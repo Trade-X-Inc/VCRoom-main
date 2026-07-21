@@ -300,3 +300,19 @@ img { max-width: 100%; height: auto; }
 .hs-walk-a { animation: hs-walk-a 0.9s steps(1) infinite; }
 .hs-walk-b { animation: hs-walk-b 0.9s steps(1) infinite; }
 .hs-walk-bob { animation: hs-walk-bob 0.9s ease-in-out infinite; }
+
+/* ── Global keyboard-focus baseline (R6 §9) ────────────────────────
+   A single :focus-visible ring so every interactive element has a
+   visible keyboard-focus state. :focus-visible (not :focus) means mouse
+   clicks never show it, and this is a BASELINE — components with their
+   own working focus styles keep them (this only fills the gaps). The
+   2px offset + a paired white ring keeps the #7C3AED outline visible on
+   light, dark, and purple backgrounds alike. */
+:where(a, button, input, select, textarea, summary, [role="button"], [role="link"], [role="tab"], [role="menuitem"], [role="switch"], [role="checkbox"], [tabindex]):focus-visible {
+  outline: 2px solid #7C3AED;
+  outline-offset: 2px;
+  /* The white halo pairs with the violet outline so the ring stays visible on
+     dark (#0A0A0B) and brand (#7C3AED) surfaces; on the light canvas it's
+     white-on-white and invisible, so it's safe as a global baseline. */
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.85);
+}

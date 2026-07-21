@@ -135,7 +135,7 @@ function SignIn() {
           <Link to="/forgot-password" className="text-muted-foreground hover:text-foreground">
             Forgot password?
           </Link>
-          <Link to="/sign-up" className="text-purple-500 hover:text-brand">
+          <Link to="/sign-up" className="text-brand hover:text-brand">
             Create account →
           </Link>
         </div>

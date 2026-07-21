@@ -58,7 +58,7 @@ function Waitlist() {
         <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
           Join the Hockystick waitlist.
         </h1>
-        <p className="mt-4 text-lg text-[#71717A] max-w-xl mx-auto">
+        <p className="mt-4 text-lg text-[rgba(255,255,255,0.72)] max-w-xl mx-auto">
           Be among the first to access the deal room where trust gets built.
         </p>
       </div>
@@ -71,7 +71,7 @@ function Waitlist() {
             <p className="text-muted-foreground">We'll be in touch. Keep an eye on your inbox.</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-5 border border-[rgba(0,0,0,0.08)] bg-white p-8">
+          <form onSubmit={handleSubmit} className="space-y-5 border border-[#E4E4E7] bg-white p-8">
             <div>
               <label className="block text-sm font-medium mb-1.5">Full name</label>
               <Input name="fullName" value={form.fullName} onChange={set} required placeholder="Your name" />

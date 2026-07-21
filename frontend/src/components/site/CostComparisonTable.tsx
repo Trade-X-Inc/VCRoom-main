@@ -18,13 +18,16 @@ export function CostComparisonTable({ variant, compact }: { variant: "dark" | "l
   const dark = variant === "dark";
   const rows = compact ? COMPACT_ROWS : ROWS;
 
-  const border = dark ? "var(--border)" : "#E5E7EB";
-  const headColor = dark ? "var(--muted-foreground)" : "#6B7280";
+  const border = dark ? "var(--border)" : "#E4E4E7";
+  // #A1A1AA (zinc-400) clears AA on the #111113 dark card; muted-foreground (#71717a) fails at 3.9:1
+  const headColor = dark ? "#A1A1AA" : "#6B7280";
   const needColor = dark ? "#FFFFFF" : "#111827";
-  const oldColor = dark ? "var(--muted-foreground)" : "#6B7280";
-  const hsColor = dark ? "#10B981" : "#059669";
+  const oldColor = dark ? "#A1A1AA" : "#6B7280";
+  const hsColor = dark ? "#34D399" : "#047857";
   const cardBg = dark ? "#111113" : "#FFFFFF";
-  const totalColor = dark ? "var(--muted-foreground)" : "#4B5563";
+  // dark variant sits on the purple TrustSection, so the footer (outside the #111113 card)
+  // must read on #7c3aed too — white at 0.88 clears AA on both purple and the dark card
+  const totalColor = dark ? "rgba(255,255,255,0.88)" : "#4B5563";
 
   return (
     <div>

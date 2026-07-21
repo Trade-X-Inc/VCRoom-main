@@ -93,12 +93,13 @@ type Tab = "accelerators" | "grants" | "vcfunds" | "programs";
 // ── Region badge colors ───────────────────────────────────────────
 
 const regionColors: Record<string, { bg: string; color: string }> = {
-  GCC:    { bg: "rgba(124,58,237,0.15)", color: "#a78bfa" },
-  MENA:   { bg: "rgba(124,58,237,0.10)", color: "#c4b5fd" },
-  EU:     { bg: "rgba(59,130,246,0.15)", color: "#93c5fd" },
-  NA:     { bg: "rgba(16,185,129,0.12)", color: "#6ee7b7" },
-  SEA:    { bg: "rgba(245,158,11,0.12)", color: "#fcd34d" },
-  Africa: { bg: "rgba(239,68,68,0.12)",  color: "#fca5a5" },
+  // AA-compliant text colors on the light tints (700-weight, not pastel 300s)
+  GCC:    { bg: "rgba(124,58,237,0.15)", color: "#6D28D9" },
+  MENA:   { bg: "rgba(124,58,237,0.10)", color: "#6D28D9" },
+  EU:     { bg: "rgba(59,130,246,0.15)", color: "#1D4ED8" },
+  NA:     { bg: "rgba(16,185,129,0.12)", color: "#047857" },
+  SEA:    { bg: "rgba(245,158,11,0.12)", color: "#92400E" },
+  Africa: { bg: "rgba(239,68,68,0.12)",  color: "#B91C1C" },
   Global: { bg: "var(--accent)", color: "var(--muted-foreground)" },
 };
 
@@ -142,8 +143,8 @@ function AcceleratorCard({ item }: { item: typeof accelerators[0] }) {
         href={item.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-auto text-xs font-medium px-3 py-1.5 rounded-lg w-fit transition-colors"
-        style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.25)", color: "#a78bfa" }}
+        className="mt-auto inline-flex items-center min-h-9 text-xs font-medium px-3.5 py-2 rounded-lg w-fit transition-colors"
+        style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.25)", color: "#6D28D9" }}
       >
         Apply →
       </a>
@@ -178,7 +179,7 @@ function GrantCard({ item }: { item: typeof grants[0] }) {
         href={item.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-auto text-xs font-medium px-3 py-1.5 rounded-lg w-fit transition-colors"
+        className="mt-auto inline-flex items-center min-h-9 text-xs font-medium px-3.5 py-2 rounded-lg w-fit transition-colors"
         style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }}
       >
         Learn more →
@@ -207,7 +208,7 @@ function VCCard({ item }: { item: typeof vcFunds[0] }) {
         </p>
         <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
           <span style={{ color: "var(--faint)" }}>Check: </span>
-          <span style={{ color: "#a78bfa" }}>{item.checkSize}</span>
+          <span style={{ color: "#6D28D9" }}>{item.checkSize}</span>
         </p>
         <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
           <span style={{ color: "var(--faint)" }}>Portfolio: </span>{item.portfolio}
@@ -217,8 +218,8 @@ function VCCard({ item }: { item: typeof vcFunds[0] }) {
         href={item.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-auto text-xs font-medium px-3 py-1.5 rounded-lg w-fit transition-colors"
-        style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.25)", color: "#a78bfa" }}
+        className="mt-auto inline-flex items-center min-h-9 text-xs font-medium px-3.5 py-2 rounded-lg w-fit transition-colors"
+        style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.25)", color: "#6D28D9" }}
       >
         Visit fund →
       </a>
@@ -252,7 +253,7 @@ function ProgramCard({ item }: { item: typeof programs[0] }) {
         href={item.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-auto text-xs font-medium px-3 py-1.5 rounded-lg w-fit transition-colors"
+        className="mt-auto inline-flex items-center min-h-9 text-xs font-medium px-3.5 py-2 rounded-lg w-fit transition-colors"
         style={{ background: "var(--accent)", border: "1px solid var(--border)", color: "var(--muted-foreground)" }}
       >
         Learn more →
@@ -359,10 +360,10 @@ function Resources() {
             <button
               key={r}
               onClick={() => setRegion(r)}
-              className="text-xs px-3 py-1.5 rounded-full transition-colors"
+              className="inline-flex items-center min-h-9 text-xs px-3.5 py-2 rounded-full transition-colors"
               style={
                 region === r
-                  ? { background: "rgba(124,58,237,0.25)", border: "1px solid rgba(124,58,237,0.5)", color: "#a78bfa" }
+                  ? { background: "rgba(124,58,237,0.25)", border: "1px solid rgba(124,58,237,0.5)", color: "#6D28D9" }
                   : { background: "var(--accent)", border: "1px solid var(--border)", color: "var(--muted-foreground)" }
               }
             >
@@ -418,13 +419,13 @@ function Resources() {
           style={{ background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)" }}
         >
           <p className="text-sm font-semibold text-foreground mb-1">Ready to raise?</p>
-          <p className="text-xs mb-4" style={{ color: "var(--muted-foreground)" }}>
+          <p className="text-xs mb-4" style={{ color: "#52525B" }}>
             Build a verified founder profile on Hockystick and get matched with investors aligned
             to your sector, stage, and region. Free during beta.
           </p>
           <a
             href="/sign-up"
-            className="text-xs font-medium px-4 py-2 rounded-lg inline-block transition-colors"
+            className="inline-flex items-center min-h-9 text-xs font-medium px-4 py-2 rounded-lg transition-colors"
             style={{ background: "var(--gradient-brand)", color: "#fff" }}
           >
             Build your verified profile →

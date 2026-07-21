@@ -4,7 +4,7 @@ import { ArrowRight, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 
-const NAV_LINK = "text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-1";
+const NAV_LINK = "inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-1 py-2";
 
 export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

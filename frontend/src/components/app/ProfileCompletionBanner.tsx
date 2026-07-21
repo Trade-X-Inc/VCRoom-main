@@ -36,7 +36,8 @@ export function ProfileCompletionBanner({ variant, percent }: ProfileCompletionB
           {isFounder ? (
             <>
               {percent}% ready ·{" "}
-              <Link to="/app/profile" className="font-medium underline underline-offset-2" style={{ color: "#F59E0B" }}>
+              {/* amber-700 for AA (4.5:1+) on the light-amber tint; amber-500 fails as text */}
+              <Link to="/app/profile" className="font-medium underline underline-offset-2" style={{ color: "#B45309" }}>
                 Complete profile →
               </Link>
             </>

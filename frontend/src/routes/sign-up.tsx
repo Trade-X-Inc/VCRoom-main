@@ -86,7 +86,7 @@ function SignUp() {
             <strong className="text-foreground">{email}</strong>. Click it to activate your
             account, then sign in.
           </p>
-          <Link to="/sign-in" className="inline-block mt-6 text-purple-500 text-sm">
+          <Link to="/sign-in" className="inline-block mt-6 text-brand text-sm">
             Go to sign in →
           </Link>
         </div>
@@ -201,7 +201,7 @@ function SignUp() {
 
         <div className="mt-6 text-center text-sm text-muted-foreground">
           Already have an account?{' '}
-          <Link to="/sign-in" className="text-purple-500">
+          <Link to="/sign-in" className="text-brand">
             Sign in
           </Link>
         </div>
