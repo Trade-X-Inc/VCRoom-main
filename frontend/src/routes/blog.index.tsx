@@ -97,15 +97,22 @@ function BlogIndex() {
 
         {/* CTA */}
         <div className="mt-16 bg-accent border border-border rounded-lg p-12 text-center">
-          <h2 className="text-2xl font-semibold mb-3">Stay updated</h2>
+          <h2 className="text-2xl font-semibold mb-3">Ready to raise?</h2>
           <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
-            Get the latest insights on fundraising and venture capital delivered to your inbox.
+            Build a verified profile and start closing deals — from first meeting to signed agreement, in one platform.
           </p>
-          <Link to="/waitlist">
-            <Button className="gap-2">
-              Join our community <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link to="/sign-up" search={{ role: "founder" } as any}>
+              <Button className="gap-2">
+                Create founder account <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link to="/waitlist">
+              <Button variant="outline" className="gap-2">
+                Join our newsletter
+              </Button>
+            </Link>
+          </div>
         </div>
       </main>
       <SiteFooter />

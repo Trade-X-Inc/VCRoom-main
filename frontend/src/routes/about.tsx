@@ -106,13 +106,14 @@ function About() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4">
-          <a href="/trust"
-            className="px-6 py-3 border border-border rounded-lg text-sm text-muted-foreground hover:border-border hover:text-foreground transition-colors text-center">
-            How our verification works →
+          <a href="/sign-up?role=founder"
+            className="px-6 py-3 rounded-[2px] text-sm font-semibold text-center"
+            style={{ background: "#7C3AED", color: "#FFFFFF" }}>
+            Create your account →
           </a>
-          <a href="/contact"
-            className="px-6 py-3 hs-gradient rounded-lg text-sm text-foreground hover:bg-[#6d28d9] transition-colors text-center">
-            Get in touch →
+          <a href="/pricing"
+            className="px-6 py-3 border border-[#E4E4E7] rounded-[2px] text-sm font-medium text-[#0A0A0B] hover:bg-[#FAFAFA] transition-colors text-center">
+            See what&rsquo;s inside →
           </a>
         </div>
       </main>

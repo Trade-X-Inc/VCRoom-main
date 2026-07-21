@@ -371,11 +371,11 @@ function Registry() {
                 LinkedIn verification, AI document review, and investor matching. Free during beta.
               </p>
               <a
-                href="/sign-up"
-                className="text-xs font-medium px-4 py-2 rounded-lg inline-block transition-colors"
+                href="/sign-up?role=founder"
+                className="text-xs font-medium px-4 py-2 rounded-[2px] inline-flex items-center min-h-9 transition-colors"
                 style={{ background: "var(--gradient-brand)", color: "#fff" }}
               >
-                Build your verified profile →
+                Verify your company →
               </a>
             </div>
           </div>

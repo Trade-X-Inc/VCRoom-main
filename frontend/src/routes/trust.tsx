@@ -220,7 +220,7 @@ function TrustPage() {
             className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-sm font-medium text-foreground transition-colors"
             style={{ background: "var(--gradient-brand)" }}
           >
-            Start as a founder
+            Build your verified profile
             <ChevronRight className="h-3.5 w-3.5" />
           </Link>
           <Link
