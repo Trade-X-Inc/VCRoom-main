@@ -10,7 +10,7 @@ export const GETTING_STARTED_PAGES: Record<string, DocPage> = {
       slug: "",
       title: "Hockystick Documentation",
       description:
-        "Documentation for Hockystick — the agentic deal flow platform for GCC & MENA. Feature guides, security posture, and changelog.",
+        "Documentation for Hockystick — the agentic fundraising platform. Feature guides, security posture, and changelog.",
       updated: UPDATED,
       toc: [
         { id: "what", label: "What Hockystick is" },
@@ -22,7 +22,7 @@ export const GETTING_STARTED_PAGES: Record<string, DocPage> = {
     Body: () => (
       <>
         <Lead>
-          Hockystick is a deal flow platform for founders and investors in the GCC and MENA:
+          Hockystick is a global fundraising platform for founders and investors:
           verified profiles, NDA-gated deal rooms, structured diligence, and recorded decisions —
           with an AI layer that drafts the work and never acts on your behalf without confirmation.
         </Lead>

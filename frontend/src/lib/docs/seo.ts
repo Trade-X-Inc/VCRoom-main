@@ -56,7 +56,7 @@ const DOC_FAQS: Record<string, Array<{ q: string; a: string }>> = {
   "": [
     {
       q: "What is Hockystick?",
-      a: "Hockystick is an AI-native deal flow platform for founders and investors in GCC & MENA. Founders build verified profiles, run NDA-gated deal rooms with a six-stage workflow, and receive recorded investment decisions. Investors get thesis-matched deal flow, an AI due-diligence engine that cross-examines documents against claims, and a decision pipeline. It operates from DIFC, Dubai.",
+      a: "Hockystick is an AI-native, global fundraising platform for founders and investors. Founders build verified profiles, run NDA-gated deal rooms with a six-stage workflow, and receive recorded investment decisions. Investors get thesis-matched deal flow, an AI due-diligence engine that cross-examines documents against claims, and a decision pipeline. It is headquartered at DIFC, Dubai.",
     },
     {
       q: "How does verification work?",
@@ -68,7 +68,7 @@ const DOC_FAQS: Record<string, Array<{ q: string; a: string }>> = {
     },
     {
       q: "What countries does Hockystick support?",
-      a: "Hockystick is GCC & MENA focused and global by design: built for founders raising from GCC & MENA investors wherever the founders are based. Registry verification covers 140+ jurisdictions including UAE, Saudi Arabia, Qatar, Bahrain, the UK, and the US.",
+      a: "Hockystick is a global platform: founders and investors from any jurisdiction can use it, wherever they are based. Registry verification covers 140+ jurisdictions including the UAE, Saudi Arabia, Qatar, Bahrain, the UK, and the US.",
     },
     {
       q: "How does the success fee work?",

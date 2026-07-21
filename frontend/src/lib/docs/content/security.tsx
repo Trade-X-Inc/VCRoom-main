@@ -412,8 +412,8 @@ WHERE n.nspname = 'public' AND c.relkind = 'r';
           Enforcement of awards is subject to the 1958 New York Convention on the Recognition and
           Enforcement of Foreign Arbitral Awards, to which the UAE is a signatory. In practice this
           means an award rendered in Dubai under a Hockystick NDA is enforceable in the courts of
-          more than 170 contracting states — including every jurisdiction where GCC/MENA venture
-          deals typically touch.
+          more than 170 contracting states — including every major venture jurisdiction
+          worldwide.
         </P>
 
         <H2 id="record">Signature record</H2>
