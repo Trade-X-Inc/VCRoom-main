@@ -64,7 +64,7 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-border/60 bg-gradient-soft">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10 sm:py-14">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 pt-10 sm:pt-14 pb-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 md:gap-12">
           {/* Col 1 — Brand */}
           <div className="sm:col-span-2 md:col-span-1 md:pr-8">
