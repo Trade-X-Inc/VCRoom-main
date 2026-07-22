@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
      canvas. No CSS transforms, no opacity, no DOM frame swaps.
 */
 
-const FRAME_COUNT = 240;
+const FRAME_COUNT = 199;
 const DESKTOP_DIR = "/vault/desktop";
 const MOBILE_DIR = "/vault/mobile";
 const CONCURRENCY = 4;
@@ -171,13 +171,21 @@ export function VaultScrollSequence({ children }: { children?: React.ReactNode }
   // Reduced-motion: render the final open-vault frame as a static image, no canvas/scroll.
   if (reduced) {
     return (
-      <div className="relative w-full" style={{ background: "#0A0A0B" }}>
+      <div className="relative w-full" style={{ background: "#FFFFFF" }}>
         <div className="relative min-h-screen w-full overflow-hidden">
           <img
             src={framePath(isMobile ? MOBILE_DIR : DESKTOP_DIR, FRAME_COUNT)}
             alt=""
             aria-hidden="true"
             className="absolute inset-0 h-full w-full object-cover"
+          />
+          {/* v2 frames are white-background with a dark obelisk centered where the
+              hero text sits — a centered radial vignette keeps white text readable
+              over the obelisk without tinting the (already-white) rest of the frame. */}
+          <div
+            className="absolute inset-0"
+            style={{ background: "radial-gradient(ellipse 70% 65% at 50% 50%, rgba(10,10,11,0.72), rgba(10,10,11,0.35) 55%, transparent 78%)" }}
+            aria-hidden="true"
           />
           <div className="relative z-10">{children}</div>
         </div>
@@ -188,26 +196,34 @@ export function VaultScrollSequence({ children }: { children?: React.ReactNode }
   const scrubHeight = isMobile ? "200vh" : "300vh";
 
   return (
-    <div ref={wrapperRef} className="relative w-full" style={{ height: scrubHeight, background: "#0A0A0B" }}>
+    <div ref={wrapperRef} className="relative w-full" style={{ height: scrubHeight, background: "#FFFFFF" }}>
       {/* Sticky viewport: canvas + overlaid hero content */}
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         <canvas
           ref={canvasRef}
           className="absolute inset-0 h-full w-full"
-          style={{ background: "#0A0A0B" }}
+          style={{ background: "#FFFFFF" }}
           aria-hidden="true"
         />
-        {/* subtle darkening so overlaid white text always clears AA on lighter frames */}
-        <div className="absolute inset-0" style={{ background: "rgba(10,10,11,0.45)" }} aria-hidden="true" />
+        {/* v2 frames are white-background with a dark obelisk centered where the
+            hero text sits — a centered radial vignette keeps white text readable
+            over the obelisk without tinting the (already-white) rest of the frame. */}
+        <div
+          className="absolute inset-0"
+          style={{ background: "radial-gradient(ellipse 70% 65% at 50% 50%, rgba(10,10,11,0.72), rgba(10,10,11,0.35) 55%, transparent 78%)" }}
+          aria-hidden="true"
+        />
 
-        {/* Minimal loading indicator until 30% loaded */}
+        {/* Minimal loading indicator until 30% loaded — light surface + ink text,
+            since v2 frames are a white canvas (v1's white-on-dark pill would be
+            invisible here). */}
         {!ready && (
           <div className="absolute inset-x-0 bottom-8 z-20 flex justify-center">
-            <div className="flex items-center gap-3 px-4 py-2" style={{ background: "rgba(255,255,255,0.08)" }}>
-              <div className="h-1 w-32" style={{ background: "rgba(255,255,255,0.15)" }}>
+            <div className="flex items-center gap-3 border px-4 py-2" style={{ background: "rgba(255,255,255,0.9)", borderColor: "#E4E4E7" }}>
+              <div className="h-1 w-32" style={{ background: "#E4E4E7" }}>
                 <div className="h-1" style={{ width: `${loadPct}%`, background: "#7C3AED" }} />
               </div>
-              <span className="text-xs" style={{ color: "rgba(255,255,255,0.72)", fontFamily: "DM Sans, sans-serif" }}>
+              <span className="text-xs" style={{ color: "#52525B", fontFamily: "DM Sans, sans-serif" }}>
                 Loading {loadPct}%
               </span>
             </div>
