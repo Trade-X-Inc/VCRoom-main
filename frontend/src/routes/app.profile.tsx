@@ -198,6 +198,17 @@ function formatRelativeTime(dateStr: string): string {
 
 export type ProfileView = "quick" | "full" | "privacy" | "preview" | "analytics" | "team-cards" | "fundraising-thesis";
 
+// Cover/logo hero card wrappers — a clickable <label> when upload is allowed
+// (Profile Builder), a plain <div> when it's read-only (Digital Profile View).
+function CoverArea({ readOnly, children }: { readOnly: boolean; children: React.ReactNode }) {
+  const cls = "relative h-40 block overflow-hidden" + (readOnly ? "" : " cursor-pointer group");
+  return readOnly ? <div className={cls}>{children}</div> : <label className={cls}>{children}</label>;
+}
+function LogoArea({ readOnly, children }: { readOnly: boolean; children: React.ReactNode }) {
+  const cls = "relative shrink-0" + (readOnly ? "" : " cursor-pointer group");
+  return readOnly ? <div className={cls}>{children}</div> : <label className={cls}>{children}</label>;
+}
+
 // R9: `view` renders a single leaf's slice of this page under route control
 // (the swapped sidebar owns navigation between slices). Omitted = original
 // standalone behavior with the internal tab bar.
@@ -1225,13 +1236,18 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
         </div>
       )}
 
-      {/* Hero card — R10: restricted to the Full Digital Profile View leaf
-          (view === "preview") and the standalone (!view) case only. Every
-          other Profile leaf (Quick Setup, Full Profile, Team Cards,
-          Fundraising Thesis, Privacy Settings) no longer renders this. */}
-      {(!view || view === "preview") && (
+      {/* Hero card — R7-testing fix 4: renders on the Full Profile leaf
+          (view === "full", edit mode with upload controls) and the
+          standalone (!view) case. The Digital Profile View leaf
+          (view === "preview") still shows this card but display-only — no
+          upload affordances — since uploading belongs in Profile Builder,
+          not Go Live. Every other Profile leaf (Quick Setup, Team Cards,
+          Fundraising Thesis, Privacy Settings) still doesn't render this. */}
+      {(!view || view === "full" || view === "preview") && (() => {
+        const canUpload = !view || view === "full";
+        return (
       <div className="mt-6 rounded-none border border-border bg-white shadow-card overflow-hidden">
-        <label className="relative h-40 block cursor-pointer group overflow-hidden">
+        <CoverArea readOnly={!canUpload}>
           {coverUrl ? (
             <img src={coverUrl} alt="Cover" className="h-full w-full object-cover" />
           ) : (
@@ -1239,20 +1255,22 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
               <div className="absolute inset-0 noise opacity-40" />
             </div>
           )}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-            {coverUploading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-white" />
-            ) : (
-              <span className="opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1.5 rounded-md bg-white/90 px-3 py-1.5 text-xs font-medium text-foreground">
-                <Upload className="h-3.5 w-3.5" /> {coverUrl ? "Replace cover" : "Add cover image"}
-              </span>
-            )}
-          </div>
-          <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleCoverUpload(e.target.files[0])} />
-        </label>
+          {canUpload && (
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+              {coverUploading ? (
+                <Loader2 className="h-5 w-5 animate-spin text-white" />
+              ) : (
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1.5 rounded-md bg-white/90 px-3 py-1.5 text-xs font-medium text-foreground">
+                  <Upload className="h-3.5 w-3.5" /> {coverUrl ? "Replace cover" : "Add cover image"}
+                </span>
+              )}
+            </div>
+          )}
+          {canUpload && <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleCoverUpload(e.target.files[0])} />}
+        </CoverArea>
         <div className="px-6 pb-6 -mt-10 relative">
           <div className="flex items-end gap-4">
-            <label className="relative cursor-pointer group shrink-0">
+            <LogoArea readOnly={!canUpload}>
               <div className="grid h-20 w-20 place-items-center rounded-none bg-gradient-brand text-brand-foreground text-lg font-bold border-4 border-white shadow-elev overflow-hidden">
                 {logoUploading
                   ? <Loader2 className="h-6 w-6 animate-spin text-brand-foreground" />
@@ -1260,11 +1278,13 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
                   ? <img src={logoUrl} alt="logo" className="h-full w-full object-cover" />
                   : <span>{initials}</span>}
               </div>
-              <div className="absolute inset-0 rounded-none bg-black/40 grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <Upload className="h-5 w-5 text-white" />
-              </div>
-              <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleLogoUpload(e.target.files[0])} />
-            </label>
+              {canUpload && (
+                <div className="absolute inset-0 rounded-none bg-black/40 grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Upload className="h-5 w-5 text-white" />
+                </div>
+              )}
+              {canUpload && <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleLogoUpload(e.target.files[0])} />}
+            </LogoArea>
           </div>
           <div className="mt-4">
             <div className="text-xl font-semibold" style={{ fontFamily: "Syne, sans-serif" }}>{form.company_name || "Your Company"}</div>
@@ -1289,7 +1309,8 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
           </div>
         </div>
       </div>
-      )}
+        );
+      })()}
 
       {/* STEP 6: Quick setup / Full details tabs — hidden under R9 route
           control, where the swapped sidebar owns navigation between slices */}
