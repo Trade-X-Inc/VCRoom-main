@@ -43,7 +43,7 @@ function formatValue(value: unknown, suffix = "") {
 
 function OverviewPage() {
   const ctx = useDealRoom();
-  const { room: dealRoom, startup, investorProfile, userId: currentUserId, pendingTransition, stageRequesting, doRequestNextStage: onRequestNextStage } = ctx;
+  const { room: dealRoom, roomLoading, startup, investorProfile, userId: currentUserId, pendingTransition, stageRequesting, doRequestNextStage: onRequestNextStage } = ctx;
   const queryClient = useQueryClient();
 
   const companyName = startup?.company_name ?? "Unknown";
@@ -195,6 +195,20 @@ function OverviewPage() {
     { key: "term_sheet" as DealRoomStageKey, label: "Term Sheet" },
     { key: "closing" as DealRoomStageKey, label: "Closing" },
   ];
+
+  // Fix 6: room/startup are undefined until this resolves — render a loading
+  // skeleton instead of the page with "Unknown"/"—" fallbacks (the empty-on-
+  // first-load bug: hard-navigating straight to /overview showed empty content
+  // because nothing gated on this).
+  if (roomLoading) {
+    return (
+      <div className="mx-auto max-w-[1360px] px-8 py-8">
+        <div className="h-24 animate-pulse border border-[rgba(0,0,0,0.08)] bg-gray-50" />
+        <div className="mt-4 h-16 animate-pulse border border-[rgba(0,0,0,0.08)] bg-gray-50" />
+        <div className="mt-4 h-40 animate-pulse border border-[rgba(0,0,0,0.08)] bg-gray-50" />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-[1360px] px-8 py-8">

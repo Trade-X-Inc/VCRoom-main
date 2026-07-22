@@ -15,7 +15,7 @@ export function useDealRoomContext(dealRoomId: string) {
   const { user } = useAuth();
   const userName = user?.fullName ?? "User";
 
-  const { data: room } = useQuery({
+  const { data: room, isLoading: roomLoading } = useQuery({
     queryKey: ["deal-room", dealRoomId],
     enabled: !!user?.id,
     staleTime: 5 * 60 * 1000,
@@ -199,6 +199,11 @@ export function useDealRoomContext(dealRoomId: string) {
     userId: user?.id,
     userName,
     room,
+    // True until the room+startup query resolves — consumers (e.g. Overview)
+    // should render a loading skeleton while this is true instead of rendering
+    // immediately with "Unknown"/"—" fallbacks on undefined room/startup, which
+    // was the fix-6 empty-on-first-load bug.
+    roomLoading,
     startup,
     startupId,
     companyName,
