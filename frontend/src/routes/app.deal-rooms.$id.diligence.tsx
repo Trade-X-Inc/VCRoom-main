@@ -370,7 +370,7 @@ function DiligencePage() {
     }
 
     return (
-      <div className="p-8 max-w-5xl mx-auto space-y-6">
+      <div className="mx-auto max-w-[1360px] px-8 py-8 space-y-6">
         {fGoals.length === 0 ? (
           <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none px-6 py-12 text-center">
             <ClipboardList className="h-12 w-12 text-gray-200 mx-auto mb-4" />
@@ -450,7 +450,7 @@ function DiligencePage() {
   }
 
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-6">
+    <div className="mx-auto max-w-[1360px] px-8 py-8 space-y-6">
 
       {showOnboarding && (
         <div className="bg-white border border-brand/20 rounded-none px-6 py-6 text-center">

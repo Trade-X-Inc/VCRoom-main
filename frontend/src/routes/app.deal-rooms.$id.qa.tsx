@@ -268,7 +268,7 @@ function QAPage() {
   const unansweredCount = openQuestions.length;
 
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-6">
+    <div className="mx-auto max-w-[1360px] px-8 py-8 space-y-6">
       {isCompleted && (
         <div className="flex items-center gap-3 rounded-none border border-border/60 bg-card px-5 py-3">
           <CheckCircle2 className="h-4 w-4 text-[#10B981] shrink-0" />

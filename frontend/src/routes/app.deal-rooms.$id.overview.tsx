@@ -197,7 +197,7 @@ function OverviewPage() {
   ];
 
   return (
-    <div className="w-full px-6 py-6">
+    <div className="mx-auto max-w-[1360px] px-8 py-8">
       <section className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4 mb-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex min-w-0 items-start gap-3">
