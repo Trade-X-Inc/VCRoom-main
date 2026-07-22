@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { ChevronLeft } from 'lucide-react'
+import { Logo } from '@/components/brand/Logo'
 
 export const Route = createFileRoute('/sign-in')({
   head: () => ({
@@ -61,14 +62,11 @@ function SignIn() {
     <div className="min-h-screen flex items-center justify-center bg-background p-5">
       <div className="w-full max-w-md bg-card border border-border rounded-2xl p-10">
         <div className="mb-8">
-          <Link to="/" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-6">
+          <Link to="/" className="flex w-fit items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-6">
             <ChevronLeft className="h-3.5 w-3.5" /> Back to home
           </Link>
-          <Link to="/" className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 rounded-lg hs-gradient-static flex items-center justify-center">
-              <span className="text-foreground text-sm font-bold">H</span>
-            </div>
-            <span className="font-semibold text-foreground">Hockystick</span>
+          <Link to="/" className="mb-6 block w-fit">
+            <Logo />
           </Link>
           <h1 className="text-2xl font-semibold text-foreground mb-1">Welcome back</h1>
           <p className="text-muted-foreground text-sm">Sign in to your workspace</p>

@@ -10,11 +10,11 @@ export function Logo({
   return (
     <div className="flex items-center gap-2">
       <img
-        src="/logo-dark.svg"
+        src="/favicon.svg"
         alt="Hockystick"
         width={dim}
         height={dim}
-        className="rounded-lg shrink-0"
+        className="shrink-0"
         style={{ imageRendering: "crisp-edges" }}
       />
       {withWordmark && (
