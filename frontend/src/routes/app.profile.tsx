@@ -788,6 +788,9 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
         const { error: avatarErr } = await supabase.from("startups").update({ founder_avatar_url: url }).eq("id", startup.id);
         if (avatarErr) throw avatarErr;
         queryClient.invalidateQueries({ queryKey: ["my-startup", user.id] });
+        // UserMenu's top-right avatar reads this same column via useFounderAvatarUrl —
+        // invalidate so it updates without a page reload (§27 real-time UI rule).
+        queryClient.invalidateQueries({ queryKey: ["founder-avatar-url", startup.id] });
       }
       toast.success("Profile photo updated");
     } catch (e: any) {

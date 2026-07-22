@@ -3,10 +3,12 @@ import { useAuth } from "@/lib/auth";
 import { useState } from "react";
 import { LogOut, Settings, User, Users, Activity } from "lucide-react";
 import { useAccountContext } from "@/hooks/useAccountContext";
+import { useFounderAvatarUrl } from "@/hooks/useFounderAvatarUrl";
 
 export function UserMenu() {
   const { user, signOut } = useAuth();
   const ctx = useAccountContext();
+  const avatarUrl = useFounderAvatarUrl(ctx.startupId);
   const [open, setOpen] = useState(false);
 
   if (!user) return null;
@@ -36,10 +38,10 @@ export function UserMenu() {
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="grid h-9 w-9 place-items-center rounded-full bg-gradient-brand text-brand-foreground text-xs font-semibold ring-2 ring-transparent hover:ring-brand/20 transition-all"
+        className="grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-gradient-brand text-brand-foreground text-xs font-semibold ring-2 ring-transparent hover:ring-brand/20 transition-all"
         aria-label="Account menu"
       >
-        {initials}
+        {avatarUrl ? <img src={avatarUrl} alt="" className="h-full w-full object-cover" /> : initials}
       </button>
 
       {open && (
