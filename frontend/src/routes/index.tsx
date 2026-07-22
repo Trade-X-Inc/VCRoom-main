@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { VaultScrollSequence } from "@/components/site/VaultScrollSequence";
+import { VaultScrollSequence, FAQ_SECTION_ID } from "@/components/site/VaultScrollSequence";
 import {
   ArrowRight, CheckCircle2, ShieldCheck, FileText, Video,
   Scale, FileSignature, Plus, Minus,
@@ -76,6 +76,10 @@ function Landing() {
           }),
         }}
       />
+      {/* Fixed full-page background — rendered once, standalone. Every section
+          below needs an opaque background to visually cover it; only the Hero
+          (immediately following) is transparent so the vault shows through. */}
+      <VaultScrollSequence />
       <SiteHeader />
       <Hero />
       <ProblemSection />
@@ -93,12 +97,25 @@ function Landing() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   SECTION 2 — HERO (over the vault scroll canvas)
+   SECTION 2 — HERO (transparent — the fixed VaultScrollSequence canvas shows
+   through). The frame content varies from ~luminance 80 to ~153 across the
+   sequence (measured), so no single flat text color is safe throughout —
+   white text + a backdrop-blur/semi-transparent dark panel behind it holds
+   up against every frame, closed through fully open.
 ═══════════════════════════════════════════════════════════════════════════ */
 function Hero() {
   return (
-    <VaultScrollSequence>
-      <div className="mx-auto max-w-4xl px-6 text-center">
+    <section className="relative z-10 flex min-h-screen w-full items-center justify-center px-6">
+      <div
+        className="mx-auto max-w-4xl px-8 py-10 text-center sm:px-12 sm:py-14"
+        style={{
+          background: "radial-gradient(ellipse 65% 80% at 50% 50%, rgba(10,10,11,0.6) 0%, rgba(10,10,11,0.4) 50%, transparent 85%)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          maskImage: "radial-gradient(ellipse 65% 80% at 50% 50%, black 0%, black 50%, transparent 85%)",
+          WebkitMaskImage: "radial-gradient(ellipse 65% 80% at 50% 50%, black 0%, black 50%, transparent 85%)",
+        }}
+      >
         <h1
           className="mx-auto max-w-3xl"
           style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(40px, 7vw, 68px)", lineHeight: 1.05, letterSpacing: "-0.02em", color: "#FFFFFF" }}
@@ -107,7 +124,7 @@ function Hero() {
         </h1>
         <p
           className="mx-auto mt-6 max-w-2xl"
-          style={{ fontFamily: DM, fontWeight: 400, fontSize: "clamp(16px, 2.2vw, 20px)", lineHeight: 1.5, color: "rgba(255,255,255,0.88)" }}
+          style={{ fontFamily: DM, fontWeight: 400, fontSize: "clamp(16px, 2.2vw, 20px)", lineHeight: 1.5, color: "rgba(255,255,255,0.92)" }}
         >
           Verified profiles. Structured due diligence. AI-powered interviews.
           Term negotiation to signed agreement — entirely in-platform.
@@ -125,16 +142,16 @@ function Hero() {
             to="/sign-up"
             search={{ role: "investor" } as any}
             className="inline-flex h-11 items-center justify-center gap-2 rounded-[2px] px-6 text-[15px] font-semibold"
-            style={{ background: "transparent", color: "#FFFFFF", border: "1px solid rgba(255,255,255,0.5)", fontFamily: SYNE }}
+            style={{ background: "rgba(255,255,255,0.08)", color: "#FFFFFF", border: "1px solid rgba(255,255,255,0.6)", fontFamily: SYNE }}
           >
             I&rsquo;m an investor
           </Link>
         </div>
-        <p className="mt-6 text-[13px]" style={{ fontFamily: DM, color: "rgba(255,255,255,0.72)" }}>
+        <p className="mt-6 text-[13px]" style={{ fontFamily: DM, color: "rgba(255,255,255,0.85)" }}>
           Free during beta · No credit card required · DIFC regulated
         </p>
       </div>
-    </VaultScrollSequence>
+    </section>
   );
 }
 
@@ -143,7 +160,7 @@ function Hero() {
 ═══════════════════════════════════════════════════════════════════════════ */
 function ProblemSection() {
   return (
-    <section className="w-full" style={{ background: "#FFFFFF", borderBottom: `1px solid ${BORDER}` }}>
+    <section className="relative z-10 w-full" style={{ background: "#FFFFFF", borderBottom: `1px solid ${BORDER}` }}>
       <div className="mx-auto max-w-[1000px] px-6 py-24 sm:py-28">
         <p className="mb-5 text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: BRAND, fontFamily: DM }}>
           The warm intro is broken
@@ -255,7 +272,7 @@ function ShotPlaceholder({ label }: { label: string }) {
 
 function ProductBands() {
   return (
-    <section className="w-full" style={{ background: "#FFFFFF" }}>
+    <section className="relative z-10 w-full" style={{ background: "#FFFFFF" }}>
       {BANDS.map((b, i) => {
         const Icon = b.icon;
         const imageFirst = i % 2 === 1;
@@ -295,7 +312,7 @@ function ProductBands() {
 ═══════════════════════════════════════════════════════════════════════════ */
 function TwoWayTrust() {
   return (
-    <section className="w-full" style={{ background: "#FAFAFA", borderBottom: `1px solid ${BORDER}` }}>
+    <section className="relative z-10 w-full" style={{ background: "#FAFAFA", borderBottom: `1px solid ${BORDER}` }}>
       <div className="mx-auto max-w-[1100px] px-6 py-24 text-center">
         <h2 className="mx-auto max-w-2xl" style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(26px, 3.4vw, 38px)", lineHeight: 1.15, color: INK, letterSpacing: "-0.01em" }}>
           Competitors verify founders. We verify both.
@@ -337,7 +354,7 @@ function HowItWorks() {
     { n: "4", t: "Close with confidence" },
   ];
   return (
-    <section className="w-full" style={{ background: "#FFFFFF", borderBottom: `1px solid ${BORDER}` }}>
+    <section className="relative z-10 w-full" style={{ background: "#FFFFFF", borderBottom: `1px solid ${BORDER}` }}>
       <div className="mx-auto max-w-[1200px] px-6 py-24">
         <h2 className="mb-14 text-center" style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", color: INK, letterSpacing: "-0.01em" }}>
           How it works
@@ -362,7 +379,7 @@ function HowItWorks() {
 ═══════════════════════════════════════════════════════════════════════════ */
 function ForFoundersInvestors() {
   return (
-    <section className="w-full" style={{ background: "#FFFFFF" }}>
+    <section className="relative z-10 w-full" style={{ background: "#FFFFFF" }}>
       {/* Founders */}
       <div style={{ borderBottom: `1px solid ${BORDER}` }}>
         <div className="mx-auto max-w-[1000px] px-6 py-24">
@@ -435,7 +452,7 @@ const COMPARE_ROWS: { feature: string; traditional: string; competitors: string;
 
 function ComparisonBand() {
   return (
-    <section className="w-full" style={{ background: BRAND }}>
+    <section className="relative z-10 w-full" style={{ background: BRAND }}>
       <div className="mx-auto max-w-[1100px] px-6 py-24">
         <h2 className="mb-3 text-center" style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(26px, 3.4vw, 38px)", color: "#FFFFFF", letterSpacing: "-0.01em" }}>
           One platform. The whole transaction.
@@ -489,7 +506,7 @@ function PricingPreview() {
     },
   ];
   return (
-    <section className="w-full" style={{ background: "#FAFAFA", borderBottom: `1px solid ${BORDER}` }}>
+    <section className="relative z-10 w-full" style={{ background: "#FAFAFA", borderBottom: `1px solid ${BORDER}` }}>
       <div className="mx-auto max-w-[1000px] px-6 py-24">
         <h2 className="mb-3 text-center" style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", color: INK, letterSpacing: "-0.01em" }}>
           Simple, honest pricing
@@ -605,7 +622,7 @@ function FaqItem({ item }: { item: Faq }) {
 
 function FaqSection() {
   return (
-    <section className="w-full" style={{ background: "#FFFFFF", borderBottom: `1px solid ${BORDER}` }}>
+    <section id={FAQ_SECTION_ID} className="relative z-10 w-full" style={{ background: "#FFFFFF", borderBottom: `1px solid ${BORDER}` }}>
       <div className="mx-auto max-w-[820px] px-6 py-24">
         <h2 className="mb-12 text-center" style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", color: INK, letterSpacing: "-0.01em" }}>
           Frequently asked questions
@@ -630,7 +647,7 @@ function FaqSection() {
 ═══════════════════════════════════════════════════════════════════════════ */
 function FinalCta() {
   return (
-    <section className="w-full" style={{ background: "#FFFFFF" }}>
+    <section className="relative z-10 w-full" style={{ background: "#FFFFFF" }}>
       <div className="mx-auto max-w-[900px] px-6 py-28 text-center">
         <h2 style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(28px, 4vw, 44px)", color: INK, letterSpacing: "-0.02em" }}>
           Start closing deals today.

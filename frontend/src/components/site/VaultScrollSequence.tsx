@@ -1,9 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 
 /*
-  VaultScrollSequence — a scroll-scrubbed canvas image sequence, no libraries.
+  VaultScrollSequence — a full-page fixed-background canvas image sequence
+  driven by real page scroll (no scroll-hijacking, no libraries).
 
-  How it stays smooth (per the three rules):
+  Architecture (v2 — full-page fixed background):
+  - The canvas is `position: fixed`, covers the whole viewport, and sits
+    behind all page content (z-index below everything). It does not wrap
+    hero content and does not create its own tall scroll zone — the page's
+    OWN scroll (from top to the FAQ section) drives the frame index.
+  - Frame 1 = scrollY 0. Frame 199 = the FAQ section's top offset. Past that,
+    the vault holds on the last frame, static.
+  - Rendered once, standalone, near the top of the page tree (see index.tsx);
+    every section above it needs a transparent background so the canvas
+    shows through, and every section from the problem section onward needs
+    an opaque bg so the canvas visually disappears beneath it.
+
+  How it stays smooth (unchanged from v1):
   1. Pre-decoded frames — every frame is an Image() that has finished loading
      (and we call .decode() so the bitmap is ready) before it's ever drawn.
   2. rAF gating — scroll events only record the target scroll position; the
@@ -18,6 +31,7 @@ const DESKTOP_DIR = "/vault/desktop";
 const MOBILE_DIR = "/vault/mobile";
 const CONCURRENCY = 4;
 const MOBILE_BREAKPOINT = 768;
+export const FAQ_SECTION_ID = "faq-section";
 
 const framePath = (dir: string, i: number) =>
   `${dir}/frame-${String(i).padStart(3, "0")}.webp`;
@@ -27,14 +41,14 @@ function prefersReducedMotion() {
     window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 }
 
-export function VaultScrollSequence({ children }: { children?: React.ReactNode }) {
-  const wrapperRef = useRef<HTMLDivElement>(null);
+export function VaultScrollSequence() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const framesRef = useRef<(HTMLImageElement | null)[]>([]);
   const loadedRef = useRef<boolean[]>([]);
   const currentFrameRef = useRef<number>(-1);
   const targetProgressRef = useRef<number>(0);
   const rafRef = useRef<number>(0);
+  const faqOffsetRef = useRef<number>(0);
 
   const [loadPct, setLoadPct] = useState(0);
   const [ready, setReady] = useState(false); // 30%+ loaded → scrubbing enabled
@@ -46,35 +60,44 @@ export function VaultScrollSequence({ children }: { children?: React.ReactNode }
   const [isMobile] = useState(() =>
     typeof window !== "undefined" && window.innerWidth < MOBILE_BREAKPOINT);
 
-  // Draw a given frame index to the canvas (letterbox-cover to fill).
+  // Cover-fit draw: scale so the frame fills the ENTIRE viewport (both
+  // dimensions), crop the excess, centered. White fill first so ultra-wide
+  // viewports never show a gap at the edges.
   const drawFrame = (idx: number) => {
     const canvas = canvasRef.current;
     const img = framesRef.current[idx];
-    if (!canvas || !img) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !img || !ctx) return;
     const cw = canvas.width, ch = canvas.height;
-    const ir = img.naturalWidth / img.naturalHeight;
-    const cr = cw / ch;
-    let dw = cw, dh = ch, dx = 0, dy = 0;
-    if (ir > cr) { dh = ch; dw = ch * ir; dx = (cw - dw) / 2; }
-    else { dw = cw; dh = cw / ir; dy = (ch - dh) / 2; }
-    ctx.clearRect(0, 0, cw, ch);
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, cw, ch);
+    const scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
+    const dw = img.naturalWidth * scale;
+    const dh = img.naturalHeight * scale;
+    const dx = (cw - dw) / 2;
+    const dy = (ch - dh) / 2;
     ctx.drawImage(img, dx, dy, dw, dh);
     currentFrameRef.current = idx;
   };
 
-  // Size the canvas to its display box * DPR for crisp rendering.
+  // Size the canvas to the full viewport * DPR for crisp rendering.
   const sizeCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = Math.round(rect.width * dpr);
-    canvas.height = Math.round(rect.height * dpr);
-    // redraw whatever frame we're on after a resize
+    canvas.width = Math.round(window.innerWidth * dpr);
+    canvas.height = Math.round(window.innerHeight * dpr);
     const cur = currentFrameRef.current;
     if (cur >= 0 && framesRef.current[cur]) drawFrame(cur);
+  };
+
+  // Measure the FAQ section's top offset from the page top (frame 199 target).
+  const measureFaqOffset = () => {
+    const el = document.getElementById(FAQ_SECTION_ID);
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      faqOffsetRef.current = rect.top + window.scrollY;
+    }
   };
 
   // Load pipeline: frame 1 first (LCP), then the rest with a concurrency limit.
@@ -108,7 +131,7 @@ export function VaultScrollSequence({ children }: { children?: React.ReactNode }
 
     // Frame 1 immediately (this is the LCP / initial paint).
     loadOne(1).then(() => {
-      if (!cancelled) drawFrame(1);
+      if (!cancelled) { sizeCanvas(); drawFrame(1); }
     });
 
     // Remaining frames via a simple concurrency-limited queue.
@@ -127,16 +150,15 @@ export function VaultScrollSequence({ children }: { children?: React.ReactNode }
     return () => { cancelled = true; };
   }, [reduced, isMobile]);
 
-  // Scroll + rAF loop: map wrapper scroll to a frame, draw only on change.
+  // Scroll + rAF loop: map real page scroll (0 -> FAQ offset) to a frame,
+  // draw only on change. Scrolling up reverses naturally since frame index
+  // is a pure function of scrollY, not a monotonic counter.
   useEffect(() => {
     if (reduced) return;
+
     const onScroll = () => {
-      const wrapper = wrapperRef.current;
-      if (!wrapper) return;
-      const rect = wrapper.getBoundingClientRect();
-      const total = rect.height - window.innerHeight;
-      // progress 0→1 across the tall wrapper
-      const p = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 0;
+      const faqOffset = faqOffsetRef.current;
+      const p = faqOffset > 0 ? Math.min(1, Math.max(0, window.scrollY / faqOffset)) : 0;
       targetProgressRef.current = p;
     };
 
@@ -156,85 +178,66 @@ export function VaultScrollSequence({ children }: { children?: React.ReactNode }
       rafRef.current = requestAnimationFrame(tick);
     };
 
-    onScroll();
+    const remeasure = () => { measureFaqOffset(); onScroll(); };
+
+    // Measure once now, and again after fonts/images settle layout (a common
+    // source of an inaccurate FAQ offset on first paint).
+    remeasure();
+    const remeasureTimer = window.setTimeout(remeasure, 500);
+
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", sizeCanvas);
+    window.addEventListener("resize", () => { sizeCanvas(); remeasure(); });
     sizeCanvas();
     rafRef.current = requestAnimationFrame(tick);
     return () => {
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", sizeCanvas);
+      window.removeEventListener("resize", remeasure);
+      window.clearTimeout(remeasureTimer);
       cancelAnimationFrame(rafRef.current);
     };
   }, [ready, reduced]);
 
-  // Reduced-motion: render the final open-vault frame as a static image, no canvas/scroll.
+  // Reduced-motion: fixed full-viewport static image of the final frame, no
+  // canvas, no scroll listener.
   if (reduced) {
     return (
-      <div className="relative w-full" style={{ background: "#FFFFFF" }}>
-        <div className="relative min-h-screen w-full overflow-hidden">
-          <img
-            src={framePath(isMobile ? MOBILE_DIR : DESKTOP_DIR, FRAME_COUNT)}
-            alt=""
-            aria-hidden="true"
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-          {/* v2 frames are white-background with a dark obelisk centered where the
-              hero text sits — a centered radial vignette keeps white text readable
-              over the obelisk without tinting the (already-white) rest of the frame. */}
-          <div
-            className="absolute inset-0"
-            style={{ background: "radial-gradient(ellipse 70% 65% at 50% 50%, rgba(10,10,11,0.72), rgba(10,10,11,0.35) 55%, transparent 78%)" }}
-            aria-hidden="true"
-          />
-          <div className="relative z-10">{children}</div>
-        </div>
+      <div
+        className="fixed inset-0 z-0"
+        style={{ background: "#FFFFFF" }}
+        aria-hidden="true"
+      >
+        <img
+          src={framePath(isMobile ? MOBILE_DIR : DESKTOP_DIR, FRAME_COUNT)}
+          alt=""
+          className="h-full w-full object-cover"
+        />
       </div>
     );
   }
 
-  const scrubHeight = isMobile ? "200vh" : "300vh";
-
   return (
-    <div ref={wrapperRef} className="relative w-full" style={{ height: scrubHeight, background: "#FFFFFF" }}>
-      {/* Sticky viewport: canvas + overlaid hero content */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden">
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 h-full w-full"
-          style={{ background: "#FFFFFF" }}
-          aria-hidden="true"
-        />
-        {/* v2 frames are white-background with a dark obelisk centered where the
-            hero text sits — a centered radial vignette keeps white text readable
-            over the obelisk without tinting the (already-white) rest of the frame. */}
-        <div
-          className="absolute inset-0"
-          style={{ background: "radial-gradient(ellipse 70% 65% at 50% 50%, rgba(10,10,11,0.72), rgba(10,10,11,0.35) 55%, transparent 78%)" }}
-          aria-hidden="true"
-        />
-
-        {/* Minimal loading indicator until 30% loaded — light surface + ink text,
-            since v2 frames are a white canvas (v1's white-on-dark pill would be
-            invisible here). */}
-        {!ready && (
-          <div className="absolute inset-x-0 bottom-8 z-20 flex justify-center">
-            <div className="flex items-center gap-3 border px-4 py-2" style={{ background: "rgba(255,255,255,0.9)", borderColor: "#E4E4E7" }}>
-              <div className="h-1 w-32" style={{ background: "#E4E4E7" }}>
-                <div className="h-1" style={{ width: `${loadPct}%`, background: "#7C3AED" }} />
-              </div>
-              <span className="text-xs" style={{ color: "#52525B", fontFamily: "DM Sans, sans-serif" }}>
-                Loading {loadPct}%
-              </span>
+    <>
+      <canvas
+        ref={canvasRef}
+        className="fixed inset-0 z-0 h-screen w-screen"
+        style={{ background: "#FFFFFF" }}
+        aria-hidden="true"
+      />
+      {/* Minimal loading indicator until 30% loaded — light surface + ink text
+          to read against the white canvas. Fixed so it doesn't scroll with
+          the page (the vault it's reporting on is also fixed). */}
+      {!ready && (
+        <div className="fixed inset-x-0 bottom-8 z-10 flex justify-center">
+          <div className="flex items-center gap-3 border px-4 py-2" style={{ background: "rgba(255,255,255,0.9)", borderColor: "#E4E4E7" }}>
+            <div className="h-1 w-32" style={{ background: "#E4E4E7" }}>
+              <div className="h-1" style={{ width: `${loadPct}%`, background: "#7C3AED" }} />
             </div>
+            <span className="text-xs" style={{ color: "#52525B", fontFamily: "DM Sans, sans-serif" }}>
+              Loading {loadPct}%
+            </span>
           </div>
-        )}
-
-        {/* Hero content overlay */}
-        <div className="relative z-10 flex h-full w-full items-center justify-center">
-          {children}
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }
