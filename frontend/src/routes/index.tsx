@@ -84,6 +84,7 @@ function Landing() {
       <Hero />
       <ProblemSection />
       <ProductBands />
+      <VideoSection />
       <TwoWayTrust />
       <HowItWorks />
       <ForFoundersInvestors />
@@ -104,27 +105,26 @@ function Landing() {
    up against every frame, closed through fully open.
 ═══════════════════════════════════════════════════════════════════════════ */
 function Hero() {
+  // Text-contrast approach: a tight, localized panel (not a full-bleed vignette)
+  // sized to the text block only, no blur on the text itself. Chosen over a
+  // text-shadow glow because the vault frames carry bright purple/white
+  // highlights that make a shadow-only approach inconsistent frame-to-frame —
+  // a solid panel guarantees AA contrast regardless of what's behind it.
   return (
     <section className="relative z-10 flex min-h-screen w-full items-center justify-center px-6">
       <div
-        className="mx-auto max-w-4xl px-8 py-10 text-center sm:px-12 sm:py-14"
-        style={{
-          background: "radial-gradient(ellipse 65% 80% at 50% 50%, rgba(10,10,11,0.6) 0%, rgba(10,10,11,0.4) 50%, transparent 85%)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          maskImage: "radial-gradient(ellipse 65% 80% at 50% 50%, black 0%, black 50%, transparent 85%)",
-          WebkitMaskImage: "radial-gradient(ellipse 65% 80% at 50% 50%, black 0%, black 50%, transparent 85%)",
-        }}
+        className="mx-auto max-w-3xl rounded-[8px] px-8 py-10 text-center sm:px-14 sm:py-14"
+        style={{ background: "rgba(10,10,11,0.72)" }}
       >
         <h1
-          className="mx-auto max-w-3xl"
-          style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(40px, 7vw, 68px)", lineHeight: 1.05, letterSpacing: "-0.02em", color: "#FFFFFF" }}
+          className="mx-auto max-w-2xl"
+          style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(36px, 6vw, 60px)", lineHeight: 1.08, letterSpacing: "-0.02em", color: "#FFFFFF" }}
         >
           From first meeting to signed agreement. One platform.
         </h1>
         <p
-          className="mx-auto mt-6 max-w-2xl"
-          style={{ fontFamily: DM, fontWeight: 400, fontSize: "clamp(16px, 2.2vw, 20px)", lineHeight: 1.5, color: "rgba(255,255,255,0.92)" }}
+          className="mx-auto mt-6 max-w-xl"
+          style={{ fontFamily: DM, fontWeight: 400, fontSize: "clamp(16px, 2.2vw, 20px)", lineHeight: 1.5, color: "rgba(255,255,255,0.95)" }}
         >
           Verified profiles. Structured due diligence. AI-powered interviews.
           Term negotiation to signed agreement — entirely in-platform.
@@ -142,12 +142,12 @@ function Hero() {
             to="/sign-up"
             search={{ role: "investor" } as any}
             className="inline-flex h-11 items-center justify-center gap-2 rounded-[2px] px-6 text-[15px] font-semibold"
-            style={{ background: "rgba(255,255,255,0.08)", color: "#FFFFFF", border: "1px solid rgba(255,255,255,0.6)", fontFamily: SYNE }}
+            style={{ background: "rgba(255,255,255,0.1)", color: "#FFFFFF", border: "1px solid rgba(255,255,255,0.7)", fontFamily: SYNE }}
           >
             I&rsquo;m an investor
           </Link>
         </div>
-        <p className="mt-6 text-[13px]" style={{ fontFamily: DM, color: "rgba(255,255,255,0.85)" }}>
+        <p className="mt-6 text-[13px]" style={{ fontFamily: DM, color: "rgba(255,255,255,0.9)" }}>
           Free during beta · No credit card required · DIFC regulated
         </p>
       </div>
@@ -159,34 +159,37 @@ function Hero() {
    SECTION 3 — PROBLEM
 ═══════════════════════════════════════════════════════════════════════════ */
 function ProblemSection() {
+  // Transparent — the vault shows through here. Text sits in its own tight
+  // contrast panel (dark, matches the Hero's approach) since there's no solid
+  // backdrop behind it anymore.
   return (
-    <section className="relative z-10 w-full" style={{ background: "#FFFFFF", borderBottom: `1px solid ${BORDER}` }}>
+    <section className="relative z-10 w-full">
       <div className="mx-auto max-w-[1000px] px-6 py-24 sm:py-28">
-        <p className="mb-5 text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: BRAND, fontFamily: DM }}>
-          The warm intro is broken
-        </p>
-        <p style={{ fontFamily: SYNE, fontWeight: 600, fontSize: "clamp(26px, 3.6vw, 40px)", lineHeight: 1.25, color: INK, letterSpacing: "-0.01em" }}>
-          Founders spend months chasing introductions. Investors waste hours on
-          unverified pitches that go nowhere. Deals stall between scattered emails,
-          shared drives, and a dozen open tabs. Both sides lose time they can&rsquo;t
-          get back.
-        </p>
+        <div className="mx-auto max-w-[820px] rounded-[8px] px-8 py-10 sm:px-12" style={{ background: "rgba(10,10,11,0.72)" }}>
+          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: "#DDD6FE", fontFamily: DM }}>
+            The warm intro is broken
+          </p>
+          <p style={{ fontFamily: SYNE, fontWeight: 600, fontSize: "clamp(26px, 3.6vw, 40px)", lineHeight: 1.25, color: "#FFFFFF", letterSpacing: "-0.01em" }}>
+            Founders spend months chasing introductions. Investors waste hours on
+            unverified pitches that go nowhere. Deals stall between scattered emails,
+            shared drives, and a dozen open tabs. Both sides lose time they can&rsquo;t
+            get back.
+          </p>
+        </div>
       </div>
     </section>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   SECTION 4 — PRODUCT BANDS (alternating text/screenshot)
+   SECTION 4 — PRODUCT BANDS (text-only feature blocks, full-width, opaque —
+   dense text needs a solid backdrop, per the product-owner review)
 ═══════════════════════════════════════════════════════════════════════════ */
 type Band = {
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   eyebrow: string;
   title: string;
   bullets: string[];
-  /* TODO(screenshots): replace ShotPlaceholder with a real 2x production capture
-     from hockystick.app using the test accounts. See report for the list. */
-  shotLabel: string;
 };
 
 const BANDS: Band[] = [
@@ -200,7 +203,6 @@ const BANDS: Band[] = [
       "Verification tier is visible before either party requests access",
       "Badges reflect exactly what was checked — never asserted, always evidenced",
     ],
-    shotLabel: "Verification tiers — /app profile",
   },
   {
     icon: FileText,
@@ -212,7 +214,6 @@ const BANDS: Band[] = [
       "Structured due-diligence workstation with a shared checklist",
       "AI document analysis — findings source-cited and confidence-scored",
     ],
-    shotLabel: "Deal room — Due Diligence workstation",
   },
   {
     icon: Video,
@@ -224,7 +225,6 @@ const BANDS: Band[] = [
       "AI extracts notes cited back to the transcript — no fabricated claims",
       "Figures attributed to the speaker, never asserted as verified fact",
     ],
-    shotLabel: "Interview sequence — meeting notes",
   },
   {
     icon: Scale,
@@ -236,7 +236,6 @@ const BANDS: Band[] = [
       "Both parties see every change in real time",
       "Agreed terms lock automatically and carry into the agreement",
     ],
-    shotLabel: "Term negotiation — per-term proposals",
   },
   {
     icon: FileSignature,
@@ -248,61 +247,73 @@ const BANDS: Band[] = [
       "The room becomes a permanent, read-only archive",
       "Invoices are generated automatically at close",
     ],
-    shotLabel: "Closing pipeline — signed & invoiced",
   },
 ];
-
-function ShotPlaceholder({ label }: { label: string }) {
-  // TODO(screenshots): swap this browser-chrome placeholder for a real 2x capture
-  // from the live app (see report for exact routes). Structure mirrors the app UI.
-  return (
-    <div className="w-full overflow-hidden rounded-[2px]" style={{ border: `1px solid ${BORDER}`, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
-      <div className="flex items-center gap-1.5 px-3 py-2.5" style={{ background: "#FAFAFA", borderBottom: `1px solid ${BORDER}` }}>
-        <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#E4E4E7" }} />
-        <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#E4E4E7" }} />
-        <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#E4E4E7" }} />
-        <span className="ml-3 text-[11px]" style={{ color: "#71717A", fontFamily: DM }}>hockystick.app</span>
-      </div>
-      <div className="flex aspect-[16/10] items-center justify-center" style={{ background: "#FFFFFF" }}>
-        <span className="px-6 text-center text-[13px]" style={{ color: "#71717A", fontFamily: DM }}>{label}</span>
-      </div>
-    </div>
-  );
-}
 
 function ProductBands() {
   return (
     <section className="relative z-10 w-full" style={{ background: "#FFFFFF" }}>
-      {BANDS.map((b, i) => {
+      {BANDS.map((b) => {
         const Icon = b.icon;
-        const imageFirst = i % 2 === 1;
         return (
           <div key={b.title} style={{ borderBottom: `1px solid ${BORDER}` }}>
-            <div className="mx-auto grid max-w-[1200px] items-center gap-10 px-6 py-20 sm:py-24 lg:grid-cols-[45fr_55fr]">
-              <div className={imageFirst ? "lg:order-2" : ""}>
-                <div className="mb-4 inline-flex items-center gap-2">
-                  <Icon className="h-4 w-4" style={{ color: BRAND }} />
-                  <span className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: BRAND, fontFamily: DM }}>{b.eyebrow}</span>
-                </div>
-                <h2 style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", lineHeight: 1.15, color: INK, letterSpacing: "-0.01em" }}>
-                  {b.title}
-                </h2>
-                <ul className="mt-6 space-y-3">
-                  {b.bullets.map((t) => (
-                    <li key={t} className="flex items-start gap-2.5">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" style={{ color: BRAND }} />
-                      <span className="text-[15px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.5 }}>{t}</span>
-                    </li>
-                  ))}
-                </ul>
+            <div className="mx-auto max-w-[760px] px-6 py-20 text-center sm:py-24">
+              <div className="mb-4 inline-flex items-center gap-2">
+                <Icon className="h-4 w-4" style={{ color: BRAND }} />
+                <span className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: BRAND, fontFamily: DM }}>{b.eyebrow}</span>
               </div>
-              <div className={imageFirst ? "lg:order-1" : ""}>
-                <ShotPlaceholder label={b.shotLabel} />
-              </div>
+              <h2 style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(26px, 3.4vw, 38px)", lineHeight: 1.15, color: INK, letterSpacing: "-0.01em" }}>
+                {b.title}
+              </h2>
+              <ul className="mx-auto mt-8 max-w-[560px] space-y-3 text-left">
+                {b.bullets.map((t) => (
+                  <li key={t} className="flex items-start gap-2.5">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" style={{ color: BRAND }} />
+                    <span className="text-[15px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.5 }}>{t}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         );
       })}
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 4B — PRODUCT TOUR VIDEO (placeholder — swap `poster`/add a `<video>`
+   src when a real capture is provided; the player shell stays the same)
+═══════════════════════════════════════════════════════════════════════════ */
+function VideoSection() {
+  return (
+    <section className="relative z-10 w-full" style={{ background: "#FFFFFF", borderBottom: `1px solid ${BORDER}` }}>
+      <div className="mx-auto max-w-[900px] px-6 py-20 sm:py-24">
+        <div className="mx-auto aspect-video w-full overflow-hidden rounded-[2px]" style={{ border: `1px solid ${BORDER}`, background: INK }}>
+          {/* TODO(video): replace this placeholder with a real <video> embed
+              (src provided by the product owner) — the surrounding aspect-ratio
+              shell and play-button overlay stay as-is; only the src changes. */}
+          <div className="relative flex h-full w-full flex-col items-center justify-center gap-5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-[2px]" style={{ background: "#18181B" }}>
+              <span style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "16px", color: BRAND }}>H</span>
+            </div>
+            <button
+              type="button"
+              aria-label="Play product tour video"
+              className="flex h-16 w-16 items-center justify-center rounded-full"
+              style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.35)" }}
+            >
+              <span
+                className="ml-1 h-0 w-0"
+                style={{ borderTop: "10px solid transparent", borderBottom: "10px solid transparent", borderLeft: "16px solid #FFFFFF" }}
+              />
+            </button>
+            <p style={{ fontFamily: DM, fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
+              Product tour — coming soon
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
@@ -353,19 +364,23 @@ function HowItWorks() {
     { n: "3", t: "Negotiate and agree terms" },
     { n: "4", t: "Close with confidence" },
   ];
+  // Transparent — the vault shows through in the gap around the step cards.
+  // Each card keeps its own solid dark backdrop so the step text stays sharp.
   return (
-    <section className="relative z-10 w-full" style={{ background: "#FFFFFF", borderBottom: `1px solid ${BORDER}` }}>
+    <section className="relative z-10 w-full">
       <div className="mx-auto max-w-[1200px] px-6 py-24">
-        <h2 className="mb-14 text-center" style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", color: INK, letterSpacing: "-0.01em" }}>
-          How it works
-        </h2>
-        <div className="grid gap-px sm:grid-cols-2 lg:grid-cols-4" style={{ background: BORDER, border: `1px solid ${BORDER}` }}>
+        <div className="mx-auto mb-14 inline-block w-full text-center">
+          <h2 className="mx-auto inline-block rounded-[8px] px-6 py-3" style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", color: "#FFFFFF", letterSpacing: "-0.01em", background: "rgba(10,10,11,0.72)" }}>
+            How it works
+          </h2>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((s) => (
-            <div key={s.n} className="flex flex-col gap-4 p-8" style={{ background: "#FFFFFF" }}>
+            <div key={s.n} className="flex flex-col gap-4 rounded-[8px] p-8" style={{ background: "rgba(10,10,11,0.72)" }}>
               <div className="flex h-9 w-9 items-center justify-center rounded-[2px] text-[15px] font-bold" style={{ background: BRAND, color: "#FFFFFF", fontFamily: SYNE }}>
                 {s.n}
               </div>
-              <p style={{ fontFamily: SYNE, fontWeight: 600, fontSize: "17px", color: INK, lineHeight: 1.25 }}>{s.t}</p>
+              <p style={{ fontFamily: SYNE, fontWeight: 600, fontSize: "17px", color: "#FFFFFF", lineHeight: 1.25 }}>{s.t}</p>
             </div>
           ))}
         </div>

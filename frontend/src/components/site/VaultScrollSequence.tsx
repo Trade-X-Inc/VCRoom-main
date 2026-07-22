@@ -50,6 +50,8 @@ export function VaultScrollSequence() {
   const rafRef = useRef<number>(0);
   const faqOffsetRef = useRef<number>(0);
 
+  const bgColorRef = useRef<string>("#FFFFFF");
+
   const [loadPct, setLoadPct] = useState(0);
   const [ready, setReady] = useState(false); // 30%+ loaded → scrubbing enabled
   // Resolve mode synchronously on first render so the load effect never fires once
@@ -61,15 +63,17 @@ export function VaultScrollSequence() {
     typeof window !== "undefined" && window.innerWidth < MOBILE_BREAKPOINT);
 
   // Cover-fit draw: scale so the frame fills the ENTIRE viewport (both
-  // dimensions), crop the excess, centered. White fill first so ultra-wide
-  // viewports never show a gap at the edges.
+  // dimensions), crop the excess, centered. Fill with the frame's OWN sampled
+  // background color first (not a hardcoded white) so an ultra-wide viewport's
+  // exposed margin blends seamlessly into the frame edge instead of risking a
+  // visible seam if a future frame set isn't pure white.
   const drawFrame = (idx: number) => {
     const canvas = canvasRef.current;
     const img = framesRef.current[idx];
     const ctx = canvas?.getContext("2d");
     if (!canvas || !img || !ctx) return;
     const cw = canvas.width, ch = canvas.height;
-    ctx.fillStyle = "#FFFFFF";
+    ctx.fillStyle = bgColorRef.current;
     ctx.fillRect(0, 0, cw, ch);
     const scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
     const dw = img.naturalWidth * scale;
@@ -89,6 +93,25 @@ export function VaultScrollSequence() {
     canvas.height = Math.round(window.innerHeight * dpr);
     const cur = currentFrameRef.current;
     if (cur >= 0 && framesRef.current[cur]) drawFrame(cur);
+  };
+
+  // Sample the frame's own corner pixel color (a 1x1 offscreen canvas read) so
+  // the fill behind the cover-fit crop matches the frame exactly, rather than
+  // assuming pure white — protects against a future frame set with an
+  // off-white/grey background producing a visible seam at wide viewports.
+  const sampleBgColor = (img: HTMLImageElement) => {
+    try {
+      const sample = document.createElement("canvas");
+      sample.width = 1;
+      sample.height = 1;
+      const sctx = sample.getContext("2d");
+      if (!sctx) return;
+      sctx.drawImage(img, 0, 0, 1, 1);
+      const [r, g, b] = sctx.getImageData(0, 0, 1, 1).data;
+      bgColorRef.current = `rgb(${r}, ${g}, ${b})`;
+    } catch {
+      // canvas read can throw on a tainted/cross-origin image; keep the white default
+    }
   };
 
   // Measure the FAQ section's top offset from the page top (frame 199 target).
@@ -131,7 +154,12 @@ export function VaultScrollSequence() {
 
     // Frame 1 immediately (this is the LCP / initial paint).
     loadOne(1).then(() => {
-      if (!cancelled) { sizeCanvas(); drawFrame(1); }
+      if (!cancelled) {
+        const img = framesRef.current[1];
+        if (img) sampleBgColor(img);
+        sizeCanvas();
+        drawFrame(1);
+      }
     });
 
     // Remaining frames via a simple concurrency-limited queue.
