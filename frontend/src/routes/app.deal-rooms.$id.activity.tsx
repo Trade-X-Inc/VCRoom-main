@@ -9,7 +9,7 @@ export const Route = createFileRoute("/app/deal-rooms/$id/activity")({
 function ActivityPage() {
   const { dealRoomId } = useDealRoom();
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div className="mx-auto max-w-[1360px] px-8 py-8">
       <Timeline dealRoomId={dealRoomId} />
     </div>
   );

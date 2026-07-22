@@ -43,7 +43,7 @@ function formatValue(value: unknown, suffix = "") {
 
 function OverviewPage() {
   const ctx = useDealRoom();
-  const { room: dealRoom, startup, investorProfile, userId: currentUserId, pendingTransition, stageRequesting, doRequestNextStage: onRequestNextStage } = ctx;
+  const { room: dealRoom, roomLoading, startup, investorProfile, userId: currentUserId, pendingTransition, stageRequesting, doRequestNextStage: onRequestNextStage } = ctx;
   const queryClient = useQueryClient();
 
   const companyName = startup?.company_name ?? "Unknown";
@@ -196,43 +196,144 @@ function OverviewPage() {
     { key: "closing" as DealRoomStageKey, label: "Closing" },
   ];
 
+  // Fix 6: room/startup are undefined until this resolves — render a loading
+  // skeleton instead of the page with "Unknown"/"—" fallbacks (the empty-on-
+  // first-load bug: hard-navigating straight to /overview showed empty content
+  // because nothing gated on this).
+  if (roomLoading) {
+    return (
+      <div className="mx-auto max-w-[1360px] px-8 py-8">
+        <div className="h-24 animate-pulse border border-[rgba(0,0,0,0.08)] bg-gray-50" />
+        <div className="mt-4 h-16 animate-pulse border border-[rgba(0,0,0,0.08)] bg-gray-50" />
+        <div className="mt-4 h-40 animate-pulse border border-[rgba(0,0,0,0.08)] bg-gray-50" />
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full px-6 py-6">
-      <section className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4 mb-4">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div className="flex min-w-0 items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full hs-gradient text-sm font-bold text-foreground">
-              {companyInitial}
-            </div>
+    <div className="mx-auto max-w-[1360px] px-8 py-8">
+      {/* Fix 7 — dual company cards: founder's startup (left) + investor's fund
+          (right), each with logo/name/tagline and a compact team-photo strip.
+          Stats that used to live in the single-company header (days open,
+          workflow, match score) move into a slim strip below the cards so
+          they still read at a glance without competing with either card. */}
+      <section className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {/* Founder card */}
+        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4">
+          <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-brand">Founder</div>
+          <div className="flex items-start gap-3">
+            {startup?.logo_url ? (
+              <img src={startup.logo_url} alt="" className="h-12 w-12 shrink-0 rounded-none border border-[rgba(0,0,0,0.08)] object-cover" />
+            ) : (
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-none hs-gradient text-sm font-bold text-foreground">
+                {companyInitial}
+              </div>
+            )}
             <div className="min-w-0">
-              <h2 className="truncate text-xl font-semibold text-gray-900">{companyName.toUpperCase()}</h2>
+              <h2 className="truncate text-lg font-semibold text-gray-900">{companyName}</h2>
               <div className="mt-1 flex flex-wrap items-center gap-2">
                 {startup?.stage && (
-                  <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-brand">
-                    {startup.stage}
-                  </span>
+                  <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-brand">{startup.stage}</span>
                 )}
                 {startup?.sector && <span className="text-sm text-gray-500">{startup.sector}</span>}
               </div>
             </div>
           </div>
-          <div className="shrink-0">
-            <div className="flex flex-wrap gap-6">
-              {[
-                ["Days open", daysOpen],
-                ["Workflow", workflowStageLabel(dealRoom?.workflow_stage)],
-                ["Match score", dealBrief?.match_score ?? "—"],
-              ].map(([label, value]) => (
-                <div key={label} className="min-w-[92px]">
-                  <div className="text-xs text-gray-500">{label}</div>
-                  <div className="mt-1 text-lg font-semibold text-gray-900">{value}</div>
+          <p className="mt-3 line-clamp-2 text-sm text-gray-600">
+            {startup?.tagline || startup?.description || "No tagline yet"}
+          </p>
+          <div className="mt-2 flex flex-wrap gap-4 text-sm text-gray-500">
+            {startup?.country && <span>{startup.country}</span>}
+            <span>Founded: {formatValue(startup?.founded_year)}</span>
+            <span>Team: {formatValue(startup?.team_size)}</span>
+          </div>
+          {founderKeyPeople.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-3 border-t border-[rgba(0,0,0,0.08)] pt-3">
+              {(founderKeyPeople as any[]).map((person) => (
+                <div key={person.id} className="flex items-center gap-2 min-w-[140px]">
+                  {person.photo_url ? (
+                    <img src={person.photo_url} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full hs-gradient text-foreground flex items-center justify-center text-xs font-bold shrink-0">
+                      {initials(person.name)}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-gray-900 truncate">{person.name ?? "Team member"}</div>
+                    {person.title && <div className="text-xs text-gray-500 truncate">{person.title}</div>}
+                  </div>
                 </div>
               ))}
             </div>
-            <div className="mt-3 text-sm text-gray-500">
-              {[dealRoom?.investor_name, dealRoom?.investor_company].filter(Boolean).join(" · ") || "Investor not assigned"}
+          )}
+        </div>
+
+        {/* Investor card */}
+        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4">
+          <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-brand">Investor</div>
+          {dealRoom?.investor_name ? (
+            <>
+              <div className="flex items-start gap-3">
+                {investorProfile?.avatar_url ? (
+                  <img src={investorProfile.avatar_url} alt="" className="h-12 w-12 shrink-0 rounded-none border border-[rgba(0,0,0,0.08)] object-cover" />
+                ) : (
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-none hs-gradient text-sm font-bold text-foreground">
+                    {initials(dealRoom.investor_name)}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <h2 className="truncate text-lg font-semibold text-gray-900">{dealRoom.investor_name}</h2>
+                  {dealRoom?.investor_company && <div className="text-sm text-gray-500">{dealRoom.investor_company}</div>}
+                </div>
+              </div>
+              <p className="mt-3 line-clamp-2 text-sm text-gray-600">
+                {investorProfile?.thesis || investorProfile?.thesis_statement || "No thesis shared yet"}
+              </p>
+              {sectors && <div className="mt-2 text-sm text-gray-500">{sectors}</div>}
+              {dealBrief?.match_score !== undefined && (
+                <div className="mt-2 text-sm text-gray-500">
+                  Match score: <span className="font-semibold text-gray-900">{dealBrief.match_score}</span>
+                </div>
+              )}
+              {investorKeyPeople.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-3 border-t border-[rgba(0,0,0,0.08)] pt-3">
+                  {(investorKeyPeople as any[]).map((person) => (
+                    <div key={person.id} className="flex items-center gap-2 min-w-[140px]">
+                      {person.avatar_url ? (
+                        <img src={person.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                      ) : (
+                        <div className="w-9 h-9 rounded-full hs-gradient text-foreground flex items-center justify-center text-xs font-bold shrink-0">
+                          {initials(person.name)}
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-gray-900 truncate">{person.name ?? "Team member"}</div>
+                        {person.designation && <div className="text-xs text-gray-500 truncate">{person.designation}</div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="text-sm text-gray-500">Investor not assigned</p>
+          )}
+        </div>
+      </section>
+
+      {/* Slim stats strip — was previously part of the single-company header */}
+      <section className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4 mb-4">
+        <div className="flex flex-wrap gap-6">
+          {[
+            ["Days open", daysOpen],
+            ["Workflow", workflowStageLabel(dealRoom?.workflow_stage)],
+            ["Match score", dealBrief?.match_score ?? "—"],
+          ].map(([label, value]) => (
+            <div key={label} className="min-w-[92px]">
+              <div className="text-xs text-gray-500">{label}</div>
+              <div className="mt-1 text-lg font-semibold text-gray-900">{value}</div>
             </div>
-          </div>
+          ))}
         </div>
       </section>
 
@@ -450,81 +551,6 @@ function OverviewPage() {
           </pre>
         </div>
       </div>
-
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-2 mb-4">
-        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand">FOUNDER</div>
-          <div className="font-semibold text-gray-900">{companyName}</div>
-          {startup?.country && <div className="mt-1 text-sm text-gray-500">{startup.country}</div>}
-          <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-500">
-            <span>Founded: {formatValue(startup?.founded_year)}</span>
-            <span>Team: {formatValue(startup?.team_size)}</span>
-          </div>
-          {startup?.description && <p className="mt-3 line-clamp-3 text-sm text-gray-600">{startup.description}</p>}
-
-          {founderKeyPeople.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-3 border-t border-[rgba(0,0,0,0.08)] pt-3">
-              {(founderKeyPeople as any[]).map((person) => (
-                <div key={person.id} className="flex items-center gap-2 min-w-[140px]">
-                  {person.photo_url ? (
-                    <img src={person.photo_url} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
-                  ) : (
-                    <div className="w-9 h-9 rounded-full hs-gradient text-foreground flex items-center justify-center text-xs font-bold shrink-0">
-                      {initials(person.name)}
-                    </div>
-                  )}
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold text-gray-900 truncate">{person.name ?? "Team member"}</div>
-                    {person.title && <div className="text-xs text-gray-500 truncate">{person.title}</div>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand">INVESTOR</div>
-          {dealRoom?.investor_name ? (
-            <>
-              <div className="font-semibold text-gray-900">{dealRoom.investor_name}</div>
-              {dealRoom?.investor_company && <div className="mt-1 text-sm text-gray-500">{dealRoom.investor_company}</div>}
-              {investorProfile?.thesis && <p className="mt-3 text-sm line-clamp-2 text-gray-600">{investorProfile.thesis}</p>}
-              {investorProfile?.thesis_statement && !investorProfile?.thesis && (
-                <p className="mt-3 text-sm line-clamp-2 text-gray-600">{investorProfile.thesis_statement}</p>
-              )}
-              {sectors && <div className="mt-3 text-sm text-gray-500">{sectors}</div>}
-              {dealBrief?.match_score !== undefined && (
-                <div className="mt-3 text-sm text-gray-500">
-                  Match score: <span className="font-semibold text-gray-900">{dealBrief.match_score}</span>
-                </div>
-              )}
-
-              {investorKeyPeople.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-3 border-t border-[rgba(0,0,0,0.08)] pt-3">
-                  {(investorKeyPeople as any[]).map((person) => (
-                    <div key={person.id} className="flex items-center gap-2 min-w-[140px]">
-                      {person.avatar_url ? (
-                        <img src={person.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
-                      ) : (
-                        <div className="w-9 h-9 rounded-full hs-gradient text-foreground flex items-center justify-center text-xs font-bold shrink-0">
-                          {initials(person.name)}
-                        </div>
-                      )}
-                      <div className="min-w-0">
-                        <div className="text-sm font-semibold text-gray-900 truncate">{person.name ?? "Team member"}</div>
-                        {person.designation && <div className="text-xs text-gray-500 truncate">{person.designation}</div>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-          ) : (
-            <p className="text-sm text-gray-500">No investor</p>
-          )}
-        </div>
-      </section>
 
       <section className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4 mb-4">
         <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-4">RECENT ACTIVITY</h3>

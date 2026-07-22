@@ -249,7 +249,7 @@ function InformationPage() {
   });
 
   return (
-    <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-6">
+    <div className="mx-auto max-w-[1360px] px-8 py-8 space-y-6">
       <MutualDisclosure />
 
       {roastRecord.length > 0 && (

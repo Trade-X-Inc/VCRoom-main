@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Turnstile } from '@marsidev/react-turnstile'
+import { Logo } from '@/components/brand/Logo'
 
 export const Route = createFileRoute('/sign-up')({
   head: () => ({
@@ -98,11 +99,8 @@ function SignUp() {
     <div className="min-h-screen flex items-center justify-center bg-background p-5">
       <div className="w-full max-w-md bg-card border border-border rounded-2xl p-10">
         <div className="mb-8">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 rounded-lg hs-gradient-static flex items-center justify-center">
-              <span className="text-foreground text-sm font-bold">H</span>
-            </div>
-            <span className="font-semibold text-foreground">Hockystick</span>
+          <div className="mb-6">
+            <Logo />
           </div>
           <h1 className="text-2xl font-semibold text-foreground mb-1">Create your account</h1>
           <p className="text-muted-foreground text-sm">Choose your role to get started</p>

@@ -413,7 +413,7 @@ function MeetingsPage() {
   };
 
   return (
-    <div className="p-6 md:p-8 max-w-5xl mx-auto">
+    <div className="mx-auto max-w-[1360px] px-8 py-8">
       <div className="mb-6">
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4 text-[#7C3AED]" />
