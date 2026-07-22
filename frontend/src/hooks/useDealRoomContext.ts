@@ -69,7 +69,7 @@ export function useDealRoomContext(dealRoomId: string) {
       const { data } = await supabase.rpc("get_public_investor_profile_by_user_id", {
         p_user_id: (room as any).investor_user_id,
       });
-      return data as { your_name?: string; fund_name?: string; thesis?: string; thesis_statement?: string; sectors?: string } | null;
+      return data as { your_name?: string; fund_name?: string; thesis?: string; thesis_statement?: string; sectors?: string; avatar_url?: string } | null;
     },
   });
 
