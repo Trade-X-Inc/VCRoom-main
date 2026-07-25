@@ -345,7 +345,7 @@ function DirectoryPreview() {
           </p>
         </div>
 
-        <p className="mt-12 mb-4 text-center text-xs font-medium uppercase tracking-[0.1em]" style={{ color: "#A1A1AA", fontFamily: DM }}>
+        <p className="mt-12 mb-4 text-center text-xs font-medium uppercase tracking-[0.1em]" style={{ color: "#71717A", fontFamily: DM }}>
           Product preview — illustrative, not live data
         </p>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
