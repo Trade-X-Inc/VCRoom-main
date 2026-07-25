@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import {
   ArrowRight, CheckCircle2, ShieldCheck, FileText, Video,
-  Scale, FileSignature, Plus, Minus,
+  Scale, FileSignature, Plus, Minus, Sparkles,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -80,6 +80,7 @@ function Landing() {
       <ProblemSection />
       <ProductBands />
       <VideoSection />
+      <DirectoryPreview />
       <TwoWayTrust />
       <HowItWorks />
       <ForFoundersInvestors />
@@ -299,6 +300,82 @@ function VideoSection() {
   );
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 4C — PUBLIC DIRECTORY PREVIEW (static product preview, NOT live
+   data). Headline options considered: "A directory of startups actually
+   raising right now" (chosen — concrete, active voice, no stat needed to
+   land the point) / "See who's raising, verified before you look" (led with
+   verification instead of currency, weaker fit for this section's specific
+   job) / "Verified startups, actively fundraising" (too flat, reads like a
+   label not a headline).
+═══════════════════════════════════════════════════════════════════════════ */
+type DirectoryCard = {
+  name: string;
+  description: string;
+  stage: string;
+  sector: string;
+  tier: string;
+};
+
+const DIRECTORY_CARDS: DirectoryCard[] = [
+  { name: "Northwind Robotics", description: "Warehouse picking robots for mid-size 3PLs", stage: "Seed", sector: "Robotics", tier: "Tier 3 — Operational" },
+  { name: "Lumen Health", description: "Remote patient monitoring for chronic care clinics", stage: "Series A", sector: "Healthtech", tier: "Tier 4 — Capital" },
+  { name: "Kestrel Logistics", description: "Cross-border freight matching for SMB exporters", stage: "Pre-seed", sector: "Logistics", tier: "Tier 2 — Claims" },
+  { name: "Aldergrove Foods", description: "Shelf-stable protein for institutional food service", stage: "Seed", sector: "Foodtech", tier: "Tier 3 — Operational" },
+  { name: "Solace Finance", description: "Embedded lending for vertical SaaS platforms", stage: "Series A", sector: "Fintech", tier: "Tier 5 — Verified" },
+  { name: "Palisade Security", description: "Attack-surface monitoring for mid-market IT teams", stage: "Seed", sector: "Security", tier: "Tier 3 — Operational" },
+];
+
+function DirectoryPreview() {
+  return (
+    <section className="w-full" style={{ background: "#FAFAFA", borderBottom: `1px solid ${BORDER}` }}>
+      <div className="mx-auto max-w-[1200px] px-6 py-24">
+        <div className="mx-auto max-w-[640px] text-center">
+          <div className="mb-4 inline-flex items-center gap-2">
+            <Sparkles className="h-4 w-4" style={{ color: BRAND }} />
+            <span className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: BRAND, fontFamily: DM }}>Public directory</span>
+          </div>
+          <h2 style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(26px, 3.4vw, 38px)", lineHeight: 1.15, color: INK, letterSpacing: "-0.01em" }}>
+            A directory of startups actually raising right now
+          </h2>
+          <p className="mt-4 text-[16px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.5 }}>
+            Verified startups only, listed while they&rsquo;re actively fundraising and
+            removed once the round closes. Investors browse a curated, current set —
+            not a stale company database.
+          </p>
+        </div>
+
+        <p className="mt-12 mb-4 text-center text-xs font-medium uppercase tracking-[0.1em]" style={{ color: "#A1A1AA", fontFamily: DM }}>
+          Product preview — illustrative, not live data
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {DIRECTORY_CARDS.map((c) => (
+            <div key={c.name} className="p-6 text-left rounded-[2px]" style={{ background: "#FFFFFF", border: `1px solid ${BORDER}` }}>
+              <div className="flex items-start justify-between gap-2">
+                <h3 style={{ fontFamily: SYNE, fontWeight: 600, fontSize: "16px", color: INK }}>{c.name}</h3>
+                <span className="shrink-0 rounded-[2px] px-2 py-0.5 text-[11px] font-semibold" style={{ background: "#F5F3FF", color: BRAND, fontFamily: DM }}>{c.stage}</span>
+              </div>
+              <p className="mt-2 text-[13px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.5 }}>{c.description}</p>
+              <div className="mt-4 flex items-center justify-between gap-2 border-t pt-3" style={{ borderColor: BORDER }}>
+                <span className="text-[12px]" style={{ color: "#71717A", fontFamily: DM }}>{c.sector}</span>
+                <span className="inline-flex items-center gap-1 text-[12px] font-medium" style={{ color: "#52525B", fontFamily: DM }}>
+                  <ShieldCheck className="h-3.5 w-3.5" style={{ color: BRAND }} />
+                  {c.tier}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-10 text-center">
+          <Link to="/sign-up" search={{ role: "founder" } as any} className="inline-flex items-center gap-1.5 text-[14px] font-medium" style={{ color: BRAND, fontFamily: DM }}>
+            Get verified and listed <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    SECTION 5 — TWO-WAY TRUST
