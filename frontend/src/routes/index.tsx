@@ -2,10 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { VaultScrollSequence } from "@/components/site/VaultScrollSequence";
 import {
   ArrowRight, CheckCircle2, ShieldCheck, FileText, Video,
-  Scale, FileSignature, Plus, Minus,
+  Scale, FileSignature, Plus, Minus, Sparkles,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -41,7 +40,7 @@ const BORDER = "#E4E4E7";
 
 /* ─── ROOT ───────────────────────────────────────────────────────────────── */
 function Landing() {
-  // Landing is always light except the vault hero + the one purple comparison band.
+  // Landing is always light except the one purple comparison band.
   useEffect(() => {
     const root = document.documentElement;
     const hadDark = root.classList.contains("dark");
@@ -80,6 +79,8 @@ function Landing() {
       <Hero />
       <ProblemSection />
       <ProductBands />
+      <VideoSection />
+      <DirectoryPreview />
       <TwoWayTrust />
       <HowItWorks />
       <ForFoundersInvestors />
@@ -93,21 +94,25 @@ function Landing() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   SECTION 2 — HERO (over the vault scroll canvas)
+   SECTION 2 — HERO. Plain white, no animation, no illustration. Centered —
+   matches the reference set (Stripe, Cloudflare, Linear all run centered
+   heroes); the institutional read comes from restraint and whitespace, not
+   from alignment, so centered stays consistent with those references rather
+   than introducing a new pattern found nowhere else on the page.
 ═══════════════════════════════════════════════════════════════════════════ */
 function Hero() {
   return (
-    <VaultScrollSequence>
-      <div className="mx-auto max-w-4xl px-6 text-center">
+    <section className="flex min-h-[85vh] w-full items-center justify-center px-6" style={{ background: "#FFFFFF" }}>
+      <div className="mx-auto max-w-3xl text-center">
         <h1
-          className="mx-auto max-w-3xl"
-          style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(40px, 7vw, 68px)", lineHeight: 1.05, letterSpacing: "-0.02em", color: "#FFFFFF" }}
+          className="mx-auto max-w-2xl"
+          style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(36px, 6vw, 60px)", lineHeight: 1.08, letterSpacing: "-0.02em", color: INK }}
         >
           From first meeting to signed agreement. One platform.
         </h1>
         <p
-          className="mx-auto mt-6 max-w-2xl"
-          style={{ fontFamily: DM, fontWeight: 400, fontSize: "clamp(16px, 2.2vw, 20px)", lineHeight: 1.5, color: "rgba(255,255,255,0.88)" }}
+          className="mx-auto mt-6 max-w-xl"
+          style={{ fontFamily: DM, fontWeight: 400, fontSize: "clamp(16px, 2.2vw, 20px)", lineHeight: 1.5, color: SECONDARY }}
         >
           Verified profiles. Structured due diligence. AI-powered interviews.
           Term negotiation to signed agreement — entirely in-platform.
@@ -125,16 +130,16 @@ function Hero() {
             to="/sign-up"
             search={{ role: "investor" } as any}
             className="inline-flex h-11 items-center justify-center gap-2 rounded-[2px] px-6 text-[15px] font-semibold"
-            style={{ background: "transparent", color: "#FFFFFF", border: "1px solid rgba(255,255,255,0.5)", fontFamily: SYNE }}
+            style={{ background: "#FFFFFF", color: INK, border: `1px solid ${BORDER}`, fontFamily: SYNE }}
           >
             I&rsquo;m an investor
           </Link>
         </div>
-        <p className="mt-6 text-[13px]" style={{ fontFamily: DM, color: "rgba(255,255,255,0.72)" }}>
+        <p className="mt-6 text-[13px]" style={{ fontFamily: DM, color: "#71717A" }}>
           Free during beta · No credit card required · DIFC regulated
         </p>
       </div>
-    </VaultScrollSequence>
+    </section>
   );
 }
 
@@ -160,16 +165,13 @@ function ProblemSection() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   SECTION 4 — PRODUCT BANDS (alternating text/screenshot)
+   SECTION 4 — PRODUCT BANDS (text-only feature blocks)
 ═══════════════════════════════════════════════════════════════════════════ */
 type Band = {
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   eyebrow: string;
   title: string;
   bullets: string[];
-  /* TODO(screenshots): replace ShotPlaceholder with a real 2x production capture
-     from hockystick.app using the test accounts. See report for the list. */
-  shotLabel: string;
 };
 
 const BANDS: Band[] = [
@@ -183,7 +185,6 @@ const BANDS: Band[] = [
       "Verification tier is visible before either party requests access",
       "Badges reflect exactly what was checked — never asserted, always evidenced",
     ],
-    shotLabel: "Verification tiers — /app profile",
   },
   {
     icon: FileText,
@@ -195,7 +196,6 @@ const BANDS: Band[] = [
       "Structured due-diligence workstation with a shared checklist",
       "AI document analysis — findings source-cited and confidence-scored",
     ],
-    shotLabel: "Deal room — Due Diligence workstation",
   },
   {
     icon: Video,
@@ -207,7 +207,6 @@ const BANDS: Band[] = [
       "AI extracts notes cited back to the transcript — no fabricated claims",
       "Figures attributed to the speaker, never asserted as verified fact",
     ],
-    shotLabel: "Interview sequence — meeting notes",
   },
   {
     icon: Scale,
@@ -219,7 +218,6 @@ const BANDS: Band[] = [
       "Both parties see every change in real time",
       "Agreed terms lock automatically and carry into the agreement",
     ],
-    shotLabel: "Term negotiation — per-term proposals",
   },
   {
     icon: FileSignature,
@@ -231,61 +229,150 @@ const BANDS: Band[] = [
       "The room becomes a permanent, read-only archive",
       "Invoices are generated automatically at close",
     ],
-    shotLabel: "Closing pipeline — signed & invoiced",
   },
 ];
-
-function ShotPlaceholder({ label }: { label: string }) {
-  // TODO(screenshots): swap this browser-chrome placeholder for a real 2x capture
-  // from the live app (see report for exact routes). Structure mirrors the app UI.
-  return (
-    <div className="w-full overflow-hidden rounded-[2px]" style={{ border: `1px solid ${BORDER}`, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
-      <div className="flex items-center gap-1.5 px-3 py-2.5" style={{ background: "#FAFAFA", borderBottom: `1px solid ${BORDER}` }}>
-        <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#E4E4E7" }} />
-        <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#E4E4E7" }} />
-        <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#E4E4E7" }} />
-        <span className="ml-3 text-[11px]" style={{ color: "#71717A", fontFamily: DM }}>hockystick.app</span>
-      </div>
-      <div className="flex aspect-[16/10] items-center justify-center" style={{ background: "#FFFFFF" }}>
-        <span className="px-6 text-center text-[13px]" style={{ color: "#71717A", fontFamily: DM }}>{label}</span>
-      </div>
-    </div>
-  );
-}
 
 function ProductBands() {
   return (
     <section className="w-full" style={{ background: "#FFFFFF" }}>
-      {BANDS.map((b, i) => {
+      {BANDS.map((b) => {
         const Icon = b.icon;
-        const imageFirst = i % 2 === 1;
         return (
           <div key={b.title} style={{ borderBottom: `1px solid ${BORDER}` }}>
-            <div className="mx-auto grid max-w-[1200px] items-center gap-10 px-6 py-20 sm:py-24 lg:grid-cols-[45fr_55fr]">
-              <div className={imageFirst ? "lg:order-2" : ""}>
-                <div className="mb-4 inline-flex items-center gap-2">
-                  <Icon className="h-4 w-4" style={{ color: BRAND }} />
-                  <span className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: BRAND, fontFamily: DM }}>{b.eyebrow}</span>
-                </div>
-                <h2 style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", lineHeight: 1.15, color: INK, letterSpacing: "-0.01em" }}>
-                  {b.title}
-                </h2>
-                <ul className="mt-6 space-y-3">
-                  {b.bullets.map((t) => (
-                    <li key={t} className="flex items-start gap-2.5">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" style={{ color: BRAND }} />
-                      <span className="text-[15px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.5 }}>{t}</span>
-                    </li>
-                  ))}
-                </ul>
+            <div className="mx-auto max-w-[760px] px-6 py-20 text-center sm:py-24">
+              <div className="mb-4 inline-flex items-center gap-2">
+                <Icon className="h-4 w-4" style={{ color: BRAND }} />
+                <span className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: BRAND, fontFamily: DM }}>{b.eyebrow}</span>
               </div>
-              <div className={imageFirst ? "lg:order-1" : ""}>
-                <ShotPlaceholder label={b.shotLabel} />
-              </div>
+              <h2 style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(26px, 3.4vw, 38px)", lineHeight: 1.15, color: INK, letterSpacing: "-0.01em" }}>
+                {b.title}
+              </h2>
+              <ul className="mx-auto mt-8 max-w-[560px] space-y-3 text-left">
+                {b.bullets.map((t) => (
+                  <li key={t} className="flex items-start gap-2.5">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" style={{ color: BRAND }} />
+                    <span className="text-[15px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.5 }}>{t}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         );
       })}
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 4B — PRODUCT TOUR VIDEO (placeholder — swap `poster`/add a `<video>`
+   src when a real capture is provided; the player shell stays the same)
+═══════════════════════════════════════════════════════════════════════════ */
+function VideoSection() {
+  return (
+    <section className="w-full" style={{ background: "#FFFFFF", borderBottom: `1px solid ${BORDER}` }}>
+      <div className="mx-auto max-w-[900px] px-6 py-20 sm:py-24">
+        <div className="mx-auto aspect-video w-full overflow-hidden rounded-[2px]" style={{ border: `1px solid ${BORDER}`, background: INK }}>
+          {/* TODO(video): replace this placeholder with a real <video> embed
+              (src provided by the product owner) — the surrounding aspect-ratio
+              shell and play-button overlay stay as-is; only the src changes. */}
+          <div className="relative flex h-full w-full flex-col items-center justify-center gap-5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-[2px]" style={{ background: "#18181B" }}>
+              <span style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "16px", color: BRAND }}>H</span>
+            </div>
+            <button
+              type="button"
+              aria-label="Play product tour video"
+              className="flex h-16 w-16 items-center justify-center rounded-full"
+              style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.35)" }}
+            >
+              <span
+                className="ml-1 h-0 w-0"
+                style={{ borderTop: "10px solid transparent", borderBottom: "10px solid transparent", borderLeft: "16px solid #FFFFFF" }}
+              />
+            </button>
+            <p style={{ fontFamily: DM, fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
+              Product tour — coming soon
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION 4C — PUBLIC DIRECTORY PREVIEW (static product preview, NOT live
+   data). Headline options considered: "A directory of startups actually
+   raising right now" (chosen — concrete, active voice, no stat needed to
+   land the point) / "See who's raising, verified before you look" (led with
+   verification instead of currency, weaker fit for this section's specific
+   job) / "Verified startups, actively fundraising" (too flat, reads like a
+   label not a headline).
+═══════════════════════════════════════════════════════════════════════════ */
+type DirectoryCard = {
+  name: string;
+  description: string;
+  stage: string;
+  sector: string;
+  tier: string;
+};
+
+const DIRECTORY_CARDS: DirectoryCard[] = [
+  { name: "Northwind Robotics", description: "Warehouse picking robots for mid-size 3PLs", stage: "Seed", sector: "Robotics", tier: "Tier 3 — Operational" },
+  { name: "Lumen Health", description: "Remote patient monitoring for chronic care clinics", stage: "Series A", sector: "Healthtech", tier: "Tier 4 — Capital" },
+  { name: "Kestrel Logistics", description: "Cross-border freight matching for SMB exporters", stage: "Pre-seed", sector: "Logistics", tier: "Tier 2 — Claims" },
+  { name: "Aldergrove Foods", description: "Shelf-stable protein for institutional food service", stage: "Seed", sector: "Foodtech", tier: "Tier 3 — Operational" },
+  { name: "Solace Finance", description: "Embedded lending for vertical SaaS platforms", stage: "Series A", sector: "Fintech", tier: "Tier 5 — Verified" },
+  { name: "Palisade Security", description: "Attack-surface monitoring for mid-market IT teams", stage: "Seed", sector: "Security", tier: "Tier 3 — Operational" },
+];
+
+function DirectoryPreview() {
+  return (
+    <section className="w-full" style={{ background: "#FAFAFA", borderBottom: `1px solid ${BORDER}` }}>
+      <div className="mx-auto max-w-[1200px] px-6 py-24">
+        <div className="mx-auto max-w-[640px] text-center">
+          <div className="mb-4 inline-flex items-center gap-2">
+            <Sparkles className="h-4 w-4" style={{ color: BRAND }} />
+            <span className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: BRAND, fontFamily: DM }}>Public directory</span>
+          </div>
+          <h2 style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(26px, 3.4vw, 38px)", lineHeight: 1.15, color: INK, letterSpacing: "-0.01em" }}>
+            A directory of startups actually raising right now
+          </h2>
+          <p className="mt-4 text-[16px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.5 }}>
+            Verified startups only, listed while they&rsquo;re actively fundraising and
+            removed once the round closes. Investors browse a curated, current set —
+            not a stale company database.
+          </p>
+        </div>
+
+        <p className="mt-12 mb-4 text-center text-xs font-medium uppercase tracking-[0.1em]" style={{ color: "#71717A", fontFamily: DM }}>
+          Product preview — illustrative, not live data
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {DIRECTORY_CARDS.map((c) => (
+            <div key={c.name} className="p-6 text-left rounded-[2px]" style={{ background: "#FFFFFF", border: `1px solid ${BORDER}` }}>
+              <div className="flex items-start justify-between gap-2">
+                <h3 style={{ fontFamily: SYNE, fontWeight: 600, fontSize: "16px", color: INK }}>{c.name}</h3>
+                <span className="shrink-0 rounded-[2px] px-2 py-0.5 text-[11px] font-semibold" style={{ background: "#F5F3FF", color: BRAND, fontFamily: DM }}>{c.stage}</span>
+              </div>
+              <p className="mt-2 text-[13px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.5 }}>{c.description}</p>
+              <div className="mt-4 flex items-center justify-between gap-2 border-t pt-3" style={{ borderColor: BORDER }}>
+                <span className="text-[12px]" style={{ color: "#71717A", fontFamily: DM }}>{c.sector}</span>
+                <span className="inline-flex items-center gap-1 text-[12px] font-medium" style={{ color: "#52525B", fontFamily: DM }}>
+                  <ShieldCheck className="h-3.5 w-3.5" style={{ color: BRAND }} />
+                  {c.tier}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-10 text-center">
+          <Link to="/sign-up" search={{ role: "founder" } as any} className="inline-flex items-center gap-1.5 text-[14px] font-medium" style={{ color: BRAND, fontFamily: DM }}>
+            Get verified and listed <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      </div>
     </section>
   );
 }
