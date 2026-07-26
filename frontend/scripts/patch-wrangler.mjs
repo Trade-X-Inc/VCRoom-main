@@ -146,6 +146,12 @@ const CSP_REPORT_ONLY = [
   "report-uri /api/csp-report",
 ].join("; ");
 
+// NOTE: this list must stay in sync with the header block in
+// public/_headers. This applies to SSR-routed responses (everything
+// _routes.json includes); _headers only applies to paths excluded from the
+// worker (static assets) — see CLAUDE.md §44. Editing one list without the
+// other silently diverges what's actually live between static and
+// SSR-routed responses.
 const SECURITY_HEADERS = {
   "X-Frame-Options": "DENY",
   "X-Content-Type-Options": "nosniff",
@@ -154,8 +160,10 @@ const SECURITY_HEADERS = {
   // iframe on our own /app/* routes, so self is sufficient; every other
   // sensitive permission is denied outright.
   "Permissions-Policy": "camera=(self), microphone=(self), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), interest-cohort=()",
-  "X-XSS-Protection": "1; mode=block",
-  "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+  // No preload: irreversible once submitted to hstspreload.org and
+  // permanently constrains every future subdomain. includeSubDomains gives
+  // the real security benefit without that lock-in.
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
   "Cross-Origin-Opener-Policy": "same-origin",
   "Cross-Origin-Resource-Policy": "same-origin",
   "Content-Security-Policy-Report-Only": CSP_REPORT_ONLY,

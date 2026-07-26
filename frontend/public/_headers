@@ -1,10 +1,15 @@
+# NOTE: this list must stay in sync with SECURITY_HEADERS in
+# scripts/patch-wrangler.mjs. This file only applies to paths excluded from
+# the SSR worker in _routes.json (static assets); everything else is served
+# by _worker.js, which _headers never reaches (see CLAUDE.md §44). Editing
+# one list without the other silently diverges what's actually live between
+# static and SSR-routed responses.
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(self), microphone=(self), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), interest-cohort=()
-  X-XSS-Protection: 1; mode=block
-  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Resource-Policy: same-origin
 
