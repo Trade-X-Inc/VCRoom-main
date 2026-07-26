@@ -2,8 +2,16 @@
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Permissions-Policy: camera=(self), microphone=(self), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), interest-cohort=()
   X-XSS-Protection: 1; mode=block
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
 
 /app/*
   X-Robots-Tag: noindex, nofollow
+
+# Immutable, hash-named build assets — long cache is safe since a content
+# change always produces a new filename.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

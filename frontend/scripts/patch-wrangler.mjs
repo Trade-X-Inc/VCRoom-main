@@ -102,6 +102,99 @@ const cfEnvPatch = `\
 })();
 `;
 
+// 4b. Security headers for the SSR path.
+// public/_headers ONLY applies to static-asset responses (paths excluded from
+// _routes.json's SSR include list) — every dynamic route (/, /pricing,
+// /tools/*, /app/*, ...) is served by this worker directly, and CF Pages does
+// NOT run _headers rules against a worker-generated Response. Verified live:
+// favicon.svg carried the _headers rules, "/" carried none of them. So the
+// only way to apply security headers to the actual HTML document is to set
+// them on the Response inside the worker itself, mirroring the SAME policy
+// documented in public/_headers so the two never drift apart.
+//
+// CSP ships Report-Only in this branch (R7C) — collect violation data before
+// ever enforcing. Do not flip this to an enforcing header without a
+// dedicated follow-up that reviews real report-uri traffic first.
+//
+// COEP is deliberately NOT set: `require-corp` blocks cross-origin iframes
+// and subresources that don't send a matching Cross-Origin-Resource-Policy
+// header, and Daily.co's embedded call iframe (used in /app/deal-rooms/*/meetings
+// and /app/roast/*) is exactly that kind of embed. Breaking a working video
+// feature to satisfy a header scanner is not an acceptable trade — skipped,
+// reported instead. COOP and CORP are safe (Google OAuth here is a full-page
+// redirect via redirectTo, never a window.open popup, so COOP: same-origin
+// doesn't sever anything) and are included below.
+const CSP_REPORT_ONLY = [
+  "default-src 'self'",
+  // Tailwind/inline style props are used throughout (design system is all
+  // inline `style={{}}`) — 'unsafe-inline' on style-src is required, not
+  // optional, given the current styling approach.
+  "style-src 'self' 'unsafe-inline'",
+  // React hydration + Vite's dev/prod bundle currently rely on inline
+  // bootstrap scripts; Turnstile and Daily's SDK are loaded as external
+  // scripts from their own origins.
+  "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://*.daily.co",
+  "img-src 'self' data: blob: https://ldimninnjlvxozubheib.supabase.co https://*.daily.co",
+  "font-src 'self' data:",
+  "connect-src 'self' https://ldimninnjlvxozubheib.supabase.co wss://ldimninnjlvxozubheib.supabase.co https://*.daily.co wss://*.daily.co https://challenges.cloudflare.com",
+  "frame-src 'self' https://challenges.cloudflare.com https://*.daily.co",
+  "media-src 'self' blob: https://*.daily.co",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  "report-uri /api/csp-report",
+].join("; ");
+
+const SECURITY_HEADERS = {
+  "X-Frame-Options": "DENY",
+  "X-Content-Type-Options": "nosniff",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  // camera/microphone scoped to self — Daily.co interviews run in an
+  // iframe on our own /app/* routes, so self is sufficient; every other
+  // sensitive permission is denied outright.
+  "Permissions-Policy": "camera=(self), microphone=(self), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), interest-cohort=()",
+  "X-XSS-Protection": "1; mode=block",
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+  "Cross-Origin-Opener-Policy": "same-origin",
+  "Cross-Origin-Resource-Policy": "same-origin",
+  "Content-Security-Policy-Report-Only": CSP_REPORT_ONLY,
+};
+
+const headerInjectionSnippet = `
+const __SECURITY_HEADERS = ${JSON.stringify(SECURITY_HEADERS)};
+function __applySecurityHeaders(request, response) {
+  try {
+    const url = new URL(request.url);
+    // /app/* keeps its own noindex header (still set below) but does not need
+    // the full document CSP — API/data routes return JSON, not HTML, and a
+    // document-oriented CSP on a JSON response is meaningless. Apply the base
+    // hardening headers everywhere; reserve CSP + frame-ancestors for actual
+    // document responses.
+    const contentType = response.headers.get("content-type") || "";
+    const isDocument = contentType.includes("text/html");
+    const headers = new Headers(response.headers);
+    for (const [k, v] of Object.entries(__SECURITY_HEADERS)) {
+      if (!isDocument && (k === "Content-Security-Policy-Report-Only" || k === "X-Frame-Options" || k === "Frame-Options")) continue;
+      headers.set(k, v);
+    }
+    if (url.pathname.startsWith("/app/")) {
+      headers.set("X-Robots-Tag", "noindex, nofollow");
+    }
+    // Cache-Control: hashed static assets (never true here — those are
+    // served by CF Pages CDN directly per _routes.json's exclude list, not
+    // by this worker) vs. HTML documents, which must never be cached shared
+    // since responses are per-session (auth state, personalized nav).
+    if (isDocument && !headers.has("cache-control")) {
+      headers.set("Cache-Control", "private, no-cache, must-revalidate");
+    }
+    return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+  } catch (e) {
+    return response;
+  }
+}
+`;
+
 let workerCode = readFileSync("dist/client/_worker.js", "utf8");
 
 // Wrap default export to inject CF env on every request.
@@ -111,6 +204,7 @@ if (initCallMatch) {
   const initCall = initCallMatch[0].replace('\nexport {', '');   // e.g. "init_server4();"
   const injection = `\
 ${initCall}
+${headerInjectionSnippet}
 // Inject CF env into globalThis.__cf_env and process.env before any handler runs
 const __origServer = server;
 const __patchedServer = {
@@ -123,13 +217,32 @@ const __patchedServer = {
             process.env[k] = v;
           }
         }
-        const safeKeys = Object.keys(env).filter(k => !k.includes('KEY') && !k.includes('SECRET') && !k.includes('TOKEN'));
+    const safeKeys = Object.keys(env).filter(k => !k.includes('KEY') && !k.includes('SECRET') && !k.includes('TOKEN'));
         const secretKeys = Object.keys(env).filter(k => k.includes('KEY') || k.includes('SECRET') || k.includes('TOKEN'));
         console.log('[Worker] CF env keys available:', safeKeys);
         console.log('[Worker] Secret keys present:', secretKeys.map(k => k + '=' + (env[k] ? '\\u2713' : '\\u2717')));
       } catch(e) { console.error('[Worker] env injection error:', e); }
     }
-    return __origServer.fetch(request, env, ctx);
+    // CSP violation reports (report-uri) intercepted here, before TanStack
+    // Start's router ever sees the request. This app has no working raw-HTTP
+    // route mechanism to hang a receiver off of — createAPIFileRoute /
+    // createAPIHandler both import from module paths that don't exist in the
+    // installed @tanstack/react-start version (verified: api.health.ts and
+    // api.invites.ts, both built on createAPIFileRoute, 404 in production
+    // today, a real pre-existing bug unrelated to this branch). Handling it
+    // here, ahead of the router, sidesteps that gap entirely rather than
+    // building a fourth broken variant of the same pattern.
+    try {
+      const __u = new URL(request.url);
+      if (__u.pathname === '/api/csp-report' && request.method === 'POST') {
+        let __body = null;
+        try { __body = await request.json(); } catch(e) {}
+        console.warn('[CSP Report]', JSON.stringify(__body));
+        return new Response(null, { status: 204 });
+      }
+    } catch(e) {}
+    const __response = await __origServer.fetch(request, env, ctx);
+    return __applySecurityHeaders(request, __response);
   }
 };
 // IMPORTANT: Only export default — CF Workers runtime rejects named exports that
