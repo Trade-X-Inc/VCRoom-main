@@ -1544,3 +1544,43 @@ single-quoted in `git add` (`git add -- 'frontend/src/routes/app.deal-rooms.$id.
 shell/glob drops them and the add silently no-ops. After any multi-file commit, re-run
 `git status --porcelain` and confirm nothing R15-relevant is left uncommitted — an empty status is
 the proof the committed tree == the tested tree.
+
+---
+
+## 44. CF PAGES `_headers` AND `_redirects` DO NOT APPLY TO SSR-ROUTED RESPONSES (found R7C, July 2026) — same category as §41
+
+**Cloudflare Pages' native `public/_headers` and `public/_redirects` files only apply to paths
+excluded from the SSR worker in `_routes.json`.** Any path matched by `_routes.json`'s
+`include: ["/*"]` (i.e. every TanStack Start route, which is nearly the whole site) is served by
+`_worker.js`, and Cloudflare Pages' `_headers`/`_redirects` processing **never runs on worker
+responses** — it's a static-asset-serving feature, not a Worker-request feature. This was verified
+empirically twice in the same branch: once for `_headers` (curl showed an excluded static asset
+like `favicon.svg` carrying the configured headers while `/`, an SSR path, carried none), and once
+independently for `_redirects` (curl showed pre-existing rules like `/signup → /sign-up` 404ing
+live in production instead of redirecting).
+
+**The fix, both times: inject the behavior directly into the worker**, in
+`scripts/patch-wrangler.mjs`, which is the one place that wraps every request/response before/after
+TanStack Start's own handler:
+- Security headers: a `SECURITY_HEADERS` object + `__applySecurityHeaders(request, response)`
+  helper, applied to every response after `__origServer.fetch` returns.
+- Redirects: `public/_redirects` is parsed at build time into a `REDIRECT_RULES` array baked into
+  the worker, and `__checkRedirect(request)` is called as the **first** line inside the wrapped
+  `fetch` handler, before anything else (CSP report intercept, Accept-header rewrite, CF env
+  injection, then the original TanStack handler, then security headers on the way out).
+
+**Real production impact found by this bug (confirmed live, not assumed):** `/signup`,
+`/accelerators`, `/grants`, and six legacy `/app/*` redirects (`/app/news`, `/app/pipeline`,
+`/app/vc-leads`, `/app/leads`, `/app/reports`, `/app/accelerators`) were all **404ing in
+production** despite having correct-looking rules in `public/_redirects` — because that file was
+silently inert for every one of these SSR-routed paths. All ten were fixed by moving redirect
+handling into the worker; the fix ships once the branch containing it is merged and deployed, it
+is not automatically live just because the rules are correctly written to the file.
+
+**Before adding ANY new `_headers` rule or `_redirects` rule to the public/ directory going
+forward:** check whether the path it targets is excluded in `dist/client/_routes.json` (or the
+source `public/_routes.json`). If it's not excluded — i.e. if it's a normal app route — the rule
+must also be added to (or already covered by) the corresponding worker-injection logic in
+`patch-wrangler.mjs`, or it will silently do nothing in production. Do not trust that a rule
+"looks right" in the static file; curl the live path (or a local `wrangler pages dev` build) to
+confirm the behavior actually applies before considering it done.
