@@ -294,7 +294,7 @@ function InvestorPublicProfile({ profile, teamMembers, portfolio, isOwnerPreview
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{ height: 36, width: 36, borderRadius: "50%", overflow: "hidden", background: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
                       {m.avatar_url
-                        ? <img src={m.avatar_url} alt={m.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        ? <img src={m.avatar_url} alt={m.name} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                         : <span>{m.name.charAt(0).toUpperCase()}</span>}
                     </div>
                     <div style={{ minWidth: 0 }}>
@@ -323,7 +323,7 @@ function InvestorPublicProfile({ profile, teamMembers, portfolio, isOwnerPreview
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                     <div style={{ height: 32, width: 32, overflow: "hidden", background: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
                       {p.logo_url
-                        ? <img src={p.logo_url} alt={p.company_name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        ? <img src={p.logo_url} alt={p.company_name} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                         : <span>{p.company_name.charAt(0).toUpperCase()}</span>}
                     </div>
                     <div style={{ fontWeight: 500, fontSize: 13 }}>{p.company_name}</div>

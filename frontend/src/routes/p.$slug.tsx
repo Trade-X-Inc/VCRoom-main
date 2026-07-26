@@ -220,7 +220,7 @@ function YouTubeEmbed({ url, label }: { url: string; label: string }) {
     <a href={`https://www.youtube.com/watch?v=${videoId}`}
       target="_blank" rel="noopener noreferrer"
       className="relative block w-full aspect-video rounded-2xl overflow-hidden group cursor-pointer">
-      <img src={thumbnail} alt={label} className="w-full h-full object-cover" />
+      <img src={thumbnail} alt={label} loading="lazy" className="w-full h-full object-cover" />
       <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/30 transition-colors">
         <div className="w-14 h-14 rounded-full bg-red-600 flex items-center justify-center">
           <div className="w-0 h-0 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent border-l-[16px] border-l-white ml-1" />
@@ -1122,7 +1122,7 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
             {startup.logo_url && (
               <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
                 <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Logo</div>
-                <img src={startup.logo_url} alt={startup.company_name ?? "Logo"} className="mt-4 w-full rounded-3xl object-cover" />
+                <img src={startup.logo_url} alt={startup.company_name ?? "Logo"} loading="lazy" className="mt-4 w-full rounded-3xl object-cover" />
               </div>
             )}
 
