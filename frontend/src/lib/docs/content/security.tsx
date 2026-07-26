@@ -73,7 +73,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
           tables in the production schema has PostgreSQL Row Level Security enabled, which means a
           query can only return rows the authenticated user is entitled to see — even if
           application code has a bug, the database refuses to serve another user's data. Details and
-          the verification query are on the <A href="/docs/security/rls">Row Level Security</A> page.
+          the verification query are on the <A href="/docs/security/access-control">Row Level Security</A> page.
         </P>
         <P>
           On top of RLS, team accounts carry role-based permissions (admin, manager, analyst,
@@ -169,7 +169,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
           The core rule: authorization lives in the database. Application-level checks exist for UX
           (hiding buttons a role can't use), but the thing that actually prevents cross-tenant data
           access is Row Level Security — described in detail on the{" "}
-          <A href="/docs/security/rls">RLS page</A>. Where a policy needs to consult another table,
+          <A href="/docs/security/access-control">RLS page</A>. Where a policy needs to consult another table,
           it does so through <Code>SECURITY DEFINER</Code> helper functions rather than inline
           subqueries, which avoids both recursion bugs and policy bypasses.
         </P>
@@ -265,10 +265,10 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
     ),
   },
 
-  // ── /docs/security/rls ────────────────────────────────────────────────────
-  "security/rls": {
+  // ── /docs/security/access-control ─────────────────────────────────────────
+  "security/access-control": {
     meta: {
-      slug: "security/rls",
+      slug: "security/access-control",
       title: "Row Level Security",
       description:
         "Every one of Hockystick's 107 database tables has PostgreSQL Row Level Security enabled. How the policy model works.",

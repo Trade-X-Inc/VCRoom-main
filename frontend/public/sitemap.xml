@@ -311,7 +311,7 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://hockystick.app/docs/security/rls</loc>
+    <loc>https://hockystick.app/docs/security/access-control</loc>
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
   </url>
