@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Hockystick — From first meeting to signed agreement" },
-      { name: "description", content: "The fundraising platform where founders and investors meet, run due diligence, negotiate terms, and close — entirely in-platform. Verified profiles, deal rooms, AI-powered interviews, term negotiation, and closing." },
+      { name: "description", content: "The fundraising platform where verified founders and investors meet, run due diligence, negotiate terms, and close deals — entirely in-platform." },
       { name: "keywords", content: "fundraising platform, verified investor platform, due diligence, deal rooms, term negotiation, startup fundraising, investor deal flow" },
       { name: "robots", content: "index, follow" },
       { property: "og:title", content: "Hockystick — From first meeting to signed agreement" },
@@ -59,22 +59,8 @@ function Landing() {
 
   return (
     <div style={{ background: "#FFFFFF" }}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "SoftwareApplication",
-            name: "Hockystick",
-            applicationCategory: "BusinessApplication",
-            operatingSystem: "Web",
-            description:
-              "A verified fundraising platform where founders and investors meet, run due diligence, hold structured interviews, negotiate terms, and close deals — entirely in-platform.",
-            offers: { "@type": "Offer", price: "49", priceCurrency: "USD" },
-            provider: { "@type": "Organization", name: "Hockystick", url: "https://hockystick.app" },
-          }),
-        }}
-      />
+      {/* SoftwareApplication + Organization JSON-LD live in __root.tsx's head
+          — exactly one instance site-wide. Do not add a second block here. */}
       <SiteHeader />
       <Hero />
       <ProblemSection />
@@ -616,48 +602,65 @@ function PricingPreview() {
 
 /* ═══════════════════════════════════════════════════════════════════════════
    SECTION 10 — FAQ (accordions allowed here per Constitution §9.3)
+
+   Answers are plain strings (plus optional trailing link metadata) so the
+   FAQPage JSON-LD below and the rendered accordion share one source of
+   truth — never hand-duplicate this copy into a schema block.
 ═══════════════════════════════════════════════════════════════════════════ */
-type Faq = { q: string; a: React.ReactNode };
+type Faq = { q: string; a: string; link?: { to: string; label: string } };
 
 const FAQ_GROUPS: { heading: string; items: Faq[] }[] = [
   {
     heading: "For founders",
     items: [
-      { q: "What is Hockystick?", a: <>A verified fundraising platform where founders and investors meet, negotiate, and close deals — entirely in-platform, from first contact to signed agreement. <FaqLink to="/about">Learn more</FaqLink></> },
-      { q: "How does founder verification work?", a: <>Five tiers — Identity, Claims, Operational, Capital, and Hockystick Verified — each built by uploading real documents that AI cross-checks. Your verification tier is visible to investors before they request access. <FaqLink to="/trust">See verification details</FaqLink></> },
-      { q: "What documents do I need to get started?", a: <>Incorporation documents, bank or revenue statements, customer contracts, and team employment records. Each builds your verification tier — you choose how much to verify. <FaqLink to="/pricing">View pricing & plans</FaqLink></> },
-      { q: "How do deal rooms work?", a: <>Private, NDA-gated spaces where you share documents, run due diligence, hold structured interviews, and negotiate terms with a specific investor. All content stays inside the room.</> },
-      { q: "What happens during due diligence?", a: <>A structured DD checklist with AI-powered document analysis. Findings are source-cited and confidence-scored — never presented as verified fact without backing. <FaqLink to="/docs">Read the docs</FaqLink></> },
-      { q: "How do structured interviews work?", a: <>Five video meeting stages — Introduction, Product Demo, Financial Discussion, Terms Discussion, and Investment Terms — each with AI note extraction. Notes are source-cited to the transcript.</> },
-      { q: "How are terms negotiated?", a: <>Per-term propose, accept, reject, or counter — with a full audit trail. Four instrument types: SAFE, Equity, Debt, and Company Sale. Both parties see updates in real time.</> },
-      { q: "What does the closing process look like?", a: <>Terms lock, the platform generates a summary, a lawyer (optional) drafts the agreement, both parties sign, payment is confirmed, the deal closes, and the room becomes a permanent archive with auto-generated invoices.</> },
-      { q: "How much does Hockystick cost?", a: <>Free during beta. After launch: $49/month for founders, with a 1.5% success fee on closed deals (minimum $500, maximum $15,000). No fee if the deal doesn&rsquo;t close. <FaqLink to="/pricing">See pricing</FaqLink></> },
-      { q: "Is my data secure?", a: <>NDA-gated deal rooms, role-based access control, DIFC governing law, and DIAC arbitration. Documents are access-logged and never shared outside the room. <FaqLink to="/privacy">Privacy policy</FaqLink></> },
-      { q: "Can I use Hockystick from anywhere?", a: <>Yes. Hockystick is a global platform. Founders and investors from any jurisdiction can use it.</> },
+      { q: "What is Hockystick?", a: "A verified fundraising platform where founders and investors meet, negotiate, and close deals — entirely in-platform, from first contact to signed agreement.", link: { to: "/about", label: "Learn more" } },
+      { q: "How does founder verification work?", a: "Five tiers — Identity, Claims, Operational, Capital, and Hockystick Verified — each built by uploading real documents that AI cross-checks. Your verification tier is visible to investors before they request access.", link: { to: "/trust", label: "See verification details" } },
+      { q: "What documents do I need to get started?", a: "Incorporation documents, bank or revenue statements, customer contracts, and team employment records. Each builds your verification tier — you choose how much to verify.", link: { to: "/pricing", label: "View pricing & plans" } },
+      { q: "How do deal rooms work?", a: "Private, NDA-gated spaces where you share documents, run due diligence, hold structured interviews, and negotiate terms with a specific investor. All content stays inside the room." },
+      { q: "What happens during due diligence?", a: "A structured DD checklist with AI-powered document analysis. Findings are source-cited and confidence-scored — never presented as verified fact without backing.", link: { to: "/docs", label: "Read the docs" } },
+      { q: "How do structured interviews work?", a: "Five video meeting stages — Introduction, Product Demo, Financial Discussion, Terms Discussion, and Investment Terms — each with AI note extraction. Notes are source-cited to the transcript." },
+      { q: "How are terms negotiated?", a: "Per-term propose, accept, reject, or counter — with a full audit trail. Four instrument types: SAFE, Equity, Debt, and Company Sale. Both parties see updates in real time." },
+      { q: "What does the closing process look like?", a: "Terms lock, the platform generates a summary, a lawyer (optional) drafts the agreement, both parties sign, payment is confirmed, the deal closes, and the room becomes a permanent archive with auto-generated invoices." },
+      { q: "How much does Hockystick cost?", a: "Free during beta. After launch: $49/month for founders, with a 1.5% success fee on closed deals (minimum $500, maximum $15,000). No fee if the deal doesn’t close.", link: { to: "/pricing", label: "See pricing" } },
+      { q: "Is my data secure?", a: "NDA-gated deal rooms, role-based access control, DIFC governing law, and DIAC arbitration. Documents are access-logged and never shared outside the room.", link: { to: "/privacy", label: "Privacy policy" } },
+      { q: "Can I use Hockystick from anywhere?", a: "Yes. Hockystick is a global platform. Founders and investors from any jurisdiction can use it." },
     ],
   },
   {
     heading: "For investors",
     items: [
-      { q: "How do I find startups on Hockystick?", a: <>Thesis-matched deal flow, a searchable founder directory, and AI-powered Deal Intake analysis. Set your investment thesis and the platform surfaces matching founders automatically.</> },
-      { q: "What investor verification is required?", a: <>The same tier system as founders — fund details, thesis, and track record build your verification tier. Founders see your tier before granting deal-room access.</> },
-      { q: "What can I see before requesting access to a founder?", a: <>Their public profile and verification tier. Full details — documents, financials, team — unlock inside the deal room after mutual disclosure.</> },
-      { q: "How does thesis matching work?", a: <>You set your stage, sector, geography, and cheque-size preferences. The platform matches founders to your thesis and sends alerts when new matches appear.</> },
-      { q: "What AI analysis do I get?", a: <>Deal briefs, DD findings, and meeting note extraction — all source-cited with confidence scores. The AI never asserts claims as verified fact.</> },
+      { q: "How do I find startups on Hockystick?", a: "Thesis-matched deal flow, a searchable founder directory, and AI-powered Deal Intake analysis. Set your investment thesis and the platform surfaces matching founders automatically." },
+      { q: "What investor verification is required?", a: "The same tier system as founders — fund details, thesis, and track record build your verification tier. Founders see your tier before granting deal-room access." },
+      { q: "What can I see before requesting access to a founder?", a: "Their public profile and verification tier. Full details — documents, financials, team — unlock inside the deal room after mutual disclosure." },
+      { q: "How does thesis matching work?", a: "You set your stage, sector, geography, and cheque-size preferences. The platform matches founders to your thesis and sends alerts when new matches appear." },
+      { q: "What AI analysis do I get?", a: "Deal briefs, DD findings, and meeting note extraction — all source-cited with confidence scores. The AI never asserts claims as verified fact." },
     ],
   },
   {
     heading: "General",
     items: [
-      { q: "Who built Hockystick?", a: <>Venture Tech LLC, headquartered at DIFC FinTech Hive, Dubai. <FaqLink to="/about">About us</FaqLink></> },
-      { q: "What jurisdictions does Hockystick cover?", a: <>Hockystick is a global platform. DIFC governing law applies to platform terms; deals operate under whatever jurisdiction the parties agree to.</> },
-      { q: "How is the platform fee calculated?", a: <>1.5% of the closed deal amount, with a minimum of $500 and a maximum of $15,000. The fee is charged at closing, never before. If a deal doesn&rsquo;t close, no fee is charged.</> },
-      { q: "What happens after a deal closes?", a: <>The deal room becomes a read-only archive. Both parties retain permanent access to all documents, terms, agreements, signed copies, payment proof, and invoices.</> },
-      { q: "Can I involve my lawyer?", a: <>Yes. Either party can invite legal counsel at the closing stage. Lawyers see the term summary and agreement only — they have zero access to earlier due diligence, negotiation history, or fee details.</> },
-      { q: "What if a deal doesn't close?", a: <>No fee is charged. Either party can exit at any point. All room content is preserved — nothing is deleted.</> },
+      { q: "Who built Hockystick?", a: "Venture Tech LLC, headquartered at DIFC FinTech Hive, Dubai.", link: { to: "/about", label: "About us" } },
+      { q: "What jurisdictions does Hockystick cover?", a: "Hockystick is a global platform. DIFC governing law applies to platform terms; deals operate under whatever jurisdiction the parties agree to." },
+      { q: "How is the platform fee calculated?", a: "1.5% of the closed deal amount, with a minimum of $500 and a maximum of $15,000. The fee is charged at closing, never before. If a deal doesn’t close, no fee is charged." },
+      { q: "What happens after a deal closes?", a: "The deal room becomes a read-only archive. Both parties retain permanent access to all documents, terms, agreements, signed copies, payment proof, and invoices." },
+      { q: "Can I involve my lawyer?", a: "Yes. Either party can invite legal counsel at the closing stage. Lawyers see the term summary and agreement only — they have zero access to earlier due diligence, negotiation history, or fee details." },
+      { q: "What if a deal doesn't close?", a: "No fee is charged. Either party can exit at any point. All room content is preserved — nothing is deleted." },
     ],
   },
 ];
+
+// FAQPage JSON-LD generated from FAQ_GROUPS — same data the accordion renders.
+const FAQ_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQ_GROUPS.flatMap((g) =>
+    g.items.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: { "@type": "Answer", text: item.a },
+    })),
+  ),
+});
 
 function FaqLink({ to, children }: { to: string; children: React.ReactNode }) {
   return (
@@ -684,6 +687,7 @@ function FaqItem({ item }: { item: Faq }) {
       {open && (
         <p className="pb-4 pr-8 text-[14px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.6 }}>
           {item.a}
+          {item.link && <> <FaqLink to={item.link.to}>{item.link.label}</FaqLink></>}
         </p>
       )}
     </div>
@@ -693,6 +697,7 @@ function FaqItem({ item }: { item: Faq }) {
 function FaqSection() {
   return (
     <section className="w-full" style={{ background: "#FFFFFF", borderBottom: `1px solid ${BORDER}` }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: FAQ_JSON_LD }} />
       <div className="mx-auto max-w-[820px] px-6 py-24">
         <h2 className="mb-12 text-center" style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", color: INK, letterSpacing: "-0.01em" }}>
           Frequently asked questions

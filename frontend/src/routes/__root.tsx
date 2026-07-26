@@ -91,16 +91,39 @@ function NotFoundComponent() {
   );
 }
 
+// Single source of structured data for the site shell: one SoftwareApplication
+// (the only one — the landing page must NOT inject a second) plus the
+// Organization entity, combined in one @graph. Price is asserted honestly:
+// the product is free during beta, so the offer says 0 — never a price that
+// isn't actually charged.
 const JSON_LD = JSON.stringify({
   "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Hockystick",
-  "url": "https://hockystick.app",
-  "description": "AI-powered deal rooms for founders raising capital and VCs managing deal flow.",
-  "applicationCategory": "BusinessApplication",
-  "operatingSystem": "Web",
-  "offers": { "@type": "Offer", "price": "49", "priceCurrency": "USD" },
-  "creator": { "@type": "Organization", "name": "Hockystick", "url": "https://hockystick.app" },
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Hockystick",
+      "url": "https://hockystick.app",
+      "description": "A verified fundraising platform where founders and investors meet, run due diligence, hold structured interviews, negotiate terms, and close deals — entirely in-platform.",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "description": "Free during beta" },
+      "creator": { "@id": "https://hockystick.app/#organization" },
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://hockystick.app/#organization",
+      "name": "Hockystick",
+      "legalName": "Venture Tech LLC",
+      "url": "https://hockystick.app",
+      "logo": "https://hockystick.app/apple-touch-icon.png",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "DIFC FinTech Hive",
+        "addressLocality": "Dubai",
+        "addressCountry": "AE",
+      },
+    },
+  ],
 });
 
 export const Route = createRootRoute({
@@ -108,32 +131,35 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1.0" },
-      { title: "Hockystick — Where deals get done" },
-      { name: "description", content: "Connect with verified investors. Replace warm intros with manufactured trust. The private fundraising platform for founders and investors." },
+      { title: "Hockystick — From first meeting to signed agreement" },
+      { name: "description", content: "The fundraising platform where verified founders and investors meet, run due diligence, negotiate terms, and close deals — entirely in-platform." },
       { name: "author", content: "Hockystick" },
       { name: "robots", content: "index, follow" },
-      { name: "theme-color", content: "#6C5CE7" },
+      { name: "theme-color", content: "#7C3AED" },
       // Open Graph
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "Hockystick — Where deals get done" },
-      { property: "og:description", content: "Connect with verified investors. Replace warm intros with manufactured trust. The private fundraising platform for founders and investors." },
+      { property: "og:title", content: "Hockystick — From first meeting to signed agreement" },
+      { property: "og:description", content: "The fundraising platform where verified founders and investors meet, run due diligence, negotiate terms, and close deals — entirely in-platform." },
       { property: "og:url", content: "https://hockystick.app" },
       { property: "og:site_name", content: "Hockystick" },
       { property: "og:image", content: "https://hockystick.app/og-image.png" },
       { property: "og:image:type", content: "image/png" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "Hockystick — Where deals get done" },
+      { property: "og:image:alt", content: "Hockystick — From first meeting to signed agreement. One platform." },
       // Twitter / X
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@hockystickapp" },
-      { name: "twitter:title", content: "Hockystick — Where deals get done" },
-      { name: "twitter:description", content: "Connect with verified investors. Replace warm intros with manufactured trust. Verified deal rooms. AI-powered matching." },
+      { name: "twitter:title", content: "Hockystick — From first meeting to signed agreement" },
+      { name: "twitter:description", content: "The fundraising platform where verified founders and investors meet, run due diligence, negotiate terms, and close deals — entirely in-platform." },
       { name: "twitter:image", content: "https://hockystick.app/og-image.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "canonical", href: "https://hockystick.app" },
+      // No site-wide canonical here: a root-level canonical pointing at the
+      // apex made EVERY subpage (/pricing, /tools/*, /blog/*) declare itself
+      // a duplicate of the homepage — actively harmful for indexing. Routes
+      // that want a canonical set their own (the landing page does).
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png" },
       { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16x16.png" },

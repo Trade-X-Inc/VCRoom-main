@@ -70,7 +70,7 @@ export function SiteFooter() {
           <div className="sm:col-span-2 md:col-span-1 md:pr-8">
             <Logo />
             <p className="mt-4 text-sm text-muted-foreground leading-relaxed max-w-xs">
-              Where deals get done.
+              From first meeting to signed agreement. One platform.
             </p>
             <div className="flex items-center gap-3 mt-4">
               <a href="https://linkedin.com/company/hockystick" target="_blank" rel="noopener noreferrer" title="Hockystick on LinkedIn"
