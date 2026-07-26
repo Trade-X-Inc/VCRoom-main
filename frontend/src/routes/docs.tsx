@@ -105,6 +105,12 @@ function DocsLayout() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-brand focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+      >
+        Skip to content
+      </a>
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-[#E4E4E7] bg-accent backdrop-blur">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:px-6">
@@ -169,7 +175,7 @@ function DocsLayout() {
         </aside>
 
         {/* Main column */}
-        <main className="min-w-0 flex-1 py-8 lg:px-10">
+        <main id="main-content" className="min-w-0 flex-1 py-8 lg:px-10">
           {/* Breadcrumbs */}
           <nav aria-label="Breadcrumb" className="mb-6 flex flex-wrap items-center gap-1.5 text-sm text-gray-500">
             <Link to={"/docs" as any} className="hover:text-gray-900">

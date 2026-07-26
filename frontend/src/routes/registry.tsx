@@ -96,7 +96,7 @@ function Registry() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
+      <main id="main-content" className="max-w-2xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
 
         {/* Back link */}
         <a
@@ -130,6 +130,7 @@ function Registry() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="e.g. Revolut, Careem, Tabby..."
+            aria-label="Company name to search"
             className="flex-1 bg-accent border border-border rounded-lg px-4 py-3.5 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors"
           />
           <button

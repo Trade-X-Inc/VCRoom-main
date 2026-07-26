@@ -62,18 +62,20 @@ function Landing() {
       {/* SoftwareApplication + Organization JSON-LD live in __root.tsx's head
           — exactly one instance site-wide. Do not add a second block here. */}
       <SiteHeader />
-      <Hero />
-      <ProblemSection />
-      <ProductBands />
-      <VideoSection />
-      <DirectoryPreview />
-      <TwoWayTrust />
-      <HowItWorks />
-      <ForFoundersInvestors />
-      <ComparisonBand />
-      <PricingPreview />
-      <FaqSection />
-      <FinalCta />
+      <main id="main-content">
+        <Hero />
+        <ProblemSection />
+        <ProductBands />
+        <VideoSection />
+        <DirectoryPreview />
+        <TwoWayTrust />
+        <HowItWorks />
+        <ForFoundersInvestors />
+        <ComparisonBand />
+        <PricingPreview />
+        <FaqSection />
+        <FinalCta />
+      </main>
       <SiteFooter />
     </div>
   );
@@ -516,7 +518,7 @@ function ComparisonBand() {
         <p className="mx-auto mb-12 max-w-xl text-center text-[16px]" style={{ color: "rgba(255,255,255,0.88)", fontFamily: DM }}>
           What fundraising takes today, versus what it takes on Hockystick.
         </p>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Feature comparison table, scroll horizontally to see all columns">
           <table className="w-full border-collapse text-left" style={{ minWidth: 720 }}>
             <thead>
               <tr>

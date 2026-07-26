@@ -436,11 +436,11 @@ function RoastPage() {
     return (
       <div className="min-h-screen bg-white">
         <SiteHeader />
-        <div className="mx-auto max-w-xl px-6 py-32 text-center">
+        <main id="main-content" className="mx-auto max-w-xl px-6 py-32 text-center">
           <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: SYNE }}>Roast not found</h1>
           <p className="mt-2 text-sm text-gray-600">This session doesn't exist or isn't public.</p>
           <Link to="/" className="mt-6 inline-block rounded-lg hs-gradient px-5 py-2.5 text-sm font-semibold text-white">Back to Hockystick</Link>
-        </div>
+        </main>
         <SiteFooter />
       </div>
     );
@@ -450,7 +450,7 @@ function RoastPage() {
     return (
       <div className="min-h-screen bg-white">
         <SiteHeader />
-        <div className="mx-auto max-w-xl px-6 py-32 text-center text-sm text-gray-500">Loading the Roast…</div>
+        <main id="main-content" className="mx-auto max-w-xl px-6 py-32 text-center text-sm text-gray-500">Loading the Roast…</main>
       </div>
     );
   }
@@ -478,7 +478,7 @@ function RoastPage() {
       `}</style>
       <SiteHeader />
 
-      <main className="mx-auto max-w-4xl px-4 pb-24 pt-8 sm:px-6">
+      <main id="main-content" className="mx-auto max-w-4xl px-4 pb-24 pt-8 sm:px-6">
         {/* Header — always visible */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">

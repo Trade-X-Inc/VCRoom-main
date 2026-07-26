@@ -10,7 +10,7 @@ function About() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
-      <main className="max-w-3xl mx-auto px-6 py-24">
+      <main id="main-content" className="max-w-3xl mx-auto px-6 py-24">
         <a href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-12 block">
           ← Back to Hockystick
         </a>

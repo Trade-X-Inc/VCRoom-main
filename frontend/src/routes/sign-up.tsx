@@ -87,7 +87,7 @@ function SignUp() {
             <strong className="text-foreground">{email}</strong>. Click it to activate your
             account, then sign in.
           </p>
-          <Link to="/sign-in" className="inline-block mt-6 text-brand text-sm">
+          <Link to="/sign-in" className="inline-block mt-6 text-brand text-sm underline">
             Go to sign in →
           </Link>
         </div>
@@ -156,7 +156,9 @@ function SignUp() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-3">
+              <label htmlFor="signup-name" className="sr-only">Full name</label>
               <input
+                id="signup-name"
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
@@ -164,7 +166,9 @@ function SignUp() {
                 placeholder="Full name"
                 className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
+              <label htmlFor="signup-email" className="sr-only">Email address</label>
               <input
+                id="signup-email"
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
@@ -172,7 +176,9 @@ function SignUp() {
                 placeholder="Email address"
                 className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
+              <label htmlFor="signup-password" className="sr-only">Password (min 6 chars)</label>
               <input
+                id="signup-password"
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
@@ -199,7 +205,7 @@ function SignUp() {
 
         <div className="mt-6 text-center text-sm text-muted-foreground">
           Already have an account?{' '}
-          <Link to="/sign-in" className="text-brand">
+          <Link to="/sign-in" className="text-brand underline">
             Sign in
           </Link>
         </div>

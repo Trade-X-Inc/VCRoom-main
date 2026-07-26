@@ -40,7 +40,7 @@ function Contact() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
-      <main className="max-w-xl mx-auto px-6 py-24">
+      <main id="main-content" className="max-w-xl mx-auto px-6 py-24">
         <a href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-12 block">
           ← Back to Hockystick
         </a>
@@ -65,8 +65,9 @@ function Contact() {
         ) : (
           <div className="space-y-4">
             <div>
-              <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Name</label>
+              <label htmlFor="contact-name" className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Name</label>
               <input
+                id="contact-name"
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
@@ -76,8 +77,9 @@ function Contact() {
             </div>
 
             <div>
-              <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Email</label>
+              <label htmlFor="contact-email" className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Email</label>
               <input
+                id="contact-email"
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
@@ -87,8 +89,9 @@ function Contact() {
             </div>
 
             <div>
-              <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">I am a</label>
+              <label htmlFor="contact-role" className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">I am a</label>
               <select
+                id="contact-role"
                 value={role}
                 onChange={e => setRole(e.target.value)}
                 className="w-full bg-accent border border-border rounded-lg px-4 py-3 text-foreground text-sm focus:border-brand/50 outline-none transition-colors"
@@ -103,8 +106,9 @@ function Contact() {
             </div>
 
             <div>
-              <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Message</label>
+              <label htmlFor="contact-message" className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Message</label>
               <textarea
+                id="contact-message"
                 value={message}
                 onChange={e => setMessage(e.target.value)}
                 rows={5}

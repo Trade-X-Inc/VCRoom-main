@@ -60,7 +60,7 @@ function Feedback() {
         </p>
       </div>
 
-      <main className="mx-auto max-w-xl px-6 py-16">
+      <main id="main-content" className="mx-auto max-w-xl px-6 py-16">
         {submitted ? (
           <div className="text-center py-12">
             <div className="text-5xl mb-4">✓</div>
@@ -70,16 +70,16 @@ function Feedback() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5 border border-[rgba(0,0,0,0.08)] bg-white p-8">
             <div>
-              <label className="block text-sm font-medium mb-1.5">Name</label>
-              <Input name="name" value={form.name} onChange={set} placeholder="Your name (optional)" />
+              <label htmlFor="feedback-name" className="block text-sm font-medium mb-1.5">Name</label>
+              <Input id="feedback-name" name="name" value={form.name} onChange={set} placeholder="Your name (optional)" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1.5">Email</label>
-              <Input type="email" name="email" value={form.email} onChange={set} placeholder="your@email.com (optional)" />
+              <label htmlFor="feedback-email" className="block text-sm font-medium mb-1.5">Email</label>
+              <Input id="feedback-email" type="email" name="email" value={form.email} onChange={set} placeholder="your@email.com (optional)" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1.5">Feedback type</label>
-              <select name="type" value={form.type} onChange={set}
+              <label htmlFor="feedback-type" className="block text-sm font-medium mb-1.5">Feedback type</label>
+              <select id="feedback-type" name="type" value={form.type} onChange={set}
                 className="w-full px-3 py-2 border border-border/60 rounded-lg bg-background text-foreground text-sm">
                 <option value="general">General</option>
                 <option value="bug">Bug report</option>
@@ -87,10 +87,11 @@ function Feedback() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Rating</label>
-              <div className="flex gap-1.5">
+              <span className="block text-sm font-medium mb-2" id="feedback-rating-label">Rating</span>
+              <div className="flex gap-1.5" role="group" aria-labelledby="feedback-rating-label">
                 {[1, 2, 3, 4, 5].map((v) => (
                   <button key={v} type="button" onClick={() => setForm((f) => ({ ...f, rating: v }))}
+                    aria-label={`${v} star${v === 1 ? "" : "s"}`} aria-pressed={v <= form.rating}
                     className="transition-transform hover:scale-110">
                     <Star className={`h-7 w-7 transition-colors ${v <= form.rating ? "fill-brand text-brand" : "text-gray-300"}`} />
                   </button>
@@ -98,8 +99,8 @@ function Feedback() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1.5">Message</label>
-              <Textarea name="message" value={form.message} onChange={set} required
+              <label htmlFor="feedback-message" className="block text-sm font-medium mb-1.5">Message</label>
+              <Textarea id="feedback-message" name="message" value={form.message} onChange={set} required
                 placeholder="Tell us what you think..." className="min-h-28" />
             </div>
             <button type="submit" disabled={loading}

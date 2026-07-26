@@ -864,7 +864,7 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
           </a>
         </div>
       )}
-      <main className="mx-auto max-w-6xl px-4 sm:px-6 py-16" style={{ paddingBottom: 80 }}>
+      <main id="main-content" className="mx-auto max-w-6xl px-4 sm:px-6 py-16" style={{ paddingBottom: 80 }}>
         {/* Header — always public */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>

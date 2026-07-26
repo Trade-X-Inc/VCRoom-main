@@ -55,6 +55,7 @@ function TrustPage() {
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
+      <main id="main-content">
       {/* Hero */}
       <section className="pt-16 sm:pt-24 pb-12 text-center px-4 sm:px-6">
         <p className="text-xs uppercase tracking-[0.2em] mb-4" style={{ color: "var(--brand)" }}>
@@ -234,6 +235,7 @@ function TrustPage() {
           </Link>
         </div>
       </section>
+      </main>
 
       <SiteFooter />
     </div>

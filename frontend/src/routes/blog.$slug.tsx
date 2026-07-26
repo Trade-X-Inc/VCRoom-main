@@ -38,7 +38,7 @@ function BlogArticle() {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <SiteHeader />
-        <main className="mx-auto max-w-3xl px-4 sm:px-6 py-32 text-center">
+        <main id="main-content" className="mx-auto max-w-3xl px-4 sm:px-6 py-32 text-center">
           <h1 className="text-3xl font-bold mb-4">Article not found</h1>
           <p className="text-muted-foreground mb-8">This post doesn't exist or hasn't been published yet.</p>
           <Link to="/blog">
@@ -53,7 +53,7 @@ function BlogArticle() {
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <SiteHeader />
-      <main className="mx-auto max-w-3xl px-4 sm:px-6 py-16 md:py-24">
+      <main id="main-content" className="mx-auto max-w-3xl px-4 sm:px-6 py-16 md:py-24">
         {/* Back */}
         <Link to="/blog" className="inline-flex items-center gap-1.5 text-sm text-brand hover:opacity-80 font-medium mb-10 transition-colors">
           <ArrowLeft className="h-3.5 w-3.5" /> All articles

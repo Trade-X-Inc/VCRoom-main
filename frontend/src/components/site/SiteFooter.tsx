@@ -34,7 +34,9 @@ function NewsletterSignup() {
         <p className="text-sm text-success font-medium">You're in. See you Tuesday. ✓</p>
       ) : (
         <div className="flex gap-2 max-w-sm">
+          <label htmlFor="newsletter-email" className="sr-only">Email address</label>
           <input
+            id="newsletter-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}

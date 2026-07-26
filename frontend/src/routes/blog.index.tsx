@@ -30,7 +30,7 @@ function BlogIndex() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
-      <main className="mx-auto max-w-6xl px-4 sm:px-6 py-24 md:py-32">
+      <main id="main-content" className="mx-auto max-w-6xl px-4 sm:px-6 py-24 md:py-32">
         {/* Header */}
         <div className="max-w-2xl mb-16">
           <h1 className="text-4xl md:text-5xl font-black tracking-tight leading-tight mb-4" style={{ fontFamily: "Syne, sans-serif" }}>

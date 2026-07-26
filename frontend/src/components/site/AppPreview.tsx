@@ -36,8 +36,11 @@ export function AppPreview() {
           ))}
         </aside>
 
-        {/* Main */}
-        <main className="col-span-12 md:col-span-9 p-5">
+        {/* Main — a div, not a <main> landmark: this whole component is a
+            decorative screenshot-style mockup of the app UI embedded inside
+            a real page, and only that page's own <main> should be the
+            document's main landmark. */}
+        <div className="col-span-12 md:col-span-9 p-5">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-xs text-muted-foreground">Founder workspace</div>
@@ -62,7 +65,7 @@ export function AppPreview() {
                 <div className="text-[11px] text-muted-foreground">{s.l}</div>
                 <div className="mt-1 flex items-baseline gap-2">
                   <span className="text-xl font-semibold">{s.v}</span>
-                  <span className="text-[11px] text-success inline-flex items-center"><TrendingUp className="h-3 w-3" />{s.trend}</span>
+                  <span className="text-[11px] inline-flex items-center" style={{ color: "#047857" }}><TrendingUp className="h-3 w-3" />{s.trend}</span>
                 </div>
                 <div className="text-[11px] text-muted-foreground">{s.d}</div>
               </div>
@@ -109,7 +112,7 @@ export function AppPreview() {
             </div>
             <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
           </div>
-        </main>
+        </div>
       </div>
     </div>
   );

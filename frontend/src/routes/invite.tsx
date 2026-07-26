@@ -47,7 +47,7 @@ function Invite() {
         </p>
       </div>
 
-      <main className="mx-auto max-w-4xl px-6 py-16">
+      <main id="main-content" className="mx-auto max-w-4xl px-6 py-16">
         <div className="grid md:grid-cols-3 gap-5 mb-10">
           {benefits.map(({ icon: Icon, title, desc }) => (
             <div key={title} className="border border-[rgba(0,0,0,0.08)] bg-white p-6">

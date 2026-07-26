@@ -63,7 +63,7 @@ function Waitlist() {
         </p>
       </div>
 
-      <main className="mx-auto max-w-xl px-6 py-16">
+      <main id="main-content" className="mx-auto max-w-xl px-6 py-16">
         {submitted ? (
           <div className="text-center py-12">
             <div className="text-5xl mb-4">✓</div>

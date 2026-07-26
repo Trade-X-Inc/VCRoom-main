@@ -51,7 +51,7 @@ function TermsPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SiteHeader />
-      <main className="flex-1 mx-auto w-full max-w-3xl px-6 py-16">
+      <main id="main-content" className="flex-1 mx-auto w-full max-w-3xl px-6 py-16">
         <div className="mb-8">
           <a href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8 block">
             ← Back to Hockystick

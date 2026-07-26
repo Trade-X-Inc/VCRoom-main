@@ -17,6 +17,7 @@ export function SolutionPage({ eyebrow, title, sub, Icon, features }: Props) {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
+      <main id="main-content">
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-gradient-hero" />
         <div className="mx-auto max-w-7xl px-6 pt-20 pb-16">
@@ -49,6 +50,7 @@ export function SolutionPage({ eyebrow, title, sub, Icon, features }: Props) {
           ))}
         </div>
       </section>
+      </main>
 
       <SiteFooter />
     </div>

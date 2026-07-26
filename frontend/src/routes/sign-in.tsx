@@ -99,8 +99,9 @@ function SignIn() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm text-muted-foreground mb-1.5">Email</label>
+            <label htmlFor="signin-email" className="block text-sm text-muted-foreground mb-1.5">Email</label>
             <input
+              id="signin-email"
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
@@ -110,8 +111,9 @@ function SignIn() {
             />
           </div>
           <div>
-            <label className="block text-sm text-muted-foreground mb-1.5">Password</label>
+            <label htmlFor="signin-password" className="block text-sm text-muted-foreground mb-1.5">Password</label>
             <input
+              id="signin-password"
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}

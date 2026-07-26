@@ -175,7 +175,7 @@ function PricingPage() {
   return (
     <div className="bg-white min-h-screen text-gray-900">
       <SiteHeader />
-      <main className="mx-auto max-w-6xl px-6 pb-24 pt-16">
+      <main id="main-content" className="mx-auto max-w-6xl px-6 pb-24 pt-16">
 
         {/* Header */}
         <div className="text-center mb-10">

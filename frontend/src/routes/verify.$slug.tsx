@@ -119,7 +119,7 @@ function VerifyPage() {
     return (
       <div style={{ background: "var(--background)", minHeight: "100vh" }}>
         <SiteHeader />
-        <main style={{ maxWidth: 600, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
+        <main id="main-content" style={{ maxWidth: 600, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
           <Shield size={40} style={{ color: "var(--faint)", margin: "0 auto 24px" }} />
           <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: 24, color: "var(--foreground)", marginBottom: 12 }}>
             Verification report not found
@@ -141,7 +141,7 @@ function VerifyPage() {
   return (
     <div style={{ background: "var(--background)", minHeight: "100vh" }}>
       <SiteHeader />
-      <main style={{ maxWidth: 680, margin: "0 auto", padding: "64px 24px 96px" }}>
+      <main id="main-content" style={{ maxWidth: 680, margin: "0 auto", padding: "64px 24px 96px" }}>
 
         <Link to="/" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--muted-foreground)", fontSize: 13, textDecoration: "none", marginBottom: 40 }}>
           <ArrowLeft size={13} /> Back to Hockystick

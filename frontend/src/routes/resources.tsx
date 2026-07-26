@@ -179,6 +179,7 @@ function GrantCard({ item }: { item: typeof grants[0] }) {
         href={item.url}
         target="_blank"
         rel="noopener noreferrer"
+        aria-label={`Learn more about ${item.name}`}
         className="mt-auto inline-flex items-center min-h-9 text-xs font-medium px-3.5 py-2 rounded-lg w-fit transition-colors"
         style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }}
       >
@@ -253,6 +254,7 @@ function ProgramCard({ item }: { item: typeof programs[0] }) {
         href={item.url}
         target="_blank"
         rel="noopener noreferrer"
+        aria-label={`Learn more about ${item.name}`}
         className="mt-auto inline-flex items-center min-h-9 text-xs font-medium px-3.5 py-2 rounded-lg w-fit transition-colors"
         style={{ background: "var(--accent)", border: "1px solid var(--border)", color: "var(--muted-foreground)" }}
       >
@@ -296,7 +298,7 @@ function Resources() {
   return (
     <div className="min-h-screen" style={{ background: "var(--background)" }}>
       <SiteHeader />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
+      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
 
         {/* Back */}
         <a href="/" className="inline-flex items-center gap-2 text-sm transition-colors mb-12" style={{ color: "var(--muted-foreground)" }}
