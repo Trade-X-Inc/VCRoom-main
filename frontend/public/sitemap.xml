@@ -11,6 +11,21 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://hockystick.app/about</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/terms</loc>
+    <priority>0.3</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/privacy</loc>
+    <priority>0.3</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
     <loc>https://hockystick.app/blog</loc>
     <priority>0.9</priority>
     <changefreq>daily</changefreq>
@@ -26,13 +41,103 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://hockystick.app/sign-up</loc>
+    <loc>https://hockystick.app/founders</loc>
+    <priority>0.9</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/investors</loc>
+    <priority>0.9</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/solutions/investor-pipeline</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://hockystick.app/sign-in</loc>
+    <loc>https://hockystick.app/solutions/vc-deal-room</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/solutions/fundraising-crm</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/solutions/raise-1m</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/solutions/due-diligence</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/trust</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/resources</loc>
+    <priority>0.7</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/registry</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/feedback</loc>
+    <priority>0.4</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/contact</loc>
     <priority>0.5</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/tools</loc>
+    <priority>0.8</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/tools/valuation</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/tools/burn-rate</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/tools/cogs</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/tools/runway</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/tools/cap-table</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/tools/safe-note</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/tools/dilution</loc>
+    <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>

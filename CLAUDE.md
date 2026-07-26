@@ -1584,3 +1584,28 @@ must also be added to (or already covered by) the corresponding worker-injection
 `patch-wrangler.mjs`, or it will silently do nothing in production. Do not trust that a rule
 "looks right" in the static file; curl the live path (or a local `wrangler pages dev` build) to
 confirm the behavior actually applies before considering it done.
+
+---
+
+## 45. `public/sitemap.xml` IS HAND-MAINTAINED — NOT GENERATED FROM THE ROUTE TREE (found R7C, July 2026)
+
+`frontend/public/sitemap.xml` is a static, manually-edited file — there is no build-time script or
+server function that generates it from `src/routes/*`. This means **it drifts silently whenever a
+new indexable public page is added** (or an existing one is deindexed) and nobody remembers to
+touch this file in the same PR. R7C's step-0 audit found it missing ~18 real indexable pages
+(`/founders`, `/investors`, all 5 `/solutions/*`, all 7 `/tools/*` + the `/tools` index, `/trust`,
+`/resources`, `/registry`, `/feedback`, `/contact`) plus `/about`, `/terms`, `/privacy` — brought
+current in the same pass (46 → 67 URLs), with every added URL verified 200/no-redirect against a
+local build before merging.
+
+**When adding a new public route file under `src/routes/` that is NOT gated by `noindex` and is
+NOT under `/app/*`:** add it to `public/sitemap.xml` in the same commit. There is no lint rule or
+CI check enforcing this — it is a manual discipline, exactly the kind of thing that will drift
+again the next time someone ships a new `/solutions/*` page or a new `/tools/*` calculator without
+reading this section first.
+
+**A real generator (e.g. a build-time script that walks `routeTree.gen.ts` or the `src/routes/`
+directory, filters out `/app/*` and anything the route's own `head()` marks `noindex`, and writes
+`sitemap.xml` as part of `npm run build`) would close this gap permanently and should be preferred
+over continuing to hand-maintain this file** — this was flagged but not built in R7C to keep the
+branch scoped; a good candidate for a small, focused follow-up.
