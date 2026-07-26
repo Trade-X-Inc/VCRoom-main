@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useId } from "react";
 import { ChevronDown, ChevronUp, Plus, Trash2, Edit2, X, Check, Download } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -296,12 +296,14 @@ function NumInput({ label, value, onChange, hint, prefix = "$", suffix, min }: {
   label: string; value: number; onChange: (v: number) => void;
   hint?: string; prefix?: string; suffix?: string; min?: number;
 }) {
+  const id = useId();
   return (
     <div style={{ marginBottom: "12px" }}>
-      {label && <label style={{ display: "block", fontSize: "12px", color: "var(--muted-foreground)", marginBottom: "5px" }}>{label}</label>}
-      <div style={{ display: "flex", alignItems: "center", background: "#1a1a1f", border: "1px solid var(--border)", borderRadius: "7px", overflow: "hidden" }}>
+      {label && <label htmlFor={id} style={{ display: "block", fontSize: "12px", color: "var(--muted-foreground)", marginBottom: "5px" }}>{label}</label>}
+      <div style={{ display: "flex", alignItems: "center", background: "var(--card)", border: "1px solid var(--border)", borderRadius: "7px", overflow: "hidden" }}>
         {prefix && <span style={{ padding: "8px 10px", fontSize: "12px", color: "var(--faint)", borderRight: "1px solid var(--border)", whiteSpace: "nowrap" }}>{prefix}</span>}
         <input
+          id={id}
           type="number" value={value || ""} min={min}
           onChange={(e) => onChange(Math.max(min ?? 0, Number(e.target.value) || 0))}
           style={{ flex: 1, background: "transparent", border: "none", outline: "none", padding: "8px 10px", fontSize: "13px", color: "var(--foreground)" }}
@@ -316,9 +318,9 @@ function NumInput({ label, value, onChange, hint, prefix = "$", suffix, min }: {
 function TextInput({ placeholder, value, onChange }: { placeholder: string; value: string; onChange: (v: string) => void }) {
   return (
     <input
-      type="text" value={value} placeholder={placeholder}
+      type="text" value={value} placeholder={placeholder} aria-label={placeholder}
       onChange={(e) => onChange(e.target.value)}
-      style={{ background: "#1a1a1f", border: "1px solid var(--border)", borderRadius: "7px", padding: "8px 10px", fontSize: "13px", color: "var(--foreground)", outline: "none", width: "100%" }}
+      style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "7px", padding: "8px 10px", fontSize: "13px", color: "var(--foreground)", outline: "none", width: "100%" }}
     />
   );
 }
@@ -393,7 +395,7 @@ function AddRoundForm({
   const inputRow = { display: "flex", gap: "8px", marginBottom: "10px" };
 
   return (
-    <div style={{ background: "#0d0d10", border: "1px solid rgba(124,58,237,0.3)", borderRadius: "10px", padding: "18px", marginBottom: "16px" }}>
+    <div style={{ background: "var(--card)", border: "1px solid rgba(124,58,237,0.3)", borderRadius: "10px", padding: "18px", marginBottom: "16px" }}>
       <div style={{ marginBottom: "12px" }}>
         <label style={{ fontSize: "12px", color: "var(--muted-foreground)", display: "block", marginBottom: "5px" }}>Round name</label>
         <TextInput placeholder="e.g. Seed" value={name} onChange={setName} />
@@ -406,7 +408,7 @@ function AddRoundForm({
 
       <div style={{ display: "flex", gap: "8px", marginBottom: "14px" }}>
         {(["priced", "safe"] as const).map((t) => (
-          <button key={t} onClick={() => setType(t)} style={{ flex: 1, padding: "7px", borderRadius: "7px", fontSize: "12px", fontWeight: 600, cursor: "pointer", background: type === t ? "var(--gradient-brand)" : "transparent", border: `1px solid ${type === t ? "var(--brand)" : "var(--border)"}`, color: type === t ? "#fff" : "var(--muted-foreground)" }}>
+          <button key={t} onClick={() => setType(t)} style={{ flex: 1, padding: "7px", borderRadius: "7px", fontSize: "12px", fontWeight: 600, cursor: "pointer", background: type === t ? "#7C3AED" : "transparent", border: `1px solid ${type === t ? "var(--brand)" : "var(--border)"}`, color: type === t ? "#fff" : "var(--muted-foreground)" }}>
             {t === "priced" ? "Priced Round" : "SAFE Note"}
           </button>
         ))}
@@ -429,14 +431,14 @@ function AddRoundForm({
                 <TextInput placeholder={`Investor ${idx + 1}`} value={inv.name} onChange={(v) => updateInvestor(inv.id, "name", v)} />
               </div>
               <div style={{ width: "120px" }}>
-                <div style={{ display: "flex", alignItems: "center", background: "#1a1a1f", border: "1px solid var(--border)", borderRadius: "7px", overflow: "hidden" }}>
+                <div style={{ display: "flex", alignItems: "center", background: "var(--card)", border: "1px solid var(--border)", borderRadius: "7px", overflow: "hidden" }}>
                   <span style={{ padding: "8px 8px", fontSize: "11px", color: "var(--faint)" }}>$</span>
-                  <input type="number" value={inv.amount || ""} onChange={(e) => updateInvestor(inv.id, "amount", Number(e.target.value) || 0)}
+                  <input type="number" aria-label={`Investment amount for investor ${idx + 1}`} value={inv.amount || ""} onChange={(e) => updateInvestor(inv.id, "amount", Number(e.target.value) || 0)}
                     style={{ flex: 1, background: "transparent", border: "none", outline: "none", padding: "8px 6px", fontSize: "12px", color: "var(--foreground)", width: "80px" }} />
                 </div>
               </div>
               {investors.length > 1 && (
-                <button onClick={() => removeInvestor(inv.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--faint)", padding: "8px 4px" }}>
+                <button onClick={() => removeInvestor(inv.id)} aria-label={`Remove ${inv.name || `investor ${idx + 1}`}`} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--faint)", padding: "8px 4px" }}>
                   <Trash2 size={13} />
                 </button>
               )}
@@ -446,11 +448,11 @@ function AddRoundForm({
             <button onClick={addInvestor} style={{ fontSize: "12px", color: "var(--brand)", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}>
               <Plus size={12} /> Add investor
             </button>
-            <span style={{ fontSize: "11px", color: invMismatch ? "#F87171" : "var(--faint)" }}>
+            <span style={{ fontSize: "11px", color: invMismatch ? "#DC2626" : "var(--faint)" }}>
               Allocated: {fmt$(invTotal)} of {fmt$(investment)}
             </span>
           </div>
-          {invMismatch && <p style={{ fontSize: "11px", color: "#F87171", marginBottom: "8px" }}>Investor total must match round investment.</p>}
+          {invMismatch && <p style={{ fontSize: "11px", color: "#DC2626", marginBottom: "8px" }}>Investor total must match round investment.</p>}
         </>
       ) : (
         <>
@@ -458,12 +460,12 @@ function AddRoundForm({
           <NumInput label="Valuation cap" value={valuationCap} onChange={setValuationCap} />
           <NumInput label="Discount rate" value={discountRate} onChange={setDiscountRate} prefix="" suffix="%" />
           <div style={{ marginBottom: "12px" }}>
-            <label style={{ fontSize: "12px", color: "var(--muted-foreground)", display: "block", marginBottom: "5px" }}>Converts at</label>
+            <label htmlFor="convert-at-select" style={{ fontSize: "12px", color: "var(--muted-foreground)", display: "block", marginBottom: "5px" }}>Converts at</label>
             {pricedRounds.length === 0 ? (
               <p style={{ fontSize: "12px", color: "var(--faint)" }}>Add a priced round first to set conversion target.</p>
             ) : (
-              <select value={convertAt} onChange={(e) => setConvertAt(e.target.value)}
-                style={{ width: "100%", background: "#1a1a1f", border: "1px solid var(--border)", borderRadius: "7px", padding: "8px 10px", fontSize: "13px", color: "var(--foreground)", outline: "none" }}>
+              <select id="convert-at-select" value={convertAt} onChange={(e) => setConvertAt(e.target.value)}
+                style={{ width: "100%", background: "var(--card)", border: "1px solid var(--border)", borderRadius: "7px", padding: "8px 10px", fontSize: "13px", color: "var(--foreground)", outline: "none" }}>
                 {pricedRounds.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
               </select>
             )}
@@ -473,7 +475,7 @@ function AddRoundForm({
       )}
 
       <div style={{ display: "flex", gap: "8px", marginTop: "6px" }}>
-        <button onClick={handleAdd} style={{ flex: 1, padding: "9px", borderRadius: "7px", background: "var(--gradient-brand)", border: "none", color: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
+        <button onClick={handleAdd} style={{ flex: 1, padding: "9px", borderRadius: "7px", background: "#7C3AED", border: "none", color: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
           Add round
         </button>
         <button onClick={onCancel} style={{ padding: "9px 14px", borderRadius: "7px", background: "transparent", border: "1px solid var(--border)", color: "var(--muted-foreground)", fontSize: "13px", cursor: "pointer" }}>
@@ -554,7 +556,7 @@ function CapTableDisplay({ snapshots, founders }: { snapshots: Snapshot[]; found
               <tr key={id} style={{ background: isAlt ? "var(--accent)" : "transparent" }}>
                 <td style={{
                   ...cellStyle, textAlign: "left", position: "sticky", left: 0,
-                  background: isAlt ? "#161619" : "var(--card)",
+                  background: isAlt ? "var(--accent)" : "var(--card)",
                   borderLeft: `2px solid ${color}`, paddingLeft: "10px",
                   fontVariantNumeric: "normal",
                 }}>
@@ -696,7 +698,7 @@ function RoundCards({ snapshots, rounds, founders }: { snapshots: Snapshot[]; ro
             ].map(({ label, value, red }) => (
               <div key={label} style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
                 <span style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>{label}</span>
-                <span style={{ fontSize: "12px", fontWeight: 600, color: red ? "#F87171" : "var(--muted-foreground)" }}>{value}</span>
+                <span style={{ fontSize: "12px", fontWeight: 600, color: red ? "#DC2626" : "var(--muted-foreground)" }}>{value}</span>
               </div>
             ))}
             {safeConvertedInRound > 0 && (
@@ -800,6 +802,7 @@ function CapTablePage() {
       <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <div className="tool-no-print"><SiteHeader /></div>
+      <main id="main-content">
 
       {/* S1 — Hero */}
       <section style={{ ...pw, padding: "56px 24px 48px" }}>
@@ -844,7 +847,7 @@ function CapTablePage() {
               </div>
 
               {founders.length === 0 && (
-                <p style={{ fontSize: "12px", color: "#F87171", marginBottom: "10px" }}>Add at least one founder to continue.</p>
+                <p style={{ fontSize: "12px", color: "#DC2626", marginBottom: "10px" }}>Add at least one founder to continue.</p>
               )}
 
               {founders.map((f) => (
@@ -853,15 +856,15 @@ function CapTablePage() {
                     <TextInput placeholder="Name" value={f.name} onChange={(v) => updateFounder(f.id, "name", v)} />
                   </div>
                   <div style={{ width: "110px" }}>
-                    <div style={{ display: "flex", alignItems: "center", background: "#1a1a1f", border: `1px solid ${f.shares === 0 ? "rgba(248,113,113,0.4)" : "var(--accent)"}`, borderRadius: "7px", overflow: "hidden" }}>
+                    <div style={{ display: "flex", alignItems: "center", background: "var(--card)", border: `1px solid ${f.shares === 0 ? "rgba(248,113,113,0.4)" : "var(--accent)"}`, borderRadius: "7px", overflow: "hidden" }}>
                       <span style={{ padding: "8px 8px", fontSize: "11px", color: "var(--faint)" }}>#</span>
-                      <input type="number" value={f.shares || ""} onChange={(e) => updateFounder(f.id, "shares", Number(e.target.value) || 0)}
+                      <input type="number" aria-label={`Share count for ${f.name || "founder"}`} value={f.shares || ""} onChange={(e) => updateFounder(f.id, "shares", Number(e.target.value) || 0)}
                         style={{ flex: 1, background: "transparent", border: "none", outline: "none", padding: "8px 4px", fontSize: "12px", color: "var(--foreground)", width: "70px" }} />
                     </div>
-                    {f.shares === 0 && <p style={{ fontSize: "10px", color: "#F87171", marginTop: "2px" }}>Enter share count</p>}
+                    {f.shares === 0 && <p style={{ fontSize: "10px", color: "#DC2626", marginTop: "2px" }}>Enter share count</p>}
                   </div>
                   {founders.length > 1 && (
-                    <button onClick={() => removeFounder(f.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--faint)", padding: "9px 4px", flexShrink: 0 }}>
+                    <button onClick={() => removeFounder(f.id)} aria-label={`Remove ${f.name || "founder"}`} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--faint)", padding: "9px 4px", flexShrink: 0 }}>
                       <X size={13} />
                     </button>
                   )}
@@ -871,7 +874,7 @@ function CapTablePage() {
               <div style={{ marginTop: "10px", paddingTop: "10px", borderTop: "1px solid var(--border)", fontSize: "12px", color: "var(--faint)" }}>
                 <div>Founders: {fmtShares(founderTotal)} shares ({foundingTotal > 0 ? fmtPct((founderTotal / foundingTotal) * 100) : "—"})</div>
                 {unallocated < 0
-                  ? <div style={{ color: "#F87171", marginTop: "3px" }}>Over-allocated by {fmtShares(Math.abs(unallocated))} shares</div>
+                  ? <div style={{ color: "#DC2626", marginTop: "3px" }}>Over-allocated by {fmtShares(Math.abs(unallocated))} shares</div>
                   : <div style={{ marginTop: "3px" }}>Unallocated: {fmtShares(unallocated)} shares</div>}
               </div>
             </div>
@@ -913,15 +916,15 @@ function CapTablePage() {
               )}
 
               {rounds.map((r) => (
-                <div key={r.id} style={{ background: "#0d0d10", border: "1px solid var(--border)", borderRadius: "8px", padding: "12px", marginBottom: "8px" }}>
+                <div key={r.id} style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "8px", padding: "12px", marginBottom: "8px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                     <div>
                       <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>{r.name}</span>
-                      <span style={{ marginLeft: "8px", fontSize: "10px", padding: "1px 6px", borderRadius: "3px", background: r.type === "priced" ? "rgba(16,185,129,0.15)" : "rgba(99,102,241,0.15)", color: r.type === "priced" ? "#10B981" : "#818CF8" }}>
+                      <span style={{ marginLeft: "8px", fontSize: "10px", padding: "1px 6px", borderRadius: "3px", background: r.type === "priced" ? "rgba(16,185,129,0.15)" : "rgba(99,102,241,0.15)", color: r.type === "priced" ? "#047857" : "#4338CA" }}>
                         {r.type === "priced" ? "Priced" : "SAFE"}
                       </span>
                     </div>
-                    <button onClick={() => setRounds((prev) => prev.filter((x) => x.id !== r.id))} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--faint)", padding: "0 2px" }}>
+                    <button onClick={() => setRounds((prev) => prev.filter((x) => x.id !== r.id))} aria-label={`Remove round ${r.name}`} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--faint)", padding: "0 2px" }}>
                       <Trash2 size={13} />
                     </button>
                   </div>
@@ -939,7 +942,7 @@ function CapTablePage() {
           <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
             {founders.length === 0 ? (
               <div style={{ background: "var(--card)", border: "1px solid rgba(248,113,113,0.3)", borderRadius: "12px", padding: "24px", textAlign: "center" }}>
-                <p style={{ color: "#F87171", fontSize: "14px" }}>Add at least one founder to see the cap table.</p>
+                <p style={{ color: "#DC2626", fontSize: "14px" }}>Add at least one founder to see the cap table.</p>
               </div>
             ) : (
               <>
@@ -981,7 +984,7 @@ function CapTablePage() {
                     display: "inline-flex", alignItems: "center", gap: "6px",
                     background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
                     borderRadius: "8px", padding: "10px 16px", fontSize: "13px",
-                    fontWeight: 600, color: "#a78bfa", cursor: "pointer",
+                    fontWeight: 600, color: "#5B21B6", cursor: "pointer",
                   }}
                 >
                   <Download size={14} /> Download PDF
@@ -1005,7 +1008,7 @@ function CapTablePage() {
               { n: "03", title: "Add funding rounds in order", body: "Add rounds chronologically. If you have a SAFE note, add it and specify which priced round it converts at. The table updates automatically to show how each round changes everyone's ownership." },
             ].map((step) => (
               <div key={step.n}>
-                <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "32px", color: "rgba(124,58,237,0.3)", marginBottom: "12px" }}>{step.n}</div>
+                <div aria-hidden="true" style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "32px", color: "rgba(124,58,237,0.72)", marginBottom: "12px" }}>{step.n}</div>
                 <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--foreground)", marginBottom: "8px" }}>{step.title}</h3>
                 <p style={{ fontSize: "13px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>{step.body}</p>
               </div>
@@ -1082,7 +1085,7 @@ function CapTablePage() {
               t.live ? (
                 <Link key={t.to} to={t.to as any} style={{ textDecoration: "none" }}>
                   <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "18px" }}>
-                    <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#10B981", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
+                    <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#047857", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
                     <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)", margin: "10px 0 6px" }}>{t.title}</h3>
                     <p style={{ fontSize: "13px", color: "var(--muted-foreground)", margin: 0 }}>{t.desc}</p>
                   </div>
@@ -1110,7 +1113,7 @@ function CapTablePage() {
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link to="/sign-up" search={{ role: "founder" } as any}
-              style={{ display: "inline-flex", alignItems: "center", background: "var(--gradient-brand)", color: "#fff", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>
+              style={{ display: "inline-flex", alignItems: "center", background: "#7C3AED", color: "#fff", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>
               Create your profile
             </Link>
             <Link to="/trust"
@@ -1121,6 +1124,7 @@ function CapTablePage() {
         </div>
       </section>
 
+      </main>
       <div className="tool-no-print"><SiteFooter /></div>
     </div>
   );

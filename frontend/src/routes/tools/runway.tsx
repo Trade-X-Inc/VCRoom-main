@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useId } from "react";
 import { ChevronDown, ChevronUp, Copy, Check, Calendar, Download } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -66,14 +66,16 @@ function NumberInput({
   label: string; value: number; onChange: (v: number) => void;
   hint?: React.ReactNode; prefix?: string;
 }) {
+  const id = useId();
   return (
     <div style={{ marginBottom: "16px" }}>
-      <label style={{ display: "block", fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "6px" }}>
+      <label htmlFor={id} style={{ display: "block", fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "6px" }}>
         {label}
       </label>
-      <div style={{ display: "flex", alignItems: "center", background: "#1a1a1f", border: "1px solid var(--border)", borderRadius: "8px", overflow: "hidden" }}>
+      <div style={{ display: "flex", alignItems: "center", background: "var(--card)", border: "1px solid var(--border)", borderRadius: "8px", overflow: "hidden" }}>
         <span style={{ padding: "10px 12px", fontSize: "13px", color: "var(--faint)", borderRight: "1px solid var(--border)", whiteSpace: "nowrap" }}>{prefix}</span>
         <input
+          id={id}
           type="number" value={value || ""}
           onChange={(e) => onChange(Number(e.target.value) || 0)}
           style={{ flex: 1, background: "transparent", border: "none", outline: "none", padding: "10px 12px", fontSize: "14px", color: "var(--foreground)" }}
@@ -90,13 +92,15 @@ function SliderInput({
   label: string; value: number; onChange: (v: number) => void;
   min: number; max: number; step?: number; unit?: string; hint?: string;
 }) {
+  const id = useId();
   return (
     <div style={{ marginBottom: "16px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-        <label style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>{label}</label>
+        <label htmlFor={id} style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>{label}</label>
         <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>{value}{unit}</span>
       </div>
       <input
+        id={id}
         type="range" min={min} max={max} step={step} value={value}
         onChange={(e) => onChange(Number(e.target.value))}
         style={{ width: "100%", accentColor: "var(--brand)", cursor: "pointer" }}
@@ -145,17 +149,17 @@ function CollapsibleBlock({ title, children, defaultOpen = false }: { title: str
 // ─── Status helpers ───────────────────────────────────────────────────────────
 
 function runwayColor(months: number): string {
-  if (months >= 18) return "#10B981";
-  if (months >= 12) return "#F59E0B";
-  if (months >= 6)  return "#F97316";
-  return "#EF4444";
+  if (months >= 18) return "#047857";
+  if (months >= 12) return "#B45309";
+  if (months >= 6)  return "#C2410C";
+  return "#DC2626";
 }
 
 function runwayBadge(months: number): { label: string; bg: string; color: string } {
-  if (months >= 18) return { label: "Safe to grow",          bg: "rgba(16,185,129,0.15)",  color: "#10B981" };
-  if (months >= 12) return { label: "Plan your raise",       bg: "rgba(245,158,11,0.15)",  color: "#F59E0B" };
-  if (months >= 6)  return { label: "Start raising now",     bg: "rgba(249,115,22,0.15)",  color: "#F97316" };
-  return             { label: "Critical — act immediately", bg: "rgba(239,68,68,0.15)",  color: "#EF4444" };
+  if (months >= 18) return { label: "Safe to grow",          bg: "rgba(16,185,129,0.15)",  color: "#047857" };
+  if (months >= 12) return { label: "Plan your raise",       bg: "rgba(245,158,11,0.15)",  color: "#B45309" };
+  if (months >= 6)  return { label: "Start raising now",     bg: "rgba(249,115,22,0.15)",  color: "#C2410C" };
+  return             { label: "Critical — act immediately", bg: "rgba(239,68,68,0.15)",  color: "#DC2626" };
 }
 
 // ─── SVG Cash Projection Chart ────────────────────────────────────────────────
@@ -411,6 +415,7 @@ Calculate yours at hockystick.app/tools/runway`;
       <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <div className="tool-no-print"><SiteHeader /></div>
+      <main id="main-content">
 
       {/* S1 — Hero */}
       <section style={{ ...pw, padding: "56px 24px 48px" }}>
@@ -453,7 +458,7 @@ Calculate yours at hockystick.app/tools/runway`;
                 hint={
                   <>
                     Net burn = total expenses − monthly revenue.{" "}
-                    <Link to="/tools/burn-rate" style={{ color: "#a78bfa", textDecoration: "none" }}>
+                    <Link to="/tools/burn-rate" style={{ color: "#5B21B6", textDecoration: "underline" }}>
                       Need help calculating? →
                     </Link>
                   </>
@@ -611,12 +616,12 @@ Calculate yours at hockystick.app/tools/runway`;
                 <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)", marginBottom: "8px" }}>
                   When should you start raising?
                 </p>
-                <p style={{ fontSize: "13px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "12px" }}>
+                <p style={{ fontSize: "13px", color: "#52525B", lineHeight: 1.7, marginBottom: "12px" }}>
                   {raiseTimingText()}
                 </p>
                 <Link
                   to="/sign-up"
-                  style={{ fontSize: "13px", color: "#a78bfa", textDecoration: "none" }}
+                  style={{ fontSize: "13px", color: "#5B21B6", textDecoration: "none" }}
                 >
                   Build your Hockystick profile to reach investors faster →
                 </Link>
@@ -636,7 +641,7 @@ Calculate yours at hockystick.app/tools/runway`;
                   alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "6px",
                   background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
                   borderRadius: "8px", padding: "10px 16px", fontSize: "13px",
-                  fontWeight: 600, color: "#a78bfa", cursor: "pointer",
+                  fontWeight: 600, color: "#5B21B6", cursor: "pointer",
                 }}
               >
                 {copied ? <Check size={14} /> : <Copy size={14} />}
@@ -648,7 +653,7 @@ Calculate yours at hockystick.app/tools/runway`;
                   alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "6px",
                   background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
                   borderRadius: "8px", padding: "10px 16px", fontSize: "13px",
-                  fontWeight: 600, color: "#a78bfa", cursor: "pointer",
+                  fontWeight: 600, color: "#5B21B6", cursor: "pointer",
                 }}
               >
                 <Download size={14} /> Download PDF
@@ -683,7 +688,7 @@ Calculate yours at hockystick.app/tools/runway`;
               },
             ].map((step) => (
               <div key={step.n}>
-                <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "32px", color: "rgba(124,58,237,0.3)", marginBottom: "12px" }}>{step.n}</div>
+                <div aria-hidden="true" style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "32px", color: "rgba(124,58,237,0.72)", marginBottom: "12px" }}>{step.n}</div>
                 <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--foreground)", marginBottom: "8px" }}>{step.title}</h3>
                 <p style={{ fontSize: "13px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>{step.body}</p>
               </div>
@@ -765,14 +770,14 @@ Calculate yours at hockystick.app/tools/runway`;
             <style>{`@media (max-width: 480px) { .rwy-related { grid-template-columns: 1fr !important; } }`}</style>
             <Link to="/tools/burn-rate" style={{ textDecoration: "none" }}>
               <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px", cursor: "pointer" }}>
-                <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#10B981", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
+                <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#047857", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
                 <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)", margin: "10px 0 6px" }}>Burn Rate Calculator</h3>
                 <p style={{ fontSize: "13px", color: "var(--muted-foreground)", margin: 0 }}>Calculate monthly gross and net burn broken down by expense category.</p>
               </div>
             </Link>
             <Link to="/tools/valuation" style={{ textDecoration: "none" }}>
               <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px", cursor: "pointer" }}>
-                <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#10B981", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
+                <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#047857", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
                 <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)", margin: "10px 0 6px" }}>Startup Valuation Calculator</h3>
                 <p style={{ fontSize: "13px", color: "var(--muted-foreground)", margin: 0 }}>VC Method, Revenue Multiples, and Berkus for pre-seed to Series A.</p>
               </div>
@@ -793,7 +798,7 @@ Calculate yours at hockystick.app/tools/runway`;
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link
               to="/sign-up"
-              style={{ display: "inline-flex", alignItems: "center", background: "var(--gradient-brand)", color: "#fff", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}
+              style={{ display: "inline-flex", alignItems: "center", background: "#7C3AED", color: "#fff", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}
             >
               Create your profile
             </Link>
@@ -807,6 +812,7 @@ Calculate yours at hockystick.app/tools/runway`;
         </div>
       </section>
 
+      </main>
       <div className="tool-no-print"><SiteFooter /></div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useId } from "react";
 import { ChevronDown, ChevronUp, Copy, Check, Calendar, Download } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -77,14 +77,16 @@ function NumberInput({
   label: string; value: number; onChange: (v: number) => void;
   hint?: string; prefix?: string;
 }) {
+  const id = useId();
   return (
     <div style={{ marginBottom: "16px" }}>
-      <label style={{ display: "block", fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "6px" }}>
+      <label htmlFor={id} style={{ display: "block", fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "6px" }}>
         {label}
       </label>
-      <div style={{ display: "flex", alignItems: "center", background: "#1a1a1f", border: "1px solid var(--border)", borderRadius: "8px", overflow: "hidden" }}>
+      <div style={{ display: "flex", alignItems: "center", background: "var(--card)", border: "1px solid var(--border)", borderRadius: "8px", overflow: "hidden" }}>
         <span style={{ padding: "10px 12px", fontSize: "13px", color: "var(--faint)", borderRight: "1px solid var(--border)", whiteSpace: "nowrap" }}>{prefix}</span>
         <input
+          id={id}
           type="number" value={value || ""}
           onChange={(e) => onChange(Number(e.target.value) || 0)}
           style={{ flex: 1, background: "transparent", border: "none", outline: "none", padding: "10px 12px", fontSize: "14px", color: "var(--foreground)" }}
@@ -124,6 +126,17 @@ const CAT_COLORS: Record<string, string> = {
   other:     "#EC4899",
 };
 
+// Darker variants of CAT_COLORS for use as text on white (CAT_COLORS itself
+// is tuned for bar/dot fills, not text contrast).
+const CAT_TEXT_COLORS: Record<string, string> = {
+  team:      "var(--brand)",
+  office:    "#4338CA",
+  marketing: "#047857",
+  tech:      "#B45309",
+  legal:     "#1D4ED8",
+  other:     "#BE185D",
+};
+
 const CAT_LABELS: Record<string, string> = {
   team: "Team & Salaries", office: "Office & Rent",
   marketing: "Marketing & Ads", tech: "Tech & Software",
@@ -133,10 +146,10 @@ const CAT_LABELS: Record<string, string> = {
 // ─── Status badge helpers ─────────────────────────────────────────────────────
 
 function statusForMonths(months: number): { label: string; bg: string; color: string } {
-  if (months >= 18) return { label: "Safe", bg: "rgba(16,185,129,0.18)", color: "#10B981" };
-  if (months >= 12) return { label: "Plan your raise", bg: "rgba(245,158,11,0.18)", color: "#F59E0B" };
-  if (months >= 6)  return { label: "Start raising now", bg: "rgba(249,115,22,0.18)", color: "#F97316" };
-  return { label: "Critical", bg: "rgba(239,68,68,0.18)", color: "#EF4444" };
+  if (months >= 18) return { label: "Safe", bg: "rgba(16,185,129,0.18)", color: "#047857" };
+  if (months >= 12) return { label: "Plan your raise", bg: "rgba(245,158,11,0.18)", color: "#B45309" };
+  if (months >= 6)  return { label: "Start raising now", bg: "rgba(249,115,22,0.18)", color: "#C2410C" };
+  return { label: "Critical", bg: "rgba(239,68,68,0.18)", color: "#DC2626" };
 }
 
 function raiseAdvice(months: number): string {
@@ -315,13 +328,13 @@ function BurnTab({
             label: "Net Burn Rate",
             value: fmt(netBurn),
             sub: "Cash leaving your account each month",
-            color: netBurn === 0 ? "#10B981" : totalRevenue >= grossBurn ? "#10B981" : "#F87171",
+            color: netBurn === 0 ? "#047857" : totalRevenue >= grossBurn ? "#047857" : "#DC2626",
           },
           {
             label: "Largest cost driver",
             value: grossBurn > 0 ? CAT_LABELS[topCat[0]] : "—",
             sub: grossBurn > 0 ? `${topPct}% of total expenses` : "Enter expenses above",
-            color: grossBurn > 0 ? CAT_COLORS[topCat[0]] : "var(--muted-foreground)",
+            color: grossBurn > 0 ? CAT_TEXT_COLORS[topCat[0]] : "var(--muted-foreground)",
           },
         ].map(({ label, value, sub, color }) => (
           <div key={label} style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px" }}>
@@ -412,7 +425,7 @@ Calculate yours at hockystick.app/tools/burn-rate`;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       {prefillNetBurn > 0 && (
-        <p style={{ fontSize: "13px", color: "var(--muted-foreground)", background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.15)", borderRadius: "8px", padding: "10px 14px" }}>
+        <p style={{ fontSize: "13px", color: "#52525B", background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.15)", borderRadius: "8px", padding: "10px 14px" }}>
           Using your burn rate from the Burn Rate tab. You can also enter values manually below.
         </p>
       )}
@@ -431,7 +444,7 @@ Calculate yours at hockystick.app/tools/burn-rate`;
           />
         </div>
         <div>
-          <label style={{ display: "block", fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "6px" }}>
+          <label htmlFor="growth-rate-slider" style={{ display: "block", fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "6px" }}>
             Expected MoM revenue growth
           </label>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
@@ -439,6 +452,7 @@ Calculate yours at hockystick.app/tools/burn-rate`;
             <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>{growthRate}%</span>
           </div>
           <input
+            id="growth-rate-slider"
             type="range" min={0} max={20} step={1} value={growthRate}
             onChange={(e) => setGrowthRate(Number(e.target.value))}
             style={{ width: "100%", accentColor: "var(--brand)", cursor: "pointer" }}
@@ -499,7 +513,7 @@ Calculate yours at hockystick.app/tools/burn-rate`;
           <p style={{ fontSize: "13px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "12px" }}>
             {raiseAdvice(currentRunway)}
           </p>
-          <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontSize: "13px", color: "#a78bfa", textDecoration: "none" }}>
+          <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontSize: "13px", color: "#5B21B6", textDecoration: "none" }}>
             Build your Hockystick profile to reach investors faster →
           </Link>
         </div>
@@ -513,7 +527,7 @@ Calculate yours at hockystick.app/tools/burn-rate`;
             display: "inline-flex", alignItems: "center", gap: "6px",
             background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
             borderRadius: "8px", padding: "10px 16px", fontSize: "13px",
-            fontWeight: 600, color: "#a78bfa", cursor: "pointer",
+            fontWeight: 600, color: "#5B21B6", cursor: "pointer",
           }}
         >
           {copied ? <Check size={14} /> : <Copy size={14} />}
@@ -525,7 +539,7 @@ Calculate yours at hockystick.app/tools/burn-rate`;
             display: "inline-flex", alignItems: "center", gap: "6px",
             background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
             borderRadius: "8px", padding: "10px 16px", fontSize: "13px",
-            fontWeight: 600, color: "#a78bfa", cursor: "pointer",
+            fontWeight: 600, color: "#5B21B6", cursor: "pointer",
           }}
         >
           <Download size={14} /> Download PDF
@@ -604,6 +618,7 @@ function BurnRatePage() {
       <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <div className="tool-no-print"><SiteHeader /></div>
+      <main id="main-content">
 
       {/* S1 — Hero */}
       <section style={{ ...pw, padding: "56px 24px 48px" }}>
@@ -636,7 +651,7 @@ function BurnRatePage() {
                 borderBottom: `2px solid ${tab === t ? "var(--brand)" : "transparent"}`,
                 marginBottom: "-1px", cursor: "pointer",
                 fontSize: "14px", fontWeight: tab === t ? 600 : 400,
-                color: tab === t ? "#fff" : "var(--muted-foreground)",
+                color: tab === t ? "var(--brand)" : "var(--muted-foreground)",
                 transition: "all 0.15s",
               }}
             >
@@ -682,7 +697,7 @@ function BurnRatePage() {
               },
             ].map((step) => (
               <div key={step.n}>
-                <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "32px", color: "rgba(124,58,237,0.3)", marginBottom: "12px" }}>{step.n}</div>
+                <div aria-hidden="true" style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "32px", color: "rgba(124,58,237,0.72)", marginBottom: "12px" }}>{step.n}</div>
                 <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--foreground)", marginBottom: "8px" }}>{step.title}</h3>
                 <p style={{ fontSize: "13px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>{step.body}</p>
               </div>
@@ -763,16 +778,18 @@ function BurnRatePage() {
             <style>{`@media (max-width: 480px) { .related-grid { grid-template-columns: 1fr !important; } }`}</style>
             <Link to="/tools/valuation" style={{ textDecoration: "none" }}>
               <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px", cursor: "pointer" }}>
-                <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#10B981", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
+                <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#047857", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
                 <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)", margin: "10px 0 6px" }}>Startup Valuation Calculator</h3>
                 <p style={{ fontSize: "13px", color: "var(--muted-foreground)", margin: 0 }}>VC Method, Revenue Multiples, and Berkus for pre-seed to Series A.</p>
               </div>
             </Link>
-            <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px", opacity: 0.5 }}>
-              <span style={{ fontSize: "10px", background: "rgba(124,58,237,0.15)", color: "var(--brand)", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Coming soon</span>
-              <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)", margin: "10px 0 6px" }}>COGS Calculator</h3>
-              <p style={{ fontSize: "13px", color: "var(--muted-foreground)", margin: 0 }}>Break down cost of goods sold and calculate gross margin.</p>
-            </div>
+            <Link to="/tools/cogs" style={{ textDecoration: "none" }}>
+              <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px", cursor: "pointer" }}>
+                <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#047857", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
+                <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)", margin: "10px 0 6px" }}>COGS Calculator</h3>
+                <p style={{ fontSize: "13px", color: "var(--muted-foreground)", margin: 0 }}>Break down cost of goods sold and calculate gross margin.</p>
+              </div>
+            </Link>
           </div>
         </div>
       </section>
@@ -790,7 +807,7 @@ function BurnRatePage() {
             <Link
               to="/sign-up"
               search={{ role: "founder" } as any}
-              style={{ display: "inline-flex", alignItems: "center", background: "var(--gradient-brand)", color: "#fff", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}
+              style={{ display: "inline-flex", alignItems: "center", background: "#7C3AED", color: "#fff", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}
             >
               Create your profile
             </Link>
@@ -804,6 +821,7 @@ function BurnRatePage() {
         </div>
       </section>
 
+      </main>
       <div className="tool-no-print"><SiteFooter /></div>
     </div>
   );

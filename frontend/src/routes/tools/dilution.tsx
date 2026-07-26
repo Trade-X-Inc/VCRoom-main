@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useId } from "react";
 import { ChevronDown, ChevronUp, Copy, Check, Download } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -121,6 +121,9 @@ function fmtPct(n: number, d = 1): string {
 
 const FOUNDER_COLORS = ["var(--brand)", "#8B5CF6", "#A78BFA", "#C4B5FD", "#DDD6FE"];
 const ROUND_COLORS = ["#10B981", "#34D399", "#6EE7B7"];
+// Darker variants of ROUND_COLORS for use as text (e.g. the "Active" badge) —
+// ROUND_COLORS itself is tuned for swatches/bars, not text contrast.
+const ROUND_TEXT_COLORS = ["#047857", "#047857", "#065F46"];
 const POOL_COLOR = "#F59E0B";
 
 // ─── UI helpers ──────────────────────────────────────────────────────────────
@@ -147,12 +150,13 @@ function NumInput({ label, value, onChange, prefix = "$", suffix, hint }: {
   label: string; value: number; onChange: (v: number) => void;
   prefix?: string; suffix?: string; hint?: string;
 }) {
+  const id = useId();
   return (
     <div style={{ marginBottom: "12px" }}>
-      <label style={{ display: "block", fontSize: "12px", color: "var(--muted-foreground)", marginBottom: "4px" }}>{label}</label>
-      <div style={{ display: "flex", alignItems: "center", background: "#1a1a1f", border: "1px solid var(--border)", borderRadius: "8px", overflow: "hidden" }}>
+      <label htmlFor={id} style={{ display: "block", fontSize: "12px", color: "var(--muted-foreground)", marginBottom: "4px" }}>{label}</label>
+      <div style={{ display: "flex", alignItems: "center", background: "var(--card)", border: "1px solid var(--border)", borderRadius: "8px", overflow: "hidden" }}>
         {prefix && <span style={{ padding: "9px 10px", fontSize: "12px", color: "var(--faint)", borderRight: "1px solid var(--border)" }}>{prefix}</span>}
-        <input type="number" value={value || ""}
+        <input id={id} type="number" value={value || ""}
           onChange={(e) => onChange(Number(e.target.value) || 0)}
           style={{ flex: 1, background: "transparent", border: "none", outline: "none", padding: "9px 10px", fontSize: "13px", color: "var(--foreground)" }} />
         {suffix && <span style={{ padding: "9px 10px", fontSize: "12px", color: "var(--faint)", borderLeft: "1px solid var(--border)" }}>{suffix}</span>}
@@ -186,17 +190,18 @@ function RoundPanel({ round, index, onChange, onToggle }: {
 }) {
   const [showAntiDil, setShowAntiDil] = useState(false);
   const color = ROUND_COLORS[index];
+  const textColor = ROUND_TEXT_COLORS[index];
 
   return (
-    <div style={{ background: "var(--card)", border: `1px solid ${round.enabled ? "var(--border)" : "var(--accent)"}`, borderRadius: "12px", overflow: "hidden", opacity: round.enabled ? 1 : 0.45, transition: "opacity 0.2s, border-color 0.2s" }}>
+    <div style={{ background: round.enabled ? "var(--card)" : "var(--accent)", border: `1px solid ${round.enabled ? "var(--border)" : "var(--accent)"}`, borderRadius: "12px", overflow: "hidden", transition: "background-color 0.2s, border-color 0.2s" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "14px 18px", borderBottom: round.enabled ? "1px solid var(--border)" : "none" }}>
         <input type="checkbox" id={`r${index}`} checked={round.enabled} onChange={onToggle}
           style={{ width: "14px", height: "14px", accentColor: color, flexShrink: 0, cursor: "pointer" }} />
-        <label htmlFor={`r${index}`} style={{ fontSize: "13px", fontWeight: 600, color: round.enabled ? "#fff" : "var(--muted-foreground)", cursor: "pointer", flex: 1 }}>
+        <label htmlFor={`r${index}`} style={{ fontSize: "13px", fontWeight: 600, color: round.enabled ? "var(--foreground)" : "var(--muted-foreground)", cursor: "pointer", flex: 1 }}>
           {round.name}
         </label>
         {round.enabled && (
-          <span style={{ fontSize: "11px", background: `${color}22`, color, padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Active</span>
+          <span style={{ fontSize: "11px", background: `${color}22`, color: textColor, padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Active</span>
         )}
       </div>
       {round.enabled && (
@@ -218,9 +223,9 @@ function RoundPanel({ round, index, onChange, onToggle }: {
           </button>
           {showAntiDil && (
             <div style={{ marginTop: "10px" }}>
-              <select value={round.antiDilution}
+              <select value={round.antiDilution} aria-label="Anti-dilution protection type"
                 onChange={(e) => onChange({ ...round, antiDilution: e.target.value as any })}
-                style={{ width: "100%", background: "#1a1a1f", border: "1px solid var(--border)", borderRadius: "8px", padding: "8px 10px", fontSize: "13px", color: "var(--foreground)", outline: "none" }}>
+                style={{ width: "100%", background: "var(--card)", border: "1px solid var(--border)", borderRadius: "8px", padding: "8px 10px", fontSize: "13px", color: "var(--foreground)", outline: "none" }}>
                 <option value="none">None</option>
                 <option value="broad">Broad-based weighted average</option>
                 <option value="narrow">Narrow-based weighted average</option>
@@ -265,7 +270,7 @@ function WaterfallTable({ snapshots }: { snapshots: Snapshot[] }) {
               {snapshots.map((s) => {
                 const sf = s.founders[fi];
                 return (
-                  <td key={s.stageName} style={{ textAlign: "right", padding: "8px 10px", fontVariantNumeric: "tabular-nums", color: sf.pct < sf.originalPct ? "#F87171" : "var(--muted-foreground)" }}>
+                  <td key={s.stageName} style={{ textAlign: "right", padding: "8px 10px", fontVariantNumeric: "tabular-nums", color: sf.pct < sf.originalPct ? "#DC2626" : "var(--muted-foreground)" }}>
                     {fmtPct(sf.pct)}
                   </td>
                 );
@@ -493,6 +498,7 @@ function DilutionPage() {
       <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <div className="tool-no-print"><SiteHeader /></div>
+      <main id="main-content">
 
       {/* S1 — Hero */}
       <section style={{ ...pw, padding: "56px 24px 48px" }}>
@@ -513,7 +519,7 @@ function DilutionPage() {
       {/* S2 — Calculator */}
       <section style={{ ...pw, paddingBottom: "80px" }}>
         {!isValid && (
-          <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: "10px", padding: "12px 16px", marginBottom: "16px", fontSize: "13px", color: "#F87171" }}>
+          <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: "10px", padding: "12px 16px", marginBottom: "16px", fontSize: "13px", color: "#B91C1C" }}>
             Founders ({fmtPct(founderTotal)}) + Option pool ({fmtPct(optionPool)}) = {fmtPct(capTableTotal)} — must total exactly 100%.
           </div>
         )}
@@ -528,17 +534,17 @@ function DilutionPage() {
               {founders.map((f, i) => (
                 <div key={f.id} style={{ display: "grid", gridTemplateColumns: "1fr 80px 28px", gap: "8px", alignItems: "center", marginBottom: "8px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
-                    <span style={{ display: "inline-block", width: "8px", height: "8px", borderRadius: "2px", background: FOUNDER_COLORS[i] ?? "var(--gradient-brand)", flexShrink: 0 }} />
-                    <input value={f.name} onChange={(e) => handleFounderChange(f.id, "name", e.target.value)}
-                      style={{ flex: 1, background: "#1a1a1f", border: "1px solid var(--border)", borderRadius: "6px", padding: "7px 9px", fontSize: "12px", color: "var(--foreground)", outline: "none" }} />
+                    <span style={{ display: "inline-block", width: "8px", height: "8px", borderRadius: "2px", background: FOUNDER_COLORS[i] ?? "#7C3AED", flexShrink: 0 }} />
+                    <input value={f.name} aria-label={`Founder ${i + 1} name`} onChange={(e) => handleFounderChange(f.id, "name", e.target.value)}
+                      style={{ flex: 1, background: "var(--card)", border: "1px solid var(--border)", borderRadius: "6px", padding: "7px 9px", fontSize: "12px", color: "var(--foreground)", outline: "none" }} />
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", background: "#1a1a1f", border: "1px solid var(--border)", borderRadius: "6px", overflow: "hidden" }}>
-                    <input type="number" value={f.pct || ""} onChange={(e) => handleFounderChange(f.id, "pct", Number(e.target.value) || 0)}
+                  <div style={{ display: "flex", alignItems: "center", background: "var(--card)", border: "1px solid var(--border)", borderRadius: "6px", overflow: "hidden" }}>
+                    <input type="number" value={f.pct || ""} aria-label={`${f.name || `Founder ${i + 1}`} ownership percent`} onChange={(e) => handleFounderChange(f.id, "pct", Number(e.target.value) || 0)}
                       style={{ flex: 1, background: "transparent", border: "none", outline: "none", padding: "7px 7px", fontSize: "12px", color: "var(--foreground)", width: "50px" }} />
                     <span style={{ fontSize: "11px", color: "var(--faint)", padding: "0 6px" }}>%</span>
                   </div>
                   <button onClick={() => removeFounder(f.id)}
-                    style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "4px", color: "#F87171", cursor: "pointer", fontSize: "13px", lineHeight: 1, padding: "5px 7px" }}>×</button>
+                    style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "4px", color: "#B91C1C", cursor: "pointer", fontSize: "13px", lineHeight: 1, padding: "5px 7px" }}>×</button>
                 </div>
               ))}
               {founders.length < 5 && (
@@ -548,19 +554,19 @@ function DilutionPage() {
                 </button>
               )}
               <div style={{ marginTop: "14px" }}>
-                <label style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                <label htmlFor="option-pool-slider" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
                   <span style={{ display: "flex", alignItems: "center", gap: "7px" }}>
                     <span style={{ display: "inline-block", width: "8px", height: "8px", borderRadius: "2px", background: POOL_COLOR, flexShrink: 0 }} />
                     <span style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>Option pool</span>
                   </span>
                   <span style={{ fontSize: "12px", color: "var(--faint)" }}>{fmtPct(optionPool)}</span>
                 </label>
-                <input type="range" min={0} max={30} step={0.5} value={optionPool}
+                <input id="option-pool-slider" type="range" min={0} max={30} step={0.5} value={optionPool}
                   onChange={(e) => setOptionPool(Number(e.target.value))}
                   style={{ width: "100%", accentColor: POOL_COLOR }} />
               </div>
               <div style={{ marginTop: "12px", padding: "8px 10px", borderRadius: "8px", background: isValid ? "rgba(16,185,129,0.07)" : "rgba(239,68,68,0.07)", border: `1px solid ${isValid ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.15)"}` }}>
-                <p style={{ fontSize: "11px", color: isValid ? "#10B981" : "#F87171", margin: 0, fontVariantNumeric: "tabular-nums" }}>
+                <p style={{ fontSize: "11px", color: isValid ? "#047857" : "#B91C1C", margin: 0, fontVariantNumeric: "tabular-nums" }}>
                   Total: {fmtPct(capTableTotal)} {isValid ? "✓" : `(${fmtPct(100 - capTableTotal)} ${capTableTotal < 100 ? "unallocated" : "over 100%"})`}
                 </p>
               </div>
@@ -582,9 +588,9 @@ function DilutionPage() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
                 {[
                   { label: "Starting equity (founders)", value: fmtPct(founderInitial), color: "var(--brand)" },
-                  { label: `Final equity (after ${snapshots.length - 1} round${snapshots.length - 1 !== 1 ? "s" : ""})`, value: fmtPct(founderFinal), color: "#10B981" },
-                  { label: "Total dilution", value: `−${fmtPct(totalDilution)}`, color: "#F87171" },
-                  { label: "Latest post-money", value: latest.postMoney > 0 ? fmt$(latest.postMoney) : "—", color: "#F59E0B" },
+                  { label: `Final equity (after ${snapshots.length - 1} round${snapshots.length - 1 !== 1 ? "s" : ""})`, value: fmtPct(founderFinal), color: "#047857" },
+                  { label: "Total dilution", value: `−${fmtPct(totalDilution)}`, color: "#B91C1C" },
+                  { label: "Latest post-money", value: latest.postMoney > 0 ? fmt$(latest.postMoney) : "—", color: "#B45309" },
                 ].map(({ label, value, color }) => (
                   <div key={label} style={{ background: "var(--accent)", borderRadius: "8px", padding: "12px" }}>
                     <p style={{ fontSize: "11px", color: "var(--faint)", marginBottom: "5px" }}>{label}</p>
@@ -617,12 +623,12 @@ function DilutionPage() {
                   <div key={f.id} style={{ marginBottom: "16px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}>
                       <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>{f.name}</span>
-                      <span style={{ fontSize: "13px", color: "#F87171", fontVariantNumeric: "tabular-nums" }}>
+                      <span style={{ fontSize: "13px", color: "#DC2626", fontVariantNumeric: "tabular-nums" }}>
                         {fmtPct(f.pct)} → {fmtPct(finalPct)} (−{fmtPct(diluted)})
                       </span>
                     </div>
                     <div style={{ height: "6px", background: "var(--accent)", borderRadius: "3px", overflow: "hidden" }}>
-                      <div style={{ height: "100%", background: FOUNDER_COLORS[fi] ?? "var(--gradient-brand)", width: barWidth, transition: "width 0.3s", borderRadius: "3px" }} />
+                      <div style={{ height: "100%", background: FOUNDER_COLORS[fi] ?? "#7C3AED", width: barWidth, transition: "width 0.3s", borderRadius: "3px" }} />
                     </div>
                   </div>
                 );
@@ -642,7 +648,7 @@ function DilutionPage() {
                 <p style={{ fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "8px", lineHeight: 1.6 }}>
                   At the latest post-money valuation of <span style={{ color: "var(--foreground)" }}>{fmt$(latest.postMoney)}</span>, each of your ownership percentage points is worth:
                 </p>
-                <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "28px", color: "#10B981", margin: "0 0 8px" }}>
+                <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "28px", color: "#047857", margin: "0 0 8px" }}>
                   {fmt$(latest.postMoney / 100)} / %
                 </p>
                 <p style={{ fontSize: "12px", color: "var(--faint)", lineHeight: 1.6 }}>
@@ -656,7 +662,7 @@ function DilutionPage() {
                   );
                   if (!breakevenSnap) {
                     return (
-                      <div style={{ marginTop: 16, padding: '12px 16px', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 8, color: '#10B981', fontSize: 14 }}>
+                      <div style={{ marginTop: 16, padding: '12px 16px', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 8, color: '#047857', fontSize: 14 }}>
                         You maintain majority ownership through all modeled rounds.
                       </div>
                     );
@@ -690,13 +696,13 @@ function DilutionPage() {
             {/* Copy / Download */}
             <div className="tool-no-print" style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
               <button onClick={handleCopy}
-                style={{ display: "inline-flex", alignItems: "center", gap: "6px", alignSelf: "flex-start", background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)", borderRadius: "8px", padding: "10px 16px", fontSize: "13px", fontWeight: 600, color: "#a78bfa", cursor: "pointer" }}>
+                style={{ display: "inline-flex", alignItems: "center", gap: "6px", alignSelf: "flex-start", background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)", borderRadius: "8px", padding: "10px 16px", fontSize: "13px", fontWeight: 600, color: "#5B21B6", cursor: "pointer" }}>
                 {copied ? <Check size={14} /> : <Copy size={14} />}
                 {copied ? "Copied!" : "Copy results"}
               </button>
               <button
                 onClick={() => { const p = document.title; document.title = "Dilution Calculator — Hockystick"; window.print(); document.title = p; }}
-                style={{ display: "inline-flex", alignItems: "center", gap: "6px", alignSelf: "flex-start", background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)", borderRadius: "8px", padding: "10px 16px", fontSize: "13px", fontWeight: 600, color: "#a78bfa", cursor: "pointer" }}>
+                style={{ display: "inline-flex", alignItems: "center", gap: "6px", alignSelf: "flex-start", background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)", borderRadius: "8px", padding: "10px 16px", fontSize: "13px", fontWeight: 600, color: "#5B21B6", cursor: "pointer" }}>
                 <Download size={14} /> Download PDF
               </button>
             </div>
@@ -715,7 +721,7 @@ function DilutionPage() {
               { n: "03", title: "Read the waterfall table", body: "The waterfall table shows every stakeholder at every stage. Red values are percentages that decreased from the prior stage. The stacked bar updates live as you change inputs." },
             ].map((step) => (
               <div key={step.n}>
-                <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "32px", color: "rgba(124,58,237,0.3)", marginBottom: "12px" }}>{step.n}</div>
+                <div aria-hidden="true" style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "32px", color: "rgba(124,58,237,0.72)", marginBottom: "12px" }}>{step.n}</div>
                 <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--foreground)", marginBottom: "8px" }}>{step.title}</h3>
                 <p style={{ fontSize: "13px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>{step.body}</p>
               </div>
@@ -786,7 +792,7 @@ function DilutionPage() {
             ].map((t) => (
               <Link key={t.to} to={t.to as any} style={{ textDecoration: "none" }}>
                 <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px" }}>
-                  <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#10B981", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
+                  <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#047857", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
                   <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)", margin: "10px 0 6px" }}>{t.title}</h3>
                   <p style={{ fontSize: "13px", color: "var(--muted-foreground)", margin: 0 }}>{t.desc}</p>
                 </div>
@@ -805,7 +811,7 @@ function DilutionPage() {
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link to="/sign-up" search={{ role: "founder" } as any}
-              style={{ display: "inline-flex", alignItems: "center", background: "var(--gradient-brand)", color: "#fff", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>
+              style={{ display: "inline-flex", alignItems: "center", background: "#7C3AED", color: "#fff", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>
               Create your profile
             </Link>
             <Link to="/tools"
@@ -816,6 +822,7 @@ function DilutionPage() {
         </div>
       </section>
 
+      </main>
       <div className="tool-no-print"><SiteFooter /></div>
     </div>
   );

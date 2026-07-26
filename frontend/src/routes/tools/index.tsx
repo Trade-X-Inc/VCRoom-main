@@ -124,7 +124,7 @@ function ToolCard({ tool }: { tool: Tool }) {
             padding: "2px 8px",
             borderRadius: "4px",
             background: tool.tagStyle === "active" ? "rgba(16,185,129,0.15)" : "rgba(124,58,237,0.15)",
-            color: tool.tagStyle === "active" ? "#10B981" : "var(--brand)",
+            color: tool.tagStyle === "active" ? "#047857" : "var(--brand)",
           }}
         >
           {tool.tag}
@@ -136,7 +136,7 @@ function ToolCard({ tool }: { tool: Tool }) {
           fontFamily: "Syne, sans-serif",
           fontWeight: 700,
           fontSize: "17px",
-          color: "#ffffff",
+          color: "var(--foreground)",
           margin: 0,
         }}
       >
@@ -182,6 +182,7 @@ function ToolsIndex() {
     <div style={{ background: "var(--background)", minHeight: "100vh" }}>
       <SiteHeader />
 
+      <main id="main-content">
       {/* Hero */}
       <section
         style={{
@@ -208,7 +209,7 @@ function ToolsIndex() {
             fontFamily: "Syne, sans-serif",
             fontWeight: 800,
             fontSize: "clamp(28px, 5vw, 48px)",
-            color: "#ffffff",
+            color: "var(--foreground)",
             lineHeight: 1.1,
             letterSpacing: "-0.03em",
             marginBottom: "20px",
@@ -272,7 +273,7 @@ function ToolsIndex() {
             display: "inline-flex",
             alignItems: "center",
             gap: "8px",
-            background: "var(--gradient-brand)",
+            background: "#7C3AED",
             color: "#ffffff",
             borderRadius: "10px",
             padding: "12px 24px",
@@ -285,6 +286,7 @@ function ToolsIndex() {
           Create your founder profile
         </Link>
       </section>
+      </main>
 
       <SiteFooter />
     </div>

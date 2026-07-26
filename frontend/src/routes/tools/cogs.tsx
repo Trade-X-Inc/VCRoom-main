@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useId } from "react";
 import { ChevronDown, ChevronUp, Copy, Check, Download } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -82,16 +82,18 @@ function NumInput({
   label: string; value: number; onChange: (v: number) => void;
   hint?: string; suffix?: string; prefix?: string; autoValue?: string;
 }) {
+  const id = useId();
   return (
     <div style={{ marginBottom: "14px" }}>
-      <label style={{ display: "block", fontSize: "12px", color: "var(--muted-foreground)", marginBottom: "5px" }}>
+      <label htmlFor={id} style={{ display: "block", fontSize: "12px", color: "var(--muted-foreground)", marginBottom: "5px" }}>
         {label}
       </label>
-      <div style={{ display: "flex", alignItems: "center", background: "#1a1a1f", border: "1px solid var(--border)", borderRadius: "8px", overflow: "hidden" }}>
+      <div style={{ display: "flex", alignItems: "center", background: "var(--card)", border: "1px solid var(--border)", borderRadius: "8px", overflow: "hidden" }}>
         {prefix && (
           <span style={{ padding: "9px 10px", fontSize: "12px", color: "var(--faint)", borderRight: "1px solid var(--border)", whiteSpace: "nowrap" }}>{prefix}</span>
         )}
         <input
+          id={id}
           type="number" value={value || ""}
           onChange={(e) => onChange(Number(e.target.value) || 0)}
           style={{ flex: 1, background: "transparent", border: "none", outline: "none", padding: "9px 10px", fontSize: "13px", color: "var(--foreground)" }}
@@ -100,7 +102,7 @@ function NumInput({
           <span style={{ padding: "9px 10px", fontSize: "12px", color: "var(--faint)", borderLeft: "1px solid var(--border)" }}>{suffix}</span>
         )}
       </div>
-      {autoValue && <p style={{ fontSize: "11px", color: "#a78bfa", marginTop: "3px" }}>{autoValue}</p>}
+      {autoValue && <p style={{ fontSize: "11px", color: "#5B21B6", marginTop: "3px" }}>{autoValue}</p>}
       {hint && <p style={{ fontSize: "11px", color: "var(--faint)", marginTop: "3px", lineHeight: 1.5 }}>{hint}</p>}
     </div>
   );
@@ -298,7 +300,7 @@ function HardwareInputs({ s, set }: { s: HardwareState; set: (v: HardwareState) 
       <SectionLabel>Volume</SectionLabel>
       <NumInput label="Units sold this month" value={s.units} onChange={(v) => up("units", v)} prefix="#" />
       {perUnitTotal > 0 && (
-        <p style={{ fontSize: "11px", color: "#a78bfa", marginBottom: "8px" }}>Total per-unit COGS: {fmt(perUnitTotal)}</p>
+        <p style={{ fontSize: "11px", color: "#5B21B6", marginBottom: "8px" }}>Total per-unit COGS: {fmt(perUnitTotal)}</p>
       )}
 
       <SectionLabel>Fixed Monthly COGS</SectionLabel>
@@ -409,7 +411,7 @@ function OutputPanel({ result, model, copied, onCopy }: {
 }) {
   const bm = BENCHMARKS[model];
   const margin = result.grossMargin;
-  const marginColor = margin >= bm.worldClass ? "#10B981" : margin >= bm.low ? "#F59E0B" : "#EF4444";
+  const marginColor = margin >= bm.worldClass ? "#047857" : margin >= bm.low ? "#B45309" : "#DC2626";
 
   // Benchmark bar: 0–90% range, dot at user's margin
   const dotPct = Math.min((margin / 90) * 100, 100);
@@ -434,7 +436,7 @@ function OutputPanel({ result, model, copied, onCopy }: {
       {/* Gross Profit */}
       <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px" }}>
         <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "var(--muted-foreground)", textTransform: "uppercase", marginBottom: "8px" }}>Gross Profit</p>
-        <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(24px, 3.5vw, 34px)", color: result.grossProfit >= 0 ? "#10B981" : "#EF4444", margin: "0 0 4px" }}>
+        <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(24px, 3.5vw, 34px)", color: result.grossProfit >= 0 ? "#047857" : "#DC2626", margin: "0 0 4px" }}>
           {result.grossProfit >= 0 ? fmt(result.grossProfit) : `-${fmt(Math.abs(result.grossProfit))}`}
         </p>
         <p style={{ fontSize: "12px", color: "var(--faint)", margin: 0 }}>After direct costs</p>
@@ -453,9 +455,9 @@ function OutputPanel({ result, model, copied, onCopy }: {
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: "5px", marginBottom: "14px" }}>
           {[
-            { label: "World-class", range: `${bm.worldClass}%+`, color: "#10B981" },
-            { label: "Healthy", range: `${bm.low}–${bm.high}%`, color: "#F59E0B" },
-            { label: "Needs attention", range: `<${bm.low}%`, color: "#EF4444" },
+            { label: "World-class", range: `${bm.worldClass}%+`, color: "#047857" },
+            { label: "Healthy", range: `${bm.low}–${bm.high}%`, color: "#B45309" },
+            { label: "Needs attention", range: `<${bm.low}%`, color: "#DC2626" },
           ].map((row) => (
             <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>{row.label}</span>
@@ -532,7 +534,7 @@ function OutputPanel({ result, model, copied, onCopy }: {
             {[
               { label: "COGS", value: fmt(result.perUnitCogs!), color: "var(--foreground)" },
               { label: "Revenue", value: fmt(result.perUnitRevenue!), color: "var(--foreground)" },
-              { label: "Gross profit", value: fmt(result.perUnitProfit!), color: (result.perUnitProfit ?? 0) >= 0 ? "#10B981" : "#EF4444" },
+              { label: "Gross profit", value: fmt(result.perUnitProfit!), color: (result.perUnitProfit ?? 0) >= 0 ? "#047857" : "#DC2626" },
             ].map((m) => (
               <div key={m.label} style={{ textAlign: "center" }}>
                 <div style={{ fontSize: "10px", color: "var(--muted-foreground)", marginBottom: "4px" }}>{m.label}</div>
@@ -551,7 +553,7 @@ function OutputPanel({ result, model, copied, onCopy }: {
             display: "inline-flex", alignItems: "center", gap: "6px", alignSelf: "flex-start",
             background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
             borderRadius: "8px", padding: "10px 16px", fontSize: "13px",
-            fontWeight: 600, color: "#a78bfa", cursor: "pointer",
+            fontWeight: 600, color: "#5B21B6", cursor: "pointer",
           }}
         >
           {copied ? <Check size={14} /> : <Copy size={14} />}
@@ -563,7 +565,7 @@ function OutputPanel({ result, model, copied, onCopy }: {
             display: "inline-flex", alignItems: "center", gap: "6px", alignSelf: "flex-start",
             background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
             borderRadius: "8px", padding: "10px 16px", fontSize: "13px",
-            fontWeight: 600, color: "#a78bfa", cursor: "pointer",
+            fontWeight: 600, color: "#5B21B6", cursor: "pointer",
           }}
         >
           <Download size={14} /> Download PDF
@@ -663,6 +665,7 @@ Calculate yours at hockystick.app/tools/cogs`;
       <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <div className="tool-no-print"><SiteHeader /></div>
+      <main id="main-content">
 
       {/* S1 — Hero */}
       <section style={{ ...pw, padding: "56px 24px 48px" }}>
@@ -697,7 +700,7 @@ Calculate yours at hockystick.app/tools/cogs`;
                 style={{
                   padding: "8px 16px", borderRadius: "8px", fontSize: "13px", fontWeight: 600,
                   cursor: "pointer", transition: "all 0.15s",
-                  background: model === m ? "var(--gradient-brand)" : "transparent",
+                  background: model === m ? "#7C3AED" : "transparent",
                   border: `1px solid ${model === m ? "var(--brand)" : "var(--border)"}`,
                   color: model === m ? "#fff" : "var(--muted-foreground)",
                 }}
@@ -740,7 +743,7 @@ Calculate yours at hockystick.app/tools/cogs`;
               { n: "03", title: "Compare to the benchmark", body: "Your gross margin percentage is the number investors will ask about. Knowing where you stand against industry medians before you're in a meeting is how you control the conversation." },
             ].map((step) => (
               <div key={step.n}>
-                <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "32px", color: "rgba(124,58,237,0.3)", marginBottom: "12px" }}>{step.n}</div>
+                <div aria-hidden="true" style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "32px", color: "rgba(124,58,237,0.72)", marginBottom: "12px" }}>{step.n}</div>
                 <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--foreground)", marginBottom: "8px" }}>{step.title}</h3>
                 <p style={{ fontSize: "13px", color: "var(--muted-foreground)", lineHeight: 1.7 }}>{step.body}</p>
               </div>
@@ -816,7 +819,7 @@ Calculate yours at hockystick.app/tools/cogs`;
             ].map((t) => (
               <Link key={t.to} to={t.to as any} style={{ textDecoration: "none" }}>
                 <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px", cursor: "pointer" }}>
-                  <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#10B981", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
+                  <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#047857", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
                   <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)", margin: "10px 0 6px" }}>{t.title}</h3>
                   <p style={{ fontSize: "13px", color: "var(--muted-foreground)", margin: 0 }}>{t.desc}</p>
                 </div>
@@ -837,7 +840,7 @@ Calculate yours at hockystick.app/tools/cogs`;
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link to="/sign-up" search={{ role: "founder" } as any}
-              style={{ display: "inline-flex", alignItems: "center", background: "var(--gradient-brand)", color: "#fff", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>
+              style={{ display: "inline-flex", alignItems: "center", background: "#7C3AED", color: "#fff", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>
               Create your profile
             </Link>
             <Link to="/trust"
@@ -848,6 +851,7 @@ Calculate yours at hockystick.app/tools/cogs`;
         </div>
       </section>
 
+      </main>
       <div className="tool-no-print"><SiteFooter /></div>
     </div>
   );

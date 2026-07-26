@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect, useId } from "react";
 import { ChevronDown, ChevronUp, Copy, Check, Download } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -99,15 +99,17 @@ function Slider({
   label: string; value: number; min: number; max: number;
   step?: number; unit?: string; onChange: (v: number) => void; hint?: string;
 }) {
+  const id = useId();
   return (
     <div style={{ marginBottom: "20px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-        <label style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>{label}</label>
+        <label htmlFor={id} style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>{label}</label>
         <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>
           {value}{unit}
         </span>
       </div>
       <input
+        id={id}
         type="range" min={min} max={max} step={step} value={value}
         onChange={(e) => onChange(Number(e.target.value))}
         style={{ width: "100%", accentColor: "var(--brand)", cursor: "pointer" }}
@@ -122,14 +124,16 @@ function NumberInput({
 }: {
   label: string; value: number; onChange: (v: number) => void; prefix?: string; hint?: string;
 }) {
+  const id = useId();
   return (
     <div style={{ marginBottom: "20px" }}>
-      <label style={{ display: "block", fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "6px" }}>
+      <label htmlFor={id} style={{ display: "block", fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "6px" }}>
         {label}
       </label>
-      <div style={{ display: "flex", alignItems: "center", background: "#1a1a1f", border: "1px solid var(--border)", borderRadius: "8px", overflow: "hidden" }}>
+      <div style={{ display: "flex", alignItems: "center", background: "var(--card)", border: "1px solid var(--border)", borderRadius: "8px", overflow: "hidden" }}>
         <span style={{ padding: "10px 12px", fontSize: "13px", color: "var(--muted-foreground)", borderRight: "1px solid var(--border)" }}>{prefix}</span>
         <input
+          id={id}
           type="number" value={value || ""}
           onChange={(e) => onChange(Number(e.target.value))}
           style={{ flex: 1, background: "transparent", border: "none", outline: "none", padding: "10px 12px", fontSize: "14px", color: "var(--foreground)" }}
@@ -145,14 +149,16 @@ function Select({
 }: {
   label: string; value: string; options: { label: string; value: string }[]; onChange: (v: string) => void;
 }) {
+  const id = useId();
   return (
     <div style={{ marginBottom: "20px" }}>
-      <label style={{ display: "block", fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "6px" }}>{label}</label>
+      <label htmlFor={id} style={{ display: "block", fontSize: "13px", color: "var(--muted-foreground)", marginBottom: "6px" }}>{label}</label>
       <select
+        id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         style={{
-          width: "100%", background: "#1a1a1f", border: "1px solid var(--border)",
+          width: "100%", background: "var(--card)", border: "1px solid var(--border)",
           borderRadius: "8px", padding: "10px 12px", fontSize: "14px", color: "var(--foreground)",
           outline: "none", cursor: "pointer",
         }}
@@ -196,10 +202,11 @@ function BerkusCalculator({ onChange }: { onChange: (r: ValuationResult) => void
       {BERKUS_FACTORS.map((label, i) => (
         <div key={label} style={{ marginBottom: "20px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-            <label style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>{label}</label>
+            <label htmlFor={`berkus-${i}`} style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>{label}</label>
             <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>{fmt(values[i])}</span>
           </div>
           <input
+            id={`berkus-${i}`}
             type="range" min={0} max={100} value={factors[i]}
             onChange={(e) => update(i, Number(e.target.value))}
             style={{ width: "100%", accentColor: "var(--brand)", cursor: "pointer" }}
@@ -271,14 +278,15 @@ function ScorecardCalculator({ onChange }: { onChange: (r: ValuationResult) => v
       {SCORECARD_FACTORS.map((f, i) => (
         <div key={f.label} style={{ marginBottom: "20px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-            <label style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>
+            <label htmlFor={`scorecard-${i}`} style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>
               {f.label} <span style={{ color: "var(--faint)" }}>({f.defaultWeight}%)</span>
             </label>
-            <span style={{ fontSize: "12px", color: comparisons[i] > 0 ? "#10B981" : comparisons[i] < 0 ? "#ef4444" : "var(--muted-foreground)" }}>
+            <span style={{ fontSize: "12px", color: comparisons[i] > 0 ? "#047857" : comparisons[i] < 0 ? "#DC2626" : "var(--muted-foreground)" }}>
               {COMP_LABELS[comparisons[i]] ?? comparisons[i]}
             </span>
           </div>
           <input
+            id={`scorecard-${i}`}
             type="range" min={-2} max={2} step={1} value={comparisons[i]}
             onChange={(e) => updateComp(i, Number(e.target.value))}
             style={{ width: "100%", accentColor: "var(--brand)", cursor: "pointer" }}
@@ -342,8 +350,8 @@ function VCCalculator({ onChange }: { onChange: (r: ValuationResult) => void }) 
           { label: "Implied ownership", value: `${(ownership * 100).toFixed(1)}%` },
         ].map((s) => (
           <div key={s.label} style={{ textAlign: "center" }}>
-            <div style={{ fontSize: "11px", color: "var(--muted-foreground)", marginBottom: "4px" }}>{s.label}</div>
-            <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--foreground)" }}>{s.value}</div>
+            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", marginBottom: "4px" }}>{s.label}</div>
+            <div style={{ fontSize: "15px", fontWeight: 700, color: "#ffffff" }}>{s.value}</div>
           </div>
         ))}
       </div>
@@ -448,20 +456,20 @@ Calculate yours at hockystick.app/tools/valuation`;
         </div>
         <div style={{ textAlign: "center" }}>
           <div style={{ fontSize: "11px", color: "var(--muted-foreground)", marginBottom: "6px" }}>Realistic</div>
-          <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(24px, 4vw, 36px)", color: "#ffffff" }}>
+          <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(24px, 4vw, 36px)", color: "var(--brand)" }}>
             {fmt(result.realistic)}
           </div>
         </div>
         <div style={{ textAlign: "center" }}>
           <div style={{ fontSize: "11px", color: "var(--muted-foreground)", marginBottom: "6px" }}>Optimistic</div>
-          <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(20px, 3vw, 28px)", color: "#10B981" }}>
+          <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(20px, 3vw, 28px)", color: "#047857" }}>
             {fmt(result.optimistic)}
           </div>
         </div>
       </div>
 
       {/* Range bar */}
-      <div style={{ position: "relative", height: "6px", borderRadius: "99px", background: "var(--gradient-brand)", marginBottom: "24px" }}>
+      <div style={{ position: "relative", height: "6px", borderRadius: "99px", background: "#7C3AED", marginBottom: "24px" }}>
         <div style={{
           position: "absolute", top: "50%", left: `${realisticPct}%`,
           transform: "translate(-50%, -50%)",
@@ -481,7 +489,7 @@ Calculate yours at hockystick.app/tools/valuation`;
             display: "inline-flex", alignItems: "center", gap: "6px",
             background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
             borderRadius: "8px", padding: "10px 16px", fontSize: "13px",
-            fontWeight: 600, color: "#a78bfa", cursor: "pointer",
+            fontWeight: 600, color: "#5B21B6", cursor: "pointer",
           }}
         >
           {copied ? <Check size={14} /> : <Copy size={14} />}
@@ -493,7 +501,7 @@ Calculate yours at hockystick.app/tools/valuation`;
             display: "inline-flex", alignItems: "center", gap: "6px",
             background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
             borderRadius: "8px", padding: "10px 16px", fontSize: "13px",
-            fontWeight: 600, color: "#a78bfa", cursor: "pointer",
+            fontWeight: 600, color: "#5B21B6", cursor: "pointer",
           }}
         >
           <Download size={14} /> Download PDF
@@ -503,8 +511,8 @@ Calculate yours at hockystick.app/tools/valuation`;
           search={{ role: "founder" } as any}
           style={{
             display: "inline-flex", alignItems: "center", gap: "6px",
-            background: "var(--gradient-brand)", borderRadius: "8px", padding: "10px 16px",
-            fontSize: "13px", fontWeight: 600, color: "var(--foreground)", textDecoration: "none",
+            background: "#7C3AED", borderRadius: "8px", padding: "10px 16px",
+            fontSize: "13px", fontWeight: 600, color: "#ffffff", textDecoration: "none",
           }}
         >
           Build your Hockystick profile →
@@ -622,6 +630,7 @@ function ValuationPage() {
       <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <div className="tool-no-print"><SiteHeader /></div>
+      <main id="main-content">
 
       {/* ── S1: Hero ──────────────────────────────────────────────── */}
       <section style={{ ...maxW, padding: "56px 24px 48px" }}>
@@ -657,7 +666,7 @@ function ValuationPage() {
                 style={{
                   padding: "8px 16px", borderRadius: "8px", fontSize: "13px", fontWeight: 600,
                   cursor: "pointer", transition: "all 0.15s",
-                  background: stage === s ? "var(--gradient-brand)" : "transparent",
+                  background: stage === s ? "#7C3AED" : "transparent",
                   border: `1px solid ${stage === s ? "var(--brand)" : "var(--border)"}`,
                   color: stage === s ? "#fff" : "var(--muted-foreground)",
                 }}
@@ -685,14 +694,14 @@ function ValuationPage() {
                     padding: "10px 16px", background: "none", border: "none",
                     borderBottom: `2px solid ${isActive ? "var(--brand)" : "transparent"}`,
                     cursor: "pointer", fontSize: "13px", fontWeight: isActive ? 600 : 400,
-                    color: isActive ? "#fff" : "var(--muted-foreground)",
+                    color: isActive ? "var(--brand)" : "var(--muted-foreground)",
                     display: "inline-flex", alignItems: "center", gap: "6px",
                     marginBottom: "-1px", transition: "all 0.15s",
                   }}
                 >
                   {METHOD_LABELS[m]}
                   {isDefault && (
-                    <span style={{ fontSize: "10px", background: "rgba(124,58,237,0.2)", color: "#a78bfa", padding: "1px 6px", borderRadius: "4px", fontWeight: 600 }}>
+                    <span style={{ fontSize: "10px", background: "rgba(124,58,237,0.2)", color: "#5B21B6", padding: "1px 6px", borderRadius: "4px", fontWeight: 600 }}>
                       Recommended
                     </span>
                   )}
@@ -751,7 +760,7 @@ function ValuationPage() {
               },
             ].map((step) => (
               <div key={step.n}>
-                <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "32px", color: "rgba(124,58,237,0.3)", marginBottom: "12px" }}>
+                <div aria-hidden="true" style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "32px", color: "rgba(124,58,237,0.72)", marginBottom: "12px" }}>
                   {step.n}
                 </div>
                 <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--foreground)", marginBottom: "8px" }}>{step.title}</h3>
@@ -846,7 +855,7 @@ function ValuationPage() {
             ].map((t) => (
               <Link key={t.to} to={t.to as any} style={{ textDecoration: "none" }}>
                 <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", padding: "20px" }}>
-                  <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#10B981", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
+                  <span style={{ fontSize: "10px", background: "rgba(16,185,129,0.15)", color: "#047857", padding: "2px 7px", borderRadius: "4px", fontWeight: 600 }}>Live</span>
                   <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)", margin: "10px 0 6px" }}>{t.title}</h3>
                   <p style={{ fontSize: "13px", color: "var(--muted-foreground)", margin: 0 }}>{t.desc}</p>
                 </div>
@@ -871,7 +880,7 @@ function ValuationPage() {
               search={{ role: "founder" } as any}
               style={{
                 display: "inline-flex", alignItems: "center",
-                background: "var(--gradient-brand)", color: "#fff", borderRadius: "10px",
+                background: "#7C3AED", color: "#fff", borderRadius: "10px",
                 padding: "12px 24px", fontSize: "14px", fontWeight: 600,
                 textDecoration: "none",
               }}
@@ -894,6 +903,7 @@ function ValuationPage() {
         </div>
       </section>
 
+      </main>
       <div className="tool-no-print"><SiteFooter /></div>
     </div>
   );
