@@ -10,3 +10,11 @@ VITE_APP_URL = "https://hockystick.app"
 SUPABASE_URL = "https://ldimninnjlvxozubheib.supabase.co"
 VITE_GOOGLE_CLIENT_ID = "1094004326767-hdd2dqad1ddtsehaa7qiqsbchfgiffou.apps.googleusercontent.com"
 VITE_TURNSTILE_SITE_KEY = "0x4AAAAAADh1iHD5_J7kFb23"
+
+# CSP violation reports only (R7C follow-up) — deliberately NOT Supabase,
+# since /api/csp-report is a public unauthenticated write endpoint and must
+# never touch the product database.
+[[d1_databases]]
+binding = "CSP_REPORTS_DB"
+database_name = "hockystick-csp-reports"
+database_id = "853e61d4-9b2d-4867-b674-d321696de528"
