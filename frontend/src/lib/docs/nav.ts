@@ -79,7 +79,7 @@ export const DOCS_NAV: DocsNavSection[] = [
       { slug: "security", title: "Security & compliance" },
       { slug: "security/overview", title: "Security posture" },
       { slug: "security/data", title: "Data storage" },
-      { slug: "security/rls", title: "Row Level Security" },
+      { slug: "security/access-control", title: "Row Level Security" },
       { slug: "security/nda", title: "NDA legal framework" },
       { slug: "security/disclosure", title: "Responsible disclosure" },
     ],

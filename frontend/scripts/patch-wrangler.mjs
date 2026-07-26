@@ -146,6 +146,12 @@ const CSP_REPORT_ONLY = [
   "report-uri /api/csp-report",
 ].join("; ");
 
+// NOTE: this list must stay in sync with the header block in
+// public/_headers. This applies to SSR-routed responses (everything
+// _routes.json includes); _headers only applies to paths excluded from the
+// worker (static assets) — see CLAUDE.md §44. Editing one list without the
+// other silently diverges what's actually live between static and
+// SSR-routed responses.
 const SECURITY_HEADERS = {
   "X-Frame-Options": "DENY",
   "X-Content-Type-Options": "nosniff",
@@ -154,8 +160,10 @@ const SECURITY_HEADERS = {
   // iframe on our own /app/* routes, so self is sufficient; every other
   // sensitive permission is denied outright.
   "Permissions-Policy": "camera=(self), microphone=(self), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), interest-cohort=()",
-  "X-XSS-Protection": "1; mode=block",
-  "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+  // No preload: irreversible once submitted to hstspreload.org and
+  // permanently constrains every future subdomain. includeSubDomains gives
+  // the real security benefit without that lock-in.
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
   "Cross-Origin-Opener-Policy": "same-origin",
   "Cross-Origin-Resource-Policy": "same-origin",
   "Content-Security-Policy-Report-Only": CSP_REPORT_ONLY,
@@ -236,6 +244,233 @@ function __applySecurityHeaders(request, response) {
 }
 `;
 
+const cspReportInjectionSnippet = `
+// CSP report handling (R7C follow-up). Persists to D1 (CSP_REPORTS_DB),
+// never Supabase — this endpoint is public and unauthenticated. Handles
+// both report formats browsers actually send:
+//   - application/csp-report (the older report-uri format; a single
+//     top-level "csp-report" object)
+//   - application/reports+json (the newer Reporting API / Report-To
+//     format; a JSON ARRAY of {type, url, body} envelopes, one or more of
+//     which may have type "csp-violation")
+const __CSP_MAX_BODY_BYTES = 8192;
+const __CSP_FIELD_MAX = 1024;
+const __CSP_RATE_LIMIT_PER_MIN = 30;
+const __CSP_RETENTION_DAYS = 30;
+const __CSP_D1_TIMEOUT_MS = 5000;
+let __cspLastPrune = 0;
+// NOT A REAL RATE LIMIT — read this before assuming this endpoint is
+// protected against abuse. This is a per-isolate, in-memory Map keyed by
+// CF-Connecting-IP. Cloudflare runs many concurrent isolates across many
+// edge locations with no shared state between them, and any isolate can be
+// evicted/recycled at any time — a client hitting a different PoP, or
+// hitting a fresh isolate after recycling, resets this counter to zero.
+// There is no cross-isolate or cross-edge enforcement. This only blunts a
+// single sustained client hammering the same warm isolate; it is not a
+// distributed rate limit and must not be relied on as one. A real limit
+// would need Cloudflare's Rate Limiting binding or a Durable Object — not
+// implemented here (see CLAUDE.md §45 for the decision not to build one
+// given current traffic volume). Deliberately NOT persisted to D1 either —
+// the csp_reports schema has no ip column, and storing raw IPs indefinitely
+// would itself be a data-minimization concern on a public endpoint.
+const __cspIpHits = new Map();
+
+function __cspTruncate(v) {
+  if (v == null) return null;
+  const s = String(v);
+  return s.length > __CSP_FIELD_MAX ? s.slice(0, __CSP_FIELD_MAX) : s;
+}
+
+function __cspRateLimited(ip) {
+  const now = Date.now();
+  const windowStart = now - 60 * 1000;
+  let hits = __cspIpHits.get(ip);
+  if (!hits) { hits = []; __cspIpHits.set(ip, hits); }
+  while (hits.length && hits[0] < windowStart) hits.shift();
+  if (hits.length >= __CSP_RATE_LIMIT_PER_MIN) return true;
+  hits.push(now);
+  // Bound the map itself so a flood of distinct IPs can't grow it forever
+  // within one isolate's lifetime.
+  if (__cspIpHits.size > 5000) __cspIpHits.clear();
+  return false;
+}
+
+// Strips identifiers out of a document-uri before it's ever considered for
+// storage: keeps origin + path structure (useful for spotting which ROUTE a
+// violation is coming from) but replaces UUID and pure-numeric path
+// segments with a placeholder. This endpoint is public and unauthenticated
+// — a deal room id (e.g. /app/deal-rooms/957f9750-00c7-402a-b1ba-d9c7a4e3ba2f)
+// or any other UUID/numeric-keyed resource id must never land in a table
+// anyone can write to without auth, regardless of how well the rest of the
+// pipeline is locked down.
+// NOTE for future edits to this function: this whole snippet is assembled
+// as a JS template literal in patch-wrangler.mjs (cspReportInjectionSnippet
+// = \`...\`) and later written verbatim into dist/client/_worker.js. A
+// literal backslash here (e.g. in a regex like /\\d+/ or /\\//) is a
+// template-literal escape sequence AT BUILD TIME, not a regex escape at
+// RUNTIME — "\\d" and "\\/" were silently stripped to "d" and "/" the first
+// time this was written with normal regex syntax, producing a regex with
+// completely different (broken) semantics with no build error. Avoid
+// constructs needing a literal backslash in this snippet; the numeric-
+// segment matcher below is written using RegExp(String.fromCharCode(92)+...)
+// specifically to sidestep this rather than risk it recurring silently.
+const __CSP_SLASH_DIGIT_RE = new RegExp(
+  String.fromCharCode(92) + "/" + String.fromCharCode(92) + "d+(?=" + String.fromCharCode(92) + "/|$)",
+  "g"
+);
+function __cspStripDocumentUri(uri) {
+  if (!uri) return null;
+  try {
+    const u = new URL(uri);
+    let pathname = u.pathname.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, ":id");
+    pathname = pathname.replace(__CSP_SLASH_DIGIT_RE, "/:id");
+    return u.origin + pathname;
+  } catch (e) {
+    // Not a parseable absolute URL — still redact any UUID/id-shaped
+    // segments from the raw string rather than storing it verbatim.
+    return String(uri)
+      .replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, ":id")
+      .replace(__CSP_SLASH_DIGIT_RE, "/:id");
+  }
+}
+
+function __cspExtractRows(bodyText, contentType) {
+  // Returns an array of normalized row objects. Never throws — a parse
+  // failure yields an empty array, which results in nothing being stored
+  // (no partial/garbage rows); the caller always responds 204 regardless,
+  // so parse failure is never visible to whatever sent the report.
+  const rows = [];
+  try {
+    const parsed = JSON.parse(bodyText);
+    if (contentType.includes("application/reports+json") || Array.isArray(parsed)) {
+      const envelopes = Array.isArray(parsed) ? parsed : [parsed];
+      for (const envelope of envelopes) {
+        if (!envelope || typeof envelope !== "object") continue;
+        if (envelope.type && envelope.type !== "csp-violation") continue;
+        const b = envelope.body || {};
+        rows.push({
+          document_uri: __cspTruncate(__cspStripDocumentUri(b.documentURL || b["document-uri"] || envelope.url)),
+          violated_directive: __cspTruncate(b.effectiveDirective || b["violated-directive"]),
+          blocked_uri: __cspTruncate(b.blockedURL || b["blocked-uri"]),
+          source_file: __cspTruncate(b.sourceFile || b["source-file"]),
+          line_number: Number.isFinite(b.lineNumber) ? b.lineNumber : (Number.isFinite(b["line-number"]) ? b["line-number"] : null),
+          disposition: __cspTruncate(b.disposition),
+        });
+      }
+    } else {
+      // application/csp-report shape: { "csp-report": { ... } }
+      const b = (parsed && parsed["csp-report"]) || parsed || {};
+      rows.push({
+        document_uri: __cspTruncate(__cspStripDocumentUri(b["document-uri"])),
+        violated_directive: __cspTruncate(b["violated-directive"]),
+        blocked_uri: __cspTruncate(b["blocked-uri"]),
+        source_file: __cspTruncate(b["source-file"]),
+        line_number: Number.isFinite(b["line-number"]) ? b["line-number"] : null,
+        disposition: __cspTruncate(b.disposition),
+      });
+    }
+  } catch (e) {
+    return [];
+  }
+  return rows;
+}
+
+// Races any promise against a hard timeout so a hung D1 call can never
+// block the caller indefinitely. Used both here and wherever this endpoint
+// touches D1 — a throw is already caught by each call site's own try/catch,
+// but a genuine network hang has no other bound without this.
+function __withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout after " + ms + "ms")), ms)),
+  ]);
+}
+
+// Validates and parses the incoming request synchronously (fast, no D1
+// involved) and returns either null (reject silently — oversized body or
+// rate-limited) or the extracted rows + metadata needed to write them.
+// Split out from the actual D1 write so the write can be handed to
+// ctx.waitUntil() and the 204 response returned immediately — a slow or
+// hung D1 call must never delay, let alone block, the response to whatever
+// sent the report.
+async function __prepareCspReport(request) {
+  const contentType = request.headers.get("content-type") || "";
+  console.warn("[CSP Report] received, content-type=" + contentType);
+
+  const ip = request.headers.get("cf-connecting-ip") || "unknown";
+  if (__cspRateLimited(ip)) {
+    console.warn("[CSP Report] rate-limited ip=" + ip);
+    return null;
+  }
+
+  // Reject bodies over 8KB. Check Content-Length first (cheap), then the
+  // real decoded length as a fallback for chunked requests with no
+  // Content-Length header.
+  const declaredLen = Number(request.headers.get("content-length") || 0);
+  if (declaredLen && declaredLen > __CSP_MAX_BODY_BYTES) {
+    console.warn("[CSP Report] rejected: declared length " + declaredLen + " exceeds " + __CSP_MAX_BODY_BYTES);
+    return null;
+  }
+  let bodyText;
+  try { bodyText = await request.text(); } catch (e) { return null; }
+  if (bodyText.length > __CSP_MAX_BODY_BYTES) {
+    console.warn("[CSP Report] rejected: actual length " + bodyText.length + " exceeds " + __CSP_MAX_BODY_BYTES);
+    return null;
+  }
+
+  const ua = __cspTruncate(request.headers.get("user-agent"));
+  const rows = __cspExtractRows(bodyText, contentType);
+  if (!rows.length) return null;
+  return { rows, ua };
+}
+
+// The actual D1 write. Runs inside ctx.waitUntil() — never awaited by the
+// response path. Every D1 call is both try/caught (covers a throw) AND
+// raced against a timeout (covers a genuine hang) — either failure mode
+// is swallowed here and logged, never surfaced anywhere the client (or the
+// response path) could observe it.
+async function __writeCspReport(env, rows, ua) {
+  const db = env && env.CSP_REPORTS_DB;
+  if (!db) { console.error("[CSP Report] no CSP_REPORTS_DB binding — dropping"); return; }
+
+  // NOT A REAL TTL — there is no cron trigger and no scheduled handler
+  // anywhere in this project (checked: zero [triggers]/scheduled config in
+  // wrangler.toml). This DELETE only runs as a side effect of a report
+  // actually being written, gated by __cspLastPrune — which is per-isolate
+  // module state, so it resets to 0 on every fresh isolate. In practice
+  // that means a burst of cold starts prunes far more often than the
+  // "~10 min" the gate implies, while a quiet period with no report
+  // traffic at all prunes never, no matter how old the rows get. If
+  // reports stop arriving, nothing enforces the 30-day retention until
+  // they resume. See CLAUDE.md §45 for the decision to accept this given
+  // current traffic volume rather than build a real scheduled prune.
+  const __now = Date.now();
+  if (__now - __cspLastPrune > 10 * 60 * 1000) {
+    __cspLastPrune = __now;
+    try {
+      await __withTimeout(
+        db.prepare("DELETE FROM csp_reports WHERE received_at < datetime('now', '-" + __CSP_RETENTION_DAYS + " days')").run(),
+        __CSP_D1_TIMEOUT_MS
+      );
+    } catch (e) { console.error("[CSP Report] prune failed:", e); }
+  }
+
+  for (const row of rows) {
+    try {
+      await __withTimeout(
+        db
+          .prepare("INSERT INTO csp_reports (document_uri, violated_directive, blocked_uri, source_file, line_number, user_agent, disposition) VALUES (?, ?, ?, ?, ?, ?, ?)")
+          .bind(row.document_uri, row.violated_directive, row.blocked_uri, row.source_file, row.line_number, ua, row.disposition)
+          .run(),
+        __CSP_D1_TIMEOUT_MS
+      );
+    } catch (e) {
+      console.error("[CSP Report] insert failed:", e);
+    }
+  }
+}
+`;
+
 let workerCode = readFileSync("dist/client/_worker.js", "utf8");
 
 // Wrap default export to inject CF env on every request.
@@ -247,6 +482,7 @@ if (initCallMatch) {
 ${initCall}
 ${redirectInjectionSnippet}
 ${headerInjectionSnippet}
+${cspReportInjectionSnippet}
 // Inject CF env into globalThis.__cf_env and process.env before any handler runs
 const __origServer = server;
 const __patchedServer = {
@@ -276,12 +512,23 @@ const __patchedServer = {
     // today, a real pre-existing bug unrelated to this branch). Handling it
     // here, ahead of the router, sidesteps that gap entirely rather than
     // building a fourth broken variant of the same pattern.
+    //
+    // Persisted to its own D1 database (CSP_REPORTS_DB), never Supabase —
+    // this is a public, unauthenticated write endpoint and must not have a
+    // path to the product database. Always returns 204 immediately — on
+    // success, on rejection (oversized body, rate-limited), on parse
+    // failure, on a missing/unbound D1, and even if D1 hangs — the actual
+    // write is handed to ctx.waitUntil() and never awaited on the response
+    // path, so this endpoint can never 500 and can never block on D1.
     try {
       const __u = new URL(request.url);
       if (__u.pathname === '/api/csp-report' && request.method === 'POST') {
-        let __body = null;
-        try { __body = await request.json(); } catch(e) {}
-        console.warn('[CSP Report]', JSON.stringify(__body));
+        try {
+          const __prepared = await __prepareCspReport(request);
+          if (__prepared && ctx && typeof ctx.waitUntil === 'function') {
+            ctx.waitUntil(__writeCspReport(env, __prepared.rows, __prepared.ua));
+          }
+        } catch (e) { console.error('[CSP Report] prepare failed:', e); }
         return new Response(null, { status: 204 });
       }
     } catch(e) {}
