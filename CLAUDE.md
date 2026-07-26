@@ -1609,3 +1609,146 @@ directory, filters out `/app/*` and anything the route's own `head()` marks `noi
 `sitemap.xml` as part of `npm run build`) would close this gap permanently and should be preferred
 over continuing to hand-maintain this file** — this was flagged but not built in R7C to keep the
 branch scoped; a good candidate for a small, focused follow-up.
+
+---
+
+## 46. CSP REPORT PERSISTENCE — D1, deliberate non-guarantees, and a real template-literal trap (found/built fix/r7c-followups, July 2026)
+
+### 46.0 What exists
+
+`/api/csp-report` (intercepted inside the worker's `fetch` handler, in `scripts/patch-wrangler.mjs`
+— see §44, this app has no working raw-HTTP route mechanism to hang a receiver off otherwise)
+persists CSP violation reports to a dedicated Cloudflare D1 database: **`hockystick-csp-reports`**,
+bound as **`CSP_REPORTS_DB`** in `wrangler.toml`. Schema in
+`frontend/d1-migrations/0001_csp_reports.sql`: `id, received_at, document_uri,
+violated_directive, blocked_uri, source_file, line_number, user_agent, disposition`.
+
+**Deliberately NOT Supabase** — this is a public, unauthenticated write endpoint (anyone's browser
+can POST to it) and must never have a path to the product database. A separate D1 instance means a
+flood, an injection attempt, or a bug in this endpoint has no way to touch real product data.
+
+Handles both real-world report formats: `application/csp-report` (older report-uri, single object)
+and `application/reports+json` (Reporting API / Report-To, a JSON array of envelopes filtered to
+`type: "csp-violation"`).
+
+### 46.1 What it deliberately does NOT store
+
+- **No raw document-uri.** Before storage, `document_uri` is stripped of UUIDs and pure-numeric
+  path segments (replaced with `:id`) — origin and route *shape* are kept (useful for knowing which
+  page a violation came from), but a real resource id — most importantly a deal room id
+  (`/app/deal-rooms/<uuid>/...`) — must never land in a table anyone can write to without auth,
+  regardless of how locked-down the rest of the pipeline is. See `__cspStripDocumentUri` in
+  `patch-wrangler.mjs`.
+- **No IP address column**, by design — see §46.2.
+- **No cookies, no auth headers, no request body beyond the reviewed column list.**
+- Every stored string field truncated to 1024 chars; bodies over 8KB rejected before parsing.
+
+### 46.2 Rate limiting is NOT real — read this before assuming the endpoint is protected
+
+The rate limit is an **in-memory `Map`, per-isolate, module-scope** (`__cspIpHits` in
+`patch-wrangler.mjs`), keyed on `CF-Connecting-IP`, capped at 30/minute. Cloudflare runs many
+concurrent isolates across many edge locations with **no shared state between them**, and any
+isolate can be evicted/recycled at any time. A client hitting a different PoP, or hitting a fresh
+isolate after recycling, resets the counter to zero. **There is no cross-isolate or cross-edge
+enforcement.** This only blunts a single sustained client hammering the same warm isolate — it is
+not a distributed rate limit and must not be relied on as one.
+
+A real limit would need Cloudflare's Rate Limiting binding or a Durable Object. **Decision: not
+built**, given current traffic volume (a handful of users) — the cost of a wrong distributed limiter
+outweighs the benefit at this scale. Revisit if/when real traffic volume changes this calculus.
+Deliberately not persisted to D1 either, per §46.1 (no ip column, and storing raw IPs indefinitely
+would itself be a data-minimization concern on a public endpoint).
+
+### 46.3 The 30-day retention is NOT a real TTL — read this before assuming old rows are purged
+
+There is **no cron trigger and no `[triggers]`/scheduled handler anywhere in this project**
+(confirmed: zero such config in `wrangler.toml`). The retention DELETE only runs as a **side effect
+of a report actually being written**, gated by a per-isolate timestamp (`__cspLastPrune`) that
+resets to 0 on every fresh isolate — so a burst of cold starts prunes far more often than the
+intended "~once per 10 min," while a quiet period with no report traffic at all prunes **never**, no
+matter how old the rows get. If reports stop arriving, nothing enforces the 30-day retention until
+they resume. **Decision: accepted given current traffic volume**, documented here rather than left
+as a comment implying a real guarantee. Revisit alongside §46.2 if traffic volume changes.
+
+### 46.4 The endpoint never blocks on D1 or throws — how, precisely
+
+Request handling is split in two: `__prepareCspReport` (fast, synchronous validation — rate limit,
+body-size check, parse) runs on the response path and is awaited; `__writeCspReport` (the actual D1
+prune + insert calls) is handed to **`ctx.waitUntil()`** and is *never* awaited by the code that
+returns the response. The worker returns `204` immediately regardless of what D1 does — success,
+throw, or a genuine hang. Every D1 call inside `__writeCspReport` is both try/caught (covers a
+throw) and raced against a 5s timeout via `__withTimeout` (covers a hang) — either failure mode is
+logged and swallowed, never surfaced anywhere the client or the response path could observe it. If
+`CSP_REPORTS_DB` is unbound at runtime, `__writeCspReport`'s own guard (`if (!db) { ...; return; }`)
+returns cleanly before any D1 call is attempted.
+
+### 46.5 A genuine, silent bug found and fixed while building this — read before editing this snippet again
+
+The CSP-report handling code is assembled as a **JS template literal** in `patch-wrangler.mjs`
+(`cspReportInjectionSnippet = \`...\``) and written verbatim into the built `dist/client/_worker.js`.
+**A literal backslash inside that snippet is a template-literal escape sequence at Node build time,
+not a regex escape at Worker runtime.** Writing a normal-looking regex like `/\/\d+(?=\/|$)/g`
+inside this snippet silently produced `/\d+(?=\/|$)/` → actually `//d+(?=/|$)/g` after Node's
+template-literal parsing dropped the backslashes — no build error, no lint warning, just a regex
+with completely different (broken) semantics that made `__cspStripDocumentUri`'s numeric-id
+stripping a permanent no-op. This was caught only by live-testing the actual stored rows against a
+real UUID/numeric path, not by reading the code or by static type-checking — `tsc` does not see
+`.mjs` build scripts, and the bundled/minified output looked superficially plausible even while
+broken. **First misdiagnosed as an esbuild minifier bug** (chasing symptoms in minified output
+rather than checking the pre-minified assembled string first) before the real cause was found by
+comparing the raw pre-minify file against source.
+
+**The fix in place**: the numeric-segment regex is built via `new RegExp(String.fromCharCode(92) +
+...)` specifically to avoid any literal backslash appearing in the template-literal source. **The
+rule going forward**: any regex or string requiring a literal backslash added to
+`cspReportInjectionSnippet` (or `redirectInjectionSnippet` / `headerInjectionSnippet`, same
+mechanism) must either avoid the backslash entirely (character classes, `String.fromCharCode`,
+etc.) or be verified by testing the actual runtime behavior against real input — not just a
+successful build — before considering it correct. A clean `npm run build` and a plausible-looking
+`grep` of the minified output are not sufficient proof; this bug survived both.
+
+### 46.6 `patch-wrangler.mjs` and `public/_headers` sync — restated from §44
+
+Both header-block lists (`SECURITY_HEADERS` in `patch-wrangler.mjs`, the `/*` block in
+`public/_headers`) carry a cross-reference comment pointing at each other and at §44 — editing one
+without the other silently diverges what's actually live between static-asset responses and
+SSR-routed responses. Re-stated here because this section's own D1/CSP work lives in the same file
+and is easy to lose track of amid a larger diff.
+
+### 46.7 HSTS ships `includeSubDomains` without `preload` — deliberate, not an oversight
+
+`Strict-Transport-Security: max-age=31536000; includeSubDomains` (no `preload`) in both
+`patch-wrangler.mjs` and `public/_headers`. `preload` requires submission to hstspreload.org and is
+**effectively irreversible** once accepted — it permanently constrains every current and future
+subdomain to HTTPS-only, baked into browsers' shipped preload lists, with removal taking months and
+requiring the constraint to already have been satisfied for an extended period. `includeSubDomains`
+alone gives the real security benefit (confirmed via DNS audit: only one real subdomain exists,
+`www`, already HTTPS-clean) without that lock-in. **Do not submit this domain to hstspreload.org**
+without a deliberate, separate decision to do so — it is not implied by anything in this section.
+
+### 46.8 `www` → apex redirect exists at the Cloudflare edge — do not add worker-level handling
+
+`www.hockystick.app` redirects to the apex with a `301`, verified to happen for arbitrary paths and
+to hold over both HTTP and HTTPS. **Neither `patch-wrangler.mjs` nor `_redirects` contains this
+rule** — it happens upstream of the worker entirely (confirmed: the 301 response carries none of
+this app's CSP/security headers, which only appear on the follow-up 200 the worker produces).
+Almost certainly Cloudflare Pages' own custom-domain behavior when both the apex and `www` are
+attached to the same Pages project. **Do not add a worker-level or `_redirects` www→apex rule** —
+one already exists and works; adding a second would be redundant at best.
+
+**A prior report misdiagnosed this once** — Google's Rich Results Test was used as evidence that
+`www` might serve `200` directly (un-redirected) based on a test run against `www`. That tool
+**displays the originally-submitted URL and silently follows redirects** before rendering results;
+a successful fetch report for a `www` submission is consistent with (and expected from) a *working*
+redirect, and is not evidence that `www` itself serves `200`. Verify redirect behavior with `curl
+-sIL`, never by reading which URL a third-party tool displays in its own results page.
+
+### 46.9 The dynamic blog-post canonical is unverified — carry to R8
+
+`/blog/$slug`'s `head()` sets a self-referencing canonical keyed off `params.slug` (see
+`blog.$slug.tsx`) and the logic was verified correct for the zero-post case (a nonexistent slug
+correctly gets no canonical, matching the early-return branch). **No real published blog post
+existed in this environment at any point during R7C or its follow-ups**, so the actual canonical
+value on a real, live post has never been observed rendering correctly end-to-end. Not a known bug
+— just genuinely unverified. First thing to check in R8 once a real post exists: `curl` a real
+`/blog/<real-slug>` and confirm the canonical matches.
