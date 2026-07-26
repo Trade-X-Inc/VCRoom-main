@@ -1654,10 +1654,20 @@ enforcement.** This only blunts a single sustained client hammering the same war
 not a distributed rate limit and must not be relied on as one.
 
 A real limit would need Cloudflare's Rate Limiting binding or a Durable Object. **Decision: not
-built**, given current traffic volume (a handful of users) — the cost of a wrong distributed limiter
-outweighs the benefit at this scale. Revisit if/when real traffic volume changes this calculus.
-Deliberately not persisted to D1 either, per §46.1 (no ip column, and storing raw IPs indefinitely
-would itself be a data-minimization concern on a public endpoint).
+built in the worker**, given current traffic volume (a handful of users) — the cost of a wrong
+distributed limiter outweighs the benefit at this scale. Deliberately not persisted to D1 either,
+per §46.1 (no ip column, and storing raw IPs indefinitely would itself be a data-minimization
+concern on a public endpoint).
+
+**Where real rate limiting belongs, if it's ever built: a Cloudflare WAF rate-limiting rule on
+`/api/csp-report`, configured in the dashboard — not code in this worker.** Cloudflare's edge
+already sees every request before it reaches any Worker isolate, so a WAF-level rule gets the
+cross-isolate, cross-edge enforcement the in-memory `Map` here structurally cannot provide, with no
+application code change needed. **This is an open product-owner task (dashboard config), not an
+engineering task for a future session to "fix" by rewriting the in-worker limiter** — a smarter
+per-isolate `Map`, a bigger window, a cleverer eviction policy, none of that closes the structural
+gap (no shared state across isolates/edge locations), so don't spend a session trying. If traffic
+volume ever justifies it, the fix is a WAF rule, not more worker code.
 
 ### 46.3 The 30-day retention is NOT a real TTL — read this before assuming old rows are purged
 
@@ -1667,8 +1677,18 @@ of a report actually being written**, gated by a per-isolate timestamp (`__cspLa
 resets to 0 on every fresh isolate — so a burst of cold starts prunes far more often than the
 intended "~once per 10 min," while a quiet period with no report traffic at all prunes **never**, no
 matter how old the rows get. If reports stop arriving, nothing enforces the 30-day retention until
-they resume. **Decision: accepted given current traffic volume**, documented here rather than left
-as a comment implying a real guarantee. Revisit alongside §46.2 if traffic volume changes.
+they resume.
+
+**Decision: delete-on-write is adequate by design — do NOT add a `[triggers]`/cron handler for
+this.** Recorded here so it isn't re-litigated by a future session that notices the "gap" and
+reaches for a scheduled Worker: a table fed exclusively by real CSP violations at this app's traffic
+volume grows slowly enough that "prunes only when a report arrives" is a fine tradeoff against the
+actual cost of a scheduled trigger — a dedicated cron handler, a new trigger to maintain, and a
+Worker invocation on a schedule regardless of whether there's anything to prune. If the table were
+ever fed by something high-volume or adversarial (which §46.2's WAF-rule gap is the real defense
+against), this tradeoff would need revisiting *together with* the rate-limiting decision, not in
+isolation — a cron trigger without also closing the rate-limit gap would just prune a table that a
+flood can refill faster than any reasonable schedule prunes it.
 
 ### 46.4 The endpoint never blocks on D1 or throws — how, precisely
 
@@ -1706,6 +1726,28 @@ mechanism) must either avoid the backslash entirely (character classes, `String.
 etc.) or be verified by testing the actual runtime behavior against real input — not just a
 successful build — before considering it correct. A clean `npm run build` and a plausible-looking
 `grep` of the minified output are not sufficient proof; this bug survived both.
+
+**The concrete verification procedure, required before trusting any change to code injected via
+`patch-wrangler.mjs`:** temporarily gate the minify `execSync` call behind an env var (e.g. `if
+(!process.env.SKIP_MINIFY_DEBUG) { ...minify... }`), run `SKIP_MINIFY_DEBUG=1 node
+scripts/patch-wrangler.mjs`, then `grep`/read the **pre-minified** `dist/client/_worker.js` directly
+for the exact construct in question — this is the file esbuild's minifier receives as input, and
+the only place a template-literal escaping bug is visible as broken *source* rather than as
+oddly-named minified output. Reading minified output for this purpose actively misleads: mangled
+names make an unrelated collision look like the bug, which is exactly how this was first
+misdiagnosed. Revert the env-var gate afterward and confirm `git diff` on `patch-wrangler.mjs` is
+empty before moving on — the gate is a debugging tool, not a permanent build option.
+
+**Re-confirmed clean in a full audit after this fix**: every backslash in all three injected
+snippets (`redirectInjectionSnippet`, `headerInjectionSnippet`, `cspReportInjectionSnippet`) was
+enumerated and checked against the actual pre-minified assembled string using the procedure above.
+`redirectInjectionSnippet` and `headerInjectionSnippet` contain zero backslashes anywhere (plain
+paths, hash fragments, and CSP directive strings — nothing backslash-dependent). The only
+backslashes in `cspReportInjectionSnippet` are inside a code comment (correctly double-escaped as
+`\\d`/`\\/` in source, confirmed rendering as intended single backslashes `\d`/`\/` in the built
+file) and the already-fixed `String.fromCharCode(92)` construct, which was additionally verified at
+runtime (`"/app/deal-rooms/123/documents".replace(re, "/:id")` → `/app/deal-rooms/:id/documents`).
+No further corruption found.
 
 ### 46.6 `patch-wrangler.mjs` and `public/_headers` sync — restated from §44
 
