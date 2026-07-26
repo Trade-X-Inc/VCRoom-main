@@ -109,6 +109,7 @@ export const Route = createFileRoute("/pricing")({
       { title: "Pricing — Hockystick" },
       { name: "description", content: "Simple, honest pricing. 30-day free trial, no credit card required. Founder plans from $19/month, investor plans from $99/month." },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/pricing" }],
   }),
   loader: () => getPlans(),
   component: PricingPage,

@@ -24,6 +24,7 @@ export const Route = createFileRoute("/tools/runway")({
           "Calculate exactly how many months of runway your startup has. See your cash-out date, model three scenarios, and know when to start your next fundraise. Free, no signup required.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/tools/runway" }],
   }),
   component: RunwayPage,
 });

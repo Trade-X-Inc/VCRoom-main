@@ -13,6 +13,7 @@ export const Route = createFileRoute("/resources")({
           "Accelerators, grants, VC funds, and programs from GCC, MENA, EU, NA, SEA, and Africa. Everything you need to fund your startup.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/resources" }],
   }),
   component: Resources,
 });

@@ -24,6 +24,7 @@ export const Route = createFileRoute("/tools/cogs")({
           "Calculate cost of goods sold, gross profit, and gross margin for SaaS, hardware, marketplace, and e-commerce startups. Compare your margins to industry benchmarks. Free, no signup required.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/tools/cogs" }],
   }),
   component: CogsPage,
 });

@@ -23,6 +23,7 @@ export const Route = createFileRoute("/trust")({
       { title: "How Verification Works — Hockystick" },
       { name: "description", content: "Every Hockystick verification tier explained. What each badge means, what we actually check, and what we never claim." },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/trust" }],
   }),
   component: TrustPage,
 });

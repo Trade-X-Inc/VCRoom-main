@@ -24,6 +24,7 @@ export const Route = createFileRoute("/tools/cap-table")({
           "Build your startup cap table, model dilution across pre-seed, seed, and Series A rounds. See exactly how each funding round affects founder and investor ownership. Free, no signup required.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/tools/cap-table" }],
   }),
   component: CapTablePage,
 });

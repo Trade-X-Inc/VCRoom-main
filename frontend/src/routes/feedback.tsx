@@ -14,6 +14,7 @@ export const Route = createFileRoute("/feedback")({
       { title: "Feedback — Hockystick" },
       { name: "description", content: "Help us improve Hockystick." },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/feedback" }],
   }),
   component: Feedback,
 });

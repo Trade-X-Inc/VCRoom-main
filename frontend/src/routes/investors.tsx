@@ -8,6 +8,7 @@ export const Route = createFileRoute("/investors")({
       { title: "For Investors — Hockystick" },
       { name: "description", content: "Evaluate, diligence, and decide. The structured deal room investors actually use." },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/investors" }],
   }),
   component: () => (
     <SolutionPage

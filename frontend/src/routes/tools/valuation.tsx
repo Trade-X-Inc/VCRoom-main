@@ -23,8 +23,8 @@ export const Route = createFileRoute("/tools/valuation")({
         content:
           "Calculate your startup's valuation using VC Method, Revenue Multiples, and Berkus Method. Built for pre-seed to Series A founders. Free, no signup required.",
       },
-      { name: "canonical", content: "https://hockystick.app/tools/valuation" },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/tools/valuation" }],
   }),
   component: ValuationPage,
 });

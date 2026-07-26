@@ -8,6 +8,7 @@ export const Route = createFileRoute("/solutions/investor-pipeline")({
       { title: "Investor Pipeline Management Tool — Hockystick" },
       { name: "description", content: "Manage every investor relationship across the full lifecycle of your raise." },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/solutions/investor-pipeline" }],
   }),
   component: () => (
     <SolutionPage

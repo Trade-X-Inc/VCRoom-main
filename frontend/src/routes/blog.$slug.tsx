@@ -6,17 +6,20 @@ import { ArrowRight, ArrowLeft, Clock, Calendar, User } from "lucide-react";
 import { getPostBySlug, type BlogPostWithContent } from "@/lib/notion-blog";
 
 export const Route = createFileRoute("/blog/$slug")({
-  head: ({ loaderData }) => {
+  head: ({ loaderData, params }) => {
     const post = loaderData as BlogPostWithContent | null;
     if (!post) return { meta: [{ title: "Post not found — Hockystick Blog" }] };
+    const url = `https://hockystick.app/blog/${params.slug}`;
     return {
       meta: [
         { title: `${post.seoTitle || post.title} — Hockystick Blog` },
         { name: "description", content: post.seoDescription || post.excerpt },
         { property: "og:title", content: post.seoTitle || post.title },
         { property: "og:description", content: post.seoDescription || post.excerpt },
+        { property: "og:url", content: url },
         ...(post.coverImage ? [{ property: "og:image", content: post.coverImage }] : []),
       ],
+      links: [{ rel: "canonical", href: url }],
     };
   },
   loader: ({ params }) => getPostBySlug({ data: { slug: params.slug } }),

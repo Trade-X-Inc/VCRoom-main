@@ -24,6 +24,7 @@ export const Route = createFileRoute("/tools/safe-note")({
           "Calculate how your SAFE note converts at the next priced round. Compare valuation cap vs discount rate scenarios. See exact share count and ownership before you sign. Free, no signup required.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/tools/safe-note" }],
   }),
   component: SafeNotePage,
 });

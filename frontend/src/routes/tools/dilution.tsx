@@ -24,6 +24,7 @@ export const Route = createFileRoute("/tools/dilution")({
           "Calculate exactly how much equity each funding round dilutes your ownership. Model up to 3 rounds with option pool top-ups. Free dilution calculator for startup founders.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/tools/dilution" }],
   }),
   component: DilutionPage,
 });

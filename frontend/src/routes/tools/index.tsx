@@ -12,6 +12,7 @@ export const Route = createFileRoute("/tools/")({
           "Free financial tools built for startup founders raising capital. Valuation calculators, burn rate, runway, cap table, SAFE notes — accurate, methodology-backed, free to use.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/tools" }],
   }),
   component: ToolsIndex,
 });

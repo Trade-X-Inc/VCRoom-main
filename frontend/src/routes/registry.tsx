@@ -13,6 +13,7 @@ export const Route = createFileRoute("/registry")({
           "Search across OpenCorporates (140+ jurisdictions), UK Companies House, and DIFC entity register simultaneously. Free. No account required.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/registry" }],
   }),
   component: Registry,
 });

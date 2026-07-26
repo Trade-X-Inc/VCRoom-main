@@ -8,6 +8,7 @@ export const Route = createFileRoute("/solutions/fundraising-crm")({
       { title: "Fundraising CRM for Startups — Hockystick" },
       { name: "description", content: "The fundraising CRM built for startups. Pipeline, AI email, follow-ups, and analytics." },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/solutions/fundraising-crm" }],
   }),
   component: () => (
     <SolutionPage

@@ -8,6 +8,7 @@ export const Route = createFileRoute("/solutions/due-diligence")({
       { title: "Startup Due Diligence Platform — Hockystick" },
       { name: "description", content: "Templated due diligence across legal, financial, technical, and market." },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/solutions/due-diligence" }],
   }),
   component: () => (
     <SolutionPage

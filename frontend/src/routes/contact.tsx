@@ -5,6 +5,9 @@ import { SiteFooter } from '@/components/site/SiteFooter'
 import { supabase } from '@/lib/supabase'
 
 export const Route = createFileRoute('/contact')({
+  head: () => ({
+    links: [{ rel: "canonical", href: "https://hockystick.app/contact" }],
+  }),
   component: Contact,
 })
 

@@ -8,6 +8,7 @@ export const Route = createFileRoute("/solutions/vc-deal-room")({
       { title: "VC Deal Room Software — Hockystick" },
       { name: "description", content: "Structured deal rooms with NDA, document vault, Q&A, and decision board." },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/solutions/vc-deal-room" }],
   }),
   component: () => (
     <SolutionPage

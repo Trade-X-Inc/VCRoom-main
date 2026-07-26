@@ -24,6 +24,7 @@ export const Route = createFileRoute("/tools/burn-rate")({
           "Calculate your startup's monthly burn rate and runway in seconds. Model three scenarios, see your cash-out date, and know exactly when to start your next raise. Free, no signup required.",
       },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/tools/burn-rate" }],
   }),
   component: BurnRatePage,
 });

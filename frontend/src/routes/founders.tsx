@@ -8,6 +8,7 @@ export const Route = createFileRoute("/founders")({
       { title: "For Founders — Hockystick" },
       { name: "description", content: "Run your fundraise like a pro. CRM, AI email, deal rooms — built for founders." },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/founders" }],
   }),
   component: () => (
     <SolutionPage

@@ -8,6 +8,7 @@ export const Route = createFileRoute("/solutions/raise-1m")({
       { title: "Raise Your First $1M — Hockystick" },
       { name: "description", content: "The complete playbook and platform to raise your first million." },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/solutions/raise-1m" }],
   }),
   component: () => (
     <SolutionPage

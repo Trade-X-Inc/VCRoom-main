@@ -11,6 +11,7 @@ export const Route = createFileRoute("/blog/")({
       { title: "Blog — Hockystick" },
       { name: "description", content: "Latest insights on fundraising, venture capital, and deal management." },
     ],
+    links: [{ rel: "canonical", href: "https://hockystick.app/blog" }],
   }),
   loader: () => getPublishedPosts(),
   component: BlogIndex,
