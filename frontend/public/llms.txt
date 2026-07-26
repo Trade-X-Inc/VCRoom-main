@@ -1,0 +1,46 @@
+# Hockystick
+
+> The fundraising platform where verified founders and investors meet, run
+> due diligence, negotiate terms, and close deals — entirely in-platform.
+
+Built by Venture Tech LLC, DIFC FinTech Hive, Dubai, UAE.
+
+## What it does
+
+- Verified profiles for both founders and investors (five-tier verification,
+  built from real documents, not self-reported claims).
+- Private NDA-gated deal rooms: document sharing, structured due diligence,
+  AI document analysis, Q&A.
+- Structured video interviews (five stages: Introduction, Product Demo,
+  Financial Discussion, Terms Discussion, Investment Terms) with AI note
+  extraction, source-cited to the transcript.
+- Per-term negotiation across four instrument types (SAFE, Equity, Debt,
+  Company Sale) with a full audit trail.
+- In-platform closing: signed agreement, payment confirmation, auto-generated
+  invoices, permanent read-only archive.
+
+## Fee model
+
+Free during beta. After beta: $49/month for founders. A 1.5% success fee on
+closed deals (minimum $500, maximum $15,000), charged only at closing. No fee
+if a deal doesn't close. Investors: free at launch.
+
+## Key pages
+
+- [Homepage](https://hockystick.app/): product overview, FAQ, pricing preview.
+- [Pricing](https://hockystick.app/pricing): full pricing detail.
+- [Trust & Verification](https://hockystick.app/trust): how the verification
+  tiers work.
+- [About](https://hockystick.app/about): company and team.
+- [Docs](https://hockystick.app/docs): full product documentation for
+  founders, investors, deal rooms, and the AI features.
+- [Blog](https://hockystick.app/blog): fundraising and deal-flow articles.
+- [Free calculators](https://hockystick.app/tools): valuation, burn rate,
+  runway, COGS, cap table, SAFE note, and dilution calculators — no signup
+  required.
+
+## Docs
+
+Full documentation lives at https://hockystick.app/docs, organized by
+founder features, investor features, deal rooms, and AI. The security model
+and platform changelog are at /docs/security and /docs/changelog.

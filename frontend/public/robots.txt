@@ -1,21 +1,74 @@
 User-agent: *
 Allow: /
-Allow: /blog
-Allow: /blog/*
-Allow: /pricing
-Allow: /sign-up
-Allow: /sign-in
 Disallow: /app/
 Disallow: /api/
 Disallow: /auth/
+Disallow: /join
+Disallow: /join-room
+Disallow: /join-investor/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
-User-agent: Googlebot
+# AI assistants and answer engines — explicitly allowed for discovery.
+User-agent: GPTBot
 Allow: /
 
-User-agent: LinkedInBot
+User-agent: OAISearchBot
 Allow: /
 
-User-agent: Twitterbot
+User-agent: ChatGPT-User
 Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: DuckAssistBot
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: MistralAIUser
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+# Low-value scrapers — not search or AI-assistant traffic, no reason to spend
+# crawl budget on them.
+User-agent: Bytespider
+Disallow: /
+
+User-agent: TikTokSpider
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+User-agent: Timpibot
+Disallow: /
+
+User-agent: ProRataInc
+Disallow: /
 
 Sitemap: https://hockystick.app/sitemap.xml

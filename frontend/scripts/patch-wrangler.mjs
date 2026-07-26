@@ -241,7 +241,30 @@ const __patchedServer = {
         return new Response(null, { status: 204 });
       }
     } catch(e) {}
-    const __response = await __origServer.fetch(request, env, ctx);
+    // TanStack Start's own router hard-codes a 500 (Response.json, wrong
+    // status for the situation — should never be a 5xx for "I don't support
+    // this content-type") whenever a request's Accept header doesn't contain
+    // "*/*" or "text/html" (createStartHandler.js: executeRouter). AI
+    // crawlers/agents sometimes send "Accept: text/markdown" for content
+    // negotiation; this is not a bug in this app's own route code, it is
+    // framework-level, and cannot be patched in node_modules. Rewrite the
+    // request's Accept header to text/html before it reaches the router for
+    // any page navigation (never for /api/* — those routes have their own
+    // real content-type contracts and must not be silently coerced) so a
+    // crawler asking for markdown still gets real HTML (200) instead of a
+    // 500 with a JSON error body.
+    let __req = request;
+    try {
+      const __u2 = new URL(request.url);
+      const __accept = request.headers.get('Accept') || '';
+      const __ok = __accept.includes('*/*') || __accept.includes('text/html');
+      if (!__ok && !__u2.pathname.startsWith('/api/')) {
+        const __h = new Headers(request.headers);
+        __h.set('Accept', 'text/html');
+        __req = new Request(request, { headers: __h });
+      }
+    } catch(e) {}
+    const __response = await __origServer.fetch(__req, env, ctx);
     return __applySecurityHeaders(request, __response);
   }
 };
