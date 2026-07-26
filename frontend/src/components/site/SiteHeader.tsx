@@ -36,7 +36,6 @@ export function SiteHeader() {
 
         {/* Center — Nav links (desktop only) */}
         <nav className="hidden md:flex items-center gap-5 flex-1 justify-center">
-          <a href="/#how-it-works" className={NAV_LINK}>Product</a>
           <Link to="/pricing" className={NAV_LINK}>Pricing</Link>
           <Link to={"/docs" as any} className={NAV_LINK}>Docs</Link>
           <Link to="/blog" className={NAV_LINK}>Blog</Link>
@@ -76,10 +75,6 @@ export function SiteHeader() {
       {/* Mobile menu */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-border/60 bg-background/95 backdrop-blur-xl px-4 py-4 space-y-1">
-          <a href="/#how-it-works" onClick={close}
-            className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
-            Product
-          </a>
           <Link to="/pricing" onClick={close}
             className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
             Pricing

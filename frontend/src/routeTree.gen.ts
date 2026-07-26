@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WaitlistRouteImport } from './routes/waitlist'
 import { Route as TrustRouteImport } from './routes/trust'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignUpRouteImport } from './routes/sign-up'
@@ -207,11 +206,6 @@ import { Route as AppInvestorThesisBadgesApplyRouteImport } from './routes/app.i
 import { Route as AppInvestorDiscoverPublicProfileProfileViewRouteImport } from './routes/app.investor.discover.public-profile.profile-view'
 import { Route as AppInvestorDiscoverPublicProfilePrivacySettingsRouteImport } from './routes/app.investor.discover.public-profile.privacy-settings'
 
-const WaitlistRoute = WaitlistRouteImport.update({
-  id: '/waitlist',
-  path: '/waitlist',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const TrustRoute = TrustRouteImport.update({
   id: '/trust',
   path: '/trust',
@@ -1276,7 +1270,6 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
   '/trust': typeof TrustRoute
-  '/waitlist': typeof WaitlistRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
   '/api/admin-verification': typeof ApiAdminVerificationRoute
@@ -1472,7 +1465,6 @@ export interface FileRoutesByTo {
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
   '/trust': typeof TrustRoute
-  '/waitlist': typeof WaitlistRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
   '/api/admin-verification': typeof ApiAdminVerificationRoute
@@ -1671,7 +1663,6 @@ export interface FileRoutesById {
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
   '/trust': typeof TrustRoute
-  '/waitlist': typeof WaitlistRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
   '/api/admin-verification': typeof ApiAdminVerificationRoute
@@ -1872,7 +1863,6 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/terms'
     | '/trust'
-    | '/waitlist'
     | '/api/admin'
     | '/api/admin-data'
     | '/api/admin-verification'
@@ -2068,7 +2058,6 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/terms'
     | '/trust'
-    | '/waitlist'
     | '/api/admin'
     | '/api/admin-data'
     | '/api/admin-verification'
@@ -2266,7 +2255,6 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/terms'
     | '/trust'
-    | '/waitlist'
     | '/api/admin'
     | '/api/admin-data'
     | '/api/admin-verification'
@@ -2466,7 +2454,6 @@ export interface RootRouteChildren {
   SignUpRoute: typeof SignUpRoute
   TermsRoute: typeof TermsRoute
   TrustRoute: typeof TrustRoute
-  WaitlistRoute: typeof WaitlistRoute
   ApiAdminRoute: typeof ApiAdminRoute
   ApiAdminDataRoute: typeof ApiAdminDataRoute
   ApiAdminVerificationRoute: typeof ApiAdminVerificationRoute
@@ -2501,13 +2488,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/waitlist': {
-      id: '/waitlist'
-      path: '/waitlist'
-      fullPath: '/waitlist'
-      preLoaderRoute: typeof WaitlistRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/trust': {
       id: '/trust'
       path: '/trust'
@@ -4287,7 +4267,6 @@ const rootRouteChildren: RootRouteChildren = {
   SignUpRoute: SignUpRoute,
   TermsRoute: TermsRoute,
   TrustRoute: TrustRoute,
-  WaitlistRoute: WaitlistRoute,
   ApiAdminRoute: ApiAdminRoute,
   ApiAdminDataRoute: ApiAdminDataRoute,
   ApiAdminVerificationRoute: ApiAdminVerificationRoute,

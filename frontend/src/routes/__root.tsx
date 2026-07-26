@@ -65,7 +65,7 @@ function NotFoundComponent() {
       </p>
       <div style={{ display: 'flex', gap: 12 }}>
         <a href="/" style={{
-          background: 'var(--gradient-brand)',
+          background: '#7C3AED',
           color: '#ffffff',
           padding: '10px 24px',
           borderRadius: 8,

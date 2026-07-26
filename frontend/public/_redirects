@@ -1,6 +1,7 @@
 /signup /sign-up 301
 /accelerators /resources 301
 /grants /resources 301
+/waitlist /sign-up 301
 /app/news /app 301
 /app/pipeline /app 301
 /app/vc-leads /app 301

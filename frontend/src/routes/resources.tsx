@@ -302,7 +302,7 @@ function Resources() {
 
         {/* Back */}
         <a href="/" className="inline-flex items-center gap-2 text-sm transition-colors mb-12" style={{ color: "var(--muted-foreground)" }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--foreground)")}
           onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted-foreground)")}
         >
           ← Back to Hockystick
@@ -315,7 +315,7 @@ function Resources() {
           </p>
           <h1
             className="font-bold text-3xl sm:text-4xl md:text-5xl mb-4 leading-tight"
-            style={{ fontFamily: "Syne, sans-serif", color: "#ffffff" }}
+            style={{ fontFamily: "Syne, sans-serif", color: "var(--foreground)" }}
           >
             Everything you need to fund your startup
           </h1>
@@ -337,7 +337,7 @@ function Resources() {
               className="px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
               style={
                 tab === t.id
-                  ? { background: "var(--gradient-brand)", color: "#fff" }
+                  ? { background: "#7C3AED", color: "#fff" }
                   : { color: "var(--muted-foreground)" }
               }
             >
@@ -428,7 +428,7 @@ function Resources() {
           <a
             href="/sign-up"
             className="inline-flex items-center min-h-9 text-xs font-medium px-4 py-2 rounded-lg transition-colors"
-            style={{ background: "var(--gradient-brand)", color: "#fff" }}
+            style={{ background: "#7C3AED", color: "#fff" }}
           >
             Build your verified profile →
           </a>

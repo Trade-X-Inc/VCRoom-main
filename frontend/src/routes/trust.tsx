@@ -219,7 +219,7 @@ function TrustPage() {
             to="/sign-up"
             search={{ role: "founder" } as any}
             className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-sm font-medium text-foreground transition-colors"
-            style={{ background: "var(--gradient-brand)" }}
+            style={{ background: "#7C3AED" }}
           >
             Build your verified profile
             <ChevronRight className="h-3.5 w-3.5" />

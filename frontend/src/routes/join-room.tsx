@@ -150,7 +150,7 @@ function JoinRoomPage() {
           </p>
           <button
             onClick={() => dealRoomId && navigate({ to: "/app/deal-rooms/$id/nda", params: { id: dealRoomId } })}
-            style={{ background: "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 8, padding: "11px 24px", fontSize: 14, fontWeight: 500, cursor: "pointer" }}
+            style={{ background: "#7C3AED", color: "#fff", border: "none", borderRadius: 8, padding: "11px 24px", fontSize: 14, fontWeight: 500, cursor: "pointer" }}
           >
             Continue to the deal room →
           </button>
@@ -238,7 +238,7 @@ function JoinRoomPage() {
               onClick={handleAccept}
               disabled={accepting}
               style={{
-                width: "100%", background: "var(--gradient-brand)", color: "#fff", border: "none",
+                width: "100%", background: "#7C3AED", color: "#fff", border: "none",
                 borderRadius: 8, padding: "12px 24px", fontSize: 14, fontWeight: 600,
                 cursor: accepting ? "not-allowed" : "pointer", opacity: accepting ? 0.7 : 1,
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
@@ -258,7 +258,7 @@ function JoinRoomPage() {
                   style={{
                     flex: 1, padding: "7px 0", fontSize: 12, fontWeight: 500, borderRadius: 6,
                     border: "none", cursor: "pointer",
-                    background: authMode === m ? "var(--gradient-brand)" : "transparent",
+                    background: authMode === m ? "#7C3AED" : "transparent",
                     color: authMode === m ? "#fff" : "var(--muted-foreground)",
                   }}
                 >
@@ -297,7 +297,7 @@ function JoinRoomPage() {
               onClick={handleAuth}
               disabled={authing}
               style={{
-                width: "100%", background: "var(--gradient-brand)", color: "#fff", border: "none",
+                width: "100%", background: "#7C3AED", color: "#fff", border: "none",
                 borderRadius: 8, padding: "11px 24px", fontSize: 13, fontWeight: 600,
                 cursor: authing ? "not-allowed" : "pointer", opacity: authing ? 0.7 : 1,
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
@@ -360,7 +360,7 @@ function ErrorCard({
       <p style={{ fontSize: 13, color: "var(--muted-foreground)", lineHeight: 1.6, marginBottom: 24 }}>{message}</p>
       <a
         href={cta.href}
-        style={{ display: "inline-block", background: "var(--gradient-brand)", color: "#fff", textDecoration: "none", borderRadius: 8, padding: "11px 24px", fontSize: 13, fontWeight: 500 }}
+        style={{ display: "inline-block", background: "#7C3AED", color: "#fff", textDecoration: "none", borderRadius: 8, padding: "11px 24px", fontSize: 13, fontWeight: 500 }}
       >
         {cta.label}
       </a>

@@ -271,7 +271,7 @@ function AdminVerificationPage() {
               )}
               {r.tier3_passed && !r.tier4_passed && (
                 <button
-                  style={{ ...btn, background: "var(--gradient-brand)" }}
+                  style={{ ...btn, background: "#7C3AED" }}
                   onClick={() => act(() => approveTier4({ data: { key, startup_id: r.startup_id, reviewer_name: reviewer } }), `Sign off Tier 4 (${r.company_name})`)}
                 >
                   Sign off Tier 4 (video review done)

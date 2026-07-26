@@ -76,7 +76,7 @@ function PublicCVPage() {
           onClick={() => window.print()}
           style={{
             display: "inline-flex", alignItems: "center", gap: 6,
-            background: "var(--gradient-brand)", color: "#fff", border: "none",
+            background: "#7C3AED", color: "#fff", border: "none",
             borderRadius: 8, padding: "9px 16px", fontSize: 13,
             fontWeight: 500, cursor: "pointer", boxShadow: "0 4px 12px rgba(124,58,237,0.3)",
           }}
@@ -92,7 +92,7 @@ function PublicCVPage() {
           <div style={{ background: "#0a0a0b", padding: "32px 36px", display: "flex", alignItems: "center", gap: 20 }}>
             <div style={{
               width: 72, height: 72, borderRadius: "50%", flexShrink: 0,
-              background: "var(--gradient-brand)", display: "flex", alignItems: "center",
+              background: "#7C3AED", display: "flex", alignItems: "center",
               justifyContent: "center", fontSize: 26, fontWeight: 700, color: "var(--foreground)",
               overflow: "hidden",
             }}>
@@ -180,7 +180,7 @@ function PublicCVPage() {
               <CVSection title="Achievements">
                 {profile.achievements.map((ach: any, i: number) => (
                   <div key={i} style={{ marginBottom: i < profile.achievements.length - 1 ? 14 : 0, display: "flex", gap: 10 }}>
-                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--gradient-brand)", marginTop: 5, flexShrink: 0 }} />
+                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#7C3AED", marginTop: 5, flexShrink: 0 }} />
                     <div>
                       <span style={{ fontSize: 14, fontWeight: 600, color: "#111" }}>{ach.title}</span>
                       {ach.year && <span style={{ fontSize: 12, color: "#9ca3af", marginLeft: 8 }}>{ach.year}</span>}

@@ -82,7 +82,7 @@ export const askOnboardingAI = createServerFn({ method: "POST" })
     if (!apiKey) {
       console.error("[OnboardingChat] OPENAI_API_KEY not found in cfEnv or getEnvVar");
       return {
-        reply: "I'm currently offline. Please sign up at hockystick.app/sign-up to explore the platform, or join our waitlist at hockystick.app/waitlist.",
+        reply: "I'm currently offline. Please sign up at hockystick.app/sign-up to explore the platform.",
         error: "no_key",
       };
     }

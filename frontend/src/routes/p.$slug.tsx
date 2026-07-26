@@ -340,7 +340,7 @@ function LockedSectionCard({
             href="/sign-up?role=investor"
             style={{
               display: 'inline-block',
-              background: 'var(--gradient-brand)',
+              background: '#7C3AED',
               color: '#fff',
               border: 'none',
               padding: '10px 20px',
@@ -393,7 +393,7 @@ function LockedSectionCard({
             onClick={onRequestAccess}
             disabled={requestStatus === "submitting"}
             style={{
-              background: 'var(--gradient-brand)',
+              background: '#7C3AED',
               color: '#fff',
               border: 'none',
               padding: '10px 20px',
@@ -1182,7 +1182,7 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
               ? "/app/investor/deal-flow"
               : `/sign-up?role=investor&interest=${startup.profile_slug}`}
             style={{
-              background: 'var(--gradient-brand)', color: '#ffffff', padding: '10px 20px',
+              background: '#7C3AED', color: '#ffffff', padding: '10px 20px',
               borderRadius: 8, textDecoration: 'none', fontSize: 14, fontWeight: 500, whiteSpace: 'nowrap',
             }}>
             {viewerRole === "investor" ? "View in deal flow →" : "Request access →"}

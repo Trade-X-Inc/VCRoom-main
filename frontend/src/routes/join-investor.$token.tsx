@@ -44,7 +44,7 @@ const inputStyle: React.CSSProperties = {
   outline: "none", boxSizing: "border-box",
 };
 const btnPrimary: React.CSSProperties = {
-  width: "100%", background: "var(--gradient-brand)", color: "#fff", border: "none",
+  width: "100%", background: "#7C3AED", color: "#fff", border: "none",
   borderRadius: 8, padding: "11px 0", fontSize: 14, fontWeight: 600, cursor: "pointer",
 };
 
@@ -185,7 +185,7 @@ function JoinViaInviteLinkPage() {
               {(["signup", "signin"] as const).map((mode) => (
                 <button key={mode} onClick={() => setAuthMode(mode)}
                   style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer",
-                    background: authMode === mode ? "var(--gradient-brand)" : "var(--accent)",
+                    background: authMode === mode ? "#7C3AED" : "var(--accent)",
                     color: authMode === mode ? "#fff" : "var(--muted-foreground)" }}>
                   {mode === "signup" ? "Create account" : "Sign in"}
                 </button>

@@ -122,7 +122,6 @@ export function SiteFooter() {
               <ul className="space-y-2.5">
                 <li><Link to="/resources" className={lnk}>Resources Hub</Link></li>
                 <li><Link to="/registry" className={lnk}>Company Registry</Link></li>
-                <li><Link to="/waitlist" className={lnk}>Waitlist</Link></li>
                 <li><Link to="/feedback" className={lnk}>Feedback</Link></li>
               </ul>
             </div>
@@ -154,12 +153,8 @@ export function SiteFooter() {
 
         <NewsletterSignup />
 
-        <div className="mt-2 flex flex-col items-start justify-between gap-3 border-t border-border/60 pt-6 md:flex-row md:items-center">
+        <div className="mt-2 border-t border-border/60 pt-6">
           <div className="text-xs text-muted-foreground">© {new Date().getFullYear()} Hockystick. All rights reserved.</div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-success animate-pulse-glow" />
-            All systems operational
-          </div>
         </div>
       </div>
     </footer>

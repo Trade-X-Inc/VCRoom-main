@@ -161,6 +161,47 @@ const SECURITY_HEADERS = {
   "Content-Security-Policy-Report-Only": CSP_REPORT_ONLY,
 };
 
+// 4c. public/_redirects, applied inside the worker.
+// Found live in production during R7C step 0: EVERY existing _redirects rule
+// (e.g. /signup -> /sign-up, /accelerators -> /resources, all the old
+// /app/* consolidation redirects from a prior session) 404s instead of
+// 301ing. Root cause is the same class of bug as the _headers issue above —
+// _routes.json's include: ["/*"] routes every request through this worker
+// BEFORE CF Pages' native _redirects file ever gets a chance to run, and
+// there is no fallback to the static-redirects layer once the worker has
+// produced its own (404) response. This is a real, previously-undiscovered
+// bug affecting redirects that predate this branch, not just the new
+// /waitlist one added in this pass — fixed here by parsing _redirects at
+// build time and checking it first, before any other request handling.
+const redirectsPath = "public/_redirects";
+let REDIRECT_RULES = [];
+if (existsSync(redirectsPath)) {
+  REDIRECT_RULES = readFileSync(redirectsPath, "utf8")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith("#"))
+    .map((line) => {
+      const parts = line.split(/\s+/);
+      if (parts.length < 2) return null;
+      const [from, to, statusStr] = parts;
+      const status = statusStr ? parseInt(statusStr, 10) : 301;
+      return { from, to, status: Number.isFinite(status) ? status : 301 };
+    })
+    .filter(Boolean);
+  console.log(`✓ Parsed ${REDIRECT_RULES.length} rule(s) from public/_redirects for in-worker redirect handling`);
+}
+
+const redirectInjectionSnippet = `
+const __REDIRECT_RULES = ${JSON.stringify(REDIRECT_RULES)};
+function __checkRedirect(request) {
+  const url = new URL(request.url);
+  const rule = __REDIRECT_RULES.find((r) => r.from === url.pathname);
+  if (!rule) return null;
+  const dest = rule.to.startsWith("http") ? rule.to : url.origin + rule.to;
+  return Response.redirect(dest, rule.status);
+}
+`;
+
 const headerInjectionSnippet = `
 const __SECURITY_HEADERS = ${JSON.stringify(SECURITY_HEADERS)};
 function __applySecurityHeaders(request, response) {
@@ -204,11 +245,14 @@ if (initCallMatch) {
   const initCall = initCallMatch[0].replace('\nexport {', '');   // e.g. "init_server4();"
   const injection = `\
 ${initCall}
+${redirectInjectionSnippet}
 ${headerInjectionSnippet}
 // Inject CF env into globalThis.__cf_env and process.env before any handler runs
 const __origServer = server;
 const __patchedServer = {
   async fetch(request, env, ctx) {
+    const __redirect = __checkRedirect(request);
+    if (__redirect) return __redirect;
     if (env && typeof env === 'object') {
       try {
         globalThis.__cf_env = { ...env };

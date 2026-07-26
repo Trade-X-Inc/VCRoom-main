@@ -107,9 +107,9 @@ function BlogIndex() {
                 Create founder account <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
-            <Link to="/waitlist">
+            <Link to="/sign-up" search={{ role: "investor" } as any}>
               <Button variant="outline" className="gap-2">
-                Join our newsletter
+                I&rsquo;m an investor
               </Button>
             </Link>
           </div>

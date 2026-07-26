@@ -374,7 +374,7 @@ function Registry() {
               <a
                 href="/sign-up?role=founder"
                 className="text-xs font-medium px-4 py-2 rounded-[2px] inline-flex items-center min-h-9 transition-colors"
-                style={{ background: "var(--gradient-brand)", color: "#fff" }}
+                style={{ background: "#7C3AED", color: "#fff" }}
               >
                 Verify your company →
               </a>
