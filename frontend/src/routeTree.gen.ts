@@ -50,7 +50,6 @@ import { Route as SolutionsFundraisingCrmRouteImport } from './routes/solutions.
 import { Route as SolutionsDueDiligenceRouteImport } from './routes/solutions.due-diligence'
 import { Route as RoastIdRouteImport } from './routes/roast.$id'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
-import { Route as JoinTokenRouteImport } from './routes/join.$token'
 import { Route as JoinInvestorTokenRouteImport } from './routes/join-investor.$token'
 import { Route as ISlugRouteImport } from './routes/i.$slug'
 import { Route as DocsSplatRouteImport } from './routes/docs.$'
@@ -411,11 +410,6 @@ const PSlugRoute = PSlugRouteImport.update({
   id: '/p/$slug',
   path: '/p/$slug',
   getParentRoute: () => rootRouteImport,
-} as any)
-const JoinTokenRoute = JoinTokenRouteImport.update({
-  id: '/$token',
-  path: '/$token',
-  getParentRoute: () => JoinRoute,
 } as any)
 const JoinInvestorTokenRoute = JoinInvestorTokenRouteImport.update({
   id: '/join-investor/$token',
@@ -1311,7 +1305,6 @@ export interface FileRoutesByFullPath {
   '/docs/$': typeof DocsSplatRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
-  '/join/$token': typeof JoinTokenRoute
   '/p/$slug': typeof PSlugRoute
   '/roast/$id': typeof RoastIdRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
@@ -1505,7 +1498,6 @@ export interface FileRoutesByTo {
   '/docs/$': typeof DocsSplatRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
-  '/join/$token': typeof JoinTokenRoute
   '/p/$slug': typeof PSlugRoute
   '/roast/$id': typeof RoastIdRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
@@ -1704,7 +1696,6 @@ export interface FileRoutesById {
   '/docs/$': typeof DocsSplatRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
-  '/join/$token': typeof JoinTokenRoute
   '/p/$slug': typeof PSlugRoute
   '/roast/$id': typeof RoastIdRoute
   '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
@@ -1904,7 +1895,6 @@ export interface FileRouteTypes {
     | '/docs/$'
     | '/i/$slug'
     | '/join-investor/$token'
-    | '/join/$token'
     | '/p/$slug'
     | '/roast/$id'
     | '/solutions/due-diligence'
@@ -2098,7 +2088,6 @@ export interface FileRouteTypes {
     | '/docs/$'
     | '/i/$slug'
     | '/join-investor/$token'
-    | '/join/$token'
     | '/p/$slug'
     | '/roast/$id'
     | '/solutions/due-diligence'
@@ -2296,7 +2285,6 @@ export interface FileRouteTypes {
     | '/docs/$'
     | '/i/$slug'
     | '/join-investor/$token'
-    | '/join/$token'
     | '/p/$slug'
     | '/roast/$id'
     | '/solutions/due-diligence'
@@ -2774,13 +2762,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/p/$slug'
       preLoaderRoute: typeof PSlugRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/join/$token': {
-      id: '/join/$token'
-      path: '/$token'
-      fullPath: '/join/$token'
-      preLoaderRoute: typeof JoinTokenRouteImport
-      parentRoute: typeof JoinRoute
     }
     '/join-investor/$token': {
       id: '/join-investor/$token'
@@ -4233,12 +4214,10 @@ const DocsRouteChildren: DocsRouteChildren = {
 const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
 
 interface JoinRouteChildren {
-  JoinTokenRoute: typeof JoinTokenRoute
   JoinTeamTokenRoute: typeof JoinTeamTokenRoute
 }
 
 const JoinRouteChildren: JoinRouteChildren = {
-  JoinTokenRoute: JoinTokenRoute,
   JoinTeamTokenRoute: JoinTeamTokenRoute,
 }
 

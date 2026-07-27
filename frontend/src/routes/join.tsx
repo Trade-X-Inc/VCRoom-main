@@ -13,21 +13,16 @@ export const Route = createFileRoute("/join")({
   }),
 });
 
-interface InviteInfo {
-  id: string;
-  token: string;
-  startup_id: string | null;
-  investor_profile_id: string | null;
-  email: string;
-  role: string;
-  invited_by: string | null;
-  expires_at: string | null;
-  accepted_at: string | null;
-  startups: { company_name: string | null; founder_name: string | null } | null;
-  investor_profiles: { your_name: string | null; fund_name: string | null } | null;
+interface InvitePreview {
+  valid: boolean;
+  org_name?: string;
+  inviter_name?: string;
+  role?: string;
+  expires_at?: string | null;
+  email?: string;
 }
 
-type PageState = "loading" | "invalid" | "expired" | "already_accepted" | "valid" | "accepted";
+type PageState = "loading" | "invalid" | "valid" | "accepted";
 
 function JoinTeamPage() {
   const { token } = Route.useSearch();
@@ -35,7 +30,7 @@ function JoinTeamPage() {
   const navigate = useNavigate();
 
   const [pageState, setPageState] = useState<PageState>("loading");
-  const [invite, setInvite] = useState<InviteInfo | null>(null);
+  const [invite, setInvite] = useState<InvitePreview | null>(null);
   const [accepting, setAccepting] = useState(false);
 
   const [signupName, setSignupName] = useState("");
@@ -51,26 +46,18 @@ function JoinTeamPage() {
 
   async function loadInvite() {
     setPageState("loading");
-    const { data, error } = await supabase
-      .from("team_invites")
-      .select(`
-        id, token, startup_id, investor_profile_id,
-        email, role, invited_by, expires_at, accepted_at,
-        startups (company_name, founder_name),
-        investor_profiles!investor_profile_id (your_name, fund_name)
-      `)
-      .eq("token", token!)
-      .maybeSingle();
-
-    if (error || !data) { setPageState("invalid"); return; }
-    if (data.accepted_at) { setInvite(data as InviteInfo); setPageState("already_accepted"); return; }
-    if (data.expires_at && new Date(data.expires_at) < new Date()) { setInvite(data as InviteInfo); setPageState("expired"); return; }
-    setInvite(data as InviteInfo);
+    // preview_team_invite is a SECURITY DEFINER RPC — team_invites itself is
+    // deny-all for anon/authenticated. Token possession is the intended
+    // authorization to see this preview (same model as a password-reset
+    // link); it is NOT the authorization to accept — see handleAccept.
+    const { data, error } = await supabase.rpc("preview_team_invite", { p_token: token });
+    if (error || !data?.valid) { setPageState("invalid"); return; }
+    setInvite(data as InvitePreview);
     setPageState("valid");
   }
 
   async function handleAccept() {
-    if (!invite) return;
+    if (!invite || !token) return;
     setAccepting(true);
     try {
       // Always fetch a fresh session at accept-time — never trust the hook's
@@ -84,45 +71,28 @@ function JoinTeamPage() {
         return;
       }
 
-      // Block self-acceptance: the person who sent the invite cannot be the
-      // same account that accepts it.
-      if (freshUser.id === invite.invited_by) {
-        toast.error("You cannot accept your own invitation. Open this link in a private window or sign in with the invited account.");
+      // accept_team_invite (SECURITY DEFINER) does everything server-side:
+      // re-verifies the caller's real email against the invite's email,
+      // blocks self-acceptance, enforces single-use, and creates the
+      // startup_team_accounts / team_member_profiles rows. The client never
+      // writes these tables directly — token possession only got the caller
+      // this far (a preview + a signup form); this call is what actually
+      // gates joining.
+      const { data, error } = await supabase.rpc("accept_team_invite", { p_token: token });
+      if (error) throw error;
+      if (!data?.ok) {
+        const messages: Record<string, string> = {
+          not_authenticated: "Session expired — please sign in again.",
+          invalid_token: "This invitation link is invalid or has already been used.",
+          already_accepted: "You have already joined this team.",
+          expired: "This invitation has expired.",
+          email_mismatch: "This invite was sent to a different email address. Sign in with the invited account to accept.",
+          self_acceptance: "You cannot accept your own invitation. Open this link in a private window or sign in with the invited account.",
+        };
+        toast.error(messages[data?.error] ?? "Could not accept invitation");
         setAccepting(false);
         return;
       }
-
-      // 1. Insert into startup_team_accounts
-      const { error: accountErr } = await supabase.from("startup_team_accounts").insert({
-        startup_id: invite.startup_id ?? null,
-        investor_profile_id: invite.investor_profile_id ?? null,
-        user_id: freshUser.id,
-        role: invite.role,
-        invite_id: invite.id,
-        invited_by: invite.invited_by,
-        display_name: freshUser.user_metadata?.full_name ?? "",
-        avatar_url: null,
-      });
-      if (accountErr) {
-        if (accountErr.code === "23505") {
-          // Already a member — mark accepted anyway
-          const { error: markErr } = await supabase.from("team_invites").update({ accepted_at: new Date().toISOString() }).eq("id", invite.id);
-          if (markErr) console.error("[join] invite accept-mark failed:", markErr);
-          setPageState("accepted");
-          return;
-        }
-        throw accountErr;
-      }
-
-      // 2. Mark invite accepted
-      const { error: acceptErr } = await supabase.from("team_invites").update({ accepted_at: new Date().toISOString() }).eq("id", invite.id);
-      if (acceptErr) throw acceptErr;
-
-      // 3. Create empty team_member_profiles row (best-effort)
-      const { error: profErr } = await supabase
-        .from("team_member_profiles")
-        .upsert({ user_id: freshUser.id }, { onConflict: "user_id", ignoreDuplicates: true });
-      if (profErr) console.error("[join] team_member_profiles upsert failed:", profErr);
 
       setPageState("accepted");
     } catch (e: any) {
@@ -133,7 +103,10 @@ function JoinTeamPage() {
   }
 
   async function handleAuth() {
-    if (!invite) return;
+    // preview_team_invite only ever includes `email` when valid:true, and
+    // pageState only reaches the auth form in that case — but the type is
+    // optional since the RPC omits it for a dead token, so guard explicitly.
+    if (!invite?.email) return;
     setAuthing(true);
     setAuthError("");
     try {
@@ -162,20 +135,10 @@ function JoinTeamPage() {
     }
   }
 
-  // Derive display name for the team being joined
-  const isStartupInvite = !!invite?.startup_id;
-  const isInvestorInvite = !!invite?.investor_profile_id;
-  const companyName = isStartupInvite
-    ? (invite?.startups?.company_name ?? "the company")
-    : isInvestorInvite
-      ? (invite?.investor_profiles?.fund_name
-          ? `${invite.investor_profiles.fund_name} (${invite.investor_profiles.your_name ?? "investment team"})`
-          : (invite?.investor_profiles?.your_name ?? "the investment team"))
-      : "the team";
-  const inviterName = isStartupInvite
-    ? (invite?.startups?.founder_name ?? "The team")
-    : (invite?.investor_profiles?.your_name ?? "The team");
-  const roleLabel = invite ? (invite.role.charAt(0).toUpperCase() + invite.role.slice(1)) : "";
+  // org_name / inviter_name are resolved server-side in preview_team_invite
+  const companyName = invite?.org_name ?? "the team";
+  const inviterName = invite?.inviter_name ?? "The team";
+  const roleLabel = invite?.role ? (invite.role.charAt(0).toUpperCase() + invite.role.slice(1)) : "";
 
   if (pageState === "accepted") {
     return (
@@ -220,37 +183,16 @@ function JoinTeamPage() {
   }
 
   if (pageState === "invalid") {
+    // Covers invalid, expired, and already-accepted alike — the preview RPC
+    // deliberately returns only {valid:false} for all three, without
+    // distinguishing which, so a dead token can't be used to probe whether
+    // it ever existed or in what state.
     return (
       <PublicShell>
         <ErrorCard
-          title="Invitation not found"
-          message="This invitation link is invalid or has already been used. Ask the team admin to send a new invitation."
+          title="Invitation not available"
+          message="This invitation link is invalid, expired, or has already been used. Ask the team admin to send a new invitation."
           cta={{ label: "Go to hockystick.app →", href: "/" }}
-        />
-      </PublicShell>
-    );
-  }
-
-  if (pageState === "expired") {
-    return (
-      <PublicShell>
-        <ErrorCard
-          title="Invitation expired"
-          message={`This invitation has expired. Ask ${companyName} to send a new invitation.`}
-          cta={{ label: "Go to hockystick.app →", href: "/" }}
-        />
-      </PublicShell>
-    );
-  }
-
-  if (pageState === "already_accepted") {
-    return (
-      <PublicShell>
-        <ErrorCard
-          title="Already joined"
-          message="You have already joined this team."
-          cta={{ label: "Go to your dashboard →", href: "/app" }}
-          success
         />
       </PublicShell>
     );
@@ -283,34 +225,29 @@ function JoinTeamPage() {
             <div style={{ fontSize: 13, color: "var(--muted-foreground)", marginBottom: 16 }}>
               Signed in as <strong style={{ color: "var(--foreground)" }}>{user.email}</strong>
             </div>
-            {/* Block self-acceptance — same account as the sender */}
-            {user.id === invite?.invited_by ? (
-              <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 8, padding: "12px 14px", fontSize: 12, color: "#EF4444", lineHeight: 1.6, textAlign: "left" }}>
-                <strong style={{ display: "block", marginBottom: 4 }}>You sent this invite — you can't accept your own invitation.</strong>
-                To accept, open this link in a private/incognito window and sign in as <strong>{invite.email}</strong>, or sign out first.
+            {/* Self-acceptance and email-match are enforced server-side by
+                accept_team_invite (SECURITY DEFINER) — this preview never
+                receives invited_by, so it can't pre-flight that specific
+                case client-side; a mismatch surfaces as a toast from the
+                RPC's response on click. */}
+            {user.email !== invite?.email && (
+              <div style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 8, padding: "8px 12px", fontSize: 12, color: "#F59E0B", marginBottom: 16 }}>
+                Note: this invite was sent to {invite?.email}. Make sure you're accepting with the right account.
               </div>
-            ) : (
-              <>
-                {user.email !== invite?.email && (
-                  <div style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 8, padding: "8px 12px", fontSize: 12, color: "#F59E0B", marginBottom: 16 }}>
-                    Note: this invite was sent to {invite?.email}. Make sure you're accepting with the right account.
-                  </div>
-                )}
-                <button
-                  onClick={handleAccept}
-                  disabled={accepting}
-                  style={{
-                    width: "100%", background: "#7C3AED", color: "#fff", border: "none",
-                    borderRadius: 8, padding: "12px 24px", fontSize: 14, fontWeight: 600,
-                    cursor: accepting ? "not-allowed" : "pointer", opacity: accepting ? 0.7 : 1,
-                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                  }}
-                >
-                  {accepting ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
-                  Accept and join {companyName}
-                </button>
-              </>
             )}
+            <button
+              onClick={handleAccept}
+              disabled={accepting}
+              style={{
+                width: "100%", background: "#7C3AED", color: "#fff", border: "none",
+                borderRadius: 8, padding: "12px 24px", fontSize: 14, fontWeight: 600,
+                cursor: accepting ? "not-allowed" : "pointer", opacity: accepting ? 0.7 : 1,
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              }}
+            >
+              {accepting ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
+              Accept and join {companyName}
+            </button>
           </div>
         ) : (
           <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 16, padding: 24 }}>

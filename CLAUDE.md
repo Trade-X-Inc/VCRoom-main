@@ -1898,3 +1898,19 @@ per-user-varying content the cache could serve stale to the wrong person. **If a
 session mechanism (`@supabase/ssr`, or any auth cookie) is ever adopted, this stops being true, and
 any edge-cache rule on public routes must be re-evaluated before that change ships** — not
 after. This is a load-bearing assumption behind any future caching work, not an incidental detail.
+
+---
+
+## 48. tsc BASELINE UPDATED 68 → 67 (R40 hotfix, July 2026)
+
+`security/r40-hotfix` deleted `src/routes/join.$token.tsx` (the vulnerable deal-room invite-accept
+route — see the R40 lawyer-RLS audit series for why). That file carried its own pre-existing type
+error (`TS2352`, an `InviteInfo` cast at its old line 65) that no other file referenced or shared —
+confirmed by diffing `main`'s full tsc error list against the branch's line-for-line: exactly one
+line disappeared, and it was this file's own error, nothing else shifted. **The real, current
+baseline is 67, not 68.** Treat 67 as the number to hold steady going forward — a future session
+should not read "68" in an old chat instruction or an older CLAUDE.md mention (§§41, 42 still say
+68, describing R15's state at the time) as license to let a *new* error slip back in under the
+old, higher number. If tsc ever reports fewer than 67, verify why before treating it as good news
+— confirm the removed error(s) as deliberately, not accidentally (e.g. a file deleted along with
+its own bug, same as this one) before updating the baseline further.
