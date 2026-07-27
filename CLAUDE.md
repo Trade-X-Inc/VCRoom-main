@@ -1794,3 +1794,107 @@ existed in this environment at any point during R7C or its follow-ups**, so the 
 value on a real, live post has never been observed rendering correctly end-to-end. Not a known bug
 — just genuinely unverified. First thing to check in R8 once a real post exists: `curl` a real
 `/blog/<real-slug>` and confirm the canonical matches.
+
+---
+
+## 47. R7E MOBILE FIRST-PAINT INVESTIGATION — findings only, no code shipped (July 2026)
+
+`perf/r7e-mobile-first-paint` investigated PSI mobile performance (baseline: mobile score 84,
+FCP/LCP/SI ~3.5s, TBT 0ms, CLS 0.012; desktop 100). Two build attempts (deferring `sonner`'s
+`<Toaster/>`, inline critical CSS for `/`) were both fully implemented, live-verified, and
+**reverted** — neither shipped. This section exists so a future session doesn't re-attempt either
+in the same broken shape. Nothing in this branch touched `src/lib/auth.tsx` or `src/lib/supabase.ts`.
+
+### 47.0 `onLoad` on a server-rendered `<link>` in `<head>` does not hydrate — the real blocker for any future critical-CSS attempt
+
+A preload+swap implementation (`<link rel="preload" as="style" onLoad={...}>`, scoped to `/` only
+via `useRouterState` frozen at first render in `RootShell`) was built and live-tested. **The swap
+never fired.** Confirmed via direct DOM inspection after a real page load: `link.rel` was still
+`"preload"`, `link.sheet` was `null`, and the live `outerHTML` had no `onload` attribute at all.
+React does not reattach an `onLoad` handler to a `<link>` element that arrived via SSR — this is
+different from how it treats `<script>`/body elements during hydration. Screenshot proof this is a
+real, persistent failure and not a capture-timing artifact: the "after" page showed an exposed
+"Skip to content" link (should be `.sr-only`, invisible until focus) and a serif fallback font on
+every heading — the full stylesheet (Syne font-face, `.sr-only`, everything outside the captured
+critical rules) never loaded, because the swap that was supposed to load it never ran. Pixel diff
+against the unmodified page on viewport-matched screenshots: 23.6% of pixels differed at 390px,
+15.9% at 1440px. This is the FOUC the design review explicitly warned against, and it is why the
+branch was reverted rather than shipped with a caveat.
+
+**Do not attempt the naive `useEffect`-based swap as the fix.** It has its own race: by the time a
+`useEffect` runs (after paint), the preload may have already fired its `load` event, so a listener
+attached in the effect never triggers, and the swap silently no-ops exactly the same way. Any real
+fix must either (a) check `link.sheet !== null` before attaching the listener, falling back to an
+immediate synchronous swap if the sheet already loaded, or (b) use the classic
+`media="print"` → `onload="this.media='all'"` attribute-string form (a plain HTML attribute, not a
+React event prop, so it survives SSR without needing hydration to reattach anything) instead of
+React's `onLoad` prop. Solve this specific wiring problem first — don't rebuild the rest around it
+until this part is proven live.
+
+**What WAS correct and is reusable if this is revisited:** the CSSOM-extraction tooling (walking
+`document.styleSheets`, recursing into `CSSLayerBlockRule`/`CSSMediaRule` containers — a naive
+walker that only checks `CSSStyleRule` misses everything Tailwind v4 wraps in `@layer`, per §41's
+neighboring lesson about this codebase's Tailwind version) and the resulting 85-rule critical CSS
+block for the landing hero/header were both verified correct in isolation. The bug was purely in
+the swap-wiring step, not in the CSS content itself.
+
+### 47.1 Deferring `sonner`'s `<Toaster/>` does not defer `sonner` — do not retry the wrapper approach
+
+A `LazyToaster` wrapper (mount-gated `React.lazy` around `<Toaster/>`, same shape as the existing
+`LazyChart.tsx`/`LazyMarkdown.tsx` pattern) was built, and reverted for a different reason than
+47.0: it worked exactly as coded, but delivered only ~310 bytes gzip — nowhere near sonner's real
+~64KB uncompressed footprint — because 75+ files across the app do `import { toast } from "sonner"`
+directly (the real package, not the thin local wrapper component), from many separately-lazy-split
+route chunks. Rollup's shared-dependency chunking anchors sonner's core module to the always-loaded
+main chunk regardless of when `<Toaster/>` itself mounts. **A component named "Lazy" that does not
+actually lazy-load the thing in its name is worse than no change at all** — it asserts something
+false in the codebase for the next session to trust. Do not re-attempt this specific wrapper.
+Deferring sonner for real would require changing how 75+ files import `toast()` (e.g., routing them
+through a lazy-loaded facade), which is out of proportion to the payoff for a 64KB uncompressed /
+~15KB gzip dependency. Not planned; don't retry without a materially different approach than a thin
+mount-gated wrapper.
+
+### 47.2 Font loading was investigated and is already optimal — do not revisit without new evidence
+
+An early concern that font loading might be contributing to mobile latency was checked and found
+unfounded: `unicode-range` on the `@font-face` declarations correctly gates `latin-ext` and `greek`
+subsets so they're never fetched for this site's actual (Latin) content — only 4 latin font files
+totaling 56,916 bytes are ever requested. This is correct, minimal font loading. Do not spend a
+future session re-investigating this without a specific new symptom pointing at fonts.
+
+### 47.3 The bundle is mostly unavoidable React + ReactDOM + TanStack Router — no hidden defect
+
+A full accounting of `index-*.js` (the main shared chunk) traced its size to `react`,
+`react-dom/client`, and TanStack Router's runtime, all statically imported by TanStack Start's own
+generated client entry (`node_modules/@tanstack/react-start/dist/plugin/default-entry/client.tsx`)
+— confirmed via `vite build --manifest`, which showed this entry's `dynamicImports` list containing
+100+ real route-component entries. **Routes are already correctly lazy-split** — nothing
+route-specific is incorrectly anchored to the shared chunk. There is no hidden bundling defect to
+find here; the shared chunk's size is the real, near-irreducible cost of React + ReactDOM + the
+router runtime for an SSR app on this stack. Do not re-audit this without a specific new candidate
+dependency in mind — the general "what's in the shared chunk" question is answered.
+
+### 47.4 `take_screenshot`'s `fullPage: true` misreports the emulated viewport width — use viewport-only captures
+
+Reproduced twice, on two different builds, after ruling out stale-emulation-state as the cause
+(fresh pages, explicit `resize_page`, closed all other tabs): `take_screenshot` with `fullPage: true`
+consistently rendered at a width other than the one set via `emulate`'s `viewport` parameter (showed
+~744px-equivalent when the viewport was explicitly set to 390 or 1440), while `document.documentElement.clientWidth`
+and a **non-full-page** (viewport-only) screenshot both correctly reflected the real set width. This
+is a tool-level quirk in this environment, not an application bug. **For any future visual
+verification in this codebase, use viewport-only screenshots** (omit `fullPage`, or explicitly
+`fullPage: false`) and, if full-page content needs checking, scroll-and-stitch manually rather than
+trusting `fullPage: true`'s dimensions.
+
+### 47.5 Why edge-caching landing HTML is safe today, and the one thing that would break it
+
+Confirmed (byte-diffing real SSR output with and without a synthetic `sb-ldimninnjlvxozubheib-auth-token`
+cookie attached to the request) that landing-page SSR HTML is identical regardless of auth state.
+This is because this app's Supabase session lives in `localStorage` only (no `@supabase/ssr`, no
+cookie-based session — confirmed via `package.json` and `src/lib/supabase.ts`), so the Cloudflare
+Worker rendering the page server-side has no way to observe whether the requester is signed in.
+**This is exactly what makes it safe to edge-cache public/landing HTML** — there is no
+per-user-varying content the cache could serve stale to the wrong person. **If a cookie-based
+session mechanism (`@supabase/ssr`, or any auth cookie) is ever adopted, this stops being true, and
+any edge-cache rule on public routes must be re-evaluated before that change ships** — not
+after. This is a load-bearing assumption behind any future caching work, not an incidental detail.
