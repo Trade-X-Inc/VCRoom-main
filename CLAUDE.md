@@ -1914,3 +1914,101 @@ should not read "68" in an old chat instruction or an older CLAUDE.md mention (�
 old, higher number. If tsc ever reports fewer than 67, verify why before treating it as good news
 — confirm the removed error(s) as deliberately, not accidentally (e.g. a file deleted along with
 its own bug, same as this one) before updating the baseline further.
+
+**Update (R40 session 3): baseline is now 64.** The `join.tsx` rewrite onto a SECURITY DEFINER
+RPC removed three more `TS2352` `InviteInfo`-cast errors (the file stopped casting raw Supabase
+query results). Verified the same way — diffed the error lists, exactly those three lines
+disappeared, nothing else moved. **Hold 64 going forward.**
+
+---
+
+## 49. `SET search_path TO 'public'` DOES NOT PROTECT SECURITY DEFINER FUNCTIONS FROM pg_temp SHADOWING (proven R40/R41, July 2026)
+
+This is the single most important database-security lesson of the R40/R41 series. Read it before
+writing or reviewing ANY `SECURITY DEFINER` function or RLS policy.
+
+### 49.0 The attack
+
+Postgres searches the session's temporary schema (`pg_temp`) **implicitly first** for relation
+(table/view) name resolution — UNLESS `pg_temp` is named explicitly in `search_path`, in which case
+it is searched only at the named position. Any authenticated user can `CREATE TEMP TABLE` (see
+§49.3), so an attacker can create `pg_temp.deal_room_members` shadowing the real
+`public.deal_room_members`, then call a `SECURITY DEFINER` function whose body has an **unqualified**
+`from deal_room_members` — and the function (running with elevated/owner rights) reads the
+attacker's fake table instead of the real one. A real R40 exploit did exactly this and read a
+foreign deal room's `nda_acceptances` (full NDA text, real signer names) as a non-member.
+
+### 49.1 What actually protects a SECURITY DEFINER function — and what does NOT
+
+- **`SET search_path TO 'public'` (a bare named schema) does NOT protect it.** pg_temp is still
+  searched implicitly first. This was believed safe for a while and is WRONG. Do not use it and do
+  not trust it on any existing function.
+- **Two patterns are safe, both empirically verified in R41 against a full multi-table shadow:**
+  - `SET search_path = public, pg_temp` — pg_temp named **LAST**, so `public` resolves first and
+    the shadow never wins. Needs **no function-body change** (pure `ALTER FUNCTION ... SET`), so it
+    is the low-risk choice for sweeping many existing functions — zero chance of a typo in a
+    rewritten body silently breaking a policy.
+  - `SET search_path = ''` (empty) with **every** table reference fully schema-qualified
+    (`public.deal_room_members`). Requires rewriting the body; use for new functions written this
+    way from the start.
+- R41 swept every remaining `SECURITY DEFINER` function in `public` to `public, pg_temp`. Before
+  adding a new one, pin it with one of the two safe patterns. To audit:
+  `select proname from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public'
+  and p.prosecdef and p.proconfig @> array['search_path=public'];` — a non-empty result means
+  vulnerable functions exist.
+
+### 49.2 THE FALSE-NEGATIVE LESSON — shadow EVERY table a function touches, not just the first
+
+The first R40 test of a two-table function (`drm_is_founder_of_room`, which joins `deal_rooms` and
+`startups`) produced a **FALSE PASS**: only `deal_rooms` was shadowed, with a fake room id that had
+no matching row in the real, unshadowed `startups` table — so the join returned zero rows for a
+reason that had nothing to do with shadow resistance. Shadowing `startups` instead (the second
+joined table) flipped the result and proved the function WAS vulnerable. **A shadow test that does
+not shadow every table the function reads proves nothing.** Enumerate every table in the function
+body (including tables reached through nested function calls) and shadow each — ideally all at once.
+
+### 49.3 `REVOKE ... FROM authenticated` is INEFFECTIVE — the grant is to PUBLIC
+
+`TEMPORARY` on the database is granted to `PUBLIC` by default (datacl shows `=Tc/postgres`), and
+`authenticated`/`anon` inherit it from PUBLIC. `REVOKE TEMPORARY ON DATABASE ... FROM authenticated`
+removes a role-specific grant that was never there — it does nothing; `has_database_privilege`
+still returns true. The same is true for any PUBLIC grant (e.g. `SELECT` on
+`extensions.pg_stat_statements` is granted to PUBLIC — a role-specific revoke is a no-op there too).
+**To actually remove a PUBLIC privilege you must `REVOKE ... FROM PUBLIC`, then grant it back
+explicitly to the roles that legitimately need it.** This is the exact same class of mistake as the
+`deal_room_members.role` column-grant issue in §33-era work.
+
+Note (R41): revoking `TEMPORARY` from PUBLIC to kill the shadow attack at its root was investigated
+and **deliberately NOT applied** — on this managed Supabase project ~9 non-superuser internal roles
+(`supabase_auth_admin`, `supabase_realtime_admin`, `supabase_storage_admin`, `supabase_etl_admin`,
+`supabase_replication_admin`, `authenticator`, `service_role`, …) hold `TEMPORARY` only via PUBLIC,
+and stripping it risks internal breakage plus forward-compat problems with the control plane. The
+search_path pinning (§49.1) is the real, complete fix; TEMP-revoke would only be redundant
+defence-in-depth. If ever revisited, grant TEMP back to every internal role and deny it to exactly
+`anon`, `authenticated`, `authenticator`.
+
+### 49.4 VIEWS are a separate RLS-bypass class — require `security_invoker`
+
+A view executes with its **owner's** rights by default, so RLS on the underlying tables does NOT
+apply to a caller reading through the view unless the view was created `WITH (security_invoker=on)`.
+An owner-rights view over a deal-room table would let anyone with SELECT on the view read every
+row, bypassing RLS entirely. **R41 confirmed this database currently has ZERO views over any
+application table** (the only views anywhere are Supabase-internal: `vault.decrypted_secrets`, which
+is unreachable by anon/authenticated, and `extensions.pg_stat_statements`, whose PUBLIC SELECT was
+revoked). **Rule for the future: never create a view over an RLS-protected table without
+`security_invoker=on`** — and if you do add one, test it as a non-member (it must return 0 foreign
+rows). Audit: `select c.relname, c.reloptions from pg_class c join pg_namespace n on
+n.oid=c.relnamespace where n.nspname='public' and c.relkind in ('v','m');` — any result lacking
+`security_invoker=on` is suspect.
+
+### 49.5 RLS FORCE is off on all deal-room tables — currently harmless, here's why
+
+Every deal-room table has RLS enabled but **not FORCED**, all owned by `postgres`. FORCE only makes
+RLS apply to the table **owner**; it does not affect `BYPASSRLS` roles or superusers. On this
+project `postgres` has `BYPASSRLS`, and all 45 `SECURITY DEFINER` functions are owned by `postgres`
+— so they bypass RLS via `BYPASSRLS`, independent of FORCE. App users (`anon`/`authenticated`) are
+neither owner nor `BYPASSRLS`, so RLS already fully applies to them. Net: **no legitimate path
+depends on the owner-FORCE-off bypass**, and enabling FORCE would change nothing (the owner still
+bypasses via `BYPASSRLS`). Left as-is deliberately. This only becomes relevant if a `SECURITY
+DEFINER` function's owner is ever changed to a non-`BYPASSRLS` role — then FORCE would start
+applying to it.
