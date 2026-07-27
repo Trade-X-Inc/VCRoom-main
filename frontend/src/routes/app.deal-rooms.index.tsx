@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { syncContactToHubSpot } from "@/lib/hubspot";
-import { Briefcase, ArrowUpRight, Plus, X, Loader2, Search, MoreHorizontal, Trash2, CheckCircle2, Copy, Check, Users, ChevronDown, ChevronUp } from "lucide-react";
+import { Briefcase, ArrowUpRight, Plus, X, Loader2, Search, MoreHorizontal, Trash2, CheckCircle2, Users, ChevronDown, ChevronUp } from "lucide-react";
 import { PageGuide } from "@/components/app/PageGuide";
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -9,7 +9,6 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
-import { sendInviteEmail } from "@/lib/invite-fn";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { EmptyState } from "@/components/system";
 import { useAccountContext } from "@/hooks/useAccountContext";
@@ -489,7 +488,6 @@ export function DealRooms({ view }: { view?: "team-assignments" } = {}) {
         <CreateRoomForm
           userId={user?.id ?? ""}
           startupId={startup?.id ?? ""}
-          founderName={user?.fullName ?? user?.email ?? ""}
           onClose={() => setOpen(false)}
           onCreated={() => {
             queryClient.invalidateQueries({ queryKey: ["deal-rooms", user?.id, startup?.id] });
@@ -577,13 +575,11 @@ const DEAL_TYPES = ["Equity", "SAFE", "Convertible Note", "Other"] as const;
 function CreateRoomForm({
   userId,
   startupId: initialStartupId,
-  founderName,
   onClose,
   onCreated,
 }: {
   userId: string;
   startupId: string;
-  founderName: string;
   onClose: () => void;
   onCreated: () => void;
 }) {
@@ -593,12 +589,10 @@ function CreateRoomForm({
   const [investorName, setInvestorName] = useState("");
   const [investorFirm, setInvestorFirm] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
-  const [personalMessage, setPersonalMessage] = useState("");
   const [dealType, setDealType] = useState<(typeof DEAL_TYPES)[number]>("Equity");
   const [fundingTarget, setFundingTarget] = useState("");
   const [startupId, setStartupId] = useState(initialStartupId);
-  const [createdRoom, setCreatedRoom] = useState<{ id: string; inviteLink?: string; email: string } | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [createdRoom, setCreatedRoom] = useState<{ id: string; email: string } | null>(null);
 
   // Autocomplete state
   const [search, setSearch] = useState("");
@@ -694,35 +688,8 @@ function CreateRoomForm({
       // Badge evaluation — fire-and-forget on this write event
       import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { startup_id: startupId } })).catch(() => {});
 
-      // 4. Send invite email via server fn if email provided
-      let inviteLink: string | undefined;
-      if (inviteEmail.trim()) {
-        const { data: { session } } = await supabase.auth.getSession();
-        const result = await sendInviteEmail({
-          data: {
-            dealRoomId: newRoom.id,
-            email: inviteEmail.trim(),
-            role: "investor",
-            invitedBy: userId,
-            userAccessToken: session?.access_token ?? "",
-            supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
-            supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-            appUrl: import.meta.env.VITE_APP_URL,
-            dealRoomName: `${selectedStartup?.company_name ?? "Deal Room"} — Deal Room`,
-            founderName: founderName || undefined,
-            startupName: selectedStartup?.company_name,
-            message: personalMessage.trim() || undefined,
-          },
-        });
-        if (result.success) {
-          inviteLink = result.inviteLink;
-        } else {
-          console.warn("Invite email failed:", result.error);
-        }
-      }
-
       onCreated();
-      setCreatedRoom({ id: newRoom.id, inviteLink, email: inviteEmail.trim() });
+      setCreatedRoom({ id: newRoom.id, email: inviteEmail.trim() });
 
       // Sync founder to HubSpot with deal room activity — fire and forget
       const { data: { session: s } } = await supabase.auth.getSession();
@@ -742,13 +709,6 @@ function CreateRoomForm({
     } finally {
       setSaving(false);
     }
-  };
-
-  const copyLink = () => {
-    if (!createdRoom?.inviteLink) return;
-    navigator.clipboard.writeText(createdRoom.inviteLink);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -772,36 +732,12 @@ function CreateRoomForm({
             <div className="flex items-center gap-3 rounded-lg bg-success/10 border border-success/20 p-4">
               <CheckCircle2 className="h-6 w-6 text-success shrink-0" />
               <div>
-                <div className="text-sm font-medium text-success">
-                  {createdRoom.email ? `Invite sent to ${createdRoom.email}` : "Deal room created"}
-                </div>
+                <div className="text-sm font-medium text-success">Deal room created</div>
                 <div className="text-xs text-muted-foreground mt-0.5">
-                  {createdRoom.email
-                    ? "They'll receive an email with a link to sign the NDA and enter the deal room."
-                    : "You can invite investors from inside the deal room."}
+                  Add this investor as a member from inside the deal room.
                 </div>
               </div>
             </div>
-
-            {createdRoom.inviteLink && (
-              <div>
-                <div className="text-xs text-muted-foreground mb-1.5">Backup invite link</div>
-                <div className="flex items-center gap-2">
-                  <input
-                    readOnly
-                    value={createdRoom.inviteLink}
-                    className="flex-1 rounded-md border border-border/60 bg-background px-3 py-1.5 text-xs font-mono text-muted-foreground min-w-0"
-                  />
-                  <button
-                    onClick={copyLink}
-                    className="shrink-0 inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent"
-                  >
-                    {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
-                    {copied ? "Copied" : "Copy"}
-                  </button>
-                </div>
-              </div>
-            )}
 
             <div className="flex gap-2 pt-2 border-t border-border/60">
               <button
@@ -926,18 +862,6 @@ function CreateRoomForm({
                 onChange={(e) => setInviteEmail(e.target.value)}
                 placeholder="investor@sequoia.com"
                 className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
-              />
-              <p className="mt-1 text-[11px] text-muted-foreground">We'll send them an NDA + deal room link.</p>
-            </div>
-
-            <div>
-              <label className="text-xs text-muted-foreground">Personal message (optional)</label>
-              <textarea
-                value={personalMessage}
-                onChange={(e) => setPersonalMessage(e.target.value)}
-                rows={2}
-                placeholder="Hi, I'd love to share our data room with you…"
-                className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
               />
             </div>
 
