@@ -2012,3 +2012,109 @@ depends on the owner-FORCE-off bypass**, and enabling FORCE would change nothing
 bypasses via `BYPASSRLS`). Left as-is deliberately. This only becomes relevant if a `SECURITY
 DEFINER` function's owner is ever changed to a non-`BYPASSRLS` role — then FORCE would start
 applying to it.
+
+---
+
+## 50. RPC REACHABILITY IS A DATA-EXPOSURE SURFACE, INDEPENDENT OF search_path (found/fixed R42, July 2026)
+
+R41 pinned every `SECURITY DEFINER` function against `pg_temp` shadowing (§49). That closed the
+shadowing attack but **not the functions themselves**. All ~45 are owned by `postgres`, which has
+`BYPASSRLS`, so **RLS is not a backstop inside any of them** — the function body sees every row
+regardless of who calls it. If such a function is (a) in `public`, (b) has EXECUTE granted to
+`anon`/`authenticated` (Postgres grants EXECUTE to `PUBLIC` by default on every new function), and
+(c) **trusts a caller-supplied ID parameter** instead of deriving the caller from `auth.uid()`,
+then it is reachable as a PostgREST RPC and an attacker passes any foreign ID and gets the data.
+No shadowing needed. R42 live-proved, as a zero-membership account:
+`POST /rest/v1/rpc/get_user_deal_room_ids {"p_user_id":"<victim uuid>"}` → the victim's private
+deal-room list; `get_deal_room_member_ids(<foreign room>)` → that room's member UUIDs; and boolean
+`(room_id, user_id)` oracles (`dr_is_principal`/`dr_is_room_member`/`drm_is_founder_of_room`) →
+`true`/`false`, which maps the founder↔investor **relationship graph** — the confidential asset
+this platform exists to protect. Booleans are NOT lower-severity here.
+
+### 50.1 The rules
+
+- **A `SECURITY DEFINER` helper that trusts a caller-supplied ID and returns data (or a boolean
+  oracle about foreign entities) must NOT live in `public`.** Move it to a schema PostgREST does
+  not expose. R42 created `rls_private` for this. PostgREST exposes only `public` and
+  `graphql_public`; a function in `rls_private` is unreachable as an RPC (attacker RPC → 404; an
+  explicit `Content-Profile: rls_private` → PostgREST 406 "Invalid schema"), while RLS policies
+  can still call it **schema-qualified** (`rls_private.dr_is_open(...)`).
+- **You cannot fix this by revoking EXECUTE from `authenticated`.** RLS policy expressions run AS
+  the querying user, so that user MUST retain EXECUTE — revoking it breaks every policy that calls
+  the helper. Relocation to an unexposed schema is the mechanism; grant `USAGE` on `rls_private`
+  and `EXECUTE` on the functions to `authenticated, anon, service_role`. Verified live that schema
+  `USAGE` does NOT make the functions PostgREST-reachable — only schema *exposure* does.
+- **`service_role` REST calls cannot reach an unexposed schema either** (verified: 404). So any
+  helper called server-side by a service-role `fetch`/`sbFetch` to `/rest/v1/rpc/<fn>` MUST stay in
+  `public`. In this codebase that is `check_and_increment_ai_usage` (called from `advisor-fn.ts`,
+  `ai-secure-fn.ts`, `claims-fn.ts`). It trusts `p_user_id` (a real, low-severity quota-tamper
+  vector — an attacker can inflate another user's daily AI counter), left in public with that
+  caveat rather than break the server callers.
+- **The axis is param-trusting vs `auth.uid()`-gated, NOT data vs boolean.** Read every body;
+  do not trust the name. A function taking `p_deal_room_id` that internally checks `auth.uid()`
+  (e.g. via `deal_room_members ... user_id = auth.uid()`) is safe to leave; one that checks the
+  *parameter* is not. R42's classification pass caught five helpers that "looked" safe but trusted
+  their parameter (`dr_is_open`, `deal_room_information_unlocked`, `investor_can_request_access`,
+  `startup_id_has_open_invite`, `investor_user_id_has_open_invite`) — each revealed foreign
+  room/user/startup status; all were moved.
+
+### 50.2 Moved to `rls_private` in R42 (12 functions — the param-trusting set)
+
+`get_user_deal_room_ids`, `get_deal_room_member_ids`, `get_investor_profile_id_for_user`,
+`investor_team_member_owner_user_id`, `dr_is_principal`, `dr_is_room_member`,
+`drm_is_founder_of_room`, `dr_is_open`, `deal_room_information_unlocked`,
+`investor_can_request_access`, `startup_id_has_open_invite`, `investor_user_id_has_open_invite`.
+44 dependent policies repointed (mechanically generated ALTER POLICY, exact expression preserved).
+Verified: legit member reads unchanged (founder/investor/lawyer), every moved fn → 404, attacker
+→ 0 rows from every sensitive table for a foreign room.
+
+### 50.3 Deliberately LEFT in `public` — and why each is safe (do not re-derive this)
+
+**Auth.uid()-gated (reveal only the CALLER's own status, so a foreign ID leaks nothing):**
+- `is_startup_founder(startup_id)` — checks `founder_id = auth.uid()`.
+- `get_founder_team_role(startup_id)`, `get_investor_team_role(profile_id)`,
+  `get_investor_team_role_by_profile_id(id)` — all `... = auth.uid()`.
+- `founder_has_permission(startup_id, perm)`, `investor_has_permission(profile_id, perm)`,
+  `can_appoint_role(...)` — delegate to the auth.uid()-gated role helpers above.
+- `can_access_deal_room_doc_path(name)`, `can_access_founder_doc_path(name)` — gate on
+  `rls_private.get_user_deal_room_ids(auth.uid())` / `is_startup_founder` / `auth.uid()`.
+- `drm_can_create_room_member(room, p_user_id)` — takes `p_user_id` but its body IGNORES it and
+  uses `founder_has_permission` (auth.uid()). Safe, though the dead param is a smell.
+- `get_investor_startup_ids()`, `get_my_deal_room_startup_ids()`, `get_startup_team_user_ids()`,
+  `get_user_team_startup_ids()`, `is_admin()` — no ID param; all internal `auth.uid()`.
+
+**Intentional RPCs the client/app legitimately calls (must stay reachable):**
+- `preview_team_invite(token)`, `accept_team_invite(token)` — the team-invite flow (§ join.tsx).
+- `accept_lawyer_invite(token)`, `finalize_counsel_waiver(room)` — auth.uid()-gated writes.
+- `get_lawyer_invite_by_token(token)` — token possession is the credential (returns invite meta).
+- `get_public_investor_profile(slug)`, `get_public_investor_profile_by_user_id(uid)`,
+  `get_public_investor_profiles_by_user_ids(uids[])` — deliberate PUBLIC projections: return only
+  `id` + columns listed in the profile's own `public_fields`.
+- `get_investor_profile_in_room(room, investor_uid)` — has an explicit `auth.uid()` disclosure
+  check (returns null unless caller shares a disclosure relationship). Returned null for the
+  attacker in the live test.
+- `global_search(query, searcher_id, role, limit)` — trusts `searcher_id` in its signature, but
+  every data branch re-derives access from `auth.uid()`'s email; live test with a spoofed
+  `searcher_id` returned `[]`. Left in public but FLAGGED: its trust of `searcher_id` is fragile —
+  if a future edit adds a branch that keys off `searcher_id` directly, it becomes a leak.
+- `investor_median_days_to_decision(investor_uid)` — client-called (`MutualDisclosure.tsx`),
+  returns a coarse aggregate (median days), not row data; returned null/0 for a foreign investor
+  in the live test. Left in public as a low-value aggregate; revisit if finer metrics are added.
+- `roast_question_pool_count(session_id)` — public roast infrastructure, non-sensitive.
+
+**Trigger functions (not RPC-relevant):** `sync_deal_room_profile_disclosure`,
+`create_default_user_plan`, `update_updated_at`, `generate_profile_slug`, `seed_dd_for_deal_room`.
+
+**Not RPC-reachable at all** (EXECUTE only to postgres/service_role): `roast_expire_overdue`,
+`roast_submit_race_click`.
+
+### 50.4 Known residual, reported not fixed in R42
+
+- `check_and_increment_ai_usage(p_user_id)` — trusts `p_user_id`; must stay in public (service-role
+  called). Low-severity quota-tamper (inflate a victim's daily AI counter; no data exfil).
+- `finalize_deal_close(p_deal_room_id)` — no `auth.uid()` check, but the write requires
+  `deal_room_close.investor_confirmed AND founder_confirmed` already true (raises otherwise) plus a
+  close-guard trigger, so an attacker can at most trigger the final flip on an already-fully-agreed
+  close. Not a forge. Left as-is.
+- `global_search`'s `searcher_id` trust (see 50.3) — currently safe via internal auth.uid()
+  re-derivation; a latent footgun.
