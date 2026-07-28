@@ -211,8 +211,11 @@ function VerificationCard({
       // Auto-recompute readiness after verification reruns
       try {
         const { computeReadiness } = await import("@/lib/readiness-fn");
-        await computeReadiness({ data: { startup_id: startupId, founder_user_id: userId } });
-        qc.invalidateQueries({ queryKey: ["readiness", startupId] });
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          await computeReadiness({ data: { startup_id: startupId, accessToken: session.access_token } });
+          qc.invalidateQueries({ queryKey: ["readiness", startupId] });
+        }
       } catch { /* non-blocking */ }
     } catch {
       toast.error("Verification check failed. Please try again.");
@@ -523,8 +526,11 @@ function VerificationCard({
             // Recompute readiness when a claim proof status changes
             try {
               const { computeReadiness } = await import("@/lib/readiness-fn");
-              await computeReadiness({ data: { startup_id: startupId, founder_user_id: userId } });
-              qc.invalidateQueries({ queryKey: ["readiness", startupId] });
+              const { data: { session } } = await supabase.auth.getSession();
+              if (session) {
+                await computeReadiness({ data: { startup_id: startupId, accessToken: session.access_token } });
+                qc.invalidateQueries({ queryKey: ["readiness", startupId] });
+              }
             } catch { /* non-blocking */ }
           }}
         />
@@ -625,7 +631,9 @@ function ReadinessCard({
     staleTime: 0,
     queryFn: async () => {
       const { computeReadiness } = await import("@/lib/readiness-fn");
-      return computeReadiness({ data: { startup_id: startupId, founder_user_id: userId } });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return null;
+      return computeReadiness({ data: { startup_id: startupId, accessToken: session.access_token } });
     },
   });
 
@@ -1828,7 +1836,9 @@ export function FounderHome() {
     staleTime: 0,
     queryFn: async () => {
       const { computeReadiness } = await import("@/lib/readiness-fn");
-      return computeReadiness({ data: { startup_id: startup!.id, founder_user_id: user!.id } });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return null;
+      return computeReadiness({ data: { startup_id: startup!.id, accessToken: session.access_token } });
     },
   });
 

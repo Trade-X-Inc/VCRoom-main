@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { getEnvVar } from "@/lib/env";
+import { requireUser } from "@/lib/require-user-fn";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -47,7 +48,7 @@ export type InvestorContext = {
   lastDealBrief: LastDealBrief | null;
 };
 
-type ContextInput = { investorId: string };
+type ContextInput = { accessToken: string };
 
 // ── Server function ────────────────────────────────────────────────────────────
 
@@ -64,33 +65,46 @@ export const getInvestorContext = createServerFn({ method: "POST" })
       };
     }
 
+    // Identity from the token — never trust a client-supplied investorId.
+    // This function only ever returns the CALLER's own data, so there is no
+    // separate membership check needed beyond resolving who the caller is.
+    // See CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) {
+      return {
+        fundName: null, investorName: null,
+        watchlist: [], thesisAlerts: [], activeDealRooms: [], lastDealBrief: null,
+      };
+    }
+    const investorId = auth.uid;
+
     const admin = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false } });
 
     const [profileRes, watchlistRes, alertsRes, dealRoomRes, briefRes] = await Promise.all([
       admin.from("investor_profiles")
         .select("fund_name, your_name")
-        .eq("user_id", data.investorId)
+        .eq("user_id", investorId)
         .maybeSingle(),
 
       admin.from("investor_watchlist")
         .select("id, company_name, status, initial_score, created_at")
-        .eq("investor_id", data.investorId)
+        .eq("investor_id", investorId)
         .order("created_at", { ascending: false })
         .limit(5),
 
       admin.from("thesis_alerts")
         .select("id, startup_id, match_score, match_reasons, alerted_at, startups!startup_id(company_name, profile_slug)")
-        .eq("investor_id", data.investorId)
+        .eq("investor_id", investorId)
         .order("alerted_at", { ascending: false })
         .limit(10),
 
       admin.from("deal_room_members")
         .select("deal_room_id, deal_rooms!deal_room_id(id, status, startup_id, startups!startup_id(company_name))")
-        .eq("user_id", data.investorId),
+        .eq("user_id", investorId),
 
       admin.from("deal_briefs")
         .select("startup_id, match_score, headline, verdict_signal, generated_at, startups!startup_id(company_name)")
-        .eq("investor_id", data.investorId)
+        .eq("investor_id", investorId)
         .order("generated_at", { ascending: false })
         .limit(1)
         .maybeSingle(),

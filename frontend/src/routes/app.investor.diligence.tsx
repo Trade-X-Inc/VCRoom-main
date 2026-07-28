@@ -22,7 +22,11 @@ export function DiligencePage() {
   const { data: summary, isLoading: summaryLoading } = useQuery({
     queryKey: ["dd-summary", user?.id],
     enabled: !!user?.id,
-    queryFn: () => getDDSummaryForInvestor({ data: { userId: user!.id } }),
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return { dealRooms: [] };
+      return getDDSummaryForInvestor({ data: { userAccessToken: session.access_token } });
+    },
   });
 
   // Watchlist entries in Diligence status that have no deal room

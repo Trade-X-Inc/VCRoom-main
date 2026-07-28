@@ -1,11 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { getEnvVar } from "@/lib/env";
+import { requireUser } from "@/lib/require-user-fn";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 type BriefInput = {
-  investorId: string;
+  accessToken: string;
   startupId: string;
   forceRefresh?: boolean;
 };
@@ -41,6 +42,14 @@ export const generateInvestorDealBrief = createServerFn({ method: "POST" })
       throw new Error("Missing Supabase configuration");
     }
 
+    // Identity from the token — never trust a client-supplied investorId.
+    // This function persists a brief keyed by investor_id and reads the
+    // investor's own thesis, so a spoofed id both misattributes the write
+    // and leaks another investor's thesis into the prompt. See CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) throw new Error("not_authenticated");
+    const investorId = auth.uid;
+
     const admin = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false } });
 
     // 1. Check cache (unless forceRefresh)
@@ -48,7 +57,7 @@ export const generateInvestorDealBrief = createServerFn({ method: "POST" })
       const { data: cached } = await admin
         .from("deal_briefs")
         .select("*, startups!startup_id(company_name)")
-        .eq("investor_id", data.investorId)
+        .eq("investor_id", investorId)
         .eq("startup_id", data.startupId)
         .order("generated_at", { ascending: false })
         .limit(1)
@@ -83,7 +92,7 @@ export const generateInvestorDealBrief = createServerFn({ method: "POST" })
         .maybeSingle(),
       admin.from("investor_profiles")
         .select("fund_name, thesis, sectors, stages, check_size_min, check_size_max, geography")
-        .eq("user_id", data.investorId)
+        .eq("user_id", investorId)
         .maybeSingle(),
     ]);
 
@@ -167,7 +176,7 @@ Rate the match score based on how well this startup aligns with the investor's s
 
     // 4. Persist to deal_briefs (upsert by investor+startup)
     const briefRow = {
-      investor_id: data.investorId,
+      investor_id: investorId,
       startup_id: data.startupId,
       match_score: parsed.matchScore ?? 0,
       headline: parsed.headline ?? null,

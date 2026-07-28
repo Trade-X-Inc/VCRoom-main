@@ -267,7 +267,9 @@ function Overview() {
     enabled: !!startupId,
     queryFn: async () => {
       const { computeReadiness } = await import("@/lib/readiness-fn");
-      return computeReadiness({ data: { startup_id: startupId!, founder_user_id: user!.id } });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return null;
+      return computeReadiness({ data: { startup_id: startupId!, accessToken: session.access_token } });
     },
   });
 

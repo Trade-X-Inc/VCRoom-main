@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getEnvVar } from "@/lib/env";
+import { requireUser } from "@/lib/require-user-fn";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -23,7 +24,7 @@ export type ReadinessResult = {
   prev_readiness_score: number | null;
 };
 
-type ComputeInput = { startup_id: string; founder_user_id: string };
+type ComputeInput = { startup_id: string; accessToken: string };
 
 // Key claim types that block the gate when unverified
 const KEY_CLAIM_TYPES = ["revenue", "arr", "customer_count"];
@@ -46,6 +47,18 @@ export const computeReadiness = createServerFn({ method: "POST" })
       "Content-Type": "application/json",
     };
 
+    // Identity from the token — never trust a client-supplied founder_user_id.
+    // See CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return emptyResult(data.startup_id, auth.error);
+    const ownerCheck = await fetch(
+      `${base}/rest/v1/startups?id=eq.${data.startup_id}&founder_id=eq.${auth.uid}&select=id`,
+      { headers },
+    ).catch(() => null);
+    const ownerRows: any[] = ownerCheck?.ok ? await ownerCheck.json().catch(() => []) : [];
+    if (!ownerRows.length) return emptyResult(data.startup_id, "not_authorized");
+    const founderUserId = auth.uid;
+
     // ── Fetch all three signals in parallel ───────────────────────────────────
     const [verifResp, claimsResp, simResp, prevResp] = await Promise.all([
       // 1. Verification score
@@ -62,7 +75,7 @@ export const computeReadiness = createServerFn({ method: "POST" })
 
       // 3. Most recent simulation result
       fetch(
-        `${base}/rest/v1/advisor_messages?user_id=eq.${data.founder_user_id}&simulation_result=not.is.null&select=simulation_result,created_at&order=created_at.desc&limit=1`,
+        `${base}/rest/v1/advisor_messages?user_id=eq.${founderUserId}&simulation_result=not.is.null&select=simulation_result,created_at&order=created_at.desc&limit=1`,
         { headers }
       ).catch(() => null),
 

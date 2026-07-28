@@ -184,8 +184,11 @@ export function VerificationSection({
       if (entityType === "founder") {
         try {
           const { computeReadiness } = await import("@/lib/readiness-fn");
-          await computeReadiness({ data: { startup_id: entityId, founder_user_id: userId } });
-          qc.invalidateQueries({ queryKey: ["readiness", entityId] });
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            await computeReadiness({ data: { startup_id: entityId, accessToken: session.access_token } });
+            qc.invalidateQueries({ queryKey: ["readiness", entityId] });
+          }
         } catch { /* non-blocking */ }
       }
     } catch (err: any) {

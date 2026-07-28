@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
+import { requireUser } from "@/lib/require-user-fn";
 
 function getAdminClient(url?: string, key?: string) {
   const cfEnv = (globalThis as any).__cf_env || {};
@@ -14,19 +15,25 @@ function getAdminClient(url?: string, key?: string) {
 export const getDDData = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
-      dealRoomId: string; userId: string; userAccessToken: string;
+      dealRoomId: string; userAccessToken: string;
       supabaseUrl?: string; supabaseKey?: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
 
+    // Identity from the token — the userAccessToken field previously existed
+    // but was never checked; the membership check ran against a raw userId
+    // param instead. See CLAUDE.md §51.
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { categories: [], items: [], error: auth.error };
+
     // Verify user is a member
     const { data: member } = await sb
       .from("deal_room_members")
       .select("user_id")
       .eq("deal_room_id", data.dealRoomId)
-      .eq("user_id", data.userId)
+      .eq("user_id", auth.uid)
       .maybeSingle();
     if (!member) return { categories: [], items: [], error: "Unauthorized" };
 
@@ -61,17 +68,19 @@ export const getDDData = createServerFn({ method: "POST" })
 export const updateDDStatus = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
-      dealRoomId: string; userId: string; category: string; status: string;
+      dealRoomId: string; category: string; status: string;
       userAccessToken: string; supabaseUrl?: string; supabaseKey?: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { success: false, error: auth.error };
     const { data: member } = await sb
       .from("deal_room_members")
       .select("user_id")
       .eq("deal_room_id", data.dealRoomId)
-      .eq("user_id", data.userId)
+      .eq("user_id", auth.uid)
       .maybeSingle();
     if (!member) return { success: false, error: "Unauthorized" };
 
@@ -88,17 +97,19 @@ export const updateDDStatus = createServerFn({ method: "POST" })
 export const updateDDNotes = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
-      dealRoomId: string; userId: string; category: string; notes: string;
+      dealRoomId: string; category: string; notes: string;
       userAccessToken: string; supabaseUrl?: string; supabaseKey?: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { success: false, error: auth.error };
     const { data: member } = await sb
       .from("deal_room_members")
       .select("user_id")
       .eq("deal_room_id", data.dealRoomId)
-      .eq("user_id", data.userId)
+      .eq("user_id", auth.uid)
       .maybeSingle();
     if (!member) return { success: false, error: "Unauthorized" };
 
@@ -115,17 +126,19 @@ export const updateDDNotes = createServerFn({ method: "POST" })
 export const toggleChecklistItem = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
-      itemId: string; userId: string; dealRoomId: string; checked: boolean;
+      itemId: string; dealRoomId: string; checked: boolean;
       userAccessToken: string; supabaseUrl?: string; supabaseKey?: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { success: false, error: auth.error };
     const { data: member } = await sb
       .from("deal_room_members")
       .select("user_id")
       .eq("deal_room_id", data.dealRoomId)
-      .eq("user_id", data.userId)
+      .eq("user_id", auth.uid)
       .maybeSingle();
     if (!member) return { success: false, error: "Unauthorized" };
 
@@ -142,17 +155,19 @@ export const toggleChecklistItem = createServerFn({ method: "POST" })
 export const overrideAutoDetectedItem = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
-      itemId: string; userId: string; dealRoomId: string; checked: boolean;
+      itemId: string; dealRoomId: string; checked: boolean; userAccessToken: string;
       supabaseUrl?: string; supabaseKey?: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { success: false, error: auth.error };
     const { data: member } = await sb
       .from("deal_room_members")
       .select("user_id")
       .eq("deal_room_id", data.dealRoomId)
-      .eq("user_id", data.userId)
+      .eq("user_id", auth.uid)
       .maybeSingle();
     if (!member) return { success: false, error: "Unauthorized" };
 
@@ -187,18 +202,21 @@ export const overrideAutoDetectedItem = createServerFn({ method: "POST" })
 export const runAutoDetection = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
-      dealRoomId: string; userId: string; supabaseUrl?: string; supabaseKey?: string;
+      dealRoomId: string; userAccessToken: string; supabaseUrl?: string; supabaseKey?: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
 
-    // Auth check
+    // Identity from the token — never trust a client-supplied userId.
+    // See CLAUDE.md §51.
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { detected: [], error: auth.error };
     const { data: member } = await sb
       .from("deal_room_members")
       .select("user_id")
       .eq("deal_room_id", data.dealRoomId)
-      .eq("user_id", data.userId)
+      .eq("user_id", auth.uid)
       .maybeSingle();
     if (!member) return { detected: [], error: "Unauthorized" };
 
@@ -404,17 +422,23 @@ Respond with ONLY valid JSON: {"contains": true} or {"contains": false}`;
 export const getDDSummaryForInvestor = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
-      userId: string; supabaseUrl?: string; supabaseKey?: string;
+      userAccessToken: string; supabaseUrl?: string; supabaseKey?: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
 
+    // Identity from the token — this function only ever returns the
+    // CALLER's own deal-room summary, so a spoofed userId would show one
+    // investor another's deal rooms and DD progress. See CLAUDE.md §51.
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { dealRooms: [] };
+
     // Get all deal rooms this investor is a member of
     const { data: memberships } = await sb
       .from("deal_room_members")
       .select("deal_room_id")
-      .eq("user_id", data.userId);
+      .eq("user_id", auth.uid);
     const roomIds = (memberships ?? []).map((m: any) => m.deal_room_id);
 
     if (!roomIds.length) return { dealRooms: [] };
