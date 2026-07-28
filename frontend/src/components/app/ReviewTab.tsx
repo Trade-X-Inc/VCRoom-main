@@ -9,7 +9,8 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { supabase, logActivity } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
+import { logActivity } from "@/lib/activity-fn";
 import { notifyUser } from "@/lib/notify";
 
 // --- Types ---

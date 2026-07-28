@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Shield, Lock, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { supabase, logActivity } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
+import { logActivity } from "@/lib/activity-fn";
 import { Logo } from "@/components/brand/Logo";
 import { triggerNdaSignedEmail } from "@/lib/email/triggers";
 import { generateNdaDocument } from "@/lib/nda-fn";
@@ -226,15 +227,15 @@ function NdaPage() {
       const { data: { session: badgeSession } } = await supabase.auth.getSession();
       import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { deal_room_id: dealRoomId, accessToken: badgeSession?.access_token ?? "" } })).catch(() => {});
 
-      const { error: memberErr } = await supabase.from("deal_room_members").upsert(
-        {
-          deal_room_id: dealRoomId,
-          user_id: user.id,
-          role,
-          accepted_at: new Date().toISOString(),
-        },
-        { onConflict: "deal_room_id,user_id" },
-      );
+      // Membership itself is created by approveConnectionRequest (founder
+      // approves an investor's access request) or accept_lawyer_invite — by
+      // the time a user reaches this page they are already a real
+      // deal_room_members row. This upsert never had a matching unique
+      // constraint on (deal_room_id, user_id), so it always failed with
+      // 42P10 and its error was silently swallowed. Nothing ever depended on
+      // it: accepted_at (the only field it tried to write beyond what
+      // already exists) had zero readers anywhere in the app, so the write
+      // is removed rather than fixed. See CLAUDE.md.
 
       await logActivity(dealRoomId, user.id, "Signed the NDA");
 
