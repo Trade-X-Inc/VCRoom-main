@@ -2071,7 +2071,14 @@ Verified: legit member reads unchanged (founder/investor/lawyer), every moved fn
 ### 50.3 Deliberately LEFT in `public` — and why each is safe (do not re-derive this)
 
 **Auth.uid()-gated (reveal only the CALLER's own status, so a foreign ID leaks nothing):**
-- `is_startup_founder(startup_id)` — checks `founder_id = auth.uid()`.
+- `is_startup_founder(startup_id)` — SINGLE overload (`startup_id uuid` only; there is no
+  `(startup_id, user_id)` variant), checks `founder_id = auth.uid()`. **A `false` return to an
+  attacker passing a foreign startup is the correct, non-leaking answer** ("you are not the
+  founder"), not data disclosure — an early R42 note mis-listed it as a leaking oracle because the
+  live test returned a non-null `false`; it is NOT a leak and correctly stays in public. Re-verified
+  live: attacker on a foreign startup → `200 false`; a 2-arg call → 404 (no such overload). The
+  param-trusting founder oracle is `rls_private.drm_is_founder_of_room(room, p_user_id)` (moved),
+  NOT this one.
 - `get_founder_team_role(startup_id)`, `get_investor_team_role(profile_id)`,
   `get_investor_team_role_by_profile_id(id)` — all `... = auth.uid()`.
 - `founder_has_permission(startup_id, perm)`, `investor_has_permission(profile_id, perm)`,
