@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { EDITABLE_STARTUP_FIELDS, EDITABLE_THESIS_FIELDS } from "./profile-edit-constants";
+import { requireUser } from "@/lib/require-user-fn";
 
 // Re-export so callers that need both server fns + constants can import from one place
 export { EDITABLE_STARTUP_FIELDS, EDITABLE_THESIS_FIELDS };
@@ -168,6 +169,7 @@ type ApplyInput = {
   field: string;
   value: string;
   startupId: string;
+  accessToken: string;
 };
 
 export const applyProfileFieldEdit = createServerFn({ method: "POST" })
@@ -194,6 +196,17 @@ export const applyProfileFieldEdit = createServerFn({ method: "POST" })
       console.error("[profile-edit] Field not in allowlist:", data.field);
       return { ok: false, error: "disallowed_field" };
     }
+
+    // Identity from the token — never trust a client-supplied startupId
+    // without verifying ownership. See CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return { ok: false, error: auth.error };
+    const ownerCheck = await fetch(
+      `${supabaseUrl}/rest/v1/startups?id=eq.${data.startupId}&founder_id=eq.${auth.uid}&select=id`,
+      { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } },
+    ).catch(() => null);
+    const ownerRows = ownerCheck?.ok ? await ownerCheck.json().catch(() => []) : [];
+    if (!Array.isArray(ownerRows) || !ownerRows.length) return { ok: false, error: "not_authorized" };
 
     const url = data.table === "startups"
       ? `${supabaseUrl}/rest/v1/startups?id=eq.${data.startupId}`

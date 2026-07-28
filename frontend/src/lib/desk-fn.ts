@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { getEnvVar } from "@/lib/env";
+import { requireUser } from "@/lib/require-user-fn";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -68,12 +69,19 @@ export type FounderStage =
   | "requests_no_deal_room"
   | "deal_room_active";
 
-type StageInput = { startupId: string };
+type StageInput = { startupId: string; accessToken: string };
 
 export const getFounderStage = createServerFn({ method: "POST" })
   .inputValidator((d: unknown): StageInput => d as StageInput)
   .handler(async ({ data }): Promise<FounderStage> => {
     const admin = adminClient();
+
+    // Identity from the token — never trust a client-supplied startupId
+    // without verifying ownership. See CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return "profile_incomplete";
+    const { data: owned } = await admin.from("startups").select("id").eq("id", data.startupId).eq("founder_id", auth.uid).maybeSingle();
+    if (!owned) return "profile_incomplete";
 
     // All 4 queries in parallel — use real data, no reimplementation
     const [sessionRes, viewsRes, requestsRes, roomsRes] = await Promise.all([
@@ -117,17 +125,19 @@ export const getFounderStage = createServerFn({ method: "POST" })
 
 // ── Fetch tasks for a user ────────────────────────────────────────────────────
 
-type FetchInput = { userId: string; role: "founder" | "investor" };
+type FetchInput = { accessToken: string; role: "founder" | "investor" };
 
 export const getDeskTasks = createServerFn({ method: "POST" })
   .inputValidator((d: unknown): FetchInput => d as FetchInput)
   .handler(async ({ data }): Promise<DeskTask[]> => {
     const admin = adminClient();
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return [];
     const now = new Date().toISOString();
     const { data: rows, error } = await admin
       .from("desk_tasks")
       .select("*")
-      .eq("user_id", data.userId)
+      .eq("user_id", auth.uid)
       .eq("role", data.role)
       .eq("status", "open")
       .or(`snoozed_until.is.null,snoozed_until.lt.${now}`)
@@ -144,11 +154,13 @@ export const getResolvedDeskTasks = createServerFn({ method: "POST" })
   .inputValidator((d: unknown): FetchInput => d as FetchInput)
   .handler(async ({ data }): Promise<DeskTask[]> => {
     const admin = adminClient();
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return [];
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const { data: rows, error } = await admin
       .from("desk_tasks")
       .select("*")
-      .eq("user_id", data.userId)
+      .eq("user_id", auth.uid)
       .eq("role", data.role)
       .in("status", ["done"])
       .gte("completed_at", sevenDaysAgo)
@@ -160,12 +172,14 @@ export const getResolvedDeskTasks = createServerFn({ method: "POST" })
 
 // ── Dismiss / snooze / mark done ─────────────────────────────────────────────
 
-type ActionInput = { taskId: string; userId: string; action: "dismiss" | "done" | "snooze" };
+type ActionInput = { taskId: string; accessToken: string; action: "dismiss" | "done" | "snooze" };
 
 export const updateDeskTask = createServerFn({ method: "POST" })
   .inputValidator((d: unknown): ActionInput => d as ActionInput)
   .handler(async ({ data }): Promise<{ ok: boolean }> => {
     const admin = adminClient();
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return { ok: false };
     const now = new Date().toISOString();
     const update: Record<string, unknown> = {};
     if (data.action === "dismiss") {
@@ -184,24 +198,26 @@ export const updateDeskTask = createServerFn({ method: "POST" })
       .from("desk_tasks")
       .update(update)
       .eq("id", data.taskId)
-      .eq("user_id", data.userId);
+      .eq("user_id", auth.uid);
     if (error) throw error;
     return { ok: true };
   });
 
 // ── Update draft content ──────────────────────────────────────────────────────
 
-type UpdateDraftInput = { taskId: string; userId: string; draftContent: string };
+type UpdateDraftInput = { taskId: string; accessToken: string; draftContent: string };
 
 export const updateDeskTaskDraft = createServerFn({ method: "POST" })
   .inputValidator((d: unknown): UpdateDraftInput => d as UpdateDraftInput)
   .handler(async ({ data }): Promise<{ ok: boolean }> => {
     const admin = adminClient();
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return { ok: false };
     const { error } = await admin
       .from("desk_tasks")
       .update({ draft_content: data.draftContent })
       .eq("id", data.taskId)
-      .eq("user_id", data.userId);
+      .eq("user_id", auth.uid);
     if (error) throw error;
     return { ok: true };
   });
@@ -210,7 +226,7 @@ export const updateDeskTaskDraft = createServerFn({ method: "POST" })
 
 type CheckpointInput = {
   taskId: string;
-  userId: string;
+  accessToken: string;
   taskType: string;
   draftContent: string;
   recipientEmail: string;
@@ -227,6 +243,11 @@ export const completeCheckpointTask = createServerFn({ method: "POST" })
     if (!resendKey) {
       return { ok: false, error: "Email service not configured" };
     }
+
+    // Identity from the token — never trust a client-supplied userId. See
+    // CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return { ok: false, error: "not_authenticated" };
 
     // Send via Resend
     const subject = data.taskType === "follow_up_investor"
@@ -261,7 +282,7 @@ export const completeCheckpointTask = createServerFn({ method: "POST" })
       status: "done",
       chain_phase: "completed",
       completed_at: new Date().toISOString(),
-    }).eq("id", data.taskId).eq("user_id", data.userId);
+    }).eq("id", data.taskId).eq("user_id", auth.uid);
     if (doneErr) console.error("[desk-fn] task complete mark failed:", doneErr.message);
 
     return { ok: true, messageId: sent.id };
@@ -295,7 +316,7 @@ function buildEmailHtml(senderName: string, body: string): string {
 // Invokes the edge function's single-founder fast path so the desk has real
 // content the moment the founder lands there — no overnight cron wait.
 
-type SeedInput = { founderId: string; startupId: string };
+type SeedInput = { accessToken: string; startupId: string };
 
 export const seedFounderPlaybook = createServerFn({ method: "POST" })
   .inputValidator((d: unknown): SeedInput => d as SeedInput)
@@ -304,9 +325,17 @@ export const seedFounderPlaybook = createServerFn({ method: "POST" })
     const supabaseKey = getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
     if (!supabaseUrl || !supabaseKey) return { ok: false, error: "Missing config" };
 
+    // Identity from the token — never trust a client-supplied founderId.
+    // See CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return { ok: false, error: "not_authenticated" };
+    const admin = adminClient();
+    const { data: owned } = await admin.from("startups").select("id").eq("id", data.startupId).eq("founder_id", auth.uid).maybeSingle();
+    if (!owned) return { ok: false, error: "not_authorized" };
+
     try {
       const resp = await fetch(
-        `${supabaseUrl}/functions/v1/daily-desk-cron?founder_id=${encodeURIComponent(data.founderId)}&startup_id=${encodeURIComponent(data.startupId)}`,
+        `${supabaseUrl}/functions/v1/daily-desk-cron?founder_id=${encodeURIComponent(auth.uid)}&startup_id=${encodeURIComponent(data.startupId)}`,
         {
           method: "POST",
           headers: {

@@ -167,10 +167,8 @@ Return this exact JSON shape:
       const result = await runMemo(() => generateInvestorMemo({
         data: {
           dealRoomId: activeDealRoomId,
-          userId: user.id,
+          accessToken: session.data.session?.access_token ?? "",
           supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
-          supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-          userAccessToken: session.data.session?.access_token ?? "",
         },
       }));
       setMemoText(result.memo);

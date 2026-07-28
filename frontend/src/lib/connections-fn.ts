@@ -1,9 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireUser } from "@/lib/require-user-fn";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
 type SendIntakeInviteInput = {
-  investorId: string;
+  accessToken: string;
   investorProfileId: string;
   candidateIds: string[];
   investorName: string;
@@ -11,7 +12,7 @@ type SendIntakeInviteInput = {
 };
 
 type GenerateInviteLinkInput = {
-  investorId: string;
+  accessToken: string;
   label?: string;
 };
 
@@ -56,6 +57,14 @@ export const sendIntakeInvites = createServerFn({ method: "POST" })
     const { url, key } = getSupabaseAdmin();
     if (!url || !key) return { ok: false, sent: 0, errors: ["db_unavailable"] };
 
+    // Identity from the token — never trust a client-supplied investorId.
+    // This function sends real emails to real people, so an unverified
+    // caller could spam arbitrary addresses under any fund's name.
+    // See CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return { ok: false, sent: 0, errors: ["not_authenticated"] };
+    const investorId = auth.uid;
+
     const cfEnv = (globalThis as any).__cf_env || {};
     const resendKey = cfEnv.RESEND_API_KEY || "";
     const fromEmail = cfEnv.RESEND_FROM_EMAIL || "hello@hockystick.app";
@@ -84,7 +93,7 @@ export const sendIntakeInvites = createServerFn({ method: "POST" })
       let watchlistId: string | null = null;
       try {
         const wlRows: any[] = await sbFetch(url, key, "investor_watchlist", "POST", {
-          investor_id: data.investorId,
+          investor_id: investorId,
           company_name: candidate.company_name,
           source: "intake",
           status: "Sourcing",
@@ -148,10 +157,15 @@ export const generateInviteLink = createServerFn({ method: "POST" })
     const { url, key } = getSupabaseAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
 
+    // Identity from the token — never trust a client-supplied investorId.
+    // See CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return { ok: false, error: "not_authenticated" };
+
     // Check if investor already has an active link
     const existing: any[] = await sbFetch(
       url, key,
-      `investor_invite_links?investor_id=eq.${data.investorId}&active=eq.true&select=*`,
+      `investor_invite_links?investor_id=eq.${auth.uid}&active=eq.true&select=*`,
       "GET"
     ).catch(() => []);
 
@@ -160,7 +174,7 @@ export const generateInviteLink = createServerFn({ method: "POST" })
     // Generate a new UUID token
     const token = crypto.randomUUID();
     const inserted: any[] = await sbFetch(url, key, "investor_invite_links", "POST", {
-      investor_id: data.investorId,
+      investor_id: auth.uid,
       token,
       label: data.label ?? null,
       active: true,

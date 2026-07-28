@@ -223,7 +223,8 @@ function NdaPage() {
       if (insertErr) throw insertErr;
 
       // Badge evaluation — fire-and-forget on this write event
-      import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { deal_room_id: dealRoomId } })).catch(() => {});
+      const { data: { session: badgeSession } } = await supabase.auth.getSession();
+      import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { deal_room_id: dealRoomId, accessToken: badgeSession?.access_token ?? "" } })).catch(() => {});
 
       const { error: memberErr } = await supabase.from("deal_room_members").upsert(
         {
@@ -238,7 +239,7 @@ function NdaPage() {
       await logActivity(dealRoomId, user.id, "Signed the NDA");
 
       // Regenerate the canonical multi-party NDA document (fire-and-forget — don't block navigation)
-      generateNdaDocument({ data: { dealRoomId } })
+      generateNdaDocument({ data: { dealRoomId, accessToken: (await supabase.auth.getSession()).data.session?.access_token ?? "" } })
         .then(() => {
           // Invalidate so Overview + Vault panels pick up the new version
           queryClient.invalidateQueries({ queryKey: ["nda-document", dealRoomId] });

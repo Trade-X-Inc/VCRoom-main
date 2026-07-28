@@ -178,8 +178,9 @@ function SlotCard({
       const text = await extractDocumentText(file, file.name);
 
       const { checkCapitalDoc } = await import("@/lib/capital-verification-fn");
+      const { data: { session } } = await supabase.auth.getSession();
       const result = await checkCapitalDoc({
-        data: { investor_id: investorId, slot: slot.key, doc_path: storagePath, document_text: text, fund_name: fundName },
+        data: { accessToken: session?.access_token ?? "", slot: slot.key, doc_path: storagePath, document_text: text, fund_name: fundName },
       });
 
       if (!result.ok) {
@@ -357,13 +358,14 @@ function HumanReviewButton({
     setRequesting(true);
     try {
       const { requestHumanReview } = await import("@/lib/verification-fn");
+      const { data: { session } } = await supabase.auth.getSession();
       const r = await requestHumanReview({
-        data: { user_id: investorId, entity_id: investorId, entity_type: "investor", user_email: userEmail, display_name: displayName },
+        data: { entity_id: investorId, entity_type: "investor", accessToken: session?.access_token ?? "", user_email: userEmail, display_name: displayName },
       });
       if (r.ok) {
         // Persist the timestamp in investor_verifications via server fn
         const { markCapitalReviewRequested } = await import("@/lib/capital-verification-fn");
-        await markCapitalReviewRequested({ data: { investor_id: investorId } });
+        await markCapitalReviewRequested({ data: { accessToken: session?.access_token ?? "" } });
         toast.success("Review request sent.");
         onRequested();
       } else {

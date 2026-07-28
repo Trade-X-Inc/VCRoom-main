@@ -56,7 +56,8 @@ export function VerificationPage() {
     setRunning(true);
     try {
       const { runTier1Check } = await import("@/lib/verification-fn");
-      const result = await runTier1Check({ data: { startup_id: startup.id, caller_user_id: user.id } });
+      const { data: { session } } = await supabase.auth.getSession();
+      const result = await runTier1Check({ data: { startup_id: startup.id, accessToken: session?.access_token ?? "" } });
       await refetch();
       if (result.error) {
         toast.error(result.error);
@@ -77,9 +78,10 @@ export function VerificationPage() {
     setLicenseChecking(true);
     try {
       const isImage = /\.(png|jpe?g|webp)$/i.test(file.name);
+      const { data: { session } } = await supabase.auth.getSession();
       const payload: Record<string, unknown> = {
         startup_id: startup.id,
-        caller_user_id: user.id,
+        accessToken: session?.access_token ?? "",
         document_name: file.name,
       };
       if (isImage) {

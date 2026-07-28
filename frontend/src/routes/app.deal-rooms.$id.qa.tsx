@@ -253,7 +253,8 @@ function QAPage() {
     if (!userId || completingQA) return;
     setCompletingQA(true);
     try {
-      await completeQaAndGenerateReport({ data: { dealRoomId, userId } });
+      const { data: { session } } = await supabase.auth.getSession();
+      await completeQaAndGenerateReport({ data: { dealRoomId, accessToken: session?.access_token ?? "" } });
       await refetchRoom();
       queryClient.invalidateQueries({ queryKey: ["vault-documents", dealRoomId] });
       toast.success("Q&A complete. Report saved to Information Vault.");

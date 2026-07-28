@@ -201,7 +201,8 @@ function VerificationCard({
     toast.info("Running automated checks — this takes up to 20 seconds…");
     try {
       const { runTier1Check } = await import("@/lib/verification-fn");
-      const result = await runTier1Check({ data: { startup_id: startupId, caller_user_id: userId } });
+      const { data: { session: tier1Session } } = await supabase.auth.getSession();
+      const result = await runTier1Check({ data: { startup_id: startupId, accessToken: tier1Session?.access_token ?? "" } });
       await qc.invalidateQueries({ queryKey: ["home-verif", startupId] });
       if (result.tier1_passed) {
         toast.success("Identity confirmed — all four checks passed");

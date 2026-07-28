@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireUser } from "@/lib/require-user-fn";
 
 function getOpenAIKey(): string {
   const cfEnv = (globalThis as any).__cf_env || {};
@@ -133,7 +134,7 @@ export type IntakeCandidate = {
 
 type ParseIntakeInput = {
   batchId: string;
-  investorProfileId: string;
+  accessToken: string;
   rawInput: string;
 };
 
@@ -147,7 +148,21 @@ export type ParseIntakeResult = {
 export const parseIntakeBatch = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as ParseIntakeInput)
   .handler(async ({ data }): Promise<ParseIntakeResult> => {
-    const { batchId, investorProfileId, rawInput } = data;
+    const { batchId, rawInput } = data;
+
+    // Identity from the token — never trust a client-supplied
+    // investorProfileId. See CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return { candidates: [], error: "not_authenticated" };
+    const investorProfileId = auth.uid;
+
+    // The batch must actually belong to this investor.
+    try {
+      const batches = await dbGet("investor_intake_batches", `id=eq.${batchId}&investor_profile_id=eq.${investorProfileId}&select=id`);
+      if (!batches?.length) return { candidates: [], error: "not_authorized" };
+    } catch {
+      return { candidates: [], error: "not_authorized" };
+    }
 
     // 1. Fetch investor thesis
     let thesis = "";

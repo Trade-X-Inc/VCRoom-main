@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { getEnvVar } from "@/lib/env";
+import { requireUser } from "@/lib/require-user-fn";
 
 type LeadData = {
   id: string;
@@ -10,7 +11,7 @@ type LeadData = {
   stage?: string | null;
 };
 
-type LinkedInInput = { userId: string; leadData: LeadData; openAIKey?: string };
+type LinkedInInput = { accessToken: string; leadData: LeadData; openAIKey?: string };
 
 export const generateLinkedInMessage = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): LinkedInInput => data as LinkedInInput)
@@ -20,13 +21,20 @@ export const generateLinkedInMessage = createServerFn({ method: "POST" })
     const cfEnv = (globalThis as any).__cf_env || {};
     const openAIKey = cfEnv.OPENAI_API_KEY || getEnvVar("OPENAI_API_KEY");
     if (!supabaseUrl || !serviceKey) throw new Error("Supabase not configured");
+
+    // Identity from the token — never trust a client-supplied userId. See
+    // CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) throw new Error("not_authenticated");
+    const userId = auth.uid;
+
     const adminClient = createClient(supabaseUrl, serviceKey);
     const lead = data.leadData;
 
     const { data: startup } = await adminClient
       .from("startups")
       .select("company_name, sector, stage, funding_target, founder_name")
-      .eq("founder_id", data.userId)
+      .eq("founder_id", userId)
       .limit(1)
       .maybeSingle();
 
@@ -57,7 +65,7 @@ Keep the message under 300 characters. Be genuine and specific, not salesy. Just
     const message = (json.choices[0]?.message?.content ?? "").trim();
     if (!message) throw new Error("Invalid AI response");
 
-    const { error: usageErr } = await adminClient.from("ai_usage").insert({ user_id: data.userId, action: "linkedin_gen" });
+    const { error: usageErr } = await adminClient.from("ai_usage").insert({ user_id: userId, action: "linkedin_gen" });
     if (usageErr) console.error("[linkedin-fn] usage log failed:", usageErr.message);
     return { message };
   });

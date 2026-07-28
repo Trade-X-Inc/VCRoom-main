@@ -3,6 +3,7 @@ import { Sparkles, Loader2, Copy, Check, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { generateOutreachEmail } from "@/lib/ai-fn";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import type { VCLead } from "./LeadDrawer";
 
@@ -26,7 +27,8 @@ export function AIEmailComposer({ lead, onSaveToNotes }: AIEmailComposerProps) {
     setRateLimited(false);
     setResult(null);
     try {
-      const res = await generateOutreachEmail({ data: { leadId: lead.id, type, userId: user.id } });
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await generateOutreachEmail({ data: { leadId: lead.id, type, accessToken: session?.access_token ?? "" } as any });
       setSubject(res.subject);
       setBody(res.body);
       setResult(res);

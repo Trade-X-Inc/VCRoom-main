@@ -173,7 +173,8 @@ export function VerificationSection({
     toast.info("Running automated checks — this takes up to 20 seconds…");
     try {
       const { runTier1Check } = await import("@/lib/verification-fn");
-      const result = await runTier1Check({ data: { startup_id: entityId, caller_user_id: userId } });
+      const { data: { session: tier1Session } } = await supabase.auth.getSession();
+      const result = await runTier1Check({ data: { startup_id: entityId, accessToken: tier1Session?.access_token ?? "" } });
       await qc.invalidateQueries({ queryKey: ["my-verification", entityType, entityId] });
       if (result.tier1_passed) {
         toast.success("Identity confirmed — all four checks passed.");
@@ -203,8 +204,9 @@ export function VerificationSection({
     setRequestingSent(true);
     try {
       const { requestHumanReview } = await import("@/lib/verification-fn");
+      const { data: { session: reviewSession } } = await supabase.auth.getSession();
       const result = await requestHumanReview({
-        data: { entity_type: entityType, entity_id: entityId, user_id: userId, user_email: userEmail, display_name: displayName },
+        data: { entity_type: entityType, entity_id: entityId, accessToken: reviewSession?.access_token ?? "", user_email: userEmail, display_name: displayName },
       });
       if (result.ok) {
         toast.success("Human review request sent. The Hockystick team will be in touch.");

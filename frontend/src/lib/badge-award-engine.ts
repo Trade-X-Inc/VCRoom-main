@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireUser } from "@/lib/require-user-fn";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Badge award engine — single responsibility: evaluate whether a startup or
@@ -330,21 +331,49 @@ export async function evaluateAndAwardBadgesCore(opts: {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const evaluateAndAwardBadges = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { startup_id?: string; investor_profile_id?: string; investor_user_id?: string; deal_room_id?: string })
+  .inputValidator((d: unknown) => d as {
+    startup_id?: string; investor_profile_id?: string; investor_user_id?: string;
+    deal_room_id?: string; accessToken: string;
+  })
   .handler(async ({ data }): Promise<BadgeEvalResult> => {
     const { url, key } = admin();
+    if (!url || !key) return EMPTY;
+
+    // Identity from the token — badge criteria are computed from the
+    // target's own real data (idempotent, non-destructive, no data
+    // returned beyond which badges were (un)changed), so the risk here is
+    // low, but a caller should still only be able to trigger evaluation
+    // for their OWN startup/investor profile or a room they belong to.
+    // See CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return EMPTY;
+
     let startupId = data.startup_id;
     let investorUserId = data.investor_user_id;
     let investorProfileId = data.investor_profile_id;
 
-    // A deal room id resolves both sides — call sites pass whatever they have.
-    if (data.deal_room_id && url && key) {
+    // A deal room id resolves both sides — call sites pass whatever they
+    // have. The caller must be a real member of the room.
+    if (data.deal_room_id) {
+      const membership = await sbGet(url, key,
+        `deal_room_members?deal_room_id=eq.${data.deal_room_id}&user_id=eq.${auth.uid}&select=user_id`);
+      if (!membership.length) return EMPTY;
       const rooms = await sbGet(url, key,
         `deal_rooms?id=eq.${data.deal_room_id}&select=startup_id,investor_user_id`);
       startupId = startupId ?? rooms[0]?.startup_id ?? undefined;
       investorUserId = investorUserId ?? rooms[0]?.investor_user_id ?? undefined;
     }
-    if (!investorProfileId && investorUserId && url && key) {
+
+    // Caller must own the startup they're asking to evaluate.
+    if (startupId) {
+      const owned = await sbGet(url, key,
+        `startups?id=eq.${startupId}&founder_id=eq.${auth.uid}&select=id`);
+      if (!owned.length) startupId = undefined;
+    }
+    // Caller must be the investor they're asking to evaluate.
+    if (investorUserId && investorUserId !== auth.uid) investorUserId = undefined;
+
+    if (!investorProfileId && investorUserId) {
       const rows = await sbGet(url, key,
         `investor_profiles?user_id=eq.${investorUserId}&select=id`);
       investorProfileId = rows[0]?.id;

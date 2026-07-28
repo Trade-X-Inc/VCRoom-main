@@ -243,7 +243,8 @@ function InviteLinkPanel({ investorId }: { investorId: string }) {
     setGenerating(true);
     try {
       const { generateInviteLink } = await import("@/lib/connections-fn");
-      const result = await generateInviteLink({ data: { investorId } });
+      const { data: { session } } = await supabase.auth.getSession();
+      const result = await generateInviteLink({ data: { accessToken: session?.access_token ?? "" } });
       if (result.ok) {
         qc.invalidateQueries({ queryKey: ["investor-invite-link", investorId] });
         toast.success("Invite link created");
@@ -687,9 +688,10 @@ export function ConnectionsPage() {
     setConfirming(true);
     try {
       const { sendIntakeInvites } = await import("@/lib/connections-fn");
+      const { data: { session } } = await supabase.auth.getSession();
       const result = await sendIntakeInvites({
         data: {
-          investorId: user!.id,
+          accessToken: session?.access_token ?? "",
           investorProfileId: investorProfile.id,
           candidateIds: Array.from(selectedIds),
           investorName: investorProfile.your_name ?? "The investor",

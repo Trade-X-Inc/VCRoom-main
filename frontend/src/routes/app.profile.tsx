@@ -318,7 +318,8 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
     staleTime: 60_000,
     queryFn: async () => {
       const { getFounderThesis } = await import("@/lib/founder-thesis-fn");
-      return getFounderThesis({ data: { startupId: startup!.id } });
+      const { data: { session } } = await supabase.auth.getSession();
+      return getFounderThesis({ data: { startupId: startup!.id, accessToken: session?.access_token ?? "" } });
     },
   });
 
@@ -348,7 +349,8 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
     setThesisSaving(true);
     try {
       const { upsertFounderThesis } = await import("@/lib/founder-thesis-fn");
-      const result = await upsertFounderThesis({ data: { startupId: startup.id, ...thesisForm, status } });
+      const { data: { session } } = await supabase.auth.getSession();
+      const result = await upsertFounderThesis({ data: { startupId: startup.id, accessToken: session?.access_token ?? "", ...thesisForm, status } });
       if (!result.ok) throw new Error(result.error ?? "Save failed");
       setThesisSaved(true);
       setTimeout(() => setThesisSaved(false), 3000);
@@ -700,6 +702,8 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
         const savedStartupId = existing?.id ?? newStartupId;
         if (savedStartupId) {
           const { upsertClaim } = await import("@/lib/claims-fn");
+          const { data: { session: claimSession } } = await supabase.auth.getSession();
+          const claimAccessToken = claimSession?.access_token ?? "";
           const quantFields: Array<{ type: string; label: string; value: string | null }> = [
             { type: "revenue",        label: "Revenue / ARR",   value: form.revenue || null },
             { type: "growth_rate",    label: "Growth Rate",     value: form.growth_rate || null },
@@ -709,7 +713,7 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
           ];
           for (const qf of quantFields) {
             if (qf.value) {
-              upsertClaim({ data: { startup_id: savedStartupId, claim_type: qf.type, claim_label: qf.label, claim_value: qf.value } })
+              upsertClaim({ data: { startup_id: savedStartupId, claim_type: qf.type, claim_label: qf.label, claim_value: qf.value, accessToken: claimAccessToken } })
                 .catch(() => null);
             }
           }
@@ -2718,8 +2722,9 @@ function CapTableSection({ startupId }: { startupId: string }) {
     setVerifyingId(row.id);
     try {
       const { verifySocialUrls } = await import("@/lib/claims-fn");
+      const { data: { session } } = await supabase.auth.getSession();
       const r = await verifySocialUrls({
-        data: { startup_id: startupId, cap_table_row_id: row.id, linkedin_url: row.linkedin_url, x_url: row.x_url, instagram_url: row.instagram_url },
+        data: { startup_id: startupId, cap_table_row_id: row.id, linkedin_url: row.linkedin_url, x_url: row.x_url, instagram_url: row.instagram_url, accessToken: session?.access_token ?? "" },
       });
       qc.invalidateQueries({ queryKey: ["cap-table", startupId] });
       toast.success(r.social_verified ? "Social links verified" : "Links could not be reached — social_verified set to false");

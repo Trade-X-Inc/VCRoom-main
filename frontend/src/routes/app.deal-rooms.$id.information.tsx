@@ -39,7 +39,10 @@ function InformationPage() {
     queryKey: ["nda-document", dealRoomId],
     enabled: !!dealRoomId,
     staleTime: 5 * 60 * 1000,
-    queryFn: async () => fetchNdaDocument({ data: { dealRoomId } }),
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      return fetchNdaDocument({ data: { dealRoomId, accessToken: session?.access_token ?? "" } });
+    },
   });
 
   const { data: vaultNdaSigners = [] } = useQuery({
