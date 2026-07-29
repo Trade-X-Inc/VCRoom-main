@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { getEnvVar } from "@/lib/env";
+import { requireUser } from "@/lib/require-user-fn";
 
 function getAdminClient() {
   const url = getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
@@ -9,7 +10,7 @@ function getAdminClient() {
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
-type BriefInput = { dealRoomId: string; userId: string };
+type BriefInput = { dealRoomId: string; accessToken: string };
 
 export interface DealBriefResult {
   matchScore: number;
@@ -23,12 +24,17 @@ export interface DealBriefResult {
 export const generateDealBrief = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): BriefInput => data as BriefInput)
   .handler(async ({ data }: { data: BriefInput }): Promise<DealBriefResult> => {
+    // Identity from the token — never trust a client-supplied userId. See
+    // CLAUDE.md §51 and deal-brief-fn.ts's identical fix.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) throw new Error("not_authenticated");
+
     // 1. Verify investor is a member of this deal room
     const { data: member } = await getAdminClient()
       .from("deal_room_members")
       .select("user_id")
       .eq("deal_room_id", data.dealRoomId)
-      .eq("user_id", data.userId)
+      .eq("user_id", auth.uid)
       .maybeSingle();
     if (!member) throw new Error("Unauthorized");
 

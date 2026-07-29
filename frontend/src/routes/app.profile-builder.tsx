@@ -670,7 +670,8 @@ function ProfileBuilder() {
       // before the task exists. A failure here must never block the founder.
       if (user?.id) {
         try {
-          await seedFounderPlaybook({ data: { founderId: user.id, startupId } });
+          const { data: { session } } = await supabase.auth.getSession();
+          await seedFounderPlaybook({ data: { accessToken: session?.access_token ?? "", startupId } });
         } catch {
           // Non-fatal — daily cron will catch it. Don't surface to user.
         }

@@ -2118,10 +2118,257 @@ Verified: legit member reads unchanged (founder/investor/lawyer), every moved fn
 ### 50.4 Known residual, reported not fixed in R42
 
 - `check_and_increment_ai_usage(p_user_id)` — trusts `p_user_id`; must stay in public (service-role
-  called). Low-severity quota-tamper (inflate a victim's daily AI counter; no data exfil).
+  called). Low-severity quota-tamper (inflate a victim's daily AI counter; no data exfil). See §51
+  and §52 — R43 found this residual is bigger and more coupled than this note originally implied.
 - `finalize_deal_close(p_deal_room_id)` — no `auth.uid()` check, but the write requires
   `deal_room_close.investor_confirmed AND founder_confirmed` already true (raises otherwise) plus a
   close-guard trigger, so an attacker can at most trigger the final flip on an already-fully-agreed
   close. Not a forge. Left as-is.
 - `global_search`'s `searcher_id` trust (see 50.3) — currently safe via internal auth.uid()
   re-derivation; a latent footgun.
+
+---
+
+## 51. GENERAL RULE — a service-role server function's caller-supplied ID param is not an
+authorization boundary; every one must derive identity from the caller's JWT (R43, July 2026)
+
+R40-R42 (§§48-50) hardened the **database** — `pg_temp` shadowing, RPC-reachable
+`SECURITY DEFINER` helpers, PUBLIC grants. R43 found the **exact same underlying mistake**
+one layer up, in the application's own TanStack Start `createServerFn` handlers: **every
+server function that authenticates with the Supabase **service-role** key runs with RLS
+fully bypassed, so whatever identity/ownership check exists inside the function body IS the
+entire security boundary — there is no backstop.** Across this codebase, ~40 such functions
+across 20+ files trusted a client-supplied `userId`/`investorId`/`startupId`/`founderId`
+field as "who is calling," with zero derivation from a real session. Confirmed live (not
+inferred from code): a fabricated, never-existed UUID was processed identically to a real
+victim's UUID; a lawyer got a full deal brief by passing the investor's `userId`; the
+investor's own valid session retrieved another founder's real verification scores by
+passing their `startup_id`.
+
+**The fix pattern, now applied everywhere this was found:** `frontend/src/lib/require-user-fn.ts`
+exports `requireUser(accessToken)`, which resolves the real, authenticated uid via
+`${supabaseUrl}/auth/v1/user` (or `client.auth.getUser(token)` for `@supabase/supabase-js`-style
+files) and returns `{ok: false}` on any missing/invalid token. Every fixed function:
+1. Removes the client-supplied identity param from its input type entirely — not kept as a
+   fallback. There must be no field left for a forged payload to populate.
+2. Adds `accessToken: string` to the input type instead.
+3. Calls `requireUser(data.accessToken)` (or the club's own membership/ownership check
+   built on it) before touching any data, and fails closed (`return` an error/empty result)
+   on any auth failure.
+4. Every client call site fetches a **fresh** session token via `supabase.auth.getSession()`
+   at call time — never stores or passes a user id it already has lying around.
+
+**The membership-check trap (found in `deal-brief-fn.ts`, `doc-request-fn.ts`, `dd-fn.ts`):**
+a query shaped like `.eq("deal_room_id", dealRoomId).eq("user_id", data.userId).maybeSingle()`
+LOOKS like an authorization check but is not one — it only proves *some* member matches the
+*claimed* id, never that the claimed id is the real caller. Several of these files even had
+an unused `userAccessToken` field sitting right next to the trusted `userId` — present,
+never read, giving a false impression that verification already existed. The fix is always:
+derive `uid` from the token first, then run the exact same membership query against the
+**derived** uid, never the param.
+
+**When the identity param IS itself the resource being requested** (e.g. `investorId` in a
+function that only ever returns the caller's own watchlist/context), there is no separate
+membership check needed — deriving the uid from the token and using it in place of the
+param is sufficient, since the function was never supposed to accept anyone else's id in
+the first place.
+
+**Before adding any new service-role `createServerFn`:** if it takes any parameter shaped
+like an id belonging to a specific user/startup/investor/deal room, ask whether a forged
+value would change what the function does or returns. If yes, it needs `requireUser()` (or
+an ownership/membership check built on its derived uid) before anything else in the
+handler — the same standard as §34's RLS-write rule, just one layer higher, because a
+service-role function has no RLS layer under it at all to catch the mistake.
+
+### 51.1 Scope note — Tier 1/2/3 fixed, three items explicitly NOT fixed (all separately reported)
+
+- **`connection-request-fn.ts`, `agreement-fn.ts`, `closing-fn.ts`, `interview-fn.ts`,
+  `term-negotiation-fn.ts`, `profile-checklist-fn.ts`, `summary-fn.ts`, `roast-fn.ts`'s
+  mutating functions, `dd-fn.ts`'s `runConfrontationalAnalysis`, `onboarding-chat-fn.ts`** —
+  already correct (JWT-derived identity) before R43; not touched.
+- **`invite-fn.ts` and `app.investor.profile.tsx:1758`** — explicitly out of scope per
+  standing instruction: both dead, both replaced by the team-onboarding rebuild.
+- **`check_and_increment_ai_usage`'s identity hole** — deliberately NOT fixed at the RPC
+  layer in R43. See §52 for why, and why it's coupled to the `ai_usage` constraint bug.
+
+---
+
+## 52. `ai_usage` — TWO INCOMPATIBLE WRITE PATTERNS SHARE ONE TABLE; NEITHER FIXED, BOTH
+COUPLED (found R43, July 2026) — no usage limit exists in production today
+
+`check_and_increment_ai_usage(p_user_id, p_feature)` needs exactly ONE row per
+`(user_id, feature, usage_date)` with an accumulating `call_count`, upserted via
+`ON CONFLICT (user_id, feature, usage_date) DO UPDATE SET call_count = call_count + 1`. **No
+such unique constraint has ever existed** — confirmed live: every call fails `42P10` ("no
+unique or exclusion constraint matching the ON CONFLICT specification"), and
+`checkUsageCap()` (repeated identically in `ai-secure-fn.ts`, `profile-builder-fn.ts`,
+`advisor-fn.ts`, `investor-advisor-fn.ts`, `investor-profile-builder-fn.ts`) **fails open**
+on any RPC error — so the AI features keep working for every user, but the daily quota has
+silently never been enforced for anyone, in production, the whole time.
+
+**Why the obvious fix (just add the constraint) is wrong:** `ai-fn.ts`, `linkedin-fn.ts`,
+and `reply-fn.ts` (`generateOutreachEmail` / `generateLinkedInMessage` / `generateReply`)
+also insert into `ai_usage`, but for a **completely different, incompatible purpose** — a
+"max N calls per rolling hour" limiter that counts rows via
+`created_at >= oneHourAgo`, one row per call. These inserts never set `feature` (it falls
+back to the column default, `'general'`) and never set `call_count` (defaults to `0`) —
+confirmed live: the exact duplicate rows found in the table (3 rows per `(user_id,
+'general', day)` in several cases) are these three files' per-call log entries, not damage
+from the RPC's missing constraint. **Adding a unique constraint on `(user_id, feature,
+usage_date)` today would fix the RPC's 42P10 but break the second-and-later call of any of
+these three files on the same day** (they do a plain `.insert()`, not `upsert`, so the
+second call per day would start failing outright). These are two genuinely different
+rate-limiting mechanisms that happen to share a table name by accident, not by design.
+
+**Compounding this: `check_and_increment_ai_usage` also trusts `p_user_id` outright, with no
+identity check** — confirmed live (fabricated UUID processed identically to a real victim's
+UUID, differing only when it hit the unrelated `42P10`/`23503` constraint bugs). All 7
+callers (`advisor-fn.ts`, `ai-secure-fn.ts`, `claims-fn.ts`, `investor-advisor-fn.ts`,
+`investor-profile-builder-fn.ts`, `profile-builder-fn.ts`, `verification-fn.ts`) call the
+RPC using the **anon key as bearer**, with no forwarded user session — meaning `auth.uid()`
+is NULL for every one of them today, so an identity check inside the RPC has nothing to
+compare `p_user_id` against unless the calling code is also changed to forward the caller's
+real access token (the same fix pattern as §51).
+
+**These two problems are coupled and neither may be fixed alone:**
+- Fixing the schema constraint without first fixing the 7 callers to forward a real token
+  (so the RPC can actually verify `p_user_id`) does nothing for the identity hole — a
+  constrained-but-unauthenticated RPC just means an attacker's forged calls now correctly
+  accumulate `call_count` against the victim's real quota row instead of failing outright —
+  **turning a currently-inert bug into a live quota-corruption vector against arbitrary
+  users.**
+- Fixing the RPC's identity check (reject when no real session is forwarded) without first
+  fixing the 7 callers to forward a real token would break every AI feature these files
+  power in production today, since all 7 currently use the anon key with no session.
+- A version of the identity check that only validates `auth.uid()` **when a token happens
+  to be forwarded**, falling back to trusting `p_user_id` otherwise, was considered and
+  explicitly rejected: an attacker simply omits the token, so the check would close nothing
+  for actual attack traffic while making the diff look fixed. This is the same failure mode
+  already caught and reverted twice elsewhere in this codebase — the in-worker CSP rate
+  limiter (§46.2, a check that can't see cross-isolate traffic) and the `LazyToaster`
+  wrapper (§47.1, a component named for something it didn't actually do) — a control that
+  only works when the adversary cooperates is not a control.
+
+**Correct fix, not yet done, needs its own dedicated branch:** forward the caller's real
+access token in all 7 callers (matching the pattern already correct in `dd-fn.ts`'s
+`runConfrontationalAnalysis` and now in `require-user-fn.ts`), reject `auth.role() = 'anon'`
+at the RPC, enforce `auth.uid() = p_user_id` when `auth.role() = 'authenticated'`, keep
+`service_role` fully trusted — **and** dedupe the existing `call_count = 0` rows (or give
+the three per-call-log files their own distinct `feature` value so they stop colliding with
+the RPC's daily-accumulator rows) before adding the unique constraint. Both halves in one
+pass; this is bigger and riskier than a single-function identity fix and was deliberately
+not attempted piecemeal in R43.
+
+---
+
+## 53. RLS POLICY GRANTING ACCESS BASED ON "AN INVITE EXISTS" RATHER THAN "CALLER IS THE
+INVITEE" — same bug found twice in one migration, both fixed (R43, July 2026)
+
+Found while live-testing the `getFounderContext` identity fix (§51): `startups_invited_read`
+and `investor_profiles_invited_read` (both from R12,
+`20260718030000_r12_invite_company_name_read.sql`) used
+`rls_private.startup_id_has_open_invite(p_startup_id)` /
+`investor_user_id_has_open_invite(p_investor_user_id)`, whose bodies were:
+```sql
+select exists (select 1 from team_invites where startup_id = p_startup_id)
+```
+— checking only that **some** `team_invites` row references that startup/investor, never
+that the **calling user** is the actual invitee, and never checking `accepted_at`/
+`expires_at` at all. **Live-verified before the fix:** the test-founder's own real, valid
+session token retrieved the **complete** `startups` row (`select=*`, all ~70 columns —
+`founder_email`, `revenue`, `burn_rate`, `runway_months`, `valuation`,
+`current_investors`, everything) for a startup they have zero relationship to, solely
+because that startup had one team invite outstanding (itself already accepted, which the
+check didn't care about either).
+
+**The general pattern to grep for elsewhere in this schema:** any RLS policy or
+`SECURITY DEFINER` helper whose logic is "does a row matching this target id exist
+somewhere in table X" rather than "does a row matching **this target id AND the calling
+user** exist" grants access to every caller uniformly, not just the intended one — the same
+class of mistake as §34's UI-permission-isn't-a-boundary rule and §38.3's broad-write-policy
+rule, but for RLS *read* policies specifically. A caller-supplied or session-derived
+identity must appear on **both sides** of the check, not just the resource side.
+
+**Fix chosen: dropped both policies and their backing functions, rather than rewriting
+them.** Investigated whether they were still needed first (removing the surface beats
+securing it, same reasoning as the `join.$token.tsx` deletion): the R12 migration's own
+comment states their sole purpose was letting an invitee preview a company name before
+accepting on `/join`. The live team-join flow (`routes/join.tsx`, rebuilt in R40) resolves
+`org_name`/`inviter_name`/`role`/`email` entirely server-side via the
+`preview_team_invite`/`accept_team_invite` `SECURITY DEFINER` RPCs and never reads
+`startups` directly at all. The only file that *does* read `startups` this way
+(`join.team.$token.tsx`) is itself dead, orphaned code from the pre-R40 `invites`-table
+system (a different table from `team_invites`) with zero live links anywhere in the app —
+confirmed via grep, only the auto-generated route tree references its path. The
+`investor_profiles` counterpart is the same: the real investor-invite-link flow
+(`join-investor.$token.tsx`) already explicitly avoids relying on any bare peer-read of
+`investor_profiles`, using the safe `get_public_investor_profile_by_user_id()` whitelist RPC
+instead — its own code comment says so ("investor_profiles has no bare peer-read RLS
+anymore").
+
+**Live-verified after the drop:** a genuinely unrelated startup (confirmed via querying for
+one with zero deal-room relationship to the test account, since the test-founder happens to
+be a real deal-room member of one candidate "foreign" startup used in an earlier, invalid
+test) now returns 0 rows for the test-founder's real token, where it previously returned the
+full row. `preview_team_invite` still executes correctly and is unaffected, since it never
+depended on either dropped policy.
+
+---
+
+## 54. NDA-SIGN `deal_room_members` UPSERT WAS DEAD CODE THAT NEVER SUCCEEDED — REMOVED, NOT
+FIXED (R43, July 2026)
+
+`app.deal-rooms.$id.nda.tsx`'s `handleAccept` upserted `deal_room_members` with
+`onConflict: "deal_room_id,user_id"` — a constraint that has never existed on this table, so
+the call always failed `42P10`, and its error (`memberErr`) was captured but never checked,
+so the failure was completely silent. Before removing it, investigated whether it was
+secretly load-bearing (i.e., the only path that ever creates an investor's `deal_room_members`
+row) — it is not. `connection-request-fn.ts`'s `approveConnectionRequest` (fired when a
+founder approves an investor's access request) inserts **both** the founder and investor
+member rows directly, and `accept_lawyer_invite` inserts the lawyer's row directly — neither
+depends on this upsert. By the time any user reaches `/nda`, they are already a real member;
+this write's only actual job was stamping `accepted_at` on the already-existing row, and
+nothing downstream ever read that column (§26 already established this via an exhaustive
+six-surface check). Removed the write entirely rather than repairing it, then dropped
+`deal_room_members.accepted_at` in the same pass. `accept_lawyer_invite` is the only
+function whose body mentions both `deal_room_members` and `accepted_at` together — confirmed
+its actual write targets `deal_room_lawyer_invites.accepted_at`, a different table, and is
+unaffected by the column drop (live-verified: still executes correctly post-drop).
+
+**`logActivity` extracted from `lib/supabase.ts` into `lib/activity-fn.ts`** in the same
+pass (a pure consumer of the already-exported `supabase` client, no relationship to any auth
+listener) — `lib/supabase.ts` itself is confirmed byte-identical via `git diff` after the
+change, per the standing never-touch rule. The three real call sites
+(`Dropzone.tsx`, `ReviewTab.tsx`, `app.deal-rooms.$id.nda.tsx`) now import from the new file;
+`lib/supabase.ts`'s own `logActivity` export is left in place, untouched, and unused going
+forward.
+
+---
+
+## 55. TWO INDEPENDENT SUPABASE AUTH LISTENERS ARE BOTH LIVE SIMULTANEOUSLY — CONFIRMED, NOT
+FIXED (found R43, July 2026) — re-check before any future auth work
+
+CLAUDE.md's own standing rule ("One Supabase auth listener only... multiple listeners cause
+5-second lock timeouts") is currently violated. Confirmed by reading the actual mount/call
+chain, not assumed:
+
+- `lib/auth.tsx`'s `AuthProvider` (rendered for real at `routes/__root.tsx:196`, inside the
+  JSX tree) registers a real `supabase.auth.onAuthStateChange(...)` subscription every time
+  it mounts (`lib/auth.tsx:66`) — a root-level provider, so once per full page
+  load/hydration.
+- `lib/auth-store.ts`'s `setupAuthListener()` is called unconditionally at module top-level
+  in `routes/__root.tsx:9` (`if (typeof window !== 'undefined') setupAuthListener();`),
+  guarded only by its own module-level `authListenerSetup` flag (prevents re-registration on
+  repeated calls, but does nothing to prevent `auth.tsx`'s separate subscription from also
+  existing) — this registers a **second, independent** `onAuthStateChange` subscription
+  (`lib/auth-store.ts:28`).
+
+Both are real, both fire on every auth state change in a real session — this is exactly the
+two-listener situation the standing rule exists to prevent, confirmed present, not
+hypothetical. **Not fixed in R43** (out of scope — this was a report-only item this
+session). Before touching `lib/auth.tsx` or `lib/auth-store.ts` for any reason, re-read this
+section — consolidating to one listener means deciding which of the two consumers
+(`AuthContext`'s `user`/`loading` state vs. `useAuthStore`'s `user`/`initialized` state,
+both read by different route files today — `app.tsx`/`app.investor.tsx` read
+`useAuthStore.getState()` directly, most of the rest of the app reads `useAuth()`) becomes
+the single source of truth, which is a real design decision, not a mechanical fix.

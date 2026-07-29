@@ -4,6 +4,7 @@
 // anywhere else.
 
 import { createServerFn } from "@tanstack/react-start";
+import { requireUser } from "@/lib/require-user-fn";
 
 export interface TierBreakdown {
   tier: 0 | 1 | 2 | 3 | 4;
@@ -108,11 +109,24 @@ export async function recomputeVerificationTier(
 // ── Client-callable wrapper ───────────────────────────────────────────────────
 
 export const calculateVerificationTier = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { startup_id: string })
+  .inputValidator((d: unknown) => d as { startup_id: string; accessToken: string })
   .handler(async ({ data }): Promise<TierBreakdown | null> => {
     const cfEnv = (globalThis as any).__cf_env || {};
     const url = cfEnv.SUPABASE_URL || cfEnv.VITE_SUPABASE_URL || (import.meta.env as any).VITE_SUPABASE_URL || "";
     const key = cfEnv.SUPABASE_SERVICE_ROLE_KEY || "";
     if (!url || !key) return null;
+
+    // Identity from the token — never trust a client-supplied startup_id
+    // without verifying ownership. This returns internal verification-tier
+    // breakdown data. See CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return null;
+    const ownerResp = await fetch(
+      `${url}/rest/v1/startups?id=eq.${data.startup_id}&founder_id=eq.${auth.uid}&select=id`,
+      { headers: { apikey: key, Authorization: `Bearer ${key}` } },
+    ).catch(() => null);
+    const ownerRows = ownerResp?.ok ? await ownerResp.json().catch(() => []) : [];
+    if (!Array.isArray(ownerRows) || !ownerRows.length) return null;
+
     return recomputeVerificationTier(url, key, data.startup_id);
   });

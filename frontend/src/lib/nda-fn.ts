@@ -1,6 +1,20 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 
+async function requireRoomMember(svc: any, dealRoomId: string, accessToken: string | undefined): Promise<boolean> {
+  if (!accessToken) return false;
+  const { data: userData } = await svc.auth.getUser(accessToken);
+  const uid = userData?.user?.id;
+  if (!uid) return false;
+  const { data: member } = await svc
+    .from("deal_room_members")
+    .select("user_id")
+    .eq("deal_room_id", dealRoomId)
+    .eq("user_id", uid)
+    .maybeSingle();
+  return !!member;
+}
+
 export interface NdaSigner {
   user_id: string;
   full_name: string;
@@ -170,7 +184,7 @@ Last updated: ${generatedAt}`;
 }
 
 export const generateNdaDocument = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { dealRoomId: string })
+  .inputValidator((d: unknown) => d as { dealRoomId: string; accessToken: string })
   .handler(async ({ data }): Promise<NdaDocument | null> => {
     const cfEnv = (globalThis as any).__cf_env || {};
     const serviceKey =
@@ -189,6 +203,11 @@ export const generateNdaDocument = createServerFn({ method: "POST" })
 
     const svc = createClient(supabaseUrl, serviceKey);
     const { dealRoomId } = data;
+
+    // Identity + membership check — this function discloses full signer
+    // names/companies/roles, and the room's own NDA document, to whoever
+    // calls it. See CLAUDE.md §51.
+    if (!(await requireRoomMember(svc, dealRoomId, data.accessToken))) return null;
 
     // 1. Fetch all acceptances for this room (service key bypasses nda_own row-level isolation)
     const { data: acceptances, error: accErr } = await svc
@@ -287,7 +306,7 @@ export const generateNdaDocument = createServerFn({ method: "POST" })
 //   import('/src/lib/nda-fn.ts').then(m => m.regenerateNdaForRoom({ data: { dealRoomId: '<uuid>' } }).then(console.log))
 // Or call via the server fn directly in any server context.
 export const regenerateNdaForRoom = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { dealRoomId: string })
+  .inputValidator((d: unknown) => d as { dealRoomId: string; accessToken: string })
   .handler(async ({ data }): Promise<{ ok: boolean; version?: number; error?: string }> => {
     const cfEnv = (globalThis as any).__cf_env || {};
     const serviceKey = cfEnv.SUPABASE_SERVICE_ROLE_KEY || cfEnv.SUPABASE_SERVICE_KEY || "";
@@ -298,6 +317,8 @@ export const regenerateNdaForRoom = createServerFn({ method: "POST" })
     // We duplicate the minimal fetch+upsert here to keep this self-contained for admin use.
     const svc = createClient(supabaseUrl, serviceKey);
     const { dealRoomId } = data;
+
+    if (!(await requireRoomMember(svc, dealRoomId, data.accessToken))) return { ok: false, error: "not_authorized" };
 
     const { data: acceptances } = await svc
       .from("nda_acceptances")
@@ -352,7 +373,7 @@ export const regenerateNdaForRoom = createServerFn({ method: "POST" })
   });
 
 export const fetchNdaDocument = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { dealRoomId: string })
+  .inputValidator((d: unknown) => d as { dealRoomId: string; accessToken: string })
   .handler(async ({ data }): Promise<NdaDocument | null> => {
     const cfEnv = (globalThis as any).__cf_env || {};
     const serviceKey = cfEnv.SUPABASE_SERVICE_ROLE_KEY || cfEnv.SUPABASE_SERVICE_KEY || "";
@@ -361,6 +382,7 @@ export const fetchNdaDocument = createServerFn({ method: "POST" })
     if (!serviceKey) return null;
 
     const svc = createClient(supabaseUrl, serviceKey);
+    if (!(await requireRoomMember(svc, data.dealRoomId, data.accessToken))) return null;
     const { data: doc, error } = await svc
       .from("nda_documents")
       .select("*")

@@ -171,8 +171,9 @@ function OpSlotCard({
       const text = await extractDocumentText(file, file.name);
 
       const { checkOperationalDoc } = await import("@/lib/operational-verification-fn");
+      const { data: { session } } = await supabase.auth.getSession();
       const result = await checkOperationalDoc({
-        data: { startup_id: startupId, slot: slot.key, doc_path: storagePath, document_text: text, company_name: companyName },
+        data: { startup_id: startupId, accessToken: session?.access_token ?? "", slot: slot.key, doc_path: storagePath, document_text: text, company_name: companyName },
       });
 
       if (!result.ok) {
@@ -349,12 +350,13 @@ function OpHumanReviewButton({
     setRequesting(true);
     try {
       const { requestHumanReview } = await import("@/lib/verification-fn");
+      const { data: { session } } = await supabase.auth.getSession();
       const r = await requestHumanReview({
-        data: { user_id: startupId, entity_id: startupId, entity_type: "founder", user_email: userEmail, display_name: displayName },
+        data: { entity_id: startupId, entity_type: "founder", accessToken: session?.access_token ?? "", user_email: userEmail, display_name: displayName },
       });
       if (r.ok) {
         const { markOperationalReviewRequested } = await import("@/lib/operational-verification-fn");
-        await markOperationalReviewRequested({ data: { startup_id: startupId } });
+        await markOperationalReviewRequested({ data: { startup_id: startupId, accessToken: session?.access_token ?? "" } });
         toast.success("Review request sent.");
         onRequested();
       } else {
@@ -404,7 +406,8 @@ export function OperationalVerificationSection({
     staleTime: 30_000,
     queryFn: async () => {
       const { getOperationalVerification } = await import("@/lib/operational-verification-fn");
-      const r = await getOperationalVerification({ data: { startup_id: startupId } });
+      const { data: { session } } = await supabase.auth.getSession();
+      const r = await getOperationalVerification({ data: { startup_id: startupId, accessToken: session?.access_token ?? "" } });
       return r.data ?? null;
     },
   });

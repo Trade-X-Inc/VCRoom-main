@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
+import { requireUser } from "@/lib/require-user-fn";
 
 function getAdminClient(url?: string, key?: string) {
   const cfEnv = (globalThis as any).__cf_env || {};
@@ -14,16 +15,18 @@ function getAdminClient(url?: string, key?: string) {
 export const getNotifications = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
-      userId: string; userAccessToken: string;
+      userAccessToken: string;
       supabaseUrl?: string; supabaseKey?: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { notifications: [], unreadCount: 0 };
     const { data: notifs, error } = await sb
       .from("notifications")
       .select("id, kind, title, body, read, meta, created_at")
-      .eq("user_id", data.userId)
+      .eq("user_id", auth.uid)
       .order("created_at", { ascending: false })
       .limit(50);
     if (error) return { notifications: [], unreadCount: 0 };
@@ -36,17 +39,19 @@ export const getNotifications = createServerFn({ method: "POST" })
 export const markNotificationRead = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
-      notificationId: string; userId: string; userAccessToken: string;
+      notificationId: string; userAccessToken: string;
       supabaseUrl?: string; supabaseKey?: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { success: false, error: auth.error };
     const { error } = await sb
       .from("notifications")
       .update({ read: true })
       .eq("id", data.notificationId)
-      .eq("user_id", data.userId);
+      .eq("user_id", auth.uid);
     if (error) return { success: false, error: error.message };
     return { success: true };
   });
@@ -55,16 +60,18 @@ export const markNotificationRead = createServerFn({ method: "POST" })
 export const markAllNotificationsRead = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
-      userId: string; userAccessToken: string;
+      userAccessToken: string;
       supabaseUrl?: string; supabaseKey?: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { success: false, error: auth.error };
     const { error } = await sb
       .from("notifications")
       .update({ read: true })
-      .eq("user_id", data.userId)
+      .eq("user_id", auth.uid)
       .eq("read", false);
     if (error) return { success: false, error: error.message };
     return { success: true };

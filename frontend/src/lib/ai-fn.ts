@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { getEnvVar } from "@/lib/env";
+import { requireUser } from "@/lib/require-user-fn";
 
 const systemPrompt = `You are an expert fundraising advisor helping startup founders write concise, personalized investor outreach emails.
 Respond ONLY with valid JSON. No markdown, no code fences, no explanation.
@@ -19,7 +20,7 @@ type LeadData = {
 type EmailInput = {
   leadData: LeadData;
   type: "cold" | "followup";
-  userId: string;
+  accessToken: string;
   openAIKey?: string;
 };
 
@@ -39,12 +40,18 @@ export const generateOutreachEmail = createServerFn({ method: "POST" })
     const adminClient = createClient(supabaseUrl, serviceKey);
     const lead = data.leadData;
 
+    // Identity from the token — never trust a client-supplied userId. See
+    // CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) throw new Error("not_authenticated");
+    const userId = auth.uid;
+
     // 1. Rate limit: max 10 per hour
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
     const { count } = await adminClient
       .from("ai_usage")
       .select("id", { count: "exact", head: true })
-      .eq("user_id", data.userId)
+      .eq("user_id", userId)
       .eq("action", "email_gen")
       .gte("created_at", oneHourAgo);
     if ((count ?? 0) >= 10) throw new Error("Rate limit exceeded");
@@ -53,7 +60,7 @@ export const generateOutreachEmail = createServerFn({ method: "POST" })
     const { data: startup } = await adminClient
       .from("startups")
       .select("*")
-      .eq("founder_id", data.userId)
+      .eq("founder_id", userId)
       .limit(1)
       .maybeSingle();
 
@@ -115,7 +122,7 @@ Be warm but direct.`;
     if (!parsed.subject || !parsed.body) throw new Error("Invalid AI response");
 
     // 6. Log usage
-    const { error: usageErr } = await adminClient.from("ai_usage").insert({ user_id: data.userId, action: "email_gen" });
+    const { error: usageErr } = await adminClient.from("ai_usage").insert({ user_id: userId, action: "email_gen" });
     if (usageErr) console.error("[ai-fn] usage log failed:", usageErr.message);
 
     // 7. Return

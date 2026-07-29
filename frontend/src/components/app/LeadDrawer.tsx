@@ -322,7 +322,8 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
     setGeneratingEmail(true);
     setGeneratedEmail("");
     try {
-      const result = await generateOutreachEmail({ data: { userId: user.id, leadData: lead, type } });
+      const { data: { session } } = await supabase.auth.getSession();
+      const result = await generateOutreachEmail({ data: { accessToken: session?.access_token ?? "", leadData: lead, type } });
       setGeneratedEmail(`Subject: ${result.subject}\n\n${result.body}`);
     } catch (err: any) {
       toast.error(err.message || "Failed to generate email");
@@ -336,7 +337,8 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
     setGeneratingLinkedIn(true);
     setGeneratedLinkedIn("");
     try {
-      const result = await generateLinkedInMessage({ data: { userId: user.id, leadData: lead } });
+      const { data: { session } } = await supabase.auth.getSession();
+      const result = await generateLinkedInMessage({ data: { accessToken: session?.access_token ?? "", leadData: lead } });
       setGeneratedLinkedIn(result.message);
     } catch (err: any) {
       toast.error(err.message || "Failed to generate LinkedIn message");
@@ -350,7 +352,8 @@ export function LeadDrawer({ open, lead, onClose, onSaved }: LeadDrawerProps) {
     setGeneratingReply(true);
     setGeneratedReply("");
     try {
-      const result = await generateReply({ data: { userId: user.id, leadData: lead, investorReply: investorReply.trim(), tone: replyTone } });
+      const { data: { session } } = await supabase.auth.getSession();
+      const result = await generateReply({ data: { accessToken: session?.access_token ?? "", leadData: lead, investorReply: investorReply.trim(), tone: replyTone } });
       setGeneratedReply(result.reply);
     } catch (err: any) {
       toast.error(err.message || "Failed to generate reply");

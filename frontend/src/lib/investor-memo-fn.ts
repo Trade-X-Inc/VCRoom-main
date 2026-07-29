@@ -4,10 +4,8 @@ import { getEnvVar } from "@/lib/env";
 
 type MemoInput = {
   dealRoomId: string;
-  userId: string;
+  accessToken: string;
   supabaseUrl?: string;
-  supabaseAnonKey?: string;
-  userAccessToken?: string;
 };
 
 export const generateInvestorMemo = createServerFn({ method: "POST" })
@@ -21,15 +19,33 @@ export const generateInvestorMemo = createServerFn({ method: "POST" })
     }
 
     const supabaseUrl = data.supabaseUrl || getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
-    const supabaseKey = data.supabaseAnonKey || getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
+    // Always the anon key here — never the service-role key. RLS must apply
+    // under the caller's own forwarded token; there is no fallback path that
+    // silently escalates to a full bypass. See CLAUDE.md §51.
+    const supabaseAnonKey = getEnvVar("SUPABASE_ANON_KEY") || getEnvVar("VITE_SUPABASE_ANON_KEY");
 
-    if (!supabaseUrl || !supabaseKey) {
+    if (!supabaseUrl || !supabaseAnonKey) {
       throw new Error('Supabase configuration missing on server');
     }
+    if (!data.accessToken) throw new Error('not_authenticated');
 
-    const client = createClient(supabaseUrl, supabaseKey, {
-      global: { headers: { Authorization: `Bearer ${data.userAccessToken ?? ""}` } },
+    const client = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: `Bearer ${data.accessToken}` } },
     });
+
+    // Explicit membership check as a backstop — RLS should already scope
+    // every query below, but verifying membership directly fails closed
+    // with a clear error instead of silently returning empty/null fields.
+    const { data: userData } = await client.auth.getUser(data.accessToken);
+    const uid = userData?.user?.id;
+    if (!uid) throw new Error('not_authenticated');
+    const { data: member } = await client
+      .from("deal_room_members")
+      .select("user_id")
+      .eq("deal_room_id", data.dealRoomId)
+      .eq("user_id", uid)
+      .maybeSingle();
+    if (!member) throw new Error('not_authorized');
 
     // 1. Fetch deal room + startup
     const { data: room } = await client

@@ -1,5 +1,18 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getEnvVar } from "@/lib/env";
+import { requireUser } from "@/lib/require-user-fn";
+
+async function ownsStartup(supabaseUrl: string, supabaseKey: string, startupId: string, accessToken: string | undefined): Promise<boolean> {
+  const auth = await requireUser(accessToken);
+  if (!auth.ok) return false;
+  const resp = await fetch(
+    `${supabaseUrl}/rest/v1/startups?id=eq.${startupId}&founder_id=eq.${auth.uid}&select=id`,
+    { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } },
+  ).catch(() => null);
+  if (!resp?.ok) return false;
+  const rows = await resp.json().catch(() => []);
+  return Array.isArray(rows) && rows.length > 0;
+}
 
 export type FounderThesis = {
   id: string;
@@ -17,9 +30,10 @@ export type FounderThesis = {
   updated_at: string;
 };
 
-type GetInput = { startupId: string };
+type GetInput = { startupId: string; accessToken: string };
 type SaveInput = {
   startupId: string;
+  accessToken: string;
   preferred_check_size_min: string;
   preferred_check_size_max: string;
   preferred_investor_type: string;
@@ -37,6 +51,7 @@ export const getFounderThesis = createServerFn({ method: "POST" })
     const supabaseUrl = getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
     const supabaseKey = getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
     if (!supabaseUrl || !supabaseKey) return null;
+    if (!(await ownsStartup(supabaseUrl, supabaseKey, data.startupId, data.accessToken))) return null;
     const resp = await fetch(
       `${supabaseUrl}/rest/v1/founder_thesis?startup_id=eq.${data.startupId}&limit=1`,
       { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}`, "Content-Type": "application/json" } },
@@ -51,6 +66,7 @@ export const saveFounderThesis = createServerFn({ method: "POST" })
     const supabaseUrl = getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
     const supabaseKey = getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
     if (!supabaseUrl || !supabaseKey) return { ok: false, error: "Missing config" };
+    if (!(await ownsStartup(supabaseUrl, supabaseKey, data.startupId, data.accessToken))) return { ok: false, error: "not_authorized" };
 
     const now = new Date().toISOString();
     const payload = {
@@ -116,6 +132,7 @@ export const upsertFounderThesis = createServerFn({ method: "POST" })
     const supabaseUrl = getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
     const supabaseKey = getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
     if (!supabaseUrl || !supabaseKey) return { ok: false, error: "Missing config" };
+    if (!(await ownsStartup(supabaseUrl, supabaseKey, data.startupId, data.accessToken))) return { ok: false, error: "not_authorized" };
 
     const now = new Date().toISOString();
     const resp = await fetch(`${supabaseUrl}/rest/v1/founder_thesis`, {

@@ -74,7 +74,7 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token ?? "";
-      return getDocRequests({ data: { dealRoomId, userId: userId ?? "", userAccessToken: token, supabaseUrl, supabaseKey } });
+      return getDocRequests({ data: { dealRoomId, userAccessToken: token, supabaseUrl, supabaseKey } });
     },
     refetchInterval: 30_000,
   });
@@ -125,7 +125,6 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
       return createDocRequest({
         data: {
           dealRoomId,
-          requestedBy: userId!,
           forUserId: resolvedFounderId,
           title: title.trim(),
           description: description.trim() || undefined,
@@ -158,7 +157,6 @@ export function DocRequestsTab({ dealRoomId, isInvestor, isFounder, userId, foun
           requestedBy: req.requested_by,
           title: req.title,
           dealRoomId,
-          userId: userId ?? "",
           userAccessToken: token,
           supabaseUrl,
           supabaseKey,

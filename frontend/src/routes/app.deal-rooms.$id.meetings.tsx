@@ -272,13 +272,15 @@ function MeetingsPage() {
     if (!date || !userId) return;
     setSaving(num);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { toast.error("Session expired — sign in again"); return; }
       const r = await upsertDealRoomMeeting({
         data: {
           deal_room_id: dealRoomId,
           meeting_number: num,
           scheduled_at: new Date(date).toISOString(),
           meeting_type: types[num] ?? "video",
-          actor_user_id: userId,
+          accessToken: session.access_token,
         },
       });
       if (r.ok) { toast.success("Meeting scheduled"); invalidate(); }
@@ -291,8 +293,10 @@ function MeetingsPage() {
     if (!userId) return;
     setSaving(num);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { toast.error("Session expired — sign in again"); return; }
       const r = await upsertDealRoomMeeting({
-        data: { deal_room_id: dealRoomId, meeting_number: num, completed_at: new Date().toISOString(), actor_user_id: userId },
+        data: { deal_room_id: dealRoomId, meeting_number: num, completed_at: new Date().toISOString(), accessToken: session.access_token },
       });
       if (r.ok) { toast.success("Meeting marked done"); invalidate(); }
       else toast.error("Could not update");
@@ -350,8 +354,10 @@ function MeetingsPage() {
     if (!userId) return;
     setSaving(num);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { toast.error("Session expired — sign in again"); return; }
       const r = await skipMeeting({
-        data: { deal_room_id: dealRoomId, meeting_number: num, actor_user_id: userId, reason: skipReason.trim() || undefined },
+        data: { deal_room_id: dealRoomId, meeting_number: num, accessToken: session.access_token, reason: skipReason.trim() || undefined },
       });
       if (r.ok) { toast.success("Meeting skipped"); setSkipOpen(null); setSkipReason(""); invalidate(); }
       else toast.error("Could not skip");
@@ -362,10 +368,13 @@ function MeetingsPage() {
   const saveNotes = async (num: 1 | 2 | 3 | 4 | 5) => {
     setSaving(num);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { toast.error("Session expired — sign in again"); return; }
       const r = await updateMeetingNotes({
         data: {
           deal_room_id: dealRoomId,
           meeting_number: num,
+          accessToken: session.access_token,
           notes_shared: sharedDraft,
           ...(isInvestor ? { notes_investor: privateDraft } : {}),
         },

@@ -1,11 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { getEnvVar } from "@/lib/env";
+import { requireUser } from "@/lib/require-user-fn";
 
 type SummaryInput = {
   documentPath: string;
   documentName: string;
   dealRoomId: string;
+  accessToken: string;
   supabaseUrl?: string;
   supabaseKey?: string;
   openAIKey?: string;
@@ -30,6 +32,20 @@ export const generateDocumentSummary = createServerFn({ method: "POST" })
     }
 
     const client = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false } });
+
+    // Identity from the token — never let a caller summarize an arbitrary
+    // storage path just by guessing it. The caller must be a real member of
+    // the deal room the document is claimed to belong to. See CLAUDE.md §51.
+    const { data: userData } = await client.auth.getUser(data.accessToken);
+    const uid = userData?.user?.id;
+    if (!uid) return { summary: null, error: "not_authenticated" };
+    const { data: member } = await client
+      .from("deal_room_members")
+      .select("user_id")
+      .eq("deal_room_id", data.dealRoomId)
+      .eq("user_id", uid)
+      .maybeSingle();
+    if (!member) return { summary: null, error: "not_authorized" };
 
     const { data: blob, error: dlError } = await client.storage
       .from("documents")

@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { getEnvVar } from "@/lib/env";
 
-type BriefInput = { dealRoomId: string; userId: string; openAIKey?: string };
+type BriefInput = { dealRoomId: string; accessToken: string; openAIKey?: string };
 
 export interface DealBriefResult {
   matchScore: number;
@@ -29,12 +29,20 @@ export const generateDealBrief = createServerFn({ method: "POST" })
     }
     const adminClient = createClient(supabaseUrl, serviceKey);
 
-    // 1. Verify investor is a member of this deal room
+    // 1. Identity from the token — never trust a client-supplied userId.
+    //    The membership check below must run against this derived uid, not
+    //    a param, or any room member can impersonate any other member
+    //    (confirmed live in R43 Part A: a lawyer got a full deal brief by
+    //    passing the investor's userId). See CLAUDE.md §51.
+    const { data: userData } = await adminClient.auth.getUser(data.accessToken);
+    const uid = userData?.user?.id;
+    if (!uid) throw new Error("not_authenticated");
+
     const { data: member } = await adminClient
       .from("deal_room_members")
       .select("user_id")
       .eq("deal_room_id", data.dealRoomId)
-      .eq("user_id", data.userId)
+      .eq("user_id", uid)
       .maybeSingle();
     if (!member) throw new Error("Unauthorized");
 

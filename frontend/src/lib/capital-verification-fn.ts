@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireUser } from "@/lib/require-user-fn";
 
 export type CapitalSlot = "fund_formation" | "capital_commitment" | "aum_confirmation";
 
@@ -27,7 +28,7 @@ export type CapitalVerificationData = {
 };
 
 type CheckCapitalDocInput = {
-  investor_id: string;
+  accessToken: string;
   slot: CapitalSlot;
   doc_path: string;
   document_text: string;
@@ -119,6 +120,12 @@ export const checkCapitalDoc = createServerFn({ method: "POST" })
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, verified: false, ai_result: null, error: "db_unavailable" };
 
+    // Identity from the token — never trust a client-supplied investor_id.
+    // See CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return { ok: false, verified: false, ai_result: null, error: auth.error };
+    const investorId = auth.uid;
+
     const cfEnv = (globalThis as any).__cf_env || {};
     const openaiKey = cfEnv.OPENAI_API_KEY || cfEnv.OPEN_AI_API_KEY || cfEnv["OPEN AI API KEY"] || "";
 
@@ -133,17 +140,17 @@ export const checkCapitalDoc = createServerFn({ method: "POST" })
 
     // Upsert the investor_verifications row (may not exist yet)
     const existing: any[] = await sbFetch(url, key,
-      `investor_verifications?investor_id=eq.${data.investor_id}&select=id`,
+      `investor_verifications?investor_id=eq.${investorId}&select=id`,
       "GET"
     ).catch(() => []);
 
     if (existing?.length) {
-      await sbFetch(url, key, `investor_verifications?investor_id=eq.${data.investor_id}`, "PATCH", pathPatch)
+      await sbFetch(url, key, `investor_verifications?investor_id=eq.${investorId}`, "PATCH", pathPatch)
         .catch(() => null);
     } else {
       await sbFetch(url, key, "investor_verifications", "POST", {
         id: globalThis.crypto.randomUUID(),
-        investor_id: data.investor_id,
+        investor_id: investorId,
         ...pathPatch,
         verification_tier: "none",
         current_tier: 0,
@@ -200,7 +207,7 @@ export const checkCapitalDoc = createServerFn({ method: "POST" })
 
     // Check if all 3 slots now verified → send admin notification
     const updatedRow: any[] = await sbFetch(url, key,
-      `investor_verifications?investor_id=eq.${data.investor_id}&select=fund_formation_verified,capital_commitment_verified,aum_confirmation_verified`,
+      `investor_verifications?investor_id=eq.${investorId}&select=fund_formation_verified,capital_commitment_verified,aum_confirmation_verified`,
       "GET"
     ).catch(() => []);
 
@@ -215,7 +222,7 @@ export const checkCapitalDoc = createServerFn({ method: "POST" })
       slotResults.capital_commitment_verified &&
       slotResults.aum_confirmation_verified;
 
-    await sbFetch(url, key, `investor_verifications?investor_id=eq.${data.investor_id}`, "PATCH", aiPatch)
+    await sbFetch(url, key, `investor_verifications?investor_id=eq.${investorId}`, "PATCH", aiPatch)
       .catch(() => null);
 
     if (allThreeVerified) {
@@ -225,7 +232,7 @@ export const checkCapitalDoc = createServerFn({ method: "POST" })
       if (resendKey) {
         const html = `
           <h2>Capital Verification (Tier 3) — All 3 Documents AI-Verified</h2>
-          <p><strong>Investor user ID:</strong> ${data.investor_id}</p>
+          <p><strong>Investor user ID:</strong> ${investorId}</p>
           <p><strong>Fund:</strong> ${data.fund_name}</p>
           <p>All three capital evidence slots passed AI check. Human review required to set tier3_passed = true.</p>
           <hr/>
@@ -250,15 +257,17 @@ export const checkCapitalDoc = createServerFn({ method: "POST" })
 
 // ── Server fn: fetch current capital verification state ───────────────────────
 
-type GetCapitalVerifInput = { investor_id: string };
+type GetCapitalVerifInput = { accessToken: string };
 
 export const getCapitalVerification = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as GetCapitalVerifInput)
   .handler(async ({ data }): Promise<{ data: CapitalVerificationData | null }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { data: null };
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return { data: null };
     const rows: any[] = await sbFetch(url, key,
-      `investor_verifications?investor_id=eq.${data.investor_id}&select=fund_formation_doc_path,fund_formation_doc_uploaded_at,fund_formation_ai_extracted,fund_formation_verified,capital_commitment_doc_path,capital_commitment_doc_uploaded_at,capital_commitment_ai_extracted,capital_commitment_verified,aum_confirmation_doc_path,aum_confirmation_doc_uploaded_at,aum_confirmation_ai_extracted,aum_confirmation_verified,tier3_passed,capital_tier_human_review_requested_at`,
+      `investor_verifications?investor_id=eq.${auth.uid}&select=fund_formation_doc_path,fund_formation_doc_uploaded_at,fund_formation_ai_extracted,fund_formation_verified,capital_commitment_doc_path,capital_commitment_doc_uploaded_at,capital_commitment_ai_extracted,capital_commitment_verified,aum_confirmation_doc_path,aum_confirmation_doc_uploaded_at,aum_confirmation_ai_extracted,aum_confirmation_verified,tier3_passed,capital_tier_human_review_requested_at`,
       "GET"
     ).catch(() => []);
     return { data: rows?.[0] ?? null };
@@ -266,15 +275,17 @@ export const getCapitalVerification = createServerFn({ method: "POST" })
 
 // ── Server fn: mark human review requested ────────────────────────────────────
 
-type MarkReviewInput = { investor_id: string };
+type MarkReviewInput = { accessToken: string };
 
 export const markCapitalReviewRequested = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as MarkReviewInput)
   .handler(async ({ data }): Promise<{ ok: boolean }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false };
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return { ok: false };
     await sbFetch(url, key,
-      `investor_verifications?investor_id=eq.${data.investor_id}`,
+      `investor_verifications?investor_id=eq.${auth.uid}`,
       "PATCH",
       { capital_tier_human_review_requested_at: new Date().toISOString(), updated_at: new Date().toISOString() },
     ).catch(() => null);

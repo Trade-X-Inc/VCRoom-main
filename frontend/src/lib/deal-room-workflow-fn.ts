@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireUser } from "@/lib/require-user-fn";
 
 export type WorkflowStage =
   | "nda_signed"
@@ -53,12 +54,34 @@ async function sbFetch(url: string, key: string, path: string, method: string, b
   return text ? JSON.parse(text) : null;
 }
 
+// Verifies the caller (derived from their own access token, never a client-
+// supplied id) is a real member of the room before any write proceeds.
+// See CLAUDE.md §51 — service-role calls bypass RLS entirely, so this check
+// is the only authorization boundary these functions have.
+async function requireRoomMember(
+  url: string,
+  key: string,
+  dealRoomId: string,
+  accessToken: string | undefined,
+): Promise<{ ok: true; uid: string } | { ok: false; error: string }> {
+  const auth = await requireUser(accessToken);
+  if (!auth.ok) return { ok: false, error: auth.error };
+  const rows: any[] = await sbFetch(
+    url,
+    key,
+    `deal_room_members?deal_room_id=eq.${dealRoomId}&user_id=eq.${auth.uid}&select=user_id`,
+    "GET",
+  ).catch(() => []);
+  if (!rows?.length) return { ok: false, error: "not_authorized" };
+  return { ok: true, uid: auth.uid };
+}
+
 // ── Server fn: advance workflow stage ────────────────────────────────────────
 
 type AdvanceStageInput = {
   deal_room_id: string;
   to_stage: WorkflowStage;
-  actor_user_id: string;
+  accessToken: string;
 };
 
 export const advanceWorkflowStage = createServerFn({ method: "POST" })
@@ -66,6 +89,8 @@ export const advanceWorkflowStage = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
     const patch: Record<string, unknown> = {
       workflow_stage: data.to_stage,
@@ -77,7 +102,7 @@ export const advanceWorkflowStage = createServerFn({ method: "POST" })
     // Log activity
     await sbFetch(url, key, "activity_log", "POST", {
       deal_room_id: data.deal_room_id,
-      actor_user_id: data.actor_user_id,
+      actor_user_id: auth.uid,
       actor_name: "Investor",
       action: `Advanced deal to ${STAGE_LABELS[data.to_stage]}`,
       metadata: { to_stage: data.to_stage },
@@ -120,7 +145,7 @@ type UpsertMeetingInput = {
   notes_investor?: string | null;
   notes_shared?: string | null;
   action_items?: string[];
-  actor_user_id: string;
+  accessToken: string;
 };
 
 export const upsertDealRoomMeeting = createServerFn({ method: "POST" })
@@ -128,6 +153,8 @@ export const upsertDealRoomMeeting = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; id?: string; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
 
     const existing: any[] = await sbFetch(url, key,
@@ -201,7 +228,7 @@ export const upsertDealRoomMeeting = createServerFn({ method: "POST" })
 
 type SendTermSheetInput = {
   deal_room_id: string;
-  actor_user_id: string;
+  accessToken: string;
   valuation?: number | null;
   investment_amount?: number | null;
   equity_pct?: number | null;
@@ -216,6 +243,8 @@ export const sendTermSheet = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
 
     const patch: Record<string, unknown> = {
@@ -241,7 +270,7 @@ export const sendTermSheet = createServerFn({ method: "POST" })
     // Log activity
     await sbFetch(url, key, "activity_log", "POST", {
       deal_room_id: data.deal_room_id,
-      actor_user_id: data.actor_user_id,
+      actor_user_id: auth.uid,
       actor_name: "Investor",
       action: "Sent a term sheet",
       metadata: { amount: data.investment_amount, valuation: data.valuation },
@@ -254,7 +283,7 @@ export const sendTermSheet = createServerFn({ method: "POST" })
 
 type RespondTermSheetInput = {
   deal_room_id: string;
-  actor_user_id: string;
+  accessToken: string;
   response: "accepted" | "countered" | "rejected";
 };
 
@@ -263,6 +292,8 @@ export const respondToTermSheet = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
 
     const patch: Record<string, unknown> = {
@@ -280,7 +311,7 @@ export const respondToTermSheet = createServerFn({ method: "POST" })
 
     await sbFetch(url, key, "activity_log", "POST", {
       deal_room_id: data.deal_room_id,
-      actor_user_id: data.actor_user_id,
+      actor_user_id: auth.uid,
       actor_name: "Founder",
       action: data.response === "accepted"
         ? "Accepted the term sheet"

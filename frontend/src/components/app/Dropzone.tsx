@@ -13,7 +13,8 @@ function validateFile(file: File): string | null {
 }
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
-import { uploadDocument, supabase, logActivity } from "@/lib/supabase";
+import { uploadDocument, supabase } from "@/lib/supabase";
+import { logActivity } from "@/lib/activity-fn";
 
 export interface UploadedFile {
   id: string;

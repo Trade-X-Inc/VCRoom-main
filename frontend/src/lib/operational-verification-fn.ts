@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireUser } from "@/lib/require-user-fn";
 
 export type OperationalSlot = "operational_bank" | "operational_contract" | "operational_team";
 
@@ -27,11 +28,29 @@ export type OperationalVerificationData = {
 
 type CheckOpDocInput = {
   startup_id: string;
+  accessToken: string;
   slot: OperationalSlot;
   doc_path: string;
   document_text: string;
   company_name: string;
 };
+
+async function requireStartupOwner(
+  url: string,
+  key: string,
+  startupId: string,
+  accessToken: string | undefined,
+): Promise<{ ok: true; uid: string } | { ok: false; error: string }> {
+  const auth = await requireUser(accessToken);
+  if (!auth.ok) return { ok: false, error: auth.error };
+  const rows: any[] = await sbFetch(
+    url, key,
+    `startups?id=eq.${startupId}&founder_id=eq.${auth.uid}&select=id`,
+    "GET",
+  ).catch(() => []);
+  if (!rows?.length) return { ok: false, error: "not_authorized" };
+  return { ok: true, uid: auth.uid };
+}
 
 type CheckOpDocResult = {
   ok: boolean;
@@ -119,6 +138,8 @@ export const checkOperationalDoc = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<CheckOpDocResult> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, verified: false, ai_result: null, error: "db_unavailable" };
+    const auth = await requireStartupOwner(url, key, data.startup_id, data.accessToken);
+    if (!auth.ok) return { ok: false, verified: false, ai_result: null, error: auth.error };
 
     const cfEnv = (globalThis as any).__cf_env || {};
     const openaiKey = cfEnv.OPENAI_API_KEY || cfEnv.OPEN_AI_API_KEY || cfEnv["OPEN AI API KEY"] || "";
@@ -235,13 +256,15 @@ export const checkOperationalDoc = createServerFn({ method: "POST" })
 
 // ── Server fn: fetch current operational verification state ───────────────────
 
-type GetOpVerifInput = { startup_id: string };
+type GetOpVerifInput = { startup_id: string; accessToken: string };
 
 export const getOperationalVerification = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as GetOpVerifInput)
   .handler(async ({ data }): Promise<{ data: OperationalVerificationData | null }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { data: null };
+    const auth = await requireStartupOwner(url, key, data.startup_id, data.accessToken);
+    if (!auth.ok) return { data: null };
     const rows: any[] = await sbFetch(url, key,
       `founder_verifications?startup_id=eq.${data.startup_id}&select=operational_bank_doc_path,operational_bank_doc_uploaded_at,operational_bank_ai_extracted,operational_bank_verified,operational_contract_doc_path,operational_contract_doc_uploaded_at,operational_contract_ai_extracted,operational_contract_verified,operational_team_doc_path,operational_team_doc_uploaded_at,operational_team_ai_extracted,operational_team_verified,operational_human_review_requested_at`,
       "GET"
@@ -251,13 +274,15 @@ export const getOperationalVerification = createServerFn({ method: "POST" })
 
 // ── Server fn: mark human review requested ────────────────────────────────────
 
-type MarkOpReviewInput = { startup_id: string };
+type MarkOpReviewInput = { startup_id: string; accessToken: string };
 
 export const markOperationalReviewRequested = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as MarkOpReviewInput)
   .handler(async ({ data }): Promise<{ ok: boolean }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false };
+    const auth = await requireStartupOwner(url, key, data.startup_id, data.accessToken);
+    if (!auth.ok) return { ok: false };
     await sbFetch(url, key,
       `founder_verifications?startup_id=eq.${data.startup_id}`,
       "PATCH",

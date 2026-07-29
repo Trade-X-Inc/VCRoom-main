@@ -441,7 +441,9 @@ export function InvestorChat() {
   const fetchContext = async (): Promise<InvestorContext | null> => {
     if (!user?.id) return null;
     try {
-      const ctx = await getInvestorContext({ data: { investorId: user.id } });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return null;
+      const ctx = await getInvestorContext({ data: { accessToken: session.access_token } });
       liveCtxRef.current = ctx;
       return ctx;
     } catch (e) {
@@ -564,7 +566,9 @@ export function InvestorChat() {
             ));
           }, 9000);
           try {
-            const brief = await withTimeout(generateInvestorDealBrief({ data: { investorId: user.id, startupId: match.startupId } }));
+            const { data: { session: briefSession } } = await supabase.auth.getSession();
+            if (!briefSession) throw new Error("Session expired — sign in again");
+            const brief = await withTimeout(generateInvestorDealBrief({ data: { accessToken: briefSession.access_token, startupId: match.startupId } }));
             clearTimeout(stillWorkingTimer);
             setMsgs((xs) => xs.map((m) => m.id === briefLoadId
               ? { ...m, content: `Here's the deal brief for **${brief.companyName}**${brief.fromCache ? " (cached)" : ""}:`, card: { type: "deal_brief", brief }, loading: false }

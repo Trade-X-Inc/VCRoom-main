@@ -201,7 +201,8 @@ function VerificationCard({
     toast.info("Running automated checks — this takes up to 20 seconds…");
     try {
       const { runTier1Check } = await import("@/lib/verification-fn");
-      const result = await runTier1Check({ data: { startup_id: startupId, caller_user_id: userId } });
+      const { data: { session: tier1Session } } = await supabase.auth.getSession();
+      const result = await runTier1Check({ data: { startup_id: startupId, accessToken: tier1Session?.access_token ?? "" } });
       await qc.invalidateQueries({ queryKey: ["home-verif", startupId] });
       if (result.tier1_passed) {
         toast.success("Identity confirmed — all four checks passed");
@@ -211,8 +212,11 @@ function VerificationCard({
       // Auto-recompute readiness after verification reruns
       try {
         const { computeReadiness } = await import("@/lib/readiness-fn");
-        await computeReadiness({ data: { startup_id: startupId, founder_user_id: userId } });
-        qc.invalidateQueries({ queryKey: ["readiness", startupId] });
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          await computeReadiness({ data: { startup_id: startupId, accessToken: session.access_token } });
+          qc.invalidateQueries({ queryKey: ["readiness", startupId] });
+        }
       } catch { /* non-blocking */ }
     } catch {
       toast.error("Verification check failed. Please try again.");
@@ -523,8 +527,11 @@ function VerificationCard({
             // Recompute readiness when a claim proof status changes
             try {
               const { computeReadiness } = await import("@/lib/readiness-fn");
-              await computeReadiness({ data: { startup_id: startupId, founder_user_id: userId } });
-              qc.invalidateQueries({ queryKey: ["readiness", startupId] });
+              const { data: { session } } = await supabase.auth.getSession();
+              if (session) {
+                await computeReadiness({ data: { startup_id: startupId, accessToken: session.access_token } });
+                qc.invalidateQueries({ queryKey: ["readiness", startupId] });
+              }
             } catch { /* non-blocking */ }
           }}
         />
@@ -625,7 +632,9 @@ function ReadinessCard({
     staleTime: 0,
     queryFn: async () => {
       const { computeReadiness } = await import("@/lib/readiness-fn");
-      return computeReadiness({ data: { startup_id: startupId, founder_user_id: userId } });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return null;
+      return computeReadiness({ data: { startup_id: startupId, accessToken: session.access_token } });
     },
   });
 
@@ -1828,7 +1837,9 @@ export function FounderHome() {
     staleTime: 0,
     queryFn: async () => {
       const { computeReadiness } = await import("@/lib/readiness-fn");
-      return computeReadiness({ data: { startup_id: startup!.id, founder_user_id: user!.id } });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return null;
+      return computeReadiness({ data: { startup_id: startup!.id, accessToken: session.access_token } });
     },
   });
 

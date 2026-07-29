@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 
 export const completeQaAndGenerateReport = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { dealRoomId: string; userId: string })
+  .inputValidator((d: unknown) => d as { dealRoomId: string; accessToken: string })
   .handler(async ({ data }): Promise<{ ok: boolean; documentId?: string; error?: string }> => {
     const cfEnv = (globalThis as any).__cf_env || {};
     const serviceKey = cfEnv.SUPABASE_SERVICE_ROLE_KEY || cfEnv.SUPABASE_SERVICE_KEY || "";
@@ -10,7 +10,20 @@ export const completeQaAndGenerateReport = createServerFn({ method: "POST" })
     if (!serviceKey) return { ok: false, error: "no service key" };
 
     const svc = createClient(supabaseUrl, serviceKey);
-    const { dealRoomId, userId } = data;
+    const { dealRoomId } = data;
+
+    // Identity from the token — never trust a client-supplied userId. See
+    // CLAUDE.md §51.
+    const { data: userData } = await svc.auth.getUser(data.accessToken);
+    const userId = userData?.user?.id;
+    if (!userId) return { ok: false, error: "not_authenticated" };
+    const { data: member } = await svc
+      .from("deal_room_members")
+      .select("user_id")
+      .eq("deal_room_id", dealRoomId)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (!member) return { ok: false, error: "not_authorized" };
 
     // 1. Fetch deal room + startup
     const { data: room } = await svc

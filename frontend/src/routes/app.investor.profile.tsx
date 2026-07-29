@@ -1607,8 +1607,9 @@ function AttachInvestorProofModal({ claim, investorId, onClose, onDone }: {
       const text = await extractDocumentText(file, file.name);
       const syntheticDocId = crypto.randomUUID();
       const { attachInvestorProofAndCheck } = await import("@/lib/investor-claims-fn");
+      const { data: { session } } = await supabase.auth.getSession();
       const r = await attachInvestorProofAndCheck({
-        data: { investor_id: investorId, claim_type: claim.type, proof_document_id: syntheticDocId, document_text: text, claim_label: claim.label, claim_value: claim.value },
+        data: { accessToken: session?.access_token ?? "", claim_type: claim.type, proof_document_id: syntheticDocId, document_text: text, claim_label: claim.label, claim_value: claim.value },
       });
       setResult(r);
     } catch {

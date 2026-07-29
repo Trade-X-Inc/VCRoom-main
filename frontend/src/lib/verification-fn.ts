@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { supabase } from "@/lib/supabase";
+import { requireUser } from "@/lib/require-user-fn";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -40,14 +41,13 @@ export type VerificationRun = {
 
 type RunTier1Input = {
   startup_id: string;
-  /** Caller must be the founder or a service-role context — enforced via RLS */
-  caller_user_id: string;
+  accessToken: string;
 };
 
 type RequestHumanReviewInput = {
   entity_type: "founder" | "investor";
   entity_id: string;   // startup_id for founder, investor_id for investor
-  user_id: string;
+  accessToken: string;
   user_email: string;
   display_name: string;
 };
@@ -325,20 +325,26 @@ export const runTier1Check = createServerFn({ method: "POST" })
 
     if (!sbUrl || !sbKey) return fail("Verification service unavailable — try again later.");
 
-    // ── Rate limit (same rpc the rest of the AI stack uses) ────────────────
-    const allowed = await supabaseQuery(sbUrl, sbKey, "rpc/check_ai_rate_limit", "POST", {
-      p_user_id: data.caller_user_id,
-      p_feature: "verification",
-    }).catch(() => true);
-    if (allowed === false) return fail("Daily verification limit reached — try again tomorrow.");
+    // Identity from the token — never trust a client-supplied caller_user_id.
+    // See CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return fail("not_authenticated");
 
-    // ── Startup data ───────────────────────────────────────────────────────
+    // ── Startup data (and ownership check) ──────────────────────────────────
     const startupRows: any[] = await supabaseQuery(sbUrl, sbKey,
       `startups?id=eq.${data.startup_id}&select=id,founder_id,company_name,website,founder_email`,
       "GET"
     ).catch(() => []);
     const startup = startupRows?.[0];
     if (!startup) return fail("Startup not found.");
+    if (startup.founder_id !== auth.uid) return fail("not_authorized");
+
+    // ── Rate limit (same rpc the rest of the AI stack uses) ────────────────
+    const allowed = await supabaseQuery(sbUrl, sbKey, "rpc/check_ai_rate_limit", "POST", {
+      p_user_id: auth.uid,
+      p_feature: "verification",
+    }).catch(() => true);
+    if (allowed === false) return fail("Daily verification limit reached — try again tomorrow.");
 
     const companyName: string = startup.company_name || "";
     const wDomain = urlDomain(startup.website || "");
@@ -468,7 +474,7 @@ export const runTier1Check = createServerFn({ method: "POST" })
 
     // ── Meter usage ────────────────────────────────────────────────────────
     await supabaseQuery(sbUrl, sbKey, "rpc/check_and_increment_ai_usage", "POST", {
-      p_user_id: data.caller_user_id,
+      p_user_id: auth.uid,
       p_feature: "verification",
     }).catch(() => null);
 
@@ -485,7 +491,7 @@ export const runTier1Check = createServerFn({ method: "POST" })
 
 type VerifyLicenseInput = {
   startup_id: string;
-  caller_user_id: string;
+  accessToken: string;
   /** Text extracted client-side, when the document is text-based */
   document_text?: string;
   /** data: URL of the license image, when the document is a scan/photo */
@@ -517,15 +523,23 @@ export const verifyTradeLicense = createServerFn({ method: "POST" })
     if (!openaiKey) return fail("AI unavailable.");
     if (!data.document_text && !data.image_data_url) return fail("No readable document provided.");
 
-    const allowed = await supabaseQuery(sbUrl, sbKey, "rpc/check_ai_rate_limit", "POST", {
-      p_user_id: data.caller_user_id, p_feature: "verification",
-    }).catch(() => true);
-    if (allowed === false) return fail("Daily verification limit reached — try again tomorrow.");
+    // Identity from the token — never trust a client-supplied caller_user_id.
+    // See CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return fail("not_authenticated");
 
     const startupRows: any[] = await supabaseQuery(sbUrl, sbKey,
-      `startups?id=eq.${data.startup_id}&select=company_name`, "GET").catch(() => []);
-    const companyName = startupRows?.[0]?.company_name || "";
+      `startups?id=eq.${data.startup_id}&select=company_name,founder_id`, "GET").catch(() => []);
+    const startupRow = startupRows?.[0];
+    if (!startupRow) return fail("Startup not found.");
+    if (startupRow.founder_id !== auth.uid) return fail("not_authorized");
+    const companyName = startupRow.company_name || "";
     if (!companyName) return fail("Startup not found.");
+
+    const allowed = await supabaseQuery(sbUrl, sbKey, "rpc/check_ai_rate_limit", "POST", {
+      p_user_id: auth.uid, p_feature: "verification",
+    }).catch(() => true);
+    if (allowed === false) return fail("Daily verification limit reached — try again tomorrow.");
 
     const today = new Date().toISOString().slice(0, 10);
     const systemPrompt = [
@@ -627,7 +641,7 @@ export const verifyTradeLicense = createServerFn({ method: "POST" })
     }
 
     await supabaseQuery(sbUrl, sbKey, "rpc/check_and_increment_ai_usage", "POST", {
-      p_user_id: data.caller_user_id, p_feature: "verification",
+      p_user_id: auth.uid, p_feature: "verification",
     }).catch(() => null);
 
     return { ok: true, passed, authority, expiry, name_match: nameMatch, detail };
@@ -646,12 +660,17 @@ export const requestHumanReview = createServerFn({ method: "POST" })
 
     if (!resendKey) return { ok: false, error: "email_unavailable" };
 
+    // Identity from the token — never trust a client-supplied user_id. See
+    // CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return { ok: false, error: "not_authenticated" };
+
     const entityLabel = data.entity_type === "founder" ? "Founder" : "Investor";
     const html = `
       <h2>Human Review Request — ${entityLabel}</h2>
       <p><strong>Name:</strong> ${data.display_name}</p>
       <p><strong>Email:</strong> ${data.user_email}</p>
-      <p><strong>User ID:</strong> ${data.user_id}</p>
+      <p><strong>User ID:</strong> ${auth.uid}</p>
       <p><strong>Entity ID:</strong> ${data.entity_id}</p>
       <p><strong>Entity type:</strong> ${data.entity_type}</p>
       <p><strong>Requested at:</strong> ${new Date().toISOString()}</p>

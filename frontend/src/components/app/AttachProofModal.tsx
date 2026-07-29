@@ -24,6 +24,8 @@ export function AttachProofModal({ claim, startupId, onClose, onDone }: AttachPr
         const text = await extractDocumentText(file, file.name);
         const syntheticDocId = crypto.randomUUID();
         const { attachProofAndCheck } = await import("@/lib/claims-fn");
+        const { supabase } = await import("@/lib/supabase");
+        const { data: { session } } = await supabase.auth.getSession();
         const r = await attachProofAndCheck({
           data: {
             startup_id: startupId,
@@ -32,12 +34,11 @@ export function AttachProofModal({ claim, startupId, onClose, onDone }: AttachPr
             document_text: text,
             claim_label: claim.label,
             claim_value: claim.value,
-            user_id: "",
+            accessToken: session?.access_token ?? "",
           },
         });
         setResult(r);
         const { logActivity } = await import("@/lib/activity-log-fn");
-        const { supabase } = await import("@/lib/supabase");
         const { data: { user: authUser } } = await supabase.auth.getUser();
         logActivity({
           account_type: "founder",

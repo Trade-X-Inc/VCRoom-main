@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireUser } from "@/lib/require-user-fn";
 
 export type DealStage =
   | "nda_signed"
@@ -88,12 +89,34 @@ async function logActivity(
   }).catch(() => null);
 }
 
+// Verifies the caller (derived from their own access token, never a client-
+// supplied id) is a real member of the room before any write proceeds.
+// See CLAUDE.md §51 — service-role calls bypass RLS entirely, so this check
+// is the only authorization boundary these functions have.
+async function requireRoomMember(
+  url: string,
+  key: string,
+  dealRoomId: string,
+  accessToken: string | undefined,
+): Promise<{ ok: true; uid: string } | { ok: false; error: string }> {
+  const auth = await requireUser(accessToken);
+  if (!auth.ok) return { ok: false, error: auth.error };
+  const rows: any[] = await sbFetch(
+    url,
+    key,
+    `deal_room_members?deal_room_id=eq.${dealRoomId}&user_id=eq.${auth.uid}&select=user_id`,
+    "GET",
+  ).catch(() => []);
+  if (!rows?.length) return { ok: false, error: "not_authorized" };
+  return { ok: true, uid: auth.uid };
+}
+
 // ── advanceDealStage ──────────────────────────────────────────────────────────
 
 type AdvanceStageInput = {
   deal_room_id: string;
   to_stage: DealStage;
-  actor_user_id: string;
+  accessToken: string;
 };
 
 export const advanceDealStage = createServerFn({ method: "POST" })
@@ -101,6 +124,8 @@ export const advanceDealStage = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
     await sbFetch(url, key, `deal_rooms?id=eq.${data.deal_room_id}`, "PATCH", {
       workflow_stage: data.to_stage,
@@ -111,7 +136,7 @@ export const advanceDealStage = createServerFn({ method: "POST" })
       url,
       key,
       data.deal_room_id,
-      data.actor_user_id,
+      auth.uid,
       `Advanced deal to ${STAGE_LABELS[data.to_stage] ?? data.to_stage}`,
       { to_stage: data.to_stage },
     );
@@ -123,7 +148,7 @@ export const advanceDealStage = createServerFn({ method: "POST" })
 type SkipMeetingInput = {
   deal_room_id: string;
   meeting_number: number;
-  actor_user_id: string;
+  accessToken: string;
   // R14B: skip-with-reason — stored in notes_shared (both parties see why a
   // stage was skipped) and echoed into the activity log.
   reason?: string;
@@ -143,6 +168,8 @@ export const skipMeeting = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; id?: string; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
     const reason = (data.reason ?? "").trim().slice(0, 300);
 
@@ -174,7 +201,7 @@ export const skipMeeting = createServerFn({ method: "POST" })
       url,
       key,
       data.deal_room_id,
-      data.actor_user_id,
+      auth.uid,
       `Skipped meeting ${data.meeting_number}`,
       { meeting_number: data.meeting_number, reason: reason || null },
     );
@@ -187,7 +214,7 @@ export const skipMeeting = createServerFn({ method: "POST" })
 type CompleteMeetingInput = {
   deal_room_id: string;
   meeting_number: number;
-  actor_user_id: string;
+  accessToken: string;
   meeting_type?: string;
   scheduled_at?: string | null;
   // R14B: routed to deal_room_meeting_private_notes — never a column write.
@@ -200,6 +227,8 @@ export const completeMeeting = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; id?: string; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
 
     const existing: any[] = await sbFetch(
@@ -249,7 +278,7 @@ export const completeMeeting = createServerFn({ method: "POST" })
       url,
       key,
       data.deal_room_id,
-      data.actor_user_id,
+      auth.uid,
       `Marked meeting ${data.meeting_number} as done`,
       { meeting_number: data.meeting_number },
     );
@@ -262,6 +291,7 @@ export const completeMeeting = createServerFn({ method: "POST" })
 type UpdateMeetingNotesInput = {
   deal_room_id: string;
   meeting_number: number;
+  accessToken: string;
   // R14B: routed to deal_room_meeting_private_notes — never a column write.
   notes_investor?: string | null;
   notes_shared?: string | null;
@@ -274,6 +304,8 @@ export const updateMeetingNotes = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; id?: string; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    if (!auth.ok) return { ok: false, error: auth.error };
 
     const existing: any[] = await sbFetch(
       url,
@@ -314,7 +346,7 @@ export const updateMeetingNotes = createServerFn({ method: "POST" })
 
 type SendTermSheetInput = {
   deal_room_id: string;
-  actor_user_id: string;
+  accessToken: string;
   valuation?: number | null;
   investment_amount?: number | null;
   equity_pct?: number | null;
@@ -329,6 +361,8 @@ export const sendTermSheet = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
 
     const patch: Record<string, unknown> = {
@@ -349,7 +383,7 @@ export const sendTermSheet = createServerFn({ method: "POST" })
     if (data.doc_path !== undefined) patch.term_sheet_doc_path = data.doc_path;
 
     await sbFetch(url, key, `deal_rooms?id=eq.${data.deal_room_id}`, "PATCH", patch);
-    await logActivity(url, key, data.deal_room_id, data.actor_user_id, "Sent a term sheet", {
+    await logActivity(url, key, data.deal_room_id, auth.uid, "Sent a term sheet", {
       amount: data.investment_amount,
       valuation: data.valuation,
     });
@@ -360,7 +394,7 @@ export const sendTermSheet = createServerFn({ method: "POST" })
 
 type RespondTermSheetInput = {
   deal_room_id: string;
-  actor_user_id: string;
+  accessToken: string;
   response: "accepted" | "countered" | "rejected";
 };
 
@@ -369,6 +403,8 @@ export const respondToTermSheet = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
 
     const patch: Record<string, unknown> = {
@@ -386,7 +422,7 @@ export const respondToTermSheet = createServerFn({ method: "POST" })
       url,
       key,
       data.deal_room_id,
-      data.actor_user_id,
+      auth.uid,
       data.response === "accepted"
         ? "Accepted the term sheet"
         : data.response === "countered"
@@ -401,7 +437,7 @@ export const respondToTermSheet = createServerFn({ method: "POST" })
 
 type CreateDocRequestInput = {
   deal_room_id: string;
-  requested_by: string;
+  accessToken: string;
   requested_from: string;
   document_name: string;
   document_description: string;
@@ -414,6 +450,8 @@ export const createDocumentRequest = createServerFn({ method: "POST" })
     async ({ data }): Promise<{ ok: boolean; blocked: boolean; blocked_reason?: string; id?: string; error?: string }> => {
       const { url, key } = getAdmin();
       if (!url || !key) return { ok: false, blocked: false, error: "db_unavailable" };
+      const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+      if (!auth.ok) return { ok: false, blocked: false, error: auth.error };
 
       const isBlocked = (BLOCKED_CATEGORIES as readonly string[]).includes(data.category);
 
@@ -422,7 +460,7 @@ export const createDocumentRequest = createServerFn({ method: "POST" })
         const blockedReason = `Hockystick does not facilitate sharing ${label}. This protects both parties.`;
         await sbFetch(url, key, "deal_room_document_requests", "POST", {
           deal_room_id: data.deal_room_id,
-          requested_by: data.requested_by,
+          requested_by: auth.uid,
           requested_from: data.requested_from,
           document_name: data.document_name,
           document_description: data.document_description,
@@ -436,7 +474,7 @@ export const createDocumentRequest = createServerFn({ method: "POST" })
 
       const rows = await sbFetch(url, key, "deal_room_document_requests", "POST", {
         deal_room_id: data.deal_room_id,
-        requested_by: data.requested_by,
+        requested_by: auth.uid,
         requested_from: data.requested_from,
         document_name: data.document_name,
         document_description: data.document_description,
@@ -444,7 +482,7 @@ export const createDocumentRequest = createServerFn({ method: "POST" })
         status: "pending",
         is_blocked: false,
       });
-      await logActivity(url, key, data.deal_room_id, data.requested_by, "Requested a document", {
+      await logActivity(url, key, data.deal_room_id, auth.uid, "Requested a document", {
         document_name: data.document_name,
         category: data.category,
       });
@@ -457,7 +495,7 @@ export const createDocumentRequest = createServerFn({ method: "POST" })
 type RespondDocRequestInput = {
   request_id: string;
   deal_room_id: string;
-  actor_user_id: string;
+  accessToken: string;
   response: "provided" | "declined" | "partial";
   document_path?: string | null;
   decline_reason?: string | null;
@@ -469,6 +507,8 @@ export const respondToDocumentRequest = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
 
     const patch: Record<string, unknown> = {
@@ -493,7 +533,7 @@ export const respondToDocumentRequest = createServerFn({ method: "POST" })
       url,
       key,
       data.deal_room_id,
-      data.actor_user_id,
+      auth.uid,
       `Responded to a document request: ${data.response}`,
       { request_id: data.request_id, response: data.response },
     );
@@ -504,7 +544,7 @@ export const respondToDocumentRequest = createServerFn({ method: "POST" })
 
 type PassDealInput = {
   deal_room_id: string;
-  actor_user_id: string;
+  accessToken: string;
   reason_category: string;
   context?: string;
   reconsider_if?: string;
@@ -515,6 +555,8 @@ export const passDeal = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
 
     await sbFetch(url, key, `deal_rooms?id=eq.${data.deal_room_id}`, "PATCH", {
@@ -523,7 +565,7 @@ export const passDeal = createServerFn({ method: "POST" })
       stage_entered_at: now,
       updated_at: now,
     });
-    await logActivity(url, key, data.deal_room_id, data.actor_user_id, "Investor passed on deal", {
+    await logActivity(url, key, data.deal_room_id, auth.uid, "Investor passed on deal", {
       reason_category: data.reason_category,
       context: data.context ?? null,
       reconsider_if: data.reconsider_if ?? null,
@@ -535,7 +577,7 @@ export const passDeal = createServerFn({ method: "POST" })
 
 type GrantAccessInput = {
   deal_room_id: string;
-  granted_by: string;
+  accessToken: string;
   granted_to: string;
   section: string;
 };
@@ -545,15 +587,17 @@ export const grantSectionAccess = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; id?: string; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
     const rows = await sbFetch(url, key, "deal_room_access_grants", "POST", {
       deal_room_id: data.deal_room_id,
-      granted_by: data.granted_by,
+      granted_by: auth.uid,
       granted_to: data.granted_to,
       section: data.section,
       granted_at: now,
     });
-    await logActivity(url, key, data.deal_room_id, data.granted_by, "Granted section access", {
+    await logActivity(url, key, data.deal_room_id, auth.uid, "Granted section access", {
       granted_to: data.granted_to,
       section: data.section,
     });
@@ -564,7 +608,7 @@ export const grantSectionAccess = createServerFn({ method: "POST" })
 
 type RevokeAccessInput = {
   deal_room_id: string;
-  granted_by: string;
+  accessToken: string;
   granted_to: string;
   section: string;
 };
@@ -574,6 +618,8 @@ export const revokeSectionAccess = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
     await sbFetch(
       url,
@@ -582,7 +628,7 @@ export const revokeSectionAccess = createServerFn({ method: "POST" })
       "PATCH",
       { revoked_at: now },
     );
-    await logActivity(url, key, data.deal_room_id, data.granted_by, "Revoked section access", {
+    await logActivity(url, key, data.deal_room_id, auth.uid, "Revoked section access", {
       granted_to: data.granted_to,
       section: data.section,
     });

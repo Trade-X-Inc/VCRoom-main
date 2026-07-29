@@ -74,8 +74,9 @@ export function ClaimsPage() {
     setAdding(true);
     try {
       const { addManualClaim } = await import("@/lib/claims-fn");
+      const { data: { session } } = await supabase.auth.getSession();
       const r = await addManualClaim({
-        data: { startup_id: startup.id, claim_text: newText, claim_category: newCategory },
+        data: { startup_id: startup.id, claim_text: newText, claim_category: newCategory, accessToken: session?.access_token ?? "" },
       });
       if (r.ok) {
         setNewText("");
@@ -92,7 +93,8 @@ export function ClaimsPage() {
   const handleDelete = async (claim: StartupClaim) => {
     if (!startup?.id) return;
     const { deleteClaim } = await import("@/lib/claims-fn");
-    await deleteClaim({ data: { startup_id: startup.id, claim_id: claim.id } });
+    const { data: { session } } = await supabase.auth.getSession();
+    await deleteClaim({ data: { startup_id: startup.id, claim_id: claim.id, accessToken: session?.access_token ?? "" } });
     await refetch();
     qc.invalidateQueries({ queryKey: ["startup-claims", startup.id] });
   };
@@ -329,6 +331,7 @@ function VerifyClaimModal({
         const { extractDocumentText } = await import("@/lib/document-extractor");
         const text = await extractDocumentText(file, file.name);
         const { verifyClaim } = await import("@/lib/claims-fn");
+        const { data: { session } } = await supabase.auth.getSession();
         const r = await verifyClaim({
           data: {
             startup_id: startupId,
@@ -337,7 +340,7 @@ function VerifyClaimModal({
             claim_category: category,
             document_text: text,
             document_name: file.name,
-            user_id: userId,
+            accessToken: session?.access_token ?? "",
           },
         });
         if (!r.ok || !r.verdict) {

@@ -18,6 +18,14 @@ import {
   upsertDealRoomMeeting, getDealRoomWorkflow,
 } from "@/lib/deal-room-workflow-fn";
 
+// Every mutating server fn call here derives the caller's identity from
+// this token server-side (see require-user-fn.ts / CLAUDE.md §51) — never
+// from a client-supplied userId field.
+async function getAccessToken(): Promise<string> {
+  const { data } = await supabase.auth.getSession();
+  return data.session?.access_token ?? "";
+}
+
 // ── Stage stepper ─────────────────────────────────────────────────────────────
 
 export function WorkflowStepper({
@@ -270,7 +278,8 @@ function Stage2Panel({ isInvestor, dealRoomId, userId, founderName, workflow, on
     if (!userId || advancing) return;
     setAdvancing(true);
     try {
-      const r = await advanceWorkflowStage({ data: { deal_room_id: dealRoomId, to_stage: "meetings", actor_user_id: userId } });
+      const accessToken = await getAccessToken();
+      const r = await advanceWorkflowStage({ data: { deal_room_id: dealRoomId, to_stage: "meetings", accessToken } });
       if (r.ok) { toast.success("Advanced to Meetings"); onStageChange(); }
       else toast.error("Failed to advance stage");
     } catch { toast.error("Failed to advance stage"); }
@@ -281,7 +290,8 @@ function Stage2Panel({ isInvestor, dealRoomId, userId, founderName, workflow, on
     if (!userId || passing) return;
     setPassing(true);
     try {
-      const r = await advanceWorkflowStage({ data: { deal_room_id: dealRoomId, to_stage: "closed", actor_user_id: userId } });
+      const accessToken = await getAccessToken();
+      const r = await advanceWorkflowStage({ data: { deal_room_id: dealRoomId, to_stage: "closed", accessToken } });
       if (r.ok) { toast.success("Deal passed"); onStageChange(); }
       else toast.error("Failed");
     } catch { toast.error("Failed"); }
@@ -380,12 +390,13 @@ function Stage3Panel({ isInvestor, dealRoomId, userId, workflow, onTabChange, on
     if (!date || !userId) return;
     setSavingMeeting(num);
     try {
+      const accessToken = await getAccessToken();
       const r = await upsertDealRoomMeeting({
         data: {
           deal_room_id: dealRoomId,
           meeting_number: num,
           scheduled_at: new Date(date).toISOString(),
-          actor_user_id: userId,
+          accessToken,
         },
       });
       if (r.ok) { toast.success(`Meeting ${num} scheduled`); onStageChange(); }
@@ -398,12 +409,13 @@ function Stage3Panel({ isInvestor, dealRoomId, userId, workflow, onTabChange, on
     if (!userId) return;
     setSavingMeeting(num);
     try {
+      const accessToken = await getAccessToken();
       const r = await upsertDealRoomMeeting({
         data: {
           deal_room_id: dealRoomId,
           meeting_number: num,
           completed_at: new Date().toISOString(),
-          actor_user_id: userId,
+          accessToken,
         },
       });
       if (r.ok) { toast.success(`Meeting ${num} marked complete`); onStageChange(); }
@@ -415,7 +427,8 @@ function Stage3Panel({ isInvestor, dealRoomId, userId, workflow, onTabChange, on
     if (!userId || advancing) return;
     setAdvancing(true);
     try {
-      const r = await sendTermSheet({ data: { deal_room_id: dealRoomId, actor_user_id: userId } });
+      const accessToken = await getAccessToken();
+      const r = await sendTermSheet({ data: { deal_room_id: dealRoomId, accessToken } });
       if (r.ok) { toast.success("Advanced to Full Diligence — term sheet stage unlocked"); onStageChange(); }
       else toast.error("Failed");
     } catch { toast.error("Failed"); }
@@ -426,7 +439,8 @@ function Stage3Panel({ isInvestor, dealRoomId, userId, workflow, onTabChange, on
     if (!userId || passing) return;
     setPassing(true);
     try {
-      const r = await advanceWorkflowStage({ data: { deal_room_id: dealRoomId, to_stage: "closed", actor_user_id: userId } });
+      const accessToken = await getAccessToken();
+      const r = await advanceWorkflowStage({ data: { deal_room_id: dealRoomId, to_stage: "closed", accessToken } });
       if (r.ok) { toast.success("Deal passed"); onStageChange(); }
     } catch { toast.error("Failed"); }
     finally { setPassing(false); }
@@ -636,10 +650,11 @@ function Stage5Panel({ isInvestor, dealRoomId, userId, workflow, onStageChange }
     if (!userId || sending) return;
     setSending(true);
     try {
+      const accessToken = await getAccessToken();
       const r = await sendTermSheet({
         data: {
           deal_room_id: dealRoomId,
-          actor_user_id: userId,
+          accessToken,
           valuation: form.valuation ? Number(form.valuation) : null,
           investment_amount: form.investment ? Number(form.investment) : null,
           equity_pct: form.equity ? Number(form.equity) : null,
@@ -658,7 +673,8 @@ function Stage5Panel({ isInvestor, dealRoomId, userId, workflow, onStageChange }
     if (!userId || responding) return;
     setResponding(response);
     try {
-      const r = await respondToTermSheet({ data: { deal_room_id: dealRoomId, actor_user_id: userId, response } });
+      const accessToken = await getAccessToken();
+      const r = await respondToTermSheet({ data: { deal_room_id: dealRoomId, accessToken, response } });
       if (r.ok) {
         toast.success(response === "accepted" ? "Term sheet accepted — deal closed!" : response === "countered" ? "Counter request noted" : "Term sheet declined");
         onStageChange();

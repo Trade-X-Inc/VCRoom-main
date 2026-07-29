@@ -49,7 +49,7 @@ export type FounderContext = {
 
 type ContextInput = {
   startupId: string;
-  userId: string;
+  accessToken: string;
 };
 
 // ── Server function ────────────────────────────────────────────────────────────
@@ -62,19 +62,34 @@ export const getFounderContext = createServerFn({ method: "POST" })
       process.env.VITE_SUPABASE_URL ||
       process.env.SUPABASE_URL ||
       "";
-    const supabaseKey =
+    const anonKey =
       (import.meta.env as any).VITE_SUPABASE_ANON_KEY ||
       process.env.VITE_SUPABASE_ANON_KEY ||
       process.env.SUPABASE_ANON_KEY ||
       "";
 
+    // Forward the caller's own access token so RLS applies under their real
+    // session — the anon key alone (previous behavior) carries no session,
+    // so every query below silently returned nothing regardless of who
+    // called it. See CLAUDE.md §51.
     const headers = {
       "Content-Type": "application/json",
-      apikey: supabaseKey,
-      Authorization: `Bearer ${supabaseKey}`,
+      apikey: anonKey,
+      Authorization: `Bearer ${data.accessToken || anonKey}`,
     };
 
     const base = supabaseUrl + "/rest/v1";
+
+    // startups.founder_id resolves the real caller from RLS itself (the
+    // startups_own policy scopes to founder_id = auth.uid()) — this also
+    // acts as the ownership check: a startupId the caller doesn't own
+    // returns zero rows here, and every dependent query below is scoped by
+    // the SAME startupId, so nothing else can leak either.
+    const userResp = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      headers: { apikey: anonKey, Authorization: `Bearer ${data.accessToken || ""}` },
+    }).catch(() => null);
+    const userJson = userResp?.ok ? await userResp.json().catch(() => null) : null;
+    const userId: string | null = userJson?.id ?? null;
 
     // Run all queries in parallel
     const [startupResp, docsResp, requestsResp, simulationResp, thesisResp, fitAlertsResp] = await Promise.all([
@@ -88,24 +103,29 @@ export const getFounderContext = createServerFn({ method: "POST" })
         `${base}/founder_documents?select=id,file_name,template_slug,status,completeness_score,ai_feedback,created_at&startup_id=eq.${data.startupId}&order=created_at.desc&limit=10`,
         { headers }
       ),
-      // pending investor access requests with investor profiles
+      // pending investor access requests — investor_id is a FK to users, not
+      // investor_profiles, so it can't be embedded in one PostgREST call;
+      // resolved via a second batched fetch below.
       fetch(
-        `${base}/discovery_requests?select=id,investor_id,created_at,investor_profiles(your_name,fund_name)&startup_id=eq.${data.startupId}&status=eq.pending&order=created_at.desc`,
+        `${base}/discovery_requests?select=id,investor_id,created_at&startup_id=eq.${data.startupId}&status=eq.pending&order=created_at.desc`,
         { headers }
       ),
       // most recent simulation result stored in advisor_messages
-      fetch(
-        `${base}/advisor_messages?select=simulation_result,created_at&user_id=eq.${data.userId}&simulation_result=not.is.null&order=created_at.desc&limit=1`,
-        { headers }
-      ),
+      userId
+        ? fetch(
+            `${base}/advisor_messages?select=simulation_result,created_at&user_id=eq.${userId}&simulation_result=not.is.null&order=created_at.desc&limit=1`,
+            { headers }
+          )
+        : Promise.resolve(null),
       // founder thesis completion status
       fetch(
         `${base}/founder_thesis?select=status&startup_id=eq.${data.startupId}&limit=1`,
         { headers }
       ),
-      // thesis alerts with real founder_fit_score (only where computed)
+      // thesis alerts with real founder_fit_score (only where computed) —
+      // same investor_id -> users FK issue as discovery_requests above.
       fetch(
-        `${base}/thesis_alerts?select=match_score,founder_fit_score,founder_fit_reasons,investor_profiles(your_name,fund_name)&startup_id=eq.${data.startupId}&founder_fit_score=not.is.null&order=founder_fit_score.desc&limit=3`,
+        `${base}/thesis_alerts?select=match_score,founder_fit_score,founder_fit_reasons,investor_id&startup_id=eq.${data.startupId}&founder_fit_score=not.is.null&order=founder_fit_score.desc&limit=3`,
         { headers }
       ),
     ]);
@@ -114,7 +134,7 @@ export const getFounderContext = createServerFn({ method: "POST" })
       startupResp.json() as Promise<any[]>,
       docsResp.json() as Promise<any[]>,
       requestsResp.json() as Promise<any[]>,
-      simulationResp.json() as Promise<any[]>,
+      simulationResp ? (simulationResp.json() as Promise<any[]>) : Promise.resolve([]),
       thesisResp.json() as Promise<any[]>,
       fitAlertsResp.json() as Promise<any[]>,
     ]);
@@ -123,6 +143,28 @@ export const getFounderContext = createServerFn({ method: "POST" })
     const docs = Array.isArray(docRows) ? docRows : [];
     const requests = Array.isArray(requestRows) ? requestRows : [];
     const simRows = Array.isArray(simulationRows) ? simulationRows : [];
+    const fitAlertRowsList = Array.isArray(fitAlertRows) ? fitAlertRows : [];
+
+    // Batch-resolve investor names/fund names for both discovery_requests and
+    // thesis_alerts in one query, keyed by investor_id (= investor_profiles.user_id).
+    const investorIds = Array.from(
+      new Set([
+        ...requests.map((r: any) => r.investor_id).filter(Boolean),
+        ...fitAlertRowsList.map((r: any) => r.investor_id).filter(Boolean),
+      ])
+    );
+    const investorProfileByUserId: Record<string, { your_name: string | null; fund_name: string | null }> = {};
+    if (investorIds.length > 0) {
+      const idList = investorIds.map((id) => `"${id}"`).join(",");
+      const profResp = await fetch(
+        `${base}/investor_profiles?select=user_id,your_name,fund_name&user_id=in.(${idList})`,
+        { headers }
+      ).catch(() => null);
+      const profRows = profResp?.ok ? await profResp.json().catch(() => []) : [];
+      for (const p of Array.isArray(profRows) ? profRows : []) {
+        investorProfileByUserId[p.user_id] = { your_name: p.your_name ?? null, fund_name: p.fund_name ?? null };
+      }
+    }
 
     // Profile completeness: reuse the INVESTOR_REQUIRED_FIELDS pattern for founders
     // Founder completeness is keyed off profile_builder_sessions.status = confirmed
@@ -144,8 +186,8 @@ export const getFounderContext = createServerFn({ method: "POST" })
 
     const pendingRequests: PendingRequestInfo[] = requests.map((r: any) => ({
       id: r.id,
-      investorName: r.investor_profiles?.your_name ?? null,
-      firmName: r.investor_profiles?.fund_name ?? null,
+      investorName: investorProfileByUserId[r.investor_id]?.your_name ?? null,
+      firmName: investorProfileByUserId[r.investor_id]?.fund_name ?? null,
       createdAt: r.created_at,
     }));
 
@@ -155,17 +197,15 @@ export const getFounderContext = createServerFn({ method: "POST" })
 
     const founderThesisComplete = Array.isArray(thesisRows) && thesisRows[0]?.status === "complete";
 
-    const topFitInvestors: InvestorFitInfo[] = Array.isArray(fitAlertRows)
-      ? fitAlertRows
-          .filter((r: any) => r.founder_fit_score != null)
-          .map((r: any) => ({
-            investorName: r.investor_profiles?.your_name ?? null,
-            firmName: r.investor_profiles?.fund_name ?? null,
-            matchScore: r.match_score,
-            founderFitScore: r.founder_fit_score,
-            fitSummary: r.founder_fit_reasons?.summary ?? null,
-          }))
-      : [];
+    const topFitInvestors: InvestorFitInfo[] = fitAlertRowsList
+      .filter((r: any) => r.founder_fit_score != null)
+      .map((r: any) => ({
+        investorName: investorProfileByUserId[r.investor_id]?.your_name ?? null,
+        firmName: investorProfileByUserId[r.investor_id]?.fund_name ?? null,
+        matchScore: r.match_score,
+        founderFitScore: r.founder_fit_score,
+        fitSummary: r.founder_fit_reasons?.summary ?? null,
+      }));
 
     return {
       companyName: startup?.company_name ?? null,

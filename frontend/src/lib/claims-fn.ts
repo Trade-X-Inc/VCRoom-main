@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireUser } from "@/lib/require-user-fn";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -42,6 +43,7 @@ type UpsertClaimInput = {
   claim_type: string;
   claim_label: string;
   claim_value: string;
+  accessToken: string;
 };
 
 type AttachProofInput = {
@@ -53,7 +55,7 @@ type AttachProofInput = {
   /** The claim label + value string shown to the AI */
   claim_label: string;
   claim_value: string;
-  user_id: string;
+  accessToken: string;
 };
 
 type AiCheckResult = {
@@ -76,6 +78,7 @@ type CheckSocialInput = {
   linkedin_url: string | null;
   x_url: string | null;
   instagram_url: string | null;
+  accessToken: string;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -105,6 +108,26 @@ async function sbFetch(url: string, key: string, path: string, method: string, b
   return text ? JSON.parse(text) : null;
 }
 
+// Verifies the caller (derived from their own access token, never a client-
+// supplied id) owns this startup before any claim read/write proceeds.
+// See CLAUDE.md §51.
+async function requireStartupOwner(
+  url: string,
+  key: string,
+  startupId: string,
+  accessToken: string | undefined,
+): Promise<{ ok: true; uid: string } | { ok: false; error: string }> {
+  const auth = await requireUser(accessToken);
+  if (!auth.ok) return { ok: false, error: auth.error };
+  const rows: any[] = await sbFetch(
+    url, key,
+    `startups?id=eq.${startupId}&founder_id=eq.${auth.uid}&select=id`,
+    "GET",
+  ).catch(() => []);
+  if (!rows?.length) return { ok: false, error: "not_authorized" };
+  return { ok: true, uid: auth.uid };
+}
+
 async function urlResolves(rawUrl: string | null): Promise<boolean> {
   if (!rawUrl) return false;
   const url = rawUrl.startsWith("http") ? rawUrl : `https://${rawUrl}`;
@@ -126,6 +149,8 @@ export const upsertClaim = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; id: string | null; error?: string }> => {
     const { url, key } = getSupabaseAdmin();
     if (!url || !key) return { ok: false, id: null, error: "db_unavailable" };
+    const auth = await requireStartupOwner(url, key, data.startup_id, data.accessToken);
+    if (!auth.ok) return { ok: false, id: null, error: auth.error };
 
     // Check if a row exists for this startup + claim_type
     const existing: any[] = await sbFetch(url, key,
@@ -177,6 +202,8 @@ export const attachProofAndCheck = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<AttachProofResult> => {
     const { url, key } = getSupabaseAdmin();
     if (!url || !key) return { ok: false, proof_status: "pending_review", ai_result: null, error: "db_unavailable" };
+    const auth = await requireStartupOwner(url, key, data.startup_id, data.accessToken);
+    if (!auth.ok) return { ok: false, proof_status: "pending_review", ai_result: null, error: auth.error };
 
     const cfEnv = (globalThis as any).__cf_env || {};
     const openaiKey = cfEnv.OPENAI_API_KEY || cfEnv.OPEN_AI_API_KEY || cfEnv["OPEN AI API KEY"] || "";
@@ -277,6 +304,7 @@ type AddManualClaimInput = {
   startup_id: string;
   claim_text: string;
   claim_category: ClaimCategory;
+  accessToken: string;
 };
 
 export const addManualClaim = createServerFn({ method: "POST" })
@@ -284,6 +312,8 @@ export const addManualClaim = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; id: string | null; error?: string }> => {
     const { url, key } = getSupabaseAdmin();
     if (!url || !key) return { ok: false, id: null, error: "db_unavailable" };
+    const auth = await requireStartupOwner(url, key, data.startup_id, data.accessToken);
+    if (!auth.ok) return { ok: false, id: null, error: auth.error };
     const text = (data.claim_text ?? "").trim();
     if (text.length < 8) return { ok: false, id: null, error: "Claim is too short — state a specific, checkable fact." };
     if (!["financial", "legal", "operational", "team"].includes(data.claim_category)) {
@@ -303,10 +333,12 @@ export const addManualClaim = createServerFn({ method: "POST" })
   });
 
 export const deleteClaim = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { startup_id: string; claim_id: string })
+  .inputValidator((d: unknown) => d as { startup_id: string; claim_id: string; accessToken: string })
   .handler(async ({ data }): Promise<{ ok: boolean }> => {
     const { url, key } = getSupabaseAdmin();
     if (!url || !key) return { ok: false };
+    const auth = await requireStartupOwner(url, key, data.startup_id, data.accessToken);
+    if (!auth.ok) return { ok: false };
     await sbFetch(url, key,
       `startup_claims?id=eq.${data.claim_id}&startup_id=eq.${data.startup_id}`,
       "DELETE"
@@ -322,7 +354,7 @@ type VerifyClaimInput = {
   /** Plain text extracted client-side from the evidence document */
   document_text: string;
   document_name: string;
-  user_id: string;
+  accessToken: string;
 };
 
 type VerifyClaimResult = {
@@ -338,6 +370,8 @@ export const verifyClaim = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<VerifyClaimResult> => {
     const { url, key } = getSupabaseAdmin();
     if (!url || !key) return { ok: false, verdict: null, reasoning: null, confidence: null, error: "db_unavailable" };
+    const auth = await requireStartupOwner(url, key, data.startup_id, data.accessToken);
+    if (!auth.ok) return { ok: false, verdict: null, reasoning: null, confidence: null, error: auth.error };
 
     const cfEnv = (globalThis as any).__cf_env || {};
     const openaiKey = cfEnv.OPENAI_API_KEY || cfEnv.OPEN_AI_API_KEY || cfEnv["OPEN AI API KEY"] || "";
@@ -348,7 +382,7 @@ export const verifyClaim = createServerFn({ method: "POST" })
 
     // Rate limit — same rpc as the rest of the AI stack
     const allowed = await sbFetch(url, key, "rpc/check_ai_rate_limit", "POST", {
-      p_user_id: data.user_id,
+      p_user_id: auth.uid,
       p_feature: "verification",
     }).catch(() => true);
     if (allowed === false) {
@@ -437,7 +471,7 @@ export const verifyClaim = createServerFn({ method: "POST" })
     await evaluateAndAwardBadgesCore({ startupId: data.startup_id });
 
     await sbFetch(url, key, "rpc/check_and_increment_ai_usage", "POST", {
-      p_user_id: data.user_id,
+      p_user_id: auth.uid,
       p_feature: "verification",
     }).catch(() => null);
 
@@ -454,6 +488,14 @@ export const verifySocialUrls = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; social_verified: boolean }> => {
     const { url, key } = getSupabaseAdmin();
     if (!url || !key) return { ok: false, social_verified: false };
+    const auth = await requireStartupOwner(url, key, data.startup_id, data.accessToken);
+    if (!auth.ok) return { ok: false, social_verified: false };
+    // Row must actually belong to the owned startup — the id alone isn't enough.
+    const rowCheck: any[] = await sbFetch(url, key,
+      `startup_cap_table?id=eq.${data.cap_table_row_id}&startup_id=eq.${data.startup_id}&select=id`,
+      "GET",
+    ).catch(() => []);
+    if (!rowCheck?.length) return { ok: false, social_verified: false };
 
     // At least one URL must be provided and resolve
     const provided = [data.linkedin_url, data.x_url, data.instagram_url].filter(Boolean);

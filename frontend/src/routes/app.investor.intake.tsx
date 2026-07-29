@@ -240,10 +240,11 @@ export function IntakePage() {
     // 2. Call AI parse server function
     try {
       const { parseIntakeBatch } = await import("@/lib/intake-fn");
+      const { data: { session } } = await supabase.auth.getSession();
       const result = await parseIntakeBatch({
         data: {
           batchId: batch?.id ?? "",
-          investorProfileId: user!.id,
+          accessToken: session?.access_token ?? "",
           rawInput: combinedInput,
         },
       });

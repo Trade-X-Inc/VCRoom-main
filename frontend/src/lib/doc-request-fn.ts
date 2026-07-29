@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
+import { requireUser } from "@/lib/require-user-fn";
 
 function getAdminClient(url?: string, key?: string) {
   const cfEnv = (globalThis as any).__cf_env || {};
@@ -14,19 +15,25 @@ function getAdminClient(url?: string, key?: string) {
 export const getDocRequests = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
-      dealRoomId: string; userId: string; userAccessToken: string;
+      dealRoomId: string; userAccessToken: string;
       supabaseUrl?: string; supabaseKey?: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
 
-    // Verify membership
+    // Identity from the token — the userAccessToken field previously existed
+    // but was never checked; the membership check ran against a raw userId
+    // param instead, letting any room member impersonate any other member.
+    // See CLAUDE.md §51.
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { requests: [], error: auth.error };
+
     const { data: member } = await sb
       .from("deal_room_members")
       .select("user_id")
       .eq("deal_room_id", data.dealRoomId)
-      .eq("user_id", data.userId)
+      .eq("user_id", auth.uid)
       .maybeSingle();
     if (!member) return { requests: [], error: "Unauthorized" };
 
@@ -43,7 +50,7 @@ export const getDocRequests = createServerFn({ method: "POST" })
 export const createDocRequest = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
-      dealRoomId: string; requestedBy: string; forUserId: string;
+      dealRoomId: string; forUserId: string;
       title: string; description?: string; userAccessToken: string;
       supabaseUrl?: string; supabaseKey?: string;
     } => data as any,
@@ -51,12 +58,17 @@ export const createDocRequest = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
 
+    // Identity from the token — never trust a client-supplied requestedBy.
+    // See CLAUDE.md §51.
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { success: false, error: auth.error };
+
     // Verify requester is a member
     const { data: member } = await sb
       .from("deal_room_members")
       .select("user_id")
       .eq("deal_room_id", data.dealRoomId)
-      .eq("user_id", data.requestedBy)
+      .eq("user_id", auth.uid)
       .maybeSingle();
     if (!member) return { success: false, error: "Unauthorized" };
 
@@ -64,7 +76,7 @@ export const createDocRequest = createServerFn({ method: "POST" })
       .from("document_requests")
       .insert({
         deal_room_id: data.dealRoomId,
-        requested_by: data.requestedBy,
+        requested_by: auth.uid,
         for_user_id: data.forUserId,
         title: data.title,
         description: data.description ?? null,
@@ -96,19 +108,24 @@ export const fulfillDocRequest = createServerFn({ method: "POST" })
   .inputValidator(
     (data: unknown): {
       requestId: string; documentId?: string; requestedBy: string;
-      title: string; dealRoomId: string; userId: string; userAccessToken: string;
+      title: string; dealRoomId: string; userAccessToken: string;
       supabaseUrl?: string; supabaseKey?: string;
     } => data as any,
   )
   .handler(async ({ data }) => {
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
 
+    // Identity from the token — never trust a client-supplied userId.
+    // See CLAUDE.md §51.
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { success: false, error: auth.error };
+
     // Verify fulfiller is a member
     const { data: member } = await sb
       .from("deal_room_members")
       .select("user_id")
       .eq("deal_room_id", data.dealRoomId)
-      .eq("user_id", data.userId)
+      .eq("user_id", auth.uid)
       .maybeSingle();
     if (!member) return { success: false, error: "Unauthorized" };
 

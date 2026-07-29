@@ -245,7 +245,9 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
   const handleRunAutoDetection = async () => {
     if (!userId) return;
     try {
-      const result = await runAutoDetect(() => runAutoDetectionFn({ data: { dealRoomId, userId } }));
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { toast.error("Session expired — sign in again"); return; }
+      const result = await runAutoDetect(() => runAutoDetectionFn({ data: { dealRoomId, userAccessToken: session.access_token } }));
       if ("error" in result && result.error) {
         toast.error(result.error as string);
       } else {

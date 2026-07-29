@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireUser } from "@/lib/require-user-fn";
 
 // ── Types (mirror of claims-fn.ts for investor_claims table) ──────────────
 
@@ -28,14 +29,14 @@ export interface InvestorClaim {
 }
 
 type UpsertInvestorClaimInput = {
-  investor_id: string;
+  accessToken: string;
   claim_type: string;
   claim_label: string;
   claim_value: string;
 };
 
 type AttachInvestorProofInput = {
-  investor_id: string;
+  accessToken: string;
   claim_type: string;
   proof_document_id: string;
   document_text: string;
@@ -89,9 +90,11 @@ export const upsertInvestorClaim = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; id: string | null; error?: string }> => {
     const { url, key } = getSupabaseAdmin();
     if (!url || !key) return { ok: false, id: null, error: "db_unavailable" };
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return { ok: false, id: null, error: auth.error };
 
     const existing: any[] = await sbFetch(url, key,
-      `investor_claims?investor_id=eq.${data.investor_id}&claim_type=eq.${encodeURIComponent(data.claim_type)}&select=id,claim_value,proof_status`,
+      `investor_claims?investor_id=eq.${auth.uid}&claim_type=eq.${encodeURIComponent(data.claim_type)}&select=id,claim_value,proof_status`,
       "GET"
     ).catch(() => []);
 
@@ -115,7 +118,7 @@ export const upsertInvestorClaim = createServerFn({ method: "POST" })
     }
 
     const inserted: any[] = await sbFetch(url, key, "investor_claims", "POST", {
-      investor_id: data.investor_id,
+      investor_id: auth.uid,
       claim_type: data.claim_type,
       claim_label: data.claim_label,
       claim_value: data.claim_value,
@@ -131,13 +134,15 @@ export const attachInvestorProofAndCheck = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<AttachInvestorProofResult> => {
     const { url, key } = getSupabaseAdmin();
     if (!url || !key) return { ok: false, proof_status: "pending_review", ai_result: null, error: "db_unavailable" };
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return { ok: false, proof_status: "pending_review", ai_result: null, error: auth.error };
 
     const cfEnv = (globalThis as any).__cf_env || {};
     const openaiKey = cfEnv.OPENAI_API_KEY || cfEnv.OPEN_AI_API_KEY || cfEnv["OPEN AI API KEY"] || "";
 
     // Step 1: mark pending immediately
     await sbFetch(url, key,
-      `investor_claims?investor_id=eq.${data.investor_id}&claim_type=eq.${encodeURIComponent(data.claim_type)}`,
+      `investor_claims?investor_id=eq.${auth.uid}&claim_type=eq.${encodeURIComponent(data.claim_type)}`,
       "PATCH",
       { proof_document_id: data.proof_document_id, proof_status: "pending_review", updated_at: new Date().toISOString() }
     ).catch(() => null);
@@ -200,7 +205,7 @@ export const attachInvestorProofAndCheck = createServerFn({ method: "POST" })
         : "ai_mismatch";
 
     await sbFetch(url, key,
-      `investor_claims?investor_id=eq.${data.investor_id}&claim_type=eq.${encodeURIComponent(data.claim_type)}`,
+      `investor_claims?investor_id=eq.${auth.uid}&claim_type=eq.${encodeURIComponent(data.claim_type)}`,
       "PATCH",
       {
         proof_status,
