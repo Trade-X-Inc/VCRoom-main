@@ -8,19 +8,6 @@ import { supabase } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { VerificationBadge } from "@/components/shared/VerificationBadge";
-import { BadgeDisplay, useBadges } from "@/components/app/BadgeDisplay";
-
-/** Public view: earned badges only — no locked states, tooltip descriptions. */
-function PublicBadges({ startupId }: { startupId: string }) {
-  const { data: badges = [] } = useBadges({ startupId });
-  if (!badges.length) return null;
-  return (
-    <div className="mt-3">
-      <BadgeDisplay badges={badges} size="sm" maxVisible={6} context="public" />
-    </div>
-  );
-}
 
 /** Roast record: the receipts behind the badge. Public sessions only. */
 function RoastRecordLink({ startupId }: { startupId: string }) {
@@ -578,33 +565,6 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
     });
   }, [startup?.id]);
 
-  const { data: registryCheck } = useQuery({
-    queryKey: ["registry-check-public", startup?.id],
-    enabled: !!startup?.id && !!startup?.registry_verified,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("company_registry_checks")
-        .select("verified, confidence_score, verified_jurisdiction, sources, checked_at")
-        .eq("startup_id", startup!.id)
-        .maybeSingle();
-      return data;
-    },
-  });
-
-  const { data: founderVerification } = useQuery({
-    queryKey: ["founder-verification-public", startup?.id],
-    enabled: !!startup?.id,
-    staleTime: 5 * 60 * 1000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("founder_verifications")
-        .select("current_tier, tier1_passed, tier1_score, tier2_passed, tier3_passed")
-        .eq("startup_id", startup!.id)
-        .maybeSingle();
-      return data ?? null;
-    },
-  });
-
   // Claims: only ai_confirmed ones are shown publicly (unverified/mismatch are
   // shown as "Unverified" to investors — they need to see what's not backed up)
   const { data: publicClaims = [] } = useQuery({
@@ -873,29 +833,6 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
               {startup.company_name || "Unnamed startup"}
             </h1>
             {startup.tagline && <p className="mt-4 max-w-3xl text-lg text-muted-foreground">{startup.tagline}</p>}
-            {(startup?.registry_verified && registryCheck || (founderVerification?.current_tier ?? 0) > 0) && (
-              <div className="flex items-center gap-2 mt-3 flex-wrap">
-                {startup?.registry_verified && registryCheck && (
-                  <span
-                    className="text-xs px-2.5 py-1 rounded-full font-medium inline-flex items-center gap-1"
-                    style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.25)", color: "#10B981" }}
-                    title={`Company registration verified with ${registryCheck.confidence_score}% confidence.`}
-                  >
-                    ✓ Registered company
-                  </span>
-                )}
-                {(founderVerification?.current_tier ?? 0) > 0 && (
-                  <VerificationBadge
-                    tier={founderVerification!.current_tier}
-                    size="md"
-                    verifySlug={startup.profile_slug ?? undefined}
-                    entityType="founder"
-                  />
-                )}
-              </div>
-            )}
-            {/* Earned badges — trust first, then readiness, then community */}
-            {startup?.id && <PublicBadges startupId={startup.id} />}
             {startup?.id && <RoastRecordLink startupId={startup.id} />}
             {(startup.social_links ?? []).length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
