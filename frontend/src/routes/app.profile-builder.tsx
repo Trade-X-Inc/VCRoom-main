@@ -753,15 +753,14 @@ function ProfileBuilder() {
           Profile built.
         </h2>
         <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 15, color: "var(--muted-foreground)", lineHeight: 1.6, marginBottom: 28 }}>
-          Now verify your identity to unlock your deal room and appear in the directory.
-          Four automatic checks, about two minutes.
+          Your profile is ready to share. Head to your dashboard to continue preparing for your raise.
         </p>
         <button
-          onClick={() => navigate({ to: "/app/verification" as any })}
+          onClick={() => navigate({ to: "/app" as any })}
           data-testid="pb-done-verify-cta"
           style={{ background: "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "Syne, sans-serif" }}
         >
-          Run verification →
+          Go to dashboard →
         </button>
         <div style={{ marginTop: 16 }}>
           <button

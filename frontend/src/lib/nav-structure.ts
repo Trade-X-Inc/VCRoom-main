@@ -77,17 +77,8 @@ export const founderSections: L2Section[] = [
         ],
       },
       {
-        label: "Workstation",
+        label: "Roast",
         children: [
-          { to: "/app/prepare/workstation/verifications", label: "Verifications" },
-          { to: "/app/prepare/workstation/claims", label: "Claims" },
-        ],
-      },
-      {
-        label: "Badges",
-        children: [
-          { to: "/app/prepare/badges/overview", label: "Badge Overview & Guide" },
-          { to: "/app/prepare/badges/apply", label: "Apply Badge" },
           { to: "/app/prepare/badges/founder-roast", label: "Founder Roast" },
           { to: "/app/prepare/badges/roast-reports", label: "Founder Roast Reports" },
         ],
@@ -176,28 +167,6 @@ export const investorSections: L2Section[] = [
           { to: "/app/investor/thesis/fund-vault/source-files", label: "Source Files" },
           { to: "/app/investor/thesis/fund-vault/digital-document-vault", label: "Digital Document Vault" },
           { to: "/app/investor/thesis/fund-vault/privacy-settings", label: "Document Privacy Settings" },
-        ],
-      },
-      {
-        label: "Verification",
-        children: [
-          { to: "/app/investor/thesis/verification/verifications", label: "Verifications" },
-          { to: "/app/investor/thesis/verification/claims", label: "Claims" },
-        ],
-      },
-      {
-        label: "Badges",
-        children: [
-          { to: "/app/investor/thesis/badges/overview", label: "Badge Overview & Guide" },
-          { to: "/app/investor/thesis/badges/apply", label: "Apply Badge" },
-          { to: "/app/investor/thesis/badges/tier-status", label: "Verification Tier Status" },
-        ],
-      },
-      {
-        label: "Capital Readiness",
-        children: [
-          { to: "/app/investor/thesis/capital-readiness/cheque-size", label: "Cheque Size Confirmation" },
-          { to: "/app/investor/thesis/capital-readiness/capacity-audit", label: "Investment Capacity Audit" },
         ],
       },
     ],
