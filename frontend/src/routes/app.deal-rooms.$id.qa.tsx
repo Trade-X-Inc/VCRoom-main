@@ -173,7 +173,6 @@ function QAPage() {
         setRows((prev) => prev.some((r) => r.id === inserted.id) ? prev : [...prev, inserted]);
         setAnswerDrafts((prev) => { const n = { ...prev }; delete n[questionId]; return n; });
         setExpandedAnswers((prev) => ({ ...prev, [questionId]: true }));
-        import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { deal_room_id: dealRoomId } })).catch(() => {});
       }
       if (questionCount >= MAX_QUESTIONS && answeredCount + 1 >= MAX_QUESTIONS) {
         triggerCompletion();

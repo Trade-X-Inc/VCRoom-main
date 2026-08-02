@@ -19,7 +19,6 @@ import { FieldVerificationBadge, prewarmClassificationCache } from "@/components
 import { logActivity } from "@/lib/activity-log-fn";
 import type { InvestorClaim } from "@/lib/investor-claims-fn";
 import { CapitalVerificationSection } from "./app.investor.profile.capital";
-import { BadgeDisplay, useBadges } from "@/components/app/BadgeDisplay";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { OnboardingTour } from "@/components/app/OnboardingTour";
 import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
@@ -1419,9 +1418,6 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
             />
           )}
 
-          {show("badges") && existing?.id && user?.id && (
-            <InvestorBadgesCard profileId={existing.id} userId={user.id} />
-          )}
         </div>
         )}
       </div>
@@ -1897,49 +1893,3 @@ class SectionErrorBoundary extends Component<{ children: ReactNode }, { error: E
 
 // ── Investor badges card ───────────────────────────────────────────
 
-function InvestorBadgesCard({ profileId, userId }: { profileId: string; userId: string }) {
-  const qc = useQueryClient();
-  const [evaluating, setEvaluating] = useState(false);
-  const { data: badges = [] } = useBadges({ investorProfileId: profileId });
-
-  const runEvaluation = async () => {
-    if (evaluating) return;
-    setEvaluating(true);
-    try {
-      const { evaluateAndAwardBadges } = await import("@/lib/badge-award-engine");
-      const result = await evaluateAndAwardBadges({
-        data: { investor_profile_id: profileId, investor_user_id: userId },
-      });
-      qc.invalidateQueries({ queryKey: ["profile-badges", profileId] });
-      if (result.awarded.length > 0) {
-        toast.success(`Newly earned: ${result.awarded.join(", ").replace(/_/g, " ")}`);
-      } else {
-        toast.info("No new badges yet — badges reflect real deal activity and decision behavior.");
-      }
-    } catch {
-      toast.error("Evaluation failed — try again.");
-    } finally {
-      setEvaluating(false);
-    }
-  };
-
-  return (
-    <Card style={{ padding: 20 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, fontFamily: font.display }}>Your badges</div>
-        <button onClick={runEvaluation} disabled={evaluating}
-          style={{ fontSize: 12, color: color.inkTertiary, background: "transparent", border: "none", cursor: "pointer", opacity: evaluating ? 0.6 : 1 }}>
-          {evaluating ? "Evaluating…" : "Re-check"}
-        </button>
-      </div>
-      {badges.length > 0 ? (
-        <BadgeDisplay badges={badges} size="md" context="profile" />
-      ) : (
-        <p style={{ fontSize: 12, color: color.inkTertiary, lineHeight: 1.5 }}>
-          No badges yet. Investor badges are earned from real behavior founders care about —
-          deciding quickly, never ghosting, and giving reasons on every pass.
-        </p>
-      )}
-    </Card>
-  );
-}

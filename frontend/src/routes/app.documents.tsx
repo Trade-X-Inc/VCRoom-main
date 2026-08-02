@@ -434,8 +434,6 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       }, { onConflict: "startup_id,template_slug" });
       if (upsertError) throw upsertError;
       toast.success(`${templateName} uploaded`);
-      // Badge evaluation — fire-and-forget on this write event
-      import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { startup_id: startup?.id } })).catch(() => {});
       // Readiness checklist refresh — new documents change the gap analysis
       if (startup?.id) {
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -521,7 +519,6 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
         toast.error("Uploaded, but extraction failed — stored in Source Files. You can retry or fill manually.");
       }
 
-      import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { startup_id: startup?.id } })).catch(() => {});
       // R11 step 4: invalidate every view of founder_documents — Intake,
       // Source Files, Digital Document Vault, and Privacy Settings are
       // separate route mounts of this same component, each with its own
@@ -1557,8 +1554,6 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
 
       if (error) throw error;
       toast.success("Document saved");
-      // Badge evaluation — fire-and-forget on this write event
-      import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { startup_id: startup?.id } })).catch(() => {});
       onSave();
     } catch (e: any) {
       toast.error(e.message || "Save failed");

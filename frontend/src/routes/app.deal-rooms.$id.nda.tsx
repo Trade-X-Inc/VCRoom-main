@@ -223,10 +223,6 @@ function NdaPage() {
       });
       if (insertErr) throw insertErr;
 
-      // Badge evaluation — fire-and-forget on this write event
-      const { data: { session: badgeSession } } = await supabase.auth.getSession();
-      import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { deal_room_id: dealRoomId, accessToken: badgeSession?.access_token ?? "" } })).catch(() => {});
-
       // Membership itself is created by approveConnectionRequest (founder
       // approves an investor's access request) or accept_lawyer_invite — by
       // the time a user reaches this page they are already a real
