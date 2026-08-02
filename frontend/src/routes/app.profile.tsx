@@ -1999,10 +1999,6 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
         </div>
       )}
 
-      {/* R10 step 2: BadgesSection removed from every Profile leaf — it
-          duplicated the real Badge Overview & Guide page (app.badges.tsx),
-          which already owns "Run badge evaluation" as its one correct home. */}
-
     </div>
   );
 }

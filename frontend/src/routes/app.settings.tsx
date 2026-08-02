@@ -2,7 +2,6 @@ import { createFileRoute, Link, Outlet, useRouterState, useSearch } from "@tanst
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Settings, Bell, Shield, User, Loader2, Camera, HelpCircle, Info, CreditCard, Activity } from "lucide-react";
-import { VerificationSection } from "@/components/app/VerificationSection";
 import { FounderHelpGuide, AboutSection } from "@/components/app/HelpGuide";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -459,19 +458,6 @@ function ProfileSettings() {
         </Card>
       )}
 
-      {/* Verification section — founders and investors */}
-      {user?.id && (isInvestor ? true : !!startup?.id) && (
-        <section className="rounded-none border border-border/60 bg-card p-5 space-y-4">
-          <VerificationSection
-            entityType={isInvestor ? "investor" : "founder"}
-            entityId={isInvestor ? user.id : startup!.id}
-            userId={user.id}
-            userEmail={user?.email ?? ""}
-            displayName={fullName || (isInvestor ? "Investor" : startup?.company_name ?? "Founder")}
-            verifySlug={isInvestor ? undefined : (startup?.profile_slug ?? undefined)}
-          />
-        </section>
-      )}
     </div>
   );
 }
