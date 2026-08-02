@@ -1,2374 +1,316 @@
-# Hockystick — AI Developer Rules
+# CLAUDE.md
 
-This file is for any future Claude Code session working on this repo. Read it before starting any build. It is the condensed, engineering-facing companion to `Hockystick_AI_First_Architecture_Plan.docx`. If something here conflicts with that doc, the doc wins — update this file to match.
+Implementation authority for this repository. Read before any work.
+
+---
+
+## 0. Precedence
+
+| Document | Governs |
+|---|---|
+| **Foundation Document** (project knowledge) | What to build, who may do it, what we refuse to build |
+| **DESIGN.md** (repo root) | How the authenticated application looks and reads |
+| **CLAUDE.md** (this file) | How we build, verify, and ship |
+
+Conflicts resolve upward: Foundation wins on product, DESIGN wins on interface, this file wins on process.
+
+A rule in this file may only be changed by amending this file. "It seemed reasonable at the time" is not an amendment.
 
 ---
 
 ## 1. The one rule
 
-A feature is either:
-- **(a) a tool the AI agent can call**, with a defined permission and a defined confirm-first/immediate rule, or
-- **(b) a page explicitly listed as staying human-driven** (Deal Rooms, the 8 financial tools, public profile/CV, the Roast session itself)
+**Audit before you build. Report before you merge.**
 
-There is no third category. If you're about to build something that doesn't fit either bucket, stop and ask before writing code.
+Every phase begins with a read-only step 0 that produces a written report and stops. No code, no migrations, no drops until that report is reviewed and approved.
+
+This rule exists because it has repeatedly found things that would not otherwise have been found: a live authorisation bypass, a template-literal bug that survived a clean build, a security test that passed while the vulnerability was open.
 
 ---
 
 ## 2. Two agents, never one
 
-- **Founder Agent** — own system prompt, own tool registry, own context. Never sees investor data except through Deal Room shared tools.
-- **Investor Agent** — own system prompt, own tool registry, own context. Never sees another investor's pipeline or another founder's private data except through Deal Room shared tools.
-- They share: the same model router (OpenRouter/OpenAI), the same rate-limit functions (`check_ai_rate_limit`, `check_and_increment_ai_usage` — already exist in Supabase, reuse them, do not rebuild).
-- They do not share: system prompt, tool list, conversation context.
+- **This repository's chat** — strategy, prompt writing, report review. Does not write production code.
+- **Claude Code** — builds, audits, verifies. Does not decide scope.
 
-**Never merge these into one branching agent**, even if it looks simpler. This was explicitly decided against.
+Neither role does the other's job. When Claude Code encounters a scope question, it stops and asks rather than deciding.
 
 ---
 
-## 3. Confirm-first rule (no exceptions)
+## 3. Model routing
 
-A tool executes immediately if it only touches the calling user's own draft/private state (saving a field, fetching a score, parsing a paste, reading their own data).
-
-A tool **always** renders a confirmation card and waits for an explicit click if its effect is visible to another party: approving/declining access, submitting a deal decision, sending a team invite, creating a deal room, changing someone's role, starting a paid Roast.
-
-If you're unsure which bucket a new tool falls into: if another human besides the caller would see a change because of this action, it's confirm-first.
-
----
-
-## 4. Where things live (current file map — verify against actual repo before assuming)
-
-| Concern | Pattern |
+| Task | Model |
 |---|---|
-| Founder AI Advisor | Becomes the base of the Founder Agent — extend, don't replace |
-| Investor AI Advisor | Becomes the base of the Investor Agent — extend, don't replace |
-| Profile builder | `app.profile-builder.tsx`, `profile_builder_sessions` table — becomes `run_profile_builder()` tool |
-| Investor intake | `app.investor.intake.tsx`, `investor_intake_batches`/`investor_intake_candidates` — becomes `parse_intake_batch()` tool |
-| Roles/permissions | `frontend/src/lib/roles.ts` (`FOUNDER_PERMISSIONS`, `INVESTOR_PERMISSIONS`), `role_permissions` table — reuse for tool permission checks, do not invent a parallel system |
-| Team identity | `startup_team_accounts`, `team_invites` — **never write `invited_by` into `user_id`**; always use the freshly-fetched session's own `auth.getUser().id` at accept time |
-| Account context / shell routing | `useAccountContext` hook — determines AdminShell vs MemberShell |
+| Step-0 audits of any kind | Opus |
+| Anything touching authorisation, RLS, the record chain, or the action layer | Opus |
+| Schema design | Opus |
+| Reviewing completed work before merge | Opus |
+| Component work, forms, tables, migrations against a settled schema | Sonnet |
+| Deletion passes, test writing, documentation | Sonnet |
+
+Do not use Haiku for this project. Its failure mode is silent, and silent failure is the expensive kind here.
+
+Security-phrased prompts sometimes trip Fable's safeguards. Use Opus for security work rather than burning attempts.
 
 ---
 
-## 5. Known historical bugs — do not reintroduce these patterns
+## 4. Confirm-first rule
 
-1. **RLS self-reference recursion.** Never write an RLS policy on table X that queries table X from inside itself. Always use a `SECURITY DEFINER` function as the intermediary (see `is_startup_founder`, `get_investor_startup_ids`, `get_user_team_startup_ids`, `get_startup_team_user_ids` for the pattern).
+Claude Code never performs these without explicit approval in the same session:
 
-2. **Team invite self-acceptance.** If the person clicking "Accept" on a `/join` link is already logged in as the inviter, block it explicitly and tell them to use a private window / different account. Always re-fetch the session fresh at accept time (`supabase.auth.getUser()`), never trust a hook's possibly-stale `user` object.
+- Dropping or altering a database table
+- Deleting a file that is not clearly dead
+- Modifying anything under `src/lib/auth.tsx` or `src/lib/supabase.ts`
+- Writing to production data, including "temporary" probe rows
+- Changing anything in Cloudflare, Supabase dashboard, or DNS
+- Merging or pushing
 
-3. **Cloudflare env vars.** Secrets are read via `globalThis.__cf_env` at runtime, never `import.meta.env` (build-time only, doesn't work in Workers). `VITE_` prefix exposes to the browser bundle — never use for secrets.
-
-4. **Grandfathering.** Any bulk account import or new gating mechanism (like the profile-completion gate) must insert a "confirmed/grandfathered" row for pre-existing accounts as part of the same migration — not as a follow-up fix.
-
-5. **One Supabase auth listener only.** Multiple listeners cause 5-second lock timeouts.
-
----
-
-## 6. Build sequence
-
-```
-Phase 0 — DONE: deprecated feature removal, profile-builder, intake parser, grandfathering
-Phase 1 — Profile-completion gate + proactive nudges (build this first, it's the
-          proof-of-concept for the whole tool-permission model)
-Phase 2 — Chat-first shell redesign (AdminShell + MemberShell, both sides)
-Phase 3 — Full tool registry rollout (read-only tools first, confirm-first last,
-          Deal Room shared tools last of all)
-Phase 4 — Roast as a chat-native flow (start_roast() tool)
-Phase 5 — Monetization/credits/Stripe wiring (deferred until 1-4 are validated)
-```
-
-**Do not combine phases in one session.** Test and confirm each phase before starting the next.
+If a test requires a write to production, stop and ask first. Disclosing it afterwards is not the same thing.
 
 ---
 
-## 7. Explicit non-goals (do not build these without revising the architecture doc first)
+## 5. Build discipline
 
-- No merged single agent
-- No chat-only Deal Room
-- No resurrecting Pipeline / Reports / VC Leads / Market News / Accelerators dashboard pages, as either pages or chat tools
-- No confirm-first exceptions, ever, even for "obviously safe" cases
-- No voice interface, no MCP server before Phase 4
-- No pricing or gating on the verification badge itself — only the Roast hosting/participation fee is paid; outcome is always decided independently
-- No investor email/CRM OAuth integration — intake is paste-your-own-data only, by design
+- Branch per phase. Commit per numbered step.
+- Merge `--no-ff`, never squash.
+- **Never run `npm run deploy`.** Push only — Git integration deploys.
+- Verify the committed tree equals the tested tree before merge. Working tree clean, `git status --porcelain` empty.
+- Report `tsc` error count and gzip bundle size before and after every branch.
+- A security gap found mid-phase is never "out of scope". Stop and report it.
+
+### Baselines
+
+| Metric | Value | Rule |
+|---|---|---|
+| `tsc` errors | 64 | Do not increase. If it drops, update this line and record why. |
+| Client bundle | 0.88 MB gzip | Ceiling is 1 MB. |
 
 ---
 
-## 8. Monetization gate
+## 6. Verification standards
 
-Every feature needs a clear monetization path before it gets built — either it drives subscription value, is directly paid (Roast fee), is metered (AI credits), or is the trust-layer moat (verification, kept free and merit-based on purpose). If a proposed feature has none of these, it doesn't get built yet, regardless of how good the idea is.
+**Claims are not evidence.** A report saying "verified" without raw output is not a report.
+
+- Paste raw `curl` output, raw query results, raw status codes. Not summaries.
+- Adversarial tests run as a real authenticated account with genuinely no access — not as a privileged role.
+- When testing whether a protection holds, attempt the actual attack. Reading the code is not a test.
+- **Shadow every table a function touches, not just the first.** A partial test produces a false pass. This exact mistake once produced a clean bill of health on a live vulnerability.
+- Verify worker-injected code against the **pre-minified** assembled string. Reading minified output has produced a wrong diagnosis before.
 
 ---
 
-## 9. Design System — THE DESIGN CONSTITUTION (July 2026, supersedes the white/gradient redesign)
-
-**The gradient-purple whitespace system is dead.** In July 2026 the founder reversed the
-earlier white-redesign direction and ordered a sharp, dense, institutional system modeled on
-Cloudflare Dashboard, Stripe Dashboard, and Linear — flat brand color used sparingly, hard
-0px radius, tables over cards, borders over whitespace-as-hierarchy. If you find a page still
-using `.hs-gradient`, `rounded-xl`/`rounded-lg` cards, DM Sans, or the old `rgba(0,0,0,0.35)`
-muted token, it is UNMIGRATED LEGACY — never "fix" a migrated page back to the old system.
-Tokens live in `frontend/src/lib/design-tokens.ts`. If a value isn't in design-tokens.ts, it
-isn't in the system.
-
-**This is not a request for creative reinterpretation.** The job is consistent execution of
-these fixed rules, not fresh creative direction per page.
-
-### 9.0 Brand
-
-- Primary: `#7C3AED` (violet) — used flat, ONLY for: primary buttons, active nav indicator,
-  links, focus rings, key data accents. Never as a section background inside the app.
-- Ink (primary text): `#0A0A0B`.
-- Background: `#FAFAFA` (app canvas), `#FFFFFF` (cards/panels).
-- Border: `#E4E4E7`, 1px solid — the ONLY divider style.
-- Fonts: Syne (display/headings, 600–700), DM Sans (UI/body, 400–500).
-- Radius: 0px on ALL structural elements. Buttons max 2px.
-- Shadows: none, or `0 1px 2px rgba(0,0,0,0.04)` max. Borders define hierarchy, not shadows.
-
-### 9.1 Text contrast — WCAG AA, hard rules
-
-```
-Primary text:    #0A0A0B
-Secondary text:  #52525B (never lighter than this for body copy)
-Tertiary/labels: #71717A minimum, 12px+
-```
-Any text lighter than `#71717A` on white is FORBIDDEN. Minimum body size 14px, tables 13px.
-
-### 9.2 Layout
-
-- App content area: max-width 1360px, minimum padding 32px. No centered 600px columns.
-- Page pattern: `[Breadcrumb 12px]` → `[H1 Syne 28px + one-line description #52525B]` →
-  `[primary action top-right]` → `[content]`.
-- 24px between blocks, 48px between sections. Pages end within 48px of the last content —
-  no trailing white space.
-- Density target: Cloudflare/Stripe dashboard, not a marketing page. Tables over cards for
-  lists; cards are reserved for summary stats only.
-
-### 9.3 Components
-
-- **Tables**: full-width, 1px `#E4E4E7` row borders, 44px rows, numbers right-aligned.
-- **Status chips**: 2px radius, 12px text, AA-compliant contrast. (This replaces the old
-  6px-dot-only status system — chips are now allowed, provided they pass contrast.)
-- **Buttons**: Primary `#7C3AED` background / white text; Secondary white + 1px border +
-  ink text. 36px height, radius max 2px.
-- No accordions or dropdowns for primary content — FAQ/help content only. If a page's main
-  content is currently gated behind an accordion, that is a migration debt, not a pattern
-  to repeat.
-- **Empty states**: icon + one sentence + one action. Max 200px tall.
-
-### 9.4 One theme — no dark mode
-
-- No dark mode, no theme toggle, no `dark:` variants, no `.dark` CSS block, in or out of `/app/*`.
-- **Sanctioned exception:** `/roast/*` PUBLIC pages keep their event styling, including the
-  full-red race button (`#EF4444`) — it is a game mechanic, not a UI button. Roast
-  *management* pages inside `/app/*` follow this system fully.
-
-### 9.5 Voice — still minimal, but not a hard word ceiling
-
-- Label: short and specific · Description: one sentence · Button: max 3 words · Error: one
-  sentence stating what happened and how to fix it.
-- No exclamation marks, no passive voice, active-verb symmetry ("Save changes" → "Changes
-  saved"), name things by what the person controls, never apologize.
-- WRONG: "Upload your pitch deck document to share with investors" → RIGHT: "Add pitch deck"
-
-### 9.6 Security rendering rules (enforce in every prompt touching deal content)
-
-- Deal content (documents, Q&A, term sheets, closing status, decision drafts) renders ONLY
-  under `/deal-rooms/:id/*` routes.
-- Top-level pages may render: room name, counterparty name, stage chip, last-activity
-  timestamp. Nothing else from inside a room — no document names, no Q&A text, no term sheet
-  figures, no decision notes, on any page outside the room.
-- `/reports` renders CLOSED deals only — no live/in-progress deal data.
-- Investor private profile fields render only inside a deal room at INFORMATION stage or later.
-
-### 9.7 Errors have personality (`EmptyState` / `Illustration` in components/system)
-
-Empty/error/loading/no-results states may still use the line-art characters (64×64, 2px
-stroke, ink only) where they fit within the 200px-tall empty-state budget in §9.3 — this is
-a carryover from the prior system that is not itself in conflict with the new one. No spinners.
-
-### 9.8 Imagery and iconography
-
-- Lucide icons only — never mix icon libraries.
-- Charts: white background, `#7C3AED` as primary series, green for positive — never pie charts.
-- Screenshots used in-product or marketing: match whatever this system currently renders.
-
-### 9.9 What every future UI prompt must include
-
-"Follow the Design Constitution in CLAUDE.md Section 9 — use design-tokens.ts. Do not invent
-colors, spacing, or component patterns. Flat `#7C3AED` only, per §9.0's limited list of uses.
-0px radius on structural elements. No dark styling anywhere. No accordions for primary content."
-
-### 9.10 Reference
-
-Cloudflare Dashboard, Stripe Dashboard, Linear. Sharp, dense, institutional.
-
-## 10. Project Identity
-
-App: Hockystick (no 'e') — Agentic VC deal flow platform
-Live URL: https://hockystick.app
-Cloudflare Pages project: vcroom-main
-GitHub repo: Trade-X-Inc/VCRoom-main
-Supabase project ID: ldimninnjlvxozubheib
-Local path: /Users/macbookpro/VCROOM/VCRoom-main/frontend
-Deploy command: cd /Users/macbookpro/VCROOM/VCRoom-main/frontend && npm run deploy
-
-## 11. Stack
-
-TanStack Start + Vite 7 + React 19 + TypeScript + Tailwind CSS v4 + Supabase + Cloudflare Pages
-
-## 12. Critical Rules — NEVER VIOLATE
-
-1. NEVER touch src/lib/auth.tsx
-2. NEVER touch src/lib/supabase.ts
-3. NEVER commit .env.local
-4. NEVER commit dist/ folder
-5. ALWAYS run npm run build before committing
-6. ALWAYS use existing design tokens (no inline styles or hardcoded hex)
-7. ALWAYS add enabled: !!user?.id to useQuery hooks
-8. NEVER add dark styling anywhere — one theme, no dark mode (see Section 9); /roast/* public pages are the one sanctioned exception
-9. NEVER use prose-invert anywhere
-10. ALWAYS read secrets server-side via cfEnv, never client-side
-
-## 13. Environment Variables
-
-### How secrets work
-scripts/patch-wrangler.mjs sets globalThis.__cf_env = {...env} on every request.
-
-### Reading secrets in server functions (ALWAYS use this pattern)
-```ts
-const cfEnv = (globalThis as any).__cf_env || {};
-const key = cfEnv.KEY_NAME || "";
-```
-
-### Cloudflare Secrets (encrypted, set in dashboard)
-- SUPABASE_SERVICE_ROLE_KEY
-- RESEND_API_KEY
-- OPENAI_API_KEY
-- ADMIN_SECRET_KEY
-- RESEND_FROM_EMAIL
-- NOTION_API_KEY
-- HUBSPOT_PRIVATE_APP_TOKEN
-
-### Plaintext vars (wrangler.jsonc)
-- VITE_SUPABASE_URL=https://ldimninnjlvxozubheib.supabase.co
-- VITE_SUPABASE_ANON_KEY=eyJhbGci...
-- VITE_APP_URL=https://hockystick.app
-- SUPABASE_URL=https://ldimninnjlvxozubheib.supabase.co
-- VITE_GOOGLE_CLIENT_ID=1094004326767-...
-
-### CRITICAL: Empty vars in wrangler.jsonc OVERRIDE Cloudflare dashboard variables
-### Never add an empty key to wrangler.jsonc vars section
-
-## 14. Key Files Reference
-
-```
-src/lib/auth.tsx                    — Auth context (DO NOT TOUCH)
-src/lib/supabase.ts                 — Supabase client (DO NOT TOUCH)
-src/lib/env.ts                      — getEnvVar() helper
-src/lib/hubspot.ts                  — HubSpot CRM sync
-src/lib/notion-blog.ts              — Notion → blog pipeline
-src/lib/document-extractor.ts       — Client-side doc text extraction (PDF/DOCX/PPTX/XLSX)
-src/lib/ai-secure-fn.ts             — Document AI summary + thesis alignment (reuse callOpenAI pattern)
-src/lib/profile-builder-fn.ts       — Profile builder AI extraction + interview server fns
-src/lib/intake-fn.ts                — Investor intake parser server fn (parseIntakeBatch)
-src/lib/roles.ts                    — FOUNDER_PERMISSIONS, INVESTOR_PERMISSIONS, PERMISSION_LABELS
-src/lib/design-tokens.ts            — Design system source of truth (Section 9)
-src/components/system/              — HsButton, StatusDot, SectionLabel, EmptyState, Illustration
-src/lib/email/resend.ts             — sendEmail() function
-src/lib/email/templates.ts          — Email templates
-src/lib/email/triggers.ts           — Email trigger server functions
-src/lib/onboarding-chat-fn.ts       — Landing page AI chat
-src/hooks/useAccountContext.ts      — AdminShell vs MemberShell routing hook
-src/components/app/AppShell.tsx     — Sidebar + nav (founder + investor) — AdminShell
-src/components/app/MemberShell.tsx  — Simplified sidebar for manager/analyst/viewer roles
-src/components/app/AdminShell.tsx   — Thin re-export of AppShell
-src/components/site/SiteFooter.tsx  — Newsletter signup
-src/routes/__root.tsx               — Root layout + OG meta tags
-src/routes/index.tsx                — Landing page
-src/routes/auth.callback.tsx        — Post-auth handler (HubSpot sync + profile-builder redirect)
-src/routes/app.tsx                  — AppLayoutRouter — chooses AdminShell vs MemberShell
-src/routes/app.profile-builder.tsx  — Founder profile builder (path selector → upload or interview → confirm)
-src/routes/app.investor.intake.tsx  — Investor intake parser (paste → AI extract → scored candidates)
-src/routes/app.member.index.tsx     — Member overview page (/app/member/)
-src/routes/blog.tsx                 — Blog layout (Outlet only)
-src/routes/blog.index.tsx           — Blog list (Notion-powered)
-src/routes/blog.$slug.tsx           — Blog article (Notion-powered)
-src/routes/app.directory.tsx        — Directory (founders + investors)
-src/routes/app.wall.tsx             — Achievement Wall
-src/routes/app.settings.tsx         — Settings (profile, company, notifications)
-src/routes/pricing.tsx              — Pricing page
-scripts/patch-wrangler.mjs          — CF Worker env injection
-public/_redirects                   — Cloudflare Pages redirects (301s for removed routes)
-```
-
-### Removed routes (do not recreate — 301 redirects exist in public/_redirects)
-- app.news.tsx — Market News → redirects to /app
-- app.pipeline.tsx — Pipeline → redirects to /app
-- app.reports.tsx — Reports → redirects to /app
-- app.leads.tsx / app.accelerators.tsx — redirects to /app
-
-## 15. Design System (quick reference — full law in Section 9)
-
-### Theme
-- EVERYTHING is white: /app/*, public pages, all of it. One theme. No toggle.
-- Sanctioned exception: /roast/* public event pages (red race button stays).
-
-### Colors
-- Ink #0A0A0B on white #FFFFFF. Hairline rgba(0,0,0,0.06).
-- Purple ONLY as gradient: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%)
-  via .hs-gradient / .hs-gradient-text. Flat #7C3AED is banned.
-- Semantic color exists only as 6px StatusDot dots.
-
-### Components (frontend/src/components/system/)
-- HsButton (primary gradient / ghost / text) — the only three buttons
-- StatusDot, SectionLabel, EmptyState, Illustration (4 characters)
-- Cards: no border, no shadow, no radius — whitespace separates; hairlines for tables
-
-### Typography
-- Syne 18/700/-0.5px headings · Inter 11/500 uppercase labels · Inter 13 body
-- Loaded via @fontsource in styles.css. DM Sans is retired.
-
-### Blog/article prose
-```
-className="prose prose-lg max-w-none
-  prose-headings:text-gray-900
-  prose-p:text-gray-700
-  prose-a:text-purple-600
-  prose-strong:text-gray-900"
-```
-NEVER use prose-invert.
-
-## 16. Architecture Patterns
-
-### Server functions
-```ts
-export const myFn = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { param: string })
-  .handler(async ({ data }) => {
-    const cfEnv = (globalThis as any).__cf_env || {};
-    const key = cfEnv.SECRET_KEY || "";
-    // ...
-  });
-```
-
-### Supabase auth queries
-```ts
-const { data } = await supabase
-  .from("table")
-  .select("*")
-  .eq("user_id", user.id);
-```
-
-### useQuery pattern
-```ts
-const { data } = useQuery({
-  queryKey: ["key", user?.id],
-  enabled: !!user?.id,        // ALWAYS required
-  queryFn: async () => { ... }
-});
-```
-
-### HubSpot sync (fire-and-forget, never block user)
-```ts
-import { upsertHubSpotContact } from "~/lib/hubspot";
-upsertHubSpotContact(email, { user_type: "founder" }).catch(() => {});
-```
-
-### AI server functions (key reading)
-```ts
-const cfEnv = (globalThis as any).__cf_env || {};
-const openaiKey = cfEnv.OPENAI_API_KEY ||
-                  cfEnv.OPEN_AI_API_KEY ||
-                  cfEnv["OPEN AI API KEY"] || "";
-if (!openaiKey) {
-  console.error("[AI] No OpenAI key");
-  return { reply: "AI unavailable", error: "no key" };
-}
-```
-
-### AI JSON response parsing (ALWAYS use this)
-```ts
-const raw = data.choices?.[0]?.message?.content || "";
-const cleaned = raw
-  .replace(/^```json\s*/i, "")
-  .replace(/^```\s*/i, "")
-  .replace(/```\s*$/i, "")
-  .trim();
-try {
-  return JSON.parse(cleaned);
-} catch {
-  return { summary: cleaned, parsed: false };
-}
-```
-
-## 17. Known Issues & Hard-Won Lessons
-
-### Auth
-- NEVER add multiple Supabase auth listeners — causes 5000ms timeout errors
-- Consolidate to single source of truth in auth.tsx
-- Google OAuth shows "supabase.co" domain — expected, fixed only with Supabase Pro custom auth domain
-
-### Cloudflare Workers
-- import.meta.env NOT available at runtime in server functions — use cfEnv
-- Empty vars in wrangler.jsonc OVERRIDE dashboard secrets — keep wrangler.jsonc clean
-- __cf_env is injected by scripts/patch-wrangler.mjs on every request
-
-### Supabase RLS
-- RLS policies allowing deal room members to read other members' rows caused infinite recursion
-- Test all new RLS policies carefully — cascading 500 errors are hard to debug
-- Soft-delete preferred: set deal_room_id to null rather than hard-deleting
-
-### Blog (Notion-powered)
-- blog.tsx is layout only (renders <Outlet />)
-- blog.index.tsx is the list page
-- blog.$slug.tsx is the article page
-- Status filter uses SELECT type: { property: "Status", select: { equals: "Published" } }
-- Date property: page.properties["Publish Date"]?.date?.start
-- Cover image: page.properties["Cover Image URL"]?.url
-
-### Document extraction
-- ArrayBuffer must be cloned before passing to pdfjs: buf.slice(0)
-- pdfjs worker: new URL("pdfjs-dist/build/pdf.worker.mjs", import.meta.url)
-- Runs entirely client-side — no server involvement
-
-### News feed (removed from nav — data pipeline still exists)
-- Hacker News: direct Firebase API, no CORS issues
-- RSS feeds: use allorigins CORS proxy or server-side fetch
-- RSS2JSON free tier rate-limited — prefer server-side fetch
-
-## 18. Notion Databases
-- Blog CMS: 8a99a69aa1a2422d81fe4b9149a68024
-- Social Media Calendar: b8d80e7170cb4eeeaced399bb62f38a2
-- Market Research DB: dce29ad7ce7741fa87c4184e3c975e49
-- Writing Rules: 37061976-2262-8185-bad1-d054ff00220d
-- Email Templates: 37161976-2262-81da-8fde-e6b3c581213d
-
-## 19. HubSpot
-Portal ID: 148593751
-Owner ID: 93128794
-Region: EU (app-eu1.hubspot.com)
-Token: cfEnv.HUBSPOT_PRIVATE_APP_TOKEN
-Custom properties: user_type, company_name, funding_stage,
-  deal_room_created, subscription_plan, platform_signup_date
-
-## 20. Test Users
-Founder (IK / Atlas Robotics): 620b1fe9-3d79-4226-8ae8-fbc59579005c
-Investor (Dr Henry): 815d3c20-3da1-4057-8178-fd41d671a1fe
-Deal Room ID: 957f9750-00c7-402a-b1ba-d9c7a4e3ba2f
-
-## 21. Admin Endpoints
-https://hockystick.app/api/admin?key=KEY — feedback/waitlist data
-https://hockystick.app/api/emailtest — email diagnostics
-https://hockystick.app/api/hubspot-sync?key=KEY — bulk HubSpot sync
-
-## 22. Current Platform Status (June 2026)
-- 8 users (7 founders, 1 investor)
-- Auth: Working (Google OAuth + email)
-- Blog: Live — Notion CMS → website pipeline working
-- HubSpot: Live — all 8 users synced, new signups auto-sync
-- Deal room: Working — Overview, Documents, Q&A, DD Workstation, Notes, Activity
-- AI Summary: Working — PDF, DOCX, PPTX, XLSX, CSV all supported
-- Mobile: Optimized — responsive across all pages
-- Directory: Live — real data + 10 GCC mock companies
-- Newsletter: Working — footer form → Supabase + HubSpot
-- Settings: Working — profile, company, notifications, security
-- Profile builder: Live — document upload + interview paths, saves to startups table
-- Investor intake parser: Live — paste → AI extract → thesis-scored candidates
-- Removed from nav: Market News, VC Leads, Pipeline, Reports, Accelerators
-- Stripe: NOT built — deferred until company registration complete
-- OG image: Fix pending — og-image.png returning 404
-
-## 23. Build Tool Strategy
-Copilot/Codex — heavy lifting, boilerplate, repetitive patterns (do NOT push/deploy)
-Claude Code — review TypeScript errors, final fixes, deploy
-This Claude chat — architecture, strategy, prompts, Notion/HubSpot management
-
-## 24. Investor-Side Surface Area Discovered June 17 (previously undocumented)
-
-A discovery audit on June 17 found real, working investor-side functionality that existed in the database and codebase but was never recorded in this file. This section exists so no future session repeats the mistake of assuming a feature doesn't exist before checking. **Lesson: before scoping any new investor-side build, run a discovery pass (search the codebase for relevant table names, check `pg_policies` for RLS gaps, check row counts) rather than trusting this file's inventory is complete. This file only documents what's been deliberately checked — treat any gap as unverified, not as "doesn't exist."**
-
-### investor_watchlist — real, full-featured, was undocumented
-
-A real watchlist management system at **`/app/investor/startups`** (linked in `investorNav` as "Startups" — reachable, not orphaned). Investors manually add companies, bulk-import via CSV, filter by status/stage/region. Status pipeline: `Sourcing → Reviewing → Diligence → Passed / Invested / Watching` — exact casing enforced **only at the UI level** via a TypeScript `const` array, no DB `CHECK` constraint.
-
-Columns: `id, investor_id, company_name, website, sector, stage, description, source, initial_score, notes, status, created_at, updated_at`. **No foreign key to `startups`** — matching a watchlist entry to a real Hockystick startup happens through a separate `discovery_requests → vc_leads` join in the UI, not through this table.
-
-**Two bugs found and fixed June 17:**
-- RLS was completely missing on this table (despite RLS being a consistent pattern everywhere else in the project). Fixed: `watchlist_investor_manage` policy added, scoped to `investor_id = auth.uid()`.
-- `app.investor.deal-flow.tsx`'s "Add to watchlist" button inserted `status: "watching"` (lowercase) — a mismatch with the proper-case enum used by every filter tab. Fixed to `"Watching"`. No production rows were corrupted before the fix (confirmed via direct query), but this was a live, waiting-to-trigger bug.
-
-Files touching this table: `app.investor.startups.tsx` (primary CRUD), `app.investor.deal-flow.tsx` (write-only, "Add to watchlist"), `app.investor.overview.tsx` + `app.investor.index.tsx` (read-only count for stat cards / chat welcome state), `app.investor.analysis.tsx` (reads for thesis scoring), `app.investor.diligence.tsx` (reads as the DD company list), `app.investor.portfolio.tsx` (filters `status = "Invested"`), `lib/investor-advisor-fn.ts` (server-side, counts by status for AI system prompt context).
-
-### investor_dd_lite — standalone DD checklist, linked to watchlist
-
-A due-diligence checklist tied to watchlist entries via `watchlist_id` — **separate from** the deal-room DD Workstation's own `dd_categories` / `dd_checklist_items` flow (two parallel DD systems exist, by design or by accident, not yet reconciled). Six categories: Financials, Team, Product, References, Market, Legal. Columns: `id, investor_id, watchlist_id, category, item_index, checked, status, updated_at`. Used by `DDChecklist.tsx` and `lib/dd-fn.ts`, read by `/app/investor/diligence`.
-
-### investor_intake_candidates and investor_watchlist are NOT connected
-
-Confirmed zero cross-references in either direction. No "save this intake result to my watchlist" action exists. These are two separate, parallel features today — worth considering as a real connection point in a future session, not assumed to already exist.
-
-### Other tables confirmed real and populated, previously undocumented
-
-| Table | Notes |
+## 7. Known defect patterns — do not reintroduce
+
+These were found the hard way. Each cost hours.
+
+### 7.1 Authorisation
+
+- **Never trust an identity parameter.** A `user_id` in a request body is spoofable. Derive identity from the session, always. Delete the parameter rather than validating it.
+- **Service-role code bypasses RLS entirely.** There is no database backstop. Authorisation must be complete in the code.
+- **"A row exists matching these IDs" is not an authorisation check.** It must be "the caller *is* the party in that row."
+- **RLS helper functions that query their own protected table cause infinite recursion.** Use direct subqueries or a `SECURITY DEFINER` helper.
+- **`auth.email()` outperforms `(SELECT email FROM auth.users WHERE id = auth.uid())`** — the latter silently fails for the authenticated role.
+
+### 7.2 SECURITY DEFINER functions
+
+- `SET search_path TO 'public'` is **not** safe. `pg_temp` is searched implicitly first. Use `SET search_path = public, pg_temp` (pg_temp last) or `SET search_path = ''` with fully-qualified names.
+- Functions owned by `postgres` have `BYPASSRLS`. RLS is not a backstop inside them.
+- A function that is RPC-reachable, takes a caller-supplied ID, and returns data is a data-exposure surface regardless of `search_path`. RLS helpers belong in an unexposed schema.
+- Revoking `EXECUTE` from `authenticated` does not work for RLS helpers — policy expressions run as the querying user.
+- `REVOKE TEMPORARY ... FROM authenticated` is a no-op. `TEMPORARY` is granted to `PUBLIC`.
+
+### 7.3 Cloudflare and the worker
+
+- `_headers` and `_redirects` do **not** apply to SSR-routed responses. Headers and redirects must be injected in the worker via `patch-wrangler.mjs`.
+- `patch-wrangler.mjs` and `public/_headers` must stay in sync. Editing one without the other silently diverges production.
+- **Regex inside `patch-wrangler.mjs` template literals is consumed at Node build time.** A literal `\d` or `\/` does not survive. Use `String.fromCharCode(92)` construction and verify against the pre-minified string.
+- `React.lazy` does not reduce the Pages `_worker.js` — esbuild `--outfile` inlines dynamic imports. Only `--external` affects the worker. Client-side splitting still helps the client bundle.
+- Edge-cached HTML referencing hashed asset filenames can break after a deploy. Keep edge TTL short on cached routes.
+
+### 7.4 Application
+
+- **One Supabase auth listener only.** Multiple listeners cause 5-second localStorage lock timeouts. Two currently exist (`lib/auth.tsx`, `lib/auth-store.ts`), each individually guarded — resolve during the rebuild.
+- **Soft-delete files** by setting the parent reference to null. Never hard-delete from storage. *(See §11.2 — this conflicts with the erasure requirement and must be reconciled.)*
+- **Errors must be checked.** A destructured `error` that is never referenced produces silent failure and false success in the interface. This class shipped to production more than once.
+- `investor_profiles.id` (profile PK) is **not** `investor_profiles.user_id` (= `auth.uid()`). Never conflate.
+- Do not hand-roll workflow transitions across an enum. The prior codebase ended with two conflicting stage vocabularies and a live constraint violation.
+
+---
+
+## 8. Architecture rules for the rebuild
+
+> **CURRENT STATE (verified 2 Aug 2026):** everything in §8 below is prospective — none of it has been built yet. There is no action-layer directory, no gateway module, no naming convention indicating a chokepoint. Actual measured shape of the codebase today: 65 files under `src/routes`/`src/components` call `supabase.from()` directly from the client (RLS-governed, not gateway-routed); 50 files in `src/lib` define independent `createServerFn` handlers, each authorising on its own; 25 of those use the shared `requireUser()` identity helper (added by the R43 branch, merged to `main`) but there is no single entry point they all pass through. This is precisely the "scattered across a hundred policies and forty functions with no chokepoint" failure mode §8.1 describes below — meaning §8.1–§8.4 describe the fix, not the present. Treat every rule below as Phase-1-not-started design intent until this note is removed.
+
+### 8.1 The action layer
+
+**The client never queries the database directly.** Every read and write passes through a server action that derives identity from the session and enforces authorisation in one place.
+
+RLS remains as a second layer but is no longer the primary boundary. Nearly every security incident in this codebase followed from authorisation scattered across a hundred policies and forty functions with no chokepoint. One gateway is auditable by a person; a hundred policies are not.
+
+### 8.2 Actions are tools
+
+Every action is defined once, at an interface-independent layer, with a typed contract, complete authorisation, and its own audit entry. The web interface and the agent interface are both consumers.
+
+**No action may exist only as a UI event handler.** Retrofitting this later means rewriting the entire action layer.
+
+Tool classes:
+
+| Class | Agent may | Examples |
+|---|---|---|
+| **Read** | Execute freely within the principal's permissions | Read pack, list requests, get status |
+| **Prepare** | Produce a draft a human must commit | Draft a request batch, draft an answer |
+| **Commit** | **Never** | Accept a term, sign, close, decline, release a document |
+
+No agent executes a Commit-class action under any circumstance, including explicit user instruction.
+
+### 8.3 The record
+
+> **CURRENT STATE (verified 2 Aug 2026):** does not exist in any form. Zero matches anywhere in the codebase or migration history for hash-chain terminology (`hash_chain`, `prev_hash`, predecessor-hash logic). Entirely prospective — Phase 1 of the build sequence, not started.
+
+Append-only, hash-chained. Each entry carries its predecessor's hash. Entries record actor identity, actor type (human / agent / system), timestamp, object reference, action.
+
+Cannot be retrofitted onto existing history. Build it from the first write.
+
+### 8.4 Reference numbering
+
+> **CURRENT STATE (verified 2 Aug 2026):** does not exist in any form. Zero matches anywhere in the codebase or migration history for `{ORG}-{TYP}-{YYYY}-{SEQ}-{CD}`-style formatting, ISO 7064 MOD 97-10, or any `reference_number`/`ref_no` column. Entirely prospective.
+
+Format: `{ORG}-{TYP}-{YYYY}-{SEQ}-{CD}` — `ATLS01-ROM-2026-000042-31`
+
+Sequences are gapless per organisation, per type, per year. Check digit is ISO 7064 MOD 97-10. **An observed gap is a records incident to be investigated, never silently corrected.**
+
+### 8.5 Never build
+
+- PDF renderer, e-signature stack, workflow state machine — use libraries or vendors
+- A platform fork of any kind. Libraries yes, platforms never. Our data model is the product.
+
+---
+
+## 9. Design
+
+**Superseded for the authenticated application.** `DESIGN.md` governs all interface behind sign-in.
+
+The tokens previously in this section remain authoritative **only** for public-facing pages — marketing, pricing, docs, blog, tools — until the application reaches roughly 80% completion, at which point the public surface migrates and this section is deleted.
+
+Do not touch public-facing surfaces during application work.
+
+---
+
+## 10. AI usage
+
+| Application | Rule |
 |---|---|
-| `deal_briefs` | Cached AI-generated deal memos — avoids regenerating. `lib/deal-brief-fn.ts`. |
-| `thesis_alerts` | Drives the investor chat's "what's new" first-load state (Phase 2 Session 1). |
-| `investor_verifications` | Verification status records, `app.investor.profile.tsx`. |
-| `document_views` | Tracks deal-room document views, `DDWorkstation.tsx`. |
-| `profile_views` | Tracks public profile page views. |
-| `onboarding_conversations` | Landing-page AI chat history, `lib/onboarding-chat-fn.ts` — already wired, just undocumented. |
-| `company_registry_checks` | Likely company verification lookups — purpose not fully confirmed from columns alone. |
-| `team_member_profiles` | Extended profile data for team accounts — separate from `team_members`. |
-| `investor_team_members` | Investor-side team memberships — separate from `startup_team_accounts`. `app.investor.team.tsx`. |
-| `user_plans` | **The monetization gating table** — already populated for all users. `plan, plan_name, ai_calls_daily_limit, deal_rooms_limit, team_members_limit`. Referenced in `app.investor.team.tsx`, `app.users.tsx`. |
-| `dd_checklist_items` / `dd_categories` | Deal-room DD Workstation templates — the *other* DD system, not the watchlist-linked one above. |
+| Extraction from documents | Proposes a value with citation to page and location. Human confirms; the confirmation is the warranty. |
+| Completeness checking | Compares pack against schedule. Reports absence, never judgment. |
+| Answer drafting | Drafts from existing pack data with citations. Human edits and sends. |
+| Discrepancy detection | Flags a conflict. Does not resolve it. |
+| Retrieval, search, translation | Permitted. Original always authoritative. |
+| Scoring, ranking, recommendation, assessment | **Prohibited.** |
+| Anything entering the record | **Prohibited.** Uncitable in a dispute. |
+| Legal instrument generation | **Prohibited.** UPL exposure. |
+
+**Injection containment:** uploaded documents are attacker-controlled text. Document content is delivered to a model as data, explicitly delimited, never as instruction. Content-derived values may populate fields awaiting human confirmation; they may never be passed as arguments to a Prepare or Commit tool without it. Read-class tools operating on document content cannot chain into another tool in the same turn.
+
+**Provider routing is enforced in code, not by convention.** Current state: OpenAI direct only, `gpt-4o-mini` and `gpt-4o`. No DPA in place. OpenRouter key exists in secrets and is unwired.
 
 ---
 
-## 25. Playwright Automated Testing Infrastructure
+## 11. Security and compliance
 
-Established June 2026. Every future session MUST use these test accounts for end-to-end verification — never the real Atlas Robotics / Dr Henry demo accounts.
+### 11.1 Controls built from day one
 
-### Test accounts (permanent — never delete)
+- AES-256 at rest with managed key rotation
+- TLS 1.3 enforced, legacy versions blocked
+- Signed, short-lived URLs for every document. No persistent public URL.
+- Tenant isolation at the action layer. No identifier in a request may widen access.
+- **Mandatory MFA** — required, not a settings toggle
+- Immutable hash-chained audit log recording actor, action, object, timestamp, source address
+- Automated dependency scanning from the first commit
+- Explicit recorded consent at onboarding per processing purpose
 
-| Account | Email | Role | Key IDs |
-|---|---|---|---|
-| Test founder | `test-founder@hockystick.app` | founder | user: `a5f889f9-d3fa-466f-bd37-b3f00a44c1d9`, startup: `c9101e5d-619a-4490-a6c9-ce4f0ed78812` |
-| Test investor | `test-investor@hockystick.app` | investor | user: `920727d9-77fa-4ecc-a3e4-467e04a0bb38`, investor_profile: `c5e48bf8-4991-405d-b21b-23b7e029e427` |
+### 11.2 Erasure versus retention — unresolved
 
-**Passwords:** stored in `VCRoom-main/.env.test` (gitignored). Never hardcode in source. Never commit `.env.test`.
+DIFC data protection law requires a genuine erasure capability for personal data. **This conflicts with the soft-delete rule in §7.4.**
 
-**Profile data:** Playwright Test Co (B2B SaaS, Seed, UAE, $18K MRR) for founder. Test Ventures ($25M, MENA/SEA, Pre-seed/Seed) for investor. Boring, plausible, no joke content.
+Intended resolution: personal data erasable; transaction records retained and pseudonymised, with the party replaced by a permanent reference so the audit trail survives.
 
-### How sign-in works (captcha bypass)
+**This must be settled with counsel before the disclosure pack schema is finalised.** It is the one compliance question that changes the data model.
 
-The live site has Supabase hCaptcha enabled — headless browsers can't solve it. The test suite uses the Supabase service role key to authenticate via `/auth/v1/token?grant_type=password` (service key bypasses captcha), then injects the session into browser localStorage before navigating. See `frontend/tests/auth-and-portfolio.spec.ts` for the pattern.
+### 11.3 Certification
 
-### Running tests
+Build the controls now, delay the audit. SOC 2 Type II requires a 6–12 month observation window, so it begins around month 6, not when a customer asks.
 
-```bash
-cd frontend
-npx playwright test                          # run all tests
-npx playwright test tests/auth-and-portfolio.spec.ts  # specific file
-```
+A regulatory sandbox licence does **not** substitute for SOC 2. They are unrelated, and claiming otherwise damages credibility with anyone who knows the difference.
 
-### Test data hygiene
-
-- Each test **must clean up** any rows it inserts (the spec uses pre/post DELETE via service key)
-- The **accounts themselves are never deleted** between runs
-- The **startup and investor_profiles rows are never deleted** — they are the stable fixture
-- Only ephemeral test data (e.g. portfolio entries, activity log rows) gets cleaned per-run
-
-### Test file location
-
-`frontend/tests/` — Playwright config at `frontend/playwright.config.ts`
-
-### Why this matters
-
-Multiple rounds of "should be fixed" claims in June 2026 turned out to need manual user testing to catch real bugs (nested form causing page reload, RLS silent rejection on INSERT, etc.). Playwright automation with real DB verification closes that gap permanently.
-
-### Discovered bugs that Playwright would have caught immediately
-
-1. Nested `<form>` elements — portfolio Add button submitted the outer profile form instead of the inner portfolio form (full page reload on submit)
-2. RLS WITH CHECK using `auth.uid()` inside a subquery — silent INSERT rejection with no error returned to client
-3. `investorOutOfBounds` guard in AppShell missing `/app/audit` in its whitelist — caused Activity Log link to redirect to AI Advisor
-
-## 26. THE DOCUMENT LIFECYCLE MODEL (established R11, July 2026) — product law
-
-This is not a suggestion or a UI convention. Every future feature touching founder
-documents, extraction, or the IP Vault must be built to this model. If a change would
-violate it, stop and revise the plan rather than the model.
-
-### 26.0 The four stages
-
-1. **DOCUMENT INTAKE** (`/app/prepare/ip-vault/document-intake`) — the single entry
-   point. A founder uploads a pre-built template document OR a custom document. AI
-   extracts structured information from whichever it is. There is no other way for a
-   document to enter the system.
-2. **DIGITAL DOCUMENT VAULT** (`/app/prepare/ip-vault/digital-document-vault`) — where
-   extracted information lives. Hockystick's standardized, stage-based document model,
-   organized by the 5 fixed categories: **Market, Financials, Team, Product, Legal**.
-   This is the curated, verified-claim-ready data investors ultimately see. It holds
-   *extracted structured content*, never raw files.
-3. **SOURCE FILES** (`/app/prepare/ip-vault/source-files`) — the original uploaded file,
-   stored and listed. Its only remaining purpose after extraction is attachment into a
-   deal room if an investor requests the physical/original document. A founder may
-   delete an original after extraction — the row (and its Digital Document Vault entry)
-   survives; only the file reference is cleared. If nothing was ever extracted, deleting
-   removes the row entirely, since nothing else exists to keep.
-4. **DOCUMENT PRIVACY SETTINGS** (`/app/prepare/ip-vault/privacy-settings`) — per-document
-   visibility control, always shown as two genuinely separate sections (Source Files
-   privacy, Digital Document Vault privacy). Never merge these into one shared block —
-   a founder controls exposure of the original file and the extracted data independently.
-
-A single `founder_documents` row carries a document through all four stages: it is
-created at Intake, its `content` populates the Digital Document Vault view, its
-`file_path`/`file_name`/`file_size` populate the Source Files view, and its `visibility`
-column is what Privacy Settings edits. Custom (non-template) documents get a synthetic
-virtual template card built from their own stored `category` so they render in every
-IP Vault view exactly like a pre-built template — a document must never be invisible in
-the UI just because it has no matching `document_templates` row.
-
-### 26.1 Category sorting
-
-Document Intake's template list and the Digital Document Vault are both organized by
-the 5 fixed categories in this exact order: **Market, Financials, Team, Product, Legal**.
-A custom upload is categorized at upload time — the founder picks a category, AI
-suggests one as a default via `suggested_category` once extraction completes. Category
-section headers render whenever the "All" filter is active; the category chip filter
-still narrows to a single category on its own.
-
-### 26.2 Honest extraction — never a silent empty result
-
-If extraction succeeds, `founder_documents.status = 'ai_extracted'` and `content` holds
-real structured data. If it fails for any reason — AI provider error, geographic API
-restriction, empty response, parse failure — the row still saves (the file isn't lost),
-but `status = 'needs_review'` and `content.extraction_error` holds the actual failure
-reason. **Never store an error string as if it were content, and never silently default
-a classification/category on a caught error without surfacing that something went
-wrong.** The UI must show an explicit "Could not extract — document stored in Source
-Files, retry or fill manually" state with a one-click retry (re-downloads the already-
-stored original; never requires re-upload). This is a Constitution-level honesty rule,
-not just an implementation detail of the document feature — it generalizes to every AI
-extraction/generation surface in the app.
-
-### 26.3 The privacy boundary (absolute)
-
-Nothing in the IP Vault (Document Intake, Source Files, Digital Document Vault, Privacy
-Settings) is EVER publicly accessible. IP Vault content is never public and never
-readable without explicit founder approval — via an approved detail-pack request
-(`discovery_requests.detail_pack_approved`, unlocking `stage2`-visible documents) or
-deal-room membership (`deal_room`-visible documents, once a deal room exists). The ONLY
-founder data that goes public is what flows through Profile Builder → Go Live digital
-profile (`startup_profile_sections` with `visibility = 'public'`) — a completely
-separate table and system from IP Vault. Never let these two systems merge or let an
-IP Vault document leak into the public-profile render path.
-
-This boundary is enforced at the **database and storage layer**, not just the UI:
-- `founder_documents` table RLS: owner-only for all writes; investor reads gated by
-  the detail-pack/deal-room rule above.
-- **`documents` Supabase Storage bucket**: object-level policies must independently
-  enforce the same rule as the table RLS above them — a correctly-scoped table policy
-  sitting on top of an unscoped storage bucket is not real security (this was a live,
-  severe bug found and fixed in R11: see `can_access_founder_doc_path()` /
-  `can_access_deal_room_doc_path()` in `supabase/migrations/20260718000000_*`). When
-  adding any new storage-backed feature, write the bucket-object policy in the same pass
-  as the table policy, and derive it from the same rule — never let the two drift apart.
-- A stage-3 template (financial-model, cap-table, incorporation-docs,
-  shareholder-agreements, bank-statements, customer-references) must never be exposed
-  via detail-pack/pre-deal-room approval regardless of what its `visibility` column
-  says — the UI's stage-2/stage-3 distinction is a display convention only and is not
-  itself enforced by the `visibility` toggle, so any RLS/storage rule referencing
-  `visibility = 'stage2'` must also exclude the stage-3 slug list explicitly.
-
-## 27. REAL-TIME UI RULE (established R11, July 2026) — app-wide, not feature-specific
-
-**Every mutation must leave the UI reflecting the change immediately, without a page
-reload.** This is a hard rule for all future code, not a one-off fix:
-
-- After any Supabase write (`insert`/`update`/`upsert`/`delete`) or mutating server
-  function call, either call `queryClient.invalidateQueries({ queryKey: [...] })` for
-  every query key that renders the affected data, or `refetch()` the specific query
-  observer if only one view is affected.
-- **When a mutation's result renders in more than one place** (e.g. a document upload
-  that affects Document Intake, Source Files, and the Digital Document Vault
-  simultaneously — three separate route mounts of the same underlying query), invalidate
-  every affected query key, not just the one belonging to the currently-mounted view.
-  `refetch()` only updates the currently-active observer; `invalidateQueries()` updates
-  the shared cache entry so every mount (current or future) sees fresh data.
-- Never pass a concatenated array like `["key-a", "key-b"]` intending it to match two
-  separate query keys — React Query treats this as ONE key. To invalidate two different
-  queries, call `invalidateQueries()` twice, once per real key.
-- A `staleTime` on the global QueryClient (see `src/routes/__root.tsx`) does not excuse
-  skipping invalidation — it only controls background refetch timing for the *same*
-  cache entry across remounts, not whether a mutation's result reaches the cache at all.
+Claim nothing we do not hold. Publish what exists instead.
 
 ---
 
-## 28. CROSS-SESSION REAL-TIME IS A SEPARATE PROBLEM FROM §27 — AND WAS NEVER WIRED UP (found R12, July 2026)
+## 12. Environments
 
-**Section 27's rule only fixes invalidation within one user's own browser/QueryClient.**
-`queryClient.invalidateQueries()` is process-local — it cannot reach a *different* user's
-open tab. When user A's action (e.g. an admin changing user B's role) needs to update
-user B's already-open session, that requires Postgres logical replication pushing the
-change out via Supabase Realtime (`supabase.channel(...).on('postgres_changes', ...)`),
-not React Query invalidation. These are two unrelated mechanisms — don't conflate them.
+> **CURRENT STATE (verified 2 Aug 2026): `main` is the only environment that exists.** No branch named "rebuild" or similar is present — the full branch list is exclusively feature/security branches (`r10-…r15c-`, `security/r40-…r42-`, `fix/r43-…`, etc.). `list_projects` against the Supabase account returns exactly **one** project, `ldimninnjlvxozubheib` ("ilovetech56@gmail.com's Project"), and it is the same project ID referenced in `frontend/wrangler.toml`/`.env.local` for both `VITE_SUPABASE_URL` and `SUPABASE_URL`. There is no second Supabase project and no schema separation between "rebuild" and "production" — `main` runs directly against the live production schema. The table below describes intended future state, not current infrastructure.
 
-**R12 discovered that Realtime was never actually wired up for ANY table in this app.**
-`select tablename from pg_publication_tables where pubname = 'supabase_realtime'`
-returned only the internal `realtime.messages_YYYY_MM_DD` partitions — zero application
-tables. This means every existing `.channel().on('postgres_changes', ...)` subscription
-in the codebase (`NotificationBell.tsx`, `DealRoomChat.tsx`, `useStageTransition.ts`,
-`app.deal-rooms.$id.qa.tsx`, `roast.$id.tsx`, `app.messages.tsx`, `app.roast.$id.live.tsx`)
-has been a **silent no-op** — each one only appears to work because it sits next to a
-`refetchInterval` polling fallback that's doing the actual work.
+| Environment | State |
+|---|---|
+| `hockystick-legacy` | Private archive of the complete pre-pivot codebase. **Frozen. Never modify. Never merge.** |
+| Production (`main`) | Live. Signups closed; sign-up route is a waitlist form feeding HubSpot. Roast is a waitlist page. |
+| Rebuild branch | Separate Supabase project — the new data model would destroy production schema. |
 
-**Fixed in R12:** added `startup_team_accounts` to `supabase_realtime` (migration
-`20260718050000_r12_enable_realtime_startup_team_accounts.sql`) so a role change now
-propagates to the affected member's open session live — verified with Playwright
-(`tests/r12-realtime-role-change.spec.ts`), no page reload required.
+Local development via the Workers dev server. Edge behaviour verified against the preview URL, never assumed from local.
 
-**Update (R12B, July 2026): the broader gap named above is now fixed for every table
-that had subscription code.** See §29 for the full architecture and what's still
-intentionally out of scope.
-
-**Gotcha if you add more tables to the publication:** `useAccountContext()` is called
-from many components simultaneously (`MemberShell`, `AppShell`, `app.tsx`,
-`app.audit.tsx`, `app.member.index.tsx`). A naive per-mount `.channel(topic).on(...).
-subscribe()` throws `cannot add postgres_changes callbacks ... after subscribe()`
-because Supabase's client treats repeated `.channel()` calls with an identical topic
-string as the same channel object — the second mount's `.subscribe()` collides with the
-first. Fixed with a module-level ref-counted registry (see `useAccountContext.ts`): only
-the first concurrent caller opens the channel, only the last one closes it. Use the same
-pattern for any other hook that's mounted from multiple places at once.
+**Latency measured from a sandbox is not production latency.** Cached static assets have measured 442ms TTFB from CC's environment. Report bytes, chain structure and cache status — not timings.
 
 ---
 
-## 29. REALTIME ARCHITECTURE — full table (established R12B, July 2026)
+## 13. Test fixtures
 
-R12B added every table backing an existing `.channel().on('postgres_changes')` call to
-`supabase_realtime`, built subscriptions for three deal-room-scoped tables that had none,
-and empirically verified (not assumed) that Realtime's Postgres Changes feature correctly
-enforces each table's RLS SELECT policy on the replication path — a subscribed-but-
-unauthorized client receives zero payloads, confirmed with a real raw WebSocket
-subscription in `tests/r12b-realtime-verify.spec.ts`, not just by reading policy text.
+> **CURRENT STATE (verified 2 Aug 2026):** the three accounts and Atlas Robotics all exist and are unchanged by the R43 branch — `test-founder@` (`a5f889f9-d3fa-466f-bd37-b3f00a44c1d9`), `test-investor@` (`920727d9-77fa-4ecc-a3e4-467e04a0bb38`), `test-lawyer@hockystick.app` (`62006467-1e23-40ea-8e66-0d41ae23b5c9`), and Atlas Robotics (startup `ebfcaf98-13e5-4e33-a0ad-175d8c041580`, founder `620b1fe9-3d79-4226-8ae8-fbc59579005c`, `profile_published: true`). **The characterization below is false as a description of current behaviour.** Atlas Robotics is already a real `deal_room_members` row (role `founder`) in deal room `957f9750-00c7-402a-b1ba-d9c7a4e3ba2f`, alongside the Dr Henry investor fixture — the opposite of "can never enter a deal room." No verification gate that would block it from doing so exists today. The paragraph below describes a not-yet-built feature.
 
-**Before adding any new realtime subscription:** check `select tablename from
-pg_publication_tables where pubname = 'supabase_realtime'` — a working `.channel()` call
-in the code does not mean the table is actually publishing. Add the table via
-`alter publication supabase_realtime add table <name>;` first.
+`test-founder@` / `test-investor@` / `test-lawyer@hockystick.app` — credentials in `.env.test`.
 
-### 29.0 Tables in `supabase_realtime` and what each covers
-
-| Table | Subscriber(s) | Covers | Live-tested latency |
-|---|---|---|---|
-| `startup_team_accounts` | `useAccountContext.ts` | A role change by an admin reaches the affected member's open session (R12) | — |
-| `notifications` | `NotificationBell.tsx` | New notification for the signed-in user | ~577ms |
-| `messages` | `DealRoomChat.tsx` | New deal-room chat message | not directly tested; same shape as `team_messages` |
-| `team_messages` | `app.messages.tsx` | New team chat message in the active channel | ~1035ms |
-| `deal_room_qa` | `app.deal-rooms.$id.qa.tsx` | New Q&A question/answer | ~487ms |
-| `deal_room_stage_transitions` | `useStageTransition.ts` | Deal-room stage-change request/approval | not directly tested; pre-existing code, unchanged |
-| `deal_room_term_sheets` | `app.deal-rooms.$id.term-sheets.tsx` (new, R12B) | Term sheet sent/accepted/countered | not directly tested; same invalidation pattern as verified tables |
-| `deal_room_closing_items` | `app.deal-rooms.$id.close.tsx` (new, R12B) | Closing checklist item status change — anticipates R15's active-closing work | not directly tested |
-| `deal_room_closure_reports` | (publication membership only, no subscriber yet) | — | — |
-| `nda_acceptances` | `app.deal-rooms.$id.overview.tsx` (new, R12B) | Counterparty's NDA acceptance appears in the room-level signer list | not directly tested |
-| `roast_sessions`, `roast_race_events`, `roast_audience` | `roast.$id.tsx` (public) | Live roast event state | not touched — existing 7s poll fallback kept, see §29.2 |
-| `roast_questions` | `app.roast.$id.live.tsx` | Roast host control panel live state | not touched — existing 7-15s poll fallbacks kept, see §29.2 |
-
-### 29.1 Security verification (step 4 result — PASS)
-
-Tested as `test-lawyer@hockystick.app` (External role, confirmed zero `deal_room_members`
-and zero `deal_room_team_assignments` rows for the target room) against `deal_room_qa`:
-
-1. Direct authenticated REST read of the room's `deal_room_qa` rows: **0 rows returned.**
-2. A real raw Supabase Realtime WebSocket subscription, opened with the exact same
-   channel/filter shape the app's own `qa.tsx` uses, while a legitimate member inserted a
-   new row into that room: **0 `postgres_changes` events received**, across an 8-second
-   window (well beyond the ~500ms-1s latency observed for authorized subscribers).
-
-**Conclusion: Realtime's RLS enforcement on the replication path is real, not just a
-table-level RLS flag that happens not to matter.** This was verified empirically per this
-task's explicit instruction — realtime payloads are a historically separate leak vector
-from REST/Storage in Supabase apps (see §26.3's storage-bucket precedent from R11), and
-"RLS is enabled on the table" is not sufficient evidence on its own; verify the actual
-subscription behavior before trusting it, the same standard applied here.
-
-### 29.2 What's still out of scope, on purpose
-
-- **`activity_log` has no working realtime and none was built.** It has no
-  `deal_room_id` column — it's a founder/investor account-level audit trail, not
-  deal-room-scoped. `DealRoomTimeline.tsx`'s query against it (`.eq("deal_room_id",
-  dealRoomId)`) targets a column that doesn't exist on this table — a pre-existing,
-  unrelated frontend bug, not a realtime gap. A future session designing a real
-  deal-room activity feed needs a new table or column, then a subscription — not before.
-- **Roast pages' polling was left untouched.** `roast.$id.tsx` and
-  `app.roast.$id.live.tsx` are live-event infrastructure with several 7-15s
-  `refetchInterval`s. Their tables are now correctly in the publication (so the existing
-  `.channel()` calls in that code are no longer no-ops), but polling wasn't reduced —
-  doing so safely needs an active-roast-session test fixture (race events, live
-  questions) that wasn't built in this branch. Live-test before touching that polling.
-- **`deal_room_closure_reports`** is in the publication (harmless, unused) but has no
-  subscriber — nothing currently needs it to feel live.
+**Atlas Robotics is the permanent adversarial case.** It must always fail verification. Under the new model this means it can never enter a deal room. That is a regression test that runs itself.
 
 ---
 
-## 30. `investor_profile_id` MEANS TWO DIFFERENT THINGS ACROSS THE SCHEMA (found R12C, July 2026) — schema-cleanup item, NOT fixed
+## 14. Interface writing
 
-A column named `investor_profile_id` exists on five tables, with two different FK targets:
+Sentence case. Active voice. A control names exactly what happens. An action keeps the same name through the whole flow — the button says *Release document*, the toast says *Document released*.
 
-```
-startup_team_accounts.investor_profile_id  -> FK to investor_profiles.user_id
-team_channels.investor_profile_id          -> FK to investor_profiles.id
-team_messages.investor_profile_id          -> FK to investor_profiles.id
-team_notes.investor_profile_id             -> FK to investor_profiles.id
-team_tasks.investor_profile_id             -> FK to investor_profiles.id
-```
+No exclamation marks. No filler. Sentences under twenty words. No emoji. The phrase "AI-powered" appears nowhere.
 
-This caused two real, live production bugs found and fixed in R12C:
-
-1. **`get_investor_team_role()`** (added R12) had its owner-check comparing the parameter
-   against `investor_profiles.id`, but every real caller — `investor_has_permission()`,
-   `startup_team_accounts.investor_profile_id` itself, R12/R12B's own test fixtures —
-   passes a `.user_id`-shaped value. Confirmed empirically: calling it with the value
-   actually stored in the FK column returned `null` instead of `'owner'`. Fixed by
-   comparing against `.user_id` (correct for this function's actual callers).
-
-2. **`investor_channel_access`/`investor_message_access`/`investor_note_access`/
-   `investor_task_access`** (pre-existing, predate R12) already correctly compared against
-   `investor_profiles.id` — matching THEIR OWN column's real FK target. A first attempt at
-   fixing (1) above incorrectly "fixed" these four in the same pass, assuming all five
-   `investor_profile_id` columns meant the same thing — they don't. Caught before any real
-   data was affected (empirically verified zero rows existed in any of the four tables at
-   the time) and reverted in a same-day follow-up migration
-   (`20260718080000_r12c_correct_investor_profile_id_dual_shape.sql`).
-
-**Lesson: never assume a repeated column name means the same thing across tables — check
-`information_schema.constraint_column_usage` for the actual FK target before writing or
-"fixing" a policy that touches it, even when the column name and a plausible-sounding
-purpose are identical.**
-
-**Current state (intentionally NOT unified further in R12C):** `get_investor_team_role()`
-is the `.user_id`-shaped function — use it for `startup_team_accounts`-adjacent
-permission/role checks. `get_investor_team_role_by_profile_id()` is the new `.id`-shaped
-counterpart — use it for any future policy on `team_channels`/`team_messages`/
-`team_notes`/`team_tasks` that needs team-member (not just owner) role resolution; it
-wasn't wired into those four tables' policies since their existing inline `EXISTS` checks
-only needed the owner case and already worked correctly post-revert.
-
-**Follow-up for a future dedicated session:** standardize `investor_profile_id`'s meaning
-to one canonical target (most likely `.user_id`, matching the newer R12-era convention and
-`startup_team_accounts`) across all five tables — this means migrating the FK constraint
-and every dependent policy on the four `team_*` tables, plus a data backfill if any rows
-exist by then. Bigger and riskier than any single feature branch should absorb
-incidentally; do it as its own deliberate migration.
+| Write | Never write |
+|---|---|
+| Asserted 4 March · evidence attached | Verified |
+| Complete against the seed schedule | Investor-ready |
+| 12 of 14 conditions satisfied | 86% complete |
+| Declined 2 June · reason recorded | Not a fit at this time |
+| Nothing is waiting on you. | You're all caught up! |
 
 ---
 
-## 31. CLEANUP-PASS BACKLOG — not urgent, don't lose these between phases
+## 15. Explicit non-goals
 
-Three known, real debt items, none blocking, all deliberately deferred rather than fixed
-incidentally inside an unrelated feature branch. Whatever session becomes the dedicated
-"cleanup pass" should start here rather than rediscovering these from scratch:
+Do not build these. Each was decided deliberately.
 
-1. **`investor_profile_id` dual FK meaning** (§30, found R12C) — same column name means
-   `investor_profiles.id` on `team_channels`/`team_messages`/`team_notes`/`team_tasks` but
-   `investor_profiles.user_id` on `startup_team_accounts` and the new R12C tables. Needs a
-   canonical-meaning decision, an FK migration, and a policy migration on four tables.
-2. **`activity_log` has no `deal_room_id` column** (§29.2, found R12B) — it's a founder/
-   investor account-level audit trail, not deal-room-scoped. `DealRoomTimeline.tsx`
-   queries a column that doesn't exist on it and has been silently broken. Needs either a
-   new deal-room-scoped activity table/column, or repointing the Timeline component at
-   whatever the correct source turns out to be.
-3. **`.hs-gradient` / gradient-purple system remnants** (§9, R1-era, superseded July 2026
-   by the Design Constitution) — `app.investor.profile.tsx` (touched extensively in R12C)
-   is a concrete example still running heavy inline `hs-gradient`/flat-`#7C3AED`-as-
-   background styling and non-0px radii. Per §9's own rule, do not "fix" this
-   incidentally while touching the file for unrelated work — migrate it deliberately, as
-   its own pass, checking every card/button/radius against `design-tokens.ts`.
-
-None of these were fixed as part of the R12/R12B/R12C branches that found them — each was
-scoped out on purpose to keep those branches focused, per the standing rule of not
-expanding a feature branch into an unrelated repair.
+- Marketplace, directory, matching, recommendation
+- Verification claims of any kind — we record assertions, parties judge
+- Readiness scores, gates, or any invented number presented as fact
+- Percentage-of-round fees, per-page fees, per-GB fees
+- Money movement, escrow, custody, trustee role
+- Our own fund, vehicle, or investment activity
+- Secondary market in unlisted shares
+- Retail crowdfunding
+- Signable legal instruments generated by us
+- Social feed, team chat, referral programme, news aggregation
+- Configurable workflow — templates with optional steps only
+- Tokenisation
+- Scraping of any kind
 
 ---
 
-## 32. PAYMENT PLACEHOLDER PATTERN (established R13, July 2026) — the standard for every paid feature until Stripe is wired
-
-Stripe is not built (§22 — deferred until company registration completes; `stripe_customer_id`/
-`stripe_subscription_id`/`stripe_price_id` columns exist on `subscriptions` and stay null).
-Every paid feature between now and real Stripe integration follows this exact pattern —
-**do not invent a different placeholder shape per feature.**
-
-### 32.0 The pattern
-
-1. **The consuming table gets its own `payment_status` column**, not a shared central
-   payments table — `roast_sessions.payment_status` (the original of this pattern, added
-   before R13 and widened in R13 to the shared vocabulary below) is the reference
-   implementation. A new paid feature adds `payment_status text not null default
-   'pending_payment' check (payment_status in ('not_required','pending_payment','paid','waived'))`
-   to its own table.
-2. **Four states, shared vocabulary across every feature:**
-   - `not_required` — this row/feature was never fee-gated (default for non-paid paths).
-   - `pending_payment` — fee owed, not yet confirmed.
-   - `paid` — confirmed via the placeholder (or later, a real Stripe PaymentIntent).
-   - `waived` — comped/free, explicitly granted (e.g. beta access).
-3. **The shared UI is `frontend/src/components/app/PaymentConfirm.tsx`** — fee label,
-   amount, a terms list (feature supplies its own copy), a required checkbox, and a
-   "Confirm payment" button. No card is ever charged; confirming just calls the caller's
-   `onConfirm`, which the feature wires to mark its own row's `payment_status = 'paid'`.
-4. **Every call site MUST carry a `TODO(stripe)` comment** at the exact line that marks
-   `paid` without a real charge, so a future Stripe-integration pass can `grep -rn
-   "TODO(stripe)"` to find every site needing the swap in one search — do not phrase the
-   comment differently per feature.
-5. **Gating a paid action**: the feature's own confirm/submit action checks
-   `payment_status === 'paid'` (or `'waived'`/`'not_required'` where applicable) before
-   proceeding — never let a `pending_payment` row's action complete silently.
-
-### 32.1 Reference implementation — Founder Roast's $40 fee (R13)
-
-`ROAST_LEVELS` in `roast-fn.ts` already carried real `priceUsd` values (Level 1 $40 /
-Level 2 $50 / Level 3 $60) that the UI displayed struck-through as "Free during beta" with
-no actual payment step — R13 built the missing step: `PaymentConfirm` renders between the
-level/date picker and the final "Schedule" action, gated server-side in
-`createRoastSession` (refuses without `paymentConfirmed: true`, same shape as the
-pre-existing `rulesAcknowledged` gate).
-
-`payment_status` started as `roast_sessions.payment_status` (pre-R13:
-`'comp'/'pending'/'paid'`; widened in `20260719000000_r13_payment_status_pattern.sql` to
-the shared 4-state vocabulary below). **It was then moved to its own table,
-`roast_session_payments`, in `20260719020000_r13_split_roast_payment_status.sql`** — see
-§32.3. Do not treat `roast_sessions.payment_status` as current; that column no longer
-exists.
-
-### 32.2 What this is NOT
-
-Not a real payment gateway, not PCI-relevant (no card data ever collected or transmitted),
-not a substitute for actually wiring Stripe — it exists purely so paid features can be
-fully built and shipped now, with the payment step structurally in place, rather than
-half-built and waiting on Stripe. Per the founder's standing rule: paid features get
-fully built and wired to this placeholder, never left partial.
-
-### 32.3 HARD RULE — never put `payment_status` on a table that's public-readable or realtime-published (found R13, July 2026)
-
-R13's mandatory security check found `roast_sessions.payment_status` leaking to ANY
-anonymous, unauthenticated visitor of a public roast session — verified live with a real
-Supabase Realtime WebSocket subscription carrying no auth token, which received the
-founder's payment state (`paid`/`pending_payment`/`waived`) in the raw `postgres_changes`
-payload on every session update.
-
-**Why this happens, and why it will happen again if you're not careful:** Postgres RLS —
-and Supabase Realtime on top of it — has **no column-level redaction**. A table's SELECT
-policy is row-level only: once a row is visible to a caller (here, `roast_sessions_public_read`'s
-`is_public = true` branch), **every column** of that row is visible too, including via the
-realtime channel, regardless of what the subscribing client's own JS callback chooses to
-read. Manually stripping a field from a server function's *response* (as the fix first did
-for `getRoastPublicState`) only closes the REST/RPC path — the direct-table realtime path
-is architecturally separate and stays open unless the column itself is removed from the
-public/published table.
-
-**The rule:** any column carrying payment state, internal ops data, or anything not meant
-for the row's full audience must live on a **separate table**, scoped by its own RLS to
-only the parties who should see it, and **not added to `supabase_realtime`** unless every
-party with realtime access to it is also a party who should see every column. Never add a
-`payment_status`-shaped column directly to a table that already has a public or
-broadly-scoped SELECT policy — split it out from the start, don't retrofit after a leak is
-found. `roast_session_payments` (§32.1) is the reference pattern: `session_id` FK,
-founder-only RLS, no realtime publication membership.
-
-**Before adding a payment (or any sensitive-status) column to an existing table, check its
-current RLS policies AND whether it's in `supabase_realtime`** — `select * from
-pg_policies where tablename = '<table>'` and `select * from pg_publication_tables where
-tablename = '<table>'`. If either check comes back broader than "only the owner," the new
-column needs its own table, not a spot on the existing one.
-
----
-
-## 33. GENERAL RULE — Postgres RLS is ROW-level, never COLUMN-level (confirmed twice: R13 §32.3, R13B, July 2026)
-
-**Any table where different columns need different audiences must be split into separate
-tables from the start.** There is no RLS policy syntax, no view trick short of an actual
-`SECURITY DEFINER` function or a `SELECT`-only projection view, that lets one policy say
-"this caller sees columns A and B but not C" on a single `SELECT *`-able table. A `SELECT`
-policy is entirely row-level: if a row passes the policy's `USING` clause, every column of
-that row is returned to a direct query, full stop — regardless of whether some other RPC
-or app-layer convention "intends" to hide part of it.
-
-**This has now bitten this codebase twice, in two unrelated features:**
-- §32.3 (R13): `roast_sessions.payment_status` leaked to any anonymous realtime subscriber
-  of a public roast session, because the row was public but the column wasn't meant to be.
-- R13B: `team_members.bio` leaked to any deal-room counterparty via a direct `SELECT *`,
-  confirmed empirically with a real inserted row and a real counterparty session — bio came
-  back in full — despite the founder's explicit decision that only name/photo/title should
-  be visible before the Information-stage unlock. Fixed by splitting `team_members` (public:
-  name, title, photo, key_person flag) from `team_member_details` (gated: bio, highlights,
-  social_links), the same pattern applied to `investor_team_members` /
-  `investor_team_member_details`.
-
-**The check before adding ANY new column to an existing table:** does this column need to
-be visible to a *different* set of callers than the table's other columns? If yes — even if
-"today" every consumer happens to want the same access — split it into its own table with
-its own RLS from the moment it's added. Do not plan to "just be careful about which columns
-the client selects" — a direct `SELECT *`, a realtime payload, or a future consumer that
-forgets the convention will all bypass that immediately. This is not a style preference; it
-is the only mechanism Postgres RLS actually offers for differential column visibility.
-
----
-
-## 34. GENERAL RULE — a UI permission check is not a security boundary; RLS must enforce role-scoped actions too (found R14, July 2026)
-
-A third instance of the same underlying lesson as §33, but for actions (INSERT/UPDATE),
-not columns: **`FOUNDER_PERMISSIONS`/`INVESTOR_PERMISSIONS` (`roles.ts`) gate what the UI
-shows, never what the database allows.** If a permission like `request_access` is meant to
-distinguish which roles may perform a write, the table's own RLS policy must check that
-role — a `PermissionGate` component or an inline `useAccountContext()` check in a button
-component is UI-layer messaging only, exactly as `PermissionGate.tsx`'s own doc comment
-already says for page-level gating. R14 found this hadn't been applied to a per-row INSERT
-policy: `discovery_requests`' `investor_insert_own` policy checked only
-`investor_id = auth.uid()`, with **no role check at all** — confirmed empirically that an
-`analyst`/`external`-role investor team member (both `request_access: false` in
-`INVESTOR_PERMISSIONS`) could still INSERT a real row via a direct API call, bypassing the
-new `RequestAccessButton` UI gate (and Directory's pre-existing identical Connect flow,
-which shares the same table and had the same gap since it was built, undetected until this
-adversarial pass).
-
-**Fixed** with a `SECURITY DEFINER` helper (`investor_can_request_access`, in
-`20260721000000_r14_discovery_requests_role_check.sql`) mirroring the existing
-`get_investor_team_role()` pattern — owner check against `investor_profiles`, then role
-lookup in `startup_team_accounts` (the real investor team/role table, keyed by `.user_id`
-per §30's documented convention — not `investor_team_members`, which is R13B's key-person
-*profile* table, unrelated to permissions) — added to the policy's `with_check` alongside
-the existing ownership check. Adversarial-verified: an `associate`-role test account (which
-has `request_access: true`) still succeeds; a temporary `analyst`-role fixture inserted and
-tested inside a rolled-back transaction was rejected with a genuine RLS policy violation,
-not just a hidden button.
-
-**The check before shipping any new role-gated write path:** does `INVESTOR_PERMISSIONS` or
-`FOUNDER_PERMISSIONS` distinguish which roles may perform this action? If yes, the table's
-own INSERT/UPDATE/DELETE policy must encode that distinction directly (via a `SECURITY
-DEFINER` helper reusing the established owner/team-role lookup pattern, not a new one) —
-never assume a `PermissionGate` wrapper or a component-level `useAccountContext()` check is
-sufficient on its own. Treat this identically to §33's column-visibility rule: the UI check
-improves the experience (an honest disabled state instead of a confusing failure), but the
-RLS policy is what actually stops the write.
-
----
-
-## 35. THIRD CONFIRMED §33 INSTANCE — `deal_room_meetings.notes_investor` (found R14B, July 2026) — FIXED
-
-Found during R14B's audit of the (unmounted) 3-slot DD meetings pattern:
-`deal_room_meetings` carried `notes_investor` ("investor-private") and `notes_shared` on
-the same row, protected by a single `deal_room_meetings_members` ALL policy scoped to ANY
-room member — so a founder's direct REST `SELECT *` could read the investor's private
-meeting notes. Invisible in the UI because all writes go through service-role server fns
-(`deal-room-fn.ts`) and the panel only renders `notes_shared` — exactly the "the client
-only selects the safe columns" convention §33 forbids treating as a boundary.
-
-**Fixed in `20260722000000_r14b_interview_stages.sql`:** `notes_investor` moved to
-`deal_room_meeting_private_notes` (PK = meeting_id), RLS scoped to room members with
-`role = 'investor'` only. Verified live: founder SELECT returns 0 rows against a real
-inserted note, investor gets the row, uninvolved third party gets nothing; founder still
-reads the meeting row's shared fields normally.
-
-Same migration established the R14B meeting-content tables:
-- `deal_room_meetings` widened to 5 interview stages (`meeting_number` 1–5 + NOT NULL
-  `stage_slug` in introduction/product_demo/financial_discussion/terms_discussion/
-  investment_terms; status stays derived from scheduled_at/completed_at/
-  meeting_type='skipped' — no stored status column, by decision).
-- `deal_room_meeting_records` (recordings/transcripts/AI-extracted notes): SELECT-only
-  policy for room members while `deal_room_id` is non-null; **soft-delete = null the
-  `deal_room_id`** (documents pattern — row survives, RLS stops matching); **no client
-  write policies at all** — ingestion/extraction writes are service-role server fns only,
-  and a room member's direct INSERT was verified to fail with a genuine RLS violation.
-
----
-
-## 36. R14B STEP 4 LIVE VERIFICATION — three real gaps found and fixed, one found and DEFERRED
-
-Live adversarial testing of the step 4 lawyer gate (room-native `deal_room_members.role =
-'lawyer'`, see step 4's design) surfaced issues beyond the original scope. Three were fixed
-in the same pass (`81d996c`); one is a genuine pre-existing bug, confirmed real, and
-explicitly left unfixed — do not assume "found" means "fixed" when reading this section.
-
-**Fixed — `useDealRoomContext.ts`'s `isTeamMember` false-positive.** A lawyer's
-`deal_room_members` row is scoped entirely to one room, but `isTeamMember` was computed
-purely from the *global* `startup_team_accounts` table — unrelated to the current room. Any
-account that happens to ALSO be a founder-team member somewhere else (as the
-`test-lawyer@hockystick.app` fixture is, from R12B) got routed into the founder
-team-assignment gate and saw a false "Access restricted" screen. Fixed by excluding
-`memberRow?.role === 'lawyer'` from `isTeamMember`. **Lesson: a role computed from one
-table can collide with unrelated data on the same account in a different table — check the
-room-scoped source of truth (`deal_room_members`) first, not a global membership table,
-when a role's real scope is "this room only."**
-
-**Fixed — shared Overview/Information Vault/Q&A/Due Diligence had no lawyer gating.** These
-routes predate R14B and were built assuming only founder/investor/viewer roles exist. A
-lawyer session could reach traction metrics, deal brief generation, and the stage-transition
-control — none of which are in the locked scope ("deal summary, term sheet area, Investment
-Terms meeting, its records — nothing else"). The underlying data was correctly RLS-blocked
-(verified: `founder_documents` policies don't match a lawyer's `auth.uid()` under either the
-founder or investor branch), so this was a page-content gap, not a data leak — but a real
-one per the locked design. Fixed with a new `LawyerRoomView.tsx`, intercepted at the
-`DealRoomLayout` level in `app.deal-rooms.$id.tsx` **before** `<Outlet/>` — so no shared
-route can render for a lawyer even via direct URL navigation. Adversarially verified against
-`/qa`, `/diligence`, `/information` with real navigation, not assumption.
-
-**Fixed — `deal_room_meetings` RLS leaked stages 1-4 to a lawyer.** The table's single
-`deal_room_meetings_members` policy (`for all`) matched any room member, including a lawyer,
-granting full read access to `notes_shared`/`action_items` on all 5 meeting rows. Per §33
-this can't be column-scoped — split into per-command policies with a stage-scoped SELECT
-restriction (`role <> 'lawyer' OR stage_slug = 'investment_terms'`), mirroring
-`deal_room_meeting_records`'s existing pattern from step 4a. **Verified with a real lawyer
-JWT via direct REST call** (not the UI): 1 row returned (investment_terms), zero for stages
-1-4, confirming the restriction holds independent of what the client requests.
-
-**Found, NOT fixed — `/nda` route is unreachable for its own purpose.** `DealRoomLayout`
-(`app.deal-rooms.$id.tsx`) gates its entire `<Outlet/>` — which includes the `/nda` route
-itself, since it's a child route of `$id.tsx` — behind `ndaAcceptance` being truthy. This
-means a user with no `nda_acceptances` row can never render the NDA-signing page to create
-that row: the `useEffect` redirects them to `/nda`, but the same gate then shows
-"Verifying access…" forever on that page too. Confirmed via `git show` that this logic is
-byte-for-byte unchanged from before R14B (predates this branch entirely) — not something
-introduced by this work. Worked around for this session's live verification by inserting the
-`nda_acceptances` row directly via SQL rather than through the UI. **Unclear why this hasn't
-visibly broken founder/investor onboarding** — possibly a code path exists elsewhere that
-signs the NDA before the user ever lands on `/deal-rooms/$id`, or possibly it's simply never
-been noticed. **Needs investigation and a fix as the first item of step 6** (per explicit
-instruction — this must be listed as a step 6 task, not just mentioned in a report). Do not
-assume it's benign just because it predates this branch.
-
----
-
-## 37. R14B STEP 5 — DAILY BATCH-PROCESSOR TRANSCRIPTION REQUIRES REAL AWS S3 + IAM ROLE; DO NOT RE-ATTEMPT WITH R2 (found R14B, July 2026)
-
-Interview meetings do **not** use Daily cloud recording. This was the original step 5 plan
-("Option A: cloud recording + post-call transcription") and was abandoned after live-verifying
-a structural incompatibility — recorded here so a future session doesn't rediscover this the
-hard way.
-
-**What was tried, in order, each with a real API call and a real error, not assumed from docs:**
-1. `POST /v1/batch-processor` with `outParams` omitted (Daily's docs describe it as fully
-   optional with a fallback to Daily's own "HIPAA-compliant" default storage) → `400
-   "outParams" is required`.
-2. `outParams: {}` → `400 "outParams.s3Config" is required` — the default-storage fallback
-   Daily's docs describe does not exist for this account (confirmed via `GET /v1/`:
-   `batch_processor_bucket: null` at the domain level).
-3. `outParams.s3Config` with a real Cloudflare R2 bucket (`hockystick-meeting-recordings`,
-   created for this purpose) + R2 access-key credentials → `400
-   "outParams.s3Config.bucket_name" is not allowed` — the batch-processor's `s3Config` shape
-   is NOT the same as `transcription_bucket`'s documented shape; only `s3KeyTemplate`/
-   `useReplacement` are accepted per-request.
-4. Domain-level `batch_processor_bucket` config (`POST /v1/` with `properties.
-   batch_processor_bucket`), matching `transcription_bucket`'s documented shape
-   (`bucket_name`/`bucket_region`/`assume_role_arn`/`allow_api_access`) → first
-   `bucket_region` rejected `"auto"` (R2's usual value) for not matching an AWS-region
-   pattern; with a real AWS region string, `400 "assume_role_arn" is not allowed to be
-   empty"` — **`assume_role_arn` is required and non-empty**, meaning Daily's batch-processor
-   storage integration is AWS IAM-role-assumption-based (STS), not access-key-based.
-
-**Conclusion: Cloudflare R2 cannot be used as batch-processor output storage under any
-request shape** — R2 has no IAM role assumption mechanism (access-key-only S3-compatible
-auth). This is a genuine Daily↔R2 incompatibility, not a misconfiguration. Only a real AWS S3
-bucket with an IAM role trusting Daily's AWS principal would work — untested, out of scope,
-and not planned (see below).
-
-**Product decision (locked): interview meetings never use recording.** The deliverable is AI
-meeting notes, not a video/audio archive. `enable_recording` is never set on interview rooms
-(`interview-fn.ts`'s `createInterviewRoom`) — roast rooms were never affected either way
-(recording was never enabled there, confirmed via diff against the branch base). The R2
-bucket (`hockystick-meeting-recordings`, private, ENAM region) and its scoped credentials
-stay provisioned in `.env.local`/Cloudflare secrets, **unused**, reserved for a possible
-future *paid* recording add-on — do not repurpose it for batch-processor transcription; that
-path is confirmed dead per the findings above.
-
-### What's used instead: Daily realtime transcription (Deepgram)
-
-No recording, no bucket, no batch job, no S3 dependency anywhere. `frame.startTranscription()`
-is called client-side (founder session only — see below) once joined; `transcription-message`
-events stream text to whichever client has the listener; on leaving the call, the accumulated
-text is sent to `saveMeetingTranscript` (service-role fn, the only writer to
-`deal_room_meeting_records`).
-
-**Real bug found and fixed: transcription requires an admin permission on the meeting
-token.** `startTranscription()` failed live with `"must be transcription admin to start
-transcription"` — Daily's default meeting token grants no admin rights. Fixed by adding
-`permissions: { canAdmin: ["transcription"] }` to the founder's token in
-`mintInterviewToken` (investor/lawyer tokens don't need it — they never call
-`startTranscription()` themselves, by design, see below).
-
-**Single deterministic transcription owner, not "whoever joins first."** Only the founder
-side's client calls `startTranscription()` (gated by `isTranscriptionOwner` in
-`InterviewCall`). Daily can run multiple concurrent transcription/recording instances if
-`startRecording()`/`startTranscription()` is called by more than one client without a shared
-`instanceId` — a second, redundant start from the investor's client would risk doubling the
-transcription cost for nothing, not merely erroring harmlessly. This mirrors the original
-(now-abandoned) recording plan's same reasoning, carried over unchanged.
-
-### Second real bug found and fixed: `transcript_status`/`extraction_status` value mismatch
-
-The actual Postgres CHECK constraint on `deal_room_meeting_records` only allows
-`'pending' | 'processing' | 'ready' | 'failed'` — **not** `'complete'`. The code (and this
-file's own §26.2 prose, describing "pending → processing → complete/failed") had been using
-`'complete'` throughout; every save using that value would silently violate the constraint.
-Found via a real failed `INSERT` during live testing (Postgres error `23514`), not caught by
-`tsc` since Supabase-js doesn't type-check string literals against DB check constraints.
-Fixed by using `'ready'` everywhere in `interview-fn.ts` and the meetings route's
-`MeetingRecordRow` type. **When touching `transcript_status`/`extraction_status` (or any
-`text` column backed by a CHECK constraint) in future work, verify the actual constraint via
-`pg_get_constraintdef` before writing status-transition code — don't assume a value from
-prose description or a doc's example, including this file's own.**
-
-### Honesty rule applied: no transcript, no record
-
-If a call produces no captured speech (silence, a party never unmutes, or — as in this
-session's own headless-browser live tests, which have no real microphone — no audio device
-at all), `saveMeetingTranscript` is **not called** rather than persisting an empty
-`transcript_text` as if it were a genuine (silent) result. The UI shows an honest "No
-transcript saved — call may have ended without speech captured, or was left before saving"
-state, per §26.2 — a missing record is more honest than a padded one that implies a real
-save attempt happened.
-
-### Live verification performed
-
-Joined a real Daily room as the founder test account; confirmed the transcription-admin
-permission fix resolved the earlier error (no error on retry); left the call; confirmed via
-direct DB query that no `deal_room_meeting_records` row was created (correct — no real
-speech, headless browser has no microphone). Since producing genuine transcribed speech
-isn't possible in this environment, the save→extract→render pipeline was verified with a
-clearly-labeled synthetic transcript inserted directly (never presented as a real call in
-any report or commit): `runMeetingExtraction` produced a real, non-fabricated
-`gpt-4o-mini` extraction — every topic/figure carries a `source_quote` and a `confidence`
-marker, figures are attributed via `stated_by` rather than asserted as fact, matching the
-standing AI honesty rule. Re-ran the step 4c lawyer adversarial check against the real
-records row created for this test: **0 rows returned** for a lawyer session reading a
-`terms_discussion`-stage meeting's records, confirming the stage-scoped RLS restriction
-(`20260723030000_r14b_meetings_lawyer_scope.sql`) still holds correctly with real transcript
-content present, not just against the earlier placeholder rows.
-
----
-
-## 38. R14B STEP 6 SECURITY PASS — findings, fixes, and one open product decision (July 2026)
-
-A dedicated security pass (fix known-deferred items, regression-prove every prior
-security find, hunt this branch's recurring bug classes). Everything below was
-live-verified with real JWTs / rolled-back or cleaned-up fixtures.
-
-### 38.1 Two real fixes beyond the known /nda item
-
-- **`/nda` gate unreachability (§36) — FIXED.** `DealRoomLayout` gated its own `/nda`
-  child route behind already-having-signed, so an invited-but-unsigned member could never
-  render the signing form. Fixed by exempting `/nda` (renders in a bare shell before the
-  ndaAcceptance gate; only that one route is reachable pre-signature). Verified: unsigned
-  founder AND unsigned lawyer both reach + complete signing.
-
-- **Lawyer role-escalation on NDA sign — FIXED (found while fixing the above).**
-  `nda.tsx`'s `handleAccept` resolved the signer role from the GLOBAL `user.role`, then
-  upserted `deal_room_members` with `onConflict deal_room_id,user_id`. A lawyer arriving
-  via `/join-room` has global `user.role === "investor"` but a `deal_room_members` row with
-  `role === "lawyer"` — so signing REWROTE their membership to `"investor"`, escalating them
-  out of the locked Legal Counsel scope into full investor access. Fixed by resolving the
-  role from the room-scoped `deal_room_members` row (fetched fresh at accept time, §5).
-  **Lesson (again): never resolve a room-scoped role from the global `user.role`; the
-  room-scoped `deal_room_members.role` is authoritative. Global role for a lawyer is
-  whatever their base account is (here investor), which is wrong for every room-scoped
-  decision.**
-
-### 38.2 Fail-closed on load-bearing access-query errors (silent-catch sweep)
-
-`useDealRoomContext`'s `memberRow` query silently coerced a backend error to `null`; since
-that row resolves `isLawyer`/`isInvestor`/`isFounder`, a null fell back to the global role —
-an escalation-on-error for a lawyer. Now the memberRow/ndaAcceptance queries throw on real
-errors (`maybeSingle()` returns `error === null` for the legitimate zero-rows case, so this
-fires only on genuine failure), and `DealRoomLayout` consumes a new `ctx.accessError` to
-**fail closed** with an honest "Couldn't verify your access" screen rather than render room
-content from an untrusted role. **General rule for this codebase: a client query whose
-result feeds a role/access decision must surface its error and the consumer must fail
-closed — never let an error coerce to a default that widens access.**
-
-### 38.3 §33 struck a FOURTH time — `deal_rooms.waived_legal_counsel` — FIXED
-
-Adversarial testing found a **founder could set `deal_rooms.waived_legal_counsel = true`
-via a plain REST PATCH**, unilaterally forcing the deal past the Investment Terms gate
-without legal counsel against the investor's wishes — bypassing the locked "skipping counsel
-requires BOTH parties" mechanic. Root cause is the exact §33 anti-pattern: step 4a added the
-waiver columns onto `deal_rooms`, which already had a broad `is_startup_founder` ALL write
-policy — a sensitive column on a table whose write policy is wider than the column's intended
-audience. (Same table-level broad-write-plus-sensitive-column mistake as §32.3 roast payment
-and §33 team bio.) The investor, conversely, had NO update policy, which also silently broke
-the mutual mechanic whenever the investor was the approver.
-
-**Fixed at the DB for every writer** (`20260723040000_r14b_counsel_waiver_integrity.sql`): a
-BEFORE UPDATE trigger blocks any direct change to the four waiver columns unless inside
-`finalize_counsel_waiver()` (marked by a txn-local GUC); that SECURITY DEFINER RPC is the
-only sanctioned path — it requires an APPROVED `waive_counsel` request to exist (whose own
-resolve policy enforces approver ≠ requester, proving both sides agreed) and works for either
-party, fixing the asymmetry. `LawyerGate` calls the RPC instead of a direct `deal_rooms`
-update. Live-verified: founder direct PATCH → trigger 400; RPC without an approved request →
-`no_approved_waive_request`; RPC as investor after genuine approval → ok with both
-`confirmed_by` recorded; uninvolved → `not_authorized`. **Reinforced lesson: when adding a
-column that must be write-restricted to a subset of a table's writers, the table's existing
-write policy is almost certainly too broad — gate the write behind a SECURITY DEFINER RPC +
-a column-guard trigger, or split the column into its own table. Adding it raw is the bug.**
-
-### 38.4 Regression matrix — all prior finds still hold
-
-Re-ran live (real JWTs, cleaned-up fixtures): §35 `notes_investor` (founder 0 / investor 1 /
-lawyer 0); records role+stage restriction (uninvolved 0, lawyer investment_terms-only, no
-stage-1, investor both); `deal_room_meetings` stage-scoped SELECT (lawyer sees meeting 5
-only); lawyer zero-footprint (0 investor_team_members; the single `startup_team_accounts`
-row is the pre-existing R12B `external` fixture, predates this branch); LawyerRoomView
-interception on `/qa` + `/diligence` (+ `/overview`/`/information` via identical layout
-interception); soft-deleted records invisible to all members; §34 `discovery_requests`
-role-check policy still references `investor_can_request_access` and the helper still
-discriminates. `mintInterviewToken` lawyer/stage authorization is unchanged since step-4's
-decoded-token live verification (only fail-closed logging was added in step 6); its live
-join-token re-mint is folded into step 7's join proofs.
-
-### 38.5 New-surface hunt — attacks attempted, all held
-
-- **Transcript save path**: `deal_room_meeting_records` is client-write-locked — direct REST
-  INSERT → 403 RLS, direct UPDATE of an existing row → 0 rows (value unchanged). The
-  service-role server fns are the only writers and gate on membership of the *claimed*
-  `dealRoomId` (uid comes from the JWT, not a passed id), so no cross-room spoof.
-- **Lawyer invite tokens**: `gen_random_uuid()` (122-bit, unguessable); `accept_lawyer_invite`
-  rejects expired / self-acceptance / invalid / already-accepted (replay by same OR different
-  user); the `one_accepted_lawyer_per_side` partial unique index caps at one accepted lawyer
-  per side and the whole accept rolls back atomically on violation (no stray member row). Note
-  (consistent with the platform's existing team-invite model, not a new defect): acceptance is
-  token-possession auth — it is NOT bound to the invited email, so anyone with the token link
-  (and not the inviter) can accept.
-- **Secrets**: no key material in the branch diff since `b1efa02`; no VITE_-prefixed secret
-  added; R2/Daily/OpenAI values live only in gitignored `.env.local`.
-- **Roast**: `roast-fn.ts` and every roast file are byte-identical to the merge-base.
-
-### 38.6 RESOLVED (product decision, finalized in step 7) — manual stop flagged, because it can't be removed without losing the ability to START transcription
-
-The step-6 audit found the founder's `canAdmin: ["transcription"]` token let them
-`stopTranscription()` mid-meeting to omit speech from the AI notes. Product decision was to
-**remove** the manual-stop capability (transcription stops only at natural meeting end). The
-intended clean path was `auto_start_transcription: true` + NO `canAdmin` (nobody can start or
-stop; Daily auto-starts). **Step 7's real-voice test disproved the premise: `auto_start_transcription`
-NEVER fires `transcription-started` on this account, even with real audio (Playwright + Chrome
-`--use-file-for-fake-audio-capture` feeding a spoken WAV).** So transcription MUST be started
-by a `canAdmin` client — and that same permission lets that client stop it. The capability
-can't be removed without losing transcription entirely.
-
-**Final resolution (the pre-authorized fallback): flag every early stop, permanently and
-visibly.** Only the founder token carries `canAdmin` (starts transcription on join, live-voice-
-verified to work and produce a real Deepgram transcript). A founder mid-call stop is detected
-(`transcription-stopped` fires with a truthy `updatedBy` ONLY on a manual stop — a natural
-room-empty end carries none; live-verified) and, while the meeting is still ongoing, writes
-`transcription_stopped_early`/`_by`/`_at` onto the record via `flagTranscriptionStoppedEarly`
-(service-role; the records table is client-locked). It renders as a prominent amber warning in
-the meeting notes UI ("Transcription was stopped early … by … at … — this record may be
-incomplete"), part of the deal-room history. A manual stop attempt WITHOUT `canAdmin` is still
-rejected (`"must be transcription admin"`, step-6-verified), so only the founder can stop and
-every founder stop is flagged. Migration: `20260723050000_r14b_transcription_stopped_early.sql`.
-
----
-
-## 39. R14B INTERVIEW SYSTEM — FULL CHANGELOG (steps 1–7, the merge summary, July 2026)
-
-The `r14b-interview-system` branch. Merge sequence is `r13b → r14 → r14b`, live-verified
-together, never r14b alone. Every item below was live-verified (real JWTs, real Daily calls,
-rolled-back or cleaned-up fixtures) — see §35–§38 for the deep detail on each finding.
-
-### What it delivers
-A 5-stage structured interview sequence per deal room (Introduction → Product Demo → Financial
-Discussion → Terms Discussion → Investment Terms), each a Daily.co video call with per-stage
-scheduling/skip. Investment Terms is lawyer-gated via a mutual-approval invite flow. Meetings
-are transcribed in real time (Deepgram) and an AI pass extracts source-cited, confidence-scored
-notes. One Daily integration (same account as Roast); Roast is byte-unchanged.
-
-### Schema (migrations, in order)
-- `20260722000000_r14b_interview_stages.sql` — widened `deal_room_meetings` to 5 stages
-  (`meeting_number` 1–5 + `stage_slug`), added `daily_room_name`/`_url`; moved `notes_investor`
-  off that shared row into `deal_room_meeting_private_notes` (investor-only RLS, the §35 §33
-  fix); created `deal_room_meeting_records` (transcripts/AI notes, SELECT-only for room members,
-  soft-delete = null the room ref, no client writes).
-- `20260722010000_r14b_records_role_restrict.sql` — records SELECT restricted to founder/investor.
-- `20260723000000_r14b_lawyer_gate.sql` — `deal_room_lawyer_requests` (mutual invite/waive) +
-  `deal_room_lawyer_invites` (token, one-accepted-per-side unique index) + `get_lawyer_invite_by_token`
-  / `accept_lawyer_invite` RPCs + `deal_rooms.waived_legal_counsel*` cols + records lawyer/
-  investment_terms read scope.
-- `20260723010000` — fixed a missing `WITH CHECK` on the lawyer-requests resolve policy.
-- `20260723020000_r14b_nda_role_lawyer.sql` — widened `nda_acceptances.role` CHECK to include
-  lawyer/analyst/viewer (a lawyer could otherwise never sign the room NDA).
-- `20260723030000_r14b_meetings_lawyer_scope.sql` — split `deal_room_meetings` into per-command
-  policies; lawyer SELECT scoped to `investment_terms` rows only.
-- `20260723040000_r14b_counsel_waiver_integrity.sql` (§6C4) — trigger + `finalize_counsel_waiver`
-  RPC so `waived_legal_counsel` can only be set after a mutually-approved waive request (closes a
-  founder unilateral-waiver bypass).
-- `20260723050000_r14b_transcription_stopped_early.sql` (§6C2/step 7) — early-stop flag columns.
-
-### Key code
-`lib/interview-fn.ts` (Daily private rooms + per-participant single-room tokens, `canAdmin`
-transcription on the founder token, `saveMeetingTranscript` / `runMeetingExtraction` /
-`flagTranscriptionStoppedEarly` service-role fns, `syncDailyRoomExpiry`); `routes/app.deal-rooms.$id.meetings.tsx`
-(the sequencer + embedded call + transcription capture + indicator + notes render);
-`components/app/LawyerGate.tsx` + `LawyerRoomView.tsx` + `routes/join-room.tsx` (room-native
-lawyer invite/accept, scoped Legal Counsel view); `email/templates.ts`+`triggers.ts` (lawyer invite).
-
-### Findings fixed along the way (the recurring bug classes)
-- §33 (RLS is row-level, not column-level) struck twice more: `notes_investor` (§35) and
-  `waived_legal_counsel` (§6C4) — both sensitive columns on broadly-writable tables, both split/
-  gated. **Lesson: a sensitive column on a table whose write/read policy is wider than the
-  column's audience is the bug; split it or gate it behind a SECURITY DEFINER fn from the start.**
-- §34 (UI permission ≠ security boundary): lawyer scope enforced at RLS + a layout-level
-  interception (`LawyerRoomView`), not just hidden buttons — verified via direct-URL nav.
-- Lawyer role-escalation on NDA sign (§38.1): never resolve a room-scoped role from global
-  `user.role`; use `deal_room_members.role`.
-- `/nda` gate unreachability (§36): the layout gated its own signing route behind having signed.
-- Silent-catch class (§6A2): access-query errors now fail closed, not into a default that widens access.
-- Daily quirks: `transcript_status` CHECK is `ready` not `complete` (§37); transcription needs
-  `canAdmin` (start/stop), rejected without it; `auto_start_transcription` does not work on this
-  account (step 7); Daily batch-processor transcription needs AWS S3 + IAM role, incompatible
-  with R2 (§37) — so recordings are NOT captured (transcription-only), R2 bucket reserved unused.
-
-### Step-7 live verification (final walk, all PASS)
-Real spoken audio (Playwright + Chrome fake-audio, headed) → Deepgram realtime → app-captured →
-`saveMeetingTranscript` → `runMeetingExtraction` → rendered notes, for BOTH a non-investment_terms
-stage and investment_terms — extractions are source-cited, confidence-scored, figures attributed
-to "Unidentified speaker" (honest, not fabricated). Transcription indicator shows for both
-participants (2-party call screenshot). 5-stage walk screenshotted as founder/investor/lawyer
-(lawyer restricted to Investment Terms only, with its real extraction visible). Token `r`-claim
-binds to a single room; a room-A token is rejected joining room B. Reschedule syncs the Daily
-room `exp` (`syncDailyRoomExpiry`). tsc 68 (baseline, unchanged across the whole branch);
-production build `_worker.js` gzip **0.98 MB, under the 1 MB CF Pages limit**.
-
-### Daily cost (per the step-2 estimate + step-7 usage)
-Realtime Deepgram transcription ≈ $0.0059/unmuted-participant-min; a full 5-stage room is a few
-dollars. No cloud recording = no recording/storage fees. Step-7 live testing used a handful of
-short (~30s) calls well under the $15 promo credit.
-
----
-
-## 40. SYSTEMIC LAWYER-RLS GAP — deal_room_* tables are member-scoped, not role-scoped (found R15A audit, July 2026) — KNOWN, NOT FIXED APP-WIDE
-
-R15A's step-0 audit (step c) found a systemic §33/§34-class gap: **almost every `deal_room_*`
-table's RLS is scoped to "any `deal_room_members` row for this room", with NO role restriction** —
-so a **lawyer** member (and, if one ever exists, an `External` member) can **read these tables
-directly at the DB level** via REST/Realtime, bypassing the R14B lawyer scope. The only barrier
-today is the **UI interception** (`LawyerRoomView` in `app.deal-rooms.$id.tsx:112`, which renders
-`LawyerRoomView` instead of the real tab for a lawyer on every route except `/meetings`) — and
-per §34, **a UI check is not a security boundary.**
-
-**Only THREE tables actually gate the lawyer role at RLS** (all R14B, all role-restricted):
-`deal_room_meetings` (SELECT scoped to `role<>'lawyer' OR stage_slug='investment_terms'`),
-`deal_room_meeting_records` (SELECT scoped founder/investor + investment_terms), and
-`deal_room_meeting_private_notes` (investor-only).
-
-**Lawyer-READABLE at the DB level right now (member-scoped, no role restriction — the gap set):**
-`deal_room_term_sheets`, `deal_room_qa`, `deal_room_notes`, `deal_room_closing_items`,
-`deal_room_messages`, `deal_room_dd_analysis`, `deal_room_document_requests`,
-`deal_room_doc_requests`, `deal_room_access_grants`, `deal_room_links`,
-`deal_room_profile_disclosures`, `deal_room_closure_reports`, `deal_room_stage_requests`,
-`deal_room_stage_transitions`, `deal_rooms` (member_read). Empirically confirmed the pattern with
-the `test-lawyer@hockystick.app` fixture (a `lawyer` member of room `11111111-2222-3333-4444-555555555555`).
-
-**Scope decision (locked for R15A):** do NOT fix this app-wide in the R15A branch — it needs a
-dedicated security session that re-scopes each table above to the correct audience (most are
-founder+investor content that a lawyer should not see pre-agreement; a few, like
-`deal_room_stage_transitions`, may legitimately need the lawyer once R15B's lawyer step exists —
-each needs a per-table decision, not a blanket rule). The list above is that session's starting
-point. **But R15A's OWN new tables (`deal_room_terms`, `deal_room_term_proposals`) MUST be scoped
-to `role IN ('founder','investor')` from the first migration** — via a SECURITY DEFINER helper
-(the §34 `investor_can_request_access` / `get_investor_team_role` pattern), never a bare
-`deal_room_members` membership check — so the negotiation engine does not add to the gap set. This
-is verified live in R15A's step-7 security pass (lawyer SELECT → 0 rows).
-
----
-
-## 41. CF PAGES `_worker.js` BUNDLE-SIZE LEVER — `--external`, NOT code-splitting (proven R15B, July 2026)
-
-**`React.lazy` / dynamic `import()` / TanStack `.lazy.tsx` routes do NOT reduce the CF Pages
-`_worker.js`.** The 1 MB limit is on the TOTAL gzipped `_worker.js` (the SSR compute worker in
-Pages Advanced Mode), and that worker is built by a single-file esbuild `--outfile` step
-(`scripts/patch-wrangler.mjs`) which **inlines every dynamic import back into the one file**. So
-lazy-loading a component splits the *client* bundle but leaves the *worker* unchanged — verified
-empirically: lazy-wrapping `TermClosingPanel` moved 0 bytes out of the worker.
-
-**The only lever that reduces `_worker.js` is `--external` on a package that is never in the SSR
-execution path.** esbuild leaves an externalized import as a runtime `import()` the worker never
-executes server-side, so its code drops out of the bundle. Requirements for a package to qualify:
-1. it must be added to the `--external:` list in `patch-wrangler.mjs` (alongside the existing
-   `pdfjs-dist`, `xlsx`, `papaparse`, `jszip`, `@daily-co/daily-js`, `react-markdown`, `recharts`);
-2. it must have **no static import anywhere in the SSR graph** — every consumer must reach it only
-   through a mount-gated client-only boundary (the `LazyMarkdown.tsx` / `LazyChart.tsx` pattern:
-   render a placeholder until `useEffect` sets mounted, then a dynamic `import()`), or SSR will try
-   to import the externalized (unresolvable) module at runtime and crash.
-
-Splitting the worker into a `_worker.js/` directory with `--splitting` does NOT help either — the
-1 MB limit is the SUM of all worker modules, not per-file.
-
-**Proven in R15B bundle optimization (commit `acd5515`):** externalizing `recharts` (~825 KB
-uncompressed / ~124 KB gz of d3 charting code) after routing all 6 chart consumers through
-`components/shared/LazyChart.tsx` took the worker from **0.99 MB → 0.87 MB gzip**. Before adding
-any large dependency, check whether it runs during SSR; if not, external + mount-gate it from the
-start rather than letting it inflate the worker.
-
----
-
-## 42. R15 CLOSING PIPELINE — FULL CHANGELOG (A→C, July 2026)
-
-The deal-closing pipeline, built over three branches, all merged to main:
-- **R15A (r15a-term-negotiation)** — per-term negotiation engine → locked term set.
-- **R15B (r15b-summary-and-agreement)** — generated summary + agreement upload/review → finalized agreement.
-- **R15C (r15c-closing-pipeline)** — fee → download gate → signing → payment → mutual close → invoice → archival.
-
-### The closing sequence (Gates 1–7), where each lives
-1–3 (R15A/B): negotiate terms → lock → auto-generate summary → draft/upload agreement → both accept. All on **/deal-rooms/:id/term-sheets** (post-lock state) + LawyerRoomView for the lawyer.
-4–7 (R15C): on **/deal-rooms/:id/close** (the R15C ClosingPipeline supersedes the old closing-checklist; `deal_room_closing_items` stays in schema, unused by the route):
-- **Gate 4** — fee determination: founder confirms deal amount (pre-filled from locked terms) + who-pays; fee = 1.5% / min $500 / max $15,000 (`lib/fee-schedule.ts`); payer confirms via the §32 placeholder (`payment_status='beta_bypass'`, honest "coming soon", `TODO(stripe)`). Agreement download gated on fee.
-- **Gate 5** — both parties download (fee-gated) + upload signed copies.
-- **Gate 6** — investor uploads payment proof (versioned), founder confirms receipt / flags discrepancy.
-- **Gate 7** — mutual close (both confirm deliverable) → auto-generate 2 invoices (structured JSON → downloadable HTML; no PDF lib) → `deal_rooms.status='closed'` + `closed_at` → room becomes a read-only archive.
-
-### Tables (R15C migrations)
-`deal_room_fees`, `deal_room_signed_agreements`, `deal_room_payment_proof` (versioned), `deal_room_close`, `deal_room_invoices` — all **`dr_is_principal` RLS only** (lawyer excluded; verified 0 rows). Fee/close/confirmation columns are **fn-owned** (service-role only, no client write) so amounts/payer/status/close can't be forged. Migrations: `20260726000000` (tables + read-only + close guard), `20260726010000` (finalize_deal_close RPC), `20260726020000` (agreement storage gate).
-
-### The three hard mechanisms (each a §33/§34/§38.3-class defense)
-1. **Room-wide read-only at RLS** — `dr_is_open(room)` (true iff `status<>'closed'`) is AND-ed into every content-write policy (terms, proposals, config, resets, reopens, agreements, comments, Q&A, notes, messages, meetings, stage requests, payment proof). A closed room rejects direct client writes at the DB, not just hidden buttons. `isClosed` on `useDealRoomContext` is the UI half. Service-role fns bypass RLS so they also re-check `status=closed`.
-2. **One-way close guard** — `trg_deal_room_close_guard` on `deal_rooms`: `status→'closed'` only inside `finalize_deal_close()` (GUC `app.deal_close_ctx`=room id, requires BOTH close flags), and `'closed'` is **terminal** (no re-open — unwinding a closed deal is a manual support case). Blocks unilateral close via the broad founder ALL policy.
-3. **Download gate at storage** — `can_access_deal_room_doc_path` excludes `<room>/agreements/` from client storage; the finalized agreement is served only via the `downloadAgreement` fn, which checks fee status. Found in R15C step 7 that the gate was UI-ONLY (an investor fetched the file with no fee confirmed); now enforced at storage.
-
-### Lawyer boundary (R15C)
-The lawyer sees NOTHING in R15C — RLS 0-rows on all 5 tables + `LawyerRoomView` interception (renders the Legal Counsel view for every route except /meetings, has zero R15C references). Verified live: lawyer at /close → Legal Counsel View, no fee/payment/close/invoice, even with a fee row present.
-
-### Stripe
-Not built — every charge site carries `TODO(stripe)`; only `confirmFeePayment`'s body swaps when live (`beta_bypass`→`paid` via a real PaymentIntent). The entire surrounding flow (who-pays, download gate, gates 5–7) stays. `stripe_*` columns on `subscriptions` remain null (§22/§32).
-
-### Exit
-Either party can abandon at any gate (`ExitDeal`) — nothing deleted, room stays accessible (not archived), no fee charged for an unclosed deal. Fee-paid-then-abandoned → honest `hello@hockystick.app` support path, NOT an auto-refund.
-
-### Step-8 live verification (Atlas/Dr Henry room, all PASS)
-Full walk: fee ($6M→$15,000 cap, investor pays) → download inactive → fee confirmed → download active → both signed → payment proof → founder confirmed → **DEAL CLOSED** → 2 invoices (HS-<ref>-F1/I1, full content) → read-only term-sheets (no edit controls) → lawyer sees no R15C. Founder-pays path + exit (with the fee-paid support branch) verified separately. tsc 68; build `_worker.js` gzip **0.88 MB** (recharts optimization §41 gave the headroom).
-
----
-
-## 43. BEFORE ANY MERGE — verify the committed tree matches the tested tree (found R15C, July 2026)
-
-**Before merging a branch, verify the COMMITTED tree matches the WORKING tree that was
-tested** — run `git status` + `git diff --stat` on the branch tip and confirm it's clean.
-Steps 7–8 (security + live verification) test the **working tree**; if an earlier `git add`
-silently missed files, the **committed branch is a different codebase than what was verified**,
-and merging it ships unverified (or broken) code.
-
-**Caught in the R15C merge (fix commit `fa3acfa`):** the steps-2–6 commit's `git add` missed four
-files because the route path contains a `$` (`app.deal-rooms.$id.close.tsx`) that needs literal
-handling — so the committed branch still had the OLD closing checklist, no `ExitDeal.tsx`, and no
-`isClosed` context flag, while steps 7–8 had verified the working tree with the NEW pipeline. The
-drift check at merge time (`git status` showing modified/untracked R15C files) caught it; the
-verified working-tree state was committed as `fa3acfa` before the ff-merge.
-
-**Concrete guard:** paths with a `$` (TanStack route files `app.deal-rooms.$id.*.tsx`) must be
-single-quoted in `git add` (`git add -- 'frontend/src/routes/app.deal-rooms.$id.close.tsx'`), or the
-shell/glob drops them and the add silently no-ops. After any multi-file commit, re-run
-`git status --porcelain` and confirm nothing R15-relevant is left uncommitted — an empty status is
-the proof the committed tree == the tested tree.
-
----
-
-## 44. CF PAGES `_headers` AND `_redirects` DO NOT APPLY TO SSR-ROUTED RESPONSES (found R7C, July 2026) — same category as §41
-
-**Cloudflare Pages' native `public/_headers` and `public/_redirects` files only apply to paths
-excluded from the SSR worker in `_routes.json`.** Any path matched by `_routes.json`'s
-`include: ["/*"]` (i.e. every TanStack Start route, which is nearly the whole site) is served by
-`_worker.js`, and Cloudflare Pages' `_headers`/`_redirects` processing **never runs on worker
-responses** — it's a static-asset-serving feature, not a Worker-request feature. This was verified
-empirically twice in the same branch: once for `_headers` (curl showed an excluded static asset
-like `favicon.svg` carrying the configured headers while `/`, an SSR path, carried none), and once
-independently for `_redirects` (curl showed pre-existing rules like `/signup → /sign-up` 404ing
-live in production instead of redirecting).
-
-**The fix, both times: inject the behavior directly into the worker**, in
-`scripts/patch-wrangler.mjs`, which is the one place that wraps every request/response before/after
-TanStack Start's own handler:
-- Security headers: a `SECURITY_HEADERS` object + `__applySecurityHeaders(request, response)`
-  helper, applied to every response after `__origServer.fetch` returns.
-- Redirects: `public/_redirects` is parsed at build time into a `REDIRECT_RULES` array baked into
-  the worker, and `__checkRedirect(request)` is called as the **first** line inside the wrapped
-  `fetch` handler, before anything else (CSP report intercept, Accept-header rewrite, CF env
-  injection, then the original TanStack handler, then security headers on the way out).
-
-**Real production impact found by this bug (confirmed live, not assumed):** `/signup`,
-`/accelerators`, `/grants`, and six legacy `/app/*` redirects (`/app/news`, `/app/pipeline`,
-`/app/vc-leads`, `/app/leads`, `/app/reports`, `/app/accelerators`) were all **404ing in
-production** despite having correct-looking rules in `public/_redirects` — because that file was
-silently inert for every one of these SSR-routed paths. All ten were fixed by moving redirect
-handling into the worker; the fix ships once the branch containing it is merged and deployed, it
-is not automatically live just because the rules are correctly written to the file.
-
-**Before adding ANY new `_headers` rule or `_redirects` rule to the public/ directory going
-forward:** check whether the path it targets is excluded in `dist/client/_routes.json` (or the
-source `public/_routes.json`). If it's not excluded — i.e. if it's a normal app route — the rule
-must also be added to (or already covered by) the corresponding worker-injection logic in
-`patch-wrangler.mjs`, or it will silently do nothing in production. Do not trust that a rule
-"looks right" in the static file; curl the live path (or a local `wrangler pages dev` build) to
-confirm the behavior actually applies before considering it done.
-
----
-
-## 45. `public/sitemap.xml` IS HAND-MAINTAINED — NOT GENERATED FROM THE ROUTE TREE (found R7C, July 2026)
-
-`frontend/public/sitemap.xml` is a static, manually-edited file — there is no build-time script or
-server function that generates it from `src/routes/*`. This means **it drifts silently whenever a
-new indexable public page is added** (or an existing one is deindexed) and nobody remembers to
-touch this file in the same PR. R7C's step-0 audit found it missing ~18 real indexable pages
-(`/founders`, `/investors`, all 5 `/solutions/*`, all 7 `/tools/*` + the `/tools` index, `/trust`,
-`/resources`, `/registry`, `/feedback`, `/contact`) plus `/about`, `/terms`, `/privacy` — brought
-current in the same pass (46 → 67 URLs), with every added URL verified 200/no-redirect against a
-local build before merging.
-
-**When adding a new public route file under `src/routes/` that is NOT gated by `noindex` and is
-NOT under `/app/*`:** add it to `public/sitemap.xml` in the same commit. There is no lint rule or
-CI check enforcing this — it is a manual discipline, exactly the kind of thing that will drift
-again the next time someone ships a new `/solutions/*` page or a new `/tools/*` calculator without
-reading this section first.
-
-**A real generator (e.g. a build-time script that walks `routeTree.gen.ts` or the `src/routes/`
-directory, filters out `/app/*` and anything the route's own `head()` marks `noindex`, and writes
-`sitemap.xml` as part of `npm run build`) would close this gap permanently and should be preferred
-over continuing to hand-maintain this file** — this was flagged but not built in R7C to keep the
-branch scoped; a good candidate for a small, focused follow-up.
-
----
-
-## 46. CSP REPORT PERSISTENCE — D1, deliberate non-guarantees, and a real template-literal trap (found/built fix/r7c-followups, July 2026)
-
-### 46.0 What exists
-
-`/api/csp-report` (intercepted inside the worker's `fetch` handler, in `scripts/patch-wrangler.mjs`
-— see §44, this app has no working raw-HTTP route mechanism to hang a receiver off otherwise)
-persists CSP violation reports to a dedicated Cloudflare D1 database: **`hockystick-csp-reports`**,
-bound as **`CSP_REPORTS_DB`** in `wrangler.toml`. Schema in
-`frontend/d1-migrations/0001_csp_reports.sql`: `id, received_at, document_uri,
-violated_directive, blocked_uri, source_file, line_number, user_agent, disposition`.
-
-**Deliberately NOT Supabase** — this is a public, unauthenticated write endpoint (anyone's browser
-can POST to it) and must never have a path to the product database. A separate D1 instance means a
-flood, an injection attempt, or a bug in this endpoint has no way to touch real product data.
-
-Handles both real-world report formats: `application/csp-report` (older report-uri, single object)
-and `application/reports+json` (Reporting API / Report-To, a JSON array of envelopes filtered to
-`type: "csp-violation"`).
-
-### 46.1 What it deliberately does NOT store
-
-- **No raw document-uri.** Before storage, `document_uri` is stripped of UUIDs and pure-numeric
-  path segments (replaced with `:id`) — origin and route *shape* are kept (useful for knowing which
-  page a violation came from), but a real resource id — most importantly a deal room id
-  (`/app/deal-rooms/<uuid>/...`) — must never land in a table anyone can write to without auth,
-  regardless of how locked-down the rest of the pipeline is. See `__cspStripDocumentUri` in
-  `patch-wrangler.mjs`.
-- **No IP address column**, by design — see §46.2.
-- **No cookies, no auth headers, no request body beyond the reviewed column list.**
-- Every stored string field truncated to 1024 chars; bodies over 8KB rejected before parsing.
-
-### 46.2 Rate limiting is NOT real — read this before assuming the endpoint is protected
-
-The rate limit is an **in-memory `Map`, per-isolate, module-scope** (`__cspIpHits` in
-`patch-wrangler.mjs`), keyed on `CF-Connecting-IP`, capped at 30/minute. Cloudflare runs many
-concurrent isolates across many edge locations with **no shared state between them**, and any
-isolate can be evicted/recycled at any time. A client hitting a different PoP, or hitting a fresh
-isolate after recycling, resets the counter to zero. **There is no cross-isolate or cross-edge
-enforcement.** This only blunts a single sustained client hammering the same warm isolate — it is
-not a distributed rate limit and must not be relied on as one.
-
-A real limit would need Cloudflare's Rate Limiting binding or a Durable Object. **Decision: not
-built in the worker**, given current traffic volume (a handful of users) — the cost of a wrong
-distributed limiter outweighs the benefit at this scale. Deliberately not persisted to D1 either,
-per §46.1 (no ip column, and storing raw IPs indefinitely would itself be a data-minimization
-concern on a public endpoint).
-
-**Where real rate limiting belongs, if it's ever built: a Cloudflare WAF rate-limiting rule on
-`/api/csp-report`, configured in the dashboard — not code in this worker.** Cloudflare's edge
-already sees every request before it reaches any Worker isolate, so a WAF-level rule gets the
-cross-isolate, cross-edge enforcement the in-memory `Map` here structurally cannot provide, with no
-application code change needed. **This is an open product-owner task (dashboard config), not an
-engineering task for a future session to "fix" by rewriting the in-worker limiter** — a smarter
-per-isolate `Map`, a bigger window, a cleverer eviction policy, none of that closes the structural
-gap (no shared state across isolates/edge locations), so don't spend a session trying. If traffic
-volume ever justifies it, the fix is a WAF rule, not more worker code.
-
-### 46.3 The 30-day retention is NOT a real TTL — read this before assuming old rows are purged
-
-There is **no cron trigger and no `[triggers]`/scheduled handler anywhere in this project**
-(confirmed: zero such config in `wrangler.toml`). The retention DELETE only runs as a **side effect
-of a report actually being written**, gated by a per-isolate timestamp (`__cspLastPrune`) that
-resets to 0 on every fresh isolate — so a burst of cold starts prunes far more often than the
-intended "~once per 10 min," while a quiet period with no report traffic at all prunes **never**, no
-matter how old the rows get. If reports stop arriving, nothing enforces the 30-day retention until
-they resume.
-
-**Decision: delete-on-write is adequate by design — do NOT add a `[triggers]`/cron handler for
-this.** Recorded here so it isn't re-litigated by a future session that notices the "gap" and
-reaches for a scheduled Worker: a table fed exclusively by real CSP violations at this app's traffic
-volume grows slowly enough that "prunes only when a report arrives" is a fine tradeoff against the
-actual cost of a scheduled trigger — a dedicated cron handler, a new trigger to maintain, and a
-Worker invocation on a schedule regardless of whether there's anything to prune. If the table were
-ever fed by something high-volume or adversarial (which §46.2's WAF-rule gap is the real defense
-against), this tradeoff would need revisiting *together with* the rate-limiting decision, not in
-isolation — a cron trigger without also closing the rate-limit gap would just prune a table that a
-flood can refill faster than any reasonable schedule prunes it.
-
-### 46.4 The endpoint never blocks on D1 or throws — how, precisely
-
-Request handling is split in two: `__prepareCspReport` (fast, synchronous validation — rate limit,
-body-size check, parse) runs on the response path and is awaited; `__writeCspReport` (the actual D1
-prune + insert calls) is handed to **`ctx.waitUntil()`** and is *never* awaited by the code that
-returns the response. The worker returns `204` immediately regardless of what D1 does — success,
-throw, or a genuine hang. Every D1 call inside `__writeCspReport` is both try/caught (covers a
-throw) and raced against a 5s timeout via `__withTimeout` (covers a hang) — either failure mode is
-logged and swallowed, never surfaced anywhere the client or the response path could observe it. If
-`CSP_REPORTS_DB` is unbound at runtime, `__writeCspReport`'s own guard (`if (!db) { ...; return; }`)
-returns cleanly before any D1 call is attempted.
-
-### 46.5 A genuine, silent bug found and fixed while building this — read before editing this snippet again
-
-The CSP-report handling code is assembled as a **JS template literal** in `patch-wrangler.mjs`
-(`cspReportInjectionSnippet = \`...\``) and written verbatim into the built `dist/client/_worker.js`.
-**A literal backslash inside that snippet is a template-literal escape sequence at Node build time,
-not a regex escape at Worker runtime.** Writing a normal-looking regex like `/\/\d+(?=\/|$)/g`
-inside this snippet silently produced `/\d+(?=\/|$)/` → actually `//d+(?=/|$)/g` after Node's
-template-literal parsing dropped the backslashes — no build error, no lint warning, just a regex
-with completely different (broken) semantics that made `__cspStripDocumentUri`'s numeric-id
-stripping a permanent no-op. This was caught only by live-testing the actual stored rows against a
-real UUID/numeric path, not by reading the code or by static type-checking — `tsc` does not see
-`.mjs` build scripts, and the bundled/minified output looked superficially plausible even while
-broken. **First misdiagnosed as an esbuild minifier bug** (chasing symptoms in minified output
-rather than checking the pre-minified assembled string first) before the real cause was found by
-comparing the raw pre-minify file against source.
-
-**The fix in place**: the numeric-segment regex is built via `new RegExp(String.fromCharCode(92) +
-...)` specifically to avoid any literal backslash appearing in the template-literal source. **The
-rule going forward**: any regex or string requiring a literal backslash added to
-`cspReportInjectionSnippet` (or `redirectInjectionSnippet` / `headerInjectionSnippet`, same
-mechanism) must either avoid the backslash entirely (character classes, `String.fromCharCode`,
-etc.) or be verified by testing the actual runtime behavior against real input — not just a
-successful build — before considering it correct. A clean `npm run build` and a plausible-looking
-`grep` of the minified output are not sufficient proof; this bug survived both.
-
-**The concrete verification procedure, required before trusting any change to code injected via
-`patch-wrangler.mjs`:** temporarily gate the minify `execSync` call behind an env var (e.g. `if
-(!process.env.SKIP_MINIFY_DEBUG) { ...minify... }`), run `SKIP_MINIFY_DEBUG=1 node
-scripts/patch-wrangler.mjs`, then `grep`/read the **pre-minified** `dist/client/_worker.js` directly
-for the exact construct in question — this is the file esbuild's minifier receives as input, and
-the only place a template-literal escaping bug is visible as broken *source* rather than as
-oddly-named minified output. Reading minified output for this purpose actively misleads: mangled
-names make an unrelated collision look like the bug, which is exactly how this was first
-misdiagnosed. Revert the env-var gate afterward and confirm `git diff` on `patch-wrangler.mjs` is
-empty before moving on — the gate is a debugging tool, not a permanent build option.
-
-**Re-confirmed clean in a full audit after this fix**: every backslash in all three injected
-snippets (`redirectInjectionSnippet`, `headerInjectionSnippet`, `cspReportInjectionSnippet`) was
-enumerated and checked against the actual pre-minified assembled string using the procedure above.
-`redirectInjectionSnippet` and `headerInjectionSnippet` contain zero backslashes anywhere (plain
-paths, hash fragments, and CSP directive strings — nothing backslash-dependent). The only
-backslashes in `cspReportInjectionSnippet` are inside a code comment (correctly double-escaped as
-`\\d`/`\\/` in source, confirmed rendering as intended single backslashes `\d`/`\/` in the built
-file) and the already-fixed `String.fromCharCode(92)` construct, which was additionally verified at
-runtime (`"/app/deal-rooms/123/documents".replace(re, "/:id")` → `/app/deal-rooms/:id/documents`).
-No further corruption found.
-
-### 46.6 `patch-wrangler.mjs` and `public/_headers` sync — restated from §44
-
-Both header-block lists (`SECURITY_HEADERS` in `patch-wrangler.mjs`, the `/*` block in
-`public/_headers`) carry a cross-reference comment pointing at each other and at §44 — editing one
-without the other silently diverges what's actually live between static-asset responses and
-SSR-routed responses. Re-stated here because this section's own D1/CSP work lives in the same file
-and is easy to lose track of amid a larger diff.
-
-### 46.7 HSTS ships `includeSubDomains` without `preload` — deliberate, not an oversight
-
-`Strict-Transport-Security: max-age=31536000; includeSubDomains` (no `preload`) in both
-`patch-wrangler.mjs` and `public/_headers`. `preload` requires submission to hstspreload.org and is
-**effectively irreversible** once accepted — it permanently constrains every current and future
-subdomain to HTTPS-only, baked into browsers' shipped preload lists, with removal taking months and
-requiring the constraint to already have been satisfied for an extended period. `includeSubDomains`
-alone gives the real security benefit (confirmed via DNS audit: only one real subdomain exists,
-`www`, already HTTPS-clean) without that lock-in. **Do not submit this domain to hstspreload.org**
-without a deliberate, separate decision to do so — it is not implied by anything in this section.
-
-### 46.8 `www` → apex redirect exists at the Cloudflare edge — do not add worker-level handling
-
-`www.hockystick.app` redirects to the apex with a `301`, verified to happen for arbitrary paths and
-to hold over both HTTP and HTTPS. **Neither `patch-wrangler.mjs` nor `_redirects` contains this
-rule** — it happens upstream of the worker entirely (confirmed: the 301 response carries none of
-this app's CSP/security headers, which only appear on the follow-up 200 the worker produces).
-Almost certainly Cloudflare Pages' own custom-domain behavior when both the apex and `www` are
-attached to the same Pages project. **Do not add a worker-level or `_redirects` www→apex rule** —
-one already exists and works; adding a second would be redundant at best.
-
-**A prior report misdiagnosed this once** — Google's Rich Results Test was used as evidence that
-`www` might serve `200` directly (un-redirected) based on a test run against `www`. That tool
-**displays the originally-submitted URL and silently follows redirects** before rendering results;
-a successful fetch report for a `www` submission is consistent with (and expected from) a *working*
-redirect, and is not evidence that `www` itself serves `200`. Verify redirect behavior with `curl
--sIL`, never by reading which URL a third-party tool displays in its own results page.
-
-### 46.9 The dynamic blog-post canonical is unverified — carry to R8
-
-`/blog/$slug`'s `head()` sets a self-referencing canonical keyed off `params.slug` (see
-`blog.$slug.tsx`) and the logic was verified correct for the zero-post case (a nonexistent slug
-correctly gets no canonical, matching the early-return branch). **No real published blog post
-existed in this environment at any point during R7C or its follow-ups**, so the actual canonical
-value on a real, live post has never been observed rendering correctly end-to-end. Not a known bug
-— just genuinely unverified. First thing to check in R8 once a real post exists: `curl` a real
-`/blog/<real-slug>` and confirm the canonical matches.
-
----
-
-## 47. R7E MOBILE FIRST-PAINT INVESTIGATION — findings only, no code shipped (July 2026)
-
-`perf/r7e-mobile-first-paint` investigated PSI mobile performance (baseline: mobile score 84,
-FCP/LCP/SI ~3.5s, TBT 0ms, CLS 0.012; desktop 100). Two build attempts (deferring `sonner`'s
-`<Toaster/>`, inline critical CSS for `/`) were both fully implemented, live-verified, and
-**reverted** — neither shipped. This section exists so a future session doesn't re-attempt either
-in the same broken shape. Nothing in this branch touched `src/lib/auth.tsx` or `src/lib/supabase.ts`.
-
-### 47.0 `onLoad` on a server-rendered `<link>` in `<head>` does not hydrate — the real blocker for any future critical-CSS attempt
-
-A preload+swap implementation (`<link rel="preload" as="style" onLoad={...}>`, scoped to `/` only
-via `useRouterState` frozen at first render in `RootShell`) was built and live-tested. **The swap
-never fired.** Confirmed via direct DOM inspection after a real page load: `link.rel` was still
-`"preload"`, `link.sheet` was `null`, and the live `outerHTML` had no `onload` attribute at all.
-React does not reattach an `onLoad` handler to a `<link>` element that arrived via SSR — this is
-different from how it treats `<script>`/body elements during hydration. Screenshot proof this is a
-real, persistent failure and not a capture-timing artifact: the "after" page showed an exposed
-"Skip to content" link (should be `.sr-only`, invisible until focus) and a serif fallback font on
-every heading — the full stylesheet (Syne font-face, `.sr-only`, everything outside the captured
-critical rules) never loaded, because the swap that was supposed to load it never ran. Pixel diff
-against the unmodified page on viewport-matched screenshots: 23.6% of pixels differed at 390px,
-15.9% at 1440px. This is the FOUC the design review explicitly warned against, and it is why the
-branch was reverted rather than shipped with a caveat.
-
-**Do not attempt the naive `useEffect`-based swap as the fix.** It has its own race: by the time a
-`useEffect` runs (after paint), the preload may have already fired its `load` event, so a listener
-attached in the effect never triggers, and the swap silently no-ops exactly the same way. Any real
-fix must either (a) check `link.sheet !== null` before attaching the listener, falling back to an
-immediate synchronous swap if the sheet already loaded, or (b) use the classic
-`media="print"` → `onload="this.media='all'"` attribute-string form (a plain HTML attribute, not a
-React event prop, so it survives SSR without needing hydration to reattach anything) instead of
-React's `onLoad` prop. Solve this specific wiring problem first — don't rebuild the rest around it
-until this part is proven live.
-
-**What WAS correct and is reusable if this is revisited:** the CSSOM-extraction tooling (walking
-`document.styleSheets`, recursing into `CSSLayerBlockRule`/`CSSMediaRule` containers — a naive
-walker that only checks `CSSStyleRule` misses everything Tailwind v4 wraps in `@layer`, per §41's
-neighboring lesson about this codebase's Tailwind version) and the resulting 85-rule critical CSS
-block for the landing hero/header were both verified correct in isolation. The bug was purely in
-the swap-wiring step, not in the CSS content itself.
-
-### 47.1 Deferring `sonner`'s `<Toaster/>` does not defer `sonner` — do not retry the wrapper approach
-
-A `LazyToaster` wrapper (mount-gated `React.lazy` around `<Toaster/>`, same shape as the existing
-`LazyChart.tsx`/`LazyMarkdown.tsx` pattern) was built, and reverted for a different reason than
-47.0: it worked exactly as coded, but delivered only ~310 bytes gzip — nowhere near sonner's real
-~64KB uncompressed footprint — because 75+ files across the app do `import { toast } from "sonner"`
-directly (the real package, not the thin local wrapper component), from many separately-lazy-split
-route chunks. Rollup's shared-dependency chunking anchors sonner's core module to the always-loaded
-main chunk regardless of when `<Toaster/>` itself mounts. **A component named "Lazy" that does not
-actually lazy-load the thing in its name is worse than no change at all** — it asserts something
-false in the codebase for the next session to trust. Do not re-attempt this specific wrapper.
-Deferring sonner for real would require changing how 75+ files import `toast()` (e.g., routing them
-through a lazy-loaded facade), which is out of proportion to the payoff for a 64KB uncompressed /
-~15KB gzip dependency. Not planned; don't retry without a materially different approach than a thin
-mount-gated wrapper.
-
-### 47.2 Font loading was investigated and is already optimal — do not revisit without new evidence
-
-An early concern that font loading might be contributing to mobile latency was checked and found
-unfounded: `unicode-range` on the `@font-face` declarations correctly gates `latin-ext` and `greek`
-subsets so they're never fetched for this site's actual (Latin) content — only 4 latin font files
-totaling 56,916 bytes are ever requested. This is correct, minimal font loading. Do not spend a
-future session re-investigating this without a specific new symptom pointing at fonts.
-
-### 47.3 The bundle is mostly unavoidable React + ReactDOM + TanStack Router — no hidden defect
-
-A full accounting of `index-*.js` (the main shared chunk) traced its size to `react`,
-`react-dom/client`, and TanStack Router's runtime, all statically imported by TanStack Start's own
-generated client entry (`node_modules/@tanstack/react-start/dist/plugin/default-entry/client.tsx`)
-— confirmed via `vite build --manifest`, which showed this entry's `dynamicImports` list containing
-100+ real route-component entries. **Routes are already correctly lazy-split** — nothing
-route-specific is incorrectly anchored to the shared chunk. There is no hidden bundling defect to
-find here; the shared chunk's size is the real, near-irreducible cost of React + ReactDOM + the
-router runtime for an SSR app on this stack. Do not re-audit this without a specific new candidate
-dependency in mind — the general "what's in the shared chunk" question is answered.
-
-### 47.4 `take_screenshot`'s `fullPage: true` misreports the emulated viewport width — use viewport-only captures
-
-Reproduced twice, on two different builds, after ruling out stale-emulation-state as the cause
-(fresh pages, explicit `resize_page`, closed all other tabs): `take_screenshot` with `fullPage: true`
-consistently rendered at a width other than the one set via `emulate`'s `viewport` parameter (showed
-~744px-equivalent when the viewport was explicitly set to 390 or 1440), while `document.documentElement.clientWidth`
-and a **non-full-page** (viewport-only) screenshot both correctly reflected the real set width. This
-is a tool-level quirk in this environment, not an application bug. **For any future visual
-verification in this codebase, use viewport-only screenshots** (omit `fullPage`, or explicitly
-`fullPage: false`) and, if full-page content needs checking, scroll-and-stitch manually rather than
-trusting `fullPage: true`'s dimensions.
-
-### 47.5 Why edge-caching landing HTML is safe today, and the one thing that would break it
-
-Confirmed (byte-diffing real SSR output with and without a synthetic `sb-ldimninnjlvxozubheib-auth-token`
-cookie attached to the request) that landing-page SSR HTML is identical regardless of auth state.
-This is because this app's Supabase session lives in `localStorage` only (no `@supabase/ssr`, no
-cookie-based session — confirmed via `package.json` and `src/lib/supabase.ts`), so the Cloudflare
-Worker rendering the page server-side has no way to observe whether the requester is signed in.
-**This is exactly what makes it safe to edge-cache public/landing HTML** — there is no
-per-user-varying content the cache could serve stale to the wrong person. **If a cookie-based
-session mechanism (`@supabase/ssr`, or any auth cookie) is ever adopted, this stops being true, and
-any edge-cache rule on public routes must be re-evaluated before that change ships** — not
-after. This is a load-bearing assumption behind any future caching work, not an incidental detail.
-
----
-
-## 48. tsc BASELINE UPDATED 68 → 67 (R40 hotfix, July 2026)
-
-`security/r40-hotfix` deleted `src/routes/join.$token.tsx` (the vulnerable deal-room invite-accept
-route — see the R40 lawyer-RLS audit series for why). That file carried its own pre-existing type
-error (`TS2352`, an `InviteInfo` cast at its old line 65) that no other file referenced or shared —
-confirmed by diffing `main`'s full tsc error list against the branch's line-for-line: exactly one
-line disappeared, and it was this file's own error, nothing else shifted. **The real, current
-baseline is 67, not 68.** Treat 67 as the number to hold steady going forward — a future session
-should not read "68" in an old chat instruction or an older CLAUDE.md mention (§§41, 42 still say
-68, describing R15's state at the time) as license to let a *new* error slip back in under the
-old, higher number. If tsc ever reports fewer than 67, verify why before treating it as good news
-— confirm the removed error(s) as deliberately, not accidentally (e.g. a file deleted along with
-its own bug, same as this one) before updating the baseline further.
-
-**Update (R40 session 3): baseline is now 64.** The `join.tsx` rewrite onto a SECURITY DEFINER
-RPC removed three more `TS2352` `InviteInfo`-cast errors (the file stopped casting raw Supabase
-query results). Verified the same way — diffed the error lists, exactly those three lines
-disappeared, nothing else moved. **Hold 64 going forward.**
-
----
-
-## 49. `SET search_path TO 'public'` DOES NOT PROTECT SECURITY DEFINER FUNCTIONS FROM pg_temp SHADOWING (proven R40/R41, July 2026)
-
-This is the single most important database-security lesson of the R40/R41 series. Read it before
-writing or reviewing ANY `SECURITY DEFINER` function or RLS policy.
-
-### 49.0 The attack
-
-Postgres searches the session's temporary schema (`pg_temp`) **implicitly first** for relation
-(table/view) name resolution — UNLESS `pg_temp` is named explicitly in `search_path`, in which case
-it is searched only at the named position. Any authenticated user can `CREATE TEMP TABLE` (see
-§49.3), so an attacker can create `pg_temp.deal_room_members` shadowing the real
-`public.deal_room_members`, then call a `SECURITY DEFINER` function whose body has an **unqualified**
-`from deal_room_members` — and the function (running with elevated/owner rights) reads the
-attacker's fake table instead of the real one. A real R40 exploit did exactly this and read a
-foreign deal room's `nda_acceptances` (full NDA text, real signer names) as a non-member.
-
-### 49.1 What actually protects a SECURITY DEFINER function — and what does NOT
-
-- **`SET search_path TO 'public'` (a bare named schema) does NOT protect it.** pg_temp is still
-  searched implicitly first. This was believed safe for a while and is WRONG. Do not use it and do
-  not trust it on any existing function.
-- **Two patterns are safe, both empirically verified in R41 against a full multi-table shadow:**
-  - `SET search_path = public, pg_temp` — pg_temp named **LAST**, so `public` resolves first and
-    the shadow never wins. Needs **no function-body change** (pure `ALTER FUNCTION ... SET`), so it
-    is the low-risk choice for sweeping many existing functions — zero chance of a typo in a
-    rewritten body silently breaking a policy.
-  - `SET search_path = ''` (empty) with **every** table reference fully schema-qualified
-    (`public.deal_room_members`). Requires rewriting the body; use for new functions written this
-    way from the start.
-- R41 swept every remaining `SECURITY DEFINER` function in `public` to `public, pg_temp`. Before
-  adding a new one, pin it with one of the two safe patterns. To audit:
-  `select proname from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public'
-  and p.prosecdef and p.proconfig @> array['search_path=public'];` — a non-empty result means
-  vulnerable functions exist.
-
-### 49.2 THE FALSE-NEGATIVE LESSON — shadow EVERY table a function touches, not just the first
-
-The first R40 test of a two-table function (`drm_is_founder_of_room`, which joins `deal_rooms` and
-`startups`) produced a **FALSE PASS**: only `deal_rooms` was shadowed, with a fake room id that had
-no matching row in the real, unshadowed `startups` table — so the join returned zero rows for a
-reason that had nothing to do with shadow resistance. Shadowing `startups` instead (the second
-joined table) flipped the result and proved the function WAS vulnerable. **A shadow test that does
-not shadow every table the function reads proves nothing.** Enumerate every table in the function
-body (including tables reached through nested function calls) and shadow each — ideally all at once.
-
-### 49.3 `REVOKE ... FROM authenticated` is INEFFECTIVE — the grant is to PUBLIC
-
-`TEMPORARY` on the database is granted to `PUBLIC` by default (datacl shows `=Tc/postgres`), and
-`authenticated`/`anon` inherit it from PUBLIC. `REVOKE TEMPORARY ON DATABASE ... FROM authenticated`
-removes a role-specific grant that was never there — it does nothing; `has_database_privilege`
-still returns true. The same is true for any PUBLIC grant (e.g. `SELECT` on
-`extensions.pg_stat_statements` is granted to PUBLIC — a role-specific revoke is a no-op there too).
-**To actually remove a PUBLIC privilege you must `REVOKE ... FROM PUBLIC`, then grant it back
-explicitly to the roles that legitimately need it.** This is the exact same class of mistake as the
-`deal_room_members.role` column-grant issue in §33-era work.
-
-Note (R41): revoking `TEMPORARY` from PUBLIC to kill the shadow attack at its root was investigated
-and **deliberately NOT applied** — on this managed Supabase project ~9 non-superuser internal roles
-(`supabase_auth_admin`, `supabase_realtime_admin`, `supabase_storage_admin`, `supabase_etl_admin`,
-`supabase_replication_admin`, `authenticator`, `service_role`, …) hold `TEMPORARY` only via PUBLIC,
-and stripping it risks internal breakage plus forward-compat problems with the control plane. The
-search_path pinning (§49.1) is the real, complete fix; TEMP-revoke would only be redundant
-defence-in-depth. If ever revisited, grant TEMP back to every internal role and deny it to exactly
-`anon`, `authenticated`, `authenticator`.
-
-### 49.4 VIEWS are a separate RLS-bypass class — require `security_invoker`
-
-A view executes with its **owner's** rights by default, so RLS on the underlying tables does NOT
-apply to a caller reading through the view unless the view was created `WITH (security_invoker=on)`.
-An owner-rights view over a deal-room table would let anyone with SELECT on the view read every
-row, bypassing RLS entirely. **R41 confirmed this database currently has ZERO views over any
-application table** (the only views anywhere are Supabase-internal: `vault.decrypted_secrets`, which
-is unreachable by anon/authenticated, and `extensions.pg_stat_statements`, whose PUBLIC SELECT was
-revoked). **Rule for the future: never create a view over an RLS-protected table without
-`security_invoker=on`** — and if you do add one, test it as a non-member (it must return 0 foreign
-rows). Audit: `select c.relname, c.reloptions from pg_class c join pg_namespace n on
-n.oid=c.relnamespace where n.nspname='public' and c.relkind in ('v','m');` — any result lacking
-`security_invoker=on` is suspect.
-
-### 49.5 RLS FORCE is off on all deal-room tables — currently harmless, here's why
-
-Every deal-room table has RLS enabled but **not FORCED**, all owned by `postgres`. FORCE only makes
-RLS apply to the table **owner**; it does not affect `BYPASSRLS` roles or superusers. On this
-project `postgres` has `BYPASSRLS`, and all 45 `SECURITY DEFINER` functions are owned by `postgres`
-— so they bypass RLS via `BYPASSRLS`, independent of FORCE. App users (`anon`/`authenticated`) are
-neither owner nor `BYPASSRLS`, so RLS already fully applies to them. Net: **no legitimate path
-depends on the owner-FORCE-off bypass**, and enabling FORCE would change nothing (the owner still
-bypasses via `BYPASSRLS`). Left as-is deliberately. This only becomes relevant if a `SECURITY
-DEFINER` function's owner is ever changed to a non-`BYPASSRLS` role — then FORCE would start
-applying to it.
-
----
-
-## 50. RPC REACHABILITY IS A DATA-EXPOSURE SURFACE, INDEPENDENT OF search_path (found/fixed R42, July 2026)
-
-R41 pinned every `SECURITY DEFINER` function against `pg_temp` shadowing (§49). That closed the
-shadowing attack but **not the functions themselves**. All ~45 are owned by `postgres`, which has
-`BYPASSRLS`, so **RLS is not a backstop inside any of them** — the function body sees every row
-regardless of who calls it. If such a function is (a) in `public`, (b) has EXECUTE granted to
-`anon`/`authenticated` (Postgres grants EXECUTE to `PUBLIC` by default on every new function), and
-(c) **trusts a caller-supplied ID parameter** instead of deriving the caller from `auth.uid()`,
-then it is reachable as a PostgREST RPC and an attacker passes any foreign ID and gets the data.
-No shadowing needed. R42 live-proved, as a zero-membership account:
-`POST /rest/v1/rpc/get_user_deal_room_ids {"p_user_id":"<victim uuid>"}` → the victim's private
-deal-room list; `get_deal_room_member_ids(<foreign room>)` → that room's member UUIDs; and boolean
-`(room_id, user_id)` oracles (`dr_is_principal`/`dr_is_room_member`/`drm_is_founder_of_room`) →
-`true`/`false`, which maps the founder↔investor **relationship graph** — the confidential asset
-this platform exists to protect. Booleans are NOT lower-severity here.
-
-### 50.1 The rules
-
-- **A `SECURITY DEFINER` helper that trusts a caller-supplied ID and returns data (or a boolean
-  oracle about foreign entities) must NOT live in `public`.** Move it to a schema PostgREST does
-  not expose. R42 created `rls_private` for this. PostgREST exposes only `public` and
-  `graphql_public`; a function in `rls_private` is unreachable as an RPC (attacker RPC → 404; an
-  explicit `Content-Profile: rls_private` → PostgREST 406 "Invalid schema"), while RLS policies
-  can still call it **schema-qualified** (`rls_private.dr_is_open(...)`).
-- **You cannot fix this by revoking EXECUTE from `authenticated`.** RLS policy expressions run AS
-  the querying user, so that user MUST retain EXECUTE — revoking it breaks every policy that calls
-  the helper. Relocation to an unexposed schema is the mechanism; grant `USAGE` on `rls_private`
-  and `EXECUTE` on the functions to `authenticated, anon, service_role`. Verified live that schema
-  `USAGE` does NOT make the functions PostgREST-reachable — only schema *exposure* does.
-- **`service_role` REST calls cannot reach an unexposed schema either** (verified: 404). So any
-  helper called server-side by a service-role `fetch`/`sbFetch` to `/rest/v1/rpc/<fn>` MUST stay in
-  `public`. In this codebase that is `check_and_increment_ai_usage` (called from `advisor-fn.ts`,
-  `ai-secure-fn.ts`, `claims-fn.ts`). It trusts `p_user_id` (a real, low-severity quota-tamper
-  vector — an attacker can inflate another user's daily AI counter), left in public with that
-  caveat rather than break the server callers.
-- **The axis is param-trusting vs `auth.uid()`-gated, NOT data vs boolean.** Read every body;
-  do not trust the name. A function taking `p_deal_room_id` that internally checks `auth.uid()`
-  (e.g. via `deal_room_members ... user_id = auth.uid()`) is safe to leave; one that checks the
-  *parameter* is not. R42's classification pass caught five helpers that "looked" safe but trusted
-  their parameter (`dr_is_open`, `deal_room_information_unlocked`, `investor_can_request_access`,
-  `startup_id_has_open_invite`, `investor_user_id_has_open_invite`) — each revealed foreign
-  room/user/startup status; all were moved.
-
-### 50.2 Moved to `rls_private` in R42 (12 functions — the param-trusting set)
-
-`get_user_deal_room_ids`, `get_deal_room_member_ids`, `get_investor_profile_id_for_user`,
-`investor_team_member_owner_user_id`, `dr_is_principal`, `dr_is_room_member`,
-`drm_is_founder_of_room`, `dr_is_open`, `deal_room_information_unlocked`,
-`investor_can_request_access`, `startup_id_has_open_invite`, `investor_user_id_has_open_invite`.
-44 dependent policies repointed (mechanically generated ALTER POLICY, exact expression preserved).
-Verified: legit member reads unchanged (founder/investor/lawyer), every moved fn → 404, attacker
-→ 0 rows from every sensitive table for a foreign room.
-
-### 50.3 Deliberately LEFT in `public` — and why each is safe (do not re-derive this)
-
-**Auth.uid()-gated (reveal only the CALLER's own status, so a foreign ID leaks nothing):**
-- `is_startup_founder(startup_id)` — SINGLE overload (`startup_id uuid` only; there is no
-  `(startup_id, user_id)` variant), checks `founder_id = auth.uid()`. **A `false` return to an
-  attacker passing a foreign startup is the correct, non-leaking answer** ("you are not the
-  founder"), not data disclosure — an early R42 note mis-listed it as a leaking oracle because the
-  live test returned a non-null `false`; it is NOT a leak and correctly stays in public. Re-verified
-  live: attacker on a foreign startup → `200 false`; a 2-arg call → 404 (no such overload). The
-  param-trusting founder oracle is `rls_private.drm_is_founder_of_room(room, p_user_id)` (moved),
-  NOT this one.
-- `get_founder_team_role(startup_id)`, `get_investor_team_role(profile_id)`,
-  `get_investor_team_role_by_profile_id(id)` — all `... = auth.uid()`.
-- `founder_has_permission(startup_id, perm)`, `investor_has_permission(profile_id, perm)`,
-  `can_appoint_role(...)` — delegate to the auth.uid()-gated role helpers above.
-- `can_access_deal_room_doc_path(name)`, `can_access_founder_doc_path(name)` — gate on
-  `rls_private.get_user_deal_room_ids(auth.uid())` / `is_startup_founder` / `auth.uid()`.
-- `drm_can_create_room_member(room, p_user_id)` — takes `p_user_id` but its body IGNORES it and
-  uses `founder_has_permission` (auth.uid()). Safe, though the dead param is a smell.
-- `get_investor_startup_ids()`, `get_my_deal_room_startup_ids()`, `get_startup_team_user_ids()`,
-  `get_user_team_startup_ids()`, `is_admin()` — no ID param; all internal `auth.uid()`.
-
-**Intentional RPCs the client/app legitimately calls (must stay reachable):**
-- `preview_team_invite(token)`, `accept_team_invite(token)` — the team-invite flow (§ join.tsx).
-- `accept_lawyer_invite(token)`, `finalize_counsel_waiver(room)` — auth.uid()-gated writes.
-- `get_lawyer_invite_by_token(token)` — token possession is the credential (returns invite meta).
-- `get_public_investor_profile(slug)`, `get_public_investor_profile_by_user_id(uid)`,
-  `get_public_investor_profiles_by_user_ids(uids[])` — deliberate PUBLIC projections: return only
-  `id` + columns listed in the profile's own `public_fields`.
-- `get_investor_profile_in_room(room, investor_uid)` — has an explicit `auth.uid()` disclosure
-  check (returns null unless caller shares a disclosure relationship). Returned null for the
-  attacker in the live test.
-- `global_search(query, searcher_id, role, limit)` — trusts `searcher_id` in its signature, but
-  every data branch re-derives access from `auth.uid()`'s email; live test with a spoofed
-  `searcher_id` returned `[]`. Left in public but FLAGGED: its trust of `searcher_id` is fragile —
-  if a future edit adds a branch that keys off `searcher_id` directly, it becomes a leak.
-- `investor_median_days_to_decision(investor_uid)` — client-called (`MutualDisclosure.tsx`),
-  returns a coarse aggregate (median days), not row data; returned null/0 for a foreign investor
-  in the live test. Left in public as a low-value aggregate; revisit if finer metrics are added.
-- `roast_question_pool_count(session_id)` — public roast infrastructure, non-sensitive.
-
-**Trigger functions (not RPC-relevant):** `sync_deal_room_profile_disclosure`,
-`create_default_user_plan`, `update_updated_at`, `generate_profile_slug`, `seed_dd_for_deal_room`.
-
-**Not RPC-reachable at all** (EXECUTE only to postgres/service_role): `roast_expire_overdue`,
-`roast_submit_race_click`.
-
-### 50.4 Known residual, reported not fixed in R42
-
-- `check_and_increment_ai_usage(p_user_id)` — trusts `p_user_id`; must stay in public (service-role
-  called). Low-severity quota-tamper (inflate a victim's daily AI counter; no data exfil). See §51
-  and §52 — R43 found this residual is bigger and more coupled than this note originally implied.
-- `finalize_deal_close(p_deal_room_id)` — no `auth.uid()` check, but the write requires
-  `deal_room_close.investor_confirmed AND founder_confirmed` already true (raises otherwise) plus a
-  close-guard trigger, so an attacker can at most trigger the final flip on an already-fully-agreed
-  close. Not a forge. Left as-is.
-- `global_search`'s `searcher_id` trust (see 50.3) — currently safe via internal auth.uid()
-  re-derivation; a latent footgun.
-
----
-
-## 51. GENERAL RULE — a service-role server function's caller-supplied ID param is not an
-authorization boundary; every one must derive identity from the caller's JWT (R43, July 2026)
-
-R40-R42 (§§48-50) hardened the **database** — `pg_temp` shadowing, RPC-reachable
-`SECURITY DEFINER` helpers, PUBLIC grants. R43 found the **exact same underlying mistake**
-one layer up, in the application's own TanStack Start `createServerFn` handlers: **every
-server function that authenticates with the Supabase **service-role** key runs with RLS
-fully bypassed, so whatever identity/ownership check exists inside the function body IS the
-entire security boundary — there is no backstop.** Across this codebase, ~40 such functions
-across 20+ files trusted a client-supplied `userId`/`investorId`/`startupId`/`founderId`
-field as "who is calling," with zero derivation from a real session. Confirmed live (not
-inferred from code): a fabricated, never-existed UUID was processed identically to a real
-victim's UUID; a lawyer got a full deal brief by passing the investor's `userId`; the
-investor's own valid session retrieved another founder's real verification scores by
-passing their `startup_id`.
-
-**The fix pattern, now applied everywhere this was found:** `frontend/src/lib/require-user-fn.ts`
-exports `requireUser(accessToken)`, which resolves the real, authenticated uid via
-`${supabaseUrl}/auth/v1/user` (or `client.auth.getUser(token)` for `@supabase/supabase-js`-style
-files) and returns `{ok: false}` on any missing/invalid token. Every fixed function:
-1. Removes the client-supplied identity param from its input type entirely — not kept as a
-   fallback. There must be no field left for a forged payload to populate.
-2. Adds `accessToken: string` to the input type instead.
-3. Calls `requireUser(data.accessToken)` (or the club's own membership/ownership check
-   built on it) before touching any data, and fails closed (`return` an error/empty result)
-   on any auth failure.
-4. Every client call site fetches a **fresh** session token via `supabase.auth.getSession()`
-   at call time — never stores or passes a user id it already has lying around.
-
-**The membership-check trap (found in `deal-brief-fn.ts`, `doc-request-fn.ts`, `dd-fn.ts`):**
-a query shaped like `.eq("deal_room_id", dealRoomId).eq("user_id", data.userId).maybeSingle()`
-LOOKS like an authorization check but is not one — it only proves *some* member matches the
-*claimed* id, never that the claimed id is the real caller. Several of these files even had
-an unused `userAccessToken` field sitting right next to the trusted `userId` — present,
-never read, giving a false impression that verification already existed. The fix is always:
-derive `uid` from the token first, then run the exact same membership query against the
-**derived** uid, never the param.
-
-**When the identity param IS itself the resource being requested** (e.g. `investorId` in a
-function that only ever returns the caller's own watchlist/context), there is no separate
-membership check needed — deriving the uid from the token and using it in place of the
-param is sufficient, since the function was never supposed to accept anyone else's id in
-the first place.
-
-**Before adding any new service-role `createServerFn`:** if it takes any parameter shaped
-like an id belonging to a specific user/startup/investor/deal room, ask whether a forged
-value would change what the function does or returns. If yes, it needs `requireUser()` (or
-an ownership/membership check built on its derived uid) before anything else in the
-handler — the same standard as §34's RLS-write rule, just one layer higher, because a
-service-role function has no RLS layer under it at all to catch the mistake.
-
-### 51.1 Scope note — Tier 1/2/3 fixed, three items explicitly NOT fixed (all separately reported)
-
-- **`connection-request-fn.ts`, `agreement-fn.ts`, `closing-fn.ts`, `interview-fn.ts`,
-  `term-negotiation-fn.ts`, `profile-checklist-fn.ts`, `summary-fn.ts`, `roast-fn.ts`'s
-  mutating functions, `dd-fn.ts`'s `runConfrontationalAnalysis`, `onboarding-chat-fn.ts`** —
-  already correct (JWT-derived identity) before R43; not touched.
-- **`invite-fn.ts` and `app.investor.profile.tsx:1758`** — explicitly out of scope per
-  standing instruction: both dead, both replaced by the team-onboarding rebuild.
-- **`check_and_increment_ai_usage`'s identity hole** — deliberately NOT fixed at the RPC
-  layer in R43. See §52 for why, and why it's coupled to the `ai_usage` constraint bug.
-
----
-
-## 52. `ai_usage` — TWO INCOMPATIBLE WRITE PATTERNS SHARE ONE TABLE; NEITHER FIXED, BOTH
-COUPLED (found R43, July 2026) — no usage limit exists in production today
-
-`check_and_increment_ai_usage(p_user_id, p_feature)` needs exactly ONE row per
-`(user_id, feature, usage_date)` with an accumulating `call_count`, upserted via
-`ON CONFLICT (user_id, feature, usage_date) DO UPDATE SET call_count = call_count + 1`. **No
-such unique constraint has ever existed** — confirmed live: every call fails `42P10` ("no
-unique or exclusion constraint matching the ON CONFLICT specification"), and
-`checkUsageCap()` (repeated identically in `ai-secure-fn.ts`, `profile-builder-fn.ts`,
-`advisor-fn.ts`, `investor-advisor-fn.ts`, `investor-profile-builder-fn.ts`) **fails open**
-on any RPC error — so the AI features keep working for every user, but the daily quota has
-silently never been enforced for anyone, in production, the whole time.
-
-**Why the obvious fix (just add the constraint) is wrong:** `ai-fn.ts`, `linkedin-fn.ts`,
-and `reply-fn.ts` (`generateOutreachEmail` / `generateLinkedInMessage` / `generateReply`)
-also insert into `ai_usage`, but for a **completely different, incompatible purpose** — a
-"max N calls per rolling hour" limiter that counts rows via
-`created_at >= oneHourAgo`, one row per call. These inserts never set `feature` (it falls
-back to the column default, `'general'`) and never set `call_count` (defaults to `0`) —
-confirmed live: the exact duplicate rows found in the table (3 rows per `(user_id,
-'general', day)` in several cases) are these three files' per-call log entries, not damage
-from the RPC's missing constraint. **Adding a unique constraint on `(user_id, feature,
-usage_date)` today would fix the RPC's 42P10 but break the second-and-later call of any of
-these three files on the same day** (they do a plain `.insert()`, not `upsert`, so the
-second call per day would start failing outright). These are two genuinely different
-rate-limiting mechanisms that happen to share a table name by accident, not by design.
-
-**Compounding this: `check_and_increment_ai_usage` also trusts `p_user_id` outright, with no
-identity check** — confirmed live (fabricated UUID processed identically to a real victim's
-UUID, differing only when it hit the unrelated `42P10`/`23503` constraint bugs). All 7
-callers (`advisor-fn.ts`, `ai-secure-fn.ts`, `claims-fn.ts`, `investor-advisor-fn.ts`,
-`investor-profile-builder-fn.ts`, `profile-builder-fn.ts`, `verification-fn.ts`) call the
-RPC using the **anon key as bearer**, with no forwarded user session — meaning `auth.uid()`
-is NULL for every one of them today, so an identity check inside the RPC has nothing to
-compare `p_user_id` against unless the calling code is also changed to forward the caller's
-real access token (the same fix pattern as §51).
-
-**These two problems are coupled and neither may be fixed alone:**
-- Fixing the schema constraint without first fixing the 7 callers to forward a real token
-  (so the RPC can actually verify `p_user_id`) does nothing for the identity hole — a
-  constrained-but-unauthenticated RPC just means an attacker's forged calls now correctly
-  accumulate `call_count` against the victim's real quota row instead of failing outright —
-  **turning a currently-inert bug into a live quota-corruption vector against arbitrary
-  users.**
-- Fixing the RPC's identity check (reject when no real session is forwarded) without first
-  fixing the 7 callers to forward a real token would break every AI feature these files
-  power in production today, since all 7 currently use the anon key with no session.
-- A version of the identity check that only validates `auth.uid()` **when a token happens
-  to be forwarded**, falling back to trusting `p_user_id` otherwise, was considered and
-  explicitly rejected: an attacker simply omits the token, so the check would close nothing
-  for actual attack traffic while making the diff look fixed. This is the same failure mode
-  already caught and reverted twice elsewhere in this codebase — the in-worker CSP rate
-  limiter (§46.2, a check that can't see cross-isolate traffic) and the `LazyToaster`
-  wrapper (§47.1, a component named for something it didn't actually do) — a control that
-  only works when the adversary cooperates is not a control.
-
-**Correct fix, not yet done, needs its own dedicated branch:** forward the caller's real
-access token in all 7 callers (matching the pattern already correct in `dd-fn.ts`'s
-`runConfrontationalAnalysis` and now in `require-user-fn.ts`), reject `auth.role() = 'anon'`
-at the RPC, enforce `auth.uid() = p_user_id` when `auth.role() = 'authenticated'`, keep
-`service_role` fully trusted — **and** dedupe the existing `call_count = 0` rows (or give
-the three per-call-log files their own distinct `feature` value so they stop colliding with
-the RPC's daily-accumulator rows) before adding the unique constraint. Both halves in one
-pass; this is bigger and riskier than a single-function identity fix and was deliberately
-not attempted piecemeal in R43.
-
----
-
-## 53. RLS POLICY GRANTING ACCESS BASED ON "AN INVITE EXISTS" RATHER THAN "CALLER IS THE
-INVITEE" — same bug found twice in one migration, both fixed (R43, July 2026)
-
-Found while live-testing the `getFounderContext` identity fix (§51): `startups_invited_read`
-and `investor_profiles_invited_read` (both from R12,
-`20260718030000_r12_invite_company_name_read.sql`) used
-`rls_private.startup_id_has_open_invite(p_startup_id)` /
-`investor_user_id_has_open_invite(p_investor_user_id)`, whose bodies were:
-```sql
-select exists (select 1 from team_invites where startup_id = p_startup_id)
-```
-— checking only that **some** `team_invites` row references that startup/investor, never
-that the **calling user** is the actual invitee, and never checking `accepted_at`/
-`expires_at` at all. **Live-verified before the fix:** the test-founder's own real, valid
-session token retrieved the **complete** `startups` row (`select=*`, all ~70 columns —
-`founder_email`, `revenue`, `burn_rate`, `runway_months`, `valuation`,
-`current_investors`, everything) for a startup they have zero relationship to, solely
-because that startup had one team invite outstanding (itself already accepted, which the
-check didn't care about either).
-
-**The general pattern to grep for elsewhere in this schema:** any RLS policy or
-`SECURITY DEFINER` helper whose logic is "does a row matching this target id exist
-somewhere in table X" rather than "does a row matching **this target id AND the calling
-user** exist" grants access to every caller uniformly, not just the intended one — the same
-class of mistake as §34's UI-permission-isn't-a-boundary rule and §38.3's broad-write-policy
-rule, but for RLS *read* policies specifically. A caller-supplied or session-derived
-identity must appear on **both sides** of the check, not just the resource side.
-
-**Fix chosen: dropped both policies and their backing functions, rather than rewriting
-them.** Investigated whether they were still needed first (removing the surface beats
-securing it, same reasoning as the `join.$token.tsx` deletion): the R12 migration's own
-comment states their sole purpose was letting an invitee preview a company name before
-accepting on `/join`. The live team-join flow (`routes/join.tsx`, rebuilt in R40) resolves
-`org_name`/`inviter_name`/`role`/`email` entirely server-side via the
-`preview_team_invite`/`accept_team_invite` `SECURITY DEFINER` RPCs and never reads
-`startups` directly at all. The only file that *does* read `startups` this way
-(`join.team.$token.tsx`) is itself dead, orphaned code from the pre-R40 `invites`-table
-system (a different table from `team_invites`) with zero live links anywhere in the app —
-confirmed via grep, only the auto-generated route tree references its path. The
-`investor_profiles` counterpart is the same: the real investor-invite-link flow
-(`join-investor.$token.tsx`) already explicitly avoids relying on any bare peer-read of
-`investor_profiles`, using the safe `get_public_investor_profile_by_user_id()` whitelist RPC
-instead — its own code comment says so ("investor_profiles has no bare peer-read RLS
-anymore").
-
-**Live-verified after the drop:** a genuinely unrelated startup (confirmed via querying for
-one with zero deal-room relationship to the test account, since the test-founder happens to
-be a real deal-room member of one candidate "foreign" startup used in an earlier, invalid
-test) now returns 0 rows for the test-founder's real token, where it previously returned the
-full row. `preview_team_invite` still executes correctly and is unaffected, since it never
-depended on either dropped policy.
-
----
-
-## 54. NDA-SIGN `deal_room_members` UPSERT WAS DEAD CODE THAT NEVER SUCCEEDED — REMOVED, NOT
-FIXED (R43, July 2026)
-
-`app.deal-rooms.$id.nda.tsx`'s `handleAccept` upserted `deal_room_members` with
-`onConflict: "deal_room_id,user_id"` — a constraint that has never existed on this table, so
-the call always failed `42P10`, and its error (`memberErr`) was captured but never checked,
-so the failure was completely silent. Before removing it, investigated whether it was
-secretly load-bearing (i.e., the only path that ever creates an investor's `deal_room_members`
-row) — it is not. `connection-request-fn.ts`'s `approveConnectionRequest` (fired when a
-founder approves an investor's access request) inserts **both** the founder and investor
-member rows directly, and `accept_lawyer_invite` inserts the lawyer's row directly — neither
-depends on this upsert. By the time any user reaches `/nda`, they are already a real member;
-this write's only actual job was stamping `accepted_at` on the already-existing row, and
-nothing downstream ever read that column (§26 already established this via an exhaustive
-six-surface check). Removed the write entirely rather than repairing it, then dropped
-`deal_room_members.accepted_at` in the same pass. `accept_lawyer_invite` is the only
-function whose body mentions both `deal_room_members` and `accepted_at` together — confirmed
-its actual write targets `deal_room_lawyer_invites.accepted_at`, a different table, and is
-unaffected by the column drop (live-verified: still executes correctly post-drop).
-
-**`logActivity` extracted from `lib/supabase.ts` into `lib/activity-fn.ts`** in the same
-pass (a pure consumer of the already-exported `supabase` client, no relationship to any auth
-listener) — `lib/supabase.ts` itself is confirmed byte-identical via `git diff` after the
-change, per the standing never-touch rule. The three real call sites
-(`Dropzone.tsx`, `ReviewTab.tsx`, `app.deal-rooms.$id.nda.tsx`) now import from the new file;
-`lib/supabase.ts`'s own `logActivity` export is left in place, untouched, and unused going
-forward.
-
----
-
-## 55. TWO INDEPENDENT SUPABASE AUTH LISTENERS ARE BOTH LIVE SIMULTANEOUSLY — CONFIRMED, NOT
-FIXED (found R43, July 2026) — re-check before any future auth work
-
-CLAUDE.md's own standing rule ("One Supabase auth listener only... multiple listeners cause
-5-second lock timeouts") is currently violated. Confirmed by reading the actual mount/call
-chain, not assumed:
-
-- `lib/auth.tsx`'s `AuthProvider` (rendered for real at `routes/__root.tsx:196`, inside the
-  JSX tree) registers a real `supabase.auth.onAuthStateChange(...)` subscription every time
-  it mounts (`lib/auth.tsx:66`) — a root-level provider, so once per full page
-  load/hydration.
-- `lib/auth-store.ts`'s `setupAuthListener()` is called unconditionally at module top-level
-  in `routes/__root.tsx:9` (`if (typeof window !== 'undefined') setupAuthListener();`),
-  guarded only by its own module-level `authListenerSetup` flag (prevents re-registration on
-  repeated calls, but does nothing to prevent `auth.tsx`'s separate subscription from also
-  existing) — this registers a **second, independent** `onAuthStateChange` subscription
-  (`lib/auth-store.ts:28`).
-
-Both are real, both fire on every auth state change in a real session — this is exactly the
-two-listener situation the standing rule exists to prevent, confirmed present, not
-hypothetical. **Not fixed in R43** (out of scope — this was a report-only item this
-session). Before touching `lib/auth.tsx` or `lib/auth-store.ts` for any reason, re-read this
-section — consolidating to one listener means deciding which of the two consumers
-(`AuthContext`'s `user`/`loading` state vs. `useAuthStore`'s `user`/`initialized` state,
-both read by different route files today — `app.tsx`/`app.investor.tsx` read
-`useAuthStore.getState()` directly, most of the rest of the app reads `useAuth()`) becomes
-the single source of truth, which is a real design decision, not a mechanical fix.
+## 16. Amendment log
+
+| Date | Change |
+|---|---|
+| 30 Jul 2026 | Rewritten for the pivot to closing infrastructure. §9 scoped to public surface only; DESIGN.md now governs the application. Prior §35–§55 consolidated into §7 as defect patterns. Action layer, tool classes and record standards added as §8. |
+| 2 Aug 2026 | Verification pass against actual repo/infra state (§8, §12, §13 were written prospectively as part of the pivot and had not been checked against reality before commit). No branch, gateway, hash-chained record, reference-numbering scheme, or second Supabase project exists — `main` is the only environment and runs directly against the live production schema (`ldimninnjlvxozubheib`). Atlas Robotics is already a real deal-room member, not excluded from one. tsc (64) and bundle (0.88 MB gzip) confirmed current. "CURRENT STATE (verified 2 Aug 2026)" notes added inline to §8.1, §8.3, §8.4, §12 and §13 to distinguish present fact from prospective design intent — no rule text changed. |
