@@ -20,6 +20,22 @@ export const WORKFLOW_STAGES: WorkflowStage[] = [
   "closed",
 ];
 
+// phase0 step 3 — DEFENSIVE STOPGAP, NOT A VOCABULARY REDESIGN. The
+// deal_rooms.workflow_stage DB CHECK constraint (deal_rooms_workflow_stage_check)
+// allows nda_signed/initial_review/diligence/term_sheet/closed/information_vault/
+// qa/due_diligence/closing — a DIFFERENT vocabulary than this file's WorkflowStage
+// type, which predates the constraint's current shape. "stage1_review" and
+// "meetings" are not in the constraint; writing either throws a raw Postgres
+// 23514 the caller can't recover from cleanly. Reconciling the two vocabularies
+// is superseded by Phase 1's lifecycle model (CLAUDE.md §8) — out of scope here.
+// This set is only the values this constraint currently accepts, so
+// advanceWorkflowStage can fail closed with a clean error instead of a raw
+// constraint violation. Update if the constraint itself changes.
+const DB_ALLOWED_WORKFLOW_STAGES = new Set([
+  "nda_signed", "initial_review", "diligence", "term_sheet", "closed",
+  "information_vault", "qa", "due_diligence", "closing",
+]);
+
 export const STAGE_LABELS: Record<WorkflowStage, string> = {
   nda_signed: "NDA Signed",
   stage1_review: "Stage 1 Review",
@@ -114,6 +130,11 @@ export const advanceWorkflowStage = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    // phase0 step 3 stopgap — reject before the write; see
+    // DB_ALLOWED_WORKFLOW_STAGES comment above for why this exists.
+    if (!DB_ALLOWED_WORKFLOW_STAGES.has(data.to_stage)) {
+      return { ok: false, error: "stage_not_supported" };
+    }
     const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
     if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
