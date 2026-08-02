@@ -111,6 +111,31 @@ async function requireRoomMember(
   return { ok: true, uid: auth.uid };
 }
 
+// Same identity derivation as requireRoomMember, but only a room PRINCIPAL
+// (founder/investor) passes — a lawyer resolves to null and fails closed.
+// Mirrors closing-fn.ts's principalRole() pattern exactly (phase0 step 2):
+// lawyers are legitimate deal_room_members rows, so requireRoomMember alone
+// authorizes them for actions that must stay founder/investor-only (stage
+// advance, term sheet send/respond, pass, section access grant/revoke).
+async function principalRoomMember(
+  url: string,
+  key: string,
+  dealRoomId: string,
+  accessToken: string | undefined,
+): Promise<{ ok: true; uid: string } | { ok: false; error: string }> {
+  const auth = await requireUser(accessToken);
+  if (!auth.ok) return { ok: false, error: auth.error };
+  const rows: any[] = await sbFetch(
+    url,
+    key,
+    `deal_room_members?deal_room_id=eq.${dealRoomId}&user_id=eq.${auth.uid}&role=in.(founder,investor)&select=role`,
+    "GET",
+  ).catch(() => []);
+  const role = rows?.[0]?.role;
+  if (role !== "founder" && role !== "investor") return { ok: false, error: "not_authorized" };
+  return { ok: true, uid: auth.uid };
+}
+
 // ── advanceDealStage ──────────────────────────────────────────────────────────
 
 type AdvanceStageInput = {
@@ -124,7 +149,7 @@ export const advanceDealStage = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
-    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    const auth = await principalRoomMember(url, key, data.deal_room_id, data.accessToken);
     if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
     await sbFetch(url, key, `deal_rooms?id=eq.${data.deal_room_id}`, "PATCH", {
@@ -555,7 +580,7 @@ export const passDeal = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
-    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    const auth = await principalRoomMember(url, key, data.deal_room_id, data.accessToken);
     if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
 
@@ -587,7 +612,7 @@ export const grantSectionAccess = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; id?: string; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
-    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    const auth = await principalRoomMember(url, key, data.deal_room_id, data.accessToken);
     if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
     const rows = await sbFetch(url, key, "deal_room_access_grants", "POST", {
@@ -618,7 +643,7 @@ export const revokeSectionAccess = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
-    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    const auth = await principalRoomMember(url, key, data.deal_room_id, data.accessToken);
     if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
     await sbFetch(

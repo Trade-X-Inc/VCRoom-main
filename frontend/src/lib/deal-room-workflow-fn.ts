@@ -76,6 +76,31 @@ async function requireRoomMember(
   return { ok: true, uid: auth.uid };
 }
 
+// Same identity derivation as requireRoomMember, but only a room PRINCIPAL
+// (founder/investor) passes — a lawyer resolves to null and fails closed.
+// Mirrors closing-fn.ts's principalRole() pattern and deal-room-fn.ts's
+// principalRoomMember() exactly (phase0 step 2): a lawyer is a legitimate
+// deal_room_members row, so requireRoomMember alone authorizes them for
+// actions that must stay founder/investor-only (term sheet send/respond).
+async function principalRoomMember(
+  url: string,
+  key: string,
+  dealRoomId: string,
+  accessToken: string | undefined,
+): Promise<{ ok: true; uid: string } | { ok: false; error: string }> {
+  const auth = await requireUser(accessToken);
+  if (!auth.ok) return { ok: false, error: auth.error };
+  const rows: any[] = await sbFetch(
+    url,
+    key,
+    `deal_room_members?deal_room_id=eq.${dealRoomId}&user_id=eq.${auth.uid}&role=in.(founder,investor)&select=role`,
+    "GET",
+  ).catch(() => []);
+  const role = rows?.[0]?.role;
+  if (role !== "founder" && role !== "investor") return { ok: false, error: "not_authorized" };
+  return { ok: true, uid: auth.uid };
+}
+
 // ── Server fn: advance workflow stage ────────────────────────────────────────
 
 type AdvanceStageInput = {
@@ -243,7 +268,7 @@ export const sendTermSheet = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
-    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    const auth = await principalRoomMember(url, key, data.deal_room_id, data.accessToken);
     if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
 
@@ -292,7 +317,7 @@ export const respondToTermSheet = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
-    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    const auth = await principalRoomMember(url, key, data.deal_room_id, data.accessToken);
     if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
 
