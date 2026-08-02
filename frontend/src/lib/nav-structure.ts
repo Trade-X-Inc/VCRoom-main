@@ -92,20 +92,6 @@ export const founderSections: L2Section[] = [
           { to: "/app/prepare/badges/roast-reports", label: "Founder Roast Reports" },
         ],
       },
-      {
-        label: "Investment Readiness",
-        children: [
-          { to: "/app/prepare/investment-readiness/investor-simulation", label: "Investor Simulation" },
-          { to: "/app/prepare/investment-readiness/investment-audit", label: "Investment Audit" },
-        ],
-      },
-      {
-        label: "Founder Coaching",
-        children: [
-          { to: "/app/prepare/founder-coaching/profile-documents-check", label: "Full Profile & Documents Check" },
-          { to: "/app/prepare/founder-coaching/report-flags", label: "Full Report & Flags" },
-        ],
-      },
     ],
   },
   {

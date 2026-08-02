@@ -80,9 +80,7 @@ import { Route as AppCloseRouteImport } from './routes/app.close'
 import { Route as AppClaimsRouteImport } from './routes/app.claims'
 import { Route as AppBadgesRouteImport } from './routes/app.badges'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
-import { Route as AppAssistantRouteImport } from './routes/app.assistant'
 import { Route as AppAnalyticsRouteImport } from './routes/app.analytics'
-import { Route as AppAdvisorRouteImport } from './routes/app.advisor'
 import { Route as ApiTestAiRouteImport } from './routes/api.test-ai'
 import { Route as ApiHubspotSyncRouteImport } from './routes/api.hubspot-sync'
 import { Route as ApiHubspotNewsletterRouteImport } from './routes/api.hubspot-newsletter'
@@ -118,10 +116,8 @@ import { Route as AppInvestorDecisionsRouteImport } from './routes/app.investor.
 import { Route as AppInvestorDecideRouteImport } from './routes/app.investor.decide'
 import { Route as AppInvestorDealFlowRouteImport } from './routes/app.investor.deal-flow'
 import { Route as AppInvestorConnectionsRouteImport } from './routes/app.investor.connections'
-import { Route as AppInvestorAssistantRouteImport } from './routes/app.investor.assistant'
 import { Route as AppInvestorAnalyticsRouteImport } from './routes/app.investor.analytics'
 import { Route as AppInvestorAnalysisRouteImport } from './routes/app.investor.analysis'
-import { Route as AppInvestorAdvisorRouteImport } from './routes/app.investor.advisor'
 import { Route as AppGoLiveProfileAnalyticsRouteImport } from './routes/app.go-live.profile-analytics'
 import { Route as AppGoLiveDirectoryRouteImport } from './routes/app.go-live.directory'
 import { Route as AppDealRoomsTeamAssignmentsRouteImport } from './routes/app.deal-rooms.team-assignments'
@@ -153,10 +149,6 @@ import { Route as AppPrepareIpVaultSourceFilesRouteImport } from './routes/app.p
 import { Route as AppPrepareIpVaultPrivacySettingsRouteImport } from './routes/app.prepare.ip-vault.privacy-settings'
 import { Route as AppPrepareIpVaultDocumentIntakeRouteImport } from './routes/app.prepare.ip-vault.document-intake'
 import { Route as AppPrepareIpVaultDigitalDocumentVaultRouteImport } from './routes/app.prepare.ip-vault.digital-document-vault'
-import { Route as AppPrepareInvestmentReadinessInvestorSimulationRouteImport } from './routes/app.prepare.investment-readiness.investor-simulation'
-import { Route as AppPrepareInvestmentReadinessInvestmentAuditRouteImport } from './routes/app.prepare.investment-readiness.investment-audit'
-import { Route as AppPrepareFounderCoachingReportFlagsRouteImport } from './routes/app.prepare.founder-coaching.report-flags'
-import { Route as AppPrepareFounderCoachingProfileDocumentsCheckRouteImport } from './routes/app.prepare.founder-coaching.profile-documents-check'
 import { Route as AppPrepareBadgesRoastReportsRouteImport } from './routes/app.prepare.badges.roast-reports'
 import { Route as AppPrepareBadgesOverviewRouteImport } from './routes/app.prepare.badges.overview'
 import { Route as AppPrepareBadgesFounderRoastRouteImport } from './routes/app.prepare.badges.founder-roast'
@@ -561,19 +553,9 @@ const AppAuditRoute = AppAuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAssistantRoute = AppAssistantRouteImport.update({
-  id: '/assistant',
-  path: '/assistant',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppAdvisorRoute = AppAdvisorRouteImport.update({
-  id: '/advisor',
-  path: '/advisor',
   getParentRoute: () => AppRoute,
 } as any)
 const ApiTestAiRoute = ApiTestAiRouteImport.update({
@@ -752,11 +734,6 @@ const AppInvestorConnectionsRoute = AppInvestorConnectionsRouteImport.update({
   path: '/connections',
   getParentRoute: () => AppInvestorRoute,
 } as any)
-const AppInvestorAssistantRoute = AppInvestorAssistantRouteImport.update({
-  id: '/assistant',
-  path: '/assistant',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
 const AppInvestorAnalyticsRoute = AppInvestorAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -765,11 +742,6 @@ const AppInvestorAnalyticsRoute = AppInvestorAnalyticsRouteImport.update({
 const AppInvestorAnalysisRoute = AppInvestorAnalysisRouteImport.update({
   id: '/analysis',
   path: '/analysis',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
-const AppInvestorAdvisorRoute = AppInvestorAdvisorRouteImport.update({
-  id: '/advisor',
-  path: '/advisor',
   getParentRoute: () => AppInvestorRoute,
 } as any)
 const AppGoLiveProfileAnalyticsRoute =
@@ -942,30 +914,6 @@ const AppPrepareIpVaultDigitalDocumentVaultRoute =
   AppPrepareIpVaultDigitalDocumentVaultRouteImport.update({
     id: '/prepare/ip-vault/digital-document-vault',
     path: '/prepare/ip-vault/digital-document-vault',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareInvestmentReadinessInvestorSimulationRoute =
-  AppPrepareInvestmentReadinessInvestorSimulationRouteImport.update({
-    id: '/prepare/investment-readiness/investor-simulation',
-    path: '/prepare/investment-readiness/investor-simulation',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareInvestmentReadinessInvestmentAuditRoute =
-  AppPrepareInvestmentReadinessInvestmentAuditRouteImport.update({
-    id: '/prepare/investment-readiness/investment-audit',
-    path: '/prepare/investment-readiness/investment-audit',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareFounderCoachingReportFlagsRoute =
-  AppPrepareFounderCoachingReportFlagsRouteImport.update({
-    id: '/prepare/founder-coaching/report-flags',
-    path: '/prepare/founder-coaching/report-flags',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareFounderCoachingProfileDocumentsCheckRoute =
-  AppPrepareFounderCoachingProfileDocumentsCheckRouteImport.update({
-    id: '/prepare/founder-coaching/profile-documents-check',
-    path: '/prepare/founder-coaching/profile-documents-check',
     getParentRoute: () => AppRoute,
   } as any)
 const AppPrepareBadgesRoastReportsRoute =
@@ -1272,9 +1220,7 @@ export interface FileRoutesByFullPath {
   '/api/hubspot-newsletter': typeof ApiHubspotNewsletterRoute
   '/api/hubspot-sync': typeof ApiHubspotSyncRoute
   '/api/test-ai': typeof ApiTestAiRoute
-  '/app/advisor': typeof AppAdvisorRoute
   '/app/analytics': typeof AppAnalyticsRoute
-  '/app/assistant': typeof AppAssistantRoute
   '/app/audit': typeof AppAuditRoute
   '/app/badges': typeof AppBadgesRoute
   '/app/claims': typeof AppClaimsRoute
@@ -1338,10 +1284,8 @@ export interface FileRoutesByFullPath {
   '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
   '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
-  '/app/investor/advisor': typeof AppInvestorAdvisorRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
   '/app/investor/analytics': typeof AppInvestorAnalyticsRoute
-  '/app/investor/assistant': typeof AppInvestorAssistantRoute
   '/app/investor/connections': typeof AppInvestorConnectionsRoute
   '/app/investor/deal-flow': typeof AppInvestorDealFlowRoute
   '/app/investor/decide': typeof AppInvestorDecideRoute
@@ -1399,10 +1343,6 @@ export interface FileRoutesByFullPath {
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
   '/app/prepare/badges/overview': typeof AppPrepareBadgesOverviewRoute
   '/app/prepare/badges/roast-reports': typeof AppPrepareBadgesRoastReportsRoute
-  '/app/prepare/founder-coaching/profile-documents-check': typeof AppPrepareFounderCoachingProfileDocumentsCheckRoute
-  '/app/prepare/founder-coaching/report-flags': typeof AppPrepareFounderCoachingReportFlagsRoute
-  '/app/prepare/investment-readiness/investment-audit': typeof AppPrepareInvestmentReadinessInvestmentAuditRoute
-  '/app/prepare/investment-readiness/investor-simulation': typeof AppPrepareInvestmentReadinessInvestorSimulationRoute
   '/app/prepare/ip-vault/digital-document-vault': typeof AppPrepareIpVaultDigitalDocumentVaultRoute
   '/app/prepare/ip-vault/document-intake': typeof AppPrepareIpVaultDocumentIntakeRoute
   '/app/prepare/ip-vault/privacy-settings': typeof AppPrepareIpVaultPrivacySettingsRoute
@@ -1466,9 +1406,7 @@ export interface FileRoutesByTo {
   '/api/hubspot-newsletter': typeof ApiHubspotNewsletterRoute
   '/api/hubspot-sync': typeof ApiHubspotSyncRoute
   '/api/test-ai': typeof ApiTestAiRoute
-  '/app/advisor': typeof AppAdvisorRoute
   '/app/analytics': typeof AppAnalyticsRoute
-  '/app/assistant': typeof AppAssistantRoute
   '/app/audit': typeof AppAuditRoute
   '/app/badges': typeof AppBadgesRoute
   '/app/claims': typeof AppClaimsRoute
@@ -1531,10 +1469,8 @@ export interface FileRoutesByTo {
   '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
   '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
-  '/app/investor/advisor': typeof AppInvestorAdvisorRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
   '/app/investor/analytics': typeof AppInvestorAnalyticsRoute
-  '/app/investor/assistant': typeof AppInvestorAssistantRoute
   '/app/investor/connections': typeof AppInvestorConnectionsRoute
   '/app/investor/deal-flow': typeof AppInvestorDealFlowRoute
   '/app/investor/decide': typeof AppInvestorDecideRoute
@@ -1592,10 +1528,6 @@ export interface FileRoutesByTo {
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
   '/app/prepare/badges/overview': typeof AppPrepareBadgesOverviewRoute
   '/app/prepare/badges/roast-reports': typeof AppPrepareBadgesRoastReportsRoute
-  '/app/prepare/founder-coaching/profile-documents-check': typeof AppPrepareFounderCoachingProfileDocumentsCheckRoute
-  '/app/prepare/founder-coaching/report-flags': typeof AppPrepareFounderCoachingReportFlagsRoute
-  '/app/prepare/investment-readiness/investment-audit': typeof AppPrepareInvestmentReadinessInvestmentAuditRoute
-  '/app/prepare/investment-readiness/investor-simulation': typeof AppPrepareInvestmentReadinessInvestorSimulationRoute
   '/app/prepare/ip-vault/digital-document-vault': typeof AppPrepareIpVaultDigitalDocumentVaultRoute
   '/app/prepare/ip-vault/document-intake': typeof AppPrepareIpVaultDocumentIntakeRoute
   '/app/prepare/ip-vault/privacy-settings': typeof AppPrepareIpVaultPrivacySettingsRoute
@@ -1663,9 +1595,7 @@ export interface FileRoutesById {
   '/api/hubspot-newsletter': typeof ApiHubspotNewsletterRoute
   '/api/hubspot-sync': typeof ApiHubspotSyncRoute
   '/api/test-ai': typeof ApiTestAiRoute
-  '/app/advisor': typeof AppAdvisorRoute
   '/app/analytics': typeof AppAnalyticsRoute
-  '/app/assistant': typeof AppAssistantRoute
   '/app/audit': typeof AppAuditRoute
   '/app/badges': typeof AppBadgesRoute
   '/app/claims': typeof AppClaimsRoute
@@ -1729,10 +1659,8 @@ export interface FileRoutesById {
   '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
   '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
-  '/app/investor/advisor': typeof AppInvestorAdvisorRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
   '/app/investor/analytics': typeof AppInvestorAnalyticsRoute
-  '/app/investor/assistant': typeof AppInvestorAssistantRoute
   '/app/investor/connections': typeof AppInvestorConnectionsRoute
   '/app/investor/deal-flow': typeof AppInvestorDealFlowRoute
   '/app/investor/decide': typeof AppInvestorDecideRoute
@@ -1790,10 +1718,6 @@ export interface FileRoutesById {
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
   '/app/prepare/badges/overview': typeof AppPrepareBadgesOverviewRoute
   '/app/prepare/badges/roast-reports': typeof AppPrepareBadgesRoastReportsRoute
-  '/app/prepare/founder-coaching/profile-documents-check': typeof AppPrepareFounderCoachingProfileDocumentsCheckRoute
-  '/app/prepare/founder-coaching/report-flags': typeof AppPrepareFounderCoachingReportFlagsRoute
-  '/app/prepare/investment-readiness/investment-audit': typeof AppPrepareInvestmentReadinessInvestmentAuditRoute
-  '/app/prepare/investment-readiness/investor-simulation': typeof AppPrepareInvestmentReadinessInvestorSimulationRoute
   '/app/prepare/ip-vault/digital-document-vault': typeof AppPrepareIpVaultDigitalDocumentVaultRoute
   '/app/prepare/ip-vault/document-intake': typeof AppPrepareIpVaultDocumentIntakeRoute
   '/app/prepare/ip-vault/privacy-settings': typeof AppPrepareIpVaultPrivacySettingsRoute
@@ -1862,9 +1786,7 @@ export interface FileRouteTypes {
     | '/api/hubspot-newsletter'
     | '/api/hubspot-sync'
     | '/api/test-ai'
-    | '/app/advisor'
     | '/app/analytics'
-    | '/app/assistant'
     | '/app/audit'
     | '/app/badges'
     | '/app/claims'
@@ -1928,10 +1850,8 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/team-assignments'
     | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
-    | '/app/investor/advisor'
     | '/app/investor/analysis'
     | '/app/investor/analytics'
-    | '/app/investor/assistant'
     | '/app/investor/connections'
     | '/app/investor/deal-flow'
     | '/app/investor/decide'
@@ -1989,10 +1909,6 @@ export interface FileRouteTypes {
     | '/app/prepare/badges/founder-roast'
     | '/app/prepare/badges/overview'
     | '/app/prepare/badges/roast-reports'
-    | '/app/prepare/founder-coaching/profile-documents-check'
-    | '/app/prepare/founder-coaching/report-flags'
-    | '/app/prepare/investment-readiness/investment-audit'
-    | '/app/prepare/investment-readiness/investor-simulation'
     | '/app/prepare/ip-vault/digital-document-vault'
     | '/app/prepare/ip-vault/document-intake'
     | '/app/prepare/ip-vault/privacy-settings'
@@ -2056,9 +1972,7 @@ export interface FileRouteTypes {
     | '/api/hubspot-newsletter'
     | '/api/hubspot-sync'
     | '/api/test-ai'
-    | '/app/advisor'
     | '/app/analytics'
-    | '/app/assistant'
     | '/app/audit'
     | '/app/badges'
     | '/app/claims'
@@ -2121,10 +2035,8 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/team-assignments'
     | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
-    | '/app/investor/advisor'
     | '/app/investor/analysis'
     | '/app/investor/analytics'
-    | '/app/investor/assistant'
     | '/app/investor/connections'
     | '/app/investor/deal-flow'
     | '/app/investor/decide'
@@ -2182,10 +2094,6 @@ export interface FileRouteTypes {
     | '/app/prepare/badges/founder-roast'
     | '/app/prepare/badges/overview'
     | '/app/prepare/badges/roast-reports'
-    | '/app/prepare/founder-coaching/profile-documents-check'
-    | '/app/prepare/founder-coaching/report-flags'
-    | '/app/prepare/investment-readiness/investment-audit'
-    | '/app/prepare/investment-readiness/investor-simulation'
     | '/app/prepare/ip-vault/digital-document-vault'
     | '/app/prepare/ip-vault/document-intake'
     | '/app/prepare/ip-vault/privacy-settings'
@@ -2252,9 +2160,7 @@ export interface FileRouteTypes {
     | '/api/hubspot-newsletter'
     | '/api/hubspot-sync'
     | '/api/test-ai'
-    | '/app/advisor'
     | '/app/analytics'
-    | '/app/assistant'
     | '/app/audit'
     | '/app/badges'
     | '/app/claims'
@@ -2318,10 +2224,8 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/team-assignments'
     | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
-    | '/app/investor/advisor'
     | '/app/investor/analysis'
     | '/app/investor/analytics'
-    | '/app/investor/assistant'
     | '/app/investor/connections'
     | '/app/investor/deal-flow'
     | '/app/investor/decide'
@@ -2379,10 +2283,6 @@ export interface FileRouteTypes {
     | '/app/prepare/badges/founder-roast'
     | '/app/prepare/badges/overview'
     | '/app/prepare/badges/roast-reports'
-    | '/app/prepare/founder-coaching/profile-documents-check'
-    | '/app/prepare/founder-coaching/report-flags'
-    | '/app/prepare/investment-readiness/investment-audit'
-    | '/app/prepare/investment-readiness/investor-simulation'
     | '/app/prepare/ip-vault/digital-document-vault'
     | '/app/prepare/ip-vault/document-intake'
     | '/app/prepare/ip-vault/privacy-settings'
@@ -2973,25 +2873,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuditRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/assistant': {
-      id: '/app/assistant'
-      path: '/assistant'
-      fullPath: '/app/assistant'
-      preLoaderRoute: typeof AppAssistantRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/analytics': {
       id: '/app/analytics'
       path: '/analytics'
       fullPath: '/app/analytics'
       preLoaderRoute: typeof AppAnalyticsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/advisor': {
-      id: '/app/advisor'
-      path: '/advisor'
-      fullPath: '/app/advisor'
-      preLoaderRoute: typeof AppAdvisorRouteImport
       parentRoute: typeof AppRoute
     }
     '/api/test-ai': {
@@ -3239,13 +3125,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorConnectionsRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/investor/assistant': {
-      id: '/app/investor/assistant'
-      path: '/assistant'
-      fullPath: '/app/investor/assistant'
-      preLoaderRoute: typeof AppInvestorAssistantRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
     '/app/investor/analytics': {
       id: '/app/investor/analytics'
       path: '/analytics'
@@ -3258,13 +3137,6 @@ declare module '@tanstack/react-router' {
       path: '/analysis'
       fullPath: '/app/investor/analysis'
       preLoaderRoute: typeof AppInvestorAnalysisRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/advisor': {
-      id: '/app/investor/advisor'
-      path: '/advisor'
-      fullPath: '/app/investor/advisor'
-      preLoaderRoute: typeof AppInvestorAdvisorRouteImport
       parentRoute: typeof AppInvestorRoute
     }
     '/app/go-live/profile-analytics': {
@@ -3482,34 +3354,6 @@ declare module '@tanstack/react-router' {
       path: '/prepare/ip-vault/digital-document-vault'
       fullPath: '/app/prepare/ip-vault/digital-document-vault'
       preLoaderRoute: typeof AppPrepareIpVaultDigitalDocumentVaultRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/prepare/investment-readiness/investor-simulation': {
-      id: '/app/prepare/investment-readiness/investor-simulation'
-      path: '/prepare/investment-readiness/investor-simulation'
-      fullPath: '/app/prepare/investment-readiness/investor-simulation'
-      preLoaderRoute: typeof AppPrepareInvestmentReadinessInvestorSimulationRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/prepare/investment-readiness/investment-audit': {
-      id: '/app/prepare/investment-readiness/investment-audit'
-      path: '/prepare/investment-readiness/investment-audit'
-      fullPath: '/app/prepare/investment-readiness/investment-audit'
-      preLoaderRoute: typeof AppPrepareInvestmentReadinessInvestmentAuditRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/prepare/founder-coaching/report-flags': {
-      id: '/app/prepare/founder-coaching/report-flags'
-      path: '/prepare/founder-coaching/report-flags'
-      fullPath: '/app/prepare/founder-coaching/report-flags'
-      preLoaderRoute: typeof AppPrepareFounderCoachingReportFlagsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/prepare/founder-coaching/profile-documents-check': {
-      id: '/app/prepare/founder-coaching/profile-documents-check'
-      path: '/prepare/founder-coaching/profile-documents-check'
-      fullPath: '/app/prepare/founder-coaching/profile-documents-check'
-      preLoaderRoute: typeof AppPrepareFounderCoachingProfileDocumentsCheckRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/prepare/badges/roast-reports': {
@@ -3845,10 +3689,8 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppInvestorRouteChildren {
-  AppInvestorAdvisorRoute: typeof AppInvestorAdvisorRoute
   AppInvestorAnalysisRoute: typeof AppInvestorAnalysisRoute
   AppInvestorAnalyticsRoute: typeof AppInvestorAnalyticsRoute
-  AppInvestorAssistantRoute: typeof AppInvestorAssistantRoute
   AppInvestorConnectionsRoute: typeof AppInvestorConnectionsRoute
   AppInvestorDealFlowRoute: typeof AppInvestorDealFlowRoute
   AppInvestorDecideRoute: typeof AppInvestorDecideRoute
@@ -3902,10 +3744,8 @@ interface AppInvestorRouteChildren {
 }
 
 const AppInvestorRouteChildren: AppInvestorRouteChildren = {
-  AppInvestorAdvisorRoute: AppInvestorAdvisorRoute,
   AppInvestorAnalysisRoute: AppInvestorAnalysisRoute,
   AppInvestorAnalyticsRoute: AppInvestorAnalyticsRoute,
-  AppInvestorAssistantRoute: AppInvestorAssistantRoute,
   AppInvestorConnectionsRoute: AppInvestorConnectionsRoute,
   AppInvestorDealFlowRoute: AppInvestorDealFlowRoute,
   AppInvestorDecideRoute: AppInvestorDecideRoute,
@@ -4031,9 +3871,7 @@ const AppDealRoomsIdRouteWithChildren = AppDealRoomsIdRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
-  AppAdvisorRoute: typeof AppAdvisorRoute
   AppAnalyticsRoute: typeof AppAnalyticsRoute
-  AppAssistantRoute: typeof AppAssistantRoute
   AppAuditRoute: typeof AppAuditRoute
   AppBadgesRoute: typeof AppBadgesRoute
   AppClaimsRoute: typeof AppClaimsRoute
@@ -4083,10 +3921,6 @@ interface AppRouteChildren {
   AppPrepareBadgesFounderRoastRoute: typeof AppPrepareBadgesFounderRoastRoute
   AppPrepareBadgesOverviewRoute: typeof AppPrepareBadgesOverviewRoute
   AppPrepareBadgesRoastReportsRoute: typeof AppPrepareBadgesRoastReportsRoute
-  AppPrepareFounderCoachingProfileDocumentsCheckRoute: typeof AppPrepareFounderCoachingProfileDocumentsCheckRoute
-  AppPrepareFounderCoachingReportFlagsRoute: typeof AppPrepareFounderCoachingReportFlagsRoute
-  AppPrepareInvestmentReadinessInvestmentAuditRoute: typeof AppPrepareInvestmentReadinessInvestmentAuditRoute
-  AppPrepareInvestmentReadinessInvestorSimulationRoute: typeof AppPrepareInvestmentReadinessInvestorSimulationRoute
   AppPrepareIpVaultDigitalDocumentVaultRoute: typeof AppPrepareIpVaultDigitalDocumentVaultRoute
   AppPrepareIpVaultDocumentIntakeRoute: typeof AppPrepareIpVaultDocumentIntakeRoute
   AppPrepareIpVaultPrivacySettingsRoute: typeof AppPrepareIpVaultPrivacySettingsRoute
@@ -4103,9 +3937,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppAdvisorRoute: AppAdvisorRoute,
   AppAnalyticsRoute: AppAnalyticsRoute,
-  AppAssistantRoute: AppAssistantRoute,
   AppAuditRoute: AppAuditRoute,
   AppBadgesRoute: AppBadgesRoute,
   AppClaimsRoute: AppClaimsRoute,
@@ -4157,14 +3989,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppPrepareBadgesFounderRoastRoute: AppPrepareBadgesFounderRoastRoute,
   AppPrepareBadgesOverviewRoute: AppPrepareBadgesOverviewRoute,
   AppPrepareBadgesRoastReportsRoute: AppPrepareBadgesRoastReportsRoute,
-  AppPrepareFounderCoachingProfileDocumentsCheckRoute:
-    AppPrepareFounderCoachingProfileDocumentsCheckRoute,
-  AppPrepareFounderCoachingReportFlagsRoute:
-    AppPrepareFounderCoachingReportFlagsRoute,
-  AppPrepareInvestmentReadinessInvestmentAuditRoute:
-    AppPrepareInvestmentReadinessInvestmentAuditRoute,
-  AppPrepareInvestmentReadinessInvestorSimulationRoute:
-    AppPrepareInvestmentReadinessInvestorSimulationRoute,
   AppPrepareIpVaultDigitalDocumentVaultRoute:
     AppPrepareIpVaultDigitalDocumentVaultRoute,
   AppPrepareIpVaultDocumentIntakeRoute: AppPrepareIpVaultDocumentIntakeRoute,

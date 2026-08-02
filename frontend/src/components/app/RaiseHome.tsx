@@ -128,20 +128,6 @@ export function RaiseHome() {
         })}
       </div>
 
-      <div className="hs-hairline-t mt-4 pt-8 flex items-center gap-6 text-xs text-muted-foreground">
-        <Link to="/app/assistant" className="hover:text-foreground transition-colors">
-          AI Advisor
-        </Link>
-        <Link to="/app/messages" className="hover:text-foreground transition-colors">
-          Team chat
-        </Link>
-        <Link to="/app/wall" className="hover:text-foreground transition-colors">
-          The Wall
-        </Link>
-        <Link to="/app/referrals" className="hover:text-foreground transition-colors">
-          Referrals
-        </Link>
-      </div>
     </div>
   );
 }
