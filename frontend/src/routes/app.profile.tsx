@@ -5,14 +5,11 @@ import { LazyChart } from "@/components/shared/LazyChart";
 import {
   Building2, Globe, Users, Upload, Pencil, Trash2, Plus, X, Loader2, Check,
   Eye, Edit3, Download, Zap, AlignLeft, AlertTriangle, Copy, Sparkles, BarChart3,
-  Shield, Briefcase, TrendingUp, DollarSign, CheckCircle2, XCircle,
-  Clock, Linkedin, Twitter, Instagram, Target, Save, RefreshCw,
+  Shield, Briefcase, TrendingUp, DollarSign, CheckCircle2,
+  Linkedin, Twitter, Instagram, Target, Save, RefreshCw,
 } from "lucide-react";
-import type { StartupClaim, ClaimStatus } from "@/lib/claims-fn";
 import type { FounderThesis } from "@/lib/founder-thesis-fn";
-import { AttachProofModal } from "@/components/app/AttachProofModal";
 import { PageGuide } from "@/components/app/PageGuide";
-import { FieldVerificationBadge, prewarmClassificationCache } from "@/components/app/FieldVerificationBadge";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -239,11 +236,6 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
   const [extractionError, setExtractionError] = useState<string | null>(null);
   const [showExtractionPreview, setShowExtractionPreview] = useState(false);
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
-  const [runningRegistryCheck, setRunningRegistryCheck] = useState(false);
-  // Attach-proof modal state
-  const [attachingClaim, setAttachingClaim] = useState<{ type: string; label: string; value: string } | null>(null);
-  const [attachingFile, setAttachingFile] = useState<File | null>(null);
-  const [attachingRunning, setAttachingRunning] = useState(false);
 
   // Founder thesis state
   const [thesisForm, setThesisForm] = useState({
@@ -270,46 +262,6 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
       return data as StartupRow | null;
     },
   });
-
-  // Prewarm classification cache once per mount
-  useEffect(() => { prewarmClassificationCache(); }, []);
-
-  // ── Founder Tier 1 verification result ───────────────────────────────────
-  // (Was previously querying a nonexistent verification_tier column keyed by a
-  //  nonexistent user_id column — the query 400'd silently and tier state never
-  //  loaded on this page.)
-  const { data: founderVerification } = useQuery({
-    queryKey: ["founder-verification", startup?.id],
-    enabled: !!startup?.id,
-    staleTime: 5 * 60_000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("founder_verifications")
-        .select("tier1_passed, current_tier")
-        .eq("startup_id", startup!.id)
-        .maybeSingle();
-      return data;
-    },
-  });
-
-  const founderTier1Passed = founderVerification?.tier1_passed === true;
-
-  // ── Claims (quantitative field verification) ──────────────────────────────
-  const { data: claims = [], refetch: refetchClaims } = useQuery<StartupClaim[]>({
-    queryKey: ["startup-claims", startup?.id],
-    enabled: !!startup?.id,
-    staleTime: 30_000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("startup_claims")
-        .select("*")
-        .eq("startup_id", startup!.id);
-      return (data ?? []) as StartupClaim[];
-    },
-  });
-
-  const claimByType = (type: string): StartupClaim | undefined =>
-    claims.find((c) => c.claim_type === type);
 
   // ── Founder thesis ────────────────────────────────────────────────────────
   const { data: existingThesis } = useQuery<FounderThesis | null>({
@@ -397,19 +349,6 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
       setThesisProposing(false);
     }
   };
-
-  const { data: registryCheck, refetch: refetchRegistryCheck } = useQuery({
-    queryKey: ["registry-check", startup?.id],
-    enabled: !!startup?.id,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("company_registry_checks")
-        .select("*")
-        .eq("startup_id", startup!.id)
-        .maybeSingle();
-      return data;
-    },
-  });
 
   // Profile views analytics
   const { data: profileViews = [] } = useQuery({
@@ -535,30 +474,6 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
       toast.error(e.message || "Could not publish profile.");
     } finally {
       setProfilePublishing(false);
-    }
-  };
-
-  const runRegistryCheck = async () => {
-    if (!startup?.id) return;
-    setRunningRegistryCheck(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-company-registry`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${session?.access_token}`,
-          },
-          body: JSON.stringify({ startup_id: startup.id }),
-        }
-      );
-      await refetchRegistryCheck();
-    } catch (e: any) {
-      toast.error("Registry check failed: " + (e.message ?? "Unknown error"));
-    } finally {
-      setRunningRegistryCheck(false);
     }
   };
 
@@ -696,29 +611,6 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
               }).catch(() => null);
             }).catch(() => null);
           }
-        }
-
-        // Upsert claims for every quantitative field that has a value — fire-and-forget
-        const savedStartupId = existing?.id ?? newStartupId;
-        if (savedStartupId) {
-          const { upsertClaim } = await import("@/lib/claims-fn");
-          const { data: { session: claimSession } } = await supabase.auth.getSession();
-          const claimAccessToken = claimSession?.access_token ?? "";
-          const quantFields: Array<{ type: string; label: string; value: string | null }> = [
-            { type: "revenue",        label: "Revenue / ARR",   value: form.revenue || null },
-            { type: "growth_rate",    label: "Growth Rate",     value: form.growth_rate || null },
-            { type: "customer_count", label: "Customers",       value: form.customer_count || null },
-            { type: "key_metric",     label: "Key Metric",      value: form.key_metric || null },
-            { type: "traction",       label: "Traction",        value: form.traction || null },
-          ];
-          for (const qf of quantFields) {
-            if (qf.value) {
-              upsertClaim({ data: { startup_id: savedStartupId, claim_type: qf.type, claim_label: qf.label, claim_value: qf.value, accessToken: claimAccessToken } })
-                .catch(() => null);
-            }
-          }
-          // Refresh claims after a brief delay to let upserts settle
-          setTimeout(() => refetchClaims(), 1200);
         }
       }
     } finally {
@@ -968,27 +860,6 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
             <div>
               <h1 className="text-lg font-bold tracking-tight">Company Profile</h1>
               <p className="text-sm text-muted-foreground mt-0.5">How investors see your startup.</p>
-              {/* Part 3 — claims + cap table summary */}
-              {claims.length > 0 && (() => {
-                const confirmed = claims.filter((c) => c.proof_status === "ai_confirmed").length;
-                const mismatched = claims.filter((c) => c.proof_status === "ai_mismatch").length;
-                return (
-                  <div className="flex items-center gap-2 mt-2 flex-wrap">
-                    <span
-                      className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full"
-                      style={mismatched > 0
-                        ? { background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", color: "#EF4444" }
-                        : confirmed === claims.length
-                        ? { background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }
-                        : { background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", color: "#F59E0B" }}
-                    >
-                      {mismatched > 0 ? <XCircle className="h-3 w-3" /> : confirmed === claims.length ? <CheckCircle2 className="h-3 w-3" /> : <AlertTriangle className="h-3 w-3" />}
-                      {confirmed}/{claims.length} claims verified
-                      {mismatched > 0 && ` · ${mismatched} mismatch${mismatched > 1 ? "es" : ""}`}
-                    </span>
-                  </div>
-                );
-              })()}
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -1044,35 +915,12 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
             <div className="mt-4 rounded-none border border-border/60 bg-card p-5 shadow-card print-card">
               <div className="text-sm font-semibold mb-3">Key details</div>
               <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2.5">
-                {pairs.map(([label, val]) => {
-                  // Map display label to claim_type
-                  const claimTypeMap: Record<string, string> = {
-                    "Revenue / ARR": "revenue",
-                    "Growth rate": "growth_rate",
-                    "Customers": "customer_count",
-                    "Key metric": "key_metric",
-                  };
-                  const claimType = claimTypeMap[label];
-                  const claim = claimType ? claimByType(claimType) : undefined;
-                  const cfg = claim ? STATUS_CONFIG[claim.proof_status as ClaimStatus] : undefined;
-                  return (
-                    <div key={label} className="flex items-center justify-between border-b border-border/40 pb-2 gap-2">
-                      <span className="text-xs text-muted-foreground shrink-0">{label}</span>
-                      <div className="flex items-center gap-2 min-w-0">
-                        {cfg && (
-                          <span
-                            className="inline-flex items-center gap-1 rounded-full text-[10px] font-medium px-1.5 py-0.5 shrink-0"
-                            style={cfg.style}
-                            title={claim?.proof_status}
-                          >
-                            {cfg.icon}
-                          </span>
-                        )}
-                        <span className="text-sm font-medium truncate">{val}</span>
-                      </div>
-                    </div>
-                  );
-                })}
+                {pairs.map(([label, val]) => (
+                  <div key={label} className="flex items-center justify-between border-b border-border/40 pb-2 gap-2">
+                    <span className="text-xs text-muted-foreground shrink-0">{label}</span>
+                    <span className="text-sm font-medium truncate">{val}</span>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -1452,29 +1300,20 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
         // FULL DETAILS: all sections
         <div className="mt-4 grid lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2 space-y-4">
-            <FormSection
-              title="Company identity"
-              badge={<FieldVerificationBadge profileType="startup" fieldName="legal_entity_name" tier1Passed={founderTier1Passed} compact />}
-            >
+            <FormSection title="Company identity">
               <Field label="Company name" value={form.company_name} onChange={field("company_name")} placeholder="Atlas Robotics" />
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs text-muted-foreground uppercase tracking-wider">Legal entity name</label>
-                  <FieldVerificationBadge profileType="startup" fieldName="legal_entity_name" tier1Passed={founderTier1Passed} />
-                </div>
+                <label className="text-xs text-muted-foreground uppercase tracking-wider">Legal entity name</label>
                 <input
                   type="text"
                   value={form.legal_entity_name ?? ""}
                   onChange={(e) => setForm((prev) => ({ ...prev, legal_entity_name: e.target.value }))}
                   placeholder="Full registered legal name (if different from trading name)"
-                  className="w-full bg-accent border border-border rounded-lg px-4 py-3 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors"
+                  className="w-full bg-accent border border-border rounded-lg px-4 py-3 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors mt-2"
                 />
               </div>
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs text-muted-foreground uppercase tracking-wider">Company registration number</label>
-                  <FieldVerificationBadge profileType="startup" fieldName="registration_number" tier1Passed={founderTier1Passed} />
-                </div>
+                <label className="text-xs text-muted-foreground uppercase tracking-wider">Company registration number</label>
                 <input
                   type="text"
                   value={form.registration_number ?? ""}
@@ -1485,90 +1324,12 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
                 <p className="text-xs text-faint mt-1">Optional but improves registry verification accuracy</p>
               </div>
 
-              {/* Registry verification section */}
-              {registryCheck ? (
-                <div className="p-4 rounded-lg border mt-2" style={{
-                  background: registryCheck.verified ? "rgba(16,185,129,0.07)" : "var(--accent)",
-                  border: registryCheck.verified ? "1px solid rgba(16,185,129,0.2)" : "1px solid var(--border)",
-                }}>
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Company registry check</p>
-                    <span className="text-xs font-bold" style={{ color: registryCheck.verified ? "#10B981" : "var(--faint)" }}>
-                      {registryCheck.verified ? `✓ ${registryCheck.confidence_score}% confidence` : "○ Not verified"}
-                    </span>
-                  </div>
-                  <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>{registryCheck.verification_summary}</p>
-
-                  {/* Structured registry sources (OpenCorporates / Companies House) */}
-                  {(registryCheck.sources as Array<{ registry: string; url: string; confidence?: string }> | null)
-                    ?.filter((s) => !s.registry?.includes("DIFC"))
-                    .length ? (
-                    <div className="mt-2 space-y-1">
-                      {(registryCheck.sources as Array<{ registry: string; url: string }>)
-                        .filter((s) => !s.registry?.includes("DIFC"))
-                        .map((source, i) => (
-                          <a key={i} href={source.url} target="_blank" rel="noopener noreferrer"
-                            className="text-xs block hover:underline" style={{ color: "var(--brand)" }}>
-                            ↗ {source.registry}
-                          </a>
-                        ))}
-                    </div>
-                  ) : null}
-
-                  {/* DIFC result — visually secondary, clearly labeled as best-effort */}
-                  {registryCheck.difc_check_method === "ai_web_search" && (
-                    <div className="mt-3 rounded-lg px-3 py-2.5" style={{ background: "var(--accent)", border: "1px solid var(--border)" }}>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-[11px] font-medium" style={{ color: "var(--muted-foreground)" }}>DIFC (UAE): best-effort web search</span>
-                        <span className="text-[11px]" style={{ color: registryCheck.difc_found ? "#10B981" : "var(--faint)" }}>
-                          {registryCheck.difc_found ? "✓ Match found" : "○ No match"}
-                          {registryCheck.difc_confidence ? ` · ${registryCheck.difc_confidence} confidence` : ""}
-                        </span>
-                      </div>
-                      <p className="text-[11px] leading-snug" style={{ color: "var(--faint)" }}>
-                        Not a direct registry API — AI-assisted search of the DIFC public register page.
-                        {registryCheck.difc_source_url && (
-                          <>
-                            {" "}
-                            <a href={registryCheck.difc_source_url} target="_blank" rel="noopener noreferrer"
-                              className="hover:underline" style={{ color: "var(--brand)" }}>
-                              Verify on difc.ae ↗
-                            </a>
-                          </>
-                        )}
-                      </p>
-                    </div>
-                  )}
-
-                  <p className="text-xs mt-2" style={{ color: "var(--faint)" }}>
-                    Checked {new Date(registryCheck.checked_at).toLocaleDateString()} · Source-cited, not manually confirmed
-                  </p>
-                </div>
-              ) : (
-                <div className="p-4 rounded-lg border mt-2" style={{ background: "var(--accent)", border: "1px solid var(--border)" }}>
-                  <p className="text-xs text-faint">
-                    Registry check runs automatically when your profile is published. Checks OpenCorporates (140+ jurisdictions), UK Companies House, and DIFC (best-effort web search).
-                  </p>
-                </div>
-              )}
-              <button
-                onClick={runRegistryCheck}
-                disabled={runningRegistryCheck || !startup?.id}
-                className="text-xs px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
-                style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.3)", color: "#a78bfa" }}
-              >
-                {runningRegistryCheck ? "⟳ Checking registries..." : "↻ Run registry check"}
-              </button>
-
               <Field label="Tagline" value={form.tagline} onChange={field("tagline")} placeholder="One line that explains your company" />
               <div className="grid sm:grid-cols-2 gap-3">
-                <Field label="Website" value={form.website} onChange={field("website")} placeholder="https://example.com"
-                  badge={<FieldVerificationBadge profileType="startup" fieldName="website" tier1Passed={founderTier1Passed} compact />} />
+                <Field label="Website" value={form.website} onChange={field("website")} placeholder="https://example.com" />
                 <Field label="Founded year" value={form.founded_year} onChange={field("founded_year")} placeholder="2022" />
                 <Field label="Country / HQ" value={form.country} onChange={field("country")} placeholder="San Francisco, USA" />
-                <Field label="Team size" value={form.team_size} onChange={field("team_size")} placeholder="e.g. 12" title="Number of full-time team members"
-                  badge={<FieldVerificationBadge profileType="startup" fieldName="team_size" claimStatus={claimByType("team_size")?.proof_status}
-                    onAttachProof={startup?.id ? () => setAttachingClaim({ type: "team_size", label: "Team Size", value: form.team_size }) : undefined} compact />} />
+                <Field label="Team size" value={form.team_size} onChange={field("team_size")} placeholder="e.g. 12" title="Number of full-time team members" />
                 <Field label="Sector" value={form.sector} onChange={field("sector")} placeholder="B2B SaaS, Fintech, AI..." />
                 <div>
                   <label className="text-xs text-muted-foreground">Stage</label>
@@ -1585,119 +1346,77 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
               <div className="grid sm:grid-cols-2 gap-3">
                 <Field label="Funding target" value={form.funding_target} onChange={field("funding_target")} placeholder="e.g. 2,000,000" title="Enter amount in USD, use commas for thousands (e.g. 2,000,000)" onBlur={(e) => setForm((f) => ({ ...f, funding_target: formatNumber(e.target.value) }))} />
                 <Field label="Pre-money valuation" value={form.valuation} onChange={field("valuation")} placeholder="e.g. 20,000,000" title="Pre-money valuation in USD" onBlur={(e) => setForm((f) => ({ ...f, valuation: formatNumber(e.target.value) }))} />
-                <Field label="Previous funding raised" value={form.previous_funding} onChange={field("previous_funding")} placeholder="$500K pre-seed"
-                  badge={<FieldVerificationBadge profileType="startup" fieldName="previous_funding" claimStatus={claimByType("previous_funding")?.proof_status}
-                    onAttachProof={startup?.id ? () => setAttachingClaim({ type: "previous_funding", label: "Previous Funding", value: form.previous_funding }) : undefined} compact />} />
-                <Field label="Current investors" value={form.current_investors} onChange={field("current_investors")} placeholder="Y Combinator, Sequoia"
-                  badge={<FieldVerificationBadge profileType="startup" fieldName="current_investors" compact />} />
+                <Field label="Previous funding raised" value={form.previous_funding} onChange={field("previous_funding")} placeholder="$500K pre-seed" />
+                <Field label="Current investors" value={form.current_investors} onChange={field("current_investors")} placeholder="Y Combinator, Sequoia" />
               </div>
               <TextArea label="Use of funds" value={form.use_of_funds} onChange={field("use_of_funds")} placeholder="40% engineering, 30% sales, 30% ops" rows={2} />
             </FormSection>
 
-            <FormSection
-              title="Traction & metrics"
-              badge={<FieldVerificationBadge profileType="startup" fieldName="revenue" claimStatus={claimByType("revenue")?.proof_status} compact />}
-            >
+            <FormSection title="Traction & metrics">
               <div className="grid sm:grid-cols-2 gap-3">
                 {/* Revenue */}
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs text-muted-foreground">Revenue / ARR</label>
-                    <ClaimBadge claim={claimByType("revenue")} onAttach={startup?.id ? () => setAttachingClaim({ type: "revenue", label: "Revenue / ARR", value: form.revenue }) : undefined} />
-                  </div>
-                  <input value={form.revenue} onChange={field("revenue")} onBlur={(e) => setForm((f) => ({ ...f, revenue: formatNumber(e.target.value) }))} placeholder="e.g. 500,000" className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
+                  <label className="text-xs text-muted-foreground">Revenue / ARR</label>
+                  <input value={form.revenue} onChange={field("revenue")} onBlur={(e) => setForm((f) => ({ ...f, revenue: formatNumber(e.target.value) }))} placeholder="e.g. 500,000" className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 mt-1" />
                 </div>
                 {/* Growth rate */}
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs text-muted-foreground">Growth rate</label>
-                    <ClaimBadge claim={claimByType("growth_rate")} onAttach={startup?.id ? () => setAttachingClaim({ type: "growth_rate", label: "Growth Rate", value: form.growth_rate }) : undefined} />
-                  </div>
-                  <input value={form.growth_rate} onChange={field("growth_rate")} placeholder="+15% MoM" className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
+                  <label className="text-xs text-muted-foreground">Growth rate</label>
+                  <input value={form.growth_rate} onChange={field("growth_rate")} placeholder="+15% MoM" className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 mt-1" />
                 </div>
                 {/* Customer count */}
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs text-muted-foreground">Customer count</label>
-                    <ClaimBadge claim={claimByType("customer_count")} onAttach={startup?.id ? () => setAttachingClaim({ type: "customer_count", label: "Customers", value: form.customer_count }) : undefined} />
-                  </div>
-                  <input value={form.customer_count} onChange={field("customer_count")} placeholder="500 paying customers" className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
+                  <label className="text-xs text-muted-foreground">Customer count</label>
+                  <input value={form.customer_count} onChange={field("customer_count")} placeholder="500 paying customers" className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 mt-1" />
                 </div>
                 {/* Key metric */}
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs text-muted-foreground">Key metric</label>
-                    <ClaimBadge claim={claimByType("key_metric")} onAttach={startup?.id ? () => setAttachingClaim({ type: "key_metric", label: "Key Metric", value: form.key_metric }) : undefined} />
-                  </div>
-                  <input value={form.key_metric} onChange={field("key_metric")} placeholder="Your most important metric" className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
+                  <label className="text-xs text-muted-foreground">Key metric</label>
+                  <input value={form.key_metric} onChange={field("key_metric")} placeholder="Your most important metric" className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 mt-1" />
                 </div>
               </div>
               {/* Traction textarea */}
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs text-muted-foreground">Traction highlights</label>
-                  <ClaimBadge claim={claimByType("traction")} onAttach={startup?.id ? () => setAttachingClaim({ type: "traction", label: "Traction", value: form.traction }) : undefined} />
-                </div>
-                <textarea value={form.traction} onChange={field("traction")} placeholder="Key traction highlights..." rows={3} className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none" />
+                <label className="text-xs text-muted-foreground">Traction highlights</label>
+                <textarea value={form.traction} onChange={field("traction")} placeholder="Key traction highlights..." rows={3} className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none mt-1" />
               </div>
             </FormSection>
 
             {/* Cap Table — founder-only, not visible to investors by default */}
             {startup?.id && <CapTableSection startupId={startup.id} />}
 
-            <FormSection
-              title="Vision & strategy"
-              badge={<FieldVerificationBadge profileType="startup" fieldName="problem" compact />}
-            >
-              <TextArea label="Problem" value={form.problem} onChange={field("problem")} placeholder="What problem are you solving?" rows={4}
-                badge={<FieldVerificationBadge profileType="startup" fieldName="problem" />} />
-              <TextArea label="Solution" value={form.solution} onChange={field("solution")} placeholder="How does your product solve it?" rows={4}
-                badge={<FieldVerificationBadge profileType="startup" fieldName="solution" />} />
-              <TextArea label="Business model" value={form.business_model} onChange={field("business_model")} placeholder="How do you make money?" rows={3}
-                badge={<FieldVerificationBadge profileType="startup" fieldName="business_model" />} />
+            <FormSection title="Vision & strategy">
+              <TextArea label="Problem" value={form.problem} onChange={field("problem")} placeholder="What problem are you solving?" rows={4} />
+              <TextArea label="Solution" value={form.solution} onChange={field("solution")} placeholder="How does your product solve it?" rows={4} />
+              <TextArea label="Business model" value={form.business_model} onChange={field("business_model")} placeholder="How do you make money?" rows={3} />
               <Field label="Market size" value={form.market_size} onChange={field("market_size") as any} placeholder="$50B TAM, $5B SAM…" />
-              <TextArea label="Why us" value={form.why_us} onChange={field("why_us")} placeholder="Why is your team uniquely positioned?" rows={3}
-                badge={<FieldVerificationBadge profileType="startup" fieldName="why_us" />} />
-              <TextArea label="Why now?" value={form.why_now} onChange={field("why_now")} placeholder="What tailwind or market shift makes this the right time?" rows={2}
-                badge={<FieldVerificationBadge profileType="startup" fieldName="why_now" />} />
+              <TextArea label="Why us" value={form.why_us} onChange={field("why_us")} placeholder="Why is your team uniquely positioned?" rows={3} />
+              <TextArea label="Why now?" value={form.why_now} onChange={field("why_now")} placeholder="What tailwind or market shift makes this the right time?" rows={2} />
             </FormSection>
 
             <FormSection title="Market & opportunity">
               <div className="grid sm:grid-cols-2 gap-3">
                 <Field label="TAM" value={form.tam} onChange={field("tam")} placeholder="Total addressable market" />
                 <Field label="SAM" value={form.sam} onChange={field("sam")} placeholder="Serviceable addressable market" />
-                <Field label="Target customer" value={form.target_customer} onChange={field("target_customer")} placeholder="Who will buy from you?"
-                  badge={<FieldVerificationBadge profileType="startup" fieldName="target_customer" compact />} />
+                <Field label="Target customer" value={form.target_customer} onChange={field("target_customer")} placeholder="Who will buy from you?" />
               </div>
             </FormSection>
 
             <FormSection title="Business model details">
               <TextArea label="Revenue model" value={form.revenue_model} onChange={field("revenue_model")} placeholder="How do you generate revenue?" rows={3} />
               <Field label="Pricing" value={form.pricing} onChange={field("pricing")} placeholder="Pricing model or range" />
-              <TextArea label="Unit economics" value={form.unit_economics} onChange={field("unit_economics")} placeholder="CAC, LTV or contribution margin" rows={3}
-                badge={<FieldVerificationBadge profileType="startup" fieldName="unit_economics" />} />
+              <TextArea label="Unit economics" value={form.unit_economics} onChange={field("unit_economics")} placeholder="CAC, LTV or contribution margin" rows={3} />
               <div className="grid sm:grid-cols-2 gap-3">
-                <Field label="Burn rate" value={form.burn_rate} onChange={field("burn_rate")} placeholder="$ / month"
-                  badge={<FieldVerificationBadge profileType="startup" fieldName="burn_rate" claimStatus={claimByType("burn_rate")?.proof_status}
-                    onAttachProof={startup?.id ? () => setAttachingClaim({ type: "burn_rate", label: "Burn Rate", value: form.burn_rate }) : undefined} compact />} />
-                <Field label="Runway (months)" value={form.runway_months} onChange={field("runway_months")} placeholder="e.g. 12"
-                  badge={<FieldVerificationBadge profileType="startup" fieldName="runway_months" claimStatus={claimByType("runway_months")?.proof_status}
-                    onAttachProof={startup?.id ? () => setAttachingClaim({ type: "runway_months", label: "Runway (months)", value: form.runway_months }) : undefined} compact />} />
+                <Field label="Burn rate" value={form.burn_rate} onChange={field("burn_rate")} placeholder="$ / month" />
+                <Field label="Runway (months)" value={form.runway_months} onChange={field("runway_months")} placeholder="e.g. 12" />
               </div>
             </FormSection>
 
-            <FormSection
-              title="Cap & relationships"
-              badge={<FieldVerificationBadge profileType="startup" fieldName="advisors" compact />}
-            >
-              <TextArea label="Moat" value={form.moat} onChange={field("moat")} placeholder="What protects your business?" rows={3}
-                badge={<FieldVerificationBadge profileType="startup" fieldName="moat" />} />
-              <TextArea label="Competitors" value={form.competitors} onChange={field("competitors")} placeholder="Key competitors and alternatives" rows={3}
-                badge={<FieldVerificationBadge profileType="startup" fieldName="competitors" />} />
-              <TextArea label="Milestones" value={form.milestones} onChange={field("milestones")} placeholder="Key traction, launches, and milestones" rows={3}
-                badge={<FieldVerificationBadge profileType="startup" fieldName="milestones" />} />
-              <TextArea label="Advisors" value={form.advisors} onChange={field("advisors")} placeholder="Notable advisors" rows={2}
-                badge={<FieldVerificationBadge profileType="startup" fieldName="advisors" />} />
+            <FormSection title="Cap & relationships">
+              <TextArea label="Moat" value={form.moat} onChange={field("moat")} placeholder="What protects your business?" rows={3} />
+              <TextArea label="Competitors" value={form.competitors} onChange={field("competitors")} placeholder="Key competitors and alternatives" rows={3} />
+              <TextArea label="Milestones" value={form.milestones} onChange={field("milestones")} placeholder="Key traction, launches, and milestones" rows={3} />
+              <TextArea label="Advisors" value={form.advisors} onChange={field("advisors")} placeholder="Notable advisors" rows={2} />
             </FormSection>
 
             <FormSection title="Media">
@@ -1764,11 +1483,9 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
               <div className="grid sm:grid-cols-2 gap-3">
                 <Field label="Founder name" value={form.founder_name} onChange={field("founder_name")} placeholder="Jane Smith" />
                 <Field label="Founder email" value={form.founder_email} onChange={field("founder_email")} placeholder="jane@startup.com" />
-                <Field label="Founder LinkedIn" value={form.founder_linkedin} onChange={field("founder_linkedin")} placeholder="linkedin.com/in/janesmith"
-                  badge={<FieldVerificationBadge profileType="startup" fieldName="founder_linkedin" tier1Passed={founderTier1Passed} compact />} />
+                <Field label="Founder LinkedIn" value={form.founder_linkedin} onChange={field("founder_linkedin")} placeholder="linkedin.com/in/janesmith" />
                 <Field label="Co-founder name" value={form.cofounder_name} onChange={field("cofounder_name")} placeholder="Alex Lee" />
-                <Field label="Co-founder LinkedIn" value={form.cofounder_linkedin} onChange={field("cofounder_linkedin")} placeholder="linkedin.com/in/alexlee"
-                  badge={<FieldVerificationBadge profileType="startup" fieldName="cofounder_linkedin" compact />} />
+                <Field label="Co-founder LinkedIn" value={form.cofounder_linkedin} onChange={field("cofounder_linkedin")} placeholder="linkedin.com/in/alexlee" />
               </div>
             </FormSection>
 
@@ -2282,24 +1999,6 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
         </div>
       )}
 
-      {/* R10 step 2: BadgesSection removed from every Profile leaf — it
-          duplicated the real Badge Overview & Guide page (app.badges.tsx),
-          which already owns "Run badge evaluation" as its one correct home. */}
-
-      {/* Operationally Verified — Tier 3 moved to Prepare › Workstation ›
-          Verifications (R9 sitemap: verification-tier content lives in the
-          Workstation group, not on a profile-builder leaf). Same component,
-          same upload flow — see app.verification.tsx. */}
-
-      {/* Attach-proof modal — rendered outside the form to avoid nesting */}
-      {attachingClaim && startup?.id && (
-        <AttachProofModal
-          claim={attachingClaim}
-          startupId={startup.id}
-          onClose={() => { setAttachingClaim(null); setAttachingFile(null); }}
-          onDone={() => { refetchClaims(); setAttachingClaim(null); setAttachingFile(null); }}
-        />
-      )}
     </div>
   );
 }
@@ -2590,60 +2289,6 @@ function RightCol({ form, deckName, deckUploading, isExtracting, onDeckUpload, s
   );
 }
 
-// ── Claim verification components ─────────────────────────────────
-
-const STATUS_CONFIG: Record<ClaimStatus, { label: string; icon: React.ReactNode; style: React.CSSProperties }> = {
-  unverified: {
-    label: "Unverified",
-    icon: <AlertTriangle className="h-3 w-3" />,
-    style: { background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.25)", color: "#F59E0B" },
-  },
-  pending_review: {
-    label: "Proof attached",
-    icon: <Clock className="h-3 w-3" />,
-    style: { background: "var(--accent)", border: "1px solid var(--border)", color: "var(--muted-foreground)" },
-  },
-  ai_confirmed: {
-    label: "AI confirmed",
-    icon: <CheckCircle2 className="h-3 w-3" />,
-    style: { background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" },
-  },
-  ai_mismatch: {
-    label: "Claim mismatch",
-    icon: <XCircle className="h-3 w-3" />,
-    style: { background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", color: "#EF4444" },
-  },
-};
-
-function ClaimBadge({ claim, onAttach }: { claim: StartupClaim | undefined; onAttach?: () => void }) {
-  if (!claim) return null;
-  const cfg = STATUS_CONFIG[claim.proof_status as ClaimStatus] ?? STATUS_CONFIG.unverified;
-  return (
-    <span
-      className="inline-flex items-center gap-1 rounded-full text-[11px] font-medium px-2 py-0.5 cursor-default"
-      style={cfg.style}
-      title={claim.proof_status === "ai_mismatch"
-        ? `Document does not match this claim. ${claim.ai_check_result?.explanation ?? ""}`
-        : claim.proof_status === "ai_confirmed"
-        ? `AI confirmed: ${claim.ai_check_result?.found_value ?? "value found in document"}`
-        : undefined}
-    >
-      {cfg.icon}
-      {cfg.label}
-      {(claim.proof_status === "unverified" || claim.proof_status === "ai_mismatch") && onAttach && (
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); onAttach(); }}
-          className="ml-1 underline underline-offset-2 hover:opacity-70"
-          style={{ color: "inherit", background: "none", border: "none", padding: 0, cursor: "pointer", fontSize: "inherit" }}
-        >
-          Attach proof
-        </button>
-      )}
-    </span>
-  );
-}
-
 // ── Cap table section ─────────────────────────────────────────────
 
 interface CapRow {
@@ -2669,7 +2314,6 @@ function CapTableSection({ startupId }: { startupId: string }) {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const blank = { shareholder_name: "", shareholder_role: "Founder", ownership_percent: "", linkedin_url: "", x_url: "", instagram_url: "" };
   const [form, setForm] = useState(blank);
 
@@ -2715,23 +2359,6 @@ function CapTableSection({ startupId }: { startupId: string }) {
       toast.error(e.message ?? "Save failed");
     } finally {
       setSaving(false);
-    }
-  };
-
-  const handleVerify = async (row: CapRow) => {
-    setVerifyingId(row.id);
-    try {
-      const { verifySocialUrls } = await import("@/lib/claims-fn");
-      const { data: { session } } = await supabase.auth.getSession();
-      const r = await verifySocialUrls({
-        data: { startup_id: startupId, cap_table_row_id: row.id, linkedin_url: row.linkedin_url, x_url: row.x_url, instagram_url: row.instagram_url, accessToken: session?.access_token ?? "" },
-      });
-      qc.invalidateQueries({ queryKey: ["cap-table", startupId] });
-      toast.success(r.social_verified ? "Social links verified" : "Links could not be reached — social_verified set to false");
-    } catch {
-      toast.error("Verification failed");
-    } finally {
-      setVerifyingId(null);
     }
   };
 
@@ -2800,19 +2427,6 @@ function CapTableSection({ startupId }: { startupId: string }) {
                       </span>
                     )}
                     <span className="text-sm font-semibold text-muted-foreground">{row.ownership_percent}%</span>
-                    {row.social_verified ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-full"
-                        style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }}>
-                        <CheckCircle2 className="h-3 w-3" /> Social verified
-                      </span>
-                    ) : (row.linkedin_url || row.x_url || row.instagram_url) ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-full"
-                        style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", color: "#F59E0B" }}>
-                        <AlertTriangle className="h-3 w-3" /> Unverified links
-                      </span>
-                    ) : (
-                      <span className="text-[11px] text-faint">No social links</span>
-                    )}
                   </div>
                   <div className="flex items-center gap-3 mt-1.5">
                     {row.linkedin_url && <a href={row.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-faint hover:text-muted-foreground transition-colors"><Linkedin className="h-3.5 w-3.5" /></a>}
@@ -2821,17 +2435,6 @@ function CapTableSection({ startupId }: { startupId: string }) {
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
-                  {(row.linkedin_url || row.x_url || row.instagram_url) && (
-                    <button
-                      onClick={() => handleVerify(row)}
-                      disabled={verifyingId === row.id}
-                      className="text-xs text-faint hover:text-muted-foreground transition-colors flex items-center gap-1"
-                      title="Re-run social link verification"
-                    >
-                      {verifyingId === row.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
-                      Verify
-                    </button>
-                  )}
                   <button onClick={() => startEdit(row)} className="text-faint hover:text-muted-foreground p-1"><Pencil className="h-3.5 w-3.5" /></button>
                   <button onClick={() => handleDelete(row.id)} className="text-faint hover:text-red-400 p-1"><Trash2 className="h-3.5 w-3.5" /></button>
                 </div>

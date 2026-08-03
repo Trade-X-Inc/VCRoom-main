@@ -8,19 +8,6 @@ import { supabase } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { VerificationBadge } from "@/components/shared/VerificationBadge";
-import { BadgeDisplay, useBadges } from "@/components/app/BadgeDisplay";
-
-/** Public view: earned badges only — no locked states, tooltip descriptions. */
-function PublicBadges({ startupId }: { startupId: string }) {
-  const { data: badges = [] } = useBadges({ startupId });
-  if (!badges.length) return null;
-  return (
-    <div className="mt-3">
-      <BadgeDisplay badges={badges} size="sm" maxVisible={6} context="public" />
-    </div>
-  );
-}
 
 /** Roast record: the receipts behind the badge. Public sessions only. */
 function RoastRecordLink({ startupId }: { startupId: string }) {
@@ -489,31 +476,6 @@ function FounderPublicProfileWrapper() {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-function ClaimStatusPill({ status }: { status: string }) {
-  if (status === "ai_confirmed") {
-    return (
-      <span className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full font-medium shrink-0"
-        style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }}>
-        ✓ Verified
-      </span>
-    );
-  }
-  if (status === "ai_mismatch") {
-    return (
-      <span className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full font-medium shrink-0"
-        style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#EF4444" }}>
-        ⚠ Mismatch
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full font-medium shrink-0"
-      style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", color: "#F59E0B" }}>
-      Unverified
-    </span>
-  );
-}
-
 function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStartup; isOwnerPreview: boolean }) {
   const [accessLevel, setAccessLevel] = useState<AccessLevel>(isOwnerPreview ? "founder" : "public");
   const [viewerId, setViewerId] = useState<string | null>(null);
@@ -577,50 +539,6 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
       }
     });
   }, [startup?.id]);
-
-  const { data: registryCheck } = useQuery({
-    queryKey: ["registry-check-public", startup?.id],
-    enabled: !!startup?.id && !!startup?.registry_verified,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("company_registry_checks")
-        .select("verified, confidence_score, verified_jurisdiction, sources, checked_at")
-        .eq("startup_id", startup!.id)
-        .maybeSingle();
-      return data;
-    },
-  });
-
-  const { data: founderVerification } = useQuery({
-    queryKey: ["founder-verification-public", startup?.id],
-    enabled: !!startup?.id,
-    staleTime: 5 * 60 * 1000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("founder_verifications")
-        .select("current_tier, tier1_passed, tier1_score, tier2_passed, tier3_passed")
-        .eq("startup_id", startup!.id)
-        .maybeSingle();
-      return data ?? null;
-    },
-  });
-
-  // Claims: only ai_confirmed ones are shown publicly (unverified/mismatch are
-  // shown as "Unverified" to investors — they need to see what's not backed up)
-  const { data: publicClaims = [] } = useQuery({
-    queryKey: ["public-claims", startup?.id],
-    enabled: !!startup?.id,
-    staleTime: 5 * 60 * 1000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("startup_claims")
-        .select("claim_type, claim_label, claim_value, proof_status")
-        .eq("startup_id", startup!.id);
-      return (data ?? []) as Array<{ claim_type: string; claim_label: string; claim_value: string; proof_status: string }>;
-    },
-  });
-
-  const publicClaimByType = (type: string) => publicClaims.find((c) => c.claim_type === type);
 
   // Profile view tracking
   useEffect(() => {
@@ -873,29 +791,6 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
               {startup.company_name || "Unnamed startup"}
             </h1>
             {startup.tagline && <p className="mt-4 max-w-3xl text-lg text-muted-foreground">{startup.tagline}</p>}
-            {(startup?.registry_verified && registryCheck || (founderVerification?.current_tier ?? 0) > 0) && (
-              <div className="flex items-center gap-2 mt-3 flex-wrap">
-                {startup?.registry_verified && registryCheck && (
-                  <span
-                    className="text-xs px-2.5 py-1 rounded-full font-medium inline-flex items-center gap-1"
-                    style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.25)", color: "#10B981" }}
-                    title={`Company registration verified with ${registryCheck.confidence_score}% confidence.`}
-                  >
-                    ✓ Registered company
-                  </span>
-                )}
-                {(founderVerification?.current_tier ?? 0) > 0 && (
-                  <VerificationBadge
-                    tier={founderVerification!.current_tier}
-                    size="md"
-                    verifySlug={startup.profile_slug ?? undefined}
-                    entityType="founder"
-                  />
-                )}
-              </div>
-            )}
-            {/* Earned badges — trust first, then readiness, then community */}
-            {startup?.id && <PublicBadges startupId={startup.id} />}
             {startup?.id && <RoastRecordLink startupId={startup.id} />}
             {(startup.social_links ?? []).length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
@@ -984,30 +879,12 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
                   </div>
                 </div>
               )}
-              {startup.revenue && (() => {
-                const revClaim = publicClaimByType("revenue");
-                const isUnverified = !revClaim || revClaim.proof_status === "unverified" || revClaim.proof_status === "ai_mismatch";
-                return (
-                  <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Revenue</div>
-                      {revClaim && (
-                        <span
-                          className="text-[10px] px-1.5 py-0.5 rounded-full font-medium inline-flex items-center gap-1"
-                          style={isUnverified
-                            ? { background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", color: "#F59E0B" }
-                            : revClaim.proof_status === "ai_mismatch"
-                            ? { background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", color: "#EF4444" }
-                            : { background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }}
-                        >
-                          {revClaim.proof_status === "ai_confirmed" ? "✓ Verified" : revClaim.proof_status === "ai_mismatch" ? "⚠ Mismatch" : "Unverified"}
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-2 text-lg font-semibold text-foreground">{formatCurrency(startup.revenue)}</div>
-                  </div>
-                );
-              })()}
+              {startup.revenue && (
+                <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
+                  <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Revenue</div>
+                  <div className="mt-2 text-lg font-semibold text-foreground">{formatCurrency(startup.revenue)}</div>
+                </div>
+              )}
             </SectionGate>
 
             {/* Market section */}
@@ -1041,19 +918,16 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
                     {startup.key_metric && (
                       <div className="flex items-center gap-2 flex-wrap">
                         <span><span className="font-semibold text-foreground">Key metric:</span> {startup.key_metric}</span>
-                        {publicClaimByType("key_metric") && <ClaimStatusPill status={publicClaimByType("key_metric")!.proof_status} />}
                       </div>
                     )}
                     {startup.growth_rate && (
                       <div className="flex items-center gap-2 flex-wrap">
                         <span><span className="font-semibold text-foreground">Growth:</span> {startup.growth_rate}</span>
-                        {publicClaimByType("growth_rate") && <ClaimStatusPill status={publicClaimByType("growth_rate")!.proof_status} />}
                       </div>
                     )}
                     {startup.customer_count && (
                       <div className="flex items-center gap-2 flex-wrap">
                         <span><span className="font-semibold text-foreground">Customers:</span> {startup.customer_count}</span>
-                        {publicClaimByType("customer_count") && <ClaimStatusPill status={publicClaimByType("customer_count")!.proof_status} />}
                       </div>
                     )}
                     {startup.milestones && <div><span className="font-semibold text-foreground">Milestones:</span> {startup.milestones}</div>}

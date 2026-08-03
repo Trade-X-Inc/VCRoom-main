@@ -295,8 +295,8 @@ export const declineConnectionRequest = createServerFn({ method: "POST" })
       user_id: request.investor_id,
       kind: "connection_declined",
       title: `${startup.company_name} is not accepting connections at this time.`,
-      body: "You can continue exploring other verified startups in the directory.",
-      action_url: "/app/directory",
+      body: "You can continue exploring other companies in your watchlist.",
+      action_url: "/app/investor/startups",
     });
 
     return { ok: true };

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { HelpCircle, X, Send, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
+import { supabase } from "@/lib/supabase";
 
 // ─── Guide content definitions ────────────────────────────────────────────────
 
@@ -148,7 +149,7 @@ async function askPageAI(opts: {
   pageId: PageId;
   message: string;
   history: Array<{ role: string; content: string }>;
-  userId: string;
+  userAccessToken: string;
   liveData?: string;
   startupContext?: Record<string, string | number | undefined>;
 }): Promise<string> {
@@ -164,7 +165,7 @@ async function askPageAI(opts: {
   const { getAIAdvice } = await import("@/lib/advisor-fn");
   const result = await getAIAdvice({
     data: {
-      userId: opts.userId,
+      userAccessToken: opts.userAccessToken,
       message: opts.message,
       history: opts.history,
       pageContext: opts.pageId,
@@ -214,11 +215,12 @@ export function PageGuide({
     const userMsg = { role: "user", content: msg };
     setHistory((h) => [...h, userMsg]);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
       const reply = await run(() => askPageAI({
         pageId,
         message: msg,
         history,
-        userId: user.id,
+        userAccessToken: session?.access_token ?? "",
         liveData,
         startupContext,
       }));

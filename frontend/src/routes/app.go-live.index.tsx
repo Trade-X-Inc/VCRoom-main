@@ -4,6 +4,6 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 // now (the swapped L3 sidebar). Its bare URL forwards to the first leaf.
 export const Route = createFileRoute("/app/go-live/")({
   beforeLoad: () => {
-    throw redirect({ to: "/app/go-live/directory" as any, replace: true });
+    throw redirect({ to: "/app/go-live/digital-profile/profile-view" as any, replace: true });
   },
 });

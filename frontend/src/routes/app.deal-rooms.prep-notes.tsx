@@ -165,9 +165,10 @@ export function PrepNotesBase({
     setSummarizing(true);
     try {
       const { secureAICall } = await import("@/lib/ai-secure-fn");
+      const { data: { session } } = await supabase.auth.getSession();
       const result = await secureAICall({
         data: {
-          userId: user.id,
+          userAccessToken: session?.access_token ?? "",
           systemPrompt: "Summarize these deal-prep notes into 3-5 concise bullet points covering the key facts and open questions. Plain text, no markdown headers.",
           userMessage: editContent,
           maxTokens: 300,

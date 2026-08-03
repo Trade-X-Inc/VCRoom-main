@@ -434,8 +434,6 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       }, { onConflict: "startup_id,template_slug" });
       if (upsertError) throw upsertError;
       toast.success(`${templateName} uploaded`);
-      // Badge evaluation — fire-and-forget on this write event
-      import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { startup_id: startup?.id } })).catch(() => {});
       // Readiness checklist refresh — new documents change the gap analysis
       if (startup?.id) {
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -488,8 +486,9 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       const { extractDocumentText } = await import("@/lib/document-extractor");
       const text = await extractDocumentText(file, file.name);
       const { extractCustomDocument } = await import("@/lib/profile-builder-fn");
+      const { data: { session: extractSession } } = await supabase.auth.getSession();
       const result = await extractCustomDocument({
-        data: { userId: user.id, documentText: text, fileName: file.name },
+        data: { userAccessToken: extractSession?.access_token ?? "", documentText: text, fileName: file.name },
       }).catch((e: any): Awaited<ReturnType<typeof extractCustomDocument>> => ({
         data: null, missing_fields: [], error: e?.message || "Extraction failed",
       }));
@@ -521,7 +520,6 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
         toast.error("Uploaded, but extraction failed — stored in Source Files. You can retry or fill manually.");
       }
 
-      import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { startup_id: startup?.id } })).catch(() => {});
       // R11 step 4: invalidate every view of founder_documents — Intake,
       // Source Files, Digital Document Vault, and Privacy Settings are
       // separate route mounts of this same component, each with its own
@@ -577,8 +575,9 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       const { extractDocumentText } = await import("@/lib/document-extractor");
       const text = await extractDocumentText(file, file.name);
       const { extractEmployeeOnePager } = await import("@/lib/profile-builder-fn");
+      const { data: { session: onePagerSession } } = await supabase.auth.getSession();
       const result = await extractEmployeeOnePager({
-        data: { userId: user.id, documentText: text, fileName: file.name },
+        data: { userAccessToken: onePagerSession?.access_token ?? "", documentText: text, fileName: file.name },
       }).catch((e: any): Awaited<ReturnType<typeof extractEmployeeOnePager>> => ({
         data: null, missing_fields: [], error: e?.message || "Extraction failed",
       }));
@@ -646,8 +645,9 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       const { extractDocumentText } = await import("@/lib/document-extractor");
       const text = await extractDocumentText(file, file.name);
       const { extractCustomDocument } = await import("@/lib/profile-builder-fn");
+      const { data: { session: extractSession } } = await supabase.auth.getSession();
       const result = await extractCustomDocument({
-        data: { userId: user.id, documentText: text, fileName: file.name },
+        data: { userAccessToken: extractSession?.access_token ?? "", documentText: text, fileName: file.name },
       }).catch((e: any): Awaited<ReturnType<typeof extractCustomDocument>> => ({
         data: null, missing_fields: [], error: e?.message || "Extraction failed",
       }));
@@ -1557,8 +1557,6 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
 
       if (error) throw error;
       toast.success("Document saved");
-      // Badge evaluation — fire-and-forget on this write event
-      import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { startup_id: startup?.id } })).catch(() => {});
       onSave();
     } catch (e: any) {
       toast.error(e.message || "Save failed");

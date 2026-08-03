@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, ClipboardCheck, Globe, UserCircle2, Briefcase,
-  PieChart, MessageSquare, Gift, Settings, Brain, FileInput,
+  PieChart, MessageSquare, Settings, Brain, FileInput,
 } from "lucide-react";
 
 /**
@@ -77,33 +77,10 @@ export const founderSections: L2Section[] = [
         ],
       },
       {
-        label: "Workstation",
+        label: "Roast",
         children: [
-          { to: "/app/prepare/workstation/verifications", label: "Verifications" },
-          { to: "/app/prepare/workstation/claims", label: "Claims" },
-        ],
-      },
-      {
-        label: "Badges",
-        children: [
-          { to: "/app/prepare/badges/overview", label: "Badge Overview & Guide" },
-          { to: "/app/prepare/badges/apply", label: "Apply Badge" },
           { to: "/app/prepare/badges/founder-roast", label: "Founder Roast" },
           { to: "/app/prepare/badges/roast-reports", label: "Founder Roast Reports" },
-        ],
-      },
-      {
-        label: "Investment Readiness",
-        children: [
-          { to: "/app/prepare/investment-readiness/investor-simulation", label: "Investor Simulation" },
-          { to: "/app/prepare/investment-readiness/investment-audit", label: "Investment Audit" },
-        ],
-      },
-      {
-        label: "Founder Coaching",
-        children: [
-          { to: "/app/prepare/founder-coaching/profile-documents-check", label: "Full Profile & Documents Check" },
-          { to: "/app/prepare/founder-coaching/report-flags", label: "Full Report & Flags" },
         ],
       },
     ],
@@ -119,20 +96,13 @@ export const founderSections: L2Section[] = [
           { to: "/app/go-live/digital-profile/privacy-settings", label: "Profile Privacy Settings" },
         ],
       },
-      { to: "/app/go-live/directory", label: "Directory Dashboard" },
       { to: "/app/go-live/profile-analytics", label: "Profile View Analytics" },
     ],
   },
   {
-    key: "crm", label: "CRM", icon: UserCircle2,
-    matchPrefixes: ["/app/crm"],
-    children: [
-      { to: "/app/crm/connections", label: "Connections" },
-      { to: "/app/crm/pipeline-manager", label: "Pipeline Manager" },
-      { to: "/app/crm/meetings", label: "Connection Meetings" },
-      { to: "/app/crm/email-outreach", label: "Email Outreach" },
-      { to: "/app/crm/analytics", label: "CRM Analytics" },
-    ],
+    key: "connections", label: "Connection Requests", icon: UserCircle2,
+    to: "/app/connections",
+    matchPrefixes: ["/app/connections"],
   },
   {
     key: "deal-rooms", label: "Deal Rooms", icon: Briefcase,
@@ -152,10 +122,6 @@ export const founderSections: L2Section[] = [
   {
     key: "team-chat", label: "Team Chat", icon: MessageSquare,
     to: "/app/team-chat", matchPrefixes: [],
-  },
-  {
-    key: "referrals", label: "Referrals", icon: Gift,
-    to: "/app/referrals", matchPrefixes: [],
   },
   {
     key: "settings", label: "Settings", icon: Settings,
@@ -192,28 +158,6 @@ export const investorSections: L2Section[] = [
           { to: "/app/investor/thesis/fund-vault/privacy-settings", label: "Document Privacy Settings" },
         ],
       },
-      {
-        label: "Verification",
-        children: [
-          { to: "/app/investor/thesis/verification/verifications", label: "Verifications" },
-          { to: "/app/investor/thesis/verification/claims", label: "Claims" },
-        ],
-      },
-      {
-        label: "Badges",
-        children: [
-          { to: "/app/investor/thesis/badges/overview", label: "Badge Overview & Guide" },
-          { to: "/app/investor/thesis/badges/apply", label: "Apply Badge" },
-          { to: "/app/investor/thesis/badges/tier-status", label: "Verification Tier Status" },
-        ],
-      },
-      {
-        label: "Capital Readiness",
-        children: [
-          { to: "/app/investor/thesis/capital-readiness/cheque-size", label: "Cheque Size Confirmation" },
-          { to: "/app/investor/thesis/capital-readiness/capacity-audit", label: "Investment Capacity Audit" },
-        ],
-      },
     ],
   },
   {
@@ -233,13 +177,13 @@ export const investorSections: L2Section[] = [
     ],
   },
   {
-    key: "crm", label: "CRM", icon: UserCircle2,
-    matchPrefixes: ["/app/investor/crm"],
+    key: "connections", label: "Connections", icon: UserCircle2,
+    matchPrefixes: ["/app/investor/connections", "/app/investor/decisions", "/app/investor/decide", "/app/investor/analysis"],
     children: [
-      { to: "/app/investor/crm/connections", label: "Connections" },
-      { to: "/app/investor/crm/pipeline-manager", label: "Pipeline Manager" },
-      { to: "/app/investor/crm/founder-meetings", label: "Founder Meetings" },
-      { to: "/app/investor/crm/deal-analysis", label: "Deal Analysis" },
+      { to: "/app/investor/connections", label: "Connections" },
+      { to: "/app/investor/decide", label: "Decide" },
+      { to: "/app/investor/decisions", label: "Decisions" },
+      { to: "/app/investor/analysis", label: "Deal Analysis" },
     ],
   },
   {
@@ -264,10 +208,6 @@ export const investorSections: L2Section[] = [
   {
     key: "team-chat", label: "Team Chat", icon: MessageSquare,
     to: "/app/team-chat", matchPrefixes: [],
-  },
-  {
-    key: "referrals", label: "Referrals", icon: Gift,
-    to: "/app/referrals", matchPrefixes: [],
   },
   {
     key: "settings", label: "Settings", icon: Settings,

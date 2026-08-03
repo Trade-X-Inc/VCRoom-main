@@ -82,8 +82,8 @@ If a test requires a write to production, stop and ask first. Disclosing it afte
 
 | Metric | Value | Rule |
 |---|---|---|
-| `tsc` errors | 64 | Do not increase. If it drops, update this line and record why. |
-| Client bundle | 0.88 MB gzip | Ceiling is 1 MB. |
+| `tsc` errors | 59 | Do not increase. If it drops, update this line and record why. Dropped from 64 across `phase0/close-and-clear`: 64→62 (cluster 3, two deleted files' own pre-existing errors), 62→61 (cluster 4, same), 61→60 (cluster 6 + orphaned `investor-advisor-fn.ts` deletion, same), 60→59 (step 5, `DDWorkstation.tsx`'s own pre-existing type error on a field reference the JWT-forwarding fix removed). Every drop verified line-by-line against the prior baseline, not by count alone — see §7.5. |
+| Worker bundle (`_worker.js`, gzip) | 0.76 MB | Ceiling is 1 MB (CF Pages limit). Same metric the build script reports as "`_worker.js` gzip size" — prior figure (0.88 MB) predates this branch's deletions; drop is consistent with net negative line count across `phase0/close-and-clear` (+350/−17,582 vs `main` as of step 5). |
 
 ---
 
@@ -110,6 +110,7 @@ These were found the hard way. Each cost hours.
 - **"A row exists matching these IDs" is not an authorisation check.** It must be "the caller *is* the party in that row."
 - **RLS helper functions that query their own protected table cause infinite recursion.** Use direct subqueries or a `SECURITY DEFINER` helper.
 - **`auth.email()` outperforms `(SELECT email FROM auth.users WHERE id = auth.uid())`** — the latter silently fails for the authenticated role.
+- **`requireUser()` authenticates the token, not the possessor.** A stolen valid token passes every check in this codebase, everywhere. This is an accepted boundary, not a gap in any single function — do not re-litigate it per-function.
 
 ### 7.2 SECURITY DEFINER functions
 
@@ -134,6 +135,15 @@ These were found the hard way. Each cost hours.
 - **Errors must be checked.** A destructured `error` that is never referenced produces silent failure and false success in the interface. This class shipped to production more than once.
 - `investor_profiles.id` (profile PK) is **not** `investor_profiles.user_id` (= `auth.uid()`). Never conflate.
 - Do not hand-roll workflow transitions across an enum. The prior codebase ended with two conflicting stage vocabularies and a live constraint violation.
+
+### 7.5 Deletion passes (found during `phase0/close-and-clear`)
+
+- **File-level cut/keep classification is insufficient when a file's import graph matches the cut pattern but its content doesn't.** `app.connections.tsx` matched the CRM cut cluster by import graph, but tracing its actual content found `IncomingRequests` — the real deal-room-creation approve/decline flow — embedded inside otherwise-cut CRM UI. Trace content, not just imports, before deleting any file with real usage. Generalises to Phase 1's action-layer work: a gateway function can have the same problem at a larger scale.
+- **Check the founder/investor mirror side even when only one side was flagged.** If a given risk shape (stale content, an orphaned component, a shared table) shows up on one side of a founder/investor pair, check the other side as a matter of habit — it is not independently flagged by the same audit pass that caught the first one.
+- **A backend function can survive with a stale prompt/context built for a deleted feature, even after its frontend callers change.** `advisor-fn.ts`'s `pageGuidance` block referenced the deleted CRM pipeline and the deleted investor-readiness-score feature — found only by reading the function's actual content after its two live callers (`PageGuide.tsx`, `AIChat.tsx`) had already been reclassified as kept. Re-check a surviving backend function's own content, not just whether its callers still exist.
+- **A dead-code component can hide behind an otherwise-clean, still-imported route file.** `FounderHome`/`InvestorChat`-shaped blocks were found rendered from routes that looked cut-cluster-clean on import graph alone. Check for orphaned route-exported components before assuming a file is load-bearing (or, conversely, safe to delete) on import graph alone.
+- **A table can be dual-role.** `discovery_requests` and `vc_leads` are each written by kept infrastructure and read by a mix of cut UI (deleted) and kept UI (preserved) simultaneously — neither is classifiable as purely cut or purely kept at the table level. Trace actual read/write call sites per table before assuming a table follows its most prominent feature's fate.
+- **A nav-reference grep catches what `tsc` misses.** Deleting a route can leave a dangling `<Link to="...">` or nav entry that is not a type error (the route path is often typed as a plain string) but is a real broken link in production. Grep for the literal route string across `src/`, not just the import graph, before treating a deletion as complete.
 
 ---
 
@@ -301,10 +311,14 @@ Do not build these. Each was decided deliberately.
 - Secondary market in unlisted shares
 - Retail crowdfunding
 - Signable legal instruments generated by us
-- Social feed, team chat, referral programme, news aggregation
+- Social feed, referral programme, news aggregation
 - Configurable workflow — templates with optional steps only
 - Tokenisation
 - Scraping of any kind
+
+"Marketplace, directory, matching, recommendation" excludes public discovery/browsing surfaces (founder directory, thesis-matching/alerts) — not the connection-request approve/decline mechanism, which is core deal-room-creation infrastructure and is kept. `discovery_requests` and `vc_leads` are both dual-role tables: written by KEPT connection-request infrastructure, read by both cut UI (deleted) and kept UI (preserved) — see step-0 and cluster 2-4 findings on the `phase0/close-and-clear` branch.
+
+Team coordination chat (internal, per-organisation) is IN SCOPE for a future phase, rebuilt toward Slack-like capability — reclassified 2 Aug 2026 during `phase0/close-and-clear` after direct product-owner instruction. This is distinct from the excluded social/engagement features above. Not a Phase 0 build item; the existing `team_messages`-backed implementation was preserved, not rebuilt, in this branch.
 
 ---
 
@@ -314,3 +328,4 @@ Do not build these. Each was decided deliberately.
 |---|---|
 | 30 Jul 2026 | Rewritten for the pivot to closing infrastructure. §9 scoped to public surface only; DESIGN.md now governs the application. Prior §35–§55 consolidated into §7 as defect patterns. Action layer, tool classes and record standards added as §8. |
 | 2 Aug 2026 | Verification pass against actual repo/infra state (§8, §12, §13 were written prospectively as part of the pivot and had not been checked against reality before commit). No branch, gateway, hash-chained record, reference-numbering scheme, or second Supabase project exists — `main` is the only environment and runs directly against the live production schema (`ldimninnjlvxozubheib`). Atlas Robotics is already a real deal-room member, not excluded from one. tsc (64) and bundle (0.88 MB gzip) confirmed current. "CURRENT STATE (verified 2 Aug 2026)" notes added inline to §8.1, §8.3, §8.4, §12 and §13 to distinguish present fact from prospective design intent — no rule text changed. |
+| 3 Aug 2026 | §15 reconciled against this session's actual kept/cut decisions per §0's precedence rule (Foundation Document governs product; §15 is a convenience summary, not an independent source of truth). Team chat reclassified in scope, flagged for future rebuild. Directory/matching exclusion clarified to distinguish public discovery (excluded) from connection-request infrastructure (kept, core to deal-room creation). |

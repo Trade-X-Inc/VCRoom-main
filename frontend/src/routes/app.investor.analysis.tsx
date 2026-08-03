@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Brain, Loader2, Download, CheckCircle2, AlertTriangle, Lightbulb,
@@ -16,10 +16,6 @@ import { Markdown } from "@/components/shared/LazyMarkdown";
 import { EmptyState, PageBreadcrumb } from "@/components/system";
 
 export const Route = createFileRoute("/app/investor/analysis")({
-  // R9 relocation: this URL's content moved — see nav-structure.ts.
-  beforeLoad: () => {
-    throw redirect({ to: "/app/investor/crm/deal-analysis" as any, replace: true });
-  },
   component: AnalysisPage,
 });
 
@@ -120,8 +116,9 @@ Be concise and specific.
 Return this exact JSON shape:
 {"matchScore":<integer>,"strengths":["...","...","..."],"risks":["...","...","..."],"mitigants":["...","..."],"nextAction":"..."}`;
 
+      const session = await supabase.auth.getSession();
       const result = await runAnalysis(() => secureAICall({
-        data: { userId: user.id, systemPrompt, userMessage, maxTokens: 600 },
+        data: { userAccessToken: session.data.session?.access_token ?? "", systemPrompt, userMessage, maxTokens: 600 },
       }));
 
       if (result.error === "usage_limit") {

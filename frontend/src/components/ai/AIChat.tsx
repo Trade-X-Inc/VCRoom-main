@@ -4,6 +4,7 @@ import { Sparkles, Send, Loader2, User } from "lucide-react";
 import { getAIAdvice } from "@/lib/advisor-fn";
 import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 import { Markdown } from "@/components/shared/LazyMarkdown";
+import { supabase } from "@/lib/supabase";
 
 export interface ChatMsg {
   id: string;
@@ -75,7 +76,8 @@ export function AIChat({ userId, scope, starters, initialAssistant, className = 
     try {
       const history = msgs.slice(1).map((m) => ({ role: m.role as string, content: m.content }));
       const contextPrefix = scope ? `Context: ${scope}\n\n` : "";
-      const result = await run(() => getAIAdvice({ data: { userId: userId || "", message: contextPrefix + t, history, pageContext, startupContext } }));
+      const { data: { session } } = await supabase.auth.getSession();
+      const result = await run(() => getAIAdvice({ data: { userAccessToken: session?.access_token ?? "", message: contextPrefix + t, history, pageContext, startupContext } }));
       const reply = result.reply || "No AI response generated.";
       setMsgs((xs) => [...xs, { id: `a${Date.now()}`, role: "assistant", content: reply, ts: Date.now() }]);
     } catch (error) {

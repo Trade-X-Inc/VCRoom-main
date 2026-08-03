@@ -4,9 +4,9 @@ import type { ReactNode, ErrorInfo } from "react";
 import {
   Loader2, Save, Plus, X, Pencil, Trash2,
   Globe, Users, Linkedin, UserCircle2, Mail, Upload,
-  Paperclip, CheckCircle2, XCircle, Clock, Sparkles,
+  Clock, Sparkles,
   ChevronDown, Link as LinkIcon, Copy, Eye, EyeOff,
-  Trophy, Briefcase, Building2, FileText, ShieldCheck,
+  Trophy, Briefcase, Building2, FileText,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,12 +14,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { sendInviteEmail } from "@/lib/invite-fn";
-import { VerificationSection } from "@/components/app/VerificationSection";
-import { FieldVerificationBadge, prewarmClassificationCache } from "@/components/app/FieldVerificationBadge";
 import { logActivity } from "@/lib/activity-log-fn";
-import type { InvestorClaim } from "@/lib/investor-claims-fn";
-import { CapitalVerificationSection } from "./app.investor.profile.capital";
-import { BadgeDisplay, useBadges } from "@/components/app/BadgeDisplay";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { OnboardingTour } from "@/components/app/OnboardingTour";
 import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
@@ -461,13 +456,10 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
   const [saved, setSaved] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
-  const [attachingClaim, setAttachingClaim] = useState<{ type: string; label: string; value: string } | null>(null);
   const [previewTab, setPreviewTab] = useState<"public" | "dealroom">("public");
   const [deckExtracting, setDeckExtracting] = useState(false);
   const [deckDraft, setDeckDraft] = useState<Record<string, unknown> | null>(null);
   const [deckMissing, setDeckMissing] = useState<string[]>([]);
-
-  useEffect(() => { prewarmClassificationCache(); }, []);
 
   const { data: existing, isLoading } = useQuery({
     queryKey: ["investor-profile", fundOwnerUserId],
@@ -556,38 +548,6 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [fundOwnerUserId, accountCtx.isOwner, qc]);
-
-  const { data: investorVerif } = useQuery({
-    queryKey: ["investor-verification-profile", user?.id],
-    enabled: !!user?.id,
-    staleTime: 5 * 60_000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("investor_verifications")
-        .select("tier1_passed, verification_tier")
-        .eq("investor_id", user!.id)
-        .maybeSingle();
-      return data;
-    },
-  });
-
-  const tier1Passed = investorVerif?.tier1_passed === true;
-
-  const { data: investorClaims = [], refetch: refetchInvestorClaims } = useQuery<InvestorClaim[]>({
-    queryKey: ["investor-claims", user?.id],
-    enabled: !!user?.id,
-    staleTime: 30_000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("investor_claims")
-        .select("*")
-        .eq("investor_id", user!.id);
-      return (data ?? []) as InvestorClaim[];
-    },
-  });
-
-  const claimByType = (type: string): InvestorClaim | undefined =>
-    investorClaims.find((c) => c.claim_type === type);
 
   useEffect(() => {
     if (!existing) {
@@ -714,8 +674,9 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
       }
       const { extractInvestorProfileFromDeck } = await import("@/lib/investor-profile-builder-fn");
       type DeckExtractResult = { data: Record<string, unknown> | null; missing_fields: string[]; error: string | null };
+      const { data: { session } } = await supabase.auth.getSession();
       const result = await runAI(() =>
-        extractInvestorProfileFromDeck({ data: { userId: user.id, documentText: text, fileName: file.name } }) as Promise<DeckExtractResult>,
+        extractInvestorProfileFromDeck({ data: { userAccessToken: session?.access_token ?? "", documentText: text, fileName: file.name } }) as Promise<DeckExtractResult>,
       );
       if (result.error) { toast.error(result.error); return; }
       if (!result.data) { toast.error("Extraction returned no data."); return; }
@@ -994,9 +955,7 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
                     {ROLES.map((r) => <option key={r}>{r}</option>)}
                   </select>
                 </Field>
-                <Field label="Fund size" badge={pendingByField.has("fund_size") ? <PendingApprovalBadge pendingValue={pendingByField.get("fund_size")!.new_value} /> : <FieldVerificationBadge profileType="investor" fieldName="fund_size"
-                    claimStatus={claimByType("fund_size")?.proof_status}
-                    onAttachProof={user?.id ? () => setAttachingClaim({ type: "fund_size", label: "Fund size", value: form.fund_size }) : undefined} compact />}>
+                <Field label="Fund size" badge={pendingByField.has("fund_size") ? <PendingApprovalBadge pendingValue={pendingByField.get("fund_size")!.new_value} /> : undefined}>
                   <input value={form.fund_size} onChange={(e) => set("fund_size", e.target.value)} style={inputStyle} placeholder="$50M" />
                 </Field>
               </div>
@@ -1148,10 +1107,10 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
                 </div>
               </Field>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                <Field label="Cheque min" badge={pendingByField.has("check_size_min") ? <PendingApprovalBadge pendingValue={pendingByField.get("check_size_min")!.new_value} /> : <FieldVerificationBadge profileType="investor" fieldName="check_size_min" claimStatus={claimByType("check_size_min")?.proof_status} onAttachProof={user?.id ? () => setAttachingClaim({ type: "check_size_min", label: "Min cheque", value: form.check_size_min }) : undefined} compact />}>
+                <Field label="Cheque min" badge={pendingByField.has("check_size_min") ? <PendingApprovalBadge pendingValue={pendingByField.get("check_size_min")!.new_value} /> : undefined}>
                   <input value={form.check_size_min} onChange={(e) => set("check_size_min", e.target.value)} style={inputStyle} placeholder="$250K" />
                 </Field>
-                <Field label="Cheque max" badge={<FieldVerificationBadge profileType="investor" fieldName="check_size_max" claimStatus={claimByType("check_size_max")?.proof_status} onAttachProof={user?.id ? () => setAttachingClaim({ type: "check_size_max", label: "Max cheque", value: form.check_size_max }) : undefined} compact />}>
+                <Field label="Cheque max">
                   <input value={form.check_size_max} onChange={(e) => set("check_size_max", e.target.value)} style={inputStyle} placeholder="$2M" />
                 </Field>
               </div>
@@ -1170,14 +1129,12 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
           {/* Track record */}
           {show("track") && (
           <Card>
-            <SectionHeader icon={Trophy} title="Track record" description="Named investments and outcomes — unverified until you attach evidence" />
+            <SectionHeader icon={Trophy} title="Track record" description="Named investments and outcomes" />
             <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
               {form.track_record.length === 0 && (
                 <p style={{ fontSize: 13, color: color.inkTertiary }}>No track record items yet.</p>
               )}
               {form.track_record.map((item, i) => {
-                const claimType = `track_record_${i}`;
-                const claim = claimByType(claimType);
                 return (
                   <div key={i} style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
                     <div style={{ display: "flex", gap: 8 }}>
@@ -1190,22 +1147,6 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
                     </div>
                     <input value={item.detail} onChange={(e) => updateTrackRecordItem(i, { detail: e.target.value })}
                       style={inputStyle} placeholder="Round led, outcome, return multiple…" />
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      {item.verified ? (
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, color: "#10B981" }}>
-                          <ShieldCheck style={{ width: 12, height: 12 }} /> Verified
-                        </span>
-                      ) : (
-                        <span style={{ fontSize: 11, color: color.inkTertiary }}>
-                          {claim?.proof_status === "ai_confirmed" ? "AI confirmed — pending publish" : claim?.proof_status === "pending_review" ? "Pending review" : "Unverified"}
-                        </span>
-                      )}
-                      <button type="button"
-                        onClick={() => setAttachingClaim({ type: claimType, label: item.label || "Track record item", value: item.detail })}
-                        style={{ fontSize: 11, color: "#7C3AED", background: "transparent", border: "none", cursor: "pointer", textDecoration: "underline" }}>
-                        Attach proof
-                      </button>
-                    </div>
                   </div>
                 );
               })}
@@ -1397,50 +1338,9 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
           </Card>
           )}
 
-          {/* Verification tier */}
-          {show("verification") && user?.id && (
-            <Card style={{ padding: 20 }}>
-              <VerificationSection
-                entityType="investor"
-                entityId={user.id}
-                userId={user.id}
-                userEmail={user?.email ?? ""}
-                displayName={form.your_name || form.fund_name || "Investor"}
-              />
-            </Card>
-          )}
-
-          {show("capital") && user?.id && (
-            <CapitalVerificationSection
-              investorId={user.id}
-              fundName={form.fund_name}
-              userEmail={user.email ?? ""}
-              displayName={form.your_name || form.fund_name || "Investor"}
-            />
-          )}
-
-          {show("badges") && existing?.id && user?.id && (
-            <InvestorBadgesCard profileId={existing.id} userId={user.id} />
-          )}
         </div>
         )}
       </div>
-
-      {attachingClaim && user?.id && (
-        <AttachInvestorProofModal
-          claim={attachingClaim}
-          investorId={user.id}
-          onClose={() => setAttachingClaim(null)}
-          onDone={(status) => {
-            refetchInvestorClaims();
-            if (status === "ai_confirmed" && attachingClaim.type.startsWith("track_record_")) {
-              const idx = parseInt(attachingClaim.type.replace("track_record_", ""), 10);
-              if (!Number.isNaN(idx)) updateTrackRecordItem(idx, { verified: true });
-            }
-            setAttachingClaim(null);
-          }}
-        />
-      )}
     </PageFrame>
   );
 }
@@ -1583,96 +1483,6 @@ function PortfolioSection({ profileId }: { profileId: string }) {
           ))}
         </div>
       )}
-    </div>
-  );
-}
-
-// ── Investor proof modal ──────────────────────────────────────────
-
-function AttachInvestorProofModal({ claim, investorId, onClose, onDone }: {
-  claim: { type: string; label: string; value: string };
-  investorId: string;
-  onClose: () => void;
-  onDone: (status: string) => void;
-}) {
-  const [file, setFile] = useState<File | null>(null);
-  const [running, setRunning] = useState(false);
-  const [result, setResult] = useState<{ proof_status: string; ai_result: any } | null>(null);
-
-  const handleAttach = async () => {
-    if (!file || running) return;
-    setRunning(true);
-    try {
-      const { extractDocumentText } = await import("@/lib/document-extractor");
-      const text = await extractDocumentText(file, file.name);
-      const syntheticDocId = crypto.randomUUID();
-      const { attachInvestorProofAndCheck } = await import("@/lib/investor-claims-fn");
-      const { data: { session } } = await supabase.auth.getSession();
-      const r = await attachInvestorProofAndCheck({
-        data: { accessToken: session?.access_token ?? "", claim_type: claim.type, proof_document_id: syntheticDocId, document_text: text, claim_label: claim.label, claim_value: claim.value },
-      });
-      setResult(r);
-    } catch {
-      toast.error("Attach failed. Please try again.");
-    } finally {
-      setRunning(false);
-    }
-  };
-
-  return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }} onClick={onClose}>
-      <div style={{ background: color.white, border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 24, maxWidth: 440, width: "100%" }} onClick={(e) => e.stopPropagation()}>
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 700, fontFamily: font.display }}>Attach proof for claim</div>
-            <div style={{ fontSize: 12, color: color.inkTertiary, marginTop: 4 }}>{claim.label}: {claim.value}</div>
-          </div>
-          <button onClick={onClose} style={{ background: "transparent", border: "none", color: color.inkTertiary, cursor: "pointer" }}><X style={{ width: 16, height: 16 }} /></button>
-        </div>
-        {!result ? (
-          <>
-            <div style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.2)", borderRadius: radius.control, padding: "10px 14px", marginBottom: 16, fontSize: 12, color: color.inkSecondary, lineHeight: 1.5 }}>
-              Upload a document containing evidence for this claim. AI will cross-check it.
-            </div>
-            <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: `1px dashed ${color.border}`, borderRadius: radius.structural, padding: "24px 16px", cursor: "pointer", gap: 8, marginBottom: 16 }}>
-              <Paperclip style={{ width: 18, height: 18, color: color.inkTertiary }} />
-              <span style={{ fontSize: 12, color: color.inkTertiary, textAlign: "center" }}>{file ? file.name : "Click to select PDF, DOCX, XLSX, CSV"}</span>
-              <input type="file" accept=".pdf,.docx,.doc,.xlsx,.xls,.csv,.txt" style={{ display: "none" }} onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
-            </label>
-            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-              <button onClick={onClose} style={{ padding: "8px 16px", fontSize: 12, color: color.inkTertiary, background: "transparent", border: "none", cursor: "pointer" }}>Cancel</button>
-              <button onClick={handleAttach} disabled={!file || running}
-                style={{ background: !file || running ? "rgba(124,58,237,0.4)" : "#7C3AED", color: "#fff", border: "none", borderRadius: radius.control, padding: "8px 16px", fontSize: 12, fontWeight: 500, cursor: !file || running ? "default" : "pointer" }}>
-                {running ? <span style={{ display: "flex", alignItems: "center", gap: 6 }}><Loader2 style={{ width: 12, height: 12 }} className="animate-spin" /> Checking…</span> : "Attach & verify"}
-              </button>
-            </div>
-          </>
-        ) : (
-          <>
-            {result.proof_status === "ai_confirmed" && (
-              <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: radius.control, padding: "12px 14px", marginBottom: 16 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#10B981", fontSize: 13, fontWeight: 500, marginBottom: 4 }}><CheckCircle2 style={{ width: 16, height: 16 }} /> Claim confirmed</div>
-                <p style={{ fontSize: 12, color: color.inkTertiary, margin: 0 }}>{result.ai_result?.explanation}</p>
-              </div>
-            )}
-            {result.proof_status === "ai_mismatch" && (
-              <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: radius.control, padding: "12px 14px", marginBottom: 16 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#EF4444", fontSize: 13, fontWeight: 500, marginBottom: 4 }}><XCircle style={{ width: 16, height: 16 }} /> Claim doesn't match</div>
-                <p style={{ fontSize: 12, color: color.inkTertiary, margin: 0 }}>{result.ai_result?.explanation}</p>
-              </div>
-            )}
-            {result.proof_status === "pending_review" && (
-              <div style={{ background: color.canvas, border: `1px solid ${color.border}`, borderRadius: radius.control, padding: "12px 14px", marginBottom: 16 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, color: color.inkSecondary, fontSize: 13, fontWeight: 500, marginBottom: 4 }}><Clock style={{ width: 16, height: 16 }} /> Proof attached</div>
-                <p style={{ fontSize: 12, color: color.inkTertiary, margin: 0 }}>AI check inconclusive — set to pending review.</p>
-              </div>
-            )}
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <button onClick={() => onDone(result.proof_status)} style={{ background: "#7C3AED", color: "#fff", border: "none", borderRadius: radius.control, padding: "8px 16px", fontSize: 12, fontWeight: 500, cursor: "pointer" }}>Done</button>
-            </div>
-          </>
-        )}
-      </div>
     </div>
   );
 }
@@ -1897,49 +1707,3 @@ class SectionErrorBoundary extends Component<{ children: ReactNode }, { error: E
 
 // ── Investor badges card ───────────────────────────────────────────
 
-function InvestorBadgesCard({ profileId, userId }: { profileId: string; userId: string }) {
-  const qc = useQueryClient();
-  const [evaluating, setEvaluating] = useState(false);
-  const { data: badges = [] } = useBadges({ investorProfileId: profileId });
-
-  const runEvaluation = async () => {
-    if (evaluating) return;
-    setEvaluating(true);
-    try {
-      const { evaluateAndAwardBadges } = await import("@/lib/badge-award-engine");
-      const result = await evaluateAndAwardBadges({
-        data: { investor_profile_id: profileId, investor_user_id: userId },
-      });
-      qc.invalidateQueries({ queryKey: ["profile-badges", profileId] });
-      if (result.awarded.length > 0) {
-        toast.success(`Newly earned: ${result.awarded.join(", ").replace(/_/g, " ")}`);
-      } else {
-        toast.info("No new badges yet — badges reflect real deal activity and decision behavior.");
-      }
-    } catch {
-      toast.error("Evaluation failed — try again.");
-    } finally {
-      setEvaluating(false);
-    }
-  };
-
-  return (
-    <Card style={{ padding: 20 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, fontFamily: font.display }}>Your badges</div>
-        <button onClick={runEvaluation} disabled={evaluating}
-          style={{ fontSize: 12, color: color.inkTertiary, background: "transparent", border: "none", cursor: "pointer", opacity: evaluating ? 0.6 : 1 }}>
-          {evaluating ? "Evaluating…" : "Re-check"}
-        </button>
-      </div>
-      {badges.length > 0 ? (
-        <BadgeDisplay badges={badges} size="md" context="profile" />
-      ) : (
-        <p style={{ fontSize: 12, color: color.inkTertiary, lineHeight: 1.5 }}>
-          No badges yet. Investor badges are earned from real behavior founders care about —
-          deciding quickly, never ghosting, and giving reasons on every pass.
-        </p>
-      )}
-    </Card>
-  );
-}

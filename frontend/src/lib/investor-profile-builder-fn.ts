@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireUser } from "@/lib/require-user-fn";
 
 // ── AI extraction for "upload fund deck → prefill profile" (R4B). ──────────
 // Mirrors src/lib/profile-builder-fn.ts's extraction pattern exactly (same
@@ -102,7 +103,7 @@ function parseExtractionJSON(raw: string): Record<string, unknown> {
 }
 
 type FundDeckExtractInput = {
-  userId: string;
+  userAccessToken: string;
   documentText: string;
   fileName: string;
 };
@@ -116,7 +117,11 @@ type FundDeckExtractResult = {
 export const extractInvestorProfileFromDeck = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as FundDeckExtractInput)
   .handler(async ({ data }): Promise<FundDeckExtractResult> => {
-    const usage = await checkUsageCap(data.userId, "investor_profile_extract");
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) {
+      return { data: null, missing_fields: [], error: "Please sign in again to use this feature." };
+    }
+    const usage = await checkUsageCap(auth.uid, "investor_profile_extract");
     if (!usage.allowed) {
       return { data: null, missing_fields: [], error: usage.message || "Daily AI limit reached" };
     }

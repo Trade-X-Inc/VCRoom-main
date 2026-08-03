@@ -20,6 +20,22 @@ export const WORKFLOW_STAGES: WorkflowStage[] = [
   "closed",
 ];
 
+// phase0 step 3 — DEFENSIVE STOPGAP, NOT A VOCABULARY REDESIGN. The
+// deal_rooms.workflow_stage DB CHECK constraint (deal_rooms_workflow_stage_check)
+// allows nda_signed/initial_review/diligence/term_sheet/closed/information_vault/
+// qa/due_diligence/closing — a DIFFERENT vocabulary than this file's WorkflowStage
+// type, which predates the constraint's current shape. "stage1_review" and
+// "meetings" are not in the constraint; writing either throws a raw Postgres
+// 23514 the caller can't recover from cleanly. Reconciling the two vocabularies
+// is superseded by Phase 1's lifecycle model (CLAUDE.md §8) — out of scope here.
+// This set is only the values this constraint currently accepts, so
+// advanceWorkflowStage can fail closed with a clean error instead of a raw
+// constraint violation. Update if the constraint itself changes.
+const DB_ALLOWED_WORKFLOW_STAGES = new Set([
+  "nda_signed", "initial_review", "diligence", "term_sheet", "closed",
+  "information_vault", "qa", "due_diligence", "closing",
+]);
+
 export const STAGE_LABELS: Record<WorkflowStage, string> = {
   nda_signed: "NDA Signed",
   stage1_review: "Stage 1 Review",
@@ -76,6 +92,31 @@ async function requireRoomMember(
   return { ok: true, uid: auth.uid };
 }
 
+// Same identity derivation as requireRoomMember, but only a room PRINCIPAL
+// (founder/investor) passes — a lawyer resolves to null and fails closed.
+// Mirrors closing-fn.ts's principalRole() pattern and deal-room-fn.ts's
+// principalRoomMember() exactly (phase0 step 2): a lawyer is a legitimate
+// deal_room_members row, so requireRoomMember alone authorizes them for
+// actions that must stay founder/investor-only (term sheet send/respond).
+async function principalRoomMember(
+  url: string,
+  key: string,
+  dealRoomId: string,
+  accessToken: string | undefined,
+): Promise<{ ok: true; uid: string } | { ok: false; error: string }> {
+  const auth = await requireUser(accessToken);
+  if (!auth.ok) return { ok: false, error: auth.error };
+  const rows: any[] = await sbFetch(
+    url,
+    key,
+    `deal_room_members?deal_room_id=eq.${dealRoomId}&user_id=eq.${auth.uid}&role=in.(founder,investor)&select=role`,
+    "GET",
+  ).catch(() => []);
+  const role = rows?.[0]?.role;
+  if (role !== "founder" && role !== "investor") return { ok: false, error: "not_authorized" };
+  return { ok: true, uid: auth.uid };
+}
+
 // ── Server fn: advance workflow stage ────────────────────────────────────────
 
 type AdvanceStageInput = {
@@ -89,6 +130,11 @@ export const advanceWorkflowStage = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    // phase0 step 3 stopgap — reject before the write; see
+    // DB_ALLOWED_WORKFLOW_STAGES comment above for why this exists.
+    if (!DB_ALLOWED_WORKFLOW_STAGES.has(data.to_stage)) {
+      return { ok: false, error: "stage_not_supported" };
+    }
     const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
     if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
@@ -108,19 +154,6 @@ export const advanceWorkflowStage = createServerFn({ method: "POST" })
       metadata: { to_stage: data.to_stage },
     }).catch(() => null);
 
-    // Badge evaluation — stage changes can earn first_close/round_closed/deal_closed
-    {
-      const rooms: any[] = await sbFetch(url, key, `deal_rooms?id=eq.${data.deal_room_id}&select=startup_id,investor_user_id`, "GET").catch(() => []);
-      const invProfiles: any[] = rooms[0]?.investor_user_id
-        ? await sbFetch(url, key, `investor_profiles?user_id=eq.${rooms[0].investor_user_id}&select=id`, "GET").catch(() => [])
-        : [];
-      const { evaluateAndAwardBadgesCore } = await import("@/lib/badge-award-engine");
-      await evaluateAndAwardBadgesCore({
-        startupId: rooms[0]?.startup_id ?? undefined,
-        investorProfileId: invProfiles[0]?.id ?? undefined,
-        investorUserId: rooms[0]?.investor_user_id ?? undefined,
-      });
-    }
     return { ok: true };
   });
 
@@ -243,7 +276,7 @@ export const sendTermSheet = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
-    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    const auth = await principalRoomMember(url, key, data.deal_room_id, data.accessToken);
     if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
 
@@ -292,7 +325,7 @@ export const respondToTermSheet = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
-    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    const auth = await principalRoomMember(url, key, data.deal_room_id, data.accessToken);
     if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
 
@@ -321,19 +354,6 @@ export const respondToTermSheet = createServerFn({ method: "POST" })
       metadata: { response: data.response },
     }).catch(() => null);
 
-    // Badge evaluation — stage changes can earn first_close/round_closed/deal_closed
-    {
-      const rooms: any[] = await sbFetch(url, key, `deal_rooms?id=eq.${data.deal_room_id}&select=startup_id,investor_user_id`, "GET").catch(() => []);
-      const invProfiles: any[] = rooms[0]?.investor_user_id
-        ? await sbFetch(url, key, `investor_profiles?user_id=eq.${rooms[0].investor_user_id}&select=id`, "GET").catch(() => [])
-        : [];
-      const { evaluateAndAwardBadgesCore } = await import("@/lib/badge-award-engine");
-      await evaluateAndAwardBadgesCore({
-        startupId: rooms[0]?.startup_id ?? undefined,
-        investorProfileId: invProfiles[0]?.id ?? undefined,
-        investorUserId: rooms[0]?.investor_user_id ?? undefined,
-      });
-    }
     return { ok: true };
   });
 

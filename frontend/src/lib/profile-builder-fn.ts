@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireUser } from "@/lib/require-user-fn";
 
 function getOpenAIKey(): string {
   const cfEnv = (globalThis as any).__cf_env || {};
@@ -95,7 +96,7 @@ function parseExtractionJSON(raw: string): Record<string, unknown> {
 
 // ── Extract from document text ────────────────────────────────────────────────
 type DocumentExtractInput = {
-  userId: string;
+  userAccessToken: string;
   documentText: string;
 };
 
@@ -108,6 +109,8 @@ type ExtractionResult = {
 export const extractProfileFromDocument = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as DocumentExtractInput)
   .handler(async ({ data }): Promise<ExtractionResult> => {
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { data: null, missing_fields: [], error: "Please sign in again to use this feature." };
     const systemPrompt = `You are an expert at extracting structured startup data from pitch decks and documents.
 Return ONLY valid JSON — no markdown, no explanation, no extra text.
 The JSON must exactly match this schema:
@@ -166,7 +169,7 @@ const CUSTOM_DOC_SCHEMA = `{
 }`;
 
 type CustomDocExtractInput = {
-  userId: string;
+  userAccessToken: string;
   documentText: string;
   fileName: string;
 };
@@ -187,7 +190,9 @@ export type CustomDocExtractResult = {
 export const extractCustomDocument = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as CustomDocExtractInput)
   .handler(async ({ data }): Promise<CustomDocExtractResult> => {
-    const usageCheck = await checkUsageCap(data.userId, "document_extraction");
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { data: null, missing_fields: [], error: "Please sign in again to use this feature." };
+    const usageCheck = await checkUsageCap(auth.uid, "document_extraction");
     if (!usageCheck.allowed) {
       return { data: null, missing_fields: [], error: usageCheck.message || "Daily AI limit reached." };
     }
@@ -237,13 +242,15 @@ Rules:
 
 // ── Extract from interview transcript ─────────────────────────────────────────
 type InterviewExtractInput = {
-  userId: string;
+  userAccessToken: string;
   transcript: string;
 };
 
 export const extractProfileFromInterview = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as InterviewExtractInput)
   .handler(async ({ data }): Promise<ExtractionResult> => {
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { data: null, missing_fields: [], error: "Please sign in again to use this feature." };
     const systemPrompt = `You are an expert at converting founder interview conversations into structured startup profile data.
 Return ONLY valid JSON — no markdown, no explanation, no extra text.
 The JSON must exactly match this schema:
@@ -334,7 +341,7 @@ const DETECT_SCHEMA = `{
 }`;
 
 type DetectExtractInput = {
-  userId: string;
+  userAccessToken: string;
   fileName: string;
   documentText: string;
 };
@@ -348,6 +355,9 @@ export const detectAndExtractDocument = createServerFn({ method: "POST" })
       pitch: null, financial: null, cap_table: null, legal: null, team: null,
       missing_fields: [], error: null,
     };
+
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { ...empty, error: "not_authenticated" };
 
     if (!data.documentText || data.documentText.trim().length < 80) {
       return { ...empty, detail: "Could not read enough text from this document — it may be image-based or empty.", error: "unreadable" };
@@ -436,7 +446,7 @@ const EMPLOYEE_ONE_PAGER_SCHEMA = `{
 }`;
 
 type EmployeeOnePagerInput = {
-  userId: string;
+  userAccessToken: string;
   documentText: string;
   fileName: string;
 };
@@ -455,7 +465,9 @@ export type EmployeeOnePagerResult = {
 export const extractEmployeeOnePager = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as EmployeeOnePagerInput)
   .handler(async ({ data }): Promise<EmployeeOnePagerResult> => {
-    const usageCheck = await checkUsageCap(data.userId, "document_extraction");
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { data: null, missing_fields: [], error: "Please sign in again to use this feature." };
+    const usageCheck = await checkUsageCap(auth.uid, "document_extraction");
     if (!usageCheck.allowed) {
       return { data: null, missing_fields: [], error: usageCheck.message || "Daily AI limit reached." };
     }
@@ -510,7 +522,7 @@ Rules:
 // ─────────────────────────────────────────────────────────────────────────────
 
 type NarrativeInput = {
-  userId: string;
+  userAccessToken: string;
   profile: Record<string, unknown>;
   transcript?: string;
   extras?: Record<string, unknown>;
@@ -528,6 +540,14 @@ export type NarrativeResult = {
 export const generateProfileNarrative = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as NarrativeInput)
   .handler(async ({ data }): Promise<NarrativeResult> => {
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) {
+      return {
+        one_liner: null, investor_narrative: null, fundraising_instrument: null,
+        fundraising_target_close: null, fundraising_committed_amount: null,
+        error: "not_authenticated",
+      };
+    }
     const systemPrompt = [
       "You turn structured startup data (and optionally an interview transcript) into investor-ready profile copy.",
       "Return ONLY valid JSON:",
@@ -592,7 +612,7 @@ export const generateProfileNarrative = createServerFn({ method: "POST" })
 // ─────────────────────────────────────────────────────────────────────────────
 
 type InterviewQuestionInput = {
-  userId: string;
+  userAccessToken: string;
   history: Array<{ role: "ai" | "founder"; content: string }>;
   questionIndex: number;
   companyName?: string;
@@ -726,6 +746,8 @@ const DONE_MESSAGE =
 export const getNextInterviewQuestion = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as InterviewQuestionInput)
   .handler(async ({ data }): Promise<InterviewQuestionResult> => {
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { question: "", isFollowUp: false, isDone: false, error: "not_authenticated" };
     // Resolve the plan from answers so far. Stage/sector default until Q2/Q3
     // are answered; the plan is stable for Phase 1 regardless.
     const provisionalPlan = buildQuestionPlan(data.companyName, "early_revenue", "other");

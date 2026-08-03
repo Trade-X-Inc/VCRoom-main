@@ -685,9 +685,6 @@ function CreateRoomForm({
       });
       if (actErr) console.error("[deal-rooms] activity log failed:", actErr);
 
-      // Badge evaluation — fire-and-forget on this write event
-      import("@/lib/badge-award-engine").then((m) => m.evaluateAndAwardBadges({ data: { startup_id: startupId } })).catch(() => {});
-
       onCreated();
       setCreatedRoom({ id: newRoom.id, email: inviteEmail.trim() });
 

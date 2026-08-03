@@ -128,7 +128,6 @@ export function MemberShell({ children }: { children?: React.ReactNode }) {
     { to: "/app/member", label: "Overview", icon: LayoutGrid },
     { to: "/app/deal-rooms", label: "My Deal Rooms", icon: Briefcase, badge: assignedCount > 0 ? String(assignedCount) : undefined },
     { to: "/app/documents", label: "Documents", icon: FileText },
-    ...(canUseAI ? [{ to: "/app/assistant", label: "Workstation", icon: Sparkles }] : []),
     { to: "/app/messages", label: "Team Chat", icon: MessageSquare },
   ];
 

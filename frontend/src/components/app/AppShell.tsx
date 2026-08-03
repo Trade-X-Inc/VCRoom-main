@@ -225,17 +225,11 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       isInvestor &&
       !path.startsWith("/app/investor") &&
       !path.startsWith("/app/team-chat") &&
-      path !== "/app/advisor" &&
-      path !== "/app/verification" &&
       !path.startsWith("/app/profile") &&
       !path.startsWith("/app/settings") &&
       !path.startsWith("/app/investor/settings") &&
-      !path.startsWith("/app/meetings") &&
       !path.startsWith("/app/deal-room") &&
       !path.startsWith("/app/messages") &&
-      !path.startsWith("/app/directory") &&
-      !path.startsWith("/app/wall") &&
-      !path.startsWith("/app/referrals") &&
       !path.startsWith("/app/member-profile") &&
       !path.startsWith("/app/audit") &&
       !path.startsWith("/app/feedback");

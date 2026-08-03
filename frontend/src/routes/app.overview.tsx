@@ -5,7 +5,7 @@ import { formatDistanceToNow } from "date-fns";
 import { LazyChart } from "@/components/shared/LazyChart";
 import {
   ChevronDown, ChevronUp, X, CheckCircle2, ArrowRight, ArrowUpRight,
-  ShieldAlert, MessageSquareWarning, Clock3, FileWarning,
+  MessageSquareWarning, Clock3,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -95,7 +95,6 @@ function OnboardingChecklist({
   const steps = [
     { id: "profile", label: "Complete your company profile", done: !!startup?.company_name, href: "/app/profile" },
     { id: "docs", label: "Upload your pitch deck", done: docs.length > 0, href: "/app/documents" },
-    { id: "verify", label: "Run identity verification", done: !!startup?.tier1_passed, href: "/app/verification" },
     { id: "dealroom", label: "Create your first deal room", done: dealRooms.length > 0, href: "/app/deal-rooms" },
     { id: "investor", label: "Invite your first investor", done: investorMembers.length > 0, href: "/app/deal-rooms" },
   ];
@@ -251,27 +250,7 @@ function Overview() {
     },
   });
   const startupId: string | undefined = startupRaw?.id;
-
-  const { data: founderVerif } = useQuery({
-    queryKey: ["overview-founder-verif", startupId],
-    enabled: !!startupId,
-    queryFn: async () => {
-      const { data } = await supabase.from("founder_verifications").select("tier1_passed, tier1_email_match, tier1_website_match, tier1_registry_match, tier1_infra_match").eq("startup_id", startupId!).maybeSingle();
-      return data;
-    },
-  });
-  const startup = startupRaw ? { ...startupRaw, tier1_passed: founderVerif?.tier1_passed } : null;
-
-  const { data: readiness } = useQuery({
-    queryKey: ["overview-readiness", startupId],
-    enabled: !!startupId,
-    queryFn: async () => {
-      const { computeReadiness } = await import("@/lib/readiness-fn");
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return null;
-      return computeReadiness({ data: { startup_id: startupId!, accessToken: session.access_token } });
-    },
-  });
+  const startup = startupRaw;
 
   const { data: profileViews = [] } = useQuery({
     queryKey: ["overview-profile-views", startupId],
@@ -370,20 +349,6 @@ function Overview() {
     },
   });
 
-  const { data: unverifiedClaims = [] } = useQuery({
-    queryKey: ["overview-unverified-claims", startupId],
-    enabled: !!startupId,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("startup_claims")
-        .select("id, claim_label, proof_status")
-        .eq("startup_id", startupId!)
-        .eq("proof_status", "unverified")
-        .limit(5);
-      return data ?? [];
-    },
-  });
-
   const { data: activities = [] } = useQuery({
     queryKey: ["overview-activities", startupId],
     enabled: !!startupId,
@@ -447,16 +412,6 @@ function Overview() {
   const staleRooms = dealRooms.filter((r: any) => new Date(r.updated_at) < staleCutoff);
 
   const attentionRows: AttentionRow[] = [
-    ...(founderVerif && !founderVerif.tier1_passed
-      ? [{ id: "verif", icon: ShieldAlert, label: "Identity verification not passed", sub: "Run checks", href: "/app/verification" }]
-      : []),
-    ...(unverifiedClaims as any[]).map((c) => ({
-      id: `claim-${c.id}`,
-      icon: FileWarning,
-      label: `Unverified claim: ${c.claim_label}`,
-      sub: "Attach proof",
-      href: "/app/claims",
-    })),
     ...staleRooms.map((r: any) => ({
       id: `stale-${r.id}`,
       icon: Clock3,
@@ -491,7 +446,7 @@ function Overview() {
     <PageFrame
       breadcrumb={[{ label: "Overview" }]}
       title="Overview"
-      description="Your raise at a glance — readiness, activity, and what needs attention."
+      description="Your raise at a glance — activity and what needs attention."
       actions={
         <Link
           to="/app/deal-rooms"
@@ -512,19 +467,7 @@ function Overview() {
         )}
 
         {/* Row 1: stat cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
-          <StatCard
-            label="Readiness score"
-            value={readiness ? `${readiness.readiness_score}/100` : "—"}
-            trend={readiness?.prev_readiness_score != null
-              ? {
-                  direction: readiness.readiness_score > readiness.prev_readiness_score ? "up" : readiness.readiness_score < readiness.prev_readiness_score ? "down" : "flat",
-                  label: `${Math.abs(readiness.readiness_score - readiness.prev_readiness_score)} pts`,
-                }
-              : null}
-            sub={readiness ? undefined : undefined}
-            empty={!startupId ? "No data yet — complete your profile to generate a score" : undefined}
-          />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
           <StatCard
             label="Profile views"
             value={totalViews7d}

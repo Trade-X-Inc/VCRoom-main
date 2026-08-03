@@ -312,6 +312,8 @@ function ProfileBuilder() {
       // type and run the type-specific extraction.
       const docIds: string[] = [];
       const results: Array<{ fileName: string; result: TypedExtraction }> = [];
+      const { data: { session } } = await supabase.auth.getSession();
+      const userAccessToken = session?.access_token ?? "";
 
       for (const file of uploadedFiles) {
         const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
@@ -325,7 +327,7 @@ function ProfileBuilder() {
         }
 
         const detection = await detectAndExtractDocument({
-          data: { userId: user!.id, fileName: file.name, documentText: text },
+          data: { userAccessToken, fileName: file.name, documentText: text },
         });
         results.push({ fileName: file.name, result: detection });
 
@@ -434,9 +436,10 @@ function ProfileBuilder() {
   async function advanceInterview(sid: string, history: ChatMsg[], qIdx: number) {
     setAiThinking(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
       const result = await getNextInterviewQuestion({
         data: {
-          userId: user!.id,
+          userAccessToken: session?.access_token ?? "",
           history: history.map((m) => ({ role: m.role, content: m.content })),
           questionIndex: qIdx,
           companyName: startup?.company_name ?? undefined,
@@ -486,8 +489,9 @@ function ProfileBuilder() {
       .map((m) => `${m.role === "ai" ? "Interviewer" : "Founder"}: ${m.content}`)
       .join("\n\n");
 
+    const { data: { session: interviewSession } } = await supabase.auth.getSession();
     const result = (await extractProfileFromInterview({
-      data: { userId: user!.id, transcript },
+      data: { userAccessToken: interviewSession?.access_token ?? "", transcript },
     })) as { data: Record<string, unknown> | null; missing_fields: string[]; error?: string };
 
     if (result.error || !result.data) {
@@ -550,8 +554,9 @@ function ProfileBuilder() {
     // AI-drafted one-liner, narrative, and fundraising terms — founder edits before saving
     try {
       const { generateProfileNarrative } = await import("@/lib/profile-builder-fn");
+      const { data: { session: narrativeSession } } = await supabase.auth.getSession();
       const narrative = await generateProfileNarrative({
-        data: { userId: user!.id, profile: profileData, transcript, extras: extras as Record<string, unknown> | undefined },
+        data: { userAccessToken: narrativeSession?.access_token ?? "", profile: profileData, transcript, extras: extras as Record<string, unknown> | undefined },
       });
       if (!narrative.error) {
         setForm((prev) => ({
@@ -753,15 +758,14 @@ function ProfileBuilder() {
           Profile built.
         </h2>
         <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 15, color: "var(--muted-foreground)", lineHeight: 1.6, marginBottom: 28 }}>
-          Now verify your identity to unlock your deal room and appear in the directory.
-          Four automatic checks, about two minutes.
+          Your profile is ready to share. Head to your dashboard to continue preparing for your raise.
         </p>
         <button
-          onClick={() => navigate({ to: "/app/verification" as any })}
+          onClick={() => navigate({ to: "/app" as any })}
           data-testid="pb-done-verify-cta"
           style={{ background: "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "Syne, sans-serif" }}
         >
-          Run verification →
+          Go to dashboard →
         </button>
         <div style={{ marginTop: 16 }}>
           <button

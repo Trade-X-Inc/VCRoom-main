@@ -384,9 +384,10 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
         ? `Document: ${fileName}\n\nAI SUMMARY (full text unavailable):\n${doc.ai_summary}`
         : `Document: ${fileName} (category: ${doc.category || "Other"}) — text extraction failed.`;
 
+      const { data: { session } } = await supabase.auth.getSession();
       const result = await runThesisAnalysis(() => analyzeThesisAlignment({
         data: {
-          userId: investorProfile.user_id || "",
+          userAccessToken: session?.access_token ?? "",
           investorThesis: thesis,
           documentContext: docContext,
           fileName,

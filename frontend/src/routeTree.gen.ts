@@ -35,7 +35,6 @@ import { Route as ToolsIndexRouteImport } from './routes/tools/index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
-import { Route as VerifySlugRouteImport } from './routes/verify.$slug'
 import { Route as ToolsValuationRouteImport } from './routes/tools/valuation'
 import { Route as ToolsSafeNoteRouteImport } from './routes/tools/safe-note'
 import { Route as ToolsRunwayRouteImport } from './routes/tools/runway'
@@ -56,39 +55,28 @@ import { Route as DocsSplatRouteImport } from './routes/docs.$'
 import { Route as CvSlugRouteImport } from './routes/cv.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
-import { Route as AppWallRouteImport } from './routes/app.wall'
-import { Route as AppVerificationRouteImport } from './routes/app.verification'
 import { Route as AppUsersRouteImport } from './routes/app.users'
 import { Route as AppTeamChatRouteImport } from './routes/app.team-chat'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
-import { Route as AppReferralsRouteImport } from './routes/app.referrals'
 import { Route as AppProfileBuilderRouteImport } from './routes/app.profile-builder'
 import { Route as AppProfileRouteImport } from './routes/app.profile'
 import { Route as AppOverviewRouteImport } from './routes/app.overview'
 import { Route as AppNotificationsRouteImport } from './routes/app.notifications'
 import { Route as AppMessagesRouteImport } from './routes/app.messages'
 import { Route as AppMemberProfileRouteImport } from './routes/app.member-profile'
-import { Route as AppMeetingsRouteImport } from './routes/app.meetings'
 import { Route as AppInvestorRouteImport } from './routes/app.investor'
 import { Route as AppHomeRouteImport } from './routes/app.home'
 import { Route as AppFeedbackRouteImport } from './routes/app.feedback'
-import { Route as AppEmailRouteImport } from './routes/app.email'
 import { Route as AppDocumentsRouteImport } from './routes/app.documents'
-import { Route as AppDirectoryRouteImport } from './routes/app.directory'
 import { Route as AppConnectionsRouteImport } from './routes/app.connections'
 import { Route as AppCloseRouteImport } from './routes/app.close'
-import { Route as AppClaimsRouteImport } from './routes/app.claims'
-import { Route as AppBadgesRouteImport } from './routes/app.badges'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
-import { Route as AppAssistantRouteImport } from './routes/app.assistant'
 import { Route as AppAnalyticsRouteImport } from './routes/app.analytics'
-import { Route as AppAdvisorRouteImport } from './routes/app.advisor'
 import { Route as ApiTestAiRouteImport } from './routes/api.test-ai'
 import { Route as ApiHubspotSyncRouteImport } from './routes/api.hubspot-sync'
 import { Route as ApiHubspotNewsletterRouteImport } from './routes/api.hubspot-newsletter'
 import { Route as ApiEmailtestRouteImport } from './routes/api.emailtest'
 import { Route as ApiEmailTestRouteImport } from './routes/api.email-test'
-import { Route as ApiAdminVerificationRouteImport } from './routes/api.admin-verification'
 import { Route as ApiAdminDataRouteImport } from './routes/api.admin-data'
 import { Route as ApiAdminRouteImport } from './routes/api.admin'
 import { Route as AppRoastIndexRouteImport } from './routes/app.roast.index'
@@ -97,7 +85,6 @@ import { Route as AppMemberIndexRouteImport } from './routes/app.member.index'
 import { Route as AppInvestorIndexRouteImport } from './routes/app.investor.index'
 import { Route as AppGoLiveIndexRouteImport } from './routes/app.go-live.index'
 import { Route as AppDealRoomsIndexRouteImport } from './routes/app.deal-rooms.index'
-import { Route as AppCrmIndexRouteImport } from './routes/app.crm.index'
 import { Route as JoinTeamTokenRouteImport } from './routes/join.team.$token'
 import { Route as AppSettingsSecurityRouteImport } from './routes/app.settings.security'
 import { Route as AppSettingsNotificationsRouteImport } from './routes/app.settings.notifications'
@@ -118,32 +105,21 @@ import { Route as AppInvestorDecisionsRouteImport } from './routes/app.investor.
 import { Route as AppInvestorDecideRouteImport } from './routes/app.investor.decide'
 import { Route as AppInvestorDealFlowRouteImport } from './routes/app.investor.deal-flow'
 import { Route as AppInvestorConnectionsRouteImport } from './routes/app.investor.connections'
-import { Route as AppInvestorAssistantRouteImport } from './routes/app.investor.assistant'
 import { Route as AppInvestorAnalyticsRouteImport } from './routes/app.investor.analytics'
 import { Route as AppInvestorAnalysisRouteImport } from './routes/app.investor.analysis'
-import { Route as AppInvestorAdvisorRouteImport } from './routes/app.investor.advisor'
 import { Route as AppGoLiveProfileAnalyticsRouteImport } from './routes/app.go-live.profile-analytics'
-import { Route as AppGoLiveDirectoryRouteImport } from './routes/app.go-live.directory'
 import { Route as AppDealRoomsTeamAssignmentsRouteImport } from './routes/app.deal-rooms.team-assignments'
 import { Route as AppDealRoomsReportsVaultRouteImport } from './routes/app.deal-rooms.reports-vault'
 import { Route as AppDealRoomsPrepNotesRouteImport } from './routes/app.deal-rooms.prep-notes'
 import { Route as AppDealRoomsMeetingsCalendarRouteImport } from './routes/app.deal-rooms.meetings-calendar'
 import { Route as AppDealRoomsIdRouteImport } from './routes/app.deal-rooms.$id'
-import { Route as AppCrmPipelineManagerRouteImport } from './routes/app.crm.pipeline-manager'
-import { Route as AppCrmMeetingsRouteImport } from './routes/app.crm.meetings'
-import { Route as AppCrmEmailOutreachRouteImport } from './routes/app.crm.email-outreach'
-import { Route as AppCrmConnectionsRouteImport } from './routes/app.crm.connections'
-import { Route as AppCrmAnalyticsRouteImport } from './routes/app.crm.analytics'
 import { Route as ApiInternalEmailTestRouteImport } from './routes/api.internal.email-test'
 import { Route as ApiInternalDataRouteImport } from './routes/api.internal.data'
 import { Route as AppInvestorThesisIndexRouteImport } from './routes/app.investor.thesis.index'
 import { Route as AppInvestorDiscoverIndexRouteImport } from './routes/app.investor.discover.index'
 import { Route as AppInvestorDealRoomsIndexRouteImport } from './routes/app.investor.deal-rooms.index'
-import { Route as AppInvestorCrmIndexRouteImport } from './routes/app.investor.crm.index'
 import { Route as AppRoastIdLiveRouteImport } from './routes/app.roast.$id.live'
 import { Route as AppRoastIdAnswersRouteImport } from './routes/app.roast.$id.answers'
-import { Route as AppPrepareWorkstationVerificationsRouteImport } from './routes/app.prepare.workstation.verifications'
-import { Route as AppPrepareWorkstationClaimsRouteImport } from './routes/app.prepare.workstation.claims'
 import { Route as AppPrepareProfileBuilderTeamCardsRouteImport } from './routes/app.prepare.profile-builder.team-cards'
 import { Route as AppPrepareProfileBuilderQuickSetupRouteImport } from './routes/app.prepare.profile-builder.quick-setup'
 import { Route as AppPrepareProfileBuilderFundraisingThesisRouteImport } from './routes/app.prepare.profile-builder.fundraising-thesis'
@@ -153,14 +129,8 @@ import { Route as AppPrepareIpVaultSourceFilesRouteImport } from './routes/app.p
 import { Route as AppPrepareIpVaultPrivacySettingsRouteImport } from './routes/app.prepare.ip-vault.privacy-settings'
 import { Route as AppPrepareIpVaultDocumentIntakeRouteImport } from './routes/app.prepare.ip-vault.document-intake'
 import { Route as AppPrepareIpVaultDigitalDocumentVaultRouteImport } from './routes/app.prepare.ip-vault.digital-document-vault'
-import { Route as AppPrepareInvestmentReadinessInvestorSimulationRouteImport } from './routes/app.prepare.investment-readiness.investor-simulation'
-import { Route as AppPrepareInvestmentReadinessInvestmentAuditRouteImport } from './routes/app.prepare.investment-readiness.investment-audit'
-import { Route as AppPrepareFounderCoachingReportFlagsRouteImport } from './routes/app.prepare.founder-coaching.report-flags'
-import { Route as AppPrepareFounderCoachingProfileDocumentsCheckRouteImport } from './routes/app.prepare.founder-coaching.profile-documents-check'
 import { Route as AppPrepareBadgesRoastReportsRouteImport } from './routes/app.prepare.badges.roast-reports'
-import { Route as AppPrepareBadgesOverviewRouteImport } from './routes/app.prepare.badges.overview'
 import { Route as AppPrepareBadgesFounderRoastRouteImport } from './routes/app.prepare.badges.founder-roast'
-import { Route as AppPrepareBadgesApplyRouteImport } from './routes/app.prepare.badges.apply'
 import { Route as AppInvestorDiscoverWatchlistRouteImport } from './routes/app.investor.discover.watchlist'
 import { Route as AppInvestorDiscoverDealIntakeRouteImport } from './routes/app.investor.discover.deal-intake'
 import { Route as AppInvestorDiscoverDealFlowRouteImport } from './routes/app.investor.discover.deal-flow'
@@ -170,11 +140,6 @@ import { Route as AppInvestorDealRoomsPrepNotesRouteImport } from './routes/app.
 import { Route as AppInvestorDealRoomsPortfolioRouteImport } from './routes/app.investor.deal-rooms.portfolio'
 import { Route as AppInvestorDealRoomsMeetingsCalendarRouteImport } from './routes/app.investor.deal-rooms.meetings-calendar'
 import { Route as AppInvestorDealRoomsDiligenceNotesRouteImport } from './routes/app.investor.deal-rooms.diligence-notes'
-import { Route as AppInvestorCrmPipelineManagerRouteImport } from './routes/app.investor.crm.pipeline-manager'
-import { Route as AppInvestorCrmFounderMeetingsRouteImport } from './routes/app.investor.crm.founder-meetings'
-import { Route as AppInvestorCrmDealAnalysisRouteImport } from './routes/app.investor.crm.deal-analysis'
-import { Route as AppInvestorCrmConnectionsRouteImport } from './routes/app.investor.crm.connections'
-import { Route as AppInvestorCrmAnalyticsRouteImport } from './routes/app.investor.crm.analytics'
 import { Route as AppGoLiveDigitalProfileProfileViewRouteImport } from './routes/app.go-live.digital-profile.profile-view'
 import { Route as AppGoLiveDigitalProfilePrivacySettingsRouteImport } from './routes/app.go-live.digital-profile.privacy-settings'
 import { Route as AppDealRoomsIdTermSheetsRouteImport } from './routes/app.deal-rooms.$id.term-sheets'
@@ -187,8 +152,6 @@ import { Route as AppDealRoomsIdDocumentsRouteImport } from './routes/app.deal-r
 import { Route as AppDealRoomsIdDiligenceRouteImport } from './routes/app.deal-rooms.$id.diligence'
 import { Route as AppDealRoomsIdCloseRouteImport } from './routes/app.deal-rooms.$id.close'
 import { Route as AppDealRoomsIdActivityRouteImport } from './routes/app.deal-rooms.$id.activity'
-import { Route as AppInvestorThesisVerificationVerificationsRouteImport } from './routes/app.investor.thesis.verification.verifications'
-import { Route as AppInvestorThesisVerificationClaimsRouteImport } from './routes/app.investor.thesis.verification.claims'
 import { Route as AppInvestorThesisProfileBuilderTrackRecordRouteImport } from './routes/app.investor.thesis.profile-builder.track-record'
 import { Route as AppInvestorThesisProfileBuilderTeamCardsRouteImport } from './routes/app.investor.thesis.profile-builder.team-cards'
 import { Route as AppInvestorThesisProfileBuilderQuickSetupRouteImport } from './routes/app.investor.thesis.profile-builder.quick-setup'
@@ -197,11 +160,6 @@ import { Route as AppInvestorThesisProfileBuilderFullProfileRouteImport } from '
 import { Route as AppInvestorThesisFundVaultSourceFilesRouteImport } from './routes/app.investor.thesis.fund-vault.source-files'
 import { Route as AppInvestorThesisFundVaultPrivacySettingsRouteImport } from './routes/app.investor.thesis.fund-vault.privacy-settings'
 import { Route as AppInvestorThesisFundVaultDigitalDocumentVaultRouteImport } from './routes/app.investor.thesis.fund-vault.digital-document-vault'
-import { Route as AppInvestorThesisCapitalReadinessChequeSizeRouteImport } from './routes/app.investor.thesis.capital-readiness.cheque-size'
-import { Route as AppInvestorThesisCapitalReadinessCapacityAuditRouteImport } from './routes/app.investor.thesis.capital-readiness.capacity-audit'
-import { Route as AppInvestorThesisBadgesTierStatusRouteImport } from './routes/app.investor.thesis.badges.tier-status'
-import { Route as AppInvestorThesisBadgesOverviewRouteImport } from './routes/app.investor.thesis.badges.overview'
-import { Route as AppInvestorThesisBadgesApplyRouteImport } from './routes/app.investor.thesis.badges.apply'
 import { Route as AppInvestorDiscoverPublicProfileProfileViewRouteImport } from './routes/app.investor.discover.public-profile.profile-view'
 import { Route as AppInvestorDiscoverPublicProfilePrivacySettingsRouteImport } from './routes/app.investor.discover.public-profile.privacy-settings'
 
@@ -335,11 +293,6 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
-const VerifySlugRoute = VerifySlugRouteImport.update({
-  id: '/verify/$slug',
-  path: '/verify/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ToolsValuationRoute = ToolsValuationRouteImport.update({
   id: '/tools/valuation',
   path: '/tools/valuation',
@@ -441,16 +394,6 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppWallRoute = AppWallRouteImport.update({
-  id: '/wall',
-  path: '/wall',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppVerificationRoute = AppVerificationRouteImport.update({
-  id: '/verification',
-  path: '/verification',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppUsersRoute = AppUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -464,11 +407,6 @@ const AppTeamChatRoute = AppTeamChatRouteImport.update({
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppReferralsRoute = AppReferralsRouteImport.update({
-  id: '/referrals',
-  path: '/referrals',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProfileBuilderRoute = AppProfileBuilderRouteImport.update({
@@ -501,11 +439,6 @@ const AppMemberProfileRoute = AppMemberProfileRouteImport.update({
   path: '/member-profile',
   getParentRoute: () => AppRoute,
 } as any)
-const AppMeetingsRoute = AppMeetingsRouteImport.update({
-  id: '/meetings',
-  path: '/meetings',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppInvestorRoute = AppInvestorRouteImport.update({
   id: '/investor',
   path: '/investor',
@@ -521,19 +454,9 @@ const AppFeedbackRoute = AppFeedbackRouteImport.update({
   path: '/feedback',
   getParentRoute: () => AppRoute,
 } as any)
-const AppEmailRoute = AppEmailRouteImport.update({
-  id: '/email',
-  path: '/email',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppDocumentsRoute = AppDocumentsRouteImport.update({
   id: '/documents',
   path: '/documents',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppDirectoryRoute = AppDirectoryRouteImport.update({
-  id: '/directory',
-  path: '/directory',
   getParentRoute: () => AppRoute,
 } as any)
 const AppConnectionsRoute = AppConnectionsRouteImport.update({
@@ -546,34 +469,14 @@ const AppCloseRoute = AppCloseRouteImport.update({
   path: '/close',
   getParentRoute: () => AppRoute,
 } as any)
-const AppClaimsRoute = AppClaimsRouteImport.update({
-  id: '/claims',
-  path: '/claims',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppBadgesRoute = AppBadgesRouteImport.update({
-  id: '/badges',
-  path: '/badges',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppAuditRoute = AppAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAssistantRoute = AppAssistantRouteImport.update({
-  id: '/assistant',
-  path: '/assistant',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppAdvisorRoute = AppAdvisorRouteImport.update({
-  id: '/advisor',
-  path: '/advisor',
   getParentRoute: () => AppRoute,
 } as any)
 const ApiTestAiRoute = ApiTestAiRouteImport.update({
@@ -599,11 +502,6 @@ const ApiEmailtestRoute = ApiEmailtestRouteImport.update({
 const ApiEmailTestRoute = ApiEmailTestRouteImport.update({
   id: '/api/email-test',
   path: '/api/email-test',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminVerificationRoute = ApiAdminVerificationRouteImport.update({
-  id: '/api/admin-verification',
-  path: '/api/admin-verification',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAdminDataRoute = ApiAdminDataRouteImport.update({
@@ -644,11 +542,6 @@ const AppGoLiveIndexRoute = AppGoLiveIndexRouteImport.update({
 const AppDealRoomsIndexRoute = AppDealRoomsIndexRouteImport.update({
   id: '/deal-rooms/',
   path: '/deal-rooms/',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppCrmIndexRoute = AppCrmIndexRouteImport.update({
-  id: '/crm/',
-  path: '/crm/',
   getParentRoute: () => AppRoute,
 } as any)
 const JoinTeamTokenRoute = JoinTeamTokenRouteImport.update({
@@ -752,11 +645,6 @@ const AppInvestorConnectionsRoute = AppInvestorConnectionsRouteImport.update({
   path: '/connections',
   getParentRoute: () => AppInvestorRoute,
 } as any)
-const AppInvestorAssistantRoute = AppInvestorAssistantRouteImport.update({
-  id: '/assistant',
-  path: '/assistant',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
 const AppInvestorAnalyticsRoute = AppInvestorAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -767,22 +655,12 @@ const AppInvestorAnalysisRoute = AppInvestorAnalysisRouteImport.update({
   path: '/analysis',
   getParentRoute: () => AppInvestorRoute,
 } as any)
-const AppInvestorAdvisorRoute = AppInvestorAdvisorRouteImport.update({
-  id: '/advisor',
-  path: '/advisor',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
 const AppGoLiveProfileAnalyticsRoute =
   AppGoLiveProfileAnalyticsRouteImport.update({
     id: '/go-live/profile-analytics',
     path: '/go-live/profile-analytics',
     getParentRoute: () => AppRoute,
   } as any)
-const AppGoLiveDirectoryRoute = AppGoLiveDirectoryRouteImport.update({
-  id: '/go-live/directory',
-  path: '/go-live/directory',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppDealRoomsTeamAssignmentsRoute =
   AppDealRoomsTeamAssignmentsRouteImport.update({
     id: '/deal-rooms/team-assignments',
@@ -809,31 +687,6 @@ const AppDealRoomsMeetingsCalendarRoute =
 const AppDealRoomsIdRoute = AppDealRoomsIdRouteImport.update({
   id: '/deal-rooms/$id',
   path: '/deal-rooms/$id',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppCrmPipelineManagerRoute = AppCrmPipelineManagerRouteImport.update({
-  id: '/crm/pipeline-manager',
-  path: '/crm/pipeline-manager',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppCrmMeetingsRoute = AppCrmMeetingsRouteImport.update({
-  id: '/crm/meetings',
-  path: '/crm/meetings',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppCrmEmailOutreachRoute = AppCrmEmailOutreachRouteImport.update({
-  id: '/crm/email-outreach',
-  path: '/crm/email-outreach',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppCrmConnectionsRoute = AppCrmConnectionsRouteImport.update({
-  id: '/crm/connections',
-  path: '/crm/connections',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppCrmAnalyticsRoute = AppCrmAnalyticsRouteImport.update({
-  id: '/crm/analytics',
-  path: '/crm/analytics',
   getParentRoute: () => AppRoute,
 } as any)
 const ApiInternalEmailTestRoute = ApiInternalEmailTestRouteImport.update({
@@ -863,11 +716,6 @@ const AppInvestorDealRoomsIndexRoute =
     path: '/deal-rooms/',
     getParentRoute: () => AppInvestorRoute,
   } as any)
-const AppInvestorCrmIndexRoute = AppInvestorCrmIndexRouteImport.update({
-  id: '/crm/',
-  path: '/crm/',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
 const AppRoastIdLiveRoute = AppRoastIdLiveRouteImport.update({
   id: '/roast/$id/live',
   path: '/roast/$id/live',
@@ -878,18 +726,6 @@ const AppRoastIdAnswersRoute = AppRoastIdAnswersRouteImport.update({
   path: '/roast/$id/answers',
   getParentRoute: () => AppRoute,
 } as any)
-const AppPrepareWorkstationVerificationsRoute =
-  AppPrepareWorkstationVerificationsRouteImport.update({
-    id: '/prepare/workstation/verifications',
-    path: '/prepare/workstation/verifications',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareWorkstationClaimsRoute =
-  AppPrepareWorkstationClaimsRouteImport.update({
-    id: '/prepare/workstation/claims',
-    path: '/prepare/workstation/claims',
-    getParentRoute: () => AppRoute,
-  } as any)
 const AppPrepareProfileBuilderTeamCardsRoute =
   AppPrepareProfileBuilderTeamCardsRouteImport.update({
     id: '/prepare/profile-builder/team-cards',
@@ -944,40 +780,10 @@ const AppPrepareIpVaultDigitalDocumentVaultRoute =
     path: '/prepare/ip-vault/digital-document-vault',
     getParentRoute: () => AppRoute,
   } as any)
-const AppPrepareInvestmentReadinessInvestorSimulationRoute =
-  AppPrepareInvestmentReadinessInvestorSimulationRouteImport.update({
-    id: '/prepare/investment-readiness/investor-simulation',
-    path: '/prepare/investment-readiness/investor-simulation',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareInvestmentReadinessInvestmentAuditRoute =
-  AppPrepareInvestmentReadinessInvestmentAuditRouteImport.update({
-    id: '/prepare/investment-readiness/investment-audit',
-    path: '/prepare/investment-readiness/investment-audit',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareFounderCoachingReportFlagsRoute =
-  AppPrepareFounderCoachingReportFlagsRouteImport.update({
-    id: '/prepare/founder-coaching/report-flags',
-    path: '/prepare/founder-coaching/report-flags',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareFounderCoachingProfileDocumentsCheckRoute =
-  AppPrepareFounderCoachingProfileDocumentsCheckRouteImport.update({
-    id: '/prepare/founder-coaching/profile-documents-check',
-    path: '/prepare/founder-coaching/profile-documents-check',
-    getParentRoute: () => AppRoute,
-  } as any)
 const AppPrepareBadgesRoastReportsRoute =
   AppPrepareBadgesRoastReportsRouteImport.update({
     id: '/prepare/badges/roast-reports',
     path: '/prepare/badges/roast-reports',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareBadgesOverviewRoute =
-  AppPrepareBadgesOverviewRouteImport.update({
-    id: '/prepare/badges/overview',
-    path: '/prepare/badges/overview',
     getParentRoute: () => AppRoute,
   } as any)
 const AppPrepareBadgesFounderRoastRoute =
@@ -986,11 +792,6 @@ const AppPrepareBadgesFounderRoastRoute =
     path: '/prepare/badges/founder-roast',
     getParentRoute: () => AppRoute,
   } as any)
-const AppPrepareBadgesApplyRoute = AppPrepareBadgesApplyRouteImport.update({
-  id: '/prepare/badges/apply',
-  path: '/prepare/badges/apply',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppInvestorDiscoverWatchlistRoute =
   AppInvestorDiscoverWatchlistRouteImport.update({
     id: '/discover/watchlist',
@@ -1045,35 +846,6 @@ const AppInvestorDealRoomsDiligenceNotesRoute =
     path: '/deal-rooms/diligence-notes',
     getParentRoute: () => AppInvestorRoute,
   } as any)
-const AppInvestorCrmPipelineManagerRoute =
-  AppInvestorCrmPipelineManagerRouteImport.update({
-    id: '/crm/pipeline-manager',
-    path: '/crm/pipeline-manager',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppInvestorCrmFounderMeetingsRoute =
-  AppInvestorCrmFounderMeetingsRouteImport.update({
-    id: '/crm/founder-meetings',
-    path: '/crm/founder-meetings',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppInvestorCrmDealAnalysisRoute =
-  AppInvestorCrmDealAnalysisRouteImport.update({
-    id: '/crm/deal-analysis',
-    path: '/crm/deal-analysis',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppInvestorCrmConnectionsRoute =
-  AppInvestorCrmConnectionsRouteImport.update({
-    id: '/crm/connections',
-    path: '/crm/connections',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppInvestorCrmAnalyticsRoute = AppInvestorCrmAnalyticsRouteImport.update({
-  id: '/crm/analytics',
-  path: '/crm/analytics',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
 const AppGoLiveDigitalProfileProfileViewRoute =
   AppGoLiveDigitalProfileProfileViewRouteImport.update({
     id: '/go-live/digital-profile/profile-view',
@@ -1138,18 +910,6 @@ const AppDealRoomsIdActivityRoute = AppDealRoomsIdActivityRouteImport.update({
   path: '/activity',
   getParentRoute: () => AppDealRoomsIdRoute,
 } as any)
-const AppInvestorThesisVerificationVerificationsRoute =
-  AppInvestorThesisVerificationVerificationsRouteImport.update({
-    id: '/thesis/verification/verifications',
-    path: '/thesis/verification/verifications',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppInvestorThesisVerificationClaimsRoute =
-  AppInvestorThesisVerificationClaimsRouteImport.update({
-    id: '/thesis/verification/claims',
-    path: '/thesis/verification/claims',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
 const AppInvestorThesisProfileBuilderTrackRecordRoute =
   AppInvestorThesisProfileBuilderTrackRecordRouteImport.update({
     id: '/thesis/profile-builder/track-record',
@@ -1198,36 +958,6 @@ const AppInvestorThesisFundVaultDigitalDocumentVaultRoute =
     path: '/thesis/fund-vault/digital-document-vault',
     getParentRoute: () => AppInvestorRoute,
   } as any)
-const AppInvestorThesisCapitalReadinessChequeSizeRoute =
-  AppInvestorThesisCapitalReadinessChequeSizeRouteImport.update({
-    id: '/thesis/capital-readiness/cheque-size',
-    path: '/thesis/capital-readiness/cheque-size',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppInvestorThesisCapitalReadinessCapacityAuditRoute =
-  AppInvestorThesisCapitalReadinessCapacityAuditRouteImport.update({
-    id: '/thesis/capital-readiness/capacity-audit',
-    path: '/thesis/capital-readiness/capacity-audit',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppInvestorThesisBadgesTierStatusRoute =
-  AppInvestorThesisBadgesTierStatusRouteImport.update({
-    id: '/thesis/badges/tier-status',
-    path: '/thesis/badges/tier-status',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppInvestorThesisBadgesOverviewRoute =
-  AppInvestorThesisBadgesOverviewRouteImport.update({
-    id: '/thesis/badges/overview',
-    path: '/thesis/badges/overview',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppInvestorThesisBadgesApplyRoute =
-  AppInvestorThesisBadgesApplyRouteImport.update({
-    id: '/thesis/badges/apply',
-    path: '/thesis/badges/apply',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
 const AppInvestorDiscoverPublicProfileProfileViewRoute =
   AppInvestorDiscoverPublicProfileProfileViewRouteImport.update({
     id: '/discover/public-profile/profile-view',
@@ -1266,39 +996,28 @@ export interface FileRoutesByFullPath {
   '/trust': typeof TrustRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
-  '/api/admin-verification': typeof ApiAdminVerificationRoute
   '/api/email-test': typeof ApiEmailTestRoute
   '/api/emailtest': typeof ApiEmailtestRoute
   '/api/hubspot-newsletter': typeof ApiHubspotNewsletterRoute
   '/api/hubspot-sync': typeof ApiHubspotSyncRoute
   '/api/test-ai': typeof ApiTestAiRoute
-  '/app/advisor': typeof AppAdvisorRoute
   '/app/analytics': typeof AppAnalyticsRoute
-  '/app/assistant': typeof AppAssistantRoute
   '/app/audit': typeof AppAuditRoute
-  '/app/badges': typeof AppBadgesRoute
-  '/app/claims': typeof AppClaimsRoute
   '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
-  '/app/directory': typeof AppDirectoryRoute
   '/app/documents': typeof AppDocumentsRoute
-  '/app/email': typeof AppEmailRoute
   '/app/feedback': typeof AppFeedbackRoute
   '/app/home': typeof AppHomeRoute
   '/app/investor': typeof AppInvestorRouteWithChildren
-  '/app/meetings': typeof AppMeetingsRoute
   '/app/member-profile': typeof AppMemberProfileRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/overview': typeof AppOverviewRoute
   '/app/profile': typeof AppProfileRoute
   '/app/profile-builder': typeof AppProfileBuilderRoute
-  '/app/referrals': typeof AppReferralsRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/team-chat': typeof AppTeamChatRoute
   '/app/users': typeof AppUsersRoute
-  '/app/verification': typeof AppVerificationRoute
-  '/app/wall': typeof AppWallRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/cv/$slug': typeof CvSlugRoute
@@ -1319,29 +1038,20 @@ export interface FileRoutesByFullPath {
   '/tools/runway': typeof ToolsRunwayRoute
   '/tools/safe-note': typeof ToolsSafeNoteRoute
   '/tools/valuation': typeof ToolsValuationRoute
-  '/verify/$slug': typeof VerifySlugRoute
   '/app/': typeof AppIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/docs/': typeof DocsIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
-  '/app/crm/analytics': typeof AppCrmAnalyticsRoute
-  '/app/crm/connections': typeof AppCrmConnectionsRoute
-  '/app/crm/email-outreach': typeof AppCrmEmailOutreachRoute
-  '/app/crm/meetings': typeof AppCrmMeetingsRoute
-  '/app/crm/pipeline-manager': typeof AppCrmPipelineManagerRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/deal-rooms/meetings-calendar': typeof AppDealRoomsMeetingsCalendarRoute
   '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
   '/app/deal-rooms/reports-vault': typeof AppDealRoomsReportsVaultRoute
   '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
-  '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
-  '/app/investor/advisor': typeof AppInvestorAdvisorRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
   '/app/investor/analytics': typeof AppInvestorAnalyticsRoute
-  '/app/investor/assistant': typeof AppInvestorAssistantRoute
   '/app/investor/connections': typeof AppInvestorConnectionsRoute
   '/app/investor/deal-flow': typeof AppInvestorDealFlowRoute
   '/app/investor/decide': typeof AppInvestorDecideRoute
@@ -1362,7 +1072,6 @@ export interface FileRoutesByFullPath {
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
   '/join/team/$token': typeof JoinTeamTokenRoute
-  '/app/crm/': typeof AppCrmIndexRoute
   '/app/deal-rooms/': typeof AppDealRoomsIndexRoute
   '/app/go-live/': typeof AppGoLiveIndexRoute
   '/app/investor/': typeof AppInvestorIndexRoute
@@ -1381,11 +1090,6 @@ export interface FileRoutesByFullPath {
   '/app/deal-rooms/$id/term-sheets': typeof AppDealRoomsIdTermSheetsRoute
   '/app/go-live/digital-profile/privacy-settings': typeof AppGoLiveDigitalProfilePrivacySettingsRoute
   '/app/go-live/digital-profile/profile-view': typeof AppGoLiveDigitalProfileProfileViewRoute
-  '/app/investor/crm/analytics': typeof AppInvestorCrmAnalyticsRoute
-  '/app/investor/crm/connections': typeof AppInvestorCrmConnectionsRoute
-  '/app/investor/crm/deal-analysis': typeof AppInvestorCrmDealAnalysisRoute
-  '/app/investor/crm/founder-meetings': typeof AppInvestorCrmFounderMeetingsRoute
-  '/app/investor/crm/pipeline-manager': typeof AppInvestorCrmPipelineManagerRoute
   '/app/investor/deal-rooms/diligence-notes': typeof AppInvestorDealRoomsDiligenceNotesRoute
   '/app/investor/deal-rooms/meetings-calendar': typeof AppInvestorDealRoomsMeetingsCalendarRoute
   '/app/investor/deal-rooms/portfolio': typeof AppInvestorDealRoomsPortfolioRoute
@@ -1395,14 +1099,8 @@ export interface FileRoutesByFullPath {
   '/app/investor/discover/deal-flow': typeof AppInvestorDiscoverDealFlowRoute
   '/app/investor/discover/deal-intake': typeof AppInvestorDiscoverDealIntakeRoute
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
-  '/app/prepare/badges/apply': typeof AppPrepareBadgesApplyRoute
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
-  '/app/prepare/badges/overview': typeof AppPrepareBadgesOverviewRoute
   '/app/prepare/badges/roast-reports': typeof AppPrepareBadgesRoastReportsRoute
-  '/app/prepare/founder-coaching/profile-documents-check': typeof AppPrepareFounderCoachingProfileDocumentsCheckRoute
-  '/app/prepare/founder-coaching/report-flags': typeof AppPrepareFounderCoachingReportFlagsRoute
-  '/app/prepare/investment-readiness/investment-audit': typeof AppPrepareInvestmentReadinessInvestmentAuditRoute
-  '/app/prepare/investment-readiness/investor-simulation': typeof AppPrepareInvestmentReadinessInvestorSimulationRoute
   '/app/prepare/ip-vault/digital-document-vault': typeof AppPrepareIpVaultDigitalDocumentVaultRoute
   '/app/prepare/ip-vault/document-intake': typeof AppPrepareIpVaultDocumentIntakeRoute
   '/app/prepare/ip-vault/privacy-settings': typeof AppPrepareIpVaultPrivacySettingsRoute
@@ -1412,21 +1110,13 @@ export interface FileRoutesByFullPath {
   '/app/prepare/profile-builder/fundraising-thesis': typeof AppPrepareProfileBuilderFundraisingThesisRoute
   '/app/prepare/profile-builder/quick-setup': typeof AppPrepareProfileBuilderQuickSetupRoute
   '/app/prepare/profile-builder/team-cards': typeof AppPrepareProfileBuilderTeamCardsRoute
-  '/app/prepare/workstation/claims': typeof AppPrepareWorkstationClaimsRoute
-  '/app/prepare/workstation/verifications': typeof AppPrepareWorkstationVerificationsRoute
   '/app/roast/$id/answers': typeof AppRoastIdAnswersRoute
   '/app/roast/$id/live': typeof AppRoastIdLiveRoute
-  '/app/investor/crm/': typeof AppInvestorCrmIndexRoute
   '/app/investor/deal-rooms/': typeof AppInvestorDealRoomsIndexRoute
   '/app/investor/discover/': typeof AppInvestorDiscoverIndexRoute
   '/app/investor/thesis/': typeof AppInvestorThesisIndexRoute
   '/app/investor/discover/public-profile/privacy-settings': typeof AppInvestorDiscoverPublicProfilePrivacySettingsRoute
   '/app/investor/discover/public-profile/profile-view': typeof AppInvestorDiscoverPublicProfileProfileViewRoute
-  '/app/investor/thesis/badges/apply': typeof AppInvestorThesisBadgesApplyRoute
-  '/app/investor/thesis/badges/overview': typeof AppInvestorThesisBadgesOverviewRoute
-  '/app/investor/thesis/badges/tier-status': typeof AppInvestorThesisBadgesTierStatusRoute
-  '/app/investor/thesis/capital-readiness/capacity-audit': typeof AppInvestorThesisCapitalReadinessCapacityAuditRoute
-  '/app/investor/thesis/capital-readiness/cheque-size': typeof AppInvestorThesisCapitalReadinessChequeSizeRoute
   '/app/investor/thesis/fund-vault/digital-document-vault': typeof AppInvestorThesisFundVaultDigitalDocumentVaultRoute
   '/app/investor/thesis/fund-vault/privacy-settings': typeof AppInvestorThesisFundVaultPrivacySettingsRoute
   '/app/investor/thesis/fund-vault/source-files': typeof AppInvestorThesisFundVaultSourceFilesRoute
@@ -1435,8 +1125,6 @@ export interface FileRoutesByFullPath {
   '/app/investor/thesis/profile-builder/quick-setup': typeof AppInvestorThesisProfileBuilderQuickSetupRoute
   '/app/investor/thesis/profile-builder/team-cards': typeof AppInvestorThesisProfileBuilderTeamCardsRoute
   '/app/investor/thesis/profile-builder/track-record': typeof AppInvestorThesisProfileBuilderTrackRecordRoute
-  '/app/investor/thesis/verification/claims': typeof AppInvestorThesisVerificationClaimsRoute
-  '/app/investor/thesis/verification/verifications': typeof AppInvestorThesisVerificationVerificationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -1460,38 +1148,27 @@ export interface FileRoutesByTo {
   '/trust': typeof TrustRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
-  '/api/admin-verification': typeof ApiAdminVerificationRoute
   '/api/email-test': typeof ApiEmailTestRoute
   '/api/emailtest': typeof ApiEmailtestRoute
   '/api/hubspot-newsletter': typeof ApiHubspotNewsletterRoute
   '/api/hubspot-sync': typeof ApiHubspotSyncRoute
   '/api/test-ai': typeof ApiTestAiRoute
-  '/app/advisor': typeof AppAdvisorRoute
   '/app/analytics': typeof AppAnalyticsRoute
-  '/app/assistant': typeof AppAssistantRoute
   '/app/audit': typeof AppAuditRoute
-  '/app/badges': typeof AppBadgesRoute
-  '/app/claims': typeof AppClaimsRoute
   '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
-  '/app/directory': typeof AppDirectoryRoute
   '/app/documents': typeof AppDocumentsRoute
-  '/app/email': typeof AppEmailRoute
   '/app/feedback': typeof AppFeedbackRoute
   '/app/home': typeof AppHomeRoute
-  '/app/meetings': typeof AppMeetingsRoute
   '/app/member-profile': typeof AppMemberProfileRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/overview': typeof AppOverviewRoute
   '/app/profile': typeof AppProfileRoute
   '/app/profile-builder': typeof AppProfileBuilderRoute
-  '/app/referrals': typeof AppReferralsRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/team-chat': typeof AppTeamChatRoute
   '/app/users': typeof AppUsersRoute
-  '/app/verification': typeof AppVerificationRoute
-  '/app/wall': typeof AppWallRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/cv/$slug': typeof CvSlugRoute
@@ -1512,29 +1189,20 @@ export interface FileRoutesByTo {
   '/tools/runway': typeof ToolsRunwayRoute
   '/tools/safe-note': typeof ToolsSafeNoteRoute
   '/tools/valuation': typeof ToolsValuationRoute
-  '/verify/$slug': typeof VerifySlugRoute
   '/app': typeof AppIndexRoute
   '/blog': typeof BlogIndexRoute
   '/docs': typeof DocsIndexRoute
   '/tools': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
-  '/app/crm/analytics': typeof AppCrmAnalyticsRoute
-  '/app/crm/connections': typeof AppCrmConnectionsRoute
-  '/app/crm/email-outreach': typeof AppCrmEmailOutreachRoute
-  '/app/crm/meetings': typeof AppCrmMeetingsRoute
-  '/app/crm/pipeline-manager': typeof AppCrmPipelineManagerRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/deal-rooms/meetings-calendar': typeof AppDealRoomsMeetingsCalendarRoute
   '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
   '/app/deal-rooms/reports-vault': typeof AppDealRoomsReportsVaultRoute
   '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
-  '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
-  '/app/investor/advisor': typeof AppInvestorAdvisorRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
   '/app/investor/analytics': typeof AppInvestorAnalyticsRoute
-  '/app/investor/assistant': typeof AppInvestorAssistantRoute
   '/app/investor/connections': typeof AppInvestorConnectionsRoute
   '/app/investor/deal-flow': typeof AppInvestorDealFlowRoute
   '/app/investor/decide': typeof AppInvestorDecideRoute
@@ -1555,7 +1223,6 @@ export interface FileRoutesByTo {
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
   '/join/team/$token': typeof JoinTeamTokenRoute
-  '/app/crm': typeof AppCrmIndexRoute
   '/app/deal-rooms': typeof AppDealRoomsIndexRoute
   '/app/go-live': typeof AppGoLiveIndexRoute
   '/app/investor': typeof AppInvestorIndexRoute
@@ -1574,11 +1241,6 @@ export interface FileRoutesByTo {
   '/app/deal-rooms/$id/term-sheets': typeof AppDealRoomsIdTermSheetsRoute
   '/app/go-live/digital-profile/privacy-settings': typeof AppGoLiveDigitalProfilePrivacySettingsRoute
   '/app/go-live/digital-profile/profile-view': typeof AppGoLiveDigitalProfileProfileViewRoute
-  '/app/investor/crm/analytics': typeof AppInvestorCrmAnalyticsRoute
-  '/app/investor/crm/connections': typeof AppInvestorCrmConnectionsRoute
-  '/app/investor/crm/deal-analysis': typeof AppInvestorCrmDealAnalysisRoute
-  '/app/investor/crm/founder-meetings': typeof AppInvestorCrmFounderMeetingsRoute
-  '/app/investor/crm/pipeline-manager': typeof AppInvestorCrmPipelineManagerRoute
   '/app/investor/deal-rooms/diligence-notes': typeof AppInvestorDealRoomsDiligenceNotesRoute
   '/app/investor/deal-rooms/meetings-calendar': typeof AppInvestorDealRoomsMeetingsCalendarRoute
   '/app/investor/deal-rooms/portfolio': typeof AppInvestorDealRoomsPortfolioRoute
@@ -1588,14 +1250,8 @@ export interface FileRoutesByTo {
   '/app/investor/discover/deal-flow': typeof AppInvestorDiscoverDealFlowRoute
   '/app/investor/discover/deal-intake': typeof AppInvestorDiscoverDealIntakeRoute
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
-  '/app/prepare/badges/apply': typeof AppPrepareBadgesApplyRoute
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
-  '/app/prepare/badges/overview': typeof AppPrepareBadgesOverviewRoute
   '/app/prepare/badges/roast-reports': typeof AppPrepareBadgesRoastReportsRoute
-  '/app/prepare/founder-coaching/profile-documents-check': typeof AppPrepareFounderCoachingProfileDocumentsCheckRoute
-  '/app/prepare/founder-coaching/report-flags': typeof AppPrepareFounderCoachingReportFlagsRoute
-  '/app/prepare/investment-readiness/investment-audit': typeof AppPrepareInvestmentReadinessInvestmentAuditRoute
-  '/app/prepare/investment-readiness/investor-simulation': typeof AppPrepareInvestmentReadinessInvestorSimulationRoute
   '/app/prepare/ip-vault/digital-document-vault': typeof AppPrepareIpVaultDigitalDocumentVaultRoute
   '/app/prepare/ip-vault/document-intake': typeof AppPrepareIpVaultDocumentIntakeRoute
   '/app/prepare/ip-vault/privacy-settings': typeof AppPrepareIpVaultPrivacySettingsRoute
@@ -1605,21 +1261,13 @@ export interface FileRoutesByTo {
   '/app/prepare/profile-builder/fundraising-thesis': typeof AppPrepareProfileBuilderFundraisingThesisRoute
   '/app/prepare/profile-builder/quick-setup': typeof AppPrepareProfileBuilderQuickSetupRoute
   '/app/prepare/profile-builder/team-cards': typeof AppPrepareProfileBuilderTeamCardsRoute
-  '/app/prepare/workstation/claims': typeof AppPrepareWorkstationClaimsRoute
-  '/app/prepare/workstation/verifications': typeof AppPrepareWorkstationVerificationsRoute
   '/app/roast/$id/answers': typeof AppRoastIdAnswersRoute
   '/app/roast/$id/live': typeof AppRoastIdLiveRoute
-  '/app/investor/crm': typeof AppInvestorCrmIndexRoute
   '/app/investor/deal-rooms': typeof AppInvestorDealRoomsIndexRoute
   '/app/investor/discover': typeof AppInvestorDiscoverIndexRoute
   '/app/investor/thesis': typeof AppInvestorThesisIndexRoute
   '/app/investor/discover/public-profile/privacy-settings': typeof AppInvestorDiscoverPublicProfilePrivacySettingsRoute
   '/app/investor/discover/public-profile/profile-view': typeof AppInvestorDiscoverPublicProfileProfileViewRoute
-  '/app/investor/thesis/badges/apply': typeof AppInvestorThesisBadgesApplyRoute
-  '/app/investor/thesis/badges/overview': typeof AppInvestorThesisBadgesOverviewRoute
-  '/app/investor/thesis/badges/tier-status': typeof AppInvestorThesisBadgesTierStatusRoute
-  '/app/investor/thesis/capital-readiness/capacity-audit': typeof AppInvestorThesisCapitalReadinessCapacityAuditRoute
-  '/app/investor/thesis/capital-readiness/cheque-size': typeof AppInvestorThesisCapitalReadinessChequeSizeRoute
   '/app/investor/thesis/fund-vault/digital-document-vault': typeof AppInvestorThesisFundVaultDigitalDocumentVaultRoute
   '/app/investor/thesis/fund-vault/privacy-settings': typeof AppInvestorThesisFundVaultPrivacySettingsRoute
   '/app/investor/thesis/fund-vault/source-files': typeof AppInvestorThesisFundVaultSourceFilesRoute
@@ -1628,8 +1276,6 @@ export interface FileRoutesByTo {
   '/app/investor/thesis/profile-builder/quick-setup': typeof AppInvestorThesisProfileBuilderQuickSetupRoute
   '/app/investor/thesis/profile-builder/team-cards': typeof AppInvestorThesisProfileBuilderTeamCardsRoute
   '/app/investor/thesis/profile-builder/track-record': typeof AppInvestorThesisProfileBuilderTrackRecordRoute
-  '/app/investor/thesis/verification/claims': typeof AppInvestorThesisVerificationClaimsRoute
-  '/app/investor/thesis/verification/verifications': typeof AppInvestorThesisVerificationVerificationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1657,39 +1303,28 @@ export interface FileRoutesById {
   '/trust': typeof TrustRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
-  '/api/admin-verification': typeof ApiAdminVerificationRoute
   '/api/email-test': typeof ApiEmailTestRoute
   '/api/emailtest': typeof ApiEmailtestRoute
   '/api/hubspot-newsletter': typeof ApiHubspotNewsletterRoute
   '/api/hubspot-sync': typeof ApiHubspotSyncRoute
   '/api/test-ai': typeof ApiTestAiRoute
-  '/app/advisor': typeof AppAdvisorRoute
   '/app/analytics': typeof AppAnalyticsRoute
-  '/app/assistant': typeof AppAssistantRoute
   '/app/audit': typeof AppAuditRoute
-  '/app/badges': typeof AppBadgesRoute
-  '/app/claims': typeof AppClaimsRoute
   '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
-  '/app/directory': typeof AppDirectoryRoute
   '/app/documents': typeof AppDocumentsRoute
-  '/app/email': typeof AppEmailRoute
   '/app/feedback': typeof AppFeedbackRoute
   '/app/home': typeof AppHomeRoute
   '/app/investor': typeof AppInvestorRouteWithChildren
-  '/app/meetings': typeof AppMeetingsRoute
   '/app/member-profile': typeof AppMemberProfileRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/overview': typeof AppOverviewRoute
   '/app/profile': typeof AppProfileRoute
   '/app/profile-builder': typeof AppProfileBuilderRoute
-  '/app/referrals': typeof AppReferralsRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/team-chat': typeof AppTeamChatRoute
   '/app/users': typeof AppUsersRoute
-  '/app/verification': typeof AppVerificationRoute
-  '/app/wall': typeof AppWallRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/cv/$slug': typeof CvSlugRoute
@@ -1710,29 +1345,20 @@ export interface FileRoutesById {
   '/tools/runway': typeof ToolsRunwayRoute
   '/tools/safe-note': typeof ToolsSafeNoteRoute
   '/tools/valuation': typeof ToolsValuationRoute
-  '/verify/$slug': typeof VerifySlugRoute
   '/app/': typeof AppIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/docs/': typeof DocsIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
-  '/app/crm/analytics': typeof AppCrmAnalyticsRoute
-  '/app/crm/connections': typeof AppCrmConnectionsRoute
-  '/app/crm/email-outreach': typeof AppCrmEmailOutreachRoute
-  '/app/crm/meetings': typeof AppCrmMeetingsRoute
-  '/app/crm/pipeline-manager': typeof AppCrmPipelineManagerRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/deal-rooms/meetings-calendar': typeof AppDealRoomsMeetingsCalendarRoute
   '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
   '/app/deal-rooms/reports-vault': typeof AppDealRoomsReportsVaultRoute
   '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
-  '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
-  '/app/investor/advisor': typeof AppInvestorAdvisorRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
   '/app/investor/analytics': typeof AppInvestorAnalyticsRoute
-  '/app/investor/assistant': typeof AppInvestorAssistantRoute
   '/app/investor/connections': typeof AppInvestorConnectionsRoute
   '/app/investor/deal-flow': typeof AppInvestorDealFlowRoute
   '/app/investor/decide': typeof AppInvestorDecideRoute
@@ -1753,7 +1379,6 @@ export interface FileRoutesById {
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
   '/join/team/$token': typeof JoinTeamTokenRoute
-  '/app/crm/': typeof AppCrmIndexRoute
   '/app/deal-rooms/': typeof AppDealRoomsIndexRoute
   '/app/go-live/': typeof AppGoLiveIndexRoute
   '/app/investor/': typeof AppInvestorIndexRoute
@@ -1772,11 +1397,6 @@ export interface FileRoutesById {
   '/app/deal-rooms/$id/term-sheets': typeof AppDealRoomsIdTermSheetsRoute
   '/app/go-live/digital-profile/privacy-settings': typeof AppGoLiveDigitalProfilePrivacySettingsRoute
   '/app/go-live/digital-profile/profile-view': typeof AppGoLiveDigitalProfileProfileViewRoute
-  '/app/investor/crm/analytics': typeof AppInvestorCrmAnalyticsRoute
-  '/app/investor/crm/connections': typeof AppInvestorCrmConnectionsRoute
-  '/app/investor/crm/deal-analysis': typeof AppInvestorCrmDealAnalysisRoute
-  '/app/investor/crm/founder-meetings': typeof AppInvestorCrmFounderMeetingsRoute
-  '/app/investor/crm/pipeline-manager': typeof AppInvestorCrmPipelineManagerRoute
   '/app/investor/deal-rooms/diligence-notes': typeof AppInvestorDealRoomsDiligenceNotesRoute
   '/app/investor/deal-rooms/meetings-calendar': typeof AppInvestorDealRoomsMeetingsCalendarRoute
   '/app/investor/deal-rooms/portfolio': typeof AppInvestorDealRoomsPortfolioRoute
@@ -1786,14 +1406,8 @@ export interface FileRoutesById {
   '/app/investor/discover/deal-flow': typeof AppInvestorDiscoverDealFlowRoute
   '/app/investor/discover/deal-intake': typeof AppInvestorDiscoverDealIntakeRoute
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
-  '/app/prepare/badges/apply': typeof AppPrepareBadgesApplyRoute
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
-  '/app/prepare/badges/overview': typeof AppPrepareBadgesOverviewRoute
   '/app/prepare/badges/roast-reports': typeof AppPrepareBadgesRoastReportsRoute
-  '/app/prepare/founder-coaching/profile-documents-check': typeof AppPrepareFounderCoachingProfileDocumentsCheckRoute
-  '/app/prepare/founder-coaching/report-flags': typeof AppPrepareFounderCoachingReportFlagsRoute
-  '/app/prepare/investment-readiness/investment-audit': typeof AppPrepareInvestmentReadinessInvestmentAuditRoute
-  '/app/prepare/investment-readiness/investor-simulation': typeof AppPrepareInvestmentReadinessInvestorSimulationRoute
   '/app/prepare/ip-vault/digital-document-vault': typeof AppPrepareIpVaultDigitalDocumentVaultRoute
   '/app/prepare/ip-vault/document-intake': typeof AppPrepareIpVaultDocumentIntakeRoute
   '/app/prepare/ip-vault/privacy-settings': typeof AppPrepareIpVaultPrivacySettingsRoute
@@ -1803,21 +1417,13 @@ export interface FileRoutesById {
   '/app/prepare/profile-builder/fundraising-thesis': typeof AppPrepareProfileBuilderFundraisingThesisRoute
   '/app/prepare/profile-builder/quick-setup': typeof AppPrepareProfileBuilderQuickSetupRoute
   '/app/prepare/profile-builder/team-cards': typeof AppPrepareProfileBuilderTeamCardsRoute
-  '/app/prepare/workstation/claims': typeof AppPrepareWorkstationClaimsRoute
-  '/app/prepare/workstation/verifications': typeof AppPrepareWorkstationVerificationsRoute
   '/app/roast/$id/answers': typeof AppRoastIdAnswersRoute
   '/app/roast/$id/live': typeof AppRoastIdLiveRoute
-  '/app/investor/crm/': typeof AppInvestorCrmIndexRoute
   '/app/investor/deal-rooms/': typeof AppInvestorDealRoomsIndexRoute
   '/app/investor/discover/': typeof AppInvestorDiscoverIndexRoute
   '/app/investor/thesis/': typeof AppInvestorThesisIndexRoute
   '/app/investor/discover/public-profile/privacy-settings': typeof AppInvestorDiscoverPublicProfilePrivacySettingsRoute
   '/app/investor/discover/public-profile/profile-view': typeof AppInvestorDiscoverPublicProfileProfileViewRoute
-  '/app/investor/thesis/badges/apply': typeof AppInvestorThesisBadgesApplyRoute
-  '/app/investor/thesis/badges/overview': typeof AppInvestorThesisBadgesOverviewRoute
-  '/app/investor/thesis/badges/tier-status': typeof AppInvestorThesisBadgesTierStatusRoute
-  '/app/investor/thesis/capital-readiness/capacity-audit': typeof AppInvestorThesisCapitalReadinessCapacityAuditRoute
-  '/app/investor/thesis/capital-readiness/cheque-size': typeof AppInvestorThesisCapitalReadinessChequeSizeRoute
   '/app/investor/thesis/fund-vault/digital-document-vault': typeof AppInvestorThesisFundVaultDigitalDocumentVaultRoute
   '/app/investor/thesis/fund-vault/privacy-settings': typeof AppInvestorThesisFundVaultPrivacySettingsRoute
   '/app/investor/thesis/fund-vault/source-files': typeof AppInvestorThesisFundVaultSourceFilesRoute
@@ -1826,8 +1432,6 @@ export interface FileRoutesById {
   '/app/investor/thesis/profile-builder/quick-setup': typeof AppInvestorThesisProfileBuilderQuickSetupRoute
   '/app/investor/thesis/profile-builder/team-cards': typeof AppInvestorThesisProfileBuilderTeamCardsRoute
   '/app/investor/thesis/profile-builder/track-record': typeof AppInvestorThesisProfileBuilderTrackRecordRoute
-  '/app/investor/thesis/verification/claims': typeof AppInvestorThesisVerificationClaimsRoute
-  '/app/investor/thesis/verification/verifications': typeof AppInvestorThesisVerificationVerificationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1856,39 +1460,28 @@ export interface FileRouteTypes {
     | '/trust'
     | '/api/admin'
     | '/api/admin-data'
-    | '/api/admin-verification'
     | '/api/email-test'
     | '/api/emailtest'
     | '/api/hubspot-newsletter'
     | '/api/hubspot-sync'
     | '/api/test-ai'
-    | '/app/advisor'
     | '/app/analytics'
-    | '/app/assistant'
     | '/app/audit'
-    | '/app/badges'
-    | '/app/claims'
     | '/app/close'
     | '/app/connections'
-    | '/app/directory'
     | '/app/documents'
-    | '/app/email'
     | '/app/feedback'
     | '/app/home'
     | '/app/investor'
-    | '/app/meetings'
     | '/app/member-profile'
     | '/app/messages'
     | '/app/notifications'
     | '/app/overview'
     | '/app/profile'
     | '/app/profile-builder'
-    | '/app/referrals'
     | '/app/settings'
     | '/app/team-chat'
     | '/app/users'
-    | '/app/verification'
-    | '/app/wall'
     | '/auth/callback'
     | '/blog/$slug'
     | '/cv/$slug'
@@ -1909,29 +1502,20 @@ export interface FileRouteTypes {
     | '/tools/runway'
     | '/tools/safe-note'
     | '/tools/valuation'
-    | '/verify/$slug'
     | '/app/'
     | '/blog/'
     | '/docs/'
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
-    | '/app/crm/analytics'
-    | '/app/crm/connections'
-    | '/app/crm/email-outreach'
-    | '/app/crm/meetings'
-    | '/app/crm/pipeline-manager'
     | '/app/deal-rooms/$id'
     | '/app/deal-rooms/meetings-calendar'
     | '/app/deal-rooms/prep-notes'
     | '/app/deal-rooms/reports-vault'
     | '/app/deal-rooms/team-assignments'
-    | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
-    | '/app/investor/advisor'
     | '/app/investor/analysis'
     | '/app/investor/analytics'
-    | '/app/investor/assistant'
     | '/app/investor/connections'
     | '/app/investor/deal-flow'
     | '/app/investor/decide'
@@ -1952,7 +1536,6 @@ export interface FileRouteTypes {
     | '/app/settings/notifications'
     | '/app/settings/security'
     | '/join/team/$token'
-    | '/app/crm/'
     | '/app/deal-rooms/'
     | '/app/go-live/'
     | '/app/investor/'
@@ -1971,11 +1554,6 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/$id/term-sheets'
     | '/app/go-live/digital-profile/privacy-settings'
     | '/app/go-live/digital-profile/profile-view'
-    | '/app/investor/crm/analytics'
-    | '/app/investor/crm/connections'
-    | '/app/investor/crm/deal-analysis'
-    | '/app/investor/crm/founder-meetings'
-    | '/app/investor/crm/pipeline-manager'
     | '/app/investor/deal-rooms/diligence-notes'
     | '/app/investor/deal-rooms/meetings-calendar'
     | '/app/investor/deal-rooms/portfolio'
@@ -1985,14 +1563,8 @@ export interface FileRouteTypes {
     | '/app/investor/discover/deal-flow'
     | '/app/investor/discover/deal-intake'
     | '/app/investor/discover/watchlist'
-    | '/app/prepare/badges/apply'
     | '/app/prepare/badges/founder-roast'
-    | '/app/prepare/badges/overview'
     | '/app/prepare/badges/roast-reports'
-    | '/app/prepare/founder-coaching/profile-documents-check'
-    | '/app/prepare/founder-coaching/report-flags'
-    | '/app/prepare/investment-readiness/investment-audit'
-    | '/app/prepare/investment-readiness/investor-simulation'
     | '/app/prepare/ip-vault/digital-document-vault'
     | '/app/prepare/ip-vault/document-intake'
     | '/app/prepare/ip-vault/privacy-settings'
@@ -2002,21 +1574,13 @@ export interface FileRouteTypes {
     | '/app/prepare/profile-builder/fundraising-thesis'
     | '/app/prepare/profile-builder/quick-setup'
     | '/app/prepare/profile-builder/team-cards'
-    | '/app/prepare/workstation/claims'
-    | '/app/prepare/workstation/verifications'
     | '/app/roast/$id/answers'
     | '/app/roast/$id/live'
-    | '/app/investor/crm/'
     | '/app/investor/deal-rooms/'
     | '/app/investor/discover/'
     | '/app/investor/thesis/'
     | '/app/investor/discover/public-profile/privacy-settings'
     | '/app/investor/discover/public-profile/profile-view'
-    | '/app/investor/thesis/badges/apply'
-    | '/app/investor/thesis/badges/overview'
-    | '/app/investor/thesis/badges/tier-status'
-    | '/app/investor/thesis/capital-readiness/capacity-audit'
-    | '/app/investor/thesis/capital-readiness/cheque-size'
     | '/app/investor/thesis/fund-vault/digital-document-vault'
     | '/app/investor/thesis/fund-vault/privacy-settings'
     | '/app/investor/thesis/fund-vault/source-files'
@@ -2025,8 +1589,6 @@ export interface FileRouteTypes {
     | '/app/investor/thesis/profile-builder/quick-setup'
     | '/app/investor/thesis/profile-builder/team-cards'
     | '/app/investor/thesis/profile-builder/track-record'
-    | '/app/investor/thesis/verification/claims'
-    | '/app/investor/thesis/verification/verifications'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -2050,38 +1612,27 @@ export interface FileRouteTypes {
     | '/trust'
     | '/api/admin'
     | '/api/admin-data'
-    | '/api/admin-verification'
     | '/api/email-test'
     | '/api/emailtest'
     | '/api/hubspot-newsletter'
     | '/api/hubspot-sync'
     | '/api/test-ai'
-    | '/app/advisor'
     | '/app/analytics'
-    | '/app/assistant'
     | '/app/audit'
-    | '/app/badges'
-    | '/app/claims'
     | '/app/close'
     | '/app/connections'
-    | '/app/directory'
     | '/app/documents'
-    | '/app/email'
     | '/app/feedback'
     | '/app/home'
-    | '/app/meetings'
     | '/app/member-profile'
     | '/app/messages'
     | '/app/notifications'
     | '/app/overview'
     | '/app/profile'
     | '/app/profile-builder'
-    | '/app/referrals'
     | '/app/settings'
     | '/app/team-chat'
     | '/app/users'
-    | '/app/verification'
-    | '/app/wall'
     | '/auth/callback'
     | '/blog/$slug'
     | '/cv/$slug'
@@ -2102,29 +1653,20 @@ export interface FileRouteTypes {
     | '/tools/runway'
     | '/tools/safe-note'
     | '/tools/valuation'
-    | '/verify/$slug'
     | '/app'
     | '/blog'
     | '/docs'
     | '/tools'
     | '/api/internal/data'
     | '/api/internal/email-test'
-    | '/app/crm/analytics'
-    | '/app/crm/connections'
-    | '/app/crm/email-outreach'
-    | '/app/crm/meetings'
-    | '/app/crm/pipeline-manager'
     | '/app/deal-rooms/$id'
     | '/app/deal-rooms/meetings-calendar'
     | '/app/deal-rooms/prep-notes'
     | '/app/deal-rooms/reports-vault'
     | '/app/deal-rooms/team-assignments'
-    | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
-    | '/app/investor/advisor'
     | '/app/investor/analysis'
     | '/app/investor/analytics'
-    | '/app/investor/assistant'
     | '/app/investor/connections'
     | '/app/investor/deal-flow'
     | '/app/investor/decide'
@@ -2145,7 +1687,6 @@ export interface FileRouteTypes {
     | '/app/settings/notifications'
     | '/app/settings/security'
     | '/join/team/$token'
-    | '/app/crm'
     | '/app/deal-rooms'
     | '/app/go-live'
     | '/app/investor'
@@ -2164,11 +1705,6 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/$id/term-sheets'
     | '/app/go-live/digital-profile/privacy-settings'
     | '/app/go-live/digital-profile/profile-view'
-    | '/app/investor/crm/analytics'
-    | '/app/investor/crm/connections'
-    | '/app/investor/crm/deal-analysis'
-    | '/app/investor/crm/founder-meetings'
-    | '/app/investor/crm/pipeline-manager'
     | '/app/investor/deal-rooms/diligence-notes'
     | '/app/investor/deal-rooms/meetings-calendar'
     | '/app/investor/deal-rooms/portfolio'
@@ -2178,14 +1714,8 @@ export interface FileRouteTypes {
     | '/app/investor/discover/deal-flow'
     | '/app/investor/discover/deal-intake'
     | '/app/investor/discover/watchlist'
-    | '/app/prepare/badges/apply'
     | '/app/prepare/badges/founder-roast'
-    | '/app/prepare/badges/overview'
     | '/app/prepare/badges/roast-reports'
-    | '/app/prepare/founder-coaching/profile-documents-check'
-    | '/app/prepare/founder-coaching/report-flags'
-    | '/app/prepare/investment-readiness/investment-audit'
-    | '/app/prepare/investment-readiness/investor-simulation'
     | '/app/prepare/ip-vault/digital-document-vault'
     | '/app/prepare/ip-vault/document-intake'
     | '/app/prepare/ip-vault/privacy-settings'
@@ -2195,21 +1725,13 @@ export interface FileRouteTypes {
     | '/app/prepare/profile-builder/fundraising-thesis'
     | '/app/prepare/profile-builder/quick-setup'
     | '/app/prepare/profile-builder/team-cards'
-    | '/app/prepare/workstation/claims'
-    | '/app/prepare/workstation/verifications'
     | '/app/roast/$id/answers'
     | '/app/roast/$id/live'
-    | '/app/investor/crm'
     | '/app/investor/deal-rooms'
     | '/app/investor/discover'
     | '/app/investor/thesis'
     | '/app/investor/discover/public-profile/privacy-settings'
     | '/app/investor/discover/public-profile/profile-view'
-    | '/app/investor/thesis/badges/apply'
-    | '/app/investor/thesis/badges/overview'
-    | '/app/investor/thesis/badges/tier-status'
-    | '/app/investor/thesis/capital-readiness/capacity-audit'
-    | '/app/investor/thesis/capital-readiness/cheque-size'
     | '/app/investor/thesis/fund-vault/digital-document-vault'
     | '/app/investor/thesis/fund-vault/privacy-settings'
     | '/app/investor/thesis/fund-vault/source-files'
@@ -2218,8 +1740,6 @@ export interface FileRouteTypes {
     | '/app/investor/thesis/profile-builder/quick-setup'
     | '/app/investor/thesis/profile-builder/team-cards'
     | '/app/investor/thesis/profile-builder/track-record'
-    | '/app/investor/thesis/verification/claims'
-    | '/app/investor/thesis/verification/verifications'
   id:
     | '__root__'
     | '/'
@@ -2246,39 +1766,28 @@ export interface FileRouteTypes {
     | '/trust'
     | '/api/admin'
     | '/api/admin-data'
-    | '/api/admin-verification'
     | '/api/email-test'
     | '/api/emailtest'
     | '/api/hubspot-newsletter'
     | '/api/hubspot-sync'
     | '/api/test-ai'
-    | '/app/advisor'
     | '/app/analytics'
-    | '/app/assistant'
     | '/app/audit'
-    | '/app/badges'
-    | '/app/claims'
     | '/app/close'
     | '/app/connections'
-    | '/app/directory'
     | '/app/documents'
-    | '/app/email'
     | '/app/feedback'
     | '/app/home'
     | '/app/investor'
-    | '/app/meetings'
     | '/app/member-profile'
     | '/app/messages'
     | '/app/notifications'
     | '/app/overview'
     | '/app/profile'
     | '/app/profile-builder'
-    | '/app/referrals'
     | '/app/settings'
     | '/app/team-chat'
     | '/app/users'
-    | '/app/verification'
-    | '/app/wall'
     | '/auth/callback'
     | '/blog/$slug'
     | '/cv/$slug'
@@ -2299,29 +1808,20 @@ export interface FileRouteTypes {
     | '/tools/runway'
     | '/tools/safe-note'
     | '/tools/valuation'
-    | '/verify/$slug'
     | '/app/'
     | '/blog/'
     | '/docs/'
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
-    | '/app/crm/analytics'
-    | '/app/crm/connections'
-    | '/app/crm/email-outreach'
-    | '/app/crm/meetings'
-    | '/app/crm/pipeline-manager'
     | '/app/deal-rooms/$id'
     | '/app/deal-rooms/meetings-calendar'
     | '/app/deal-rooms/prep-notes'
     | '/app/deal-rooms/reports-vault'
     | '/app/deal-rooms/team-assignments'
-    | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
-    | '/app/investor/advisor'
     | '/app/investor/analysis'
     | '/app/investor/analytics'
-    | '/app/investor/assistant'
     | '/app/investor/connections'
     | '/app/investor/deal-flow'
     | '/app/investor/decide'
@@ -2342,7 +1842,6 @@ export interface FileRouteTypes {
     | '/app/settings/notifications'
     | '/app/settings/security'
     | '/join/team/$token'
-    | '/app/crm/'
     | '/app/deal-rooms/'
     | '/app/go-live/'
     | '/app/investor/'
@@ -2361,11 +1860,6 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/$id/term-sheets'
     | '/app/go-live/digital-profile/privacy-settings'
     | '/app/go-live/digital-profile/profile-view'
-    | '/app/investor/crm/analytics'
-    | '/app/investor/crm/connections'
-    | '/app/investor/crm/deal-analysis'
-    | '/app/investor/crm/founder-meetings'
-    | '/app/investor/crm/pipeline-manager'
     | '/app/investor/deal-rooms/diligence-notes'
     | '/app/investor/deal-rooms/meetings-calendar'
     | '/app/investor/deal-rooms/portfolio'
@@ -2375,14 +1869,8 @@ export interface FileRouteTypes {
     | '/app/investor/discover/deal-flow'
     | '/app/investor/discover/deal-intake'
     | '/app/investor/discover/watchlist'
-    | '/app/prepare/badges/apply'
     | '/app/prepare/badges/founder-roast'
-    | '/app/prepare/badges/overview'
     | '/app/prepare/badges/roast-reports'
-    | '/app/prepare/founder-coaching/profile-documents-check'
-    | '/app/prepare/founder-coaching/report-flags'
-    | '/app/prepare/investment-readiness/investment-audit'
-    | '/app/prepare/investment-readiness/investor-simulation'
     | '/app/prepare/ip-vault/digital-document-vault'
     | '/app/prepare/ip-vault/document-intake'
     | '/app/prepare/ip-vault/privacy-settings'
@@ -2392,21 +1880,13 @@ export interface FileRouteTypes {
     | '/app/prepare/profile-builder/fundraising-thesis'
     | '/app/prepare/profile-builder/quick-setup'
     | '/app/prepare/profile-builder/team-cards'
-    | '/app/prepare/workstation/claims'
-    | '/app/prepare/workstation/verifications'
     | '/app/roast/$id/answers'
     | '/app/roast/$id/live'
-    | '/app/investor/crm/'
     | '/app/investor/deal-rooms/'
     | '/app/investor/discover/'
     | '/app/investor/thesis/'
     | '/app/investor/discover/public-profile/privacy-settings'
     | '/app/investor/discover/public-profile/profile-view'
-    | '/app/investor/thesis/badges/apply'
-    | '/app/investor/thesis/badges/overview'
-    | '/app/investor/thesis/badges/tier-status'
-    | '/app/investor/thesis/capital-readiness/capacity-audit'
-    | '/app/investor/thesis/capital-readiness/cheque-size'
     | '/app/investor/thesis/fund-vault/digital-document-vault'
     | '/app/investor/thesis/fund-vault/privacy-settings'
     | '/app/investor/thesis/fund-vault/source-files'
@@ -2415,8 +1895,6 @@ export interface FileRouteTypes {
     | '/app/investor/thesis/profile-builder/quick-setup'
     | '/app/investor/thesis/profile-builder/team-cards'
     | '/app/investor/thesis/profile-builder/track-record'
-    | '/app/investor/thesis/verification/claims'
-    | '/app/investor/thesis/verification/verifications'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -2444,7 +1922,6 @@ export interface RootRouteChildren {
   TrustRoute: typeof TrustRoute
   ApiAdminRoute: typeof ApiAdminRoute
   ApiAdminDataRoute: typeof ApiAdminDataRoute
-  ApiAdminVerificationRoute: typeof ApiAdminVerificationRoute
   ApiEmailTestRoute: typeof ApiEmailTestRoute
   ApiEmailtestRoute: typeof ApiEmailtestRoute
   ApiHubspotNewsletterRoute: typeof ApiHubspotNewsletterRoute
@@ -2468,7 +1945,6 @@ export interface RootRouteChildren {
   ToolsRunwayRoute: typeof ToolsRunwayRoute
   ToolsSafeNoteRoute: typeof ToolsSafeNoteRoute
   ToolsValuationRoute: typeof ToolsValuationRoute
-  VerifySlugRoute: typeof VerifySlugRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
   ApiInternalDataRoute: typeof ApiInternalDataRoute
   ApiInternalEmailTestRoute: typeof ApiInternalEmailTestRoute
@@ -2658,13 +2134,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/verify/$slug': {
-      id: '/verify/$slug'
-      path: '/verify/$slug'
-      fullPath: '/verify/$slug'
-      preLoaderRoute: typeof VerifySlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/tools/valuation': {
       id: '/tools/valuation'
       path: '/tools/valuation'
@@ -2805,20 +2274,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/wall': {
-      id: '/app/wall'
-      path: '/wall'
-      fullPath: '/app/wall'
-      preLoaderRoute: typeof AppWallRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/verification': {
-      id: '/app/verification'
-      path: '/verification'
-      fullPath: '/app/verification'
-      preLoaderRoute: typeof AppVerificationRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/users': {
       id: '/app/users'
       path: '/users'
@@ -2838,13 +2293,6 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/app/settings'
       preLoaderRoute: typeof AppSettingsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/referrals': {
-      id: '/app/referrals'
-      path: '/referrals'
-      fullPath: '/app/referrals'
-      preLoaderRoute: typeof AppReferralsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/profile-builder': {
@@ -2889,13 +2337,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMemberProfileRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/meetings': {
-      id: '/app/meetings'
-      path: '/meetings'
-      fullPath: '/app/meetings'
-      preLoaderRoute: typeof AppMeetingsRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/investor': {
       id: '/app/investor'
       path: '/investor'
@@ -2917,25 +2358,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFeedbackRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/email': {
-      id: '/app/email'
-      path: '/email'
-      fullPath: '/app/email'
-      preLoaderRoute: typeof AppEmailRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/documents': {
       id: '/app/documents'
       path: '/documents'
       fullPath: '/app/documents'
       preLoaderRoute: typeof AppDocumentsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/directory': {
-      id: '/app/directory'
-      path: '/directory'
-      fullPath: '/app/directory'
-      preLoaderRoute: typeof AppDirectoryRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/connections': {
@@ -2952,20 +2379,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCloseRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/claims': {
-      id: '/app/claims'
-      path: '/claims'
-      fullPath: '/app/claims'
-      preLoaderRoute: typeof AppClaimsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/badges': {
-      id: '/app/badges'
-      path: '/badges'
-      fullPath: '/app/badges'
-      preLoaderRoute: typeof AppBadgesRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/audit': {
       id: '/app/audit'
       path: '/audit'
@@ -2973,25 +2386,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuditRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/assistant': {
-      id: '/app/assistant'
-      path: '/assistant'
-      fullPath: '/app/assistant'
-      preLoaderRoute: typeof AppAssistantRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/analytics': {
       id: '/app/analytics'
       path: '/analytics'
       fullPath: '/app/analytics'
       preLoaderRoute: typeof AppAnalyticsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/advisor': {
-      id: '/app/advisor'
-      path: '/advisor'
-      fullPath: '/app/advisor'
-      preLoaderRoute: typeof AppAdvisorRouteImport
       parentRoute: typeof AppRoute
     }
     '/api/test-ai': {
@@ -3027,13 +2426,6 @@ declare module '@tanstack/react-router' {
       path: '/api/email-test'
       fullPath: '/api/email-test'
       preLoaderRoute: typeof ApiEmailTestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin-verification': {
-      id: '/api/admin-verification'
-      path: '/api/admin-verification'
-      fullPath: '/api/admin-verification'
-      preLoaderRoute: typeof ApiAdminVerificationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/admin-data': {
@@ -3090,13 +2482,6 @@ declare module '@tanstack/react-router' {
       path: '/deal-rooms'
       fullPath: '/app/deal-rooms/'
       preLoaderRoute: typeof AppDealRoomsIndexRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/crm/': {
-      id: '/app/crm/'
-      path: '/crm'
-      fullPath: '/app/crm/'
-      preLoaderRoute: typeof AppCrmIndexRouteImport
       parentRoute: typeof AppRoute
     }
     '/join/team/$token': {
@@ -3239,13 +2624,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorConnectionsRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/investor/assistant': {
-      id: '/app/investor/assistant'
-      path: '/assistant'
-      fullPath: '/app/investor/assistant'
-      preLoaderRoute: typeof AppInvestorAssistantRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
     '/app/investor/analytics': {
       id: '/app/investor/analytics'
       path: '/analytics'
@@ -3260,25 +2638,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorAnalysisRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/investor/advisor': {
-      id: '/app/investor/advisor'
-      path: '/advisor'
-      fullPath: '/app/investor/advisor'
-      preLoaderRoute: typeof AppInvestorAdvisorRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
     '/app/go-live/profile-analytics': {
       id: '/app/go-live/profile-analytics'
       path: '/go-live/profile-analytics'
       fullPath: '/app/go-live/profile-analytics'
       preLoaderRoute: typeof AppGoLiveProfileAnalyticsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/go-live/directory': {
-      id: '/app/go-live/directory'
-      path: '/go-live/directory'
-      fullPath: '/app/go-live/directory'
-      preLoaderRoute: typeof AppGoLiveDirectoryRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/deal-rooms/team-assignments': {
@@ -3316,41 +2680,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDealRoomsIdRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/crm/pipeline-manager': {
-      id: '/app/crm/pipeline-manager'
-      path: '/crm/pipeline-manager'
-      fullPath: '/app/crm/pipeline-manager'
-      preLoaderRoute: typeof AppCrmPipelineManagerRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/crm/meetings': {
-      id: '/app/crm/meetings'
-      path: '/crm/meetings'
-      fullPath: '/app/crm/meetings'
-      preLoaderRoute: typeof AppCrmMeetingsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/crm/email-outreach': {
-      id: '/app/crm/email-outreach'
-      path: '/crm/email-outreach'
-      fullPath: '/app/crm/email-outreach'
-      preLoaderRoute: typeof AppCrmEmailOutreachRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/crm/connections': {
-      id: '/app/crm/connections'
-      path: '/crm/connections'
-      fullPath: '/app/crm/connections'
-      preLoaderRoute: typeof AppCrmConnectionsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/crm/analytics': {
-      id: '/app/crm/analytics'
-      path: '/crm/analytics'
-      fullPath: '/app/crm/analytics'
-      preLoaderRoute: typeof AppCrmAnalyticsRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/api/internal/email-test': {
       id: '/api/internal/email-test'
       path: '/api/internal/email-test'
@@ -3386,13 +2715,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorDealRoomsIndexRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/investor/crm/': {
-      id: '/app/investor/crm/'
-      path: '/crm'
-      fullPath: '/app/investor/crm/'
-      preLoaderRoute: typeof AppInvestorCrmIndexRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
     '/app/roast/$id/live': {
       id: '/app/roast/$id/live'
       path: '/roast/$id/live'
@@ -3405,20 +2727,6 @@ declare module '@tanstack/react-router' {
       path: '/roast/$id/answers'
       fullPath: '/app/roast/$id/answers'
       preLoaderRoute: typeof AppRoastIdAnswersRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/prepare/workstation/verifications': {
-      id: '/app/prepare/workstation/verifications'
-      path: '/prepare/workstation/verifications'
-      fullPath: '/app/prepare/workstation/verifications'
-      preLoaderRoute: typeof AppPrepareWorkstationVerificationsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/prepare/workstation/claims': {
-      id: '/app/prepare/workstation/claims'
-      path: '/prepare/workstation/claims'
-      fullPath: '/app/prepare/workstation/claims'
-      preLoaderRoute: typeof AppPrepareWorkstationClaimsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/prepare/profile-builder/team-cards': {
@@ -3484,34 +2792,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPrepareIpVaultDigitalDocumentVaultRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/prepare/investment-readiness/investor-simulation': {
-      id: '/app/prepare/investment-readiness/investor-simulation'
-      path: '/prepare/investment-readiness/investor-simulation'
-      fullPath: '/app/prepare/investment-readiness/investor-simulation'
-      preLoaderRoute: typeof AppPrepareInvestmentReadinessInvestorSimulationRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/prepare/investment-readiness/investment-audit': {
-      id: '/app/prepare/investment-readiness/investment-audit'
-      path: '/prepare/investment-readiness/investment-audit'
-      fullPath: '/app/prepare/investment-readiness/investment-audit'
-      preLoaderRoute: typeof AppPrepareInvestmentReadinessInvestmentAuditRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/prepare/founder-coaching/report-flags': {
-      id: '/app/prepare/founder-coaching/report-flags'
-      path: '/prepare/founder-coaching/report-flags'
-      fullPath: '/app/prepare/founder-coaching/report-flags'
-      preLoaderRoute: typeof AppPrepareFounderCoachingReportFlagsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/prepare/founder-coaching/profile-documents-check': {
-      id: '/app/prepare/founder-coaching/profile-documents-check'
-      path: '/prepare/founder-coaching/profile-documents-check'
-      fullPath: '/app/prepare/founder-coaching/profile-documents-check'
-      preLoaderRoute: typeof AppPrepareFounderCoachingProfileDocumentsCheckRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/prepare/badges/roast-reports': {
       id: '/app/prepare/badges/roast-reports'
       path: '/prepare/badges/roast-reports'
@@ -3519,25 +2799,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPrepareBadgesRoastReportsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/prepare/badges/overview': {
-      id: '/app/prepare/badges/overview'
-      path: '/prepare/badges/overview'
-      fullPath: '/app/prepare/badges/overview'
-      preLoaderRoute: typeof AppPrepareBadgesOverviewRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/prepare/badges/founder-roast': {
       id: '/app/prepare/badges/founder-roast'
       path: '/prepare/badges/founder-roast'
       fullPath: '/app/prepare/badges/founder-roast'
       preLoaderRoute: typeof AppPrepareBadgesFounderRoastRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/prepare/badges/apply': {
-      id: '/app/prepare/badges/apply'
-      path: '/prepare/badges/apply'
-      fullPath: '/app/prepare/badges/apply'
-      preLoaderRoute: typeof AppPrepareBadgesApplyRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/investor/discover/watchlist': {
@@ -3601,41 +2867,6 @@ declare module '@tanstack/react-router' {
       path: '/deal-rooms/diligence-notes'
       fullPath: '/app/investor/deal-rooms/diligence-notes'
       preLoaderRoute: typeof AppInvestorDealRoomsDiligenceNotesRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/crm/pipeline-manager': {
-      id: '/app/investor/crm/pipeline-manager'
-      path: '/crm/pipeline-manager'
-      fullPath: '/app/investor/crm/pipeline-manager'
-      preLoaderRoute: typeof AppInvestorCrmPipelineManagerRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/crm/founder-meetings': {
-      id: '/app/investor/crm/founder-meetings'
-      path: '/crm/founder-meetings'
-      fullPath: '/app/investor/crm/founder-meetings'
-      preLoaderRoute: typeof AppInvestorCrmFounderMeetingsRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/crm/deal-analysis': {
-      id: '/app/investor/crm/deal-analysis'
-      path: '/crm/deal-analysis'
-      fullPath: '/app/investor/crm/deal-analysis'
-      preLoaderRoute: typeof AppInvestorCrmDealAnalysisRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/crm/connections': {
-      id: '/app/investor/crm/connections'
-      path: '/crm/connections'
-      fullPath: '/app/investor/crm/connections'
-      preLoaderRoute: typeof AppInvestorCrmConnectionsRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/crm/analytics': {
-      id: '/app/investor/crm/analytics'
-      path: '/crm/analytics'
-      fullPath: '/app/investor/crm/analytics'
-      preLoaderRoute: typeof AppInvestorCrmAnalyticsRouteImport
       parentRoute: typeof AppInvestorRoute
     }
     '/app/go-live/digital-profile/profile-view': {
@@ -3722,20 +2953,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDealRoomsIdActivityRouteImport
       parentRoute: typeof AppDealRoomsIdRoute
     }
-    '/app/investor/thesis/verification/verifications': {
-      id: '/app/investor/thesis/verification/verifications'
-      path: '/thesis/verification/verifications'
-      fullPath: '/app/investor/thesis/verification/verifications'
-      preLoaderRoute: typeof AppInvestorThesisVerificationVerificationsRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/thesis/verification/claims': {
-      id: '/app/investor/thesis/verification/claims'
-      path: '/thesis/verification/claims'
-      fullPath: '/app/investor/thesis/verification/claims'
-      preLoaderRoute: typeof AppInvestorThesisVerificationClaimsRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
     '/app/investor/thesis/profile-builder/track-record': {
       id: '/app/investor/thesis/profile-builder/track-record'
       path: '/thesis/profile-builder/track-record'
@@ -3792,41 +3009,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorThesisFundVaultDigitalDocumentVaultRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/investor/thesis/capital-readiness/cheque-size': {
-      id: '/app/investor/thesis/capital-readiness/cheque-size'
-      path: '/thesis/capital-readiness/cheque-size'
-      fullPath: '/app/investor/thesis/capital-readiness/cheque-size'
-      preLoaderRoute: typeof AppInvestorThesisCapitalReadinessChequeSizeRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/thesis/capital-readiness/capacity-audit': {
-      id: '/app/investor/thesis/capital-readiness/capacity-audit'
-      path: '/thesis/capital-readiness/capacity-audit'
-      fullPath: '/app/investor/thesis/capital-readiness/capacity-audit'
-      preLoaderRoute: typeof AppInvestorThesisCapitalReadinessCapacityAuditRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/thesis/badges/tier-status': {
-      id: '/app/investor/thesis/badges/tier-status'
-      path: '/thesis/badges/tier-status'
-      fullPath: '/app/investor/thesis/badges/tier-status'
-      preLoaderRoute: typeof AppInvestorThesisBadgesTierStatusRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/thesis/badges/overview': {
-      id: '/app/investor/thesis/badges/overview'
-      path: '/thesis/badges/overview'
-      fullPath: '/app/investor/thesis/badges/overview'
-      preLoaderRoute: typeof AppInvestorThesisBadgesOverviewRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/thesis/badges/apply': {
-      id: '/app/investor/thesis/badges/apply'
-      path: '/thesis/badges/apply'
-      fullPath: '/app/investor/thesis/badges/apply'
-      preLoaderRoute: typeof AppInvestorThesisBadgesApplyRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
     '/app/investor/discover/public-profile/profile-view': {
       id: '/app/investor/discover/public-profile/profile-view'
       path: '/discover/public-profile/profile-view'
@@ -3845,10 +3027,8 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppInvestorRouteChildren {
-  AppInvestorAdvisorRoute: typeof AppInvestorAdvisorRoute
   AppInvestorAnalysisRoute: typeof AppInvestorAnalysisRoute
   AppInvestorAnalyticsRoute: typeof AppInvestorAnalyticsRoute
-  AppInvestorAssistantRoute: typeof AppInvestorAssistantRoute
   AppInvestorConnectionsRoute: typeof AppInvestorConnectionsRoute
   AppInvestorDealFlowRoute: typeof AppInvestorDealFlowRoute
   AppInvestorDecideRoute: typeof AppInvestorDecideRoute
@@ -3864,11 +3044,6 @@ interface AppInvestorRouteChildren {
   AppInvestorStartupsRoute: typeof AppInvestorStartupsRoute
   AppInvestorTeamRoute: typeof AppInvestorTeamRoute
   AppInvestorIndexRoute: typeof AppInvestorIndexRoute
-  AppInvestorCrmAnalyticsRoute: typeof AppInvestorCrmAnalyticsRoute
-  AppInvestorCrmConnectionsRoute: typeof AppInvestorCrmConnectionsRoute
-  AppInvestorCrmDealAnalysisRoute: typeof AppInvestorCrmDealAnalysisRoute
-  AppInvestorCrmFounderMeetingsRoute: typeof AppInvestorCrmFounderMeetingsRoute
-  AppInvestorCrmPipelineManagerRoute: typeof AppInvestorCrmPipelineManagerRoute
   AppInvestorDealRoomsDiligenceNotesRoute: typeof AppInvestorDealRoomsDiligenceNotesRoute
   AppInvestorDealRoomsMeetingsCalendarRoute: typeof AppInvestorDealRoomsMeetingsCalendarRoute
   AppInvestorDealRoomsPortfolioRoute: typeof AppInvestorDealRoomsPortfolioRoute
@@ -3878,17 +3053,11 @@ interface AppInvestorRouteChildren {
   AppInvestorDiscoverDealFlowRoute: typeof AppInvestorDiscoverDealFlowRoute
   AppInvestorDiscoverDealIntakeRoute: typeof AppInvestorDiscoverDealIntakeRoute
   AppInvestorDiscoverWatchlistRoute: typeof AppInvestorDiscoverWatchlistRoute
-  AppInvestorCrmIndexRoute: typeof AppInvestorCrmIndexRoute
   AppInvestorDealRoomsIndexRoute: typeof AppInvestorDealRoomsIndexRoute
   AppInvestorDiscoverIndexRoute: typeof AppInvestorDiscoverIndexRoute
   AppInvestorThesisIndexRoute: typeof AppInvestorThesisIndexRoute
   AppInvestorDiscoverPublicProfilePrivacySettingsRoute: typeof AppInvestorDiscoverPublicProfilePrivacySettingsRoute
   AppInvestorDiscoverPublicProfileProfileViewRoute: typeof AppInvestorDiscoverPublicProfileProfileViewRoute
-  AppInvestorThesisBadgesApplyRoute: typeof AppInvestorThesisBadgesApplyRoute
-  AppInvestorThesisBadgesOverviewRoute: typeof AppInvestorThesisBadgesOverviewRoute
-  AppInvestorThesisBadgesTierStatusRoute: typeof AppInvestorThesisBadgesTierStatusRoute
-  AppInvestorThesisCapitalReadinessCapacityAuditRoute: typeof AppInvestorThesisCapitalReadinessCapacityAuditRoute
-  AppInvestorThesisCapitalReadinessChequeSizeRoute: typeof AppInvestorThesisCapitalReadinessChequeSizeRoute
   AppInvestorThesisFundVaultDigitalDocumentVaultRoute: typeof AppInvestorThesisFundVaultDigitalDocumentVaultRoute
   AppInvestorThesisFundVaultPrivacySettingsRoute: typeof AppInvestorThesisFundVaultPrivacySettingsRoute
   AppInvestorThesisFundVaultSourceFilesRoute: typeof AppInvestorThesisFundVaultSourceFilesRoute
@@ -3897,15 +3066,11 @@ interface AppInvestorRouteChildren {
   AppInvestorThesisProfileBuilderQuickSetupRoute: typeof AppInvestorThesisProfileBuilderQuickSetupRoute
   AppInvestorThesisProfileBuilderTeamCardsRoute: typeof AppInvestorThesisProfileBuilderTeamCardsRoute
   AppInvestorThesisProfileBuilderTrackRecordRoute: typeof AppInvestorThesisProfileBuilderTrackRecordRoute
-  AppInvestorThesisVerificationClaimsRoute: typeof AppInvestorThesisVerificationClaimsRoute
-  AppInvestorThesisVerificationVerificationsRoute: typeof AppInvestorThesisVerificationVerificationsRoute
 }
 
 const AppInvestorRouteChildren: AppInvestorRouteChildren = {
-  AppInvestorAdvisorRoute: AppInvestorAdvisorRoute,
   AppInvestorAnalysisRoute: AppInvestorAnalysisRoute,
   AppInvestorAnalyticsRoute: AppInvestorAnalyticsRoute,
-  AppInvestorAssistantRoute: AppInvestorAssistantRoute,
   AppInvestorConnectionsRoute: AppInvestorConnectionsRoute,
   AppInvestorDealFlowRoute: AppInvestorDealFlowRoute,
   AppInvestorDecideRoute: AppInvestorDecideRoute,
@@ -3921,11 +3086,6 @@ const AppInvestorRouteChildren: AppInvestorRouteChildren = {
   AppInvestorStartupsRoute: AppInvestorStartupsRoute,
   AppInvestorTeamRoute: AppInvestorTeamRoute,
   AppInvestorIndexRoute: AppInvestorIndexRoute,
-  AppInvestorCrmAnalyticsRoute: AppInvestorCrmAnalyticsRoute,
-  AppInvestorCrmConnectionsRoute: AppInvestorCrmConnectionsRoute,
-  AppInvestorCrmDealAnalysisRoute: AppInvestorCrmDealAnalysisRoute,
-  AppInvestorCrmFounderMeetingsRoute: AppInvestorCrmFounderMeetingsRoute,
-  AppInvestorCrmPipelineManagerRoute: AppInvestorCrmPipelineManagerRoute,
   AppInvestorDealRoomsDiligenceNotesRoute:
     AppInvestorDealRoomsDiligenceNotesRoute,
   AppInvestorDealRoomsMeetingsCalendarRoute:
@@ -3938,7 +3098,6 @@ const AppInvestorRouteChildren: AppInvestorRouteChildren = {
   AppInvestorDiscoverDealFlowRoute: AppInvestorDiscoverDealFlowRoute,
   AppInvestorDiscoverDealIntakeRoute: AppInvestorDiscoverDealIntakeRoute,
   AppInvestorDiscoverWatchlistRoute: AppInvestorDiscoverWatchlistRoute,
-  AppInvestorCrmIndexRoute: AppInvestorCrmIndexRoute,
   AppInvestorDealRoomsIndexRoute: AppInvestorDealRoomsIndexRoute,
   AppInvestorDiscoverIndexRoute: AppInvestorDiscoverIndexRoute,
   AppInvestorThesisIndexRoute: AppInvestorThesisIndexRoute,
@@ -3946,14 +3105,6 @@ const AppInvestorRouteChildren: AppInvestorRouteChildren = {
     AppInvestorDiscoverPublicProfilePrivacySettingsRoute,
   AppInvestorDiscoverPublicProfileProfileViewRoute:
     AppInvestorDiscoverPublicProfileProfileViewRoute,
-  AppInvestorThesisBadgesApplyRoute: AppInvestorThesisBadgesApplyRoute,
-  AppInvestorThesisBadgesOverviewRoute: AppInvestorThesisBadgesOverviewRoute,
-  AppInvestorThesisBadgesTierStatusRoute:
-    AppInvestorThesisBadgesTierStatusRoute,
-  AppInvestorThesisCapitalReadinessCapacityAuditRoute:
-    AppInvestorThesisCapitalReadinessCapacityAuditRoute,
-  AppInvestorThesisCapitalReadinessChequeSizeRoute:
-    AppInvestorThesisCapitalReadinessChequeSizeRoute,
   AppInvestorThesisFundVaultDigitalDocumentVaultRoute:
     AppInvestorThesisFundVaultDigitalDocumentVaultRoute,
   AppInvestorThesisFundVaultPrivacySettingsRoute:
@@ -3970,10 +3121,6 @@ const AppInvestorRouteChildren: AppInvestorRouteChildren = {
     AppInvestorThesisProfileBuilderTeamCardsRoute,
   AppInvestorThesisProfileBuilderTrackRecordRoute:
     AppInvestorThesisProfileBuilderTrackRecordRoute,
-  AppInvestorThesisVerificationClaimsRoute:
-    AppInvestorThesisVerificationClaimsRoute,
-  AppInvestorThesisVerificationVerificationsRoute:
-    AppInvestorThesisVerificationVerificationsRoute,
 }
 
 const AppInvestorRouteWithChildren = AppInvestorRoute._addFileChildren(
@@ -4031,47 +3178,30 @@ const AppDealRoomsIdRouteWithChildren = AppDealRoomsIdRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
-  AppAdvisorRoute: typeof AppAdvisorRoute
   AppAnalyticsRoute: typeof AppAnalyticsRoute
-  AppAssistantRoute: typeof AppAssistantRoute
   AppAuditRoute: typeof AppAuditRoute
-  AppBadgesRoute: typeof AppBadgesRoute
-  AppClaimsRoute: typeof AppClaimsRoute
   AppCloseRoute: typeof AppCloseRoute
   AppConnectionsRoute: typeof AppConnectionsRoute
-  AppDirectoryRoute: typeof AppDirectoryRoute
   AppDocumentsRoute: typeof AppDocumentsRoute
-  AppEmailRoute: typeof AppEmailRoute
   AppFeedbackRoute: typeof AppFeedbackRoute
   AppHomeRoute: typeof AppHomeRoute
   AppInvestorRoute: typeof AppInvestorRouteWithChildren
-  AppMeetingsRoute: typeof AppMeetingsRoute
   AppMemberProfileRoute: typeof AppMemberProfileRoute
   AppMessagesRoute: typeof AppMessagesRoute
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppOverviewRoute: typeof AppOverviewRoute
   AppProfileRoute: typeof AppProfileRoute
   AppProfileBuilderRoute: typeof AppProfileBuilderRoute
-  AppReferralsRoute: typeof AppReferralsRoute
   AppSettingsRoute: typeof AppSettingsRouteWithChildren
   AppTeamChatRoute: typeof AppTeamChatRoute
   AppUsersRoute: typeof AppUsersRoute
-  AppVerificationRoute: typeof AppVerificationRoute
-  AppWallRoute: typeof AppWallRoute
   AppIndexRoute: typeof AppIndexRoute
-  AppCrmAnalyticsRoute: typeof AppCrmAnalyticsRoute
-  AppCrmConnectionsRoute: typeof AppCrmConnectionsRoute
-  AppCrmEmailOutreachRoute: typeof AppCrmEmailOutreachRoute
-  AppCrmMeetingsRoute: typeof AppCrmMeetingsRoute
-  AppCrmPipelineManagerRoute: typeof AppCrmPipelineManagerRoute
   AppDealRoomsIdRoute: typeof AppDealRoomsIdRouteWithChildren
   AppDealRoomsMeetingsCalendarRoute: typeof AppDealRoomsMeetingsCalendarRoute
   AppDealRoomsPrepNotesRoute: typeof AppDealRoomsPrepNotesRoute
   AppDealRoomsReportsVaultRoute: typeof AppDealRoomsReportsVaultRoute
   AppDealRoomsTeamAssignmentsRoute: typeof AppDealRoomsTeamAssignmentsRoute
-  AppGoLiveDirectoryRoute: typeof AppGoLiveDirectoryRoute
   AppGoLiveProfileAnalyticsRoute: typeof AppGoLiveProfileAnalyticsRoute
-  AppCrmIndexRoute: typeof AppCrmIndexRoute
   AppDealRoomsIndexRoute: typeof AppDealRoomsIndexRoute
   AppGoLiveIndexRoute: typeof AppGoLiveIndexRoute
   AppMemberIndexRoute: typeof AppMemberIndexRoute
@@ -4079,14 +3209,8 @@ interface AppRouteChildren {
   AppRoastIndexRoute: typeof AppRoastIndexRoute
   AppGoLiveDigitalProfilePrivacySettingsRoute: typeof AppGoLiveDigitalProfilePrivacySettingsRoute
   AppGoLiveDigitalProfileProfileViewRoute: typeof AppGoLiveDigitalProfileProfileViewRoute
-  AppPrepareBadgesApplyRoute: typeof AppPrepareBadgesApplyRoute
   AppPrepareBadgesFounderRoastRoute: typeof AppPrepareBadgesFounderRoastRoute
-  AppPrepareBadgesOverviewRoute: typeof AppPrepareBadgesOverviewRoute
   AppPrepareBadgesRoastReportsRoute: typeof AppPrepareBadgesRoastReportsRoute
-  AppPrepareFounderCoachingProfileDocumentsCheckRoute: typeof AppPrepareFounderCoachingProfileDocumentsCheckRoute
-  AppPrepareFounderCoachingReportFlagsRoute: typeof AppPrepareFounderCoachingReportFlagsRoute
-  AppPrepareInvestmentReadinessInvestmentAuditRoute: typeof AppPrepareInvestmentReadinessInvestmentAuditRoute
-  AppPrepareInvestmentReadinessInvestorSimulationRoute: typeof AppPrepareInvestmentReadinessInvestorSimulationRoute
   AppPrepareIpVaultDigitalDocumentVaultRoute: typeof AppPrepareIpVaultDigitalDocumentVaultRoute
   AppPrepareIpVaultDocumentIntakeRoute: typeof AppPrepareIpVaultDocumentIntakeRoute
   AppPrepareIpVaultPrivacySettingsRoute: typeof AppPrepareIpVaultPrivacySettingsRoute
@@ -4096,54 +3220,35 @@ interface AppRouteChildren {
   AppPrepareProfileBuilderFundraisingThesisRoute: typeof AppPrepareProfileBuilderFundraisingThesisRoute
   AppPrepareProfileBuilderQuickSetupRoute: typeof AppPrepareProfileBuilderQuickSetupRoute
   AppPrepareProfileBuilderTeamCardsRoute: typeof AppPrepareProfileBuilderTeamCardsRoute
-  AppPrepareWorkstationClaimsRoute: typeof AppPrepareWorkstationClaimsRoute
-  AppPrepareWorkstationVerificationsRoute: typeof AppPrepareWorkstationVerificationsRoute
   AppRoastIdAnswersRoute: typeof AppRoastIdAnswersRoute
   AppRoastIdLiveRoute: typeof AppRoastIdLiveRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppAdvisorRoute: AppAdvisorRoute,
   AppAnalyticsRoute: AppAnalyticsRoute,
-  AppAssistantRoute: AppAssistantRoute,
   AppAuditRoute: AppAuditRoute,
-  AppBadgesRoute: AppBadgesRoute,
-  AppClaimsRoute: AppClaimsRoute,
   AppCloseRoute: AppCloseRoute,
   AppConnectionsRoute: AppConnectionsRoute,
-  AppDirectoryRoute: AppDirectoryRoute,
   AppDocumentsRoute: AppDocumentsRoute,
-  AppEmailRoute: AppEmailRoute,
   AppFeedbackRoute: AppFeedbackRoute,
   AppHomeRoute: AppHomeRoute,
   AppInvestorRoute: AppInvestorRouteWithChildren,
-  AppMeetingsRoute: AppMeetingsRoute,
   AppMemberProfileRoute: AppMemberProfileRoute,
   AppMessagesRoute: AppMessagesRoute,
   AppNotificationsRoute: AppNotificationsRoute,
   AppOverviewRoute: AppOverviewRoute,
   AppProfileRoute: AppProfileRoute,
   AppProfileBuilderRoute: AppProfileBuilderRoute,
-  AppReferralsRoute: AppReferralsRoute,
   AppSettingsRoute: AppSettingsRouteWithChildren,
   AppTeamChatRoute: AppTeamChatRoute,
   AppUsersRoute: AppUsersRoute,
-  AppVerificationRoute: AppVerificationRoute,
-  AppWallRoute: AppWallRoute,
   AppIndexRoute: AppIndexRoute,
-  AppCrmAnalyticsRoute: AppCrmAnalyticsRoute,
-  AppCrmConnectionsRoute: AppCrmConnectionsRoute,
-  AppCrmEmailOutreachRoute: AppCrmEmailOutreachRoute,
-  AppCrmMeetingsRoute: AppCrmMeetingsRoute,
-  AppCrmPipelineManagerRoute: AppCrmPipelineManagerRoute,
   AppDealRoomsIdRoute: AppDealRoomsIdRouteWithChildren,
   AppDealRoomsMeetingsCalendarRoute: AppDealRoomsMeetingsCalendarRoute,
   AppDealRoomsPrepNotesRoute: AppDealRoomsPrepNotesRoute,
   AppDealRoomsReportsVaultRoute: AppDealRoomsReportsVaultRoute,
   AppDealRoomsTeamAssignmentsRoute: AppDealRoomsTeamAssignmentsRoute,
-  AppGoLiveDirectoryRoute: AppGoLiveDirectoryRoute,
   AppGoLiveProfileAnalyticsRoute: AppGoLiveProfileAnalyticsRoute,
-  AppCrmIndexRoute: AppCrmIndexRoute,
   AppDealRoomsIndexRoute: AppDealRoomsIndexRoute,
   AppGoLiveIndexRoute: AppGoLiveIndexRoute,
   AppMemberIndexRoute: AppMemberIndexRoute,
@@ -4153,18 +3258,8 @@ const AppRouteChildren: AppRouteChildren = {
     AppGoLiveDigitalProfilePrivacySettingsRoute,
   AppGoLiveDigitalProfileProfileViewRoute:
     AppGoLiveDigitalProfileProfileViewRoute,
-  AppPrepareBadgesApplyRoute: AppPrepareBadgesApplyRoute,
   AppPrepareBadgesFounderRoastRoute: AppPrepareBadgesFounderRoastRoute,
-  AppPrepareBadgesOverviewRoute: AppPrepareBadgesOverviewRoute,
   AppPrepareBadgesRoastReportsRoute: AppPrepareBadgesRoastReportsRoute,
-  AppPrepareFounderCoachingProfileDocumentsCheckRoute:
-    AppPrepareFounderCoachingProfileDocumentsCheckRoute,
-  AppPrepareFounderCoachingReportFlagsRoute:
-    AppPrepareFounderCoachingReportFlagsRoute,
-  AppPrepareInvestmentReadinessInvestmentAuditRoute:
-    AppPrepareInvestmentReadinessInvestmentAuditRoute,
-  AppPrepareInvestmentReadinessInvestorSimulationRoute:
-    AppPrepareInvestmentReadinessInvestorSimulationRoute,
   AppPrepareIpVaultDigitalDocumentVaultRoute:
     AppPrepareIpVaultDigitalDocumentVaultRoute,
   AppPrepareIpVaultDocumentIntakeRoute: AppPrepareIpVaultDocumentIntakeRoute,
@@ -4180,9 +3275,6 @@ const AppRouteChildren: AppRouteChildren = {
     AppPrepareProfileBuilderQuickSetupRoute,
   AppPrepareProfileBuilderTeamCardsRoute:
     AppPrepareProfileBuilderTeamCardsRoute,
-  AppPrepareWorkstationClaimsRoute: AppPrepareWorkstationClaimsRoute,
-  AppPrepareWorkstationVerificationsRoute:
-    AppPrepareWorkstationVerificationsRoute,
   AppRoastIdAnswersRoute: AppRoastIdAnswersRoute,
   AppRoastIdLiveRoute: AppRoastIdLiveRoute,
 }
@@ -4248,7 +3340,6 @@ const rootRouteChildren: RootRouteChildren = {
   TrustRoute: TrustRoute,
   ApiAdminRoute: ApiAdminRoute,
   ApiAdminDataRoute: ApiAdminDataRoute,
-  ApiAdminVerificationRoute: ApiAdminVerificationRoute,
   ApiEmailTestRoute: ApiEmailTestRoute,
   ApiEmailtestRoute: ApiEmailtestRoute,
   ApiHubspotNewsletterRoute: ApiHubspotNewsletterRoute,
@@ -4272,7 +3363,6 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsRunwayRoute: ToolsRunwayRoute,
   ToolsSafeNoteRoute: ToolsSafeNoteRoute,
   ToolsValuationRoute: ToolsValuationRoute,
-  VerifySlugRoute: VerifySlugRoute,
   ToolsIndexRoute: ToolsIndexRoute,
   ApiInternalDataRoute: ApiInternalDataRoute,
   ApiInternalEmailTestRoute: ApiInternalEmailTestRoute,
