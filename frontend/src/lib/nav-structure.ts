@@ -96,7 +96,6 @@ export const founderSections: L2Section[] = [
           { to: "/app/go-live/digital-profile/privacy-settings", label: "Profile Privacy Settings" },
         ],
       },
-      { to: "/app/go-live/directory", label: "Directory Dashboard" },
       { to: "/app/go-live/profile-analytics", label: "Profile View Analytics" },
     ],
   },

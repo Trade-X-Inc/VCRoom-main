@@ -230,7 +230,6 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       !path.startsWith("/app/investor/settings") &&
       !path.startsWith("/app/deal-room") &&
       !path.startsWith("/app/messages") &&
-      !path.startsWith("/app/directory") &&
       !path.startsWith("/app/wall") &&
       !path.startsWith("/app/referrals") &&
       !path.startsWith("/app/member-profile") &&

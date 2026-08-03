@@ -70,7 +70,6 @@ import { Route as AppInvestorRouteImport } from './routes/app.investor'
 import { Route as AppHomeRouteImport } from './routes/app.home'
 import { Route as AppFeedbackRouteImport } from './routes/app.feedback'
 import { Route as AppDocumentsRouteImport } from './routes/app.documents'
-import { Route as AppDirectoryRouteImport } from './routes/app.directory'
 import { Route as AppConnectionsRouteImport } from './routes/app.connections'
 import { Route as AppCloseRouteImport } from './routes/app.close'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
@@ -111,7 +110,6 @@ import { Route as AppInvestorConnectionsRouteImport } from './routes/app.investo
 import { Route as AppInvestorAnalyticsRouteImport } from './routes/app.investor.analytics'
 import { Route as AppInvestorAnalysisRouteImport } from './routes/app.investor.analysis'
 import { Route as AppGoLiveProfileAnalyticsRouteImport } from './routes/app.go-live.profile-analytics'
-import { Route as AppGoLiveDirectoryRouteImport } from './routes/app.go-live.directory'
 import { Route as AppDealRoomsTeamAssignmentsRouteImport } from './routes/app.deal-rooms.team-assignments'
 import { Route as AppDealRoomsReportsVaultRouteImport } from './routes/app.deal-rooms.reports-vault'
 import { Route as AppDealRoomsPrepNotesRouteImport } from './routes/app.deal-rooms.prep-notes'
@@ -473,11 +471,6 @@ const AppDocumentsRoute = AppDocumentsRouteImport.update({
   path: '/documents',
   getParentRoute: () => AppRoute,
 } as any)
-const AppDirectoryRoute = AppDirectoryRouteImport.update({
-  id: '/directory',
-  path: '/directory',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppConnectionsRoute = AppConnectionsRouteImport.update({
   id: '/connections',
   path: '/connections',
@@ -680,11 +673,6 @@ const AppGoLiveProfileAnalyticsRoute =
     path: '/go-live/profile-analytics',
     getParentRoute: () => AppRoute,
   } as any)
-const AppGoLiveDirectoryRoute = AppGoLiveDirectoryRouteImport.update({
-  id: '/go-live/directory',
-  path: '/go-live/directory',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppDealRoomsTeamAssignmentsRoute =
   AppDealRoomsTeamAssignmentsRouteImport.update({
     id: '/deal-rooms/team-assignments',
@@ -1029,7 +1017,6 @@ export interface FileRoutesByFullPath {
   '/app/audit': typeof AppAuditRoute
   '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
-  '/app/directory': typeof AppDirectoryRoute
   '/app/documents': typeof AppDocumentsRoute
   '/app/feedback': typeof AppFeedbackRoute
   '/app/home': typeof AppHomeRoute
@@ -1076,7 +1063,6 @@ export interface FileRoutesByFullPath {
   '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
   '/app/deal-rooms/reports-vault': typeof AppDealRoomsReportsVaultRoute
   '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
-  '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
   '/app/investor/analytics': typeof AppInvestorAnalyticsRoute
@@ -1185,7 +1171,6 @@ export interface FileRoutesByTo {
   '/app/audit': typeof AppAuditRoute
   '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
-  '/app/directory': typeof AppDirectoryRoute
   '/app/documents': typeof AppDocumentsRoute
   '/app/feedback': typeof AppFeedbackRoute
   '/app/home': typeof AppHomeRoute
@@ -1231,7 +1216,6 @@ export interface FileRoutesByTo {
   '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
   '/app/deal-rooms/reports-vault': typeof AppDealRoomsReportsVaultRoute
   '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
-  '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
   '/app/investor/analytics': typeof AppInvestorAnalyticsRoute
@@ -1344,7 +1328,6 @@ export interface FileRoutesById {
   '/app/audit': typeof AppAuditRoute
   '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
-  '/app/directory': typeof AppDirectoryRoute
   '/app/documents': typeof AppDocumentsRoute
   '/app/feedback': typeof AppFeedbackRoute
   '/app/home': typeof AppHomeRoute
@@ -1391,7 +1374,6 @@ export interface FileRoutesById {
   '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
   '/app/deal-rooms/reports-vault': typeof AppDealRoomsReportsVaultRoute
   '/app/deal-rooms/team-assignments': typeof AppDealRoomsTeamAssignmentsRoute
-  '/app/go-live/directory': typeof AppGoLiveDirectoryRoute
   '/app/go-live/profile-analytics': typeof AppGoLiveProfileAnalyticsRoute
   '/app/investor/analysis': typeof AppInvestorAnalysisRoute
   '/app/investor/analytics': typeof AppInvestorAnalyticsRoute
@@ -1505,7 +1487,6 @@ export interface FileRouteTypes {
     | '/app/audit'
     | '/app/close'
     | '/app/connections'
-    | '/app/directory'
     | '/app/documents'
     | '/app/feedback'
     | '/app/home'
@@ -1552,7 +1533,6 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/prep-notes'
     | '/app/deal-rooms/reports-vault'
     | '/app/deal-rooms/team-assignments'
-    | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
     | '/app/investor/analysis'
     | '/app/investor/analytics'
@@ -1661,7 +1641,6 @@ export interface FileRouteTypes {
     | '/app/audit'
     | '/app/close'
     | '/app/connections'
-    | '/app/directory'
     | '/app/documents'
     | '/app/feedback'
     | '/app/home'
@@ -1707,7 +1686,6 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/prep-notes'
     | '/app/deal-rooms/reports-vault'
     | '/app/deal-rooms/team-assignments'
-    | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
     | '/app/investor/analysis'
     | '/app/investor/analytics'
@@ -1819,7 +1797,6 @@ export interface FileRouteTypes {
     | '/app/audit'
     | '/app/close'
     | '/app/connections'
-    | '/app/directory'
     | '/app/documents'
     | '/app/feedback'
     | '/app/home'
@@ -1866,7 +1843,6 @@ export interface FileRouteTypes {
     | '/app/deal-rooms/prep-notes'
     | '/app/deal-rooms/reports-vault'
     | '/app/deal-rooms/team-assignments'
-    | '/app/go-live/directory'
     | '/app/go-live/profile-analytics'
     | '/app/investor/analysis'
     | '/app/investor/analytics'
@@ -2427,13 +2403,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDocumentsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/directory': {
-      id: '/app/directory'
-      path: '/directory'
-      fullPath: '/app/directory'
-      preLoaderRoute: typeof AppDirectoryRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/connections': {
       id: '/app/connections'
       path: '/connections'
@@ -2712,13 +2681,6 @@ declare module '@tanstack/react-router' {
       path: '/go-live/profile-analytics'
       fullPath: '/app/go-live/profile-analytics'
       preLoaderRoute: typeof AppGoLiveProfileAnalyticsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/go-live/directory': {
-      id: '/app/go-live/directory'
-      path: '/go-live/directory'
-      fullPath: '/app/go-live/directory'
-      preLoaderRoute: typeof AppGoLiveDirectoryRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/deal-rooms/team-assignments': {
@@ -3258,7 +3220,6 @@ interface AppRouteChildren {
   AppAuditRoute: typeof AppAuditRoute
   AppCloseRoute: typeof AppCloseRoute
   AppConnectionsRoute: typeof AppConnectionsRoute
-  AppDirectoryRoute: typeof AppDirectoryRoute
   AppDocumentsRoute: typeof AppDocumentsRoute
   AppFeedbackRoute: typeof AppFeedbackRoute
   AppHomeRoute: typeof AppHomeRoute
@@ -3280,7 +3241,6 @@ interface AppRouteChildren {
   AppDealRoomsPrepNotesRoute: typeof AppDealRoomsPrepNotesRoute
   AppDealRoomsReportsVaultRoute: typeof AppDealRoomsReportsVaultRoute
   AppDealRoomsTeamAssignmentsRoute: typeof AppDealRoomsTeamAssignmentsRoute
-  AppGoLiveDirectoryRoute: typeof AppGoLiveDirectoryRoute
   AppGoLiveProfileAnalyticsRoute: typeof AppGoLiveProfileAnalyticsRoute
   AppDealRoomsIndexRoute: typeof AppDealRoomsIndexRoute
   AppGoLiveIndexRoute: typeof AppGoLiveIndexRoute
@@ -3309,7 +3269,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppAuditRoute: AppAuditRoute,
   AppCloseRoute: AppCloseRoute,
   AppConnectionsRoute: AppConnectionsRoute,
-  AppDirectoryRoute: AppDirectoryRoute,
   AppDocumentsRoute: AppDocumentsRoute,
   AppFeedbackRoute: AppFeedbackRoute,
   AppHomeRoute: AppHomeRoute,
@@ -3331,7 +3290,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppDealRoomsPrepNotesRoute: AppDealRoomsPrepNotesRoute,
   AppDealRoomsReportsVaultRoute: AppDealRoomsReportsVaultRoute,
   AppDealRoomsTeamAssignmentsRoute: AppDealRoomsTeamAssignmentsRoute,
-  AppGoLiveDirectoryRoute: AppGoLiveDirectoryRoute,
   AppGoLiveProfileAnalyticsRoute: AppGoLiveProfileAnalyticsRoute,
   AppDealRoomsIndexRoute: AppDealRoomsIndexRoute,
   AppGoLiveIndexRoute: AppGoLiveIndexRoute,

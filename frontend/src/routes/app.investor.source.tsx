@@ -1,4 +1,4 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { PageFrame } from "@/components/system";
 import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
@@ -7,10 +7,6 @@ import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
 // Connections are real standalone routes — this page links out to them.
 
 export const Route = createFileRoute("/app/investor/source")({
-  // R9 relocation: this URL's content moved — see nav-structure.ts.
-  beforeLoad: () => {
-    throw redirect({ to: "/app/investor/discover/watchlist" as any, replace: true });
-  },
   component: SourcePage,
 });
 
@@ -51,7 +47,6 @@ function SourcePage() {
           summary={p ? `${p.watchlistCount} companies` : undefined}
         />
         <SectionLinkRow to="/app/investor/intake" label="Deal intake" summary="Paste, parse, score" />
-        <SectionLinkRow to="/app/directory" label="Directory" summary="Verified founders" />
         <SectionLinkRow to="/app/investor/connections" label="Connections" summary="Requests sent" />
       </div>
     </PageFrame>
