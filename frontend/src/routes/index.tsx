@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import {
-  ArrowRight, CheckCircle2, ShieldCheck, FileText, Video,
+  ArrowRight, CheckCircle2, FileText, Video,
   Scale, FileSignature, Plus, Minus, Sparkles,
 } from "lucide-react";
 
@@ -11,17 +11,17 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Hockystick — From first meeting to signed agreement" },
-      { name: "description", content: "The fundraising platform where verified founders and investors meet, run due diligence, negotiate terms, and close deals — entirely in-platform." },
-      { name: "keywords", content: "fundraising platform, verified investor platform, due diligence, deal rooms, term negotiation, startup fundraising, investor deal flow" },
+      { name: "description", content: "The fundraising platform where founders and investors meet, run due diligence, negotiate terms, and close deals — entirely in-platform." },
+      { name: "keywords", content: "fundraising platform, due diligence, deal rooms, term negotiation, startup fundraising, investor deal flow" },
       { name: "robots", content: "index, follow" },
       { property: "og:title", content: "Hockystick — From first meeting to signed agreement" },
-      { property: "og:description", content: "Verified profiles. Deal rooms. AI-powered interviews. Term negotiation to signed agreement — entirely in-platform." },
+      { property: "og:description", content: "Profiles. Deal rooms. Structured interviews. Term negotiation to signed agreement — entirely in-platform." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://hockystick.app" },
       { property: "og:image", content: "https://hockystick.app/og-image.png" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Hockystick — From first meeting to signed agreement" },
-      { name: "twitter:description", content: "The complete fundraising transaction platform. Verified both sides. Close deals in-platform." },
+      { name: "twitter:description", content: "The complete fundraising transaction platform. Deal rooms, term negotiation, close in-platform." },
     ],
     links: [
       { rel: "canonical", href: "https://hockystick.app" },
@@ -68,7 +68,6 @@ function Landing() {
         <ProductBands />
         <VideoSection />
         <DirectoryPreview />
-        <TwoWayTrust />
         <HowItWorks />
         <ForFoundersInvestors />
         <ComparisonBand />
@@ -102,7 +101,7 @@ function Hero() {
           className="mx-auto mt-6 max-w-xl"
           style={{ fontFamily: DM, fontWeight: 400, fontSize: "clamp(16px, 2.2vw, 20px)", lineHeight: 1.5, color: SECONDARY }}
         >
-          Verified profiles. Structured due diligence. AI-powered interviews.
+          Structured profiles. Structured due diligence. Structured interviews.
           Term negotiation to signed agreement — entirely in-platform.
         </p>
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -164,17 +163,6 @@ type Band = {
 
 const BANDS: Band[] = [
   {
-    icon: ShieldCheck,
-    eyebrow: "Verification",
-    title: "Verified from day one",
-    bullets: [
-      "Five-tier verification built from real documents, cross-checked by AI",
-      "Both founders and investors are verified — not just one side",
-      "Verification tier is visible before either party requests access",
-      "Badges reflect exactly what was checked — never asserted, always evidenced",
-    ],
-  },
-  {
     icon: FileText,
     eyebrow: "Deal rooms",
     title: "Deal rooms with teeth",
@@ -210,12 +198,12 @@ const BANDS: Band[] = [
   {
     icon: FileSignature,
     eyebrow: "Closing",
-    title: "Close the deal. Get the invoice.",
+    title: "Sign, close, archive",
     bullets: [
       "Locked terms generate a summary; counsel can draft the agreement",
-      "Both parties sign, payment is confirmed, and the deal closes",
+      "Both parties sign to close the deal",
       "The room becomes a permanent, read-only archive",
-      "Invoices are generated automatically at close",
+      "An invoice is generated for each party at close",
     ],
   },
 ];
@@ -302,16 +290,15 @@ type DirectoryCard = {
   description: string;
   stage: string;
   sector: string;
-  tier: string;
 };
 
 const DIRECTORY_CARDS: DirectoryCard[] = [
-  { name: "Northwind Robotics", description: "Warehouse picking robots for mid-size 3PLs", stage: "Seed", sector: "Robotics", tier: "Tier 3 — Operational" },
-  { name: "Lumen Health", description: "Remote patient monitoring for chronic care clinics", stage: "Series A", sector: "Healthtech", tier: "Tier 4 — Capital" },
-  { name: "Kestrel Logistics", description: "Cross-border freight matching for SMB exporters", stage: "Pre-seed", sector: "Logistics", tier: "Tier 2 — Claims" },
-  { name: "Aldergrove Foods", description: "Shelf-stable protein for institutional food service", stage: "Seed", sector: "Foodtech", tier: "Tier 3 — Operational" },
-  { name: "Solace Finance", description: "Embedded lending for vertical SaaS platforms", stage: "Series A", sector: "Fintech", tier: "Tier 5 — Verified" },
-  { name: "Palisade Security", description: "Attack-surface monitoring for mid-market IT teams", stage: "Seed", sector: "Security", tier: "Tier 3 — Operational" },
+  { name: "Northwind Robotics", description: "Warehouse picking robots for mid-size 3PLs", stage: "Seed", sector: "Robotics" },
+  { name: "Lumen Health", description: "Remote patient monitoring for chronic care clinics", stage: "Series A", sector: "Healthtech" },
+  { name: "Kestrel Logistics", description: "Cross-border freight matching for SMB exporters", stage: "Pre-seed", sector: "Logistics" },
+  { name: "Aldergrove Foods", description: "Shelf-stable protein for institutional food service", stage: "Seed", sector: "Foodtech" },
+  { name: "Solace Finance", description: "Embedded lending for vertical SaaS platforms", stage: "Series A", sector: "Fintech" },
+  { name: "Palisade Security", description: "Attack-surface monitoring for mid-market IT teams", stage: "Seed", sector: "Security" },
 ];
 
 function DirectoryPreview() {
@@ -327,9 +314,9 @@ function DirectoryPreview() {
             A directory of startups actually raising right now
           </h2>
           <p className="mt-4 text-[16px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.5 }}>
-            Verified startups only, listed while they&rsquo;re actively fundraising and
-            removed once the round closes. Investors browse a curated, current set —
-            not a stale company database.
+            Listed while they&rsquo;re actively fundraising and removed once the round
+            closes. Investors browse a curated, current set — not a stale company
+            database.
           </p>
         </div>
 
@@ -346,10 +333,6 @@ function DirectoryPreview() {
               <p className="mt-2 text-[13px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.5 }}>{c.description}</p>
               <div className="mt-4 flex items-center justify-between gap-2 border-t pt-3" style={{ borderColor: BORDER }}>
                 <span className="text-[12px]" style={{ color: "#71717A", fontFamily: DM }}>{c.sector}</span>
-                <span className="inline-flex items-center gap-1 text-[12px] font-medium" style={{ color: "#52525B", fontFamily: DM }}>
-                  <ShieldCheck className="h-3.5 w-3.5" style={{ color: BRAND }} />
-                  {c.tier}
-                </span>
               </div>
             </div>
           ))}
@@ -357,45 +340,9 @@ function DirectoryPreview() {
 
         <div className="mt-10 text-center">
           <Link to="/sign-up" search={{ role: "founder" } as any} className="inline-flex items-center gap-1.5 text-[14px] font-medium" style={{ color: BRAND, fontFamily: DM }}>
-            Get verified and listed <ArrowRight className="h-3.5 w-3.5" />
+            Get listed <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
-      </div>
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   SECTION 5 — TWO-WAY TRUST
-═══════════════════════════════════════════════════════════════════════════ */
-function TwoWayTrust() {
-  return (
-    <section className="w-full" style={{ background: "#FAFAFA", borderBottom: `1px solid ${BORDER}` }}>
-      <div className="mx-auto max-w-[1100px] px-6 py-24 text-center">
-        <h2 className="mx-auto max-w-2xl" style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(26px, 3.4vw, 38px)", lineHeight: 1.15, color: INK, letterSpacing: "-0.01em" }}>
-          Competitors verify founders. We verify both.
-        </h2>
-        <p className="mx-auto mt-4 max-w-xl text-[16px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.5 }}>
-          Trust runs both ways. Every founder and every investor builds a verification
-          tier before a single document changes hands.
-        </p>
-        <div className="mx-auto mt-12 grid max-w-3xl gap-4 sm:grid-cols-2">
-          {[
-            { t: "Founders are verified", d: "Incorporation, financials, customers, and team — checked against real documents, not claims." },
-            { t: "Investors are verified", d: "Fund details, thesis, and track record — so founders know who they're talking to before they share." },
-          ].map((c) => (
-            <div key={c.t} className="p-8 text-left rounded-[2px]" style={{ background: "#FFFFFF", border: `1px solid ${BORDER}` }}>
-              <div className="mb-3 inline-flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4" style={{ color: BRAND }} />
-                <h3 style={{ fontFamily: SYNE, fontWeight: 600, fontSize: "18px", color: INK }}>{c.t}</h3>
-              </div>
-              <p className="text-[14px]" style={{ color: SECONDARY, fontFamily: DM, lineHeight: 1.5 }}>{c.d}</p>
-            </div>
-          ))}
-        </div>
-        <Link to="/trust" className="mt-8 inline-flex items-center gap-1.5 text-[14px] font-medium" style={{ color: BRAND, fontFamily: DM }}>
-          How verification works <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
       </div>
     </section>
   );
@@ -406,7 +353,7 @@ function TwoWayTrust() {
 ═══════════════════════════════════════════════════════════════════════════ */
 function HowItWorks() {
   const steps = [
-    { n: "1", t: "Build your verified profile" },
+    { n: "1", t: "Build your profile" },
     { n: "2", t: "Connect in a deal room" },
     { n: "3", t: "Negotiate and agree terms" },
     { n: "4", t: "Close with confidence" },
@@ -443,15 +390,15 @@ function ForFoundersInvestors() {
         <div className="mx-auto max-w-[1000px] px-6 py-24">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: BRAND, fontFamily: DM }}>For founders</p>
           <h2 style={{ fontFamily: SYNE, fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", color: INK, letterSpacing: "-0.01em" }}>
-            Raise on your terms, with your work already verified
+            Raise on your terms, in one place
           </h2>
           <div className="mt-8 grid gap-x-10 gap-y-4 sm:grid-cols-2">
             {[
-              "A verified profile investors trust before the first conversation",
+              "A structured profile and document vault, ready before the first conversation",
               "Private deal rooms — you decide who sees what, and when",
               "AI document analysis that surfaces gaps before an investor does",
               "Structured interviews and term negotiation, all in one place",
-              "Close, sign, and archive the deal without leaving the platform",
+              "Sign and archive the deal without leaving the platform",
               "No fee unless the deal actually closes",
             ].map((t) => (
               <div key={t} className="flex items-start gap-2.5">
@@ -461,7 +408,7 @@ function ForFoundersInvestors() {
             ))}
           </div>
           <Link to="/sign-up" search={{ role: "founder" } as any} className="mt-9 inline-flex h-9 items-center gap-2 rounded-[2px] px-5 text-[14px] font-semibold" style={{ background: BRAND, color: "#FFFFFF", fontFamily: SYNE }}>
-            Create your verified profile <ArrowRight className="h-4 w-4" />
+            Create your profile <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </div>
@@ -475,8 +422,8 @@ function ForFoundersInvestors() {
           <div className="mt-8 grid gap-x-10 gap-y-4 sm:grid-cols-2">
             {[
               "Thesis-matched founders surfaced automatically as they join",
-              "Verification tier visible before you request access",
-              "AI-powered Deal Intake analysis on every opportunity",
+              "A structured profile and document vault before you request access",
+              "AI Deal Intake analysis on every opportunity",
               "Structured due diligence with source-cited findings",
               "Term negotiation with a full, auditable history",
               "One workspace from sourcing to signed agreement",
@@ -500,11 +447,10 @@ function ForFoundersInvestors() {
    SECTION 8 — COMPARISON BAND (the one dark violet #7C3AED band)
 ═══════════════════════════════════════════════════════════════════════════ */
 const COMPARE_ROWS: { feature: string; traditional: string; competitors: string; hockystick: string }[] = [
-  { feature: "Verification", traditional: "None — reputation only", competitors: "Founders only", hockystick: "Both sides, evidence-based" },
   { feature: "Structured due diligence", traditional: "Ad-hoc, in email", competitors: "Basic checklist", hockystick: "Workstation + AI analysis" },
-  { feature: "AI interviews", traditional: "None", competitors: "None", hockystick: "5 stages, source-cited notes" },
+  { feature: "Structured interviews", traditional: "None", competitors: "None", hockystick: "5 stages, source-cited notes" },
   { feature: "Term negotiation", traditional: "Lawyers + email", competitors: "Document upload", hockystick: "4 instruments, per-term audit" },
-  { feature: "Agreement + close", traditional: "Offline, weeks", competitors: "Not supported", hockystick: "Sign, pay, close in-platform" },
+  { feature: "Agreement + close", traditional: "Offline, weeks", competitors: "Not supported", hockystick: "Sign and archive in-platform" },
   { feature: "Fee transparency", traditional: "Opaque advisory %", competitors: "Subscription only", hockystick: "1.5% at close, capped" },
 ];
 
@@ -554,12 +500,12 @@ function PricingPreview() {
   const cards = [
     {
       role: "Founder", price: "Free during beta", after: "$49/month after launch",
-      points: ["Verified profile & IP vault", "Unlimited deal rooms", "AI due diligence & interviews", "Term negotiation to close"],
+      points: ["Structured profile & IP vault", "Unlimited deal rooms", "AI due diligence & interviews", "Term negotiation to close"],
       cta: "Create founder account", search: { role: "founder" },
     },
     {
       role: "Investor", price: "Free during beta", after: "Free at launch",
-      points: ["Verified investor profile", "Thesis-matched deal flow", "AI deal intake & briefs", "Full deal-room access"],
+      points: ["Structured investor profile", "Thesis-matched deal flow", "AI deal intake & briefs", "Full deal-room access"],
       cta: "Create investor account", search: { role: "investor" },
     },
   ];
@@ -615,14 +561,14 @@ const FAQ_GROUPS: { heading: string; items: Faq[] }[] = [
   {
     heading: "For founders",
     items: [
-      { q: "What is Hockystick?", a: "A verified fundraising platform where founders and investors meet, negotiate, and close deals — entirely in-platform, from first contact to signed agreement.", link: { to: "/about", label: "Learn more" } },
-      { q: "How does founder verification work?", a: "Five tiers — Identity, Claims, Operational, Capital, and Hockystick Verified — each built by uploading real documents that AI cross-checks. Your verification tier is visible to investors before they request access.", link: { to: "/trust", label: "See verification details" } },
-      { q: "What documents do I need to get started?", a: "Incorporation documents, bank or revenue statements, customer contracts, and team employment records. Each builds your verification tier — you choose how much to verify.", link: { to: "/pricing", label: "View pricing & plans" } },
+      { q: "What is Hockystick?", a: "A fundraising platform where founders and investors meet, negotiate, and close deals — entirely in-platform, from first contact to signed agreement.", link: { to: "/about", label: "Learn more" } },
+      { q: "How does founder verification work?", a: "There's no automated verification tier today. You can build a Founder Roast — a live, public Q&A with investors and other founders — which earns a Roast Survivor badge on your profile once completed." },
+      { q: "What documents do I need to get started?", a: "Incorporation documents, bank or revenue statements, customer contracts, and team employment records — the same set your due-diligence checklist asks for.", link: { to: "/pricing", label: "View pricing & plans" } },
       { q: "How do deal rooms work?", a: "Private, NDA-gated spaces where you share documents, run due diligence, hold structured interviews, and negotiate terms with a specific investor. All content stays inside the room." },
-      { q: "What happens during due diligence?", a: "A structured DD checklist with AI-powered document analysis. Findings are source-cited and confidence-scored — never presented as verified fact without backing.", link: { to: "/docs", label: "Read the docs" } },
+      { q: "What happens during due diligence?", a: "A structured DD checklist with AI document analysis. Findings are source-cited and confidence-scored — never presented as verified fact without backing.", link: { to: "/docs", label: "Read the docs" } },
       { q: "How do structured interviews work?", a: "Five video meeting stages — Introduction, Product Demo, Financial Discussion, Terms Discussion, and Investment Terms — each with AI note extraction. Notes are source-cited to the transcript." },
       { q: "How are terms negotiated?", a: "Per-term propose, accept, reject, or counter — with a full audit trail. Four instrument types: SAFE, Equity, Debt, and Company Sale. Both parties see updates in real time." },
-      { q: "What does the closing process look like?", a: "Terms lock, the platform generates a summary, a lawyer (optional) drafts the agreement, both parties sign, payment is confirmed, the deal closes, and the room becomes a permanent archive with auto-generated invoices." },
+      { q: "What does the closing process look like?", a: "Terms lock, the platform generates a summary, a lawyer (optional) drafts the agreement, both parties sign, and the room becomes a permanent archive." },
       { q: "How much does Hockystick cost?", a: "Free during beta. After launch: $49/month for founders, with a 1.5% success fee on closed deals (minimum $500, maximum $15,000). No fee if the deal doesn’t close.", link: { to: "/pricing", label: "See pricing" } },
       { q: "Is my data secure?", a: "NDA-gated deal rooms, role-based access control, DIFC governing law, and DIAC arbitration. Documents are access-logged and never shared outside the room.", link: { to: "/privacy", label: "Privacy policy" } },
       { q: "Can I use Hockystick from anywhere?", a: "Yes. Hockystick is a global platform. Founders and investors from any jurisdiction can use it." },
@@ -631,9 +577,9 @@ const FAQ_GROUPS: { heading: string; items: Faq[] }[] = [
   {
     heading: "For investors",
     items: [
-      { q: "How do I find startups on Hockystick?", a: "Thesis-matched deal flow, a searchable founder directory, and AI-powered Deal Intake analysis. Set your investment thesis and the platform surfaces matching founders automatically." },
-      { q: "What investor verification is required?", a: "The same tier system as founders — fund details, thesis, and track record build your verification tier. Founders see your tier before granting deal-room access." },
-      { q: "What can I see before requesting access to a founder?", a: "Their public profile and verification tier. Full details — documents, financials, team — unlock inside the deal room after mutual disclosure." },
+      { q: "How do I find startups on Hockystick?", a: "Thesis-matched deal flow, a searchable founder directory, and AI Deal Intake analysis. Set your investment thesis and the platform surfaces matching founders automatically." },
+      { q: "What investor verification is required?", a: "None today. Founders review your profile — fund details, thesis, and track record — before granting deal-room access." },
+      { q: "What can I see before requesting access to a founder?", a: "Their public profile. Full details — documents, financials, team — unlock inside the deal room after mutual disclosure." },
       { q: "How does thesis matching work?", a: "You set your stage, sector, geography, and cheque-size preferences. The platform matches founders to your thesis and sends alerts when new matches appear." },
       { q: "What AI analysis do I get?", a: "Deal briefs, DD findings, and meeting note extraction — all source-cited with confidence scores. The AI never asserts claims as verified fact." },
     ],

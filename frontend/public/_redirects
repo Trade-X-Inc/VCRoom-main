@@ -9,6 +9,9 @@
 /app/reports /app 301
 /app/accelerators /app 301
 /docs/security/rls /docs/security/access-control 301
+/docs/founders/verification /docs/founders 301
+/docs/ai/verification /docs/ai 301
+/trust / 301
 
 # P4: founder nav restructure — old pages consolidated into /app/prepare
 /app/profile      /app/prepare#profile        301

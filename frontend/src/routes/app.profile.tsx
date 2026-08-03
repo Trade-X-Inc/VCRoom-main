@@ -1068,17 +1068,6 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
             <span className="font-semibold">Your profile is not yet visible in the directory.</span> Complete at least 80% to go live.
           </div>
         )}
-        <div className="mt-3">
-          <a
-            href="/trust"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs transition-colors"
-            style={{ color: "rgba(124,58,237,0.65)" }}
-          >
-            See how verification works →
-          </a>
-        </div>
       </div>
 
       {startup && !form.company_name.trim() && (

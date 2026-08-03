@@ -872,7 +872,7 @@ function ValuationPage() {
             Knowing your valuation is step one.
           </h3>
           <p style={{ fontSize: "15px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "28px" }}>
-            Step two is getting it in front of investors who are actively looking. Hockystick puts your verified profile in front of verified investors — no cold email required.
+            Step two is getting it in front of investors who are actively looking. Hockystick puts your profile in front of them — no cold email required.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link
@@ -886,18 +886,6 @@ function ValuationPage() {
               }}
             >
               Create your profile
-            </Link>
-            <Link
-              to="/trust"
-              style={{
-                display: "inline-flex", alignItems: "center",
-                background: "transparent", color: "var(--muted-foreground)",
-                borderRadius: "10px", padding: "12px 24px", fontSize: "14px",
-                fontWeight: 500, textDecoration: "none",
-                border: "1px solid var(--border)",
-              }}
-            >
-              See how verification works
             </Link>
           </div>
         </div>

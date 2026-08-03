@@ -17,7 +17,6 @@ export const AI_PAGES: Record<string, DocPage> = {
         { id: "two-agents", label: "Two agents, never one" },
         { id: "confirm-first", label: "The confirm-first rule" },
         { id: "features", label: "AI features" },
-        { id: "readiness-ai", label: "Fundraising readiness AI" },
         { id: "confrontational-dd", label: "Confrontational DD analysis" },
         { id: "scope-note", label: "Where the line is" },
       ],
@@ -65,26 +64,14 @@ export const AI_PAGES: Record<string, DocPage> = {
           rows={[
             ["AI panel", "Both sides", <A href="/docs/ai/operator-panel">AI panel</A>],
             ["Deal briefs", "Investors", <A href="/docs/ai/deal-brief">Deal briefs</A>],
-            ["Verification classification", "Both sides", <A href="/docs/ai/verification">AI verification</A>],
             ["Profile extraction", "Founders", <A href="/docs/founders/ai">AI for founders</A>],
             ["Intake parsing", "Investors", <A href="/docs/investors/intake">Intake</A>],
             ["Investment memos", "Investors", <A href="/docs/investors/analysis">Memos</A>],
             ["Document review", "Founders", <A href="/docs/founders/vault">Vault</A>],
             ["Data handling policy", "Everyone", <A href="/docs/ai/data-handling">Data handling</A>],
-            ["Readiness checklist", "Founders", <A href="/docs/founders#readiness">Readiness</A>],
             ["Deep DD analysis", "Investors", <A href="/docs/deal-rooms/due-diligence">DD analysis</A>],
           ]}
         />
-
-        <H2 id="readiness-ai">Fundraising readiness AI</H2>
-        <P>
-          After every profile save or document upload, the AI reviews the founder's complete
-          file — profile fields, documents, verification state, claim verdicts — and produces a
-          0–100 readiness score with the 5–7 gaps most likely to make an investor pass, specific
-          to that company's stage and sector. Each gap carries the investor's-eye rationale and a
-          concrete fix. Deal-room investors see the score and top gaps, so diligence starts
-          focused.
-        </P>
 
         <H2 id="confrontational-dd">Confrontational DD analysis</H2>
         <P>
@@ -99,12 +86,12 @@ export const AI_PAGES: Record<string, DocPage> = {
 
         <H2 id="scope-note">Where the line is</H2>
         <P>
-          Honest update: the AI now goes further than drafting and summarizing — it critiques,
-          scores readiness, and cross-examines documents. What has not changed: it only reads
-          data the requesting user could already see, every party-visible action still requires
-          an explicit confirmation click, verdicts are conservative by instruction (it flags what
-          it cannot verify rather than assuming it's fine), and no AI output — score, finding, or
-          verdict — ever auto-triggers a decision. Humans decide; the AI prepares.
+          Honest update: the AI now goes further than drafting and summarizing — it critiques
+          and cross-examines documents. What has not changed: it only reads data the requesting
+          user could already see, every party-visible action still requires an explicit
+          confirmation click, verdicts are conservative by instruction (it flags what it cannot
+          verify rather than assuming it's fine), and no AI output — finding or verdict — ever
+          auto-triggers a decision. Humans decide; the AI prepares.
         </P>
       </>
     ),
@@ -227,64 +214,6 @@ export const AI_PAGES: Record<string, DocPage> = {
     ),
   },
 
-  // ── /docs/ai/verification ─────────────────────────────────────────────────
-  "ai/verification": {
-    meta: {
-      slug: "ai/verification",
-      title: "AI verification classification",
-      description:
-        "How AI checks verification evidence: each document is classified against the specific criterion its slot requires.",
-      updated: UPDATED,
-      toc: [
-        { id: "overview", label: "Overview" },
-        { id: "how", label: "How it works" },
-        { id: "slots", label: "Slot-specific rubrics" },
-        { id: "scope", label: "What it does / doesn't" },
-      ],
-    },
-    Body: () => (
-      <>
-        <Lead>
-          Tier 2 and Tier 3 verification require documents as evidence. AI classification is the
-          first reviewer: it checks that each uploaded document actually satisfies the specific
-          criterion of the slot it was uploaded for — before any badge is granted.
-        </Lead>
-
-        <H2 id="how">How it works</H2>
-        <Steps
-          items={[
-            <>Each verification slot states what it needs — for example, a capital commitment letter showing a committed amount and a named signatory.</>,
-            <>You upload a document into a slot. The AI reads it against that slot's rubric only.</>,
-            <>The result is confirm or flag, with the reason stated. A flagged document can be replaced and re-checked.</>,
-            <>Tier 4 (<em>Hockystick Verified</em>) adds a human review over all prior evidence — the AI never grants the top badge alone.</>,
-          ]}
-        />
-
-        <H2 id="slots">Slot-specific rubrics</H2>
-        <P>
-          The classification is deliberately narrow: a bank statement uploaded into the
-          customer-evidence slot fails, even though it is a perfectly good bank statement. One
-          document never satisfies multiple unrelated claims — that rule comes from the
-          verification tier design itself, and the AI enforces it mechanically.
-        </P>
-
-        <H2 id="scope">What it does / doesn't</H2>
-        <AIScope
-          does={[
-            "Checks each document against its slot's specific criterion",
-            "States why a document was confirmed or flagged",
-            "Feeds results into the tier system for badge computation",
-          ]}
-          doesNot={[
-            "Grant Tier 4 — the top badge always requires human review",
-            "Use verification documents for anything beyond the check itself",
-            "Expose evidence documents to investors or deal rooms",
-          ]}
-        />
-      </>
-    ),
-  },
-
   // ── /docs/ai/data-handling ────────────────────────────────────────────────
   "ai/data-handling": {
     meta: {
@@ -312,7 +241,7 @@ export const AI_PAGES: Record<string, DocPage> = {
         <Rules
           items={[
             <><strong>Extraction is local.</strong> Reading text out of your uploaded files (PDF, DOCX, PPTX, XLSX, CSV) happens in your browser, client-side. Uploading a file transmits it to storage — not to any AI model.</>,
-            <><strong>Transmission is explicit.</strong> Content goes to an AI provider only when you trigger an AI action on it: generate a summary, a brief, a memo; run a review; submit verification evidence for classification.</>,
+            <><strong>Transmission is explicit.</strong> Content goes to an AI provider only when you trigger an AI action on it: generate a summary, a brief, a memo; run a review.</>,
             <><strong>Scope is per-user.</strong> AI requests are built from data your account can read under Row Level Security. There is no cross-tenant context, ever.</>,
           ]}
         />

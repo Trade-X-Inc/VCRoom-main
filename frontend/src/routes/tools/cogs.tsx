@@ -837,16 +837,12 @@ Calculate yours at hockystick.app/tools/cogs`;
             Investors will calculate your margins before you do.
           </h3>
           <p style={{ fontSize: "15px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "28px" }}>
-            Put your financials in front of verified investors on Hockystick — before they find gaps in your numbers.
+            Put your financials in front of investors on Hockystick — before they find gaps in your numbers.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link to="/sign-up" search={{ role: "founder" } as any}
               style={{ display: "inline-flex", alignItems: "center", background: "#7C3AED", color: "#fff", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>
               Create your profile
-            </Link>
-            <Link to="/trust"
-              style={{ display: "inline-flex", alignItems: "center", background: "transparent", color: "var(--muted-foreground)", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 500, textDecoration: "none", border: "1px solid var(--border)" }}>
-              See how verification works
             </Link>
           </div>
         </div>

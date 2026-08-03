@@ -812,12 +812,6 @@ function BurnRatePage() {
             >
               Create your profile
             </Link>
-            <Link
-              to="/trust"
-              style={{ display: "inline-flex", alignItems: "center", background: "transparent", color: "var(--muted-foreground)", borderRadius: "10px", padding: "12px 24px", fontSize: "14px", fontWeight: 500, textDecoration: "none", border: "1px solid var(--border)" }}
-            >
-              See how verification works
-            </Link>
           </div>
         </div>
       </section>

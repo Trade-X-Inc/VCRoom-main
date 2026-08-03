@@ -10,20 +10,19 @@ export const FOUNDER_PAGES: Record<string, DocPage> = {
       slug: "founders",
       title: "Founder features",
       description:
-        "Everything a founder can do on Hockystick: build a verified profile, run deal rooms, control document access, and answer investor diligence.",
+        "Everything a founder can do on Hockystick: build a profile, run deal rooms, control document access, and answer investor diligence.",
       updated: UPDATED,
       toc: [
         { id: "map", label: "Feature map" },
         { id: "flow", label: "The founder flow" },
         { id: "onboarding", label: "Onboarding flow" },
-        { id: "readiness", label: "Fundraising readiness checklist" },
-        { id: "badges", label: "Badge system" },
+        { id: "badges", label: "Roast Survivor badge" },
       ],
     },
     Body: () => (
       <>
         <Lead>
-          The founder side of Hockystick is built around one loop: build a verified profile, get
+          The founder side of Hockystick is built around one loop: build a profile, get
           discovered by investors whose thesis you match, open a deal room, and get a real decision
           — Invest, Hold, or Pass with a reason — instead of silence.
         </Lead>
@@ -32,12 +31,11 @@ export const FOUNDER_PAGES: Record<string, DocPage> = {
         <DocTable
           head={["Feature", "What it does", "Docs"]}
           rows={[
-            ["Company profile", "Structured, verifiable company profile with a public page", <A href="/docs/founders/profile">Profile</A>],
+            ["Company profile", "Structured company profile with a public page", <A href="/docs/founders/profile">Profile</A>],
             ["Deal rooms", "NDA-gated private spaces where deals actually progress", <A href="/docs/founders/deal-rooms">Deal rooms</A>],
             ["Document vault", "Stage-aware document workspace with tiered visibility", <A href="/docs/founders/vault">Vault</A>],
             ["Q&A", "Structured investor questions with a hard limit and typed answers", <A href="/docs/founders/qa">Q&A</A>],
             ["NDA", "Mutual NDA generated and signed before documents unlock", <A href="/docs/founders/nda">NDA</A>],
-            ["Verification", "Five trust tiers from automated checks to human review", <A href="/docs/founders/verification">Verification</A>],
             ["Team", "Role-based team accounts with scoped permissions", <A href="/docs/founders/team">Team</A>],
             ["AI", "Profile extraction, document review, and a context-aware advisor", <A href="/docs/founders/ai">AI</A>],
           ]}
@@ -47,7 +45,6 @@ export const FOUNDER_PAGES: Record<string, DocPage> = {
         <Steps
           items={[
             <>Create an account and build your profile — by hand, or by letting the AI extract it from your pitch deck.</>,
-            <>Pass verification checks. Tier 1 is automated and instant; higher tiers add document evidence.</>,
             <>Fill the document vault against your stage's checklist so you're ready before the first investor call.</>,
             <>Open a deal room when an investor engages. The NDA gate protects everything inside it.</>,
             <>Progress through the six stages — Overview, Information Vault, Q&A, Due Diligence, Term Sheet, Closing — and receive a recorded decision.</>,
@@ -58,61 +55,18 @@ export const FOUNDER_PAGES: Record<string, DocPage> = {
         <P>
           New founders follow one sequential path with a single call to action at each step:
           <strong> build your profile</strong> (a 10–12 question AI interview or a document
-          upload, ~10 minutes), <strong>verify your identity</strong> (four automated checks,
-          ~2 minutes), and <strong>publish to the directory</strong>. After saving, the app
-          points you straight at verification; after publishing, you get a durable
-          confirmation with your public profile link. The whole path from signup to a live,
-          discoverable profile is designed to take under ten minutes.
+          upload, ~10 minutes) and <strong>publish to the directory</strong>. After publishing,
+          you get a durable confirmation with your public profile link. The whole path from
+          signup to a live, discoverable profile is designed to take under ten minutes.
         </P>
 
-        <H2 id="readiness">Fundraising readiness checklist</H2>
+        <H2 id="badges">Roast Survivor badge</H2>
         <P>
-          Every time you save your profile or upload a document, the AI reviews your complete
-          file — profile data, documents, verification status, and claim verdicts — the way an
-          investment analyst would, and produces a readiness score (0–100) with the 5–7 most
-          important gaps for <em>your</em> stage and sector. Each gap explains what an investor
-          thinks when it's missing, how to fix it, and links to the exact place to do so. A
-          pre-revenue deeptech company is asked about IP status; an early-revenue SaaS company
-          about churn and unit economics — this is not a generic checklist.
-        </P>
-        <P>
-          Investors in a deal room with you see your score and top three gaps on the room's
-          Overview panel, so their questions focus on what actually matters. The checklist lives
-          on your <A href="/app/overview">dashboard</A> and can be re-run at any time.
-        </P>
-
-        <H2 id="badges">Badge system</H2>
-        <P>
-          23 badges across four categories. Most are awarded automatically when the underlying
-          fact becomes true — none can be bought outright (Roast Survivor has a participation
-          fee for the live event itself; the outcome is decided independently).
-        </P>
-        <DocTable
-          head={["Badge", "How it's earned", "What it signals to investors"]}
-          rows={[
-            ["Identity Confirmed", "Email, website, registry and domain-infrastructure checks pass", "Real person, real company"],
-            ["Claims Verified", "3+ specific claims (1 financial) verified against evidence", "Their numbers survive document checks"],
-            ["Revenue Verified", "Stated revenue confirmed against financial documents", "Revenue is real, not aspirational"],
-            ["Team Verified", "Payroll/employment records confirm named team members", "The team exists as described"],
-            ["Operationally Verified", "3 operational documents AI-checked, then human-reviewed", "Operations match the pitch"],
-            ["Hockystick Verified", "Full review by a named reviewer incl. live video call", "The highest trust tier on the platform"],
-            ["Deal Ready", "Deal room open, NDA signed, pitch materials uploaded", "Ready to run a real process"],
-            ["Fully Documented", "Documents complete in all 5 diligence categories", "DD will be fast"],
-            ["Fast Responder", "3+ investor questions answered within 24 hours", "Responsive counterparty"],
-            ["DD Ready", "Every DD goal completed in at least one room", "Has been through diligence"],
-            ["First Close", "A deal room reached the Closing stage", "Gets deals over the line"],
-            ["Round Closed", "A room concluded with an Invest decision", "Proven closer"],
-            ["Early Builder", "Among the first 100 identity-verified founders", "Early conviction in the platform"],
-            ["Roast Survivor", "Completed a live Founder Roast (paid event)", "Held up under live investor challenge"],
-            ["Roast Champion", "Top-scored in a Roast cohort, judged by investors", "Best of a challenged cohort"],
-            ["Cohort Graduate", "Partner-institution program completion, co-issued", "Externally validated"],
-          ]}
-        />
-        <P>
-          Investors earn their own seven — Active Investor, Thesis Clarity, Fast Decision, Deal
-          Closed, No Ghosting, Gives Reasons, and Verified Fund — so accountability runs both
-          ways: founders can see whether an investor decides quickly and never ghosts before
-          accepting a deal room.
+          Completing a Founder Roast — a live, public Q&A where investors and other founders
+          challenge your pitch on the record — earns a Roast Survivor badge on your profile.
+          It is the platform's only automatically-awarded badge today: earned by completing
+          the session, not by paying the entry fee, and it can't be gamed because the whole
+          exchange happens in public.
         </P>
       </>
     ),
@@ -147,7 +101,7 @@ export const FOUNDER_PAGES: Record<string, DocPage> = {
         <Steps
           items={[
             <>Open Profile from the sidebar. Sections are edited independently and saved as you go.</>,
-            <>Each factual claim (revenue, customers, registration) can be backed by evidence for verification — see <A href="/docs/founders/verification">Verification tiers</A>.</>,
+            <>Each factual claim (revenue, customers, registration) can be backed by evidence, which the AI checks against the document you attach.</>,
             <>Toggle <strong>Publish</strong> to generate your public page at <code>hockystick.app/p/your-slug</code>. Unpublished profiles are invisible to direct API calls, enforced at the database level.</>,
             <>Add team members with roles, photos, and bios — they appear on the public page if the team section is visible.</>,
           ]}
@@ -424,74 +378,6 @@ export const FOUNDER_PAGES: Record<string, DocPage> = {
           The NDA is an agreement between you and the investor — Hockystick generates it but is not
           a party to it. If anything in it matters to your situation, read it with counsel.
         </Callout>
-      </>
-    ),
-  },
-
-  // ── /docs/founders/verification ───────────────────────────────────────────
-  "founders/verification": {
-    meta: {
-      slug: "founders/verification",
-      title: "Verification tiers",
-      description:
-        "Hockystick's five trust tiers, from automated checks to human review. What each badge means and what it takes to earn it.",
-      updated: UPDATED,
-      toc: [
-        { id: "overview", label: "Overview" },
-        { id: "tiers", label: "The five tiers" },
-        { id: "tier1", label: "Tier 1: automated checks" },
-        { id: "tier3", label: "Tier 3: operational evidence" },
-        { id: "principles", label: "Principles" },
-      ],
-    },
-    Body: () => (
-      <>
-        <Lead>
-          Verification is Hockystick's trust layer: badges that tell an investor how much of your
-          profile has actually been checked, and by what. It is free at every tier and never gates
-          platform access — an unverified account can use everything, it just carries no badge.
-        </Lead>
-
-        <H2 id="tiers">The five tiers</H2>
-        <DocTable
-          head={["Tier", "Badge", "What it means"]}
-          rows={[
-            ["0", "Joined", "Account exists. No badge shown — verification signals trust, it doesn't gatekeep."],
-            ["1", "Hockystick Checked", "Automated checks passed — instant and free."],
-            ["2", "Document Verified", "Specific claims backed by matching evidence. One document never satisfies multiple unrelated claims."],
-            ["3", "Operationally Verified", "Three independent documents proving real operations: financial activity, customer/contract evidence, team evidence."],
-            ["4", "Hockystick Verified", "All prior evidence reviewed and confirmed by a human. The badge that means the most."],
-          ]}
-        />
-
-        <H2 id="tier1">Tier 1: automated checks</H2>
-        <Rules
-          items={[
-            <>Business email domain — MX records confirm the domain actually receives mail.</>,
-            <>Website — a live HTTP check confirms it exists and responds.</>,
-            <>LinkedIn URL — format validation only; we do not scrape LinkedIn.</>,
-            <>Company registration — registry document check.</>,
-          ]}
-        />
-        <P>Checks run on demand from the verification page and can be re-run any time.</P>
-
-        <H2 id="tier3">Tier 3: operational evidence</H2>
-        <P>
-          Founders submit three independent documents: proof of financial activity (for example a
-          bank or revenue statement), customer or contract evidence, and team evidence. Each
-          document is classified by AI against the specific criterion it must satisfy — a bank
-          statement can't double as customer evidence. Investors have a parallel Tier 3 path
-          (Capital Verified) with fund formation and committed-capital documents.
-        </P>
-
-        <H2 id="principles">Principles</H2>
-        <Rules
-          items={[
-            <>Verification is never paid. There is no way to buy a badge.</>,
-            <>Investors see what was confirmed <em>and what wasn't</em> — badges state their scope precisely.</>,
-            <>Evidence documents are used for verification only; they don't enter any deal room unless you put them there.</>,
-          ]}
-        />
       </>
     ),
   },

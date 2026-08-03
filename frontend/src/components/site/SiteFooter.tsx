@@ -102,7 +102,6 @@ export function SiteFooter() {
                 <li><Link to={"/docs" as any} className={lnk}>Docs</Link></li>
                 <li><Link to={"/docs/security" as any} className={lnk}>Security</Link></li>
                 <li><Link to={"/docs/changelog" as any} className={lnk}>Changelog</Link></li>
-                <li><Link to="/trust" className={lnk}>Trust & Verification</Link></li>
               </ul>
             </div>
 
