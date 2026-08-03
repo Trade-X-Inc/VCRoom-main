@@ -110,6 +110,7 @@ These were found the hard way. Each cost hours.
 - **"A row exists matching these IDs" is not an authorisation check.** It must be "the caller *is* the party in that row."
 - **RLS helper functions that query their own protected table cause infinite recursion.** Use direct subqueries or a `SECURITY DEFINER` helper.
 - **`auth.email()` outperforms `(SELECT email FROM auth.users WHERE id = auth.uid())`** — the latter silently fails for the authenticated role.
+- **`requireUser()` authenticates the token, not the possessor.** A stolen valid token passes every check in this codebase, everywhere. This is an accepted boundary, not a gap in any single function — do not re-litigate it per-function.
 
 ### 7.2 SECURITY DEFINER functions
 
