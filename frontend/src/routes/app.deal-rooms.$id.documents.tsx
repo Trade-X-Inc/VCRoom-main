@@ -426,9 +426,10 @@ function DocumentsPage() {
         return;
       }
 
+      const { data: { session } } = await supabase.auth.getSession();
       const aiData = await withTimeout(generateDocSummary({
         data: {
-          userId: userId || "",
+          userAccessToken: session?.access_token ?? "",
           documentContent: textContent.slice(0, 3000),
           fileName,
           category: doc.category,

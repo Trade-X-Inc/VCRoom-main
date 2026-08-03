@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireUser } from "@/lib/require-user-fn";
 
 // ── getEnvVar: reads from server env only (never exposed to browser) ──
 function getEnvVar(key: string): string {
@@ -10,21 +11,21 @@ function getEnvVar(key: string): string {
 
 // ── Types ──
 type ThesisInput = {
-  userId: string;
+  userAccessToken: string;
   investorThesis: string;
   documentContext: string;
   fileName: string;
 };
 
 type SummaryInput = {
-  userId: string;
+  userAccessToken: string;
   documentContent: string;
   fileName: string;
   category?: string;
 };
 
 type GenericAIInput = {
-  userId: string;
+  userAccessToken: string;
   systemPrompt: string;
   userMessage: string;
   history?: Array<{ role: string; content: string }>;
@@ -116,7 +117,9 @@ async function callOpenAI(
 export const analyzeThesisAlignment = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): ThesisInput => data as ThesisInput)
   .handler(async ({ data }): Promise<AIResult> => {
-    const usageCheck = await checkUsageCap(data.userId, "thesis");
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { reply: "Please sign in again to use this feature.", error: "not_authenticated" };
+    const usageCheck = await checkUsageCap(auth.uid, "thesis");
     if (!usageCheck.allowed) {
       return { reply: usageCheck.message || "Daily AI limit reached.", error: "usage_limit" };
     }
@@ -140,7 +143,9 @@ CRITICAL RULES:
 export const generateDocSummary = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): SummaryInput => data as SummaryInput)
   .handler(async ({ data }): Promise<AIResult> => {
-    const usageCheck = await checkUsageCap(data.userId, "summary");
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { reply: "Please sign in again to use this feature.", error: "not_authenticated" };
+    const usageCheck = await checkUsageCap(auth.uid, "summary");
     if (!usageCheck.allowed) {
       return { reply: usageCheck.message || "Daily AI limit reached.", error: "usage_limit" };
     }
@@ -158,7 +163,9 @@ export const generateDocSummary = createServerFn({ method: "POST" })
 export const secureAICall = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): GenericAIInput => data as GenericAIInput)
   .handler(async ({ data }): Promise<AIResult> => {
-    const usageCheck = await checkUsageCap(data.userId, "qa_draft");
+    const auth = await requireUser(data.userAccessToken);
+    if (!auth.ok) return { reply: "Please sign in again to use this feature.", error: "not_authenticated" };
+    const usageCheck = await checkUsageCap(auth.uid, "qa_draft");
     if (!usageCheck.allowed) {
       return { reply: usageCheck.message || "Daily AI limit reached.", error: "usage_limit" };
     }

@@ -116,8 +116,9 @@ Be concise and specific.
 Return this exact JSON shape:
 {"matchScore":<integer>,"strengths":["...","...","..."],"risks":["...","...","..."],"mitigants":["...","..."],"nextAction":"..."}`;
 
+      const session = await supabase.auth.getSession();
       const result = await runAnalysis(() => secureAICall({
-        data: { userId: user.id, systemPrompt, userMessage, maxTokens: 600 },
+        data: { userAccessToken: session.data.session?.access_token ?? "", systemPrompt, userMessage, maxTokens: 600 },
       }));
 
       if (result.error === "usage_limit") {

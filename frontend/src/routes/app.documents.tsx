@@ -486,8 +486,9 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       const { extractDocumentText } = await import("@/lib/document-extractor");
       const text = await extractDocumentText(file, file.name);
       const { extractCustomDocument } = await import("@/lib/profile-builder-fn");
+      const { data: { session: extractSession } } = await supabase.auth.getSession();
       const result = await extractCustomDocument({
-        data: { userId: user.id, documentText: text, fileName: file.name },
+        data: { userAccessToken: extractSession?.access_token ?? "", documentText: text, fileName: file.name },
       }).catch((e: any): Awaited<ReturnType<typeof extractCustomDocument>> => ({
         data: null, missing_fields: [], error: e?.message || "Extraction failed",
       }));
@@ -574,8 +575,9 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       const { extractDocumentText } = await import("@/lib/document-extractor");
       const text = await extractDocumentText(file, file.name);
       const { extractEmployeeOnePager } = await import("@/lib/profile-builder-fn");
+      const { data: { session: onePagerSession } } = await supabase.auth.getSession();
       const result = await extractEmployeeOnePager({
-        data: { userId: user.id, documentText: text, fileName: file.name },
+        data: { userAccessToken: onePagerSession?.access_token ?? "", documentText: text, fileName: file.name },
       }).catch((e: any): Awaited<ReturnType<typeof extractEmployeeOnePager>> => ({
         data: null, missing_fields: [], error: e?.message || "Extraction failed",
       }));
@@ -643,8 +645,9 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       const { extractDocumentText } = await import("@/lib/document-extractor");
       const text = await extractDocumentText(file, file.name);
       const { extractCustomDocument } = await import("@/lib/profile-builder-fn");
+      const { data: { session: extractSession } } = await supabase.auth.getSession();
       const result = await extractCustomDocument({
-        data: { userId: user.id, documentText: text, fileName: file.name },
+        data: { userAccessToken: extractSession?.access_token ?? "", documentText: text, fileName: file.name },
       }).catch((e: any): Awaited<ReturnType<typeof extractCustomDocument>> => ({
         data: null, missing_fields: [], error: e?.message || "Extraction failed",
       }));

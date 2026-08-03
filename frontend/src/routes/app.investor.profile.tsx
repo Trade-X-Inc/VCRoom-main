@@ -674,8 +674,9 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
       }
       const { extractInvestorProfileFromDeck } = await import("@/lib/investor-profile-builder-fn");
       type DeckExtractResult = { data: Record<string, unknown> | null; missing_fields: string[]; error: string | null };
+      const { data: { session } } = await supabase.auth.getSession();
       const result = await runAI(() =>
-        extractInvestorProfileFromDeck({ data: { userId: user.id, documentText: text, fileName: file.name } }) as Promise<DeckExtractResult>,
+        extractInvestorProfileFromDeck({ data: { userAccessToken: session?.access_token ?? "", documentText: text, fileName: file.name } }) as Promise<DeckExtractResult>,
       );
       if (result.error) { toast.error(result.error); return; }
       if (!result.data) { toast.error("Extraction returned no data."); return; }
