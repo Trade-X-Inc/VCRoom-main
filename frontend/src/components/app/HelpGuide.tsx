@@ -123,20 +123,17 @@ export function FounderHelpGuide() {
             "Go to Documents → upload your pitch deck first — investors open it first",
             "Add your financial model — burn rate, runway, revenue projections",
             "Complete your team section — name, title, LinkedIn for each co-founder",
-            "Click Workstation to run your first Readiness Score — it shows exactly what to fix",
+            "Check your Overview page — it shows your profile completeness percentage and what's still missing",
           ]} />
           <Tip>
-            You do not need everything perfect before going live. A score of 60+ is enough to start getting investor attention. Upload, improve as you go.
+            You do not need everything perfect before going live. Upload, improve as you go — the Overview page's checklist always shows what's next.
           </Tip>
         </Article>
 
-        <Article heading="Going live — how the verification process works">
+        <Article heading="Going live — completing your raise checklist">
           <Body>
-            When you publish your profile, Hockystick runs automated checks: company registry search, website availability, email domain check, LinkedIn format. These checks produce your Verification Score (0–100). 60+ passes Tier 1. You can see exactly what was checked under Workstation → Verification.
+            Your Prepare checklist tracks Profile, Documents, Verification, Claims, Readiness, and Badges as you complete each one. The Overview page shows which section is next.
           </Body>
-          <Note>
-            LinkedIn scraping is prohibited. We validate URL format only — we do not read your LinkedIn profile.
-          </Note>
         </Article>
       </Accordion>
 
@@ -190,77 +187,26 @@ export function FounderHelpGuide() {
         </Article>
       </Accordion>
 
-      {/* Section 3 — Workstation */}
-      <Accordion title="The Workstation">
-        <Article heading="Understanding your Readiness Score">
+      {/* Section 3 — Profile completeness */}
+      <Accordion title="Profile completeness">
+        <Article heading="Tracking what's left to complete">
           <Body>
-            Your score (0–100) reflects how prepared your profile is for investor scrutiny. It breaks down into 6 factors: Team, Market, Traction, Financials, Product, Legal. Each factor has a max score. The "What the AI could not evaluate" section shows data gaps — missing documents that reduce your confidence band.
+            Your Overview page shows a completeness percentage and a checklist across Profile, Documents, Verification, Claims, Readiness, and Badges. Each section shows complete, in progress, or not started — the checklist always points to what's next.
           </Body>
-          <Tip>
-            A confidence band of ±20 points means: if you uploaded your financial model, your score could jump 15–20 points. Fix your highest-impact gap first.
-          </Tip>
         </Article>
 
-        <Article heading="Investor Simulation — what it is and how to use it">
+        <Article heading="Rejection feedback">
           <Body>
-            The simulation reads your profile the way an investor would in a first pass. It outputs 4 things:
-          </Body>
-          <div className="mt-2 space-y-2">
-            {[
-              { n: "①", label: "First question", desc: "The first question they would ask — usually about your weakest point" },
-              { n: "②", label: "Red flag", desc: "The most likely objection an investor would raise" },
-              { n: "③", label: "Strongest point", desc: "What would make them lean forward in the first meeting" },
-              { n: "④", label: "Kill risk", desc: "The one thing that could end the deal before it starts" },
-            ].map(({ n, label, desc }) => (
-              <div key={label} className="flex gap-3">
-                <span className="text-base shrink-0 font-mono" style={{ color: "#A855F7" }}>{n}</span>
-                <div>
-                  <span className="text-sm font-medium text-foreground">{label}: </span>
-                  <span className="text-sm text-muted-foreground">{desc}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-          <Note>
-            Run the simulation before your first investor call. Fix the kill risk. Know the first question they will ask before they ask it.
-          </Note>
-        </Article>
-
-        <Article heading="Coaching — how rejection feedback works">
-          <Body>
-            When an investor submits a Pass decision, Hockystick generates a debrief: what the investor was looking for, which specific element triggered the pass, and three things to fix before approaching a similar investor.
-          </Body>
-          <Body>
-            This appears in your Workstation → Coaching section automatically after each pass.
+            When an investor passes on your deal room with a reason, Hockystick generates a debrief for your team — what the investor was looking for and what to address before approaching a similar investor.
           </Body>
         </Article>
       </Accordion>
 
       {/* Section 4 — Connections */}
       <Accordion title="Connections">
-        <Article heading="Tracking investors in your pipeline">
+        <Article heading="Responding to investor requests">
           <Body>
-            The Connections page is your investor CRM. Add investors manually, import from CSV, or they appear automatically when they connect through the Hockystick directory.
-          </Body>
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {["Tracking", "→", "Contacted", "→", "In Conversation", "→", "Deal Room Sent", "→", "Invested / Passed"].map((s, i) => (
-              s === "→" ? (
-                <span key={i} className="text-muted-foreground/50 text-sm self-center">→</span>
-              ) : (
-                <span key={s} className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-accent text-foreground border border-border/40">
-                  {s}
-                </span>
-              )
-            ))}
-          </div>
-          <Body>
-            When you move an investor to "In Conversation", the system reminds you to follow up if there's no activity for 3 days.
-          </Body>
-        </Article>
-
-        <Article heading="Importing your investor list">
-          <Body>
-            Use the Import button on the Connections page. CSV format — required columns: fund_name, contact_name, email. Optional: website, LinkedIn, stage_focus, sector_focus, geography, check_size. Download the sample CSV from the import modal to see the exact format.
+            The Connections page lists incoming requests from investors who want to connect with your startup. Review each request, then approve or decline. Approving creates a deal room with that investor — you'll see a confirmation before it's created.
           </Body>
         </Article>
       </Accordion>
@@ -458,10 +404,6 @@ export function InvestorHelpGuide() {
         <QA
           q="Can I add companies that are not on Hockystick?"
           a="Yes — use Deal Intake to paste or upload any founder data. They don't need to be on the platform for you to score and track them."
-        />
-        <QA
-          q="What does the verification badge mean?"
-          a="Tier 1 (Hockystick Checked): email domain, website, and company registry checks passed. Not a guarantee of legitimacy — a signal that basic facts check out. Higher tiers require additional documentation and human review."
         />
       </Accordion>
     </div>
