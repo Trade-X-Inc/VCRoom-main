@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo, useCallback } from "react";
 import {
   LayoutGrid, List, Columns3, Search,
@@ -13,10 +13,6 @@ import { EmptyState, PageBreadcrumb } from "@/components/system";
 import { downloadCsv } from "@/lib/csv-export";
 
 export const Route = createFileRoute("/app/investor/decisions")({
-  // R9 relocation: this URL's content moved — see nav-structure.ts.
-  beforeLoad: () => {
-    throw redirect({ to: "/app/investor/crm/pipeline-manager" as any, replace: true });
-  },
   component: DecisionsPage,
 });
 

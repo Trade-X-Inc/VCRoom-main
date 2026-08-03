@@ -101,15 +101,9 @@ export const founderSections: L2Section[] = [
     ],
   },
   {
-    key: "crm", label: "CRM", icon: UserCircle2,
-    matchPrefixes: ["/app/crm"],
-    children: [
-      { to: "/app/crm/connections", label: "Connections" },
-      { to: "/app/crm/pipeline-manager", label: "Pipeline Manager" },
-      { to: "/app/crm/meetings", label: "Connection Meetings" },
-      { to: "/app/crm/email-outreach", label: "Email Outreach" },
-      { to: "/app/crm/analytics", label: "CRM Analytics" },
-    ],
+    key: "connections", label: "Connection Requests", icon: UserCircle2,
+    to: "/app/connections",
+    matchPrefixes: ["/app/connections"],
   },
   {
     key: "deal-rooms", label: "Deal Rooms", icon: Briefcase,
@@ -188,13 +182,13 @@ export const investorSections: L2Section[] = [
     ],
   },
   {
-    key: "crm", label: "CRM", icon: UserCircle2,
-    matchPrefixes: ["/app/investor/crm"],
+    key: "connections", label: "Connections", icon: UserCircle2,
+    matchPrefixes: ["/app/investor/connections", "/app/investor/decisions", "/app/investor/decide", "/app/investor/analysis"],
     children: [
-      { to: "/app/investor/crm/connections", label: "Connections" },
-      { to: "/app/investor/crm/pipeline-manager", label: "Pipeline Manager" },
-      { to: "/app/investor/crm/founder-meetings", label: "Founder Meetings" },
-      { to: "/app/investor/crm/deal-analysis", label: "Deal Analysis" },
+      { to: "/app/investor/connections", label: "Connections" },
+      { to: "/app/investor/decide", label: "Decide" },
+      { to: "/app/investor/decisions", label: "Decisions" },
+      { to: "/app/investor/analysis", label: "Deal Analysis" },
     ],
   },
   {
