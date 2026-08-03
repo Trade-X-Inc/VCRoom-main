@@ -194,11 +194,6 @@ function InvestorPublicProfile({ profile, teamMembers, portfolio, isOwnerPreview
                 {profile.fund_size ? ` · ${profile.fund_size} fund` : ""}
               </div>
               <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
-                {profile.verification_tier && profile.verification_tier !== "none" && (
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, background: "rgba(16,185,129,0.08)", color: "#059669", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 2, padding: "3px 8px", fontWeight: 500 }}>
-                    <CheckCircle2 style={{ height: 12, width: 12 }} /> Hockystick Verified
-                  </span>
-                )}
                 {profile.geography && (
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, background: color.canvas, color: color.inkSecondary, border: `1px solid ${color.border}`, borderRadius: 2, padding: "3px 8px" }}>
                     {profile.geography}

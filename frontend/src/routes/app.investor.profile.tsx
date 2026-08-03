@@ -114,7 +114,6 @@ const PUBLIC_FIELD_OPTIONS: { key: string; label: string }[] = [
   { key: "stages", label: "Stages" },
   { key: "geography", label: "Geography" },
   { key: "check_size_min", label: "Cheque size (min/max)" },
-  { key: "verification_tier", label: "Verification tier" },
   { key: "achievements", label: "Achievements" },
   { key: "track_record", label: "Track record" },
   { key: "avatar_url", label: "Photo" },

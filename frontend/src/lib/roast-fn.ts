@@ -386,20 +386,15 @@ export const joinRoastAudience = createServerFn({ method: "POST" })
       if (!already?.length && (counted?.length ?? 0) >= s.max_audience)
         return { ok: false, error: "session_full" };
 
-      const [users, invProfiles]: [any[], any[]] = await Promise.all([
-        sbFetch(url, key, `users?id=eq.${uid}&select=full_name,role`).catch(
-          () => [],
-        ),
-        sbFetch(
-          url,
-          key,
-          `investor_profiles?user_id=eq.${uid}&select=verification_tier`,
-        ).catch(() => []),
-      ]);
+      const users: any[] = await sbFetch(
+        url,
+        key,
+        `users?id=eq.${uid}&select=full_name,role`,
+      ).catch(() => []);
       const displayName = users?.[0]?.full_name ?? "Challenger";
-      const isVerifiedInvestor =
-        !!invProfiles?.length &&
-        invProfiles[0]?.verification_tier === "verified";
+      // verification_tier can never reach "verified" — no live path sets it
+      // (see CLAUDE.md §7.5, verify-investor stubbed 3 Aug 2026).
+      const isVerifiedInvestor = false;
 
       if (!already?.length) {
         await sbFetch(
