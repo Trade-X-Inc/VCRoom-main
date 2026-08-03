@@ -65,17 +65,16 @@ export const PRICING_PAGES: Record<string, DocPage> = {
           When a round closes through a Hockystick deal room, the platform charges a success fee
           of <strong>1.5% of the closed amount — minimum $500, maximum $15,000</strong>. The cap
           matters: on a $5M round the fee is $15K, not $75K. The fee funds the parts of the
-          platform that make closing possible — verification infrastructure, the NDA framework,
-          and the confrontational due-diligence engine — and aligns Hockystick's incentive with
-          the founder's: we only earn meaningfully when you close.
+          platform that make closing possible — the NDA framework and the confrontational
+          due-diligence engine — and aligns Hockystick's incentive with the founder's: we only
+          earn meaningfully when you close.
         </P>
 
         <H2 id="invitation">Investor access</H2>
         <P>
           Investor registration is open during beta — no application or approval step. You build a
-          verified investor profile the same way founders do, and founders see your fund, thesis,
-          and verification tier before sharing sensitive material. Trust on the network comes from
-          verification, not from a signup gate.
+          profile the same way founders do, and founders see your fund and thesis before sharing
+          sensitive material.
         </P>
         <Callout>
           Signing up is free and takes minutes. Create an investor account from{" "}

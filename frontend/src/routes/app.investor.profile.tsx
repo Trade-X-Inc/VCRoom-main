@@ -398,13 +398,18 @@ function BulletEditor({ bullets, onChange, placeholder }: { bullets: string[]; o
 // route control via `view`. Unset renders the full R4B page.
 export type InvestorProfileView =
   | "quick-setup" | "full-profile" | "team-cards" | "track-record" | "investment-thesis"
-  | "source-files" | "verifications" | "claims" | "badges-overview" | "tier-status"
-  | "cheque-size" | "profile-view" | "privacy-settings";
+  | "source-files" | "claims"
+  | "profile-view" | "privacy-settings";
 
 // Card keys: left column = identity, deck, thesis, track, achievements, team,
-// portfolio, visibility · rail = completeness, preview, share, verification,
-// capital, badges
-const ALL_CARDS = ["identity", "deck", "thesis", "track", "achievements", "team", "portfolio", "visibility", "completeness", "preview", "share", "verification", "capital", "badges"];
+// portfolio, visibility · rail = completeness, preview, share
+//
+// verification/capital/badges cards were scaffolded (ALL_CARDS, VIEW_CARDS,
+// VIEW_COPY) but never wired to a show() render check anywhere in this
+// component, and their 4 dedicated views (verifications, tier-status,
+// badges-overview, cheque-size) had no route ever calling them — removed
+// 3 Aug 2026 as dead code, not stale copy. See CLAUDE.md §7.5.
+const ALL_CARDS = ["identity", "deck", "thesis", "track", "achievements", "team", "portfolio", "visibility", "completeness", "preview", "share"];
 const VIEW_CARDS: Record<InvestorProfileView, string[]> = {
   "quick-setup": ["identity", "completeness"],
   "full-profile": ALL_CARDS,
@@ -412,11 +417,7 @@ const VIEW_CARDS: Record<InvestorProfileView, string[]> = {
   "track-record": ["track"],
   "investment-thesis": ["thesis"],
   "source-files": ["deck"],
-  "verifications": ["verification"],
   "claims": ["track"],
-  "badges-overview": ["badges"],
-  "tier-status": ["verification"],
-  "cheque-size": ["capital"],
   "profile-view": ["preview", "share"],
   "privacy-settings": ["visibility", "share"],
 };
@@ -427,11 +428,7 @@ const VIEW_COPY: Record<InvestorProfileView, { title: string; description: strin
   "track-record": { title: "Track Record", description: "Named investments and outcomes — unverified until you attach evidence." },
   "investment-thesis": { title: "Investment Thesis", description: "Your thesis statement, sectors, stages, and cheque size." },
   "source-files": { title: "Source Files", description: "Upload your fund deck — AI drafts your profile, you confirm before anything is applied." },
-  "verifications": { title: "Verifications", description: "Your identity and fund verification checks." },
   "claims": { title: "Claims", description: "Attach proof to your track-record claims." },
-  "badges-overview": { title: "Badge Overview & Guide", description: "Badges you hold and how each one is earned." },
-  "tier-status": { title: "Verification Tier Status", description: "Your current verification tier and what unlocks the next one." },
-  "cheque-size": { title: "Cheque Size Confirmation", description: "Verify your capital capacity and cheque size." },
   "profile-view": { title: "Full Digital Profile View", description: "How your profile appears publicly and inside deal rooms." },
   "privacy-settings": { title: "Profile Privacy Settings", description: "Control which fields appear on your public profile." },
 };
@@ -865,7 +862,7 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
   // R9 view gating — which cards this leaf renders
   const show = (card: string) => (view ? VIEW_CARDS[view].includes(card) : true);
   const hasLeft = ["identity", "deck", "thesis", "track", "achievements", "team", "portfolio", "visibility"].some(show);
-  const hasRail = ["completeness", "preview", "share", "verification", "capital", "badges"].some(show);
+  const hasRail = ["completeness", "preview", "share"].some(show);
   const copy = view ? VIEW_COPY[view] : null;
 
   const showThesisSpotlight =

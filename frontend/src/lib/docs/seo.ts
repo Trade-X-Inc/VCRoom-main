@@ -56,15 +56,15 @@ const DOC_FAQS: Record<string, Array<{ q: string; a: string }>> = {
   "": [
     {
       q: "What is Hockystick?",
-      a: "Hockystick is an AI-native, global fundraising platform for founders and investors. Founders build verified profiles, run NDA-gated deal rooms with a six-stage workflow, and receive recorded investment decisions. Investors get thesis-matched deal flow, an AI due-diligence engine that cross-examines documents against claims, and a decision pipeline. It is headquartered at DIFC, Dubai.",
+      a: "Hockystick is a global fundraising platform for founders and investors. Founders build a structured profile, run NDA-gated deal rooms with a six-stage workflow, and receive recorded investment decisions. Investors get thesis-matched deal flow, an AI due-diligence engine that cross-examines documents against claims, and a decision pipeline. It is headquartered at DIFC, Dubai.",
     },
     {
-      q: "How does verification work?",
-      a: "Verification is evidence-tiered. Tier 1 runs four automated checks — business email domain, live website, public company registry (140+ jurisdictions), and mail infrastructure. Higher tiers verify specific claims against uploaded documents (a pitch deck never verifies a financial claim), team against payroll records, and the top tier includes human review with a live video call. Each of the 23 badges is backed by a specific checkable fact and none can be bought.",
+      q: "How does founder verification work?",
+      a: "There's no automated verification tier today. You can build a Founder Roast — a live, public Q&A with investors and other founders — which earns a Roast Survivor badge on your profile once completed.",
     },
     {
       q: "Is Hockystick suitable for family offices?",
-      a: "Yes — family offices managing 5–50 active deals are a core audience. Investor registration is open during beta, with verification tiers that let founders see each fund's thesis and confirmed details before sharing. Deal rooms are NDA-gated (DIFC governing law, DIAC arbitration), documents are access-logged, and the AI deep-analysis engine produces analyst-grade findings without an analyst team.",
+      a: "Yes — family offices managing 5–50 active deals are a core audience. Investor registration is open during beta. Founders see each fund's profile — thesis, sectors, stages, and cheque size — before sharing. Deal rooms are NDA-gated (DIFC governing law, DIAC arbitration), documents are access-logged, and the AI deep-analysis engine produces analyst-grade findings without an analyst team.",
     },
     {
       q: "What countries does Hockystick support?",

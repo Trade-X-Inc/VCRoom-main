@@ -210,9 +210,9 @@ function PricingPage() {
               Investor access — free during beta
             </div>
             <p className="mt-3 text-sm leading-relaxed text-gray-700">
-              Open registration for investors during beta. Build a verified profile,
-              set your thesis, and get thesis-matched deal flow. Founders see your fund,
-              thesis, and verification tier before they share.
+              Open registration for investors during beta. Build a profile,
+              set your thesis, and get thesis-matched deal flow. Founders see your fund
+              and thesis before they share.
             </p>
             <Link
               to="/sign-up"
