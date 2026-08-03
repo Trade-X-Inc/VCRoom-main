@@ -139,27 +139,6 @@ export function FounderHelpGuide() {
 
       {/* Section 2 — Deal rooms */}
       <Accordion title="Deal rooms">
-        <Article heading="How deal room access tiers work">
-          <div className="space-y-2 mt-1">
-            {[
-              { tier: "Tier 1 — Public profile", desc: "Company name, tagline, stage, sector, verification badge" },
-              { tier: "Tier 2 — Initial data pack (NDA required)", desc: "Pitch deck, team, problem/solution" },
-              { tier: "Tier 3 — Full deal room", desc: "Financials, cap table, legal documents" },
-            ].map(({ tier, desc }) => (
-              <div key={tier} className="flex gap-3 py-2 border-b border-border/40 last:border-0">
-                <span className="text-xs font-semibold text-brand shrink-0 pt-0.5">→</span>
-                <div>
-                  <span className="text-sm font-medium text-foreground">{tier}:</span>{" "}
-                  <span className="text-sm text-muted-foreground">{desc}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-          <Body>
-            You control which investor sees which tier. You can grant and revoke access at any time. Investors cannot download documents unless you enable it.
-          </Body>
-        </Article>
-
         <Article heading="Creating and sharing your deal room">
           <Steps items={[
             "Go to Deal Rooms → click \"Create new deal room\"",
@@ -172,18 +151,8 @@ export function FounderHelpGuide() {
 
         <Article heading="Understanding deal room analytics">
           <Body>
-            For each investor: total time spent, documents viewed, time per document, visit history, and whether they returned.
+            For each investor: total time spent, documents viewed, time per document, and visit history — tracked automatically as they browse your deal room.
           </Body>
-          <div className="mt-3 space-y-2">
-            <div className="rounded-lg px-3 py-2 text-sm bg-accent/40 border border-border/40">
-              <span className="font-semibold text-foreground">High intent: </span>
-              <span className="text-muted-foreground">Multiple visits, long time on financials, returning after 48 hours.</span>
-            </div>
-            <div className="rounded-lg px-3 py-2 text-sm bg-accent/40 border border-border/40">
-              <span className="font-semibold text-foreground">Low intent: </span>
-              <span className="text-muted-foreground">Single visit under 2 minutes, only opened pitch deck, never returned.</span>
-            </div>
-          </div>
         </Article>
       </Accordion>
 
@@ -332,7 +301,7 @@ export function InvestorHelpGuide() {
             Each deal room has a DD checklist with 23 standard items. The AI pre-fills what it can from uploaded documents — you verify the rest.
           </Body>
           <div className="mt-2 flex flex-wrap gap-1.5">
-            {["Team & Founders", "Market & Traction", "Financials", "Legal & Cap Table", "Product"].map((cat) => (
+            {["Financials", "Team", "Legal", "Market", "Product", "References"].map((cat) => (
               <span key={cat} className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-accent text-foreground border border-border/40">
                 {cat}
               </span>
@@ -357,12 +326,12 @@ export function InvestorHelpGuide() {
       <Accordion title="Decisions and Pipeline">
         <Article heading="The Decision Board">
           <Body>
-            Kanban view of all your active deals. Move cards between columns to update deal stage.
+            Table view of all your active deals by default, with a Kanban view available via the toggle. Move deals between stages to update pipeline status.
           </Body>
           <div className="mt-2 flex flex-wrap gap-1.5 mb-2">
-            {["Sourcing", "→", "Reviewing", "→", "Diligence", "→", "Decision", "→", "Invested/Passed"].map((s, i) => (
-              s === "→" ? (
-                <span key={i} className="text-muted-foreground/50 text-sm self-center">→</span>
+            {["Sourcing", "→", "Reviewing", "→", "Meeting", "→", "Diligence", "→", "Term Sheet", "→", "Decision", "→", "Invested", "/", "Passed"].map((s, i) => (
+              s === "→" || s === "/" ? (
+                <span key={i} className="text-muted-foreground/50 text-sm self-center">{s}</span>
               ) : (
                 <span key={s} className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-accent text-foreground border border-border/40">
                   {s}
@@ -378,7 +347,7 @@ export function InvestorHelpGuide() {
         <Article heading="Submitting Invest / Hold / Pass">
           <div className="space-y-2 mt-1">
             {[
-              { v: "Invest", color: "#10B981", bg: "rgba(16,185,129,0.08)", desc: "Marks the deal as committed. Triggers term sheet builder (coming soon)." },
+              { v: "Invest", color: "#10B981", bg: "rgba(16,185,129,0.08)", desc: "Marks the deal as committed." },
               { v: "Hold", color: "#F59E0B", bg: "rgba(245,158,11,0.08)", desc: "Sets a follow-up date. Deal stays active in your pipeline." },
               { v: "Pass", color: "#EF4444", bg: "rgba(239,68,68,0.08)", desc: "Requires a reason category. The reason is shared with the founder as structured feedback — not your internal notes." },
             ].map(({ v, color, bg, desc }) => (
@@ -388,6 +357,12 @@ export function InvestorHelpGuide() {
               </div>
             ))}
           </div>
+        </Article>
+
+        <Article heading="Negotiating terms">
+          <Body>
+            Each deal room has a Term Sheet tab for structured negotiation. Propose a term, and the other party can accept, reject, or counter it. Choose from standard instrument templates or add custom terms. A closing panel tracks progress once terms are agreed.
+          </Body>
         </Article>
       </Accordion>
 
