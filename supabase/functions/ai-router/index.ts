@@ -23,6 +23,34 @@ const MODEL_MAP: Record<string, string> = {
 
 const VALID_FEATURES = new Set(["coaching", "readiness", "investor_sim", "dd_report", "deal_brief"]);
 
+// Identity is derived from the caller's own bearer token, never from the
+// request body. This mirrors requireUser() in the frontend fns: resolve the
+// real uid by verifying the token against /auth/v1/user. A missing token, a
+// garbage token, or the public anon key (which has no `sub` claim) all fail
+// here and are rejected — the anon key is embedded in the client bundle and
+// must not be usable to reach this endpoint as an authenticated caller.
+// See CLAUDE.md §7.1 and the ai-router audit (§17).
+async function resolveUid(req: Request): Promise<string | null> {
+  const authHeader = req.headers.get("Authorization") ?? "";
+  const token = authHeader.replace(/^Bearer\s+/i, "").trim();
+  if (!token) return null;
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return null;
+  try {
+    // /auth/v1/user requires the apikey header to be a project key (anon or
+    // service_role) — NOT the caller's user token. The caller's token goes in
+    // Authorization; Supabase resolves it to the user. Passing the user token
+    // as apikey returns "Invalid API key" and would reject every real user.
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${token}` },
+    });
+    if (!resp.ok) return null;
+    const json = await resp.json() as { id?: string };
+    return json.id ?? null;
+  } catch (_) {
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -36,22 +64,31 @@ serve(async (req) => {
       );
     }
 
-    const { task_type, messages, system_prompt, user_id } = await req.json() as {
+    // Authenticate the caller from their token before anything else. The
+    // request body's user_id is never trusted for identity.
+    const uid = await resolveUid(req);
+    if (!uid) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    const { task_type, messages, system_prompt } = await req.json() as {
       task_type: string;
       messages: Array<{ role: string; content: string }>;
       system_prompt: string;
-      user_id?: string;
     };
 
     const model = MODEL_MAP[task_type] ?? "gpt-4o-mini";
     const p_feature = VALID_FEATURES.has(task_type) ? task_type : "chat";
 
     // Rate limit check — fail open on any infra error
-    if (user_id && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+    if (uid && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
       try {
         const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
         const { data: allowed, error: rateLimitErr } = await sb.rpc("check_ai_rate_limit", {
-          p_user_id: user_id,
+          p_user_id: uid,
           p_feature,
         });
         if (!rateLimitErr && allowed === false) {
@@ -99,12 +136,12 @@ serve(async (req) => {
     const content = completion.choices?.[0]?.message?.content ?? "";
 
     // Increment usage — fire and forget, never block response
-    if (user_id && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+    if (uid && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
       (async () => {
         try {
           const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
           await sb.rpc("check_and_increment_ai_usage", {
-            p_user_id: user_id,
+            p_user_id: uid,
             p_feature,
           });
         } catch (_) {}
