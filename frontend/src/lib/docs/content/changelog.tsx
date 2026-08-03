@@ -15,13 +15,13 @@ const CHANGELOG: { month: string; entries: ChangeEntry[] }[] = [
     month: "July 2026",
     entries: [
       { date: "2026-07-12", area: "AI", text: "Confrontational due-diligence engine: the AI reads actual document contents in a deal room and cross-examines them against every stated claim — reporting contradictions, gaps, red flags, and unverifiable claims with quoted evidence and suggested Q&A questions." },
-      { date: "2026-07-12", area: "AI", text: "Fundraising readiness checklist: after every profile save or document upload, the AI scores readiness 0–100 and lists the stage- and sector-specific gaps investors would probe, each with a fix link. Investors see the score and top gaps in the deal room." },
+      { date: "2026-07-12", area: "AI", text: "Fundraising readiness checklist: after every profile save or document upload, the AI scores readiness 0–100 and lists the stage- and sector-specific gaps investors would probe, each with a fix link. Investors see the score and top gaps in the deal room.\n\nCorrection, 2026-08-03: this feature was removed. The readiness-score engine had no live path from profile save or document upload to any score ever being computed or shown." },
       { date: "2026-07-12", area: "Docs", text: "Documentation updated for everything below, plus a new Pricing & plans page and structured data for AI crawlers." },
       { date: "2026-07-11", area: "Deal rooms", text: "Connection request → deal room flow: investors request access from the directory or a public profile; founder approval auto-creates the room with both members behind the NDA gate. Sent requests are tracked with live status." },
-      { date: "2026-07-11", area: "Onboarding", text: "First-founder experience rebuilt: one sequential journey (build → verify → publish) with a single call to action, post-save verification prompt, live-in-directory confirmation, and publish unblocked for interview-built profiles. Landing to live profile now takes under ten minutes." },
+      { date: "2026-07-11", area: "Onboarding", text: "First-founder experience rebuilt: one sequential journey (build → verify → publish) with a single call to action, post-save verification prompt, live-in-directory confirmation, and publish unblocked for interview-built profiles. Landing to live profile now takes under ten minutes.\n\nCorrection, 2026-08-03: the verify step never shipped as described. The journey today is build → publish; see /docs/founders for the current flow." },
       { date: "2026-07-10", area: "Profiles", text: "Profile Builder v3: stage- and sector-aware AI interview (10–12 questions), broad document detection (pitch deck / financial model / cap table / legal / team), and investor-ready output — one-liner, three-paragraph narrative, key metrics card, and fundraising status." },
-      { date: "2026-07-09", area: "Trust", text: "Badge system launched: 23 badges across trust, readiness, community, and investor-conduct categories — every badge backed by a checkable fact, most auto-awarded, none purchasable." },
-      { date: "2026-07-09", area: "Trust", text: "Verification redesigned around evidence tiers with per-check results, registry lookups across 140+ jurisdictions, and a trade-license fallback reviewed by AI." },
+      { date: "2026-07-09", area: "Trust", text: "Badge system launched: 23 badges across trust, readiness, community, and investor-conduct categories — every badge backed by a checkable fact, most auto-awarded, none purchasable.\n\nCorrection, 2026-08-03: this entry overstated what shipped. Of the 23 badges described, only Roast Survivor was ever wired to an automated award mechanism — the remaining 22 had no functioning award path. See /docs/founders#badges for what's live today." },
+      { date: "2026-07-09", area: "Trust", text: "Verification redesigned around evidence tiers with per-check results, registry lookups across 140+ jurisdictions, and a trade-license fallback reviewed by AI.\n\nCorrection, 2026-08-03: the evidence-tier verification system described here was never completed beyond Tier 1's automated checks, and even that path has since been disabled. Registry lookups (140+ jurisdictions) are a separate, still-live feature and are unaffected." },
       { date: "2026-07-09", area: "Billing", text: "Payment foundation: six subscription plans with 30-day trials, plan limits enforced from the database, billing settings, and trial-expiry banners. Stripe wiring intentionally deferred." },
       { date: "2026-07-12", area: "Reliability", text: "Platform-wide silent-failure audit: every database constraint now matches what the code writes, all notification types deliver, account deletion verified, and 150 swallowed-error patterns fixed with a lint rule preventing new ones." },
       { date: "2026-07-08", area: "Docs", text: "Documentation site launched at /docs — feature guides, security posture, and this changelog." },
@@ -110,7 +110,7 @@ export const CHANGELOG_PAGES: Record<string, DocPage> = {
                       {e.area}
                     </span>
                   </div>
-                  <p className="text-[15px] leading-7 text-gray-700">{e.text}</p>
+                  <p className="text-[15px] leading-7 text-gray-700" style={{ whiteSpace: "pre-line" }}>{e.text}</p>
                 </li>
               ))}
             </ul>
