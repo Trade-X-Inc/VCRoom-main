@@ -25,6 +25,11 @@ interface GuideContent {
   aiSystemContext: string; // injected into the AI as liveContextBlock prefix
 }
 
+// home, investor-home, and investor-diligence entries below are currently
+// unreachable dead code (no route mounts these pageIds) and contain stale
+// content referencing deleted features (readiness score, investor
+// simulation). Do not wire a route to these pageIds without rewriting the
+// content first — see phase0 branch findings, 3 Aug 2026.
 const GUIDES: Record<PageId, GuideContent> = {
   home: {
     title: "Investor Readiness — Home",
@@ -49,15 +54,15 @@ const GUIDES: Record<PageId, GuideContent> = {
       "The user is on /app/profile — the Company Profile page. It has sections for company details (name, stage, sector, website), claims (revenue, ARR, customer count — each can have proof attached), team/cap table, and a founder thesis section. Claims with proof_status 'unverified' show amber badges. AI confirms or flags claims when proof is uploaded.",
   },
   documents: {
-    title: "Document Vault",
+    title: "IP Vault — Documents",
     paragraphs: [
-      "Document Vault stores your fundraising materials organized by category: Pitch Deck, Financials, Legal, Market Research, Team, and Product.",
-      "When you upload a file, the AI reads it and assigns a category. If you upload to the wrong tab, a warning appears — you can override it, but the AI logs the mismatch.",
-      "The AI Summary button generates a plain-language summary of each document. Investors in a deal room can read these summaries before downloading the full file.",
-      "The Investor Simulation at the bottom runs your uploaded documents through a simulated investor review. The score (1-10) and deal-killer feedback feed directly into your Readiness score on the Home page.",
+      "IP Vault organizes your fundraising documents into five categories: Market, Financials, Team, Product, and Legal — and into four views: Document Intake, Source Files, Digital Document Vault, and Privacy Settings.",
+      "Document Intake shows what's still missing or in draft — the documents investors expect for your stage that you haven't added yet.",
+      "Source Files lists the raw files you've uploaded. Digital Document Vault shows documents the AI has actually extracted structured content from — highlights, key metrics, and a summary pulled from the real text, not invented.",
+      "Privacy Settings controls who can see each document. Uploads outside the standard templates go through AI extraction too — the AI reads the file and returns a suggested category, highlights, and any funding or metrics figures it found.",
     ],
     aiSystemContext:
-      "The user is on /app/documents — the founder's Document Vault. Categories: Pitch Deck, Financials, Legal, Market Research, Team, Product. Each upload triggers AI classification and optionally a summary. The Investor Simulation feature at the bottom scores 1-10 and returns deal-killer feedback. That score feeds the readiness calculation.",
+      "The user is in IP Vault (Prepare › IP Vault), one of four views over the same document set: Document Intake (missing/draft documents for their stage), Source Files (raw uploads), Digital Document Vault (documents with real AI-extracted structured content — highlights, key metrics, funding figures), Privacy Settings (per-document visibility). Categories: Market, Financials, Team, Product, Legal. AI extraction (extractCustomDocument/extractEmployeeOnePager) only reports what it actually found in the document — never an invented score.",
   },
   "deal-room": {
     title: "Deal Room",
@@ -68,7 +73,7 @@ const GUIDES: Record<PageId, GuideContent> = {
       "The Workstation (visible to investors as DD Workstation) is where the investor runs thesis alignment scoring on your documents. You see the summary; the detailed scoring is private to the investor. The Review tab is where the investor records their formal decision.",
     ],
     aiSystemContext:
-      "The user is in a Deal Room. Tabs: Overview (deal summary, NDA status), Document Vault (files shared with investor, request tracking), Q&A (async investor questions), Workstation/DD (investor's diligence, thesis alignment scoring), Team Chat, Notes, Activity, Meetings, and Review (formal decision). NDA must be signed before the investor can access documents.",
+      "The user is in a Deal Room. Tabs: Overview (deal summary, NDA status), Document Vault (files shared with investor, request tracking), Q&A (async investor questions), Workstation/DD (investor's diligence, thesis alignment scoring), Notes, Activity, Meetings, and Review (formal decision). NDA must be signed before the investor can access documents.",
   },
   "deal-rooms": {
     title: "Deal Rooms",
