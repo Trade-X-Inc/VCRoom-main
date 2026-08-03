@@ -21,6 +21,8 @@ const MODEL_MAP: Record<string, string> = {
   dd_report: "gpt-4o",
 };
 
+const VALID_FEATURES = new Set(["coaching", "readiness", "investor_sim", "dd_report", "deal_brief"]);
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -42,27 +44,31 @@ serve(async (req) => {
     };
 
     const model = MODEL_MAP[task_type] ?? "gpt-4o-mini";
+    const p_feature = VALID_FEATURES.has(task_type) ? task_type : "chat";
 
     // Rate limit check — fail open on any infra error
     if (user_id && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
-      const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-      const { data: allowed, error: rateLimitErr } = await sb.rpc("check_ai_rate_limit", {
-        p_user_id: user_id,
-        p_feature: task_type,
-      });
-      if (!rateLimitErr && allowed === false) {
-        return new Response(
-          JSON.stringify({ error: "Daily limit reached" }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-        );
+      try {
+        const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+        const { data: allowed, error: rateLimitErr } = await sb.rpc("check_ai_rate_limit", {
+          p_user_id: user_id,
+          p_feature,
+        });
+        if (!rateLimitErr && allowed === false) {
+          return new Response(
+            JSON.stringify({ error: "Daily limit reached" }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          );
+        }
+      } catch (_) {
+        // fail open — rate limit check never blocks the request
       }
     }
 
-    // Append formatting rule to every system prompt — ensures no markdown bleed-through
+    // Append formatting rule for chat task type
     const FORMATTING_RULE = "\n\nFORMATTING RULE: Never use markdown formatting. No ** bold **, no ## headers, no bullet points with *. Write in plain sentences. Use numbered lists (1. 2. 3.) only when listing steps. Keep responses under 150 words unless specifically asked for detail.";
     const effectiveSystemPrompt = system_prompt + (task_type === "chat" ? FORMATTING_RULE : "");
 
-    // Build message array — system prompt first, then conversation history
     const openAIMessages = [
       { role: "system", content: effectiveSystemPrompt },
       ...messages,
@@ -94,11 +100,15 @@ serve(async (req) => {
 
     // Increment usage — fire and forget, never block response
     if (user_id && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
-      const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-      sb.rpc("check_and_increment_ai_usage", {
-        p_user_id: user_id,
-        p_feature: task_type,
-      }).catch(() => {});
+      (async () => {
+        try {
+          const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          await sb.rpc("check_and_increment_ai_usage", {
+            p_user_id: user_id,
+            p_feature,
+          });
+        } catch (_) {}
+      })();
     }
 
     return new Response(
