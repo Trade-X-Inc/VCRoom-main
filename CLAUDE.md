@@ -322,10 +322,32 @@ Team coordination chat (internal, per-organisation) is IN SCOPE for a future pha
 
 ---
 
-## 16. Amendment log
+## 17. HIGHEST-PRIORITY FOLLOW-UP — `ai-router` is unaudited and actively fabricating information in production
+
+Found 3 Aug 2026, post-merge of `phase0/close-and-clear`, while live-verifying that branch's `advisor-fn.ts`/`PageGuide.tsx` fixes against the real "Ask AI" panel on `/app/prepare/ip-vault/document-intake`.
+
+**`ai-router` (Supabase Edge Function, source confirmed present at `supabase/functions/ai-router` in this repo) serves the live Ask AI panel on at least `/app/prepare/ip-vault/document-intake`, has fabricated information about a non-existent feature to a real user in production, and has never been audited for identity/authorization or content accuracy. Highest-priority follow-up.**
+
+What's confirmed so far, from network-request inspection only (no source read yet):
+- The panel's request goes to `POST https://<project>.supabase.co/functions/v1/ai-router`, not to `getAIAdvice`/`advisor-fn.ts`. This is a separate backend from everything `phase0/close-and-clear` touched or fixed.
+- Asked to describe an "Investor Simulation" feature (deliberately, to probe for the same stale-content class of bug already found and fixed in `advisor-fn.ts`/`PageGuide.tsx`), it invented a detailed, entirely fictional description — practicing pitches against simulated investors, a scored readiness mechanism — none of which exists in this codebase. Its system prompt (visible in the raw request body) contains no such content to begin with; this was pure fabrication in response to a leading question, not a stale-content echo.
+- Its system prompt has no visible "never invent a feature you cannot confirm exists" guardrail, unlike `advisor-fn.ts`'s prompt which has this rule explicitly.
+- Identity/authorization mechanism: **not yet checked.** Do not assume it matches `requireUser()`'s pattern or is otherwise safe — this needs the same forged-token trace treatment §7.1's `requireUser()` entries and step 5's `advisor-fn.ts` check got, from first principles, not by analogy.
+
+**Required next session (Opus, step-0 audit-only, same standing rules as every audit this session — read-only, written report, stop before any fix):**
+1. Confirm `ai-router`'s full source and deploy path — is `supabase/functions/ai-router` actually what's deployed, or does deployed code diverge from this repo's copy? (Check via `mcp__claude_ai_Supabase__get_edge_function` / `list_edge_functions` against the live project, not just the repo tree.)
+2. Full system-prompt audit: what data it has access to, every guardrail present or absent around invention, whether it has any equivalent of `GUIDES`/`pageGuidance` content or is free-floating.
+3. Identity/auth audit, from first principles: how does it authenticate the caller? `requireUser()`-shaped, something else, or nothing? Forged-token trace required, same standard as step 5.
+4. Full mount list: every route/page currently wired to call `ai-router` instead of `getAIAdvice`/`advisor-fn.ts` — same reachability-grep discipline as the `PageGuide.tsx` audit in this branch.
+5. Report only. No fixes, no prompt edits, until reviewed.
+
+---
+
+## 18. Amendment log
 
 | Date | Change |
 |---|---|
 | 30 Jul 2026 | Rewritten for the pivot to closing infrastructure. §9 scoped to public surface only; DESIGN.md now governs the application. Prior §35–§55 consolidated into §7 as defect patterns. Action layer, tool classes and record standards added as §8. |
 | 2 Aug 2026 | Verification pass against actual repo/infra state (§8, §12, §13 were written prospectively as part of the pivot and had not been checked against reality before commit). No branch, gateway, hash-chained record, reference-numbering scheme, or second Supabase project exists — `main` is the only environment and runs directly against the live production schema (`ldimninnjlvxozubheib`). Atlas Robotics is already a real deal-room member, not excluded from one. tsc (64) and bundle (0.88 MB gzip) confirmed current. "CURRENT STATE (verified 2 Aug 2026)" notes added inline to §8.1, §8.3, §8.4, §12 and §13 to distinguish present fact from prospective design intent — no rule text changed. |
 | 3 Aug 2026 | §15 reconciled against this session's actual kept/cut decisions per §0's precedence rule (Foundation Document governs product; §15 is a convenience summary, not an independent source of truth). Team chat reclassified in scope, flagged for future rebuild. Directory/matching exclusion clarified to distinguish public discovery (excluded) from connection-request infrastructure (kept, core to deal-room creation). |
+| 3 Aug 2026 | Added §17 (new numbered section, not folded into §7): `ai-router` Supabase Edge Function found live-serving the Ask AI panel on at least one real page, fabricating a non-existent feature in production, never audited for identity/auth. Flagged as highest-priority follow-up, full audit scoped for next session (Opus, step-0 only). |
