@@ -755,10 +755,9 @@ async function resolveStalePlaybookTasks(admin: any, founderId: string, currentS
 
 /**
  * STAGE: profile_done_no_visibility
- * Generates one card with 3 sub-options stored in draft_content as JSON.
+ * Generates one card with 2 sub-options stored in draft_content as JSON.
  * Option A: 7 social post drafts (generated at creation time from real startup data)
  * Option B: cold outreach draft (generated at creation time)
- * Option C: Roast — coming soon (static, no AI needed)
  */
 async function generatePlaybookVisibilityTask(admin: any, founderId: string, startupId: string): Promise<number> {
   const dedupeKey = `playbook_visibility_${startupId}`;
@@ -889,16 +888,10 @@ Return ONLY the message text — no subject line, no JSON.`,
       requiresExternalAction: false,
       draft: outreachDraft,
     },
-    optionC: {
-      label: "Set up your verification Roast",
-      chainPhase: "coming_soon",
-      requiresExternalAction: false,
-      comingSoonNote: "A short AI-led interview that earns your profile a verified badge. Not yet available — check back soon.",
-    },
   };
 
   const postsGenerated = socialPosts.length;
-  const autonomousSummary = `Your profile is confirmed and ready. ${postsGenerated > 0 ? `${postsGenerated} social post drafts are ready to copy out.` : "Content drafts could not be generated — try again tomorrow."} A cold outreach draft is also ready to review. Option C (Roast verification) is coming soon.`;
+  const autonomousSummary = `Your profile is confirmed and ready. ${postsGenerated > 0 ? `${postsGenerated} social post drafts are ready to copy out.` : "Content drafts could not be generated — try again tomorrow."} A cold outreach draft is also ready to review.`;
 
   await insertTask(admin, {
     user_id: founderId,
@@ -910,7 +903,7 @@ Return ONLY the message text — no subject line, no JSON.`,
     checkpoint_reason: null,
     requires_external_action: false,
     title: "Your profile is ready — let's get it seen",
-    description: "Choose one of 3 options to start getting in front of investors.",
+    description: "Choose one of 2 options to start getting in front of investors.",
     priority: "high",
     action_label: "Pick an option",
     status: "open",
