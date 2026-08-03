@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, ClipboardCheck, Globe, UserCircle2, Briefcase,
-  PieChart, MessageSquare, Gift, Settings, Brain, FileInput,
+  PieChart, MessageSquare, Settings, Brain, FileInput,
 } from "lucide-react";
 
 /**
@@ -124,10 +124,6 @@ export const founderSections: L2Section[] = [
     to: "/app/team-chat", matchPrefixes: [],
   },
   {
-    key: "referrals", label: "Referrals", icon: Gift,
-    to: "/app/referrals", matchPrefixes: [],
-  },
-  {
     key: "settings", label: "Settings", icon: Settings,
     to: "/app/settings", matchPrefixes: [],
   },
@@ -212,10 +208,6 @@ export const investorSections: L2Section[] = [
   {
     key: "team-chat", label: "Team Chat", icon: MessageSquare,
     to: "/app/team-chat", matchPrefixes: [],
-  },
-  {
-    key: "referrals", label: "Referrals", icon: Gift,
-    to: "/app/referrals", matchPrefixes: [],
   },
   {
     key: "settings", label: "Settings", icon: Settings,

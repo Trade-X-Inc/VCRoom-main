@@ -55,11 +55,9 @@ import { Route as DocsSplatRouteImport } from './routes/docs.$'
 import { Route as CvSlugRouteImport } from './routes/cv.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
-import { Route as AppWallRouteImport } from './routes/app.wall'
 import { Route as AppUsersRouteImport } from './routes/app.users'
 import { Route as AppTeamChatRouteImport } from './routes/app.team-chat'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
-import { Route as AppReferralsRouteImport } from './routes/app.referrals'
 import { Route as AppProfileBuilderRouteImport } from './routes/app.profile-builder'
 import { Route as AppProfileRouteImport } from './routes/app.profile'
 import { Route as AppOverviewRouteImport } from './routes/app.overview'
@@ -396,11 +394,6 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppWallRoute = AppWallRouteImport.update({
-  id: '/wall',
-  path: '/wall',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppUsersRoute = AppUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -414,11 +407,6 @@ const AppTeamChatRoute = AppTeamChatRouteImport.update({
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppReferralsRoute = AppReferralsRouteImport.update({
-  id: '/referrals',
-  path: '/referrals',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProfileBuilderRoute = AppProfileBuilderRouteImport.update({
@@ -1027,11 +1015,9 @@ export interface FileRoutesByFullPath {
   '/app/overview': typeof AppOverviewRoute
   '/app/profile': typeof AppProfileRoute
   '/app/profile-builder': typeof AppProfileBuilderRoute
-  '/app/referrals': typeof AppReferralsRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/team-chat': typeof AppTeamChatRoute
   '/app/users': typeof AppUsersRoute
-  '/app/wall': typeof AppWallRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/cv/$slug': typeof CvSlugRoute
@@ -1180,11 +1166,9 @@ export interface FileRoutesByTo {
   '/app/overview': typeof AppOverviewRoute
   '/app/profile': typeof AppProfileRoute
   '/app/profile-builder': typeof AppProfileBuilderRoute
-  '/app/referrals': typeof AppReferralsRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/team-chat': typeof AppTeamChatRoute
   '/app/users': typeof AppUsersRoute
-  '/app/wall': typeof AppWallRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/cv/$slug': typeof CvSlugRoute
@@ -1338,11 +1322,9 @@ export interface FileRoutesById {
   '/app/overview': typeof AppOverviewRoute
   '/app/profile': typeof AppProfileRoute
   '/app/profile-builder': typeof AppProfileBuilderRoute
-  '/app/referrals': typeof AppReferralsRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/team-chat': typeof AppTeamChatRoute
   '/app/users': typeof AppUsersRoute
-  '/app/wall': typeof AppWallRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/cv/$slug': typeof CvSlugRoute
@@ -1497,11 +1479,9 @@ export interface FileRouteTypes {
     | '/app/overview'
     | '/app/profile'
     | '/app/profile-builder'
-    | '/app/referrals'
     | '/app/settings'
     | '/app/team-chat'
     | '/app/users'
-    | '/app/wall'
     | '/auth/callback'
     | '/blog/$slug'
     | '/cv/$slug'
@@ -1650,11 +1630,9 @@ export interface FileRouteTypes {
     | '/app/overview'
     | '/app/profile'
     | '/app/profile-builder'
-    | '/app/referrals'
     | '/app/settings'
     | '/app/team-chat'
     | '/app/users'
-    | '/app/wall'
     | '/auth/callback'
     | '/blog/$slug'
     | '/cv/$slug'
@@ -1807,11 +1785,9 @@ export interface FileRouteTypes {
     | '/app/overview'
     | '/app/profile'
     | '/app/profile-builder'
-    | '/app/referrals'
     | '/app/settings'
     | '/app/team-chat'
     | '/app/users'
-    | '/app/wall'
     | '/auth/callback'
     | '/blog/$slug'
     | '/cv/$slug'
@@ -2298,13 +2274,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/wall': {
-      id: '/app/wall'
-      path: '/wall'
-      fullPath: '/app/wall'
-      preLoaderRoute: typeof AppWallRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/users': {
       id: '/app/users'
       path: '/users'
@@ -2324,13 +2293,6 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/app/settings'
       preLoaderRoute: typeof AppSettingsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/referrals': {
-      id: '/app/referrals'
-      path: '/referrals'
-      fullPath: '/app/referrals'
-      preLoaderRoute: typeof AppReferralsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/profile-builder': {
@@ -3230,11 +3192,9 @@ interface AppRouteChildren {
   AppOverviewRoute: typeof AppOverviewRoute
   AppProfileRoute: typeof AppProfileRoute
   AppProfileBuilderRoute: typeof AppProfileBuilderRoute
-  AppReferralsRoute: typeof AppReferralsRoute
   AppSettingsRoute: typeof AppSettingsRouteWithChildren
   AppTeamChatRoute: typeof AppTeamChatRoute
   AppUsersRoute: typeof AppUsersRoute
-  AppWallRoute: typeof AppWallRoute
   AppIndexRoute: typeof AppIndexRoute
   AppDealRoomsIdRoute: typeof AppDealRoomsIdRouteWithChildren
   AppDealRoomsMeetingsCalendarRoute: typeof AppDealRoomsMeetingsCalendarRoute
@@ -3279,11 +3239,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppOverviewRoute: AppOverviewRoute,
   AppProfileRoute: AppProfileRoute,
   AppProfileBuilderRoute: AppProfileBuilderRoute,
-  AppReferralsRoute: AppReferralsRoute,
   AppSettingsRoute: AppSettingsRouteWithChildren,
   AppTeamChatRoute: AppTeamChatRoute,
   AppUsersRoute: AppUsersRoute,
-  AppWallRoute: AppWallRoute,
   AppIndexRoute: AppIndexRoute,
   AppDealRoomsIdRoute: AppDealRoomsIdRouteWithChildren,
   AppDealRoomsMeetingsCalendarRoute: AppDealRoomsMeetingsCalendarRoute,
