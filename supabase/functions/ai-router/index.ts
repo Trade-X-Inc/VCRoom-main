@@ -102,9 +102,15 @@ serve(async (req) => {
       }
     }
 
+    // Anti-fabrication guardrail — appended to EVERY task_type, not just chat.
+    // This model has repeatedly invented platform features that do not exist
+    // (see §17 audit). Assertion-boundary language, generalised from the DD
+    // caller which already carried it, so no single caller can omit it.
+    const ANTI_FABRICATION_RULE = "\n\nACCURACY RULE (never override): Treat all data provided to you as unverified claims, not established fact. Never invent, assume, or embellish — no features, tools, numbers, pages, scores, or capabilities you cannot see in what you were given. If you are unsure whether something exists or is true, say you don't have that information rather than fabricating it. Surface uncertainty; do not paper over it.";
+
     // Append formatting rule for chat task type
     const FORMATTING_RULE = "\n\nFORMATTING RULE: Never use markdown formatting. No ** bold **, no ## headers, no bullet points with *. Write in plain sentences. Use numbered lists (1. 2. 3.) only when listing steps. Keep responses under 150 words unless specifically asked for detail.";
-    const effectiveSystemPrompt = system_prompt + (task_type === "chat" ? FORMATTING_RULE : "");
+    const effectiveSystemPrompt = system_prompt + ANTI_FABRICATION_RULE + (task_type === "chat" ? FORMATTING_RULE : "");
 
     const openAIMessages = [
       { role: "system", content: effectiveSystemPrompt },
