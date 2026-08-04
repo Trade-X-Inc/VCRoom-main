@@ -124,6 +124,15 @@ profile/founder group — see note below.
 | `doc_update` | `documents_own` | **UPLOADER only** — a member who is not the uploader is forbidden. Do NOT upgrade to membership (that would weaken RLS). Verified live. |
 | `doc_view_insert` | `authenticated_insert_doc_views` | any authenticated caller (non-null p_uid). |
 | `doc_request_*` | `doc_requests_access` | member of the request's room (`authz_is_deal_room_member`). |
+| `doc_request_respond_link` | `doc_requests_access` | member; sets `response_link` + status→fulfilled (founder "Share link" path). |
+
+**Column-coverage note (Stage-1 finding, migration `20260805020000`):** the initial
+functions silently dropped columns the real UI writes — `document_requests.priority`
+/ `for_user_id`, `documents.file_size`, and the `response_link` path had no function
+at all. Widened so the gateway is a faithful (not lossy) replacement. Authorization
+unchanged. `doc_request_insert` and `doc_insert` were re-created with default-valued
+params (priority/for_user_id; file_size) and the old narrower signatures dropped, so
+each has exactly one signature.
 
 **Deferred (NOT migrated in Step A): `founder_documents` / `app.documents.tsx`.**
 Founder-ownership auth (`is_startup_founder` / `founder_has_permission('upload_documents')`),

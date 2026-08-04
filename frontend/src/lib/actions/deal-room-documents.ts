@@ -45,7 +45,7 @@ export const docList = defineAction<{ dealRoomId: string }, Obj>({
 
 // ── documents.insert (write: member + room open; uploader forced = caller) ──
 export const docInsert = defineAction<
-  { dealRoomId: string; storagePath: string; fileName: string; category: string | null; uploadedByRole: string | null },
+  { dealRoomId: string; storagePath: string; fileName: string; category: string | null; uploadedByRole: string | null; fileSize: number | null },
   Obj
 >({
   name: "documents.insert",
@@ -61,6 +61,7 @@ export const docInsert = defineAction<
       fileName: r.fileName as string,
       category: r.category == null ? null : asStr(r.category),
       uploadedByRole: r.uploadedByRole == null ? null : asStr(r.uploadedByRole),
+      fileSize: typeof r.fileSize === "number" ? r.fileSize : null,
     };
   },
   authorize: async () => true,
@@ -68,6 +69,7 @@ export const docInsert = defineAction<
     const { data, error } = await ctx.sb.schema("pack_api").rpc("doc_insert", {
       p_uid: ctx.uid, p_deal_room_id: input.dealRoomId, p_storage_path: input.storagePath,
       p_file_name: input.fileName, p_category: input.category, p_uploaded_by_role: input.uploadedByRole,
+      p_file_size: input.fileSize,
     });
     if (error) throw new Error(`doc_insert: ${error.message}`);
     const res = data as { ok: boolean; error?: string } & Obj;
@@ -160,7 +162,7 @@ export const docRequestList = defineAction<{ dealRoomId: string }, Obj>({
 });
 
 export const docRequestInsert = defineAction<
-  { dealRoomId: string; title: string; description: string | null },
+  { dealRoomId: string; title: string; description: string | null; priority: string | null; forUserId: string | null },
   Obj
 >({
   name: "documentRequests.insert",
@@ -169,12 +171,21 @@ export const docRequestInsert = defineAction<
     const r = raw as Record<string, unknown>;
     if (!isUuid(r?.dealRoomId)) throw new Error("dealRoomId must be a uuid");
     if (!asStr(r?.title)) throw new Error("title required");
-    return { dealRoomId: r.dealRoomId as string, title: r.title as string, description: r.description == null ? null : asStr(r.description) };
+    const fu = optUuid(r?.forUserId);
+    if (fu === "invalid") throw new Error("forUserId must be a uuid");
+    return {
+      dealRoomId: r.dealRoomId as string,
+      title: r.title as string,
+      description: r.description == null ? null : asStr(r.description),
+      priority: r.priority == null ? null : asStr(r.priority),
+      forUserId: fu,
+    };
   },
   authorize: async () => true,
   handle: async (ctx, input): Promise<Obj> => {
     const { data, error } = await ctx.sb.schema("pack_api").rpc("doc_request_insert", {
       p_uid: ctx.uid, p_deal_room_id: input.dealRoomId, p_title: input.title, p_description: input.description,
+      p_priority: input.priority, p_for_user_id: input.forUserId,
     });
     if (error) throw new Error(`doc_request_insert: ${error.message}`);
     const res = data as { ok: boolean; error?: string } & Obj;
@@ -182,6 +193,32 @@ export const docRequestInsert = defineAction<
     return res;
   },
   record: (input, output) => ({ objectType: "document_request", objectId: (output.id as string) ?? null, data: { dealRoomId: input.dealRoomId } }),
+});
+
+// ── document_requests.respondLink — founder shares a link (member) ───────────
+// Sets response_link + status→fulfilled. Membership-authorized (same as list).
+// class: prepare — providing a link is content authoring, not a state-commit like
+// closing a request (that is setStatus). Human still initiates it in the UI.
+export const docRequestRespondLink = defineAction<{ requestId: string; link: string }, Obj>({
+  name: "documentRequests.respondLink",
+  class: "prepare",
+  validate: (raw) => {
+    const r = raw as { requestId?: unknown; link?: unknown };
+    if (!isUuid(r?.requestId)) throw new Error("requestId must be a uuid");
+    if (!asStr(r?.link).trim()) throw new Error("link required");
+    return { requestId: r.requestId, link: (r.link as string).trim() };
+  },
+  authorize: async () => true,
+  handle: async (ctx, input): Promise<Obj> => {
+    const { data, error } = await ctx.sb.schema("pack_api").rpc("doc_request_respond_link", {
+      p_uid: ctx.uid, p_request_id: input.requestId, p_link: input.link,
+    });
+    if (error) throw new Error(`doc_request_respond_link: ${error.message}`);
+    const res = data as { ok: boolean; error?: string } & Obj;
+    if (!res.ok) throw new Error(res.error ?? "doc_request_respond_link_failed");
+    return res;
+  },
+  record: (input) => ({ objectType: "document_request", objectId: input.requestId, data: { respondedWithLink: true } }),
 });
 
 export const docRequestSetStatus = defineAction<{ requestId: string; status: "pending" | "fulfilled" }, Obj>({

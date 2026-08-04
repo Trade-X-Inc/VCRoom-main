@@ -4,6 +4,11 @@ const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","xlsx","xls","docx","doc"
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { callAction } from "@/lib/actions/call";
+import {
+  docRequestList, docRequestInsert, docRequestSetStatus, docRequestDelete,
+  docRequestRespondLink, docInsert,
+} from "@/lib/actions/deal-room-documents";
 import {
   Plus, X, CheckCircle2, ClipboardList, ChevronDown, ChevronUp,
   AlertTriangle, Link2, Upload, Loader2, Flag
@@ -56,12 +61,11 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
     queryKey: ["doc-wishlist", dealRoomId],
     enabled: !!dealRoomId,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("document_requests")
-        .select("id, title, description, status, priority, response_link, created_at, requested_by")
-        .eq("deal_room_id", dealRoomId)
-        .order("created_at", { ascending: true });
-      return data ?? [];
+      // doc_request_list returns member-scoped rows (to_jsonb, all columns),
+      // ordered created_at desc; the UI re-derives pending/fulfilled and does not
+      // depend on order, so this is behaviourally equivalent to the prior query.
+      const res = await callAction<{ requests: any[] }>(docRequestList, dealRoomId, { dealRoomId });
+      return res.requests ?? [];
     },
     refetchInterval: 30_000,
   });
@@ -72,16 +76,15 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
     if (!finalTitle || !userId) return;
     setSaving(true);
     try {
-      const { error } = await supabase.from("document_requests").insert({
-        deal_room_id: dealRoomId,
-        requested_by: userId,
-        for_user_id: userId,
+      // requested_by is derived server-side from the token (not passed); for_user_id
+      // preserves the prior behaviour (= the caller). status defaults to 'pending'.
+      await callAction(docRequestInsert, dealRoomId, {
+        dealRoomId,
         title: finalTitle,
         description: description.trim() || null,
         priority: finalPriority,
-        status: "pending",
+        forUserId: userId,
       });
-      if (error) throw error;
       toast.success("Document requested");
       setTitle(""); setDescription(""); setAdding(false); setShowSuggested(false);
       qc.invalidateQueries({ queryKey: ["doc-wishlist", dealRoomId] });
@@ -93,8 +96,11 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
   };
 
   const handleFulfill = async (id: string) => {
-    const { error } = await supabase.from("document_requests").update({ status: "fulfilled" }).eq("id", id);
-    if (error) { console.error("[wishlist] fulfill failed:", error); toast.error("Could not update request."); return; }
+    try {
+      await callAction(docRequestSetStatus, dealRoomId, { requestId: id, status: "fulfilled" });
+    } catch (err: any) {
+      console.error("[wishlist] fulfill failed:", err); toast.error("Could not update request."); return;
+    }
     toast.success("Marked as uploaded");
     qc.invalidateQueries({ queryKey: ["doc-wishlist", dealRoomId] });
   };
@@ -102,13 +108,13 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
   const handleSaveLink = async (id: string) => {
     if (!linkValue.trim()) return;
     setSavingLink(true);
-    const { error } = await supabase.from("document_requests")
-      .update({ response_link: linkValue.trim(), status: "fulfilled" })
-      .eq("id", id);
-    if (error) { toast.error(error.message); } else {
+    try {
+      await callAction(docRequestRespondLink, dealRoomId, { requestId: id, link: linkValue.trim() });
       toast.success("Link saved and request marked fulfilled");
       setLinkInputId(null); setLinkValue("");
       qc.invalidateQueries({ queryKey: ["doc-wishlist", dealRoomId] });
+    } catch (err: any) {
+      toast.error(err.message);
     }
     setSavingLink(false);
   };
@@ -122,21 +128,19 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
     try {
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
       const path = `${dealRoomId}/${Date.now()}-${safeName}`;
+      // Storage upload stays client-side (Storage RLS-governed; no gateway storage
+      // action in Step A scope). Only the two DB writes move to the gateway.
       const { error: upErr } = await supabase.storage.from("documents").upload(path, file, { upsert: true });
       if (upErr) throw upErr;
-      const req = (requests as any[]).find((r) => r.id === id);
-      const { error: docErr } = await supabase.from("documents").insert({
-        deal_room_id: dealRoomId,
-        uploader_id: userId,
+      await callAction(docInsert, dealRoomId, {
+        dealRoomId,
+        storagePath: path,
+        fileName: file.name,
         category: "Other",
-        status: "uploaded",
-        storage_path: path,
-        file_name: file.name,
-        file_size: file.size,
+        uploadedByRole: null,
+        fileSize: file.size,
       });
-      if (docErr) throw docErr;
-      const { error: reqErr } = await supabase.from("document_requests").update({ status: "fulfilled" }).eq("id", id);
-      if (reqErr) throw reqErr;
+      await callAction(docRequestSetStatus, dealRoomId, { requestId: id, status: "fulfilled" });
       qc.invalidateQueries({ queryKey: ["doc-wishlist", dealRoomId] });
       qc.invalidateQueries({ queryKey: ["documents", dealRoomId] });
       toast.success(`${file.name} uploaded and request fulfilled`);
@@ -145,8 +149,11 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
   };
 
   const handleDelete = async (id: string) => {
-    const { error } = await supabase.from("document_requests").delete().eq("id", id);
-    if (error) { console.error("[wishlist] delete failed:", error); toast.error("Could not delete request."); return; }
+    try {
+      await callAction(docRequestDelete, dealRoomId, { requestId: id });
+    } catch (err: any) {
+      console.error("[wishlist] delete failed:", err); toast.error("Could not delete request."); return;
+    }
     qc.invalidateQueries({ queryKey: ["doc-wishlist", dealRoomId] });
   };
 
