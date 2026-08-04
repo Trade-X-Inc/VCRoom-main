@@ -15,7 +15,7 @@ type PackGetOutput = { [k: string]: JsonValue };
 // on id/org_id/subject_ref — so the honest first Read action is get-by-id.)
 //
 // Authorization lives in pack_api.pack_get: it confirms the pack's org_id
-// matches the org the caller asserted (ctx.orgId). The action's authorize()
+// matches the scope the caller asserted (ctx.scopeId, = org for pack actions). The action's authorize()
 // step is where a membership check (uid ∈ org) binds at cutover, once
 // public.organization_members is linked; today pack_v1 has no membership table,
 // so authorize() delegates the org-ownership check to the RPC and returns true
@@ -34,7 +34,7 @@ export const packGet = defineAction<PackGetInput, PackGetOutput>({
 
   authorize: async (ctx, input) => {
     // Pre-cutover: the real org-ownership authorization is inside
-    // pack_api.pack_get (returns 'forbidden' if ctx.orgId doesn't own the pack).
+    // pack_api.pack_get (returns 'forbidden' if ctx.scopeId doesn't own the pack).
     // This returns true to reach it. TODO(cutover): add
     //   uid ∈ organization_members(org_id) here, once that table is linked.
     void ctx;
@@ -45,7 +45,7 @@ export const packGet = defineAction<PackGetInput, PackGetOutput>({
   handle: async (ctx, input): Promise<PackGetOutput> => {
     const { data, error } = await ctx.sb.schema("pack_api").rpc("pack_get", {
       p_uid: ctx.uid,
-      p_org_id: ctx.orgId,
+      p_org_id: ctx.scopeId,
       p_pack_id: input.packId,
     });
     if (error) throw new Error(`pack_get_rpc: ${error.message}`);

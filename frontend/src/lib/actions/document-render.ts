@@ -60,7 +60,7 @@ export const documentRender = defineAction<RenderInput, RenderOutput>({
     // client-supplied storage_path — the server re-derives it here.
     const { data, error } = await ctx.sb.schema("pack_api").rpc("document_request_access", {
       p_uid: ctx.uid,
-      p_org_id: ctx.orgId,
+      p_org_id: ctx.scopeId,
       p_document_id: input.documentId,
       p_recipient: input.recipientId,
       p_governing_nda: null,

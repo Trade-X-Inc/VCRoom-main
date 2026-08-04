@@ -82,7 +82,7 @@ export const documentRequestAccess = defineAction<RequestAccessInput, RequestAcc
   handle: async (ctx, input): Promise<RequestAccessOutput> => {
     const { data, error } = await ctx.sb.schema("pack_api").rpc("document_request_access", {
       p_uid: ctx.uid,
-      p_org_id: ctx.orgId,
+      p_org_id: ctx.scopeId,
       p_document_id: input.documentId,
       p_recipient: input.recipientId,
       p_governing_nda: input.governingNda,
@@ -132,7 +132,7 @@ export const documentGrantRelease = defineAction<GrantReleaseInput, GrantRelease
   handle: async (ctx, input): Promise<GrantReleaseOutput> => {
     const { data, error } = await ctx.sb.schema("pack_api").rpc("document_grant_release", {
       p_approver: ctx.uid,
-      p_org_id: ctx.orgId,
+      p_org_id: ctx.scopeId,
       p_release_id: input.releaseId,
     });
     if (error) throw new Error(`document_grant_release_rpc: ${error.message}`);

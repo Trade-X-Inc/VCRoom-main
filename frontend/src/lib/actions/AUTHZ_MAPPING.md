@@ -87,5 +87,51 @@ the pack_api data function's `where … in (select …)`, not round-tripped to T
 - **Grants:** all 9 functions service_role-only (`anon`/`authenticated` execute =
   false). Isolation holds.
 
+---
+
+## Record scope (`scopeId`) — the record-chain partition key per feature class
+
+`defineAction` appends a record entry on every action, keyed by `scopeId` (the
+envelope's `scopeId` field; passed to `pack_api.append_record` as its generic
+`p_org_id` partition-key param — not renamed in SQL to avoid churning the proven
+signature). **`scopeId` is NOT an authorization input** — authorization lives in
+the pack_api functions on the real object ids. It only decides *which append-only
+chain* the audit entry joins. Foundation §9.4's record is per-scope; the scope
+depends on the feature class:
+
+| Feature class | `scopeId` = | Why |
+|---|---|---|
+| Deal-room actions (documents, requests, qa, dd, closing) | `deal_room_id` | The deal room is the audit-trail unit — one chain per room. |
+| Founder / profile actions (future group) | `startup_id` | The raising entity's record. |
+| Org-level actions | `org_id` | Once `organizations` is real and used (0 rows today). |
+| Pack actions (pack.get etc., pack_v1-native) | the pack's `org_id` | pack_v1 IS org-scoped; for these, scope == org. |
+
+**Verified (5 Aug 2026) that the chain logic is scope-agnostic — the rename is not
+inert-by-assumption:** re-ran the full chain proof with real `deal_room_id`s as
+scope — genesis + link per scope, two deal_room_ids → two independent chains,
+hash recomputes, UPDATE rejected. Identical behaviour to the original org_id proof.
+
+## Documents feature group (Step A) — RLS → pack_api.doc_* mapping
+
+Migration `20260805010000_pack_api_documents_group.sql`. Membership-authorized;
+`founder_documents` (founder vault) is a SEPARATE feature deferred to the
+profile/founder group — see note below.
+
+| pack_api function | Source RLS policy | Rule |
+|---|---|---|
+| `doc_list` | `documents_room_read` ∪ `documents_own` | read = member (`authz_is_deal_room_member`) OR uploader. |
+| `doc_insert` | `documents_own` + membership + §8 open | member of room AND room open (`authz_dr_is_open`); `uploader_id` forced = caller (documents_own made non-forgeable). |
+| `doc_update` | `documents_own` | **UPLOADER only** — a member who is not the uploader is forbidden. Do NOT upgrade to membership (that would weaken RLS). Verified live. |
+| `doc_view_insert` | `authenticated_insert_doc_views` | any authenticated caller (non-null p_uid). |
+| `doc_request_*` | `doc_requests_access` | member of the request's room (`authz_is_deal_room_member`). |
+
+**Deferred (NOT migrated in Step A): `founder_documents` / `app.documents.tsx`.**
+Founder-ownership auth (`is_startup_founder` / `founder_has_permission('upload_documents')`),
+NOT membership. Belongs to the profile/founder migration group. **Coupling to
+carry forward:** its investor-read RLS (`investor_read_approved_docs`) joins
+through `discovery_requests` (`detail_pack_approved`), coupling founder_documents
+to the investor group too — whoever scopes the profile/founder step must handle
+both the ownership auth and this discovery-request read path.
+
 Related: [`WHY_PACK_API.md`](./WHY_PACK_API.md) (why the RPC layer exists),
 [`../../../supabase/migrations/pack_v1/CANONICAL_JSON_SPEC.md`](../../../supabase/migrations/pack_v1/CANONICAL_JSON_SPEC.md).

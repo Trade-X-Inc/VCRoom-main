@@ -51,20 +51,26 @@ export type JsonValue =
 
 // ── The envelope every action receives ──────────────────────────────────────
 // accessToken: caller's Supabase token (body convention, matches existing fns).
-// orgId: the org context the caller asserts; pack_api functions verify the
-//        target object actually belongs to it.
+// scopeId: the record-chain partition this action's audit entry belongs to.
+//   Foundation §9.4's audit trail is per-scope; the scope depends on the
+//   feature class (see AUTHZ_MAPPING.md § "record scope"):
+//     • deal-room actions   → scopeId = deal_room_id  (the deal room's chain)
+//     • founder/profile      → scopeId = startup_id    (future group)
+//     • org-level actions    → scopeId = org_id        (once organizations is real)
+//   It is NOT an authorization input — authorization lives in the pack_api
+//   functions on the real object ids. scopeId only keys the append-only record.
 // isAgent: agent vs human caller (§15.3 gate input for Commit actions).
 // input: the action-specific payload, validated by def.input.
 export type ActionEnvelope<Input> = {
   accessToken: string;
-  orgId: string;
+  scopeId: string;
   isAgent?: boolean;
   input: Input;
 };
 
 export type ActionCtx = {
   uid: string;
-  orgId: string;
+  scopeId: string;
   isAgent: boolean;
   sb: SupabaseClient;
 };
@@ -125,7 +131,7 @@ export function defineAction<Input, Output extends JsonValue>(def: ActionDef<Inp
         return { ok: false, error: "supabase_not_configured", status: 500 };
       }
 
-      const ctx: ActionCtx = { uid: auth.uid, orgId: data.orgId, isAgent, sb };
+      const ctx: ActionCtx = { uid: auth.uid, scopeId: data.scopeId, isAgent, sb };
 
       // 4. authorization — required, runs before the handler
       let allowed = false;
@@ -151,7 +157,11 @@ export function defineAction<Input, Output extends JsonValue>(def: ActionDef<Inp
       const { data: appendRes, error: appendErr } = await sb
         .schema("pack_api")
         .rpc("append_record", {
-          p_org_id: ctx.orgId,
+          // p_org_id is the DB function's generic partition-key param — the
+          // record chain is per-scope (deal_room_id / startup_id / org_id per
+          // feature class). Not renamed in SQL to avoid churning the proven
+          // append_record signature; ctx.scopeId is what's passed.
+          p_org_id: ctx.scopeId,
           p_actor_id: ctx.uid,
           p_actor_type: ctx.isAgent ? "agent" : "human",
           p_action: def.name,
