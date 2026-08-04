@@ -119,12 +119,21 @@ profile/founder group — see note below.
 
 | pack_api function | Source RLS policy | Rule |
 |---|---|---|
-| `doc_list` | `documents_room_read` ∪ `documents_own` | read = member (`authz_is_deal_room_member`) OR uploader. |
+| `doc_list_room` | `documents_room_read` (+`documents_own`) | member of room; all its docs; uploader{full_name} join. [route docs query] |
+| `doc_list_library` | `documents_own` | UPLOADER-scoped: `uploader_id=caller AND deal_room_id<>current`. NOT membership — the user's own docs elsewhere. [route library picker] **Uses SQL `<>` not `is distinct from`, so detached (deal_room_id IS NULL) docs are EXCLUDED — faithfully matching the original PostgREST `.neq`. A functional-equivalence test caught the `is distinct from` version diverging (it included null docs). Whether detached docs *should* show in the library is a separate product question, flagged not silently changed.** |
+| `doc_list_investor` | `documents_room_read` | member of room; filtered `uploaded_by_role='investor'`; uploader{full_name,avatar_url}. [route investor-docs] |
+| `doc_list` (orphaned) | — | superseded by the three named reads above; no caller. Left in DB (harmless, service_role-only); flag for a cleanup pass, do not drop silently. |
 | `doc_insert` | `documents_own` + membership + §8 open | member of room AND room open (`authz_dr_is_open`); `uploader_id` forced = caller (documents_own made non-forgeable). |
 | `doc_update` | `documents_own` | **UPLOADER only** — a member who is not the uploader is forbidden. Do NOT upgrade to membership (that would weaken RLS). Verified live. |
 | `doc_view_insert` | `authenticated_insert_doc_views` | any authenticated caller (non-null p_uid). |
 | `doc_request_*` | `doc_requests_access` | member of the request's room (`authz_is_deal_room_member`). |
 | `doc_request_respond_link` | `doc_requests_access` | member; sets `response_link` + status→fulfilled (founder "Share link" path). |
+
+**doc_view_insert widened (Stage-2 finding, migration `20260805030000`):** the route's
+`trackDocumentView` writes `startup_id`, `viewer_role`, `viewer_name` (viewer_name derived
+from an `investor_profiles` read on the client). The initial function dropped all three —
+same silent-drop class as Stage 1. Widened; authorization UNCHANGED (any authenticated
+caller, `authenticated_insert_doc_views`). Old 5-arg signature dropped.
 
 **Column-coverage note (Stage-1 finding, migration `20260805020000`):** the initial
 functions silently dropped columns the real UI writes — `document_requests.priority`

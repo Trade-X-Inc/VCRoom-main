@@ -21,27 +21,37 @@ const asStr = (v: unknown): string => (typeof v === "string" ? v : "");
 
 type Obj = { [k: string]: JsonValue };
 
-// ── documents.list (read: member OR uploader) ───────────────────────────────
-export const docList = defineAction<{ dealRoomId: string }, Obj>({
-  name: "documents.list",
-  class: "read",
-  validate: (raw) => {
-    const r = raw as { dealRoomId?: unknown };
-    if (!isUuid(r?.dealRoomId)) throw new Error("dealRoomId must be a uuid");
-    return { dealRoomId: r.dealRoomId };
-  },
-  authorize: async () => true, // membership enforced in pack_api.doc_list
-  handle: async (ctx, input): Promise<Obj> => {
-    const { data, error } = await ctx.sb.schema("pack_api").rpc("doc_list", {
-      p_uid: ctx.uid, p_deal_room_id: input.dealRoomId,
-    });
-    if (error) throw new Error(`doc_list: ${error.message}`);
-    const res = data as { ok: boolean; error?: string } & Obj;
-    if (!res.ok) throw new Error(res.error ?? "doc_list_failed");
-    return res;
-  },
-  record: (input) => ({ objectType: "deal_room", objectId: input.dealRoomId, data: { list: "documents" } }),
-});
+// ── documents reads — three named shapes, each independently authorized ──────
+// doc_list_room     member of room; all docs; uploader{full_name}
+// doc_list_library  UPLOADER-scoped; own docs NOT in this room; no join
+// doc_list_investor member of room; uploaded_by_role='investor'; uploader{full_name,avatar_url}
+// (Each maps to the same-named pack_api function; see AUTHZ_MAPPING.md.)
+function makeListAction(name: string, fn: string) {
+  return defineAction<{ dealRoomId: string }, Obj>({
+    name,
+    class: "read",
+    validate: (raw) => {
+      const r = raw as { dealRoomId?: unknown };
+      if (!isUuid(r?.dealRoomId)) throw new Error("dealRoomId must be a uuid");
+      return { dealRoomId: r.dealRoomId };
+    },
+    authorize: async () => true, // authorization enforced in the pack_api function
+    handle: async (ctx, input): Promise<Obj> => {
+      const { data, error } = await ctx.sb.schema("pack_api").rpc(fn, {
+        p_uid: ctx.uid, p_deal_room_id: input.dealRoomId,
+      });
+      if (error) throw new Error(`${fn}: ${error.message}`);
+      const res = data as { ok: boolean; error?: string } & Obj;
+      if (!res.ok) throw new Error(res.error ?? `${fn}_failed`);
+      return res;
+    },
+    record: (input) => ({ objectType: "deal_room", objectId: input.dealRoomId, data: { list: name } }),
+  });
+}
+
+export const docListRoom = makeListAction("documents.listRoom", "doc_list_room");
+export const docListLibrary = makeListAction("documents.listLibrary", "doc_list_library");
+export const docListInvestor = makeListAction("documents.listInvestor", "doc_list_investor");
 
 // ── documents.insert (write: member + room open; uploader forced = caller) ──
 export const docInsert = defineAction<
@@ -113,18 +123,24 @@ export const docUpdate = defineAction<{ documentId: string; patch: Obj }, Obj>({
 
 // ── document_views.insert (any authed caller) ───────────────────────────────
 export const docViewInsert = defineAction<
-  { dealRoomId: string | null; documentId: string | null; founderDocumentId: string | null; durationSeconds: number },
+  {
+    dealRoomId: string | null; documentId: string | null; founderDocumentId: string | null;
+    durationSeconds: number; startupId: string | null; viewerRole: string | null; viewerName: string | null;
+  },
   Obj
 >({
   name: "documents.viewInsert",
   class: "read", // a view record; not a consequential act
   validate: (raw) => {
     const r = raw as Record<string, unknown>;
-    const dr = optUuid(r?.dealRoomId), doc = optUuid(r?.documentId), fd = optUuid(r?.founderDocumentId);
-    if (dr === "invalid" || doc === "invalid" || fd === "invalid") throw new Error("invalid uuid");
+    const dr = optUuid(r?.dealRoomId), doc = optUuid(r?.documentId), fd = optUuid(r?.founderDocumentId), su = optUuid(r?.startupId);
+    if (dr === "invalid" || doc === "invalid" || fd === "invalid" || su === "invalid") throw new Error("invalid uuid");
     return {
       dealRoomId: dr, documentId: doc, founderDocumentId: fd,
       durationSeconds: typeof r?.durationSeconds === "number" ? r.durationSeconds : 0,
+      startupId: su,
+      viewerRole: r?.viewerRole == null ? null : asStr(r.viewerRole),
+      viewerName: r?.viewerName == null ? null : asStr(r.viewerName),
     };
   },
   authorize: async () => true,
@@ -132,6 +148,7 @@ export const docViewInsert = defineAction<
     const { data, error } = await ctx.sb.schema("pack_api").rpc("doc_view_insert", {
       p_uid: ctx.uid, p_deal_room_id: input.dealRoomId, p_document_id: input.documentId,
       p_founder_document_id: input.founderDocumentId, p_duration_seconds: input.durationSeconds,
+      p_startup_id: input.startupId, p_viewer_role: input.viewerRole, p_viewer_name: input.viewerName,
     });
     if (error) throw new Error(`doc_view_insert: ${error.message}`);
     return (data as Obj) ?? { ok: true };

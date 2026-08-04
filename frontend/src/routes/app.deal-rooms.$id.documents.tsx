@@ -7,6 +7,11 @@ import {
   ChevronUp, ChevronDown, Upload, Link as LinkIcon, ExternalLink, Shield, CheckCircle2,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { callAction } from "@/lib/actions/call";
+import {
+  docListRoom, docListLibrary, docListInvestor,
+  docUpdate, docInsert, docViewInsert,
+} from "@/lib/actions/deal-room-documents";
 import { cn } from "@/lib/utils";
 import { Dropzone } from "@/components/app/Dropzone";
 import { Stage2Gate } from "@/components/app/DealRoomWorkflow";
@@ -188,22 +193,24 @@ function DocumentsPage() {
     try {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (!authUser) return;
+      // §B — future migration group: investor_profiles (profile/investor group).
+      // Read stays a direct call; only the document_views write moves to the gateway.
       const { data: profile } = await supabase
         .from("investor_profiles")
         .select("your_name, fund_name")
         .eq("user_id", authUser.id)
         .maybeSingle();
       const viewerName = profile?.your_name ?? profile?.fund_name ?? "Investor";
-      const { error } = await supabase.from("document_views").insert({
-        document_id: params.documentId ?? null,
-        founder_document_id: params.founderDocumentId ?? null,
-        deal_room_id: dealRoomId,
-        startup_id: startupId,
-        viewer_id: authUser.id,
-        viewer_role: "investor",
-        viewer_name: viewerName,
+      // viewer_id is derived server-side from the token (not passed).
+      await callAction(docViewInsert, dealRoomId, {
+        dealRoomId,
+        documentId: params.documentId ?? null,
+        founderDocumentId: params.founderDocumentId ?? null,
+        startupId: startupId ?? null,
+        viewerRole: "investor",
+        viewerName,
+        durationSeconds: 0,
       });
-      if (error) console.error("[trackDocumentView] insert failed:", error);
     } catch (e) {
       console.error("[trackDocumentView]", e);
     }
@@ -215,13 +222,9 @@ function DocumentsPage() {
     staleTime: 0,
     gcTime: 5 * 60 * 1000,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("documents")
-        .select("*, uploader:users!uploader_id(full_name)")
-        .eq("deal_room_id", dealRoomId)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data ?? [];
+      // member of room; all docs; uploader{full_name} join (doc_list_room).
+      const res = await callAction<{ documents: any[] }>(docListRoom, dealRoomId, { dealRoomId });
+      return res.documents ?? [];
     },
   });
 
@@ -229,13 +232,9 @@ function DocumentsPage() {
     queryKey: ["library-docs", userId],
     enabled: showLibrary && !!userId,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("documents")
-        .select("*")
-        .eq("uploader_id", userId!)
-        .neq("deal_room_id", dealRoomId)
-        .order("created_at", { ascending: false });
-      return data ?? [];
+      // uploader-scoped: caller's own docs NOT in this room (doc_list_library).
+      const res = await callAction<{ documents: any[] }>(docListLibrary, dealRoomId, { dealRoomId });
+      return res.documents ?? [];
     },
   });
 
@@ -243,6 +242,7 @@ function DocumentsPage() {
     queryKey: ["deal-room-links", dealRoomId],
     enabled: !!dealRoomId,
     queryFn: async () => {
+      // §B — future migration group: deal_room_links (its own small group).
       const { data } = await supabase
         .from("deal_room_links")
         .select("*, users(full_name)")
@@ -257,13 +257,9 @@ function DocumentsPage() {
     enabled: !!userId && !!dealRoomId,
     staleTime: 0,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("documents")
-        .select("*, uploader:uploader_id(full_name, avatar_url)")
-        .eq("deal_room_id", dealRoomId)
-        .eq("uploaded_by_role", "investor")
-        .order("created_at", { ascending: false });
-      return data ?? [];
+      // member of room; uploaded_by_role='investor'; uploader{full_name,avatar_url} (doc_list_investor).
+      const res = await callAction<{ documents: any[] }>(docListInvestor, dealRoomId, { dealRoomId });
+      return res.documents ?? [];
     },
   });
 
@@ -271,6 +267,8 @@ function DocumentsPage() {
     queryKey: ["platform-docs", startupId],
     enabled: !!startupId,
     queryFn: async () => {
+      // §B — future migration group: founder_documents (profile/founder group;
+      // couples to the investor group via discovery_requests — see AUTHZ_MAPPING.md).
       const { data, error } = await supabase
         .from("founder_documents")
         .select(`id, template_slug, title, status, content, completeness_score, ai_feedback, visibility, updated_at, document_templates ( name, category )`)
@@ -288,6 +286,7 @@ function DocumentsPage() {
     enabled: !!dealRoomId,
     staleTime: 15_000,
     queryFn: async () => {
+      // §B — future migration group: deal_rooms read (deal-room-core group).
       const { data } = await supabase
         .from("deal_rooms")
         .select("workflow_stage, stage2_unlocked")
@@ -313,14 +312,20 @@ function DocumentsPage() {
 
   const updateDocVisibility = async (docId: string, visibility: "shared" | "private") => {
     setInvestorDocVisibility((prev) => ({ ...prev, [docId]: visibility }));
-    const { error } = await supabase.from("documents").update({ visibility }).eq("id", docId);
-    if (error) { console.error("[docs] visibility update failed:", error); toast.error("Could not change document visibility."); return; }
+    try {
+      await callAction(docUpdate, dealRoomId, { documentId: docId, patch: { visibility } });
+    } catch (err: any) {
+      console.error("[docs] visibility update failed:", err); toast.error("Could not change document visibility."); return;
+    }
     queryClient.invalidateQueries({ queryKey: ["investor-documents", dealRoomId, userId] });
   };
 
   const removeInvestorDoc = async (docId: string) => {
-    const { error } = await supabase.from("documents").update({ deal_room_id: null }).eq("id", docId);
-    if (error) { console.error("[docs] remove failed:", error); toast.error("Could not remove document."); return; }
+    try {
+      await callAction(docUpdate, dealRoomId, { documentId: docId, patch: { deal_room_id: null } });
+    } catch (err: any) {
+      console.error("[docs] remove failed:", err); toast.error("Could not remove document."); return;
+    }
     queryClient.invalidateQueries({ queryKey: ["investor-documents", dealRoomId, userId] });
     toast.success("Document removed");
   };
@@ -329,6 +334,7 @@ function DocumentsPage() {
     if (!linkName.trim() || !linkUrl.trim() || !userId) return;
     setAddingLink(true);
     const url = linkUrl.startsWith("http") ? linkUrl : `https://${linkUrl}`;
+    // §B — future migration group: deal_room_links (its own small group).
     const { error } = await supabase.from("deal_room_links").insert({
       deal_room_id: dealRoomId,
       uploader_id: userId,
@@ -343,6 +349,7 @@ function DocumentsPage() {
   };
 
   const removeLink = async (linkId: string) => {
+    // §B — future migration group: deal_room_links (its own small group).
     const { error } = await supabase.from("deal_room_links").delete().eq("id", linkId);
     if (error) { console.error("[links] remove failed:", error); toast.error("Could not remove link."); return; }
     queryClient.invalidateQueries({ queryKey: ["deal-room-links", dealRoomId] });
@@ -364,8 +371,11 @@ function DocumentsPage() {
     const displayName = rawName.replace(/^\d{13}-/, "");
     let toastId: string | number;
     const timer = setTimeout(async () => {
-      const { error } = await supabase.from("documents").update({ deal_room_id: null }).eq("id", doc.id);
-      if (error) { console.error("[docs] deferred remove failed:", error); toast.error(`Could not remove "${displayName}".`); }
+      try {
+        await callAction(docUpdate, dealRoomId, { documentId: doc.id, patch: { deal_room_id: null } });
+      } catch (err: any) {
+        console.error("[docs] deferred remove failed:", err); toast.error(`Could not remove "${displayName}".`);
+      }
       queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
     }, 5000);
     toastId = toast(`"${displayName}" removed`, {
@@ -383,8 +393,11 @@ function DocumentsPage() {
 
   const addFromLibrary = async (docId: string) => {
     setAddingFromLib(docId);
-    const { error } = await supabase.from("documents").update({ deal_room_id: dealRoomId }).eq("id", docId);
-    if (error) { console.error("[docs] add from library failed:", error); toast.error("Could not add document."); setAddingFromLib(null); return; }
+    try {
+      await callAction(docUpdate, dealRoomId, { documentId: docId, patch: { deal_room_id: dealRoomId } });
+    } catch (err: any) {
+      console.error("[docs] add from library failed:", err); toast.error("Could not add document."); setAddingFromLib(null); return;
+    }
     await queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
     await queryClient.invalidateQueries({ queryKey: ["library-docs", userId] });
     setAddingFromLib(null);
@@ -417,8 +430,11 @@ function DocumentsPage() {
 
       if (!textContent || textContent.length < 30) {
         const honestMessage = `Could not extract readable text from this file.\n\nTo review: Click Preview or Download to open locally.`;
-        const { error: msgErr } = await supabase.from("documents").update({ ai_summary: honestMessage }).eq("id", doc.id);
-        if (msgErr) console.error("[docs] ai_summary placeholder save failed:", msgErr);
+        // doc_update is uploader-only (documents_own) — same as current RLS, which
+        // already only lets the uploader write ai_summary. Behaviour preserved.
+        try {
+          await callAction(docUpdate, dealRoomId, { documentId: doc.id, patch: { ai_summary: honestMessage } });
+        } catch (err: any) { console.error("[docs] ai_summary placeholder save failed:", err); }
         queryClient.setQueryData(["documents", dealRoomId], (old: any[]) =>
           (old ?? []).map((d: any) => d.id === doc.id ? { ...d, ai_summary: honestMessage } : d)
         );
@@ -448,8 +464,7 @@ function DocumentsPage() {
         return;
       }
 
-      const { error: sumErr } = await supabase.from("documents").update({ ai_summary: summary }).eq("id", doc.id);
-      if (sumErr) throw sumErr;
+      await callAction(docUpdate, dealRoomId, { documentId: doc.id, patch: { ai_summary: summary } });
       queryClient.setQueryData(["documents", dealRoomId], (old: any[]) =>
         (old ?? []).map((d: any) => d.id === doc.id ? { ...d, ai_summary: summary } : d)
       );
@@ -708,6 +723,7 @@ function DocumentsPage() {
                 triggerDocumentUploadedEmail({
                   data: { dealRoomId, documentName: fileName, uploaderUserId: userId },
                 }).catch(() => {});
+                // §B — future migration group: deal_room_members read (deal-room-core group).
                 supabase
                   .from("deal_room_members")
                   .select("user_id")
@@ -715,6 +731,7 @@ function DocumentsPage() {
                   .then(({ data: members }) => {
                     const investorMembers = (members ?? []).filter((m: any) => m.user_id !== userId);
                     if (investorMembers.length > 0) {
+                      // §B — future migration group: notifications insert (notifications group).
                       supabase.from("notifications").insert(
                         investorMembers.map((m: any) => ({
                           user_id: m.user_id,
@@ -949,10 +966,9 @@ function DocumentsPage() {
                                     onClick={async () => {
                                       const text = summaryEdits[doc.id]?.trim();
                                       if (!text) return;
-                                      const { error } = await supabase.from("documents")
-                                        .update({ ai_summary: text, summary_edited: true })
-                                        .eq("id", doc.id);
-                                      if (error) { toast.error("Failed to save summary"); return; }
+                                      try {
+                                        await callAction(docUpdate, dealRoomId, { documentId: doc.id, patch: { ai_summary: text, summary_edited: true } });
+                                      } catch { toast.error("Failed to save summary"); return; }
                                       queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
                                       queryClient.invalidateQueries({ queryKey: ["dd-docs", dealRoomId] });
                                       setEditingSummaryId(null);
@@ -1038,24 +1054,24 @@ function DocumentsPage() {
                   const path = `${dealRoomId}/${userId}/${Date.now()}-${file.name}`;
                   const { error } = await supabase.storage.from("documents").upload(path, file);
                   if (error) { toast.error("Upload failed"); return; }
-                  const { error: insErr } = await supabase.from("documents").insert({
-                    deal_room_id: dealRoomId,
-                    uploader_id: userId,
-                    storage_path: path,
-                    file_name: file.name,
-                    file_size: file.size,
-                    category: "Other",
-                  });
-                  if (insErr) { console.error("[docs] insert after upload failed:", insErr); toast.error("Upload failed — please try again."); return; }
+                  // uploader_id derived server-side from the token (not passed).
+                  try {
+                    await callAction(docInsert, dealRoomId, {
+                      dealRoomId, storagePath: path, fileName: file.name,
+                      category: "Other", uploadedByRole: null, fileSize: file.size,
+                    });
+                  } catch (insErr: any) { console.error("[docs] insert after upload failed:", insErr); toast.error("Upload failed — please try again."); return; }
                   queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
                   toast.success("Uploaded!");
                   e.target.value = "";
+                  // §B — future migration group: deal_room_members read (deal-room-core group).
                   const { data: members } = await supabase
                     .from("deal_room_members")
                     .select("user_id")
                     .eq("deal_room_id", dealRoomId);
                   const investorMembers = (members ?? []).filter((m: any) => m.user_id !== userId);
                   if (investorMembers.length > 0) {
+                    // §B — future migration group: notifications insert (notifications group).
                     supabase.from("notifications").insert(
                       investorMembers.map((m: any) => ({
                         user_id: m.user_id,
@@ -1108,24 +1124,24 @@ function DocumentsPage() {
                         const path = `${dealRoomId}/${userId}/${Date.now()}-${file.name}`;
                         const { error: upErr } = await supabase.storage.from("documents").upload(path, file);
                         if (upErr) { toast.error("Upload failed"); return; }
-                        const { error: insErr } = await supabase.from("documents").insert({
-                          deal_room_id: dealRoomId,
-                          uploader_id: userId,
-                          storage_path: path,
-                          category: expected.category,
-                          file_name: file.name,
-                          file_size: file.size,
-                        });
-                        if (insErr) { console.error("[docs] insert after upload failed:", insErr); toast.error("Upload failed — please try again."); return; }
+                        // uploader_id derived server-side from the token (not passed).
+                        try {
+                          await callAction(docInsert, dealRoomId, {
+                            dealRoomId, storagePath: path, fileName: file.name,
+                            category: expected.category, uploadedByRole: null, fileSize: file.size,
+                          });
+                        } catch (insErr: any) { console.error("[docs] insert after upload failed:", insErr); toast.error("Upload failed — please try again."); return; }
                         queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
                         toast.success(`${file.name} uploaded`);
                         e.target.value = "";
+                        // §B — future migration group: deal_room_members read (deal-room-core group).
                         const { data: members } = await supabase
                           .from("deal_room_members")
                           .select("user_id")
                           .eq("deal_room_id", dealRoomId);
                         const investorMembers = (members ?? []).filter((m: any) => m.user_id !== userId);
                         if (investorMembers.length > 0) {
+                          // §B — future migration group: notifications insert (notifications group).
                           supabase.from("notifications").insert(
                             investorMembers.map((m: any) => ({
                               user_id: m.user_id,
