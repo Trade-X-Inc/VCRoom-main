@@ -179,11 +179,13 @@ No agent executes a Commit-class action under any circumstance, including explic
 
 ### 8.3 The record
 
-> **CURRENT STATE (verified 2 Aug 2026):** does not exist in any form. Zero matches anywhere in the codebase or migration history for hash-chain terminology (`hash_chain`, `prev_hash`, predecessor-hash logic). Entirely prospective — Phase 1 of the build sequence, not started.
+> **CURRENT STATE (updated 4 Aug 2026):** first implementation built and verified in the **isolated `pack_v1` schema** (Phase 1 sub-milestone A, migration `supabase/migrations/pack_v1/20260804000000_pack_v1_foundation.sql`, commit `cfd20f5`). NOT in `public`, NOT promoted, 0 real entries — `pack_v1` is a discardable design-proving namespace (Supabase branching is Pro-only and unavailable on this project; schema isolation is the approved substitute). `record_entry` is one append-only hash-chain per org; `append_record()` is the sole writer; UPDATE/DELETE blocked by trigger (defense-in-depth — a superuser can `DISABLE TRIGGER`, so the hash chain itself, not the trigger, is the real tamper-evidence). Verified live: genesis + links, per-org independence, all three actor types, immutability, and independent hash recomputation. Still prospective in `public` until cutover.
 
 Append-only, hash-chained. Each entry carries its predecessor's hash. Entries record actor identity, actor type (human / agent / system), timestamp, object reference, action.
 
 Cannot be retrofitted onto existing history. Build it from the first write.
+
+**`entry_hash = sha256(prev_hash || canonical_json(payload))`. The canonicalisation is spec'd, versioned, and authoritative in [`supabase/migrations/pack_v1/CANONICAL_JSON_SPEC.md`](supabase/migrations/pack_v1/CANONICAL_JSON_SPEC.md) — the Postgres function is the reference implementation, that document is what any second implementation (export tooling, client verifier, auditor) is checked against.** Key traps it records, found by probing actual output, not intent: number trailing-zeros are PRESERVED (`1.50` ≠ `1.5` — this is deliberately NOT RFC 8785/JCS, which would normalise them), object keys are recursively code-point-sorted while array order is preserved, and numbers must be carried as arbitrary-precision decimals never floats. Changing canonicalisation once real entries exist is a breaking, versioned change with product-owner sign-off — never a silent edit.
 
 ### 8.4 Reference numbering
 
