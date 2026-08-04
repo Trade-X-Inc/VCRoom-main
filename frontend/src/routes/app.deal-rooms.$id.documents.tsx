@@ -82,7 +82,9 @@ function DocPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
   const ext = displayName.split(".").pop()?.toLowerCase() ?? "";
   const isImage = ["png", "jpg", "jpeg", "gif", "webp"].includes(ext);
   const isPdf = ext === "pdf";
-  const isOffice = ["pptx", "docx", "xlsx", "ppt", "doc", "xls"].includes(ext);
+  // Office types intentionally have no dedicated branch: preview routed through
+  // docs.google.com/gview leaked documents to Google and was removed. They fall
+  // through to the download-only path until in-platform Office rendering ships.
 
   useEffect(() => {
     supabase.storage.from("documents").createSignedUrl(doc.storage_path, 300).then(({ data }) => {
@@ -121,13 +123,14 @@ function DocPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
               className="w-full h-[70vh] rounded-lg border border-[rgba(0,0,0,0.08)]"
               title={displayName}
             />
-          ) : isOffice ? (
-            <iframe
-              src={`https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`}
-              className="w-full h-[70vh] rounded-lg border border-[rgba(0,0,0,0.08)]"
-              title={displayName}
-            />
           ) : (
+            // Office files (and any other non-image/PDF type) fall through to
+            // download-only. The previous Office branch routed the signed URL
+            // through docs.google.com/gview, which leaked confidential deal-room
+            // documents to Google on every render — removed. In-platform Office
+            // rendering is deferred (see step-6 evaluation); until then, no
+            // preview is strictly better than a third-party-routed one, and the
+            // download path is a recorded, in-platform action.
             <div className="flex flex-col items-center gap-4 py-8 text-center">
               <div className="grid h-16 w-16 place-items-center rounded-2xl bg-accent">
                 <FileText className="h-8 w-8 text-gray-500" />

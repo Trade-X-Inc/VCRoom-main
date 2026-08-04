@@ -788,7 +788,11 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                                 const ext = (doc.file_name || doc.storage_path || "").split(".").pop()?.toLowerCase() ?? "";
                                 const isOffice = ["pptx", "docx", "xlsx", "ppt", "doc", "xls"].includes(ext);
                                 if (isOffice) {
-                                  window.open(`https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=false`, "_blank");
+                                  // Office preview previously routed the signed URL through
+                                  // docs.google.com/gview, leaking confidential documents to
+                                  // Google — removed. In-platform Office rendering is deferred;
+                                  // until then, no preview (download the file to view it).
+                                  toast.info("Preview not available for Office files yet — download to view.");
                                 } else {
                                   window.open(url, "_blank");
                                 }
@@ -867,7 +871,13 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                                     if (!data?.signedUrl) { toast.error("Could not open file"); return; }
                                     const ext = (uploadedDeck.file_name || uploadedDeck.storage_path || "").split(".").pop()?.toLowerCase() ?? "";
                                     const isOffice = ["pptx", "ppt"].includes(ext);
-                                    window.open(isOffice ? `https://docs.google.com/gview?url=${encodeURIComponent(data.signedUrl)}&embedded=false` : data.signedUrl, "_blank");
+                                    if (isOffice) {
+                                      // gview routing removed — leaked signed URLs to Google.
+                                      // Office rendering deferred; download to view for now.
+                                      toast.info("Preview not available for PowerPoint files yet — download to view.");
+                                    } else {
+                                      window.open(data.signedUrl, "_blank");
+                                    }
                                   }}
                                   className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-accent text-brand px-3 py-1.5 text-xs font-medium hover:bg-accent transition-colors"
                                 >
