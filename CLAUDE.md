@@ -362,7 +362,37 @@ Found during the deployed-edge-function inventory sweep queued after the §17 `a
 
 ---
 
-## 20. Amendment log
+## 20. Current status — documents-group migration closed, 5 Aug 2026
+
+**STATUS AS OF 5 AUG 2026:**
+
+- **Documents-group migration is COMPLETE and PUSHED to `origin/main`** — commits `9398d03` through `c64e9cf` (6 commits). Verified in production, live, post-push: v1 isolation holds (untouched screens render exactly as before, no `--v2-*` leakage), the rebuilt documents screens render correctly and accept real writes end-to-end, `pack_v1`/`pack_api` schema isolation holds (raw `PGRST106` / `42501` checks re-run), and the gateway authorization matrix — including the load-bearing uploader-only `doc_update` boundary — passes live against the production Supabase project.
+- **This closes the first full vertical slice of the new architecture**: token layer → primitives → ported authorization primitives → gateway data functions → client rewire → DESIGN v2 presentation rebuild. Every stage of that sequence was built, adversarially verified, and reviewed before the next stage started, and the whole slice was pushed as one unit only after every stage passed.
+- **NO WORK IS IN PROGRESS.** No open branch for this work, no uncommitted changes, no half-migrated feature. `main` is clean and matches `origin/main`.
+
+### 20.1 Next up — deal-room-core migration
+
+`deal_rooms` and `deal_room_members` reads are currently left as direct `supabase.from()` calls throughout the documents-group code, each marked with an inline `// §B — future migration group: ... (deal-room-core group)` comment. **Grep for these comments to find every site** before starting — they are the complete, already-traced worklist for this group; do not re-derive it from scratch.
+
+Follow the exact sequence proven on the documents group, in order, each its own reviewed step:
+
+1. **Content-trace audit before trusting any file/table grouping** — a table or file can look like it belongs to one feature by name and still be dual-role or misclassified; verify by reading actual usage, not by import graph or naming alone (this is the general form of the lesson CLAUDE.md §7.5 already records).
+2. **Port and adversarially verify authorization primitives before building anything on them** — the same discipline as the `9398d03` `authz_*` port: trace each primitive against the exact current RLS predicate it replaces, run the full member/non-member/wrong-scope/null matrix live, and document the RLS-predicate-to-function mapping before any gateway data function is written against it.
+3. **Build gateway data functions, verify against real UI write/read contracts, not just RLS/schema** — the Stage-1/Stage-2 proving runs on the documents group caught real column-coverage gaps this way (`priority`, `for_user_id`, `file_size`, the founder "share link" path) that a schema-only or RLS-only read would have missed. Trace every actual `.select()`/`.insert()`/`.update()` call site's real column list before considering a data function complete.
+4. **Client rewire, verify functional equivalence old-vs-new** — old RLS-governed query vs. new gateway output, field-by-field, same fixtures. This caught a real semantic divergence on the documents group (`is distinct from` vs. SQL `<>` on a nullable column) that the adversarial matrix alone did not.
+5. **DESIGN v2 presentation rebuild, as its own reviewable step** — do not fold presentation into the data-layer rewire step; keep it a separate, explicitly-reviewed pass over already-proven primitives, as done for the documents group.
+6. **Push only after all of the above is reviewed as one unit** — the documents-group precedent: six commits, one push, after every stage was individually approved.
+
+### 20.2 Known open items — not blocking, logged for whenever relevant
+
+- **`useAuth()` session-injection gap** blocks real-browser-render testing in production without solving hCaptcha. This affects test tooling only, not shipped code — the underlying gateway authorization was independently verified live against production by calling the `pack_api` functions directly with real, freshly-minted tokens. The same gap exists in the codebase's own previously-trusted Playwright pattern (`auth-and-portfolio.spec.ts`), confirmed by running it directly against this exact scenario — it is pre-existing, not introduced by this work.
+- **Orphaned `doc_list` DB function** (superseded by the three named `doc_list_room`/`doc_list_library`/`doc_list_investor` reads, no caller) — left in place per §4 (harmless, service-role-only, unexposed); flagged for a future cleanup pass rather than dropped silently.
+- **Detached-documents library bug** (pre-existing, faithfully preserved during the migration, not fixed) — a document detached from a deal room (`deal_room_id` set to `NULL`) becomes permanently invisible to the "add from library" picker, because the picker's `<>` comparison excludes `NULL` rows, matching the original PostgREST query's behaviour exactly. Needs a product decision on whether detached docs should be re-addable from the library before anyone touches this comparison. See the `project-detached-docs-library-bug` memory for the full trace.
+- **Font-loading cost during the v1/v2 coexistence period**: five font families now load simultaneously — v1's DM Sans and Syne, plus v2's Archivo, Source Serif 4 and JetBrains Mono. Self-hosted, no third-party requests, but still a real payload cost worth revisiting once v1 fully retires and the coexistence period ends.
+
+---
+
+## 21. Amendment log
 
 | Date | Change |
 |---|---|
@@ -372,3 +402,4 @@ Found during the deployed-edge-function inventory sweep queued after the §17 `a
 | 3 Aug 2026 | Added §17 (new numbered section, not folded into §7): `ai-router` Supabase Edge Function found live-serving the Ask AI panel on at least one real page, fabricating a non-existent feature in production, never audited for identity/auth. Flagged as highest-priority follow-up, full audit scoped for next session (Opus, step-0 only). |
 | 3 Aug 2026 | `ai-router` audited and remediated same day (commits `ef32b6c`, `d825b43`, `9c4da33`; deployed through v9): `verify_jwt: true` + in-code `resolveUid()` closes the open-auth and forgeable-`user_id` gap (anon key explicitly tested and rejected); anti-fabrication guardrail added to every `task_type` and to `AIOperatorPanel.tsx`; deployed↔repo drift reconciled before the fix, as its own commit. §17 rewritten to record this as history rather than an open incident. Added a general §7.1 lesson: test whether the anon key itself passes any `verify_jwt`-style check. Corrected §10's provider-routing line, which had claimed enforcement that the audit proved does not exist. **DPA/sensitive-routing question (Foundation §16 Rule 16.1) explicitly left open** — counsel/product decision, not resolved by this pass. |
 | 3 Aug 2026 | Deployed-edge-function inventory sweep (queued after the `ai-router` remediation above) found `match-investors` and `verify-investor` as fully-built, cron-scheduled, §15/§25-excluded features with zero repo trace — traced to a much larger finding of a never-fully-functional 5-tier verification / 23-badge system described sitewide. Added as new §19 (27 files, 5 commits `6ded0dd`..`e403023`; both crons unscheduled, 4 fixture rows deleted per product-owner authorization, 4 edge functions stubbed to `410 Gone`, 4 changelog entries corrected inline rather than rewritten). §19 records this as closed; the founder/investor pricing figure inconsistency found incidentally during the sweep ($49/mo vs. $19+$99/mo across different pages) is logged there as a separate open item, not resolved by this pass. |
+| 5 Aug 2026 | Added §20 (new numbered section; prior §20 Amendment log renumbered to §21): documents-group migration recorded as CLOSED and PUSHED — `9398d03`..`c64e9cf`, 6 commits, verified live in production on all four post-push checks (v1 isolation, rebuilt-screen render + real write, `pack_v1`/`pack_api` isolation, gateway authorization matrix). First full vertical slice of the new architecture (token layer → primitives → authorization port → gateway functions → client rewire → DESIGN v2 presentation) proven end-to-end. No work in progress. §20.1 records the proven six-step sequence for the next group (deal-room-core) and points at the inline `§B — future migration group` comments left throughout the documents-group code as the traced worklist. §20.2 logs four known open items (session-injection test-tooling gap, orphaned `doc_list` function, detached-documents library bug, five-font-family coexistence cost) as non-blocking. |
