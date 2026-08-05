@@ -7,6 +7,21 @@
 @import "@fontsource/dm-sans/500.css";
 @import "@fontsource/syne/600.css";
 @import "@fontsource/syne/700.css";
+/* v2 (Design Constitution v2 — the register/ledger system, behind sign-in).
+   Self-hosted like the v1 faces above; loaded alongside them because the app
+   is intentionally MIXED v1/v2 during the rebuild. These faces are used only
+   by v2 components (font-v2-ui / font-v2-doc / font-v2-data); v1 screens keep
+   DM Sans/Syne untouched. Archivo 400/500/600/700 (interface), Source Serif 4
+   400/600 (document surface), JetBrains Mono 400/500/700 (data). */
+@import "@fontsource/archivo/400.css";
+@import "@fontsource/archivo/500.css";
+@import "@fontsource/archivo/600.css";
+@import "@fontsource/archivo/700.css";
+@import "@fontsource/source-serif-4/400.css";
+@import "@fontsource/source-serif-4/600.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/jetbrains-mono/700.css";
 @plugin "@tailwindcss/typography";
 
 /* ── Mobile globals ──────────────────────────────────────────────── */
@@ -65,6 +80,32 @@ img { max-width: 100%; height: auto; }
   --color-sidebar-ring: var(--sidebar-ring);
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Syne", ui-sans-serif, system-ui, sans-serif;
+
+  /* ── Design Constitution v2 — exposed as Tailwind utilities ──────────────
+     Every v2 token is prefixed --v2-* to guarantee it never collides with or
+     leaks into the v1 theme above (only --accent actually clashed, but the
+     whole layer is prefixed uniformly so v2 adoption is greppable and the
+     convention has no exceptions — see PRIMITIVES.md § naming). Values are
+     DESIGN.md §14 verbatim; the class names differ from §14's implied literals
+     (bg-v2-surface, not bg-surface) by that same deliberate prefix decision. */
+  --color-v2-surface: var(--v2-surface);
+  --color-v2-panel: var(--v2-panel);
+  --color-v2-ink: var(--v2-ink);
+  --color-v2-ink-secondary: var(--v2-ink-secondary);
+  --color-v2-ink-muted: var(--v2-ink-muted);
+  --color-v2-rule: var(--v2-rule);
+  --color-v2-rule-light: var(--v2-rule-light);
+  --color-v2-accent: var(--v2-accent);
+  --color-v2-accent-wash: var(--v2-accent-wash);
+  --color-v2-satisfied: var(--v2-satisfied);
+  --color-v2-satisfied-wash: var(--v2-satisfied-wash);
+  --color-v2-attention: var(--v2-attention);
+  --color-v2-attention-wash: var(--v2-attention-wash);
+  --color-v2-adverse: var(--v2-adverse);
+  --color-v2-adverse-wash: var(--v2-adverse-wash);
+  --font-v2-ui: "Archivo", system-ui, sans-serif;
+  --font-v2-doc: "Source Serif 4", Georgia, serif;
+  --font-v2-data: "JetBrains Mono", ui-monospace, monospace;
   /* Institutional type scale (CLAUDE.md §9.1): body 14px min, tables 13px min. */
   --text-sm: 0.8125rem;
   --text-sm--line-height: 1.25rem;
@@ -133,6 +174,36 @@ img { max-width: 100%; height: auto; }
   --shadow-lg: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-glow: none;
   --shadow-card: none;
+
+  /* ── Design Constitution v2 token values (DESIGN.md §14, verbatim) ───────
+     The register/ledger system for the authenticated application. Prefixed
+     --v2-* so they are additive to the v1 theme above and never repaint a
+     still-v1 screen. Do not add a value here that is not in DESIGN.md §14;
+     if v2 work needs one that isn't specified, amend DESIGN.md first. */
+  --v2-surface: #F5F4F1;
+  --v2-panel: #FFFFFF;
+  --v2-ink: #16181C;
+  --v2-ink-secondary: #464C58;
+  --v2-ink-muted: #6E7585;
+  --v2-rule: #D6D4CD;
+  --v2-rule-light: #E8E6E0;
+  --v2-accent: #1B3A63;
+  --v2-accent-wash: #E8EDF4;
+  --v2-satisfied: #215B49;
+  --v2-satisfied-wash: #E6F0EC;
+  --v2-attention: #7A5310;
+  --v2-attention-wash: #F8F0E0;
+  --v2-adverse: #7A2E2A;
+  --v2-adverse-wash: #F7EAE9;
+  /* Geometry (§14). --v2-radius is the ONLY radius v2 components use. */
+  --v2-radius: 2px;
+  --v2-border: 1px;
+  --v2-border-emphasis: 1.5px;
+  --v2-rule-status: 3px;
+  /* Motion (§14) */
+  --v2-dur-fast: 120ms;
+  --v2-dur-base: 180ms;
+  --v2-ease: cubic-bezier(0.2, 0, 0.2, 1);
 }
 
 

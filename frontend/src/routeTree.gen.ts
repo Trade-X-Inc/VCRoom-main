@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TrustRouteImport } from './routes/trust'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
@@ -52,6 +51,7 @@ import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as JoinInvestorTokenRouteImport } from './routes/join-investor.$token'
 import { Route as ISlugRouteImport } from './routes/i.$slug'
 import { Route as DocsSplatRouteImport } from './routes/docs.$'
+import { Route as DevV2PrimitivesRouteImport } from './routes/dev.v2-primitives'
 import { Route as CvSlugRouteImport } from './routes/cv.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
@@ -163,11 +163,6 @@ import { Route as AppInvestorThesisFundVaultDigitalDocumentVaultRouteImport } fr
 import { Route as AppInvestorDiscoverPublicProfileProfileViewRouteImport } from './routes/app.investor.discover.public-profile.profile-view'
 import { Route as AppInvestorDiscoverPublicProfilePrivacySettingsRouteImport } from './routes/app.investor.discover.public-profile.privacy-settings'
 
-const TrustRoute = TrustRouteImport.update({
-  id: '/trust',
-  path: '/trust',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -378,6 +373,11 @@ const DocsSplatRoute = DocsSplatRouteImport.update({
   id: '/$',
   path: '/$',
   getParentRoute: () => DocsRoute,
+} as any)
+const DevV2PrimitivesRoute = DevV2PrimitivesRouteImport.update({
+  id: '/dev/v2-primitives',
+  path: '/dev/v2-primitives',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CvSlugRoute = CvSlugRouteImport.update({
   id: '/cv/$slug',
@@ -993,7 +993,6 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
-  '/trust': typeof TrustRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
   '/api/email-test': typeof ApiEmailTestRoute
@@ -1021,6 +1020,7 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/cv/$slug': typeof CvSlugRoute
+  '/dev/v2-primitives': typeof DevV2PrimitivesRoute
   '/docs/$': typeof DocsSplatRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
@@ -1145,7 +1145,6 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
-  '/trust': typeof TrustRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
   '/api/email-test': typeof ApiEmailTestRoute
@@ -1172,6 +1171,7 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/cv/$slug': typeof CvSlugRoute
+  '/dev/v2-primitives': typeof DevV2PrimitivesRoute
   '/docs/$': typeof DocsSplatRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
@@ -1300,7 +1300,6 @@ export interface FileRoutesById {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
-  '/trust': typeof TrustRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
   '/api/email-test': typeof ApiEmailTestRoute
@@ -1328,6 +1327,7 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/cv/$slug': typeof CvSlugRoute
+  '/dev/v2-primitives': typeof DevV2PrimitivesRoute
   '/docs/$': typeof DocsSplatRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
@@ -1457,7 +1457,6 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/terms'
-    | '/trust'
     | '/api/admin'
     | '/api/admin-data'
     | '/api/email-test'
@@ -1485,6 +1484,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/cv/$slug'
+    | '/dev/v2-primitives'
     | '/docs/$'
     | '/i/$slug'
     | '/join-investor/$token'
@@ -1609,7 +1609,6 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/terms'
-    | '/trust'
     | '/api/admin'
     | '/api/admin-data'
     | '/api/email-test'
@@ -1636,6 +1635,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/cv/$slug'
+    | '/dev/v2-primitives'
     | '/docs/$'
     | '/i/$slug'
     | '/join-investor/$token'
@@ -1763,7 +1763,6 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/terms'
-    | '/trust'
     | '/api/admin'
     | '/api/admin-data'
     | '/api/email-test'
@@ -1791,6 +1790,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/cv/$slug'
+    | '/dev/v2-primitives'
     | '/docs/$'
     | '/i/$slug'
     | '/join-investor/$token'
@@ -1919,7 +1919,6 @@ export interface RootRouteChildren {
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   TermsRoute: typeof TermsRoute
-  TrustRoute: typeof TrustRoute
   ApiAdminRoute: typeof ApiAdminRoute
   ApiAdminDataRoute: typeof ApiAdminDataRoute
   ApiEmailTestRoute: typeof ApiEmailTestRoute
@@ -1929,6 +1928,7 @@ export interface RootRouteChildren {
   ApiTestAiRoute: typeof ApiTestAiRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   CvSlugRoute: typeof CvSlugRoute
+  DevV2PrimitivesRoute: typeof DevV2PrimitivesRoute
   ISlugRoute: typeof ISlugRoute
   JoinInvestorTokenRoute: typeof JoinInvestorTokenRoute
   PSlugRoute: typeof PSlugRoute
@@ -1952,13 +1952,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/trust': {
-      id: '/trust'
-      path: '/trust'
-      fullPath: '/trust'
-      preLoaderRoute: typeof TrustRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -2252,6 +2245,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/docs/$'
       preLoaderRoute: typeof DocsSplatRouteImport
       parentRoute: typeof DocsRoute
+    }
+    '/dev/v2-primitives': {
+      id: '/dev/v2-primitives'
+      path: '/dev/v2-primitives'
+      fullPath: '/dev/v2-primitives'
+      preLoaderRoute: typeof DevV2PrimitivesRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/cv/$slug': {
       id: '/cv/$slug'
@@ -3337,7 +3337,6 @@ const rootRouteChildren: RootRouteChildren = {
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   TermsRoute: TermsRoute,
-  TrustRoute: TrustRoute,
   ApiAdminRoute: ApiAdminRoute,
   ApiAdminDataRoute: ApiAdminDataRoute,
   ApiEmailTestRoute: ApiEmailTestRoute,
@@ -3347,6 +3346,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiTestAiRoute: ApiTestAiRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   CvSlugRoute: CvSlugRoute,
+  DevV2PrimitivesRoute: DevV2PrimitivesRoute,
   ISlugRoute: ISlugRoute,
   JoinInvestorTokenRoute: JoinInvestorTokenRoute,
   PSlugRoute: PSlugRoute,
