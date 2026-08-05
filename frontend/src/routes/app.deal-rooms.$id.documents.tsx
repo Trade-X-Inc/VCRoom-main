@@ -13,6 +13,9 @@ import {
   docUpdate, docInsert, docViewInsert,
 } from "@/lib/actions/deal-room-documents";
 import { cn } from "@/lib/utils";
+import {
+  V2Button, LedgerTable, LedgerHead, LedgerBody, Th, Tr, Td, StatusLabel,
+} from "@/components/v2";
 import { Dropzone } from "@/components/app/Dropzone";
 import { Stage2Gate } from "@/components/app/DealRoomWorkflow";
 import { generateDocSummary } from "@/lib/ai-secure-fn";
@@ -31,26 +34,14 @@ export const Route = createFileRoute("/app/deal-rooms/$id/documents")({
 const ALLOWED_UPLOAD_EXTENSIONS = new Set(["pdf", "pptx", "ppt", "xlsx", "xls", "docx", "doc", "csv", "png", "jpg", "jpeg"]);
 const MAX_UPLOAD_SIZE = 50 * 1024 * 1024;
 
-const CATEGORY_COLORS: Record<string, string> = {
-  "Pitch Deck": "bg-accent text-brand",
-  "Financials": "bg-success/10 text-success",
-  "Legal": "bg-violet/10 text-violet",
-  "Market Research": "bg-warning/10 text-warning",
-  "Team": "bg-accent text-brand",
-  "Product": "bg-violet/10 text-violet",
-  "Other": "bg-accent text-gray-500",
-};
-
 const TEXT_EXTS = new Set(["pdf", "docx", "doc", "xlsx", "xls", "csv", "pptx", "ppt", "txt"]);
 
-function getFileTypeStyle(ext: string): { bg: string; color: string; Icon: any } {
-  if (ext === "pdf") return { bg: "bg-red-500/10", color: "text-red-500", Icon: FileText };
-  if (["docx", "doc"].includes(ext)) return { bg: "bg-blue-500/10", color: "text-blue-500", Icon: FileText };
-  if (["xlsx", "xls", "csv"].includes(ext)) return { bg: "bg-green-500/10", color: "text-green-500", Icon: FileText };
-  if (["pptx", "ppt"].includes(ext)) return { bg: "bg-orange-500/10", color: "text-orange-500", Icon: FileText };
-  if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) return { bg: "bg-accent", color: "text-purple-500", Icon: Image };
-  if (["mp4", "mov", "avi", "webm"].includes(ext)) return { bg: "bg-orange-500/10", color: "text-orange-500", Icon: Film };
-  return { bg: "bg-accent", color: "text-gray-500", Icon: FileText };
+function getFileTypeIcon(ext: string) {
+  if (ext === "pdf") return FileText;
+  if (["docx", "doc", "xlsx", "xls", "csv", "pptx", "ppt"].includes(ext)) return FileText;
+  if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) return Image;
+  if (["mp4", "mov", "avi", "webm"].includes(ext)) return Film;
+  return FileText;
 }
 
 function formatFileSize(bytes: number | null): string {
@@ -59,16 +50,6 @@ function formatFileSize(bytes: number | null): string {
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
-
-const CAT_BORDER: Record<string, string> = {
-  "Pitch Deck": "border-l-purple-500",
-  "Financials": "border-l-green-500",
-  "Legal": "border-l-red-500",
-  "Market Research": "border-l-violet-500",
-  "Team": "border-l-blue-500",
-  "Product": "border-l-orange-500",
-  "Other": "border-l-muted-foreground/40",
-};
 
 function formatRelativeTime(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -99,33 +80,33 @@ function DocPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm grid place-items-center p-4"
+      className="fixed inset-0 z-50 grid place-items-center p-4"
+      style={{ background: "rgba(22,24,28,0.4)" }}
       onClick={onClose}
     >
       <div
-        className="w-full max-w-4xl rounded-2xl border border-[rgba(0,0,0,0.08)] bg-card shadow-elev overflow-hidden"
+        className="w-full max-w-4xl bg-v2-panel border border-v2-rule overflow-hidden font-v2-ui"
+        style={{ borderRadius: "var(--v2-radius)" }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(0,0,0,0.08)]">
-          <div className="text-sm font-semibold truncate">{displayName}</div>
-          <button
-            onClick={onClose}
-            className="grid h-7 w-7 place-items-center rounded-md text-gray-500 hover:bg-gray-100"
-          >
+        <div className="flex items-center justify-between px-5" style={{ height: "40px", borderBottom: "1px solid var(--v2-rule)" }}>
+          <div className="text-v2-ink font-medium truncate" style={{ fontSize: "13.5px" }}>{displayName}</div>
+          <V2Button variant="quiet" onClick={onClose} style={{ height: "28px", padding: "0 6px" }}>
             <X className="h-4 w-4" />
-          </button>
+          </V2Button>
         </div>
         <div className="p-6">
           {!url ? (
             <div className="flex justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
+              <Loader2 className="h-6 w-6 animate-spin text-v2-ink-muted" />
             </div>
           ) : isImage ? (
-            <img src={url} alt={displayName} className="max-w-full max-h-[60vh] object-contain mx-auto rounded-lg" />
+            <img src={url} alt={displayName} className="max-w-full max-h-[60vh] object-contain mx-auto" style={{ borderRadius: "var(--v2-radius)" }} />
           ) : isPdf ? (
             <iframe
               src={url}
-              className="w-full h-[70vh] rounded-lg border border-[rgba(0,0,0,0.08)]"
+              className="w-full h-[70vh] border border-v2-rule"
+              style={{ borderRadius: "var(--v2-radius)" }}
               title={displayName}
             />
           ) : (
@@ -137,16 +118,12 @@ function DocPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
             // preview is strictly better than a third-party-routed one, and the
             // download path is a recorded, in-platform action.
             <div className="flex flex-col items-center gap-4 py-8 text-center">
-              <div className="grid h-16 w-16 place-items-center rounded-2xl bg-accent">
-                <FileText className="h-8 w-8 text-gray-500" />
+              <div className="grid h-16 w-16 place-items-center bg-v2-surface" style={{ borderRadius: "var(--v2-radius)" }}>
+                <FileText className="h-8 w-8 text-v2-ink-muted" />
               </div>
-              <p className="text-sm text-gray-500">Preview not available for this file type.</p>
-              <a
-                href={url}
-                download={displayName}
-                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm"
-              >
-                <Download className="h-4 w-4" /> Download to view
+              <p className="text-v2-ink-secondary" style={{ fontSize: "13px" }}>Preview not available for this file type.</p>
+              <a href={url} download={displayName}>
+                <V2Button variant="primary"><Download className="h-4 w-4" /> Download to view</V2Button>
               </a>
             </div>
           )}
@@ -515,46 +492,46 @@ function DocumentsPage() {
   }, {});
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div className="p-8 max-w-5xl mx-auto font-v2-ui text-v2-ink">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1 rounded-xl bg-gray-100/50 p-1">
+        <div className="flex items-center gap-1 border border-v2-rule bg-v2-panel p-1" style={{ borderRadius: "var(--v2-radius)" }}>
           <button
             onClick={() => setActiveVaultTab("documents")}
-            className={cn(
-              "px-4 py-1.5 rounded-lg text-sm font-medium transition-colors",
-              activeVaultTab === "documents" ? "hs-gradient text-brand-foreground shadow-sm" : "text-gray-500 hover:text-foreground"
-            )}
+            className="px-4 py-1.5 font-medium transition-colors"
+            style={{
+              borderRadius: "var(--v2-radius)",
+              fontSize: "13px",
+              background: activeVaultTab === "documents" ? "var(--v2-accent)" : "transparent",
+              color: activeVaultTab === "documents" ? "#fff" : "var(--v2-ink-muted)",
+            }}
           >
-            📁 Documents
-            <span className="ml-1.5 text-[10px] text-gray-500">({(docs as any[]).length})</span>
+            Documents
+            <span className="ml-1.5" style={{ fontSize: "10px", opacity: 0.8 }}>({(docs as any[]).length})</span>
           </button>
           <button
             onClick={() => setActiveVaultTab("links")}
-            className={cn(
-              "px-4 py-1.5 rounded-lg text-sm font-medium transition-colors",
-              activeVaultTab === "links" ? "hs-gradient text-brand-foreground shadow-sm" : "text-gray-500 hover:text-foreground"
-            )}
+            className="px-4 py-1.5 font-medium transition-colors"
+            style={{
+              borderRadius: "var(--v2-radius)",
+              fontSize: "13px",
+              background: activeVaultTab === "links" ? "var(--v2-accent)" : "transparent",
+              color: activeVaultTab === "links" ? "#fff" : "var(--v2-ink-muted)",
+            }}
           >
-            🔗 Links
-            <span className="ml-1.5 text-[10px] text-gray-500">({(dealRoomLinks as any[]).length})</span>
+            Links
+            <span className="ml-1.5" style={{ fontSize: "10px", opacity: 0.8 }}>({(dealRoomLinks as any[]).length})</span>
           </button>
         </div>
         <div className="flex gap-2">
           {activeVaultTab === "documents" && isFounder && (
-            <button
-              onClick={() => setShowLibrary(true)}
-              className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 bg-accent text-brand px-3 py-1.5 text-sm hover:bg-accent"
-            >
+            <V2Button variant="secondary" onClick={() => setShowLibrary(true)}>
               <Plus className="h-4 w-4" /> Add from library
-            </button>
+            </V2Button>
           )}
           {activeVaultTab === "links" && (
-            <button
-              onClick={() => setShowAddLink(true)}
-              className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow"
-            >
+            <V2Button variant="primary" onClick={() => setShowAddLink(true)}>
               <Plus className="h-4 w-4" /> Add link
-            </button>
+            </V2Button>
           )}
         </div>
       </div>
@@ -564,154 +541,49 @@ function DocumentsPage() {
       {(platformDocs as any[]).length > 0 && (
         <div className="mt-5 mb-6">
           <div className="flex items-center gap-2 mb-3">
-            <h3 className="text-sm font-semibold text-foreground">Platform Documents</h3>
-            <span className="text-xs bg-accent text-brand px-2 py-0.5 rounded-full">
+            <h3 className="text-v2-ink font-medium" style={{ fontSize: "13.5px" }}>Platform documents</h3>
+            <span className="text-v2-ink-muted" style={{ fontSize: "11px" }}>
               {(platformDocs as any[]).length} structured
             </span>
           </div>
           {isInvestor && <Stage2Gate stage2Unlocked={stage2Unlocked} />}
           {isInvestor && platformDocsSplit.stage1.length > 0 && (
             <div className="mb-2">
-              <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-2 font-semibold">Stage 1 — Initial review</div>
-              <div className="space-y-2">
-                {platformDocsSplit.stage1.map((doc: any) => (
-                  <div key={doc.id}
-                    className="flex items-center justify-between p-4 rounded-none border border-border bg-white/[0.02] hover:bg-accent transition-colors">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-brand text-sm shrink-0">≡</div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{doc.title}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">
-                          {doc.document_templates?.category
-                            ? doc.document_templates.category.charAt(0).toUpperCase() + doc.document_templates.category.slice(1)
-                            : "Document"}
-                          {" · "}Updated {formatRelativeTime(doc.updated_at)}
-                          {doc.completeness_score > 0 && <> · {doc.completeness_score}% complete</>}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 shrink-0">
-                      <span className={cn("text-xs px-2 py-0.5 rounded-full", doc.status === "complete" ? "bg-green-500/15 text-green-400" : "bg-amber-500/15 text-amber-400")}>
-                        {doc.status === "complete" ? "✓ Complete" : "In progress"}
-                      </span>
-                      <button
-                        onClick={() => {
-                          setViewingDoc(doc);
-                          trackDocumentView({ founderDocumentId: doc.id });
-                        }}
-                        className="text-xs px-3 py-1.5 rounded-lg bg-accent text-brand hover:bg-accent transition-colors">
-                        View
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <div className="text-v2-ink-muted uppercase font-medium mb-2" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Stage 1 — Initial review</div>
+              <PlatformDocList docs={platformDocsSplit.stage1} onView={(doc) => { setViewingDoc(doc); trackDocumentView({ founderDocumentId: doc.id }); }} />
             </div>
           )}
           {isInvestor && platformDocsSplit.stage2.length > 0 && stage2Unlocked && (
             <div>
-              <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-2 font-semibold">Stage 2 — Full diligence</div>
-              <div className="space-y-2">
-                {platformDocsSplit.stage2.map((doc: any) => (
-                  <div key={doc.id}
-                    className="flex items-center justify-between p-4 rounded-none border border-border bg-white/[0.02] hover:bg-accent transition-colors">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-brand text-sm shrink-0">≡</div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{doc.title}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">
-                          {doc.document_templates?.category
-                            ? doc.document_templates.category.charAt(0).toUpperCase() + doc.document_templates.category.slice(1)
-                            : "Document"}
-                          {" · "}Updated {formatRelativeTime(doc.updated_at)}
-                          {doc.completeness_score > 0 && <> · {doc.completeness_score}% complete</>}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 shrink-0">
-                      <span className={cn("text-xs px-2 py-0.5 rounded-full", doc.status === "complete" ? "bg-green-500/15 text-green-400" : "bg-amber-500/15 text-amber-400")}>
-                        {doc.status === "complete" ? "✓ Complete" : "In progress"}
-                      </span>
-                      <button
-                        onClick={() => {
-                          setViewingDoc(doc);
-                          trackDocumentView({ founderDocumentId: doc.id });
-                        }}
-                        className="text-xs px-3 py-1.5 rounded-lg bg-accent text-brand hover:bg-accent transition-colors">
-                        View
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <div className="text-v2-ink-muted uppercase font-medium mb-2" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Stage 2 — Full diligence</div>
+              <PlatformDocList docs={platformDocsSplit.stage2} onView={(doc) => { setViewingDoc(doc); trackDocumentView({ founderDocumentId: doc.id }); }} />
             </div>
           )}
           {!isInvestor && (
-          <div className="space-y-2">
-            {(platformDocs as any[]).map((doc: any) => (
-              <div key={doc.id}
-                className="flex items-center justify-between p-4 rounded-none border border-border bg-white/[0.02] hover:bg-accent transition-colors">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-brand text-sm shrink-0">≡</div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{doc.title}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {doc.document_templates?.category
-                        ? doc.document_templates.category.charAt(0).toUpperCase() + doc.document_templates.category.slice(1)
-                        : "Document"}
-                      {" · "}Updated {formatRelativeTime(doc.updated_at)}
-                      {doc.completeness_score > 0 && <> · {doc.completeness_score}% complete</>}
-                      {" · "}
-                      <span className="font-medium text-brand">
-                        Stage {(doc.deal_room_stage ?? 1) === 2 ? "2 — Full diligence" : "1 — Initial review"}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 shrink-0">
-                  <span className={cn("text-xs px-2 py-0.5 rounded-full", doc.status === "complete" ? "bg-green-500/15 text-green-400" : "bg-amber-500/15 text-amber-400")}>
-                    {doc.status === "complete" ? "✓ Complete" : "In progress"}
-                  </span>
-                  <button
-                    onClick={() => {
-                      setViewingDoc(doc);
-                      trackDocumentView({ founderDocumentId: doc.id });
-                    }}
-                    className="text-xs px-3 py-1.5 rounded-lg bg-accent text-brand hover:bg-accent transition-colors">
-                    View
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+            <PlatformDocList docs={platformDocs as any[]} onView={(doc) => { setViewingDoc(doc); trackDocumentView({ founderDocumentId: doc.id }); }} showStage />
           )}
         </div>
       )}
 
       {(platformDocs as any[]).length > 0 && (docs as any[]).length > 0 && (
         <div className="flex items-center gap-3 mb-5">
-          <div className="flex-1 h-px bg-border/40" />
-          <span className="text-xs text-gray-500 uppercase tracking-wider">Uploaded files</span>
-          <div className="flex-1 h-px bg-border/40" />
+          <div className="flex-1" style={{ height: "1px", background: "var(--v2-rule-light)" }} />
+          <span className="text-v2-ink-muted uppercase" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Uploaded files</span>
+          <div className="flex-1" style={{ height: "1px", background: "var(--v2-rule-light)" }} />
         </div>
       )}
 
       {isFounder && (
         <div className="mt-5 space-y-3">
-          <div className="rounded-lg bg-gray-100/40 border border-[rgba(0,0,0,0.08)] px-4 py-3 text-xs text-gray-500 space-y-1">
-            <div>💡 <strong>Documents shared here are visible to the investor</strong> and appear in their Workstation automatically.</div>
-            <div className="flex flex-wrap gap-1.5 mt-1.5">
-              {[
-                { ext: "PDF", color: "text-red-600 bg-red-500/10" },
-                { ext: "PPTX", color: "text-orange-600 bg-orange-500/10" },
-                { ext: "DOCX", color: "text-blue-600 bg-blue-500/10" },
-                { ext: "XLSX", color: "text-green-600 bg-green-500/10" },
-                { ext: "CSV", color: "text-green-600 bg-green-500/10" },
-                { ext: "PNG/JPG", color: "text-brand bg-accent" },
-              ].map(({ ext, color }) => (
-                <span key={ext} className={cn("rounded px-1.5 py-0.5 text-[9px] font-bold uppercase", color)}>{ext}</span>
+          <div className="border border-v2-rule bg-v2-surface px-4 py-3" style={{ borderRadius: "var(--v2-radius)" }}>
+            <div className="text-v2-ink-secondary" style={{ fontSize: "12px" }}>
+              Documents shared here are visible to the investor and appear in their workstation automatically.
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+              {["PDF", "PPTX", "DOCX", "XLSX", "CSV", "PNG/JPG"].map((ext) => (
+                <span key={ext} className="border border-v2-rule px-1.5 py-0.5 font-medium uppercase text-v2-ink-muted" style={{ borderRadius: "var(--v2-radius)", fontSize: "10px" }}>{ext}</span>
               ))}
-              <span className="text-[10px] text-gray-500 self-center">· Max 50MB per file</span>
+              <span className="text-v2-ink-muted" style={{ fontSize: "11px" }}>Max 50 MB per file</span>
             </div>
           </div>
           <Dropzone
@@ -753,23 +625,26 @@ function DocumentsPage() {
         </div>
       )}
 
-      <div className="flex gap-1 mt-5 pb-2 overflow-x-auto border-b border-[rgba(0,0,0,0.08)]">
+      <div className="flex gap-1 mt-5 pb-2 overflow-x-auto" style={{ borderBottom: "1px solid var(--v2-rule)" }}>
         {DOC_CATEGORIES.map((cat) => {
           const count = cat === "All" ? (docs as any[]).length : (catCounts[cat] ?? 0);
+          const active = activeDocTab === cat;
           return (
             <button
               key={cat}
               onClick={() => setActiveDocTab(cat)}
-              className={cn(
-                "shrink-0 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs transition-colors",
-                activeDocTab === cat
-                  ? "hs-gradient text-brand-foreground"
-                  : "border border-[rgba(0,0,0,0.08)] hover:bg-gray-100"
-              )}
+              className="shrink-0 inline-flex items-center gap-1 px-3 py-1 transition-colors font-v2-ui"
+              style={{
+                borderRadius: "var(--v2-radius)",
+                fontSize: "12px",
+                background: active ? "var(--v2-accent)" : "transparent",
+                color: active ? "#fff" : "var(--v2-ink-secondary)",
+                border: active ? "none" : "1px solid var(--v2-rule)",
+              }}
             >
               {cat}
               {count > 0 && (
-                <span className={cn("rounded-full px-1.5 py-0.5 text-[9px] font-bold", activeDocTab === cat ? "bg-background/20" : "bg-accent text-gray-500")}>
+                <span style={{ fontSize: "10px", fontWeight: 600, opacity: active ? 0.9 : 0.7 }}>
                   {count}
                 </span>
               )}
@@ -780,49 +655,44 @@ function DocumentsPage() {
 
       {showLibrary && (
         <div
-          className="fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm grid place-items-center p-4"
+          className="fixed inset-0 z-50 grid place-items-center p-4"
+          style={{ background: "rgba(22,24,28,0.4)" }}
           onClick={() => setShowLibrary(false)}
         >
           <div
-            className="w-full max-w-lg rounded-2xl border border-[rgba(0,0,0,0.08)] bg-card shadow-elev"
+            className="w-full max-w-lg bg-v2-panel border border-v2-rule font-v2-ui"
+            style={{ borderRadius: "var(--v2-radius)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-5 border-b border-[rgba(0,0,0,0.08)]">
-              <div className="text-sm font-semibold">Add from document library</div>
-              <button
-                onClick={() => setShowLibrary(false)}
-                className="grid h-8 w-8 place-items-center rounded-md text-gray-500 hover:bg-gray-100"
-              >
+            <div className="flex items-center justify-between px-5" style={{ height: "40px", borderBottom: "1px solid var(--v2-rule)" }}>
+              <div className="text-v2-ink font-medium" style={{ fontSize: "13.5px" }}>Add from document library</div>
+              <V2Button variant="quiet" onClick={() => setShowLibrary(false)} style={{ height: "28px", padding: "0 6px" }}>
                 <X className="h-4 w-4" />
-              </button>
+              </V2Button>
             </div>
             <div className="p-3 max-h-80 overflow-y-auto">
-              {libLoading && <div className="text-sm text-gray-500 p-3 animate-pulse">Loading…</div>}
+              {libLoading && <div className="text-v2-ink-muted p-3" style={{ fontSize: "13px" }}>Loading</div>}
               {!libLoading && (libraryDocs as any[]).length === 0 && (
-                <div className="text-sm text-gray-500 p-3 text-center py-6">
-                  <FileText className="h-8 w-8 mx-auto mb-2 text-[#71717A]" />
-                  No documents to add. Upload documents from the main Documents page first.
+                <div className="text-v2-ink-muted p-3 text-center py-6" style={{ fontSize: "13px" }}>
+                  <FileText className="h-8 w-8 mx-auto mb-2" />
+                  No documents to add. Upload documents from the main documents page first.
                 </div>
               )}
               {(libraryDocs as any[]).map((doc) => (
-                <div key={doc.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent/50">
-                  <div className="grid h-8 w-8 place-items-center rounded-md bg-accent shrink-0">
-                    <FileText className="h-4 w-4 text-brand" />
+                <div key={doc.id} className="flex items-center gap-3 p-3 hover:bg-v2-accent-wash" style={{ borderRadius: "var(--v2-radius)" }}>
+                  <div className="grid h-8 w-8 place-items-center bg-v2-surface shrink-0" style={{ borderRadius: "var(--v2-radius)" }}>
+                    <FileText className="h-4 w-4 text-v2-accent" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate">
+                    <div className="font-medium truncate text-v2-ink" style={{ fontSize: "13px" }}>
                       {doc.name || doc.storage_path?.split("/").pop() || "Document"}
                     </div>
-                    {doc.category && <div className="text-xs text-gray-500">{doc.category}</div>}
+                    {doc.category && <div className="text-v2-ink-muted" style={{ fontSize: "11px" }}>{doc.category}</div>}
                   </div>
-                  <button
-                    onClick={() => addFromLibrary(doc.id)}
-                    disabled={addingFromLib === doc.id}
-                    className="shrink-0 inline-flex items-center gap-1 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs disabled:opacity-50"
-                  >
+                  <V2Button variant="primary" onClick={() => addFromLibrary(doc.id)} disabled={addingFromLib === doc.id} style={{ height: "28px", fontSize: "11px" }}>
                     {addingFromLib === doc.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
                     Add
-                  </button>
+                  </V2Button>
                 </div>
               ))}
             </div>
@@ -832,17 +702,19 @@ function DocumentsPage() {
 
       {ndaDocs.length > 0 && (
         <div className="mt-5">
-          <div className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-2">System generated</div>
-          <div className="rounded-none border border-[rgba(0,0,0,0.08)] bg-card shadow-card divide-y divide-border/60">
+          <div className="text-v2-ink-muted uppercase font-medium mb-2" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>System generated</div>
+          <div className="border border-v2-rule bg-v2-panel divide-y" style={{ borderRadius: "var(--v2-radius)", borderColor: "var(--v2-rule-light)" }}>
             {ndaDocs.map((d) => (
-              <div key={d.name} className="flex items-center gap-3 px-5 py-3">
-                <div className="grid h-8 w-8 place-items-center rounded-md bg-success/10"><Shield className="h-4 w-4 text-success" /></div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium truncate">{d.name}</div>
-                  <div className="text-xs text-gray-500">Auto-generated NDA · {new Date(d.createdAt).toLocaleDateString()}</div>
+              <div key={d.name} className="flex items-center gap-3 px-5 py-3" style={{ borderColor: "var(--v2-rule-light)" }}>
+                <div className="grid h-8 w-8 place-items-center bg-v2-satisfied-wash" style={{ borderRadius: "var(--v2-radius)" }}>
+                  <Shield className="h-4 w-4 text-v2-satisfied" />
                 </div>
-                <span className="inline-flex items-center gap-1 text-success text-xs"><CheckCircle2 className="h-3.5 w-3.5" /> Signed by all</span>
-                <button className="text-gray-500 hover:text-foreground"><Download className="h-4 w-4" /></button>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium truncate text-v2-ink" style={{ fontSize: "13px" }}>{d.name}</div>
+                  <div className="text-v2-ink-muted" style={{ fontSize: "11px" }}>Auto-generated NDA · {new Date(d.createdAt).toLocaleDateString()}</div>
+                </div>
+                <StatusLabel tone="satisfied">Signed by all</StatusLabel>
+                <V2Button variant="quiet" style={{ height: "28px", padding: "0 6px" }}><Download className="h-4 w-4" /></V2Button>
               </div>
             ))}
           </div>
@@ -850,188 +722,176 @@ function DocumentsPage() {
       )}
 
       {filteredDocs.length > 0 && (
-        <div className="mt-5 space-y-3">
-          {filteredDocs.map((doc) => {
-            const rawName = doc.name || doc.storage_path?.split("/").pop() || "Document";
-            const displayName = rawName.replace(/^\d{13}-/, "");
-            const ext = displayName.split(".").pop()?.toLowerCase() ?? "";
-            const hasSummary = !!doc.ai_summary;
-            const isGenerating = generatingSummaryId === doc.id;
-            const isEditing = editingSummaryId === doc.id;
-            const supportsAI = TEXT_EXTS.has(ext);
-            const catColor = CATEGORY_COLORS[doc.category] ?? "bg-accent text-gray-500";
-            const catBorder = CAT_BORDER[doc.category] ?? "border-l-muted-foreground/40";
-            const { bg: iconBg, color: iconColor, Icon: FileIcon } = getFileTypeStyle(ext);
-            const fileSize = formatFileSize(doc.file_size ?? null);
+        <div className="mt-5 overflow-x-auto">
+          <LedgerTable>
+            <LedgerHead>
+              <Tr>
+                <Th>Document</Th>
+                <Th>Category</Th>
+                <Th>Uploader</Th>
+                <Th numeric>Size</Th>
+                <Th aria-label="Actions" />
+              </Tr>
+            </LedgerHead>
+            <LedgerBody>
+              {filteredDocs.map((doc) => {
+                const rawName = doc.name || doc.storage_path?.split("/").pop() || "Document";
+                const displayName = rawName.replace(/^\d{13}-/, "");
+                const ext = displayName.split(".").pop()?.toLowerCase() ?? "";
+                const hasSummary = !!doc.ai_summary;
+                const isGenerating = generatingSummaryId === doc.id;
+                const isEditing = editingSummaryId === doc.id;
+                const supportsAI = TEXT_EXTS.has(ext);
+                const FileIcon = getFileTypeIcon(ext);
+                const fileSize = formatFileSize(doc.file_size ?? null);
+                const isPinned = activeDocTab === "All" && pitchDeckDoc?.id === doc.id;
 
-            return (
-              <div
-                key={doc.id}
-                className={cn(
-                  "rounded-none bg-card overflow-hidden border border-[rgba(0,0,0,0.08)] border-l-4",
-                  catBorder
-                )}
-              >
-                <div className="flex items-center gap-3 px-4 py-3">
-                  <div className={cn("grid h-9 w-9 place-items-center rounded-lg shrink-0", iconBg)}>
-                    <FileIcon className={cn("h-4 w-4", iconColor)} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-medium truncate">{displayName}</span>
-                      {activeDocTab === "All" && pitchDeckDoc?.id === doc.id && (
-                        <span className="shrink-0 text-[9px] font-bold bg-accent text-brand px-1.5 py-0.5 rounded-full">📌 PINNED</span>
-                      )}
-                      {doc.category && (
-                        <span className={cn("shrink-0 text-[10px] px-1.5 py-0.5 rounded-full font-medium", catColor)}>
-                          {doc.category}
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-0.5 flex items-center gap-1.5 text-xs text-gray-500">
-                      <span>{doc.uploader?.full_name ?? "Unknown"}</span>
-                      <span>·</span>
-                      <span>{new Date(doc.created_at).toLocaleDateString()}</span>
-                      {fileSize && <><span>·</span><span>{fileSize}</span></>}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      onClick={() => {
-                        setPreviewDoc(doc);
-                        trackDocumentView({ documentId: doc.id });
-                      }}
-                      className="grid h-7 w-7 place-items-center rounded-md text-gray-500 hover:bg-accent hover:text-foreground"
-                      title="Preview"
-                    >
-                      <Eye className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      onClick={() => handleDownload(doc.storage_path)}
-                      className="grid h-7 w-7 place-items-center rounded-md text-gray-500 hover:bg-accent hover:text-foreground"
-                      title="Download"
-                    >
-                      <Download className="h-3.5 w-3.5" />
-                    </button>
-                    {isFounder && (
-                      <button
-                        onClick={() => handleDocRemove(doc)}
-                        title="Remove from deal room"
-                        className="grid h-7 w-7 place-items-center rounded-md text-gray-500 hover:text-destructive hover:bg-destructive/10 transition-colors"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {supportsAI && (
-                  <div className="border-t border-[rgba(0,0,0,0.08)]">
-                    {hasSummary ? (
-                      <div className="px-4 py-2.5">
-                        <button
-                          onClick={() => toggleSummary(doc.id)}
-                          className="flex items-center gap-1.5 text-xs text-brand hover:underline w-full text-left"
-                        >
-                          <Sparkles className="h-3.5 w-3.5 shrink-0" />
-                          <span className="flex-1">AI Summary</span>
-                          <span className={cn(
-                            "px-1.5 py-0.5 rounded text-[9px] font-medium",
-                            doc.summary_edited ? "bg-accent text-brand" : "bg-muted/60 text-gray-500"
-                          )}>
-                            {doc.summary_edited ? "Edited" : "AI"}
-                          </span>
-                          {isSummaryExpanded(doc.id)
-                            ? <ChevronUp className="h-3 w-3 shrink-0" />
-                            : <ChevronDown className="h-3 w-3 shrink-0" />}
-                        </button>
-                        {isSummaryExpanded(doc.id) && (
-                          <div className="mt-2 rounded-lg border-l-2 border-brand/40 bg-gray-100/30 px-3 py-3">
-                            {isEditing ? (
-                              <div className="space-y-2">
-                                <textarea
-                                  value={summaryEdits[doc.id] ?? ""}
-                                  onChange={(e) => setSummaryEdits((s) => ({ ...s, [doc.id]: e.target.value }))}
-                                  rows={4}
-                                  className="w-full rounded-md border border-[rgba(0,0,0,0.08)] bg-background px-3 py-2 text-xs resize-none focus:outline-none focus:border-brand/50"
-                                />
-                                <div className="flex gap-2">
-                                  <button
-                                    onClick={() => setEditingSummaryId(null)}
-                                    className="text-[10px] border border-[rgba(0,0,0,0.08)] rounded px-2 py-1 hover:bg-gray-100"
-                                  >
-                                    Cancel
-                                  </button>
-                                  <button
-                                    onClick={async () => {
-                                      const text = summaryEdits[doc.id]?.trim();
-                                      if (!text) return;
-                                      try {
-                                        await callAction(docUpdate, dealRoomId, { documentId: doc.id, patch: { ai_summary: text, summary_edited: true } });
-                                      } catch { toast.error("Failed to save summary"); return; }
-                                      queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
-                                      queryClient.invalidateQueries({ queryKey: ["dd-docs", dealRoomId] });
-                                      setEditingSummaryId(null);
-                                      setSummaryEdits((s) => { const n = { ...s }; delete n[doc.id]; return n; });
-                                      toast.success("Summary saved");
-                                    }}
-                                    className="text-[10px] bg-gradient-brand text-brand-foreground rounded px-2 py-1"
-                                  >
-                                    Save
-                                  </button>
-                                </div>
-                              </div>
-                            ) : (
-                              <>
-                                <p className="text-sm text-gray-900 leading-relaxed whitespace-pre-line">
-                                  {doc.ai_summary}
-                                </p>
-                                <div className="flex gap-2 mt-2">
-                                  <button
-                                    onClick={() => generateSummary(doc)}
-                                    disabled={isGenerating}
-                                    className="text-[10px] text-gray-500 hover:text-foreground border border-[rgba(0,0,0,0.08)] rounded px-2 py-0.5 hover:bg-accent disabled:opacity-50"
-                                  >
-                                    {isGenerating ? "Regenerating…" : "Regenerate"}
-                                  </button>
-                                  {isFounder && (
-                                    <button
-                                      onClick={() => {
-                                        setEditingSummaryId(doc.id);
-                                        setSummaryEdits((s) => ({ ...s, [doc.id]: doc.ai_summary! }));
-                                      }}
-                                      className="text-[10px] text-gray-500 hover:text-foreground border border-[rgba(0,0,0,0.08)] rounded px-2 py-0.5 hover:bg-gray-100"
-                                    >
-                                      Edit
-                                    </button>
+                return (
+                  <>
+                    <Tr key={doc.id}>
+                      <Td>
+                        <div className="flex items-center gap-2">
+                          <FileIcon className="h-3.5 w-3.5 text-v2-ink-muted shrink-0" />
+                          <span className="font-medium text-v2-ink truncate">{displayName}</span>
+                          {isPinned && <StatusLabel tone="neutral" dot={false}>Pinned</StatusLabel>}
+                        </div>
+                        <div className="text-v2-ink-muted mt-0.5" style={{ fontSize: "11px" }}>
+                          {new Date(doc.created_at).toLocaleDateString()}
+                        </div>
+                      </Td>
+                      <Td>{doc.category || "Other"}</Td>
+                      <Td>{doc.uploader?.full_name ?? "Unknown"}</Td>
+                      <Td numeric>{fileSize || "—"}</Td>
+                      <Td numeric>
+                        <div className="flex items-center justify-end gap-1">
+                          <V2Button
+                            variant="quiet"
+                            onClick={() => { setPreviewDoc(doc); trackDocumentView({ documentId: doc.id }); }}
+                            style={{ height: "28px", padding: "0 6px" }}
+                            title="Preview"
+                          >
+                            <Eye className="h-3.5 w-3.5" />
+                          </V2Button>
+                          <V2Button
+                            variant="quiet"
+                            onClick={() => handleDownload(doc.storage_path)}
+                            style={{ height: "28px", padding: "0 6px" }}
+                            title="Download"
+                          >
+                            <Download className="h-3.5 w-3.5" />
+                          </V2Button>
+                          {isFounder && (
+                            <V2Button
+                              variant="quiet"
+                              onClick={() => handleDocRemove(doc)}
+                              style={{ height: "28px", padding: "0 6px" }}
+                              title="Remove from deal room"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </V2Button>
+                          )}
+                        </div>
+                      </Td>
+                    </Tr>
+                    {supportsAI && (
+                      <Tr>
+                        <Td colSpan={5} style={{ padding: "0 16px 8px" }}>
+                          {hasSummary ? (
+                            <div>
+                              <button
+                                onClick={() => toggleSummary(doc.id)}
+                                className="flex items-center gap-1.5 text-v2-accent hover:underline w-full text-left"
+                                style={{ fontSize: "11.5px" }}
+                              >
+                                <Sparkles className="h-3.5 w-3.5 shrink-0" />
+                                <span className="flex-1">AI summary</span>
+                                <StatusLabel tone="neutral" dot={false}>{doc.summary_edited ? "Edited" : "Generated"}</StatusLabel>
+                                {isSummaryExpanded(doc.id)
+                                  ? <ChevronUp className="h-3 w-3 shrink-0" />
+                                  : <ChevronDown className="h-3 w-3 shrink-0" />}
+                              </button>
+                              {isSummaryExpanded(doc.id) && (
+                                <div className="mt-2 bg-v2-surface px-3 py-3" style={{ borderInlineStart: "2px solid var(--v2-accent)", borderRadius: "var(--v2-radius)" }}>
+                                  {isEditing ? (
+                                    <div className="space-y-2">
+                                      <textarea
+                                        value={summaryEdits[doc.id] ?? ""}
+                                        onChange={(e) => setSummaryEdits((s) => ({ ...s, [doc.id]: e.target.value }))}
+                                        rows={4}
+                                        className="w-full border border-v2-rule bg-v2-panel px-3 py-2 resize-none focus:outline-none font-v2-ui"
+                                        style={{ borderRadius: "var(--v2-radius)", fontSize: "12px" }}
+                                      />
+                                      <div className="flex gap-2">
+                                        <V2Button variant="quiet" onClick={() => setEditingSummaryId(null)} style={{ height: "26px", fontSize: "11px" }}>
+                                          Cancel
+                                        </V2Button>
+                                        <V2Button
+                                          variant="primary"
+                                          style={{ height: "26px", fontSize: "11px" }}
+                                          onClick={async () => {
+                                            const text = summaryEdits[doc.id]?.trim();
+                                            if (!text) return;
+                                            try {
+                                              await callAction(docUpdate, dealRoomId, { documentId: doc.id, patch: { ai_summary: text, summary_edited: true } });
+                                            } catch { toast.error("Failed to save summary"); return; }
+                                            queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+                                            queryClient.invalidateQueries({ queryKey: ["dd-docs", dealRoomId] });
+                                            setEditingSummaryId(null);
+                                            setSummaryEdits((s) => { const n = { ...s }; delete n[doc.id]; return n; });
+                                            toast.success("Summary saved");
+                                          }}
+                                        >
+                                          Save
+                                        </V2Button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <>
+                                      <p className="text-v2-ink whitespace-pre-line" style={{ fontSize: "13px", lineHeight: 1.55 }}>
+                                        {doc.ai_summary}
+                                      </p>
+                                      <div className="flex gap-2 mt-2">
+                                        <V2Button variant="quiet" onClick={() => generateSummary(doc)} disabled={isGenerating} style={{ height: "24px", fontSize: "10.5px" }}>
+                                          {isGenerating ? "Regenerating" : "Regenerate"}
+                                        </V2Button>
+                                        {isFounder && (
+                                          <V2Button
+                                            variant="quiet"
+                                            style={{ height: "24px", fontSize: "10.5px" }}
+                                            onClick={() => {
+                                              setEditingSummaryId(doc.id);
+                                              setSummaryEdits((s) => ({ ...s, [doc.id]: doc.ai_summary! }));
+                                            }}
+                                          >
+                                            Edit
+                                          </V2Button>
+                                        )}
+                                      </div>
+                                    </>
                                   )}
                                 </div>
-                              </>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2 px-4 py-2.5">
-                        <Sparkles className="h-3.5 w-3.5 text-brand shrink-0" />
-                        <span className="text-xs font-medium text-brand flex-1">AI Summary</span>
-                        <span className="text-xs text-gray-500 italic mr-2">Not generated</span>
-                        <button
-                          onClick={() => generateSummary(doc)}
-                          disabled={isGenerating}
-                          className="inline-flex items-center gap-1 rounded-md hs-gradient text-brand-foreground px-2.5 py-1 text-xs font-medium shadow-sm disabled:opacity-50"
-                        >
-                          {isGenerating
-                            ? <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</>
-                            : <><Sparkles className="h-3 w-3" /> Generate</>}
-                        </button>
-                      </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <Sparkles className="h-3.5 w-3.5 text-v2-accent shrink-0" />
+                              <span className="text-v2-accent font-medium flex-1" style={{ fontSize: "11.5px" }}>AI summary</span>
+                              <span className="text-v2-ink-muted" style={{ fontSize: "11px" }}>Not generated</span>
+                              <V2Button variant="secondary" onClick={() => generateSummary(doc)} disabled={isGenerating} style={{ height: "26px", fontSize: "11px" }}>
+                                {isGenerating
+                                  ? <><Loader2 className="h-3 w-3 animate-spin" /> Generating</>
+                                  : <><Sparkles className="h-3 w-3" /> Generate</>}
+                              </V2Button>
+                            </div>
+                          )}
+                        </Td>
+                      </Tr>
                     )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                  </>
+                );
+              })}
+            </LedgerBody>
+          </LedgerTable>
         </div>
       )}
 
@@ -1039,8 +899,10 @@ function DocumentsPage() {
         <div className="flex flex-col items-center justify-center text-center">
           <EmptyState kind="empty" title="No documents" />
           {isFounder && (
-            <label className="-mt-4 inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-4 py-2 text-sm cursor-pointer">
-              <Upload className="h-4 w-4" /> Upload
+            <label className="-mt-4 cursor-pointer">
+              <V2Button variant="primary" style={{ pointerEvents: "none" }}>
+                <Upload className="h-4 w-4" /> Upload
+              </V2Button>
               <input
                 type="file"
                 className="sr-only"
@@ -1062,7 +924,7 @@ function DocumentsPage() {
                     });
                   } catch (insErr: any) { console.error("[docs] insert after upload failed:", insErr); toast.error("Upload failed — please try again."); return; }
                   queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
-                  toast.success("Uploaded!");
+                  toast.success("Uploaded");
                   e.target.value = "";
                   // §B — future migration group: deal_room_members read (deal-room-core group).
                   const { data: members } = await supabase
@@ -1095,22 +957,24 @@ function DocumentsPage() {
 
       {activeDocTab !== "All" && expectedForTab.length > 0 && (
         <div className="pb-4">
-          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-4">
+          <div className="text-v2-ink-muted uppercase font-medium mb-2 mt-4" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>
             Recommended for this category
           </div>
-          <div className="rounded-none border border-dashed border-[rgba(0,0,0,0.08)] divide-y divide-border/40 overflow-hidden">
+          <div className="border border-v2-rule divide-y overflow-hidden" style={{ borderRadius: "var(--v2-radius)", borderStyle: "dashed", borderColor: "var(--v2-rule)" }}>
             {expectedForTab.map((expected) => (
-              <div key={expected.name} className="flex items-center gap-3 px-4 py-3 bg-gray-100/20">
-                <div className="grid h-8 w-8 place-items-center rounded-lg bg-muted shrink-0">
-                  <FileText className="h-4 w-4 text-gray-500" />
+              <div key={expected.name} className="flex items-center gap-3 px-4 py-3 bg-v2-surface" style={{ borderColor: "var(--v2-rule-light)" }}>
+                <div className="grid h-8 w-8 place-items-center bg-v2-panel border border-v2-rule shrink-0" style={{ borderRadius: "var(--v2-radius)" }}>
+                  <FileText className="h-4 w-4 text-v2-ink-muted" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm text-gray-500">{expected.name}</div>
-                  <div className="text-[10px] text-gray-500 mt-0.5">Not uploaded</div>
+                  <div className="text-v2-ink-secondary" style={{ fontSize: "13px" }}>{expected.name}</div>
+                  <StatusLabel tone="attention" dot={false}>Not provided</StatusLabel>
                 </div>
                 {isFounder && (
-                  <label className="inline-flex items-center gap-1.5 rounded-md border border-brand/40 text-brand px-3 py-1.5 text-xs cursor-pointer hover:bg-accent transition-colors shrink-0">
-                    <Upload className="h-3 w-3" /> Upload
+                  <label className="cursor-pointer shrink-0">
+                    <V2Button variant="secondary" style={{ pointerEvents: "none" }}>
+                      <Upload className="h-3 w-3" /> Upload
+                    </V2Button>
                     <input
                       type="file"
                       className="sr-only"
@@ -1169,12 +1033,10 @@ function DocumentsPage() {
         <div className="mt-8">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h3 className="text-sm font-semibold flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-md bg-success/10 text-success px-2 py-0.5 text-[11px] font-semibold">
-                  🔒 Investor Documents
-                </span>
+              <h3 className="font-medium flex items-center gap-2 text-v2-ink" style={{ fontSize: "13.5px" }}>
+                <StatusLabel tone="satisfied" dot={false}>Investor documents</StatusLabel>
               </h3>
-              <p className="text-[10px] text-gray-500 mt-0.5">
+              <p className="text-v2-ink-muted mt-0.5" style={{ fontSize: "11px" }}>
                 {isInvestor
                   ? "Only you can upload here. Choose visibility per document."
                   : "Documents shared with you by the investor."}
@@ -1195,178 +1057,194 @@ function DocumentsPage() {
           )}
 
           {visibleInvestorDocs.length === 0 && isInvestor && (
-            <div className="rounded-none border border-dashed border-[rgba(0,0,0,0.08)] p-8 text-center">
-              <FileText className="h-8 w-8 mx-auto mb-2 text-[#71717A]" />
-              <p className="text-sm text-gray-500">No investor documents</p>
+            <div className="border p-8 text-center" style={{ borderRadius: "var(--v2-radius)", borderStyle: "dashed", borderColor: "var(--v2-rule)" }}>
+              <FileText className="h-8 w-8 mx-auto mb-2 text-v2-ink-muted" />
+              <p className="text-v2-ink-secondary" style={{ fontSize: "13px" }}>No investor documents</p>
             </div>
           )}
 
-          <div className="space-y-2">
-            {visibleInvestorDocs.map((doc: any) => {
-              const rawName = doc.name || doc.storage_path?.split("/").pop() || "Document";
-              const displayName = rawName.replace(/^\d{13}-/, "");
-              const ext = displayName.split(".").pop()?.toLowerCase() ?? "";
-              const { bg: iconBg, color: iconColor, Icon: FileIcon } = getFileTypeStyle(ext);
-              const currentVisibility = investorDocVisibility[doc.id] ?? doc.visibility ?? "shared";
+          {visibleInvestorDocs.length > 0 && (
+            <div className="overflow-x-auto">
+              <LedgerTable>
+                <LedgerHead>
+                  <Tr>
+                    <Th>Document</Th>
+                    <Th>Uploader</Th>
+                    <Th>Visibility</Th>
+                    <Th aria-label="Actions" />
+                  </Tr>
+                </LedgerHead>
+                <LedgerBody>
+                  {visibleInvestorDocs.map((doc: any) => {
+                    const rawName = doc.name || doc.storage_path?.split("/").pop() || "Document";
+                    const displayName = rawName.replace(/^\d{13}-/, "");
+                    const ext = displayName.split(".").pop()?.toLowerCase() ?? "";
+                    const FileIcon = getFileTypeIcon(ext);
+                    const currentVisibility = investorDocVisibility[doc.id] ?? doc.visibility ?? "shared";
 
-              return (
-                <div key={doc.id} className="flex items-center gap-3 rounded-none border border-[rgba(0,0,0,0.08)] bg-card px-4 py-3 shadow-card border-l-4 border-l-success/60">
-                  <div className={cn("grid h-9 w-9 place-items-center rounded-lg shrink-0", iconBg)}>
-                    <FileIcon className={cn("h-4 w-4", iconColor)} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate">{displayName}</div>
-                    <div className="text-xs text-gray-500">
-                      {doc.uploader?.full_name ?? "Investor"} · {new Date(doc.created_at).toLocaleDateString()}
-                    </div>
-                  </div>
-                  {isInvestor && (
-                    <div className="flex items-center gap-1 rounded-lg bg-gray-100/60 p-0.5 shrink-0">
-                      {(["shared", "private"] as const).map((v) => (
-                        <button
-                          key={v}
-                          onClick={() => updateDocVisibility(doc.id, v)}
-                          className={cn(
-                            "px-2 py-1 rounded-md text-[10px] font-medium transition-colors",
-                            currentVisibility === v
-                              ? v === "shared"
-                                ? "bg-success text-success-foreground shadow-sm"
-                                : "bg-warning text-warning-foreground shadow-sm"
-                              : "text-gray-500 hover:text-foreground"
+                    return (
+                      <Tr key={doc.id} status="satisfied">
+                        <Td>
+                          <div className="flex items-center gap-2">
+                            <FileIcon className="h-3.5 w-3.5 text-v2-ink-muted shrink-0" />
+                            <span className="font-medium text-v2-ink truncate">{displayName}</span>
+                          </div>
+                          <div className="text-v2-ink-muted mt-0.5" style={{ fontSize: "11px" }}>
+                            {new Date(doc.created_at).toLocaleDateString()}
+                          </div>
+                        </Td>
+                        <Td>{doc.uploader?.full_name ?? "Investor"}</Td>
+                        <Td>
+                          {isInvestor ? (
+                            <div className="flex items-center gap-1">
+                              {(["shared", "private"] as const).map((v) => (
+                                <button
+                                  key={v}
+                                  onClick={() => updateDocVisibility(doc.id, v)}
+                                  className="px-2 py-1 font-medium transition-colors"
+                                  style={{
+                                    borderRadius: "var(--v2-radius)",
+                                    fontSize: "10.5px",
+                                    background: currentVisibility === v ? "var(--v2-accent-wash)" : "transparent",
+                                    color: currentVisibility === v ? "var(--v2-accent)" : "var(--v2-ink-muted)",
+                                    border: currentVisibility === v ? "1px solid var(--v2-accent)" : "1px solid transparent",
+                                  }}
+                                >
+                                  {v === "shared" ? "Shared" : "Private"}
+                                </button>
+                              ))}
+                            </div>
+                          ) : (
+                            <StatusLabel tone="satisfied" dot={false}>Shared</StatusLabel>
                           )}
-                        >
-                          {v === "shared" ? "🌐 Shared" : "🔒 Private"}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  {isFounder && (
-                    <span className="text-[10px] text-success bg-success/10 px-2 py-0.5 rounded-full shrink-0">
-                      🌐 Shared
-                    </span>
-                  )}
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      onClick={() => handleDownload(doc.storage_path)}
-                      className="grid h-7 w-7 place-items-center rounded-md text-gray-500 hover:bg-accent hover:text-foreground"
-                      title="Download"
-                    >
-                      <Download className="h-3.5 w-3.5" />
-                    </button>
-                    {isInvestor && (
-                      <button
-                        onClick={() => removeInvestorDoc(doc.id)}
-                        className="grid h-7 w-7 place-items-center rounded-md text-gray-500 hover:text-destructive hover:bg-destructive/10"
-                        title="Remove"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                        </Td>
+                        <Td numeric>
+                          <div className="flex items-center justify-end gap-1">
+                            <V2Button variant="quiet" onClick={() => handleDownload(doc.storage_path)} style={{ height: "28px", padding: "0 6px" }} title="Download">
+                              <Download className="h-3.5 w-3.5" />
+                            </V2Button>
+                            {isInvestor && (
+                              <V2Button variant="quiet" onClick={() => removeInvestorDoc(doc.id)} style={{ height: "28px", padding: "0 6px" }} title="Remove">
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </V2Button>
+                            )}
+                          </div>
+                        </Td>
+                      </Tr>
+                    );
+                  })}
+                </LedgerBody>
+              </LedgerTable>
+            </div>
+          )}
         </div>
       )}
       </>)}
 
       {activeVaultTab === "links" && (
-        <div className="mt-5 space-y-3">
+        <div className="mt-5">
           {(dealRoomLinks as any[]).length === 0 && (
-            <div className="rounded-none border border-dashed border-[rgba(0,0,0,0.08)] p-10 text-center">
-              <LinkIcon className="h-8 w-8 mx-auto mb-2 text-[#71717A]" />
-              <p className="text-sm font-medium">No links</p>
-              <p className="text-xs text-gray-500 mt-1">Add product videos, Loom recordings, external documents, or any URL</p>
-              <button
-                onClick={() => setShowAddLink(true)}
-                className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-sm shadow-glow"
-              >
-                <Plus className="h-4 w-4" /> Add first link
-              </button>
+            <div className="border p-10 text-center" style={{ borderRadius: "var(--v2-radius)", borderStyle: "dashed", borderColor: "var(--v2-rule)" }}>
+              <LinkIcon className="h-8 w-8 mx-auto mb-2 text-v2-ink-muted" />
+              <p className="font-medium text-v2-ink" style={{ fontSize: "13.5px" }}>No links</p>
+              <p className="text-v2-ink-muted mt-1" style={{ fontSize: "12px" }}>Add product videos, recordings, external documents, or any URL.</p>
+              <div className="mt-4">
+                <V2Button variant="primary" onClick={() => setShowAddLink(true)}>
+                  <Plus className="h-4 w-4" /> Add first link
+                </V2Button>
+              </div>
             </div>
           )}
-          {(dealRoomLinks as any[]).map((link: any) => (
-            <div key={link.id} className="flex items-center gap-3 rounded-none border border-[rgba(0,0,0,0.08)] bg-card px-4 py-3 shadow-card">
-              <div className="grid h-9 w-9 place-items-center rounded-lg bg-accent shrink-0">
-                <LinkIcon className="h-4 w-4 text-brand" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium truncate">{link.name}</div>
-                <div className="text-xs text-gray-500 truncate">{link.url}</div>
-              </div>
-              <div className="flex items-center gap-1 shrink-0">
-                <a
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="grid h-7 w-7 place-items-center rounded-md text-gray-500 hover:bg-accent hover:text-foreground"
-                  title="Open link"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </a>
-                {link.uploader_id === userId && (
-                  <button
-                    onClick={() => removeLink(link.id)}
-                    className="grid h-7 w-7 place-items-center rounded-md text-gray-500 hover:text-destructive hover:bg-destructive/10"
-                    title="Remove link"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                )}
-              </div>
+          {(dealRoomLinks as any[]).length > 0 && (
+            <div className="overflow-x-auto">
+              <LedgerTable>
+                <LedgerHead>
+                  <Tr>
+                    <Th>Link</Th>
+                    <Th>URL</Th>
+                    <Th aria-label="Actions" />
+                  </Tr>
+                </LedgerHead>
+                <LedgerBody>
+                  {(dealRoomLinks as any[]).map((link: any) => (
+                    <Tr key={link.id}>
+                      <Td>
+                        <div className="flex items-center gap-2">
+                          <LinkIcon className="h-3.5 w-3.5 text-v2-ink-muted shrink-0" />
+                          <span className="font-medium text-v2-ink truncate">{link.name}</span>
+                        </div>
+                      </Td>
+                      <Td>
+                        <span className="text-v2-ink-secondary truncate block">{link.url}</span>
+                      </Td>
+                      <Td numeric>
+                        <div className="flex items-center justify-end gap-1">
+                          <a href={link.url} target="_blank" rel="noopener noreferrer" title="Open link">
+                            <V2Button variant="quiet" style={{ height: "28px", padding: "0 6px", pointerEvents: "none" }}>
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </V2Button>
+                          </a>
+                          {link.uploader_id === userId && (
+                            <V2Button variant="quiet" onClick={() => removeLink(link.id)} style={{ height: "28px", padding: "0 6px" }} title="Remove link">
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </V2Button>
+                          )}
+                        </div>
+                      </Td>
+                    </Tr>
+                  ))}
+                </LedgerBody>
+              </LedgerTable>
             </div>
-          ))}
+          )}
         </div>
       )}
 
       {showAddLink && (
         <div
-          className="fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm grid place-items-center p-4"
+          className="fixed inset-0 z-50 grid place-items-center p-4"
+          style={{ background: "rgba(22,24,28,0.4)" }}
           onClick={() => setShowAddLink(false)}
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-[rgba(0,0,0,0.08)] bg-card shadow-elev"
+            className="w-full max-w-md bg-v2-panel border border-v2-rule font-v2-ui"
+            style={{ borderRadius: "var(--v2-radius)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-5 border-b border-[rgba(0,0,0,0.08)]">
-              <div className="text-sm font-semibold">Add a link</div>
-              <button onClick={() => setShowAddLink(false)} className="grid h-8 w-8 place-items-center rounded-md text-gray-500 hover:bg-gray-100">
+            <div className="flex items-center justify-between px-5" style={{ height: "40px", borderBottom: "1px solid var(--v2-rule)" }}>
+              <div className="text-v2-ink font-medium" style={{ fontSize: "13.5px" }}>Add a link</div>
+              <V2Button variant="quiet" onClick={() => setShowAddLink(false)} style={{ height: "28px", padding: "0 6px" }}>
                 <X className="h-4 w-4" />
-              </button>
+              </V2Button>
             </div>
             <div className="p-5 space-y-4">
               <div>
-                <label className="text-xs font-medium text-gray-500 mb-1.5 block">Link name</label>
+                <label className="text-v2-ink-muted uppercase mb-1.5 block" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Link name</label>
                 <input
                   value={linkName}
                   onChange={(e) => setLinkName(e.target.value)}
-                  placeholder="e.g. Product Demo Video, Financial Model..."
-                  className="w-full rounded-md border border-[rgba(0,0,0,0.08)] bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                  placeholder="e.g. Product demo video, financial model"
+                  className="w-full border border-v2-rule bg-v2-panel px-3 focus:outline-none font-v2-ui"
+                  style={{ height: "36px", borderRadius: "var(--v2-radius)", fontSize: "13.5px" }}
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-500 mb-1.5 block">URL</label>
+                <label className="text-v2-ink-muted uppercase mb-1.5 block" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>URL</label>
                 <input
                   value={linkUrl}
                   onChange={(e) => setLinkUrl(e.target.value)}
-                  placeholder="https://..."
+                  placeholder="https://"
                   type="url"
-                  className="w-full rounded-md border border-[rgba(0,0,0,0.08)] bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                  className="w-full border border-v2-rule bg-v2-panel px-3 focus:outline-none font-v2-ui"
+                  style={{ height: "36px", borderRadius: "var(--v2-radius)", fontSize: "13.5px" }}
                 />
               </div>
               <div className="flex justify-end gap-2 pt-1">
-                <button onClick={() => setShowAddLink(false)} className="px-4 py-2 rounded-md border border-[rgba(0,0,0,0.08)] text-sm hover:bg-gray-100">
-                  Cancel
-                </button>
-                <button
-                  onClick={addLink}
-                  disabled={!linkName.trim() || !linkUrl.trim() || addingLink}
-                  className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-50"
-                >
+                <V2Button variant="secondary" onClick={() => setShowAddLink(false)}>Cancel</V2Button>
+                <V2Button variant="primary" onClick={addLink} disabled={!linkName.trim() || !linkUrl.trim() || addingLink}>
                   {addingLink ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
                   Add link
-                </button>
+                </V2Button>
               </div>
             </div>
           </div>
@@ -1378,50 +1256,89 @@ function DocumentsPage() {
       )}
 
       {viewingDoc && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4"
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(22,24,28,0.4)" }}
           onClick={() => setViewingDoc(null)}>
-          <div className="bg-[#111118] border border-border rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col"
+          <div className="bg-v2-panel border border-v2-rule w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col font-v2-ui"
+            style={{ borderRadius: "var(--v2-radius)" }}
             onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-6 border-b border-border">
+            <div className="flex items-center justify-between p-6" style={{ borderBottom: "1px solid var(--v2-rule)" }}>
               <div>
-                <h2 className="text-lg font-bold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{viewingDoc.title}</h2>
-                <p className="text-xs text-gray-500 mt-1">
+                <h2 className="font-medium text-v2-ink" style={{ fontSize: "15px" }}>{viewingDoc.title}</h2>
+                <p className="text-v2-ink-muted mt-1" style={{ fontSize: "11px" }}>
                   {viewingDoc.completeness_score}% complete · Updated {formatRelativeTime(viewingDoc.updated_at)}
                 </p>
               </div>
-              <button onClick={() => setViewingDoc(null)} className="text-gray-500 hover:text-foreground text-xl leading-none">×</button>
+              <V2Button variant="quiet" onClick={() => setViewingDoc(null)} style={{ height: "28px", padding: "0 6px" }}>
+                <X className="h-4 w-4" />
+              </V2Button>
             </div>
             <div className="overflow-y-auto p-6 space-y-4 flex-1">
               {viewingDoc.content && Object.entries(viewingDoc.content as Record<string, string>)
                 .filter(([, v]) => v && String(v).trim())
                 .map(([key, value]) => (
                   <div key={key}>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{key.replace(/_/g, " ")}</p>
-                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{String(value)}</p>
+                    <p className="text-v2-ink-muted uppercase mb-1" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>{key.replace(/_/g, " ")}</p>
+                    <p className="text-v2-ink-secondary whitespace-pre-wrap" style={{ fontSize: "13px", lineHeight: 1.55 }}>{String(value)}</p>
                   </div>
                 ))
               }
               {(!viewingDoc.content || Object.keys(viewingDoc.content).length === 0) && (
-                <p className="text-gray-500 text-sm text-center py-8">No content available</p>
+                <p className="text-v2-ink-muted text-center py-8" style={{ fontSize: "13px" }}>No content available</p>
               )}
             </div>
             {viewingDoc.ai_feedback && (viewingDoc.ai_feedback as Record<string, unknown>).overall_score && (
-              <div className="border-t border-border p-4 flex items-center gap-3 bg-white/[0.02]">
-                <div className={cn(
-                  "w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold shrink-0",
-                  (viewingDoc.ai_feedback as Record<string, unknown>).signal === "strong"
-                    ? "border-green-500 text-green-400" : "border-amber-500 text-amber-400"
-                )}>
-                  {String((viewingDoc.ai_feedback as Record<string, unknown>).overall_score)}
+              <div className="p-4 flex items-center gap-3" style={{ borderTop: "1px solid var(--v2-rule)" }}>
+                <div className="text-v2-ink-muted" style={{ fontSize: "11.5px" }}>
+                  {String((viewingDoc.ai_feedback as Record<string, unknown>).summary ?? "").substring(0, 120)}
                 </div>
-                <p className="text-xs text-gray-500 flex-1">
-                  AI score: {String((viewingDoc.ai_feedback as Record<string, unknown>).summary ?? "").substring(0, 120)}...
-                </p>
               </div>
             )}
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// §B — future migration group: founder_documents (profile/founder group).
+// Presentation of a list already re-skinned onto v2; the data source itself is
+// unchanged. Extracted only to avoid repeating the three near-identical blocks
+// that existed in the original (stage1 / stage2 / non-investor).
+function PlatformDocList({ docs, onView, showStage }: { docs: any[]; onView: (doc: any) => void; showStage?: boolean }) {
+  return (
+    <div className="space-y-2">
+      {docs.map((doc: any) => (
+        <div key={doc.id}
+          className="flex items-center justify-between px-4 py-3 border border-v2-rule bg-v2-panel hover:bg-v2-accent-wash transition-colors"
+          style={{ borderRadius: "var(--v2-radius)" }}>
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 flex items-center justify-center bg-v2-accent-wash text-v2-accent shrink-0" style={{ borderRadius: "var(--v2-radius)", fontSize: "13px" }}>≡</div>
+            <div className="min-w-0">
+              <p className="font-medium text-v2-ink truncate" style={{ fontSize: "13px" }}>{doc.title}</p>
+              <p className="text-v2-ink-muted mt-0.5" style={{ fontSize: "11px" }}>
+                {doc.document_templates?.category
+                  ? doc.document_templates.category.charAt(0).toUpperCase() + doc.document_templates.category.slice(1)
+                  : "Document"}
+                {" · "}Updated {formatRelativeTime(doc.updated_at)}
+                {showStage && (
+                  <> {" · "}<span className="font-medium text-v2-accent">
+                    Stage {(doc.deal_room_stage ?? 1) === 2 ? "2 — Full diligence" : "1 — Initial review"}
+                  </span></>
+                )}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <StatusLabel tone={doc.status === "complete" ? "satisfied" : "attention"} dot={false}>
+              {doc.status === "complete" ? "Complete" : "In progress"}
+            </StatusLabel>
+            <V2Button variant="secondary" onClick={() => onView(doc)} style={{ height: "28px", fontSize: "11px" }}>
+              View
+            </V2Button>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

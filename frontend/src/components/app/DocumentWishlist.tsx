@@ -10,8 +10,10 @@ import {
   docRequestRespondLink, docInsert,
 } from "@/lib/actions/deal-room-documents";
 import {
-  Plus, X, CheckCircle2, ClipboardList, ChevronDown, ChevronUp,
-  AlertTriangle, Link2, Upload, Loader2, Flag
+  V2Button, LedgerTable, LedgerHead, LedgerBody, Th, Tr, Td, StatusLabel,
+} from "@/components/v2";
+import {
+  Plus, X, ChevronDown, ChevronUp, Link2, Upload, Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -23,11 +25,7 @@ interface Props {
   userId: string | undefined;
 }
 
-const PRIORITY_CONFIG = {
-  high:   { label: "High",   color: "text-destructive bg-destructive/10 border-destructive/30" },
-  medium: { label: "Medium", color: "text-warning bg-warning/10 border-warning/30" },
-  low:    { label: "Low",    color: "text-muted-foreground bg-muted border-border/60" },
-} as const;
+const PRIORITY_LABEL = { high: "High", medium: "Medium", low: "Low" } as const;
 
 const SUGGESTED_REQUESTS = [
   { title: "Audited financials (last 2 years)", priority: "high" },
@@ -159,41 +157,38 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
 
   const pending   = (requests as any[]).filter((r) => r.status === "pending");
   const fulfilled = (requests as any[]).filter((r) => r.status === "fulfilled");
+  const allRows = [...pending, ...fulfilled];
 
   if (requests.length === 0 && !isInvestor) return null;
 
   return (
-    <div className="mb-5 rounded-lg border border-brand/25 bg-accent overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-brand/15">
-        <button className="flex items-center gap-2 flex-1 text-left" onClick={() => setCollapsed((v) => !v)}>
-          <ClipboardList className="h-4 w-4 text-brand shrink-0" />
-          <span className="text-sm font-semibold">Documents needed</span>
+    <div className="mb-5 border border-v2-rule bg-v2-panel" style={{ borderRadius: "var(--v2-radius)" }}>
+      {/* Header — no reference number exists for document_requests yet, so
+          ReferenceLine is not used here; it would render null anyway. */}
+      <div
+        className="flex items-center justify-between px-4"
+        style={{ height: "40px", borderBottom: "1px solid var(--v2-rule)" }}
+      >
+        <button className="flex items-center gap-2 flex-1 text-left font-v2-ui" onClick={() => setCollapsed((v) => !v)}>
+          <span className="text-v2-ink font-medium" style={{ fontSize: "13.5px" }}>Documents needed</span>
           {pending.length > 0 && (
-            <span className="inline-flex items-center gap-0.5 rounded-full bg-warning/20 text-warning px-2 py-0.5 text-[10px] font-semibold">
-              <span className="h-1.5 w-1.5 rounded-full bg-warning inline-block animate-pulse" />
-              {pending.length} pending
-            </span>
+            <StatusLabel tone="attention" dot={false}>{pending.length} outstanding</StatusLabel>
           )}
           {fulfilled.length > 0 && (
-            <span className="text-[10px] text-muted-foreground ml-1">{fulfilled.length} fulfilled</span>
+            <StatusLabel tone="satisfied" dot={false}>{fulfilled.length} complete</StatusLabel>
           )}
-          {collapsed ? <ChevronDown className="h-3.5 w-3.5 text-muted-foreground ml-auto" /> : <ChevronUp className="h-3.5 w-3.5 text-muted-foreground ml-auto" />}
+          {collapsed
+            ? <ChevronDown className="h-3.5 w-3.5 text-v2-ink-muted ml-auto" />
+            : <ChevronUp className="h-3.5 w-3.5 text-v2-ink-muted ml-auto" />}
         </button>
         {isInvestor && !adding && !collapsed && (
           <div className="flex items-center gap-1.5 ml-3">
-            <button
-              onClick={() => setShowSuggested((v) => !v)}
-              className="text-[10px] text-muted-foreground hover:text-brand border border-border/60 rounded-md px-2 py-1"
-            >
+            <V2Button variant="quiet" onClick={() => setShowSuggested((v) => !v)} style={{ height: "auto", padding: "2px 6px", fontSize: "11px" }}>
               Quick add
-            </button>
-            <button
-              onClick={() => { setAdding(true); setShowSuggested(false); }}
-              className="inline-flex items-center gap-1 text-xs text-brand hover:underline"
-            >
+            </V2Button>
+            <V2Button variant="quiet" onClick={() => { setAdding(true); setShowSuggested(false); }} style={{ height: "auto", padding: "2px 6px" }}>
               <Plus className="h-3.5 w-3.5" /> Custom
-            </button>
+            </V2Button>
           </div>
         )}
       </div>
@@ -202,20 +197,21 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
         <>
           {/* Quick add suggestions */}
           {showSuggested && isInvestor && (
-            <div className="px-4 py-3 border-b border-brand/15 bg-background/50">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Common requests — click to add</div>
+            <div className="px-4 py-3 font-v2-ui" style={{ borderBottom: "1px solid var(--v2-rule)", background: "var(--v2-surface)" }}>
+              <div className="text-v2-ink-muted uppercase font-medium mb-2" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>
+                Common requests — select to add
+              </div>
               <div className="flex flex-wrap gap-1.5">
                 {SUGGESTED_REQUESTS.map((s) => (
                   <button
                     key={s.title}
                     onClick={() => handleAdd(s.title, s.priority)}
                     disabled={saving}
-                    className={cn(
-                      "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-medium hover:opacity-80 transition-opacity disabled:opacity-40",
-                      PRIORITY_CONFIG[s.priority].color
-                    )}
+                    className="inline-flex items-center gap-1.5 border border-v2-rule bg-v2-panel px-2.5 py-1 hover:bg-v2-accent-wash disabled:opacity-40 font-v2-ui"
+                    style={{ borderRadius: "var(--v2-radius)", fontSize: "11px" }}
                   >
-                    <Flag className="h-2.5 w-2.5" /> {s.title}
+                    {s.title}
+                    <span className="text-v2-ink-muted" style={{ fontSize: "10px" }}>{PRIORITY_LABEL[s.priority]}</span>
                   </button>
                 ))}
               </div>
@@ -224,47 +220,55 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
 
           {/* Custom add form */}
           {adding && (
-            <div className="px-4 py-3 border-b border-brand/15 bg-background/60 space-y-2">
+            <div className="px-4 py-3 space-y-2 font-v2-ui" style={{ borderBottom: "1px solid var(--v2-rule)" }}>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleAdd()}
                 placeholder="Document name (e.g. Audited financials 2024)"
                 autoFocus
-                className="w-full rounded-md border border-border/60 bg-background px-3 py-1.5 text-sm focus:outline-none focus:border-brand/50"
+                className="w-full border border-v2-rule bg-v2-panel px-3 focus:outline-none"
+                style={{ height: "36px", borderRadius: "var(--v2-radius)", fontSize: "13.5px" }}
               />
               <input
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Optional note for the founder…"
-                className="w-full rounded-md border border-border/60 bg-background px-3 py-1.5 text-xs focus:outline-none focus:border-brand/50"
+                placeholder="Optional note for the founder"
+                className="w-full border border-v2-rule bg-v2-panel px-3 py-1.5 focus:outline-none"
+                style={{ borderRadius: "var(--v2-radius)", fontSize: "12.5px" }}
               />
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-muted-foreground">Priority:</span>
+                <span className="text-v2-ink-muted uppercase" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Priority</span>
                 {(["high", "medium", "low"] as const).map((p) => (
-                  <button key={p} onClick={() => setPriority(p)}
-                    className={cn("rounded-full border px-2 py-0.5 text-[10px] font-medium transition-all", priority === p ? PRIORITY_CONFIG[p].color : "border-border/60 text-muted-foreground hover:bg-accent")}
+                  <button
+                    key={p}
+                    onClick={() => setPriority(p)}
+                    className={cn(
+                      "border px-2 py-0.5 font-medium transition-colors",
+                      priority === p ? "border-v2-accent bg-v2-accent-wash text-v2-accent" : "border-v2-rule text-v2-ink-muted hover:bg-v2-accent-wash",
+                    )}
+                    style={{ borderRadius: "var(--v2-radius)", fontSize: "11px" }}
                   >
-                    {PRIORITY_CONFIG[p].label}
+                    {PRIORITY_LABEL[p]}
                   </button>
                 ))}
                 <div className="flex-1" />
-                <button onClick={() => { setAdding(false); setTitle(""); setDescription(""); }}
-                  className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
-                <button onClick={() => handleAdd()} disabled={!title.trim() || saving}
-                  className="rounded-md hs-gradient text-brand-foreground px-3 py-1.5 text-xs disabled:opacity-50 inline-flex items-center gap-1">
+                <V2Button variant="quiet" onClick={() => { setAdding(false); setTitle(""); setDescription(""); }}>
+                  <X className="h-4 w-4" />
+                </V2Button>
+                <V2Button variant="primary" onClick={() => handleAdd()} disabled={!title.trim() || saving}>
                   {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />} Add
-                </button>
+                </V2Button>
               </div>
             </div>
           )}
 
-          {/* Empty state */}
+          {/* Empty state — names what would appear + the primary action (§7.3) */}
           {requests.length === 0 && (
-            <div className="px-4 py-4 text-xs text-muted-foreground">
+            <div className="px-4 py-4 text-v2-ink-secondary font-v2-ui" style={{ fontSize: "12.5px" }}>
               {isInvestor
-                ? "Request specific documents from the founder. They'll be notified and can upload files or share links directly in response."
-                : "The investor hasn't requested any specific documents yet."}
+                ? "Request specific documents from the founder. They are notified and can upload files or share links directly in response."
+                : "The investor has not requested any specific documents yet."}
             </div>
           )}
 
@@ -278,101 +282,98 @@ export function DocumentWishlist({ dealRoomId, isInvestor, isFounder, userId }: 
             }}
           />
 
-          {/* Pending requests */}
-          {pending.length > 0 && (
-            <div className="divide-y divide-brand/10">
-              {pending.map((r: any) => (
-                <div key={r.id} className="px-4 py-3 space-y-2">
-                  <div className="flex items-start gap-3">
-                    <span className="relative flex h-2 w-2 shrink-0 mt-1.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500" />
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-medium">{r.title}</span>
-                        {r.priority && (
-                          <span className={cn("text-[9px] rounded-full border px-1.5 py-0.5 font-semibold", PRIORITY_CONFIG[r.priority as keyof typeof PRIORITY_CONFIG]?.color ?? "")}>
-                            {PRIORITY_CONFIG[r.priority as keyof typeof PRIORITY_CONFIG]?.label ?? r.priority}
-                          </span>
+          {allRows.length > 0 && (
+            <div className="overflow-x-auto">
+              <LedgerTable>
+                <LedgerHead>
+                  <Tr>
+                    <Th>Document</Th>
+                    <Th>Priority</Th>
+                    <Th>Status</Th>
+                    {isFounder && <Th>Respond</Th>}
+                    {isInvestor && <Th aria-label="Actions" />}
+                  </Tr>
+                </LedgerHead>
+                <LedgerBody>
+                  {pending.map((r: any) => (
+                    <Tr key={r.id} status="attention">
+                      <Td>
+                        <div className="font-medium text-v2-ink">{r.title}</div>
+                        {r.description && (
+                          <div className="text-v2-ink-muted" style={{ fontSize: "11px", marginTop: "2px" }}>{r.description}</div>
                         )}
-                      </div>
-                      {r.description && <p className="text-[11px] text-muted-foreground mt-0.5">{r.description}</p>}
-                    </div>
-                    {isInvestor && (
-                      <button onClick={() => handleDelete(r.id)} className="text-muted-foreground hover:text-destructive shrink-0">
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Founder response options */}
-                  {isFounder && (
-                    <div className="ml-5 flex items-center gap-2 flex-wrap">
-                      {linkInputId === r.id ? (
-                        <div className="flex-1 flex gap-2">
-                          <input
-                            value={linkValue}
-                            onChange={(e) => setLinkValue(e.target.value)}
-                            placeholder="Paste Google Drive / DocSend / Dropbox link…"
-                            autoFocus
-                            className="flex-1 rounded-md border border-border/60 bg-background px-2.5 py-1 text-xs focus:outline-none focus:border-brand/50"
-                            onKeyDown={(e) => e.key === "Enter" && handleSaveLink(r.id)}
-                          />
-                          <button onClick={() => handleSaveLink(r.id)} disabled={!linkValue.trim() || savingLink}
-                            className="rounded-md hs-gradient text-brand-foreground px-2.5 py-1 text-[10px] disabled:opacity-50">
-                            {savingLink ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
-                          </button>
-                          <button onClick={() => { setLinkInputId(null); setLinkValue(""); }}
-                            className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
-                        </div>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => { setLinkInputId(r.id); setLinkValue(""); }}
-                            className="inline-flex items-center gap-1 rounded-md border border-border/60 px-2.5 py-1 text-[10px] hover:bg-accent"
-                          >
-                            <Link2 className="h-3 w-3" /> Share link
-                          </button>
-                          <button
-                            onClick={() => { setUploadingId(r.id); fileRef.current?.click(); }}
-                            disabled={uploadingId === r.id}
-                            className="inline-flex items-center gap-1 rounded-md border border-border/60 px-2.5 py-1 text-[10px] hover:bg-accent disabled:opacity-50"
-                          >
-                            {uploadingId === r.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
-                            Upload file
-                          </button>
-                          <button onClick={() => handleFulfill(r.id)}
-                            className="inline-flex items-center gap-1 text-[10px] text-success hover:underline">
-                            <CheckCircle2 className="h-3 w-3" /> Mark uploaded
-                          </button>
-                        </>
+                      </Td>
+                      <Td>{r.priority ? PRIORITY_LABEL[r.priority as keyof typeof PRIORITY_LABEL] ?? r.priority : "—"}</Td>
+                      <Td><StatusLabel tone="attention">Outstanding</StatusLabel></Td>
+                      {isFounder && (
+                        <Td>
+                          {linkInputId === r.id ? (
+                            <div className="flex gap-2 items-center">
+                              <input
+                                value={linkValue}
+                                onChange={(e) => setLinkValue(e.target.value)}
+                                placeholder="Paste link"
+                                autoFocus
+                                className="border border-v2-rule bg-v2-panel px-2 py-1 focus:outline-none font-v2-ui"
+                                style={{ borderRadius: "var(--v2-radius)", fontSize: "11.5px", width: "160px" }}
+                                onKeyDown={(e) => e.key === "Enter" && handleSaveLink(r.id)}
+                              />
+                              <V2Button variant="primary" onClick={() => handleSaveLink(r.id)} disabled={!linkValue.trim() || savingLink} style={{ height: "28px", fontSize: "11px" }}>
+                                {savingLink ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
+                              </V2Button>
+                              <V2Button variant="quiet" onClick={() => { setLinkInputId(null); setLinkValue(""); }} style={{ height: "28px" }}>
+                                <X className="h-3.5 w-3.5" />
+                              </V2Button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1.5">
+                              <V2Button variant="secondary" onClick={() => { setLinkInputId(r.id); setLinkValue(""); }} style={{ height: "28px", fontSize: "11px" }}>
+                                <Link2 className="h-3 w-3" /> Share link
+                              </V2Button>
+                              <V2Button
+                                variant="secondary"
+                                onClick={() => { setUploadingId(r.id); fileRef.current?.click(); }}
+                                disabled={uploadingId === r.id}
+                                style={{ height: "28px", fontSize: "11px" }}
+                              >
+                                {uploadingId === r.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+                                Upload
+                              </V2Button>
+                              <V2Button variant="quiet" onClick={() => handleFulfill(r.id)} style={{ height: "28px", fontSize: "11px" }}>
+                                Mark uploaded
+                              </V2Button>
+                            </div>
+                          )}
+                        </Td>
                       )}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Fulfilled requests */}
-          {fulfilled.length > 0 && (
-            <div className="divide-y divide-brand/10">
-              {fulfilled.map((r: any) => (
-                <div key={r.id} className="flex items-start gap-3 px-4 py-2.5 opacity-60">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0 mt-0.5" />
-                  <div className="flex-1 min-w-0">
-                    <span className="text-sm line-through text-muted-foreground">{r.title}</span>
-                    {r.response_link && (
-                      <a href={r.response_link} target="_blank" rel="noopener noreferrer"
-                        className="block text-[10px] text-brand hover:underline truncate mt-0.5">
-                        ↗ {r.response_link}
-                      </a>
-                    )}
-                  </div>
-                  <span className="text-[10px] text-success shrink-0">Fulfilled</span>
-                </div>
-              ))}
+                      {isInvestor && (
+                        <Td numeric>
+                          <V2Button variant="quiet" onClick={() => handleDelete(r.id)} style={{ height: "28px" }}>
+                            <X className="h-3.5 w-3.5" />
+                          </V2Button>
+                        </Td>
+                      )}
+                    </Tr>
+                  ))}
+                  {fulfilled.map((r: any) => (
+                    <Tr key={r.id} status="satisfied">
+                      <Td>
+                        <div className="text-v2-ink-secondary" style={{ textDecoration: "line-through" }}>{r.title}</div>
+                        {r.response_link && (
+                          <a href={r.response_link} target="_blank" rel="noopener noreferrer"
+                            className="text-v2-accent hover:underline block" style={{ fontSize: "11px", marginTop: "2px" }}>
+                            {r.response_link}
+                          </a>
+                        )}
+                      </Td>
+                      <Td>{r.priority ? PRIORITY_LABEL[r.priority as keyof typeof PRIORITY_LABEL] ?? r.priority : "—"}</Td>
+                      <Td><StatusLabel tone="satisfied">Complete</StatusLabel></Td>
+                      {isFounder && <Td />}
+                      {isInvestor && <Td numeric />}
+                    </Tr>
+                  ))}
+                </LedgerBody>
+              </LedgerTable>
             </div>
           )}
         </>
