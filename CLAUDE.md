@@ -380,8 +380,9 @@ Follow the exact sequence proven on the documents group, in order, each its own 
 2. **Port and adversarially verify authorization primitives before building anything on them** — the same discipline as the `9398d03` `authz_*` port: trace each primitive against the exact current RLS predicate it replaces, run the full member/non-member/wrong-scope/null matrix live, and document the RLS-predicate-to-function mapping before any gateway data function is written against it.
 3. **Build gateway data functions, verify against real UI write/read contracts, not just RLS/schema** — the Stage-1/Stage-2 proving runs on the documents group caught real column-coverage gaps this way (`priority`, `for_user_id`, `file_size`, the founder "share link" path) that a schema-only or RLS-only read would have missed. Trace every actual `.select()`/`.insert()`/`.update()` call site's real column list before considering a data function complete.
 4. **Client rewire, verify functional equivalence old-vs-new** — old RLS-governed query vs. new gateway output, field-by-field, same fixtures. This caught a real semantic divergence on the documents group (`is distinct from` vs. SQL `<>` on a nullable column) that the adversarial matrix alone did not.
-5. **DESIGN v2 presentation rebuild, as its own reviewable step** — do not fold presentation into the data-layer rewire step; keep it a separate, explicitly-reviewed pass over already-proven primitives, as done for the documents group.
-6. **Push only after all of the above is reviewed as one unit** — the documents-group precedent: six commits, one push, after every stage was individually approved.
+5. **Empty states and error semantics, as their own step** — see §20.4. Not folded into the client rewire and not left to the presentation pass; specced and built between the two.
+6. **DESIGN v2 presentation rebuild, as its own reviewable step** — do not fold presentation into the data-layer rewire step; keep it a separate, explicitly-reviewed pass over already-proven primitives, as done for the documents group.
+7. **Push only after all of the above is reviewed as one unit, against the §20.3 exit checklist** — the documents-group precedent: six commits, one push, after every stage was individually approved.
 
 ### 20.2 Known open items — not blocking, logged for whenever relevant
 
@@ -389,6 +390,76 @@ Follow the exact sequence proven on the documents group, in order, each its own 
 - **Orphaned `doc_list` DB function** (superseded by the three named `doc_list_room`/`doc_list_library`/`doc_list_investor` reads, no caller) — left in place per §4 (harmless, service-role-only, unexposed); flagged for a future cleanup pass rather than dropped silently.
 - **Detached-documents library bug** (pre-existing, faithfully preserved during the migration, not fixed) — a document detached from a deal room (`deal_room_id` set to `NULL`) becomes permanently invisible to the "add from library" picker, because the picker's `<>` comparison excludes `NULL` rows, matching the original PostgREST query's behaviour exactly. Needs a product decision on whether detached docs should be re-addable from the library before anyone touches this comparison. See the `project-detached-docs-library-bug` memory for the full trace.
 - **Font-loading cost during the v1/v2 coexistence period**: five font families now load simultaneously — v1's DM Sans and Syne, plus v2's Archivo, Source Serif 4 and JetBrains Mono. Self-hosted, no third-party requests, but still a real payload cost worth revisiting once v1 fully retires and the coexistence period ends.
+
+### 20.3 Standard exit checklist per migration group
+
+A migration group is complete only when all of the following are true. This replaces per-group improvisation — do not renegotiate this list on the next group.
+
+- **Content-trace audit done before trusting any file/table grouping.** This has changed the plan on every group so far. Treat as mandatory, not optional — see §20.1 step 1 and the general §7.5 lesson it extends.
+- **Column contract verified against real UI reads/writes, not just RLS and schema.** §20.1 step 3's lesson — this caught silent data loss on the documents group (`priority`, `for_user_id`, `file_size`, the founder share-link path).
+- **Authorization ported and adversarially verified, live, not inferred:** correct user, wrong user, non-member, wrong-room, closed-room, and null identity, each actually run against the deployed function — not read from the code and assumed to hold.
+- **Functional equivalence proven old-vs-new, field by field.** Separate from and not covered by the adversarial matrix — this is what caught the `is distinct from` vs. SQL `<>` NULL divergence on the documents group. A passing adversarial matrix does not substitute for this check.
+- **Empty states specced and built for every surface in the group** — see §20.4.
+- **Error semantics defined for the group's failure modes** — see §20.4.
+- **`tsc` at or below baseline, verified by error-set diff, not count.** Two different error sets of equal size is not a pass; the baseline count dropping is not proof nothing new was introduced. Diff the actual error list against the pre-group baseline.
+- **Review gate passed before push.** No group pushes without an explicit review, same as the documents-group precedent in §20.
+
+### 20.4 Empty states and error semantics as explicit steps
+
+These are step 5 in the §20.1 sequence, between the client rewire (step 4) and the DESIGN v2 presentation rebuild (step 6). Not polish, not foldable into either neighboring step — they are the difference between a product that reads as six months old and one that reads as five years old.
+
+**Empty states.** One per surface in the group. Each names what would appear and the one next action available from that empty state. No illustrations. Per DESIGN.md §7.3.
+
+**Error semantics.** Each failure class in a group needs its own defined behaviour — retryable, not retryable, partially applied, or unknown — because each reads differently to the user and silently defaulting to one generic error message is itself a defect. Define behaviour explicitly for at least:
+
+- Write failure after a user action
+- Session expiry mid-action
+- Concurrent edit conflict
+- Third-party provider failure
+- Upload interruption
+
+**No optimistic UI on consequential actions.** A consequential action (anything Commit-class per Foundation Document §15.2 / CLAUDE.md §8.2) shows a pending state until the record confirms — never an optimistic success state that could be rolled back under the user.
+
+### 20.5 V1 retirement condition
+
+The codebase currently runs two design systems, five font families (§20.2), and two data-access paradigms (direct `supabase.from()` and the gateway) simultaneously. **This is correct during migration and must not become permanent.**
+
+End condition, stated plainly: v1 tokens, v1 fonts (DM Sans, Syne), and the remaining direct `supabase.from()` paths are removed when the last migration group completes — not before, and not left in place after as a "just in case."
+
+Until that point, **each group's DESIGN v2 rebuild is final, not interim.** Do not build a group's presentation layer twice under the assumption that a later cleanup pass will redo it — build it once, to the standard in §20.3/§20.4, and move on.
+
+The five-font load cost logged in §20.2 is a tracked cost of the coexistence period, resolved at v1 retirement, not before. Do not attempt to prematurely optimize it mid-migration.
+
+### 20.6 Reference numbering placement
+
+Reference numbering (Foundation Document §9.1, CLAUDE.md §8.4) exists as a proven `pack_v1` primitive but sits on no user-facing table today. This means `ReferenceLine` — the signature element of the entire design system per DESIGN.md — currently renders nothing, everywhere, indefinitely, until this is addressed.
+
+**Reference numbering lands with the deal-room-core group** (`deal_rooms`, `deal_room_members`), not later. Deal rooms are the first object a user would actually cite, which makes this group the natural landing point. Every subsequent migration group inherits reference numbering from this point forward — it is not re-derived or re-scoped per group after this.
+
+### 20.7 Rollback procedure per group
+
+Not yet needed for any group, which is exactly when to write the procedure — before the pressure of an in-flight incident forces improvisation.
+
+For each migration group, before push, state and confirm as actually executable (not assumed):
+
+- The commit range to revert
+- Any schema state that would need to be reversed (new columns, new functions, new isolated-schema objects) and the exact statement or migration that reverses it
+- Any `pack_api` function introduced by the group that would need to be dropped
+- Confirmation that the stated rollback has been checked against the real commit range and schema state for that group, not written generically and assumed to apply
+
+A rollback procedure that has not been checked against the actual group is a claim, not a procedure — see §6, claims are not evidence.
+
+### 20.8 Migration progress tracking
+
+Tracked so progress is measurable, not vibes.
+
+**Starting figure:** 226 direct `supabase.from()` call sites identified in the step-0 audit, minus whatever the documents group migrated onto the gateway.
+
+At the close of each migration group, update this section with:
+- Remaining direct `supabase.from()` call-site count
+- Remaining inline `// §B — future migration group: ...` comment count (or equivalent worklist marker for that group)
+
+Next update due at the close of the deal-room-core group.
 
 ---
 
@@ -403,3 +474,4 @@ Follow the exact sequence proven on the documents group, in order, each its own 
 | 3 Aug 2026 | `ai-router` audited and remediated same day (commits `ef32b6c`, `d825b43`, `9c4da33`; deployed through v9): `verify_jwt: true` + in-code `resolveUid()` closes the open-auth and forgeable-`user_id` gap (anon key explicitly tested and rejected); anti-fabrication guardrail added to every `task_type` and to `AIOperatorPanel.tsx`; deployed↔repo drift reconciled before the fix, as its own commit. §17 rewritten to record this as history rather than an open incident. Added a general §7.1 lesson: test whether the anon key itself passes any `verify_jwt`-style check. Corrected §10's provider-routing line, which had claimed enforcement that the audit proved does not exist. **DPA/sensitive-routing question (Foundation §16 Rule 16.1) explicitly left open** — counsel/product decision, not resolved by this pass. |
 | 3 Aug 2026 | Deployed-edge-function inventory sweep (queued after the `ai-router` remediation above) found `match-investors` and `verify-investor` as fully-built, cron-scheduled, §15/§25-excluded features with zero repo trace — traced to a much larger finding of a never-fully-functional 5-tier verification / 23-badge system described sitewide. Added as new §19 (27 files, 5 commits `6ded0dd`..`e403023`; both crons unscheduled, 4 fixture rows deleted per product-owner authorization, 4 edge functions stubbed to `410 Gone`, 4 changelog entries corrected inline rather than rewritten). §19 records this as closed; the founder/investor pricing figure inconsistency found incidentally during the sweep ($49/mo vs. $19+$99/mo across different pages) is logged there as a separate open item, not resolved by this pass. |
 | 5 Aug 2026 | Added §20 (new numbered section; prior §20 Amendment log renumbered to §21): documents-group migration recorded as CLOSED and PUSHED — `9398d03`..`c64e9cf`, 6 commits, verified live in production on all four post-push checks (v1 isolation, rebuilt-screen render + real write, `pack_v1`/`pack_api` isolation, gateway authorization matrix). First full vertical slice of the new architecture (token layer → primitives → authorization port → gateway functions → client rewire → DESIGN v2 presentation) proven end-to-end. No work in progress. §20.1 records the proven six-step sequence for the next group (deal-room-core) and points at the inline `§B — future migration group` comments left throughout the documents-group code as the traced worklist. §20.2 logs four known open items (session-injection test-tooling gap, orphaned `doc_list` function, detached-documents library bug, five-font-family coexistence cost) as non-blocking. |
+| 8 Aug 2026 | Closed four gaps in §20 that would otherwise be renegotiated per migration group, documentation only, no code touched. §20.1's six-step sequence became seven steps: inserted "empty states and error semantics" as its own step (new step 5) between client rewire and DESIGN v2 presentation, and the final push step now points at the new §20.3 checklist. Added §20.3 (standard exit checklist per migration group — codifies content-trace audit, column-contract verification, live adversarial authorization matrix, field-by-field functional equivalence, empty states, error semantics, `tsc` error-set diff, and review gate as mandatory, not improvised, per group). Added §20.4 (empty states and error semantics as explicit steps, including the five named failure classes and the no-optimistic-UI-on-Commit-class-actions rule). Added §20.5 (v1 retirement condition: two design systems/five fonts/two data-access paradigms are correct only during migration, removed when the last group completes; each group's DESIGN v2 rebuild is final, not interim — no double-building). Added §20.6 (reference numbering, proven in `pack_v1` per §8.4 but on no user-facing table today, explicitly slotted into the deal-room-core group rather than left open-ended — `ReferenceLine` currently renders nothing anywhere until this lands). Added §20.7 (rollback procedure required per group before push: commit range, schema reversal, `pack_api` function drops, confirmed executable against the actual group, not written generically). Added §20.8 (migration progress tracking: starting figure 226 direct `supabase.from()` call sites from the step-0 audit, minus the documents group's migrated sites; updated at each group's close alongside the remaining `§B — future migration group` comment count). |
