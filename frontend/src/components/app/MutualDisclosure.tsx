@@ -8,19 +8,29 @@ import { useDealRoom } from "@/hooks/useDealRoom";
  * Two-column mutual disclosure block for the deal room Information tab.
  * "What you see about them" | "What they see about you" — identical layout
  * both sides. Locked until the room advances past nda_signed (workflow_stage
- * in initial_review/qa/diligence/term_sheet/closed — see
- * deal_room_information_unlocked() in Supabase, the same gate that RLS
- * enforces on investor_profiles reads). This component reads the same
- * gate client-side purely to decide what UI to show; the actual security
- * boundary is the RLS policy — a locked room simply returns no row for the
- * counterparty's investor_profiles query, so there is nothing to leak even
- * if this client-side check were bypassed.
+ * in initial_review/qa/diligence/due_diligence/term_sheet/closing/closed —
+ * see sync_deal_room_profile_disclosure() in Supabase, the same set that
+ * gates deal_room_profile_disclosures, which RLS enforces on
+ * investor_profiles/team_member_details/investor_team_member_details reads).
+ * This component reads the same gate client-side purely to decide what UI to
+ * show; the actual security boundary is the RLS policy — a locked room
+ * simply returns no row for the counterparty's investor_profiles query, so
+ * there is nothing to leak even if this client-side check were bypassed.
+ *
+ * due_diligence and closing were added 9 Aug 2026 (previously missing here
+ * and in the DB trigger both — advancing a room from qa into due_diligence,
+ * the very next step in useStageTransition.ts's STAGE_ORDER, silently
+ * revoked the investor's disclosure row and the founder's counterpart).
+ * Keep this list identical to sync_deal_room_profile_disclosure()'s; a
+ * future divergence here doesn't reopen the security gap (RLS still governs)
+ * but does silently disable these queries for a stage the server has
+ * actually unlocked, which reads as a bug.
  */
 export function MutualDisclosure() {
   const { dealRoomId, room, isInvestor, isFounder, investorUserId, founderUserId, startupId } = useDealRoom();
 
   const workflowStage = (room as any)?.workflow_stage as string | undefined;
-  const unlocked = !!workflowStage && ["initial_review", "qa", "diligence", "term_sheet", "closed"].includes(workflowStage);
+  const unlocked = !!workflowStage && ["initial_review", "qa", "diligence", "due_diligence", "term_sheet", "closing", "closed"].includes(workflowStage);
 
   // Founder's own public profile fields (small, safe subset) for the locked state.
   const { data: founderPublic } = useQuery({
