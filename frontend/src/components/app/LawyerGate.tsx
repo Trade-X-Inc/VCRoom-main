@@ -3,6 +3,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Scale, Loader2, Check, X, Clock3, Mail } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { callAction } from "@/lib/actions/call";
+import { roomGetTermSheet } from "@/lib/actions/deal-room-core";
 import { triggerLawyerInvite } from "@/lib/email/triggers";
 
 // R14B step 4 — the Investment Terms gate. Mutual-approval mechanic mirrors
@@ -72,13 +74,10 @@ export function useLawyerGateState(dealRoomId: string) {
     queryKey: ["lawyer-gate-room", dealRoomId],
     enabled: !!dealRoomId,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("deal_rooms")
-        .select("waived_legal_counsel")
-        .eq("id", dealRoomId)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
+      const res = await callAction<{ term_sheet: { waived_legal_counsel: boolean } }>(
+        roomGetTermSheet, dealRoomId, { dealRoomId },
+      );
+      return { waived_legal_counsel: res.term_sheet.waived_legal_counsel };
     },
   });
 

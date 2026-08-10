@@ -505,6 +505,19 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
       setViewerId(userId);
       setViewerRole(userRole);
       setAccessLoaded(true);
+    }).catch((err) => {
+      // A failed access check must fail to the LEAST access level, not hang.
+      // getAccessLevel's own internal fallback for every negative case
+      // (no session, not founder, not a member, no approved request) is
+      // already "public" — matching that here rather than inventing a new
+      // behavior. accessLevel's useState default is already "public"
+      // (unless isOwnerPreview, which never reaches this branch), so no
+      // explicit reset is needed — only accessLoaded must still flip, or
+      // the page hangs in its loading state forever.
+      console.error("[p.$slug] access level check failed, defaulting to public:", err);
+      setViewerId(null);
+      setViewerRole(null);
+      setAccessLoaded(true);
     });
   }, [startup?.id, isOwnerPreview]);
 

@@ -20,6 +20,8 @@ function formatThesisText(text: string) {
   });
 }
 import { supabase } from "@/lib/supabase";
+import { callAction } from "@/lib/actions/call";
+import { roomGetMedia } from "@/lib/actions/deal-room-core";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
@@ -177,16 +179,24 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
     },
   });
 
+  // room_get_media is fully forbidden for the lawyer (b/c narrowing) as
+  // well as for a non-member — both map to null here, matching the old
+  // silent-null contract every roomMedia?.x read below already expects.
+  // Component has zero import sites in src/routes as of this rewire (9 Aug
+  // 2026) — not reachable from any route — so this path is unexercised in
+  // production; rewired for correctness in case it's reactivated, not
+  // because it's currently live. Flagged, not silently left stale.
   const { data: roomMedia } = useQuery({
     queryKey: ["room-media", dealRoomId],
     enabled: !!dealRoomId,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("deal_rooms")
-        .select("pitch_deck_url, product_video_url, product_images")
-        .eq("id", dealRoomId)
-        .maybeSingle();
-      return data;
+      try {
+        const res = await callAction<{ media: Record<string, any> }>(roomGetMedia, dealRoomId, { dealRoomId });
+        return res.media;
+      } catch (err) {
+        if (err instanceof Error && err.message === "forbidden") return null;
+        throw err;
+      }
     },
   });
 

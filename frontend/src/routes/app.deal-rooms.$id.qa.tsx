@@ -5,6 +5,8 @@ import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { CheckCircle2, Loader2, Sparkles, Send, ChevronDown, Lock } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { callAction } from "@/lib/actions/call";
+import { roomGetWorkflowState } from "@/lib/actions/deal-room-core";
 import { cn } from "@/lib/utils";
 import { getQASuggestions } from "@/lib/qa-suggestions-fn";
 import { completeQaAndGenerateReport } from "@/lib/qa-report-fn";
@@ -61,16 +63,28 @@ function QAPage() {
     }
   }, [initialRows, rowsLoaded]);
 
+  // This route only mounts inside DealRoomCtx, which the layout already
+  // intercepts for the lawyer (renders LawyerRoomView instead) — so the
+  // room_get_workflow_state lawyer-null on qa_completed_at/by is
+  // unreachable here in practice, but handled anyway for defense in depth.
+  // Also adds staleTime (was unset — React Query default 0, refetching on
+  // every mount/remount of this tab route) to avoid a fresh gateway call
+  // and record_entry append on every Q&A tab revisit (CLAUDE.md §20.1
+  // record-volume finding).
   const { data: roomData, refetch: refetchRoom } = useQuery({
     queryKey: ["qa-room-status", dealRoomId],
     enabled: !!dealRoomId,
+    staleTime: 60_000,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("deal_rooms")
-        .select("qa_completed_at, qa_completed_by")
-        .eq("id", dealRoomId)
-        .single();
-      return data;
+      try {
+        const res = await callAction<{ workflow: { qa_completed_at: string | null; qa_completed_by: string | null } }>(
+          roomGetWorkflowState, dealRoomId, { dealRoomId },
+        );
+        return res.workflow;
+      } catch (err) {
+        if (err instanceof Error && err.message === "forbidden") return null;
+        throw err;
+      }
     },
   });
 

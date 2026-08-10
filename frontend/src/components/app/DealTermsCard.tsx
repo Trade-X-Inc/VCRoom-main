@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { callAction } from "@/lib/actions/call";
+import { roomGetDealTerms } from "@/lib/actions/deal-room-core";
 import { cn } from "@/lib/utils";
 import { DollarSign, Plus, Trash2, Pencil, Save, X } from "lucide-react";
 import { toast } from "sonner";
@@ -40,16 +42,24 @@ export function DealTermsCard({ dealRoomId, isFounder, isInvestor }: Props) {
   const [rounds, setRounds] = useState<Round[]>([]);
   const [metrics, setMetrics] = useState<{ k: string; v: string }[]>([]);
 
+  // room_get_deal_terms's "forbidden" (non-member) is mapped to null, same
+  // as the old RLS query's silent-zero-rows contract — hasAnyData/isFounder
+  // below already treat a null/empty terms object as "nothing to show yet",
+  // and this component has no member-only render path that would need a
+  // distinct error UI (a non-member should never mount this card in the
+  // first place; DealRoomLayout's accessError already fails closed before
+  // any child route renders it).
   const { data: terms, isLoading } = useQuery({
     queryKey: ["deal-terms", dealRoomId],
     enabled: !!dealRoomId,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("deal_rooms")
-        .select("funding_stage, funding_ask, pre_money_valuation, equity_offered, previous_rounds, key_metrics")
-        .eq("id", dealRoomId)
-        .maybeSingle();
-      return data ?? null;
+      try {
+        const res = await callAction<{ terms: Record<string, any> }>(roomGetDealTerms, dealRoomId, { dealRoomId });
+        return res.terms;
+      } catch (err) {
+        if (err instanceof Error && err.message === "forbidden") return null;
+        throw err;
+      }
     },
   });
 

@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { callAction } from "@/lib/actions/call";
+import { roomGetIdentity, roomGetWorkflowState } from "@/lib/actions/deal-room-core";
 import { useStageTransition } from "@/hooks/useStageTransition";
 import { DEAL_STAGES, type DealStage } from "@/lib/deal-room-fn";
 
@@ -15,19 +17,57 @@ export function useDealRoomContext(dealRoomId: string) {
   const { user } = useAuth();
   const userName = user?.fullName ?? "User";
 
-  const { data: room, isLoading: roomLoading } = useQuery({
+  // room is now assembled from two gateway calls (identity + workflow
+  // state) plus a direct startups read — the old select("*, startups(*)")
+  // was one round trip, this is three. Verified (CLAUDE.md §20.1) that no
+  // consumer depends on room/startup being read as one atomic snapshot —
+  // every downstream use takes a single scalar field independently (e.g.
+  // dealRoom.investor_user_id, startup.id feeding separate queries), never
+  // a value computed jointly across both objects. Also verified per role
+  // (founder/investor/lawyer/non-member) that the standalone startups read
+  // returns identical rows to the old nested join — startups has its own
+  // RLS (startups_own, startups_investor_read via get_investor_startup_ids,
+  // which is membership-based and role-agnostic, so the lawyer is
+  // unaffected here; (b)'s narrowing was never applied to startups).
+  //
+  // room_get_identity/room_get_workflow_state's "forbidden" (genuine
+  // non-member) is distinguished from a real failure — the old RLS query
+  // returned a silent null for "not a member" via .maybeSingle(); the
+  // gateway throws for that same case. Catching specifically "forbidden"
+  // and returning null preserves the original null-on-not-a-member
+  // contract every downstream (room as any)?.x consumer already expects;
+  // anything else re-throws into isError, feeding accessError below,
+  // exactly like memberRow already does.
+  const { data: room, isLoading: roomLoading, isError: roomError } = useQuery({
     queryKey: ["deal-room", dealRoomId],
     enabled: !!user?.id,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("deal_rooms")
-        .select("*, startups(*)")
-        .eq("id", dealRoomId)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
+    // Returns `any`, matching the old select("*, startups(*)") call's own
+    // implicit-any shape — every downstream consumer already reads this
+    // via (room as any)?.x (see companyName/isClosed/etc. below and every
+    // route/component this hook feeds). Typing the merged object tightly
+    // here would only push unknown-vs-string mismatches into 26 downstream
+    // files that were never in this rewire's scope; that's a separate,
+    // much larger typing pass, not this migration.
+    queryFn: async (): Promise<any> => {
+      let identity: { room: Record<string, unknown> };
+      let workflow: { workflow: Record<string, unknown> };
+      try {
+        [identity, workflow] = await Promise.all([
+          callAction<{ room: Record<string, unknown> }>(roomGetIdentity, dealRoomId, { dealRoomId }),
+          callAction<{ workflow: Record<string, unknown> }>(roomGetWorkflowState, dealRoomId, { dealRoomId }),
+        ]);
+      } catch (err) {
+        if (err instanceof Error && err.message === "forbidden") return null;
+        throw err;
+      }
+      const startupId = identity.room.startup_id as string | null;
+      const { data: startup, error: startupErr } = startupId
+        ? await supabase.from("startups").select("*").eq("id", startupId).maybeSingle()
+        : { data: null, error: null };
+      if (startupErr) throw startupErr;
+      return { ...identity.room, ...workflow.workflow, startups: startup };
     },
   });
 
@@ -219,8 +259,9 @@ export function useDealRoomContext(dealRoomId: string) {
     ndaLoading,
     // Load-bearing access queries errored — the layout must fail closed
     // (show an error, render no room content) rather than trust a role
-    // resolved from a null memberRow. §6A2.
-    accessError: memberError || ndaError,
+    // resolved from a null memberRow. §6A2. roomError added when room's
+    // gateway calls were wired — same fail-closed contract, not a new one.
+    accessError: memberError || ndaError || roomError,
     isInvestor,
     isFounder,
     isLawyer: isLawyerMember,

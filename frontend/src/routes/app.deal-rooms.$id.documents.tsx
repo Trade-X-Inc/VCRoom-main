@@ -12,6 +12,7 @@ import {
   docListRoom, docListLibrary, docListInvestor,
   docUpdate, docInsert, docViewInsert,
 } from "@/lib/actions/deal-room-documents";
+import { roomGetWorkflowState } from "@/lib/actions/deal-room-core";
 import { cn } from "@/lib/utils";
 import {
   V2Button, LedgerTable, LedgerHead, LedgerBody, Th, Tr, Td, StatusLabel,
@@ -263,13 +264,15 @@ function DocumentsPage() {
     enabled: !!dealRoomId,
     staleTime: 15_000,
     queryFn: async () => {
-      // §B — future migration group: deal_rooms read (deal-room-core group).
-      const { data } = await supabase
-        .from("deal_rooms")
-        .select("workflow_stage, stage2_unlocked")
-        .eq("id", dealRoomId)
-        .maybeSingle();
-      return data ?? null;
+      try {
+        const res = await callAction<{ workflow: { workflow_stage: string | null; stage2_unlocked: boolean | null } }>(
+          roomGetWorkflowState, dealRoomId, { dealRoomId },
+        );
+        return res.workflow;
+      } catch (err) {
+        if (err instanceof Error && err.message === "forbidden") return null;
+        throw err;
+      }
     },
   });
   const stage2Unlocked = drStageData?.stage2_unlocked ?? false;
