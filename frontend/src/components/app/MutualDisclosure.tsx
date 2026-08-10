@@ -225,11 +225,15 @@ export function MutualDisclosure() {
               <EmptyNote text="Founder hasn't published a public profile yet." />
             )
           )}
-          {unlocked && isFounder && (investorKeyPeople?.length ?? 0) > 0 && (
-            <TeamDetailList people={investorKeyPeople!} kind="investor" />
+          {unlocked && isFounder && (
+            (investorKeyPeople?.length ?? 0) > 0
+              ? <TeamDetailList people={investorKeyPeople!} kind="investor" />
+              : <EmptyNote text="No key people added yet." />
           )}
-          {unlocked && isInvestor && (founderKeyPeople?.length ?? 0) > 0 && (
-            <TeamDetailList people={founderKeyPeople!} kind="founder" />
+          {unlocked && isInvestor && (
+            (founderKeyPeople?.length ?? 0) > 0
+              ? <TeamDetailList people={founderKeyPeople!} kind="founder" />
+              : <EmptyNote text="No key people added yet." />
           )}
         </div>
 

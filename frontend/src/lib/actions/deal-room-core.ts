@@ -112,3 +112,93 @@ export const roomListProgressInvestor = defineAction<Record<string, never>, Room
   },
   record: () => ({ objectType: "deal_room_list", objectId: null, data: { list: "deal_room.listProgressInvestor" } }),
 });
+
+// ── Write functions with optimistic concurrency (migration 20260810010000)
+// §20.4 error semantics: DealTermsCard.tsx and DDWorkstation.tsx's
+// product_images write directly with no conflict detection today — two
+// concurrent edits silently overwrite each other (product_images: real
+// data loss, not just a conflict; see CLAUDE.md §7.4). Both writes are
+// whole-row compare-and-swap on updated_at, not field-level — a caller
+// whose expectedUpdatedAt no longer matches the row gets 'conflict',
+// distinguishable from 'forbidden' (not the founder) and 'not_found'.
+// class: "prepare", not "commit" — neither action is irreversible or
+// closes/signs/accepts anything (§8.2 tool classes).
+
+type DealTermsInput = {
+  dealRoomId: string; expectedUpdatedAt: string;
+  fundingStage: string | null; fundingAsk: string | null; preMoneyValuation: string | null;
+  equityOffered: string | null; previousRounds: JsonValue; keyMetrics: JsonValue;
+};
+type ConflictableOutput = Obj & { conflict?: boolean };
+
+export const roomUpdateDealTerms = defineAction<DealTermsInput, ConflictableOutput>({
+  name: "deal_room.updateDealTerms",
+  class: "prepare",
+  validate: (raw) => {
+    const r = raw as Record<string, unknown>;
+    if (!isUuid(r?.dealRoomId)) throw new Error("dealRoomId must be a uuid");
+    if (typeof r?.expectedUpdatedAt !== "string") throw new Error("expectedUpdatedAt required");
+    return {
+      dealRoomId: r.dealRoomId as string,
+      expectedUpdatedAt: r.expectedUpdatedAt as string,
+      fundingStage: (r.fundingStage as string) ?? null,
+      fundingAsk: (r.fundingAsk as string) ?? null,
+      preMoneyValuation: (r.preMoneyValuation as string) ?? null,
+      equityOffered: (r.equityOffered as string) ?? null,
+      previousRounds: (r.previousRounds as JsonValue) ?? [],
+      keyMetrics: (r.keyMetrics as JsonValue) ?? {},
+    };
+  },
+  authorize: async () => true, // authorization enforced in the pack_api function (founder-only)
+  handle: async (ctx, input): Promise<ConflictableOutput> => {
+    const { data, error } = await ctx.sb.schema("pack_api").rpc("room_update_deal_terms", {
+      p_uid: ctx.uid, p_deal_room_id: input.dealRoomId, p_expected_updated_at: input.expectedUpdatedAt,
+      p_funding_stage: input.fundingStage, p_funding_ask: input.fundingAsk,
+      p_pre_money_valuation: input.preMoneyValuation, p_equity_offered: input.equityOffered,
+      p_previous_rounds: input.previousRounds, p_key_metrics: input.keyMetrics,
+    });
+    if (error) throw new Error(`room_update_deal_terms: ${error.message}`);
+    const res = data as { ok: boolean; error?: string } & Obj;
+    // 'conflict' is returned to the caller as data, NOT thrown — the
+    // client needs to distinguish it from a real failure (session expiry,
+    // forbidden, not_found), which callAction's throw-on-!ok would
+    // otherwise collapse into one generic catch block.
+    if (!res.ok && res.error === "conflict") return { conflict: true };
+    if (!res.ok) throw new Error(res.error ?? "room_update_deal_terms_failed");
+    return res;
+  },
+  record: (input, output) => ({
+    objectType: "deal_room", objectId: input.dealRoomId,
+    data: { action: "updateDealTerms", conflict: !!output.conflict },
+  }),
+});
+
+type ProductImageInput = { dealRoomId: string; expectedUpdatedAt: string; imageUrl: string };
+
+export const roomAppendProductImage = defineAction<ProductImageInput, ConflictableOutput>({
+  name: "deal_room.appendProductImage",
+  class: "prepare",
+  validate: (raw) => {
+    const r = raw as Record<string, unknown>;
+    if (!isUuid(r?.dealRoomId)) throw new Error("dealRoomId must be a uuid");
+    if (typeof r?.expectedUpdatedAt !== "string") throw new Error("expectedUpdatedAt required");
+    if (typeof r?.imageUrl !== "string" || !r.imageUrl.trim()) throw new Error("imageUrl required");
+    return { dealRoomId: r.dealRoomId as string, expectedUpdatedAt: r.expectedUpdatedAt as string, imageUrl: r.imageUrl as string };
+  },
+  authorize: async () => true, // authorization enforced in the pack_api function (founder-only)
+  handle: async (ctx, input): Promise<ConflictableOutput> => {
+    const { data, error } = await ctx.sb.schema("pack_api").rpc("room_append_product_image", {
+      p_uid: ctx.uid, p_deal_room_id: input.dealRoomId,
+      p_expected_updated_at: input.expectedUpdatedAt, p_image_url: input.imageUrl,
+    });
+    if (error) throw new Error(`room_append_product_image: ${error.message}`);
+    const res = data as { ok: boolean; error?: string } & Obj;
+    if (!res.ok && res.error === "conflict") return { conflict: true };
+    if (!res.ok) throw new Error(res.error ?? "room_append_product_image_failed");
+    return res;
+  },
+  record: (input, output) => ({
+    objectType: "deal_room", objectId: input.dealRoomId,
+    data: { action: "appendProductImage", conflict: !!output.conflict },
+  }),
+});

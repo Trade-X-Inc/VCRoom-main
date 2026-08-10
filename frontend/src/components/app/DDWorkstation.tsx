@@ -21,7 +21,7 @@ function formatThesisText(text: string) {
 }
 import { supabase } from "@/lib/supabase";
 import { callAction } from "@/lib/actions/call";
-import { roomGetMedia } from "@/lib/actions/deal-room-core";
+import { roomGetMedia, roomAppendProductImage } from "@/lib/actions/deal-room-core";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
@@ -971,14 +971,35 @@ export function DDWorkstation({ dealRoomId, userId, isInvestor = false, isFounde
                             type="url"
                             placeholder="Paste URL and press Enter or click away to add…"
                             onBlur={async (e) => {
-                              if (!e.target.value.trim()) return;
-                              const existing = (roomMedia?.product_images as string[]) ?? [];
-                              const { error } = await supabase.from("deal_rooms")
-                                .update({ product_images: [...existing, e.target.value.trim()] })
-                                .eq("id", dealRoomId);
-                              if (error) { console.error("[dd] product image save failed:", error); toast.error("Could not save image."); return; }
-                              e.target.value = "";
-                              qc.invalidateQueries({ queryKey: ["room-media", dealRoomId] });
+                              const url = e.target.value.trim();
+                              if (!url) return;
+                              const loadedAt = (roomMedia as any)?.updated_at;
+                              try {
+                                // Server-side append inside the compare-and-swap, not a
+                                // client-computed [...existing, url] — two concurrent
+                                // additions each retry against the CURRENT array on
+                                // conflict rather than one silently overwriting the
+                                // other's addition entirely (§20.4 — this was a real,
+                                // live data-loss defect, not just a race condition).
+                                const res = await callAction<{ conflict?: boolean }>(roomAppendProductImage, dealRoomId, {
+                                  dealRoomId, expectedUpdatedAt: loadedAt, imageUrl: url,
+                                });
+                                if (res.conflict) {
+                                  toast.error("Someone else updated this room's media. Reloading — please re-add your image.");
+                                  qc.invalidateQueries({ queryKey: ["room-media", dealRoomId] });
+                                  return;
+                                }
+                                e.target.value = "";
+                                qc.invalidateQueries({ queryKey: ["room-media", dealRoomId] });
+                              } catch (err: any) {
+                                const msg = err?.message ?? "";
+                                if (msg === "not_authenticated" || msg.includes("JWT") || msg.includes("session")) {
+                                  toast.error("Your session expired. Sign in again to add this image.");
+                                } else {
+                                  console.error("[dd] product image save failed:", err);
+                                  toast.error("Could not save image.");
+                                }
+                              }
                             }}
                             className="w-full rounded-md border border-border/60 bg-background px-3 py-1.5 text-xs focus:outline-none focus:border-brand/50 mb-2"
                           />

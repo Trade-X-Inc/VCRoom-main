@@ -694,7 +694,14 @@ function CreateRoomForm({
       onCreated();
       setCreatedRoom({ id: newRoom.id, email: inviteEmail.trim() });
 
-      // Sync founder to HubSpot with deal room activity — fire and forget
+      // Sync founder to HubSpot with deal room activity — fire and forget,
+      // deliberately: room creation must never be blocked or alarmed by a
+      // CRM sync failure that has nothing to do with the deal itself
+      // (§20.4). But a discarded error means nobody — not the user, not an
+      // engineer debugging a missing HubSpot contact later — can ever find
+      // out it failed. Logged server-visible instead of silently dropped;
+      // still no user-facing state, since a founder creating a room has no
+      // actionable response to "your CRM sync failed."
       const { data: { session: s } } = await supabase.auth.getSession();
       if (s?.user?.email) {
         syncContactToHubSpot({
@@ -705,7 +712,7 @@ function CreateRoomForm({
               deal_room_created: "true",
             },
           },
-        }).catch(() => {});
+        }).catch((err) => console.error("[hubspot] contact sync failed:", err));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create deal room.");

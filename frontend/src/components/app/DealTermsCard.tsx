@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase";
 import { callAction } from "@/lib/actions/call";
-import { roomGetDealTerms } from "@/lib/actions/deal-room-core";
+import { roomGetDealTerms, roomUpdateDealTerms } from "@/lib/actions/deal-room-core";
 import { cn } from "@/lib/utils";
-import { DollarSign, Plus, Trash2, Pencil, Save, X } from "lucide-react";
+import { DollarSign, Plus, Trash2, Pencil, Save, X, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 const FUNDING_STAGES = ["Pre-seed", "Seed", "Series A", "Series B", "Series C"] as const;
@@ -34,6 +33,12 @@ export function DealTermsCard({ dealRoomId, isFounder, isInvestor }: Props) {
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  // §20.4 error semantics — three distinct save-failure states, not one
+  // generic toast: conflict (someone else saved first — form values kept,
+  // user chooses reload-or-keep-editing), sessionExpired (distinct copy,
+  // form values kept), and the generic toast path for everything else.
+  const [conflict, setConflict] = useState(false);
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   const [fundingStage, setFundingStage] = useState("");
   const [fundingAsk, setFundingAsk] = useState("");
@@ -63,6 +68,10 @@ export function DealTermsCard({ dealRoomId, isFounder, isInvestor }: Props) {
     },
   });
 
+  // The updated_at this edit session started from — the compare-and-swap
+  // key. Captured once, at edit-start, not re-read on every keystroke.
+  const [loadedAt, setLoadedAt] = useState<string | null>(null);
+
   const startEditing = () => {
     setFundingStage(terms?.funding_stage ?? "");
     setFundingAsk(terms?.funding_ask ?? "");
@@ -72,34 +81,56 @@ export function DealTermsCard({ dealRoomId, isFounder, isInvestor }: Props) {
     setRounds(rawRounds.map((r: any) => ({ name: r.name ?? "", amount: r.amount ?? "", investors: r.investors ?? "" })));
     const rawMetrics = terms?.key_metrics ?? {};
     setMetrics(Object.entries(rawMetrics).map(([k, v]) => ({ k, v: String(v) })));
+    setLoadedAt(terms?.updated_at ?? null);
+    setConflict(false);
+    setSessionExpired(false);
     setEditing(true);
   };
 
   const handleSave = async () => {
     setSaving(true);
+    setConflict(false);
+    setSessionExpired(false);
     try {
       const metricsObj: Record<string, string> = {};
       metrics.filter((m) => m.k.trim()).forEach((m) => { metricsObj[m.k.trim()] = m.v; });
-      const { error } = await supabase
-        .from("deal_rooms")
-        .update({
-          funding_stage: fundingStage || null,
-          funding_ask: fundingAsk || null,
-          pre_money_valuation: preMoneyVal || null,
-          equity_offered: equityOffered || null,
-          previous_rounds: rounds.filter((r) => r.name.trim()),
-          key_metrics: metricsObj,
-        })
-        .eq("id", dealRoomId);
-      if (error) throw error;
+      const res = await callAction<{ conflict?: boolean }>(roomUpdateDealTerms, dealRoomId, {
+        dealRoomId,
+        expectedUpdatedAt: loadedAt,
+        fundingStage: fundingStage || null,
+        fundingAsk: fundingAsk || null,
+        preMoneyValuation: preMoneyVal || null,
+        equityOffered: equityOffered || null,
+        previousRounds: rounds.filter((r) => r.name.trim()),
+        keyMetrics: metricsObj,
+      });
+      if (res.conflict) {
+        // Form values are NOT cleared — the user keeps what they typed and
+        // chooses reload-vs-keep-editing explicitly (§20.4). Whole-form
+        // conflict, not field-level: a negotiation record's terms are
+        // never silently merged across two parties' edits.
+        setConflict(true);
+        return;
+      }
       qc.invalidateQueries({ queryKey: ["deal-terms", dealRoomId] });
       setEditing(false);
       toast.success("Deal terms saved");
     } catch (err: any) {
-      toast.error(err.message ?? "Failed to save");
+      const msg = err?.message ?? "";
+      if (msg === "not_authenticated" || msg.includes("JWT") || msg.includes("session")) {
+        setSessionExpired(true);
+      } else {
+        toast.error(msg || "Failed to save");
+      }
     } finally {
       setSaving(false);
     }
+  };
+
+  const reloadAfterConflict = () => {
+    qc.invalidateQueries({ queryKey: ["deal-terms", dealRoomId] });
+    setConflict(false);
+    setEditing(false);
   };
 
   const addRound = () => setRounds((r) => [...r, { name: "", amount: "", investors: "" }]);
@@ -163,6 +194,32 @@ export function DealTermsCard({ dealRoomId, isFounder, isInvestor }: Props) {
         </div>
       ) : editing ? (
         <div className="space-y-4">
+          {conflict && (
+            <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2.5 text-xs text-amber-900 flex items-start gap-2">
+              <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+              <div className="flex-1">
+                <p className="font-medium">Someone else saved changes to these terms while you were editing.</p>
+                <p className="mt-0.5">Your changes have not been saved. Reload to see the latest, or keep editing and save again.</p>
+                <div className="mt-2 flex gap-2">
+                  <button onClick={reloadAfterConflict} className="text-xs font-medium underline hover:no-underline">
+                    Reload
+                  </button>
+                  <button onClick={() => setConflict(false)} className="text-xs font-medium underline hover:no-underline">
+                    Keep editing
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          {sessionExpired && (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-xs text-destructive flex items-start gap-2">
+              <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-medium">Your session expired.</p>
+                <p className="mt-0.5">Sign in again to save this — your changes are still here.</p>
+              </div>
+            </div>
+          )}
           {/* Core fields */}
           <div className="grid grid-cols-2 gap-3">
             <div>

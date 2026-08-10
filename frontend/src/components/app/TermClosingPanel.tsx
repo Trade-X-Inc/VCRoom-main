@@ -150,17 +150,39 @@ export function TermClosingPanel({
   const content = (summary?.content ?? null) as any;
 
   // ── file upload ────────────────────────────────────────────────────────────
+  // §20.4 — upload is two steps (storage, then the record call) with no
+  // transactional link between them. Not made atomic here; instead, the
+  // failure modes are made explicit so an interruption is never presented
+  // as success. An interruption between the two steps (connection drop,
+  // not either named error) falls to the outer catch below — the file may
+  // be sitting in storage unreferenced, but nothing claims it uploaded,
+  // and the user is told to retry the WHOLE upload, not resume — a fresh
+  // storagePath is generated each attempt, so a retry never collides with
+  // the orphaned object. The orphan itself is accepted as harmless cleanup
+  // debt (unreferenced, not part of this fix), not silently presented as
+  // a success.
   const onUpload = async (file: File) => {
     setBusy("upload");
     try {
       const path = `${dealRoomId}/agreements/${Date.now()}-${file.name}`;
       const { error: upErr } = await supabase.storage.from("documents").upload(path, file);
-      if (upErr) { toast.error("Upload failed"); return; }
+      if (upErr) { toast.error("Upload failed. Try again."); return; }
       const r = await uploadAgreement({ data: { dealRoomId, accessToken: await token(), storagePath: path, fileName: file.name, fileSize: file.size } });
-      if (!r.ok) { toast.error(r.error === "not_uploader" ? "Only the designated party can upload" : r.error === "already_finalized" ? "Agreement is finalized" : "Could not record agreement"); return; }
+      if (!r.ok) {
+        toast.error(
+          r.error === "not_uploader" ? "Only the designated party can upload" :
+          r.error === "already_finalized" ? "Agreement is finalized" :
+          "Upload didn't complete — the file wasn't recorded. Try uploading again."
+        );
+        return;
+      }
       toast.success(`Agreement v${r.version} uploaded`);
       refresh();
-    } catch { toast.error("Upload failed"); }
+    } catch {
+      // Interrupted between storage upload and the record call, or a
+      // network failure of an indeterminate kind — never claim success.
+      toast.error("Upload didn't complete. Try uploading again.");
+    }
     finally { setBusy(null); }
   };
 
