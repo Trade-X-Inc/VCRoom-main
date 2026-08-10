@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { callAction } from "@/lib/actions/call";
+import { roomListProgressFounder } from "@/lib/actions/deal-room-core";
 import { useAuth } from "@/lib/auth";
 
 /**
@@ -124,7 +126,12 @@ export function useRaiseProgress() {
           100,
       );
 
-      const [docs, verif, claims, badges, rooms] = await Promise.all([
+      // rooms pulled separately via the gateway — {ok:true, rooms:[]} for a
+      // genuine zero-room founder reaches roomRows as [] the normal way,
+      // never via the catch below; any other failure degrades to [] too,
+      // matching this hook's existing all-failures-log-and-continue
+      // convention for the other four queries in the Promise.all.
+      const [docs, verif, claims, badges, roomsResult] = await Promise.all([
         supabase
           .from("founder_documents")
           .select("id", { count: "exact", head: true })
@@ -142,12 +149,10 @@ export function useRaiseProgress() {
           .from("profile_badges")
           .select("id", { count: "exact", head: true })
           .eq("startup_id", startup.id),
-        supabase
-          .from("deal_rooms")
-          .select("id, status, workflow_stage, term_sheet_status")
-          .eq("startup_id", startup.id),
+        callAction<{ rooms: any[] }>(roomListProgressFounder, startup.id, { startupId: startup.id })
+          .catch((err) => { console.error("[raise] rooms fetch failed:", err); return { rooms: [] }; }),
       ]);
-      for (const r of [docs, verif, claims, badges, rooms]) {
+      for (const r of [docs, verif, claims, badges]) {
         if (r.error) console.error("[raise] progress fetch failed:", r.error);
       }
 
@@ -158,7 +163,7 @@ export function useRaiseProgress() {
         (c) => c.ai_verdict === "verified",
       ).length;
       const badgeCount = badges.count ?? 0;
-      const roomRows = rooms.data ?? [];
+      const roomRows = roomsResult.rooms ?? [];
 
       const status = (done: boolean, started: boolean): SectionStatus =>
         done ? "complete" : started ? "in-progress" : "not-started";

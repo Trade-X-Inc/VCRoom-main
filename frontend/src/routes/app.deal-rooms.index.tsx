@@ -6,6 +6,8 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { callAction } from "@/lib/actions/call";
+import { roomListByStartup } from "@/lib/actions/deal-room-core";
 import { useAuth } from "@/lib/auth";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -74,20 +76,24 @@ export function DealRooms({ view }: { view?: "team-assignments" } = {}) {
     },
   });
 
+  // Preserves the original soft-fail-to-[] contract on ANY failure, not
+  // just the ones the old .from() call could produce — room_list_by_startup
+  // returning {ok:true, rooms:[]} for a real zero-room founder reaches here
+  // as a normal (non-error) empty array via res.rooms, never via the catch
+  // block below. staleTime added (was unset) to avoid re-appending a
+  // record entry on every remount of this route.
   const { data: rooms = [], isLoading: roomsLoading } = useQuery({
     queryKey: ["deal-rooms", user?.id, startup?.id],
     enabled: !!user?.id && !!startup?.id,
+    staleTime: 30_000,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("deal_rooms")
-        .select("id, status, created_at, updated_at, investor_name, investor_email, investor_company")
-        .eq("startup_id", startup!.id)
-        .order("updated_at", { ascending: false });
-      if (error) {
-        console.error("Deal rooms query failed:", error);
+      try {
+        const res = await callAction<{ rooms: any[] }>(roomListByStartup, startup!.id, { startupId: startup!.id });
+        return res.rooms ?? [];
+      } catch (err) {
+        console.error("Deal rooms query failed:", err);
         return [];
       }
-      return (data ?? []) as any[];
     },
   });
 
