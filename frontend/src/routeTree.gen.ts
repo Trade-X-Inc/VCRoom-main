@@ -98,7 +98,6 @@ import { Route as AppInvestorSettingsRouteImport } from './routes/app.investor.s
 import { Route as AppInvestorProfileRouteImport } from './routes/app.investor.profile'
 import { Route as AppInvestorPortfolioRouteImport } from './routes/app.investor.portfolio'
 import { Route as AppInvestorOverviewRouteImport } from './routes/app.investor.overview'
-import { Route as AppInvestorIntakeRouteImport } from './routes/app.investor.intake'
 import { Route as AppInvestorEvaluateRouteImport } from './routes/app.investor.evaluate'
 import { Route as AppInvestorDiligenceRouteImport } from './routes/app.investor.diligence'
 import { Route as AppInvestorDecisionsRouteImport } from './routes/app.investor.decisions'
@@ -132,7 +131,6 @@ import { Route as AppPrepareIpVaultDigitalDocumentVaultRouteImport } from './rou
 import { Route as AppPrepareBadgesRoastReportsRouteImport } from './routes/app.prepare.badges.roast-reports'
 import { Route as AppPrepareBadgesFounderRoastRouteImport } from './routes/app.prepare.badges.founder-roast'
 import { Route as AppInvestorDiscoverWatchlistRouteImport } from './routes/app.investor.discover.watchlist'
-import { Route as AppInvestorDiscoverDealIntakeRouteImport } from './routes/app.investor.discover.deal-intake'
 import { Route as AppInvestorDiscoverDealFlowRouteImport } from './routes/app.investor.discover.deal-flow'
 import { Route as AppInvestorDealRoomsTeamAssignmentsRouteImport } from './routes/app.investor.deal-rooms.team-assignments'
 import { Route as AppInvestorDealRoomsReportsVaultRouteImport } from './routes/app.investor.deal-rooms.reports-vault'
@@ -610,11 +608,6 @@ const AppInvestorOverviewRoute = AppInvestorOverviewRouteImport.update({
   path: '/overview',
   getParentRoute: () => AppInvestorRoute,
 } as any)
-const AppInvestorIntakeRoute = AppInvestorIntakeRouteImport.update({
-  id: '/intake',
-  path: '/intake',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
 const AppInvestorEvaluateRoute = AppInvestorEvaluateRouteImport.update({
   id: '/evaluate',
   path: '/evaluate',
@@ -796,12 +789,6 @@ const AppInvestorDiscoverWatchlistRoute =
   AppInvestorDiscoverWatchlistRouteImport.update({
     id: '/discover/watchlist',
     path: '/discover/watchlist',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppInvestorDiscoverDealIntakeRoute =
-  AppInvestorDiscoverDealIntakeRouteImport.update({
-    id: '/discover/deal-intake',
-    path: '/discover/deal-intake',
     getParentRoute: () => AppInvestorRoute,
   } as any)
 const AppInvestorDiscoverDealFlowRoute =
@@ -1058,7 +1045,6 @@ export interface FileRoutesByFullPath {
   '/app/investor/decisions': typeof AppInvestorDecisionsRoute
   '/app/investor/diligence': typeof AppInvestorDiligenceRoute
   '/app/investor/evaluate': typeof AppInvestorEvaluateRoute
-  '/app/investor/intake': typeof AppInvestorIntakeRoute
   '/app/investor/overview': typeof AppInvestorOverviewRoute
   '/app/investor/portfolio': typeof AppInvestorPortfolioRoute
   '/app/investor/profile': typeof AppInvestorProfileRoute
@@ -1097,7 +1083,6 @@ export interface FileRoutesByFullPath {
   '/app/investor/deal-rooms/reports-vault': typeof AppInvestorDealRoomsReportsVaultRoute
   '/app/investor/deal-rooms/team-assignments': typeof AppInvestorDealRoomsTeamAssignmentsRoute
   '/app/investor/discover/deal-flow': typeof AppInvestorDiscoverDealFlowRoute
-  '/app/investor/discover/deal-intake': typeof AppInvestorDiscoverDealIntakeRoute
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
   '/app/prepare/badges/roast-reports': typeof AppPrepareBadgesRoastReportsRoute
@@ -1209,7 +1194,6 @@ export interface FileRoutesByTo {
   '/app/investor/decisions': typeof AppInvestorDecisionsRoute
   '/app/investor/diligence': typeof AppInvestorDiligenceRoute
   '/app/investor/evaluate': typeof AppInvestorEvaluateRoute
-  '/app/investor/intake': typeof AppInvestorIntakeRoute
   '/app/investor/overview': typeof AppInvestorOverviewRoute
   '/app/investor/portfolio': typeof AppInvestorPortfolioRoute
   '/app/investor/profile': typeof AppInvestorProfileRoute
@@ -1248,7 +1232,6 @@ export interface FileRoutesByTo {
   '/app/investor/deal-rooms/reports-vault': typeof AppInvestorDealRoomsReportsVaultRoute
   '/app/investor/deal-rooms/team-assignments': typeof AppInvestorDealRoomsTeamAssignmentsRoute
   '/app/investor/discover/deal-flow': typeof AppInvestorDiscoverDealFlowRoute
-  '/app/investor/discover/deal-intake': typeof AppInvestorDiscoverDealIntakeRoute
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
   '/app/prepare/badges/roast-reports': typeof AppPrepareBadgesRoastReportsRoute
@@ -1365,7 +1348,6 @@ export interface FileRoutesById {
   '/app/investor/decisions': typeof AppInvestorDecisionsRoute
   '/app/investor/diligence': typeof AppInvestorDiligenceRoute
   '/app/investor/evaluate': typeof AppInvestorEvaluateRoute
-  '/app/investor/intake': typeof AppInvestorIntakeRoute
   '/app/investor/overview': typeof AppInvestorOverviewRoute
   '/app/investor/portfolio': typeof AppInvestorPortfolioRoute
   '/app/investor/profile': typeof AppInvestorProfileRoute
@@ -1404,7 +1386,6 @@ export interface FileRoutesById {
   '/app/investor/deal-rooms/reports-vault': typeof AppInvestorDealRoomsReportsVaultRoute
   '/app/investor/deal-rooms/team-assignments': typeof AppInvestorDealRoomsTeamAssignmentsRoute
   '/app/investor/discover/deal-flow': typeof AppInvestorDiscoverDealFlowRoute
-  '/app/investor/discover/deal-intake': typeof AppInvestorDiscoverDealIntakeRoute
   '/app/investor/discover/watchlist': typeof AppInvestorDiscoverWatchlistRoute
   '/app/prepare/badges/founder-roast': typeof AppPrepareBadgesFounderRoastRoute
   '/app/prepare/badges/roast-reports': typeof AppPrepareBadgesRoastReportsRoute
@@ -1522,7 +1503,6 @@ export interface FileRouteTypes {
     | '/app/investor/decisions'
     | '/app/investor/diligence'
     | '/app/investor/evaluate'
-    | '/app/investor/intake'
     | '/app/investor/overview'
     | '/app/investor/portfolio'
     | '/app/investor/profile'
@@ -1561,7 +1541,6 @@ export interface FileRouteTypes {
     | '/app/investor/deal-rooms/reports-vault'
     | '/app/investor/deal-rooms/team-assignments'
     | '/app/investor/discover/deal-flow'
-    | '/app/investor/discover/deal-intake'
     | '/app/investor/discover/watchlist'
     | '/app/prepare/badges/founder-roast'
     | '/app/prepare/badges/roast-reports'
@@ -1673,7 +1652,6 @@ export interface FileRouteTypes {
     | '/app/investor/decisions'
     | '/app/investor/diligence'
     | '/app/investor/evaluate'
-    | '/app/investor/intake'
     | '/app/investor/overview'
     | '/app/investor/portfolio'
     | '/app/investor/profile'
@@ -1712,7 +1690,6 @@ export interface FileRouteTypes {
     | '/app/investor/deal-rooms/reports-vault'
     | '/app/investor/deal-rooms/team-assignments'
     | '/app/investor/discover/deal-flow'
-    | '/app/investor/discover/deal-intake'
     | '/app/investor/discover/watchlist'
     | '/app/prepare/badges/founder-roast'
     | '/app/prepare/badges/roast-reports'
@@ -1828,7 +1805,6 @@ export interface FileRouteTypes {
     | '/app/investor/decisions'
     | '/app/investor/diligence'
     | '/app/investor/evaluate'
-    | '/app/investor/intake'
     | '/app/investor/overview'
     | '/app/investor/portfolio'
     | '/app/investor/profile'
@@ -1867,7 +1843,6 @@ export interface FileRouteTypes {
     | '/app/investor/deal-rooms/reports-vault'
     | '/app/investor/deal-rooms/team-assignments'
     | '/app/investor/discover/deal-flow'
-    | '/app/investor/discover/deal-intake'
     | '/app/investor/discover/watchlist'
     | '/app/prepare/badges/founder-roast'
     | '/app/prepare/badges/roast-reports'
@@ -2575,13 +2550,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorOverviewRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/investor/intake': {
-      id: '/app/investor/intake'
-      path: '/intake'
-      fullPath: '/app/investor/intake'
-      preLoaderRoute: typeof AppInvestorIntakeRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
     '/app/investor/evaluate': {
       id: '/app/investor/evaluate'
       path: '/evaluate'
@@ -2813,13 +2781,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorDiscoverWatchlistRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/investor/discover/deal-intake': {
-      id: '/app/investor/discover/deal-intake'
-      path: '/discover/deal-intake'
-      fullPath: '/app/investor/discover/deal-intake'
-      preLoaderRoute: typeof AppInvestorDiscoverDealIntakeRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
     '/app/investor/discover/deal-flow': {
       id: '/app/investor/discover/deal-flow'
       path: '/discover/deal-flow'
@@ -3035,7 +2996,6 @@ interface AppInvestorRouteChildren {
   AppInvestorDecisionsRoute: typeof AppInvestorDecisionsRoute
   AppInvestorDiligenceRoute: typeof AppInvestorDiligenceRoute
   AppInvestorEvaluateRoute: typeof AppInvestorEvaluateRoute
-  AppInvestorIntakeRoute: typeof AppInvestorIntakeRoute
   AppInvestorOverviewRoute: typeof AppInvestorOverviewRoute
   AppInvestorPortfolioRoute: typeof AppInvestorPortfolioRoute
   AppInvestorProfileRoute: typeof AppInvestorProfileRoute
@@ -3051,7 +3011,6 @@ interface AppInvestorRouteChildren {
   AppInvestorDealRoomsReportsVaultRoute: typeof AppInvestorDealRoomsReportsVaultRoute
   AppInvestorDealRoomsTeamAssignmentsRoute: typeof AppInvestorDealRoomsTeamAssignmentsRoute
   AppInvestorDiscoverDealFlowRoute: typeof AppInvestorDiscoverDealFlowRoute
-  AppInvestorDiscoverDealIntakeRoute: typeof AppInvestorDiscoverDealIntakeRoute
   AppInvestorDiscoverWatchlistRoute: typeof AppInvestorDiscoverWatchlistRoute
   AppInvestorDealRoomsIndexRoute: typeof AppInvestorDealRoomsIndexRoute
   AppInvestorDiscoverIndexRoute: typeof AppInvestorDiscoverIndexRoute
@@ -3077,7 +3036,6 @@ const AppInvestorRouteChildren: AppInvestorRouteChildren = {
   AppInvestorDecisionsRoute: AppInvestorDecisionsRoute,
   AppInvestorDiligenceRoute: AppInvestorDiligenceRoute,
   AppInvestorEvaluateRoute: AppInvestorEvaluateRoute,
-  AppInvestorIntakeRoute: AppInvestorIntakeRoute,
   AppInvestorOverviewRoute: AppInvestorOverviewRoute,
   AppInvestorPortfolioRoute: AppInvestorPortfolioRoute,
   AppInvestorProfileRoute: AppInvestorProfileRoute,
@@ -3096,7 +3054,6 @@ const AppInvestorRouteChildren: AppInvestorRouteChildren = {
   AppInvestorDealRoomsTeamAssignmentsRoute:
     AppInvestorDealRoomsTeamAssignmentsRoute,
   AppInvestorDiscoverDealFlowRoute: AppInvestorDiscoverDealFlowRoute,
-  AppInvestorDiscoverDealIntakeRoute: AppInvestorDiscoverDealIntakeRoute,
   AppInvestorDiscoverWatchlistRoute: AppInvestorDiscoverWatchlistRoute,
   AppInvestorDealRoomsIndexRoute: AppInvestorDealRoomsIndexRoute,
   AppInvestorDiscoverIndexRoute: AppInvestorDiscoverIndexRoute,

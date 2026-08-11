@@ -1,5 +1,9 @@
 .env.local
 .env.test
+# Cloudflare local-dev secrets (wrangler). Added 11 Aug 2026 alongside the
+# §19e key-leak fix — .env.local is no longer the place for server-only
+# secrets, so this must be ignored before it is used for one.
+.dev.vars
 dist/
 .wrangler/
 test-results/

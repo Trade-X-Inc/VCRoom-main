@@ -21,7 +21,24 @@ const devCfEnvShim = {
 export default defineConfig({
   cloudflare: true,
   vite: {
-    envPrefix: ["VITE_", "NEXT_PUBLIC_", "OPENAI_"],
+    // SECURITY — do not add a secret-bearing prefix here. Every var matching a
+    // listed prefix is INLINED into the client JS bundle as a literal.
+    //
+    // "OPENAI_" was removed 11 Aug 2026 after a live OpenAI API key was found
+    // in plaintext in the production bundle (/assets/index-*.js, readable by
+    // anyone). It was added by 6ae6dd6 (24 May 2026) to make the key resolve on
+    // Cloudflare via `import.meta.env` fallbacks — a real problem, fixed the
+    // wrong way. That problem is now solved properly: patch-wrangler.mjs sets
+    // `globalThis.__cf_env` from the Cloudflare runtime secrets, and
+    // getEnvVar() (src/lib/env.ts) reads __cf_env FIRST, then process.env.
+    // No current source reads the OpenAI key via import.meta.env, so removing
+    // this prefix cannot reopen the original issue — verified before removal.
+    //
+    // A prior remediation (f52e60e, "remove VITE_OPENAI from browser") moved
+    // the calls server-side but left this line and the env var, so builds kept
+    // shipping the key regardless. Removing the caller is not removing the
+    // exposure. See CLAUDE.md §19e.
+    envPrefix: ["VITE_", "NEXT_PUBLIC_"],
     plugins: [devCfEnvShim],
     server: {
       host: "0.0.0.0",
