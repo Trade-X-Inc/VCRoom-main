@@ -423,7 +423,6 @@ function ForFoundersInvestors() {
             {[
               "Thesis-matched founders surfaced automatically as they join",
               "A structured profile and document vault before you request access",
-              "AI Deal Intake analysis on every opportunity",
               "Structured due diligence with source-cited findings",
               "Term negotiation with a full, auditable history",
               "One workspace from sourcing to signed agreement",
@@ -505,7 +504,7 @@ function PricingPreview() {
     },
     {
       role: "Investor", price: "Free during beta", after: "Free at launch",
-      points: ["Structured investor profile", "Thesis-matched deal flow", "AI deal intake & briefs", "Full deal-room access"],
+      points: ["Structured investor profile", "Thesis-matched deal flow", "AI briefs", "Full deal-room access"],
       cta: "Create investor account", search: { role: "investor" },
     },
   ];
@@ -577,7 +576,7 @@ const FAQ_GROUPS: { heading: string; items: Faq[] }[] = [
   {
     heading: "For investors",
     items: [
-      { q: "How do I find startups on Hockystick?", a: "Thesis-matched deal flow, a searchable founder directory, and AI Deal Intake analysis. Set your investment thesis and the platform surfaces matching founders automatically." },
+      { q: "How do I find startups on Hockystick?", a: "Thesis-matched deal flow and a searchable founder directory. Set your investment thesis and the platform surfaces matching founders automatically." },
       { q: "What investor verification is required?", a: "None today. Founders review your profile — fund details, thesis, and track record — before granting deal-room access." },
       { q: "What can I see before requesting access to a founder?", a: "Their public profile. Full details — documents, financials, team — unlock inside the deal room after mutual disclosure." },
       { q: "How does thesis matching work?", a: "You set your stage, sector, geography, and cheque-size preferences. The platform matches founders to your thesis and sends alerts when new matches appear." },

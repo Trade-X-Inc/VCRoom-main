@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { PageFrame } from "@/components/system";
 import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
 
-// ② Source — find and import deals. Watchlist, Deal intake, Directory, and
+// ② Source — find and import deals. Watchlist, Directory, and
 // Connections are real standalone routes — this page links out to them.
 
 export const Route = createFileRoute("/app/investor/source")({
@@ -46,7 +46,6 @@ function SourcePage() {
           label="Watchlist"
           summary={p ? `${p.watchlistCount} companies` : undefined}
         />
-        <SectionLinkRow to="/app/investor/intake" label="Deal intake" summary="Paste, parse, score" />
         <SectionLinkRow to="/app/investor/connections" label="Connections" summary="Requests sent" />
       </div>
     </PageFrame>

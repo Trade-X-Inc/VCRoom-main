@@ -166,9 +166,8 @@ export function StartupsPage() {
 
   // R14 — resolve watchlist rows to real Hockystick startups by exact
   // company name, client-side (investor_watchlist has no startup_id column
-  // at all — same limitation intake-fn.ts's server-side match works around
-  // for Deal Intake candidates; mirrored here rather than adding a schema
-  // column for a plain name-match lookup).
+  // at all). Flagged separately for its own §15/§25 review — see
+  // CLAUDE.md §20.2 — not touched here.
   const { data: matchableStartups = [] } = useQuery({
     queryKey: ["startups-for-watchlist-match"],
     staleTime: 5 * 60 * 1000,

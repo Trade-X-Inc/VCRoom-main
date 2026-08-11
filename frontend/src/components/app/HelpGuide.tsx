@@ -276,24 +276,6 @@ export function InvestorHelpGuide() {
         </Article>
       </Accordion>
 
-      {/* Section 2 — Deal Intake */}
-      <Accordion title="Deal Intake">
-        <Article heading="What Deal Intake does">
-          <Body>
-            Deal Intake lets you paste any founder data — forwarded emails, LinkedIn exports, CSV lists, event attendee sheets — and Hockystick scores each one against your thesis instantly.
-          </Body>
-          <Body>
-            Result: match score 0–100, strengths, red flags, and recommended next step. Companies that score above your threshold are added to your watchlist automatically.
-          </Body>
-        </Article>
-
-        <Article heading="Uploading a batch of companies">
-          <Body>
-            Click "Upload files" in Deal Intake. Excel, CSV, or PDF pitch decks supported. Up to 20 files per batch. The system extracts company names, founders, sectors, and stages automatically. You review the extracted data before scoring.
-          </Body>
-        </Article>
-      </Accordion>
-
       {/* Section 3 — Due Diligence */}
       <Accordion title="Due Diligence">
         <Article heading="Using the DD workstation">
@@ -375,10 +357,6 @@ export function InvestorHelpGuide() {
         <QA
           q="How does thesis matching work?"
           a="Daily matching compares new founder profiles against your stated thesis (sectors, stages, geography, check size). Match scores appear on every founder card. You get an email when new high-match founders join."
-        />
-        <QA
-          q="Can I add companies that are not on Hockystick?"
-          a="Yes — use Deal Intake to paste or upload any founder data. They don't need to be on the platform for you to score and track them."
         />
       </Accordion>
     </div>

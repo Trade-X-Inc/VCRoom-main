@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { LazyChart } from "@/components/shared/LazyChart";
-import { ArrowRight, ArrowUpRight, FileInput, Clock3 } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Clock3 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useAccountContext } from "@/hooks/useAccountContext";
 import { supabase } from "@/lib/supabase";
@@ -197,21 +197,6 @@ function InvestorOverview() {
     },
   });
 
-  const { data: latestIntakeRun } = useQuery({
-    queryKey: ["investor-latest-intake", user?.id],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("intake_runs")
-        .select("id, created_at, input_summary, total_items, extracted_count, failed_count")
-        .eq("investor_id", user!.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      return data;
-    },
-  });
-
   const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
   const { data: recentActivity = [] } = useQuery({
     queryKey: ["founder-activity", roomIds.join(","), user?.id],
@@ -365,29 +350,6 @@ function InvestorOverview() {
           />
           <StatCard label="Stale deals" value={watchlistStaleCount} sub="in review or diligence" />
           <StatCard label="Meetings this week" value={meetingsThisWeek} sub="scheduled" />
-        </div>
-
-        {/* Deal intake hero */}
-        <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, padding: 20, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ display: "grid", placeItems: "center", height: 36, width: 36, background: "rgba(124,58,237,0.08)", color: "#7C3AED", flexShrink: 0 }}>
-              <FileInput style={{ width: 16, height: 16 }} />
-            </div>
-            <div>
-              <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Deal intake</div>
-              <div style={{ fontSize: 12, color: color.inkTertiary, marginTop: 2 }}>
-                {latestIntakeRun
-                  ? `Last run ${formatDistanceToNow(new Date(latestIntakeRun.created_at), { addSuffix: true })} — ${latestIntakeRun.extracted_count} of ${latestIntakeRun.total_items} extracted`
-                  : "Paste pipeline or inbox data — extracts thesis-matching candidates"}
-              </div>
-            </div>
-          </div>
-          <Link
-            to="/app/investor/discover/deal-intake"
-            style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 36, background: "#7C3AED", color: "#fff", border: "none", borderRadius: radius.control, padding: "0 16px", fontSize: 13, fontWeight: 500, textDecoration: "none", flexShrink: 0 }}
-          >
-            Open intake <ArrowRight style={{ width: 14, height: 14 }} />
-          </Link>
         </div>
 
         {/* Row: matches trend + activity */}

@@ -14,7 +14,6 @@ export type PageId =
   | "deal-rooms"
   | "investor-home"
   | "investor-startups"
-  | "investor-intake"
   | "investor-deal-flow"
   | "investor-analysis"
   | "investor-diligence";
@@ -105,22 +104,12 @@ const GUIDES: Record<PageId, GuideContent> = {
     aiSystemContext:
       "The user is on /app/investor/startups — the Investor Watchlist. Status values: Sourcing, Reviewing, Diligence, Passed, Invested, Watching. Companies can be added manually, via CSV, or from the deal flow feed. Score column = thesis match score at add time.",
   },
-  "investor-intake": {
-    title: "Intake Parser",
-    paragraphs: [
-      "Intake Parser extracts structured data from unformatted inbound deal flow — copy-paste your inbox, CSV exports from AngelList or Notion, or any batch of company descriptions.",
-      "The AI parses each entry and scores it against your thesis. Scores above your threshold are highlighted as strong fits. Below threshold entries are listed but not promoted.",
-      "Review the parsed results before acting. Candidates matched to a real Hockystick account get a Request access action; everyone else gets a mailto invite to join.",
-    ],
-    aiSystemContext:
-      "The user is on /app/investor/discover/deal-intake — the Intake Parser. They paste raw inbound deal flow text or upload CSV. The AI extracts company name, sector, stage, and scores against the investor's thesis, and attempts an exact-name match against real startups (matched_startup_id). Matched candidates get Request access (discovery_requests); unmatched candidates get a mailto invite to create a Hockystick account.",
-  },
   "investor-deal-flow": {
     title: "Deal Flow",
     paragraphs: [
       "Deal Flow lists every deal room you're already a member of — it does not surface new founders. Rooms appear here automatically once a connection request you sent is approved.",
       "Sort by most recently active. Search narrows by company or sector. Each row opens straight into the room.",
-      "To reach a new founder, use Request access from Watchlist, Deal Intake, or Directory — approval is what creates the room and brings it here.",
+      "To reach a new founder, use Request access from Watchlist or Directory — approval is what creates the room and brings it here.",
     ],
     aiSystemContext:
       "The user is on /app/investor/discover/deal-flow — the list of deal rooms the investor already belongs to (deal_room_members join, not a discovery feed). New founders are reached via Request access (discovery_requests) from Watchlist, Deal Intake, or Directory; approval creates the room, which then appears here.",

@@ -82,7 +82,7 @@ If a test requires a write to production, stop and ask first. Disclosing it afte
 
 | Metric | Value | Rule |
 |---|---|---|
-| `tsc` errors | 59 | Do not increase. If it drops, update this line and record why. Dropped from 64 across `phase0/close-and-clear`: 64→62 (cluster 3, two deleted files' own pre-existing errors), 62→61 (cluster 4, same), 61→60 (cluster 6 + orphaned `investor-advisor-fn.ts` deletion, same), 60→59 (step 5, `DDWorkstation.tsx`'s own pre-existing type error on a field reference the JWT-forwarding fix removed). Every drop verified line-by-line against the prior baseline, not by count alone — see §7.5. |
+| `tsc` errors | 58 | Do not increase. If it drops, update this line and record why. Dropped from 64 across `phase0/close-and-clear`: 64→62 (cluster 3, two deleted files' own pre-existing errors), 62→61 (cluster 4, same), 61→60 (cluster 6 + orphaned `investor-advisor-fn.ts` deletion, same), 60→59 (step 5, `DDWorkstation.tsx`'s own pre-existing type error on a field reference the JWT-forwarding fix removed), 59→58 (11 Aug 2026, deleting `app.investor.intake.tsx` removed its own pre-existing type error alongside the file — see §19-style entry below). Every drop verified line-by-line against the prior baseline, not by count alone — see §7.5. |
 | Worker bundle (`_worker.js`, gzip) | 0.76 MB | Ceiling is 1 MB (CF Pages limit). Same metric the build script reports as "`_worker.js` gzip size" — prior figure (0.88 MB) predates this branch's deletions; drop is consistent with net negative line count across `phase0/close-and-clear` (+350/−17,582 vs `main` as of step 5). |
 
 ---
@@ -367,6 +367,37 @@ Found during the deployed-edge-function inventory sweep queued after the §17 `a
 **Changelog handling:** 4 changelog entries (`docs/content/changelog.tsx`, dated 2026-07-09 through -07-11) had described the system as shipped. Left as historical record, each with a dated correction appended inline rather than rewritten or silently removed — the changelog is not the place to erase a mistake, only to annotate it.
 
 **STILL OPEN — logged separately so it is not lost:** a founder-pricing inconsistency, found incidentally during this sweep, unrelated to the verification/badge claim itself. `index.tsx` and `pricing.tsx`'s own body both state $49/month for founders (free for investors); `pricing.tsx`'s page metadata (line ~110) and `seo.ts`'s FAQ JSON-LD (`DOC_FAQS[""]`, the "How does the success fee work?" entry) both state $19/month founder, $99/month investor. Not touched by this pass — needs a product decision on which figure is correct before either file is edited.
+
+---
+
+## 19a. Deal Intake — a third fully-built §15/§25 violation, found and deleted 11 Aug 2026
+
+Found incidentally, the same way as §19: not by a targeted audit, but by tracing an empty-state action link (`app.investor.deal-rooms.index.tsx`'s "Browse startups" → `/discover/watchlist`) during the deal-room-core §20.4 pass. Following that link's redirect chain surfaced five other routes under the same `/app/investor/discover/*` namespace — four legitimate (watchlist, deal-flow, profile view/privacy, all relocated aliases per an "R9" reorganisation), one not: `discover/deal-intake`, a fully-built LLM scoring/matching pipeline.
+
+**What it was:** an investor pastes or uploads raw inbound deal-flow text/CSV; `intake-fn.ts`'s `parseIntakeBatch` prompts an LLM to extract company data and assign a `thesis_fit_score` (0–100) against an explicit rubric embedded in the prompt ("80–100: Strong match on sector, stage, AND geography" … "0–39: Clear mismatch"), labelled in the UI as "Strong fit"/"Possible fit". Separately runs exact-name matching against real `startups` rows (`matched_startup_id`). `connections-fn.ts`'s `sendIntakeInvites` then sent **real outbound email via Resend** to scored candidates' contact addresses — cold outreach to people who had never signed up, gated on an AI-assigned score. This is Foundation §15/§25's "Scoring, ranking, recommendation, assessment" and "Marketplace, directory, matching, recommendation," both explicitly prohibited, fully built and live — not a stub.
+
+**Second consumer found, not just the intake page itself:** `app.investor.connections.tsx` (the kept watchlist/pipeline CRM) had its own dedicated scoring section — `THESIS_THRESHOLD = 60`, a "Founders scoring 60% or above on your thesis, not yet in pipeline" panel, matched/unmatched candidate splits — mixed into an otherwise-legitimate file. Exactly the §7.5 "file matches by import graph but content is dual-role" pattern: the file was not deletable wholesale, only the scoring half.
+
+**Real production usage, checked from data not assumed:** `intake_runs` had 7 rows, all `test-investor@hockystick.app` (the §13 fixture account), all within a 32-minute window on 8 July 2026. Every downstream table was empty — `investor_intake_batches` 0, `investor_intake_candidates` 0, `invite_sent_at` non-null 0, `investor_watchlist` rows with `source='intake'` 0. **No real person was ever scored, matched, or emailed** — the outbound Resend path never fired. Same discipline as §19's cron-log check: verified from the data, not inferred from the feature existing.
+
+**What was deleted (code only — tables left in place, same treatment as the orphaned `doc_list` function, §20.2):**
+- Both routes (`app.investor.intake.tsx`, `app.investor.discover.deal-intake.tsx`) and the legacy redirect
+- `intake-fn.ts` entirely
+- `sendIntakeInvites` + its `buildInviteEmail` template from `connections-fn.ts` — `generateInviteLink`/`processInviteLinkJoin` (the kept invite-link CRM path, independent table `investor_invite_links`, no shared code) untouched
+- The scoring half of `app.investor.connections.tsx` — `THESIS_THRESHOLD`, `IntakeCandidate`, `matchedCandidates`/`unmatchedCandidates`, `CandidateRow`, `ConfirmModal`, the `"new_intake"` tab, `investorProfile` (used only by the deleted code) — watchlist/invite-link/connection-request half kept intact
+- `nav-structure.ts`'s "Deal Intake" nav entry, `app.investor.overview.tsx`'s "Deal intake hero" dashboard widget (its own `intake_runs` query, not previously scoped, found while editing the named link on the same page — removed as one unit rather than left half-broken)
+- `PageGuide.tsx`'s `"investor-intake"` guide entry, `HelpGuide.tsx`'s "Deal Intake" accordion section and its FAQ entry
+- Four public-marketing claims: `index.tsx`'s "AI Deal Intake analysis on every opportunity" bullet, its pricing-preview "AI deal intake & briefs" point, its FAQ answer's "AI Deal Intake analysis" clause, `app.investor.source.tsx`'s dangling nav-hub link (found only by the literal-route-string grep per §7.5 — `to="/app/investor/intake"` survived the symbol-level sweep because it's a plain string, not an import)
+
+**Deliberately NOT touched, flagged instead — four more surfaces found while deleting this one, none triaged:**
+1. `investor_watchlist.initial_score` — a scoring column on the **kept** watchlist table itself.
+2. `thesis_alerts` table (0 rows) + `app.investor.overview.tsx`'s "New thesis matches" stat card and "Matches over time" trend chart — an automated daily thesis-matching/alert system, fully wired UI, dormant data. `HelpGuide.tsx`'s "How does thesis matching work?" FAQ ("Daily matching compares new founder profiles against your stated thesis... You get an email when new high-match founders join") describes this directly and was left in place, unlike the deal-intake FAQ.
+3. `app.investor.analysis.tsx` ("Thesis Analysis" per its own `PageGuide.tsx` entry, still present) — an AI feature scoring an uploaded document against thesis, returning "a recommendation summary." Same route this session already touched once for an unrelated write-conflict fix.
+4. `HelpGuide.tsx`'s "Due Diligence" section's "AI Analysis" description ("thesis match score, strengths, risks, mitigants, and recommended next action") — same or adjacent surface to #3.
+
+**Why these four were left, not fixed:** each needs its own trace before a deletion call — unlike deal-intake, none of these are self-evidently a single deletable unit, and at least one (`docs/content/ai.tsx`'s "Deal briefs" feature, `generate-deal-brief`) turned out on inspection to be a *sixth, different* AI-summarization feature that may be legitimately in-scope (extraction/completeness-checking is permitted; ranking-for-discovery is not) rather than another violation — read far enough to conclude it needed its own audit, not assumed either way. A structural detection sweep (schema-vocabulary grep + AI-prompt-corpus grep) was dispatched the same session specifically because three finds by incidental discovery in one codebase is a pattern, not three coincidences — see the sweep's own findings for the complete worklist these four (and any others) resolve into.
+
+**`tsc`: 59→58**, verified line-by-line (deleting `app.investor.intake.tsx` removed its own pre-existing type error along with the file, not a new drop from this session's edits) — see the baseline table.
 
 ---
 

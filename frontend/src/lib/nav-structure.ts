@@ -172,7 +172,6 @@ export const investorSections: L2Section[] = [
         ],
       },
       { to: "/app/investor/discover/deal-flow", label: "Deal Flow" },
-      { to: "/app/investor/discover/deal-intake", label: "Deal Intake" },
       { to: "/app/investor/discover/watchlist", label: "Watchlist" },
     ],
   },

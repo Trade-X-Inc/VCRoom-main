@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Plus, Copy, Check, Loader2, ChevronRight,
-  Circle, Send, Link as LinkIcon, Building2, AlertCircle,
+  Circle, Link as LinkIcon, Building2, AlertCircle,
   LayoutList, LayoutGrid, Table2, Columns3, Search,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -39,17 +39,6 @@ interface WatchlistRow {
   updated_at: string;
 }
 
-interface IntakeCandidate {
-  id: string;
-  company_name: string;
-  contact_name: string | null;
-  contact_email: string | null;
-  thesis_fit_score: number | null;
-  watchlist_id: string | null;
-  invite_sent_at: string | null;
-  matched_startup_id: string | null;
-}
-
 interface InviteLink {
   id: string;
   token: string;
@@ -62,10 +51,9 @@ interface InviteLink {
 type ViewMode = "pipeline" | "list" | "card" | "kanban";
 
 // Stage tab definitions
-type TabKey = "all" | "new_intake" | "sourcing" | "reviewing" | "diligence" | "invested";
+type TabKey = "all" | "sourcing" | "reviewing" | "diligence" | "invested";
 const TABS: { key: TabKey; label: string }[] = [
   { key: "all", label: "All" },
-  { key: "new_intake", label: "New from intake" },
   { key: "sourcing", label: "Sourcing" },
   { key: "reviewing", label: "Reviewing" },
   { key: "diligence", label: "Diligence" },
@@ -80,35 +68,6 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   Passed:     { bg: "rgba(239,68,68,0.10)",  text: "#EF4444" },
   Watching:   { bg: "var(--accent)", text: "var(--muted-foreground)" },
 };
-
-// ── Confirm-first modal ────────────────────────────────────────────────────
-
-function ConfirmModal({ count, onConfirm, onCancel, confirming }: {
-  count: number;
-  onConfirm: () => void;
-  onCancel: () => void;
-  confirming: boolean;
-}) {
-  return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
-      onClick={onCancel}>
-      <div style={{ background: "var(--hs-bg-secondary)", border: "1px solid var(--hs-border)", borderRadius: 16, padding: 28, maxWidth: 420, width: "100%" }}
-        onClick={(e) => e.stopPropagation()}>
-        <div className="text-sm font-semibold mb-2" style={{ fontFamily: "Syne, sans-serif", color: "var(--hs-text-primary)" }}>Send Hockystick invites</div>
-        <p className="text-xs leading-relaxed mb-5" style={{ color: "var(--hs-text-muted)" }}>
-          This will send a real email invite to <strong style={{ color: "var(--hs-text-secondary)" }}>{count} {count === 1 ? "founder" : "founders"}</strong> and add them to your pipeline as Sourcing leads. This action cannot be undone.
-        </p>
-        <div className="flex gap-2 justify-end">
-          <button onClick={onCancel} className="px-4 py-2 text-xs transition-colors" style={{ color: "var(--hs-text-muted)" }}>Cancel</button>
-          <button onClick={onConfirm} disabled={confirming}
-            style={{ background: confirming ? "rgba(124,58,237,0.4)" : "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 12, fontWeight: 600, cursor: confirming ? "not-allowed" : "pointer" }}>
-            {confirming ? <span className="flex items-center gap-1.5"><Loader2 className="h-3 w-3 animate-spin" /> Sending…</span> : `Send ${count} invite${count !== 1 ? "s" : ""}`}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ── Watchlist row component ────────────────────────────────────────────────
 
@@ -168,45 +127,6 @@ function PipelineRow({ row, onMarkSeen, onDecide }: {
       )}
 
       {!isNew && <ChevronRight className="h-4 w-4 text-faint flex-shrink-0" />}
-    </div>
-  );
-}
-
-// ── Intake candidate row ───────────────────────────────────────────────────
-
-function CandidateRow({ candidate, selected, onToggle }: {
-  candidate: IntakeCandidate;
-  selected: boolean;
-  onToggle: () => void;
-}) {
-  const score = candidate.thesis_fit_score ?? 0;
-  const scoreColor = score >= 80 ? "#10B981" : score >= 60 ? "#F59E0B" : "var(--faint)";
-  const alreadyInvited = !!candidate.invite_sent_at;
-
-  return (
-    <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 14px" }}
-      className="flex items-center gap-3">
-      <input type="checkbox" checked={selected} onChange={onToggle} disabled={alreadyInvited}
-        style={{ width: 15, height: 15, accentColor: "var(--brand)", flexShrink: 0, cursor: alreadyInvited ? "not-allowed" : "pointer" }} />
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-foreground truncate">{candidate.company_name}</span>
-          {candidate.matched_startup_id && (
-            <span style={{ background: "rgba(16,185,129,0.1)", color: "#10B981", borderRadius: 99, padding: "1px 7px", fontSize: 10, fontWeight: 600 }}>On platform</span>
-          )}
-          {alreadyInvited && (
-            <span style={{ background: "var(--accent)", color: "var(--faint)", borderRadius: 99, padding: "1px 7px", fontSize: 10 }}>Invited</span>
-          )}
-        </div>
-        {candidate.contact_email && (
-          <div className="text-[11px] text-faint mt-0.5">{candidate.contact_email}</div>
-        )}
-      </div>
-
-      <span style={{ background: score >= 60 ? "rgba(245,158,11,0.12)" : "var(--accent)", color: scoreColor, borderRadius: 99, padding: "2px 8px", fontSize: 11, fontWeight: 600, flexShrink: 0 }}>
-        {score}% fit
-      </span>
     </div>
   );
 }
@@ -505,29 +425,9 @@ export function ConnectionsPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [activeTab, setActiveTab] = useState<TabKey>("all");
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [confirming, setConfirming] = useState(false);
   const [decidingId, setDecidingId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("pipeline");
   const [search, setSearch] = useState("");
-
-  const THESIS_THRESHOLD = 60;
-
-  // ── Investor profile (for profile id + name/fund)
-  const { data: investorProfile } = useQuery({
-    queryKey: ["connections-investor-profile", user?.id],
-    enabled: !!user?.id,
-    staleTime: 300_000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("investor_profiles")
-        .select("id, your_name, fund_name")
-        .eq("user_id", user!.id)
-        .maybeSingle();
-      return data;
-    },
-  });
 
   // ── Watchlist rows (includes discovery_requests with status='connected' merged in)
   const { data: watchlist = [], refetch: refetchWatchlist } = useQuery<WatchlistRow[]>({
@@ -576,34 +476,9 @@ export function ConnectionsPage() {
     },
   });
 
-  // ── Intake candidates (not yet watchlisted)
-  const { data: allCandidates = [], refetch: refetchCandidates } = useQuery<IntakeCandidate[]>({
-    queryKey: ["connections-intake-candidates", investorProfile?.id],
-    enabled: !!investorProfile?.id,
-    staleTime: 60_000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("investor_intake_candidates")
-        .select("id,company_name,contact_name,contact_email,thesis_fit_score,watchlist_id,invite_sent_at,matched_startup_id")
-        .eq("investor_profile_id", investorProfile!.id)
-        .order("thesis_fit_score", { ascending: false });
-      return (data ?? []) as IntakeCandidate[];
-    },
-  });
-
-  // Derive sections
-  const matchedCandidates = allCandidates.filter(
-    (c) => (c.thesis_fit_score ?? 0) >= THESIS_THRESHOLD && !c.watchlist_id
-  );
-  const unmatchedCandidates = allCandidates.filter(
-    (c) => (c.thesis_fit_score ?? 0) < THESIS_THRESHOLD && !c.watchlist_id
-  );
-  const newFromIntakeCount = matchedCandidates.length;
-
   // Tab counts
   const tabCounts: Record<TabKey, number> = {
     all: watchlist.length,
-    new_intake: newFromIntakeCount,
     sourcing: watchlist.filter((w) => w.status === "Sourcing").length,
     reviewing: watchlist.filter((w) => w.status === "Reviewing").length,
     diligence: watchlist.filter((w) => w.status === "Diligence").length,
@@ -613,7 +488,6 @@ export function ConnectionsPage() {
   // Filtered pipeline rows by tab
   const filteredPipeline = watchlist.filter((w) => {
     if (activeTab === "all") return true;
-    if (activeTab === "new_intake") return false; // handled separately
     if (activeTab === "sourcing") return w.status === "Sourcing";
     if (activeTab === "reviewing") return w.status === "Reviewing";
     if (activeTab === "diligence") return w.status === "Diligence";
@@ -654,56 +528,6 @@ export function ConnectionsPage() {
       refetchWatchlist();
     } finally {
       setDecidingId(null);
-    }
-  };
-
-  // ── Bulk invite
-  const toggleSelect = (id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  };
-  const toggleSelectAll = (candidates: IntakeCandidate[]) => {
-    const eligible = candidates.filter((c) => !c.invite_sent_at).map((c) => c.id);
-    const allSelected = eligible.every((id) => selectedIds.has(id));
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (allSelected) {
-        eligible.forEach((id) => next.delete(id));
-      } else {
-        eligible.forEach((id) => next.add(id));
-      }
-      return next;
-    });
-  };
-
-  const handleSendInvites = async () => {
-    if (!investorProfile?.id || selectedIds.size === 0) return;
-    setConfirming(true);
-    try {
-      const { sendIntakeInvites } = await import("@/lib/connections-fn");
-      const { data: { session } } = await supabase.auth.getSession();
-      const result = await sendIntakeInvites({
-        data: {
-          accessToken: session?.access_token ?? "",
-          investorProfileId: investorProfile.id,
-          candidateIds: Array.from(selectedIds),
-          investorName: investorProfile.your_name ?? "The investor",
-          investorFundName: investorProfile.fund_name ?? "our fund",
-        },
-      });
-      setShowConfirm(false);
-      setSelectedIds(new Set());
-      refetchCandidates();
-      refetchWatchlist();
-      if (result.sent > 0) toast.success(`${result.sent} invite${result.sent !== 1 ? "s" : ""} sent`);
-      if (result.errors.length > 0) toast.error(`${result.errors.length} failed — check console`);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to send invites");
-    } finally {
-      setConfirming(false);
     }
   };
 
@@ -774,7 +598,7 @@ export function ConnectionsPage() {
         <KanbanView rows={watchlist} />
       )}
 
-      {/* Default pipeline view (tabs + intake + pipeline + right sidebar) */}
+      {/* Default pipeline view (tabs + pipeline + right sidebar) */}
       {viewMode === "pipeline" && (
       <div className="grid lg:grid-cols-[1fr_300px] gap-6">
         {/* LEFT — main pipeline area */}
@@ -806,134 +630,35 @@ export function ConnectionsPage() {
             ))}
           </div>
 
-          {/* NEW FROM INTAKE — thesis matched */}
-          {(activeTab === "all" || activeTab === "new_intake") && (
-            <div className={card}>
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <div className="text-sm font-semibold" style={{ fontFamily: "Syne, sans-serif" }}>
-                    From your last deal intake — thesis matched
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-0.5">
-                    Founders scoring {THESIS_THRESHOLD}% or above on your thesis, not yet in pipeline
-                  </div>
-                </div>
-                {matchedCandidates.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => toggleSelectAll(matchedCandidates)}
-                      className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {matchedCandidates.filter((c) => !c.invite_sent_at).every((c) => selectedIds.has(c.id)) ? "Deselect all" : "Select all"}
-                    </button>
-                    {selectedIds.size > 0 && (
-                      <button
-                        onClick={() => setShowConfirm(true)}
-                        style={{ background: "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}
-                      >
-                        <Send className="h-3 w-3" />
-                        Send {selectedIds.size} invite{selectedIds.size !== 1 ? "s" : ""}
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {matchedCandidates.length === 0 ? (
-                <div style={{ background: "var(--accent)", border: "1px dashed var(--border)", borderRadius: 8, padding: "20px 16px", textAlign: "center" }}>
-                  <p className="text-xs text-muted-foreground">No thesis-matched candidates yet — run a deal intake to surface leads above {THESIS_THRESHOLD}% fit.</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {matchedCandidates.map((c) => (
-                    <CandidateRow
-                      key={c.id}
-                      candidate={c}
-                      selected={selectedIds.has(c.id)}
-                      onToggle={() => toggleSelect(c.id)}
-                    />
-                  ))}
-                </div>
-              )}
+          {/* ACTIVE PIPELINE */}
+          <div className={card}>
+            <div className="text-sm font-semibold mb-3" style={{ fontFamily: "Syne, sans-serif" }}>
+              {activeTab === "all" ? "Active pipeline" : TABS.find((t) => t.key === activeTab)?.label}
             </div>
-          )}
 
-          {/* FROM INTAKE — not thesis match */}
-          {(activeTab === "all" || activeTab === "new_intake") && unmatchedCandidates.length > 0 && (
-            <div className={card}>
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <div className="text-sm font-semibold" style={{ fontFamily: "Syne, sans-serif" }}>
-                    From intake — outside thesis
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-0.5">
-                    Below {THESIS_THRESHOLD}% fit — you can still invite them
-                  </div>
-                </div>
-                {unmatchedCandidates.filter((c) => !c.invite_sent_at).length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => toggleSelectAll(unmatchedCandidates)}
-                      className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {unmatchedCandidates.filter((c) => !c.invite_sent_at).every((c) => selectedIds.has(c.id)) ? "Deselect all" : "Select all"}
-                    </button>
-                    {selectedIds.size > 0 && selectedIds.size > (Array.from(selectedIds).filter((id) => matchedCandidates.some((c) => c.id === id)).length) && (
-                      <button
-                        onClick={() => setShowConfirm(true)}
-                        style={{ background: "rgba(245,158,11,0.15)", color: "#F59E0B", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}
-                      >
-                        <Send className="h-3 w-3" />
-                        Send {selectedIds.size} invite{selectedIds.size !== 1 ? "s" : ""}
-                      </button>
-                    )}
-                  </div>
+            {filteredPipeline.length === 0 ? (
+              <div style={{ background: "var(--accent)", border: "1px dashed var(--border)", borderRadius: 8, padding: "20px 16px", textAlign: "center" }}>
+                {activeTab === "all" ? (
+                  <p className="text-xs text-muted-foreground">
+                    No companies in your pipeline yet. Share your invite link to bring founders in.
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">No companies at this stage.</p>
                 )}
               </div>
+            ) : (
               <div className="space-y-2">
-                {unmatchedCandidates.map((c) => (
-                  <CandidateRow
-                    key={c.id}
-                    candidate={c}
-                    selected={selectedIds.has(c.id)}
-                    onToggle={() => toggleSelect(c.id)}
+                {filteredPipeline.map((row) => (
+                  <PipelineRow
+                    key={row.id}
+                    row={row}
+                    onMarkSeen={handleMarkSeen}
+                    onDecide={handleDecide}
                   />
                 ))}
               </div>
-            </div>
-          )}
-
-          {/* ACTIVE PIPELINE */}
-          {activeTab !== "new_intake" && (
-            <div className={card}>
-              <div className="text-sm font-semibold mb-3" style={{ fontFamily: "Syne, sans-serif" }}>
-                {activeTab === "all" ? "Active pipeline" : TABS.find((t) => t.key === activeTab)?.label}
-              </div>
-
-              {filteredPipeline.length === 0 ? (
-                <div style={{ background: "var(--accent)", border: "1px dashed var(--border)", borderRadius: 8, padding: "20px 16px", textAlign: "center" }}>
-                  {activeTab === "all" ? (
-                    <p className="text-xs text-muted-foreground">
-                      No companies in your pipeline yet. Add from intake matches above, or use Deal Intake to find new leads.
-                    </p>
-                  ) : (
-                    <p className="text-xs text-muted-foreground">No companies at this stage.</p>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {filteredPipeline.map((row) => (
-                    <PipelineRow
-                      key={row.id}
-                      row={row}
-                      onMarkSeen={handleMarkSeen}
-                      onDecide={handleDecide}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* RIGHT sidebar */}
@@ -981,16 +706,6 @@ export function ConnectionsPage() {
         </div>
       </div>
       )} {/* end pipeline view */}
-
-      {/* Confirm modal */}
-      {showConfirm && (
-        <ConfirmModal
-          count={selectedIds.size}
-          onConfirm={handleSendInvites}
-          onCancel={() => setShowConfirm(false)}
-          confirming={confirming}
-        />
-      )}
     </div>
   );
 }
