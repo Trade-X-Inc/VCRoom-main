@@ -367,215 +367,17 @@ CONTEXT: ${investorLabel} viewed the deal room documents within the last 48 hour
 // INVESTOR TASK GENERATORS
 // ══════════════════════════════════════════════════════════════════════════════
 
-/**
- * review_thesis_match — fully autonomous
- * Calls generateInvestorDealBrief logic directly (same AI prompt used in the chat),
- * writes to deal_briefs, task appears already containing the brief's headline + verdict.
- *
- * "Add to watchlist" is a one-click direct action (investor's own private data only —
- * confirmed correct by CLAUDE.md §3: no other party sees the change).
- */
-async function generateInvestorThesisMatchTasks(admin: any, investorId: string): Promise<number> {
-  const { data: alerts } = await admin
-    .from("thesis_alerts")
-    .select("id, startup_id, match_score, match_reasons, alerted_at, startups!startup_id(company_name, profile_slug, sector, stage, funding_target, traction, description, team_size, revenue, country)")
-    .eq("investor_id", investorId)
-    .gte("match_score", 70)
-    .order("alerted_at", { ascending: false })
-    .limit(5);
-
-  if (!alerts?.length) return 0;
-
-  const { data: investorProfile } = await admin
-    .from("investor_profiles")
-    .select("fund_name, thesis, sectors, stages, check_size_min, check_size_max, geography")
-    .eq("user_id", investorId)
-    .maybeSingle();
-
-  let generated = 0;
-  for (const alert of alerts) {
-    const startup = alert.startups;
-    if (!startup) continue;
-
-    const dedupeKey = `thesis_match_${alert.id}`;
-    if (await dedupeExists(admin, investorId, dedupeKey)) continue;
-
-    // Check if deal brief already cached
-    const { data: cachedBrief } = await admin
-      .from("deal_briefs")
-      .select("headline, match_score, verdict_signal, overall_verdict")
-      .eq("investor_id", investorId)
-      .eq("startup_id", alert.startup_id)
-      .order("generated_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    let briefHeadline = cachedBrief?.headline ?? null;
-    let verdictSignal = cachedBrief?.verdict_signal ?? null;
-    let dealScore = cachedBrief?.match_score ?? null;
-
-    // Generate deal brief if not cached — same prompt as investor-deal-brief-fn.ts
-    if (!briefHeadline || !cachedBrief?.overall_verdict) {
-      try {
-        const raw = await callOpenAI(
-          `You are a senior investment analyst. Given a startup profile and an investor's thesis, produce a structured deal brief.
-Respond ONLY with valid JSON matching this exact shape (no markdown, no explanation):
-{
-  "matchScore": <0-100 integer>,
-  "headline": "<15-word summary of the opportunity>",
-  "investment_thesis": "<2-3 sentence investment case>",
-  "key_metrics": { "stage": "...", "sector": "...", "funding_ask": "...", "revenue": "...", "traction": "...", "team_size": "..." },
-  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
-  "red_flags": ["<risk 1>", "<risk 2>", "<risk 3>"],
-  "suggested_questions": ["<question 1>", "<question 2>", "<question 3>"],
-  "overall_verdict": "<3-4 sentence balanced verdict>",
-  "verdict_signal": "strong" | "neutral" | "weak"
-}`,
-          `STARTUP:
-Company: ${startup.company_name}
-Sector: ${startup.sector ?? "Unknown"}
-Stage: ${startup.stage ?? "Unknown"}
-Funding ask: ${startup.funding_target ?? "Unknown"}
-Revenue: ${startup.revenue ?? "Unknown"}
-Traction: ${startup.traction ?? "Unknown"}
-Team size: ${startup.team_size ?? "Unknown"}
-Country: ${startup.country ?? "Unknown"}
-Description: ${startup.description ?? "Not provided"}
-
-INVESTOR THESIS:
-Fund: ${investorProfile?.fund_name ?? "Unknown"}
-Thesis: ${investorProfile?.thesis ?? "Not set"}
-Sectors: ${investorProfile?.sectors ?? "Not set"}
-Stages: ${investorProfile?.stages ?? "Not set"}
-Check size: $${investorProfile?.check_size_min ?? "?"} – $${investorProfile?.check_size_max ?? "?"}
-Geography: ${investorProfile?.geography ?? "Not set"}`,
-          1000,
-        );
-        const parsed = parseJSON(raw);
-        if (parsed) {
-          const now = new Date().toISOString();
-          await admin.from("deal_briefs").upsert({
-            investor_id: investorId,
-            startup_id: alert.startup_id,
-            match_score: parsed.matchScore ?? 0,
-            headline: parsed.headline ?? null,
-            investment_thesis: parsed.investment_thesis ?? null,
-            key_metrics: parsed.key_metrics ?? null,
-            strengths: parsed.strengths ?? [],
-            red_flags: parsed.red_flags ?? [],
-            suggested_questions: parsed.suggested_questions ?? [],
-            overall_verdict: parsed.overall_verdict ?? null,
-            verdict_signal: parsed.verdict_signal ?? "neutral",
-            generated_at: now,
-          }, { onConflict: "investor_id,startup_id", ignoreDuplicates: false });
-          briefHeadline = parsed.headline ?? null;
-          verdictSignal = parsed.verdict_signal ?? null;
-          dealScore = parsed.matchScore ?? null;
-        }
-      } catch (e) {
-        console.warn("[desk-cron] Deal brief gen failed for alert", alert.id, (e as Error).message);
-      }
-    }
-
-    // ── FOUNDER FIT SCORE ─────────────────────────────────────────────────────
-    // Compute how well THIS investor fits what the FOUNDER is looking for.
-    // Only runs when founder_thesis.status = 'complete'. Null is the honest
-    // value when thesis is absent or incomplete — never fabricate a score.
-    // Mirrors the match_score pattern: same callOpenAI, same JSON shape.
-    try {
-      const { data: founderThesis } = await admin
-        .from("founder_thesis")
-        .select(
-          "preferred_check_size_min, preferred_check_size_max, preferred_investor_type, " +
-          "board_preference, sector_expertise_wanted, geography_preference, " +
-          "exclusions, what_good_fit_looks_like, status",
-        )
-        .eq("startup_id", alert.startup_id)
-        .maybeSingle();
-
-      if (founderThesis?.status === "complete") {
-        const raw = await callOpenAI(
-          `You are scoring how well an investor fits what a specific startup founder is looking for.
-The founder has described their ideal investor. Score this specific investor on 0-100.
-Respond ONLY with valid JSON (no markdown):
-{
-  "founder_fit_score": <0-100 integer>,
-  "reasons": [
-    { "factor": "<what the founder wanted>", "verdict": "match|partial|mismatch", "note": "<one sentence>" },
-    { "factor": "...", "verdict": "...", "note": "..." },
-    { "factor": "...", "verdict": "...", "note": "..." }
-  ],
-  "summary": "<2-sentence plain-language verdict from the founder's perspective>"
-}`,
-          `WHAT THIS FOUNDER WANTS IN AN INVESTOR:
-Check size range: ${founderThesis.preferred_check_size_min ?? "not specified"} – ${founderThesis.preferred_check_size_max ?? "not specified"}
-Investor type: ${founderThesis.preferred_investor_type ?? "not specified"}
-Involvement preference: ${founderThesis.board_preference ?? "not specified"}
-Sector expertise wanted: ${founderThesis.sector_expertise_wanted ?? "not specified"}
-Geography preference: ${founderThesis.geography_preference ?? "no preference"}
-Exclusions / red lines: ${founderThesis.exclusions ?? "none stated"}
-What a great-fit investor looks like: ${founderThesis.what_good_fit_looks_like ?? "not specified"}
-
-THIS INVESTOR'S PROFILE:
-Name: ${investorProfile?.your_name ?? "Unknown"}
-Fund: ${investorProfile?.fund_name ?? "Unknown"}
-Thesis: ${investorProfile?.thesis ?? "Not provided"}
-Sectors: ${investorProfile?.sectors ?? "Not specified"}
-Stages: ${investorProfile?.stages ?? "Not specified"}
-Check size: $${investorProfile?.check_size_min ?? "?"} – $${investorProfile?.check_size_max ?? "?"}
-Geography: ${investorProfile?.geography ?? "Not specified"}`,
-          400,
-        );
-        const parsed = parseJSON(raw);
-        if (parsed?.founder_fit_score !== undefined) {
-          await admin
-            .from("thesis_alerts")
-            .update({
-              founder_fit_score: parsed.founder_fit_score,
-              founder_fit_reasons: {
-                reasons: parsed.reasons ?? [],
-                summary: parsed.summary ?? null,
-              },
-            })
-            .eq("id", alert.id);
-          console.log(
-            `[desk-cron] founder_fit_score=${parsed.founder_fit_score} for alert ${alert.id} (startup ${alert.startup_id})`,
-          );
-        }
-      } else {
-        // Thesis absent or incomplete — leave founder_fit_score null (correct, honest)
-        console.log(`[desk-cron] No complete founder_thesis for startup ${alert.startup_id} — founder_fit_score left null`);
-      }
-    } catch (e) {
-      console.warn("[desk-cron] founder_fit_score computation failed for alert", alert.id, (e as Error).message);
-    }
-
-    const verdictLabel = verdictSignal === "strong" ? "Strong fit" : verdictSignal === "weak" ? "Weak fit" : "Neutral fit";
-    const autonomousSummary = briefHeadline
-      ? `${startup.company_name} — ${alert.match_score}% thesis fit. Deal quality: ${dealScore ?? "??"}/100 (${verdictLabel}). ${briefHeadline}`
-      : `${startup.company_name} matched your thesis at ${alert.match_score}%. Deal brief generation failed — view manually.`;
-
-    await insertTask(admin, {
-      user_id: investorId,
-      role: "investor",
-      task_type: "review_thesis_match",
-      chain_phase: "autonomous_done",
-      autonomous_summary: autonomousSummary,
-      requires_external_action: false,
-      title: `Thesis match: ${startup.company_name} (${alert.match_score}% thesis fit)`,
-      description: briefHeadline ?? `${startup.company_name} matched your investment thesis.`,
-      priority: alert.match_score >= 85 ? "high" : "normal",
-      action_label: "View full brief",
-      action_url: `/app/investor`,
-      status: "open",
-      dedupe_key: dedupeKey,
-      related_entity_id: alert.startup_id,
-      related_entity_type: "thesis_alert",
-    });
-    generated++;
-  }
-  return generated;
-}
+// generateInvestorThesisMatchTasks removed 11 Aug 2026 — Foundation Document
+// §15/§25 (scoring, ranking, recommendation, assessment). Computed a
+// matchScore deal-brief (0-100), a founder_fit_score (0-100), and a
+// match_score-derived task priority, all live only in the batch pass this
+// function was called from — a pass with no trigger of any kind (no
+// cron.job entry, zero callers of the manual trigger, confirmed in
+// CLAUDE.md §19c Audit B). Also one of two independent, uncoordinated
+// writers of deal_briefs.verdict_signal (see the §7.4 dual-writer entry);
+// removing this one leaves generate-deal-brief's already-stubbed writer as
+// the sole (inert) writer. thesis_alerts.match_score/match_reasons remain
+// unwritten by any live path after this removal — see CLAUDE.md §19c.
 
 /**
  * follow_up_watchlist — fully autonomous (investor's own private pipeline data)
@@ -1125,10 +927,8 @@ serve(async (req) => {
       const investorId = ip.user_id as string;
       report.investors.processed++;
       try {
-        const tm = await generateInvestorThesisMatchTasks(admin, investorId);
         const sw = await generateInvestorWatchlistStaleTasks(admin, investorId);
         const pg = await generateInvestorProfileGapTask(admin, investorId);
-        report.investors.tasks.thesis_matches += tm;
         report.investors.tasks.stale_watchlist += sw;
         report.investors.tasks.profile_gaps += pg;
       } catch (e) {
@@ -1139,7 +939,7 @@ serve(async (req) => {
     // Log skipped task types (by design — insufficient detection data)
     report.skipped = [
       "founder: follow_up_investor — only generated when document_views.viewer_role='investor' exists in last 48h",
-      "investor: (none skipped — all 3 types have reliable detection signals)",
+      "investor: review_thesis_match removed 11 Aug 2026 (§15/§25 scoring) — 2 remaining types have reliable detection signals",
     ];
 
     console.log("[daily-desk-cron] Done:", JSON.stringify(report, null, 2));

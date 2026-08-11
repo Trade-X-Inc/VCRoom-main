@@ -357,34 +357,10 @@ export const seedFounderPlaybook = createServerFn({ method: "POST" })
     }
   });
 
-// ── Trigger the cron manually (admin / test endpoint) ────────────────────────
-
-type TriggerInput = { adminSecret: string };
-
-export const triggerDeskCron = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown): TriggerInput => d as TriggerInput)
-  .handler(async ({ data }): Promise<{ ok: boolean; report?: unknown; error?: string }> => {
-    const cfEnv = (globalThis as any).__cf_env || {};
-    const expectedSecret = cfEnv.ADMIN_SECRET_KEY || getEnvVar("ADMIN_SECRET_KEY") || "";
-    if (!expectedSecret || data.adminSecret !== expectedSecret) {
-      return { ok: false, error: "Unauthorized" };
-    }
-
-    const supabaseUrl = getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
-    const supabaseKey = getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
-    if (!supabaseUrl || !supabaseKey) return { ok: false, error: "Missing config" };
-
-    try {
-      const resp = await fetch(`${supabaseUrl}/functions/v1/daily-desk-cron`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${supabaseKey}`,
-          "Content-Type": "application/json",
-        },
-      });
-      const report = await resp.json();
-      return { ok: resp.ok, report };
-    } catch (e: any) {
-      return { ok: false, error: e.message };
-    }
-  });
+// triggerDeskCron removed 11 Aug 2026 — zero callers anywhere in the frontend,
+// and its target (daily-desk-cron's batch pass) had every scoring computation
+// removed the same day (see CLAUDE.md §19c). An unused admin escape hatch to a
+// function that no longer does what its name implied is exactly the
+// ambiguous-leftover pattern this session repeatedly found and had to
+// re-diagnose. If a manual trigger for the fast path is needed later, add one
+// deliberately, scoped to what it actually does then.
