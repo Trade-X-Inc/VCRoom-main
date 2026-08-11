@@ -392,8 +392,12 @@ export const joinRoastAudience = createServerFn({ method: "POST" })
         `users?id=eq.${uid}&select=full_name,role`,
       ).catch(() => []);
       const displayName = users?.[0]?.full_name ?? "Challenger";
-      // verification_tier can never reach "verified" — no live path sets it
-      // (see CLAUDE.md §7.5, verify-investor stubbed 3 Aug 2026).
+      // verification_tier can never reach "verified" — no live path sets it.
+      // Corrected 11 Aug 2026: this comment previously said "verify-investor
+      // stubbed 3 Aug 2026". It was not — it stayed live and publicly invokable
+      // until 11 Aug, and could write verification_tier the whole time. The
+      // conclusion held only because this flag is hardcoded false below.
+      // See CLAUDE.md §19's correction and §19b.
       const isVerifiedInvestor = false;
 
       if (!already?.length) {
