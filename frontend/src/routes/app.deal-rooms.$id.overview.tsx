@@ -1,19 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { format, formatDistanceToNow } from "date-fns";
-import { toast } from "sonner";
 import {
-  FileText, Shield, Clock, CheckCircle2, Download, X, Sparkles, Loader2,
+  Shield, CheckCircle2, Download, X, Loader2,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { ProfileChecklist } from "@/components/app/ProfileChecklist";
-import { useTimedAI, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
-import { AITimeoutError } from "@/lib/with-timeout";
-import { runDealBrief, fetchDealBrief, markBriefViewed, type AgentDealBrief } from "@/lib/deal-brief-fn";
 import { fetchNdaDocument, type NdaDocument } from "@/lib/nda-fn";
 import { UI_STAGE_ORDER, stageRank, workflowStageLabel, type DealRoomStageKey } from "@/lib/deal-room-stages";
 import { useDealRoom } from "@/hooks/useDealRoom";
+import { ReferenceLine, StatusLabel, V2Button, V2Skeleton, V2EmptyState } from "@/components/v2";
 
 export const Route = createFileRoute("/app/deal-rooms/$id/overview")({
   component: OverviewPage,
@@ -92,39 +89,15 @@ function OverviewPage() {
     },
   });
 
-  const dealBriefQueryKey = ["deal-room-overview-brief", startup?.id, dealRoom?.investor_user_id];
-  const { data: dealBrief } = useQuery<AgentDealBrief | null>({
-    queryKey: dealBriefQueryKey,
-    enabled: !!startup?.id && !!dealRoom?.investor_user_id,
-    staleTime: 5 * 60 * 1000,
-    queryFn: async () => fetchDealBrief(dealRoom.investor_user_id, startup.id),
-  });
-
-  useEffect(() => {
-    if (dealBrief && !dealBrief.viewed_at) markBriefViewed(dealBrief.id).catch(() => {});
-  }, [dealBrief?.id]);
-
-  const { isWorking: generatingBrief, stillWorking: briefStillWorking, run: runBriefTimed } = useTimedAI();
-
-  const handleGenerateBrief = async () => {
-    if (!startup?.id || !dealRoom?.investor_user_id) return;
-    try {
-      await runBriefTimed(async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-        const jwt = session?.access_token ?? "";
-        const result = await runDealBrief({
-          startupId: startup.id,
-          investorId: dealRoom.investor_user_id,
-          userId: currentUserId ?? "",
-          jwt,
-        });
-        queryClient.setQueryData(dealBriefQueryKey, result);
-        toast.success("Deal brief generated");
-      });
-    } catch (err) {
-      toast.error(err instanceof AITimeoutError ? AI_TIMEOUT_MESSAGE : "Failed to generate brief. Please try again.");
-    }
-  };
+  // Deal Brief section removed 12 Aug 2026 — CLAUDE.md §19c/§19d. This
+  // displayed dealBrief.match_score (a 0-100 AI score, color-banded) and
+  // called runDealBrief -> the generate-deal-brief edge function, which was
+  // already stubbed to 410 as a §15/§25 scoring violation earlier this
+  // session. Leaving the display live on a freshly-rebuilt page would have
+  // presented a closed violation as a working feature. This closes the
+  // frontend half of that removal; fetchDealBrief/markBriefViewed remain
+  // available in lib/deal-brief-fn.ts for any future legitimate use, only
+  // this route's consumption of them is removed.
 
   const [ndaModalOpen, setNdaModalOpen] = useState(false);
 
@@ -205,65 +178,73 @@ function OverviewPage() {
   // because nothing gated on this).
   if (roomLoading) {
     return (
-      <div className="mx-auto max-w-[1360px] px-8 py-8">
-        <div className="h-24 animate-pulse border border-[rgba(0,0,0,0.08)] bg-gray-50" />
-        <div className="mt-4 h-16 animate-pulse border border-[rgba(0,0,0,0.08)] bg-gray-50" />
-        <div className="mt-4 h-40 animate-pulse border border-[rgba(0,0,0,0.08)] bg-gray-50" />
+      <div className="mx-auto max-w-5xl px-8 py-8 font-v2-ui">
+        <V2Skeleton style={{ height: "96px" }} />
+        <V2Skeleton style={{ height: "64px", marginTop: "16px" }} />
+        <V2Skeleton style={{ height: "160px", marginTop: "16px" }} />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-[1360px] px-8 py-8">
+    <div className="mx-auto max-w-5xl px-8 py-8 font-v2-ui text-v2-ink">
       {/* Fix 7 — dual company cards: founder's startup (left) + investor's fund
           (right), each with logo/name/tagline and a compact team-photo strip.
           Stats that used to live in the single-company header (days open,
-          workflow, match score) move into a slim strip below the cards so
-          they still read at a glance without competing with either card. */}
+          workflow) move into a slim strip below the cards so they still read
+          at a glance without competing with either card. */}
+      <ReferenceLine
+        refNo={(dealRoom as any)?.reference_no}
+        caption={dealRoom?.created_at ? `Deal room · opened ${format(new Date(dealRoom.created_at), "d MMMM yyyy")}` : null}
+        className="mb-4"
+      />
       <section className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Founder card */}
-        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4">
-          <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-brand">Founder</div>
+        <div className="bg-v2-panel border border-v2-rule p-4">
+          <div className="mb-3 text-v2-accent uppercase font-medium" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Founder</div>
           <div className="flex items-start gap-3">
             {startup?.logo_url ? (
-              <img src={startup.logo_url} alt="" className="h-12 w-12 shrink-0 rounded-none border border-[rgba(0,0,0,0.08)] object-cover" />
+              <img src={startup.logo_url} alt="" className="h-12 w-12 shrink-0 border border-v2-rule object-cover" style={{ borderRadius: "var(--v2-radius)" }} />
             ) : (
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-none hs-gradient text-sm font-bold text-foreground">
+              <div
+                className="flex h-12 w-12 shrink-0 items-center justify-center bg-v2-accent text-white font-semibold"
+                style={{ borderRadius: "var(--v2-radius)", fontSize: "13px" }}
+              >
                 {companyInitial}
               </div>
             )}
             <div className="min-w-0">
-              <h2 className="truncate text-lg font-semibold text-gray-900">{companyName}</h2>
+              <h2 className="truncate text-v2-ink font-semibold" style={{ fontSize: "15px" }}>{companyName}</h2>
               <div className="mt-1 flex flex-wrap items-center gap-2">
                 {startup?.stage && (
-                  <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-brand">{startup.stage}</span>
+                  <span className="bg-v2-accent-wash text-v2-accent px-2 py-0.5 font-medium" style={{ borderRadius: "var(--v2-radius)", fontSize: "11.5px" }}>{startup.stage}</span>
                 )}
-                {startup?.sector && <span className="text-sm text-gray-500">{startup.sector}</span>}
+                {startup?.sector && <span className="text-v2-ink-secondary" style={{ fontSize: "12.5px" }}>{startup.sector}</span>}
               </div>
             </div>
           </div>
-          <p className="mt-3 line-clamp-2 text-sm text-gray-600">
+          <p className="mt-3 line-clamp-2 text-v2-ink-secondary" style={{ fontSize: "13px" }}>
             {startup?.tagline || startup?.description || "No tagline yet"}
           </p>
-          <div className="mt-2 flex flex-wrap gap-4 text-sm text-gray-500">
+          <div className="mt-2 flex flex-wrap gap-4 text-v2-ink-secondary" style={{ fontSize: "12.5px" }}>
             {startup?.country && <span>{startup.country}</span>}
             <span>Founded: {formatValue(startup?.founded_year)}</span>
             <span>Team: {formatValue(startup?.team_size)}</span>
           </div>
           {founderKeyPeople.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-3 border-t border-[rgba(0,0,0,0.08)] pt-3">
+            <div className="mt-4 flex flex-wrap gap-3 border-t border-v2-rule-light pt-3">
               {(founderKeyPeople as any[]).map((person) => (
                 <div key={person.id} className="flex items-center gap-2 min-w-[140px]">
                   {person.photo_url ? (
                     <img src={person.photo_url} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
                   ) : (
-                    <div className="w-9 h-9 rounded-full hs-gradient text-foreground flex items-center justify-center text-xs font-bold shrink-0">
+                    <div className="w-9 h-9 rounded-full bg-v2-accent text-white flex items-center justify-center font-semibold shrink-0" style={{ fontSize: "11px" }}>
                       {initials(person.name)}
                     </div>
                   )}
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold text-gray-900 truncate">{person.name ?? "Team member"}</div>
-                    {person.title && <div className="text-xs text-gray-500 truncate">{person.title}</div>}
+                    <div className="text-v2-ink font-medium truncate" style={{ fontSize: "13px" }}>{person.name ?? "Team member"}</div>
+                    {person.title && <div className="text-v2-ink-muted truncate" style={{ fontSize: "11.5px" }}>{person.title}</div>}
                   </div>
                 </div>
               ))}
@@ -272,46 +253,44 @@ function OverviewPage() {
         </div>
 
         {/* Investor card */}
-        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4">
-          <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-brand">Investor</div>
+        <div className="bg-v2-panel border border-v2-rule p-4">
+          <div className="mb-3 text-v2-accent uppercase font-medium" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Investor</div>
           {dealRoom?.investor_name ? (
             <>
               <div className="flex items-start gap-3">
                 {investorProfile?.avatar_url ? (
-                  <img src={investorProfile.avatar_url} alt="" className="h-12 w-12 shrink-0 rounded-none border border-[rgba(0,0,0,0.08)] object-cover" />
+                  <img src={investorProfile.avatar_url} alt="" className="h-12 w-12 shrink-0 border border-v2-rule object-cover" style={{ borderRadius: "var(--v2-radius)" }} />
                 ) : (
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-none hs-gradient text-sm font-bold text-foreground">
+                  <div
+                    className="flex h-12 w-12 shrink-0 items-center justify-center bg-v2-accent text-white font-semibold"
+                    style={{ borderRadius: "var(--v2-radius)", fontSize: "13px" }}
+                  >
                     {initials(dealRoom.investor_name)}
                   </div>
                 )}
                 <div className="min-w-0">
-                  <h2 className="truncate text-lg font-semibold text-gray-900">{dealRoom.investor_name}</h2>
-                  {dealRoom?.investor_company && <div className="text-sm text-gray-500">{dealRoom.investor_company}</div>}
+                  <h2 className="truncate text-v2-ink font-semibold" style={{ fontSize: "15px" }}>{dealRoom.investor_name}</h2>
+                  {dealRoom?.investor_company && <div className="text-v2-ink-secondary" style={{ fontSize: "12.5px" }}>{dealRoom.investor_company}</div>}
                 </div>
               </div>
-              <p className="mt-3 line-clamp-2 text-sm text-gray-600">
+              <p className="mt-3 line-clamp-2 text-v2-ink-secondary" style={{ fontSize: "13px" }}>
                 {investorProfile?.thesis || investorProfile?.thesis_statement || "No thesis shared yet"}
               </p>
-              {sectors && <div className="mt-2 text-sm text-gray-500">{sectors}</div>}
-              {dealBrief?.match_score !== undefined && (
-                <div className="mt-2 text-sm text-gray-500">
-                  Match score: <span className="font-semibold text-gray-900">{dealBrief.match_score}</span>
-                </div>
-              )}
+              {sectors && <div className="mt-2 text-v2-ink-secondary" style={{ fontSize: "12.5px" }}>{sectors}</div>}
               {investorKeyPeople.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-3 border-t border-[rgba(0,0,0,0.08)] pt-3">
+                <div className="mt-4 flex flex-wrap gap-3 border-t border-v2-rule-light pt-3">
                   {(investorKeyPeople as any[]).map((person) => (
                     <div key={person.id} className="flex items-center gap-2 min-w-[140px]">
                       {person.avatar_url ? (
                         <img src={person.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
                       ) : (
-                        <div className="w-9 h-9 rounded-full hs-gradient text-foreground flex items-center justify-center text-xs font-bold shrink-0">
+                        <div className="w-9 h-9 rounded-full bg-v2-accent text-white flex items-center justify-center font-semibold shrink-0" style={{ fontSize: "11px" }}>
                           {initials(person.name)}
                         </div>
                       )}
                       <div className="min-w-0">
-                        <div className="text-sm font-semibold text-gray-900 truncate">{person.name ?? "Team member"}</div>
-                        {person.designation && <div className="text-xs text-gray-500 truncate">{person.designation}</div>}
+                        <div className="text-v2-ink font-medium truncate" style={{ fontSize: "13px" }}>{person.name ?? "Team member"}</div>
+                        {person.designation && <div className="text-v2-ink-muted truncate" style={{ fontSize: "11.5px" }}>{person.designation}</div>}
                       </div>
                     </div>
                   ))}
@@ -319,22 +298,21 @@ function OverviewPage() {
               )}
             </>
           ) : (
-            <p className="text-sm text-gray-500">Investor not assigned</p>
+            <p className="text-v2-ink-secondary" style={{ fontSize: "13px" }}>Investor not assigned</p>
           )}
         </div>
       </section>
 
       {/* Slim stats strip — was previously part of the single-company header */}
-      <section className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4 mb-4">
+      <section className="bg-v2-panel border border-v2-rule p-4 mb-4">
         <div className="flex flex-wrap gap-6">
           {[
             ["Days open", daysOpen],
             ["Workflow", workflowStageLabel(dealRoom?.workflow_stage)],
-            ["Match score", dealBrief?.match_score ?? "—"],
           ].map(([label, value]) => (
             <div key={label} className="min-w-[92px]">
-              <div className="text-xs text-gray-500">{label}</div>
-              <div className="mt-1 text-lg font-semibold text-gray-900">{value}</div>
+              <div className="text-v2-ink-muted" style={{ fontSize: "11px" }}>{label}</div>
+              <div className="mt-1 text-v2-ink font-semibold" style={{ fontSize: "15px" }}>{value}</div>
             </div>
           ))}
         </div>
@@ -346,8 +324,8 @@ function OverviewPage() {
         </section>
       )}
 
-      <section className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4 mb-4">
-        <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-2">TRACTION METRICS</h3>
+      <section className="bg-v2-panel border border-v2-rule p-4 mb-4">
+        <h3 className="text-v2-ink-muted uppercase font-medium mb-2" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Traction metrics</h3>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {[
             ["Revenue", formatValue(startup?.revenue)],
@@ -356,100 +334,35 @@ function OverviewPage() {
             ["Team size", formatValue(startup?.team_size)],
           ].map(([label, value]) => (
             <div key={label}>
-              <div className="text-xs text-gray-500">{label}</div>
-              <div className="mt-1 text-2xl font-bold text-gray-900">{value}</div>
+              <div className="text-v2-ink-muted" style={{ fontSize: "11px" }}>{label}</div>
+              <div className="mt-1 text-v2-ink font-semibold font-v2-data" style={{ fontSize: "22px" }}>{value}</div>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4 mb-4">
-        <div className="flex items-center justify-between gap-3 mb-1">
-          <h3 className="text-xs uppercase tracking-wider text-gray-500">DEAL BRIEF</h3>
-          <button
-            type="button"
-            data-testid="generate-brief-btn"
-            onClick={handleGenerateBrief}
-            disabled={generatingBrief || !dealRoom?.investor_user_id}
-            className="inline-flex items-center gap-1.5 rounded-lg hs-gradient px-3 py-1.5 text-xs font-medium text-foreground transition-colors disabled:cursor-not-allowed disabled:bg-accent"
-          >
-            {generatingBrief ? (
-              <>
-                <Loader2 className="h-3 w-3 animate-spin" />
-                {briefStillWorking ? "Still working…" : "Generating…"}
-              </>
-            ) : dealBrief ? (
-              <>
-                <Sparkles className="h-3 w-3" /> Refresh brief
-              </>
-            ) : (
-              <>
-                <FileText className="h-3 w-3" /> Generate brief
-              </>
-            )}
-          </button>
-        </div>
-
-        {!dealRoom?.investor_user_id ? (
-          <p className="text-sm text-[#71717A]">No investor assigned</p>
-        ) : !dealBrief ? (
-          <p className="text-sm text-[#71717A]">No brief</p>
-        ) : (
-          <div>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <span
-                className="text-xs px-2 py-0.5 rounded-full font-medium"
-                style={
-                  dealBrief.match_score >= 80
-                    ? { background: "rgba(16,185,129,0.12)", color: "#10B981" }
-                    : dealBrief.match_score >= 50
-                    ? { background: "rgba(245,158,11,0.12)", color: "#F59E0B" }
-                    : { background: "rgba(239,68,68,0.12)", color: "#EF4444" }
-                }
-              >
-                {dealBrief.match_score}/100
-              </span>
-              {dealBrief.headline && (
-                <span className="text-sm font-semibold text-gray-900">{dealBrief.headline}</span>
-              )}
-            </div>
-            {dealBrief.investment_thesis && (
-              <p className="mt-2 text-sm text-gray-600 line-clamp-2">{dealBrief.investment_thesis}</p>
-            )}
-            <p className="mt-3 text-xs text-[#71717A]">
-              {dealBrief.generated_at
-                ? `Generated ${formatDistanceToNow(new Date(dealBrief.generated_at), { addSuffix: true })}`
-                : null}
-            </p>
-          </div>
-        )}
-      </section>
-
       <section className="mb-4">
-        <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-2">NDA &amp; CONFIDENTIALITY</h3>
-        <div className="bg-card border border-border/60 rounded-none p-5">
+        <h3 className="text-v2-ink-muted uppercase font-medium mb-2" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>NDA and confidentiality</h3>
+        <div className="bg-v2-panel border border-v2-rule p-5">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.2)]">
-                <Shield className="h-4 w-4 text-[#10B981]" />
+              <div className="grid h-9 w-9 shrink-0 place-items-center border border-v2-rule" style={{ borderRadius: "var(--v2-radius)" }}>
+                <Shield className="h-4 w-4 text-v2-satisfied" />
               </div>
               <div>
-                <div className="text-sm font-semibold text-foreground">NDA &amp; Confidentiality Agreement</div>
+                <div className="text-sm font-semibold text-v2-ink">NDA and confidentiality agreement</div>
                 {ndaDoc ? (
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(16,185,129,0.12)] text-[#10B981] text-[11px] font-semibold px-2 py-0.5">
-                      <CheckCircle2 className="h-3 w-3" />
+                  <div className="mt-1">
+                    <StatusLabel tone="satisfied">
                       Signed by {ndaSigners.length} {ndaSigners.length === 1 ? "party" : "parties"}
-                    </span>
-                    <span className="text-[11px] text-muted-foreground">
-                      · v{ndaDoc.version} · updated {formatDistanceToNow(new Date(ndaDoc.updated_at), { addSuffix: true })}
+                    </StatusLabel>
+                    <span className="text-v2-ink-muted ml-2" style={{ fontSize: "11px" }}>
+                      v{ndaDoc.version} · updated {formatDistanceToNow(new Date(ndaDoc.updated_at), { addSuffix: true })}
                     </span>
                   </div>
                 ) : (
-                  <div className="mt-0.5">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-accent text-muted-foreground text-[11px] font-semibold px-2 py-0.5">
-                      <Clock className="h-3 w-3" /> Pending
-                    </span>
+                  <div className="mt-1">
+                    <StatusLabel tone="attention">Pending</StatusLabel>
                   </div>
                 )}
               </div>
@@ -457,35 +370,29 @@ function OverviewPage() {
             <div className="flex items-center gap-2 shrink-0">
               {ndaDoc && (
                 <>
-                  <button
-                    onClick={() => setNdaModalOpen(true)}
-                    className="text-xs text-muted-foreground hover:text-foreground border border-border/60 rounded-lg px-3 py-1.5 transition-colors"
-                  >
+                  <V2Button variant="quiet" onClick={() => setNdaModalOpen(true)}>
                     View full NDA
-                  </button>
-                  <button
-                    onClick={handlePrintNda}
-                    className="inline-flex items-center gap-1.5 text-xs border border-border/60 rounded-lg px-3 py-1.5 text-muted-foreground hover:text-foreground transition-colors"
-                  >
+                  </V2Button>
+                  <V2Button variant="secondary" onClick={handlePrintNda}>
                     <Download className="h-3.5 w-3.5" /> Download PDF
-                  </button>
+                  </V2Button>
                 </>
               )}
             </div>
           </div>
 
           {ndaSigners.length > 0 && (
-            <div className="mt-4 border-t border-border/60 pt-4 space-y-2">
+            <div className="mt-4 border-t border-v2-rule-light pt-4 space-y-2">
               {(ndaSigners as any[]).map((signer, i) => (
-                <div key={i} className="flex items-center justify-between text-xs">
+                <div key={i} className="flex items-center justify-between" style={{ fontSize: "12px" }}>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-[#10B981] shrink-0" />
-                    <span className="font-medium text-foreground">{signer.signer_full_name || "—"}</span>
+                    <CheckCircle2 className="h-3.5 w-3.5 text-v2-satisfied shrink-0" />
+                    <span className="font-medium text-v2-ink">{signer.signer_full_name || "—"}</span>
                     {signer.signer_company && (
-                      <span className="text-muted-foreground">· {signer.signer_company}</span>
+                      <span className="text-v2-ink-muted">· {signer.signer_company}</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
+                  <div className="flex items-center gap-2 text-v2-ink-muted">
                     <span className="capitalize">{signer.role}</span>
                     <span>·</span>
                     <span>{signer.accepted_at ? format(new Date(signer.accepted_at), "MMM d, yyyy") : "—"}</span>
@@ -499,40 +406,40 @@ function OverviewPage() {
 
       {ndaModalOpen && ndaDoc && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm print:hidden"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 print:hidden"
           onClick={() => setNdaModalOpen(false)}
         >
           <div
-            className="w-full max-w-2xl max-h-[85vh] bg-card border border-border/60 rounded-2xl overflow-hidden shadow-2xl flex flex-col"
+            className="w-full max-w-2xl max-h-[85vh] bg-v2-panel border border-v2-rule overflow-hidden flex flex-col"
+            style={{ borderRadius: "var(--v2-radius)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border/60 shrink-0">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-v2-rule shrink-0">
               <div className="flex items-center gap-3">
-                <Shield className="h-5 w-5 text-[#10B981]" />
+                <Shield className="h-5 w-5 text-v2-satisfied" />
                 <div>
-                  <div className="font-semibold text-sm text-foreground">Non-Disclosure Agreement</div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="font-semibold text-sm text-v2-ink">Non-disclosure agreement</div>
+                  <div className="text-v2-ink-muted" style={{ fontSize: "11.5px" }}>
                     {companyName} · v{ndaDoc.version} · {ndaSigners.length} {ndaSigners.length === 1 ? "party" : "parties"}
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <button
-                  onClick={handlePrintNda}
-                  className="inline-flex items-center gap-1.5 text-xs bg-accent hover:bg-accent text-brand border border-brand/20 rounded-lg px-3 py-1.5 transition-colors"
-                >
+                <V2Button variant="secondary" onClick={handlePrintNda}>
                   <Download className="h-3.5 w-3.5" /> Download PDF
-                </button>
+                </V2Button>
                 <button
                   onClick={() => setNdaModalOpen(false)}
-                  className="p-1.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground"
+                  className="p-1.5 hover:bg-v2-accent-wash transition-colors text-v2-ink-muted"
+                  style={{ borderRadius: "var(--v2-radius)" }}
+                  aria-label="Close"
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
             </div>
             <div className="flex-1 overflow-y-auto px-6 py-5">
-              <pre className="text-xs leading-relaxed text-muted-foreground whitespace-pre-wrap font-sans">
+              <pre className="text-xs leading-relaxed text-v2-ink-secondary whitespace-pre-wrap font-v2-doc">
                 {ndaDoc.nda_text}
               </pre>
             </div>
@@ -555,20 +462,20 @@ function OverviewPage() {
         </div>
       </div>
 
-      <section className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4 mb-4">
-        <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-4">RECENT ACTIVITY</h3>
+      <section className="bg-v2-panel border border-v2-rule p-4 mb-4">
+        <h3 className="text-v2-ink-muted uppercase font-medium mb-4" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Recent activity</h3>
         {recentActivity.length === 0 ? (
-          <p className="text-[#71717A] text-sm">No activity</p>
+          <V2EmptyState text="No activity recorded for this room yet." />
         ) : (
           <div className="space-y-3">
             {(recentActivity as any[]).map((activity) => (
               <div key={activity.id} className="flex items-start gap-3">
-                <div className="w-2 h-2 rounded-full hs-gradient mt-1.5 flex-shrink-0" />
-                <div className="min-w-0 text-sm text-gray-700">
-                  <span className="font-semibold text-gray-900">{activity.actor_name ?? "Someone"}</span>
+                <div className="w-1.5 h-1.5 bg-v2-accent mt-1.5 flex-shrink-0" style={{ borderRadius: "50%" }} />
+                <div className="min-w-0 text-sm text-v2-ink-secondary">
+                  <span className="font-semibold text-v2-ink">{activity.actor_name ?? "Someone"}</span>
                   <span> · {activity.action_type ?? activity.target_label ?? "Activity"}</span>
                 </div>
-                <div className="ml-auto whitespace-nowrap text-xs text-[#71717A]">
+                <div className="ml-auto whitespace-nowrap text-v2-ink-muted" style={{ fontSize: "11px" }}>
                   {activity.created_at ? new Date(activity.created_at).toLocaleDateString() : ""}
                 </div>
               </div>
@@ -577,25 +484,29 @@ function OverviewPage() {
         )}
       </section>
 
-      <section className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4" data-testid="stage-progress-bar">
+      <section className="bg-v2-panel border border-v2-rule p-4" data-testid="stage-progress-bar">
         <div className="flex items-start">
           {progressStages.map((stage, index) => {
             const rank = UI_STAGE_ORDER.indexOf(stage.key);
             const isCurrent = rank === workflowRank;
             const isComplete = rank < workflowRank;
-            const dotClass = isCurrent
-              ? "hs-gradient text-white"
+            const dotColor = isCurrent
+              ? "var(--v2-accent)"
               : isComplete
-                ? "bg-green-500 text-white"
-                : "bg-gray-300 text-gray-500";
-            const lineClass = rank < workflowRank ? "bg-green-500" : "bg-gray-200";
+                ? "var(--v2-satisfied)"
+                : "var(--v2-rule)";
+            const lineColor = rank < workflowRank ? "var(--v2-satisfied)" : "var(--v2-rule-light)";
             return (
               <div key={stage.key} className="flex flex-1 items-start last:flex-none">
                 <div className="flex min-w-[64px] flex-col items-center gap-2">
-                  <div className={`h-4 w-4 rounded-full ${dotClass}`} data-testid={`stage-progress-dot-${stage.key}`} />
-                  <div className="text-center text-xs text-gray-500">{stage.label}</div>
+                  <div
+                    className="h-3.5 w-3.5"
+                    style={{ borderRadius: "50%", background: dotColor }}
+                    data-testid={`stage-progress-dot-${stage.key}`}
+                  />
+                  <div className="text-center text-v2-ink-muted" style={{ fontSize: "11px" }}>{stage.label}</div>
                 </div>
-                {index < progressStages.length - 1 && <div className={`mt-2 h-0.5 flex-1 ${lineClass}`} />}
+                {index < progressStages.length - 1 && <div className="mt-1.5 h-px flex-1" style={{ background: lineColor }} />}
               </div>
             );
           })}
@@ -603,17 +514,17 @@ function OverviewPage() {
         {stageRank(dealRoom?.workflow_stage) !== stageRank("closing") && (
           <div className="mt-5 flex justify-end">
             {pendingTransition ? (
-              <span className="text-xs text-amber-600 px-3 py-2">Stage advance pending approval…</span>
+              <span className="text-v2-attention px-3 py-2" style={{ fontSize: "12px" }}>Stage advance pending approval</span>
             ) : (
-              <button
+              <V2Button
+                variant="primary"
                 onClick={onRequestNextStage}
                 disabled={stageRequesting}
-                className="inline-flex items-center gap-1.5 hs-gradient text-foreground px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-60"
                 data-testid="request-next-stage"
               >
                 {stageRequesting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                Request next stage →
-              </button>
+                Request next stage
+              </V2Button>
             )}
           </div>
         )}
